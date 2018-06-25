@@ -251,7 +251,7 @@ void QnServerUpdatesWidget::initDropdownActions()
         [this]()
         {
             setMode(Mode::LatestVersion);
-            m_targetVersion = QnSoftwareVersion();
+            m_targetVersion = {};
             m_targetChangeset = QString();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_latestVersion);
@@ -272,8 +272,9 @@ void QnServerUpdatesWidget::initDropdownActions()
                 return;
 
             setMode(Mode::SpecificBuild);
-            QnSoftwareVersion version = qnStaticCommon->engineVersion();
-            m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
+            const auto version = qnStaticCommon->engineVersion();
+            m_targetVersion = nx::utils::SoftwareVersion(
+                version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
             m_targetChangeset = dialog.changeset();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_targetVersion);
@@ -300,7 +301,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             setMode(Mode::LocalFile);
             ui->targetVersionLabel->setText(kNoVersionNumberText);
             ui->selectUpdateTypeButton->setText(tr("Selected Update File"));
-            m_updatesModel->setLatestVersion(QnSoftwareVersion());
+            m_updatesModel->setLatestVersion({});
 
             checkForUpdates(false);
         });
@@ -545,7 +546,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
     m_updatesModel->setCheckResult(result);
 
-    QnSoftwareVersion displayVersion = result.version.isNull()
+    const auto displayVersion = result.version.isNull()
         ? m_latestVersion
         : result.version;
 
@@ -630,7 +631,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
     updateVersionPage();
 }
 
-bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)
+bool QnServerUpdatesWidget::restartClient(const nx::utils::SoftwareVersion& version)
 {
     /* Try to run applauncher if it is not running. */
     if (!applauncher::checkOnline())

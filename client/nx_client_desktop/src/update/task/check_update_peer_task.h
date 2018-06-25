@@ -6,6 +6,7 @@
 
 #include <utils/common/system_information.h>
 #include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/utils/software_version.h>
 
 class QnAsyncHttpClientReply;
 
@@ -32,8 +33,8 @@ protected:
 
 private:
     bool isUpdateNeed(
-        const QnSoftwareVersion& version,
-        const QnSoftwareVersion& updateVersion) const;
+        const nx::utils::SoftwareVersion& version,
+        const nx::utils::SoftwareVersion& updateVersion) const;
 
     void checkUpdate();
     bool checkCloudHost();

@@ -985,7 +985,7 @@ nx::utils::Url MediaServerProcess::appServerConnectionUrl() const
     {
         appServerUrl = nx::utils::Url::fromLocalFile( closeDirPath( getDataDirectory() ) );
     }
-    else 
+    else
     {
         appServerUrl.setScheme(nx::network::http::urlSheme(settings->secureAppserverConnection()));
         appServerUrl.setHost(host);
@@ -3326,7 +3326,7 @@ void MediaServerProcess::run()
     if (!m_cmdLineArguments.engineVersion.isNull())
     {
         qWarning() << "Starting with overridden version: " << m_cmdLineArguments.engineVersion;
-        qnStaticCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
+        qnStaticCommon->setEngineVersion(nx::utils::SoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
 #ifdef Q_OS_WIN32

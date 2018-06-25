@@ -58,6 +58,11 @@ bool SoftwareVersion::isNull() const
     return m_data[0] == 0 && m_data[1] == 0 && m_data[2] == 0 && m_data[3] == 0;
 }
 
+bool SoftwareVersion::isCompatible(const SoftwareVersion &r) const
+{
+    return m_data[0] == r.m_data[0] && m_data[1] == r.m_data[1];
+}
+
 bool operator<(const SoftwareVersion& l, const SoftwareVersion& r)
 {
     return std::lexicographical_compare(l.m_data.begin(), l.m_data.end(),

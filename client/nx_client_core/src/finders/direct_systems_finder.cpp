@@ -16,8 +16,8 @@ namespace {
 
 bool isOldServer(const QnModuleInformation& info)
 {
-    static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
-    return (info.version < kMinVersionWithSystem);
+    static const nx::vms::api::SoftwareVersion kMinVersionWithSystem = {2, 3};
+    return info.version < kMinVersionWithSystem;
 }
 
 bool isCloudAddress(const nx::network::HostAddress& address)

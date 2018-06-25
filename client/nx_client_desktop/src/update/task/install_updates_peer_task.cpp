@@ -17,30 +17,31 @@
 #include <nx/utils/log/log.h>
 #include <network/router.h>
 
-namespace detail {
-    using namespace std::chrono;
-    using namespace std::chrono_literals;
+namespace {
 
-    constexpr milliseconds kCheckTimeoutMs = 20min;
-    constexpr milliseconds kStartPingTimeoutMs = 1min;
-    constexpr milliseconds kPingIntervalMs = 10s;
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
-    const QnSoftwareVersion kUnauthenticatedUpdateMinVersion(3, 0);
+constexpr milliseconds kCheckTimeoutMs = 20min;
+constexpr milliseconds kStartPingTimeoutMs = 1min;
+constexpr milliseconds kPingIntervalMs = 10s;
 
-    QnInstallUpdatesPeerTask::PeersToQueryMap sortedPeers(QnRouter* router, const QSet<QnUuid>& peers)
-    {
-        QnInstallUpdatesPeerTask::PeersToQueryMap result;
+static const nx::utils::SoftwareVersion kUnauthenticatedUpdateMinVersion(3, 0);
 
-        if (!router)
-            return result;
+QnInstallUpdatesPeerTask::PeersToQueryMap sortedPeers(QnRouter* router, const QSet<QnUuid>& peers)
+{
+    QnInstallUpdatesPeerTask::PeersToQueryMap result;
 
-        for (const auto& id: peers)
-            result.emplace(router->routeTo(id).distance, id);
-
+    if (!router)
         return result;
-    }
 
-} using namespace detail;
+    for (const auto& id: peers)
+        result.emplace(router->routeTo(id).distance, id);
+
+    return result;
+}
+
+} // namespace;
 
 QnInstallUpdatesPeerTask::QnInstallUpdatesPeerTask(QObject* parent):
     QnNetworkPeerTask(parent)
@@ -61,7 +62,7 @@ void QnInstallUpdatesPeerTask::setUpdateId(const QString& updateId)
     m_updateId = updateId;
 }
 
-void QnInstallUpdatesPeerTask::setVersion(const QnSoftwareVersion& version)
+void QnInstallUpdatesPeerTask::setVersion(const nx::utils::SoftwareVersion& version)
 {
     m_version = version;
 }

@@ -175,7 +175,7 @@ void RemoteConnectionFactory::tryConnectToOldEC(const nx::utils::Url& ecUrl,
                 ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo)
         {
             if (errorCode == ErrorCode::ok
-                && oldECConnectionInfo.version >= QnSoftwareVersion(2, 3, 0))
+                && oldECConnectionInfo.version >= nx::utils::SoftwareVersion(2, 3, 0))
             {
                 // Somehow connected to 2.3 server with old ec connection. Returning
                 // error, since could not connect to ec 2.3 during normal connect.
@@ -218,7 +218,7 @@ static bool parseOldECConnectionInfo(
     ++data;
     if (data + fieldLen >= dataEnd)
         return false;
-    connectionInfo->version = QnSoftwareVersion(QByteArray::fromRawData(data, fieldLen));
+    connectionInfo->version = nx::vms::api::SoftwareVersion(QByteArray::fromRawData(data, fieldLen));
     return true;
 }
 
@@ -245,7 +245,7 @@ void RemoteConnectionFactory::connectToOldEC(const nx::utils::Url& ecUrl, Handle
             oldECConnectionInfo.ecUrl = httpsEcUrl;
             if (parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo))
             {
-                if (oldECConnectionInfo.version >= QnSoftwareVersion(2, 3))
+                if (oldECConnectionInfo.version >= nx::utils::SoftwareVersion(2, 3))
                 {
                     // Ignoring response from 2.3+ server received using compatibility response.
                     completionFunc(ErrorCode::ioError, QnConnectionInfo());

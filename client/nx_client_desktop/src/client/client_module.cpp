@@ -496,7 +496,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 
     if (!startupParams.engineVersion.isEmpty())
     {
-        QnSoftwareVersion version(startupParams.engineVersion);
+        nx::utils::SoftwareVersion version(startupParams.engineVersion);
         if (!version.isNull())
         {
             qWarning() << "Starting with overridden version: " << version.toString();

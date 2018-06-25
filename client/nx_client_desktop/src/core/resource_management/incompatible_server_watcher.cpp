@@ -19,7 +19,7 @@ namespace {
 
 bool isSuitable(const QnModuleInformation &moduleInformation)
 {
-    return moduleInformation.version >= QnSoftwareVersion(2, 3, 0, 0);
+    return moduleInformation.version >= nx::utils::SoftwareVersion(2, 3, 0, 0);
 }
 
 } // namespace

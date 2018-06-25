@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/software_version.h>
+#include <nx/vms/api/data/software_version.h>
 
 #include "json_data_parser.h"
 #include "../update_data.h"
@@ -33,11 +33,12 @@ struct CustomizationInfo
     QString updates_prefix;
     QString release_notes;
     QString description;
-    QMap<QString, QnSoftwareVersion> releases;
+    QMap<QString, nx::vms::api::SoftwareVersion> releases;
 };
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    CustomizationInfo, (json),
+    CustomizationInfo,
+    (json),
     (current_release)(updates_prefix)(release_notes)(description)(releases))
 
 const static QString kAlternativesServersKey = "__info";

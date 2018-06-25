@@ -9,7 +9,7 @@
 #include <network/module_information.h>
 #include <network/system_helpers.h>
 #include <nx_ec/impl/ec_api_impl.h>
-#include <utils/common/software_version.h>
+#include <nx/utils/software_version.h>
 #include <utils/common/app_info.h>
 
 #include <nx/network/app_info.h>
@@ -18,15 +18,15 @@
 
 namespace {
 
-QnSoftwareVersion minSupportedVersion(nx::vms::api::PeerType localPeerType)
+nx::utils::SoftwareVersion minSupportedVersion(nx::vms::api::PeerType localPeerType)
 {
     if (nx::vms::api::PeerData::isMobileClient(localPeerType))
-        return QnSoftwareVersion("2.5");
+        return nx::utils::SoftwareVersion("2.5");
 
     if (QnAppInfo::applicationPlatform() == lit("macosx"))
-        return QnSoftwareVersion("3.0");
+        return nx::utils::SoftwareVersion("3.0");
 
-    return QnSoftwareVersion("1.4");
+    return nx::utils::SoftwareVersion("1.4");
 }
 
 /* For mobile clients country-local customizations must be compatible with base, e.g.
@@ -55,7 +55,7 @@ bool compatibleCloudHost(const QString& cloudHost, bool isMobile)
 
 } // namespace
 
-QnSoftwareVersion QnConnectionValidator::minSupportedVersion()
+nx::vms::api::SoftwareVersion QnConnectionValidator::minSupportedVersion()
 {
     return ::minSupportedVersion(qnStaticCommon->localPeerType());
 }
@@ -113,7 +113,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QString& brand,
     const QString& customization,
     int protoVersion,
-    const QnSoftwareVersion& version,
+    const nx::vms::api::SoftwareVersion& version,
     const QString& cloudHost)
 {
     bool isMobile = nx::vms::api::PeerData::isMobileClient(qnStaticCommon->localPeerType());

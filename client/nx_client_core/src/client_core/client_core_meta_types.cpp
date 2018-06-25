@@ -30,6 +30,7 @@
 #include <nx/client/core/utils/quick_item_mouse_tracker.h>
 #include <nx/client/core/utils/operation_manager.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/vms/api/data/software_version.h>
 
 namespace nx {
 namespace client {
@@ -80,7 +81,7 @@ void initializeMetaTypes()
         "Nx.Utils", 1, 0, "Uuid", QLatin1String("Cannot create an instance of Uuid."));
     qmlRegisterUncreatableType<utils::Url>(
         "Nx.Utils", 1, 0, "Url", QLatin1String("Cannot create an instance of Url."));
-    qmlRegisterUncreatableType<QnSoftwareVersion>(
+    qmlRegisterUncreatableType<nx::vms::api::SoftwareVersion>(
         "Nx", 1, 0, "SoftwareVersion", QLatin1String("Cannot create an instance of SoftwareVersion."));
 
     FrameSection::registedQmlType();

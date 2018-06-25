@@ -198,8 +198,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnTimePeriodList>();
     qRegisterMetaType<MultiServerPeriodDataList>();
 
-    qRegisterMetaType<QnSoftwareVersion>();
-    qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
     qRegisterMetaType<QnSystemInformation>();
     qRegisterMetaTypeStreamOperators<QnSystemInformation>();
 

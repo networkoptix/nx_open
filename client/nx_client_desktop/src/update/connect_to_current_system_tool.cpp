@@ -14,7 +14,6 @@
 #include <network/system_helpers.h>
 
 #include <utils/merge_systems_tool.h>
-#include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 

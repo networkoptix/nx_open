@@ -34,7 +34,7 @@ namespace {
 using MergeStatus = ::utils::MergeSystemsStatus::Value;
 
 // Minimal server version which could be configured.
-static const QnSoftwareVersion kMinimalVersion(2, 3);
+static const nx::utils::SoftwareVersion kMinimalVersion = {2, 3};
 
 static const std::chrono::milliseconds kRequestTimeout = std::chrono::minutes(1);
 

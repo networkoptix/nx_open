@@ -28,6 +28,7 @@
 #include "data/resource_type_data.h"
 #include "data/reverse_connection_data.h"
 #include "data/runtime_data.h"
+#include "data/software_version.h"
 #include "data/system_id_data.h"
 #include "data/system_merge_history_record.h"
 #include "data/tran_state_data.h"
@@ -114,6 +115,8 @@ void Metatypes::initialize()
     qRegisterMetaType<RuntimeData>();
     qRegisterMetaType<ServerFootageData>();
     qRegisterMetaType<ServerFootageDataList>();
+    qRegisterMetaType<SoftwareVersion>();
+    qRegisterMetaTypeStreamOperators<SoftwareVersion>();
     qRegisterMetaType<StorageData>();
     qRegisterMetaType<StorageDataList>();
     qRegisterMetaType<SyncRequestData>();

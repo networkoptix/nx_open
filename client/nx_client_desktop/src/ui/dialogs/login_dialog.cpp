@@ -520,8 +520,8 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
                 || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult;
 
             auto versionFormat = showBuild
-                ? QnSoftwareVersion::FullFormat
-                : QnSoftwareVersion::BugfixFormat;
+                ? nx::utils::SoftwareVersion::FullFormat
+                : nx::utils::SoftwareVersion::BugfixFormat;
 
             vm.title += lit(" (v%1)")
                 .arg(data.info.version.toString(versionFormat));

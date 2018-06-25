@@ -8,7 +8,6 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/system_information.h>
-#include <utils/common/software_version.h>
 #include <nx/utils/singleton.h>
 #include <common/common_module_aware.h>
 

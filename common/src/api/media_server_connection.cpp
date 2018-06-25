@@ -549,7 +549,7 @@ void QnMediaServerConnection::addOldVersionPtzParams(
     const QnNetworkResourcePtr& camera,
     QnRequestParamList& params)
 {
-    if (m_serverVersion < QnSoftwareVersion(3, 0))
+    if (m_serverVersion < nx::utils::SoftwareVersion(3, 0))
         params << QnRequestParam("resourceId", QnLexical::serialized(camera->getUniqueId()));
 }
 
@@ -1314,14 +1314,14 @@ int QnMediaServerConnection::modulesInformation(QObject* target, const char* slo
 int QnMediaServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request, QObject* target, const char* slot)
 {
-    QnSoftwareVersion connectionVersion;
+    nx::utils::SoftwareVersion connectionVersion;
     if (const auto& connection = commonModule()->ec2Connection())
         connectionVersion = connection->connectionInfo().version;
 
     QnChunksRequestData fixedFormatRequest(request);
     fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
 
-    if (!connectionVersion.isNull() && connectionVersion < QnSoftwareVersion(3, 0))
+    if (!connectionVersion.isNull() && connectionVersion < nx::utils::SoftwareVersion(3, 0))
         fixedFormatRequest.requestVersion = QnChunksRequestData::RequestVersion::v2_6;
 
     return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,

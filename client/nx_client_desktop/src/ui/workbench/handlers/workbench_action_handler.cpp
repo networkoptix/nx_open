@@ -2413,8 +2413,8 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     if (!watcher->hasMismatches())
         return;
 
-    QnSoftwareVersion latestVersion = watcher->latestVersion();
-    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+    const auto latestVersion = watcher->latestVersion();
+    auto latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
 
     // if some component is newer than the newest mediaserver, focus on its version
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))

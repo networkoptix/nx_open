@@ -2,16 +2,15 @@
 * 30 sep 2013
 * a.kolesnikov
 ***********************************************************/
-
-#ifndef COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H
-#define COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QDialog>
 
-#include <utils/common/software_version.h>
 #include <utils/common/connective.h>
 #include <update/updates_common.h>
 #include <ui/dialogs/common/dialog.h>
+
+#include <nx/vms/api/data/software_version.h>
 
 class QnCompatibilityVersionInstallationTool;
 class QnMediaServerUpdateTool;
@@ -21,19 +20,21 @@ namespace Ui {
 }
 
 // TODO: #dklychkov rename class in 2.4
-class CompatibilityVersionInstallationDialog : public Connective<QnDialog> {
+class CompatibilityVersionInstallationDialog: public Connective<QnDialog>
+{
     Q_OBJECT
+    using base_type = Connective<QnDialog>;
 
-    typedef Connective<QnDialog> base_type;
 public:
-    CompatibilityVersionInstallationDialog(const QnSoftwareVersion &version, QWidget *parent = 0);
+    CompatibilityVersionInstallationDialog(
+        const nx::vms::api::SoftwareVersion& version, QWidget* parent = nullptr);
     virtual ~CompatibilityVersionInstallationDialog();
 
     bool installationSucceeded() const;
 
     virtual int exec() override;
 
-    static bool useUpdate(const QnSoftwareVersion &version);
+    static bool useUpdate(const nx::vms::api::SoftwareVersion& version);
 
 public slots:
     virtual void reject() override;
@@ -50,11 +51,9 @@ private:
 private:
     QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;
 
-    QnSoftwareVersion m_versionToInstall;
+    nx::vms::api::SoftwareVersion m_versionToInstall;
     QScopedPointer<QnCompatibilityVersionInstallationTool> m_compatibilityTool;
     QScopedPointer<QnMediaServerUpdateTool> m_updateTool;
 
     bool m_installationOk;
 };
-
-#endif  //COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H

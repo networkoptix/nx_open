@@ -70,7 +70,7 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QnSoftwareVersion &version,
+    const nx::utils::SoftwareVersion& version,
     const QString& module,
     const QString& installationPath);
 
@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
             mirrorListUrl,
             productNameToInstall,
             customizationToInstall,
-            QnSoftwareVersion(versionToInstall),
+            nx::utils::SoftwareVersion(versionToInstall),
             moduleToInstall,
             installationPath);
 
@@ -274,7 +274,7 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QnSoftwareVersion& version,
+    const nx::utils::SoftwareVersion& version,
     const QString& module,
     const QString& installationPath)
 {

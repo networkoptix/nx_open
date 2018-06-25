@@ -25,7 +25,7 @@ public:
         module.type = lit("test");
         module.customization = lit("test");
         module.brand = lit("test");
-        module.version = QnSoftwareVersion(1, 2, 3, 123);
+        module.version = nx::utils::SoftwareVersion(1, 2, 3, 123);
         module.type = lit("test");
         module.name = lit("test");
         module.port = 7001;

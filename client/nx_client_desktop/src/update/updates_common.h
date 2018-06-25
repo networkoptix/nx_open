@@ -3,8 +3,9 @@
 #include <QtCore/QCoreApplication>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+
+#include <nx/utils/software_version.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
 
@@ -24,15 +25,12 @@ struct QnCheckForUpdateResult
         DowngradeIsProhibited
     };
 
-    QnCheckForUpdateResult():
-        result(NoNewerVersion) {}
+    QnCheckForUpdateResult() = default;
+    explicit QnCheckForUpdateResult(Value result): result(result) {}
 
-    explicit QnCheckForUpdateResult(Value result):
-        result(result) {}
-
-    Value result;
+    Value result = NoNewerVersion;
     QSet<QnSystemInformation> systems; /**< Set of supported system, for which updates were found. */
-    QnSoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     bool clientInstallerRequired = false;
     nx::utils::Url releaseNotesUrl;
     QString description;
@@ -43,8 +41,8 @@ Q_DECLARE_METATYPE(QnCheckForUpdateResult)
 struct QnUpdateResult
 {
     Q_DECLARE_TR_FUNCTIONS(QnUpdateResult)
-public:
 
+public:
     enum Value
     {
         Successful,
@@ -64,20 +62,15 @@ public:
         RestInstallationFailed
     };
 
-    QnUpdateResult():
-        result(Cancelled)
-    {}
-
-    explicit QnUpdateResult(Value result):
-        result(result)
-    {}
+    QnUpdateResult() = default;
+    explicit QnUpdateResult(Value result): result(result) {}
 
     QString errorMessage() const;
 
-    Value result;
-    QnSoftwareVersion targetVersion;
-    bool clientInstallerRequired;
-    bool protocolChanged;
+    Value result = Cancelled;
+    nx::utils::SoftwareVersion targetVersion;
+    bool clientInstallerRequired = false;
+    bool protocolChanged = false;
     QnMediaServerResourceList failedServers;
 };
 Q_DECLARE_METATYPE(QnUpdateResult)
@@ -111,7 +104,7 @@ Q_DECLARE_METATYPE(QnFullUpdateStage)
 
 struct QnUpdateFileInformation
 {
-    QnSoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     QString fileName;
     qint64 fileSize = 0;
     QString baseFileName;
@@ -120,27 +113,31 @@ struct QnUpdateFileInformation
 
     QnUpdateFileInformation() {}
 
-    QnUpdateFileInformation(const QnSoftwareVersion &version, const QString &fileName) :
+    QnUpdateFileInformation(const nx::utils::SoftwareVersion& version, const QString& fileName):
         version(version), fileName(fileName)
-    {}
+    {
+    }
 
-    QnUpdateFileInformation(const QnSoftwareVersion &version, const nx::utils::Url &url) :
+    QnUpdateFileInformation(const nx::utils::SoftwareVersion& version, const nx::utils::Url& url):
         version(version), url(url)
-    {}
+    {
+    }
 };
-typedef QSharedPointer<QnUpdateFileInformation> QnUpdateFileInformationPtr;
+
+using QnUpdateFileInformationPtr = QSharedPointer<QnUpdateFileInformation>;
 
 struct QnUpdateTarget
 {
     QnUpdateTarget(
         QSet<QnUuid> targets,
-        const QnSoftwareVersion& version,
+        const nx::utils::SoftwareVersion& version,
         bool denyClientUpdates = false)
         :
         targets(targets),
         version(version),
         denyClientUpdates(denyClientUpdates)
-    {}
+    {
+    }
 
     QnUpdateTarget(
         QSet<QnUuid> targets,
@@ -150,10 +147,11 @@ struct QnUpdateTarget
         targets(targets),
         fileName(fileName),
         denyClientUpdates(denyClientUpdates)
-    {}
+    {
+    }
 
     QSet<QnUuid> targets;
-    QnSoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     QString fileName;
     bool denyClientUpdates;
 };

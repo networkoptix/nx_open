@@ -363,7 +363,7 @@ private:
     void addOldVersionPtzParams(const QnNetworkResourcePtr& camera, QnRequestParamList& params);
 
 private:
-    QnSoftwareVersion m_serverVersion;
+    nx::vms::api::SoftwareVersion m_serverVersion;
     QString m_serverId; // for debug purposes so storing in string to avoid conversions
     QString m_proxyAddr;
     int m_proxyPort;

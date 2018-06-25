@@ -4,7 +4,7 @@
 
 #include <utils/math/math.h>
 #include <utils/common/app_info.h>
-#include <utils/common/software_version.h>
+#include <nx/vms/api/data/software_version.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
 #include <network/system_description.h>
@@ -76,15 +76,17 @@ public:
 
     void resetModel();
 
-    QnSoftwareVersion getIncompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
-    QnSoftwareVersion getCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
+    nx::vms::api::SoftwareVersion getIncompatibleVersion(
+        const QnSystemDescriptionPtr& systemDescription) const;
+    nx::vms::api::SoftwareVersion getCompatibleVersion(
+        const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
     bool isCompatibleInternal(const QnSystemDescriptionPtr& systemDescription) const;
 
     QnDisconnectHelper disconnectHelper;
     InternalList internalData;
-    QnSoftwareVersion minimalVersion;
+    nx::vms::api::SoftwareVersion minimalVersion;
 };
 
 QnSystemsModel::QnSystemsModel(QObject *parent)
@@ -238,7 +240,7 @@ void QnSystemsModel::setMinimalVersion(const QString& minimalVersion)
 {
     Q_D(QnSystemsModel);
 
-    const auto version = QnSoftwareVersion(minimalVersion);
+    const auto version = nx::vms::api::SoftwareVersion(minimalVersion);
 
     if (d->minimalVersion == version)
         return;
@@ -456,7 +458,7 @@ void QnSystemsModelPrivate::resetModel()
         addSystem(system);
 }
 
-QnSoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
+nx::vms::api::SoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
     const QnSystemDescriptionPtr& systemDescription) const
 {
     for (const auto& serverInfo: systemDescription->servers())
@@ -472,16 +474,16 @@ QnSoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
         }
     }
 
-    return QnSoftwareVersion();
+    return {};
 }
 
-QnSoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
+nx::vms::api::SoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
     const QnSystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
 
     if (servers.isEmpty())
-        return QnSoftwareVersion();
+        return {};
 
     const auto predicate =
         [this, systemDescription](const QnModuleInformation& serverInfo)
@@ -499,7 +501,7 @@ QnSoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
     const auto incompatibleIt = std::find_if(servers.begin(), servers.end(), predicate);
 
     if (incompatibleIt == servers.end())
-        return QnSoftwareVersion();
+        return {};
 
     return incompatibleIt->version;
 }

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <common/common_globals.h>
-
 #include <nx_ec/ec_api_fwd.h>
+
+#include <nx/vms/api/data/software_version.h>
 
 struct QnConnectionInfo;
 struct QnModuleInformation;
-class QnSoftwareVersion;
 class QnCommonModule;
 
 /**
@@ -25,7 +25,7 @@ class QnCommonModule;
 class QnConnectionValidator
 {
 public:
-    static QnSoftwareVersion minSupportedVersion();
+    static nx::vms::api::SoftwareVersion minSupportedVersion();
 
     static Qn::ConnectionResult validateConnection(const QnModuleInformation& info);
     static Qn::ConnectionResult validateConnection(const QnConnectionInfo& connectionInfo,
@@ -39,6 +39,6 @@ protected:
         const QString& brand,
         const QString& customization,
         int protoVersion,
-        const QnSoftwareVersion& version,
+        const nx::vms::api::SoftwareVersion& version,
         const QString& cloudHost);
 };

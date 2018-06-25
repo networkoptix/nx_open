@@ -25,103 +25,110 @@
 #include <nx/network/http/async_http_client_reply.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/software_version.h>
 
 namespace {
 
-    const QString buildInformationSuffix = lit("update.json");
-    const QString updateInformationFileName = (lit("update.json"));
+static const QString kBuildInformationSuffix = lit("update.json");
+static const QString kUpdateInformationFileName = (lit("update.json"));
 
-    const int httpResponseTimeoutMs = 30000;
+constexpr int kHttpResponseTimeoutMs = 30000;
 
-    struct CustomizationInfo
-    {
-        QString current_release;
-        QString updates_prefix;
-        QString release_notes;
-        QString description;
-        QMap<QString, QnSoftwareVersion> releases;
-    };
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-        CustomizationInfo, (json),
-        (current_release)(updates_prefix)(release_notes)(description)(releases))
+struct CustomizationInfo
+{
+    QString current_release;
+    QString updates_prefix;
+    QString release_notes;
+    QString description;
+    QMap<QString, nx::vms::api::SoftwareVersion> releases;
+};
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    CustomizationInfo, (json),
+    (current_release)(updates_prefix)(release_notes)(description)(releases))
 
-    struct UpdateFileInformation
-    {
-        QString md5;
-        QString file;
-        qint64 size;
-    };
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-        UpdateFileInformation, (json),
-        (md5)(file)(size))
+struct UpdateFileInformation
+{
+    QString md5;
+    QString file;
+    qint64 size;
+};
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    UpdateFileInformation, (json),
+    (md5)(file)(size))
 
-    struct BuildInformation
-    {
-        using PackagesHash = QHash<QString, QHash<QString, UpdateFileInformation>>;
-        PackagesHash packages;
-        PackagesHash clientPackages;
-        QnSoftwareVersion version;
-        QString cloudHost;
-        QnSoftwareVersion minimalClientVersion;
-    };
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-        BuildInformation, (json),
-        (packages)(clientPackages)(version)(cloudHost)(minimalClientVersion))
+struct BuildInformation
+{
+    using PackagesHash = QHash<QString, QHash<QString, UpdateFileInformation>>;
+    PackagesHash packages;
+    PackagesHash clientPackages;
+    nx::vms::api::SoftwareVersion version;
+    QString cloudHost;
+    nx::vms::api::SoftwareVersion minimalClientVersion;
+};
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    BuildInformation, (json),
+    (packages)(clientPackages)(version)(cloudHost)(minimalClientVersion))
 
-    QnSoftwareVersion minimalVersionForUpdatePackage(const QString &fileName) {
-        QuaZipFile infoFile(fileName, updateInformationFileName);
-        if (!infoFile.open(QuaZipFile::ReadOnly))
-            return QnSoftwareVersion();
+nx::utils::SoftwareVersion minimalVersionForUpdatePackage(const QString& fileName)
+{
+    QuaZipFile infoFile(fileName, kUpdateInformationFileName);
+    if (!infoFile.open(QuaZipFile::ReadOnly))
+        return {};
 
-        QString data = QString::fromUtf8(infoFile.readAll());
-        infoFile.close();
+    QString data = QString::fromUtf8(infoFile.readAll());
+    infoFile.close();
 
-        QRegExp minimalVersionRegExp(QLatin1String("\"minimalVersion\"\\s*:\\s*\"([\\d\\.]+)\""));
-        if (minimalVersionRegExp.indexIn(data) != -1)
-            return QnSoftwareVersion(minimalVersionRegExp.cap(1));
+    QRegExp minimalVersionRegExp(QLatin1String("\"minimalVersion\"\\s*:\\s*\"([\\d\\.]+)\""));
+    if (minimalVersionRegExp.indexIn(data) != -1)
+        return nx::utils::SoftwareVersion(minimalVersionRegExp.cap(1));
 
-        return QnSoftwareVersion();
-    }
+    return {};
+}
 
-    QnSoftwareVersion maximumAvailableVersion() {
-        QList<QnSoftwareVersion> versions;
-        if (applauncher::getInstalledVersions(&versions) != applauncher::api::ResultType::ok)
-            versions.append(QnSoftwareVersion(qApp->applicationVersion()));
+nx::utils::SoftwareVersion maximumAvailableVersion()
+{
+    QList<nx::utils::SoftwareVersion> versions;
+    if (applauncher::getInstalledVersions(&versions) != applauncher::api::ResultType::ok)
+        versions.append(nx::utils::SoftwareVersion(qApp->applicationVersion()));
 
-        return *std::max_element(versions.begin(), versions.end());
-    }
+    return *std::max_element(versions.begin(), versions.end());
+}
 
-    QnUpdateFileInformationPtr createFileInformation(
-        const QString& fileName, const QnSoftwareVersion& version)
-    {
-        QFile file(fileName);
+QnUpdateFileInformationPtr createFileInformation(
+    const QString& fileName, const nx::utils::SoftwareVersion& version)
+{
+    QFile file(fileName);
 
-        QnUpdateFileInformationPtr updateFileInformation(
-            new QnUpdateFileInformation(version, fileName));
-        updateFileInformation->fileSize = file.size();
-        updateFileInformation->md5 = makeMd5(&file);
+    QnUpdateFileInformationPtr updateFileInformation(
+        new QnUpdateFileInformation(version, fileName));
 
-        return updateFileInformation;
-    }
+    updateFileInformation->fileSize = file.size();
+    updateFileInformation->md5 = makeMd5(&file);
+
+    return updateFileInformation;
+}
 
 } // namespace
 
-QnCheckForUpdatesPeerTask::QnCheckForUpdatesPeerTask(const QnUpdateTarget &target, QObject *parent) :
+QnCheckForUpdatesPeerTask::QnCheckForUpdatesPeerTask(const QnUpdateTarget& target, QObject* parent):
     QnNetworkPeerTask(parent),
     m_mainUpdateUrl(nx::utils::Url(qnSettings->updateFeedUrl())),
     m_target(target)
 {
 }
 
-QHash<QnSystemInformation, QnUpdateFileInformationPtr> QnCheckForUpdatesPeerTask::updateFiles() const {
+QHash<QnSystemInformation, QnUpdateFileInformationPtr> QnCheckForUpdatesPeerTask::updateFiles() const
+{
     return m_updateFiles;
 }
 
-QnUpdateFileInformationPtr QnCheckForUpdatesPeerTask::clientUpdateFile() const {
+QnUpdateFileInformationPtr QnCheckForUpdatesPeerTask::clientUpdateFile() const
+{
     return m_clientUpdateFile;
 }
 
-void QnCheckForUpdatesPeerTask::doStart() {
+void QnCheckForUpdatesPeerTask::doStart()
+{
     if (!m_target.fileName.isEmpty())
         checkLocalUpdates();
     else
@@ -129,8 +136,8 @@ void QnCheckForUpdatesPeerTask::doStart() {
 }
 
 bool QnCheckForUpdatesPeerTask::isUpdateNeed(
-    const QnSoftwareVersion& version,
-    const QnSoftwareVersion& updateVersion) const
+    const nx::utils::SoftwareVersion& version,
+    const nx::utils::SoftwareVersion& updateVersion) const
 {
     return (m_targetMustBeNewer && updateVersion > version)
         || (!m_targetMustBeNewer && updateVersion != version);
@@ -150,7 +157,7 @@ void QnCheckForUpdatesPeerTask::checkUpdate()
 bool QnCheckForUpdatesPeerTask::checkCloudHost()
 {
     /* Ignore cloud host for versions lower than 3.0. */
-    static const QnSoftwareVersion kCloudRequiredVersion(3, 0);
+    static const nx::utils::SoftwareVersion kCloudRequiredVersion(3, 0);
 
     if (m_target.version < kCloudRequiredVersion)
         return true;
@@ -236,10 +243,10 @@ bool QnCheckForUpdatesPeerTask::isDowngradeAllowed()
 void QnCheckForUpdatesPeerTask::checkBuildOnline()
 {
     nx::utils::Url url(lit("%1/%2/%3")
-        .arg(m_updateLocationPrefix).arg(m_target.version.build()).arg(buildInformationSuffix));
+        .arg(m_updateLocationPrefix).arg(m_target.version.build()).arg(kBuildInformationSuffix));
 
     auto httpClient = nx::network::http::AsyncHttpClient::create();
-    httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
+    httpClient->setResponseReadTimeoutMs(kHttpResponseTimeoutMs);
     auto reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished,
         this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
@@ -331,8 +338,11 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
     }
 
     QString currentRelease = customizationInfo.current_release;
-    if (QnSoftwareVersion(currentRelease) < qnStaticCommon->engineVersion())
-        currentRelease = qnStaticCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
+    if (nx::utils::SoftwareVersion(currentRelease) < qnStaticCommon->engineVersion())
+    {
+        currentRelease = qnStaticCommon->engineVersion().toString(
+            nx::utils::SoftwareVersion::MinorFormat);
+    }
 
     const auto latestVersion = customizationInfo.releases[currentRelease];
     const QString updatesPrefix = customizationInfo.updates_prefix;
@@ -351,7 +361,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
     else if (m_target.version.build() == 0)
     {
         m_target.version = customizationInfo.releases[
-            m_target.version.toString(QnSoftwareVersion::MinorFormat)];
+            m_target.version.toString(nx::utils::SoftwareVersion::MinorFormat)];
     }
 
     m_updateLocationPrefix = updatesPrefix;
@@ -468,7 +478,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
                 cl_logDEBUG1);
         }
 
-        QnSoftwareVersion minimalVersionToUpdate = buildInformation.minimalClientVersion;
+        const auto minimalVersionToUpdate = buildInformation.minimalClientVersion;
         m_clientRequiresInstaller = !minimalVersionToUpdate.isNull()
             && minimalVersionToUpdate > maximumAvailableVersion();
     }
@@ -502,7 +512,7 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error)
     for (const auto& entry: zipExtractor->fileList())
     {
         QString fileName = dir.absoluteFilePath(entry);
-        QnSoftwareVersion version;
+        nx::utils::SoftwareVersion version;
         QnSystemInformation sysInfo;
         QString cloudHost;
         bool isClient = false;
@@ -552,7 +562,7 @@ void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value)
 {
     if (m_checkLatestVersion && value == QnCheckForUpdateResult::NoSuchBuild)
     {
-        m_target.version = QnSoftwareVersion();
+        m_target.version = {};
         value = QnCheckForUpdateResult::NoNewerVersion;
     }
 
@@ -597,7 +607,7 @@ bool QnCheckForUpdatesPeerTask::tryNextServer()
     m_currentUpdateUrl = serverInfo.url;
 
     auto httpClient = nx::network::http::AsyncHttpClient::create();
-    httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
+    httpClient->setResponseReadTimeoutMs(kHttpResponseTimeoutMs);
     auto reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished,
         this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);

@@ -73,7 +73,7 @@ int QnUpdateRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    QnSoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     QnSystemInformation sysInfo;
 
     {

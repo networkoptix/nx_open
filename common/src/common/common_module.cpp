@@ -183,7 +183,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_moduleInformation.systemInformation = QnSystemInformation::currentSystemInformation();
     m_moduleInformation.brand = QnAppInfo::productNameShort();
     m_moduleInformation.customization = QnAppInfo::customizationName();
-    m_moduleInformation.version = QnSoftwareVersion(QnAppInfo::engineVersion());
+    m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::engineVersion());
     m_moduleInformation.type = clientMode ?
         QnModuleInformation::nxClientId() : QnModuleInformation::nxMediaServerId();
 }

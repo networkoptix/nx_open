@@ -8,9 +8,9 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/resource_types.h>
+#include <nx/vms/api/data/software_version.h>
 
 #include <common/common_globals.h>
-#include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 
 struct QnModuleInformation
@@ -18,7 +18,7 @@ struct QnModuleInformation
     QString type;
     QString customization;
     QString brand;
-    QnSoftwareVersion version;
+    nx::vms::api::SoftwareVersion version;
     QnSystemInformation systemInformation;
     QString systemName;
     QString name;

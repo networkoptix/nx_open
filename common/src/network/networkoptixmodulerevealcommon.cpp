@@ -83,7 +83,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
 
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
     type = map.value(lit("application")).toString();
-    version = QnSoftwareVersion(map.value(lit("version")).toString());
+    version = nx::utils::SoftwareVersion(map.value(lit("version")).toString());
     systemInformation = map.value(lit("systemInformation")).toString();
     customization = map.value(lit("customization")).toString();
     brand = map.value(lit("brand")).toString();

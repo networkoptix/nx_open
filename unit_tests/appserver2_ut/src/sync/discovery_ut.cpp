@@ -50,7 +50,7 @@ protected:
 
     void initServerData(::ec2::Appserver2Process* module)
     {
-        QnSoftwareVersion version(1, 2, 3, 123);
+        nx::utils::SoftwareVersion version(1, 2, 3, 123);
         const auto connection = module->ecConnection();
         ASSERT_NE(nullptr, connection);
 

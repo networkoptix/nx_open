@@ -6,8 +6,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <update/task/network_peer_task.h>
-#include <utils/common/software_version.h>
 #include <network/module_information.h>
+
+#include <nx/utils/software_version.h>
 
 class QTimer;
 struct QnUploadUpdateReply;
@@ -29,7 +30,7 @@ public:
     explicit QnInstallUpdatesPeerTask(QObject* parent = nullptr);
 
     void setUpdateId(const QString& updateId);
-    void setVersion(const QnSoftwareVersion& version);
+    void setVersion(const nx::utils::SoftwareVersion& version);
 
 signals:
     void protocolProblemDetected();
@@ -57,7 +58,7 @@ private:
     QString m_updateId;
     QnMediaServerResourcePtr m_ecServer;
     QnMediaServerConnectionPtr m_ecConnection;
-    QnSoftwareVersion m_version;
+    nx::utils::SoftwareVersion m_version;
     QSet<QnUuid> m_stoppingPeers;
     QSet<QnUuid> m_restartingPeers;
     QSet<QnUuid> m_pendingPeers;

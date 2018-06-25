@@ -8,8 +8,9 @@
 
 #include <update/updates_common.h>
 
-#include <utils/common/software_version.h>
+
 #include <utils/common/system_information.h>
+#include <nx/utils/software_version.h>
 #include <nx/utils/thread/long_runnable.h>
 
 struct QnPeerUpdateInformation {
@@ -30,7 +31,7 @@ struct QnPeerUpdateInformation {
 
     QnMediaServerResourcePtr server;
     QnPeerUpdateStage stage;
-    QnSoftwareVersion sourceVersion;
+    nx::utils::SoftwareVersion sourceVersion;
     QnUpdateFileInformationPtr updateInformation;
 
     int progress;

@@ -88,7 +88,8 @@ void PtzAvailabilityWatcher::updateAvailability()
         return;
 
     const auto server = m_camera->getParentServer();
-    const bool wrongServerVersion = !server || server->getVersion() < QnSoftwareVersion(2, 6);
+    const bool wrongServerVersion = !server 
+        || server->getVersion() < nx::utils::SoftwareVersion(2, 6);
     if (wrongServerVersion)
         return;
 

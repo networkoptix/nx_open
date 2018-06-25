@@ -27,7 +27,8 @@ int castTileToInt(QnTileTest test)
 void addServerToSystem(
     const QnSystemDescriptionPtr& baseSystem,
     const nx::utils::Url& url = nx::utils::Url::fromUserInput(lit("127.0.0.1:7001")),
-    const QnSoftwareVersion& version = QnSoftwareVersion(QnAppInfo::applicationVersion()),
+    const nx::utils::SoftwareVersion& version =
+        nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()),
     int protoVersion = QnAppInfo::ec2ProtoVersion())
 {
     const auto system = baseSystem.dynamicCast<QnLocalSystemDescription>();
@@ -68,7 +69,8 @@ void removeServerFromSystem(
 
 QnSystemDescriptionPtr createSystem(
     const nx::utils::Url& url = nx::utils::Url::fromUserInput(lit("127.0.0.1:7001")),
-    const QnSoftwareVersion& version = QnSoftwareVersion(QnAppInfo::applicationVersion()),
+    const nx::utils::SoftwareVersion& version =
+        nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()),
     int protoVersion = QnAppInfo::ec2ProtoVersion())
 {
     static int systemNumber = 0;
@@ -332,7 +334,7 @@ void QnSystemTilesTestCase::maximizeTest(CompletionHandler completionHandler)
 void QnSystemTilesTestCase::versionChangeTest(CompletionHandler completionHandler)
 {
     const auto system = createSystem(nx::utils::Url::fromUserInput(lit("127.0.0.1:7002")),
-        QnSoftwareVersion(2, 6), QnAppInfo::ec2ProtoVersion() - 10);
+        nx::utils::SoftwareVersion(2, 6), QnAppInfo::ec2ProtoVersion() - 10);
     setSystemMaxWeight(system);
     const auto systemRemoveGuard = addSystem(system, m_finder);
 

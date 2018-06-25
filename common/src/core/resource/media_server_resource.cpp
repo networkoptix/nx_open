@@ -78,7 +78,7 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
 QnMediaServerResource::~QnMediaServerResource()
 {
     directDisconnectAll();
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     m_runningIfRequests.clear();
 }
 
@@ -106,14 +106,14 @@ void QnMediaServerResource::resetCachedValues()
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     if (m_firstCamera.isNull() && resource.dynamicCast<QnSecurityCamResource>() &&  resource->getParentId() == getId())
         m_firstCamera = resource;
 }
 
 void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     if (m_firstCamera && resource->getId() == m_firstCamera->getId())
         m_firstCamera.clear();
 }
@@ -134,7 +134,7 @@ QString QnMediaServerResource::getName() const
 {
     if (getServerFlags().testFlag(vms::api::SF_Edge))
     {
-        QnMutexLocker lock( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
@@ -175,7 +175,7 @@ void QnMediaServerResource::setName( const QString& name )
 void QnMediaServerResource::setNetAddrList(const QList<nx::network::SocketAddress>& netAddrList)
 {
     {
-        QnMutexLocker lock( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         if (m_netAddrList == netAddrList)
             return;
         m_netAddrList = netAddrList;
@@ -185,7 +185,7 @@ void QnMediaServerResource::setNetAddrList(const QList<nx::network::SocketAddres
 
 QList<nx::network::SocketAddress> QnMediaServerResource::getNetAddrList() const
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     return m_netAddrList;
 }
 
@@ -287,7 +287,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 
 rest::QnConnectionPtr QnMediaServerResource::restConnection()
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
     if (!m_restConnection)
         m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(
@@ -465,10 +465,9 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
     }
 }
 
-QnSoftwareVersion QnMediaServerResource::getVersion() const
+nx::utils::SoftwareVersion QnMediaServerResource::getVersion() const
 {
-    QnMutexLocker lock( &m_mutex );
-
+    QnMutexLocker lock(&m_mutex);
     return m_version;
 }
 
@@ -517,10 +516,10 @@ bool QnMediaServerResource::isRedundancy() const
     return (*lk)->isRedundancyEnabled;
 }
 
-void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
+void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version)
 {
     {
-        QnMutexLocker lock( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         if (m_version == version)
             return;
         m_version = version;
@@ -529,13 +528,13 @@ void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 }
 
 QnSystemInformation QnMediaServerResource::getSystemInfo() const {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
     return m_systemInfo;
 }
 
 void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo) {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
     m_systemInfo = systemInfo;
 }
@@ -619,7 +618,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
     if (getStatus() != newStatus)
     {
         {
-            QnMutexLocker lock( &m_mutex );
+            QnMutexLocker lock(&m_mutex);
             m_statusTimer.restart();
         }
 
@@ -642,7 +641,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
 
 qint64 QnMediaServerResource::currentStatusTime() const
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     return m_statusTimer.elapsed();
 }
 

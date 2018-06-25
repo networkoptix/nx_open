@@ -9,6 +9,7 @@ namespace vms {
 namespace api {
 
 struct Data;
+class SoftwareVersion;
 
 #define DECLARE_LIST(Type) \
     using Type##List = std::vector<Type>;

@@ -2,15 +2,15 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include <api/server_rest_connection_fwd.h>
 #include <api/media_server_connection.h>
-#include <utils/common/value_cache.h>
-#include <utils/common/software_version.h>
-#include <utils/common/system_information.h>
-#include <nx/utils/safe_direct_connection.h>
 #include <core/resource/resource.h>
-#include <nx/network/socket_common.h>
+#include <utils/common/value_cache.h>
+#include <utils/common/system_information.h>
 
-#include "api/server_rest_connection_fwd.h"
+#include <nx/network/socket_common.h>
+#include <nx/utils/safe_direct_connection.h>
+#include <nx/utils/software_version.h>
 
 namespace nx {
 namespace network {
@@ -102,8 +102,8 @@ public:
     QnServerBackupSchedule getBackupSchedule() const;
     void setBackupSchedule(const QnServerBackupSchedule &value);
 
-    QnSoftwareVersion getVersion() const;
-    void setVersion(const QnSoftwareVersion& version);
+    nx::utils::SoftwareVersion getVersion() const;
+    void setVersion(const nx::utils::SoftwareVersion& version);
 
     QnSystemInformation getSystemInfo() const;
     void setSystemInfo(const QnSystemInformation &systemInfo);
@@ -167,7 +167,7 @@ private:
     QList<nx::utils::Url> m_ignoredUrls;
     bool m_sslAllowed = false;
     nx::vms::api::ServerFlags m_serverFlags;
-    QnSoftwareVersion m_version;
+    nx::utils::SoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
     QVector<nx::network::http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;

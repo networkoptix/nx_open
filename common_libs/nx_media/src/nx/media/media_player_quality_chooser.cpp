@@ -415,7 +415,7 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
 
     if (requestType == TranscodingRequestType::detailed)
     {
-        if (server->getVersion() < QnSoftwareVersion(3, 0))
+        if (server->getVersion() < nx::utils::SoftwareVersion(3, 0))
             return Player::TranscodingNotSupportedForServersOlder30;
 
         const auto& info = server->getSystemInfo();

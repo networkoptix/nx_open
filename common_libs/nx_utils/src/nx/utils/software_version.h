@@ -68,7 +68,7 @@ public:
     friend bool NX_UTILS_API operator<(const SoftwareVersion& l, const SoftwareVersion& r);
     friend bool NX_UTILS_API operator==(const SoftwareVersion& l, const SoftwareVersion& r);
 
-private:
+protected:
     std::array<int, 4> m_data;
 };
 

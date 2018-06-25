@@ -16,6 +16,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/data/software_version.h>
 
 class QSettings;
 class QnSessionManager;
@@ -290,7 +291,7 @@ private:
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
     bool m_cloudMode;
-    QnSoftwareVersion m_engineVersion;
+    nx::vms::api::SoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
     mutable QnMutex m_mutex;
     bool m_transcodingDisabled = false;

@@ -11,9 +11,9 @@
 
 namespace {
 
-static const auto kMinVersionWithSystem = QnSoftwareVersion(2, 3);
-static const auto kMinVersionWithSafeMode = QnSoftwareVersion(2, 4, 1);
-static const auto kMinVersionWithLocalId = QnSoftwareVersion(3, 0);
+static const nx::utils::SoftwareVersion kMinVersionWithSystem = {2, 3};
+static const nx::utils::SoftwareVersion kMinVersionWithSafeMode = {2, 4, 1};
+static const nx::utils::SoftwareVersion kMinVersionWithLocalId = {3, 0};
 
 QnUuid getFactorySystemIdImpl(const QnUuid& serverId)
 {
@@ -30,7 +30,7 @@ QnUuid getLocalSystemIdImpl(
     const QString& systemName,
     const QnUuid& localSystemId,
     const QnUuid& serverId,
-    const QnSoftwareVersion& serverVersion)
+    const nx::utils::SoftwareVersion& serverVersion)
 {
     if (serverVersion < kMinVersionWithSystem)
         return serverId;    //< We have only one hub-server if version is less than 2.3
@@ -54,7 +54,7 @@ QString getTargetSystemIdImpl(
     const QString& cloudSystemId,
     const QnUuid& localSystemId,
     const QnUuid& serverId,
-    const QnSoftwareVersion& serverVersion)
+    const nx::utils::SoftwareVersion& serverVersion)
 {
     const auto fixedLocalId = getLocalSystemIdImpl(
         systemName, localSystemId, serverId, serverVersion);

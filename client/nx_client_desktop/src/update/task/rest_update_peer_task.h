@@ -3,8 +3,9 @@
 #include <update/task/network_peer_task.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/system_information.h>
-#include <utils/common/software_version.h>
 #include <core/resource/fake_media_server.h>
+
+#include <nx/utils/software_version.h>
 
 struct QnUploadUpdateReply;
 
@@ -25,7 +26,7 @@ public:
     explicit QnRestUpdatePeerTask(QObject* parent = nullptr);
 
     void setUpdateId(const QString& updateId);
-    void setVersion(const QnSoftwareVersion& version);
+    void setVersion(const nx::utils::SoftwareVersion& version);
 
 signals:
     void peerUpdateFinished(const QnUuid& incompatibleId, const QnUuid& id);
@@ -45,7 +46,7 @@ private slots:
 
 private:
     QString m_updateId;
-    QnSoftwareVersion m_version;
+    nx::utils::SoftwareVersion m_version;
     QHash<int, QnMediaServerResourcePtr> m_serverByRequest;
     QHash<QnUuid, QnFakeMediaServerResourcePtr> m_serverByRealId;
     QTimer* m_timer;
