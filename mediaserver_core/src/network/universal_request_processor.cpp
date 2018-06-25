@@ -20,6 +20,7 @@
 #include <nx/utils/log/log.h>
 #include <api/global_settings.h>
 #include <nx/network/rtsp/rtsp_types.h>
+#include <nx/vms/network/proxy_connection.h>
 
 namespace {
 
@@ -85,7 +86,8 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
     {
         nx::utils::Url url = getDecodedUrl();
         // set variable to true if standard proxy_unauthorized should be used
-        const bool isProxy = needStandardProxy(d->owner->commonModule(), d->request);
+        const bool isProxy = nx::vms::network::ProxyConnectionProcessor::needStandardProxy(
+            d->owner->commonModule(), d->request);
         QElapsedTimer t;
         t.restart();
         QnAuthSession lastUnauthorizedData;
@@ -332,57 +334,4 @@ void QnUniversalRequestProcessor::pleaseStop()
     if (d->processor)
         d->processor->pleaseStop();
     QnTCPConnectionProcessor::pleaseStop();
-}
-
-bool QnUniversalRequestProcessor::isProxy(QnCommonModule* commonModule, const nx::network::http::Request& request)
-{
-    nx::network::http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
-    if( xServerGuidIter != request.headers.end() )
-    {
-        // is proxy to other media server
-        QnUuid desiredServerGuid(xServerGuidIter->second);
-        if (desiredServerGuid != commonModule->moduleGUID())
-        {
-            NX_VERBOSE(typeid(QnUniversalRequestProcessor),
-                lm("Need proxy to another server for request [%1]").arg(request.requestLine));
-
-            return true;
-        }
-    }
-
-    return needStandardProxy(commonModule, request);
-}
-
-bool QnUniversalRequestProcessor::needStandardProxy(QnCommonModule* commonModule, const nx::network::http::Request& request)
-{
-    return isCloudRequest(request) || isProxyForCamera(commonModule, request);
-}
-
-bool QnUniversalRequestProcessor::isCloudRequest(const nx::network::http::Request& request)
-{
-    return request.requestLine.url.host() == nx::network::SocketGlobals::cloud().cloudHost() ||
-           request.requestLine.url.path().startsWith("/cdb") ||
-           request.requestLine.url.path().startsWith("/nxcloud") ||
-           request.requestLine.url.path().startsWith("/nxlicense");
-}
-
-bool QnUniversalRequestProcessor::isProxyForCamera(
-    QnCommonModule* commonModule,
-    const nx::network::http::Request& request)
-{
-    nx::network::http::BufferType desiredCameraGuid;
-    nx::network::http::HttpHeaders::const_iterator xCameraGuidIter = request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
-    if( xCameraGuidIter != request.headers.end() )
-    {
-        desiredCameraGuid = xCameraGuidIter->second;
-    }
-    else {
-        desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
-    }
-    if (!desiredCameraGuid.isEmpty()) {
-        QnResourcePtr camera = commonModule->resourcePool()->getResourceById(QnUuid::fromStringSafe(desiredCameraGuid));
-        return camera != 0;
-    }
-
-    return false;
 }

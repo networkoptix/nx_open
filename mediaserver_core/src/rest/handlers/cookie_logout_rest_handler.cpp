@@ -7,7 +7,7 @@ int QnCookieLogoutRestHandler::executeGet(
     const QString &, const QnRequestParams &/*params*/,
     QnJsonRestResult &/*result*/, const QnRestConnectionProcessor* owner)
 {
-    QnUniversalTcpListener::authorizer(owner->owner())
+    QnUniversalTcpListener::authenticator(owner->owner())
         ->removeAccessCookie(owner->request(), owner->response());
 
     return nx::network::http::StatusCode::ok;

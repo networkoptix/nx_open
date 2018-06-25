@@ -21,7 +21,7 @@ int QnMergeLdapUsersRestHandler::executePost(
     const QnRestConnectionProcessor* owner)
 {
     QnLdapUsers ldapUsers;
-    const auto ldapResult = QnUniversalTcpListener::authorizer(owner->owner())->ldapManager()
+    const auto ldapResult = QnUniversalTcpListener::authenticator(owner->owner())->ldapManager()
         ->fetchUsers(ldapUsers);
     if (ldapResult != nx::mediaserver::LdapResult::NoError)
 	{

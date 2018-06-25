@@ -16,19 +16,19 @@ class MoveLockNotAcquired(Exception):
 
 
 class MoveLock(object):
-    def __init__(self, ssh_access, path, timeout_sec=10):
-        self._ssh_access = ssh_access  # type: SSH
+    def __init__(self, ssh, path, timeout_sec=10):
+        self._ssh = ssh  # type: SSH
         self._path = path  # type: SSHPath
         self._timeout_sec = timeout_sec
 
     def __repr__(self):
-        return '<{} on {}>'.format(self.__class__.__name__, self._ssh_access)
+        return '<{} on {}>'.format(self.__class__.__name__, self._ssh)
 
     def __enter__(self):
         # Implemented as single bash script to speedup locking.
         _logger.info("Acquire lock at %r", self._path)
         try:
-            self._ssh_access.run_sh_script(
+            self._ssh.run_sh_script(
                 # language=Bash
                 '''
                     temp_file="$(mktemp)"
@@ -57,7 +57,7 @@ class MoveLock(object):
         # Implemented as single bash script to speedup locking.
         _logger.info("Release lock at %r", self._path)
         try:
-            self._ssh_access.run_sh_script(
+            self._ssh.run_sh_script(
                 # language=Bash
                 '''
                     [ -e "$LOCK_FILE" ] || exit 3

@@ -33,7 +33,7 @@ int QnCookieLoginRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    const auto authenticator = QnUniversalTcpListener::authorizer(owner->owner());
+    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
     Qn::UserAccessData accessRights;
     Qn::AuthResult authResult = authenticator->tryAuthRecord(
         owner->socket()->getForeignAddress().address,

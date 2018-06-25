@@ -44,7 +44,7 @@ public:
     virtual void applyModToRequest(nx::network::http::Request* request) override;
 
     nx::mediaserver::Authenticator* authenticator() const;
-    static nx::mediaserver::Authenticator* authorizer(const QnTcpListener* listener);
+    static nx::mediaserver::Authenticator* authenticator(const QnTcpListener* listener);
 
     bool isAuthentificationRequired(nx::network::http::Request& request);
     void enableUnauthorizedForwarding(const QString& path);
@@ -61,7 +61,7 @@ protected:
     virtual void destroyServerSocket(nx::network::AbstractStreamServerSocket* serverSocket) override;
 
 private:
-    std::unique_ptr<nx::mediaserver::Authenticator> m_authorizer;
+    std::unique_ptr<nx::mediaserver::Authenticator> m_authenticator;
     nx::network::MultipleServerSocket* m_multipleServerSocket;
     std::unique_ptr<nx::network::AbstractStreamServerSocket> m_serverSocket;
     QnMutex m_mutex;

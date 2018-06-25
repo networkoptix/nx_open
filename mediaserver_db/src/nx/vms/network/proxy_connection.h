@@ -1,32 +1,43 @@
 #pragma once
 
 #include <QtNetwork/QHostAddress>
-#include "network/universal_request_processor.h"
-#include <nx/mediaserver/server_module_aware.h>
+#include <network/tcp_connection_processor.h>
 #include <nx/vms/network/reverse_connection_manager.h>
 
 class QnAbstractStreamDataProvider;
-class QnProxyConnectionProcessorPrivate;
 struct QnRoute;
 
 namespace ec2 {
     class TransactionMessageBusAdapter;
 }
 
-class QnProxyConnectionProcessor: public QnTCPConnectionProcessor
+namespace nx {
+namespace vms {
+namespace network {
+
+class ProxyConnectionProcessorPrivate;
+
+class ProxyConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnProxyConnectionProcessor(
+    ProxyConnectionProcessor(
         nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
         QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
     static void cleanupProxyInfo(nx::network::http::Request* request);
 
-    virtual ~QnProxyConnectionProcessor();
+    virtual ~ProxyConnectionProcessor();
+
+    static bool needProxyRequest(QnCommonModule* commonModule, const nx::network::http::Request& request);
+    static bool needStandardProxy(QnCommonModule* commonModule, const nx::network::http::Request& request);
+    static bool isCloudRequest(const nx::network::http::Request& request);
+
 protected:
     virtual void run() override;
 private:
+    static bool isProxyForCamera(QnCommonModule* commonModule, const nx::network::http::Request& request);
+
     bool doProxyData(
         nx::network::AbstractStreamSocket* srcSocket,
         nx::network::AbstractStreamSocket* dstSocket,
@@ -46,6 +57,11 @@ private:
     /** Returns false if socket would block in blocking mode */
     bool readSocketNonBlock(
         int* returnValue, nx::network::AbstractStreamSocket* socket, void* buffer, int bufferSize);
+    void doProxyRequest();
 private:
-    Q_DECLARE_PRIVATE(QnProxyConnectionProcessor);
+    Q_DECLARE_PRIVATE(nx::vms::network::ProxyConnectionProcessor);
 };
+
+} // namespace network
+} // namespace vms
+} // namespace nx

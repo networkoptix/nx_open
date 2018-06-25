@@ -1126,6 +1126,9 @@ bool AsyncClient::sendRequestToNewLocation(const Response& response)
     if (locationIter == response.headers.end())
         return false;
 
+    NX_VERBOSE(this, lm("Redirect to location [ %1 ] from [ %2 ]").args(
+        locationIter->second, m_contentLocationUrl));
+
     m_authorizationTried = false;
     m_ha1RecalcTried = false;
 

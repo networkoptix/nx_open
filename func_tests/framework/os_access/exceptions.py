@@ -39,8 +39,18 @@ class DoesNotExist(Exception):
     pass
 
 
+class CannotDownload(DoesNotExist):
+    pass
+
+
 class AlreadyExists(Exception):
     pass
+
+
+class AlreadyDownloaded(AlreadyExists):
+    def __init__(self, message, path):
+        super(AlreadyDownloaded, self).__init__(message)
+        self.path = path
 
 
 class BadParent(Exception):

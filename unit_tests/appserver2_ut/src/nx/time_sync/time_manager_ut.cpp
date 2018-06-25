@@ -182,10 +182,8 @@ public:
 
                     commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
                         std::chrono::milliseconds(100));
-                    // TODO: need to comment this setter as soon as we fix proxy for timeSync tests.
-                    // It doesn't work because appServerLauncher don't have proxy handler.
-                    commonModule->globalSettings()->setSyncTimeExchangePeriod(
-                        std::chrono::milliseconds(100));
+                    //commonModule->globalSettings()->setSyncTimeExchangePeriod(
+                    //    std::chrono::milliseconds(100));
 
                 }, Qt::DirectConnection);
             }, Qt::DirectConnection);

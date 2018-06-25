@@ -17,7 +17,7 @@ int QnCurrentUserRestHandler::executeGet(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    const auto authenticator = QnUniversalTcpListener::authorizer(owner->owner());
+    const auto authenticator = QnUniversalTcpListener::authenticator(owner->owner());
     const auto clientIp = owner->socket()->getForeignAddress().address;
     auto accessRights = owner->accessRights();
 

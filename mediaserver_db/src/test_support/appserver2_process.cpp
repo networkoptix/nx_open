@@ -59,6 +59,7 @@
 #include <api/model/time_reply.h>
 #include <nx/utils/test_support/test_options.h>
 #include <rest/handlers/sync_time_rest_handler.h>
+#include <nx/vms/network/proxy_connection.h>
 
 static int registerQtResources()
 {
@@ -446,6 +447,10 @@ void Appserver2Process::registerHttpHandlers(
 
     m_tcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     ec2ConnectionFactory->registerTransactionListener(m_tcpListener);
+
+    m_tcpListener->setProxyHandler<nx::vms::network::ProxyConnectionProcessor>(
+        &nx::vms::network::ProxyConnectionProcessor::needProxyRequest,
+        ec2ConnectionFactory->serverConnector());
 }
 
 void Appserver2Process::resetInstanceCounter()

@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractproperty
 
-from framework.os_access.exceptions import AlreadyExists
+from framework.move_lock import MoveLock
+from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, NonZeroExitStatus
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.posix_shell import PosixShell
 
@@ -38,26 +39,38 @@ class PosixAccess(OSAccess):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
-            raise AlreadyExists("Cannot download {!s} to {!s}".format(source_url, destination_dir))
-        self.shell.run_command([
-            'wget',
-            '--no-clobber', source_url,  # Don't overwrite file.
-            '--output-document', destination,
-            ])
+            raise AlreadyDownloaded(
+                "Cannot download {!s} to {!s}".format(source_url, destination_dir),
+                destination)
+        try:
+            self.shell.run_command([
+                'wget',
+                '--no-clobber', source_url,  # Don't overwrite file.
+                '--output-document', destination,
+                ])
+        except NonZeroExitStatus as e:
+            raise CannotDownload(e.stderr)
         return destination
 
     def _download_by_smb(self, source_hostname, source_path, destination_dir):
         url = 'smb://{!s}/{!s}'.format(source_hostname, '/'.join(source_path.parts))
         destination = destination_dir / source_path.name
         if destination.exists():
-            raise AlreadyExists(
+            raise AlreadyDownloaded(
                 "Cannot download file {!s} from {!s} to {!s}".format(
-                    source_path, source_hostname, destination_dir))
+                    source_path, source_hostname, destination_dir),
+                destination)
         # TODO: Decide on authentication based on username and password from URL.
-        self.shell.run_command([
-            'smbget',
-            '--guest',  # Force guest authentication.
-            '--outputfile', destination,
-            url,
-            ])
+        try:
+            self.shell.run_command([
+                'smbget',
+                '--guest',  # Force guest authentication.
+                '--outputfile', destination,
+                url,
+                ])
+        except NonZeroExitStatus as e:
+            raise CannotDownload(e.stderr)
         return destination
+
+    def lock(self, path, try_lock_timeout_sec=10):
+        return MoveLock(self.shell, path)

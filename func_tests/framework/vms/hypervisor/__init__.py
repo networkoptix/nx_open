@@ -20,14 +20,3 @@ class VMAllAdaptersBusy(Exception):
         self.vm_name = vm_name
         self.vm_networks = vm_networks
 
-
-def obtain_running_vm(hypervisor, vm_name, vm_index, vm_configuration):
-    try:
-        vm_info = hypervisor.find(vm_name)
-    except VMNotFound:
-        vm_info = hypervisor.clone(vm_name, vm_index, vm_configuration)
-    assert vm_info.name == vm_name
-    if not vm_info.is_running:
-        hypervisor.power_on(vm_info.name)
-    return vm_info
-
