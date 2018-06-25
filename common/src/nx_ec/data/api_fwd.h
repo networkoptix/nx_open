@@ -8,8 +8,6 @@ class QString;
 
 namespace ec2 {
 
-struct ApiFullInfoData;
-
 struct ApiConnectionData;
 struct ApiTransactionData;
 struct ApiTranLogFilter;
@@ -31,7 +29,6 @@ struct ParentId
 };
 
 #define QN_EC2_API_DATA_TYPES \
-    (ApiFullInfoData)\
     (ApiConnectionData)\
     (ApiMiscData)\
     (ApiDiscoveredServerData)\

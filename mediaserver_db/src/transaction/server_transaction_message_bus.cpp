@@ -265,20 +265,20 @@ bool ServerTransactionMessageBus::isSyncInProgress() const
     return false;
 }
 
-bool ServerTransactionMessageBus::readApiFullInfoData(
+bool ServerTransactionMessageBus::readFullInfoData(
     const Qn::UserAccessData& userAccess,
     const vms::api::PeerData& remotePeer,
-    ApiFullInfoData* outData)
+    vms::api::FullInfoData* outData)
 {
     ErrorCode errorCode;
     if (remotePeer.peerType == vms::api::PeerType::mobileClient)
-        errorCode = dbManager(m_db, userAccess).readApiFullInfoDataForMobileClient(outData, userAccess.userId);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataForMobileClient(outData, userAccess.userId);
     else
-        errorCode = dbManager(m_db, userAccess).readApiFullInfoDataComplete(outData);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataComplete(outData);
 
     if (errorCode != ErrorCode::ok)
     {
-        qWarning() << "Cannot execute query for ApiFullInfoData:" << toString(errorCode);
+        qWarning() << "Cannot execute query for FullInfoData:" << toString(errorCode);
         return false;
     }
     return true;
@@ -296,10 +296,10 @@ bool ServerTransactionMessageBus::sendInitialData(QnTransactionTransport* transp
         transport->remotePeer().peerType == vms::api::PeerType::mobileClient)
     {
         /** Request all data to be sent to the Desktop Client peers on the connect. */
-        QnTransaction<ApiFullInfoData> tran;
+        QnTransaction<vms::api::FullInfoData> tran;
         tran.command = ApiCommand::getFullInfo;
         tran.peerID = commonModule()->moduleGUID();
-        if (!readApiFullInfoData(transport->getUserAccessData(), transport->remotePeer(), &tran.params))
+        if (!readFullInfoData(transport->getUserAccessData(), transport->remotePeer(), &tran.params))
             return false;
 
         transport->setWriteSync(true);

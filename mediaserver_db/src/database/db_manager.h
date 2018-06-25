@@ -314,11 +314,12 @@ namespace detail
             const QnUuid& resourceId,
             nx::vms::api::ResourceParamWithRefDataList& params);
 
-        // ApiFullInfo
-        ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data);
+        // FullInfoData
+        ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data);
 
-        // ApiFullInfo abridged for Mobile Client
-        ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
+        // FullInfoData abridged for Mobile Client
+        ErrorCode readFullInfoDataForMobileClient(
+            nx::vms::api::FullInfoData* data, const QnUuid& userId);
 
         //getLicenses
         ErrorCode doQueryNoLock(
@@ -465,7 +466,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiFullInfoData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::FullInfoData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -859,15 +860,15 @@ public:
 
     ApiObjectType getObjectType(const QnUuid& objectId);
 
-    ErrorCode doQuery(std::nullptr_t /*dummy*/, ApiFullInfoData& data)
+    ErrorCode doQuery(std::nullptr_t /*dummy*/, nx::vms::api::FullInfoData& data)
     {
-        return readApiFullInfoDataComplete(&data);
+        return readFullInfoDataComplete(&data);
     }
 
-    ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data)
+    ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data)
     {
         const ErrorCode errorCode =
-            m_dbManager->readApiFullInfoDataComplete(data);
+            m_dbManager->readFullInfoDataComplete(data);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -895,7 +896,8 @@ public:
         return ErrorCode::ok;
     }
 
-    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
+    ErrorCode readFullInfoDataForMobileClient(
+        nx::vms::api::FullInfoData* data, const QnUuid& userId);
 
     QnDbHelper::QnDbTransaction* getTransaction();
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);

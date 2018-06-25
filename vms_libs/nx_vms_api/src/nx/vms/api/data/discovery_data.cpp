@@ -8,7 +8,7 @@ namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (DiscoverPeerData)(DiscoveryData),
-    (ubjson)(json)(xml)(sql_record)(csv_record),
+    (eq)(ubjson)(json)(xml)(sql_record)(csv_record),
     _Fields)
 
 } // namespace api

@@ -33,7 +33,6 @@
 #include <utils/common/util.h>
 #include <utils/crypt/symmetrical.h>
 
-#include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/data/api_discovery_data.h>
 
@@ -45,6 +44,7 @@
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/api/data/media_server_data.h>
@@ -4402,7 +4402,7 @@ ec2::database::api::QueryCache::Pool* QnDbManager::queryCachePool()
         return errorCode; \
 } while (0)
 
-ErrorCode QnDbManager::readApiFullInfoDataComplete(ApiFullInfoData* data)
+ErrorCode QnDbManager::readFullInfoDataComplete(FullInfoData* data)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -4429,8 +4429,8 @@ ErrorCode QnDbManager::readApiFullInfoDataComplete(ApiFullInfoData* data)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
-    ApiFullInfoData* data, const QnUuid& userId)
+ErrorCode QnDbManager::readFullInfoDataForMobileClient(
+    FullInfoData* data, const QnUuid& userId)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -5242,10 +5242,10 @@ bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
     }
 }
 
-ErrorCode QnDbManagerAccess::readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId)
+ErrorCode QnDbManagerAccess::readFullInfoDataForMobileClient(FullInfoData* data, const QnUuid& userId)
 {
     const ErrorCode errorCode =
-        m_dbManager->readApiFullInfoDataForMobileClient(data, userId);
+        m_dbManager->readFullInfoDataForMobileClient(data, userId);
     if (errorCode != ErrorCode::ok)
         return errorCode;
 

@@ -37,7 +37,6 @@
 #include <nx_ec/managers/abstract_webpage_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
-#include <nx_ec/data/api_full_info_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
@@ -45,6 +44,7 @@
 #include <nx/time_sync/time_sync_manager.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/event/rule.h>
@@ -433,7 +433,7 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     layoutTourManager()->resetTours();
 }
 
-void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoData& fullData)
+void QnCommonMessageProcessor::on_gotInitialNotification(const FullInfoData& fullData)
 {
     onGotInitialNotification(fullData);
 
@@ -710,7 +710,7 @@ void QnCommonMessageProcessor::resetResourceTypes(const ResourceTypeDataList& re
     qnResTypePool->replaceResourceTypeList(qnResTypes);
 }
 
-void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullData)
+void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
 {
     /* Store all remote resources id to clean them if they are not in the list anymore. */
     QHash<QnUuid, QnResourcePtr> remoteResources;
@@ -880,7 +880,7 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
     }
 }
 
-void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
+void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& fullData)
 {
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();

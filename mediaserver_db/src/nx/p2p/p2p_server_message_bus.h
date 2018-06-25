@@ -95,10 +95,10 @@ private:
         const QVector<vms::api::PersistentIdData>& subscribedTo,
         const QVector<qint32>& sequences) const;
 
-    bool readApiFullInfoData(
+    bool readFullInfoData(
         const Qn::UserAccessData& userAccess,
         const vms::api::PeerData& remotePeer,
-        ApiFullInfoData* outData);
+        vms::api::FullInfoData* outData);
 
 private:
     ec2::detail::QnDbManager* m_db;

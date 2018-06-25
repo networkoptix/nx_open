@@ -1571,7 +1571,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[default] format
      * %return Object in the requested format.
      */
-    regGet<std::nullptr_t, ApiFullInfoData>(p, ApiCommand::getFullInfo);
+    regGet<std::nullptr_t, FullInfoData>(p, ApiCommand::getFullInfo);
 
     /**%apidoc GET /ec2/getLicenses
      * Read license list

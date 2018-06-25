@@ -82,10 +82,10 @@ private:
         QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader);
 
     bool isSyncInProgress() const;
-    bool readApiFullInfoData(
+    bool readFullInfoData(
         const Qn::UserAccessData& userAccess,
         const nx::vms::api::PeerData& remotePeer,
-        ApiFullInfoData* outData);
+        nx::vms::api::FullInfoData* outData);
 
     void printTranState(const nx::vms::api::TranState& tranState);
 

@@ -426,9 +426,9 @@ void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connectio
     sendRuntimeData(connection, m_lastRuntimeInfo.keys());
 
     {
-        QnTransaction<ApiFullInfoData> tran(commonModule()->moduleGUID());
+        QnTransaction<vms::api::FullInfoData> tran(commonModule()->moduleGUID());
         tran.command = ApiCommand::getFullInfo;
-        if (!readApiFullInfoData(connection.staticCast<Connection>()->userAccessData(),
+        if (!readFullInfoData(connection.staticCast<Connection>()->userAccessData(),
             connection->remotePeer(), &tran.params))
         {
             connection->setState(Connection::State::Error);
@@ -438,19 +438,19 @@ void ServerMessageBus::sendInitialDataToClient(const P2pConnectionPtr& connectio
     }
 }
 
-bool ServerMessageBus::readApiFullInfoData(
+bool ServerMessageBus::readFullInfoData(
     const Qn::UserAccessData& userAccess,
     const vms::api::PeerData& remotePeer,
-    ApiFullInfoData* outData)
+    vms::api::FullInfoData* outData)
 {
     ErrorCode errorCode;
     if (remotePeer.peerType == vms::api::PeerType::mobileClient)
-        errorCode = dbManager(m_db, userAccess).readApiFullInfoDataForMobileClient(outData, userAccess.userId);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataForMobileClient(outData, userAccess.userId);
     else
-        errorCode = dbManager(m_db, userAccess).readApiFullInfoDataComplete(outData);
+        errorCode = dbManager(m_db, userAccess).readFullInfoDataComplete(outData);
 
     if (errorCode != ErrorCode::ok)
-        NX_WARNING(this, lm("Cannot execute query for ApiFullInfoData: %1").arg(errorCode));
+        NX_WARNING(this, lm("Cannot execute query for FullInfoData: %1").arg(errorCode));
     return errorCode == ErrorCode::ok;
 }
 

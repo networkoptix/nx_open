@@ -1122,7 +1122,7 @@ signals :
         \param licenses
         \param cameraHistoryItems
     */
-    void initNotification(const ec2::ApiFullInfoData& fullData);
+    void initNotification(const nx::vms::api::FullInfoData& fullData);
     void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
 
     void reverseConnectionRequested(const nx::vms::api::ReverseConnectionData& reverseConnetionData);

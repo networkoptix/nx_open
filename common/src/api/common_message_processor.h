@@ -100,7 +100,7 @@ protected:
     virtual void handleRemotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
     virtual void handleRemotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
 
-    virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData);
+    virtual void onGotInitialNotification(const nx::vms::api::FullInfoData& fullData);
     virtual void onResourceStatusChanged(
         const QnResourcePtr &resource,
         Qn::ResourceStatus status,
@@ -110,7 +110,7 @@ protected:
     virtual void handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour);
 
     void resetResourceTypes(const nx::vms::api::ResourceTypeDataList& resTypes);
-    void resetResources(const ec2::ApiFullInfoData& fullData);
+    void resetResources(const nx::vms::api::FullInfoData& fullData);
     void resetLicenses(const nx::vms::api::LicenseDataList& licenses);
     void resetCamerasWithArchiveList(const nx::vms::api::ServerFootageDataList& cameraHistoryList);
     void resetTime();
@@ -126,7 +126,7 @@ public slots:
     void on_licenseRemoved(const QnLicensePtr &license);
 
 private slots:
-    void on_gotInitialNotification(const ec2::ApiFullInfoData& fullData);
+    void on_gotInitialNotification(const nx::vms::api::FullInfoData& fullData);
     void on_gotDiscoveryData(const nx::vms::api::DiscoveryData& discoveryData, bool addInformation);
 
     void on_remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);

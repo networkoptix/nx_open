@@ -257,11 +257,11 @@ APPLY(205, getResourceTypes, nx::vms::api::ResourceTypeDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(206, getFullInfo, ApiFullInfoData, \
+APPLY(206, getFullInfo, nx::vms::api::FullInfoData, \
                        false, /* persistent*/ \
                        false, /* system*/ \
                        InvalidGetHashHelper(), /* getHash*/ \
-                       [] (const QnTransaction<ApiFullInfoData> & tran, const NotificationParams &notificationParams) \
+                       [] (const QnTransaction<nx::vms::api::FullInfoData> & tran, const NotificationParams &notificationParams) \
                        { \
                            emit notificationParams.ecConnection->initNotification(tran.params); \
                            for (const auto& data: tran.params.discoveryData) \

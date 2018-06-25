@@ -260,7 +260,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, api::PeerType p
     }
 }
 
-void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
+void QnClientMessageProcessor::onGotInitialNotification(const api::FullInfoData& fullData)
 {
     NX_DEBUG(this, lit("resources received, state -> Ready"));
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
