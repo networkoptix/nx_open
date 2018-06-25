@@ -280,8 +280,9 @@ std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>>
     if (localAddress.address.toString() == nx::network::HostAddress::anyHost.toString()
         || (bool) localAddress.address.isPureIpV6())
     {
-        if (!addSocket(localAddress, AF_INET6))
-            return {};
+        addSocket(localAddress, AF_INET6); // Ignoring result since it does not work in Linux.
+        //if (!addSocket(localAddress, AF_INET6))
+        //    return {};
     }
 
     return sockets;
