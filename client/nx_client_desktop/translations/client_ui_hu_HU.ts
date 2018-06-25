@@ -750,7 +750,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Generálás</translation>
     </message>
     <message>
       <location/>
@@ -1740,7 +1740,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>IP-címek kamerákhoz, szerverekhez, felhasználói csoportokhoz stb.</translation>
     </message>
   </context>
   <context>
@@ -1804,7 +1804,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;hordozható kamera&quot; egy virtuális tárhely a videofájlokhoz, amelyeket fel lehet tölteni bármely szerverre a rendszerén, és bármely felhasználó hozzáférhet.</translation>
     </message>
   </context>
   <context>
@@ -3044,12 +3044,12 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>Még nincsenek egyedi felhasználói szerepkörök.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>Kattintson a &quot;Új szerepkör&quot; gombra a létrehozásához.</translation>
     </message>
   </context>
   <context>
