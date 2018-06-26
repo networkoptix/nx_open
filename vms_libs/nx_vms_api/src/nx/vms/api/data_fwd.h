@@ -129,7 +129,7 @@ DECLARE_STRUCT_AND_LIST(MiscData)
 DECLARE_STRUCT(DiscoverPeerData)
 DECLARE_STRUCT_AND_LIST(DiscoveryData)
 
-DECLARE_STRUCT(FullInfoData)
+DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))
 
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_EX

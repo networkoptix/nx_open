@@ -24,7 +24,7 @@ namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (FullInfoData),
-    (eq)(ubjson)(json)(xml)(sql_record)(csv_record),
+    (ubjson)(json)(xml)(csv_record),
     _Fields)
 
 } // namespace api
