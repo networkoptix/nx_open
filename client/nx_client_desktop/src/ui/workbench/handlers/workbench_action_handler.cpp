@@ -2079,7 +2079,7 @@ void ActionHandler::at_renameAction_triggered()
 
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
     QString oldName = nodeType == NodeType::recorder
-        ? camera->getGroupName()
+        ? camera->getUserDefinedGroupName()
         : resource->getName();
 
     // TODO: #vkutin #gdm Is the following block of code still in use?
