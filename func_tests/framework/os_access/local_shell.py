@@ -7,7 +7,6 @@ import subprocess
 import time
 
 from framework.os_access.command import Command
-from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.posix_shell import PosixShell, _DEFAULT_TIMEOUT_SEC, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
@@ -122,13 +121,13 @@ class _LocalShell(PosixShell):
         return '<LocalShell>'
 
     @staticmethod
-    def _make_kwargs(cwd, env, has_input):
+    def _make_kwargs(cwd, env):
         kwargs = {
             'close_fds': True,
             'bufsize': 16 * 1024 * 1024,
             'stdout': subprocess.PIPE,
             'stderr': subprocess.PIPE,
-            'stdin': subprocess.PIPE if has_input else None}
+            'stdin': subprocess.PIPE}
         if cwd is not None:
             kwargs['cwd'] = str(cwd)
         if env is not None:
@@ -136,27 +135,19 @@ class _LocalShell(PosixShell):
         return kwargs
 
     @classmethod
-    def run_command(cls, command, input=None, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
-        kwargs = cls._make_kwargs(cwd, env, input is not None)
+    def command(cls, command, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
+        kwargs = cls._make_kwargs(cwd, env)
         command = [str(arg) for arg in command]
         _logger.debug('Run command:\n%s', sh_command_to_script(command))
-        with _LocalCommand(command, shell=False, **kwargs) as running_command:
-            exit_status, stdout, stderr = running_command.communicate(input=input, timeout_sec=timeout_sec)
-        if exit_status != 0:
-            raise exit_status_error_cls(exit_status)(stdout, stderr)
-        return stdout
+        return _LocalCommand(command, shell=False, **kwargs)
 
     @classmethod
-    def run_sh_script(cls, script, input=None, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
+    def sh_script(cls, script, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
         augmented_script_to_run = sh_augment_script(script, None, None)
         augmented_script_to_log = sh_augment_script(script, cwd, env)
         _logger.debug('Run:\n%s', augmented_script_to_log)
-        kwargs = cls._make_kwargs(cwd, env, input is not None)
-        with _LocalCommand(augmented_script_to_run, shell=True, **kwargs) as running_command:
-            exit_status, stdout, stderr = running_command.communicate(input=input, timeout_sec=timeout_sec)
-        if exit_status != 0:
-            raise exit_status_error_cls(exit_status)(stdout, stderr)
-        return stdout
+        kwargs = cls._make_kwargs(cwd, env)
+        return _LocalCommand(augmented_script_to_run, shell=True, **kwargs)
 
 
 local_shell = _LocalShell()

@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
+from framework.os_access.command import Command
+
 _DEFAULT_TIMEOUT_SEC = 60
 _BIG_CHUNK_THRESHOLD_CHARS = 10000
 _BIG_CHUNK_THRESHOLD_LINES = 50
@@ -11,12 +13,20 @@ class PosixShell(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def run_command(self, command, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
-        return b'stdout'
+    def command(self, args, cwd=None, env=None):
+        return Command()
 
     @abstractmethod
+    def sh_script(self, script, cwd=None, env=None):
+        return Command()
+
+    def run_command(self, args, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
+        """Shortcut. Deprecated."""
+        return self.command(args, cwd=cwd, env=env).check_output(input=input,timeout_sec=timeout_sec)
+
     def run_sh_script(self, script, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
-        return b'stdout'
+        """Shortcut. Deprecated."""
+        return self.sh_script(script, cwd=cwd, env=env).check_output(input=input, timeout_sec=timeout_sec)
 
 
 class _LoggedOutputBuffer(object):

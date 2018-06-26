@@ -6,13 +6,7 @@ import paramiko
 
 from framework.method_caching import cached_getter
 from framework.os_access.command import Command
-from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.posix_shell import (
-    PosixShell,
-    _BIG_CHUNK_THRESHOLD_CHARS,
-    _DEFAULT_TIMEOUT_SEC,
-    _STREAM_BUFFER_SIZE,
-    )
+from framework.os_access.posix_shell import PosixShell, _BIG_CHUNK_THRESHOLD_CHARS, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
 _logger = logging.getLogger(__name__)
@@ -110,13 +104,6 @@ class SSH(PosixShell):
         script = sh_command_to_script(args)
         return self.sh_script(script, cwd=cwd, env=env)
 
-    def run_command(self, command, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
-        with self.command(command, cwd=cwd, env=env) as running_command:
-            exit_status, stdout, stderr = running_command.communicate(input=input, timeout_sec=timeout_sec)
-        if exit_status != 0:
-            raise exit_status_error_cls(exit_status)(stdout, stderr)
-        return stdout
-
     @cached_getter
     def _client(self):
         client = paramiko.SSHClient()
@@ -138,13 +125,6 @@ class SSH(PosixShell):
     def sh_script(self, script, cwd=None, env=None):
         augmented_script = sh_augment_script(script, cwd, env)
         return _SSHCommand(self._client(), augmented_script)
-
-    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
-        with self.sh_script(script, cwd=cwd, env=env) as command:
-            exit_status, stdout, stderr = command.communicate(input=input, timeout_sec=timeout_sec)
-        if exit_status != 0:
-            raise exit_status_error_cls(exit_status)(stdout, stderr)
-        return stdout
 
     def is_working(self):
         try:

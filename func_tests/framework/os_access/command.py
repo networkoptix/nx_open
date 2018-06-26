@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from framework.os_access.exceptions import Timeout
+from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.waiting import Wait
 
 _DEFAULT_COMMUNICATION_TIMEOUT_SEC = 10
@@ -38,3 +38,11 @@ class Command(object):
                 return exit_code, b''.join(stdout), b''.join(stderr)
             if not wait.again():
                 raise Timeout(timeout_sec)
+
+    def check_output(self, input=None, timeout_sec=None):
+        """Shortcut."""
+        with self:
+            exit_status, stdout, stderr = self.communicate(input=input, timeout_sec=timeout_sec)
+        if exit_status != 0:
+            raise exit_status_error_cls(exit_status)(stdout, stderr)
+        return stdout

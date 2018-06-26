@@ -64,16 +64,7 @@ class WinRM(object):
         return self._shell().start(*command_str_list)
 
     def run_command(self, command, input=None):
-        with self.command(command) as running_command:
-            exit_code, stdout_bytes, stderr_bytes = running_command.communicate(input=input)
-        _logger.debug(
-            "Outcome:\nexit code: %d\nstdout:\n%s\nstderr:\n%s",
-            exit_code,
-            stdout_bytes.decode('ascii', errors='replace'),
-            stderr_bytes.decode('ascii', errors='replace'))
-        if exit_code != 0:
-            raise exit_status_error_cls(exit_code)(stdout_bytes, stderr_bytes)
-        return stdout_bytes
+        return self.command(command).check_output(input)
 
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables)
