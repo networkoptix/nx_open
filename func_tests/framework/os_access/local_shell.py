@@ -4,126 +4,117 @@ import math
 import os
 import select
 import subprocess
+import time
 
-from framework.os_access.exceptions import Timeout, exit_status_error_cls
-from framework.os_access.posix_shell import PosixShell, _DEFAULT_TIMEOUT_SEC, _LoggedOutputBuffer, _STREAM_BUFFER_SIZE
+from framework.os_access.command import Command
+from framework.os_access.exceptions import exit_status_error_cls
+from framework.os_access.posix_shell import PosixShell, _DEFAULT_TIMEOUT_SEC, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
-from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)
 
 
-def _communicate(process, input, timeout_sec):
-    """Patched version of method with same name from standard Popen class"""
-    process_logger = _logger.getChild('pid{}'.format(process.pid))
-    interaction_logger = process_logger.getChild('interaction')
-    interaction_logger.setLevel(logging.INFO)  # Too verbose for everyday usage.
+class _LocalCommand(Command):
+    """See `_communicate` from Python's standard library."""
 
-    stdout = None  # Return
-    stderr = None  # Return
-    fd2file = {}
-    fd2output = {}
+    def __init__(self, *popenargs, **popenkwargs):
+        self.popenargs = popenargs
+        self.popenkwargs = popenkwargs
 
-    poller = select.poll()
+    def __enter__(self):
+        self.process = subprocess.Popen(*self.popenargs, **self.popenkwargs)
+        self.poller = select.poll()
+        process_logger = _logger.getChild('pid{}'.format(self.process.pid))
+        self.interaction_logger = process_logger.getChild('interaction')
+        self.interaction_logger.setLevel(logging.INFO)  # Too verbose for everyday usage.
+        self.fd2name = {}
+        self.fd2file = {}
+        if self.process.stdout:
+            self.register_and_append('stdout', self.process.stdout, select.POLLIN | select.POLLPRI)
+        if self.process.stderr:
+            self.register_and_append('stderr', self.process.stderr, select.POLLIN | select.POLLPRI)
+        return self
 
-    def register_and_append(file_obj, eventmask):
-        interaction_logger.debug("Register file descriptor %d, event mask %x.", file_obj.fileno(), eventmask)
-        poller.register(file_obj.fileno(), eventmask)
-        fd2file[file_obj.fileno()] = file_obj
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        for fd in list(self.fd2file):  # List is preserved during iteration. Dict is emptying.
+            self.close_unregister_and_remove(fd)
+        self.interaction_logger.debug("All file descriptors are closed.")
 
-    def close_unregister_and_remove(fd):
-        interaction_logger.debug("Unregister file descriptor %d.", fd)
-        poller.unregister(fd)
-        fd2file[fd].close()
-        fd2file.pop(fd)
+    def register_and_append(self, name, file_obj, eventmask):
+        fd = file_obj.fileno()
+        self.interaction_logger.debug("Register file descriptor %d, event mask %x.", fd, eventmask)
+        self.poller.register(fd, eventmask)
+        self.fd2file[fd] = file_obj
+        self.fd2name[fd] = name
 
-    if process.stdin and input is not None:
-        register_and_append(process.stdin, select.POLLOUT)
+    def close_unregister_and_remove(self, fd):
+        self.interaction_logger.debug("Unregister file descriptor %d.", fd)
+        self.poller.unregister(fd)
+        self.fd2file[fd].close()
+        self.fd2file.pop(fd)
 
-    if process.stdout:
-        register_and_append(process.stdout, select.POLLIN | select.POLLPRI)
-        fd2output[process.stdout.fileno()] = stdout = _LoggedOutputBuffer(process_logger.getChild('stdout'))
-    if process.stderr:
-        register_and_append(process.stderr, select.POLLIN | select.POLLPRI)
-        fd2output[process.stderr.fileno()] = stderr = _LoggedOutputBuffer(process_logger.getChild('stderr'))
-
-    input_offset = 0
-
-    wait = Wait(
-        'process responds',
-        timeout_sec=timeout_sec,
-        log_continue=process_logger.getChild('wait').debug,
-        log_stop=process_logger.getChild('wait').error)
-
-    while fd2file:
+    def send(self, bytes_buffer, is_last=False):
+        # Blocking call, no need to use polling functionality.
         try:
-            ready = poller.poll(int(math.ceil(wait.delay_sec * 1000)))
+            bytes_written = os.write(self.process.stdin.fileno(), bytes_buffer)
+            assert 0 < bytes_written <= len(bytes_buffer)
+            if is_last and bytes_written == len(bytes_buffer):
+                self.process.stdin.close()
+            return bytes_written
+        except OSError as e:
+            if e.errno != errno.EPIPE:
+                raise
+            # Ignore EPIPE: -- behave as if everything has been written.
+            self.interaction_logger.debug("EPIPE on STDIN.")
+            self.process.stdin.close()
+            return len(bytes_buffer)
+
+    def _receive_exit_status(self, timeout_sec):
+        # TODO: When moved to Python 3, simply use `self.process.wait(timeout_sec)`.
+        assert not self.fd2file
+        if self.process.poll() is None:
+            self.interaction_logger.debug("Hasn't exited. Sleep for %.3f seconds.", timeout_sec)
+            time.sleep(timeout_sec)
+        return self.process.poll(), None, None
+
+    def receive(self, timeout_sec):
+        if not self.fd2file:
+            return self._receive_exit_status(timeout_sec)
+
+        try:
+            ready = self.poller.poll(int(math.ceil(timeout_sec * 1000)))
         except select.error as e:
             if e.args[0] == errno.EINTR:
-                interaction_logger.debug("Got EINTR.")
-                continue
+                self.interaction_logger.debug("Got EINTR.")
+                return None, None, None
             raise
 
         if not ready:
-            interaction_logger.warning("Nothing on streams. Some still open.")
-            if process.poll() is not None:
-                interaction_logger.error("Process exited but some streams open. Ignore them.")
-                break
-            if not wait.again():
-                break
-            continue
+            self.interaction_logger.warning("Nothing on streams. Some still open.")
+            if self.process.poll() is not None:
+                self.interaction_logger.error("Process exited but some streams open. Ignore them.")
+                return self.process.poll(), None, None
+            return None, None, None
 
+        name2data = {}
         for fd, mode in ready:
-            if mode & select.POLLOUT:
-                interaction_logger.debug("STDIN ready.")
-                assert fd == process.stdin.fileno()
-                chunk = input[input_offset: input_offset + _STREAM_BUFFER_SIZE]
-                try:
-                    interaction_logger.debug("Write %d bytes.", len(chunk))
-                    input_offset += os.write(fd, chunk)
-                except OSError as e:
-                    if e.errno == errno.EPIPE:
-                        interaction_logger.debug("EPIPE on STDIN.")
-                        close_unregister_and_remove(fd)
-                    else:
-                        raise
-                else:
-                    if input_offset >= len(input):
-                        interaction_logger.debug("Everything is transmitted to STDIN.")
-                        close_unregister_and_remove(fd)
-            elif mode & (select.POLLIN | select.POLLPRI):
-                if not process.stdout.closed and fd == process.stdout.fileno():
-                    interaction_logger.debug("STDOUT ready.")
-                elif not process.stderr.closed and fd == process.stderr.fileno():
-                    interaction_logger.debug("STDERR ready.")
+            if mode & (select.POLLIN | select.POLLPRI):
+                if not self.process.stdout.closed and fd == self.process.stdout.fileno():
+                    self.interaction_logger.debug("STDOUT ready.")
+                elif not self.process.stderr.closed and fd == self.process.stderr.fileno():
+                    self.interaction_logger.debug("STDERR ready.")
                 else:
                     assert False
                 data = os.read(fd, _STREAM_BUFFER_SIZE)
                 if not data:
-                    interaction_logger.debug("No data (%r), close %d.", fd)
-                    close_unregister_and_remove(fd)
-                fd2output[fd].append(data)
+                    self.interaction_logger.debug("No data (%r), close %d.", fd)
+                    self.close_unregister_and_remove(fd)
+                name2data[self.fd2name[fd]] = data
             else:
                 # Ignore hang up or errors.
-                close_unregister_and_remove(fd)
+                self.close_unregister_and_remove(fd)
 
-    for fd in list(fd2file):  # List is preserved during iteration. Dict is emptying.
-        close_unregister_and_remove(fd)
-    interaction_logger.debug("All file descriptors are closed.")
-
-    while True:
-        exit_status = process.poll()
-        if exit_status is not None:
-            interaction_logger.debug("Polled and got exit status: %d.", exit_status)
-            break
-        interaction_logger.debug("Polled and got no exit status.")
-        if not wait.again():
-            interaction_logger.debug("No more waiting for exit.")
-            break
-        interaction_logger.debug("Wait for exit.")
-        wait.sleep()
-
-    return exit_status, b''.join(stdout.chunks), b''.join(stderr.chunks)  # TODO: Return io.BytesIO.
+        return self.process.poll(), name2data.get('stdout'), name2data.get('stderr')
 
 
 class _LocalShell(PosixShell):
@@ -145,21 +136,15 @@ class _LocalShell(PosixShell):
         return kwargs
 
     @classmethod
-    def _communicate(cls, process, input, timeout_sec):
-        exit_status, stdout, stderr = _communicate(process, input, timeout_sec)
-        if exit_status is None:
-            raise Timeout(timeout_sec)
-        if exit_status != 0:
-            raise exit_status_error_cls(exit_status)(stdout, stderr)
-        return stdout
-
-    @classmethod
     def run_command(cls, command, input=None, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
         kwargs = cls._make_kwargs(cwd, env, input is not None)
         command = [str(arg) for arg in command]
         _logger.debug('Run command:\n%s', sh_command_to_script(command))
-        process = subprocess.Popen(command, shell=False, **kwargs)
-        return cls._communicate(process, input, timeout_sec)
+        with _LocalCommand(command, shell=False, **kwargs) as running_command:
+            exit_status, stdout, stderr = running_command.communicate(input=input, timeout_sec=timeout_sec)
+        if exit_status != 0:
+            raise exit_status_error_cls(exit_status)(stdout, stderr)
+        return stdout
 
     @classmethod
     def run_sh_script(cls, script, input=None, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
@@ -167,8 +152,11 @@ class _LocalShell(PosixShell):
         augmented_script_to_log = sh_augment_script(script, cwd, env)
         _logger.debug('Run:\n%s', augmented_script_to_log)
         kwargs = cls._make_kwargs(cwd, env, input is not None)
-        process = subprocess.Popen(augmented_script_to_run, shell=True, **kwargs)
-        return cls._communicate(process, input, timeout_sec)
+        with _LocalCommand(augmented_script_to_run, shell=True, **kwargs) as running_command:
+            exit_status, stdout, stderr = running_command.communicate(input=input, timeout_sec=timeout_sec)
+        if exit_status != 0:
+            raise exit_status_error_cls(exit_status)(stdout, stderr)
+        return stdout
 
 
 local_shell = _LocalShell()

@@ -78,6 +78,7 @@ class _SSHCommand(Command):
                     output_logger.debug("Text:\n%s", output_chunk.decode('ascii'))
                 except UnicodeDecodeError:
                     output_logger.debug("Binary: %d bytes", len(output_chunk))
+        # TODO: If streams are closed, wait for exit status, poll otherwise.
         self._logger.debug("Exit status: %r.", self._channel.exit_status)
         if self._channel.exit_status != -1:
             assert 0 <= self._channel.exit_status <= 255
