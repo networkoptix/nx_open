@@ -7,6 +7,8 @@
 #include <nx_ec/data/api_stored_file_data.h>
 
 #include <set>
+#include <chrono>
+
 class QnCommonModule;
 
 namespace nx {
@@ -25,21 +27,21 @@ public:
     void start();
     void update();
 
-    /* 
-     changeIntervalAsync just emits doChangeInterval, 
-     that restarts timer in timer's thread
-    */
-    void changeIntervalAsync(int ms);
+    /** changeIntervalAsync just emits doChangeInterval, that restarts timer in timer's thread */
+    void changeIntervalAsync(std::chrono::milliseconds interval);
 
 signals:
-    void doChangeInterval(int ms);
+    void doChangeInterval(std::chrono::milliseconds interval);
 
 private:
     using Uuids=std::set<QnUuid>;
     Uuids m_previousOrphanCameras;
     QTimer m_timer;
-    int m_updateIntervalMs;
+    std::chrono::milliseconds m_updateInterval;
+    bool m_setDefaultUpdateInterval;
 };
 
 } // namespace appserver
 } // namespace nx
+
+Q_DECLARE_METATYPE(std::chrono::milliseconds);

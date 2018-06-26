@@ -24,51 +24,51 @@ struct QnStaticCommonModulePrivate;
  * All singletons and initialization/deinitialization code goes here.
  */
 class QnStaticCommonModule:
-    public QObject,
-    public QnInstanceStorage,
-    public Singleton<QnStaticCommonModule>
+	public QObject,
+	public QnInstanceStorage,
+	public Singleton<QnStaticCommonModule>
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    QnStaticCommonModule(
-        Qn::PeerType localPeerType = Qn::PeerType::PT_NotDefined,
-        const QString& brand = QString(),
-        const QString& customization = QString(),
-        const QString& customCloudHost = QString(),
-        QObject *parent = nullptr);
-    virtual ~QnStaticCommonModule();
+	QnStaticCommonModule(
+		Qn::PeerType localPeerType = Qn::PeerType::PT_NotDefined,
+		const QString& brand = QString(),
+		const QString& customization = QString(),
+		const QString& customCloudHost = QString(),
+		QObject *parent = nullptr);
+	virtual ~QnStaticCommonModule();
 
-    using Singleton<QnStaticCommonModule>::instance;
-    using QnInstanceStorage::instance;
-    using QnInstanceStorage::store;
+	using Singleton<QnStaticCommonModule>::instance;
+	using QnInstanceStorage::instance;
+	using QnInstanceStorage::store;
 
-    Qn::PeerType localPeerType() const;
-    QString brand() const;
-    QString customization() const;
+	Qn::PeerType localPeerType() const;
+	QString brand() const;
+	QString customization() const;
 
-    QnSoftwareVersion engineVersion() const;
-    void setEngineVersion(const QnSoftwareVersion &version);
+	QnSoftwareVersion engineVersion() const;
+	void setEngineVersion(const QnSoftwareVersion &version);
 
-    QnResourceDataPool *dataPool() const;
+	QnResourceDataPool *dataPool() const;
 
-    void setModuleShortId(const QnUuid& id, int number);
-    int moduleShortId(const QnUuid& id) const;
-    QString moduleDisplayName(const QnUuid& id) const;
+	void setModuleShortId(const QnUuid& id, int number);
+	int moduleShortId(const QnUuid& id) const;
+	QString moduleDisplayName(const QnUuid& id) const;
 protected:
-    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
+	static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
-    mutable QnMutex m_mutex;
+	mutable QnMutex m_mutex;
 	QMap<QnUuid, int> m_longToShortInstanceId;
-    QnStaticCommonModulePrivate* m_private;
+	QnStaticCommonModulePrivate* m_private;
 
-    const Qn::PeerType m_localPeerType;
-    const QString m_brand;
-    const QString m_customization;
-    QnSoftwareVersion m_engineVersion;
+	const Qn::PeerType m_localPeerType;
+	const QString m_brand;
+	const QString m_customization;
+	QnSoftwareVersion m_engineVersion;
 
-    QnResourceDataPool* m_dataPool = nullptr;
+	QnResourceDataPool* m_dataPool = nullptr;
 };
 
 #define qnStaticCommon (QnStaticCommonModule::instance())
