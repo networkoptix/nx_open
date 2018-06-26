@@ -176,7 +176,7 @@ QString ServerWriterHandler::groupId() const
 
 QString ServerWriterHandler::groupName() const
 {
-    return m_camera->getGroupName();
+    return m_camera->getUserDefinedGroupName();
 }
 
 QString ServerWriterHandler::url() const

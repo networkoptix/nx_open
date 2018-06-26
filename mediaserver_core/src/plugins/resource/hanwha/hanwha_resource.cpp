@@ -2853,7 +2853,7 @@ void HanwhaResource::updateToChannel(int value)
     setUrl(url.toString());
 
     QString physicalId = getPhysicalId().split('_')[0];
-    setGroupName(getModel());
+    setDefaultGroupName(getModel());
     setGroupId(physicalId);
 
     QString suffix = lit("_channel=%1").arg(value + 1);

@@ -37,17 +37,6 @@ QDateTime addHours(const QDateTime& dateTime, int hours)
 }
 } // namespace
 
-QnTimeStep::QnTimeStep():
-    type(Milliseconds),
-    unitMSecs(0),
-    stepMSecs(0),
-    stepUnits(0),
-    wrapUnits(0),
-    isRelative(true),
-    index(0)
-{
-}
-
 QnTimeStep::QnTimeStep(
     Type type,
     milliseconds unitMSecs,

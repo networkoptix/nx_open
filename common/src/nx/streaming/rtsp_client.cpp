@@ -36,6 +36,7 @@ static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
+static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
 static const int TCP_CONNECT_TIMEOUT_MS = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
@@ -47,18 +48,6 @@ static const int DRIFT_STATS_WINDOW_SIZE = 1000;
 
 QByteArray QnRtspClient::m_guid;
 QnMutex QnRtspClient::m_guidMutex;
-
-#if 0
-
-static QString getValueFromString(const QString& line)
-{
-    int index = line.indexOf(QLatin1Char('='));
-    if (index < 1)
-        return QString();
-    return line.mid(index+1);
-}
-
-#endif // 0
 
 namespace {
 
@@ -81,7 +70,6 @@ QnRtspIoDevice::QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPo
     m_mediaPort(mediaPort),
     m_remoteEndpointRtcpPort(rtcpPort),
     ssrc(0),
-    m_rtpTrackNum(0),
     m_reportTimerStarted(false),
     m_forceRtcpReports(false)
 {
@@ -561,36 +549,24 @@ int QnRtspClient::getLastResponseCode() const
     return m_responseCode;
 }
 
-// see rfc1890 for full RTP predefined codec list
-QString findCodecById(int num)
-{
-    switch (num)
-    {
-        case 0: return QLatin1String("PCMU");
-        case 8: return QLatin1String("PCMA");
-        case 26: return QLatin1String("JPEG");
-        default: return QString();
-    }
-}
-
 void QnRtspClient::usePredefinedTracks()
 {
-    if(!m_sdpTracks.isEmpty())
+    if (!m_sdpTracks.isEmpty())
         return;
 
     int trackNum = 0;
     for (; trackNum < m_numOfPredefinedChannels; ++trackNum)
     {
-        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QByteArray("video"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, trackNum, this, true));
+        m_sdpTracks << QSharedPointer<SDPTrackInfo>(new SDPTrackInfo(FFMPEG_STR, QByteArray("video"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, this, true));
     }
 
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QByteArray("audio"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, trackNum, this, true));
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(METADATA_STR, QByteArray("metadata"), QByteArray("trackID=7"), METADATA_CODE, METADATA_TRACK_NUM, this, true));
+    m_sdpTracks << QSharedPointer<SDPTrackInfo>(new SDPTrackInfo(FFMPEG_STR, QByteArray("audio"), QByteArray("trackID=") + QByteArray::number(trackNum), FFMPEG_CODE, this, true));
+    m_sdpTracks << QSharedPointer<SDPTrackInfo>(new SDPTrackInfo(METADATA_STR, QByteArray("metadata"), QByteArray("trackID=7"), METADATA_CODE, this, true));
 }
 
 bool trackNumLess(const QSharedPointer<QnRtspClient::SDPTrackInfo>& track1, const QSharedPointer<QnRtspClient::SDPTrackInfo>& track2)
 {
-    return track1->trackNum < track2->trackNum;
+    return track1->trackNumber < track2->trackNumber;
 }
 
 void QnRtspClient::updateTrackNum()
@@ -615,56 +591,47 @@ void QnRtspClient::updateTrackNum()
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
         if (m_sdpTracks[i]->trackType == TT_VIDEO)
-            m_sdpTracks[i]->trackNum = curVideo++;
+            m_sdpTracks[i]->trackNumber = curVideo++;
         else if (m_sdpTracks[i]->trackType == TT_AUDIO)
-            m_sdpTracks[i]->trackNum = videoNum + curAudio++;
+            m_sdpTracks[i]->trackNumber = videoNum + curAudio++;
         else if (m_sdpTracks[i]->trackType == TT_METADATA) {
             if (m_sdpTracks[i]->codecName == METADATA_STR)
-                m_sdpTracks[i]->trackNum = METADATA_TRACK_NUM; // use fixed track num for our proprietary format
+                m_sdpTracks[i]->trackNumber = METADATA_TRACK_NUM; // use fixed track num for our proprietary format
             else
-                m_sdpTracks[i]->trackNum = videoNum + audioNum + curMetadata++;
+                m_sdpTracks[i]->trackNumber = videoNum + audioNum + curMetadata++;
         }
         else
-            m_sdpTracks[i]->trackNum = videoNum + audioNum + metadataNum; // unknown track
+            m_sdpTracks[i]->trackNumber = videoNum + audioNum + metadataNum; // unknown track
     }
     std::sort(m_sdpTracks.begin(), m_sdpTracks.end(), trackNumLess);
 }
 
+/**
+ * Parse RPT session description according to RFC-4566: Session Description Protocol
+ * https://tools.ietf.org/html/rfc4566
+ * Current implementation is not complete and may fail on correct data
+ * (though it work fine in all tests? we've done).
+ */
 void QnRtspClient::parseSDP()
 {
     QList<QByteArray> lines = m_sdp.split('\n');
 
-    int mapNum = -1;
-    QString codecName;
-    QByteArray codecType;
-    QByteArray setupURL;
-    bool isBackChannel = false;
-    int timeBase = 0;
-
-    for(QByteArray line: lines)
+    QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(this, m_transport == TRANSPORT_TCP));
+    for (QByteArray line : lines)
     {
         line = line.trimmed();
         QByteArray lineLower = line.toLower();
         if (lineLower.startsWith("m="))
         {
-            if (mapNum >= 0) {
-                if (codecName.isEmpty())
-                    codecName = findCodecById(mapNum);
-                QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
-                sdpTrack->isBackChannel = isBackChannel;
-                sdpTrack->timeBase = timeBase;
+            if (sdpTrack->isValid())
                 m_sdpTracks << sdpTrack;
-                setupURL.clear();
-            }
+            sdpTrack.reset(new SDPTrackInfo(this, m_transport == TRANSPORT_TCP));
+
             QList<QByteArray> trackParams = lineLower.mid(2).split(' ');
-            codecType = trackParams[0];
-            codecName.clear();
-            isBackChannel = false;
-            timeBase = 0;
-            mapNum = 0;
-            if (trackParams.size() >= 4) {
-                mapNum = trackParams[3].toInt();
-            }
+            const auto codecType = trackParams[0];
+            sdpTrack->trackType = SDPTrackInfo::trackTypeFromString(codecType);
+            if (trackParams.size() >= 4)
+                sdpTrack->setMapNumber(trackParams[3].toInt());
         }
         if (lineLower.startsWith("a=rtpmap"))
         {
@@ -675,32 +642,27 @@ void QnRtspClient::parseSDP()
             QList<QByteArray> codecInfo = params[1].split('/');
             if (trackInfo.size() < 2 || codecInfo.size() < 2)
                 continue; // invalid data format. skip
-            mapNum = trackInfo[1].toUInt();
-            codecName = QLatin1String(codecInfo[0]);
+            int mapNumber = trackInfo[1].toUInt();
+            if (sdpTrack->mapNumber >= 0 && mapNumber != sdpTrack->mapNumber)
+                continue; //< Ignore invalid rtpmap
+            sdpTrack->setMapNumber(mapNumber);
+            sdpTrack->codecName = QLatin1String(codecInfo[0]);
             if (codecInfo.size() > 1)
-                timeBase = codecInfo[1].toInt();
+                sdpTrack->timeBase = codecInfo[1].toInt();
         }
         else if (lineLower.startsWith("a=control:"))
         {
-            setupURL = line.mid(QByteArray("a=control:").length());
+            sdpTrack->setupURL = line.mid(QByteArray("a=control:").length());
         }
         else if (lineLower.startsWith("a=sendonly"))
         {
-            isBackChannel = true;
+            sdpTrack->isBackChannel = true;
         }
     }
-    if (mapNum >= 0)
-    {
-        if (codecName.isEmpty())
-            codecName = findCodecById(mapNum);
-        //if (codecName == METADATA_STR)
-        //    trackNumber = METADATA_TRACK_NUM;
-        QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
-        sdpTrack->isBackChannel = isBackChannel;
-        sdpTrack->timeBase = timeBase;
+    if (sdpTrack->isValid())
         m_sdpTracks << sdpTrack;
-    }
     updateTrackNum();
+
 }
 
 void QnRtspClient::parseRangeHeader(const QString& rangeStr)
@@ -796,7 +758,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
         m_additionalReadBufferSize = 0;
     }
 
-    m_tcpSock->setRecvTimeout(TCP_CONNECT_TIMEOUT_MS);
+    m_tcpSock->setRecvTimeout(TCP_RECEIVE_TIMEOUT_MS);
 
     nx::network::SocketAddress targetAddress;
     if (m_proxyAddress)
@@ -1048,13 +1010,13 @@ QList<QByteArray> QnRtspClient::getSdpByTrackNum(int trackNum) const
     QList<QByteArray> rez;
     QList<QByteArray> tmp = m_sdp.split('\n');
 
-    int mapNum = -1;
+    int mapNumber = -1;
     for (int i = 0; i < m_sdpTracks.size(); ++i)
     {
-        if (trackNum == m_sdpTracks[i]->trackNum)
-            mapNum = m_sdpTracks[i]->mapNum;
+        if (trackNum == m_sdpTracks[i]->trackNumber)
+            mapNumber = m_sdpTracks[i]->mapNumber;
     }
-    if (mapNum == -1)
+    if (mapNumber == -1)
         return rez;
 #if 0
     // match all a= lines like:
@@ -1066,7 +1028,7 @@ QList<QByteArray> QnRtspClient::getSdpByTrackNum(int trackNum) const
         if (line.startsWith("a=")) {
             QByteArray lineMapNum = line.split(' ')[0];
             lineMapNum = lineMapNum.mid(line.indexOf(':')+1);
-            if (lineMapNum.toInt() == mapNum)
+            if (lineMapNum.toInt() == mapNumber)
                 rez << line;
         }
     }
@@ -1079,7 +1041,7 @@ QList<QByteArray> QnRtspClient::getSdpByTrackNum(int trackNum) const
         QByteArray line = tmp[i].trimmed();
         if (line.startsWith("m="))
             currentTrackNum = line.split(' ').last().trimmed().toInt();
-        else if (line.startsWith("a=") && currentTrackNum == mapNum)
+        else if (line.startsWith("a=") && currentTrackNum == mapNumber)
             rez << line;
     }
 #endif
@@ -1156,7 +1118,7 @@ bool QnRtspClient::sendSetup()
         }
         else
         {
-        	int rtpNum = trackInfo->trackNum*SDP_TRACK_STEP;
+        	int rtpNum = trackInfo->trackNumber*SDP_TRACK_STEP;
             trackInfo->interleaved = QPair<int,int>(rtpNum, rtpNum+1);
             request += QLatin1String("interleaved=") + QString::number(trackInfo->interleaved.first) + QLatin1Char('-') + QString::number(trackInfo->interleaved.second);
         }
@@ -1209,7 +1171,7 @@ bool QnRtspClient::sendSetup()
             }
             else
             {
-        	    int rtpNum = trackInfo->trackNum*SDP_TRACK_STEP;
+        	    int rtpNum = trackInfo->trackNumber*SDP_TRACK_STEP;
                 trackInfo->interleaved = QPair<int,int>(rtpNum, rtpNum+1);
                 transportStr += QLatin1String("interleaved=") + QString::number(trackInfo->interleaved.first) + QLatin1Char('-') + QString::number(trackInfo->interleaved.second);
             }
@@ -1913,7 +1875,7 @@ int QnRtspClient::getChannelNum(int rtpChannelNum)
     if (static_cast<size_t>(rtpChannelNum) < m_rtpToTrack.size()) {
         const QSharedPointer<SDPTrackInfo>& track = m_rtpToTrack[rtpChannelNum];
         if (track)
-            return track->trackNum;
+            return track->trackNumber;
     }
     return 0;
 }

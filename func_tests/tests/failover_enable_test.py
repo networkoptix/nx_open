@@ -55,7 +55,7 @@ def layout():
 
 
 @pytest.fixture()
-def three_mediaserver_list(network, mediaserver_factory):
+def three_mediaservers(network, mediaserver_factory):
     allocated_mediaservers = []
     with ClosingPool(mediaserver_factory.allocated_mediaserver, network, None) as mediaservers:
         for name in ['one', 'two', 'three']:

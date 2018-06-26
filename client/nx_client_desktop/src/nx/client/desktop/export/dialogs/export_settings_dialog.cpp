@@ -442,6 +442,7 @@ void ExportSettingsDialog::updateMode()
 
     const auto currentMode = isCameraMode ? Mode::Media : Mode::Layout;
     d->setMode(currentMode);
+    updateWidgetsState();
 }
 
 void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts,
@@ -503,9 +504,10 @@ void ExportSettingsDialog::updateWidgetsState()
     const auto& settings = d->exportMediaPersistentSettings();
     bool transcodingLocked = settings.areFiltersForced();
     bool transcodingChecked = settings.applyFilters;
-    bool overlayOptionsAvailable = d->mode() == Mode::Media && settings.canExportOverlays();
+    auto mode = d->mode();
+    bool overlayOptionsAvailable = mode == Mode::Media && settings.canExportOverlays();
 
-    if (d->mode() == Mode::Media && !d->hasVideo())
+    if (mode == Mode::Media && !d->hasVideo())
     {
         transcodingLocked = true;
         transcodingChecked = false;
@@ -516,7 +518,7 @@ void ExportSettingsDialog::updateWidgetsState()
     ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
     ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked, true);
 
-    if (transcodingChecked && overlayOptionsAvailable)
+    if (overlayOptionsAvailable)
         ui->cameraExportSettingsButton->click();
 
     // Yep, we need exactly this condition.
