@@ -37,6 +37,7 @@ public: // Properties section
     int presetsCount() const;
     int activePresetIndex() const;
 
+    Ptz::Capabilities operationalCapabilities() const;
     int capabilities() const;
 
 public:

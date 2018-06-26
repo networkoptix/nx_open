@@ -260,8 +260,8 @@ public:
     {
         // VCA-camera executes cgi-commands very slow (especially complex commands), so read
         // intervals must be really huge.
-        m_client.setResponseReadTimeoutMs(12000);
-        m_client.setMessageBodyReadTimeoutMs(5000);
+        m_client.setResponseReadTimeout(std::chrono::seconds(12));
+        m_client.setMessageBodyReadTimeout(std::chrono::seconds(5));
     }
 
     void setCgiPreamble(const QString& ip)
@@ -277,8 +277,7 @@ public:
 
     void setReadTimeout(std::chrono::seconds readTimeout)
     {
-        const int ms = (std::chrono::duration_cast<std::chrono::milliseconds>(readTimeout)).count();
-        m_client.setResponseReadTimeoutMs(ms);
+        m_client.setResponseReadTimeout(readTimeout);
     }
 
     bool execute(const QString& command, QByteArray& report)

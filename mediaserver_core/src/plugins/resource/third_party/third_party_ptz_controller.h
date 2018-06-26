@@ -25,14 +25,30 @@ public:
         nxcip::CameraPtzManager* cameraPtzManager );
     virtual ~QnThirdPartyPtzController();
 
-    virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
-    virtual bool continuousMove(const QVector3D &speed) override;
-    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const override;
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const override;
-    virtual bool getFlip(Qt::Orientations *flip) const override;
+    virtual bool absoluteMove(
+        Qn::PtzCoordinateSpace space,
+        const nx::core::ptz::Vector& position,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool getPosition(
+        Qn::PtzCoordinateSpace space,
+        nx::core::ptz::Vector* outPosition,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getLimits(
+        Qn::PtzCoordinateSpace space, QnPtzLimits* limits,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getFlip(
+        Qt::Orientations* flip,
+        const nx::core::ptz::Options& options) const override;
 
 private:
     QnThirdPartyResourcePtr m_resource;

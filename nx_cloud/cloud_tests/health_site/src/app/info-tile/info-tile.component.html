@@ -22,7 +22,7 @@
                         [innerHTML]="getClassFor(item).alert">
                     </h6>
                     <p class="card-text offset-1 mt-1">
-                        {{ item.timestamp | timeChecked }} ({{ item.timestamp | timeAgo:true }} ago)
+                        {{ item.timestamp | timeChecked }} {{ item.timestamp | timeAgo:serverTime }}
                     </p>
                 </div>
                 <div class="row subsections" *ngIf="item.subsections">

@@ -17,7 +17,7 @@ ManualFileData::ManualFileData(const QString& file, const OsVersion& osVersion,
 
 ManualFileData ManualFileData::fromFileName(const QString& fileName)
 {
-    const QRegExp fileRegExp("^.+-([a-z]+)_update-([0-9:.]+)-(.+)\\.zip$");
+    const QRegExp fileRegExp("^.+-([a-z]+)_update-([0-9:.]+)-([0-9,a-z]+)-?.*\\.zip$");
     ManualFileData result;
 
     if (int pos = fileRegExp.indexIn(fileName); pos == -1)

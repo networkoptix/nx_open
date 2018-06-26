@@ -40,8 +40,8 @@ protected:
 
         peerContext.id = QnUuid::createUuid().toStdString();
         nx::network::http::HttpClient httpClient;
-        httpClient.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
-        httpClient.setMessageBodyReadTimeoutMs(nx::network::kNoTimeout.count());
+        httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
+        httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
         ASSERT_TRUE(httpClient.doUpgrade(getUrl(), nx::network::websocket::kWebsocketProtocolName));
         ASSERT_TRUE(nx::network::http::StatusCode::isSuccessCode(httpClient.response()->statusLine.statusCode))
             << httpClient.response()->statusLine.statusCode;

@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include <nx/utils/math/sum_per_period.h>
@@ -27,7 +29,8 @@ protected:
 
     void setSubPeriodCount(int count)
     {
-        m_sumPerPeriod = math::SumPerPeriod<int>(m_period, count);
+        std::destroy_at(&m_sumPerPeriod);
+        new (&m_sumPerPeriod) math::SumPerPeriod<int>(m_period, count);
     }
 
     void addMultipleValuesWithinPeriod(std::chrono::milliseconds period)

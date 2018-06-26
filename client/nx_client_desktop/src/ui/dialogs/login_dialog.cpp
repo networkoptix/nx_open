@@ -50,7 +50,6 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/rendering_widget.h>
-#include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <helpers/system_helpers.h>
@@ -170,7 +169,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     QnWorkbenchContextAware(parent),
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
-    m_renderingWidget(QnGlWidgetFactory::create<QnRenderingWidget>())
+    m_renderingWidget(new QnRenderingWidget(this))
 {
     ui->setupUi(this);
 

@@ -11,8 +11,7 @@ TransactionMessageBusAdapter::TransactionMessageBusAdapter(
     :
     AbstractTransactionMessageBus(commonModule),
     m_jsonTranSerializer(jsonTranSerializer),
-    m_ubjsonTranSerializer(ubjsonTranSerializer),
-    m_timeSyncManager(nullptr)
+    m_ubjsonTranSerializer(ubjsonTranSerializer)
 {
 }
 
@@ -21,9 +20,8 @@ void TransactionMessageBusAdapter::reset()
     m_bus.reset();
 }
 
-void TransactionMessageBusAdapter::initInternal(Qn::PeerType peerType)
+void TransactionMessageBusAdapter::initInternal()
 {
-    m_bus->setTimeSyncManager(m_timeSyncManager);
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerFound,
         this, &AbstractTransactionMessageBus::peerFound, Qt::DirectConnection);
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerLost,
@@ -54,9 +52,10 @@ QSet<QnUuid> TransactionMessageBusAdapter::directlyConnectedServerPeers() const
     return m_bus->directlyConnectedServerPeers();
 }
 
-QnUuid TransactionMessageBusAdapter::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
+QnUuid TransactionMessageBusAdapter::routeToPeerVia(
+    const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
-    return m_bus->routeToPeerVia(dstPeer, distance);
+    return m_bus->routeToPeerVia(dstPeer, distance, knownPeerAddress);
 }
 
 int TransactionMessageBusAdapter::distanceToPeer(const QnUuid& dstPeer) const
@@ -115,12 +114,5 @@ detail::QnDbManager* TransactionMessageBusAdapter::getDb() const
     return m_bus->getDb();
 }
 #endif
-
-void TransactionMessageBusAdapter::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
-{
-    m_timeSyncManager = timeSyncManager;
-    if (m_bus)
-        m_bus->setTimeSyncManager(m_timeSyncManager);
-}
 
 } // namespace ec2

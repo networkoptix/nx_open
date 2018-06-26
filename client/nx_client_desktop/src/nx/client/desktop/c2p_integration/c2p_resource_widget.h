@@ -20,7 +20,7 @@ public:
     Q_INVOKABLE void c2pplayback(const QString& cameraNames, int timestamp);
 
 private:
-    void resetC2pLayout(const QnVirtualCameraResourceList& cameras);
+    void resetC2pLayout(const QnVirtualCameraResourceList& cameras, qint64 timestampMs);
 };
 
 

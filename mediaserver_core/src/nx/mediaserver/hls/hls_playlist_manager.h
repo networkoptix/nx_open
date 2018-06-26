@@ -32,23 +32,23 @@ public:
             quint64 _startTimestamp,
             quint64 _duration,
             unsigned int _mediaSequence,
-            bool _discontinuity = false );
+            bool _discontinuity = false);
         ChunkData(
             const QString& _alias,
             unsigned int _mediaSequence,
-            bool _discontinuity = false );
+            bool _discontinuity = false);
     };
 
     virtual ~AbstractPlaylistManager() = default;
 
-    //!Generates chunks and appends them to \a chunkList
-    /*!
-        \param endOfStreamReached Can be NULL
-        \return Number of chunks generated
-    */
+    /**
+     * Generates chunks and appends them to chunkList.
+     * @param endOfStreamReached Can be NULL.
+     * @return Number of chunks generated.
+     */
     virtual size_t generateChunkList(
         std::vector<ChunkData>* const chunkList,
-        bool* const endOfStreamReached ) const = 0;
+        bool* const endOfStreamReached) const = 0;
     //!Returns maximum stream bitrate in bps
     virtual int getMaxBitrate() const = 0;
 };

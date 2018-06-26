@@ -167,6 +167,7 @@ public:
     SocketAddress(const HostAddress& _address = HostAddress::anyHost, quint16 _port = 0);
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
+    SocketAddress(const std::string& str);
     SocketAddress(const char* utf8Str);
     SocketAddress(const sockaddr_in& ipv4Endpoint);
     SocketAddress(const sockaddr_in6& ipv6Endpoint);

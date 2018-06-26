@@ -43,6 +43,9 @@ public:
     Value value() const;
     void setValue(const Value& val);
 
+    void lockRotationAdd(bool value);
+    void lockRotationDec(bool value);
+
 signals:
     void valueChanged(const Value& value);
 
@@ -104,7 +107,7 @@ protected:
 
     void updateState();
 
-    void onButtonClicked(ButtonType button);
+    void onButtonClicked(ButtonType button, bool state);
 
     void drawRotationCircle(QPainter* painter, const QRectF& rect) const;
     void drawRotationValue(QPainter* painter, const QRectF& rect, float rotation) const;
@@ -129,6 +132,9 @@ protected:
 
     // Current state of control.
     Value m_current;
+
+    // Additional change from buttons,
+    Value m_buttonState;
     // Increment for horizontal or vertical axis.
     // It is applied when you press arrow buttons on the widget.
     float m_increment = 0.1f;
@@ -137,6 +143,8 @@ protected:
     Handler m_rotationHandler;
 
     bool m_rotationEnabled = true;
+    bool m_rotationIsAbsolute = false;
+    bool m_rotationAutoReturn = true;
     bool m_panTiltEnabled = true;
 
     QnGenericPalette m_palette;

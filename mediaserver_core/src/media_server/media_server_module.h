@@ -20,6 +20,9 @@ class QThread;
 class AbstractArchiveIntegrityWatcher;
 class QnDataProviderFactory;
 class QnResourceCommandProcessor;
+class QnResourcePool;
+class QnResourcePropertyDictionary;
+class QnCameraHistoryPool;
 
 namespace nx {
 
@@ -29,12 +32,17 @@ class AbstractEventsStorage;
 }
 } // namespace analytics
 
+namespace time_sync { 
+class TimeSyncManager; 
+} // namespace time_sync
+
 namespace mediaserver {
 
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
 class RootTool;
 class Settings;
+class ServerTimeSyncManager;
 
 namespace updates2 {
 class ServerUpdates2Manager;
@@ -98,10 +106,18 @@ class QnMediaServerModule : public QObject,
     QnDataProviderFactory* dataProviderFactory() const;
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
+    QnResourcePool* resourcePool() const;
+    QnResourcePropertyDictionary* propertyDictionary() const;
+    QnCameraHistoryPool* cameraHistoryPool() const;
+
     nx::mediaserver::RootTool* rootTool() const;
+
+    QnStorageManager* normalStorageManager() const;
+    QnStorageManager* backupStorageManager() const;
 
   private:
     void registerResourceDataProviders();
+    QDir downloadsDirectory() const;
 
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;

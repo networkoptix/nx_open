@@ -15,6 +15,7 @@
 #include <plugins/resource/onvif/onvif_resource.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
+#include <nx/core/ptz/type.h>
 #include <nx/utils/timer_holder.h>
 
 extern "C" {
@@ -168,7 +169,7 @@ private:
 
     CameraDiagnostics::Result initIo();
     CameraDiagnostics::Result initPtz();
-    CameraDiagnostics::Result initAlternativePtz();
+    CameraDiagnostics::Result initConfigurationalPtz();
     CameraDiagnostics::Result initAdvancedParameters();
     CameraDiagnostics::Result initTwoWayAudio();
     CameraDiagnostics::Result initRemoteArchive();
@@ -324,6 +325,8 @@ private:
     void setDirectProfile(Qn::ConnectionRole role, int profileNumber);
     void setBypassProfile(Qn::ConnectionRole role, int profileNumber);
 
+    Ptz::Capabilities ptzCapabilities(nx::core::ptz::Type ptzType) const;
+
 private:
     using AdvancedParameterId = QString;
 
@@ -343,10 +346,13 @@ private:
     HanwhaCodecInfo m_codecInfo;
     std::map<Qn::ConnectionRole, ProfileNumbers> m_profileByRole;
 
-    Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
-    std::map<QString, HanwhaRange> m_alternativePtzRanges;
+    std::map<QString, HanwhaRange> m_configurationalPtzRanges;
+    std::map<nx::core::ptz::Type, Ptz::Capabilities> m_ptzCapabilities = {
+        {nx::core::ptz::Type::operational, Ptz::NoPtzCapabilities},
+        {nx::core::ptz::Type::configurational, Ptz::NoPtzCapabilities}
+    };
 
     std::map<AdvancedParameterId, HanwhaAdavancedParameterInfo> m_advancedParameterInfos;
 

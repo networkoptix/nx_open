@@ -25,7 +25,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
-    ServerFlags TimeFlags IOPortTypes
+    ServerFlags IOPortTypes
     Permissions GlobalPermissions
     )
 
@@ -44,10 +44,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AudioTransmitCapability             = 0x040,
         RemoteArchiveCapability             = 0x100,
         SetUserPasswordCapability           = 0x200, //< Can change password on a camera.
-        isDefaultPasswordCapability         = 0x400, //< Camera has default password now.
-        isOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
-        customMediaUrlCapability            = 0x1000, //< Camera's streams are editable.
-        isPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
+        IsDefaultPasswordCapability         = 0x400, //< Camera has default password now.
+        IsOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
+        CustomMediaUrlCapability            = 0x1000, //< Camera's streams are editable.
+        IsPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -58,6 +58,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AbsoluteDeviceMovePtzCommand,
         AbsoluteLogicalMovePtzCommand,
         ViewportMovePtzCommand,
+
+        RelativeMovePtzCommand,
+        RelativeFocusPtzCommand,
 
         GetDevicePositionPtzCommand,
         GetLogicalPositionPtzCommand,
@@ -313,22 +316,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
 
-
-    enum TimeFlag
-    {
-        TF_none = 0x0,
-        TF_peerIsNotEdgeServer = 0x0001,
-        TF_peerHasMonotonicClock = 0x0002,
-        TF_peerTimeSetByUser = 0x0004,
-        TF_peerTimeSynchronizedWithInternetServer = 0x0008,
-        TF_peerIsServer = 0x1000
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TimeFlag)
-
-    Q_DECLARE_FLAGS(TimeFlags, TimeFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(TimeFlags)
-
-
     enum IOPortType {
         PT_Unknown  = 0x0,
         PT_Disabled = 0x1,
@@ -516,6 +503,7 @@ using StreamQuality = nx::vms::api::StreamQuality;
         Auth_CloudConnectError,   // can't connect to the Cloud to authenticate
         Auth_DisabledUser,    // disabled user
         Auth_InvalidCsrfToken, // for cookie login
+        Auth_LockedOut, //< locked out for a period of time.
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);
@@ -803,8 +791,9 @@ using CameraBackupQualities = nx::vms::api::CameraBackupQualities;
         IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
         IncompatibleVersionConnectionResult,        /*< Server version is too low. */
         IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/
-        ForbiddenConnectionResult,                   /*< Connection is not allowed yet. Try again later*/
-        DisabledUserConnectionResult                /*< Disabled user*/
+        ForbiddenConnectionResult,                  /*< Connection is not allowed yet. Try again later*/
+        DisabledUserConnectionResult,               /*< Disabled user*/
+        UserTemporaryLockedOut,                     /*< User is prohibited from logging in for several minutes. Try again later*/
     };
 
     enum MediaStreamEvent
@@ -869,7 +858,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::TimeFlags)
+    (Qn::ServerFlags)
     (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)(Qn::IOPortTypes)
     ,
     (metatype)(numeric)(lexical)

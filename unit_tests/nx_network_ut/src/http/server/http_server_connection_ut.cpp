@@ -23,6 +23,11 @@ class HttpServerConnection:
     public ::testing::Test
 {
 protected:
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(m_httpServer.bindAndListen());
+    }
+
     void whenRespondWithEmptyMessageBody()
     {
         installRequestHandlerWithEmptyBody();
@@ -74,16 +79,22 @@ protected:
         ASSERT_GE(m_prevStrictTransportSecurity.maxAge, desiredMinimalAge);
     }
 
+    TestHttpServer& httpServer()
+    {
+        return m_httpServer;
+    }
+
+    nx::utils::Url prepareRequestUrl(const char* requestPath) const
+    {
+        return nx::network::url::Builder().setScheme(http::kUrlSchemeName)
+            .setEndpoint(m_httpServer.serverAddress()).setPath(requestPath);
+    }
+
 private:
     TestHttpServer m_httpServer;
     nx::utils::SyncQueue<int /*dummy*/> m_responseSentEvents;
     boost::optional<Response> m_prevResponse;
     header::StrictTransportSecurity m_prevStrictTransportSecurity;
-
-    virtual void SetUp() override
-    {
-        ASSERT_TRUE(m_httpServer.bindAndListen());
-    }
 
     void installRequestHandlerWithEmptyBody()
     {
@@ -161,6 +172,127 @@ TEST_F(
 
     thenStrictTransportSecurityHeaderIsValid();
     andStrictTransportSecurityMaxAgeIsNotLessThan(std::chrono::hours(24) * 365);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpServerConnectionClientEndpoint:
+    public HttpServerConnection
+{
+    using base_type = HttpServerConnection;
+
+protected:
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        base_type::SetUp();
+
+        httpServer().registerRequestProcessorFunc(
+            kTestPath,
+            std::bind(&HttpServerConnectionClientEndpoint::saveHttpClientEndpoint, this,
+                _1, _2, _3, _4, _5));
+    }
+
+    void whenIssueRequest()
+    {
+        issueRequest({});
+
+        m_httpClientEndpoint = m_client.socket()->getLocalAddress();
+    }
+
+    void whenIssueRequestWithXForwardedFor()
+    {
+        issueRequest({{ "X-Forwarded-For", "1.2.3.4" }});
+
+        m_httpClientEndpoint =
+            SocketAddress("1.2.3.4", m_client.socket()->getLocalAddress().port);
+    }
+
+    void whenIssueRequestWithXForwardedPort()
+    {
+        issueRequest({
+            {"X-Forwarded-For", "1.2.3.4"},
+            {"X-Forwarded-Port", "5831"}});
+
+        m_httpClientEndpoint = SocketAddress("1.2.3.4", 5831);
+    }
+
+    void whenIssueRequestWithForwardedHeaderWithoutPort()
+    {
+        issueRequest({{"Forwarded", "for=1.2.3.4"}});
+
+        m_httpClientEndpoint =
+            SocketAddress("1.2.3.4", m_client.socket()->getLocalAddress().port);
+    }
+
+    void whenIssueRequestWithForwardedHeaderWithPort()
+    {
+        issueRequest({{"Forwarded", "for=1.2.3.4:5678"}});
+
+        m_httpClientEndpoint = SocketAddress("1.2.3.4", 5678);
+    }
+
+    void thenHttpClientEndpointIsCorrect()
+    {
+        ASSERT_EQ(m_httpClientEndpoint, m_httpClientEndpoints.pop());
+    }
+
+private:
+    nx::utils::SyncQueue<SocketAddress> m_httpClientEndpoints;
+    SocketAddress m_httpClientEndpoint;
+    HttpClient m_client;
+
+    void issueRequest(HttpHeaders additionalHeaders)
+    {
+        for (const auto& header: additionalHeaders)
+            m_client.addAdditionalHeader(header.first, header.second);
+        ASSERT_TRUE(m_client.doGet(prepareRequestUrl(kTestPath)));
+    }
+
+    void saveHttpClientEndpoint(
+        nx::network::http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        Request /*request*/,
+        Response* const /*response*/,
+        RequestProcessedHandler completionHandler)
+    {
+        m_httpClientEndpoints.push(connection->clientEndpoint());
+
+        completionHandler(StatusCode::ok);
+    }
+};
+
+TEST_F(
+    HttpServerConnectionClientEndpoint,
+    if_no_special_header_present_than_tcp_connection_source_is_provided)
+{
+    whenIssueRequest();
+    thenHttpClientEndpointIsCorrect();
+}
+
+TEST_F(HttpServerConnectionClientEndpoint, x_forwarded_for_header_is_used)
+{
+    whenIssueRequestWithXForwardedFor();
+    thenHttpClientEndpointIsCorrect();
+}
+
+TEST_F(HttpServerConnectionClientEndpoint, x_forwarded_port_header_is_used)
+{
+    whenIssueRequestWithXForwardedPort();
+    thenHttpClientEndpointIsCorrect();
+}
+
+TEST_F(HttpServerConnectionClientEndpoint, forwarded_header_without_port)
+{
+    whenIssueRequestWithForwardedHeaderWithoutPort();
+    thenHttpClientEndpointIsCorrect();
+}
+
+TEST_F(HttpServerConnectionClientEndpoint, forwarded_header_with_port)
+{
+    whenIssueRequestWithForwardedHeaderWithPort();
+    thenHttpClientEndpointIsCorrect();
 }
 
 } // namespace test

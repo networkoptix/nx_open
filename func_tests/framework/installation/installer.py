@@ -1,4 +1,5 @@
 from collections import namedtuple
+from pprint import pformat
 
 from pathlib2 import PurePosixPath, PureWindowsPath
 
@@ -11,9 +12,13 @@ class Version(tuple):  # `tuple` gives `__hash__` and comparisons but requires `
         super(Version, self).__init__()
         self.major, self.minor, self.fix, self.build = self
         self.as_str = version_str
+        self.short_as_str = '{}.{}'.format(self.major, self.minor)
 
     def __repr__(self):
         return 'Version({!r})'.format(self.as_str)
+
+    def __str__(self):
+        return self.as_str
 
 
 class PackageNameParseError(Exception):
@@ -52,7 +57,7 @@ known_customizations = {
     Customization(
         customization_name='metavms',
         installer_name='metavms',
-        company_name='Nx MetaVMS',
+        company_name='Network Optix',
         linux_service_name='networkoptix-mediaserver',
         linux_subdir=PurePosixPath('networkoptix/mediaserver'),
         windows_service_name='metavmsMediaServer',
@@ -60,7 +65,51 @@ known_customizations = {
         windows_app_data_subdir=PureWindowsPath(u'Network Optix', u'Network Optix Media Server'),
         windows_registry_key=u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Network Optix\\Network Optix Media Server',
         ),
+    Customization(
+        customization_name='digitalwatchdog',
+        installer_name='dwspectrum',
+        company_name='Digital Watchdog',
+        linux_service_name='dwspectrum-mediaserver',
+        linux_subdir=PurePosixPath('dwspectrum/mediaserver'),
+        windows_service_name='dwspectrumMediaServer',
+        windows_installation_subdir=PureWindowsPath(u'Digital Watchdog', u'DW Spectrum', u'MediaServer'),
+        windows_app_data_subdir=PureWindowsPath(u'Digital Watchdog', u'Digital Watchdog Media Server'),
+        windows_registry_key=u'HKEY_LOCAL_MACHINE\\SOFTWARE\\Digital Watchdog\\Digital Watchdog Media Server',
+        ),
     }
+
+
+class UnknownCustomization(EnvironmentError):
+    def __init__(self, field_name, field_value):
+        super(UnknownCustomization, self).__init__(
+            "No customization found with {!s}={!r}".format(
+                field_name, field_value))
+        self.field_name = field_name
+        self.field_value = field_value
+
+
+class AmbiguousCustomization(EnvironmentError):
+    def __init__(self, field_name, field_value, customizations):
+        super(AmbiguousCustomization, self).__init__(
+            "Multiple customizations found with {!s}={!r}:\n{}".format(
+                field_name, field_value, pformat(customizations)))
+        self.field_name = field_name
+        self.field_value = field_value
+        self.customizations = customizations
+
+
+def find_customization(field_name, field_value):
+    found = []
+    for customization in known_customizations:
+        if getattr(customization, field_name) == field_value:
+            found.append(customization)
+    if not found:
+        raise UnknownCustomization(field_name, field_value)
+    try:
+        one, = found
+    except ValueError:
+        raise AmbiguousCustomization(field_name, field_value, found)
+    return one
 
 
 class Installer(object):
@@ -80,14 +129,7 @@ class Installer(object):
         if platform_extension != self.extension:
             raise PackageNameParseError("Extension of {} should be {}".format(path.name, platform_extension))
         self.version = Version(version_str)
-        try:
-            customization, = (
-                customization
-                for customization in known_customizations
-                if customization.installer_name == installer_name)
-        except ValueError:
-            raise PackageNameParseError("Customization with installer name {} is unknown".format(installer_name))
-        self.customization = customization  # type: Customization
+        self.customization = find_customization('installer_name', installer_name)
         self.path = path
 
     def __repr__(self):

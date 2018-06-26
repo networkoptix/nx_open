@@ -38,7 +38,6 @@ namespace ec2
         virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const override;
 
         virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
-        virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
 
     protected:
         QThread* m_thread = nullptr;
@@ -52,6 +51,5 @@ namespace ec2
 
         mutable QnMutex m_mutex;
         ConnectionGuardSharedState m_connectionGuardSharedState;
-        TimeSynchronizationManager* m_timeSyncManager = nullptr;
     };
 };

@@ -16,17 +16,17 @@ namespace discovery {
  * Verifies module access possibility by maintaining stream connection to first available address.
  */
 class ModuleConnector:
-    public network::aio::BasicPollable
+    public nx::network::aio::BasicPollable
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void(
         QnModuleInformation, nx::network::SocketAddress /*endpoint*/, nx::network::HostAddress /*ip*/)> ConnectedHandler;
     typedef nx::utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
 
-    ModuleConnector(network::aio::AbstractAioThread* thread = nullptr);
+    ModuleConnector(nx::network::aio::AbstractAioThread* thread = nullptr);
 
     void setDisconnectTimeout(std::chrono::milliseconds value);
-    void setReconnectPolicy(network::RetryPolicy value);
+    void setReconnectPolicy(nx::network::RetryPolicy value);
 
     void setConnectHandler(ConnectedHandler handler);
     void setDisconnectHandler(DisconnectedHandler handler);
@@ -91,10 +91,10 @@ private:
         const QnUuid m_id;
         Endpoints m_endpoints;
         std::set<nx::network::SocketAddress> m_forbiddenEndpoints;
-        network::RetryTimer m_reconnectTimer;
+        nx::network::RetryTimer m_reconnectTimer;
         std::list<std::unique_ptr<InformationReader>> m_attemptingReaders;
         std::unique_ptr<InformationReader> m_connectedReader;
-        network::aio::Timer m_disconnectTimer;
+        nx::network::aio::Timer m_disconnectTimer;
     };
 
     Module* getModule(const QnUuid& id);
@@ -102,7 +102,7 @@ private:
 private:
     bool m_isPassiveMode = true;
     std::chrono::milliseconds m_disconnectTimeout;
-    network::RetryPolicy m_retryPolicy;
+    nx::network::RetryPolicy m_retryPolicy;
 
     ConnectedHandler m_connectedHandler;
     DisconnectedHandler m_disconnectedHandler;

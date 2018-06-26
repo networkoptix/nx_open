@@ -238,8 +238,8 @@ public:
     CameraControllerImpl()
     {
         m_client.setIgnoreMutexAnalyzer(true);
-        m_client.setResponseReadTimeoutMs(5000);
-        m_client.setMessageBodyReadTimeoutMs(5000);
+        m_client.setResponseReadTimeout(std::chrono::seconds(5));
+        m_client.setMessageBodyReadTimeout(std::chrono::seconds(5));
     }
 
     void setCgiPreamble(const QByteArray& ip)
@@ -255,8 +255,7 @@ public:
 
     void setReadTimeout(std::chrono::seconds readTimeout)
     {
-        const int ms = (std::chrono::duration_cast<std::chrono::milliseconds>(readTimeout)).count();
-        m_client.setResponseReadTimeoutMs(ms);
+        m_client.setResponseReadTimeout(readTimeout);
     }
 
     /*

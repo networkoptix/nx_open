@@ -1,5 +1,7 @@
 #include "server_db.h"
 
+#include <chrono>
+
 #include <QtCore/QtEndian>
 
 #include <api/helpers/event_log_request_data.h>
@@ -26,6 +28,9 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+
+using std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
 
 using namespace nx;
 
@@ -1108,9 +1113,9 @@ bool QnServerDb::getBookmarks(
 
     if (filter.isValid())
     {
-        if (filter.startTimeMs > 0)
+        if (filter.startTimeMs > 0ms)
             addGetBookmarksFilter("endTimeMs >= :minStartTimeMs", &filterText, &bindings);
-        if (filter.endTimeMs < INT64_MAX)
+        if (filter.endTimeMs < milliseconds(INT64_MAX))
             addGetBookmarksFilter("startTimeMs <= :maxEndTimeMs", &filterText, &bindings);
     }
 
@@ -1170,8 +1175,8 @@ bool QnServerDb::getBookmarks(
             ++index;
         }
 
-        checkedBind(":minStartTimeMs", filter.startTimeMs);
-        checkedBind(":maxEndTimeMs", filter.endTimeMs);
+        checkedBind(":minStartTimeMs", (qint64) filter.startTimeMs.count());
+        checkedBind(":maxEndTimeMs", (qint64) filter.endTimeMs.count());
         //checkedBind(":minDurationMs", filter.minDurationMs);
 
         const auto getFilterValue =

@@ -17,9 +17,9 @@ namespace mediaserver {
 namespace hls {
 
 /*!
-    - Provides live playlist for resource
-    - Updates playlist in real-time (by registering itself as an MediaStreamCache event receiver)
-    - Blocks must-be-available chunks data from removal from MediaStreamCache
+- Provides live playlist for resource
+- Updates playlist in real-time (by registering itself as an MediaStreamCache event receiver)
+- Blocks must-be-available chunks data from removal from MediaStreamCache
 */
 class LivePlaylistManager:
     public AbstractPlaylistManager
@@ -31,14 +31,13 @@ public:
         int removedChunksToKeepCount);
     virtual ~LivePlaylistManager();
 
-    //!Returns playlist for live data
-    /*!
-        \return Number of chunks generated
-    */
+    /**
+     * Provides playlist for live data.
+     * @return Number of chunks generated.
+     */
     virtual size_t generateChunkList(
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
-        bool* const endOfStreamReached ) const override;
-    //!Implementation of AbstractPlaylistManager::getMaxBitrate
+        bool* const endOfStreamReached) const override;
     virtual int getMaxBitrate() const override;
 
     void clear();
@@ -46,7 +45,7 @@ public:
     qint64 inactivityPeriod() const;
 
 private:
-    MediaStreamCache* const m_mediaStreamCache;
+    MediaStreamCache * const m_mediaStreamCache;
     mutable std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
     const quint64 m_targetDurationUSec;
     mutable unsigned int m_mediaSequence;

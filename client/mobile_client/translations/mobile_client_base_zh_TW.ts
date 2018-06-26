@@ -8,4 +8,11 @@
       <translation>所有攝影機</translation>
     </message>
   </context>
+  <context>
+    <name>nx::client::mobile::ActionButtonsModel</name>
+    <message>
+      <source>Press and hold to speak</source>
+      <translation>長按進行發話</translation>
+    </message>
+  </context>
 </TS>

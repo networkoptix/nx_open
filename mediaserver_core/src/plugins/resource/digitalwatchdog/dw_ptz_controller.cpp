@@ -3,6 +3,8 @@
 
 #include "digital_watchdog_resource.h"
 
+using namespace nx::core;
+
 namespace {
     const QString flipParamId = lit("flipmode1");
     const QString mirrirParamId = lit("mirrormode1");
@@ -49,19 +51,36 @@ QnDwPtzController::~QnDwPtzController() {
     return;
 }
 
-bool QnDwPtzController::continuousMove(const QVector3D &speed) {
-    QVector3D localSpeed = speed;
+bool QnDwPtzController::continuousMove(
+    const nx::core::ptz::Vector& speedVector,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
+    auto localSpeed = speedVector;
 
     if(m_flip & Qt::Horizontal)
-        localSpeed.setX(-localSpeed.x());
+        localSpeed.pan = -localSpeed.pan;
     if(m_flip & Qt::Vertical)
-        localSpeed.setY(-localSpeed.y());
+        localSpeed.tilt = -localSpeed.tilt;
 
-    return base_type::continuousMove(localSpeed);
+    return base_type::continuousMove(localSpeed, options);
 }
 
-bool QnDwPtzController::getFlip(Qt::Orientations *flip) const
+bool QnDwPtzController::getFlip(
+    Qt::Orientations *flip,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
     *flip = m_flip;
     return true;
 }

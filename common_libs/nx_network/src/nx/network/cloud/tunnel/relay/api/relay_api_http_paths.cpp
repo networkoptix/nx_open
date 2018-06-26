@@ -11,6 +11,7 @@ const char* const kServerIncomingConnectionsPath = "/relay/server/{serverId}/inc
 const char* const kServerClientSessionsPath = "/relay/server/{serverPeerName}/client_sessions/";
 const char* const kClientSessionConnectionsPath = "/relay/client_session/{sessionId}/connections/";
 const char* const kRelayClientPathPrefix = "/relay/client/";
+const char* const kServerTunnelPath = "/relay/server/{serverId}/tunnel/{sequence}";
 
 const char* const kRelayStatisticsMetricsPath = "/relay/statistics/metrics/";
 const char* const kRelayStatisticsSpecificMetricPath = "/relay/statistics/metrics/{metric}";

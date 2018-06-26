@@ -271,7 +271,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
 
     nx::network::http::HttpClient client;
-    client.setSendTimeoutMs(15000);
+    client.setSendTimeout(std::chrono::seconds(15));
     if (!client.doGet(urlStr) || !client.response())
     {
         std::cerr<<"No response has been received"<<std::endl;
@@ -301,8 +301,13 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     }
     else
     {
-        if (nx::network::http::getHeaderValue(client.response()->headers, "Content-Type") == "application/json")
+        const auto contentType =
+            nx::network::http::getHeaderValue(client.response()->headers, "Content-Type");
+        if (contentType == "application/json" ||
+            contentType == "text/xml")
+        {
             outputStream = &std::cout;
+        }
     }
 
     if (outputStream)

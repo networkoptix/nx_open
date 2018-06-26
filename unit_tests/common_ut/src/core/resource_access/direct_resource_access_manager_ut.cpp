@@ -780,7 +780,7 @@ TEST_F(QnDirectResourceAccessManagerTest, checkDefaultAuthCamera)
     auto user = addUser(Qn::GlobalAdminPermission);
     auto camera = addCamera();
 
-    camera->setCameraCapabilities(Qn::SetUserPasswordCapability | Qn::isDefaultPasswordCapability);
+    camera->setCameraCapabilities(Qn::SetUserPasswordCapability | Qn::IsDefaultPasswordCapability);
 
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
     ASSERT_FALSE(hasPermission(user, camera, Qn::ViewLivePermission));
@@ -803,7 +803,7 @@ TEST_F(QnDirectResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
     auto user = addUser(Qn::GlobalAdminPermission);
     auto camera = addCamera();
 
-    camera->setCameraCapabilities(Qn::isDefaultPasswordCapability);
+    camera->setCameraCapabilities(Qn::IsDefaultPasswordCapability);
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
     ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));

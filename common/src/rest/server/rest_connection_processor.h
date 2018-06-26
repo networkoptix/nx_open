@@ -51,7 +51,6 @@ public:
     //!Rest handler can use following methods to access http request/response directly
     const nx::network::http::Request& request() const;
     nx::network::http::Response* response() const;
-    QnTcpListener* owner() const;
 
 protected:
     virtual void run() override;

@@ -36,7 +36,7 @@ public:
 private:
     const nx::utils::Url m_relayUrl;
     const AddressEntry m_targetHostAddress;
-    nx::String m_connectSessionId;
+    std::string m_connectSessionId;
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
     ConnectCompletionHandler m_handler;
     aio::Timer m_timer;

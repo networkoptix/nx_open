@@ -41,6 +41,7 @@
     (QnStatisticsReply)\
     (QnTimeReply)\
     (ApiServerDateTimeData)\
+    (SyncTimeData)\
     (ApiServerHardwareIdsData)\
     (QnTestEmailSettingsReply)\
     (QnCompatibilityItem)\

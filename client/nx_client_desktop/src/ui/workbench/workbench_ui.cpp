@@ -645,8 +645,8 @@ void QnWorkbenchUi::tick(int deltaMSecs)
     auto slider = m_timeline->item->timeSlider();
 
     QPointF pos;
-    if (slider->windowStart() <= slider->sliderPosition() && slider->sliderPosition() <= slider->windowEnd())
-        pos = slider->positionFromValue(slider->sliderPosition(), true);
+    if (slider->windowStart() <= slider->sliderTimePosition() && slider->sliderTimePosition() <= slider->windowEnd())
+        pos = slider->positionFromTime(slider->sliderTimePosition(), true);
     else
         pos = slider->rect().center();
 

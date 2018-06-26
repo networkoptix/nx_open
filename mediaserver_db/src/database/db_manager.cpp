@@ -7,7 +7,6 @@
 #include <common/common_module.h>
 
 #include "utils/common/util.h"
-#include "managers/time_manager.h"
 #include "nx_ec/data/api_discovery_data.h"
 #include <nx/vms/event/event_fwd.h>
 #include "utils/common/synctime.h"
@@ -34,6 +33,7 @@
 #include <database/migrations/add_default_webpages_migration.h>
 #include <database/migrations/cleanup_removed_transactions.h>
 #include <database/migrations/access_rights_db_migration.h>
+#include <database/migrations/ptz_rotation_migration.h>
 #include <database/migrations/camera_user_attributes_migration.h>
 
 #include <network/system_helpers.h>
@@ -51,7 +51,6 @@
 #include <nx/vms/api/data/camera_history_data.h>
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
-#include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include <nx_ec/data/api_access_rights_data.h>
 #include "api/runtime_info_manager.h"
@@ -63,6 +62,8 @@
 #include <database/api/db_resource_api.h>
 
 #include <nx/fusion/model_functions.h>
+#include <api/global_settings.h>
+#include <nx/time_sync/legacy/time_manager.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -296,7 +297,6 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_needReparentLayouts(false),
     m_resyncFlags(),
     m_tranLog(nullptr),
-    m_timeSyncManager(nullptr),
     m_insertCameraQuery(&m_queryCachePool),
     m_insertCameraUserAttrQuery(&m_queryCachePool),
     m_insertCameraScheduleQuery(&m_queryCachePool),
@@ -748,6 +748,16 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
                 }
             }
 
+            if (m_resyncFlags.testFlag(ResyncGlobalSettings))
+            {
+                if (!fillTransactionLogInternal<
+                    QnUuid,
+                    ResourceParamWithRefData,
+                    ResourceParamWithRefDataList>(ApiCommand::setResourceParam, nullptr, m_adminUserID))
+                {
+                    return false;
+                }
+            }
         }
 
         // Set admin user's password
@@ -906,10 +916,13 @@ bool QnDbManager::syncLicensesBetweenDB()
 }
 
 template <typename FilterDataType, class ObjectType, class ObjectListType>
-bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
+bool QnDbManager::fillTransactionLogInternal(
+    ApiCommand::Value command, 
+    std::function<bool (ObjectType& data)> updater, 
+    FilterDataType filter)
 {
     ObjectListType objects;
-    if (doQueryNoLock(FilterDataType(), objects) != ErrorCode::ok)
+    if (doQueryNoLock(filter, objects) != ErrorCode::ok)
         return false;
 
     for(const ObjectType& object: objects)
@@ -1861,6 +1874,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
+    if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
+        return ec2::migration::ptz::addRotationToPresets(m_sdb);
+
     if (updateName.endsWith("99_20180329_02_add_record_thresholds_camera_attributes.sql"))
     {
         return ec2::db::migrateRecordingThresholds(m_sdb)
@@ -1874,6 +1890,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             removeBusinessRule(rule->id());
         }
         return fixDefaultBusinessRuleGuids() && resyncIfNeeded(ResyncRules);
+    }
+
+    if (updateName.endsWith(lit("/99_20180528_time_manager_refactor.sql")))
+    {
+        return migrateTimeManagerData() && resyncIfNeeded(ResyncGlobalSettings);
     }
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
@@ -3278,19 +3299,6 @@ ErrorCode QnDbManager::saveMiscParam(const ApiMiscData &params)
     return ErrorCode::ok;
 }
 
-bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT data from misc_data where key = ?");
-    query.addBindValue(name);
-    if( query.exec() && query.next() ) {
-        *value = query.value(0).toByteArray();
-        return true;
-    }
-    return false;
-}
-
 ErrorCode QnDbManager::readSettings(ResourceParamDataList& settings)
 {
     ResourceParamWithRefDataList params;
@@ -3436,8 +3444,15 @@ void QnDbManager::addResourceTypesFromXML(ResourceTypeDataList& data)
 
 ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscData)
 {
-    if (!readMiscParam(name, &miscData.value))
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT data from misc_data where key = ?");
+    query.addBindValue(name);
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
         return ErrorCode::dbError;
+    
+    if (query.next())
+        miscData.value = query.value(0).toByteArray();
     miscData.name = name;
     return ErrorCode::ok;
 }
@@ -4296,13 +4311,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ResourceParamWith
     return fetchResourceParams( filter, params );
 }
 
-// getCurrentTime
-ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime)
-{
-    currentTime = m_timeSyncManager->getTimeInfo();
-    return ErrorCode::ok;
-}
-
 // dumpDatabase
 ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData& data)
 {
@@ -5041,11 +5049,6 @@ void QnDbManager::setTransactionLog(QnTransactionLog* tranLog)
     m_tranLog = tranLog;
 }
 
-void QnDbManager::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
-{
-    m_timeSyncManager = timeSyncManager;
-}
-
 QnTransactionLog* QnDbManager::transactionLog() const
 {
     return m_tranLog;
@@ -5124,6 +5127,41 @@ bool QnDbManager::rebuildUserAccessRightsTransactions()
         if (transactionLog()->saveTransaction(transaction) != ErrorCode::ok)
             return false;
     }
+
+    return true;
+}
+
+bool QnDbManager::migrateTimeManagerData()
+{
+    const QByteArray kLegacyUsedTimePriorityKey = "used_time_priority_key";
+    ApiMiscData syncTimeKeyData;
+    if (doQueryNoLock(kLegacyUsedTimePriorityKey, syncTimeKeyData) != ErrorCode::ok)
+        return false;
+
+    using namespace nx::time_sync::legacy;
+    TimePriorityKey syncTimeKey;
+    syncTimeKey.fromUInt64(syncTimeKeyData.value.toULongLong());
+
+    QnUuid primaryTimeServerId;
+    ApiMediaServerDataList serverList;
+    if (doQueryNoLock(QnUuid(), serverList) != ErrorCode::ok)
+        return false;
+
+    for (const auto& server: serverList)
+    {
+        if (TimePriorityKey::seedFromId(server.id) == syncTimeKey.seed)
+        {
+            primaryTimeServerId = server.id;
+            break;
+        }
+    }
+
+    ResourceParamWithRefData param;
+    param.resourceId = m_adminUserID;
+    param.name = nx::settings_names::kNamePrimaryTimeServer;
+    param.value = primaryTimeServerId.toString();
+    if (insertAddParam(param) != ErrorCode::ok)
+        return false;
 
     return true;
 }

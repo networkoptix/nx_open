@@ -8,9 +8,10 @@
 #include "ptz_object.h"
 
 namespace {
-    int homeTimeout = 2 * 60 * 1000;
-    //int homeTimeout = 10 * 1000;
-}
+
+int homeTimeout = 2 * 60 * 1000;
+
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnHomePtzExecutorPrivate
@@ -75,8 +76,15 @@ QnHomePtzExecutor::QnHomePtzExecutor(const QnPtzControllerPtr &controller):
     d->q = this;
     d->controller = controller;
 
-    connect(this, &QnHomePtzExecutor::restartRequested, this, &QnHomePtzExecutor::at_restartRequested, Qt::QueuedConnection);
-    connect(this, &QnHomePtzExecutor::stopRequested,    this, &QnHomePtzExecutor::at_stopRequested, Qt::QueuedConnection);
+    connect(
+        this, &QnHomePtzExecutor::restartRequested,
+        this, &QnHomePtzExecutor::at_restartRequested,
+        Qt::QueuedConnection);
+
+    connect(
+        this, &QnHomePtzExecutor::stopRequested,
+        this, &QnHomePtzExecutor::at_stopRequested,
+        Qt::QueuedConnection);
 }
 
 QnHomePtzExecutor::~QnHomePtzExecutor() {
@@ -100,9 +108,9 @@ bool QnHomePtzExecutor::isRunning() {
     return d->isRunning.loadAcquire() != 0;
 }
 
-void QnHomePtzExecutor::setHomePosition(const QnPtzObject &homePosition) {
+void QnHomePtzExecutor::setHomePosition(const QnPtzObject &homePosition)
+{
     QnMutexLocker locker( &d->mutex );
-
     d->homePosition = homePosition;
 }
 

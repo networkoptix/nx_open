@@ -38,6 +38,7 @@
 
 #include <nx/client/core/utils/human_readable.h>
 #include <utils/media/audio_player.h>
+#include <nx/network/http/http_types.h>
 
 using namespace nx;
 
@@ -186,7 +187,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     const auto addActionItem =
         [this](vms::event::ActionType actionType)
         {
-            QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
+            auto item = new QStandardItem(m_helper->actionName(actionType));
             item->setData(actionType);
             item->setData(!vms::event::canBeInstant(actionType), ProlongedActionRole);
             m_actionTypesModel->appendRow(item);
@@ -828,7 +829,7 @@ bool QnBusinessRuleViewModel::disabled() const
     return m_disabled;
 }
 
-void QnBusinessRuleViewModel::setDisabled(const bool value)
+void QnBusinessRuleViewModel::setDisabled(bool value)
 {
     if (m_disabled == value)
         return;
@@ -855,7 +856,7 @@ QString QnBusinessRuleViewModel::comments() const
     return m_comments;
 }
 
-void QnBusinessRuleViewModel::setComments(const QString value)
+void QnBusinessRuleViewModel::setComments(const QString& value)
 {
     if (m_comments == value)
         return;
@@ -871,7 +872,7 @@ QString QnBusinessRuleViewModel::schedule() const
     return m_schedule;
 }
 
-void QnBusinessRuleViewModel::setSchedule(const QString value)
+void QnBusinessRuleViewModel::setSchedule(const QString& value)
 {
     if (m_schedule == value)
         return;
@@ -899,7 +900,7 @@ QStandardItemModel* QnBusinessRuleViewModel::actionTypesModel()
 
 // utilities
 
-QString QnBusinessRuleViewModel::getText(Column column, const bool detailed) const
+QString QnBusinessRuleViewModel::getText(Column column, bool detailed) const
 {
     switch (column)
     {
@@ -1134,7 +1135,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     QUrl url(m_actionParams.url);
                     return url.isValid()
                         && !url.isEmpty()
-                        && (url.scheme().isEmpty() || url.scheme().toLower() == lit("http"))
+                        && (url.scheme().isEmpty() || nx::network::http::isUrlSheme(url.scheme()))
                         && !url.host().isEmpty();
                 }
                 default:
@@ -1182,7 +1183,7 @@ void QnBusinessRuleViewModel::updateActionTypesModel()
     }
 }
 
-QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
+QString QnBusinessRuleViewModel::getSourceText(bool detailed) const
 {
     QnResourceList resources = resourcePool()->getResourcesByIds(eventResources());
     if (m_eventType == EventType::cameraMotionEvent)
@@ -1222,7 +1223,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 
 }
 
-QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
+QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
 {
     QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
     switch (m_actionType)

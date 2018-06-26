@@ -452,9 +452,9 @@ bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthent
     if (!outHttpClient)
         return false;
 
-    outHttpClient->setSendTimeoutMs(kHttpTimeout.count());
-    outHttpClient->setMessageBodyReadTimeoutMs(kHttpTimeout.count());
-    outHttpClient->setResponseReadTimeoutMs(kHttpTimeout.count());
+    outHttpClient->setSendTimeout(kHttpTimeout);
+    outHttpClient->setMessageBodyReadTimeout(kHttpTimeout);
+    outHttpClient->setResponseReadTimeout(kHttpTimeout);
     outHttpClient->setUserName(auth.user());
     outHttpClient->setUserPassword(auth.password());
 

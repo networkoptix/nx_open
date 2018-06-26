@@ -13,7 +13,7 @@ from framework.os_access.windows_remoting._cim_query import CIMClass
 from ._cim_query import CIMQuery
 from ._cmd import Shell, run_command
 from ._powershell import run_powershell_script
-from .registry import Key
+from .registry import _WindowsRegistryKey
 
 _logger = logging.getLogger(__name__)
 

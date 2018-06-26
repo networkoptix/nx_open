@@ -295,8 +295,8 @@ void QnDesktopCameraConnection::run()
         httpClient->addAdditionalHeader("user-id", commonModule()->moduleGUID().toByteArray());
         httpClient->addAdditionalHeader("unique-id",
             QnDesktopResource::calculateUniqueId(commonModule()->moduleGUID(), m_userId).toUtf8());
-        httpClient->setSendTimeoutMs(CONNECT_TIMEOUT);
-        httpClient->setResponseReadTimeoutMs(CONNECT_TIMEOUT);
+        httpClient->setSendTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
+        httpClient->setResponseReadTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
 
         httpClient->setUserName(auth.user());
         httpClient->setUserPassword(auth.password());
@@ -307,7 +307,6 @@ void QnDesktopCameraConnection::run()
         }
 
         nx::utils::Url url(m_server->getApiUrl());
-        url.setScheme(lit("http"));
         url.setPath(lit("/desktop_camera"));
 
         if (!httpClient->doGet(url))

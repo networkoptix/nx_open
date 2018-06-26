@@ -1,8 +1,9 @@
 import logging
 
 from framework.installation.installation import Installation
-from framework.installation.installer import Customization, Installer
+from framework.installation.installer import Installer
 from framework.installation.windows_service import WindowsService
+from framework.method_caching import cached_property
 from framework.os_access.path import copy_file
 from framework.os_access.windows_access import WindowsAccess
 from framework.os_access.windows_remoting.registry import WindowsRegistry
@@ -13,10 +14,10 @@ _logger = logging.getLogger(__name__)
 class WindowsInstallation(Installation):
     """Manage installation on Windows"""
 
-    def __init__(self, windows_access, installer):
-        self.installer = installer  # type: Installer
+    def __init__(self, windows_access, installer):  # type: (WindowsAccess, Installer) -> None
+        self.installer = installer
         program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
-        customization = installer.customization  # type: Customization
+        customization = installer.customization
         self.dir = program_files_dir / customization.windows_installation_subdir
         self.binary = self.dir / 'mediaserver.exe'
         self.info = self.dir / 'build_info.txt'
@@ -27,14 +28,22 @@ class WindowsInstallation(Installation):
         self.key_pair = self.var / 'ssl' / 'cert.pem'
         self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
         self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
-        self.service = WindowsService(windows_access.winrm, customization.windows_service_name)
-        self.os_access = windows_access  # type: WindowsAccess
+        self.windows_access = windows_access
+
+    @property
+    def os_access(self):
+        return self.windows_access
 
     def is_valid(self):
         if not self.binary.exists():
             _logger.info("%r does not exist", self.binary)
             return False
         return True
+
+    @cached_property
+    def service(self):
+        service_name = self.installer.customization.windows_service_name
+        return WindowsService(self.windows_access.winrm, service_name)
 
     def _upload_installer(self):
         remote_path = self.os_access.Path.tmp() / self.installer.path.name
@@ -44,15 +53,12 @@ class WindowsInstallation(Installation):
         return remote_path
 
     def _backup_configuration(self):
-        values = self._config_key.list_values()
-        self._config_key_backup.create()
-        for value in values:
-            value.copy(self._config_key_backup)
+        self._config_key.copy_values_to(self._config_key_backup)
 
     def install(self):
         remote_installer_path = self._upload_installer()
         remote_log_path = remote_installer_path.parent / (remote_installer_path.name + '.install.log')
-        self.os_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
+        self.windows_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
         self._backup_configuration()
 
     def list_core_dumps_from_task_manager(self):
@@ -88,10 +94,10 @@ class WindowsInstallation(Installation):
         return dumps
 
     def restore_mediaserver_conf(self):
-        pass
+        self._config_key_backup.copy_values_to(self._config_key)
 
     def update_mediaserver_conf(self, new_configuration):
-        pass
+        self._config_key.update_values(new_configuration)
 
     def read_log(self):
         pass

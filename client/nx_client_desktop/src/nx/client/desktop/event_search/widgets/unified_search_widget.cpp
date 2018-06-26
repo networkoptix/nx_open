@@ -143,8 +143,8 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->showPreviewsButton->setChecked(ui->ribbon->previewsEnabled());
     ui->showInfoButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
     ui->showPreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
-    ui->showInfoButton->setIcon(qnSkin->icon(lit("events/show_information.png")));
-    ui->showPreviewsButton->setIcon(qnSkin->icon(lit("events/show_preview.png")));
+    ui->showInfoButton->setIcon(qnSkin->icon(lit("text_buttons/text.png")));
+    ui->showPreviewsButton->setIcon(qnSkin->icon(lit("text_buttons/image.png")));
 
     connect(ui->showInfoButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setFootersEnabled);

@@ -316,7 +316,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
     if (!m_remoteModuleInformation.remoteAddresses.contains(url.host()))
     {
         nx::utils::Url simpleUrl;
-        simpleUrl.setScheme(lit("http"));
+        simpleUrl.setScheme(nx::network::http::urlSheme(m_remoteModuleInformation.sslAllowed));
         simpleUrl.setHost(url.host());
         if (url.port() != m_remoteModuleInformation.port)
             simpleUrl.setPort(url.port());
@@ -403,9 +403,9 @@ bool SystemMergeProcessor::executeRemoteConfigure(
     QByteArray serializedData = QJson::serialized(data);
 
     nx::network::http::HttpClient client;
-    client.setResponseReadTimeoutMs(kRequestTimeout.count());
-    client.setSendTimeoutMs(kRequestTimeout.count());
-    client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
+    client.setResponseReadTimeout(kRequestTimeout);
+    client.setSendTimeout(kRequestTimeout);
+    client.setMessageBodyReadTimeout(kRequestTimeout);
     client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, m_authSession.toByteArray());
 
     nx::utils::Url requestUrl(remoteUrl);
@@ -521,9 +521,9 @@ bool SystemMergeProcessor::applyRemoteSettings(
         fromResourceToApi(mServer, currentServer);
 
         nx::network::http::HttpClient client;
-        client.setResponseReadTimeoutMs(kRequestTimeout.count());
-        client.setSendTimeoutMs(kRequestTimeout.count());
-        client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
+        client.setResponseReadTimeout(kRequestTimeout);
+        client.setSendTimeout(kRequestTimeout);
+        client.setMessageBodyReadTimeout(kRequestTimeout);
         client.addAdditionalHeader(
             Qn::AUTH_SESSION_HEADER_NAME,
             m_authSession.toByteArray());
@@ -576,9 +576,9 @@ bool SystemMergeProcessor::executeRequest(
     const QString& path)
 {
     nx::network::http::HttpClient client;
-    client.setResponseReadTimeoutMs(kRequestTimeout.count());
-    client.setSendTimeoutMs(kRequestTimeout.count());
-    client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
+    client.setResponseReadTimeout(kRequestTimeout);
+    client.setSendTimeout(kRequestTimeout);
+    client.setMessageBodyReadTimeout(kRequestTimeout);
 
     nx::utils::Url requestUrl(remoteUrl);
     requestUrl.setPath(path);
@@ -616,9 +616,9 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformatio
     QByteArray moduleInformationData;
     {
         nx::network::http::HttpClient client;
-        client.setResponseReadTimeoutMs(kRequestTimeout.count());
-        client.setSendTimeoutMs(kRequestTimeout.count());
-        client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
+        client.setResponseReadTimeout(kRequestTimeout);
+        client.setSendTimeout(kRequestTimeout);
+        client.setMessageBodyReadTimeout(kRequestTimeout);
 
         QUrlQuery query;
         query.addQueryItem(lit("checkOwnerPermissions"), lit("true"));

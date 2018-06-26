@@ -48,6 +48,7 @@ private:
 
     QString toHanwhaPlaybackTime(int64_t timestamp) const;
     QnAbstractMediaDataPtr createEmptyPacket();
+    QString forcedUrl(Qn::ConnectionRole role) const;
 private:
     HanwhaResourcePtr m_hanwhaResource;
     bool m_rateControlEnabled = true;

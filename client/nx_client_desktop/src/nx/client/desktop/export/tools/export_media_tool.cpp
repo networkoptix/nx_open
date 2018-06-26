@@ -62,11 +62,11 @@ struct ExportMediaTool::Private
     {
         NX_ASSERT(status == ExportProcessStatus::initial);
         const auto timelapseFrameStepUs = settings.timelapseFrameStepMs * 1000ll;
-        const auto startTimeUs = settings.timePeriod.startTimeMs * 1000ll;
-        NX_ASSERT(settings.timePeriod.durationMs > 0,
+        const auto startTimeUs = settings.period.startTimeMs * 1000ll;
+        NX_ASSERT(settings.period.durationMs > 0,
             "Invalid time period, possibly LIVE is exported");
-        const auto endTimeUs = settings.timePeriod.durationMs > 0
-            ? settings.timePeriod.endTimeMs() * 1000ll
+        const auto endTimeUs = settings.period.durationMs > 0
+            ? settings.period.endTimeMs() * 1000ll
             : DATETIME_NOW;
 
         if (!initDataProvider(startTimeUs, endTimeUs, timelapseFrameStepUs))
@@ -110,7 +110,7 @@ struct ExportMediaTool::Private
         if (settings.fileName.extension == FileExtension::avi
             || settings.fileName.extension == FileExtension::mp4)
         {
-            exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); //< Transcode audio to MP3.
+            exportRecorder->setAudioCodec(AV_CODEC_ID_MP2); //< Transcode audio to MP2.
         }
 
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(dataProvider.data());

@@ -9,14 +9,16 @@ namespace update {
 namespace manager {
 namespace detail {
 
-UpdateFileRequestDataFactory::FactoryFunc UpdateFileRequestDataFactory::s_factoryFunc = nullptr;
+UpdateRequestDataFactory::FactoryFunc UpdateRequestDataFactory::s_factoryFunc = nullptr;
 
-update::info::UpdateFileRequestData UpdateFileRequestDataFactory::create(bool isClient)
+update::info::UpdateRequestData UpdateRequestDataFactory::create(
+    bool isClient,
+    const QnSoftwareVersion* targetVersion)
 {
     if (s_factoryFunc)
         return s_factoryFunc();
 
-    return update::info::UpdateFileRequestData(
+    return update::info::UpdateRequestData(
         nx::network::SocketGlobals::cloud().cloudHost(),
         QnAppInfo::customizationName(),
         QnSoftwareVersion(QnAppInfo::applicationVersion()),
@@ -24,10 +26,11 @@ update::info::UpdateFileRequestData UpdateFileRequestDataFactory::create(bool is
             QnAppInfo::applicationPlatform(),
             QnAppInfo::applicationArch(),
             QnAppInfo::applicationPlatformModification()),
+        targetVersion,
         isClient);
 }
 
-void UpdateFileRequestDataFactory::setFactoryFunc(UpdateFileRequestDataFactory::FactoryFunc factoryFunc)
+void UpdateRequestDataFactory::setFactoryFunc(UpdateRequestDataFactory::FactoryFunc factoryFunc)
 {
     s_factoryFunc = std::move(factoryFunc);
 }

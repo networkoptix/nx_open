@@ -403,15 +403,10 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
-
     if (mediaPersistentSettings.canExportOverlays())
     {
         ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
         ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
-        ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
-        ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
-        ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
-        ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
         if(mediaPersistentSettings.rapidReview.enabled)
         {
@@ -419,6 +414,11 @@ void ExportSettingsDialog::updateSettingsWidgets()
             ui->rapidReviewSettingsPage->setSpeed(speed);
         }
     }
+
+    ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
+    ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
+    ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
+    ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
@@ -473,9 +473,9 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         [layout](int index, const QString& text)
         {
             auto item = layout->itemAt(index);
-            auto bar = item ? qobject_cast<AlertBar*>(item->widget()) : nullptr;
-            NX_EXPECT(bar);
-            if (bar)
+            // Notice: notifications are added at the runtime. It is possible to have no
+            // widget so far, especially when dialog is only initialized.
+            if (auto bar = item ? qobject_cast<MessageBar*>(item->widget()) : nullptr)
                 bar->setText(text);
         };
 
@@ -556,7 +556,7 @@ void ExportSettingsDialog::setMediaParams(
 
     const auto resource = mediaResource->toResourcePtr();
     const auto currentSettings = d->exportMediaSettings();
-    const auto startTimeMs = currentSettings.timePeriod.startTimeMs;
+    const auto startTimeMs = currentSettings.period.startTimeMs;
 
     QString timePart;
     if (resource->hasFlags(Qn::utc))
@@ -609,7 +609,7 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
     auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
     if (qnRuntime->isActiveXMode() || baseName.isEmpty())
         baseName = tr("exported");
-    Filename baseFileName = d->exportLayoutSettings().filename;
+    Filename baseFileName = d->exportLayoutSettings().fileName;
     baseFileName.name = baseName;
     ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }

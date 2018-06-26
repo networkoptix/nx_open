@@ -1011,7 +1011,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>Paramètres non disponibles pour les fichiers .EXE et .NOV</translation>
+      <translation>Paramètres non disponibles pour les fichiers .EXE et .NOV.</translation>
     </message>
   </context>
   <context>
@@ -4310,11 +4310,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer courriel avec clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P. envoyer courriel avec clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>S.V.P envoyer clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+      <translation>S.V.P. envoyer courriel avec clé de licence et ID Matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
   </context>
   <context>

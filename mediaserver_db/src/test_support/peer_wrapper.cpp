@@ -59,7 +59,7 @@ void PeerWrapper::addSetting(const std::string& name, const std::string& value)
 
 bool PeerWrapper::startAndWaitUntilStarted()
 {
-    const QString dbFileArg = lm("--dbFile=%1/db.sqlite").args(m_dataDir);
+    const QString dbFileArg = lm("--dbFile=%1/db.dir").args(m_dataDir);
     m_process.addArg(dbFileArg.toStdString().c_str());
     return m_process.startAndWaitUntilStarted();
 }
@@ -158,7 +158,7 @@ ec2::ErrorCode PeerWrapper::getTransactionLog(ec2::ApiTransactionDataList* resul
 
 QnUuid PeerWrapper::id() const
 {
-    return m_process.moduleInstance()->impl()->commonModule()->moduleGUID();
+    return m_process.moduleInstance()->commonModule()->moduleGUID();
 }
 
 nx::network::SocketAddress PeerWrapper::endpoint() const
@@ -181,7 +181,7 @@ std::unique_ptr<MediaServerClientEx> PeerWrapper::mediaServerClient() const
     return prepareMediaServerClient();
 }
 
-nx::utils::test::ModuleLauncher<Appserver2ProcessPublic>& PeerWrapper::process()
+nx::utils::test::ModuleLauncher<Appserver2Process>& PeerWrapper::process()
 {
     return m_process;
 }
@@ -235,7 +235,7 @@ bool PeerWrapper::arePeersInterconnected(
     for (const auto& peer: peers)
     {
         const auto connectedPeers =
-            peer->m_process.moduleInstance()->impl()->commonModule()->
+            peer->m_process.moduleInstance()->commonModule()->
                 ec2Connection()->messageBus()->directlyConnectedServerPeers();
 
         for (const auto& peerId: peerIds)

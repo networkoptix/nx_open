@@ -310,6 +310,15 @@ RuleList Rule::getDefaultRules()
     result << RulePtr(new Rule(10023, 30,      false, ActionType::showPopupAction, EventType::licenseIssueEvent,     {},        true));
 
     result << getSystemRules() << getRulesUpd43() << getRulesUpd48();
+    auto disabledRules = getDisabledRulesUpd43();
+
+    result.erase(std::remove_if(result.begin(), result.end(),
+        [&disabledRules](const auto& rulePtr)
+        {
+            return std::any_of(disabledRules.cbegin(), disabledRules.cend(),
+                [&rulePtr](const auto& drPtr) { return drPtr->id() == rulePtr->id(); });
+        }), result.end());
+
     return result;
 }
 

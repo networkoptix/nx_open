@@ -10,12 +10,15 @@
 #include <nx/utils/string.h>
 
 #include "listen_mode.h"
+#include "listen_on_relay_mode.h"
 #include "client_mode.h"
 
 void printHelp()
 {
     std::cout << "\n";
     nx::cctu::printListenOptions(&std::cout);
+    std::cout << "\n";
+    nx::cctu::printListenOnRelayOptions(&std::cout);
     std::cout << "\n";
     nx::cctu::printConnectOptions(&std::cout);
     std::cout << "\n";
@@ -51,15 +54,26 @@ int main(int argc, const char* argv[])
     nx::utils::log::initializeGlobally(args);
     SocketGlobals::applyArguments(args);
 
-    // reading mode
-    if (args.get("listen"))
-        return nx::cctu::runInListenMode(args);
+    try
+    {
+        // reading mode
+        if (args.get("listen"))
+            return nx::cctu::runInListenMode(args);
 
-    if (args.get("connect"))
-        return nx::cctu::runInConnectMode(args);
+        if (args.get("listen-on-relay"))
+            return nx::cctu::runInListenOnRelayMode(args);
 
-    if (args.get("http-client"))
-        return nx::cctu::runInHttpClientMode(args);
+        if (args.get("connect"))
+            return nx::cctu::runInConnectMode(args);
+
+        if (args.get("http-client"))
+            return nx::cctu::runInHttpClientMode(args);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return 2;
+    }
 
     std::cerr<<"error. Unknown mode"<<std::endl;
     printHelp();

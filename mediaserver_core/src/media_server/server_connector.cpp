@@ -9,18 +9,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 
-#if 0
-namespace {
-    QUrl trimmedUrl(const QUrl& url) {
-        QUrl newUrl;
-        newUrl.setScheme(lit("http"));
-        newUrl.setHost(url.host());
-        newUrl.setPort(url.port());
-        return newUrl;
-    }
-}
-#endif
-
 QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
     QObject(),
     QnCommonModuleAware(commonModule)
@@ -38,7 +26,7 @@ QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
 static QString makeModuleUrl(const nx::vms::discovery::ModuleEndpoint& module)
 {
     QUrl moduleUrl;
-    moduleUrl.setScheme(module.sslAllowed ? lit("https") : lit("http"));
+    moduleUrl.setScheme(nx::network::http::urlSheme(module.sslAllowed));
     moduleUrl.setHost(module.endpoint.address.toString());
     moduleUrl.setPort(module.endpoint.port);
     return moduleUrl.toString();

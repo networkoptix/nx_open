@@ -128,6 +128,7 @@ public:
         ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+    virtual bool hasAccessToTheUrl(const QString& /*url*/) const override { return false; }
 
     virtual void pleaseStop() override;
     virtual void run() override;
@@ -231,6 +232,7 @@ public:
         ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+    virtual bool hasAccessToTheUrl(const QString& /*url*/) const override { return false; }
 
 private:
     TestPeerManager* m_peerManager;

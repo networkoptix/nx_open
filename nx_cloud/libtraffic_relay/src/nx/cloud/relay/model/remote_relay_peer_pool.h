@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 
+#include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/mutex.h>
@@ -65,16 +66,25 @@ private:
         UpdateType updateType) const;
 };
 
-class RemoteRelayPeerPoolFactory
+//-------------------------------------------------------------------------------------------------
+
+using RemoteRelayPeerPoolFactoryFunc =
+    std::unique_ptr<model::AbstractRemoteRelayPeerPool>(
+        const conf::Settings&);
+
+class RemoteRelayPeerPoolFactory:
+    public nx::utils::BasicFactory<RemoteRelayPeerPoolFactoryFunc>
 {
+    using base_type = nx::utils::BasicFactory<RemoteRelayPeerPoolFactoryFunc>;
+
 public:
-    using FactoryFunc = nx::utils::MoveOnlyFunc<
-        std::unique_ptr<model::AbstractRemoteRelayPeerPool>(const conf::Settings&)>;
+    RemoteRelayPeerPoolFactory();
 
-    static std::unique_ptr<model::AbstractRemoteRelayPeerPool> create(
+    static RemoteRelayPeerPoolFactory& instance();
+
+private:
+    std::unique_ptr<model::AbstractRemoteRelayPeerPool> defaultFactory(
         const conf::Settings& settings);
-
-    static void setFactoryFunc(FactoryFunc func);
 };
 
 } // namespace model

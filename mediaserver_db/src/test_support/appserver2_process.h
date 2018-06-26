@@ -18,6 +18,7 @@
 #include <nx_ec/ec_api.h>
 
 #include "appserver2_http_server.h"
+#include <nx/utils/test_support/module_instance_launcher.h>
 
 namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
 
@@ -26,9 +27,11 @@ namespace ec2 {
 class AbstractECConnection;
 class LocalConnectionFactory;
 class QnSimpleHttpConnectionListener;
+class Appserver2Process;
 
-class Appserver2Process: public QnStoppable
+class Appserver2Process: public QObject, public QnStoppable
 {
+    Q_OBJECT
 public:
     Appserver2Process(int argc, char **argv);
     virtual ~Appserver2Process() = default;
@@ -44,6 +47,13 @@ public:
     ec2::AbstractECConnection* ecConnection();
     nx::network::SocketAddress endpoint() const;
 
+    bool createInitialData(const QString& systemName);
+
+    void connectTo(const Appserver2Process* dstServer);
+
+    static void resetInstanceCounter();
+signals:
+    void beforeStart();
 private:
     int m_argc;
     char** m_argv;
@@ -62,26 +72,25 @@ private:
     void addSelfServerResource(ec2::AbstractECConnectionPtr ec2Connection);
 };
 
-class Appserver2ProcessPublic: public QnStoppable
+class Appserver2Launcher:
+    public QObject, public nx::utils::test::ModuleLauncher<ec2::Appserver2Process>
 {
+    Q_OBJECT;
+    using base_type = ModuleLauncher<ec2::Appserver2Process>;
+signals:
+    void beforeStart();
 public:
-    Appserver2ProcessPublic(int argc, char **argv);
-    virtual ~Appserver2ProcessPublic() = default;
-
-    virtual void pleaseStop() override;
-
-    void setOnStartedEventHandler(
-        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
-
-    int exec();
-
-    const Appserver2Process* impl() const;
-    ec2::AbstractECConnection* ecConnection();
-    nx::network::SocketAddress endpoint() const;
-    QnCommonModule* commonModule() const;
-
-private:
-    std::unique_ptr<Appserver2Process> m_impl;
+    static std::unique_ptr<ec2::Appserver2Launcher> createAppserver(
+        bool keepDbFile = false,
+        quint16 baseTcpPort = 0);
+protected:
+    virtual void beforeModuleStart() override
+    {
+        base_type::beforeModuleStart();
+        emit beforeStart();
+    }
 };
+
+using Appserver2Ptr = std::unique_ptr<Appserver2Launcher>;
 
 } // namespace ec2

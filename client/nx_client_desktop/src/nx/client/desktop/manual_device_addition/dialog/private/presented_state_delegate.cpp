@@ -49,7 +49,7 @@ void CellWidget::setState(FoundDevicesModel::PresentedState value)
 
     if (addedState)
     {
-        button->setIcon(qnSkin->icon("buttons/checkmark.png"));
+        button->setIcon(qnSkin->icon("text_buttons/ok.png"));
         return;
     }
 

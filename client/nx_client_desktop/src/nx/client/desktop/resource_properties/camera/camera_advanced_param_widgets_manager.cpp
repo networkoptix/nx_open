@@ -89,6 +89,7 @@ void CameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamVa
             continue;
 
         auto widget = m_paramWidgetsById[param.id];
+
         widget->setValue(param.value);
         widget->setEnabled(true);
 
@@ -306,7 +307,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
         m_paramWidgetsById[param.id] = widget;
 
         // Widget is disabled until it receives correct value.
-        if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))
+        if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType) && !param.isCustomControl())
         {
             widget->setEnabled(false);
         }

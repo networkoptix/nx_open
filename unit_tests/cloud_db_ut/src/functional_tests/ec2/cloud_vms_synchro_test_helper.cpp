@@ -40,7 +40,7 @@ Ec2MserverCloudSynchronization::~Ec2MserverCloudSynchronization()
     m_cdb.stop();
 }
 
-utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>*
+utils::test::ModuleLauncher<::ec2::Appserver2Process>*
     Ec2MserverCloudSynchronization::appserver2()
 {
     return &m_appserver2;
@@ -751,8 +751,8 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     nx::network::http::HttpClient httpClient;
-    httpClient.setResponseReadTimeoutMs(0);
-    httpClient.setMessageBodyReadTimeoutMs(0);
+    httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
+    httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
     if (!httpClient.doGet(url))
         return api::ResultCode::networkError;
     if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)

@@ -18,7 +18,8 @@ class AutoscaledPlainText;
 class ImageProvider;
 
 /**
- * The widget shows image from ImageProvider
+ * The widget shows image that it receives from ImageProvider.
+ * Busy indicator is shown until the image is loaded.
  */
 class AsyncImageWidget : public Connective<QWidget>
 {
@@ -75,6 +76,9 @@ public:
     ReloadMode reloadMode() const;
     void setReloadMode(ReloadMode value);
 
+    // If set to true, widget shows "NO DATA" until reset to false.
+    void setNoDataMode(bool noData);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void changeEvent(QEvent* event) override;
@@ -103,6 +107,8 @@ private:
     bool m_autoScaleUp = false;
     ReloadMode m_reloadMode = ReloadMode::showLoadingIndicator;
     Qn::ThumbnailStatus m_previousStatus = Qn::ThumbnailStatus::Invalid;
+    // Show "NO DATA" no matter what.
+    bool m_noDataMode = false;
 };
 
 } // namespace desktop

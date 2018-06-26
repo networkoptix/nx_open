@@ -10,10 +10,11 @@ using namespace ec2;
 
 struct RoutingRecord
 {
-    RoutingRecord() : distance(0) {}
-    RoutingRecord(int distance) : distance(distance) {}
+    RoutingRecord() = default;
+    RoutingRecord(int distance, ec2::ApiPersistentIdData firstVia = ec2::ApiPersistentIdData());
 
-    qint32 distance;
+    qint32 distance = 0;
+    ec2::ApiPersistentIdData firstVia;
 };
 
 typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
@@ -32,7 +33,7 @@ struct RouteToPeerInfo
 {
     RouteToPeerInfo() {}
 
-    qint32 minDistance(QVector<ApiPersistentIdData>* outViaList = nullptr) const;
+    qint32 minDistance(RoutingInfo* outViaList = nullptr) const;
     qint32 distanceVia(const ApiPersistentIdData& peer) const;
     const RoutingInfo& routeVia() const { return m_routeVia; }
 
@@ -64,8 +65,8 @@ struct BidirectionRoutingInfo
         const ApiPersistentIdData& via,
         const ApiPersistentIdData& to,
         const RoutingRecord& record);
-    qint32 distanceTo(const ApiPersistentIdData& peer, QVector<ApiPersistentIdData>* outVia = nullptr) const;
-    qint32 distanceTo(const QnUuid& peerId, QVector<ApiPersistentIdData>* outVia = nullptr) const;
+    qint32 distanceTo(const ApiPersistentIdData& peer, RoutingInfo* outVia = nullptr) const;
+    qint32 distanceTo(const QnUuid& peerId, RoutingInfo* outVia = nullptr) const;
     void updateLocalDistance(const ApiPersistentIdData& peer, qint32 sequence);
 
     AlivePeersMap alivePeers; //< alive peers in the system. key - route via, value - route to

@@ -4,8 +4,6 @@
 #include <future>
 #include <limits>
 
-#include <boost/optional.hpp>
-
 #include <nx/cloud/cdb/client/data/types.h>
 
 #include <nx/fusion/serialization/lexical.h>
@@ -55,7 +53,7 @@ AuthenticationHelper::AuthenticationHelper(
         : std::string();
 
     m_userLockKey = std::make_tuple(
-        connection.socket()->getForeignAddress().address,
+        connection.clientEndpoint().address,
         m_username);
 
     if (m_authzHeader)

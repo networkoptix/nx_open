@@ -4,11 +4,6 @@ namespace nx {
 namespace network {
 namespace http {
 
-HttpModManager::HttpModManager(QObject* parent /*= nullptr*/):
-    base_type(parent)
-{
-}
-
 void HttpModManager::apply(Request* const request)
 {
     // Applying m_urlRewriteExact.
