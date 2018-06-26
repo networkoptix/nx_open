@@ -1,4 +1,5 @@
 # default logging configuration
+# https://docs.python.org/2/library/logging.config.html#dictionary-schema-details
 
 version: 1
 formatters:
