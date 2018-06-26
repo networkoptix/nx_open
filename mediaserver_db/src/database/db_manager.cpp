@@ -51,7 +51,6 @@
 #include <nx/vms/api/data/camera_history_data.h>
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
-#include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include <nx_ec/data/api_access_rights_data.h>
 #include "api/runtime_info_manager.h"

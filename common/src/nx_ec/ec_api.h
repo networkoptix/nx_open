@@ -22,7 +22,6 @@
 #include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_peer_alive_data.h>
-#include <nx_ec/data/api_time_data.h>
 #include <nx_ec/data/api_license_overflow_data.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
