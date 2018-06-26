@@ -78,14 +78,12 @@ class _SSHCommand(Command):
     def receive(self, timeout_sec):
         self._channel.settimeout(timeout_sec)
         output_chunks = {}
-        subprocess_responded = False  # TODO: Use `for: ... else: ...`.
         for key, (recv, output_logger) in self._open_streams.items():
             try:
                 # TODO: Wait on `self.channel.event`.
                 output_chunk = recv(_STREAM_BUFFER_SIZE)
             except socket.timeout:
                 continue  # Next stream might have data on it.
-            subprocess_responded = True
             if not output_chunk:
                 output_logger.debug("Closed from the other side.")
                 del self._open_streams[key]
