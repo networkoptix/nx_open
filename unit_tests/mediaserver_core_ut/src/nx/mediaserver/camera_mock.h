@@ -25,14 +25,22 @@ public:
     void setMediaTraits(nx::media::CameraTraits traits);
     void enableSetProperty(bool isEnabled);
 
-    static QnCameraAdvancedParams makeParameterDescriptions(const std::vector<QString>& parameters);
+    static QnCameraAdvancedParams makeParameterDescriptions(
+        const std::vector<QString>& parameters);
+
+    void setPtzController(const QnAbstractPtzController* controller);
+
     virtual bool isCameraControlDisabled() const override;
     virtual Qn::MotionType getMotionType() const override;
     virtual bool hasDualStreaming() const override;
     virtual bool hasDualStreaming2() const override;
-public:
+
     virtual QString getProperty(const QString& key) const override;
-    virtual bool setProperty(const QString& key, const QString& value, PropertyOptions options) override;
+    virtual bool setProperty(
+        const QString& key,
+        const QString& value,
+        PropertyOptions options) override;
+
     virtual bool saveParams() override;
 
 protected:
@@ -40,8 +48,10 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual std::vector<AdvancedParametersProvider*> advancedParametersProviders() override;
-    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
     virtual nx::media::CameraTraits mediaTraits() const override;
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
 
 private:
     friend class CameraTest;
@@ -51,6 +61,7 @@ private:
     nx::media::CameraTraits m_mediaTraits;
     bool isSetProprtyEnabled = true;
     mutable std::map<QString, QString> m_properties;
+    QnAbstractPtzController* m_ptzController;
 };
 
 class CameraTest: public testing::Test
