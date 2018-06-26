@@ -82,7 +82,6 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
-            if (info.data.peer.peerType != vms::api::PeerType::server)
             const auto uuid = resource->getId();
             int idx = nx::utils::algorithm::index_of(m_items,
                 [uuid](const Item& item)
@@ -559,6 +558,6 @@ void QnTimeServerSelectionModel::updateHasInternetAccess()
         [](const QnMediaServerResourcePtr& server)
         {
             return server->getStatus() == Qn::Online
-                && server->getServerFlags().testFlag(vms::api::SF_HasPublicIP);
+                && server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
         });
 }
