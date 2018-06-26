@@ -3234,7 +3234,7 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
         && thumbnailsLoader()->timeStep() != 0 && m_oldThumbnailData.isEmpty()
         && !m_thumbnailsUpdateTimer->isActive())
     {
-        milliseconds time =
+        auto time =
             milliseconds(qRound(valueFromPosition(event->pos()), thumbnailsLoader()->timeStep()));
 
         setThumbnailSelecting(m_lastHoverThumbnail, false);
