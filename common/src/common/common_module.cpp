@@ -180,12 +180,13 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_startupTime = QDateTime::currentDateTime();
 
     m_moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    m_moduleInformation.systemInformation = QnSystemInformation::currentSystemInformation();
+    m_moduleInformation.systemInformation = QnAppInfo::currentSystemInformation();
     m_moduleInformation.brand = QnAppInfo::productNameShort();
     m_moduleInformation.customization = QnAppInfo::customizationName();
     m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::engineVersion());
-    m_moduleInformation.type = clientMode ?
-        QnModuleInformation::nxClientId() : QnModuleInformation::nxMediaServerId();
+    m_moduleInformation.type = clientMode
+        ? QnModuleInformation::nxClientId()
+        : QnModuleInformation::nxMediaServerId();
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)

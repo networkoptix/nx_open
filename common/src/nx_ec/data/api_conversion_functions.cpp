@@ -612,7 +612,7 @@ void fromApiToResource(const MediaServerData& src, QnMediaServerResourcePtr& dst
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
     dst->setVersion(nx::utils::SoftwareVersion(src.version));
-    dst->setSystemInfo(QnSystemInformation(src.systemInfo));
+    dst->setSystemInfo(nx::vms::api::SystemInformation(src.systemInfo));
     dst->setAuthKey(src.authKey);
 }
 

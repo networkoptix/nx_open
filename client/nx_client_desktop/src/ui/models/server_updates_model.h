@@ -7,7 +7,6 @@
 #include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <update/media_server_update_tool.h>
-#include <utils/common/system_information.h>
 
 class QnServerUpdatesModel:
     public Customized<QAbstractTableModel>,

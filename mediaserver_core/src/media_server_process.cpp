@@ -215,9 +215,9 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
+#include <utils/common/app_info.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
-#include <utils/common/system_information.h>
 #include <utils/common/util.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/ssl_socket.h>
@@ -1336,7 +1336,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
     server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
     server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
-    server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
+    server->setProperty(Qn::SYSTEM_RUNTIME, nx::vms::api::SystemInformation::currentSystemRuntime());
 
     if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents)
         server->setPanicMode(Qn::PM_None);
@@ -3701,7 +3701,7 @@ void MediaServerProcess::run()
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
 
         // used for statistics reported
-        server->setSystemInfo(QnSystemInformation::currentSystemInformation());
+        server->setSystemInfo(QnAppInfo::currentSystemInformation());
         server->setVersion(qnStaticCommon->engineVersion());
 
         QByteArray settingsAuthKey = nx::ServerSetting::getAuthKey();

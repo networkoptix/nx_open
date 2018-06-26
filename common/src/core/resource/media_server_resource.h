@@ -6,11 +6,11 @@
 #include <api/media_server_connection.h>
 #include <core/resource/resource.h>
 #include <utils/common/value_cache.h>
-#include <utils/common/system_information.h>
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/data/system_information.h>
 
 namespace nx {
 namespace network {
@@ -100,13 +100,13 @@ public:
     bool isRedundancy() const;
 
     QnServerBackupSchedule getBackupSchedule() const;
-    void setBackupSchedule(const QnServerBackupSchedule &value);
+    void setBackupSchedule(const QnServerBackupSchedule& value);
 
     nx::utils::SoftwareVersion getVersion() const;
     void setVersion(const nx::utils::SoftwareVersion& version);
 
-    QnSystemInformation getSystemInfo() const;
-    void setSystemInfo(const QnSystemInformation &systemInfo);
+    nx::vms::api::SystemInformation getSystemInfo() const;
+    void setSystemInfo(const nx::vms::api::SystemInformation& systemInfo);
     virtual QnModuleInformation getModuleInformation() const;
 
     QnModuleInformationWithAddresses getModuleInformationWithAddresses() const;
@@ -168,7 +168,7 @@ private:
     bool m_sslAllowed = false;
     nx::vms::api::ServerFlags m_serverFlags;
     nx::utils::SoftwareVersion m_version;
-    QnSystemInformation m_systemInfo;
+    nx::vms::api::SystemInformation m_systemInfo;
     QVector<nx::network::http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;

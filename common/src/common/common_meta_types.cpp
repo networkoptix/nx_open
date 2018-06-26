@@ -198,9 +198,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnTimePeriodList>();
     qRegisterMetaType<MultiServerPeriodDataList>();
 
-    qRegisterMetaType<QnSystemInformation>();
-    qRegisterMetaTypeStreamOperators<QnSystemInformation>();
-
     qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnCameraAdvancedParamValue>();
     qRegisterMetaType<QnCameraAdvancedParamValueList>();

@@ -8,7 +8,6 @@
 #include <core/resource/resource_fwd.h>
 #include <update/updates_common.h>
 #include <update/update_process.h>
-#include <utils/common/system_information.h>
 #include <utils/common/connective.h>
 
 #include <nx/utils/software_version.h>

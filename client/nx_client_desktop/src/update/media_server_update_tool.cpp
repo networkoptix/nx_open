@@ -194,7 +194,7 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(
         query.addQueryItem(lit("password"), passwordForBuild(key));
     }
 
-    QSet<QnSystemInformation> systemInformationList;
+    QSet<nx::vms::api::SystemInformation> systemInformationList;
     for (const auto& server: actualTargets())
     {
         bool incompatible = (server->getStatus() == Qn::Incompatible);
@@ -211,8 +211,10 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(
         systemInformationList.insert(server->getSystemInfo());
     }
 
-    query.addQueryItem(lit("client"), QnSystemInformation::currentSystemInformation().toString().replace(L' ', L'_'));
-    foreach (const QnSystemInformation &systemInformation, systemInformationList)
+    query.addQueryItem(lit("client"),
+        QnAppInfo::currentSystemInformation().toString().replace(L' ', L'_'));
+
+    for (const auto& systemInformation: systemInformationList)
         query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
 
     query.addQueryItem(lit("customization"), QnAppInfo::customizationName());

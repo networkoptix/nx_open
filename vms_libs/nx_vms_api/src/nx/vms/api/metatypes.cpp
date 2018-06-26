@@ -31,6 +31,7 @@
 #include "data/software_version.h"
 #include "data/system_id_data.h"
 #include "data/system_merge_history_record.h"
+#include "data/system_information.h"
 #include "data/tran_state_data.h"
 #include "data/timestamp.h"
 #include "data/update_data.h"
@@ -122,6 +123,8 @@ void Metatypes::initialize()
     qRegisterMetaType<SyncRequestData>();
     qRegisterMetaType<SystemIdData>();
     qRegisterMetaType<SystemMergeHistoryRecord>();
+    qRegisterMetaType<SystemInformation>();
+    qRegisterMetaTypeStreamOperators<SystemInformation>();
     qRegisterMetaType<Timestamp>();
     qRegisterMetaType<TranState>();
     qRegisterMetaType<TranStateResponse>();

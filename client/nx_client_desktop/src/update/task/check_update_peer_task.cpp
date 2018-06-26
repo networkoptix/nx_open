@@ -117,7 +117,8 @@ QnCheckForUpdatesPeerTask::QnCheckForUpdatesPeerTask(const QnUpdateTarget& targe
 {
 }
 
-QHash<QnSystemInformation, QnUpdateFileInformationPtr> QnCheckForUpdatesPeerTask::updateFiles() const
+QHash<nx::vms::api::SystemInformation, QnUpdateFileInformationPtr>
+    QnCheckForUpdatesPeerTask::updateFiles() const
 {
     return m_updateFiles;
 }
@@ -442,7 +443,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
             info->baseFileName = variant->file;
             info->fileSize = variant->size;
             info->md5 = variant->md5;
-            QnSystemInformation systemInformation(platform.key(), arch, modification);
+            nx::vms::api::SystemInformation systemInformation(platform.key(), arch, modification);
             m_updateFiles.insert(systemInformation, info);
 
             NX_LOG(
@@ -513,7 +514,7 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error)
     {
         QString fileName = dir.absoluteFilePath(entry);
         nx::utils::SoftwareVersion version;
-        QnSystemInformation sysInfo;
+        nx::vms::api::SystemInformation sysInfo;
         QString cloudHost;
         bool isClient = false;
 
@@ -535,7 +536,7 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error)
         if (isClient)
         {
             if (m_target.denyClientUpdates || m_clientUpdateFile
-                || sysInfo != QnSystemInformation::currentSystemInformation())
+                || sysInfo != QnAppInfo::currentSystemInformation())
             {
                 continue;
             }

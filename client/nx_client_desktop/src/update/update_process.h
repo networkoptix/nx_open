@@ -3,17 +3,15 @@
 #include <QtCore/QPointer>
 
 #include <client_core/connection_context_aware.h>
-
 #include <core/resource/resource_fwd.h>
-
 #include <update/updates_common.h>
 
-
-#include <utils/common/system_information.h>
 #include <nx/utils/software_version.h>
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/vms/api/data/system_information.h>
 
-struct QnPeerUpdateInformation {
+struct QnPeerUpdateInformation
+{
 //     enum State {
 //         UpdateUnknown,
 //         UpdateNotFound,
@@ -34,9 +32,9 @@ struct QnPeerUpdateInformation {
     nx::utils::SoftwareVersion sourceVersion;
     QnUpdateFileInformationPtr updateInformation;
 
-    int progress;
+    int progress = 0;
 
-    QnPeerUpdateInformation(const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr());
+    QnPeerUpdateInformation(const QnMediaServerResourcePtr& server = {});
 };
 
 class QnNetworkPeerTask;
@@ -113,10 +111,10 @@ private:
     QSet<QnUuid> m_incompatiblePeerIds;
     QSet<QnUuid> m_targetPeerIds;
     bool m_clientRequiresInstaller;
-    QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
+    QHash<nx::vms::api::SystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
     QnUpdateFileInformationPtr m_clientUpdateFile;
     QHash<QnUuid, QnPeerUpdateInformation> m_updateInformationById;
-    QMultiHash<QnSystemInformation, QnUuid> m_idBySystemInformation;
+    QMultiHash<nx::vms::api::SystemInformation, QnUuid> m_idBySystemInformation;
     QnUpdateResult::Value m_updateResult;
     bool m_protocolChanged;
     QSet<QnUuid> m_failedPeerIds;

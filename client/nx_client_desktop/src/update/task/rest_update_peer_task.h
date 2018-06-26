@@ -2,7 +2,6 @@
 
 #include <update/task/network_peer_task.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/common/system_information.h>
 #include <core/resource/fake_media_server.h>
 
 #include <nx/utils/software_version.h>

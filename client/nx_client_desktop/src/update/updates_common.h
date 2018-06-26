@@ -3,11 +3,11 @@
 #include <QtCore/QCoreApplication>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/common/system_information.h>
 
 #include <nx/utils/software_version.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
+#include <nx/vms/api/data/system_information.h>
 
 struct QnCheckForUpdateResult
 {
@@ -29,7 +29,10 @@ struct QnCheckForUpdateResult
     explicit QnCheckForUpdateResult(Value result): result(result) {}
 
     Value result = NoNewerVersion;
-    QSet<QnSystemInformation> systems; /**< Set of supported system, for which updates were found. */
+
+    /** Set of supported system, for which updates were found. */
+    QSet<nx::vms::api::SystemInformation> systems;
+
     nx::utils::SoftwareVersion version;
     bool clientInstallerRequired = false;
     nx::utils::Url releaseNotesUrl;

@@ -527,17 +527,18 @@ void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version
     emit versionChanged(::toSharedPointer(this));
 }
 
-QnSystemInformation QnMediaServerResource::getSystemInfo() const {
+nx::vms::api::SystemInformation QnMediaServerResource::getSystemInfo() const
+{
     QnMutexLocker lock(&m_mutex);
-
     return m_systemInfo;
 }
 
-void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo) {
+void QnMediaServerResource::setSystemInfo(const nx::vms::api::SystemInformation& systemInfo)
+{
     QnMutexLocker lock(&m_mutex);
-
     m_systemInfo = systemInfo;
 }
+
 QnModuleInformation QnMediaServerResource::getModuleInformation() const
 {
     if (auto module = commonModule())

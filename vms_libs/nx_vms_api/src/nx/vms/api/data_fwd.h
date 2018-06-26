@@ -10,6 +10,7 @@ namespace api {
 
 struct Data;
 class SoftwareVersion;
+class SystemInformation;
 
 #define DECLARE_LIST(Type) \
     using Type##List = std::vector<Type>;

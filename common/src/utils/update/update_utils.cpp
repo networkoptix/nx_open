@@ -40,7 +40,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 bool verifyUpdatePackageInternal(
     QuaZipFile* infoFile,
     nx::utils::SoftwareVersion* version = nullptr,
-    QnSystemInformation* sysInfo = nullptr,
+    nx::vms::api::SystemInformation* sysInfo = nullptr,
     QString* cloudHost = nullptr,
     bool* isClient = nullptr)
 {
@@ -50,7 +50,8 @@ bool verifyUpdatePackageInternal(
     const auto data = infoFile->readAll();
     auto fileData = QJson::deserialized<UpdateFileData>(data);
 
-    QnSystemInformation locSysInfo(fileData.platform, fileData.arch, fileData.modification);
+    nx::vms::api::SystemInformation locSysInfo(
+        fileData.platform, fileData.arch, fileData.modification);
     if (!locSysInfo.isValid())
         return false;
 
@@ -74,7 +75,7 @@ bool verifyUpdatePackageInternal(
 bool verifyUpdatePackage(
     const QString& fileName,
     nx::utils::SoftwareVersion* version,
-    QnSystemInformation* sysInfo,
+    nx::vms::api::SystemInformation* sysInfo,
     QString* cloudHost,
     bool* isClient)
 {
@@ -85,7 +86,7 @@ bool verifyUpdatePackage(
 bool verifyUpdatePackage(
     QIODevice* device,
     nx::utils::SoftwareVersion* version,
-    QnSystemInformation* sysInfo,
+    nx::vms::api::SystemInformation* sysInfo,
     QString* cloudHost,
     bool* isClient)
 {

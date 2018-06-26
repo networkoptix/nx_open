@@ -4,14 +4,14 @@
 #include <QtCore/QString>
 #include <QtCore/QSet>
 
+#include <common/common_globals.h>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types/resource_types.h>
 #include <nx/vms/api/data/software_version.h>
-
-#include <common/common_globals.h>
-#include <utils/common/system_information.h>
+#include <nx/vms/api/data/system_information.h>
 
 struct QnModuleInformation
 {
@@ -19,7 +19,7 @@ struct QnModuleInformation
     QString customization;
     QString brand;
     nx::vms::api::SoftwareVersion version;
-    QnSystemInformation systemInformation;
+    nx::vms::api::SystemInformation systemInformation;
     QString systemName;
     QString name;
     int port;
