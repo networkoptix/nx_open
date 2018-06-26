@@ -497,8 +497,8 @@ bool ProxyConnectionProcessor::openProxyDstConnection()
 
 	NX_VERBOSE(this, lm("Found destination url %1").args(dstUrl));
 
-	d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
-	if (d->lastConnectedUrl.isEmpty())
+	d->lastConnectedEndpoint = connectToRemoteHost(dstRoute, dstUrl);
+	if (d->lastConnectedEndpoint.isEmpty())
 	{
 		NX_VERBOSE(this, lm("Failed to open connection to the target %1").args(dstUrl));
 		return false; // invalid dst address
@@ -585,13 +585,13 @@ void ProxyConnectionProcessor::doProxyRequest()
 	QnRoute dstRoute;
 	updateClientRequest(dstUrl, dstRoute);
 	bool isWebSocket = nx::network::http::getHeaderValue(d->request.headers, "Upgrade").toLower() == lit("websocket");
-	bool isSameAddr = d->lastConnectedUrl == dstRoute.addr.toString() || d->lastConnectedUrl == dstUrl
-		|| (dstRoute.reverseConnect && d->lastConnectedUrl == dstRoute.id.toByteArray());
+	bool isSameAddr = d->lastConnectedEndpoint == dstRoute.addr.toString() || d->lastConnectedEndpoint == dstUrl
+		|| (dstRoute.reverseConnect && d->lastConnectedEndpoint == dstRoute.id.toByteArray());
 	if (!isSameAddr)
 	{
 		// new server
-		d->lastConnectedUrl = connectToRemoteHost(dstRoute, dstUrl);
-		if (d->lastConnectedUrl.isEmpty())
+		d->lastConnectedEndpoint = connectToRemoteHost(dstRoute, dstUrl);
+		if (d->lastConnectedEndpoint.isEmpty())
 		{
 			NX_VERBOSE(this, lm("Failed to connect to destination %1 during \"smart\" proxying")
 				.args(dstUrl));
