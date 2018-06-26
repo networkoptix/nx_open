@@ -3,7 +3,7 @@ def test_remote_process_interaction(winrm_shell):
         for i in range(3):
             stdin = ('chunk %d\n' % i).encode('ascii')
             command.send(stdin)
-            _, stdout, stderr = command.receive()
+            _, stdout, stderr = command.receive(None)
             assert stdout.replace(b'\r\n', b'\n') == stdin
         command.send(b'', is_last=True)
         _, _, _ = command.communicate()
