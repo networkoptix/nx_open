@@ -821,7 +821,7 @@ void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> so
             std::bind(
                 &AsyncClient::asyncConnectDone,
                 this,
-                SystemError::getLastOSErrorCode()));
+                SystemError::noError));
     }
     else
     {
