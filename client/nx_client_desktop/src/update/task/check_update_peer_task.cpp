@@ -135,7 +135,7 @@ void QnCheckForUpdatesPeerTask::doStart()
         checkOnlineUpdates();
 }
 
-bool QnCheckForUpdatesPeerTask::isUpdateNeed(
+bool QnCheckForUpdatesPeerTask::isUpdateNeeded(
     const nx::utils::SoftwareVersion& version,
     const nx::utils::SoftwareVersion& updateVersion) const
 {
@@ -187,7 +187,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
         if (!server)
             continue;
 
-        bool updateServer = isUpdateNeed(server->getVersion(), m_target.version);
+        bool updateServer = isUpdateNeeded(server->getVersion(), m_target.version);
         if (updateServer && !m_updateFiles.value(server->getSystemInfo()))
         {
             NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: No update file for server [%1 : %2]")
@@ -199,7 +199,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
 
     if (!m_target.denyClientUpdates && !m_clientRequiresInstaller)
     {
-        bool updateClient = isUpdateNeed(qnStaticCommon->engineVersion(), m_target.version);
+        bool updateClient = isUpdateNeeded(qnStaticCommon->engineVersion(), m_target.version);
 
         if (updateClient && !m_clientUpdateFile)
         {

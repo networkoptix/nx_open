@@ -32,7 +32,7 @@ protected:
     virtual void doCancel() override;
 
 private:
-    bool isUpdateNeed(
+    bool isUpdateNeeded(
         const nx::utils::SoftwareVersion& version,
         const nx::utils::SoftwareVersion& updateVersion) const;
 
