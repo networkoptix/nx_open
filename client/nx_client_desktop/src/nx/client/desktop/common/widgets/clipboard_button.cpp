@@ -75,7 +75,7 @@ ClipboardButton::ClipboardButton(
     base_type(
         qnSkin->icon(lit("text_buttons/copy.png")),
         text,
-        qnSkin->icon(lit("buttons/checkmark.png")),
+        qnSkin->icon(lit("text_buttons/ok.png")),
         confirmationText,
         parent)
 {

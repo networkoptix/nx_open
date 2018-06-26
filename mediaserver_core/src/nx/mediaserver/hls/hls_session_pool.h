@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <map>
 #include <set>
@@ -6,6 +6,7 @@
 #include <QSharedPointer>
 #include <QString>
 
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -63,6 +64,9 @@ public:
     QPair<QString, QString> chunkAuthenticationQueryItem() const;
     void updateAuditInfo(qint64 timeUsec);
 
+    std::optional<AVCodecID> audioCodecId() const;
+    void setAudioCodecId(AVCodecID);
+
 private:
     const QString m_id;
     const unsigned int m_targetDurationMS;
@@ -79,6 +83,7 @@ private:
     mutable QnMutex m_mutex;
     AuditHandle m_auditHandle;
     QnAuthSession m_authSession;
+    std::optional<AVCodecID> m_audioCodecId;
 };
 
 /**

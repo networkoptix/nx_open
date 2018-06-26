@@ -3,8 +3,9 @@ import sys
 from io import BytesIO
 
 from framework.installation.installation import Installation
-from framework.installation.installer import Version, known_customizations
+from framework.installation.installer import Version, find_customization, UnknownCustomization
 from framework.installation.upstart_service import UpstartService
+from framework.method_caching import cached_property
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
 from framework.os_access.posix_shell import SSH
@@ -33,12 +34,11 @@ class DebInstallation(Installation):
         self.var = self.dir / 'var'
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self.os_access = ssh_access
-        self.service = UpstartService(
-            self.os_access.ssh,
-            self.installer.customization.linux_service_name,
-            stop_timeout_sec=10,  # 120 seconds specified in upstart conf file.
-            )
+        self.ssh_access = ssh_access
+
+    @property
+    def os_access(self):
+        return self.ssh_access
 
     def is_valid(self):
         paths_to_check = [
@@ -52,6 +52,12 @@ class DebInstallation(Installation):
                 _logger.warning("Path %r does not exists.", path)
                 all_paths_exist = False
         return all_paths_exist
+
+    @cached_property
+    def service(self):
+        service_name = self.installer.customization.linux_service_name
+        stop_timeout_sec = 10  # 120 seconds specified in upstart conf file.
+        return UpstartService(self.ssh_access.ssh, service_name, stop_timeout_sec)
 
     def list_core_dumps(self):
         return self._bin.glob('core.*')
@@ -89,11 +95,11 @@ class DebInstallation(Installation):
             for line in build_info_text.splitlines(False))
         if self.installer.version != Version(build_info['version']):
             return False
-        customization, = (
-            customization
-            for customization in known_customizations
-            if customization.customization_name == build_info['customization'])
-        if self.installer.customization != customization:
+        try:
+            installed_customization = find_customization('customization_name', build_info['customization'])
+        except UnknownCustomization:
+            return False
+        if self.installer.customization != installed_customization:
             return False
         return True
 
@@ -104,7 +110,7 @@ class DebInstallation(Installation):
         remote_path = self.os_access.Path.tmp() / self.installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
         copy_file(self.installer.path, remote_path)
-        self.os_access.ssh.run_sh_script(
+        self.ssh_access.ssh.run_sh_script(
             # language=Bash
             '''
                 # Commands and dependencies for trusty template.

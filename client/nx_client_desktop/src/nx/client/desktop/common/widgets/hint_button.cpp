@@ -91,6 +91,7 @@ template<class T> struct DenyProtectedStyle: public T
 
 void HintButton::updateGeometry(QGroupBox* parent)
 {
+    m_hostBox = parent;
     auto unlockedStyleInit = static_cast<DenyProtectedStyle<QGroupBox>*>(parent);
     QStyleOptionGroupBox box;
     unlockedStyleInit->publicInitStyleOption(&box);
@@ -197,7 +198,14 @@ void HintButton::paintEvent(QPaintEvent* event)
     {
         // Always center pixmap
         QPointF centeredCorner = rect().center() - pixmap.rect().center() / pixmap.devicePixelRatioF();
-        if (!isEnabled())
+
+        bool disabledState = !isEnabled();
+        // We do not show disabled state for the cases we embed this hint into a QGroupBox.
+        // This case can be changed in future.
+        if (m_hostBox && m_hostBox->isCheckable())
+            disabledState = false;
+
+        if (disabledState)
             painter.setOpacity(0.3);
         painter.drawPixmap(centeredCorner, pixmap);
     }
@@ -205,8 +213,15 @@ void HintButton::paintEvent(QPaintEvent* event)
 
 void HintButton::enterEvent(QEvent* event)
 {
-    if (!isEnabled())
+    bool skipHover = !isEnabled();
+
+    // There is an exception for QGroupBox, when we keep the hint enabled.
+    if (m_hostBox && m_hostBox->isCheckable())
+        skipHover = false;
+
+    if (skipHover)
         return;
+
     if (!m_isHovered)
     {
         m_isHovered = true;

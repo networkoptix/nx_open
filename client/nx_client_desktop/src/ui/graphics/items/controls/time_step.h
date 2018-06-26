@@ -1,12 +1,15 @@
 #ifndef QN_TIME_STEP_H
 #define QN_TIME_STEP_H
 
+#include <chrono>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QPair>
 #include <QtCore/QString>
 
 class QnTimeStep
 {
+    using milliseconds = std::chrono::milliseconds;
 public:
     enum Type
     {
@@ -19,34 +22,25 @@ public:
         Years
     };
 
-    QnTimeStep(): type(Milliseconds), unitMSecs(0), stepMSecs(0), stepUnits(0), wrapUnits(0), isRelative(true), index(0) {}
+    QnTimeStep() = default;
 
-    QnTimeStep(Type type, qint64 unitMSecs, int stepUnits, int wrapUnits, const QString &format, const QString &longFormat, bool isRelative = true):
-        type(type),
-        unitMSecs(unitMSecs),
-        stepMSecs(unitMSecs * stepUnits),
-        stepUnits(stepUnits),
-        wrapUnits(wrapUnits),
-        format(format),
-        longFormat(longFormat),
-        isRelative(isRelative),
-        index(0)
-    {}
+    QnTimeStep(Type type, milliseconds unitMSecs, int stepUnits, int wrapUnits,
+        const QString& format, const QString& longFormat, bool isRelative = true);
 
     /** Type of the time step. */
-    Type type;
+    Type type = Milliseconds;
 
     /** Size of the unit in which step value is measured, in milliseconds. */
-    qint64 unitMSecs;
+    milliseconds unitMSecs = milliseconds(0);
 
     /** Time step, in milliseconds */
-    qint64 stepMSecs;
+    milliseconds stepMSecs = milliseconds(0);
 
     /** Time step, in units. */
-    int stepUnits;
+    int stepUnits = 0;
 
     /** Number of units for a wrap-around. */
-    int wrapUnits;
+    int wrapUnits = 0;
 
     /** Format string for the step value. */
     QString format;
@@ -56,32 +50,31 @@ public:
 
     /** Whether this time step is to be used for relative times (e.g. time intervals),
      * or for absolute times (i.e. obtained via <tt>QDateTime::toMSecsSinceEpoch</tt>). */
-    bool isRelative;
+    bool isRelative = true;
 
     /** Index of this time step in the enclosing list. */
-    int index;
+    int index = 0;
 };
 
+// We do not want chrono::milliseconds propagate to hashes etc., so we leave qint64..
 typedef QPair<qint64, qint64> QnTimeStepLongCacheKey;
 
-qint64 roundUp(qint64 msecs, const QnTimeStep &step);
+// These function are used in low-level drawings, so we return qint64 instead of time.
+qint64 roundUp(std::chrono::milliseconds msecs, const QnTimeStep &step);
+qint64 add(std::chrono::milliseconds msecs, const QnTimeStep &step);
+qint64 sub(std::chrono::milliseconds msecs, const QnTimeStep &step);
+qint64 absoluteNumber(std::chrono::milliseconds msecs, const QnTimeStep &step);
 
-qint64 add(qint64 msecs, const QnTimeStep &step);
+qint32 shortCacheKey(std::chrono::milliseconds msecs, int height, const QnTimeStep &step);
 
-qint64 sub(qint64 msecs, const QnTimeStep &step);
-
-qint64 absoluteNumber(qint64 msecs, const QnTimeStep &step);
-
-qint32 shortCacheKey(qint64 msecs, int height, const QnTimeStep &step);
-
-QnTimeStepLongCacheKey longCacheKey(qint64 msecs, int height, const QnTimeStep &step);
+QnTimeStepLongCacheKey longCacheKey(std::chrono::milliseconds msecs, int height, const QnTimeStep &step);
 
 // TODO: #Elric #TR what to do with locale-translation inconsistencies?
 
-QString toShortString(qint64 msecs, const QnTimeStep &step);
+QString toShortString(std::chrono::milliseconds msecs, const QnTimeStep &step);
 
 QString toLongestShortString(const QnTimeStep &step);
 
-QString toLongString(qint64 msecs, const QnTimeStep &step);
+QString toLongString(std::chrono::milliseconds msecs, const QnTimeStep &step);
 
 #endif // QN_TIME_STEP_H

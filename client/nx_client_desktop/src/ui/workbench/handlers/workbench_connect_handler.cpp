@@ -829,16 +829,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 
     auto connection = commonModule()->ec2Connection();
     NX_ASSERT(connection);
-    connect(connection->getTimeNotificationManager(),
-        &ec2::AbstractTimeNotificationManager::timeChanged,
-        this,
-        [](qint64 syncTime)
-        {
-            NX_ASSERT(qnSyncTime);
-            if (qnSyncTime)
-                qnSyncTime->updateTime(syncTime);
-        });
-
     commonModule()->setReadOnly(connection->connectionInfo().ecDbReadOnly);
 }
 
@@ -889,7 +879,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
     /* Avoid double reconnect when server is very slow or in debug. */
     m_connecting.reset();
 
-    NX_ASSERT(m_logicalState != LogicalState::disconnected);
+    // We can close client while connecting, and initial resources are queued now.
     if (m_logicalState == LogicalState::disconnected)
         return;
 

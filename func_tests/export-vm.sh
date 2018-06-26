@@ -4,5 +4,8 @@ set -euxo pipefail
 : ${2:?"Second parameter is dir to put exported VM to."}
 NAME="$1-template"
 EXPORTED="$2/$NAME.ova"
+TEMP="$2/$NAME.bu.ova"
+mkdir -p "$(dirname "$TEMP")"
+VBoxManage export "$NAME" -o "$TEMP" --options nomacs
 mkdir -p "$(dirname "$EXPORTED")"
-VBoxManage export "$NAME" -o "$EXPORTED" --options nomacs
+mv "$TEMP" "$EXPORTED"

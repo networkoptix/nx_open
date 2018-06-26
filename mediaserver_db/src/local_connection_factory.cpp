@@ -26,7 +26,6 @@
 #include "remote_ec_connection.h"
 #include <rest/handlers/ec2_base_query_http_handler.h>
 #include <rest/handlers/ec2_update_http_handler.h>
-#include <rest/handlers/time_sync_rest_handler.h>
 #include "rest/server/rest_connection_processor.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
@@ -36,7 +35,6 @@
 #include <http/p2p_connection_listener.h>
 #include <transaction/message_bus_adapter.h>
 #include "server_query_processor.h"
-#include <managers/time_manager.h>
 #include <nx/p2p/p2p_message_bus.h>
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
@@ -53,14 +51,16 @@ static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 LocalConnectionFactory::LocalConnectionFactory(
     QnCommonModule* commonModule,
     Qn::PeerType peerType,
-	nx::utils::TimerManager* const timerManager,
-	bool isP2pMode)
+	bool isP2pMode,
+    QnHttpConnectionListener* tcpListener)
 	:
     AbstractECConnectionFactory(commonModule),
-	// dbmanager is initialized by direct connection.
 
 	m_jsonTranSerializer(new QnJsonTransactionSerializer()),
 	m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+    m_serverConnector(new nx::vms::network::ReverseConnectionManager(tcpListener)),
+    m_timeSynchronizationManager(new nx::time_sync::ServerTimeSyncManager(
+        commonModule, m_serverConnector.get())),
 	m_terminated(false),
 	m_runningRequests(0),
 	m_sslEnabled(false),
@@ -77,12 +77,6 @@ LocalConnectionFactory::LocalConnectionFactory(
 		m_jsonTranSerializer.get(),
 		m_ubjsonTranSerializer.get()));
 
-	m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
-        commonModule,
-		peerType,
-		timerManager,
-		&m_settingsInstance));
-
     if (m_p2pMode)
     {
         auto messageBus = m_bus->init<nx::p2p::ServerMessageBus>(peerType);
@@ -98,31 +92,22 @@ LocalConnectionFactory::LocalConnectionFactory(
 	m_serverQueryProcessor.reset(new ServerQueryProcessorAccess(m_dbManager.get(), m_bus.get()));
 
 	m_dbManager->setTransactionLog(m_transactionLog.get());
-	m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
-
-	m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 
 	// Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
 	// order.
 	// TODO: #Elric #EC2 register in a proper place!
 	// Registering ec2 types with Qt meta-type system.
 	qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");
-
-	// TODO: Add comment why this code is commented out.
-	//m_transactionMessageBus->start();
 }
 
 void LocalConnectionFactory::shutdown()
 {
-	// Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
-	// uses QnTransactionMessageBus.
-	if (m_timeSynchronizationManager)
-		m_timeSynchronizationManager->pleaseStop();
-
 	m_serverQueryProcessor->waitForAsyncTasks();
 
 	pleaseStop();
 	join();
+
+    messageBus()->removeHandler(m_directConnection->notificationManager());
 }
 
 LocalConnectionFactory::~LocalConnectionFactory()
@@ -1385,11 +1370,13 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param locked Whether the layout is locked.
      *     %value false
      *     %value true
+     * %param fixedWidth Fixed width of the layout in cells (integer).
+     * %param fixedHeight Fixed height of the layout in cells (integer).
+     * %param logicalId Logical ID of the layout, set by user (integer).
      * %param backgroundImageFilename
-     * %param backgroundWidth Width of the background image in pixels (integer).
-     * %param backgroundHeight Height of the background image in pixels (integer).
-     * %param backgroundOpacity Level of opacity of the background image in pixels (floating-point
-     *     0..1).
+     * %param backgroundWidth Width of the background image in cells (integer).
+     * %param backgroundHeight Height of the background image in cells (integer).
+     * %param backgroundOpacity Level of opacity of the background image (floating-point, 0..1).
      * %// AbstractLayoutManager::save
      */
     regUpdate<LayoutData>(p, ApiCommand::saveLayout);
@@ -1575,20 +1562,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractECConnection
     regUpdate<DatabaseDumpData>(p, ApiCommand::restoreDatabase);
 
-    /**%apidoc GET /ec2/getCurrentTime
-     * Read current time.
-     * %permissions Administrator.
-     * %param[default] format
-     * %return Object in the requested format.
-     * %// AbstractTimeManager::getCurrentTimeImpl
-     */
-    regGet<std::nullptr_t, ApiTimeData>(p, ApiCommand::getCurrentTime);
-
-    // AbstractTimeManager::forcePrimaryTimeServer
-    regUpdate<IdData>(p, ApiCommand::forcePrimaryTimeServer,
-        std::bind(&TimeSynchronizationManager::primaryTimeServerChanged,
-            m_timeSynchronizationManager.get(), _1));
-
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
      * %param[default] format
@@ -1639,7 +1612,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
         });
 
     p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_bus.get()));
-    p->registerHandler(TimeSynchronizationManager::kTimeSyncUrlPath, new QnTimeSyncRestHandler(this));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
 	p->registerHandler(
@@ -1673,8 +1645,13 @@ int LocalConnectionFactory::establishDirectConnection(
 					m_serverQueryProcessor.get(),
 					connectionInfo,
 					url));
+            m_timeSynchronizationManager->init(m_directConnection);
+
+            messageBus()->setHandler(m_directConnection->notificationManager());
+
 			if (m_directConnection->initialized())
 			{
+                m_serverConnector->startReceivingNotifications(m_directConnection.get());
 			}
 			else
 			{
@@ -1985,9 +1962,14 @@ QnDistributedMutexManager* LocalConnectionFactory::distributedMutex() const
 	return m_distributedMutexManager.get();
 }
 
-TimeSynchronizationManager* LocalConnectionFactory::timeSyncManager() const
+nx::time_sync::TimeSyncManager* LocalConnectionFactory::timeSyncManager() const
 {
 	return m_timeSynchronizationManager.get();
+}
+
+nx::vms::network::ReverseConnectionManager* LocalConnectionFactory::serverConnector() const
+{
+    return m_serverConnector.get();
 }
 
 } // namespace ec2

@@ -160,7 +160,12 @@ if(UNIX)
         -Wno-error=unused-function
     )
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(
+            -Wno-error=dangling-else
+            -Wno-psabi
+        )
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override

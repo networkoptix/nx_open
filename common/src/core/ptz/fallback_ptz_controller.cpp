@@ -5,12 +5,15 @@
 #include <core/resource/resource.h>
 #include <utils/common/warnings.h>
 
+using namespace nx::core;
+
 QnFallbackPtzController::QnFallbackPtzController(
     const QnPtzControllerPtr& mainController,
     const QnPtzControllerPtr& fallbackController)
     :
     base_type(mainController->resource()),
-    m_mainIsValid(true),
+    m_hasOperationalCapabilities(true),
+    m_hasConfigurationalCapabilities(true),
     m_mainController(mainController),
     m_fallbackController(fallbackController)
 {
@@ -38,19 +41,29 @@ QnFallbackPtzController::~QnFallbackPtzController()
 
 void QnFallbackPtzController::baseChanged(Qn::PtzDataFields fields)
 {
-    if(fields.testFlag(Qn::CapabilitiesPtzField))
-        m_mainIsValid = m_mainController->getCapabilities() != Ptz::NoPtzCapabilities;
+    if (fields.testFlag(Qn::CapabilitiesPtzField))
+    {
+        m_hasOperationalCapabilities = m_mainController
+            ->getCapabilities({ptz::Type::operational}) != Ptz::NoPtzCapabilities;
+
+        m_hasConfigurationalCapabilities = m_mainController
+            ->getCapabilities({ptz::Type::configurational}) != Ptz::NoPtzCapabilities;
+    }
 
     emit changed(fields);
 }
 
-const QnPtzControllerPtr& QnFallbackPtzController::baseController() const
+const QnPtzControllerPtr& QnFallbackPtzController::baseController(
+    const nx::core::ptz::Options& options) const
 {
-    return m_mainIsValid ? m_mainController : m_fallbackController;
+    const bool isControllerValid = options.type == ptz::Type::operational
+        ? m_hasOperationalCapabilities
+        : m_hasConfigurationalCapabilities;
+
+    return isControllerValid ? m_mainController : m_fallbackController;
 }
 
 QnPtzControllerPtr QnFallbackPtzController::mainController() const
-
 {
     return m_mainController;
 }
@@ -60,124 +73,159 @@ QnPtzControllerPtr QnFallbackPtzController::fallbackController() const
     return m_fallbackController;
 }
 
-Ptz::Capabilities QnFallbackPtzController::getCapabilities() const
+Ptz::Capabilities QnFallbackPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
-    return baseController()->getCapabilities();
+    return baseController(options)->getCapabilities(options);
 }
 
-bool QnFallbackPtzController::continuousMove(const QVector3D& speed)
+bool QnFallbackPtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
-    return baseController()->continuousMove(speed);
+    return baseController(options)->continuousMove(speed, options);
 }
 
-bool QnFallbackPtzController::continuousFocus(qreal speed)
+bool QnFallbackPtzController::continuousFocus(
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    return baseController()->continuousFocus(speed);
+    return baseController(options)->continuousFocus(speed, options);
 }
 
 bool QnFallbackPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const QVector3D& position,
-    qreal speed)
+    const nx::core::ptz::Vector& position,
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    return baseController()->absoluteMove(space, position, speed);
+    return baseController(options)->absoluteMove(space, position, speed, options);
 }
 
 bool QnFallbackPtzController::viewportMove(
     qreal aspectRatio,
     const QRectF& viewport,
-    qreal speed)
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    return baseController()->viewportMove(aspectRatio, viewport, speed);
+    return baseController(options)->viewportMove(aspectRatio, viewport, speed, options);
 }
 
-bool QnFallbackPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
+bool QnFallbackPtzController::relativeMove(
+    const ptz::Vector& direction,
+    const ptz::Options& options)
 {
-    return baseController()->getPosition(space, position);
+    return baseController(options)->relativeMove(direction, options);
 }
 
-bool QnFallbackPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
+bool QnFallbackPtzController::relativeFocus(qreal direction, const ptz::Options& options)
 {
-    return baseController()->getLimits(space, limits);
+    return baseController(options)->relativeFocus(direction, options);
 }
 
-bool QnFallbackPtzController::getFlip(Qt::Orientations* flip) const
+bool QnFallbackPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::Vector* position,
+    const nx::core::ptz::Options& options) const
 {
-    return baseController()->getFlip(flip);
+    return baseController(options)->getPosition(space, position, options);
+}
+
+bool QnFallbackPtzController::getLimits(
+    Qn::PtzCoordinateSpace space,
+    QnPtzLimits* limits,
+    const nx::core::ptz::Options& options) const
+{
+    return baseController(options)->getLimits(space, limits, options);
+}
+
+bool QnFallbackPtzController::getFlip(
+    Qt::Orientations* flip,
+    const nx::core::ptz::Options& options) const
+{
+    return baseController(options)->getFlip(flip, options);
 }
 
 bool QnFallbackPtzController::createPreset(const QnPtzPreset& preset)
 {
-    return baseController()->createPreset(preset);
+    return baseController(ptz::Options())->createPreset(preset);
 }
 bool QnFallbackPtzController::updatePreset(const QnPtzPreset& preset)
 {
-    return baseController()->updatePreset(preset);
+    return baseController(ptz::Options())->updatePreset(preset);
 }
 
 bool QnFallbackPtzController::removePreset(const QString& presetId)
 {
-    return baseController()->removePreset(presetId);
+    return baseController(ptz::Options())->removePreset(presetId);
 }
 
 bool QnFallbackPtzController::activatePreset(const QString& presetId, qreal speed)
 {
-    return baseController()->activatePreset(presetId, speed);
+    return baseController(ptz::Options())->activatePreset(presetId, speed);
 }
 
 bool QnFallbackPtzController::getPresets(QnPtzPresetList* presets) const
 {
-    return baseController()->getPresets(presets);
+    return baseController(ptz::Options())->getPresets(presets);
 }
 
 bool QnFallbackPtzController::createTour(const QnPtzTour& tour)
 {
-    return baseController()->createTour(tour);
+    return baseController(ptz::Options())->createTour(tour);
 }
 
 bool QnFallbackPtzController::removeTour(const QString& tourId)
 {
-    return baseController()->removeTour(tourId);
+    return baseController(ptz::Options())->removeTour(tourId);
 }
 
 bool QnFallbackPtzController::activateTour(const QString& tourId)
 {
-    return baseController()->activateTour(tourId);
+    return baseController(ptz::Options())->activateTour(tourId);
 }
 
 bool QnFallbackPtzController::getTours(QnPtzTourList* tours) const
 {
-    return baseController()->getTours(tours);
+    return baseController(ptz::Options())->getTours(tours);
 }
 
 bool QnFallbackPtzController::getActiveObject(QnPtzObject* activeObject) const
 {
-    return baseController()->getActiveObject(activeObject);
+    return baseController(ptz::Options())->getActiveObject(activeObject);
 }
 
-bool QnFallbackPtzController::updateHomeObject(const QnPtzObject& homeObject)
+bool QnFallbackPtzController::updateHomeObject(
+    const QnPtzObject& homeObject)
 {
-    return baseController()->updateHomeObject(homeObject);
+    return baseController(ptz::Options())->updateHomeObject(homeObject);
 }
 
 bool QnFallbackPtzController::getHomeObject(QnPtzObject* homeObject) const
 {
-    return baseController()->getHomeObject(homeObject);
+    return baseController(ptz::Options())->getHomeObject(homeObject);
 }
 
-bool QnFallbackPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const
+bool QnFallbackPtzController::getAuxilaryTraits(
+    QnPtzAuxilaryTraitList* auxilaryTraits,
+    const nx::core::ptz::Options& options) const
 {
-    return baseController()->getAuxilaryTraits(auxilaryTraits);
+    return baseController(options)->getAuxilaryTraits(auxilaryTraits, options);
 }
 
-bool QnFallbackPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, const QString& data)
+bool QnFallbackPtzController::runAuxilaryCommand(
+    const QnPtzAuxilaryTrait& trait,
+    const QString& data,
+    const nx::core::ptz::Options& options)
 {
-    return baseController()->runAuxilaryCommand(trait, data);
+    return baseController(options)->runAuxilaryCommand(trait, data, options);
 }
 
-bool QnFallbackPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
+bool QnFallbackPtzController::getData(
+    Qn::PtzDataFields query,
+    QnPtzData* data,
+    const nx::core::ptz::Options& options) const
 {
-    return baseController()->getData(query, data);
+    return baseController(options)->getData(query, data, options);
 }
 
 void QnFallbackPtzController::baseFinished(Qn::PtzCommand command, const QVariant& data)

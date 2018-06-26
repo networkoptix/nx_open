@@ -44,43 +44,47 @@ static const int MAX_FRAME_SIZE = 4*1024*1024;
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
-    const nxcip::CameraInfo& cameraInfo,
+    const QString& login,
+    const QString& password,
+    const QString& url,
     float fps,
     int encoderNumber )
 :
-    m_refManager( parentRefManager ),
-    m_cameraInfo( cameraInfo ),
-    m_fps( fps ),
-    m_encoderNumber( encoderNumber ),
-    m_curTimestamp( 0 ),
-    m_streamType( none ),
-    m_prevFrameClock( -1 ),
-    m_frameDurationMSec( 0 ),
-    m_terminated( false ),
-    m_isInGetNextData( 0 ),
+    m_refManager(parentRefManager),
+    m_login(login),
+    m_password(password),
+    m_url(url),
+    m_fps(fps),
+    m_encoderNumber(encoderNumber),
+    m_curTimestamp(0),
+    m_streamType(none),
+    m_prevFrameClock(-1),
+    m_frameDurationMSec(0),
+    m_terminated(false),
+    m_isInGetNextData(0),
     m_timeProvider(timeProvider)
 {
     NX_ASSERT(m_timeProvider);
-    setFps( fps );
+    setFps(fps);
 }
 
 StreamReader::~StreamReader()
 {
-    NX_ASSERT( m_isInGetNextData == 0 );
+    NX_ASSERT(m_isInGetNextData == 0);
     m_timeProvider->releaseRef();
 
     m_videoPacket.reset();
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
-void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
+void* StreamReader::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
-    if( memcmp( &interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader) ) == 0 )
+    if(memcmp(&interfaceID, &nxcip::IID_StreamReader, sizeof(nxcip::IID_StreamReader) ) == 0)
     {
         addRef();
         return this;
     }
-    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    if(memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
@@ -102,18 +106,18 @@ unsigned int StreamReader::releaseRef()
 
 static const unsigned int MAX_FRAME_DURATION_MS = 5000;
 
-int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
+int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     ++m_isInGetNextData;
-    auto SCOPED_GUARD_FUNC = [this]( StreamReader* ) { --m_isInGetNextData; };
+    auto SCOPED_GUARD_FUNC = [this](StreamReader* ) { --m_isInGetNextData; };
     const std::unique_ptr<StreamReader, decltype(SCOPED_GUARD_FUNC)>
-        SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+        SCOPED_GUARD(this, SCOPED_GUARD_FUNC);
 
     bool httpClientHasBeenJustCreated = false;
     std::shared_ptr<nx::network::http::HttpClient> localHttpClientPtr;
     {
-        QnMutexLocker lk( &m_mutex );
-        if( !m_httpClient )
+        QnMutexLocker lk(&m_mutex);
+        if(!m_httpClient)
         {
             m_httpClient = std::make_shared<nx::network::http::HttpClient>();
             m_httpClient->setMessageBodyReadTimeout(std::chrono::milliseconds(MAX_FRAME_DURATION_MS));
@@ -122,7 +126,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         localHttpClientPtr = m_httpClient;
     }
 
-    if( httpClientHasBeenJustCreated )
+    if(httpClientHasBeenJustCreated)
     {
         using namespace std::placeholders;
 
@@ -132,55 +136,55 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(jpgFrameHandleFunc)>>(
                 jpgFrameHandleFunc));
 
-        const int result = doRequest( localHttpClientPtr.get() );
-        if( result != nxcip::NX_NO_ERROR )
+        const int result = doRequest(localHttpClientPtr.get());
+        if(result != nxcip::NX_NO_ERROR)
             return result;
 
-        if( nx::network::http::strcasecmp(localHttpClientPtr->contentType(), "image/jpeg") == 0 )
+        if(nx::network::http::strcasecmp(localHttpClientPtr->contentType(), "image/jpeg") == 0)
         {
             //single jpeg, have to get it by timer
             m_streamType = jpg;
         }
-        else if( m_multipartContentParser->setContentType(localHttpClientPtr->contentType()) )
+        else if(m_multipartContentParser->setContentType(localHttpClientPtr->contentType()))
         {
             //motion jpeg stream
             m_streamType = mjpg;
         }
         else
         {
-            NX_LOG( QString::fromLatin1("Unsupported Content-Type %1").arg(QLatin1String(localHttpClientPtr->contentType())), cl_logDEBUG1 );
+            NX_DEBUG(this, QString::fromLatin1("Unsupported Content-Type %1").arg(QLatin1String(localHttpClientPtr->contentType())));
             return nxcip::NX_UNSUPPORTED_CODEC;
         }
     }
 
-    switch( m_streamType )
+    switch(m_streamType)
     {
         case jpg:
         {
-            if( !httpClientHasBeenJustCreated )
+            if(!httpClientHasBeenJustCreated)
             {
-                if( !waitForNextFrameTime() )
+                if(!waitForNextFrameTime())
                     return nxcip::NX_INTERRUPTED;
-                const int result = doRequest( localHttpClientPtr.get() );
-                if( result != nxcip::NX_NO_ERROR )
+                const int result = doRequest(localHttpClientPtr.get());
+                if(result != nxcip::NX_NO_ERROR)
                     return result;
             }
 
             nx::network::http::BufferType msgBody;
-            while( msgBody.size() < MAX_FRAME_SIZE )
+            while(msgBody.size() < MAX_FRAME_SIZE)
             {
                 const nx::network::http::BufferType& msgBodyBuf = localHttpClientPtr->fetchMessageBodyBuffer();
                 {
-                    QnMutexLocker lk( &m_mutex );
-                    if( m_terminated )
+                    QnMutexLocker lk(&m_mutex);
+                    if(m_terminated)
                     {
                         m_terminated = false;
                         return nxcip::NX_INTERRUPTED;
                     }
                 }
-                if( localHttpClientPtr->eof() )
+                if(localHttpClientPtr->eof())
                 {
-                    gotJpegFrame( msgBody.isEmpty() ? msgBodyBuf : (msgBody + msgBodyBuf) );
+                    gotJpegFrame(msgBody.isEmpty() ? msgBodyBuf : (msgBody + msgBodyBuf));
                     localHttpClientPtr.reset();
                     break;
                 }
@@ -194,12 +198,12 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
         case mjpg:
             //reading mjpg picture
-            while( !m_videoPacket.get() && !localHttpClientPtr->eof() )
+            while(!m_videoPacket.get() && !localHttpClientPtr->eof())
             {
                 m_multipartContentParser->processData(localHttpClientPtr->fetchMessageBodyBuffer());
                 {
-                    QnMutexLocker lk( &m_mutex );
-                    if( m_terminated )
+                    QnMutexLocker lk(&m_mutex);
+                    if(m_terminated)
                     {
                         m_terminated = false;
                         return nxcip::NX_INTERRUPTED;
@@ -212,14 +216,14 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             break;
     }
 
-    if( m_videoPacket.get() )
+    if(m_videoPacket.get())
     {
         *lpPacket = m_videoPacket.release();
         return nxcip::NX_NO_ERROR;
     }
 
-    QnMutexLocker lk( &m_mutex );
-    if( m_httpClient )
+    QnMutexLocker lk(&m_mutex);
+    if(m_httpClient)
     {
         //reconnecting
         m_httpClient.reset();
@@ -246,76 +250,81 @@ void StreamReader::interrupt()
     }
 }
 
-void StreamReader::setFps( float fps )
+void StreamReader::setFps(float fps)
 {
     m_fps = fps;
     m_frameDurationMSec = (qint64)(1000.0 / m_fps);
 }
 
-void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
+void StreamReader::updateCredentials(const QString& login, const QString& password)
 {
-    m_cameraInfo = info;
+    m_login = login;
+    m_password = password;
+}
+
+void StreamReader::updateMediaUrl(const QString& url)
+{
+    m_url = url;
 }
 
 int StreamReader::doRequest( nx::network::http::HttpClient* const httpClient )
 {
-    httpClient->setUserName( QLatin1String(m_cameraInfo.defaultLogin) );
-    httpClient->setUserPassword( QLatin1String(m_cameraInfo.defaultPassword) );
-    if( !httpClient->doGet( nx::utils::Url(QLatin1String(m_cameraInfo.url)) ) ||
-        !httpClient->response() )
+    httpClient->setUserName(m_login);
+    httpClient->setUserPassword(m_password);
+    if (!httpClient->doGet(nx::utils::Url(m_url)) || !httpClient->response())
     {
-        NX_LOG( QString::fromLatin1("Failed to request %1").arg(QLatin1String(m_cameraInfo.url)), cl_logDEBUG1 );
+        NX_DEBUG(this, QString::fromLatin1("Failed to request %1").arg(m_url));
         return nxcip::NX_NETWORK_ERROR;
     }
-    if( httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::unauthorized )
+    if(httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::unauthorized)
     {
-        NX_LOG( QString::fromLatin1("Failed to request %1: %2").arg(QLatin1String(m_cameraInfo.url)).
-            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
+        NX_DEBUG(this, QString::fromLatin1("Failed to request %1: %2").arg(m_url).
+            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
         return nxcip::NX_NOT_AUTHORIZED;
     }
-    if( httpClient->response()->statusLine.statusCode / 100 * 100 != nx::network::http::StatusCode::ok )
+    if(httpClient->response()->statusLine.statusCode / 100 * 100 != nx::network::http::StatusCode::ok)
     {
-        NX_LOG( QString::fromLatin1("Failed to request %1: %2").arg(QLatin1String(m_cameraInfo.url)).
-            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
+        NX_DEBUG(this, QString::fromLatin1("Failed to request %1: %2").arg(m_url).
+            arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)));
         return nxcip::NX_NETWORK_ERROR;
     }
     return nxcip::NX_NO_ERROR;
 }
 
-void StreamReader::gotJpegFrame( const nx::network::http::ConstBufferRefType& jpgFrame )
+void StreamReader::gotJpegFrame(const nx::network::http::ConstBufferRefType& jpgFrame)
 {
     //creating video packet
 
-    m_videoPacket.reset( new ILPVideoPacket(
+    m_videoPacket.reset(new ILPVideoPacket(
         &m_allocator,
         0,
         m_timeProvider->millisSinceEpoch()  * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,
         0 ) );
-    m_videoPacket->resizeBuffer( jpgFrame.size() );
-    if( m_videoPacket->data() )
-        memcpy( m_videoPacket->data(), jpgFrame.constData(), jpgFrame.size() );
+    m_videoPacket->resizeBuffer(jpgFrame.size() );
+    if(m_videoPacket->data() )
+        memcpy(m_videoPacket->data(), jpgFrame.constData(), jpgFrame.size() );
 }
 
 bool StreamReader::waitForNextFrameTime()
 {
     const qint64 currentTime = m_timeProvider->millisSinceEpoch();
-    if( m_prevFrameClock != -1 &&
+    if(m_prevFrameClock != -1 &&
         !((m_prevFrameClock > currentTime) || (currentTime - m_prevFrameClock > m_frameDurationMSec)) ) //system time changed
     {
         const qint64 msecToSleep = m_frameDurationMSec - (currentTime - m_prevFrameClock);
-        if( msecToSleep > 0 )
+        if(msecToSleep > 0 )
         {
-            QnMutexLocker lk( &m_mutex );
+            QnMutexLocker lk(&m_mutex );
             QElapsedTimer monotonicTimer;
             monotonicTimer.start();
             qint64 msElapsed = monotonicTimer.elapsed();
-            while( !m_terminated && (msElapsed < msecToSleep) )
+            while(!m_terminated && (msElapsed < msecToSleep) )
             {
-                m_cond.wait( lk.mutex(), msecToSleep - msElapsed );
+                m_cond.wait(lk.mutex(), msecToSleep - msElapsed );
                 msElapsed = monotonicTimer.elapsed();
             }
-            if( m_terminated )
+            if(m_terminated )
             {
                 //call has been interrupted
                 m_terminated = false;

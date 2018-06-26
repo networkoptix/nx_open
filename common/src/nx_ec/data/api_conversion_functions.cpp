@@ -166,7 +166,7 @@ void fromApiToResource(const CameraData& src, QnVirtualCameraResourcePtr& dst)
     dst->setManuallyAdded(src.manuallyAdded);
     dst->setModel(src.model);
     dst->setGroupId(src.groupId);
-    dst->setGroupName(src.groupName);
+    dst->setDefaultGroupName(src.groupName);
     dst->setStatusFlags(src.statusFlags);
 
     dst->setVendor(src.vendor);
@@ -432,6 +432,9 @@ void fromApiToResource(const LayoutData& src, QnLayoutResourcePtr& dst)
     dst->setCellAspectRatio(src.cellAspectRatio);
     dst->setCellSpacing(src.horizontalSpacing);
     dst->setLocked(src.locked);
+    dst->setLogicalId(src.logicalId);
+    dst->setFixedSize({src.fixedWidth, src.fixedHeight});
+
     dst->setBackgroundImageFilename(src.backgroundImageFilename);
     dst->setBackgroundSize(QSize(src.backgroundWidth, src.backgroundHeight));
     dst->setBackgroundOpacity(src.backgroundOpacity);
@@ -453,6 +456,12 @@ void fromResourceToApi(const QnLayoutResourcePtr& src, LayoutData& dst)
     dst.horizontalSpacing = src->cellSpacing();
     dst.verticalSpacing = src->cellSpacing(); // TODO: #ynikitenkov Remove vertical spacing?
     dst.locked = src->locked();
+    dst.logicalId = src->logicalId();
+
+    const auto fixedSize = src->fixedSize();
+    dst.fixedWidth = fixedSize.isEmpty() ? 0 : fixedSize.width();
+    dst.fixedHeight = fixedSize.isEmpty() ? 0 : fixedSize.height();
+
     dst.backgroundImageFilename = src->backgroundImageFilename();
     dst.backgroundWidth = src->backgroundSize().width();
     dst.backgroundHeight = src->backgroundSize().height();

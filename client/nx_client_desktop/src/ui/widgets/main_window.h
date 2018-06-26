@@ -12,9 +12,9 @@
 
 class QTabBar;
 class QBoxLayout;
+class QStackedLayout;
 class QSpacerItem;
 class QToolButton;
-class QStackedWidget;
 
 class QnLayoutTabBar;
 class QnGraphicsView;
@@ -120,10 +120,8 @@ private:
     QScopedPointer<QnWorkbenchUi> m_ui;
     QnWorkbenchWelcomeScreen* m_welcomeScreen = nullptr;
 
-    QStackedWidget * const m_currentPageHolder;
-
     QnMainWindowTitleBarWidget *m_titleBar;
-    QBoxLayout *m_viewLayout;
+    QStackedLayout* m_viewLayout;
     QBoxLayout *m_globalLayout;
 
     bool m_welcomeScreenVisible = true;

@@ -4,11 +4,12 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/fusion/serialization/lexical.h>
 
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
@@ -38,15 +39,11 @@
 #include <nx/api/analytics/driver_manifest.h>
 
 namespace {
-    const QString kUrlScheme = lit("rtsp");
-    const QString protoVersionPropertyName = lit("protoVersion");
-    const QString safeModePropertyName = lit("ecDbReadOnly");
-}
 
-QString QnMediaServerResource::apiUrlScheme(bool sslAllowed)
-{
-    return sslAllowed ? lit("https") : lit("http");
-}
+const QString protoVersionPropertyName = lit("protoVersion");
+const QString safeModePropertyName = lit("ecDbReadOnly");
+
+} // namespace
 
 QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -318,14 +315,15 @@ void QnMediaServerResource::setUrl(const QString& url)
 nx::utils::Url QnMediaServerResource::getApiUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme(apiUrlScheme(isSslAllowed()))
+        .setScheme(nx::network::http::urlSheme(isSslAllowed()))
         .setEndpoint(getPrimaryAddress()).toUrl();
 }
 
 QString QnMediaServerResource::getUrl() const
 {
+    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
     return nx::network::url::Builder()
-        .setScheme(kUrlScheme)
+        .setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure))
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
@@ -707,12 +705,12 @@ nx::utils::Url QnMediaServerResource::buildApiUrl() const
     if (m_primaryAddress.isNull())
     {
         url = m_apiConnection->url();
-        url.setScheme(apiUrlScheme(m_sslAllowed));
+        url.setScheme(nx::network::http::urlSheme(m_sslAllowed));
     }
     else
     {
         url = nx::network::url::Builder()
-            .setScheme(apiUrlScheme(m_sslAllowed))
+            .setScheme(nx::network::http::urlSheme(m_sslAllowed))
             .setEndpoint(m_primaryAddress).toUrl();
     }
 

@@ -1,5 +1,7 @@
 #include "timeline_bookmarks_watcher.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 
 #include <utils/common/delayed.h>
@@ -21,6 +23,9 @@
 #include <utils/common/scoped_timer.h>
 #include <nx/utils/pending_operation.h>
 
+using std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
+
 namespace {
 
 static constexpr int kMaxStaticBookmarksCount = 5000;
@@ -33,13 +38,13 @@ void updateQueryWindowExtended(const QnCameraBookmarksQueryPtr& query, qint64 st
 {
     auto filter = query->filter();
     const bool shouldChange = helpers::isTimeWindowChanged(startTimeMs, endTimeMs,
-        filter.startTimeMs, filter.endTimeMs, kTimelineMinWindowChangeMs);
+        filter.startTimeMs.count(), filter.endTimeMs.count(), kTimelineMinWindowChangeMs);
 
     if (!shouldChange)
         return;
 
-    filter.startTimeMs = startTimeMs;
-    filter.endTimeMs = endTimeMs;
+    filter.startTimeMs = milliseconds(startTimeMs);
+    filter.endTimeMs = milliseconds(endTimeMs);
     query->setFilter(filter);
 }
 
@@ -70,8 +75,8 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
             if (!m_timelineQuery)
                 return;
 
-            updateQueryWindowExtended(m_timelineQuery, m_timlineFilter.startTimeMs,
-                m_timlineFilter.endTimeMs);
+            updateQueryWindowExtended(m_timelineQuery, m_timlineFilter.startTimeMs.count(),
+                m_timlineFilter.endTimeMs.count());
         };
     m_updateQueryOperation = new nx::utils::PendingOperation(delayedUpdateWindow,
         kUpdateQueryPeriodMs, this);
@@ -103,8 +108,8 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
         , this, &QnTimelineBookmarksWatcher::onTimelineWindowChanged);
     connect(navigator()->timeSlider(), &QnTimeSlider::msecsPerPixelChanged, this, [this]()
     {
-        m_timlineFilter.sparsing = QnBookmarkSparsingOptions(true
-            , navigator()->timeSlider()->msecsPerPixel());
+        m_timlineFilter.sparsing = QnBookmarkSparsingOptions(true,
+            milliseconds(qint64(navigator()->timeSlider()->msecsPerPixel())));
         if (m_timelineQuery)
             updateQuerySparing(m_timelineQuery, m_timlineFilter.sparsing);
     });
@@ -121,8 +126,8 @@ QnTimelineBookmarksWatcher::~QnTimelineBookmarksWatcher()
 {
 }
 
-QnCameraBookmarkList QnTimelineBookmarksWatcher::bookmarksAtPosition(qint64 position
-    , qint64 msecdsPerDp)
+QnCameraBookmarkList QnTimelineBookmarksWatcher::bookmarksAtPosition(milliseconds position,
+    milliseconds  msecdsPerDp)
 {
     return m_mergeHelper->bookmarksAtPosition(position, msecdsPerDp);
 }
@@ -218,12 +223,12 @@ void QnTimelineBookmarksWatcher::setTimelineBookmarks(const QnCameraBookmarkList
     }
 }
 
-void QnTimelineBookmarksWatcher::onTimelineWindowChanged(qint64 startTimeMs, qint64 endTimeMs)
+void QnTimelineBookmarksWatcher::onTimelineWindowChanged(milliseconds startTimeMs, milliseconds endTimeMs)
 {
     if (!m_timelineQuery)
         return;
 
-    if (!startTimeMs || !endTimeMs || (startTimeMs > endTimeMs))
+    if (startTimeMs == 0ms || endTimeMs == 0ms || (startTimeMs > endTimeMs))
         return;
 
     m_timlineFilter.startTimeMs = startTimeMs;

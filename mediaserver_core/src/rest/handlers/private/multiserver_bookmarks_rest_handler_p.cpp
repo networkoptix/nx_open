@@ -1,5 +1,7 @@
 #include "multiserver_bookmarks_rest_handler_p.h"
 
+#include <chrono>
+
 #include <api/helpers/multiserver_request_data.h>
 #include <api/helpers/bookmark_request_data.h>
 
@@ -23,6 +25,8 @@
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/actions/common_action.h>
 #include <utils/common/synctime.h>
+
+using std::chrono::milliseconds;
 
 namespace
 {
@@ -258,7 +262,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
 
     auto bookmark = context.request().bookmark;
     bookmark.creatorId = authorityUser;
-    bookmark.creationTimeStampMs = qnSyncTime->currentMSecsSinceEpoch();
+    bookmark.creationTimeStampMs = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
 
     if (!qnServerDb->addBookmark(bookmark))
         return false;
@@ -270,7 +274,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
 
     nx::vms::event::EventParameters runtimeParams;
     runtimeParams.eventResourceId = bookmark.cameraId;
-    runtimeParams.eventTimestampUsec = bookmark.startTimeMs * 1000;
+    runtimeParams.eventTimestampUsec = bookmark.startTimeMs.count() * 1000;
 
     runtimeParams.eventType = rule
         ? rule->eventType()

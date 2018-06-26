@@ -94,7 +94,7 @@ QnSecurityCamResourcePtr findCameraByFlexibleId(
         result = resourcePool->getResourceByMacAddress(flexibleId);
     if (!result)
     {
-        auto resourceList = resourcePool->getResourcesByLogicalId(flexibleId);
+        auto resourceList = resourcePool->getResourcesByLogicalId(flexibleId.toInt());
         if (!resourceList.isEmpty())
             result = resourceList.front();
     }

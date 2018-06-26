@@ -26,22 +26,36 @@ public:
     QnFisheyePtzController(const QnMediaResourcePtr& mediaRes);
     virtual ~QnFisheyePtzController();
 
-    virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
-    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
+
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const QVector3D& position,
-        qreal speed) override;
+        const nx::core::ptz::Vector& position,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
-    virtual bool getFlip(Qt::Orientations* flip) const override;
+    virtual bool getPosition(
+        Qn::PtzCoordinateSpace space,
+        nx::core::ptz::Vector* outPosition,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getLimits(
+        Qn::PtzCoordinateSpace space,
+        QnPtzLimits* limits,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getFlip(
+        Qt::Orientations* flip,
+        const nx::core::ptz::Options& options) const override;
 
     QnMediaDewarpingParams mediaDewarpingParams() const;
     QnItemDewarpingParams itemDewarpingParams() const;
 
-    static QVector3D positionFromRect(
+    static nx::core::ptz::Vector positionFromRect(
         const QnMediaDewarpingParams& dewarpingParams,
         const QRectF& rect);
 
@@ -58,9 +72,9 @@ private:
     Q_SLOT void updateMediaDewarpingParams();
     Q_SLOT void updateItemDewarpingParams();
 
-    QVector3D boundedPosition(const QVector3D& position);
-    QVector3D getPositionInternal() const;
-    void absoluteMoveInternal(const QVector3D& position);
+    nx::core::ptz::Vector boundedPosition(const nx::core::ptz::Vector& position);
+    nx::core::ptz::Vector getPositionInternal() const;
+    void absoluteMoveInternal(const nx::core::ptz::Vector& position);
 
 private:
     enum AnimationMode
@@ -73,7 +87,7 @@ private:
     QPointer<QnMediaResourceWidget> m_widget;
     QPointer<QnResourceWidgetRenderer> m_renderer;
     Ptz::Capabilities m_capabilities;
-    QVector3D m_unitSpeed;
+    nx::core::ptz::Vector m_unitSpeed;
 
     QnPtzLimits m_limits;
     bool m_unlimitedPan;
@@ -81,9 +95,9 @@ private:
     qreal m_aspectRatio;
 
     AnimationMode m_animationMode;
-    QVector3D m_speed;
-    QVector3D m_startPosition;
-    QVector3D m_endPosition;
+    nx::core::ptz::Vector m_speed;
+    nx::core::ptz::Vector m_startPosition;
+    nx::core::ptz::Vector m_endPosition;
     qreal m_relativeSpeed;
     qreal m_progress;
 

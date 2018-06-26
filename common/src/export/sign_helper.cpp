@@ -136,29 +136,34 @@ void QnSignHelper::doUpdateDigest(AVCodecID codecId, const quint8* extradata, in
         // prefix is unit len
         int reqUnitSize = (extradata[4] & 0x03) + 1;
 
-        const quint8* curNal = data;
-        while (curNal < dataEnd - reqUnitSize)
+        // Data pointer can be completely empty sometimes.
+        if (const quint8* curNal = data)
         {
-            int curSize = 0;
-            for (int i = 0; i < reqUnitSize; ++i)
-                curSize = (curSize << 8) + curNal[i];
-            curNal += reqUnitSize;
-            curSize = qMin(curSize, (int)(dataEnd - curNal));
-            ctx.addData((const char*) curNal, curSize);
+            while (curNal < dataEnd - reqUnitSize)
+            {
+                int curSize = 0;
+                for (int i = 0; i < reqUnitSize; ++i)
+                    curSize = (curSize << 8) + curNal[i];
+                curNal += reqUnitSize;
+                curSize = qMin(curSize, (int)(dataEnd - curNal));
+                ctx.addData((const char*)curNal, curSize);
 
-            curNal += curSize;
+                curNal += curSize;
+            }
         }
     }
     else
     {
         // prefix is 00 00 01 code
-        const quint8* curNal = NALUnit::findNextNAL(data, dataEnd);
-        while (curNal < dataEnd)
+        if (const quint8* curNal = NALUnit::findNextNAL(data, dataEnd))
         {
-            const quint8* nextNal = NALUnit::findNALWithStartCode(curNal, dataEnd, true);
-            ctx.addData((const char*) curNal, nextNal - curNal);
+            while (curNal < dataEnd)
+            {
+                const quint8* nextNal = NALUnit::findNALWithStartCode(curNal, dataEnd, true);
+                ctx.addData((const char*)curNal, nextNal - curNal);
 
-            curNal = NALUnit::findNextNAL(nextNal, dataEnd);
+                curNal = NALUnit::findNextNAL(nextNal, dataEnd);
+            }
         }
     }
 }

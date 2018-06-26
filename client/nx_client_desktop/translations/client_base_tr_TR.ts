@@ -7817,37 +7817,37 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçili dosyalar çok eski</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Seçili dosyalar çok eski</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçilen dosya %1 kaydedildi, ancak yalnızca son %n gün içinde kaydedilmiş dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Seçilen dosya %1 kaydedildi, ancak yalnızca son %n gün içinde kaydedilmiş dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Seçilen dosyalar %1 ile %2 arasında kaydedildi, ancak yalnızca son %n gün içinde kaydedilen dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Seçilen dosyalar %1 ile %2 arasında kaydedildi, ancak yalnızca son %n gün içinde kaydedilen dosyalar yüklenebilir. Bunu kamera arşiv ayarlarından değiştirebilirsiniz.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bu dosyaları yükledikten sonra bazı görüntüler silinebilir</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Bu dosyaları yükledikten sonra bazı görüntüler silinebilir</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Sunucu depolama biriminde çok boş alan değil. Bazı eski görüntüleri yer açmak için silinebilir. Seçilen dosyalar sunucudaki en eski dosyalar olursa, yüklendikten hemen sonra silineceklerini unutmayın.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>Sunucu depolama biriminde çok boş alan değil. Bazı eski görüntüleri yer açmak için silinebilir. Seçilen dosyalar sunucudaki en eski dosyalar olursa, yüklendikten hemen sonra silineceklerini unutmayın.</numerusform>
       </translation>
     </message>
     <message>

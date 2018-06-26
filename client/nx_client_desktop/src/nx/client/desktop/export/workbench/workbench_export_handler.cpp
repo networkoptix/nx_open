@@ -11,10 +11,12 @@
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
+#include <platform/environment.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/fusion/model_functions.h>
@@ -35,17 +37,26 @@
 #include <nx/client/desktop/export/tools/export_manager.h>
 #include <nx/client/desktop/export/dialogs/export_settings_dialog.h>
 
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/app_info.h>
+
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_access_controller.h>
+
+#include "nx/client/desktop/export/tools/export_media_validator.h"
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -74,6 +85,27 @@ static bool informersEnabled()
 {
     return ini().enableProgressInformers && ini().unifiedEventPanel;
 }
+
+bool isBinaryExportSupported()
+{
+    if (nx::utils::AppInfo::isWindows())
+        return !qnRuntime->isActiveXMode();
+    return false;
+}
+
+QString binaryFilterName()
+{
+#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN64
+    return QObject::tr("Executable %1 Media File (x64) (*.exe)").arg(QnAppInfo::organizationName());
+#else
+    return QObject::tr("Executable %1 Media File (x86) (*.exe)").arg(QnAppInfo::organizationName());
+#endif
+#endif
+    return QString();
+}
+
+static const QString filterSeparator(QLatin1String(";;"));
 
 } // namespace
 
@@ -152,6 +184,36 @@ struct WorkbenchExportHandler::Private
         return exportProcessId;
     }
 
+    std::function<bool(const Filename& filename, bool quiet)> fileNameValidator()
+    {
+        return
+            [this](const Filename& filename, bool quiet) -> bool
+            {
+                if (isInRunningExports(filename))
+                {
+                    if (!quiet)
+                    {
+                        QnMessageBox::warning(q->mainWindowWidget(), tr("Cannot write file"),
+                            tr("%1 is in use by another export.", "%1 is file name")
+                                .arg(filename.completeFileName()));
+                    }
+                    return false;
+                }
+
+                if (QFileInfo::exists(filename.completeFileName()))
+                {
+                    if (quiet || !QnFileMessages::confirmOverwrite(
+                        q->mainWindowWidget(),
+                        filename.completeFileName()))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            };
+    }
+
     static void addResourceToPool(const Filename& filename, QnResourcePool* resourcePool)
     {
         const auto completeFilename = filename.completeFileName();
@@ -204,10 +266,25 @@ WorkbenchExportHandler::WorkbenchExportHandler(QObject *parent):
         &WorkbenchExportHandler::exportProcessFinished);
 
     connect(action(ui::action::ExportVideoAction), &QAction::triggered, this,
-        &WorkbenchExportHandler::handleExportVideoAction);
+        [this]()
+        {
+            const auto parameters = menu()->currentParameters(sender());
+            handleExportVideoAction(parameters);
+        });
+
+    connect(action(ui::action::ExportBookmarkAction), &QAction::triggered, this,
+        [this]()
+        {
+            const auto parameters = menu()->currentParameters(sender());
+            handleExportBookmarkAction(parameters);
+        });
 
     connect(action(ui::action::ExportStandaloneClientAction), &QAction::triggered, this,
         &WorkbenchExportHandler::at_exportStandaloneClientAction_triggered);
+
+    // from legacy::WorkbenchExportHandler
+    connect(action(ui::action::SaveLocalLayoutAction), &QAction::triggered, this,
+        &WorkbenchExportHandler::at_saveLocalLayoutAction_triggered);
 }
 
 WorkbenchExportHandler::~WorkbenchExportHandler()
@@ -262,11 +339,11 @@ void WorkbenchExportHandler::exportProcessFinished(const ExportProcessInfo& info
     }
 }
 
-void WorkbenchExportHandler::handleExportVideoAction()
+void WorkbenchExportHandler::handleExportVideoAction(const ui::action::Parameters& parameters)
 {
-    const auto parameters = menu()->currentParameters(sender());
+    // Extracting parameters as fast as we can.
+    //const auto parameters = menu()->currentParameters(sender());
     const auto period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
     const auto widget = extractMediaWidget(display(), parameters);
     const auto mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
@@ -275,148 +352,101 @@ void WorkbenchExportHandler::handleExportVideoAction()
     if (!widget && !mediaResource) //< Media resource or widget is mandatory.
         return;
 
-    NX_ASSERT(period.isValid() || bookmark.isValid());
-    if (!period.isValid() && !bookmark.isValid())
+    NX_ASSERT(period.isValid());
+    if (!period.isValid())
         return;
-
-    const auto isFileNameValid =
-        [this](const Filename& filename, bool quiet) -> bool
-        {
-            if (d->isInRunningExports(filename))
-            {
-                if (!quiet)
-                {
-                    QnMessageBox::warning(mainWindowWidget(), tr("Cannot write file"),
-                        tr("%1 is in use by another export.", "%1 is file name")
-                            .arg(filename.completeFileName()));
-                }
-                return false;
-            }
-
-            if (QFileInfo::exists(filename.completeFileName()))
-            {
-                if (quiet || !QnFileMessages::confirmOverwrite(mainWindowWidget(), filename.completeFileName()))
-                    return false;
-            }
-
-            return true;
-        };
-
-    QWidget* main = mainWindowWidget();
-    QScopedPointer<ExportSettingsDialog> dialog;
 
     const auto centralResource = widget ? widget->resource() : mediaResource;
 
-    bool hasPermission = accessController()->hasPermissions(centralResource->toResourcePtr(),
+    const bool hasPermission = accessController()->hasPermissions(
+        centralResource->toResourcePtr(),
         Qn::ExportPermission);
+
+    if (!hasPermission && !widget)
+        return;
+
+    ExportSettingsDialog dialog(
+            period,
+            QnCameraBookmark(),
+            d->fileNameValidator(),
+            mainWindowWidget());
+
     if (!hasPermission)
     {
-        if (!widget || !period.isValid())
-            return;
-
         // We have no permission for camera, but still can view the rest of layout
-        dialog.reset(new ExportSettingsDialog(period, QnCameraBookmark(), isFileNameValid, main));
-
-        static const QString reason = tr("Selected period cannot be exported for the current camera.");
-        dialog->disableTab(ExportSettingsDialog::Mode::Media, reason);
-        dialog->setLayout(widget->item()->layout()->resource());
+        static const QString reason =
+            tr("Selected period cannot be exported for the current camera.");
+        dialog.disableTab(ExportSettingsDialog::Mode::Media, reason);
+        dialog.setLayout(widget->item()->layout()->resource());
     }
     else if (widget)
     {
-        QnLayoutItemData itemData = widget->item()->data();
+        const QnLayoutItemData itemData = widget->item()->data();
         // Exporting from the scene and timeline
-        if (bookmark.isValid())
-        {
-            dialog.reset(new ExportSettingsDialog(
-                { bookmark.startTimeMs, bookmark.durationMs }, bookmark, isFileNameValid, main));
+        dialog.setMediaParams(centralResource, itemData, widget->context());
 
-            dialog->setMediaParams(centralResource, itemData, widget->context());
-            dialog->hideTab(ExportSettingsDialog::Mode::Layout);
-        }
+        // Why symmetry with the next block is broken?
+        const auto periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
+        const bool layoutExportAllowed = periods.intersects(period);
+        if (layoutExportAllowed)
+            dialog.setLayout(widget->item()->layout()->resource());
         else
-        {
-            dialog.reset(new ExportSettingsDialog(period, bookmark, isFileNameValid, main));
-            dialog->setMediaParams(centralResource, itemData, widget->context());
-
-            // Why symmetry with the next block is broken?
-            const auto periods = parameters.argument<QnTimePeriodList>(Qn::MergedTimePeriodsRole);
-            bool layoutExportAllowed = periods.intersects(period);
-            if (layoutExportAllowed)
-                dialog->setLayout(widget->item()->layout()->resource());
-            else
-                dialog->hideTab(ExportSettingsDialog::Mode::Layout);
-        }
+            dialog.hideTab(ExportSettingsDialog::Mode::Layout);
     }
     else
     {
-        if (bookmark.isValid())
-        {
-            dialog.reset(new ExportSettingsDialog(
-                { bookmark.startTimeMs, bookmark.durationMs }, bookmark, isFileNameValid, main));
-        }
-        else
-        {
-            dialog.reset(new ExportSettingsDialog(period, QnCameraBookmark(), isFileNameValid, main));
-        }
-        dialog->setMediaParams(centralResource, QnLayoutItemData(), context());
-        dialog->hideTab(ExportSettingsDialog::Mode::Layout);
+        dialog.setMediaParams(centralResource, QnLayoutItemData(), context());
+        dialog.hideTab(ExportSettingsDialog::Mode::Layout);
     }
 
-    if (dialog->exec() != QDialog::Accepted)
+    if (dialog.exec() != QDialog::Accepted)
         return;
 
+    auto context = prepareExportTool(dialog);
+    runExport(std::move(context));
+}
+
+void WorkbenchExportHandler::handleExportBookmarkAction(const ui::action::Parameters& parameters)
+{
+    const auto bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+    NX_ASSERT(bookmark.isValid());
+    if (!bookmark.isValid())
+        return;
+
+    const auto camera =
+        resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
+    NX_ASSERT(camera);
+    if (!camera)
+        return;
+
+    const auto widget = extractMediaWidget(display(), parameters);
+    NX_ASSERT(!widget || widget->resource()->toResourcePtr() == camera);
+
+    const bool hasPermission = accessController()->hasPermissions(camera, Qn::ExportPermission);
+    NX_ASSERT(hasPermission);
+    if (!hasPermission)
+        return;
+
+    const QnTimePeriod period(bookmark.startTimeMs, bookmark.durationMs);
+    ExportSettingsDialog dialog(period, bookmark, d->fileNameValidator(), mainWindowWidget());
+
+    const QnLayoutItemData itemData = widget ? widget->item()->data() : QnLayoutItemData();
+    dialog.setMediaParams(camera, itemData, context());
+    dialog.hideTab(ExportSettingsDialog::Mode::Layout);
+
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    auto context = prepareExportTool(dialog);
+    runExport(std::move(context));
+}
+
+void WorkbenchExportHandler::runExport(ExportInstance&& context)
+{
     QnUuid exportProcessId;
     std::unique_ptr<AbstractExportTool> exportTool;
 
-    switch (dialog->mode())
-    {
-        case ExportSettingsDialog::Mode::Media:
-        {
-            const auto settings = dialog->exportMediaSettings();
-            exportProcessId = d->initExport(settings.fileName);
-
-            if (FileExtensionUtils::isLayout(settings.fileName.extension))
-            {
-                ExportLayoutSettings layoutSettings;
-                layoutSettings.filename = settings.fileName;
-                const auto& resourcePtr = mediaResource->toResourcePtr();
-                layoutSettings.layout = QnLayoutResource::createFromResource(resourcePtr);
-                layoutSettings.mode = ExportLayoutSettings::Mode::Export;
-                layoutSettings.period = period;
-                layoutSettings.readOnly = false;
-
-                // Forcing camera rotation to match a rotation, used for camera in export preview.
-                // This rotation properly matches either to:
-                //  - export from the scene, uses rotation from the layout.
-                //  - export from bookmark. Matches rotation from camera settings.
-                auto layoutItems = layoutSettings.layout->getItems();
-                if (!layoutItems.empty())
-                {
-                    QnLayoutItemData item = *layoutItems.begin();
-                    item.rotation = settings.transcodingSettings.rotation;
-                    layoutSettings.layout->updateItem(item);
-                }
-
-                exportTool.reset(new ExportLayoutTool(layoutSettings));
-            }
-            else
-            {
-                exportTool.reset(new ExportMediaTool(settings));
-            }
-
-            break;
-        }
-        case ExportSettingsDialog::Mode::Layout:
-        {
-            const auto settings = dialog->exportLayoutSettings();
-            exportProcessId = d->initExport(settings.filename);
-            exportTool.reset(new ExportLayoutTool(settings));
-            break;
-        }
-        default:
-            NX_ASSERT(false, "Unhandled export mode");
-            return;
-    }
+    std::tie(exportProcessId, exportTool) = std::move(context);
 
     NX_ASSERT(exportTool);
     NX_ASSERT(!exportProcessId.isNull(), "Workflow is broken");
@@ -427,28 +457,83 @@ void WorkbenchExportHandler::handleExportVideoAction()
 
     const auto info = d->exportManager->info(exportProcessId);
 
-    switch(info.status)
+    switch (info.status)
     {
-
-        case ExportProcessStatus::initial:
-        case ExportProcessStatus::exporting:
-        case ExportProcessStatus::cancelling:
-            if (const auto dialog = d->runningExports.value(exportProcessId).progressDialog)
-                dialog->show();
-            // Fill dialog with initial values (export is already running).
-            exportProcessUpdated(info);
-            break;
-        case ExportProcessStatus::success:
-        case ExportProcessStatus::failure:
-            // Possibly export is finished already.
-            exportProcessFinished(info);
-            break;
-        default:
-            NX_ASSERT(false, "Should never get here in 'cancelled' state");
-            break;
+    case ExportProcessStatus::initial:
+    case ExportProcessStatus::exporting:
+    case ExportProcessStatus::cancelling:
+        if (const auto dialog = d->runningExports.value(exportProcessId).progressDialog)
+            dialog->show();
+        // Fill dialog with initial values (export is already running).
+        exportProcessUpdated(info);
+        break;
+    case ExportProcessStatus::success:
+    case ExportProcessStatus::failure:
+        // Possibly export is finished already.
+        exportProcessFinished(info);
+        break;
+    default:
+        NX_ASSERT(false, "Should never get here in 'cancelled' state");
+        break;
     }
 }
 
+WorkbenchExportHandler::ExportInstance
+WorkbenchExportHandler::prepareExportTool(const ExportSettingsDialog& dialog)
+{
+    QnUuid exportId;
+    std::unique_ptr<AbstractExportTool> tool;
+
+    switch (dialog.mode())
+    {
+    case ExportSettingsDialog::Mode::Media:
+    {
+        const auto settings = dialog.exportMediaSettings();
+        exportId = d->initExport(settings.fileName);
+
+        if (FileExtensionUtils::isLayout(settings.fileName.extension))
+        {
+            ExportLayoutSettings layoutSettings;
+            layoutSettings.fileName = settings.fileName;
+
+            const auto& resourcePtr = settings.mediaResource->toResourcePtr();
+            layoutSettings.layout = QnLayoutResource::createFromResource(resourcePtr);
+            layoutSettings.mode = ExportLayoutSettings::Mode::Export;
+            layoutSettings.period = settings.period;
+            layoutSettings.readOnly = false;
+
+            // Forcing camera rotation to match a rotation, used for camera in export preview.
+            // This rotation properly matches either to:
+            //  - export from the scene, uses rotation from the layout.
+            //  - export from bookmark. Matches rotation from camera settings.
+            auto layoutItems = layoutSettings.layout->getItems();
+            if (!layoutItems.empty())
+            {
+                QnLayoutItemData item = *layoutItems.begin();
+                item.rotation = settings.transcodingSettings.rotation;
+                layoutSettings.layout->updateItem(item);
+            }
+
+            tool.reset(new ExportLayoutTool(layoutSettings));
+        }
+        else
+        {
+            tool.reset(new ExportMediaTool(settings));
+        }
+    }
+    case ExportSettingsDialog::Mode::Layout:
+    {
+        const auto settings = dialog.exportLayoutSettings();
+        exportId = d->initExport(settings.fileName);
+        tool.reset(new ExportLayoutTool(settings));
+        break;
+    }
+    default:
+        NX_ASSERT(false, "Unhandled export mode");
+    }
+
+    return std::make_pair(exportId, std::move(tool));
+}
 
 void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
 {
@@ -482,6 +567,81 @@ void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
     QFile::rename(temporaryFilename, targetFilename);
     QnMessageBox::success(mainWindowWidget(), tr("Export completed"));
 #endif
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Wonderfull legacy
+
+bool WorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr& layout) const
+{
+    bool hasImage = false;
+    bool hasLocal = false;
+
+    for (const QnLayoutItemData &item : layout->getItems())
+    {
+        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(item.resource);
+        if (!resource)
+            continue;
+        if (resource->getParentResource() == layout)
+            continue;
+        hasImage |= resource->hasFlags(Qn::still_image);
+        hasLocal |= resource->hasFlags(Qn::local);
+        if (hasImage || hasLocal)
+            break;
+    }
+
+    const auto showWarning =
+        [this]()
+        {
+            QnMessageBox::warning(mainWindowWidget(),
+                tr("Local files not allowed for Multi-Video export"),
+                tr("Please remove all local files from the layout and try again.")
+            );
+        };
+
+    if (hasImage)
+    {
+        showWarning();
+        return false;
+    }
+
+    if (hasLocal)
+    {
+        /* Always allow export selected area. */
+        if (layout->getItems().size() == 1)
+            return true;
+
+        showWarning();
+        return false;
+    }
+    return true;
+}
+
+void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    const auto layout = parameters.resource().dynamicCast<QnLayoutResource>();
+    const auto period = layout->getLocalRange();
+
+    NX_ASSERT(layout && layout->isFile());
+    if (!layout || !layout->isFile())
+        return;
+
+    const bool readOnly = !accessController()->hasPermissions(layout, Qn::WritePermission);
+
+    ExportLayoutSettings layoutSettings;
+    layoutSettings.fileName = Filename::parse(layout->getUrl());
+    layoutSettings.layout = layout;
+    layoutSettings.mode = ExportLayoutSettings::Mode::LocalSave;
+    layoutSettings.period = layout->getLocalRange();
+    layoutSettings.readOnly = readOnly;
+
+    std::unique_ptr<nx::client::desktop::AbstractExportTool> exportTool;
+    exportTool.reset(new ExportLayoutTool(layoutSettings));
+
+    QnUuid exportId = d->initExport(layoutSettings.fileName);
+
+    runExport(std::make_pair(exportId, std::move(exportTool)));
 }
 
 } // namespace desktop

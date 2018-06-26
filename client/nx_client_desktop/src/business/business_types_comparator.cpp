@@ -139,7 +139,7 @@ QList<ActionType> QnBusinessTypesComparator::lexSortedActions(ActionSubType subt
     switch (subtype)
     {
         case ActionSubType::server:
-            allowedActions -= clientsideActions;
+            allowedActions.subtract(clientsideActions);
             break;
         case ActionSubType::client:
             allowedActions.intersect(clientsideActions);

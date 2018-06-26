@@ -164,9 +164,9 @@ namespace LLUtil {
         First come ones with guid_compatibility=0 */
     QStringList getHardwareIds(int version)
     {
-        if (version < 0 || version > LATEST_HWID_VERSION)
+        if (version < 0 || version >= g_hardwareId.size())
         {
-            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): requested hwid of invalid version: $1")).arg(version) , cl_logERROR);
+            NX_LOG(QnLog::HWID_LOG, QString(lit("getHardwareId(): requested hwid of invalid version: %1")).arg(version) , cl_logERROR);
             return QStringList();
         }
 

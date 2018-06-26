@@ -21,9 +21,9 @@
   <String Id="HelpHeader">Telepítő súgó</String>
   <String Id="HelpCloseButton">Bezár</String>
   <String Id="InstallOptionsButton">Opciók</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">Telepítés</String>
   <String Id="InstallCloseButton">Bezár</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">Egyetértek a</String>
   <String Id="InstallLicenseLinkText">Végfelhasználói licencszerződés</String>
   <String Id="OptionsHeader">Rendszerbeállítási opciók</String>
   <String Id="OptionsLocationLabel">Telepítés helye:</String>

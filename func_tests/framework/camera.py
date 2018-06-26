@@ -112,7 +112,7 @@ class Camera(object):
         start_time = datetime_utc_now()
         while datetime_utc_now() - start_time < timeout:
             for server in server_list:
-                for d in server.api.ec2.getCamerasEx.GET():
+                for d in server.api.get('ec2/getCamerasEx'):
                     if d['physicalId'].replace('-', ':') == self.mac_addr:
                         self.id = d['id']
                         _logger.info('Camera %s is discovered by server %s, registered with id %r', self, server, self.id)
@@ -124,9 +124,9 @@ class Camera(object):
     def switch_to_server(self, server):
         assert self.id, 'Camera %s is not yet registered on server' % self
         server_guid = get_server_id(server.api)
-        server.api.ec2.saveCamera.POST(id=self.id, parentId=server_guid)
+        server.api.post('ec2/saveCamera', dict(id=self.id, parentId=server_guid))
         d = None
-        for d in server.api.ec2.getCamerasEx.GET():
+        for d in server.api.get('ec2/getCamerasEx'):
             if d['id'] == self.id:
                 break
         if d is None:

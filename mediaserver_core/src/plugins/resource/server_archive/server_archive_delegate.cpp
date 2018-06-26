@@ -38,6 +38,7 @@ QnServerArchiveDelegate::QnServerArchiveDelegate(QnMediaServerModule* mediaServe
     //m_sendMotion(false),
     m_eof(false),
     m_quality(MEDIA_Quality_High),
+    m_dialQualityHelper(qnNormalStorageMan, qnBackupStorageMan),
     m_mutex( QnMutex::Recursive ),    //just to be sure no callback can occur and block
     m_lastChunkQuality(QnServer::LowQualityCatalog)
 {

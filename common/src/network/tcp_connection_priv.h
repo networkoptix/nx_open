@@ -14,6 +14,10 @@
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
 
+static const QByteArray STATIC_BAD_REQUEST_HTML(
+    "<!DOCTYPE html><HTML><BODY><H1>400 Bad request.</H1></BODY></HTML>"
+);
+
 static const QByteArray STATIC_UNAUTHORIZED_HTML(
     "<!DOCTYPE html><HTML><BODY><H1>401 Unauthorized.</H1></BODY></HTML>"
 );
@@ -34,6 +38,7 @@ static const int CODE_MOVED_PERMANENTLY = 301;
 static const int CODE_NOT_MODIFIED = 304;
 static const int CODE_BAD_REQUEST = 400;
 static const int CODE_AUTH_REQUIRED = 401;
+static const int CODE_FORBIDDEN = 403;
 static const int CODE_NOT_FOUND = 404;
 static const int CODE_PROXY_AUTH_REQUIRED = 407;
 static const int CODE_INVALID_PARAMETER = 451;

@@ -288,8 +288,11 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 
     AVRational srcRate = {1, 1000000};
     int streamIndex = 0;
-    if (m_vTranscoder && m_aTranscoder && media->dataType == QnAbstractMediaData::AUDIO)
+    if (m_videoCodec != AV_CODEC_ID_NONE &&
+        media->dataType == QnAbstractMediaData::AUDIO)
+    {
         streamIndex = 1;
+    }
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
     QnFfmpegAvPacket packet;

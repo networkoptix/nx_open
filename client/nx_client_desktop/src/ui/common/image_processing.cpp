@@ -115,7 +115,7 @@ QImage cropToAspectRatio(const QImage &source, const qreal targetAspectRatio)
         else
         {
             int targetWidth = qRound((qreal)source.height() * targetAspectRatio);
-            int offset = (source.width() - targetWidth / 2);
+            int offset = (source.width() - targetWidth) / 2;
             result = source.copy(offset, 0, targetWidth, source.height());
         }
     }

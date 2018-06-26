@@ -63,6 +63,8 @@
 #include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/client/core/utils/geometry.h>
+#include "webview_style.h"
+
 
 using namespace style;
 using namespace nx::client::desktop;
@@ -3982,6 +3984,12 @@ void QnNxStyle::polish(QWidget *widget)
     {
         if (widget->focusPolicy() != Qt::NoFocus)
             widget->setFocusPolicy(Qt::TabFocus);
+    }
+
+    if (widget->inherits("WebCore::QtWebComboBox"))
+    {
+        auto palette = NxUi::createWebViewPalette();
+        widget->setPalette(palette);
     }
 }
 

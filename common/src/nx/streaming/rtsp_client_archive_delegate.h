@@ -118,7 +118,7 @@ private:
     bool m_isMultiserverAllowed;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     bool m_playNowModeAllowed; // fast open mode without DESCRIBE
-    QnArchiveStreamReader* m_reader;
+    QPointer<QnArchiveStreamReader> m_reader;
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
 

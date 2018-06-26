@@ -77,10 +77,10 @@ private:
     QnResourceList doCustomSearch();
     QnResourceList createResListFromCameraInfoList(
         nxcip_qt::CameraDiscoveryManager* const discoveryManager,
-        const QVector<nxcip::CameraInfo>& cameraInfoArray );
+        const QVector<nxcip::CameraInfo2>& cameraInfoArray );
     QnThirdPartyResourcePtr createResourceFromCameraInfo(
         nxcip_qt::CameraDiscoveryManager* const discoveryManager,
-        const nxcip::CameraInfo& cameraInfo );
+        const nxcip::CameraInfo2& cameraInfo );
 };
 
 #endif // ENABLE_THIRD_PARTY

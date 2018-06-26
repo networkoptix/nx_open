@@ -331,7 +331,6 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    NX_EXPECT(commonModule());
     return commonModule()
         ? commonModule()->statusDictionary()->value(getId())
         : Qn::NotDefined;
@@ -417,6 +416,16 @@ void QnResource::setUrl(const QString &url)
         m_url = url;
     }
     emit urlChanged(toSharedPointer(this));
+}
+
+int QnResource::logicalId() const
+{
+    return 0;
+}
+
+void QnResource::setLogicalId(int /*value*/)
+{
+    // Base implementation does not keep logical Id.
 }
 
 void QnResource::addConsumer(QnResourceConsumer *consumer)

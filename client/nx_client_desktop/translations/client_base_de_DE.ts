@@ -3366,7 +3366,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Alle %1benutzer werden gelöscht.</translation>
+      <translation>Alle %1 benutzer werden gelöscht.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -6967,7 +6967,7 @@ to %1</source>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1benutzer</translation>
+      <translation>%1 benutzer</translation>
     </message>
   </context>
   <context>
@@ -7208,7 +7208,7 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1benutzer mit angegebener Email existiert bereits.</translation>
+      <translation>%1 benutzer mit angegebener Email existiert bereits.</translation>
     </message>
     <message>
       <source>Local users</source>
@@ -7487,7 +7487,7 @@ to %1</source>
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1systeme können nicht zusammengeführt werden</translation>
+      <translation>%1 systeme können nicht zusammengeführt werden</translation>
     </message>
   </context>
   <context>

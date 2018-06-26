@@ -539,11 +539,13 @@ void QnResourceDirectoryBrowser::setPathCheckList(const QStringList& paths)
     m_pathListToCheck = paths;
 }
 
-void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& directory)
+void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& dir)
 {
     m_cacheMutex.lock();
     ResourceCache cache = m_resourceCache;
     m_cacheMutex.unlock();
+    // Getting normalized directory path.
+    QString directory = QDir(dir).absolutePath();
 
     // Paths to be removed from fs watcher.
     QStringList paths;
@@ -553,18 +555,22 @@ void QnResourceDirectoryBrowser::dropResourcesFromFolder(const QString& director
     // Finding all the resources in specified directory.
     for (auto& resource: cache)
     {
-        if (!resource->hasFlags(Qn::local_media))
+        if (!resource->hasFlags(Qn::local))
+        {
             continue;
+        }
 
         QString path = resource->getUniqueId();
-        if (path.startsWith(directory))
+        // We need normalized path to do proper comparison.
+        QString normPath = QFileInfo(path).absoluteFilePath();
+        if (normPath.startsWith(directory))
         {
             paths.append(path);
             resources.append(resource);
         }
     }
 
-    // Removing files from resource pool
+    // Removing files from resource pool.
     QnResourcePool* pool = resourcePool();
     pool->removeResources(resources);
 

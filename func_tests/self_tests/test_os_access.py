@@ -4,6 +4,7 @@ import pytest
 import pytz
 
 from framework.networking.interface import Networking
+from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import FileSystemPath
 
 
@@ -20,9 +21,9 @@ def test_is_accessible(os_access):
     assert isinstance(os_access.is_accessible(), bool)
 
 
-def test_path(os_access):
+def test_path(os_access):  # type: (OSAccess) -> None
     assert issubclass(os_access.Path, FileSystemPath)
-    assert os_access.Path is os_access.Path  # I.e. same class returned each time.
+    assert os_access.Path is os_access.Path,  "Same class must be returned each time"
     assert isinstance(os_access.Path.home(), os_access.Path)
     assert isinstance(os_access.Path.tmp(), os_access.Path)
 

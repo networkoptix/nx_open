@@ -16,17 +16,22 @@ from framework.waiting import Wait
 
 _logger = logging.getLogger(__name__)
 
+_DEFAULT_TIMEOUT_SEC = 60
+_BIG_CHUNK_THRESHOLD_CHARS = 10000
+_BIG_CHUNK_THRESHOLD_LINES = 50
+_STREAM_BUFFER_SIZE = 16 * 1024
+
 
 class PosixShell(object):
     """Posix-specific interface"""
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def run_command(self, command, input=None, cwd=None, timeout_sec=60, env=None):
+    def run_command(self, command, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
         return b'stdout'
 
     @abstractmethod
-    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=60, env=None):
+    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
         return b'stdout'
 
 
@@ -44,7 +49,7 @@ class SSH(PosixShell):
     def __repr__(self):
         return 'SSH({!r}, {!r}, {!r}, {!r})'.format(self._username, self._hostname, self._port, self._key_path)
 
-    def run_command(self, command, input=None, cwd=None, timeout_sec=60, env=None):
+    def run_command(self, command, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
         script = sh_command_to_script(command)
         output = self.run_sh_script(script, input=input, cwd=cwd, timeout_sec=timeout_sec, env=env)
         return output
@@ -82,7 +87,7 @@ class SSH(PosixShell):
                 if input_offset == len(input):  # If input is empty, nothing is sent.
                     _logger.debug("Input sent successfully.")
                     break
-                input_chunk = input[input_offset:input_offset + 64 * 1024]
+                input_chunk = input[input_offset:input_offset + _STREAM_BUFFER_SIZE]
                 input_bytes_sent = channel.send(input_chunk)
                 input_offset += input_bytes_sent
                 if input_bytes_sent == 0:
@@ -92,7 +97,7 @@ class SSH(PosixShell):
         _logger.debug("Shutdown write direction.")
         channel.shutdown_write()
 
-    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=60, env=None):
+    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
         augmented_script = sh_augment_script(script, cwd, env)
         subprocess_logger = _logger.getChild('subprocess')
         subprocess_logger.debug("Run on %r:\n%s", self, augmented_script)
@@ -113,7 +118,7 @@ class SSH(PosixShell):
             subprocess_responded = False
             for key, (recv, output_chunks, output_logger) in open_streams.items():
                 try:
-                    output_chunk = recv(1024 * 1024)
+                    output_chunk = recv(_STREAM_BUFFER_SIZE)
                 except socket.timeout:
                     continue  # Next stream might have data on it.
                 subprocess_responded = True
@@ -123,7 +128,7 @@ class SSH(PosixShell):
                     break  # Avoid iteration over mutated dict.
                 output_logger.debug("Received: %d bytes.", len(output_chunk))
                 output_chunks.append(output_chunk)
-                if len(output_chunk) > 10000:
+                if len(output_chunk) > _BIG_CHUNK_THRESHOLD_CHARS:
                     output_logger.debug("Big chunk: %d bytes", len(output_chunk))
                 else:
                     try:
@@ -179,7 +184,7 @@ class _LoggedOutputBuffer(object):
                 self._considered_binary = True
             else:
                 # Potentially expensive.
-                if len(decoded) < 5000 and decoded.count('\n') < 50:
+                if len(decoded) < _BIG_CHUNK_THRESHOLD_CHARS and decoded.count('\n') < _BIG_CHUNK_THRESHOLD_LINES:
                     self._logger.debug(u'\n%s', decoded)
                 else:
                     self._logger.debug('%d characters.', len(decoded))
@@ -251,7 +256,7 @@ def _communicate(process, input, timeout_sec):
             if mode & select.POLLOUT:
                 interaction_logger.debug("STDIN ready.")
                 assert fd == process.stdin.fileno()
-                chunk = input[input_offset: input_offset + 16 * 1024]
+                chunk = input[input_offset: input_offset + _STREAM_BUFFER_SIZE]
                 try:
                     interaction_logger.debug("Write %d bytes.", len(chunk))
                     input_offset += os.write(fd, chunk)
@@ -272,7 +277,7 @@ def _communicate(process, input, timeout_sec):
                     interaction_logger.debug("STDERR ready.")
                 else:
                     assert False
-                data = os.read(fd, 16 * 1024)
+                data = os.read(fd, _STREAM_BUFFER_SIZE)
                 if not data:
                     interaction_logger.debug("No data (%r), close %d.", fd)
                     close_unregister_and_remove(fd)
@@ -328,7 +333,7 @@ class _LocalShell(PosixShell):
         return stdout
 
     @classmethod
-    def run_command(cls, command, input=None, cwd=None, env=None, timeout_sec=60 * 60):
+    def run_command(cls, command, input=None, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
         kwargs = cls._make_kwargs(cwd, env, input is not None)
         command = [str(arg) for arg in command]
         _logger.debug('Run command:\n%s', sh_command_to_script(command))
@@ -336,7 +341,7 @@ class _LocalShell(PosixShell):
         return cls._communicate(process, input, timeout_sec)
 
     @classmethod
-    def run_sh_script(cls, script, input=None, cwd=None, env=None, timeout_sec=60 * 60):
+    def run_sh_script(cls, script, input=None, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
         augmented_script_to_run = sh_augment_script(script, None, None)
         augmented_script_to_log = sh_augment_script(script, cwd, env)
         _logger.debug('Run:\n%s', augmented_script_to_log)

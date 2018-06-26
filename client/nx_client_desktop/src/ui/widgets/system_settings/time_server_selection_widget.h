@@ -33,8 +33,6 @@ private:
     void updateDescription();
     void updateAlert();
 
-    QnUuid selectedServer() const;
-
 private:
     QScopedPointer<Ui::TimeServerSelectionWidget> ui;
     QnTimeServerSelectionModel* m_model;

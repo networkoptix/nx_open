@@ -7,6 +7,9 @@ namespace nx_rtsp {
 NX_NETWORK_API extern const char* const kUrlSchemeName;
 NX_NETWORK_API extern const char* const kSecureUrlSchemeName;
 
+QString NX_NETWORK_API urlSheme(bool isSecure);
+bool NX_NETWORK_API isUrlSheme(const QString& scheme);
+
 const int DEFAULT_RTSP_PORT = 554;
 
 static const nx::network::http::MimeProtoVersion rtsp_1_0 = { "RTSP", "1.0" };

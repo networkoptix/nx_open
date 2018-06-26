@@ -41,6 +41,9 @@ const int DEFAULT_HTTPS_PORT = 443;
 NX_NETWORK_API extern const char* const kUrlSchemeName;
 NX_NETWORK_API extern const char* const kSecureUrlSchemeName;
 
+QString NX_NETWORK_API urlSheme(bool isSecure);
+bool NX_NETWORK_API isUrlSheme(const QString& scheme);
+
 /**
  * TODO: #ak Consider using another container.
  * Need some buffer with:
@@ -336,6 +339,10 @@ public:
         const ConstBufferRefType& boundary) const;
     StringType toString() const;
     StringType toMultipartString(const ConstBufferRefType& boundary) const;
+
+    void setCookie(const StringType& name, const StringType& value, const StringType& path = "/");
+    void removeCookie(const StringType& name);
+    std::map<StringType, StringType> getCookies() const;
 };
 
 NX_NETWORK_API bool isMessageBodyPresent(const Response& response);

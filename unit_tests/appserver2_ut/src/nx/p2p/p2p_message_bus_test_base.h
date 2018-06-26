@@ -15,9 +15,6 @@ namespace nx {
 namespace p2p {
 namespace test {
 
-using Appserver2 = nx::utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>;
-using Appserver2Ptr = std::unique_ptr<Appserver2>;
-
 /**
  * Base helper class for p2p message bus tests
  */
@@ -26,6 +23,7 @@ class P2pMessageBusTestBase: public testing::Test
 public:
 protected:
     static void connectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
+    static void bidirectConnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
     static void disconnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
 
     static void sequenceConnect(std::vector<Appserver2Ptr>& servers);
@@ -36,9 +34,7 @@ protected:
         int count,
         int keepDbAtServerIndex = -1,
         quint16 baseTcpPort = 0);
-    Appserver2Ptr createAppserver(bool keepDbFile = false, quint16 port = 0);
 
-    void initResourceTypes(ec2::AbstractECConnection* ec2Connection);
     void createData(
         const Appserver2Ptr& server,
         int camerasCount,
@@ -49,9 +45,23 @@ protected:
     bool waitForConditionOnAllServers(
         std::function<bool(const Appserver2Ptr&)> condition,
         std::chrono::milliseconds timeout);
+
+    void waitForSync(int cameraCount);
+
+    void checkMessageBus(
+        std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+        const QString& errorMessage);
+    void checkMessageBusInternal(
+        std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+        const QString& errorMessage,
+        bool waitForSync,
+        int* outSyncDoneCounter);
+
+    static bool checkSubscription(const MessageBus* bus, const ApiPersistentIdData& peer);
+    static bool checkDistance(const MessageBus* bus, const ApiPersistentIdData& peer);
+    bool checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& /*peer*/);
 protected:
     std::vector<Appserver2Ptr> m_servers;
-    static int m_instanceCounter;
 };
 
 } // namespace test

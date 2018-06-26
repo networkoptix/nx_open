@@ -244,7 +244,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
 
                     nx::utils::Url url;
                     url.setHost(moduleInformation.cloudId());
-                    url.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
+                    url.setScheme(nx::network::http::urlSheme(moduleInformation.sslAllowed));
                     systemDescription->setServerHost(serverId, url);
                 }); //< executeInThread
             reply->pleaseStopSync();

@@ -2857,7 +2857,7 @@ to %1</source>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation>请登录到 %1 , 并依照提供的指示进行操作。</translation>
+      <translation>请登录到 %1, 并依照提供的指示进行操作。</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -4831,7 +4831,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation>若需启用全功能模式,请使用另外的服务器</translation>
+      <translation>若需启用全功能模式, 请使用另外的服务器</translation>
     </message>
   </context>
   <context>

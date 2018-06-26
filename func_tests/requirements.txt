@@ -21,3 +21,7 @@ cryptography==2.2.2
 pysmb==1.1.22
 python-dateutil==2.7.2
 paramiko==2.4.1
+click==6.7
+Flask==0.12.2
+pathlib2==2.3.0
+Werkzeug==0.14.1

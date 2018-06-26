@@ -34,6 +34,8 @@ TEST(Settings, loadSave)
     {
         Option<QString> option1{this, "option1", "qwerty", "Option description"};
         Option<int> option2{this, "option2", 7, "Option description"};
+        Option<std::chrono::milliseconds> option3{this, "option3",
+            std::chrono::milliseconds(7), "Option description"};
     };
 
     Settings settings;
@@ -41,11 +43,14 @@ TEST(Settings, loadSave)
     file.remove();
     QSettings qSettings(kSettingsFilename, QSettings::IniFormat);
     qSettings.setValue("option1", "loaded value");
+    qSettings.setValue("option3", "300");
     ASSERT_TRUE(settings.load(qSettings));
     ASSERT_FALSE(settings.option2.removed());
     ASSERT_TRUE(settings.option1.present());
     ASSERT_EQ(settings.option1(), QString("loaded value"));
     ASSERT_FALSE(settings.option2.present());
+    ASSERT_TRUE(settings.option3.present());
+    ASSERT_EQ(settings.option3().count(), 300);
     settings.option1.set("qqrq");
     ASSERT_EQ(settings.option1(), QString("qqrq"));
     ASSERT_TRUE(settings.save(qSettings));

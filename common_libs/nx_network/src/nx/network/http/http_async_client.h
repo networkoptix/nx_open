@@ -90,6 +90,12 @@ public:
     static const int UNLIMITED_RECONNECT_TRIES = -1;
 
     AsyncClient();
+
+    /**
+     * Set already connected socket to force it for the very first request.
+     */
+    AsyncClient(std::unique_ptr<AbstractStreamSocket> socket);
+
     virtual ~AsyncClient();
 
     AsyncClient(const AsyncClient&) = delete;
@@ -355,6 +361,7 @@ private:
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
     int m_maxNumberOfRedirects = 5;
+    std::unique_ptr<AbstractStreamSocket> m_userDefinedSocket;
 
     virtual void stopWhileInAioThread() override;
 
@@ -365,7 +372,7 @@ private:
     void resetDataBeforeNewRequest();
     void initiateHttpMessageDelivery();
     bool canExistingConnectionBeUsed() const;
-    void initiateTcpConnection();
+    void initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> socket = std::unique_ptr<AbstractStreamSocket>());
     /**
      * @return Bytes parsed or -1 in case of error.
      */

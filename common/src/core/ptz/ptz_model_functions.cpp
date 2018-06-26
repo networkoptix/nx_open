@@ -9,7 +9,7 @@
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, Orientations)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnPtzPreset)(QnPtzTourSpot)(QnPtzTour)(QnPtzLimits)(QnPtzObject)(QnPtzData),
+    (QnPtzLimits)(QnPtzPreset)(QnPtzTourSpot)(QnPtzTour)(QnPtzData)(QnPtzObject),
     (json)(eq),
     _Fields)
 

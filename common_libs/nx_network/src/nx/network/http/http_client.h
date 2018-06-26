@@ -25,6 +25,7 @@ class NX_NETWORK_API HttpClient
 {
 public:
     HttpClient();
+    HttpClient(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
     ~HttpClient();
 
     void pleaseStop();
@@ -119,7 +120,6 @@ public:
         BufferType* msgBody,
         StringType* contentType,
         std::optional<std::chrono::milliseconds> customResponseReadTimeout);
-
 private:
     std::unique_ptr<nx::network::http::AsyncClient> m_asyncHttpClient;
     QnWaitCondition m_cond;
@@ -144,6 +144,7 @@ private:
     bool m_precalculatedAuthorizationDisabled = false;
     bool m_expectOnlyBody = false;
     bool m_ignoreMutexAnalyzer = false;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
 
     void instantiateHttpClient();
     template<typename AsyncClientFunc>

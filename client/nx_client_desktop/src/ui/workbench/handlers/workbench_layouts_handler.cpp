@@ -295,12 +295,6 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     if (!layout || !user)
         return;
 
-    if (layout->isFile())
-    {
-        menu()->trigger(action::SaveLocalLayoutAsAction, layout);
-        return;
-    }
-
     if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
         return;
 

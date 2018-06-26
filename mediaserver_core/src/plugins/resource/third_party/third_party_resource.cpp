@@ -155,16 +155,6 @@ bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& n
     //TODO #ak antipattern: calling virtual function from base class
     bool mergedSomething = base_type::mergeResourcesIfNeeded( newResource );
 
-    const auto localParams = QnCameraAdvancedParamsReader::paramsFromResource(
-        this->toSharedPointer());
-    const auto sourceParams = QnCameraAdvancedParamsReader::paramsFromResource(newResource);
-
-    if (sourceParams != localParams)
-    {
-        QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), sourceParams);
-        mergedSomething = true;
-    }
-
     // TODO: #ak to make minimal influence on existing code, merging only few properties.
     // But, perharps, other properties should be processed too (in QnResource)
     for( const auto propertyName: PROPERTIES_TO_MERGE )
@@ -515,13 +505,15 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
             arg(m_discoveryManager.getVendorName()).arg(QString::fromUtf8(m_camInfo.modelName)).
             arg(QString::fromUtf8(m_camInfo.url)).arg(m_camManager->getLastErrorString()), cl_logDEBUG1 );
         setStatus( result == nxcip::NX_NOT_AUTHORIZED ? Qn::Unauthorized : Qn::Offline );
+        m_encoderCount = 0;
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    if( m_encoderCount == 0 )
+    if( m_encoderCount <= 0 )
     {
         NX_LOG( lit("Third-party camera %1:%2 (url %3) returned 0 encoder count!").arg(m_discoveryManager.getVendorName()).
             arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
+        m_encoderCount = 0;
         return CameraDiagnostics::UnknownErrorResult();
     }
 
@@ -547,37 +539,37 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
     if(cameraCapabilities & nxcip::BaseCameraManager::shareIpCapability)
         setCameraCapability( Qn::ShareIpCapability, true );
     if(cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
-        setCameraCapability( Qn::customMediaUrlCapability, true );
-    if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
+        setCameraCapability( Qn::CustomMediaUrlCapability, true );
+    if(cameraCapabilities & nxcip::BaseCameraManager::ptzCapability)
     {
         nxcip::CameraPtzManager* ptzManager = m_camManager->getPtzManager();
         if( ptzManager )
         {
             const int ptzCapabilities = ptzManager->getCapabilities();
-            if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousPanCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::ContinuousPanCapability)
                 setPtzCapability( Ptz::ContinuousPanCapability, true );
-            if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousTiltCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::ContinuousTiltCapability)
                 setPtzCapability( Ptz::ContinuousTiltCapability, true );
-            if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousZoomCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::ContinuousZoomCapability)
                 setPtzCapability( Ptz::ContinuousZoomCapability, true );
-            if( ptzCapabilities & nxcip::CameraPtzManager::AbsolutePanCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::AbsolutePanCapability)
                 setPtzCapability( Ptz::AbsolutePanCapability, true );
-            if( ptzCapabilities & nxcip::CameraPtzManager::AbsoluteTiltCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::AbsoluteTiltCapability)
                 setPtzCapability( Ptz::AbsoluteTiltCapability, true );
-            if( ptzCapabilities & nxcip::CameraPtzManager::AbsoluteZoomCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::AbsoluteZoomCapability)
                 setPtzCapability( Ptz::AbsoluteZoomCapability, true );
-            if( ptzCapabilities & nxcip::CameraPtzManager::FlipPtzCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::FlipPtzCapability)
                 setPtzCapability( Ptz::FlipPtzCapability, true );
-            if( ptzCapabilities & nxcip::CameraPtzManager::LimitsPtzCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::LimitsPtzCapability)
                 setPtzCapability( Ptz::LimitsPtzCapability, true );
-            if( ptzCapabilities & nxcip::CameraPtzManager::DevicePositioningPtzCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::DevicePositioningPtzCapability)
                 setPtzCapability( Ptz::DevicePositioningPtzCapability, true );
-            if( ptzCapabilities & nxcip::CameraPtzManager::LogicalPositioningPtzCapability )
+            if(ptzCapabilities & nxcip::CameraPtzManager::LogicalPositioningPtzCapability)
                 setPtzCapability( Ptz::LogicalPositioningPtzCapability, true );
         }
         ptzManager->releaseRef();
     }
-	
+
     bool hasDualStreaming = m_encoderCount > 1;
     if ((cameraCapabilities & nxcip::BaseCameraManager::customMediaUrlCapability)
         && sourceUrl(Qn::CR_SecondaryLiveVideo).isEmpty())
@@ -585,7 +577,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initializeCameraDriver()
         hasDualStreaming = false;
     }
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, hasDualStreaming ? 1 : 0);
-	
+
     setProperty(
         Qn::IS_AUDIO_SUPPORTED_PARAM_NAME,
         (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0);

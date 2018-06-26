@@ -8,54 +8,39 @@ namespace nx {
 namespace update {
 namespace info {
 
+// #TODO #akulikov remove this?
 struct NX_UPDATE_API UpdateRequestData
 {
     QString cloudHost;
     QString customization;
     QnSoftwareVersion currentNxVersion;
+    OsVersion osVersion;
+    const QnSoftwareVersion* targetVersion = nullptr;
+    bool isClient = false;
 
     UpdateRequestData(
         const QString& cloudHost,
         const QString& customization,
-        const QnSoftwareVersion& currentNxVersion)
+        const QnSoftwareVersion& currentNxVersion,
+        const OsVersion& osVersion,
+        const QnSoftwareVersion* targetVersion,
+        bool isClient)
         :
         cloudHost(cloudHost),
         customization(customization),
-        currentNxVersion(currentNxVersion)
-    {}
-
-    UpdateRequestData(): currentNxVersion("0.0.0.0") {}
-
-    QString toString() const
-    {
-        return QString::fromLatin1("cloud host=%1, customization=%2, current nx version=%3").arg(
-            cloudHost, customization, currentNxVersion.toString());
-    }
-};
-
-struct NX_UPDATE_API UpdateFileRequestData: UpdateRequestData
-{
-    OsVersion osVersion;
-    bool isClient = false;
-
-    UpdateFileRequestData(
-        const QString& cloudHost,
-        const QString& customization,
-        const QnSoftwareVersion& currentNxVersion,
-        const OsVersion& osVersion,
-        bool isClient)
-        :
-        UpdateRequestData(cloudHost, customization, currentNxVersion),
+        currentNxVersion(currentNxVersion),
         osVersion(osVersion),
+        targetVersion(targetVersion),
         isClient(isClient)
     {}
 
-    UpdateFileRequestData() = default;
+    UpdateRequestData() = default;
 
     QString toString() const
     {
-        return UpdateRequestData::toString()
-            + QString::fromLatin1(", os=%1").arg(osVersion.serialize());
+        return QString::fromLatin1(
+            "cloud host=%1, customization=%2, current nx version=%3, os version = %4").arg(
+                cloudHost, customization, currentNxVersion.toString(), osVersion.serialize());
     }
 };
 

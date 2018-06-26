@@ -299,12 +299,6 @@ private:
     ActionVisibility m_nonMatchingVisibility;
 };
 
-class ExportCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-};
-
 class AddBookmarkCondition: public Condition
 {
 public:
@@ -612,7 +606,10 @@ ConditionWrapper isSafeMode();
 ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
 
 ConditionWrapper treeNodeType(QSet<ResourceTreeNodeType> types);
-inline ConditionWrapper treeNodeType(ResourceTreeNodeType type) { return treeNodeType({{type}}); }
+inline ConditionWrapper treeNodeType(ResourceTreeNodeType type)
+{
+    return treeNodeType(QSet<ResourceTreeNodeType>{type});
+}
 
 /** Visible in layout tour preview mode only. */
 ConditionWrapper isLayoutTourReviewMode();
@@ -635,6 +632,10 @@ ConditionWrapper isEntropixCamera();
 
 /** Playback sync is forced. */
 ConditionWrapper syncIsForced();
+
+ConditionWrapper canExportLayout();
+
+ConditionWrapper canExportBookmark();
 
 /** Whether wearable camera upload is enabled. */
 ConditionWrapper wearableCameraUploadEnabled();

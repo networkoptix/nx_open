@@ -127,6 +127,8 @@ public:
 
     virtual const nxpl::Setting* params() override
     {
+		if (m_settings.empty())
+			return nullptr;
         return &m_settings.front();
     }
 

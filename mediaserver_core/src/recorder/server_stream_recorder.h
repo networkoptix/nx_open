@@ -94,6 +94,7 @@ protected:
     virtual void endOfRun() override;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex) override;
+    virtual bool forceDefaultContext(const QnConstAbstractMediaDataPtr& frame) const override;
 private:
     struct ScheduleTaskWithThresholds: QnScheduleTask
     {
@@ -130,6 +131,7 @@ private:
     void resumeRebuildIfLowDataNoLock();
     bool cleanupQueue();
     void addQueueSizeUnsafe(qint64 value);
+    bool mediaHasBuiltinContext(const QnConstAbstractMediaDataPtr& frame) const;
     virtual void updateContainerMetadata(QnAviArchiveMetadata* metadata) const override;
 
 private slots:

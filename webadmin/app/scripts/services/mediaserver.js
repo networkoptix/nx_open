@@ -337,8 +337,10 @@ angular.module('webadminApp')
             disconnectFromSystem:function(){
                 return wrapPost(proxy + '/web/api/detachFromSystem');
             },
-            restoreFactoryDefaults:function(){
-                return wrapPost(proxy + '/web/api/restoreState');
+            restoreFactoryDefaults:function(currentPassword){
+                return wrapPost(proxy + '/web/api/restoreState', {
+                    currentPassword: currentPassword
+                });
             },
             setupCloudSystem:function(systemName, systemId, authKey, cloudAccountName, systemSettings){
                 return wrapPost(proxy + '/web/api/setupCloudSystem',{
@@ -373,9 +375,10 @@ angular.module('webadminApp')
             },
 
 
-            changeAdminPassword: function(password) {
+            changeAdminPassword: function(newPassword, currentPassword) {
                 return wrapPost(proxy + '/web/api/configure', {
-                    password:password
+                    password: newPassword,
+                    currentPassword: currentPassword
                 });
             },
 
