@@ -1,4 +1,5 @@
 import logging
+import select
 import socket
 
 import paramiko
@@ -57,28 +58,31 @@ class _SSHCommand(Command):
         return bytes_sent
 
     def receive(self, timeout_sec):
-        self._channel.settimeout(timeout_sec)
+        self._channel.setblocking(False)
         output_chunks = {}
-        for key, (recv, output_logger) in self._open_streams.items():
-            try:
-                # TODO: Wait on `self.channel.event`.
-                output_chunk = recv(_STREAM_BUFFER_SIZE)
-            except socket.timeout:
-                continue  # Next stream might have data on it.
-            if not output_chunk:
-                output_logger.debug("Closed from the other side.")
-                del self._open_streams[key]
-                break  # Avoid iteration over mutated dict.
-            output_logger.debug("Received: %d bytes.", len(output_chunk))
-            output_chunks[key] = output_chunk
-            if len(output_chunk) > _BIG_CHUNK_THRESHOLD_CHARS:
-                output_logger.debug("Big chunk: %d bytes", len(output_chunk))
-            else:
+        if not self._open_streams:
+            self._channel.status_event.wait(timeout_sec)
+        else:
+            # TODO: Check on Windows. Paramiko uses sockets on Windows as prescribed in Python docs.
+            select.select([self._channel], [], [], timeout_sec)
+            for key, (recv, output_logger) in list(self._open_streams.items()):  # Copy dict items.
                 try:
-                    output_logger.debug("Text:\n%s", output_chunk.decode('ascii'))
-                except UnicodeDecodeError:
-                    output_logger.debug("Binary: %d bytes", len(output_chunk))
-        # TODO: If streams are closed, wait for exit status, poll otherwise.
+                    output_chunk = recv(_STREAM_BUFFER_SIZE)
+                except socket.timeout:
+                    continue  # Next stream might have data on it.
+                if not output_chunk:
+                    output_logger.debug("Closed from the other side.")
+                    del self._open_streams[key]
+                    continue
+                output_logger.debug("Received: %d bytes.", len(output_chunk))
+                output_chunks[key] = output_chunk
+                if len(output_chunk) > _BIG_CHUNK_THRESHOLD_CHARS:
+                    output_logger.debug("Big chunk: %d bytes", len(output_chunk))
+                else:
+                    try:
+                        output_logger.debug("Text:\n%s", output_chunk.decode('ascii'))
+                    except UnicodeDecodeError:
+                        output_logger.debug("Binary: %d bytes", len(output_chunk))
         self._logger.debug("Exit status: %r.", self._channel.exit_status)
         if self._channel.exit_status != -1:
             assert 0 <= self._channel.exit_status <= 255
