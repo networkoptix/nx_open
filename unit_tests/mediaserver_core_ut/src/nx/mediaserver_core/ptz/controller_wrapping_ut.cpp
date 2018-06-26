@@ -45,7 +45,7 @@ public:
 public:
     void hasControllerWithCapabilities(Ptz::Capabilities capabilities)
     {
-        auto controller = new core_ptz::TestPtzController(m_camera);
+        auto controller = new core_ptz::test_support::TestPtzController(m_camera);
         m_controller.reset(controller);
         controller->setCapabilities(capabilities);
         m_camera->setPtzController(controller);

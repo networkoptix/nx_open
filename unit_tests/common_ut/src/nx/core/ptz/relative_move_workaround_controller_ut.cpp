@@ -71,7 +71,9 @@ TEST(RelativeMoveWorkaround, extending)
 
 TEST(RelativeMoveWorkaround, relativeMoveProxy)
 {
-    QSharedPointer<TestPtzController> controller(new TestPtzController());
+    QSharedPointer<test_support::TestPtzController> controller(
+        new test_support::TestPtzController());
+
     controller->setCapabilities(Ptz::AbsolutePanCapability
         | Ptz::RelativeTiltCapability
         | Ptz::RelativeRotationCapability
@@ -114,7 +116,9 @@ TEST(RelativeMoveWorkaround, relativeMoveProxy)
 
 TEST(RelativeMoveWorkaround, relativeMoveViaAbsoluteMove)
 {
-    QSharedPointer<TestPtzController> controller(new TestPtzController());
+    QSharedPointer<test_support::TestPtzController> controller(
+        new test_support::TestPtzController());
+
     controller->setCapabilities(Ptz::LogicalPositioningPtzCapability
         | Ptz::AbsolutePanCapability
         | Ptz::AbsoluteTiltCapability

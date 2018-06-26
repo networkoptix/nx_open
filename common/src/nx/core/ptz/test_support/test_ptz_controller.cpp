@@ -3,6 +3,7 @@
 namespace nx {
 namespace core {
 namespace ptz {
+namespace test_support {
 
 TestPtzController::TestPtzController():
     base_type(QnResourcePtr())
@@ -350,6 +351,7 @@ void TestPtzController::setData(std::optional<QnPtzData> data)
     m_predefinedData = std::move(data);
 }
 
+} // namespace test_support
 } // namespace ptz
 } // namespace core
 } // namespace nx

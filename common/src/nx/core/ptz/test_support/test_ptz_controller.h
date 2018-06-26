@@ -10,6 +10,7 @@
 namespace nx {
 namespace core {
 namespace ptz {
+namespace test_support {
 
 #define FUNC_TYPE(METHOD) std::function<typename nx::utils::meta::SignatureExtractor<\
     decltype(&QnAbstractPtzController::METHOD)>::type>
@@ -234,6 +235,7 @@ private:
     std::optional<QnPtzData> m_predefinedData;
 };
 
+} // namespace test_support
 } // namespace ptz
 } // namespace core
 } // namespace nx
