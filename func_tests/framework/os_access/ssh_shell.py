@@ -106,10 +106,16 @@ class SSH(PosixShell):
     def __repr__(self):
         return 'SSH({!r}, {!r}, {!r}, {!r})'.format(self._username, self._hostname, self._port, self._key_path)
 
+    def command(self, args, cwd=None, env=None):
+        script = sh_command_to_script(args)
+        return self.sh_script(script, cwd=cwd, env=env)
+
     def run_command(self, command, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
-        script = sh_command_to_script(command)
-        output = self.run_sh_script(script, input=input, cwd=cwd, timeout_sec=timeout_sec, env=env)
-        return output
+        with self.command(command, cwd=cwd, env=env) as running_command:
+            exit_status, stdout, stderr = running_command.communicate(input=input, timeout_sec=timeout_sec)
+        if exit_status != 0:
+            raise exit_status_error_cls(exit_status)(stdout, stderr)
+        return stdout
 
     @cached_getter
     def _client(self):
@@ -129,9 +135,12 @@ class SSH(PosixShell):
     def __del__(self):
         self._client().close()
 
-    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
+    def sh_script(self, script, cwd=None, env=None):
         augmented_script = sh_augment_script(script, cwd, env)
-        with _SSHCommand(self._client(), augmented_script) as command:
+        return _SSHCommand(self._client(), augmented_script)
+
+    def run_sh_script(self, script, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
+        with self.sh_script(script, cwd=cwd, env=env) as command:
             exit_status, stdout, stderr = command.communicate(input=input, timeout_sec=timeout_sec)
         if exit_status != 0:
             raise exit_status_error_cls(exit_status)(stdout, stderr)
