@@ -36,7 +36,7 @@ public:
             /*clientMode*/ false,
             nx::core::access::Mode::direct);
 
-        m_pool = new QnServerPtzControllerPool(m_commonModule.get());
+        m_pool = new ptz::ServerPtzControllerPool(m_commonModule.get());
         m_camera.reset(new test::CameraMock());
         m_camera->setCommonModule(m_commonModule.get());
         m_camera->initialize();

@@ -14,7 +14,6 @@
 #include <nx/mediaserver_core/ptz/server_ptz_helpers.h>
 
 namespace core_ptz = nx::core::ptz;
-namespace mediaserver_ptz = nx::mediaserver_core::ptz;
 
 namespace {
 
@@ -46,28 +45,32 @@ QnPtzMapperPtr mapper(const QnSecurityCamResourcePtr& camera)
 
 } // namespace
 
-QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
+namespace nx {
+namespace mediaserver_core {
+namespace ptz {
+
+ServerPtzControllerPool::ServerPtzControllerPool(QObject *parent):
     base_type(parent)
 {
     NX_DEBUG(this, "Creating server PTZ controller pool");
     setConstructionMode(ThreadedControllerConstruction);
 
     connect(
-        this, &QnServerPtzControllerPool::controllerAboutToBeChanged,
-        this, &QnServerPtzControllerPool::at_controllerAboutToBeChanged);
+        this, &ServerPtzControllerPool::controllerAboutToBeChanged,
+        this, &ServerPtzControllerPool::at_controllerAboutToBeChanged);
 
     connect(
-        this, &QnServerPtzControllerPool::controllerChanged,
-        this, &QnServerPtzControllerPool::at_controllerChanged);
+        this, &ServerPtzControllerPool::controllerChanged,
+        this, &ServerPtzControllerPool::at_controllerChanged);
 }
 
-QnServerPtzControllerPool::~QnServerPtzControllerPool()
+ServerPtzControllerPool::~ServerPtzControllerPool()
 {
     disconnect(this, nullptr, this, nullptr);
     deinitialize();
 }
 
-void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource)
+void ServerPtzControllerPool::registerResource(const QnResourcePtr &resource)
 {
     // TODO: #Elric we're creating controller from main thread.
     // Controller ctor may take some time (several seconds).
@@ -78,13 +81,13 @@ void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource)
 
     connect(
         resource, &QnResource::initializedChanged,
-        this, &QnServerPtzControllerPool::updateController,
+        this, &ServerPtzControllerPool::updateController,
         Qt::QueuedConnection);
 
     base_type::registerResource(resource);
 }
 
-void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource)
+void ServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource)
 {
     NX_DEBUG(this, lm("Unregistering resource %1 (%2)")
         .args(resource->getName(), resource->getId()));
@@ -93,7 +96,7 @@ void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource
     disconnect(resource, nullptr, this, nullptr);
 }
 
-QnPtzControllerPtr QnServerPtzControllerPool::createController(
+QnPtzControllerPtr ServerPtzControllerPool::createController(
     const QnResourcePtr &resource) const
 {
     NX_DEBUG(this, lm("Attempting to create PTZ controller for resource %1 (%2)")
@@ -142,20 +145,20 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(
     }
 
     bool disableNativePresets = false;
-    if (mediaserver_ptz::capabilities(controller).testFlag(Ptz::NativePresetsPtzCapability))
+    if (ptz::capabilities(controller).testFlag(Ptz::NativePresetsPtzCapability))
     {
         disableNativePresets = !resource->getProperty(
             Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
 
         connect(
             resource, &QnResource::propertyChanged,
-            this, &QnServerPtzControllerPool::at_cameraPropertyChanged,
+            this, &ServerPtzControllerPool::at_cameraPropertyChanged,
             Qt::UniqueConnection);
     }
 
-    mediaserver_ptz::ControllerWrappingParameters wrappingParameters;
-    wrappingParameters.capabilitiesToAdd = mediaserver_ptz::ini().addedCapabilities();
-    wrappingParameters.capabilitiesToRemove = mediaserver_ptz::ini().excludedCapabilities();
+    ptz::ControllerWrappingParameters wrappingParameters;
+    wrappingParameters.capabilitiesToAdd = ptz::ini().addedCapabilities();
+    wrappingParameters.capabilitiesToRemove = ptz::ini().excludedCapabilities();
     wrappingParameters.absoluteMoveMapper = mapper(camera);
     wrappingParameters.relativeMoveMapping = relativeMoveMapping(camera);
     wrappingParameters.areNativePresetsDisabled = disableNativePresets;
@@ -168,8 +171,8 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(
            "Parameters: %3")
             .args(resource->getName(), resource->getId(), wrappingParameters));
 
-    controller = mediaserver_ptz::wrapController(controller, wrappingParameters);
-    const auto controllerCapabilities = mediaserver_ptz::capabilities(controller);
+    controller = ptz::wrapController(controller, wrappingParameters);
+    const auto controllerCapabilities = ptz::capabilities(controller);
     if (cameraPtzCapabilities != controllerCapabilities)
     {
         NX_DEBUG(
@@ -184,7 +187,7 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(
     return controller;
 }
 
-void QnServerPtzControllerPool::at_cameraPropertyChanged(
+void ServerPtzControllerPool::at_cameraPropertyChanged(
     const QnResourcePtr& resource, const QString& key)
 {
     if (key == Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME)
@@ -200,7 +203,7 @@ void QnServerPtzControllerPool::at_cameraPropertyChanged(
     }
 }
 
-void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource)
+void ServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource)
 {
     QnPtzControllerPtr oldController = controller(resource);
     if (oldController)
@@ -217,7 +220,7 @@ void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePt
     }
 }
 
-void QnServerPtzControllerPool::at_controllerChanged(const QnResourcePtr &resource)
+void ServerPtzControllerPool::at_controllerChanged(const QnResourcePtr &resource)
 {
     QnPtzControllerPtr controller = this->controller(resource);
     if(!controller)
@@ -245,3 +248,7 @@ void QnServerPtzControllerPool::at_controllerChanged(const QnResourcePtr &resour
         controller->activatePreset(object.id, QnAbstractPtzController::MaxPtzSpeed);
     }
 }
+
+} // namespace ptz
+} // namespace mediaserver_core
+} // namespace nx

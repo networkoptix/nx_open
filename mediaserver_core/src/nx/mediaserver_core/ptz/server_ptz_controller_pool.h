@@ -6,14 +6,18 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-class QnServerPtzControllerPool: public QnPtzControllerPool
+namespace nx {
+namespace mediaserver_core {
+namespace ptz {
+
+class ServerPtzControllerPool: public QnPtzControllerPool
 {
     Q_OBJECT
     typedef QnPtzControllerPool base_type;
 
 public:
-    QnServerPtzControllerPool(QObject *parent = NULL);
-    ~QnServerPtzControllerPool();
+    ServerPtzControllerPool(QObject *parent = NULL);
+    virtual ~ServerPtzControllerPool();
 
 protected:
     virtual void registerResource(const QnResourcePtr &resource) override;
@@ -30,3 +34,7 @@ private:
     mutable QnMutex m_mutex;
     QHash<QnResourcePtr, QnPtzObject> activeObjectByResource;
 };
+
+} // namespace ptz
+} // namespace mediaserver_core
+} // namespace nx
