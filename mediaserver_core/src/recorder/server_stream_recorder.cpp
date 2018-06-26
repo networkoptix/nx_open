@@ -33,6 +33,9 @@
 #include <nx/utils/cryptographic_hash.h>
 #include "archive_integrity_watcher.h"
 #include <nx/mediaserver/resource/camera.h>
+#include <utils/media/h264_utils.h>
+#include <utils/media/nalUnits.h>
+#include <utils/media/hevc_common.h>
 
 namespace {
 
@@ -687,20 +690,19 @@ void QnServerStreamRecorder::addQueueSizeUnsafe(qint64 value)
 
 bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
-    QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
+    const QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!media)
-        return true; // skip data
+        return true; //< skip data
 
     {
         QnMutexLocker lock( &m_queueSizeMutex );
-        addQueueSizeUnsafe(- (qint64) media->dataSize());
+        addQueueSizeUnsafe(-((qint64) media->dataSize()));
     }
 
-    // for empty schedule we record all time
+    // For empty schedule, we record all the time.
     beforeProcessData(media);
 
-    bool rez = QnStreamRecorder::processData(data);
-    return rez;
+    return QnStreamRecorder::processData(data);
 }
 
 void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
@@ -755,9 +757,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
 
         if (normalStorage || backupStorage)
             setTruncateInterval(
-                qnServerModule->roSettings()->value(
-                    nx_ms_conf::MEDIA_FILE_DURATION_SECONDS,
-                    nx_ms_conf::DEFAULT_MEDIA_FILE_DURATION_SECONDS).toInt());
+                qnServerModule->settings().mediaFileDuration());
 
         if (normalStorage)
             m_recordingContextVector.emplace_back(
@@ -911,4 +911,50 @@ bool QnServerStreamRecorder::needConfigureProvider() const
 {
     const nx::mediaserver::resource::Camera* camera = dynamic_cast<nx::mediaserver::resource::Camera*>(m_resource.data());
     return camera->isLicenseUsed();
+}
+
+bool QnServerStreamRecorder::forceDefaultContext(const QnConstAbstractMediaDataPtr& frame) const
+{
+    // Do not put codec context to the container level if video stream has built-in context.
+    // It is CPU optimization for server recording. Ffmpeg works faster at this mode.
+    return mediaHasBuiltinContext(frame);
+}
+
+bool QnServerStreamRecorder::mediaHasBuiltinContext(const QnConstAbstractMediaDataPtr& frame) const
+{
+    auto videoFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(frame);
+
+    if (!videoFrame)
+        return false;
+
+    auto codecId = videoFrame->compressionType;
+    using namespace nx::media_utils;
+    switch (codecId)
+    {
+        case AV_CODEC_ID_H264:
+        case AV_CODEC_ID_HEVC:
+        {
+            std::vector<std::pair<const quint8*, size_t>> nalUnits;
+            readNALUsFromAnnexBStream(videoFrame, &nalUnits);
+
+            for (const std::pair<const quint8*, size_t>& nalu: nalUnits)
+            {
+                if (codecId == AV_CODEC_ID_H264)
+                {
+                    auto nalUnitType = *nalu.first & 0x1f;
+                    if (nalUnitType == NALUnitType::nuSPS)
+                        return true;
+                }
+                else if (codecId == AV_CODEC_ID_HEVC)
+                {
+                    hevc::NalUnitHeader header;
+                    header.decode(nalu.first, nalu.second);
+                    if (hevc::isParameterSet(header.unitType))
+                        return true;
+                }
+            }
+        }
+        default:
+            return false;
+    }
 }

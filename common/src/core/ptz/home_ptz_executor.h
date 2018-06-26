@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 
 #include "ptz_fwd.h"
+#include <nx/core/ptz/options.h>
 
 class QnHomePtzExecutorPrivate;
 
@@ -18,8 +19,9 @@ public:
     void restart();
     void stop();
     bool isRunning();
-    
+
     void setHomePosition(const QnPtzObject &homePosition);
+
     QnPtzObject homePosition() const;
 
 protected:

@@ -99,6 +99,26 @@
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>시스템 이벤트</translation>
     </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>이미 클라우드 (id %1) 에 바인딩된 시스템</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>서버가 인터넷에 연결되어 있지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>로컬 DB에 클라우드 인증정보를 저장하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>클라우드 소유자를 로컬 DB에 저장하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>클라우드: %1 에 연결할 수 없습니다</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -504,13 +524,13 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%n %2 는(은) %1에서 사용됩니다.</numerusform>
+        <numerusform>%n %2은 %1에 사용됩니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 는(은) %1에서 사용될 것입니다.</numerusform>
+        <numerusform>%n %2 은 %1에서 사용될 것입니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -579,7 +599,7 @@
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n 카메라 (들)</numerusform>
+        <numerusform>%n 카메라(들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -591,7 +611,7 @@
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n 장치</numerusform>
+        <numerusform>%n 장치(들)</numerusform>
       </translation>
     </message>
     <message>
@@ -629,13 +649,13 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n I/O 모듈</numerusform>
+        <numerusform>%n I/O 장치(들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O 모듈</numerusform>
+        <numerusform>%n I/O 장치(들)</numerusform>
       </translation>
     </message>
     <message>
@@ -814,145 +834,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>유효하지 않은 변수</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>초</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>분</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>시간</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>일</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>주</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>분</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>년</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>밀리초</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>초</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>분</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>시간</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>일</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>wks</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>년</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>밀리초</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>초</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>분</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>시간</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>일</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>주</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>개월</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>년</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1156,7 +1037,7 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>장치 연결끊김</numerusform>
+        <numerusform>장치 연결이 끊어졌습니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1499,6 +1380,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%2 에서 %1</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>레이아웃 열기...</translation>
     </message>
   </context>
   <context>

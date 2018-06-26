@@ -47,14 +47,14 @@ Plugin::SharedResources::SharedResources(
     sharedContext(std::make_shared<mediaserver_core::plugins::HanwhaSharedResourceContext>(
         sharedId))
 {
-    sharedContext->setRecourceAccess(url, auth);
+    sharedContext->setResourceAccess(url, auth);
 }
 
 void Plugin::SharedResources::setResourceAccess(
     const nx::utils::Url& url,
     const QAuthenticator& auth)
 {
-    sharedContext->setRecourceAccess(url, auth);
+    sharedContext->setResourceAccess(url, auth);
     monitor->setResourceAccess(url, auth);
 }
 

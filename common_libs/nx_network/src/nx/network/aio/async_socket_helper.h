@@ -189,8 +189,10 @@ public:
                 SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
             {
                 if (code != SystemError::noError)
+                {
                     return this->m_resolveResultScheduler.post(
                         [h = std::move(handler), code]() { h(code); });
+                }
 
                 connectToIpsAsync(std::move(ips), port, std::move(handler));
             });
@@ -435,7 +437,7 @@ private:
             }
             else
             {
-                NX_CRITICAL(false);
+                NX_CRITICAL(false, lm("Unexpected value: 0b%1").arg(static_cast<int>(eventType), 0, 2));
             }
         }
         catch (const std::exception& e)

@@ -87,9 +87,9 @@ protected:
         this->ftpStorageUrl = nx::ut::cfg::configInstance().ftpUrl;
         this->smbStorageUrl = nx::ut::cfg::configInstance().smbUrl;
 
-        pluginManager = std::unique_ptr<PluginManager>( new PluginManager(nullptr));
+        pluginManager = std::make_unique<PluginManager>();
 
-        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
+        platformAbstraction = std::make_unique<QnPlatformAbstraction>();
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
         pluginManager->loadPlugins(serverModule().roSettings());
@@ -137,7 +137,7 @@ TEST_F(AbstractStorageResourceTest, Capabilities)
 
 TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 {
-    const size_t fileCount = 500;
+    const size_t fileCount = 100;
     std::vector<QString> fileNames;
     const char *dummyData = "abcdefgh";
     const size_t dummyDataLen = strlen(dummyData);

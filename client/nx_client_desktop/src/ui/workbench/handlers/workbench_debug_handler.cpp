@@ -21,9 +21,9 @@
 #include <nx/api/analytics/driver_manifest.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/widgets/palette_widget.h>
 #include <ui/dialogs/common/dialog.h>
 #include <ui/dialogs/common/message_box.h>
+#include <ui/style/webview_style.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/widgets/main_window.h>
@@ -31,6 +31,7 @@
 #include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
 #include <nx/client/desktop/custom_settings/dialogs/custom_settings_test_dialog.h>
+#include <nx/client/desktop/debug_utils/widgets/palette_widget.h>
 
 #include <finders/test_systems_finder.h>
 #include <finders/system_tiles_test_case.h>
@@ -68,6 +69,8 @@ public:
     {
         m_webView->setPage(m_page);
 
+        NxUi::setupWebViewStyle(m_webView);
+
         QVBoxLayout *layout = new QVBoxLayout(this);
         layout->setContentsMargins(QMargins());
         layout->addWidget(m_urlLineEdit);
@@ -76,7 +79,17 @@ public:
             {
                 m_webView->load(m_urlLineEdit->text());
             });
-    }
+
+        auto paletteWidget = new PaletteWidget(this);
+        paletteWidget->setDisplayPalette(m_webView->palette());
+        layout->addWidget(paletteWidget);
+        connect(paletteWidget, &PaletteWidget::paletteChanged, this,
+            [this, paletteWidget]
+            {
+                m_webView->setPalette(paletteWidget->displayPalette());
+            });
+
+        }
 
     QString url() const { return m_urlLineEdit->text(); }
     void setUrl(const QString& value)
@@ -127,7 +140,7 @@ public:
         addButton(lit("Web View"), [this]
             {
                 auto dialog(new QnWebViewDialog(this));
-                dialog->setUrl(lit("http://localhost:7001"));
+                //dialog->setUrl(lit("http://localhost:7001"));
                 dialog->show();
             });
 
@@ -138,7 +151,7 @@ public:
                 if (cameras.empty())
                     return;
 
-                const auto caps = Qn::SetUserPasswordCapability | Qn::isDefaultPasswordCapability;
+                const auto caps = Qn::SetUserPasswordCapability | Qn::IsDefaultPasswordCapability;
 
                 const bool isDefaultPassword = cameras.first()->needsToChangeDefaultPassword();
 
@@ -156,7 +169,7 @@ public:
 
         addButton(lit("Palette"), [this]
             {
-                QnPaletteWidget *w = new QnPaletteWidget(this);
+                auto w = new PaletteWidget(this);
                 w->setPalette(qApp->palette());
                 auto messageBox = new QnMessageBox(mainWindowWidget());
                 messageBox->setWindowFlags(Qt::Window);

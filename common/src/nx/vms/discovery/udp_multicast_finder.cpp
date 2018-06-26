@@ -13,7 +13,7 @@ const nx::network::SocketAddress UdpMulticastFinder::kMulticastEndpoint("239.255
 const std::chrono::milliseconds UdpMulticastFinder::kUpdateInterfacesInterval = std::chrono::minutes(1);
 const std::chrono::milliseconds UdpMulticastFinder::kSendInterval = std::chrono::seconds(10);
 
-UdpMulticastFinder::UdpMulticastFinder(network::aio::AbstractAioThread* thread):
+UdpMulticastFinder::UdpMulticastFinder(nx::network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
     m_multicastEndpoint(kMulticastEndpoint),
     m_updateInterfacesInterval(kUpdateInterfacesInterval),

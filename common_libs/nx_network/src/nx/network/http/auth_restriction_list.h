@@ -30,15 +30,20 @@ enum Value
      * Authentication by X-NetworkOptix-VideoWall header.
      * TODO: #ak Does not look appropriate here.
      */
-    videowall = 1 << 4,
+    videowallHeader = 1 << 4,
 
     /**
      * Authentication by url query parameters auth and proxy_auth.
      * Params have the following format: BASE64-URL( UTF8(username) ":" MD5( LATIN1(username) ":NetworkOptix:" LATIN1(password) ) )
      * TODO: #ak This method is too poor, have to introduce some salt.
      */
-    urlQueryParam = 1 << 5,
-    tempUrlQueryParam = 1 << 6,
+    urlQueryDigest = 1 << 5,
+    temporaryUrlQueryKey = 1 << 6,
+
+    /**
+     * X-Runtime-Guid header name.
+     */
+    sessionKey = 1 << 7,
 
     /**
      * Normally all GET requests do not requres SCRF token, but we could not allow that, because of

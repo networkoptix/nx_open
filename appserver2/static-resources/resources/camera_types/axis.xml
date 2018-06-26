@@ -342,5 +342,27 @@
         <resource name = "AXISM5054" public = "AXISQ6044"/>
         <resource name = "AXISD2050" public = "AXISQ1942"/>
         <resource name = "AXISP12MkII" public = "AXISP1428E"/>
+        <resource name = "AXISP1447" public = "AXISM3104"/>
+        <resource name = "AXISQ3515" public = "AXISP1365"/>        
+        <resource name = "AXISM5065" public = "AXISM3104"/>
+        <resource name = "AXISM3058" public = "AXISM3104"/>
+        <resource name = "AXISM3015" public = "AXISM3104"/>
+        <resource name = "AXISP1290" public = "AXISQ1659"/>
+        <resource name = "AXISQ6125" public = "AXISP1365"/>    
+        <resource name = "AXISM3057" public = "AXISP1365"/> 
+        <resource name = "AXISQ1645" public = "AXISP1365"/> 
+        <resource name = "AXISQ1647" public = "AXISP1365"/> 
+        <resource name = "AXISM5055" public = "AXISM3104"/>
+        <resource name = "AXISM3016" public = "AXISM3104"/>
+        <resource name = "AXISP1280" public = "AXISQ1659"/>                
+        <resource name = "AXISA9161" public = "AXIS_COMMON">
+            <params>
+                <param name = "ioConfigCapability" default_value ="1"/>
+                <param name = "ioDisplayName" default_value ="I/O 1,I/O 2,I/O 3,I/O 4,I/O 5,I/O 6,Relay 1"/>  
+                <param name = "noVideoSupport" default_value ="1"/>
+                <param name = "hasDualStreaming" default_value ="0"/>
+            </params>
+        </resource> 
+        <resource name = "AXISP1448" public = "AXISP1447"/>
     </oem>
 </resources>

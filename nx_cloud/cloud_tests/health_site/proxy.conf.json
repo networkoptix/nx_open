@@ -1,0 +1,7 @@
+{
+  "/health": {
+    "target"      : "https://api.status.nxvms.com/health",
+    "secure"      : true,
+    "changeOrigin": true
+  }
+}

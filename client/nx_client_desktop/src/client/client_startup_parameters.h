@@ -52,6 +52,7 @@ struct QnStartupParameters
     QString authenticationString;
     QString delayedDrop;
     QString instantDrop;
+    QString layoutName;
     QString logLevel;
     QString logFile;
     QString ec2TranLogLevel;

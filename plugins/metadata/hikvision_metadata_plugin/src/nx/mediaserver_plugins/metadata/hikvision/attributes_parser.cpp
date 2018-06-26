@@ -101,8 +101,8 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
         }
         else if (name == "detectionregionlist")
         {
-            const auto regionList = reader.readElementText().trimmed();
-            // TODO: Region number is empty. I haven't seen cameras with non empty region list so far.
+            // TODO: parse region number
+            reader.skipCurrentElement();
         }
         else
         {
@@ -113,7 +113,10 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
     result.description = buildDescription(manifest, result);
 
     if (reader.error() != QXmlStreamReader::NoError)
+    {
+        NX_VERBOSE(typeid(AttributesParser), lm("XML parse error: %1").arg(reader.errorString()));
         return boost::optional<HikvisionEvent>();
+    }
     return result;
 }
 

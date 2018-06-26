@@ -21,6 +21,11 @@ std::vector<network::SocketAddress> RelayService::httpEndpoints() const
     return m_view->httpEndpoints();
 }
 
+std::vector<network::SocketAddress> RelayService::httpsEndpoints() const
+{
+    return m_view->httpsEndpoints();
+}
+
 const relaying::AbstractListeningPeerPool& RelayService::listeningPeerPool() const
 {
     return m_model->listeningPeerPool();
@@ -48,7 +53,8 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     m_model = &model;
 
     Controller controller(settings, &model);
-    if (!controller.discoverPublicAddress())
+    const auto publicIp = controller.discoverPublicAddress();
+    if (!publicIp)
     {
         NX_ERROR(this, "Failed to discover public address. Terminating.");
         return -1;
@@ -62,6 +68,9 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
         view.httpServer(),
         controller.trafficRelay());
     view.registerStatisticsApiHandlers(*statisticsProvider);
+
+    m_model->remoteRelayPeerPool().setNodeId(
+        network::SocketAddress(*publicIp, view.httpEndpoints().front().port).toStdString());
 
     // TODO: #ak: process rights reduction should be done here.
 

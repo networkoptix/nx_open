@@ -14,3 +14,7 @@ target_include_directories(nx_onvif PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/gsoap
 if(NOT WINDOWS)
     target_link_libraries(nx_onvif PUBLIC pthread)
 endif()
+
+# This generated file provides tons of warning messages, so disable them.
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/onvif/soapC.cpp
+    PROPERTIES COMPILE_FLAGS "-w")

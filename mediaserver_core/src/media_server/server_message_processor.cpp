@@ -33,8 +33,7 @@
 #include "nx_ec/ec_api.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_serverPort( qnServerModule->roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
+    base_type(commonModule)
 {
 }
 
@@ -120,8 +119,6 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     connect(connection, &ec2::AbstractECConnection::remotePeerUnauthorized,
         this, &QnServerMessageProcessor::at_remotePeerUnauthorized);
-    connect(connection, &ec2::AbstractECConnection::reverseConnectionRequested,
-        this, &QnServerMessageProcessor::at_reverseConnectionRequested);
 
     connect(connection->getMiscNotificationManager().get(), &ec2::AbstractMiscNotificationManager::systemIdChangeRequested,
             this, [this](const QnUuid& systemId, qint64 sysIdTime, ec2::Timestamp tranLogTime)
@@ -218,11 +215,6 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     return false;
 }
 
-void QnServerMessageProcessor::registerProxySender(QnUniversalTcpListener* tcpListener)
-{
-    m_universalTcpListener = tcpListener;
-}
-
 void QnServerMessageProcessor::execBusinessActionInternal(
     const nx::vms::event::AbstractActionPtr& action)
 {
@@ -239,19 +231,6 @@ void QnServerMessageProcessor::at_updateInstallationRequested(const QString& upd
 {
     QnServerUpdateTool::instance()->installUpdate(
         updateId, QnServerUpdateTool::UpdateType::Delayed);
-}
-
-void QnServerMessageProcessor::at_reverseConnectionRequested(
-    const ec2::ApiReverseConnectionData& data)
-{
-    if (m_universalTcpListener)
-    {
-        QnRoute route = commonModule()->router()->routeTo(data.targetServer);
-
-        // just to be sure that we have direct access to the server
-        if (route.gatewayId.isNull() && !route.addr.isNull())
-            m_universalTcpListener->addProxySenderConnections(route.addr, data.socketCount);
-    }
 }
 
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)

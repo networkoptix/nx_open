@@ -22,6 +22,13 @@ TEST_F(QnLexicalTextFixture, integralTypes)
     ASSERT_EQ(-12, QnLexical::deserialized<int>("-12"));
 }
 
+TEST_F(QnLexicalTextFixture, chronoTypes)
+{
+    ASSERT_EQ("7", QnLexical::serialized(std::chrono::milliseconds(7)));
+    ASSERT_EQ(std::chrono::milliseconds(50), QnLexical::deserialized<std::chrono::milliseconds>("50"));
+}
+
+
 TEST_F(QnLexicalTextFixture, QtStringTypes)
 {
     //ASSERT_EQ(kHelloWorld, QnLexical::serialized(kHelloWorld.toUtf8())); -- not supported, returns base64

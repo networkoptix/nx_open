@@ -1,5 +1,6 @@
-
 #pragma once
+
+#include <chrono>
 
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
@@ -27,8 +28,9 @@ class QnTimelineBookmarksWatcher : public Connective<QObject>
     , public QnWorkbenchContextAware
 {
     Q_OBJECT
-
     typedef Connective<QObject> base_type;
+
+    using milliseconds = std::chrono::milliseconds;
 
 public:
     QnTimelineBookmarksWatcher(QObject *parent = nullptr);
@@ -36,12 +38,12 @@ public:
     virtual ~QnTimelineBookmarksWatcher();
 
 public:
-    QnCameraBookmarkList bookmarksAtPosition(qint64 position
-        , qint64 msecdsPerDp = 0);
+    QnCameraBookmarkList bookmarksAtPosition(milliseconds position,
+        milliseconds msecdsPerDp = milliseconds(0));
 
     QnCameraBookmarkList rawBookmarksAtPosition(
-        const QnVirtualCameraResourcePtr &camera
-        , qint64 positionMs);
+        const QnVirtualCameraResourcePtr &camera,
+        qint64 positionMs);
 
     QString textFilter() const;
     void setTextFilter(const QString& value);
@@ -53,8 +55,7 @@ private:
     void updateCurrentCamera();
     void onBookmarkRemoved(const QnUuid &id);
     void tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr &camera);
-    void onTimelineWindowChanged(qint64 startTimeMs
-        , qint64 endTimeMs);
+    void onTimelineWindowChanged(milliseconds startTimeMs, milliseconds endTimeMs);
 
     void setTimelineBookmarks(const QnCameraBookmarkList& bookmarks);
 

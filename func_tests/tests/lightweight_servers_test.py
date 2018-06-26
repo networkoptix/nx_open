@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 LWS_MERGE_TIMEOUT = datetime.timedelta(minutes=10)
@@ -15,7 +15,7 @@ LWS_MERGE_TIMEOUT = datetime.timedelta(minutes=10)
 def test_merge(linux_mediaservers_pool, lightweight_servers_factory, iteration):
     server = linux_mediaservers_pool.get('full')
     lws_list = lightweight_servers_factory(10)
-    log.info('Allocated %d lightweight servers', len(lws_list))
+    _logger.info('Allocated %d lightweight servers', len(lws_list))
     lws_list[0].wait_until_synced(LWS_MERGE_TIMEOUT)
     server.merge_systems(lws_list[0], take_remote_settings=True)
 

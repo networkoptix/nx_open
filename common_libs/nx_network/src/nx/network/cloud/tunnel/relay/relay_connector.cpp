@@ -4,6 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "api/relay_api_client_factory.h"
 #include "relay_outgoing_tunnel_connection.h"
 
 namespace nx {
@@ -20,7 +21,7 @@ Connector::Connector(
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId)),
     m_relayClient(
-        nx::cloud::relay::api::ClientFactory::create(m_relayUrl))
+        nx::cloud::relay::api::ClientFactory::instance().create(m_relayUrl))
 {
     bindToAioThread(getAioThread());
 }
@@ -56,7 +57,7 @@ void Connector::connect(
         {
             m_relayClient->startSession(
                 m_connectSessionId,
-                m_targetHostAddress.host.toString().toUtf8(),
+                m_targetHostAddress.host.toStdString(),
                 [this](
                     nx::cloud::relay::api::ResultCode resultCode,
                     nx::cloud::relay::api::CreateClientSessionResponse response)
@@ -102,7 +103,7 @@ void Connector::onStartRelaySessionResponse(
             nullptr);
     }
 
-    m_connectSessionId = response.sessionId.c_str();
+    m_connectSessionId = response.sessionId;
 
     auto tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
         nx::utils::Url(response.actualRelayUrl.c_str()),

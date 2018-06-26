@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "Max. rekord sorméret (bájt)",
         "maxRecordQueueSizeElements": "Max. rekord sorméret (elem)",
         "maxRemoteArchiveSynchronizationThreads": "Rögzített videók távoli szinkronizálása max. szála",
-        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
+        "maxRtspConnectDurationSeconds": "Maximum Rtsp kapcsolat időtartama másodpercben",
         "maxSceneItems": "Max. elemszám (0 alapértelmezett)",
         "proxyConnectTimeoutSec": "Proxy kapcsolat időtúllépés (másodperc)",
         "rtpTimeoutMs": "RTP időtúllépés (millisec)",

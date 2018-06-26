@@ -155,138 +155,177 @@ public:
     boost::optional<hpm::api::ConnectionMethods> connectionMethonds;
 };
 
-int runInListenMode(const nx::utils::ArgumentParser& args)
+static std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeLocalServer(
+    const nx::utils::ArgumentParser& args)
 {
-    const auto beginTime = std::chrono::steady_clock::now();
-    using namespace nx::network;
-
-    auto transmissionMode = test::TestTransmissionMode::spam;
-    if (args.get("ping"))
-        transmissionMode = test::TestTransmissionMode::pong;
-    std::cout << lm("Server mode: %1").args(transmissionMode).toStdString() << std::endl;
-
-    auto multiServerSocket = new network::MultipleServerSocket();
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
-    const auto guard = makeScopeGuard([&serverSocket]()
-    {
-        if (serverSocket)
-            serverSocket->pleaseStopSync();
-    });
-
-    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
-    {
-        QString value;
-        if (args.read("rw-timeout", &value))
-            rwTimeout = nx::utils::parseTimerDuration(value, rwTimeout);
-
-        stun::AbstractAsyncClient::Settings settings;
-        settings.sendTimeout = rwTimeout;
-        settings.recvTimeout = rwTimeout;
-        hpm::api::MediatorConnector::setStunClientSettings(settings);
-    }
-
-    CloudServerSocketGenerator cloudServerSocketGenerator;
-    test::RandomDataTcpServer server(
-        test::TestTrafficLimitType::none, 0, transmissionMode, true);
-
     network::SocketAddress localAddress(network::HostAddress::localhost);
     if (const auto address = args.get("local-address"))
         localAddress = network::SocketAddress(*address);
 
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> localServer;
+    if (args.get("udt"))
+        localServer = std::make_unique<nx::network::UdtStreamServerSocket>(AF_INET);
+    else
+        localServer = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
+
+    if (!localServer->setReuseAddrFlag(true) ||
+        !localServer->bind(localAddress))
     {
-        std::unique_ptr<AbstractStreamServerSocket> localServer;
-        if (args.get("udt"))
-            localServer = std::make_unique<UdtStreamServerSocket>(AF_INET);
-        else
-            localServer = std::make_unique<TCPServerSocket>(AF_INET);
-
-        if (!localServer->setReuseAddrFlag(true) ||
-            !localServer->bind(localAddress))
-        {
-            std::cout << "Error: Unable to bind to " << localAddress.toString().toStdString() << std::endl;
-            return 1;
-        }
-
-        localAddress = localServer->getLocalAddress();
-        NX_CRITICAL(multiServerSocket->addSocket(std::move(localServer)));
-        std::cout << "Listening on local " << (args.get("udt") ? "UDT" : "TCP")
-            << " address " << localAddress.toString().toStdString() << std::endl;
+        const auto errorCode = SystemError::getLastOSErrorCode();
+        throw std::runtime_error(
+            lm("Unable to bind to %1: %2")
+                .args(localAddress, SystemError::toString(errorCode)).toStdString());
     }
 
+    std::cout << "Listening on local " << (args.get("udt") ? "UDT" : "TCP")
+        << " address " << localServer->getLocalAddress().toStdString() << std::endl;
+
+    return localServer;
+}
+
+String makeServerName(const QString& prefix, size_t number)
+{
+    static const QString kFormat = QLatin1String("%1-%2");
+    return kFormat.arg(prefix).arg((uint)number, 5, 10, QLatin1Char('0')).toUtf8();
+}
+
+static void emulateCloudServerSockets(
+    const nx::utils::ArgumentParser& args,
+    CloudServerSocketGenerator* cloudServerSocketGenerator,
+    nx::network::MultipleServerSocket* multiServerSocket)
+{
+    const auto credentials = args.get("cloud-credentials");
+    if (!credentials)
+        return;
+
+    const auto cloudCredentials = credentials->split(":");
+    if (cloudCredentials.size() != 2)
+    {
+        throw std::runtime_error(
+            "Error: Parameter cloud-credentials MUST have format "
+                "system_id:authentication_key");
+    }
+
+    const String systemId = cloudCredentials[0].toUtf8();
+    const String authKey = cloudCredentials[1].toUtf8();
+
+    std::vector<String> serverIds;
+    QString serverId = QnUuid::createUuid().toSimpleString().toUtf8();
+    args.read("server-id", &serverId);
+    serverIds.push_back(serverId.toUtf8());
+
+    size_t serverCount = 1;
+    args.read("server-count", &serverCount);
+    for (size_t i = serverIds.size(); i < serverCount; ++i)
+        serverIds.push_back(makeServerName(serverId, i));
+
+    for (auto& id : serverIds)
+    {
+        auto socket = cloudServerSocketGenerator->make(systemId, authKey, id);
+        if (!multiServerSocket->addSocket(std::move(socket)))
+        {
+            throw std::runtime_error(
+                lm("Error: could not add server %1").args(id).toStdString());
+        }
+    }
+
+    if (!cloudServerSocketGenerator->registerOnMediatorSync())
+    {
+        throw std::runtime_error(
+            "Error: All sockets failed to listen on mediator");
+    }
+}
+
+static std::unique_ptr<nx::network::AbstractStreamServerSocket> initializeSslServer(
+    nx::network::test::TestTransmissionMode transmissionMode,
+    std::unique_ptr<nx::network::AbstractStreamServerSocket> serverSocket)
+{
+    if (transmissionMode == nx::network::test::TestTransmissionMode::spam)
+    {
+        throw std::runtime_error(
+            "Error: spam mode does not support SSL, use --ping");
+    }
+
+    const auto certificate = network::ssl::Engine::makeCertificateAndKey(
+        "cloud_connect_test_util", "US", "NX");
+
+    if (certificate.isEmpty())
+        throw std::runtime_error("Could not generate SSL certificate");
+
+    NX_CRITICAL(network::ssl::Engine::useCertificateAndPkey(certificate));
+
+    return std::make_unique<nx::network::deprecated::SslServerSocket>(
+        std::move(serverSocket),
+        false);
+}
+
+static void loadSettings(
+    const nx::utils::ArgumentParser& args,
+    nx::network::test::TestTransmissionMode* transmissionMode,
+    std::chrono::milliseconds* rwTimeout)
+{
+    if (args.get("ping"))
+        *transmissionMode = nx::network::test::TestTransmissionMode::pong;
+
+    *rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
+    QString value;
+    if (args.read("rw-timeout", &value))
+        *rwTimeout = nx::utils::parseTimerDuration(value, *rwTimeout);
+
+    nx::network::stun::AbstractAsyncClient::Settings settings;
+    settings.sendTimeout = *rwTimeout;
+    settings.recvTimeout = *rwTimeout;
+    hpm::api::MediatorConnector::setStunClientSettings(settings);
+}
+
+int runInListenMode(const nx::utils::ArgumentParser& args)
+{
+    using namespace nx::network;
+
+    const auto beginTime = std::chrono::steady_clock::now();
+
+    auto transmissionMode = test::TestTransmissionMode::spam;
+    std::chrono::milliseconds rwTimeout =
+        nx::network::test::TestConnection::kDefaultRwTimeout;
+    loadSettings(args, &transmissionMode, &rwTimeout);
+
+    std::cout << lm("Server mode: %1").args(transmissionMode).toStdString() << std::endl;
+
+    auto multiServerSocket = new network::MultipleServerSocket();
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
+    const auto guard = makeScopeGuard(
+        [&serverSocket]()
+        {
+            if (serverSocket)
+                serverSocket->pleaseStopSync();
+        });
+
+    auto localServer = initializeLocalServer(args);
+    auto localServerPtr = localServer.get();
+    NX_CRITICAL(multiServerSocket->addSocket(std::move(localServer)));
+
+    CloudServerSocketGenerator cloudServerSocketGenerator;
     if (const auto address = args.get("forward-address"))
     {
         // TODO: uncoment when CLOUD-730 is fixed
         // cloudServerSocketGenerator.connectionMethonds = hpm::api::ConnectionMethod::none;
 
         cloudServerSocketGenerator.forwardedAddress =
-            address->isEmpty() ? localAddress : network::SocketAddress(*address);
+            address->isEmpty()
+            ? localServerPtr->getLocalAddress()
+            : network::SocketAddress(*address);
 
         std::cout << "Mediator address forwarding: "
             << cloudServerSocketGenerator.forwardedAddress->toString().toStdString() << std::endl;
     }
 
-    if (const auto credentials = args.get("cloud-credentials"))
-    {
-        const auto cloudCredentials = credentials->split(":");
-        if (cloudCredentials.size() != 2)
-        {
-            std::cerr << "Error: Parameter cloud-credentials MUST have format "
-                << "system_id:authentication_key" << std::endl;
-            return 16;
-        }
-
-        String systemId = cloudCredentials[0].toUtf8();
-        String authKey = cloudCredentials[1].toUtf8();
-        std::vector<String> serverIds;
-        {
-            QString serverId = QnUuid::createUuid().toSimpleString().toUtf8();
-            args.read("server-id", &serverId);
-            serverIds.push_back(serverId.toUtf8());
-
-            size_t serverCount = 1;
-            args.read("server-count", &serverCount);
-            for (size_t i = serverIds.size(); i < serverCount; i++)
-                serverIds.push_back(makeServerName(serverId, i));
-        }
-
-        for (auto& id : serverIds)
-        {
-            auto socket = cloudServerSocketGenerator.make(systemId, authKey, id);
-            if (!multiServerSocket->addSocket(std::move(socket)))
-            {
-                std::cout << "Error: could not add server " << id.data() << std::endl;
-                return 15;
-            }
-        }
-
-        if (!cloudServerSocketGenerator.registerOnMediatorSync())
-        {
-            std::cerr << "Error: All sockets failed to listen on mediator. " << std::endl;
-            return 2;
-        }
-    }
+    emulateCloudServerSockets(args, &cloudServerSocketGenerator, multiServerSocket);
 
     if (args.get("ssl"))
-    {
-        if (transmissionMode == test::TestTransmissionMode::spam)
-        {
-            std::cerr << "Error: spam mode does not support SSL, use --ping" << std::endl;
-            return 7;
-        }
+        serverSocket = initializeSslServer(transmissionMode, std::move(serverSocket));
 
-        const auto certificate = network::ssl::Engine::makeCertificateAndKey(
-            "cloud_connect_test_util", "US", "NX");
-
-        if (certificate.isEmpty())
-        {
-            std::cerr << "Could not generate SSL certificate" << std::endl;
-            return 4;
-        }
-
-        NX_CRITICAL(network::ssl::Engine::useCertificateAndPkey(certificate));
-        serverSocket = std::make_unique<deprecated::SslServerSocket>(std::move(serverSocket), false);
-    }
-
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::none, 0, transmissionMode, true);
     server.setServerSocket(std::move(serverSocket));
     if (!server.start(rwTimeout))
     {
@@ -381,12 +420,6 @@ int printStatsAndWaitForCompletion(
     }
 
     return 0;
-}
-
-String makeServerName(const QString& prefix, size_t number)
-{
-    static const QString kFormat = QLatin1String("%1-%2");
-    return kFormat.arg(prefix).arg((uint) number, 5, 10, QLatin1Char('0')).toUtf8();
 }
 
 void limitStringList(QStringList* list)

@@ -172,11 +172,6 @@ enum IDType
     BetaVersionMessageAction,
 
     /**
-     * Displays eula acceptance dialog.
-     */
-    ShowEulaAction,
-
-    /**
      * Displays HiDpi screens support warning dialog.
      */
     HiDpiSupportMessageAction,
@@ -481,7 +476,6 @@ enum IDType
      * Saves selected local layout.
      */
     SaveLocalLayoutAction,
-    SaveLocalLayoutAsAction,
 
     /**
      * Saves selected layout under another name.
@@ -978,6 +972,11 @@ enum IDType
      * Exports selected range.
      */
     ExportVideoAction,
+
+    /**
+     * Exports selected bookmark.
+     */
+    ExportBookmarkAction,
 
     /**
      * Bookmark selected range.

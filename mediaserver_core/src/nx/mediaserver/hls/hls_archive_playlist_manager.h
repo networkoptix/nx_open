@@ -15,13 +15,13 @@ namespace nx {
 namespace mediaserver {
 namespace hls {
 
-//!Generates sliding chunk list for archive playback
-/*!
-    From hls point view this class generates "LIVE" playlist
-    \note It is necessary to make archive playlist sliding since archive can be very long and playlist would be quite large (~ 25Mb for a month archive)
-*/
-class ArchivePlaylistManager
-:
+/**
+ * Generates sliding chunk list for archive playback.
+ * From hls point view this class generates "LIVE" playlist
+ * NOTE: It is necessary to make archive playlist sliding since archive can be very long
+ *   and playlist would be quite large (~ 25Mb for a month archive).
+ */
+class ArchivePlaylistManager:
     public AbstractPlaylistManager
 {
 public:
@@ -30,19 +30,18 @@ public:
         qint64 startTimestamp,
         unsigned int maxChunkNumberInPlaylist,
         qint64 targetDurationUsec,
-        MediaQuality streamQuality );
+        MediaQuality streamQuality);
     virtual ~ArchivePlaylistManager();
 
     bool initialize();
 
-    //!Implementation of AbstractPlaylistManager::generateChunkList
     virtual size_t generateChunkList(
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
-        bool* const endOfStreamReached ) const override;
-    //!Implementation of AbstractPlaylistManager::getMaxBitrate
+        bool* const endOfStreamReached) const override;
     virtual int getMaxBitrate() const override;
 
     CameraDiagnostics::Result lastError() const;
+
 private:
     const QnSecurityCamResourcePtr m_camResource;
     qint64 m_startTimestamp;

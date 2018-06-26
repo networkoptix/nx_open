@@ -22,6 +22,7 @@
 
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/api/analytics/supported_events.h>
+#include <nx/vms/event/analytics_helper.h>
 
 #include <utils/email/email.h>
 
@@ -238,7 +239,7 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 
 bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
 {
-    return !camera->analyticsSupportedEvents().isEmpty();
+    return !nx::vms::event::AnalyticsHelper::supportedAnalyticsEvents({camera}).isEmpty();
 }
 
 QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)
@@ -248,6 +249,24 @@ QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const 
     int invalid = invalidResourcesCount<QnCameraAnalyticsPolicy>(cameras);
     return genericCameraText<QnCameraAnalyticsPolicy>(cameras, detailed,
         tr("Analytics is not available for %1"), invalid);
+}
+
+//-------------------------------------------------------------------------------------------------
+// QnFullscreenCameraPolicy
+//-------------------------------------------------------------------------------------------------
+
+bool QnFullscreenCameraPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+{
+    return true;
+}
+
+QString QnFullscreenCameraPolicy::getText(const QnResourceList& resources, const bool /*detailed*/)
+{
+    const auto cameras = resources.filtered<QnVirtualCameraResource>();
+    if (cameras.size() != 1)
+        return tr("Select exactly one camera");
+
+    return getShortResourceName(cameras.first());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -431,12 +450,22 @@ bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 namespace QnBusiness {
 
 // TODO: #vkutin It's here until full refactoring.
-bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
+bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
     const QnUserResourcePtr& user)
 {
     if (!user)
         return false;
 
+    switch (action->actionType())
+    {
+        case nx::vms::event::ActionType::fullscreenCameraAction:
+        case nx::vms::event::ActionType::exitFullscreenAction:
+            return true;
+        default:
+            break;
+    }
+
+    const auto params = action->getParams();
     if (params.allUsers)
         return true;
 

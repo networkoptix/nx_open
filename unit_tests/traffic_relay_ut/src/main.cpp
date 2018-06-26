@@ -3,6 +3,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/ssl/ssl_engine.h>
 
 #define USE_GMOCK
 #include <nx/network/test_support/run_test.h>

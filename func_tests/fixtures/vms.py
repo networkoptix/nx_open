@@ -9,11 +9,10 @@ from pylru import lrudecorator
 
 from framework.networking import setup_flat_network
 from framework.os_access.local_access import local_access
-from framework.os_access.posix_shell import local_shell
-from framework.registry import Registry
 from framework.serialize import load
 from framework.vms.factory import VMFactory
 from framework.vms.hypervisor.virtual_box import VirtualBox
+from framework.vms.vm_type import VMType
 
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
@@ -21,6 +20,7 @@ DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 
 @lrudecorator(1)
 def vm_types_configuration():
+    # It's a function, not a fixture, because used when parameters are generated.
     path = Path(__file__).with_name('configuration.yaml')
     configuration = load(path.read_text())
     return configuration['vm_types']
@@ -42,7 +42,7 @@ def pytest_addoption(parser):
     parser.addoption('--vm-host-key', help=(
         'Identity file to use for ssh to login to VirtualBox host'))
     parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR, help=(
-        'Working directory at host with VirtualBox, used to store vagrant files'))
+        'Working directory at host with VirtualBox'))
 
 
 @pytest.fixture(scope='session')
@@ -65,11 +65,6 @@ def vm_host(request):
 
 
 @pytest.fixture(scope='session')
-def host_posix_shell():
-    return local_shell
-
-
-@pytest.fixture(scope='session')
 def host_os_access():
     return local_access
 
@@ -80,20 +75,16 @@ def hypervisor(host_os_access):
 
 
 @pytest.fixture(scope='session')
-def vm_registries(host_posix_shell, host_os_access):
+def vm_types(hypervisor):
     return {
-        vm_type: Registry(
-            host_posix_shell,
-            host_os_access.Path(vm_type_configuration['registry_path']).expanduser(),
-            vm_type_configuration['name_format'].format(vm_index='{index}'),  # Registry doesn't know about VMs.
-            vm_type_configuration['limit'],
-            )
-        for vm_type, vm_type_configuration in vm_types_configuration().items()}
+        vm_type_name: VMType(hypervisor, **vm_type_conf['vm'])
+        for vm_type_name, vm_type_conf in vm_types_configuration().items()
+        }
 
 
 @pytest.fixture(scope='session')
-def vm_factory(request, hypervisor, vm_registries):
-    factory = VMFactory(vm_types_configuration(), hypervisor, vm_registries)
+def vm_factory(request, hypervisor, vm_types):
+    factory = VMFactory(vm_types_configuration(), hypervisor, vm_types)
     if request.config.getoption('--clean'):
         factory.cleanup()
     return factory
@@ -115,9 +106,21 @@ def two_vm_types(request):
 
 
 @pytest.fixture(scope='session')
-def one_vm(one_vm_type, vm_factory):
-    with vm_factory.allocated_vm('single-{}'.format(one_vm_type), vm_type=one_vm_type) as vm:
+def linux_vm(vm_factory):
+    with vm_factory.allocated_vm('single-linux', vm_type='linux') as vm:
         yield vm
+
+
+@pytest.fixture(scope='session')
+def windows_vm(vm_factory):
+    with vm_factory.allocated_vm('single-windows', vm_type='windows') as vm:
+        yield vm
+
+
+@pytest.fixture(scope='session')
+def one_vm(request, one_vm_type):
+    # TODO: If new VM type is added, create separate fixture for it or use factory here.
+    return request.getfixturevalue(one_vm_type + '_vm')
 
 
 @pytest.fixture(scope='session')

@@ -14,7 +14,8 @@ struct QnDataProviderFactory::Private
         Data(QByteArray&& className, DataProviderGenerator&& generator):
             className(std::move(className)),
             generator(std::move(generator))
-        {}
+        {
+        }
     };
 
     std::list<Data> data;

@@ -43,8 +43,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonMod
 {
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
         qnEventRuleConnector, &nx::mediaserver::event::EventConnector::at_cameraDisconnected);
-    m_serverOfflineTimeout = qnServerModule->roSettings()->value(
-        "redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
+    m_serverOfflineTimeout = qnServerModule->settings().redundancyTimeout() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_startupTimer.restart();
 }

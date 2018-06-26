@@ -1,5 +1,7 @@
 #include "server_db.h"
 
+#include <chrono>
+
 #include <QtCore/QtEndian>
 
 #include <api/helpers/event_log_request_data.h>
@@ -26,6 +28,9 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+
+using std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
 
 using namespace nx;
 
@@ -312,9 +317,7 @@ QnServerDb::QnServerDb(QnCommonModule* commonModule):
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
-    const QString fileName =
-        closeDirPath(
-            qnServerModule->roSettings()->value("eventsDBFilePath", getDataDirectory()).toString())
+    const QString fileName = closeDirPath(qnServerModule->settings().eventsDBFilePath())
         + QString(lit("mserver.sqlite"));
     addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())
@@ -955,7 +958,9 @@ vms::event::ActionDataList QnServerDb::getActions(
             || actionData.eventParams.eventType == vms::api::cameraInputEvent
             || actionData.eventParams.eventType == vms::api::analyticsSdkEvent
             || actionData.actionType == vms::api::bookmarkAction
-            || actionData.actionType == vms::api::acknowledgeAction)
+            || actionData.actionType == vms::api::ActionType::acknowledgeAction
+            || actionData.actionType == vms::api::ActionType::fullscreenCameraAction
+            )
         {
             QnNetworkResourcePtr camRes =
                 resourcePool()->getResourceById<QnNetworkResource>(actionData.eventParams.eventResourceId);
@@ -1019,7 +1024,9 @@ void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
         if (eventType == vms::api::EventType::cameraMotionEvent
             || eventType == vms::api::EventType::cameraInputEvent
             || actionType == vms::api::ActionType::bookmarkAction
-            || actionType == vms::api::ActionType::acknowledgeAction)
+            || actionType == vms::api::ActionType::acknowledgeAction
+            || actionType == vms::api::ActionType::fullscreenCameraAction
+            )
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =
@@ -1106,9 +1113,9 @@ bool QnServerDb::getBookmarks(
 
     if (filter.isValid())
     {
-        if (filter.startTimeMs > 0)
+        if (filter.startTimeMs > 0ms)
             addGetBookmarksFilter("endTimeMs >= :minStartTimeMs", &filterText, &bindings);
-        if (filter.endTimeMs < INT64_MAX)
+        if (filter.endTimeMs < milliseconds(INT64_MAX))
             addGetBookmarksFilter("startTimeMs <= :maxEndTimeMs", &filterText, &bindings);
     }
 
@@ -1168,8 +1175,8 @@ bool QnServerDb::getBookmarks(
             ++index;
         }
 
-        checkedBind(":minStartTimeMs", filter.startTimeMs);
-        checkedBind(":maxEndTimeMs", filter.endTimeMs);
+        checkedBind(":minStartTimeMs", (qint64) filter.startTimeMs.count());
+        checkedBind(":maxEndTimeMs", (qint64) filter.endTimeMs.count());
         //checkedBind(":minDurationMs", filter.minDurationMs);
 
         const auto getFilterValue =

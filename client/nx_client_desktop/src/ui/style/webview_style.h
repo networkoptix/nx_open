@@ -5,7 +5,14 @@ class QGraphicsWebView;
 
 namespace NxUi {
 
-void setupWebViewStyle(QWebView* webView);
-void setupWebViewStyle(QGraphicsWebView* webView);
+enum class WebViewStyle
+{
+    common,
+    eula
+};
 
-}
+QPalette createWebViewPalette(WebViewStyle style = WebViewStyle::common);
+void setupWebViewStyle(QWebView* webView, WebViewStyle style = WebViewStyle::common);
+void setupWebViewStyle(QGraphicsWebView* webView, WebViewStyle style = WebViewStyle::common);
+
+} // namespace NxUi

@@ -4,7 +4,7 @@ from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.posix_shell import SSH
 from framework.os_access.ssh_path import SSHPath
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class MoveLockAlreadyAcquired(Exception):
@@ -16,19 +16,19 @@ class MoveLockNotAcquired(Exception):
 
 
 class MoveLock(object):
-    def __init__(self, ssh_access, path, timeout_sec=10):
-        self._ssh_access = ssh_access  # type: SSH
+    def __init__(self, ssh, path, timeout_sec=10):
+        self._ssh = ssh  # type: SSH
         self._path = path  # type: SSHPath
         self._timeout_sec = timeout_sec
 
     def __repr__(self):
-        return '<{} on {}>'.format(self.__class__.__name__, self._ssh_access)
+        return '<{} on {}>'.format(self.__class__.__name__, self._ssh)
 
     def __enter__(self):
         # Implemented as single bash script to speedup locking.
-        logger.info("Acquire lock at %r", self._path)
+        _logger.info("Acquire lock at %r", self._path)
         try:
-            self._ssh_access.run_sh_script(
+            self._ssh.run_sh_script(
                 # language=Bash
                 '''
                     temp_file="$(mktemp)"
@@ -55,9 +55,9 @@ class MoveLock(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Implemented as single bash script to speedup locking.
-        logger.info("Release lock at %r", self._path)
+        _logger.info("Release lock at %r", self._path)
         try:
-            self._ssh_access.run_sh_script(
+            self._ssh.run_sh_script(
                 # language=Bash
                 '''
                     [ -e "$LOCK_FILE" ] || exit 3

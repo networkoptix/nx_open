@@ -38,7 +38,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     {
         const nx::network::SocketAddress endpoint(addressList.first().toString(), serverData.port);
         const auto url = nx::network::url::Builder()
-            .setScheme(apiUrlScheme(serverData.sslAllowed))
+            .setScheme(nx::network::http::urlSheme(serverData.sslAllowed))
             .setEndpoint(endpoint);
         setUrl(url.toString());
     }
@@ -74,6 +74,20 @@ Qn::ResourceStatus QnFakeMediaServerResource::getStatus() const
 {
     QnMutexLocker lock(&m_mutex);
     return static_cast<Qn::ResourceStatus>(m_serverData.status);
+}
+
+nx::utils::Url QnFakeMediaServerResource::getApiUrl() const
+{
+    auto url = base_type::getApiUrl();
+    url.setUserName(m_authenticator.user());
+    url.setPassword(m_authenticator.password());
+    return url;
+}
+
+void QnFakeMediaServerResource::setAuthenticator(const QAuthenticator& authenticator)
+{
+    m_authenticator = authenticator;
+    apiConnection()->setUrl(getApiUrl());
 }
 
 void QnFakeMediaServerResource::updateInternal(const QnResourcePtr& /*other*/, Qn::NotifierList& /*notifiers*/)

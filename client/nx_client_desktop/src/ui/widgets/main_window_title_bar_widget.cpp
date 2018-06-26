@@ -1,5 +1,7 @@
 #include "main_window_title_bar_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <QtGui/QDragMoveEvent>
 
 #include <QtWidgets/QBoxLayout>
@@ -104,13 +106,17 @@ public:
     void setSkipDoubleClick();
 
 public:
-    ToolButton* mainMenuButton;
-    QnLayoutTabBar* tabBar;
-    ToolButton* newTabButton;
-    ToolButton* currentLayoutsButton;
-    QnCloudStatusPanel* cloudPanel;
+    ToolButton* mainMenuButton = nullptr;
+    QnLayoutTabBar* tabBar = nullptr;
+    ToolButton* newTabButton = nullptr;
+    ToolButton* currentLayoutsButton = nullptr;
+    QnCloudStatusPanel* cloudPanel = nullptr;
     std::unique_ptr<MimeData> mimeData;
-    bool skipDoubleClickFlag;
+    bool skipDoubleClickFlag = false;
+
+    /** There are some rare scenarios with looping menus. */
+    bool isMenuOpened = false;
+
     QSharedPointer<QMenu> mainMenuHolder;
 };
 
@@ -118,14 +124,7 @@ QnMainWindowTitleBarWidgetPrivate::QnMainWindowTitleBarWidgetPrivate(
     QnMainWindowTitleBarWidget* parent)
     :
     QObject(parent),
-    q_ptr(parent),
-    mainMenuButton(nullptr),
-    tabBar(nullptr),
-    newTabButton(nullptr),
-    currentLayoutsButton(nullptr),
-    cloudPanel(nullptr),
-    skipDoubleClickFlag(false),
-    mainMenuHolder()
+    q_ptr(parent)
 {
 }
 
@@ -164,6 +163,11 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             Q_D(QnMainWindowTitleBarWidget);
             if (!isWidgetVisible(d->mainMenuButton))
                 return;
+
+            if (d->isMenuOpened)
+                return;
+            QScopedValueRollback<bool> guard(d->isMenuOpened, true);
+
             static const QPoint kVerticalOffset(0, 2);
             d->mainMenuHolder.reset(menu()->newMenu(action::MainScope, nullptr));
             d->mainMenuButton->setDown(true);
@@ -207,11 +211,16 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     connect(d->currentLayoutsButton, &ToolButton::justPressed, this,
         [this]()
         {
+            Q_D(QnMainWindowTitleBarWidget);
+
+            if (d->isMenuOpened)
+                return;
+            QScopedValueRollback<bool> guard(d->isMenuOpened, true);
+
             QScopedPointer<QMenu> layoutsMenu(menu()->newMenu(
                 action::OpenCurrentUserLayoutMenu,
                 action::TitleBarScope));
 
-            Q_D(const QnMainWindowTitleBarWidget);
             executeButtonMenu(d->currentLayoutsButton, layoutsMenu.data());
         });
 

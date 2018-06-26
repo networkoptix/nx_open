@@ -1,10 +1,11 @@
 #pragma once
 
+#include <array>
+#include <chrono>
+
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 #include <QtCore/QTime>
-
-#include <array>
 
 #include <nx/utils/uuid.h>
 
@@ -60,6 +61,8 @@ class QnWorkbenchNavigator:
     Q_OBJECT;
 
     typedef Connective<QObject> base_type;
+
+    using milliseconds = std::chrono::milliseconds;
 
     Q_PROPERTY(bool hasArchive READ hasArchive NOTIFY hasArchiveChanged)
 public:
@@ -235,7 +238,7 @@ protected slots:
 
     void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
 
-    void at_timeSlider_valueChanged(qint64 value);
+    void at_timeSlider_valueChanged(milliseconds value);
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
     void at_timeSlider_selectionPressed();

@@ -184,7 +184,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         }
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap(lit("events/analytics.png")));
+            return QVariant::fromValue(qnSkin->pixmap(lit("text_buttons/analytics.png")));
 
         case Qn::DescriptionTextRole:
             return description(object);
@@ -773,14 +773,10 @@ void AnalyticsSearchListModel::Private::executePluginAction(
 
             const auto reply = result.deserialized<AnalyticsActionResult>();
             if (!reply.messageToUser.isEmpty())
-            {
                 QnMessageBox::success(q->mainWindowWidget(), reply.messageToUser);
-            }
 
             if (!reply.actionUrl.isEmpty())
-            {
-                WebViewDialog::showUrl(reply.actionUrl);
-            }
+                WebViewDialog::showUrl(QUrl(reply.actionUrl));
         };
 
     AnalyticsAction actionData;

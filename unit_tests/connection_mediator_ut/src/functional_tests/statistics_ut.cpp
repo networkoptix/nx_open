@@ -113,7 +113,7 @@ protected:
     }
 
 private:
-    boost::optional<nx::network::http::StringType> m_responseBody;
+    std::optional<nx::network::http::StringType> m_responseBody;
     stats::Statistics m_serverStatistics;
     api::ListeningPeers m_prevListeningPeersResponse;
     AbstractCloudDataProvider::System m_system;

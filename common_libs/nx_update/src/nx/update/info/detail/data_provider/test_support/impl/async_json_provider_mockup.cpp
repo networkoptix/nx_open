@@ -96,17 +96,16 @@ class ResponseComposer
 {
 public:
     ResponseComposer(
-        const QString& customization,
-        const QString& version,
+        const QString& updatePrefix,
+        const QString& build,
         const std::vector<UpdateTestData>& updateTestDataList)
     {
         auto testUpdateIt = std::find_if(
             updateTestDataList.cbegin(),
             updateTestDataList.cend(),
-            [&customization, &version](const UpdateTestData& updateTestData)
+            [&updatePrefix, &build](const UpdateTestData& updateTestData)
             {
-                return updateTestData.customization == customization
-                    && updateTestData.version == version;
+                return updateTestData.updatePrefix == updatePrefix && updateTestData.build == build;
             });
 
         if (testUpdateIt == updateTestDataList.cend())
@@ -146,14 +145,12 @@ void AsyncJsonProviderMockup::getUpdatesMetaInformation()
             m_handler, ResultCode::ok, metaDataJson()));
 }
 
-void AsyncJsonProviderMockup::getSpecificUpdateData(
-    const QString& customization,
-    const QString& version)
+void AsyncJsonProviderMockup::getSpecificUpdateData(const QString& updatePrefix, const QString& build)
 {
     using namespace detail::data_provider;
     using namespace std::placeholders;
 
-    ResponseComposer responseComposer(customization, version, updateTestDataList());
+    ResponseComposer responseComposer(updatePrefix, build, updateTestDataList());
     m_executor->submit(
         std::bind(
             &AbstractAsyncRawDataProviderHandler::onGetSpecificUpdateInformationDone,

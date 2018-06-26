@@ -55,12 +55,14 @@ QString QnVirtualCameraResource::getUniqueId() const
 
 QStringList QnVirtualCameraResource::searchFilters() const
 {
-    return
-        QnNetworkResource::searchFilters()
+    QStringList result = QnNetworkResource::searchFilters()
         << getModel()
         << getFirmware()
-        << getVendor()
-        << getLogicalId();
+        << getVendor();
+    const int logicalId = this->logicalId();
+    if (logicalId > 0)
+        result << QString::number(logicalId);
+    return result;
 }
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
@@ -110,7 +112,7 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url,
     Qn::ConnectionRole role,
     bool save)
 {
-    if (!storeUrlForRole(role) || url.isEmpty())
+    if (!storeUrlForRole(role))
         return;
 
     auto cachedUrl = m_cachedStreamUrls.find(role);

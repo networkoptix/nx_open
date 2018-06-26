@@ -16,7 +16,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/dialogs/new_wearable_camera_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -26,6 +25,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
+#include <nx/client/desktop/ui/workbench/extensions/workbench_progress_manager.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
 #include <nx/client/desktop/utils/wearable_state.h>
 #include <nx/client/desktop/utils/wearable_payload.h>
@@ -100,6 +100,21 @@ QnWorkbenchWearableHandler::QnWorkbenchWearableHandler(QObject* parent):
         &QnWorkbenchWearableHandler::at_context_userChanged);
     connect(qnClientModule->wearableManager(), &WearableManager::stateChanged, this,
         &QnWorkbenchWearableHandler::at_wearableManager_stateChanged);
+
+    const auto& manager = context()->instance<WorkbenchProgressManager>();
+    connect(manager, &WorkbenchProgressManager::cancelRequested, this,
+        [this](const QnUuid& progressId)
+        {
+            if (const auto camera = cameraByProgressId(progressId))
+                context()->menu()->trigger(ui::action::CancelWearableCameraUploadsAction, camera);
+        });
+
+    connect(manager, &WorkbenchProgressManager::interactionRequested, this,
+        [this](const QnUuid& progressId)
+        {
+            if (const auto camera = cameraByProgressId(progressId))
+                context()->menu()->trigger(ui::action::CameraSettingsAction, camera);
+        });
 }
 
 QnWorkbenchWearableHandler::~QnWorkbenchWearableHandler()
@@ -163,7 +178,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
     filters << tr("Video (%1)").arg(kVideoExtensions.join(L' '));
     filters << tr("All files (*.*)");
 
-    QStringList paths = QnFileDialog::getOpenFileNames(
+    QStringList paths = QFileDialog::getOpenFileNames(
         mainWindowWidget(),
         tr("Open Wearable Camera Recordings..."),
         QString(),
@@ -175,7 +190,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFileAction_triggered()
         return;
 
     // TODO: #wearable requested by rvasilenko as copypaste from totalcmd doesn't work without
-    // this line. Maybe move directly to QnFileDialog?
+    // this line. Maybe move directly to QFileDialog?
     for(QString& path: paths)
         path = path.trimmed();
 
@@ -194,7 +209,7 @@ void QnWorkbenchWearableHandler::at_uploadWearableCameraFolderAction_triggered()
     if (!camera || !camera->getParentServer())
         return;
 
-    QString path = QnFileDialog::getExistingDirectory(mainWindowWidget(),
+    QString path = QFileDialog::getExistingDirectory(mainWindowWidget(),
         tr("Open Wearable Camera Recordings..."),
         QString(),
         QnCustomFileDialog::directoryDialogOptions()
@@ -456,20 +471,24 @@ void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableS
 {
     QnSecurityCamResourcePtr camera =
         resourcePool()->getResourceById<QnSecurityCamResource>(state.cameraId);
-    if (!camera)
-        return;
 
-    /* Fire an error only on upload failure. */
+    if (!camera)
+    {
+        removeProgress(state.cameraId);
+        return;
+    }
+
+    // Fire an error only on upload failure.
     if (state.error == WearableState::UploadFailed)
     {
         QnMessageBox::critical(mainWindowWidget(),
             tr("Could not finish upload to %1").arg(camera->getName()),
             tr("Make sure there is enough space on server storage."));
+        removeProgress(state.cameraId);
         return;
     }
 
-
-    /* Update chunks if we've just finished consume request. */
+    // Update chunks if we've just finished consume request.
     if (state.consumeProgress == 100 && state.status == WearableState::Consuming)
     {
         QnCachingCameraDataLoaderPtr loader =
@@ -477,6 +496,60 @@ void QnWorkbenchWearableHandler::at_wearableManager_stateChanged(const WearableS
         loader->invalidateCachedData();
         loader->load(/*forced=*/true);
     }
+
+    // Update progress.
+    switch (state.status)
+    {
+        case WearableState::Locked:
+        case WearableState::Uploading:
+        case WearableState::Consuming:
+        {
+            const auto& manager = context()->instance<WorkbenchProgressManager>();
+            const auto progressId = ensureProgress(state.cameraId);
+            manager->setDescription(progressId, camera->getName());
+            manager->setCancellable(progressId, state.isCancellable());
+            manager->setProgress(progressId, state.progress() / 100.0);
+            break;
+        }
+
+        default:
+        {
+            removeProgress(state.cameraId);
+            break;
+        }
+    }
+}
+
+QnUuid QnWorkbenchWearableHandler::ensureProgress(const QnUuid& cameraId)
+{
+    const auto iter = m_currentProgresses.find(cameraId);
+    if (iter != m_currentProgresses.end())
+        return iter.value();
+
+    const auto progressId =
+        context()->instance<WorkbenchProgressManager>()->add(tr("Uploading footage"));
+
+    m_currentProgresses.insert(cameraId, progressId);
+    return progressId;
+}
+
+void QnWorkbenchWearableHandler::removeProgress(const QnUuid& cameraId)
+{
+    const auto iter = m_currentProgresses.find(cameraId);
+    if (iter == m_currentProgresses.end())
+        return;
+
+    context()->instance<WorkbenchProgressManager>()->remove(iter.value());
+    m_currentProgresses.erase(iter);
+}
+
+QnSecurityCamResourcePtr QnWorkbenchWearableHandler::cameraByProgressId(
+    const QnUuid& progressId) const
+{
+    const auto cameraId = m_currentProgresses.key(progressId); //< No need of extra performance here.
+    return cameraId.isNull()
+        ? QnSecurityCamResourcePtr()
+        : resourcePool()->getResourceById<QnSecurityCamResource>(cameraId);
 }
 
 QString QnWorkbenchWearableHandler::calculateExtendedErrorMessage(const WearablePayload& upload)

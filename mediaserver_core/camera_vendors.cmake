@@ -46,7 +46,7 @@ set(camera_vendors
     desktop_camera
 )
 
-if(NOT targetDevice MATCHES "android|ios|edge1")
+if(NOT targetDevice MATCHES "edge1")
     nx_enable_camera_vendor_old(onvif)
     nx_enable_camera_vendor_old(axis)
     nx_enable_camera_vendor_old(acti)
@@ -91,7 +91,7 @@ foreach(vendor ${camera_vendors})
     elseif(vendor IN_LIST _enabled_camera_vendors_old)
         continue()
     else()
-        list(APPEND vendor_source_exclusions src/plugins/resource/${vendor}/)
+        list(APPEND vendor_source_exclusions plugins/resource/${vendor}/)
     endif()
 endforeach()
 

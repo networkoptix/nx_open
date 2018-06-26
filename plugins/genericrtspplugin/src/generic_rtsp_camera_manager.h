@@ -17,9 +17,7 @@
 
 class GenericRTSPMediaEncoder;
 
-class GenericRTSPCameraManager
-:
-    public nxcip::BaseCameraManager3
+class GenericRTSPCameraManager: public nxcip::BaseCameraManager3
 {
 public:
     GenericRTSPCameraManager( const nxcip::CameraInfo& info );
@@ -76,13 +74,14 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     /*!
-        Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
+        Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
     nxpt::ScopedRef<GenericRTSPPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
-    std::unique_ptr<GenericRTSPMediaEncoder> m_encoder;
+    static const int kEncodersCount = 2;
+    std::unique_ptr<GenericRTSPMediaEncoder> m_encoder[kEncodersCount];
 };
 
 #endif  //GENERIC_RTSP_CAMERA_MANAGER_H

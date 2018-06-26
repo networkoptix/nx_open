@@ -1,6 +1,8 @@
 #include "password_analyzer.h"
 #include "password_analyzer_p.h"
 
+#include <nx/utils/literal.h>
+
 #include <numeric>
 #include <string>
 #include <array>
@@ -76,6 +78,29 @@ bool hasConsecutiveSequence(const QString& password,
 
 namespace nx {
 namespace utils {
+
+QString toString(PasswordStrength strength)
+{
+    switch (strength)
+    {
+        case PasswordStrength::Good: return lit("good");
+        case PasswordStrength::Fair: return lit("fair");
+        case PasswordStrength::Common: return lit("common");
+        case PasswordStrength::Weak: return lit("weak");
+        case PasswordStrength::Short: return lit("short");
+        case PasswordStrength::Conseq: return lit("consecutive sequence of characters");
+        case PasswordStrength::Repeat: return lit("repeating characters");
+        case PasswordStrength::Long: return lit("too much characters");
+        case PasswordStrength::Incorrect: return lit("invalid characters");
+        case PasswordStrength::IncorrectCamera: return lit("invalid characters for camera");
+        case PasswordStrength::WeakAndFair: return lit("weak and still short");
+        case PasswordStrength::WeakAndGood: return lit("good but weak");
+    }
+
+    const auto result = lit("IncorrectEnumValue=%1").arg(static_cast<int>(strength));
+    NX_ASSERT(false, result);
+    return result;
+}
 
 const QByteArray PasswordLimitations::kAllowedSymbols = "~!@#$%^&*()-=_+[]{};:,.<>?`'\"|/\\";
 const QByteArray PasswordLimitations::kCameraAllowedSymbols = "~`!@#$%^*()_-+=|{}[].?/";
@@ -180,6 +205,21 @@ PasswordStrength cameraPasswordStrength(const QString& password)
         return PasswordStrength::Repeat;
 
     return fairPasswordCategory ? PasswordStrength::Fair : PasswordStrength::Good;
+}
+
+PasswordAcceptance passwordAcceptance(PasswordStrength strength)
+{
+    switch (strength)
+    {
+        case PasswordStrength::Good:
+            return PasswordAcceptance::Good;
+
+        case PasswordStrength::Fair:
+            return PasswordAcceptance::Acceptable;
+
+        default:
+            return PasswordAcceptance::Unacceptable;
+    }
 }
 
 } // namespace utils

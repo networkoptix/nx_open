@@ -56,11 +56,11 @@ class StartApplicationTask
 public:
     QnSoftwareVersion version;
     //!Command-line params to pass to application instance
-    QString appArgs;
+    QStringList appArgs;
     bool autoRestore;
 
     StartApplicationTask();
-    StartApplicationTask(const QnSoftwareVersion& _version, const QString& _appParams = QString());
+    StartApplicationTask(const QnSoftwareVersion& _version);
     StartApplicationTask(const QnSoftwareVersion& _version, const QStringList& _appParams);
 
     virtual QByteArray serialize() const override;

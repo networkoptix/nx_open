@@ -1740,7 +1740,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>카메라들의 IP 주소들, 서버들, 사용자들의 그룹 등</translation>
     </message>
   </context>
   <context>

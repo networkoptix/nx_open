@@ -10,7 +10,7 @@ import pytz
 from pylru import lrudecorator
 from pytz import utc
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class SimpleNamespace:
@@ -54,9 +54,9 @@ def is_list_inst(l, cls):
 
 
 def log_list(name, values):
-    log.debug('%s:', name)
+    _logger.debug('%s:', name)
     for i, value in enumerate(values):
-        log.debug('\t #%d: %s', i, value)
+        _logger.debug('\t #%d: %s', i, value)
 
 
 def quote(s, char='"'):
@@ -118,7 +118,10 @@ class RunningTime(object):
         return self._initial + (datetime.now(pytz.utc) - self._received_at)
 
     def is_close_to(self, other, threshold=timedelta(seconds=2)):
-        return abs(self.current - other.current) <= threshold + self.error + other.error
+        if isinstance(other, self.__class__):
+            return abs(self.current - other.current) <= threshold + self.error + other.error
+        else:
+            return abs(self.current - other) <= threshold + self.error
 
     def __str__(self):
         return '{} +/- {}'.format(self.current.strftime('%Y-%m-%d %H:%M:%S.%f %Z'), self.error.total_seconds())

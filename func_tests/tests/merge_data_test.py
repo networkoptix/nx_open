@@ -11,7 +11,7 @@ from framework.api_shortcuts import get_server_id
 from framework.installation.mediaserver import TimePeriod
 from framework.waiting import Wait
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize(('layout_file', 'target_alias', 'proxy_alias'), [

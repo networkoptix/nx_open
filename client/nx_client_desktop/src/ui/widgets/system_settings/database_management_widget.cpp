@@ -13,7 +13,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -110,7 +109,7 @@ void QnDatabaseManagementWidget::backupDb()
 
 void QnDatabaseManagementWidget::restoreDb()
 {
-    QString fileName = QnFileDialog::getOpenFileName(
+    QString fileName = QFileDialog::getOpenFileName(
         this,
         tr("Open Database Backup..."),
         qnSettings->lastDatabaseBackupDir(),

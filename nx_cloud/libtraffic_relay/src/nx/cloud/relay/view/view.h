@@ -9,6 +9,7 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 
 #include "authentication_manager.h"
+#include "get_post_tunnel_processor.h"
 
 namespace nx {
 namespace cloud {
@@ -37,6 +38,7 @@ public:
     void start();
 
     std::vector<network::SocketAddress> httpEndpoints() const;
+    std::vector<network::SocketAddress> httpsEndpoints() const;
 
     const MultiHttpServer& httpServer() const;
 
@@ -48,6 +50,9 @@ private:
     nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
+    std::vector<network::SocketAddress> m_httpEndpoint;
+    std::vector<network::SocketAddress> m_httpsEndpoint;
+    view::GetPostTunnelProcessor m_getPostTunnelProcessor;
 
     void registerApiHandlers();
     void registerCompatibilityHandlers();
@@ -63,7 +68,19 @@ private:
         const nx::network::http::StringType& method,
         Arg arg);
 
+    void loadSslCertificate();
+
     void startAcceptor();
+
+    std::unique_ptr<MultiHttpServer> startHttpServer(
+        const std::list<network::SocketAddress>& endpoints);
+
+    std::unique_ptr<MultiHttpServer> startHttpsServer(
+        const std::list<network::SocketAddress>& endpoints);
+
+    std::unique_ptr<MultiHttpServer> startServer(
+        const std::list<network::SocketAddress>& endpoints,
+        bool sslMode);
 };
 
 } // namespace relay

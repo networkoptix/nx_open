@@ -13,6 +13,7 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 #include <nx/client/desktop/common/widgets/search_line_edit.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -107,6 +108,11 @@ EventPanel::Private::Private(EventPanel* q):
         connect(tab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
 
     setupTabsSyncWithNavigator();
+
+    q->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(q, &EventPanel::customContextMenuRequested,
+        this, &EventPanel::Private::showContextMenu);
+
 }
 
 EventPanel::Private::~Private() = default;
@@ -376,6 +382,10 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 
     at_motionSelectionChanged();
     at_specialModeToggled(m_currentMediaWidget->isMotionSearchModeEnabled(), m_motionTab);
+
+    // This will reload tab content if the camera or resource was changed.
+    if (const auto searchWidget = qobject_cast<UnifiedSearchWidget*>(m_tabs->currentWidget()))
+        searchWidget->requestFetch();
 }
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
@@ -481,6 +491,17 @@ void EventPanel::Private::connectToRowCountChanges(QAbstractItemModel* model,
     connect(model, &QAbstractItemModel::modelReset, this, handler);
     connect(model, &QAbstractItemModel::rowsInserted, this, handler);
     connect(model, &QAbstractItemModel::rowsRemoved, this, handler);
+}
+
+void EventPanel::Private::showContextMenu(const QPoint& pos)
+{
+    QMenu contextMenu;
+    contextMenu.addAction(q->action(ui::action::OpenBusinessLogAction));
+    contextMenu.addAction(q->action(ui::action::BusinessEventsAction));
+    contextMenu.addAction(q->action(ui::action::PreferencesNotificationTabAction));
+    contextMenu.addSeparator();
+    contextMenu.addAction(q->action(ui::action::PinNotificationsAction));
+    contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
 } // namespace desktop

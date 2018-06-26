@@ -4,11 +4,11 @@ set(enable_hanwha true)
 # Components Namings
 set(display.product.name "Nx MetaVMS")
 set(product.name "Nx MetaVMS")
-set(product.name.short "metavms") # why do we have so lot of different names?
-set(product.appName "nxmetavms")  # why not metavms here
+set(product.name.short "metavms")
+set(product.appName "metavms")
 set(company.name "Network Optix")
 set(cloudName "Nx Meta Cloud")
-set(uri.protocol "nx-vms")  # are you sure we cannot have both Nx and Meta installed on the same pc?
+set(uri.protocol "nx-metavms")
 
 # Default settings
 set(backgroundImage
@@ -18,8 +18,8 @@ set(defaultWebPages
 
 # Support section
 set(companyUrl "http://networkoptix.com")
-set(productUrl "http://networkoptix.com/nxwitness-overview")
-set(supportUrl "https://networkoptix.com/meta/")
+set(productUrl "https://networkoptix.com/meta/")
+set(supportUrl "")
 set(supportEmail "meta@networkoptix.com")
 set(supportPhone "")
 set(licenseEmail "meta@networkoptix.com")
@@ -61,6 +61,7 @@ set(additionalTranslations
     de_DE
     ru_RU
     es_ES
+    it_IT
     ja_JP
     ko_KR
     tr_TR

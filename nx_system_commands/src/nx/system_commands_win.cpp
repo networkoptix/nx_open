@@ -26,7 +26,7 @@ SystemCommands::UnmountCode SystemCommands::unmount(
 
 bool SystemCommands::changeOwner(const std::string& /*path*/)
 {
-    return false;
+    return true;
 }
 
 bool SystemCommands::makeDirectory(const std::string& directoryPath)
@@ -86,7 +86,9 @@ int SystemCommands::open(
 
 bool SystemCommands::rename(const std::string& oldPath, const std::string& newPath)
 {
-    return QFile::rename(QString::fromStdString(oldPath), QString::fromStdString(newPath));
+    return MoveFileW(
+        (LPCTSTR) QString::fromStdString(oldPath).constData(),
+        (LPCTSTR) QString::fromStdString(newPath).constData());
 }
 
 int64_t SystemCommands::freeSpace(

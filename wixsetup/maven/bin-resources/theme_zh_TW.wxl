@@ -70,6 +70,6 @@
   <String Id="Product_ArchMismatch_x86">此安裝包是為 32 位元作業系統設計的. 安裝程式將立即退出.</String>
   <String Id="Product_ArchMismatch_x64">此安裝包是為 64 位元作業系統設計的. 安裝程式將立即退出.</String>
 
-  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="136"/>
-  <UI Dialog="BalExtension" Control="EulaHyperlink" X="150"/>
+  <UI Dialog="BalExtension" Control="EulaAcceptCheckbox" Width="141"/>
+  <UI Dialog="BalExtension" Control="EulaHyperlink" X="155"/>
 </WixLocalization>

@@ -4,6 +4,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/system_socket.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -61,6 +62,20 @@ protected:
             .arg(nx::network::url::joinPath(kContentServerPathPrefix, kTestPath)));
     }
 
+    void givenHttpsResourceServer()
+    {
+        m_resourceServer.reset();
+
+        m_resourceServer = std::make_unique<TestHttpServer>(
+            SocketFactory::createSslAdapter(
+                std::make_unique<TCPServerSocket>(AF_INET), ssl::EncryptionUse::always));
+
+        registerContentHandlers();
+        givenResourceServer();
+
+        m_actualUrl.setScheme(http::kSecureUrlSchemeName);
+    }
+
     void givenRedirectServer()
     {
         ASSERT_TRUE(m_redirector->bindAndListen());
@@ -98,7 +113,7 @@ protected:
         m_httpClient.doPost(url, "text/plain", kTestMessageBody);
     }
 
-    void thenClientShouldFetchResourceFromActualLocation()
+    void thenClientFetchedResourceFromActualLocation()
     {
         ASSERT_NE(nullptr, m_httpClient.response());
         ASSERT_EQ(StatusCode::ok, m_httpClient.response()->statusLine.statusCode);
@@ -205,7 +220,7 @@ TEST_F(AsyncHttpClientRedirect, simple_redirect_by_301_and_location)
 {
     givenTwoHttpServersWithRedirection();
     whenRequestingRedirectedResource();
-    thenClientShouldFetchResourceFromActualLocation();
+    thenClientFetchedResourceFromActualLocation();
 }
 
 TEST_F(AsyncHttpClientRedirect, no_infinite_redirect_loop)
@@ -220,7 +235,7 @@ TEST_F(AsyncHttpClientRedirect, redirect_of_authorized_resource)
     givenHttpResourceWithAuthentication();
     givenRedirectServer();
     whenRequestingRedirectedResource();
-    thenClientShouldFetchResourceFromActualLocation();
+    thenClientFetchedResourceFromActualLocation();
 }
 
 TEST_F(AsyncHttpClientRedirect, message_body_is_redirected)
@@ -251,6 +266,16 @@ TEST_F(AsyncHttpClientRedirect, digest_url_is_correct)
     thenPostRequestIsReceived();
     andHostHeaderHoldsCorrectValue();
     andDigestUrlIsCorrectAndFullyEncoded();
+}
+
+TEST_F(AsyncHttpClientRedirect, redirect_from_http_to_https)
+{
+    givenHttpsResourceServer();
+    givenRedirectServer();
+
+    whenRequestingRedirectedResource();
+
+    thenClientFetchedResourceFromActualLocation();
 }
 
 } // namespace test

@@ -68,13 +68,12 @@ void callSaveUserAsync(
     const QString& newPassword)
 {
     //after successfull call completion users.front()->getPassword() is empty, so saving it here
+    const bool updatePassword = queryProcessor->userName() == user.name && !newPassword.isEmpty();
     queryProcessor->getAccess(userAccessData).processUpdateAsync(
         ApiCommand::saveUser, user,
-        [queryProcessor, handler, reqID, user, newPassword](ec2::ErrorCode errorCode)
+        [updatePassword, handler, reqID, user, newPassword](ec2::ErrorCode errorCode)
         {
-            if (errorCode == ec2::ErrorCode::ok
-                && queryProcessor->userName() == user.name
-                && !newPassword.isEmpty())
+            if (errorCode == ec2::ErrorCode::ok && updatePassword)
             {
                 if (auto connection = QnAppServerConnectionFactory::ec2Connection())
                 {

@@ -1,17 +1,15 @@
 import pytest
 from pathlib2 import Path
 
+from defaults import defaults
 from framework.camera import CameraFactory, SampleMediaFile
-
-MEDIA_SAMPLE_PATH = 'sample.mkv'
-MEDIA_STREAM_PATH = 'sample.testcam-stream.data'
 
 
 def pytest_addoption(parser):
-    parser.addoption('--media-sample-path', type=Path, default=MEDIA_SAMPLE_PATH, help=(
-        'media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_PATH))
-    parser.addoption('--media-stream-path', type=Path, default=MEDIA_STREAM_PATH, help=(
-        'media sample test camera stream, relative to bin dir [%s]' % MEDIA_STREAM_PATH))
+    parser.addoption('--media-sample-path', type=Path, default=defaults['media_sample_path'], help=(
+        'media sample file path, default is %(default)s at binary directory'))
+    parser.addoption('--media-stream-path', type=Path, default=defaults['media_stream_path'], help=(
+        'media sample test camera stream, relative to bin dir [%(default)s]'))
 
 
 @pytest.fixture(params=['rtsp', 'webm', 'hls', 'direct-hls'])

@@ -1,11 +1,4 @@
-if(targetDevice MATCHES "android|ios")
-    # TODO: Remove after updating to Qt built with libc++ for Android.
-    # Currently we use libstdc++ from NDK which is from GCC 4.9. With the present Clang some
-    # functions from <type_traits> are broken (e.g. std::is_function).
-    set(CMAKE_CXX_STANDARD 14)
-else()
-    set(CMAKE_CXX_STANDARD 17)
-endif()
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -167,7 +160,12 @@ if(UNIX)
         -Wno-error=unused-function
     )
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(
+            -Wno-error=dangling-else
+            -Wno-psabi
+        )
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override

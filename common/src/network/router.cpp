@@ -1,9 +1,5 @@
 #include "router.h"
 
-// #include <nx/utils/log/log.h>
-// #include "nx_ec/dummy_handler.h"
-// #include "nx_ec/ec_api.h"
-
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 
@@ -39,9 +35,20 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     if (!connection)
         return result; // no connection to the server, can't route
 
-    bool isknownServer = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(id) != 0;
-    bool isClient = commonModule()->remoteGUID() != commonModule()->moduleGUID();
-    if (!isknownServer && isClient) {
+    auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(id);
+    if (server && server->getId() == commonModule()->moduleGUID())
+    {
+        // Route to himself
+        result.addr.address = server->getApiUrl().host();
+        result.addr.port = server->getApiUrl().port();
+        return result;
+    }
+
+    bool isknownServer = server != 0;
+    bool isClient = !commonModule()->remoteGUID().isNull()
+        && commonModule()->remoteGUID() != commonModule()->moduleGUID();
+    if (!isknownServer && isClient) 
+    {
 		if (commonModule()->remoteGUID().isNull())
             return result;
 
@@ -56,7 +63,9 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     }
 
     result.distance = INT_MAX;
-    QnUuid routeVia = connection->routeToPeerVia(id, &result.distance);
+    QnUuid routeVia = connection->routeToPeerVia(id, &result.distance, &result.addr);
+    if (!result.addr.isNull())
+        return result; //< Peer has found in message bus among outgoing connections.
     if (routeVia.isNull())
         return result; // can't route
 
@@ -75,15 +84,4 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
         result.reverseConnect = true;
 
     return result;
-}
-
-void QnRouter::updateRequest(QUrl& url, nx::network::http::HttpHeaders& headers, const QnUuid &id)
-{
-    QnRoute route = routeTo(id);
-    if (route.isValid())
-    {
-        url.setHost(route.addr.address.toString());
-        url.setPort(route.addr.port);
-        headers.emplace("x-server-guid", id.toByteArray());
-    }
 }

@@ -1,59 +1,202 @@
 #pragma once
 
-#include <memory>
+#include <map>
+#include <functional>
+#include <chrono>
 
-#include <QtCore/QSettings>
+#include <nx/utils/log/assert.h>
 
-#include "argument_parser.h"
+#include <QSettings>
+#include <QJsonObject>
+
+
+namespace nx {
+namespace utils {
 
 /**
- * Able to take settings from QSettings class (win32 registry or linux ini file) or from
- *  command line arguments.
+ * Container that offers declaration, access and changing of settings. Additionally, it
+ * keeps description of options to build documentation. Options can be loaded or saved from
+ * QSettings. To define a settings group, declare a struct derived from nx::utils::Settings. To
+ * define an option, declare a struct member with type Option<>. To access an option value, use
+ * operator().
  *
- * Value defined as command line argument has preference over registry.
+ * Usage example:
+ * <pre><code>
  *
- * example.reg
- *      [pathToModule/section]
- *      "item" = "value"
+ *     class Settings: public nx::utils::Settings
+ *     {
+ *     public:
+ *         Option<QString> option1{this, "option1", "defaultValue", "Option1 description"};
  *
- * example.ini
- *      [section]
- *      item = value
+ *         Option<int> option2{this, "option2",
+ *             7, "Option2 description"};
  *
- * arguments: --section/item=value
+ *         // Overriding value accessor.
+ *         Option<QString> option3{this, "option3", "", "Option3 description",
+ *             [this](const QString& value)
+ *             {
+ *                 if (!value.isEmpty())
+ *                     return value;
+ *                 return option1();
+ *             }
+ *         };
+ *     };
+ *
+ * </code></pre>
  */
-class NX_UTILS_API QnSettings
+class NX_UTILS_API Settings
 {
 public:
-    QnSettings(
-        const QString& organizationName,
-        const QString& applicationName,
-        const QString& moduleName,
-        QSettings::Scope scope = QSettings::SystemScope);
-    /**
-     * Initialize using existing QSettings object.
-     * Caller is responsible for existingSettings life time.
-     */
-    QnSettings(QSettings* existingSettings);
+    Settings() = default;
+    bool load(const QSettings& settings);
+    bool save(QSettings& settings) const;
 
-    void parseArgs(int argc, const char* argv[]);
-    bool contains(const QString& key) const;
-    QVariant value(
-        const QString& key,
-        const QVariant& defaultValue = QVariant()) const;
+    QJsonObject buildDocumentation() const;
 
-    const QString getApplicationName() const { return m_applicationName; }
-    const QString getModuleName() const { return m_moduleName; }
+protected:
+    struct BaseOption
+    {
+        BaseOption(Settings* settings, const QString& name, QString description):
+            m_description(std::move(description))
+        {
+            settings->add(name, this);
+        }
+
+        virtual ~BaseOption() = default;
+
+        bool present() const { return isPresent; }
+        bool removed() const { return isRemoved; }
+
+        const QString& description() { return m_description; }
+
+        virtual bool load(const QVariant& value) = 0;
+        virtual QVariant save() const = 0;
+        virtual QVariant defaultValueVariant() const = 0;
+
+        BaseOption(const BaseOption&) = delete;
+        BaseOption& operator=(const BaseOption&) = delete;
+
+    protected:
+        QString m_description;
+        bool isPresent = false;
+        bool isRemoved = false;
+    };
+
+    template<typename T>
+    struct Option final: BaseOption
+    {
+        using Accessor = std::function<T(const T&)>;
+        static inline const Accessor defaultAccessor = [](const T& value) { return value; };
+
+        Option(
+            Settings* settings,
+            const QString& name,
+            T defaultValue,
+            QString description,
+            Accessor accessor = defaultAccessor)
+            :
+            BaseOption(settings, name, std::move(description)),
+            m_settings(settings),
+            m_value(defaultValue),
+            m_defaultValue(std::move(defaultValue)),
+            m_accessor(std::move(accessor))
+        {
+        }
+
+        T operator()() const
+        {
+            NX_ASSERT(m_settings->m_loaded);
+            return m_accessor(m_value);
+        }
+
+        T defaultValue() const { return m_defaultValue; }
+
+        void set(T value)
+        {
+            m_value = std::move(value);
+            isPresent = true;
+            isRemoved = false;
+        }
+
+        void remove()
+        {
+            isRemoved = true;
+            isPresent = false;
+        }
+
+    private:
+        virtual bool load(const QVariant& value) override
+        {
+            if (!fromQVariant(value, m_value))
+                return false;
+
+            isPresent = true;
+            return true;
+        }
+
+        virtual QVariant save() const override
+        {
+            return toQVariant(m_value);
+        }
+
+        virtual QVariant defaultValueVariant() const override
+        {
+            return toQVariant(m_defaultValue);
+        }
+
+        static bool fromQVariant(const QVariant& value, T& result)
+        {
+            if (!value.isValid() || !value.canConvert<T>())
+                return false;
+
+            result = value.value<T>();
+            return true;
+        }
+
+        static QVariant toQVariant(const T& value)
+        {
+            QVariant result;
+            result.setValue(value);
+            return result;
+        }
+
+    private:
+        const Settings *const m_settings;
+        T  m_value;
+        T  m_defaultValue;
+
+        Accessor m_accessor;
+    };
+
+    void add(const QString& name, BaseOption* option);
+
+    Settings(const Settings&) = delete;
+    Settings& operator=(const Settings&) = delete;
 
 private:
-    void initializeSystemSettings();
-
-    const QString m_organizationName;
-    const QString m_applicationName;
-    const QString m_moduleName;
-    const QSettings::Scope m_scope;
-
-    std::unique_ptr<QSettings> m_ownSettings;
-    QSettings* m_systemSettings = nullptr;
-    nx::utils::ArgumentParser m_args;
+    bool m_loaded = false;
+    std::map<QString, BaseOption*> m_options;
 };
+
+template<>
+inline bool Settings::Option<std::chrono::milliseconds>::fromQVariant(
+    const QVariant& value, std::chrono::milliseconds& result)
+{
+    if (!value.isValid() || !value.canConvert<quint64>())
+        return false;
+
+    result = std::chrono::milliseconds(value.value<quint64>());
+    return true;
+}
+
+template<>
+inline QVariant Settings::Option<std::chrono::milliseconds>::toQVariant(
+    const std::chrono::milliseconds& value)
+{
+    QVariant result;
+    result.setValue(value.count());
+    return result;
+}
+
+} // namespace utils
+} // namespace nx

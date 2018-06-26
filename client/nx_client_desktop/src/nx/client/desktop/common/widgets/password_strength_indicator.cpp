@@ -160,11 +160,11 @@ void PasswordStrengthIndicator::paintEvent(QPaintEvent* /*event*/)
     QColor background;
     switch (d->currentInformation.acceptance())
     {
-        case PasswordInformation::Good:
+        case utils::PasswordAcceptance::Good:
             background = d->colors.good;
             break;
 
-        case PasswordInformation::Acceptable:
+        case utils::PasswordAcceptance::Acceptable:
             background = d->colors.acceptable;
             break;
 

@@ -220,9 +220,9 @@ bool HanwhaRequestHelper::doRequestInternal(
     httpClient.setIgnoreMutexAnalyzer(true);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
-    httpClient.setSendTimeoutMs(kHttpTimeout.count());
-    httpClient.setMessageBodyReadTimeoutMs(kHttpTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kHttpTimeout.count());
+    httpClient.setSendTimeout(kHttpTimeout);
+    httpClient.setMessageBodyReadTimeout(kHttpTimeout);
+    httpClient.setResponseReadTimeout(kHttpTimeout);
 
     auto realUrl = m_bypassChannel == boost::none ? url : makeBypassUrl(url);
 

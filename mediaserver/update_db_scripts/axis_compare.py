@@ -18,21 +18,37 @@ referer_url = "https://www.axis.com/za/en/products/product-selector"
 api_key = "apikey da6cac02-e554-44c5-8125-1281982c3cdb"
 headers={"Host":"www.axis.com", "referer": referer_url, "Authorization": api_key}
 home_dir = expanduser("~")
-axis_url = "https://www.axis.com/api/pia/v2/items/?categories=cameras,encoders,modular&fields=properties,parents&orderBy=name&propertyFilterMap=%7B%22archived%22:0,%22compare%22:1,%22targetGrouping%22:%22--%22%7D&type=ProductVariant"
+
+axis_base_url = "https://www.axis.com/api/pia/v2/items/"
+parameters = ""
+parameters += '?categories=cameras,encoders,modular&'
+parameters += 'fields=properties,parents&orderBy=name'
+parameters += '&propertyFilterMap=%7B%22archived%22:0,'
+parameters += '%22compare%22:1,%22targetGrouping%22:%22--%22%7D'
+parameters += '&type=ProductVariant'
+axis_url = axis_base_url + parameters
+
 get_list = requests.get(axis_url, headers = headers).json()
 site_list = {}
+
 for i in range(len(get_list)):
     model = get_list[i]['name'].encode('utf-8')
     fps = get_list[i]['properties']['MaxFPS'].encode('utf-8')
     a_series = re.findall('AXIS\s\S\d\d+', model)
-    af_series = re.findall('AXIS\s\S\S\d+', model)
+    af_series = re.findall('AXIS\s\FA\d+', model)
     x_series = re.findall('X\S\d+\-\S\d+', model)
-    if (is_empty(a_series) and is_empty(af_series)):
-        model = x_series[0].lower()
-    elif (is_empty(a_series) and is_empty(x_series)):
-        model = af_series[0][5:].lower()
-    else:
+    d_series = re.findall('D\d+\S+\s\S+', model)
+    if not is_empty(a_series):
         model = a_series[0][5:].lower()
+    elif not is_empty(x_series):
+        model = x_series[0].lower()
+    elif not is_empty(af_series):
+        model = af_series[0][5:].lower()
+    elif not is_empty(d_series):
+        model = d_series[0].lower()
+    else: 
+        print model
+        break
     upd = {model : fps}
     site_list.update(upd)
 

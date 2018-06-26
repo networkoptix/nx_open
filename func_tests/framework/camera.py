@@ -30,7 +30,7 @@ import hachoir_metadata
 from .utils import datetime_utc_now
 import datetime
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
         
 
 DEFAULT_CAMERA_MAC_ADDR = '11:22:33:44:55:66'
@@ -108,14 +108,14 @@ class Camera(object):
 
     def wait_until_discovered_by_server(self, server_list, timeout=CAMERA_DISCOVERY_WAIT_TIMEOUT):
         # assert is_list_inst(server_list, Mediaserver), repr(server_list)
-        log.info('Waiting for camera %s to be discovered by servers %s', self, ', '.join(map(str, server_list)))
+        _logger.info('Waiting for camera %s to be discovered by servers %s', self, ', '.join(map(str, server_list)))
         start_time = datetime_utc_now()
         while datetime_utc_now() - start_time < timeout:
             for server in server_list:
-                for d in server.api.ec2.getCamerasEx.GET():
+                for d in server.api.get('ec2/getCamerasEx'):
                     if d['physicalId'].replace('-', ':') == self.mac_addr:
                         self.id = d['id']
-                        log.info('Camera %s is discovered by server %s, registered with id %r', self, server, self.id)
+                        _logger.info('Camera %s is discovered by server %s, registered with id %r', self, server, self.id)
                         return
             time.sleep(5)
         pytest.fail('Camera %s was not discovered by servers %s in %s'
@@ -124,9 +124,9 @@ class Camera(object):
     def switch_to_server(self, server):
         assert self.id, 'Camera %s is not yet registered on server' % self
         server_guid = get_server_id(server.api)
-        server.api.ec2.saveCamera.POST(id=self.id, parentId=server_guid)
+        server.api.post('ec2/saveCamera', dict(id=self.id, parentId=server_guid))
         d = None
-        for d in server.api.ec2.getCamerasEx.GET():
+        for d in server.api.get('ec2/getCamerasEx'):
             if d['id'] == self.id:
                 break
         if d is None:
@@ -164,14 +164,14 @@ class DiscoveryUdpListener(object):
     def stop(self):
         self._stop_flag = True
         if self._thread:
-            log.debug('Waiting for test camera UDP discovery listener to stop...')
+            _logger.debug('Waiting for test camera UDP discovery listener to stop...')
             self._thread.join()
         for listener in self._media_listeners:
             listener.stop()
-        log.info('Test camera UDP discovery listener is stopped.')
+        _logger.info('Test camera UDP discovery listener is stopped.')
 
     def stream_to(self, camera, ip_address):
-        log.info('Test camera %s: will stream to %s', camera.name, ip_address)
+        _logger.info('Test camera %s: will stream to %s', camera.name, ip_address)
         self._stream_to_camera_list.append(camera)
         self._stream_to_address_list.append(str(ip_address) if ip_address else None)
         if not self._thread:
@@ -183,13 +183,13 @@ class DiscoveryUdpListener(object):
         hostname = '0.0.0.0'
         port = TEST_CAMERA_DISCOVERY_PORT
         listen_socket.bind((hostname, port))
-        log.info('Test camera discoverer: UDP Listening on %s:%d', hostname, port)
+        _logger.info('Test camera discoverer: UDP Listening on %s:%d', hostname, port)
         self._thread = threading.Thread(target=self._thread_main, args=(listen_socket,))
         self._thread.daemon = True
         self._thread.start()
 
     def _thread_main(self, listen_socket):
-        log.info('Test camera UDP discovery listener thread is started.')
+        _logger.info('Test camera UDP discovery listener thread is started.')
         while not self._stop_flag:
             read, write, error = select.select([listen_socket], [], [listen_socket], 0.1)
             if not read and not error:
@@ -203,11 +203,11 @@ class DiscoveryUdpListener(object):
             for camera in self._stream_to_camera_list:
                 listener = MediaListener(self._media_stream_path)
                 response = '%s;%d;%s' % (TEST_CAMERA_ID_MSG, listener.port, camera.mac_addr)
-                log.info('Responding to %s:%d: %r', addr[0], addr[1], response)
+                _logger.info('Responding to %s:%d: %r', addr[0], addr[1], response)
                 listen_socket.sendto(response, addr)
                 self._media_listeners.append(listener)
         listen_socket.close()
-        log.debug('Test camera UDP discovery listener thread is finished.')
+        _logger.debug('Test camera UDP discovery listener thread is finished.')
 
 
 class MediaListener(object):
@@ -229,15 +229,15 @@ class MediaListener(object):
         return 'Test camera media listener at %s:%d' % (self.hostname, self.port)
 
     def stop(self):
-        log.info('%s with %d active streamers: stopping...', self, len(self._streamers))
+        _logger.info('%s with %d active streamers: stopping...', self, len(self._streamers))
         self._stop_flag = True
         self._thread.join()
         for streamer in self._streamers:
             streamer.stop()
-        log.info('%s: stopped.', self)
+        _logger.info('%s: stopped.', self)
 
     def _thread_main(self, listen_socket):
-        log.info('%s: thread started.', self)
+        _logger.info('%s: thread started.', self)
         poll = select.poll()
         poll.register(listen_socket, select.POLLIN | select.POLLERR)
         while not self._stop_flag:
@@ -245,12 +245,12 @@ class MediaListener(object):
             if not events:
                 continue
             sock, addr = listen_socket.accept()
-            log.info('%s: accepted connection from %s:%d', self, addr[0], addr[1])
+            _logger.info('%s: accepted connection from %s:%d', self, addr[0], addr[1])
             streamer = MediaStreamer(self._media_stream_path, sock, addr)
             self._streamers.append(streamer)
         poll.unregister(listen_socket)
         listen_socket.close()
-        log.info('%s: thread is finished.', self)
+        _logger.info('%s: thread is finished.', self)
 
 
 class MediaStreamer(object):
@@ -270,17 +270,17 @@ class MediaStreamer(object):
     def stop(self):
         self._stop_flag = True
         self._thread.join()
-        log.info('%s: stopped.', self)
+        _logger.info('%s: stopped.', self)
 
     def _thread_main(self, sock):
         try:
             self._run(sock)
         except socket.error as x:
-            log.info('%s is finished: %r', self, x)
+            _logger.info('%s is finished: %r', self, x)
 
     def _run(self, sock):
         request = sock.recv(1024)            
-        log.info('%s: received request %r; starting streaming %s', self, request, self._media_stream_path)
+        _logger.info('%s: received request %r; starting streaming %s', self, request, self._media_stream_path)
         while not self._stop_flag:
             with self._media_stream_path.open('rb') as f:
                 while True:
@@ -292,7 +292,7 @@ class MediaStreamer(object):
                     if self._stop_flag:
                         break
         sock.close()
-        log.debug('%s: thread is finished.', self)
+        _logger.debug('%s: thread is finished.', self)
 
 
 class SampleMediaFile(object):

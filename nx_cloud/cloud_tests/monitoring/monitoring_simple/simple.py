@@ -43,7 +43,7 @@ def testclass(cls):
     return cls
 
 
-def testmethod(delay=0, host=None, continue_if_fails=False, metric=None):
+def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1):
     def _testmethod(f):
         def wrapper(self):
             try:
@@ -51,7 +51,25 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None):
                     log.info('Test {}: {}. Sleeping for {} seconds'.format(wrapper.testmethod_index, f.__name__, delay))
                     time.sleep(delay)
 
-                log.info('Running test {}: {}'.format(wrapper.testmethod_index, f.__name__))
+                n_try = 0
+
+                for n_try in range(1, tries):
+                    log.info('Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
+                    try:
+                        f(self)
+                    except AssertionError:
+                        log.error('Test {}: failed. Retrying..'.format(f.__name__))
+
+                        io = StringIO()
+                        traceback.print_exc(file=io)
+                        log.error(io.getvalue())
+
+                        time.sleep(1)
+                        continue
+
+                n_try += 1
+
+                log.info('Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
                 f(self)
                 log.info('Test {}: success'.format(f.__name__))
 
@@ -342,7 +360,7 @@ class CloudSession(object):
 
         assert self.system_id == data[0]['id'], 'Invalid response from portal. Invalid system id'
 
-    @testmethod()
+    @testmethod(tries=3)
     def share_system(self):
         request_data = {
             "email": self.user_email,
@@ -363,7 +381,7 @@ class CloudSession(object):
         data = r.json()
         assert 'id' in data, 'No ID'
 
-    @testmethod(delay=20, metric='view_and_settings_failure')
+    @testmethod(delay=20, metric='view_and_settings_failure', tries=3)
     def check_system_users(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),

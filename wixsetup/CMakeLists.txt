@@ -6,7 +6,7 @@ option(addQtPdb
 set(project.build.directory "${CMAKE_CURRENT_BINARY_DIR}")
 set(bin_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources")
 set(filter_resources "${CMAKE_CURRENT_SOURCE_DIR}/maven/filter-resources")
-set(ClientHelpSourceDir "${bin_source_dir}/help")
+set(ClientHelpSourceDir "${help_directory}/bin/help")
 set(VoxSourceDir "${bin_source_dir}/vox")
 set(client_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/client_qml")
 set(nxtool_qml_dir "${CMAKE_CURRENT_BINARY_DIR}/nxtool_qml")
@@ -26,7 +26,6 @@ file(TO_CMAKE_PATH ${VC14RedistPath} VC14RedistPath)
 add_subdirectory(custom_actions)
 
 nx_copy_bin_resources(${bin_resources} "${CMAKE_CURRENT_BINARY_DIR}")
-nx_copy_bin_resources("${customization_dir}/wixsetup" "${CMAKE_CURRENT_BINARY_DIR}")
 nx_configure_directory(${filter_resources} "${CMAKE_CURRENT_BINARY_DIR}")
 
 file(WRITE ${bin_source_dir}/launcher.version "${releaseVersion.full}")
@@ -38,6 +37,17 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/signtool_interface.py"
 
 set(config_file "${CMAKE_CURRENT_BINARY_DIR}/config.yaml")
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/config.yaml" "${config_file}")
+
+message(STATUS "Generating license")
+execute_process(
+    COMMAND pandoc -s ${customization.dir}/license.html -o ${CMAKE_CURRENT_BINARY_DIR}/license.rtf
+    WORKING_DIRECTORY ${pandoc_directory}/bin
+    RESULT_VARIABLE pandoc_result
+)
+
+if(NOT pandoc_result STREQUAL "0")
+    message(FATAL_ERROR "error: License generation failed")
+endif()
 
 if (withMediaServer OR withDesktopClient)
     add_custom_target(wixsetup ALL
@@ -167,6 +177,8 @@ if(withDesktopClient OR withMediaServer OR withTestCamera)
             nx_utils
             nx_vms_utils
             nx_vms_api
+            nx_kit
+            nx_update
             udt
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/wixsetup/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_libs_debug_package.py

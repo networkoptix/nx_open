@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bitset>
+#include <core/resource/resource_fwd.h>
 
 namespace nx {
 namespace client {
@@ -30,6 +31,10 @@ public:
     static Results validateSettings(const ExportMediaSettings& settings);
     static Results validateSettings(const ExportLayoutSettings& settings);
 
+    /** Check if exe file will be greater than 4 Gb. */
+    static bool exeFileIsTooBig(const QnLayoutResourcePtr& layout, qint64 durationMs);
+    /** Check if exe file will be greater than 4 Gb. */
+    static bool exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, qint64 durationMs);
 };
 
 } // namespace desktop

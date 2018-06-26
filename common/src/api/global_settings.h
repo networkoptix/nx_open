@@ -50,14 +50,25 @@ const QString kNameFrom(lit("emailFrom"));
 const QString kNameSignature(lit("emailSignature"));
 const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
+
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
 const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
+const QString kNamePrimaryTimeServer(lit("primaryTimeServer"));
+
+/* Max rtt for internet time synchronization request */
 const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
     lit("maxDifferenceBetweenSynchronizedAndInternetTime"));
+
+/* Max rtt for server to server or client to server time synchronization request */
 const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
     lit("maxDifferenceBetweenSynchronizedAndLocalTimeMs"));
+
+/* Period to check local time for changes */
 const QString kOsTimeChangeCheckPeriod(lit("osTimeChangeCheckPeriodMs"));
+
+/* Period to synchronize time via network */
 const QString kSyncTimeExchangePeriod(lit("syncTimeExchangePeriod"));
+
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -232,6 +243,9 @@ public:
     bool isSynchronizingTimeWithInternet() const;
     void setSynchronizingTimeWithInternet(bool value);
 
+    QnUuid primaryTimeServer() const;
+    void setPrimaryTimeServer(const QnUuid& value);
+
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndLocalTime() const;
 
@@ -383,6 +397,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnUuid> *m_primaryTimeServerAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_osTimeChangeCheckPeriodAdaptor = nullptr;

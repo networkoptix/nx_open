@@ -14,10 +14,9 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 
-#include <nx/client/desktop/resource_properties/camera/legacy_camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_dialog.h>
 #include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
 
-#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_roles_dialog.h>
@@ -28,8 +27,10 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/client/desktop/resource_properties/layout/layout_settings_dialog.h>
 #include <nx/client/desktop/utils/parameter_helper.h>
+
+#include <nx/utils/raii_guard.h>
 
 #include <common/common_module.h>
 #include <client/client_settings.h>
@@ -224,16 +225,14 @@ void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
 
     // We should update local media directories
     // Is there a better place for it?
-    auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>();
-    if (localFilesSearcher)
+    if (auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>())
     {
         QStringList dirs;
         dirs << qnSettings->mediaFolder();
         dirs << qnSettings->extraMediaFolders();
         localFilesSearcher->setPathCheckList(dirs);
+        emit localFilesSearcher->startLocalDiscovery();
     }
-
-    emit localFilesSearcher->startLocalDiscovery();
 }
 
 void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
@@ -245,15 +244,15 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
-    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindowWidget()));
+    QScopedPointer<LayoutSettingsDialog> dialog(new LayoutSettingsDialog(mainWindowWidget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->readFromResource(layout);
+    dialog->setLayout(layout);
 
-    bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
-    if (!dialog->exec() || !dialog->submitToResource(layout))
+    const bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
+    if (!dialog->exec())
         return;
 
-    /* Move layout items to grid center to best fit the background */
+    // Move layout items to grid center to best fit the background.
     if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
     {
         if (auto wlayout = QnWorkbenchLayout::instance(layout))

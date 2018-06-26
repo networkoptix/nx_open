@@ -9,11 +9,7 @@ namespace http {
 namespace server {
 namespace proxy {
 
-AbstractProxyHandler::TargetHost::TargetHost(
-    nx::network::http::StatusCode::Value status,
-    network::SocketAddress target)
-    :
-    status(status),
+AbstractProxyHandler::TargetHost::TargetHost(network::SocketAddress target):
     target(std::move(target))
 {
 }
@@ -29,29 +25,15 @@ void AbstractProxyHandler::processRequest(
 {
     using namespace std::placeholders;
 
-    m_targetHost = cutTargetFromRequest(*connection, &request);
-    if (!nx::network::http::StatusCode::isSuccessCode(m_targetHost.status))
-    {
-        completionHandler(m_targetHost.status);
-        return;
-    }
-
-    // TODO: #ak avoid request loop by using Via header.
-    m_sslConnectionRequired = m_targetHost.sslMode == SslMode::enabled;
-
-    m_requestCompletionHandler = std::move(completionHandler);
     m_request = std::move(request);
+    m_requestCompletionHandler = std::move(completionHandler);
+    m_requestSourceEndpoint = connection->socket()->getForeignAddress();
+    m_httpConnectionAioThread = connection->getAioThread();
 
-    NX_VERBOSE(this,
-        lm("Establishing connection to %1 to serve request %2 from %3 with SSL=%4")
-        .args(m_targetHost.target, m_request.requestLine.url,
-            connection->socket()->getForeignAddress(), m_sslConnectionRequired));
-
-    m_targetPeerConnector = createTargetConnector();
-    m_targetPeerConnector->bindToAioThread(connection->getAioThread());
-    m_targetPeerConnector->connectAsync(
-        m_targetHost.target,
-        std::bind(&AbstractProxyHandler::onConnected, this, m_targetHost.target, _1, _2));
+    detectProxyTarget(
+        *connection,
+        &m_request,
+        std::bind(&AbstractProxyHandler::startProxying, this, _1, _2));
 }
 
 void AbstractProxyHandler::sendResponse(
@@ -73,6 +55,35 @@ void AbstractProxyHandler::setTargetHostConnectionInactivityTimeout(
     std::optional<std::chrono::milliseconds> timeout)
 {
     m_targetConnectionInactivityTimeout = timeout;
+}
+
+void AbstractProxyHandler::startProxying(
+    nx::network::http::StatusCode::Value resultCode,
+    TargetHost proxyTarget)
+{
+    using namespace std::placeholders;
+
+    if (!nx::network::http::StatusCode::isSuccessCode(resultCode))
+    {
+        nx::utils::swapAndCall(m_requestCompletionHandler, resultCode);
+        return;
+    }
+
+    m_targetHost = std::move(proxyTarget);
+
+    // TODO: #ak avoid request loop by using Via header.
+    m_sslConnectionRequired = m_targetHost.sslMode == SslMode::enabled;
+
+    NX_VERBOSE(this,
+        lm("Establishing connection to %1 to serve request %2 from %3 with SSL=%4")
+        .args(m_targetHost.target, m_request.requestLine.url,
+            m_requestSourceEndpoint, m_sslConnectionRequired));
+
+    m_targetPeerConnector = createTargetConnector();
+    m_targetPeerConnector->bindToAioThread(m_httpConnectionAioThread);
+    m_targetPeerConnector->connectAsync(
+        m_targetHost.target,
+        std::bind(&AbstractProxyHandler::onConnected, this, m_targetHost.target, _1, _2));
 }
 
 void AbstractProxyHandler::onConnected(

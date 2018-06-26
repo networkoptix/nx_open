@@ -17,9 +17,7 @@ public:
     AsyncHttpJsonProvider(const QString& baseUrl, AbstractAsyncRawDataProviderHandler* handler);
     virtual ~AsyncHttpJsonProvider() override;
     virtual void getUpdatesMetaInformation() override;
-    virtual void getSpecificUpdateData(
-        const QString& customization,
-        const QString& version) override;
+    virtual void getSpecificUpdateData(const QString& updatePrefix, const QString& build) override;
 
 private:
     QString m_baseUrl;

@@ -150,9 +150,11 @@ void QnDirectSystemsFinder::removeServer(QnUuid id)
 {
     const auto systemIt = getSystemItByServer(id);
     const auto serverIsInKnownSystem = (systemIt != m_systems.end());
-    NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
     if (!serverIsInKnownSystem)
+    {
+        NX_WARNING(this, lm("Server id %1 is not known").arg(id));
         return;
+    }
 
     NX_LOGX(lm("Removed server %1 from system %2").args(id, systemIt.value()->id()), cl_logDEBUG2);
     const auto removedCount = m_serverToSystem.remove(id);
@@ -221,7 +223,7 @@ void QnDirectSystemsFinder::updatePrimaryAddress(nx::vms::discovery::ModuleEndpo
 
     const auto systemDescription = systemIt.value();
     const auto url = nx::network::url::Builder()
-        .setScheme(module.sslAllowed ? lit("https") : lit("http"))
+        .setScheme(nx::network::http::urlSheme(module.sslAllowed))
         .setEndpoint(module.endpoint).toUrl();
     systemDescription->setServerHost(module.id, url);
 

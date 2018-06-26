@@ -82,9 +82,9 @@ namespace
     const QString kCloudConnectRelayingEnabled(lit("cloudConnectRelayingEnabled"));
     const bool kCloudConnectRelayingEnabledDefault = true;
 
-    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
-    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
-    const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(10);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(5);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(5);
+    const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(1);
     const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
 
     const QString kHanwhaDeleteProfilesOnInitIfNeeded(lit("hanwhaDeleteProfilesOnInitIfNeeded"));
@@ -313,6 +313,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
         true,
         this);
     timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
+
+    m_primaryTimeServerAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
+        kNamePrimaryTimeServer,
+        QnUuid(),
+        this);
+    timeSynchronizationAdaptors << m_primaryTimeServerAdaptor;
 
     m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor =
         new QnLexicalResourcePropertyAdaptor<int>(
@@ -1067,6 +1073,16 @@ bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
 void QnGlobalSettings::setSynchronizingTimeWithInternet(bool value)
 {
     m_synchronizeTimeWithInternetAdaptor->setValue(value);
+}
+
+QnUuid QnGlobalSettings::primaryTimeServer() const
+{
+    return m_primaryTimeServerAdaptor->value();
+}
+
+void QnGlobalSettings::setPrimaryTimeServer(const QnUuid& value)
+{
+    m_primaryTimeServerAdaptor->setValue(value);
 }
 
 std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndInternetTime() const

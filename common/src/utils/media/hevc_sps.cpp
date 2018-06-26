@@ -24,7 +24,7 @@ bool Sps::decodeFromVideoFrame(const QnConstCompressedVideoDataPtr& videoData)
 
     // H.265 nal units have same format (unit delimiter) as H.264 nal units
     std::vector<std::pair<const quint8*, size_t>> nalUnits =
-        nx::media_utils::avc::decodeNalUnits(videoData);
+        nx::media_utils::h264::decodeNalUnits(videoData);
 
     for (const std::pair<const quint8*, size_t>& nalu : nalUnits)
     {
@@ -45,6 +45,9 @@ bool Sps::decodeFromVideoFrame(const QnConstCompressedVideoDataPtr& videoData)
 
 bool Sps::decode(const uint8_t* payload, int payloadLength)
 {
+    if (payloadLength <= NalUnitHeader::kTotalLength)
+        return false;
+
     payload += NalUnitHeader::kTotalLength;
     payloadLength -= NalUnitHeader::kTotalLength;
 

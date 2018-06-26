@@ -6,7 +6,7 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_common.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/basic_service_settings.h>
 
 #include <nx/cloud/relaying/settings.h>
@@ -26,6 +26,12 @@ struct Http
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 
     Http();
+};
+
+struct Https
+{
+    std::list<network::SocketAddress> endpoints;
+    std::string certificatePath;
 };
 
 struct ConnectingPeer
@@ -60,11 +66,13 @@ public:
     const relaying::Settings& listeningPeer() const;
     const ConnectingPeer& connectingPeer() const;
     const Http& http() const;
+    const Https& https() const;
     const CassandraConnection& cassandraConnection() const;
 
 private:
     utils::log::Settings m_logging;
     Http m_http;
+    Https m_https;
     relaying::Settings m_listeningPeer;
     ConnectingPeer m_connectingPeer;
     CassandraConnection m_cassandraConnection;
@@ -72,6 +80,12 @@ private:
     virtual void loadSettings() override;
 
     void loadHttp();
+    void loadEndpointList(
+        const char* settingName,
+        const char* defaultValue,
+        std::list<network::SocketAddress>* endpoints);
+
+    void loadHttps();
     void loadConnectingPeer();
     void loadCassandraHost();
 };

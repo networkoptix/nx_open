@@ -6,18 +6,19 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
 
-#include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/common/palette.h>
-#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
-#include <nx/client/desktop/common/widgets/search_line_edit.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
+#include <nx/client/desktop/common/utils/custom_painted.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
+#include <nx/client/desktop/common/widgets/search_line_edit.h>
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
+
 #include <nx/utils/disconnect_helper.h>
 #include <nx/utils/pending_operation.h>
 
@@ -48,6 +49,7 @@ SearchLineEdit* createSearchLineEdit(QWidget* parent)
         };
 
     auto result = new CustomPainted<SearchLineEdit>(parent);
+    result->setGlassVisible(false);
     result->setCustomPaintFunction(paintFunction);
     result->setAttribute(Qt::WA_TranslucentBackground);
     result->setAttribute(Qt::WA_Hover);
@@ -87,10 +89,17 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->areaButton->hide();
     ui->cameraButton->hide();
 
+    ui->timeButton->setSelectable(false);
+    ui->typeButton->setSelectable(false);
+    ui->areaButton->setSelectable(false);
+    ui->cameraButton->setSelectable(false);
+
     ui->timeButton->setDeactivatable(true);
     ui->typeButton->setDeactivatable(true);
     ui->areaButton->setDeactivatable(true);
     ui->cameraButton->setDeactivatable(true);
+
+    setPaletteColor(ui->filterLine, QPalette::Shadow, colorTheme()->color("dark6"));
 
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
@@ -134,8 +143,8 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->showPreviewsButton->setChecked(ui->ribbon->previewsEnabled());
     ui->showInfoButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
     ui->showPreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
-    ui->showInfoButton->setIcon(qnSkin->icon(lit("events/show_information.png")));
-    ui->showPreviewsButton->setIcon(qnSkin->icon(lit("events/show_preview.png")));
+    ui->showInfoButton->setIcon(qnSkin->icon(lit("text_buttons/text.png")));
+    ui->showPreviewsButton->setIcon(qnSkin->icon(lit("text_buttons/image.png")));
 
     connect(ui->showInfoButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setFootersEnabled);

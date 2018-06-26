@@ -2,38 +2,37 @@ import datetime
 import timeit
 
 import pytz
-from pylru import lrudecorator
 
+from framework.method_caching import cached_property
 from framework.networking.linux import LinuxNetworking
-from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.posix_access import PosixAccess
 from framework.os_access.posix_shell import SSH
+from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.ssh_path import make_ssh_path_cls
 from framework.utils import RunningTime
 
 
-class SSHAccess(OSAccess):
-    def __init__(self, forwarded_ports, macs, username, key_path):
+class SSHAccess(RemoteAccess, PosixAccess):
+    def __init__(self, port_map, macs, username, key_path):
+        RemoteAccess.__init__(self, port_map)
         self._macs = macs
-        ssh_hostname, ssh_port = forwarded_ports['tcp', 22]
-        self.ssh = SSH(ssh_hostname, ssh_port, username, key_path)
-        self._forwarded_ports = forwarded_ports
+        self.ssh = SSH(port_map.remote.address, port_map.remote.tcp(22), username, key_path)
+
+    def __repr__(self):
+        return '<SSHAccess via {!r}>'.format(self.ssh)
 
     @property
-    def forwarded_ports(self):
-        return self._forwarded_ports
+    def shell(self):
+        return self.ssh
 
-    @property
+    @cached_property
     def Path(self):
         return make_ssh_path_cls(self.ssh)
-
-    def run_command(self, command, input=None):
-        return self.ssh.run_command(command, input=input)
 
     def is_accessible(self):
         return self.ssh.is_working()
 
-    @property
-    @lrudecorator(1)
+    @cached_property
     def networking(self):
         return LinuxNetworking(self.ssh, self._macs)
 

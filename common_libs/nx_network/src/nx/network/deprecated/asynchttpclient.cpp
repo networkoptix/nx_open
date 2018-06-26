@@ -26,6 +26,17 @@ namespace http {
 
 AsyncHttpClient::AsyncHttpClient()
 {
+    initDelegate();
+}
+
+AsyncHttpClient::AsyncHttpClient(std::unique_ptr<AbstractStreamSocket> socket):
+    m_delegate(std::move(socket))
+{
+    initDelegate();
+}
+
+void AsyncHttpClient::initDelegate()
+{
     using namespace std::placeholders;
 
     m_delegate.setOnRequestHasBeenSent(
@@ -412,6 +423,12 @@ AsyncHttpClientPtr AsyncHttpClient::create()
     return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(new AsyncHttpClient()));
 }
 
+AsyncHttpClientPtr AsyncHttpClient::create(std::unique_ptr<AbstractStreamSocket> socket)
+{
+    return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(
+        new AsyncHttpClient(std::move(socket))));
+}
+
 QString AsyncHttpClient::endpointWithProtocol(const nx::utils::Url& url)
 {
     return lm("%1://%2:%3")
@@ -527,7 +544,7 @@ void downloadFileAsyncEx(
         httpClientCaptured.get(), requestCompletionFunc,
         Qt::DirectConnection);
 
-    if (method.isEmpty() || method == nx::network::http::Method::get)
+    if (method == nx::network::http::Method::get)
     {
         httpClientCaptured->doGet(url);
     }

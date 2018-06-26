@@ -248,7 +248,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         if (textEnd > textPos.x())
         {
             const auto main = m_textPixmapCache.pixmap(baseName, option.font, mainColor,
-                textEnd - textPos.x(), option.textElideMode);
+                textEnd - textPos.x() + 1, option.textElideMode);
 
             if (!main.pixmap.isNull())
             {

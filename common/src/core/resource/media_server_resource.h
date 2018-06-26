@@ -35,7 +35,7 @@ public:
     QnMediaServerResource(QnCommonModule* commonModule);
     virtual ~QnMediaServerResource();
 
-    virtual QString getUniqueId() const;
+    virtual QString getUniqueId() const override;
 
     //!Overrides \a QnResource::getName. Returns camera name from \a QnMediaServerUserAttributes
     virtual QString getName() const override;
@@ -140,9 +140,6 @@ public:
     virtual QnUuid getOriginalGuid() const { return getId();  }
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
-
-protected:
-    static QString apiUrlScheme(bool sslAllowed);
 
 private slots:
     void onNewResource(const QnResourcePtr &resource);

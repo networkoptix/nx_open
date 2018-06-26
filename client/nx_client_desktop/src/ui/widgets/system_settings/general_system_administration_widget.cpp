@@ -2,6 +2,7 @@
 #include "ui_general_system_administration_widget.h"
 
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QAction>
 
 #include <api/runtime_info_manager.h>
 

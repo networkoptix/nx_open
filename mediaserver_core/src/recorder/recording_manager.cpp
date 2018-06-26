@@ -39,8 +39,6 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <media_server/media_server_module.h>
 
-static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 30;
-static const qint64 UPDATE_CAMERA_HISTORY_PERIOD_MSEC = 60 * 1000;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 QnRecordingManager::QnRecordingManager(
@@ -54,7 +52,7 @@ QnRecordingManager::QnRecordingManager(
     m_tooManyRecordingCnt = 0;
     m_licenseMutex = nullptr;
     connect(this, &QnRecordingManager::recordingDisabled, qnEventRuleConnector, &nx::mediaserver::event::EventConnector::at_licenseIssueEvent);
-    m_recordingStopTime = qMin(LICENSE_RECORDING_STOP_TIME, qnServerModule->roSettings()->value("forceStopRecordingTime", LICENSE_RECORDING_STOP_TIME).toLongLong());
+    m_recordingStopTime = qnServerModule->settings().forceStopRecordingTime();
     m_recordingStopTime *= 1000 * 60;
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnRecordingManager::onNewResource, Qt::QueuedConnection);

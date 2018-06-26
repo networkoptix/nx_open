@@ -1,14 +1,29 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
+from framework.installation.service import Service
+from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import FileSystemPath
 
 
 class Installation(object):
+    """Install and access installed files in uniform way"""
     __metaclass__ = ABCMeta
+
+    @abstractproperty
+    def os_access(self):
+        return OSAccess()
+
+    @abstractmethod
+    def install(self):
+        pass
 
     @abstractmethod
     def is_valid(self):
         return False
+
+    @abstractproperty
+    def service(self):
+        return Service()
 
     @abstractmethod
     def list_core_dumps(self):
@@ -25,7 +40,3 @@ class Installation(object):
     @abstractmethod
     def read_log(self):
         return b'log file contents'
-
-    @abstractmethod
-    def patch_binary_set_cloud_host(self, new_host):  # type: (str) -> None
-        pass

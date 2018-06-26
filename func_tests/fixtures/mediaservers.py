@@ -2,6 +2,7 @@ import logging
 
 import pytest
 
+from defaults import defaults
 from framework.installation.installer import Installer, PackageNameParseError
 from framework.installation.mediaserver_factory import MediaserverFactory
 from framework.merging import merge_systems, setup_local_system
@@ -12,7 +13,7 @@ _logger = logging.getLogger(__name__)
 
 def pytest_addoption(parser):
     parser.addoption(
-        '--mediaserver-installers-dir', type=LocalPath, required=True,
+        '--mediaserver-installers-dir', default=defaults.get('mediaserver_installers_dir'), type=LocalPath,
         help="Directory with installers of same version and customization.")
     parser.addoption('--mediaserver-dist-path', help="Ignored.")
 
@@ -30,7 +31,7 @@ def mediaserver_installers(request):
         _logger.info("File {}: {!r}".format(path, installer))
         installers.append(installer)
     if len(set((installer.customization, installer.version) for installer in installers)) != 1:
-        raise ValueError("Multiple names and versions in {}: {}".format(installers_dir, installers))
+        raise ValueError("Only one version and customizations expected in {}: {}".format(installers_dir, installers))
     installers_by_platform = {installer.platform: installer for installer in installers}
     return installers_by_platform
 
@@ -43,8 +44,8 @@ def mediaserver_factory(mediaserver_installers, artifact_factory, ca):
 @pytest.fixture()
 def two_stopped_mediaservers(mediaserver_factory, two_vms):
     first_vm, second_vm = two_vms
-    with mediaserver_factory.allocated_mediaserver(first_vm) as first_mediaserver:
-        with mediaserver_factory.allocated_mediaserver(second_vm) as second_mediaserver:
+    with mediaserver_factory.allocated_mediaserver('first', first_vm) as first_mediaserver:
+        with mediaserver_factory.allocated_mediaserver('second', second_vm) as second_mediaserver:
             yield first_mediaserver, second_mediaserver
 
 
@@ -70,7 +71,7 @@ def two_merged_mediaservers(two_separate_mediaservers):
 
 @pytest.fixture()
 def one_mediaserver(one_vm, mediaserver_factory):
-    with mediaserver_factory.allocated_mediaserver(one_vm) as mediaserver:
+    with mediaserver_factory.allocated_mediaserver('single', one_vm) as mediaserver:
         yield mediaserver
 
 

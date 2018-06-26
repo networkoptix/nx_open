@@ -1,14 +1,14 @@
 vm_types:
   linux:
     os_family: linux
-    registry_path: ~/.func_tests/trusty-registry.yaml
     power_on_timeout_sec: 120
-    name_format: trusty-{vm_index}
-    limit: 100
     vm:
+      registry_path: ~/.func_tests/trusty-registry.yaml
+      name_format: trusty-{vm_index}
+      limit: 100
       mac_address_format: 0A-00-00-01-{vm_index:02X}-0{nic_index:01X}
       template_vm: trusty-template
-      template_vm_snapshot: template
+      template_url: smb://qanas/rw/gsovetov/func_tests/trusty-template.ova
       port_forwarding:
         host_ports_base: 33000
         host_ports_per_vm: 10
@@ -23,14 +23,14 @@ vm_types:
             host_port_offset: 2
   windows:
     os_family: windows
-    registry_path: ~/.func_tests/win10-registry.yaml
-    power_on_timeout_sec: 600  # After SysPrep, first boot takes several minutes to prepare user profile.
-    name_format: win10-{vm_index}
-    limit: 20
+    power_on_timeout_sec: 1200  # After SysPrep, first boot takes several minutes to prepare user profile.
     vm:
+      registry_path: ~/.func_tests/win10-registry.yaml
+      name_format: win10-{vm_index}
+      limit: 20
       mac_address_format: 0A-00-00-02-{vm_index:02X}-0{nic_index:01X}
       template_vm: win10-template
-      template_vm_snapshot: template
+      template_url: smb://qanas/rw/gsovetov/func_tests/win10-template.ova
       port_forwarding:
         host_ports_base: 35000
         host_ports_per_vm: 10
@@ -51,3 +51,7 @@ vm_types:
             protocol: tcp
             guest_port: 139
             host_port_offset: 9
+          smb-direct:
+            protocol: tcp
+            guest_port: 445
+            host_port_offset: 4

@@ -11,13 +11,9 @@ VOLUME_NAME="@display.product.name@ @release.version@"
 DMG_FILE="@artifact.name.client@.dmg"
 KEYCHAIN="@codeSigningKeychainName@"
 
-# Take into consideration that we have protocol handler app with name
-# @protocol_handler_app_name@ = @display.product.name@ Client.app.
-# Please do not add "Client" word to APP_DIR because of that.
 APP_DIR="$SRC/@display.product.name@.app"
 HELP=@ClientHelpSourceDir@
 RELEASE_VERSION=@release.version@
-PROTOCOL_HANDLER_APP_NAME="@protocol_handler_app_name@"
 
 QT_DIR="@qt.dir@"
 QT_VERSION="@qt.version@"
@@ -25,7 +21,6 @@ QT_VERSION="@qt.version@"
 ln -s /Applications $SRC/Applications
 
 mv $SRC/client.app "$APP_DIR"
-mv "$APP_DIR"/Contents/MacOS/protocol_handler.app "$APP_DIR"/Contents/MacOS/"$PROTOCOL_HANDLER_APP_NAME"
 mkdir -p "$APP_DIR/Contents/Resources"
 cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
 cp logo.icns $SRC/.VolumeIcon.icns
@@ -54,26 +49,41 @@ function patch_dsstore
     cat $xfrom | hexify | sed "s/$from_ver_hex/$to_ver_hex/g" | dehexify > $xto
 }
 
+# Mac OS specific applauncher stuff
+
+LAUNCHER_DIR=LAUNCHER.app
+LAUNCHER_RESOURCES_DIR="$LAUNCHER_DIR/Contents/Resources"
+APP_RESOURCES_DIR="$APP_DIR/Contents/Resources"
+
+rm -rf $LAUNCHER_DIR
+osacompile -o $LAUNCHER_DIR global_launcher.applescript
+
+mkdir -p "$APP_RESOURCES_DIR/Scripts"
+cp "$LAUNCHER_RESOURCES_DIR/Scripts/main.scpt" "$APP_RESOURCES_DIR/Scripts"
+cp "$LAUNCHER_RESOURCES_DIR/droplet.rsrc" "$APP_RESOURCES_DIR/launcher.rsrc"
+cp "$LAUNCHER_DIR/Contents/MacOS/droplet" "$APP_DIR/Contents/MacOS/launcher"
+
+#
+
+function hard_detach_dmg
+{
+    lsof -t "$1" | xargs kill -9
+}
+
 patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 
 python macdeployqt.py "$APP_DIR" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
 
-if [ '@mac.skip.sign@' == 'false'  ]
+if [ '${mac.skip.sign}' == 'false'  ]
 then
-    if [ -z "$KEYCHAIN" ]
-    then
-        KEYCHAIN_ARGS=
-        security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain \
-            || security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
-    else
-        KEYCHAIN_ARGS="--keychain $KEYCHAIN"
-    fi
-
-    codesign -f -v --deep $KEYCHAIN_ARGS -s "@mac.sign.identity@" "$APP_DIR"
+    codesign -f -v --deep -s "@mac.sign.identity@" "$APP_DIR"
 fi
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
+
+hard_detach_dmg "raw-$DMG_FILE"
+
 hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -fs "HFS+" -format UDRW -ov "raw-$DMG_FILE"
 
 [ "$1" == "rwonly" ] && exit 0
@@ -101,6 +111,6 @@ done
 
 rm -rf "$TMP"
 rm -f "$DMG_FILE"
-lsof -t "raw-$DMG_FILE" | xargs kill -9
+hard_detach_dmg "raw-$DMG_FILE"
 hdiutil convert "raw-$DMG_FILE" -format UDZO -o "$DMG_FILE"
 rm -f "raw-$DMG_FILE"

@@ -11,6 +11,7 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("desktop_client.ini") {}
 
     NX_INI_STRING("", cloudHost, "Overridden Cloud Host");
+    NX_INI_FLAG(0, ignoreBetaWarning, "Hide beta version warning");
     NX_INI_FLAG(0, enableEntropixEnhancer, "Enable Entropix image enhancement controls.");
     NX_INI_STRING("http://96.64.226.250:8888/image",
         entropixEnhancerUrl, "URL of Entropix image enhancement API.");
@@ -35,6 +36,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, enableDeviceSearch, "Enable reworked device search dialog");
     NX_INI_FLAG(1, enableWearableCameras, "Enable wearable cameras.");
     NX_INI_FLAG(0, enableResourceFiltering, "Enable reworked resource filtering");
+    NX_INI_FLAG(1, enableResourceFilteringByDefault, "Enable reworked resource filtering");
     NX_INI_FLAG(0, debugThumbnailProviders, "Enable debug mode for thumbnail providers");
     NX_INI_FLAG(0, ignoreZoomWindowConstraints, "Ignore constrains for a zoom region");
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon, "Show extra timestamp information in event ribbon");
@@ -42,6 +44,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_FLAG(0, allowOsScreenSaver, "Allow OS to enable screensaver when user is not active.");
     NX_INI_FLAG(0, enableWebKitDeveloperExtras, "Enable WebKit developer tools like Inspector.");
     NX_INI_FLAG(1, modalServerSetupWizard, "Server setup wizard dialog is a modal window.");
+    NX_INI_FLAG(0, enableTimelineScreenshotCursor, "Show screenshot cursor when hovering above timeline.");
 };
 
 inline Ini& ini()

@@ -28,9 +28,10 @@ public:
         relaying::AbstractListeningPeerPool* listeningPeerPool);
 
 protected:
-    virtual TargetHost cutTargetFromRequest(
+    virtual void detectProxyTarget(
         const nx::network::http::HttpServerConnection& connection,
-        nx::network::http::Request* const request) override;
+        nx::network::http::Request* const request,
+        ProxyTargetDetectedHandler handler) override;
 
     virtual std::unique_ptr<nx::network::aio::AbstractAsyncConnector>
         createTargetConnector() override;
@@ -40,8 +41,13 @@ private:
     const conf::RunTimeOptions& m_runTimeOptions;
     relaying::AbstractListeningPeerPool* m_listeningPeerPool;
 
-    TargetHost cutTargetFromUrl(nx::network::http::Request* const request);
-    TargetHost cutTargetFromPath(nx::network::http::Request* const request);
+    network::http::StatusCode::Value cutTargetFromUrl(
+        nx::network::http::Request* const request,
+        TargetHost* const targetHost);
+
+    network::http::StatusCode::Value cutTargetFromPath(
+        nx::network::http::Request* const request,
+        TargetHost* const targetHost);
 };
 
 } // namespace gateway

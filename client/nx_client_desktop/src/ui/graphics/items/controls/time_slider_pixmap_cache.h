@@ -1,6 +1,8 @@
 #ifndef QN_TIME_SLIDER_PIXMAP_CACHE_H
 #define QN_TIME_SLIDER_PIXMAP_CACHE_H
 
+#include <chrono>
+
 #include <QtCore/QObject>
 #include <QtCore/QCache>
 #include <QtGui/QPixmap>
@@ -19,6 +21,8 @@ class QnTextPixmapCache;
 class QnTimeSliderPixmapCache: public QObject
 {
     Q_OBJECT;
+    using milliseconds = std::chrono::milliseconds;
+
 public:
     QnTimeSliderPixmapCache(int numLevels, QObject* parent = nullptr);
     virtual ~QnTimeSliderPixmapCache();
@@ -43,8 +47,8 @@ public:
     const QColor& tickmarkColor(int level) const;
     void setTickmarkColor(int level, const QColor& color);
 
-    const QPixmap& tickmarkTextPixmap(int level, qint64 position, int height, const QnTimeStep& step);
-    const QPixmap& dateTextPixmap(qint64 position, int height, const QnTimeStep& step);
+    const QPixmap& tickmarkTextPixmap(int level, milliseconds position, int height, const QnTimeStep& step);
+    const QPixmap& dateTextPixmap(milliseconds position, int height, const QnTimeStep& step);
 
     const QPixmap& textPixmap(const QString& text, int height);
     const QPixmap& textPixmap(const QString& text, int height, const QColor& color);

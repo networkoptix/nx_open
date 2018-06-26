@@ -60,7 +60,7 @@ using namespace nx::debugging;
 using PixelFormat = UncompressedVideoFrame::PixelFormat;
 
 ManagerPool::ManagerPool(QnMediaServerModule* serverModule):
-    m_serverModule(serverModule),
+    nx::mediaserver::ServerModuleAware(serverModule),
     m_visualMetadataDebugger(
         VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::managerPool)),
     m_thread(new QThread(this))
@@ -87,7 +87,7 @@ void ManagerPool::stop()
 void ManagerPool::init()
 {
     NX_DEBUG(this, lit("Initializing metadata manager pool."));
-    auto resourcePool = m_serverModule->commonModule()->resourcePool();
+    auto resourcePool = commonModule()->resourcePool();
 
     connect(
         resourcePool, &QnResourcePool::resourceAdded,
@@ -98,7 +98,7 @@ void ManagerPool::init()
         this, &ManagerPool::at_resourceRemoved);
 
     connect(
-        qnServerModule->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
+        serverModule()->metadataRuleWatcher(), &EventRuleWatcher::rulesUpdated,
         this, &ManagerPool::at_rulesUpdated);
 
     QMetaObject::invokeMethod(this, "initExistingResources");
@@ -106,9 +106,9 @@ void ManagerPool::init()
 
 void ManagerPool::initExistingResources()
 {
-    auto resourcePool = m_serverModule->commonModule()->resourcePool();
+    auto resourcePool = commonModule()->resourcePool();
     const auto mediaServer = resourcePool->getResourceById<QnMediaServerResource>(
-        m_serverModule->commonModule()->moduleGUID());
+        commonModule()->moduleGUID());
 
     const auto cameras = resourcePool->getAllCameras(
         mediaServer,
@@ -120,25 +120,33 @@ void ManagerPool::initExistingResources()
 
 void ManagerPool::at_resourceAdded(const QnResourcePtr& resource)
 {
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Resource %1 (%2) has been added.")
             .args(resource->getName(), resource->getId()));
 
     connect(
-        resource.data(), &QnResource::statusChanged,
+        resource, &QnResource::statusChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::parentIdChanged,
+        resource, &QnResource::parentIdChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::urlChanged,
+        resource, &QnResource::urlChanged,
         this, &ManagerPool::handleResourceChanges);
 
     connect(
-        resource.data(), &QnResource::propertyChanged,
+        camera, &QnSecurityCamResource::logicalIdChanged,
+        this, &ManagerPool::handleResourceChanges);
+
+    connect(
+        resource, &QnResource::propertyChanged,
         this, &ManagerPool::at_propertyChanged);
 
     handleResourceChanges(resource);
@@ -168,6 +176,7 @@ void ManagerPool::at_resourceRemoved(const QnResourcePtr& resource)
     if (!camera)
         return;
 
+    camera->disconnect(this);
     QnMutexLocker lock(&m_contextMutex);
     m_contexts.erase(resource->getId());
 }
@@ -180,18 +189,17 @@ void ManagerPool::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 
     for (const auto& resourceId: affectedResources)
     {
-        auto resource = m_serverModule
-            ->commonModule()
-            ->resourcePool()
-            ->getResourceById(resourceId);
-
-        handleResourceChanges(resource);
+        auto resource = resourcePool()->getResourceById(resourceId);
+        if (!resource)
+            releaseResourceCameraManagersUnsafe(resourceId);
+        else
+            handleResourceChanges(resource);
     }
 }
 
 ManagerPool::PluginList ManagerPool::availablePlugins() const
 {
-    auto pluginManager = qnServerModule->pluginManager();
+    auto pluginManager = serverModule()->pluginManager();
     NX_ASSERT(pluginManager, lit("Cannot access PluginManager instance"));
     if (!pluginManager)
         return PluginList();
@@ -298,7 +306,7 @@ void ManagerPool::saveManifestToFile(
     if (!f.open(QFile::WriteOnly))
         return log(Level::error, lit("Unable to (re)create file"));
 
-    const int len = strlen(manifest);
+    const qint64 len = (qint64) strlen(manifest);
     if (f.write(manifest, len) != len)
         return log(Level::error, lit("Unable to write to file"));
 }
@@ -349,18 +357,15 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
                 return;
         }
     }
-    QnMediaServerResourcePtr server = m_serverModule
-        ->commonModule()
-        ->resourcePool()
-        ->getResourceById<QnMediaServerResource>(
-            m_serverModule->commonModule()->moduleGUID());
+    QnMediaServerResourcePtr server = commonModule()->resourcePool()
+        ->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     NX_ASSERT(server, lm("Can not obtain current server resource."));
     if (!server)
         return;
 
     for (Plugin* const plugin: availablePlugins())
     {
-        const QString& pluginLibName = qnServerModule->pluginManager()->pluginLibName(plugin);
+        const QString& pluginLibName = serverModule()->pluginManager()->pluginLibName(plugin);
 
         // TODO: Consider assigning plugin settings earlier.
         setPluginDeclaredSettings(plugin, pluginLibName);
@@ -383,6 +388,7 @@ void ManagerPool::createCameraManagersForResourceUnsafe(const QnSecurityCamResou
             loadManagerManifest(plugin, manager.get(), camera);
         if (managerManifest)
         {
+            // TODO: Fix: Camera property should receive a union of data from all plugins.
             addManifestToCamera(*managerManifest, camera);
         }
         if (auxiliaryPluginManifest)
@@ -443,10 +449,15 @@ CameraManager* ManagerPool::createCameraManager(
 
 void ManagerPool::releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera)
 {
+    releaseResourceCameraManagersUnsafe(camera->getId());
+}
+
+void ManagerPool::releaseResourceCameraManagersUnsafe(const QnUuid& cameraId)
+{
     if (ini().enablePersistentMetadataManager)
         return;
 
-    auto& context = m_contexts[camera->getId()];
+    auto& context = m_contexts[cameraId];
     context.clearManagers();
     context.setManagersInitialized(false);
 }
@@ -474,6 +485,10 @@ MetadataHandler* ManagerPool::createMetadataHandler(
 
 void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 {
+    NX_ASSERT(resource);
+    if (!resource)
+        return;
+
     NX_VERBOSE(
         this,
         lm("Handling resource changes for resource %1 (%2)")
@@ -481,9 +496,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
 
     auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
-    {
         return;
-    }
 
     {
         NX_DEBUG(
@@ -499,7 +512,7 @@ void ManagerPool::handleResourceChanges(const QnResourcePtr& resource)
     {
         if (!context.isManagerInitialized())
             createCameraManagersForResourceUnsafe(camera);
-        auto events = qnServerModule->metadataRuleWatcher()->watchedEventsForResource(resourceId);
+        auto events = serverModule()->metadataRuleWatcher()->watchedEventsForResource(resourceId);
         fetchMetadataForResourceUnsafe(resourceId, context, events);
     }
     else
@@ -730,7 +743,7 @@ ManagerPool::loadManagerManifest(
     auto deviceManifest = deserializeManifest<nx::api::AnalyticsDeviceManifest>(
         managerManifest.get());
 
-    if (deviceManifest && deviceManifest->supportedEventTypes.size())
+    if (deviceManifest && !deviceManifest->supportedEventTypes.empty())
         return std::make_pair(deviceManifest, boost::none);
 
     // If manifest occurred to be not AnalyticsDeviceManifest, we try to treat it as
@@ -760,6 +773,7 @@ ManagerPool::loadManagerManifest(
     return std::make_pair(boost::none, boost::none);
 }
 
+// TODO: #mshevchenko: Rename to addDataFromCameraManagerManifestToCameraResource().
 void ManagerPool::addManifestToCamera(
     const nx::api::AnalyticsDeviceManifest& manifest,
     const QnSecurityCamResourcePtr& camera)
@@ -817,6 +831,7 @@ bool ManagerPool::cameraInfoFromResource(
         CameraInfo::kStringParameterMaxLength);
 
     outCameraInfo->channel = camera->getChannel();
+    outCameraInfo->logicalId = camera->logicalId();
 
     return true;
 }

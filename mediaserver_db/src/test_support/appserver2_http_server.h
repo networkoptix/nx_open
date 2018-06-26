@@ -100,6 +100,9 @@ protected:
         const QnResourcePtr& resource,
         ec2::NotificationSource /*source*/) override;
 
+    virtual void handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType) override;
+    virtual void handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType) override;
+
 protected:
     std::unique_ptr<nx::TestResourceFactory> m_factory;
 };

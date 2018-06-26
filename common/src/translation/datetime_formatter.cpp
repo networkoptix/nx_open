@@ -36,7 +36,7 @@ std::map<Format, QString> formatStrings =
     {Format::MMM, lit("MMM")},
     {Format::yyyy, lit("yyyy")},
 
-    {Format::dd_MM, lit("dd:MM")},
+    {Format::dd_MM, lit("dd-MM")},
     {Format::MMMM_yyyy, lit("MMMM yyyy")},
     {Format::dd_MM_yyyy, lit("dd-MM-yyyy")},
     {Format::yyyy_MM_dd_hh_mm_ss, lit("yyyy-MM-dd hh:mm:ss")},
@@ -48,7 +48,7 @@ std::map<Format, QString> formatStrings =
 
 void DateTimeFormats::setFormats()
 {
-    QLocale locale = QLocale();
+    QLocale locale = QLocale::system(); //< We now use OS locale for time instead of client locale.
     const bool amPm = locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
 
     formatStrings[Format::hh] = amPm ? lit("h AP") : lit("hh:00");
@@ -60,8 +60,7 @@ void DateTimeFormats::setFormats()
 
     formatStrings[Format::hh_mm_ss_zzz] = formatStrings[Format::hh_mm_ss] + lit(".zzz");
 
-
-    formatStrings[Format::dd_MM] = tr("dd/MM"); //< Localizable
+    formatStrings[Format::dd_MM] = tr("MM/dd"); //< Localizable
     formatStrings[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable
     formatStrings[Format::dd_MM_yyyy] = locale.dateFormat(QLocale::ShortFormat);
     formatStrings[Format::yyyy_MM_dd_hh_mm_ss] = locale.dateTimeFormat(QLocale::ShortFormat);
@@ -70,38 +69,56 @@ void DateTimeFormats::setFormats()
     // Fix - we never want timezone in time string.
     removeTimezone(formatStrings[Format::yyyy_MM_dd_hh_mm_ss]);
     removeTimezone(formatStrings[Format::dddd_d_MMMM_yyyy_hh_mm_ss]);
+
+    formatStrings[Format::filename_date] = amPm
+        ? lit("yyyy_MM_dd_hAP_mm_ss")
+        : lit("yyyy_MM_dd_hh_mm_ss");
+}
+
+bool localeEverInited = false;
+
+void checkInited()
+{
+    if (!localeEverInited)
+        initLocale();
 }
 
 } // namespace
 
 QString toString(const QDateTime& time, Format format)
 {
+    checkInited();
     return time.toString(formatStrings[format]);
 }
 
 QString toString(const QTime& time, Format format)
 {
+    checkInited();
     return time.toString(formatStrings[format]);
 }
 
 QString toString(const QDate& date, Format format)
 {
+    checkInited();
     return date.toString(formatStrings[format]);
 }
 
 QString toString(qint64 msSinceEpoch, Format format)
 {
+    checkInited();
     return QDateTime::fromMSecsSinceEpoch(msSinceEpoch).toString(formatStrings[format]);
 }
 
 QString getFormatString(Format format)
 {
+    checkInited();
     return formatStrings[format];
 }
 
 void initLocale()
 {
     DateTimeFormats::setFormats();
+    localeEverInited = true;
 }
 
 } // namespace datetime

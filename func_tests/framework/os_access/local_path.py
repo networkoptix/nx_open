@@ -44,6 +44,11 @@ _reraising_existing_dir_errors = _reraising({
 
 
 class LocalPath(PosixPath, FileSystemPath):
+    """Access local filesystem with unified interface (incl. exceptions)
+
+    Unlike SSHPath and SMBPath, there can be only one local file system,
+    therefore, this class is not to be inherited from.
+    """
     @classmethod
     def tmp(cls):
         temp_dir = cls('/tmp/func_tests')
@@ -52,7 +57,7 @@ class LocalPath(PosixPath, FileSystemPath):
 
     mkdir = _reraising_new_file_errors(PosixPath.mkdir)
     write_text = _reraising_new_file_errors(PosixPath.write_text)
-    write_bytes = _reraising_new_file_errors(PosixPath.write_bytes)
+    _write_bytes_to_entire_file = _reraising_new_file_errors(PosixPath.write_bytes)
     read_text = _reraising_existing_file_errors(PosixPath.read_text)
     read_bytes = _reraising_existing_file_errors(PosixPath.read_bytes)
     unlink = _reraising_existing_file_errors(PosixPath.unlink)
@@ -67,3 +72,11 @@ class LocalPath(PosixPath, FileSystemPath):
     @_reraising_existing_dir_errors
     def rmtree(self, ignore_errors=False):
         rmtree(str(self), ignore_errors=ignore_errors)
+
+    def write_bytes(self, data, offset=None):
+        if offset is None:
+            return self._write_bytes_to_entire_file(data)
+        else:
+            with self.open('r+b') as f:  # See: https://stackoverflow.com/a/28932052/1833960
+                f.seek(offset)
+                return f.write(data)

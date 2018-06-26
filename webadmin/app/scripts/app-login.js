@@ -8,8 +8,8 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'ngStorage'
 ]).config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';
-    $httpProvider.defaults.xsrfHeaderName = 'Nx-Vms-Csrf-Token';
+    $httpProvider.defaults.xsrfCookieName = 'x-runtime-guid';
+    $httpProvider.defaults.xsrfHeaderName = 'X-Runtime-Guid';
 }]).run(['mediaserver',function (mediaserver) {
     mediaserver.getCurrentUser();
 }]);

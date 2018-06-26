@@ -12,7 +12,7 @@ ListView
     signal buttonDownChanged(int index, bool down)
     signal buttonPressed(int index)
     signal buttonClicked(int index)
-    signal longPressedChanged(int index, bool pressed)
+    signal longPressedChanged(int index, bool pressed, bool down)
     signal actionCancelled(int index)
     signal enabledChanged(int index, bool buttonEnabled)
 
@@ -94,7 +94,7 @@ ListView
         onButtonLongPressedChanged:
         {
             if (active)
-                control.longPressedChanged(index, buttonLongPressed)
+                control.longPressedChanged(index, buttonLongPressed, button.pressed)
         }
 
         onPressedChanged: pressedSignalOrderTimer.restart()
@@ -108,18 +108,10 @@ ListView
             onDraggingChanged: handleCancelled()
         }
 
-        onClicked:
-        {
-            d.allowInteractiveState = true
-            if (!filteringPressing)
-            {
-                pressedStateFilterTimer.stop()
-                control.buttonClicked(index)
-            }
-        }
-
         onPressed:
         {
+            filteringPressing = false
+            buttonLongPressed = false
             d.allowInteractiveState = false
 
             button.active = true
@@ -169,10 +161,15 @@ ListView
 
         function handleButtonReleased()
         {
-            if (pressedStateFilterTimer.running)
+            if (pressedStateFilterTimer.running || model.disableLongPress)
+            {
                 pressedStateFilterTimer.stop()
+                control.buttonClicked(index)
+            }
             else
+            {
                 finishStateProcessing(false)
+            }
         }
 
         function finishStateProcessing(value)
