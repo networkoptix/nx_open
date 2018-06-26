@@ -16,7 +16,6 @@ if("${platform}" STREQUAL "linux")
         set(_withTests OFF)
 
         if("${box}" STREQUAL "bpi")
-            set(_withMobileClient ON)
             set(_withTests ON)
         elseif("${box}" STREQUAL "tx1")
             set(_withDesktopClient ON)

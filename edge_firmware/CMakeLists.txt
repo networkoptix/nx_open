@@ -3,10 +3,6 @@ set(depends
     server_plugins
 )
 
-if(targetDevice STREQUAL "bpi")
-    list(APPEND depends "mobile_client")
-endif()
-
 set(tar_file ${distribution_output_dir}/${artifact.name.server}.tar.gz)
 set(zip_file ${distribution_output_dir}/${artifact.name.server_update}.zip)
 set(installer_output_list ${tar_file} ${zip_file})

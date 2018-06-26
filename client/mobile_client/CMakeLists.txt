@@ -69,10 +69,6 @@ if(ANDROID)
     target_link_libraries(mobile_client PUBLIC GLESv2 z log)
 endif()
 
-if(box STREQUAL "bpi")
-    target_link_libraries(mobile_client PRIVATE GLESv2)
-endif()
-
 if(ANDROID)
     nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/maven/bin-resources/android
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
