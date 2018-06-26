@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/core/ptz/test_ptz_controller.h>
+#include <nx/core/ptz/test_support/test_ptz_controller.h>
 #include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
 #include <nx/core/ptz/realtive/relative_move_workaround_controller.h>
 
