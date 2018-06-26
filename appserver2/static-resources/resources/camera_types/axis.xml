@@ -365,5 +365,6 @@
                 <param name = "hasDualStreaming" default_value ="0"/>
             </params>
         </resource> 
+        <resource name = "AXISP1448" public = "AXISP1447"/>
     </oem>
 </resources>
