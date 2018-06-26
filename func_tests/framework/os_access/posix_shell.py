@@ -41,11 +41,12 @@ class SSHNotConnected(Exception):
 
 
 class _SSHCommand(Command):
-    def __init__(self, ssh_client, script, subprocess_logger):
+    _logger = _logger.getChild('_SSHCommand')
+
+    def __init__(self, ssh_client, script):
         super(_SSHCommand, self).__init__()
         self._ssh_client = ssh_client
         self._script = script
-        self._logger = subprocess_logger
 
     def __enter__(self):
         transport = self._ssh_client.get_transport()
@@ -146,8 +147,7 @@ class SSH(PosixShell):
 
     def run_sh_script(self, script, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
         augmented_script = sh_augment_script(script, cwd, env)
-        subprocess_logger = _logger.getChild('subprocess')
-        with _SSHCommand(self._client(), augmented_script, subprocess_logger) as command:
+        with _SSHCommand(self._client(), augmented_script) as command:
             exit_status, stdout, stderr = command.communicate(input=input, timeout_sec=timeout_sec)
         if exit_status != 0:
             raise exit_status_error_cls(exit_status)(stdout, stderr)
