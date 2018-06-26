@@ -10,6 +10,7 @@ from abc import ABCMeta, abstractmethod
 import paramiko
 
 from framework.method_caching import cached_getter
+from framework.os_access.command import Command
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 from framework.waiting import Wait
@@ -37,6 +38,77 @@ class PosixShell(object):
 
 class SSHNotConnected(Exception):
     pass
+
+
+class _SSHCommand(Command):
+    def __init__(self, ssh_client, script, subprocess_logger):
+        super(_SSHCommand, self).__init__()
+        self._ssh_client = ssh_client
+        self._script = script
+        self._logger = subprocess_logger
+
+    def __enter__(self):
+        transport = self._ssh_client.get_transport()
+        self._channel = transport.open_session()
+        self._logger.debug("Run on %r:\n%s", self, self._script)
+        self._channel.exec_command(self._script)
+        self._open_streams = {
+            "STDOUT": (self._channel.recv, self._logger.getChild('stdout')),
+            "STDERR": (self._channel.recv_stderr, self._logger.getChild('stderr')),
+            }
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def send(self, input, is_last=False):
+        self._channel.settimeout(10)  # Must never time out assuming process always open stdin and read from it.
+        input = memoryview(input)
+        bytes_sent = self._channel.send(input[:_STREAM_BUFFER_SIZE])
+        _logger.debug("Chunk of input sent: %d bytes.", bytes_sent)
+        if bytes_sent == 0:
+            _logger.warning("Write direction preliminary closed from the other side.")
+            # TODO: Raise exception.
+        if is_last and not input[bytes_sent:]:
+            _logger.debug("Shutdown write direction.")
+            self._channel.shutdown_write()
+        return bytes_sent
+
+    def receive(self, timeout_sec):
+        self._channel.settimeout(timeout_sec)
+        output_chunks = {}
+        subprocess_responded = False  # TODO: Use `for: ... else: ...`.
+        for key, (recv, output_logger) in self._open_streams.items():
+            try:
+                # TODO: Wait on `self.channel.event`.
+                output_chunk = recv(_STREAM_BUFFER_SIZE)
+            except socket.timeout:
+                continue  # Next stream might have data on it.
+            subprocess_responded = True
+            if not output_chunk:
+                output_logger.debug("Closed from the other side.")
+                del self._open_streams[key]
+                break  # Avoid iteration over mutated dict.
+            output_logger.debug("Received: %d bytes.", len(output_chunk))
+            output_chunks[key] = output_chunk
+            if len(output_chunk) > _BIG_CHUNK_THRESHOLD_CHARS:
+                output_logger.debug("Big chunk: %d bytes", len(output_chunk))
+            else:
+                try:
+                    output_logger.debug("Text:\n%s", output_chunk.decode('ascii'))
+                except UnicodeDecodeError:
+                    output_logger.debug("Binary: %d bytes", len(output_chunk))
+        self._logger.debug("Exit status: %r.", self._channel.exit_status)
+        if self._channel.exit_status != -1:
+            assert 0 <= self._channel.exit_status <= 255
+            if self._open_streams:
+                self._logger.error("Remote process exited but streams left open. Child forked?")
+            exit_status = self._channel.exit_status
+        else:
+            exit_status = None
+        if not self._open_streams:
+            self._channel.shutdown_read()  # Other side could be open by forked child.
+        return exit_status, output_chunks.get('STDOUT'), output_chunks.get('STDERR')
 
 
 class SSH(PosixShell):
@@ -72,92 +144,13 @@ class SSH(PosixShell):
     def __del__(self):
         self._client().close()
 
-    def _channel(self):
-        transport = self._client().get_transport()
-        channel = transport.open_session()
-        return channel
-
-    @staticmethod
-    def _send_input(channel, input):
-        if input is not None:
-            channel.settimeout(10)  # Must never time out assuming process always open stdin and read from it.
-            input_offset = 0
-            while True:
-                assert 0 <= input_offset <= len(input)
-                if input_offset == len(input):  # If input is empty, nothing is sent.
-                    _logger.debug("Input sent successfully.")
-                    break
-                input_chunk = input[input_offset:input_offset + _STREAM_BUFFER_SIZE]
-                input_bytes_sent = channel.send(input_chunk)
-                input_offset += input_bytes_sent
-                if input_bytes_sent == 0:
-                    _logger.warning("Write direction preliminary closed from the other side.")
-                    break
-                _logger.debug("Chunk of input sent: %d bytes.", input_bytes_sent)
-        _logger.debug("Shutdown write direction.")
-        channel.shutdown_write()
-
     def run_sh_script(self, script, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
         augmented_script = sh_augment_script(script, cwd, env)
         subprocess_logger = _logger.getChild('subprocess')
-        subprocess_logger.debug("Run on %r:\n%s", self, augmented_script)
-        channel = self._channel()
-        channel.exec_command(augmented_script)
-
-        self._send_input(channel, input)
-
-        wait_for_data = Wait("data received on stdout and stderr", timeout_sec=timeout_sec, attempts_limit=10000)
-        stdout_chunks = []
-        stderr_chunks = []
-        open_streams = {
-            "STDOUT": (channel.recv, stdout_chunks, subprocess_logger.getChild('stdout')),
-            "STDERR": (channel.recv_stderr, stderr_chunks, subprocess_logger.getChild('stderr')),
-            }
-        while open_streams:
-            channel.settimeout(wait_for_data.delay_sec)
-            subprocess_responded = False
-            for key, (recv, output_chunks, output_logger) in open_streams.items():
-                try:
-                    output_chunk = recv(_STREAM_BUFFER_SIZE)
-                except socket.timeout:
-                    continue  # Next stream might have data on it.
-                subprocess_responded = True
-                if not output_chunk:
-                    output_logger.debug("Closed from the other side.")
-                    del open_streams[key]
-                    break  # Avoid iteration over mutated dict.
-                output_logger.debug("Received: %d bytes.", len(output_chunk))
-                output_chunks.append(output_chunk)
-                if len(output_chunk) > _BIG_CHUNK_THRESHOLD_CHARS:
-                    output_logger.debug("Big chunk: %d bytes", len(output_chunk))
-                else:
-                    try:
-                        output_logger.debug("Text:\n%s", output_chunk.decode('ascii'))
-                    except UnicodeDecodeError:
-                        output_logger.debug("Binary: %d bytes", len(output_chunk))
-            if not subprocess_responded:
-                subprocess_logger.debug("Exit status: %r.", channel.exit_status)
-                if channel.exit_status != -1:
-                    assert 0 <= channel.exit_status <= 255
-                    subprocess_logger.error("Remote process exited but streams left open (child forked?)")
-                    break  # Leave
-                if not wait_for_data.again():
-                    raise Timeout(timeout_sec)
-
-        subprocess_logger.debug("No data will be read from stdout and stderr.")
-        stdout = b''.join(stdout_chunks)
-        stderr = b''.join(stderr_chunks)
-
-        while True:
-            if channel.exit_status_ready():
-                subprocess_logger.debug("Process exit status: %d.", channel.exit_status)
-                if channel.exit_status != 0:
-                    raise exit_status_error_cls(channel.exit_status)(stdout, stderr)
-                break
-            subprocess_logger.debug("Process still not exited")
-
-        channel.shutdown_read()  # Other side could be open by forked child.
-
+        with _SSHCommand(self._client(), augmented_script, subprocess_logger) as command:
+            exit_status, stdout, stderr = command.communicate(input=input, timeout_sec=timeout_sec)
+        if exit_status != 0:
+            raise exit_status_error_cls(exit_status)(stdout, stderr)
         return stdout
 
     def is_working(self):
