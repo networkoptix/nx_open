@@ -22,7 +22,6 @@ TranscodeMediaEncoder::TranscodeMediaEncoder(
         codecContext,
         ffmpegStreamReader)
 {
-    debug("%s\n", __FUNCTION__);
 }
 
 TranscodeMediaEncoder::~TranscodeMediaEncoder()
@@ -31,7 +30,6 @@ TranscodeMediaEncoder::~TranscodeMediaEncoder()
 
 nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 {
-    debug("%s\n", __FUNCTION__);
     if (!m_streamReader)
     {
         m_streamReader.reset(new TranscodeStreamReader(

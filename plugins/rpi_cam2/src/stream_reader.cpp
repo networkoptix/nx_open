@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
 
+#include "utils/utils.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/stream_reader.h"
 
@@ -27,13 +28,11 @@ StreamReader::StreamReader(
     m_ffmpegStreamReader(ffmpegStreamReader)
 {
     NX_ASSERT(m_timeProvider);
-    m_ffmpegStreamReader.lock()->addRef();
 }
 
 StreamReader::~StreamReader()
 {
     m_timeProvider->releaseRef();
-    m_ffmpegStreamReader.lock()->removeRef();
 }
 
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -79,13 +78,13 @@ std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(AVPacket *packet, AVCod
         nxcip::MediaDataPacket::fKeyPacket,
         0 ) );
 
-     nxVideoPacket->resizeBuffer(packet->size);
-     if (nxVideoPacket->data())
-         memcpy(nxVideoPacket->data(), packet->data, packet->size);
+    nxVideoPacket->resizeBuffer(packet->size);
+    if (nxVideoPacket->data())
+        memcpy(nxVideoPacket->data(), packet->data, packet->size);
 
-     nxVideoPacket->setCodecType(ffmpeg::utils::toNxCompressionType(codecID));
+    nxVideoPacket->setCodecType(ffmpeg::utils::toNxCompressionType(codecID));
 
-     return nxVideoPacket;
+    return nxVideoPacket;
 }
 
 // QString StreamReader::decodeCameraInfoUrl() const

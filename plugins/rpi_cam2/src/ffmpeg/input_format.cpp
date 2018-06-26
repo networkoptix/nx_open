@@ -1,10 +1,12 @@
 #include "input_format.h"
 
+#include <string>
+
 extern "C" {
 #include <libavformat/avformat.h>
 }
 
-#include <string>
+#include "error.h"
 
 namespace nx {
 namespace webcam_plugin {
@@ -24,23 +26,31 @@ int InputFormat::initialize(const char * deviceType)
 {
     m_inputFormat = av_find_input_format(deviceType); 
     if (!m_inputFormat)
+    {
         // there is no error code for format not found
+        error::setLastError(AVERROR_PROTOCOL_NOT_FOUND);
         return AVERROR_PROTOCOL_NOT_FOUND;
+    }
 
     m_formatContext = avformat_alloc_context();
     if (!m_formatContext)
+    {
+        error::setLastError(AVERROR(ENOMEM));
         return AVERROR(ENOMEM);
+    }
 
     return 0;
 }
 
 int InputFormat::open(const char * url)
 {
-    return avformat_open_input(
+    int openCode = avformat_open_input(
         &m_formatContext,
         url,
         m_inputFormat,
         &m_options);
+    error::updateIfError(openCode);
+    return openCode;
 }
 
 void InputFormat::close()
@@ -56,8 +66,7 @@ int InputFormat::setFps(int fps)
 
 int InputFormat::setResolution(int width, int height)
 {
-    std::string res = std::to_string(width) + "x" + std::to_string(height);
-    return setEntry("video_size", res.c_str());
+    return setEntry("video_size", (std::to_string(width) + "x" + std::to_string(height)).c_str());
 }
 
 AVFormatContext * InputFormat::formatContext() const

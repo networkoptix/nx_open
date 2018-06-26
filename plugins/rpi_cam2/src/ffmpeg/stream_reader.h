@@ -17,11 +17,18 @@ namespace ffmpeg {
 class StreamReader
 {
 public:
+    enum CameraState
+    {
+        kOff,
+        kInitialized,
+        kModified
+    };
+
+public:
     StreamReader(const char * url, const CodecContext& codecParameters);
     virtual ~StreamReader();
-
-    int addRef();
-    int removeRef();
+    
+    CameraState cameraState();
 
     const std::unique_ptr<Codec>& codec();
     const std::unique_ptr<InputFormat>& inputFormat();
@@ -29,10 +36,9 @@ public:
     void setFps(int fps);
     void setBitrate(int bitrate);
     void setResolution(int width, int height);
-    
-    AVFrame * currentFrame();
-    AVPacket * currentPacket();
-    int loadNextData();
+
+    int nextPacket(AVPacket * outPacket);
+    int nextFrame(AVFrame * outFrame);
 
 private:
     std::string m_url;
@@ -41,25 +47,13 @@ private:
     std::unique_ptr<Codec> m_decoder;
     std::unique_ptr<InputFormat> m_inputFormat;
 
-    AVPacket * m_currentPacket = nullptr;
-    AVFrame * m_currentFrame = nullptr;
-
-    enum CameraState
-    {
-        kOff,
-        kInitialized,
-        kModified
-    };
     CameraState m_cameraState = kOff;
     std::mutex m_mutex;
 
-    int m_refCount = 0;
 private:
-    int ensureInitialized();
+    bool ensureInitialized();
     int initialize();
     void uninitialize();
-    int allocateCurrentPacket();
-    int allocateCurrentFrame();
     void setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat);
     int decodeFrame(AVPacket * packet, AVFrame* outFrame);
 };

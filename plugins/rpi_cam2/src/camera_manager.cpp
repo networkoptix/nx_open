@@ -16,8 +16,7 @@ namespace {
 
 static const std::vector<nxcip::CompressionType> videoCodecPriorityList =
 {
-    nxcip::AV_CODEC_ID_H264,
-    nxcip::AV_CODEC_ID_MJPEG
+    nxcip::AV_CODEC_ID_H264
 };
 
 nxcip::CompressionType getPriorityCodec(const std::vector<nxcip::CompressionType>& codecList)
@@ -44,14 +43,10 @@ CameraManager::CameraManager(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::primaryStreamSoftMotionCapability)
 {
-    debug("%s\n", __FUNCTION__);
-
     int encoderCount = 2;
     m_encoders.reserve(encoderCount);
     m_encoders.push_back(nullptr);
-    m_encoders.push_back(nullptr);
-    
-    debug("%s done\n", __FUNCTION__);
+    m_encoders.push_back(nullptr);    
 }
 
 CameraManager::~CameraManager()
@@ -90,15 +85,13 @@ unsigned int CameraManager::releaseRef()
 
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    debug("%s\n", __FUNCTION__);
-    *encoderCount = m_encoders.size();
+    *encoderCount = 1;
+    //*encoderCount = m_encoders.size();
     return nxcip::NX_NO_ERROR;
 }
 
 int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
 {
-    debug("%s\n", __FUNCTION__);
-
     if(!m_ffmpegStreamReader)
     {
         m_ffmpegStreamReader = std::make_shared<ffmpeg::StreamReader>(
@@ -222,11 +215,9 @@ std::string CameraManager::decodeCameraInfoUrl() const
 
 CodecContext CameraManager::getEncoderDefaults(int encoderIndex)
 {
-    debug("%s\n", __FUNCTION__);
-
     float defaultFPS = 30;
     int defaultBitrate = 200000; 
-    nxcip::Resolution resolution;
+    nxcip::Resolution resolution = {640, 480};
 
     std::string url = decodeCameraInfoUrl();
     auto codecList = utils::getSupportedCodecs(url.c_str());
@@ -259,8 +250,6 @@ CodecContext CameraManager::getEncoderDefaults(int encoderIndex)
             defaultBitrate = 200000;
             resolution = {480, 270};
             break;
-        default:
-        return CodecContext();
     }
 
     return CodecContext(codecID, resolution, defaultFPS, defaultBitrate);

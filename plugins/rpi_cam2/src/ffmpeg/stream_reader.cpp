@@ -16,6 +16,7 @@ extern "C" {
 #include "utils.h"
 #include "input_format.h"
 #include "codec.h"
+#include "packet.h"
 #include "error.h"
 
 namespace nx {
@@ -44,7 +45,6 @@ StreamReader::StreamReader(const char * url, const CodecContext& codecParameters
     m_url(url),
     m_codecParams(codecParameters)
 {
-    debug("%s\n", __FUNCTION__);
 }
 
 StreamReader::~StreamReader()
@@ -52,17 +52,9 @@ StreamReader::~StreamReader()
     uninitialize();
 }
 
-int StreamReader::addRef()
+StreamReader::CameraState StreamReader::cameraState()
 {
-    return ++m_refCount;
-}
-
-int StreamReader::removeRef()
-{
-    m_refCount = m_refCount > 0 ? m_refCount - 1 : 0;
-    if(m_refCount == 0 && m_cameraState == kInitialized)
-        uninitialize();
-    return m_refCount;
+    return m_cameraState;
 }
 
 const std::unique_ptr<ffmpeg::Codec>& StreamReader::codec()
@@ -77,51 +69,50 @@ const std::unique_ptr<ffmpeg::InputFormat>& StreamReader::inputFormat()
 
 void StreamReader::setFps(int fps)
 {
-    m_codecParams.setFps(fps);
-    m_cameraState = kModified;
+    if(fps != m_codecParams.fps())
+    {
+        m_codecParams.setFps(fps);
+        m_cameraState = kModified;
+    }
 }
 
 void StreamReader::setBitrate(int bitrate)
 {
-    m_codecParams.setBitrate(bitrate);
-    m_cameraState = kModified;
+    if(bitrate != m_codecParams.bitrate())
+    {
+        m_codecParams.setBitrate(bitrate);
+        m_cameraState = kModified;
+    }
 }
 
 void StreamReader::setResolution(int width, int height)
 {
-    m_codecParams.setResolution({width, height});
-    m_cameraState = kModified;
+    nxcip::Resolution res = m_codecParams.resolution();
+    if(width != res.width || height != res.height)
+    {
+        m_codecParams.setResolution({width, height});
+        m_cameraState = kModified;
+    }
 }
 
-AVFrame * StreamReader::currentFrame()
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_currentFrame;
-}
-
-AVPacket * StreamReader::currentPacket()
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_currentPacket;
-}
-
-int StreamReader::loadNextData()
+int StreamReader::nextPacket(AVPacket * outPacket)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if(!ensureInitialized())
         return error::lastError();
-
-    av_packet_unref(m_currentPacket);
-    av_frame_unref(m_currentFrame);
-    av_init_packet(m_currentPacket);
-
-    int decodeCode = decodeFrame(m_currentPacket, m_currentFrame);
-    error::updateIfError(decodeCode);
-    
-    return decodeCode;
+    return m_decoder->readFrame(m_inputFormat->formatContext(), outPacket);
 }
 
-int StreamReader::ensureInitialized()
+int StreamReader::nextFrame(AVFrame * outFrame)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if(!ensureInitialized())
+        return error::lastError();
+    Packet packet;
+    return decodeFrame(packet.ffmpegPacket(), outFrame);
+}
+
+bool StreamReader::ensureInitialized()
 {
      auto printError =
         [this]()
@@ -136,22 +127,22 @@ int StreamReader::ensureInitialized()
             NX_DEBUG(this) << "ensureInitialized(): ffmpeg::error::lastError" << error::lastError();
         };
 
-    int error = 0;
-    if(m_cameraState != kInitialized)
+    switch(m_cameraState)
     {
-        error = initialize();
-        NX_DEBUG(this) << "ensureInitialized(): first initialization";
-        printError();
-    }
-    else if(m_cameraState == kModified)
-    {
-        NX_DEBUG(this) << "ensureInitialized(): codec parameters modified, reinitializing";
-        uninitialize();
-        error = initialize();
-        printError();
+        case kModified:
+            NX_DEBUG(this) << "ensureInitialized(): codec parameters modified, reinitializing";
+            uninitialize();
+            initialize();
+            printError();
+            break;
+        case kOff:
+            NX_DEBUG(this) << "ensureInitialized(): first initialization";
+            initialize();
+            printError();
+            break;
     }
 
-    return error;
+    return m_cameraState == kInitialized;
 }
 
 int StreamReader::initialize()
@@ -178,17 +169,10 @@ int StreamReader::initialize()
     if (error::updateIfError(openCode))
         return openCode;
 
-    int allocCode = allocateCurrentPacket();
-    if (error::updateIfError(allocCode))
-        return allocCode;
-
-    allocCode = allocateCurrentFrame();
-    if (error::updateIfError(allocCode))
-        return allocCode;
-
     m_inputFormat = std::move(inputFormat);
     m_decoder = std::move(decoder);
 
+    debug("");
     av_dump_format(m_inputFormat->formatContext(), 0, m_url.c_str(), 0);
     m_cameraState = kInitialized;
     
@@ -197,35 +181,14 @@ int StreamReader::initialize()
 
 void StreamReader::uninitialize()
 {
+    debug("%s\n", __FUNCTION__);
     if (m_decoder)
         m_decoder.reset(nullptr);
 
     if (m_inputFormat)
         m_inputFormat.reset(nullptr);
 
-    if (m_currentPacket)
-        av_packet_free(&m_currentPacket);
-
-    if (m_currentFrame)
-        av_frame_free(&m_currentFrame);
-
     m_cameraState = kOff;
-}
-
-int StreamReader::allocateCurrentPacket()
-{
-    m_currentPacket = av_packet_alloc();
-    if(!m_currentPacket)
-        return AVERROR(ENOMEM);
-    return 0;
-}
-
-int StreamReader::allocateCurrentFrame()
-{
-    m_currentFrame = av_frame_alloc();
-    if(!m_currentFrame)
-        return AVERROR(ENOMEM);
-    return 0;
 }
 
 void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat)

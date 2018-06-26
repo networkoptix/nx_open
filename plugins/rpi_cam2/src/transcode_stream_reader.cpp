@@ -58,8 +58,10 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(!ensureInitialized())
         return nxcip::NX_OTHER_ERROR;
 
-    streamReader->loadNextData();
-    AVFrame * frame = streamReader->currentFrame();
+    AVFrame * frame = av_frame_alloc();
+    int decodeCode = streamReader->nextFrame(frame);
+    if(decodeCode < 0)
+        return nxcip::NX_IO_ERROR;
 
     AVFrame * scaledFrame = nullptr;
     int scaleCode = scale(frame, &scaledFrame);
@@ -94,7 +96,7 @@ void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
     auto currentRes = m_codecContext.resolution();
     if(currentRes.width != resolution.width
-        && currentRes.height != resolution.height)
+        || currentRes.height != resolution.height)
     {
         m_codecContext.setResolution(resolution);
         m_modified = true;
@@ -252,7 +254,7 @@ void TranscodeStreamReader::uninitialize()
     m_initialized = false;
 }
 
-int TranscodeStreamReader::ensureInitialized()
+bool TranscodeStreamReader::ensureInitialized()
 {
     auto printError =
         [this]()
@@ -267,10 +269,9 @@ int TranscodeStreamReader::ensureInitialized()
             NX_DEBUG(this) << "ensureInitialized()::m_lastAvError" << ffmpeg::error::lastError();
         };
 
-    int error = 0;
     if(!m_initialized)
     {
-        error = initialize();
+        initialize();
         NX_DEBUG(this) << "ensureInitialized(): first initialization";
         printError();
     }
@@ -278,12 +279,12 @@ int TranscodeStreamReader::ensureInitialized()
     {
         NX_DEBUG(this) << "ensureInitialized(): codec parameters modified, reinitializing";
         uninitialize();
-        error = initialize();
+        initialize();
         printError();
         m_modified = false;
     }
 
-    return error;
+    return m_initialized;
 }
 
 } // namespace webcam_plugin

@@ -32,16 +32,14 @@ private:
     AVPacket* m_encodedPacket = nullptr;
     std::unique_ptr<ffmpeg::Codec> m_videoEncoder;
 
-
     bool m_initialized = false;
     bool m_modified = true;
-    bool m_terminated = false;
 
 private:
     int scale(AVFrame* frame, AVFrame ** outFrame) const;
     int encode(AVFrame * frame, AVPacket * outPacket) const;
 
-    int ensureInitialized();
+    bool ensureInitialized();
     int initialize();
     void uninitialize();
     int openVideoEncoder();

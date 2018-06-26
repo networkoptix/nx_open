@@ -21,7 +21,6 @@ MediaEncoder(
     codecContext,
     ffmpegStreamReader)
 {
-    debug("%s\n", __FUNCTION__);
 }
 
 NativeMediaEncoder::~NativeMediaEncoder()
@@ -30,7 +29,6 @@ NativeMediaEncoder::~NativeMediaEncoder()
 
 nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
 {
-    debug("%s\n", __FUNCTION__);
     if (!m_streamReader)
     {
         m_streamReader.reset(new NativeStreamReader(

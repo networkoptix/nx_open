@@ -31,10 +31,10 @@ std::vector<ResolutionData> getResolutionList(
 
         std::vector<ResolutionData> list;
 
-        // addResolutionData(&list, {1920, 1080}, 30);
-        // addResolutionData(&list, {1280, 720}, 30); // locks up the h264_omx encoder
-        // addResolutionData(&list, {800, 600}, 30);
-        // addResolutionData(&list, {640, 480}, 30); // locks up the h264_omx encoder
+        addResolutionData(&list, {1920, 1080}, 30);
+        addResolutionData(&list, {1280, 720}, 30); // locks up the h264_omx encoder
+        addResolutionData(&list, {800, 600}, 30);
+        addResolutionData(&list, {640, 480}, 30); // locks up the h264_omx encoder
         addResolutionData(&list, {320, 180}, 30);
 
         return list;

@@ -20,7 +20,6 @@ DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager,
     m_refManager(refManager),
     m_timeProvider(timeProvider)
 {
-    debug("%s\n", __FUNCTION__);
 }
 
 void* DiscoveryManager::queryInterface(const nxpl::NX_GUID& interfaceID)
@@ -57,7 +56,6 @@ void DiscoveryManager::getVendorName(char* buf) const
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
-    debug("%s\n", __FUNCTION__);
     std::vector<utils::DeviceData> devices = utils::getDeviceList();
     int deviceCount = devices.size();
     for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
