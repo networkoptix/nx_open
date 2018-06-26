@@ -126,8 +126,8 @@ DECLARE_STRUCT_AND_LIST(SystemMergeHistoryRecord)
 DECLARE_STRUCT_AND_LIST(KeyValueData)
 DECLARE_STRUCT_AND_LIST(MiscData)
 
-DECLARE_STRUCT(DiscoverPeerData)
-DECLARE_STRUCT_AND_LIST(DiscoveryData)
+DECLARE_STRUCT_EX(DiscoverPeerData, (ubjson)(json)(xml)(csv_record))
+DECLARE_STRUCT_AND_LIST_EX(DiscoveryData, (ubjson)(json)(xml)(csv_record))
 
 DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))
 
