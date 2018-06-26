@@ -58,10 +58,13 @@ class WinRM(object):
         shell.__enter__()
         return shell
 
-    def run_command(self, command, input=None):
-        command_str_list = command_args_to_str_list(command)
+    def command(self, args):
+        command_str_list = command_args_to_str_list(args)
         _logger.debug("Command: %s", list2cmdline(command_str_list))
-        with self._shell().start(*command_str_list) as running_command:
+        return self._shell().start(*command_str_list)
+
+    def run_command(self, command, input=None):
+        with self.command(command) as running_command:
             exit_code, stdout_bytes, stderr_bytes = running_command.communicate(input=input)
         _logger.debug(
             "Outcome:\nexit code: %d\nstdout:\n%s\nstderr:\n%s",
