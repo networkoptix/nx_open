@@ -23,7 +23,8 @@ bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
 QnTourPtzController::QnTourPtzController(
     const QnPtzControllerPtr &baseController,
     QThreadPool* threadPool,
-    QThread* executorThread):
+    QThread* executorThread)
+    :
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(
         lit("ptzTours"), QnPtzTourHash(), this)),

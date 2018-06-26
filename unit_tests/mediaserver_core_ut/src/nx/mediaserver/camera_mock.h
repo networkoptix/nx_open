@@ -12,6 +12,8 @@ namespace test {
 class CameraMock: public Camera
 {
 public:
+    CameraDiagnostics::Result initialize();
+
     template<template<typename> class ApiProvider>
     void makeApiAdvancedParametersProvider(const std::vector<QString>& parameters);
 
@@ -28,7 +30,7 @@ public:
     static QnCameraAdvancedParams makeParameterDescriptions(
         const std::vector<QString>& parameters);
 
-    void setPtzController(const QnAbstractPtzController* controller);
+    void setPtzController(QnAbstractPtzController* controller);
 
     virtual bool isCameraControlDisabled() const override;
     virtual Qn::MotionType getMotionType() const override;

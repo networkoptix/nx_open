@@ -7,7 +7,11 @@ namespace ptz {
 TestPtzController::TestPtzController():
     base_type(QnResourcePtr())
 {
+}
 
+TestPtzController::TestPtzController(const QnResourcePtr& resource):
+    base_type(resource)
+{
 }
 
 Ptz::Capabilities TestPtzController::getCapabilities(const nx::core::ptz::Options& options) const

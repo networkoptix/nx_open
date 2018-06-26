@@ -134,13 +134,13 @@ QnPtzControllerPtr wrapController(
             }
         },
 
-        [](QnPtzControllerPtr* original)
+        [&parameters](QnPtzControllerPtr* original)
         {
             if (QnHomePtzController::extends(capabilities(*original)))
             {
                 original->reset(new QnHomePtzController(
                     *original,
-                    qnPtzPool->executorThread()));
+                    parameters.ptzPool->executorThread()));
             }
         },
 
@@ -157,7 +157,7 @@ QnPtzControllerPtr wrapController(
                 original->reset(new core_ptz::RelativeMoveWorkaroundController(
                     *original,
                     parameters.relativeMoveMapping,
-                    qnPtzPool->commandThreadPool()));
+                    parameters.ptzPool->commandThreadPool()));
             }
         }
     };

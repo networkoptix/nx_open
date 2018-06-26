@@ -56,6 +56,7 @@ class TestPtzController: public QnAbstractPtzController
     using base_type = QnAbstractPtzController;
 public:
     TestPtzController();
+    TestPtzController(const QnResourcePtr& resource);
 
     virtual Ptz::Capabilities getCapabilities(
         const nx::core::ptz::Options& options) const override;

@@ -6,6 +6,11 @@ namespace mediaserver {
 namespace resource {
 namespace test {
 
+CameraDiagnostics::Result CameraMock::initialize()
+{
+    return initInternal();
+}
+
 boost::optional<QString> CameraMock::getApiParameter(const QString& id)
 {
     const auto it = m_apiAadvancedParameters.find(id);
