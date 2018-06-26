@@ -6,7 +6,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace mediaserver {
+namespace mediaserver_core {
 namespace ptz {
 
 MappedPresetManager::MappedPresetManager(const QnResourcePtr& resource):
@@ -86,7 +86,9 @@ void MappedPresetManager::loadMappings()
     }
 }
 
-void MappedPresetManager::createOrUpdateMapping(const QString& devicePresetId, const QnPtzPreset& nxPreset)
+void MappedPresetManager::createOrUpdateMapping(
+    const QString& devicePresetId,
+    const QnPtzPreset& nxPreset)
 {
     NX_DEBUG(this, lm("Update device preset %1 - %2")
         .args(devicePresetId,  QJson::serialized(nxPreset)));
@@ -176,5 +178,5 @@ QString MappedPresetManager::nativePresetId(const QString& nxPresetId) const
 }
 
 } // namespace ptz
-} // namespace mediaserver
+} // namespace mediaserver_core
 } // namespace nx
