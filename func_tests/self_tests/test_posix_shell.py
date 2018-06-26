@@ -4,7 +4,7 @@ import pytest
 from pathlib2 import PurePath
 
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
-from framework.os_access.posix_shell import local_shell
+from framework.os_access.local_shell import local_shell
 from framework.os_access.ssh_path import make_ssh_path_cls
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']

@@ -1,7 +1,7 @@
 import logging
 
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_path import SSHPath
 
 _logger = logging.getLogger(__name__)

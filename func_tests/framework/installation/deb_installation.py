@@ -8,7 +8,7 @@ from framework.installation.upstart_service import UpstartService
 from framework.method_caching import cached_property
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
-from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_shell import SSH
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences

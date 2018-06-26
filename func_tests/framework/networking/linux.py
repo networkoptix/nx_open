@@ -7,7 +7,7 @@ from netaddr import EUI
 from framework.method_caching import cached_property
 from framework.networking.interface import Networking
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_shell import SSH
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)  # TODO: Rename all such vars to `_logger`.
