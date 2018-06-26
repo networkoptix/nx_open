@@ -64,9 +64,9 @@ bool HanwhaPtzController::continuousMove(
     const nx::core::ptz::Vector& speedVector,
     const nx::core::ptz::Options& options)
 {
-    if (m_commandStreamer && options.type == ptz::Type::configurational)
+    if (m_commandStreamer && options.type == core::ptz::Type::configurational)
     {
-        if (!hasAnyCapability(Ptz::ContinuousPtrzCapabilities, ptz::Type::configurational))
+        if (!hasAnyCapability(Ptz::ContinuousPtrzCapabilities, core::ptz::Type::configurational))
             return false;
 
         return m_commandStreamer->continuousMove(speedVector);
@@ -113,9 +113,9 @@ bool HanwhaPtzController::continuousFocus(
     qreal speed,
     const nx::core::ptz::Options& options)
 {
-    if (m_commandStreamer && options.type == ptz::Type::configurational)
+    if (m_commandStreamer && options.type == core::ptz::Type::configurational)
     {
-        if (!hasAnyCapability(Ptz::ContinuousFocusCapability, ptz::Type::configurational))
+        if (!hasAnyCapability(Ptz::ContinuousFocusCapability, core::ptz::Type::configurational))
             return false;
 
         return m_commandStreamer->continuousFocus(speed);
@@ -138,7 +138,7 @@ bool HanwhaPtzController::absoluteMove(
     qreal /*speed*/,
     const nx::core::ptz::Options& options)
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != core::ptz::Type::operational)
     {
         NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
         return false;
@@ -168,7 +168,7 @@ bool HanwhaPtzController::viewportMove(
     qreal speed,
     const nx::core::ptz::Options& options)
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != core::ptz::Type::operational)
     {
         NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
         return false;
@@ -187,7 +187,7 @@ bool HanwhaPtzController::getPosition(
     nx::core::ptz::Vector* outPosition,
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != core::ptz::Type::operational)
     {
         NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
         return false;
@@ -233,7 +233,7 @@ bool HanwhaPtzController::getLimits(
     QnPtzLimits* limits,
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != core::ptz::Type::operational)
     {
         NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
         return false;
@@ -250,7 +250,7 @@ bool HanwhaPtzController::getFlip(
     Qt::Orientations* flip,
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != core::ptz::Type::operational)
     {
         NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
         return false;
@@ -308,7 +308,7 @@ bool HanwhaPtzController::getAuxilaryTraits(
     QnPtzAuxilaryTraitList* auxilaryTraits,
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != core::ptz::Type::operational)
     {
         NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
         return false;
@@ -323,13 +323,13 @@ bool HanwhaPtzController::runAuxilaryCommand(
     const QString& data,
     const nx::core::ptz::Options& options)
 {
-    if (options.type != ptz::Type::operational)
+    if (options.type != core::ptz::Type::operational)
     {
         NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
         return false;
     }
 
-    if (!hasAnyCapability(Ptz::AuxilaryPtzCapability, ptz::Type::operational))
+    if (!hasAnyCapability(Ptz::AuxilaryPtzCapability, core::ptz::Type::operational))
         return false;
 
     if (trait.standardTrait() == Ptz::ManualAutoFocusPtzTrait)

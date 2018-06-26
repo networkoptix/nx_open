@@ -5,7 +5,7 @@
 #include <core/ptz/ptz_constants.h>
 
 namespace nx {
-namespace core {
+namespace mediaserver_core {
 namespace ptz {
 
 struct PtzIniConfig: public nx::kit::IniConfig
@@ -34,5 +34,5 @@ inline PtzIniConfig& ini()
 }
 
 } // namespace ptz
-} // namespace core
+} // namespace mediaserver_core
 } // namespace nx

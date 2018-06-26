@@ -1,7 +1,7 @@
 #include "ptz_ini_config.h"
 
 namespace nx {
-namespace core {
+namespace mediaserver_core {
 namespace ptz {
 
 namespace {
@@ -24,5 +24,5 @@ Ptz::Capabilities PtzIniConfig::excludedCapabilities() const
 }
 
 } // namespace ptz
-} // namespace core
+} // namespace mediaserver_core
 } // namespace nx

@@ -903,8 +903,8 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
 
 QnAbstractPtzController* HanwhaResource::createPtzControllerInternal() const
 {
-    const auto operationalCapabilities = ptzCapabilities(ptz::Type::operational);
-    const auto configurationalCapabilities = ptzCapabilities(ptz::Type::configurational);
+    const auto operationalCapabilities = ptzCapabilities(core::ptz::Type::operational);
+    const auto configurationalCapabilities = ptzCapabilities(core::ptz::Type::configurational);
 
     const bool hasSomePtzCapabilities =
         (operationalCapabilities | configurationalCapabilities) != Ptz::NoPtzCapabilities;
@@ -1270,7 +1270,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
         ? kHanwhaNvrPtzCapabilityDescriptors
         : kHanwhaCameraPtzCapabilityDescriptors;
 
-    auto& capabilities = m_ptzCapabilities[ptz::Type::operational];
+    auto& capabilities = m_ptzCapabilities[core::ptz::Type::operational];
     capabilities = calculateSupportedPtzCapabilities(
         mainDescriptors,
         m_attributes,
@@ -1316,7 +1316,7 @@ CameraDiagnostics::Result HanwhaResource::initPtz()
 CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
 {
     const auto channel = getChannel();
-    auto& configurationalCapabilities = m_ptzCapabilities[ptz::Type::configurational];
+    auto& configurationalCapabilities = m_ptzCapabilities[core::ptz::Type::configurational];
     if (ini().forceLensControl)
     {
         configurationalCapabilities = Ptz::ContinuousPtzCapabilities
@@ -1345,7 +1345,7 @@ CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
             continue;
 
         if (qnGlobalSettings->showHanwhaAlternativePtzControlsOnTile())
-            m_ptzCapabilities[ptz::Type::operational] |= descriptor.capabilities;
+            m_ptzCapabilities[core::ptz::Type::operational] |= descriptor.capabilities;
 
         configurationalCapabilities |= descriptor.capabilities;
         m_configurationalPtzRanges[parameter->name()] = HanwhaRange(*parameter);
@@ -2570,7 +2570,7 @@ QnCameraAdvancedParams HanwhaResource::filterParameters(
         if (neededPtzCapabilities != Ptz::NoPtzCapabilities)
         {
             const bool hasNeededCapabilities =
-                (neededPtzCapabilities & ptzCapabilities(ptz::Type::configurational))
+                (neededPtzCapabilities & ptzCapabilities(core::ptz::Type::configurational))
                     == neededPtzCapabilities;
 
             if (hasNeededCapabilities)
