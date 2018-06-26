@@ -194,7 +194,7 @@ public:
         SDPTrackInfo(QnRtspClient* owner, bool useTCP)
         {
             ioDevice = new QnRtspIoDevice(owner, useTCP);
-            ioDevice->setHostAddress(HostAddress(owner->getUrl().host()));
+            ioDevice->setHostAddress(nx::network::HostAddress(owner->getUrl().host()));
         }
         ~SDPTrackInfo() { delete ioDevice; }
 
