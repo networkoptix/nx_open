@@ -46,6 +46,9 @@ struct NX_VMS_API LayoutData: ResourceData
     float verticalSpacing = 0;
     LayoutItemDataList items;
     bool locked = false;
+    qint32 fixedWidth = 0;
+    qint32 fixedHeight = 0;
+    qint32 logicalId = 0;
     QString backgroundImageFilename;
     qint32 backgroundWidth = 0;
     qint32 backgroundHeight = 0;
@@ -53,7 +56,8 @@ struct NX_VMS_API LayoutData: ResourceData
 };
 #define LayoutData_Fields ResourceData_Fields (cellAspectRatio)(horizontalSpacing) \
     (verticalSpacing)(items)(locked)(backgroundImageFilename)(backgroundWidth) \
-    (backgroundHeight)(backgroundOpacity)
+    (backgroundHeight)(backgroundOpacity) \
+    (fixedWidth)(fixedHeight)(logicalId)
 
 } // namespace api
 } // namespace vms

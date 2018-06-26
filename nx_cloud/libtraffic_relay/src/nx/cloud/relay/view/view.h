@@ -9,6 +9,7 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 
 #include "authentication_manager.h"
+#include "get_post_tunnel_processor.h"
 
 namespace nx {
 namespace cloud {
@@ -51,6 +52,7 @@ private:
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
     std::vector<network::SocketAddress> m_httpEndpoint;
     std::vector<network::SocketAddress> m_httpsEndpoint;
+    view::GetPostTunnelProcessor m_getPostTunnelProcessor;
 
     void registerApiHandlers();
     void registerCompatibilityHandlers();

@@ -17,7 +17,6 @@ enum class ConnectionType;
 enum class RtpTransportType;
 enum class MotionStreamType;
 enum class PeerType;
-enum class TimeFlag;
 enum class DayOfWeek;
 enum class BackupType;
 enum class UserRole;
@@ -40,7 +39,6 @@ DECLARE_TYPE(ConnectionType)
 DECLARE_TYPE(RtpTransportType)
 DECLARE_TYPE(MotionStreamType)
 DECLARE_TYPE(PeerType)
-DECLARE_TYPE(TimeFlag)
 DECLARE_TYPE(BackupType)
 DECLARE_TYPE(UserRole)
 

@@ -55,7 +55,7 @@ def layout():
 
 
 @pytest.fixture()
-def three_mediaservers(network, mediaserver_factory):
+def three_mediaserver_list(network, mediaserver_factory):
     allocated_mediaservers = []
     with ClosingPool(mediaserver_factory.allocated_mediaserver, network, None) as mediaservers:
         for name in ['one', 'two', 'three']:
@@ -71,18 +71,18 @@ ServerRec = namedtuple('ServerRec', 'server camera_mac_set')
 # Each server can have own copy of each auto-discovered cameras until they completely merge.
 # To catch exact moment when servers merge complete, we first wait until each server discover all cameras.
 # After that we merge servers and wait until preferred cameras settle down on destined servers.
-def create_cameras_and_setup_servers(servers, camera_factory, counter):
-    server_count = len(servers)
+def create_cameras_and_setup_servers(server_list, camera_factory, counter):
+    server_count = len(server_list)
     # we always use 2 cameras per server
     all_camera_mac_set = set(create_cameras(camera_factory, counter, count=server_count*2))
-    for server in servers:
+    for server in server_list:
         setup_server(server, all_camera_mac_set)
-    for server in servers[1:]:
-        merge_systems(servers[0], server)
-    wait_until_servers_are_online(servers)
+    for server in server_list[1:]:
+        merge_systems(server_list[0], server)
+    wait_until_servers_are_online(server_list)
     server_rec_list = [
         ServerRec(server, set(sorted(all_camera_mac_set)[idx * 2: idx * 2 + 2]))
-        for idx, server in enumerate(servers)]
+        for idx, server in enumerate(server_list)]
     for rec in server_rec_list:
         attach_cameras_to_server(rec.server, rec.camera_mac_set)
     for rec in server_rec_list:
@@ -94,10 +94,10 @@ def setup_server(server, all_camera_mac_set, system_settings=None):
     wait_until_cameras_are_online(server, all_camera_mac_set)
 
 
-def wait_until_servers_are_online(servers):
+def wait_until_servers_are_online(server_list):
     start_time = datetime_utc_now()
-    server_guids = sorted([get_server_id(s.api) for s in servers])
-    for srv in servers:
+    server_guids = sorted([get_server_id(s.api) for s in server_list])
+    for srv in server_list:
         while True:
             online_server_guids = sorted([s['id'] for s in srv.api.get('ec2/getMediaServersEx')
                                           if s['status'] == 'Online'])

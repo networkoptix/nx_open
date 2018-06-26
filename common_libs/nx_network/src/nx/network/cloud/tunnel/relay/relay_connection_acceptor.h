@@ -47,7 +47,7 @@ protected:
 
 private:
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayClient;
-    const nx::String m_peerName;
+    const std::string m_peerName;
     ReverseConnectionCompletionHandler m_connectHandler;
     std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_httpPipeline;
     ReverseConnectionCompletionHandler m_onConnectionActivated;

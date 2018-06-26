@@ -114,9 +114,8 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     }
     auto maxRtt = commonModule()->globalSettings()->maxDifferenceBetweenSynchronizedAndLocalTime();
 
-    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
-    httpClient->setSocket(std::move(socket));
-    httpClient->setResponseReadTimeoutMs(std::chrono::milliseconds(maxRtt).count());
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>(std::move(socket));
+    httpClient->setResponseReadTimeout(std::chrono::milliseconds(maxRtt));
     httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toByteArray());
     auto server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
     if (!server)
@@ -134,12 +133,13 @@ bool TimeSyncManager::loadTimeFromServer(const QnRoute& route)
     // With gateway repeat request twice to make sure we have opened tunnel to the target server.
     // That way it is possible to reduce rtt.
     const int iterations = route.gatewayId.isNull() ? 1 : 2;
-    boost::optional<QByteArray> response;
+    std::optional<QByteArray> response;
     for (int i = 0; i < iterations; ++i)
     {
         rttTimer.restart();
         bool success = httpClient->doGet(url);
-        response = httpClient->fetchEntireMessageBody();
+        if (success)
+            response = httpClient->fetchEntireMessageBody();
         if (!success || !response)
         {
             NX_WARNING(this, lm("Can't read time from server %1. Error: %2")

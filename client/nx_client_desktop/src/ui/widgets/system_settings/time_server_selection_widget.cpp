@@ -197,7 +197,7 @@ QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget()
 void QnTimeServerSelectionWidget::loadDataToUi()
 {
     PRINT_DEBUG("provide selected server to model:");
-    m_model->setSelectedServer(selectedServer());
+    m_model->setSelectedServer(qnGlobalSettings->primaryTimeServer());
     ui->syncWithInternetCheckBox->setChecked(qnGlobalSettings->isSynchronizingTimeWithInternet());
     updateTime();
 }
@@ -231,27 +231,7 @@ bool QnTimeServerSelectionWidget::hasChanges() const
 
     return syncWithInternet
         ? false
-        : m_model->selectedServer() != selectedServer();
-}
-
-QnUuid QnTimeServerSelectionWidget::selectedServer() const
-{
-    PRINT_DEBUG("check selected server by runtime info");
-
-    for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
-    {
-        if (runtimeInfo.data.peer.peerType != vms::api::PeerType::server)
-            continue;
-
-        if (!m_model->isSelected(runtimeInfo.data.serverTimePriority))
-            continue;
-
-        PRINT_DEBUG("selected server " + runtimeInfo.uuid.toByteArray());
-        return runtimeInfo.uuid;
-    }
-
-    PRINT_DEBUG("no selected server found");
-    return QnUuid();
+        : m_model->selectedServer() != qnGlobalSettings->primaryTimeServer();
 }
 
 void QnTimeServerSelectionWidget::updateTime()

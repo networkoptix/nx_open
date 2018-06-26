@@ -403,15 +403,10 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
-
     if (mediaPersistentSettings.canExportOverlays())
     {
         ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
         ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
-        ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
-        ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
-        ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
-        ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
         if(mediaPersistentSettings.rapidReview.enabled)
         {
@@ -419,6 +414,11 @@ void ExportSettingsDialog::updateSettingsWidgets()
             ui->rapidReviewSettingsPage->setSpeed(speed);
         }
     }
+
+    ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
+    ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
+    ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
+    ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
@@ -473,9 +473,9 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         [layout](int index, const QString& text)
         {
             auto item = layout->itemAt(index);
-            auto bar = item ? qobject_cast<AlertBar*>(item->widget()) : nullptr;
-            //NX_EXPECT(bar);
-            if (bar)
+            // Notice: notifications are added at the runtime. It is possible to have no
+            // widget so far, especially when dialog is only initialized.
+            if (auto bar = item ? qobject_cast<MessageBar*>(item->widget()) : nullptr)
                 bar->setText(text);
         };
 

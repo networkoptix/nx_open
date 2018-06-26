@@ -85,6 +85,12 @@ AsyncClient::AsyncClient():
     m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
 }
 
+AsyncClient::AsyncClient(std::unique_ptr<AbstractStreamSocket> socket):
+    AsyncClient()
+{
+    m_userDefinedSocket = std::move(socket);
+}
+
 AsyncClient::~AsyncClient()
 {
 }
@@ -92,11 +98,6 @@ AsyncClient::~AsyncClient()
 const std::unique_ptr<AbstractStreamSocket>& AsyncClient::socket()
 {
     return m_socket;
-}
-
-void AsyncClient::setSocket(std::unique_ptr<AbstractStreamSocket> socket)
-{
-    m_userDefinedSocket = std::move(socket);
 }
 
 std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
@@ -212,6 +213,14 @@ void AsyncClient::doPost(const nx::utils::Url& url)
 
 void AsyncClient::doPost(
     const nx::utils::Url& url,
+    std::unique_ptr<AbstractMsgBodySource> body)
+{
+    setRequestBody(std::move(body));
+    doPost(url);
+}
+
+void AsyncClient::doPost(
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
@@ -221,6 +230,14 @@ void AsyncClient::doPost(
 void AsyncClient::doPut(const nx::utils::Url& url)
 {
     doRequest(nx::network::http::Method::put, url);
+}
+
+void AsyncClient::doPut(
+    const nx::utils::Url& url,
+    std::unique_ptr<AbstractMsgBodySource> body)
+{
+    setRequestBody(std::move(body));
+    doPut(url);
 }
 
 void AsyncClient::doPut(
@@ -246,6 +263,32 @@ void AsyncClient::doDelete(
 
 void AsyncClient::doUpgrade(
     const nx::utils::Url& url,
+    const StringType& protocolToUpgradeTo)
+{
+    doUpgrade(url, Method::options, protocolToUpgradeTo);
+}
+
+void AsyncClient::doUpgrade(
+    const nx::utils::Url& url,
+    nx::network::http::Method::ValueType method,
+    const StringType& protocolToUpgradeTo)
+{
+    NX_ASSERT(url.isValid());
+
+    resetDataBeforeNewRequest();
+    m_requestUrl = url;
+    m_contentLocationUrl = url;
+    if (m_additionalHeaders.count("Connection") == 0)
+        m_additionalHeaders.emplace("Connection", "Upgrade");
+    if (m_additionalHeaders.count("Upgrade") == 0)
+        m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
+    m_additionalHeaders.emplace("Content-Length", "0");
+    composeRequest(method);
+    initiateHttpMessageDelivery();
+}
+
+void AsyncClient::doUpgrade(
+    const nx::utils::Url& url,
     const StringType& protocolToUpgradeTo,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
@@ -263,19 +306,7 @@ void AsyncClient::doUpgrade(
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
-
-    NX_ASSERT(url.isValid());
-
-    resetDataBeforeNewRequest();
-    m_requestUrl = url;
-    m_contentLocationUrl = url;
-    if (m_additionalHeaders.count("Connection") == 0)
-        m_additionalHeaders.emplace("Connection", "Upgrade");
-    if (m_additionalHeaders.count("Upgrade") == 0)
-        m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
-    m_additionalHeaders.emplace("Content-Length", "0");
-    composeRequest(method);
-    initiateHttpMessageDelivery();
+    doUpgrade(url, method, protocolToUpgradeTo);
 }
 
 void AsyncClient::doConnect(

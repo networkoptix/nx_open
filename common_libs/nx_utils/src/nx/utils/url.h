@@ -48,6 +48,9 @@ public:
     Q_INVOKABLE QString toString(
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 
+    std::string toStdString(
+        QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
+
     Q_INVOKABLE QString toDisplayString(
         QUrl::FormattingOptions options = QUrl::FormattingOptions(QUrl::PrettyDecoded)) const;
 

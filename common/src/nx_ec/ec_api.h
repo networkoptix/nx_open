@@ -28,7 +28,6 @@
 #include <nx/vms/api/data/misc_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/access_rights_data.h>
-#include <nx/vms/api/data/time_data.h>
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>

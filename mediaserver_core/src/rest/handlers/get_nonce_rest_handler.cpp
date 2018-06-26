@@ -25,7 +25,7 @@ bool isResponseOK(const nx::network::http::HttpClient& client)
     return client.response()->statusLine.statusCode == nx::network::http::StatusCode::ok;
 }
 
-const int requestTimeoutMs = 10000;
+const std::chrono::seconds requestTimeout(10);
 
 } // namespace
 
@@ -49,9 +49,9 @@ int QnGetNonceRestHandler::executeGet(
         }
 
         nx::network::http::HttpClient client;
-        client.setResponseReadTimeoutMs(requestTimeoutMs);
-        client.setSendTimeoutMs(requestTimeoutMs);
-        client.setMessageBodyReadTimeoutMs(requestTimeoutMs);
+        client.setResponseReadTimeout(requestTimeout);
+        client.setSendTimeout(requestTimeout);
+        client.setMessageBodyReadTimeout(requestTimeout);
 
         nx::utils::Url requestUrl(params.value("url"));
         requestUrl.setPath(m_remotePath);

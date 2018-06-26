@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 
 #include <nx/network/aio/timer.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_async_client.h>

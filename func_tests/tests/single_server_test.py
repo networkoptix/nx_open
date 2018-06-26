@@ -10,12 +10,12 @@ import urllib3.exceptions
 from requests.auth import HTTPDigestAuth
 
 import server_api_data_generators as generator
-from framework.api_shortcuts import get_time, get_server_id, is_primary_time_server
+from framework.api_shortcuts import get_server_id, get_time, is_primary_time_server
 from framework.installation.mediaserver import TimePeriod
 from framework.rest_api import HttpError, REST_API_TIMEOUT_SEC
+from framework.timeless_mediaserver import timeless_mediaserver
 from framework.utils import log_list
 from framework.waiting import wait_for_true
-from framework.timeless_mediaserver import timeless_mediaserver
 
 _logger = logging.getLogger(__name__)
 

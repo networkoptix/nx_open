@@ -1160,17 +1160,6 @@ APPLY(1502, removeWebPage, nx::vms::api::IdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2003, getCurrentTime, nx::vms::api::TimeData, \
-                       false, \
-                       false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(2004, changeSystemId, nx::vms::api::SystemIdData, \
                        false, \
                        false, \

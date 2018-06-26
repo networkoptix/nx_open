@@ -90,6 +90,12 @@ public:
     static const int UNLIMITED_RECONNECT_TRIES = -1;
 
     AsyncClient();
+
+    /**
+     * Set already connected socket to force it for the very first request.
+     */
+    AsyncClient(std::unique_ptr<AbstractStreamSocket> socket);
+
     virtual ~AsyncClient();
 
     AsyncClient(const AsyncClient&) = delete;
@@ -161,12 +167,18 @@ public:
      * Start POST request to url.
      * @return true, if socket is created and async connect is started. false otherwise
      */
-    void doPost(const nx::utils::Url &url);
+    void doPost(const nx::utils::Url& url);
+    void doPost(
+        const nx::utils::Url& url,
+        std::unique_ptr<AbstractMsgBodySource> body);
     void doPost(
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void doPut(const nx::utils::Url& url);
+    void doPut(
+        const nx::utils::Url& url,
+        std::unique_ptr<AbstractMsgBodySource> body);
     void doPut(
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
@@ -175,6 +187,14 @@ public:
     void doDelete(
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
+
+    void doUpgrade(
+        const nx::utils::Url& url,
+        const StringType& protocolToUpgradeTo);
+    void doUpgrade(
+        const nx::utils::Url& url,
+        nx::network::http::Method::ValueType method,
+        const StringType& protocolToUpgradeTo);
 
     void doUpgrade(
         const nx::utils::Url& url,
@@ -244,11 +264,6 @@ public:
     void setProxyUserAuthToken(const AuthToken& proxyUserToken);
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
-
-    /**
-     * Set already connected socket to force it for the very first request.
-     */
-    void setSocket(std::unique_ptr<AbstractStreamSocket> socket);
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
 

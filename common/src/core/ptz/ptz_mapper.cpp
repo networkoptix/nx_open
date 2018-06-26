@@ -36,7 +36,7 @@ QnPtzMapper::QnPtzMapper(
             m_inputMapper->targetToSource(nx::core::ptz::Vector(pan, 0, 0, 0)));
 
         minPan = qMin(pos.pan, minPan);
-        maxPan = qMax(pos.tilt, maxPan);
+        maxPan = qMax(pos.pan, maxPan);
     }
 
     if(qFuzzyCompare(maxPan - minPan, 720.0))

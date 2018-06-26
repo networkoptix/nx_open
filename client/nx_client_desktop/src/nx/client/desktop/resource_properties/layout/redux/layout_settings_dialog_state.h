@@ -21,6 +21,13 @@ struct LayoutSettingsDialogState
     bool isLocalFile = false;
     float cellAspectRatio = 0.0;
 
+    int logicalId = 0;
+    int reservedLogicalId = 0;
+
+    // Split values to keep old values when user toggles checkbox.
+    bool fixedSizeEnabled = false;
+    QSize fixedSize;
+
     struct Range
     {
         int min = 0;

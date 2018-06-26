@@ -112,7 +112,6 @@ DECLARE_STRUCT_AND_LIST(PredefinedRoleData)
 
 DECLARE_STRUCT_AND_LIST(PeerSystemTimeData)
 DECLARE_STRUCT(PeerSyncTimeData)
-DECLARE_STRUCT(TimeData)
 
 DECLARE_STRUCT(ReverseConnectionData)
 DECLARE_STRUCT_EX(RuntimeData, (ubjson)(json)(xml))

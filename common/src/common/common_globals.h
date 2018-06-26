@@ -26,7 +26,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     Permission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields
-    ServerFlags TimeFlags IOPortTypes
+    ServerFlags IOPortTypes
     Permissions
     )
 

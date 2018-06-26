@@ -25,6 +25,12 @@ public:
     void loadLayout(const QnLayoutResourcePtr& layout);
 
     void setLocked(bool value);
+    void setLogicalId(int value);
+    void resetLogicalId();
+    void generateLogicalId();
+    void setFixedSizeEnabled(bool value);
+    void setFixedSizeWidth(int value);
+    void setFixedSizeHeight(int value);
 
     void setBackgroundImageError(const QString& errorText);
     void clearBackgroundImage();

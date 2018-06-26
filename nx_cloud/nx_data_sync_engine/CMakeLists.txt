@@ -6,7 +6,7 @@ endif()
 set(product.title "${company.name} nx_data_sync_engine")
 set(product.display.title "${company.name} P2p Data Sync Engine")
 
-nx_add_target(nx_data_sync_engine LIBRARY ${library_type}
+nx_add_target(nx_data_sync_engine LIBRARY ${library_type} NO_MOC
     WERROR_IF NOT WINDOWS
     PUBLIC_LIBS appserver2 nx_network)
 

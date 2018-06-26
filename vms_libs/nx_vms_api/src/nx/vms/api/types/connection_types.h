@@ -19,19 +19,6 @@ enum class PeerType
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
 
-enum class TimeFlag
-{
-    none = 0,
-    peerIsNotEdgeServer = 0x1,
-    peerHasMonotonicClock = 0x2,
-    peerTimeSetByUser = 0x4,
-    peerTimeSynchronizedWithInternetServer = 0x8,
-    peerIsServer = 0x1000
-};
-Q_DECLARE_FLAGS(TimeFlags, TimeFlag)
-Q_DECLARE_OPERATORS_FOR_FLAGS(TimeFlags)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TimeFlag)
-
 enum class RuntimeFlag
 {
     /** Sync transactions with cloud. */
@@ -45,6 +32,5 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RuntimeFlag)
 } // namespace vms
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::TimeFlags, (metatype)(lexical)(debug), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::RuntimeFlag, (metatype)(lexical)(debug), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::RuntimeFlags, (metatype)(lexical)(debug), NX_VMS_API)

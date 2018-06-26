@@ -1581,10 +1581,10 @@ void MediaServerProcess::registerRestHandlers(
         new ::rest::handlers::SyncTimeRestHandler());
 
     /**%apidoc POST /ec2/forcePrimaryTimeServer
-    * Set primary time server. Requires json object with optional 'id' field in the message body.
-    * If id field is missing, primary time server is turned off.
-    * %return:object JSON object with error message and error code (0 means OK).
-    */
+     * Set primary time server. Requires json object with optional 'id' field in the message body.
+     * If id field is missing, primary time server is turned off.
+     * %return:object JSON object with error message and error code (0 means OK).
+     */
     reg("ec2/forcePrimaryTimeServer",
         new ::rest::handlers::SetPrimaryTimeServerRestHandler(), kAdmin);
 

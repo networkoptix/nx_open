@@ -50,7 +50,6 @@
 #include <nx/vms/api/data/media_server_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/api/data/stored_file_data.h>
-#include <nx/vms/api/data/time_data.h>
 #include <nx/vms/api/data/update_data.h>
 #include <nx/vms/api/data/user_data.h>
 #include <nx/vms/api/data/videowall_data.h>

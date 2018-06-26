@@ -118,7 +118,7 @@ public:
         std::vector<nx::network::http::StatusCode::Value> expectedReponseStatusCodes)
     {
         NX_LOGX(lm("testProxyUrl(%1)").arg(url), cl_logINFO);
-        httpClient->setResponseReadTimeoutMs(1000*1000);
+        httpClient->setResponseReadTimeout(std::chrono::minutes(17));
         ASSERT_TRUE(httpClient->doGet(url));
         ASSERT_TRUE(
             std::find(
@@ -460,7 +460,7 @@ private:
     {
         const nx::utils::Url url(lm("http://%1/%2%3").arg(endpoint()).arg(testHttpServer()->serverAddress()).arg(path));
         nx::network::http::HttpClient httpClient;
-        httpClient.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
+        httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
         ASSERT_TRUE(httpClient.doGet(url));
         ASSERT_NE(nullptr, httpClient.response());
 

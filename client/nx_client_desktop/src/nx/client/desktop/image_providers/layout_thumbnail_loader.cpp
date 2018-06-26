@@ -472,10 +472,12 @@ void LayoutThumbnailLoader::doLoadAsync()
 
     d->reset();
 
-    QRectF bounding;
+    const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
+    const auto backgroundRect = d->layout->backgroundRect();
+
     const QnLayoutItemDataMap& layoutItems = d->layout->getItems();
 
-    QVector<QPair<QnUuid, QnResourcePtr>> validItems;
+    std::vector<std::pair<QnLayoutItemData, QnResourcePtr>> validItems;
     validItems.reserve(layoutItems.size());
 
     // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
@@ -492,15 +494,25 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!resource)
             continue;
 
-        bounding = bounding.united(itemRect);
-        validItems << qMakePair(iter.key(),  resource);
+        validItems.emplace_back(item, resource);
     }
 
-    const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
-    const auto backgroundRect = d->layout->backgroundRect();
+    // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
+    // Right now we do not know actual pixel size of layout items.
+    // Pixel-accurate calculations will be done in Private::finalizeOutputImage.
+    QRectF bounding;
+    if (!d->layout->fixedSize().isEmpty())
+    {
+        bounding = d->layout->backgroundRect(d->layout->fixedSize());
+    }
+    else
+    {
+        for (const auto& [item, resource]: validItems)
+            bounding = bounding.united(item.combinedGeometry);
 
-    if (hasBackground)
-        bounding = bounding.united(backgroundRect);
+        if (hasBackground)
+            bounding = bounding.united(backgroundRect);
+    }
 
     if (bounding.isEmpty())
     {
@@ -584,15 +596,13 @@ void LayoutThumbnailLoader::doLoadAsync()
         item->provider->loadAsync();
     }
 
-    for (const auto& layoutItem: validItems)
+    for (const auto& [data, resource]: validItems)
     {
-        QnLayoutItemData data = d->layout->getItem(layoutItem.first);
-
         Private::ItemPtr thumbnailItem = d->newItem();
 
-        thumbnailItem->resource = layoutItem.second;
+        thumbnailItem->resource = resource;
         thumbnailItem->rotation = data.rotation;
-        thumbnailItem->name = layoutItem.second->getName();
+        thumbnailItem->name = resource->getName();
 
         // Cell bounds.
         const auto& cellRect = data.combinedGeometry;

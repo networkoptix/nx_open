@@ -35,9 +35,6 @@ struct NX_VMS_API RuntimeData: DataWithVersion
     /** Videowall item id, governed by the current client instance's control session. */
     QnUuid videoWallControlSession;
 
-    /** Priority of this peer as the time synchronization server. */
-    quint64 serverTimePriority = 0;
-
     QVector<QString> hardwareIds;
 
     QString nx1mac;
@@ -56,14 +53,6 @@ struct NX_VMS_API RuntimeData: DataWithVersion
     */
     bool operator==(const RuntimeData& other) const;
     bool operator!=(const RuntimeData& other) const { return !operator==(other); }
-
-    static TimeFlags timeFlags(quint64 serverTimePriority) { return serverTimePriority >> 32; }
-    TimeFlags timeFlags() const { return timeFlags(serverTimePriority); }
-
-    void setTimeFlags(TimeFlags flags)
-    {
-        serverTimePriority = (quint64(flags) << 32) | (serverTimePriority & 0xFFFFFFFF);
-    }
 };
 
 #define RuntimeData_Fields \
@@ -76,7 +65,6 @@ struct NX_VMS_API RuntimeData: DataWithVersion
     (prematureLicenseExperationDate) \
     (videoWallInstanceGuid) \
     (videoWallControlSession) \
-    (serverTimePriority) \
     (hardwareIds) \
     (updateStarted) \
     (nx1mac) \

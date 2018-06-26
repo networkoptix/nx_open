@@ -15,7 +15,6 @@ bool RuntimeData::operator==(const RuntimeData& other) const
         && publicIP == other.publicIP
         && videoWallInstanceGuid == other.videoWallInstanceGuid
         && videoWallControlSession == other.videoWallControlSession
-        && serverTimePriority == other.serverTimePriority
         && prematureLicenseExperationDate == other.prematureLicenseExperationDate
         && hardwareIds == other.hardwareIds
         && updateStarted == other.updateStarted

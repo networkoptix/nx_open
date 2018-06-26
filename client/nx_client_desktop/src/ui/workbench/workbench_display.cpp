@@ -1489,7 +1489,13 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
 
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const
 {
-    auto layout = workbench()->currentLayout();
+    const auto layout = workbench()->currentLayout();
+    if (const auto layoutResource = layout->resource())
+    {
+        QSize fixedSize = layoutResource->fixedSize();
+        if (!fixedSize.isEmpty())
+            return workbench()->mapper()->mapFromGridF(QnLayoutResource::backgroundRect(fixedSize));
+    }
 
     QRect layoutBoundingRect = layout->boundingRect();
     if (layoutBoundingRect.isNull())
@@ -1919,6 +1925,13 @@ void QnWorkbenchDisplay::at_layout_zoomLinkRemoved(QnWorkbenchItem *item, QnWork
 
 void QnWorkbenchDisplay::at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect)
 {
+    const auto layout = workbench()->currentLayout();
+    if (const auto layoutResource = layout->resource())
+    {
+        if (!layoutResource->fixedSize().isEmpty())
+            return;
+    }
+
     QRect backgroundBoundingRect = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
 
     QRect oldBoundingRect = (backgroundBoundingRect.isNull())
@@ -2126,11 +2139,20 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
     connect(layout, SIGNAL(zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)), this, SLOT(at_layout_zoomLinkAdded(QnWorkbenchItem *, QnWorkbenchItem *)));
     connect(layout, SIGNAL(zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)), this, SLOT(at_layout_zoomLinkRemoved(QnWorkbenchItem *, QnWorkbenchItem *)));
     connect(layout, SIGNAL(boundingRectChanged(QRect, QRect)), this, SLOT(at_layout_boundingRectChanged(QRect, QRect)));
-    if (layout->resource())
+    if (const auto& layoutResource = layout->resource())
     {
-        connect(layout->resource(), SIGNAL(backgroundImageChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
-        connect(layout->resource(), SIGNAL(backgroundSizeChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
-        connect(layout->resource(), SIGNAL(backgroundOpacityChanged(const QnLayoutResourcePtr &)), this, SLOT(updateBackground(const QnLayoutResourcePtr &)));
+        connect(layout->resource(), &QnLayoutResource::backgroundImageChanged, this,
+            &QnWorkbenchDisplay::updateBackground);
+        connect(layout->resource(), &QnLayoutResource::backgroundSizeChanged, this,
+            &QnWorkbenchDisplay::updateBackground);
+        connect(layout->resource(), &QnLayoutResource::backgroundOpacityChanged, this,
+            &QnWorkbenchDisplay::updateBackground);
+        connect(layoutResource, &QnLayoutResource::fixedSizeChanged, this,
+            [this]
+            {
+                synchronizeSceneBounds();
+                fitInView(/*animate*/ false);
+            });
     }
     updateBackground(layout->resource());
     synchronizeSceneBounds();

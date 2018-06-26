@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/socket_common.h>
-#include <nx/network/http/http_client.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include "request_processor.h"
 

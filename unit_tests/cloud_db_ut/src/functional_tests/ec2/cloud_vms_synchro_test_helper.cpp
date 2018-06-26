@@ -752,8 +752,8 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     nx::network::http::HttpClient httpClient;
-    httpClient.setResponseReadTimeoutMs(0);
-    httpClient.setMessageBodyReadTimeoutMs(0);
+    httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
+    httpClient.setMessageBodyReadTimeout(nx::network::kNoTimeout);
     if (!httpClient.doGet(url))
         return api::ResultCode::networkError;
     if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
