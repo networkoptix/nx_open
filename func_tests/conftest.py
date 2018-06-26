@@ -1,7 +1,9 @@
 import logging
+import logging.config
 
 import pytest
 from pathlib2 import Path
+import yaml
 
 from defaults import defaults
 from framework.artifact import ArtifactFactory
@@ -42,16 +44,16 @@ def pytest_addoption(parser):
         '--customization',
         help="Dir name from nx_vms/customization. Only checked against customization of installer.")
     parser.addoption(
-        '--max-log-width',
-        default=defaults.get('max_log_width', 500),
-        type=int,
-        help="Maximum log message length. [%(default)s]")
-    parser.addoption(
         '--log-level',
         type=str.upper,
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         help="Log level. [%(default)s]",
         default=defaults.get('log_level', 'DEBUG'))
+    parser.addoption(
+        '--logging-config',
+        type=Path,
+        default=defaults.get('logging_config'),
+        help="Configuration file for logging, in yaml format.")
     parser.addoption(
         '--tests-config-file',
         type=TestsConfig.from_yaml_file,
@@ -101,20 +103,13 @@ def ca(work_dir):
 
 @pytest.fixture(scope='session', autouse=True)
 def init_logging(request, work_dir):
+    logging_config_path = request.config.getoption('--logging-config')
+    if logging_config_path:
+        with logging_config_path.open() as f:
+            config = yaml.load(f)
+        logging.config.dictConfig(config)
+
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)  # It's WARNING by default. Level constraints are set in handlers.
-
-    logging.getLogger('SMB.SMBConnection').setLevel(logging.INFO)  # Big files cause too many logs.
-    logging.getLogger('paramiko.transport').setLevel(logging.INFO)  # Big files cause too many logs.
-
-    stderr_log_width = request.config.getoption('--max-log-width')
-    stderr_handler = logging.StreamHandler()
-    # %(message).10s truncates log message to 10 characters.
-    stderr_handler.setFormatter(logging.Formatter(
-        '%(asctime)-15s %(name)s %(levelname)s %(message).{:d}s'.format(stderr_log_width)))
-    stderr_handler.setLevel(request.config.getoption('--log-level'))
-    root_logger.addHandler(stderr_handler)
-
     file_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
     for level in {logging.DEBUG, logging.INFO}:
         file_name = logging.getLevelName(level).lower() + '.log'

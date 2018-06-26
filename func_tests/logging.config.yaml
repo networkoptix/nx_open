@@ -1,0 +1,20 @@
+# default logging configuration
+
+version: 1
+formatters:
+  default:
+    format: '%(asctime)-15s %(name)s %(levelname)s %(message)s'
+handlers:
+  stderr:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: default
+    stream: ext://sys.stderr
+loggers:
+  SMB.SMBConnection:
+    level: INFO
+  paramiko.transport:
+    level: INFO
+root:
+  level: DEBUG  # default is WARNING
+  handlers: [stderr]
