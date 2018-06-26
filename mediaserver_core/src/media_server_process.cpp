@@ -224,7 +224,7 @@
 
 #include "platform/hardware_information.h"
 #include "platform/platform_abstraction.h"
-#include "core/ptz/server_ptz_controller_pool.h"
+#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
 #include "plugins/resource/acti/acti_resource.h"
 #include "common/common_module.h"
 #include "proxy/proxy_receiver_connection_processor.h"

@@ -9,7 +9,8 @@
 
 #include <nx/mediaserver/camera_mock.h>
 #include <nx/mediaserver_core/ptz/server_ptz_helpers.h>
-#include <core/ptz/server_ptz_controller_pool.h>
+#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
+
 #include <core/ptz/ptz_mapper.h>
 #include <nx/core/ptz/test_support/test_ptz_controller.h>
 #include <nx/core/ptz/space_mapper.h>
