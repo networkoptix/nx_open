@@ -5,6 +5,7 @@
 #include <QtCore/QTimer>
 
 #include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/socket_global.h>
@@ -539,7 +540,7 @@ void QnMediaServerResource::setSystemInfo(const nx::vms::api::SystemInformation&
     m_systemInfo = systemInfo;
 }
 
-QnModuleInformation QnMediaServerResource::getModuleInformation() const
+nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() const
 {
     if (auto module = commonModule())
     {
@@ -549,10 +550,12 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
 
     // build module information for other server
 
-    QnModuleInformation moduleInformation;
-    moduleInformation.type = QnModuleInformation::nxMediaServerId();
+    nx::vms::api::ModuleInformation moduleInformation;
+    moduleInformation.type = nx::vms::api::ModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = m_sslAllowed;
+    moduleInformation.realm = nx::network::AppInfo::realm();
+    moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     moduleInformation.name = getName();
     moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     if (moduleInformation.protoVersion == 0)
@@ -581,9 +584,10 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
     return moduleInformation;
 }
 
-QnModuleInformationWithAddresses QnMediaServerResource::getModuleInformationWithAddresses() const
+nx::vms::api::ModuleInformationWithAddresses
+    QnMediaServerResource::getModuleInformationWithAddresses() const
 {
-    QnModuleInformationWithAddresses information = getModuleInformation();
+    nx::vms::api::ModuleInformationWithAddresses information = getModuleInformation();
     information.setEndpoints(getAllAvailableAddresses());
     return information;
 }

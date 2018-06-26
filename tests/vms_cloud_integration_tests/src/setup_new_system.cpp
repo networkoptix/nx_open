@@ -100,7 +100,7 @@ protected:
 
         for (;;)
         {
-            QnModuleInformation moduleInformation;
+            nx::vms::api::ModuleInformation moduleInformation;
             ASSERT_EQ(
                 QnJsonRestResult::NoError,
                 client.getModuleInformation(&moduleInformation).error);

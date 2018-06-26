@@ -1,5 +1,6 @@
 #include "metatypes.h"
 
+#include <QtCore/QList>
 #include <QtCore/QMetaType>
 
 #include "data/access_rights_data.h"
@@ -20,6 +21,7 @@
 #include "data/lock_data.h"
 #include "data/media_server_data.h"
 #include "data/misc_data.h"
+#include "data/module_information.h"
 #include "data/p2p_statistics_data.h"
 #include "data/peer_data.h"
 #include "data/peer_alive_data.h"
@@ -99,6 +101,10 @@ void Metatypes::initialize()
     qRegisterMetaType<MediaServerUserAttributesDataList>();
     qRegisterMetaType<MiscData>();
     qRegisterMetaType<MiscDataList>();
+    qRegisterMetaType<ModuleInformation>();
+    qRegisterMetaType<ModuleInformationWithAddresses>();
+    qRegisterMetaType<QList<ModuleInformation>>();
+    qRegisterMetaType<QList<ModuleInformationWithAddresses>>();
     qRegisterMetaType<P2pStatisticsData>();
     qRegisterMetaType<PeerData>();
     qRegisterMetaType<PeerDataEx>();

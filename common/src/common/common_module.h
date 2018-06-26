@@ -6,7 +6,6 @@
 
 #include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
-#include <network/module_information.h>
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/value_cache.h>
@@ -17,6 +16,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/software_version.h>
+#include <nx/vms/api/data/module_information.h>
 
 class QSettings;
 class QnSessionManager;
@@ -226,8 +226,8 @@ public:
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
 
-    void setModuleInformation(const QnModuleInformation& moduleInformation);
-    QnModuleInformation moduleInformation();
+    void setModuleInformation(const nx::vms::api::ModuleInformation& moduleInformation);
+    nx::vms::api::ModuleInformation moduleInformation();
 
     bool isTranscodeDisabled() const { return m_transcodingDisabled; }
     void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
@@ -292,7 +292,7 @@ private:
     QnUuid m_remoteUuid;
     bool m_cloudMode;
     nx::vms::api::SoftwareVersion m_engineVersion;
-    QnModuleInformation m_moduleInformation;
+    nx::vms::api::ModuleInformation m_moduleInformation;
     mutable QnMutex m_mutex;
     bool m_transcodingDisabled = false;
     QSet<QnUuid> m_allowedPeers;

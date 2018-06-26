@@ -45,8 +45,8 @@ bool RevealRequest::isValid(const quint8 *bufStart, const quint8 *bufEnd)
 }
 
 
-RevealResponse::RevealResponse(const QnModuleInformation &other)
-    : QnModuleInformation(other)
+RevealResponse::RevealResponse(const nx::vms::api::ModuleInformation& other):
+    nx::vms::api::ModuleInformation(other)
 {
 }
 

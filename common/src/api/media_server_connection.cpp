@@ -289,10 +289,10 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnConfigureReply>(this, response, handle);
             break;
         case ModulesInformationObject:
-            processJsonReply<QList<QnModuleInformation>>(this, response, handle);
+            processJsonReply<QList<nx::vms::api::ModuleInformation>>(this, response, handle);
             break;
         case PingSystemObject:
-            processJsonReply<QnModuleInformation>(this, response, handle);
+            processJsonReply<nx::vms::api::ModuleInformation>(this, response, handle);
             break;
         case GetNonceObject:
             processJsonReply<QnGetNonceReply>(this, response, handle);
@@ -304,7 +304,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processUbjsonReply<QnAuditRecordList>(this, response, handle);
             break;
         case MergeSystemsObject:
-            processJsonReply<QnModuleInformation>(this, response, handle);
+            processJsonReply<nx::vms::api::ModuleInformation>(this, response, handle);
             break;
         case ec2RecordedTimePeriodsObject:
             processCompressedPeriodsReply<MultiServerPeriodDataList>(this, response, handle);
@@ -1254,7 +1254,7 @@ int QnMediaServerConnection::pingSystemAsync(
     params << QnRequestParam("getKey", getKey);
 
     return sendAsyncGetRequestLogged(PingSystemObject,
-        params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+        params, QN_STRINGIZE_TYPE(nx::vms::api::ModuleInformation), target, slot);
 }
 
 int QnMediaServerConnection::getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot)
@@ -1300,7 +1300,7 @@ int QnMediaServerConnection::mergeSystemAsync(
         ignoreIncompatible ? lit("true") : lit("false"));
 
     return sendAsyncGetRequestLogged(MergeSystemsObject,
-        params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+        params, QN_STRINGIZE_TYPE(nx::vms::api::ModuleInformation), target, slot);
 }
 
 int QnMediaServerConnection::modulesInformation(QObject* target, const char* slot)
@@ -1308,7 +1308,7 @@ int QnMediaServerConnection::modulesInformation(QObject* target, const char* slo
     QnRequestParamList params;
     params << QnRequestParam("allModules", lit("true"));
     return sendAsyncGetRequestLogged(ModulesInformationObject,
-        params, QN_STRINGIZE_TYPE(QList<QnModuleInformation>), target, slot);
+        params, QN_STRINGIZE_TYPE(QList<nx::vms::api::ModuleInformation>), target, slot);
 }
 
 int QnMediaServerConnection::recordedTimePeriods(

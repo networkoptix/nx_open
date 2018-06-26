@@ -165,7 +165,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
     connect(m_mergeTool, &QnMergeSystemsTool::mergeFinished, this,
         [this](
             utils::MergeSystemsStatus::Value mergeStatus,
-            const QnModuleInformation& moduleInformation)
+            const nx::vms::api::ModuleInformation& moduleInformation)
         {
             if (mergeStatus != utils::MergeSystemsStatus::ok)
             {

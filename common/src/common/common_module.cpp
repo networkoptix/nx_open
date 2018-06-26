@@ -185,8 +185,8 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_moduleInformation.customization = QnAppInfo::customizationName();
     m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::engineVersion());
     m_moduleInformation.type = clientMode
-        ? QnModuleInformation::nxClientId()
-        : QnModuleInformation::nxMediaServerId();
+        ? nx::vms::api::ModuleInformation::nxClientId()
+        : nx::vms::api::ModuleInformation::nxMediaServerId();
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)
@@ -277,7 +277,7 @@ bool QnCommonModule::isReadOnly() const
     return m_moduleInformation.ecDbReadOnly;
 }
 
-void QnCommonModule::setModuleInformation(const QnModuleInformation& moduleInformation)
+void QnCommonModule::setModuleInformation(const nx::vms::api::ModuleInformation& moduleInformation)
 {
     bool isReadOnlyChanged = false;
     {
@@ -297,7 +297,7 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation& moduleInfor
     emit moduleInformationChanged();
 }
 
-QnModuleInformation QnCommonModule::moduleInformation()
+nx::vms::api::ModuleInformation QnCommonModule::moduleInformation()
 {
     {
         QnMutexLocker lock(&m_mutex);

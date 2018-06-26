@@ -14,7 +14,7 @@
 
 namespace {
 
-bool isOldServer(const QnModuleInformation& info)
+bool isOldServer(const nx::vms::api::ModuleInformation& info)
 {
     static const nx::vms::api::SoftwareVersion kMinVersionWithSystem = {2, 3};
     return info.version < kMinVersionWithSystem;

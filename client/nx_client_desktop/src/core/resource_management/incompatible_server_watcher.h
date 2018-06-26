@@ -7,16 +7,18 @@
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <nx/utils/uuid.h>
-#include <network/module_information.h>
 
 class QnIncompatibleServerWatcherPrivate;
 
-class QnIncompatibleServerWatcher : public QObject, public QnConnectionContextAware
+class QnIncompatibleServerWatcher:
+    public QObject,
+    public QnConnectionContextAware
 {
     Q_OBJECT
+
 public:
-    explicit QnIncompatibleServerWatcher(QObject *parent = 0);
-    ~QnIncompatibleServerWatcher();
+    explicit QnIncompatibleServerWatcher(QObject* parent = nullptr);
+    virtual ~QnIncompatibleServerWatcher() override;
 
     void start();
     void stop();
@@ -27,9 +29,9 @@ public:
      * In case when the resource was removed when was having 'keep' flag on
      * it will be removed in this method.
      */
-    void keepServer(const QnUuid &id, bool keep);
+    void keepServer(const QnUuid& id, bool keep);
 
-    void createInitialServers(const ec2::ApiDiscoveredServerDataList &discoveredServers);
+    void createInitialServers(const ec2::ApiDiscoveredServerDataList& discoveredServers);
 
 private:
     Q_DECLARE_PRIVATE(QnIncompatibleServerWatcher)

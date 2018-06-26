@@ -102,7 +102,8 @@ void SystemMergeProcessor::saveBackupOfSomeLocalData()
     m_cloudAuthKey = m_commonModule->globalSettings()->cloudAuthKey().toUtf8();
 }
 
-const QnModuleInformationWithAddresses& SystemMergeProcessor::remoteModuleInformation() const
+const nx::vms::api::ModuleInformationWithAddresses&
+    SystemMergeProcessor::remoteModuleInformation() const
 {
     return m_remoteModuleInformation;
 }
@@ -611,7 +612,7 @@ void SystemMergeProcessor::addAuthToRequest(
 nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformation(
     const nx::utils::Url& url,
     const QString& authenticationKey,
-    QnModuleInformationWithAddresses* moduleInformation)
+    nx::vms::api::ModuleInformationWithAddresses* moduleInformation)
 {
     QByteArray moduleInformationData;
     {
@@ -644,7 +645,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformatio
     }
 
     const auto json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
-    *moduleInformation = json.deserialized<QnModuleInformationWithAddresses>();
+    *moduleInformation = json.deserialized<nx::vms::api::ModuleInformationWithAddresses>();
 
     return nx::network::http::StatusCode::ok;
 }
@@ -653,7 +654,7 @@ bool SystemMergeProcessor::addMergeHistoryRecord(const MergeSystemData& data)
 {
     const auto& mergedSystemModuleInformation = data.takeRemoteSettings
         ? m_localModuleInformation
-        : static_cast<const QnModuleInformation&>(m_remoteModuleInformation);
+        : m_remoteModuleInformation;
 
     nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
     mergeHistoryRecord.timestamp = QDateTime::currentMSecsSinceEpoch();

@@ -979,7 +979,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
 
     const auto servers = system->servers();
     auto reachableServer = std::find_if(servers.cbegin(), servers.cend(),
-        [system](const QnModuleInformation& server)
+        [system](const nx::vms::api::ModuleInformation& server)
         {
             return system->isReachableServer(server.id);
         });

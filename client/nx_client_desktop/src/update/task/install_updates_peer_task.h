@@ -6,9 +6,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <update/task/network_peer_task.h>
-#include <network/module_information.h>
 
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/data_fwd.h>
 
 class QTimer;
 struct QnUploadUpdateReply;
@@ -44,7 +44,7 @@ private slots:
     void at_checkTimer_timeout();
     void at_pingTimer_timeout();
     void at_gotModuleInformation(
-        int status, const QList<QnModuleInformation>& modules, int handle);
+        int status, const QList<nx::vms::api::ModuleInformation>& modules, int handle);
     void at_installUpdateResponse(
         int status, const QnUploadUpdateReply& reply, int handle);
 

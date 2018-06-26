@@ -269,11 +269,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::ResourceInfoLevel>();
     qRegisterMetaTypeStreamOperators<Qn::ResourceInfoLevel>();
 
-    qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QnGetNonceReply>();
-    qRegisterMetaType<QnModuleInformationWithAddresses>();
-    qRegisterMetaType<QList<QnModuleInformation>>();
-    qRegisterMetaType<QList<QnModuleInformationWithAddresses>>();
 
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();

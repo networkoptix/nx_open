@@ -56,15 +56,17 @@ QnJsonRestResult MediaServerClient::saveCloudSystemCredentials(
 }
 
 void MediaServerClient::getModuleInformation(
-    std::function<void(QnJsonRestResult, QnModuleInformation)> completionHandler)
+    std::function<void(QnJsonRestResult, nx::vms::api::ModuleInformation)> completionHandler)
 {
     performApiRequest("api/moduleInformation", std::move(completionHandler));
 }
 
-QnJsonRestResult MediaServerClient::getModuleInformation(QnModuleInformation* moduleInformation)
+QnJsonRestResult MediaServerClient::getModuleInformation(
+    nx::vms::api::ModuleInformation* moduleInformation)
 {
     using GetModuleInformationAsyncFuncPointer =
-        void(MediaServerClient::*)(std::function<void(QnJsonRestResult, QnModuleInformation)>);
+        void(MediaServerClient::*)(
+            std::function<void(QnJsonRestResult, nx::vms::api::ModuleInformation)>);
 
     return syncCallWrapper(
         this,

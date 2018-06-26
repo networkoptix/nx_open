@@ -9,9 +9,8 @@
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QMetaType>
 
-#include "module_information.h"
-
 #include <nx/vms/api/types_fwd.h>
+#include <nx/vms/api/data/module_information.h>
 
 //!This request is sent by host which tries to find other modules
 class RevealRequest
@@ -31,10 +30,10 @@ typedef QMap<QString, QString> TypeSpecificParamMap;
 Q_DECLARE_METATYPE(TypeSpecificParamMap)
 
 //!Sent in response to RevealRequest by module which reveals itself
-struct RevealResponse : public QnModuleInformation {
+struct RevealResponse : public nx::vms::api::ModuleInformation {
 public:
     RevealResponse() {}
-    RevealResponse(const QnModuleInformation &other);
+    RevealResponse(const nx::vms::api::ModuleInformation &other);
     QByteArray serialize();
     bool deserialize(const quint8 *bufStart, const quint8 *bufEnd);
 };

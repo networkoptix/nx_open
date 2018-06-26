@@ -4,6 +4,9 @@
 
 #include <core/resource/resource_type.h>
 #include <nx_ec/ec_api.h>
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <nx/utils/test_support/test_options.h>
@@ -74,12 +77,14 @@ protected:
         serverData.networkAddresses = module->endpoint().toString();
         serverData.version = version.toString();
 
-        QnModuleInformation information;
-        information.type = QnModuleInformation::nxMediaServerId();
+        nx::vms::api::ModuleInformation information;
+        information.type = nx::vms::api::ModuleInformation::nxMediaServerId();
         information.id = serverData.id;
         information.name = serverData.name;
         information.version = version;
         information.runtimeId = module->commonModule()->runningInstanceGUID();
+        information.realm = nx::network::AppInfo::realm();
+        information.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
         module->commonModule()->setModuleInformation(information);
 
         auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);

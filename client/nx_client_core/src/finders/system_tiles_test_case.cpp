@@ -2,11 +2,14 @@
 
 #include <client/system_weights_manager.h>
 #include <finders/test_systems_finder.h>
+#include <helpers/system_weight_helper.h>
 #include <network/local_system_description.h>
-
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
-#include <helpers/system_weight_helper.h>
+
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/raii_guard.h>
 
@@ -39,7 +42,7 @@ void addServerToSystem(
     }
 
     const auto systemName = system->name();
-    QnModuleInformation serverInfo;
+    nx::vms::api::ModuleInformation serverInfo;
     serverInfo.id = QUuid::createUuid();
     serverInfo.name = lit("Server of <%1>").arg(systemName);
     serverInfo.systemName = systemName;
@@ -47,6 +50,8 @@ void addServerToSystem(
     serverInfo.protoVersion = protoVersion;
     serverInfo.version = version;
     serverInfo.port = 7001;
+    serverInfo.realm = nx::network::AppInfo::realm();
+    serverInfo.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
 
     system->addServer(serverInfo, 0);
     system->setServerHost(serverInfo.id, url);

@@ -10,6 +10,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/software_version.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/system_information.h>
 
 namespace nx {
@@ -107,9 +108,9 @@ public:
 
     nx::vms::api::SystemInformation getSystemInfo() const;
     void setSystemInfo(const nx::vms::api::SystemInformation& systemInfo);
-    virtual QnModuleInformation getModuleInformation() const;
+    virtual nx::vms::api::ModuleInformation getModuleInformation() const;
 
-    QnModuleInformationWithAddresses getModuleInformationWithAddresses() const;
+    nx::vms::api::ModuleInformationWithAddresses getModuleInformationWithAddresses() const;
 
     QList<nx::api::AnalyticsDriverManifest> analyticsDrivers() const;
     void setAnalyticsDrivers(const QList<nx::api::AnalyticsDriverManifest>& drivers);

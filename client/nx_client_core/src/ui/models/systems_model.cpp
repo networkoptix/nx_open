@@ -4,6 +4,7 @@
 
 #include <utils/math/math.h>
 #include <utils/common/app_info.h>
+#include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/disconnect_helper.h>
@@ -486,7 +487,7 @@ nx::vms::api::SoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
         return {};
 
     const auto predicate =
-        [this, systemDescription](const QnModuleInformation& serverInfo)
+        [this, systemDescription](const nx::vms::api::ModuleInformation& serverInfo)
         {
             if (!systemDescription->isReachableServer(serverInfo.id))
                 return false;
@@ -517,7 +518,7 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
 {
     const auto servers = systemDescription->servers();
     return std::all_of(servers.cbegin(), servers.cend(),
-        [this, systemDescription](const QnModuleInformation& serverInfo)
+        [this, systemDescription](const nx::vms::api::ModuleInformation& serverInfo)
         {
             if (!systemDescription->isReachableServer(serverInfo.id))
                 return true;
@@ -536,7 +537,7 @@ bool QnSystemsModelPrivate::isCompatibleInternal(
 {
     const auto servers = systemDescription->servers();
     return std::all_of(servers.cbegin(), servers.cend(),
-        [systemDescription](const QnModuleInformation& serverInfo)
+        [systemDescription](const nx::vms::api::ModuleInformation& serverInfo)
         {
             if (!systemDescription->isReachableServer(serverInfo.id))
                 return true;

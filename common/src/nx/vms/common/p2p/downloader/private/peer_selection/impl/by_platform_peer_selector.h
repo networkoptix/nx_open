@@ -1,7 +1,5 @@
 #pragma once
 
-#include <network/module_information.h>
-
 #include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
 
 namespace nx {

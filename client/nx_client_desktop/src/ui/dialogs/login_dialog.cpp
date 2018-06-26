@@ -168,7 +168,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::LoginDialog),
-    m_requestHandle(-1),
+    m_connectionsModel(new QStandardItemModel(this)),
     m_renderingWidget(new QnRenderingWidget(this))
 {
     ui->setupUi(this);
@@ -212,7 +212,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     layout->addWidget(m_renderingWidget);
     DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(m_renderingWidget);
 
-    m_connectionsModel = new QStandardItemModel(this);
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
     m_lastUsedItem = NULL;

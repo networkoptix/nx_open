@@ -6,7 +6,6 @@
 #include <common/common_module.h>
 #include <common/common_module_aware.h>
 #include <common/static_common_module.h>
-#include <network/module_information.h>
 #include <network/system_helpers.h>
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx/utils/software_version.h>
@@ -15,6 +14,7 @@
 #include <nx/network/app_info.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace {
 
@@ -61,7 +61,7 @@ nx::vms::api::SoftwareVersion QnConnectionValidator::minSupportedVersion()
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnection(
-    const QnModuleInformation& info)
+    const nx::vms::api::ModuleInformation& info)
 {
     return validateConnectionInternal(
         info.brand,
@@ -101,7 +101,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         connectionInfo.cloudHost);
 }
 
-bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info,
+bool QnConnectionValidator::isCompatibleToCurrentSystem(const nx::vms::api::ModuleInformation& info,
     const QnCommonModule* commonModule)
 {
     return !info.localSystemId.isNull()

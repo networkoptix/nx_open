@@ -1,23 +1,20 @@
 #include "incompatible_server_watcher.h"
 
-#include <common/common_module.h>
-
 #include <client_core/connection_context_aware.h>
-
 #include <client/client_message_processor.h>
-
+#include <common/common_module.h>
+#include <common/common_module.h>
+#include <core/resource/fake_media_server.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-
 #include <network/connection_validator.h>
 
 #include <nx/utils/log/log.h>
-#include <common/common_module.h>
-#include <core/resource/fake_media_server.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace {
 
-bool isSuitable(const QnModuleInformation &moduleInformation)
+bool isSuitable(const nx::vms::api::ModuleInformation& moduleInformation)
 {
     return moduleInformation.version >= nx::utils::SoftwareVersion(2, 3, 0, 0);
 }

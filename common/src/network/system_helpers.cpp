@@ -1,13 +1,13 @@
 #include "system_helpers.h"
 
-#include <core/resource/media_server_resource.h>
-
-#include <network/cloud_system_data.h>
-#include <network/module_information.h>
 #include <api/model/connection_info.h>
 #include <api/global_settings.h>
-#include <utils/common/id.h>
 #include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
+#include <network/cloud_system_data.h>
+#include <utils/common/id.h>
+
+#include <nx/vms/api/data/module_information.h>
 
 namespace {
 
@@ -71,7 +71,7 @@ QString getTargetSystemId(const QnConnectionInfo& info)
         info.localSystemId, info.serverId(), info.version);
 }
 
-QString getTargetSystemId(const QnModuleInformation& info)
+QString getTargetSystemId(const nx::vms::api::ModuleInformation& info)
 {
     return ::getTargetSystemIdImpl(info.systemName, info.cloudSystemId,
         info.localSystemId, info.id, info.version);
@@ -82,7 +82,7 @@ QString getTargetSystemId(const QnCloudSystem& cloudSystem)
     return generateTargetId(cloudSystem.cloudId, cloudSystem.localId);
 }
 
-QnUuid getLocalSystemId(const QnModuleInformation& info)
+QnUuid getLocalSystemId(const nx::vms::api::ModuleInformation& info)
 {
     return getLocalSystemIdImpl(info.systemName, info.localSystemId, info.id, info.version);
 }
@@ -92,12 +92,12 @@ QnUuid getLocalSystemId(const QnConnectionInfo& info)
     return getLocalSystemIdImpl(info.systemName, info.localSystemId, info.serverId(), info.version);
 }
 
-QString getFactorySystemId(const QnModuleInformation& info)
+QString getFactorySystemId(const nx::vms::api::ModuleInformation& info)
 {
     return getFactorySystemIdImpl(info.id).toString();
 }
 
-bool isSafeMode(const QnModuleInformation& info)
+bool isSafeMode(const nx::vms::api::ModuleInformation& info)
 {
     return (info.version < kMinVersionWithSafeMode ? false : info.ecDbReadOnly);
 }
@@ -107,7 +107,7 @@ bool isNewSystem(const QnConnectionInfo& info)
     return info.localSystemId.isNull();
 }
 
-bool isNewSystem(const QnModuleInformation& info)
+bool isNewSystem(const nx::vms::api::ModuleInformation& info)
 {
     if (info.version < kMinVersionWithLocalId)
         return false; //< No new systems until 3.0
@@ -120,7 +120,7 @@ bool isNewSystem(const QnCloudSystem& info)
     return info.localId.isNull();
 }
 
-bool isCloudSystem(const QnModuleInformation& info)
+bool isCloudSystem(const nx::vms::api::ModuleInformation& info)
 {
     return (info.version < kMinVersionWithLocalId ? false : !info.cloudSystemId.isEmpty());
 }
@@ -135,7 +135,8 @@ QnUuid currentSystemLocalId(const QnCommonModule* commonModule)
     return (localId.isNull() ? commonModule->remoteGUID() : localId);
 }
 
-bool serverBelongsToCurrentSystem(const QnModuleInformation& info, const QnCommonModule* commonModule)
+bool serverBelongsToCurrentSystem(
+    const nx::vms::api::ModuleInformation& info, const QnCommonModule* commonModule)
 {
     return (getLocalSystemId(info) == currentSystemLocalId(commonModule));
 }

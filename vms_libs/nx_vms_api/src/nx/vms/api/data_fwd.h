@@ -131,6 +131,9 @@ DECLARE_STRUCT_AND_LIST_EX(DiscoveryData, (ubjson)(json)(xml)(csv_record))
 
 DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))
 
+DECLARE_STRUCT_EX(ModuleInformation, (eq)(ubjson)(json)(xml))
+DECLARE_STRUCT_EX(ModuleInformationWithAddresses, (eq)(ubjson)(json)(xml))
+
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_EX
 #undef DECLARE_STRUCT_AND_LIST

@@ -45,15 +45,17 @@ void Manager::setMulticastInterval(std::chrono::milliseconds value)
     m_multicastFinder->setSendInterval(value);
 }
 
-ModuleEndpoint::ModuleEndpoint(QnModuleInformation old, nx::network::SocketAddress endpoint):
-    QnModuleInformation(std::move(old)),
+ModuleEndpoint::ModuleEndpoint(
+    nx::vms::api::ModuleInformation old, nx::network::SocketAddress endpoint)
+    :
+    nx::vms::api::ModuleInformation(std::move(old)),
     endpoint(std::move(endpoint))
 {
 }
 
 bool ModuleEndpoint::operator==(const ModuleEndpoint& rhs) const
 {
-    typedef const QnModuleInformation& BaseRef;
+    typedef const nx::vms::api::ModuleInformation& BaseRef;
     return BaseRef(*this) == BaseRef(rhs) && endpoint == rhs.endpoint;
 }
 
@@ -130,7 +132,8 @@ void Manager::initializeConnector()
 {
     m_moduleConnector = std::make_unique<ModuleConnector>();
     m_moduleConnector->setConnectHandler(
-        [this](QnModuleInformation information, nx::network::SocketAddress endpoint, nx::network::HostAddress ip)
+        [this](nx::vms::api::ModuleInformation information, nx::network::SocketAddress endpoint,
+            nx::network::HostAddress ip)
         {
             if (!commonModule())
                 return;
@@ -209,9 +212,11 @@ void Manager::initializeMulticastFinders(bool clientMode)
 {
     m_multicastFinder = std::make_unique<UdpMulticastFinder>(m_moduleConnector->getAioThread());
     m_multicastFinder->listen(
-        [this](QnModuleInformationWithAddresses module, nx::network::SocketAddress /*endpoint*/)
+        [this](nx::vms::api::ModuleInformationWithAddresses module,
+            nx::network::SocketAddress /*endpoint*/)
         {
-            m_moduleConnector->newEndpoints(module.endpoints(), module.id);
+            m_moduleConnector->newEndpoints(
+                module.endpoints<nx::network::SocketAddress>(), module.id);
         });
 
     if (!clientMode)
@@ -242,10 +247,11 @@ void Manager::initializeMulticastFinders(bool clientMode)
 
     m_legacyMulticastFinder = new DeprecatedMulticastFinder(this, options);
     connect(m_legacyMulticastFinder, &DeprecatedMulticastFinder::responseReceived,
-        [this](const QnModuleInformation &module,
+        [this](const nx::vms::api::ModuleInformation& module,
             const nx::network::SocketAddress &endpoint, const nx::network::HostAddress& ip)
         {
-            m_moduleConnector->newEndpoints({nx::network::SocketAddress(ip, endpoint.port)}, module.id);
+            m_moduleConnector->newEndpoints(
+                {nx::network::SocketAddress(ip, endpoint.port)}, module.id);
         });
 }
 

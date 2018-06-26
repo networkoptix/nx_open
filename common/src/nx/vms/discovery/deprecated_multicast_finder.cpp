@@ -6,25 +6,21 @@
 #include <QtCore/QDateTime>
 #include <QtNetwork/QNetworkInterface>
 
+#include <api/global_settings.h>
+#include <common/common_module.h>
 #include <common/static_common_module.h>
+#include <network/connection_validator.h>
+#include <utils/common/app_info.h>
 
+#include <nx/network/socket.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/system_socket.h>
+#include <nx/network/nettools.h>
+#include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/std/cpp14.h>
-
-#include <nx/network/socket.h>
-#include <nx/network/system_socket.h>
-
-#include <common/common_module.h>
-#include <network/connection_validator.h>
-
-#include <network/module_information.h>
-
-#include <utils/common/app_info.h>
-#include <nx/utils/cryptographic_hash.h>
-#include <api/global_settings.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/nettools.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace nx {
 namespace vms {
@@ -213,7 +209,7 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
         return false;
     }
 
-    //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
+    //TODO #ak RevealResponse class is excess here. Should send/receive nx::vms::api::ModuleInformation
     {
         QnMutexLocker lock(&m_moduleInfoMutex);
         if (m_serializedModuleInfo.isEmpty())
@@ -277,8 +273,8 @@ bool DeprecatedMulticastFinder::processDiscoveryResponse(UDPSocket *udpSocket)
         return false;
     }
 
-    if (response->type != QnModuleInformation::nxMediaServerId()
-        && response->type != QnModuleInformation::nxECId())
+    if (response->type != nx::vms::api::ModuleInformation::nxMediaServerId()
+        && response->type != nx::vms::api::ModuleInformation::nxECId())
     {
         NX_DEBUG(this, lm("Ignoring %1 (%2) with id %3 on local address %4").args(
             response->type, remoteEndpoint, response->id, udpSocket->getLocalAddress()));

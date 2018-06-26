@@ -34,14 +34,13 @@
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
-struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
 struct BeforeRestoreDbData;
 class TimeBasedNonceProvider;
 
-namespace ec2 { 
+namespace ec2 {
 
-class CrashReporter; 
+class CrashReporter;
 class LocalConnectionFactory;
 
 } // namespace ec2

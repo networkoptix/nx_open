@@ -3,10 +3,10 @@
 #include <common/common_globals.h>
 #include <nx_ec/ec_api_fwd.h>
 
+#include <nx/vms/api/data_fwd.h>
 #include <nx/vms/api/data/software_version.h>
 
 struct QnConnectionInfo;
-struct QnModuleInformation;
 class QnCommonModule;
 
 /**
@@ -27,11 +27,11 @@ class QnConnectionValidator
 public:
     static nx::vms::api::SoftwareVersion minSupportedVersion();
 
-    static Qn::ConnectionResult validateConnection(const QnModuleInformation& info);
+    static Qn::ConnectionResult validateConnection(const nx::vms::api::ModuleInformation& info);
     static Qn::ConnectionResult validateConnection(const QnConnectionInfo& connectionInfo,
         ec2::ErrorCode networkError);
 
-    static bool isCompatibleToCurrentSystem(const QnModuleInformation& info,
+    static bool isCompatibleToCurrentSystem(const nx::vms::api::ModuleInformation& info,
         const QnCommonModule* commonModule);
 
 protected:

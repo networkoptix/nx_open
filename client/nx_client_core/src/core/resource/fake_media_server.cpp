@@ -58,7 +58,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     emit moduleInformationChanged(::toSharedPointer(this));
 }
 
-QnModuleInformation QnFakeMediaServerResource::getModuleInformation() const
+nx::vms::api::ModuleInformation QnFakeMediaServerResource::getModuleInformation() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_serverData;

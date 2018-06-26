@@ -9,8 +9,6 @@
 #include <QtCore/QPair>
 #include <QtCore/QList>
 
-#include "network/module_information.h"
-
 #include <api/model/connection_info.h>
 
 #include <core/resource/videowall_control_message.h>
@@ -46,9 +44,10 @@
 class QnRestProcessorPool;
 class QnHttpConnectionListener;
 class QnCommonModule;
-struct QnModuleInformation;
 
 namespace nx {
+
+namespace network { class SocketAddress; }
 
 namespace vms { namespace discovery { class Manager; }}
 namespace time_sync { class TimeSyncManager; }

@@ -21,9 +21,9 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/type_utils.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/data/module_information.h>
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
-#include <network/module_information.h>
 #include <nx_ec/ec_api.h>
 #include <rest/server/json_rest_result.h>
 
@@ -65,8 +65,8 @@ public:
     QnJsonRestResult saveCloudSystemCredentials(const CloudCredentialsData& request);
 
     void getModuleInformation(
-        std::function<void(QnJsonRestResult, QnModuleInformation)> completionHandler);
-    QnJsonRestResult getModuleInformation(QnModuleInformation* result);
+        std::function<void(QnJsonRestResult, nx::vms::api::ModuleInformation)> completionHandler);
+    QnJsonRestResult getModuleInformation(nx::vms::api::ModuleInformation* result);
 
     void setupLocalSystem(
         const SetupLocalSystemData& request,

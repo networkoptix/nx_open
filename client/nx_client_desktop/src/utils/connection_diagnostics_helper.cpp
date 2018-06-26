@@ -15,8 +15,6 @@
 
 #include <nx_ec/ec_api.h>
 
-#include <network/module_information.h>
-
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/compatibility_version_installation_dialog.h>
 #include <ui/help/help_topics.h>
