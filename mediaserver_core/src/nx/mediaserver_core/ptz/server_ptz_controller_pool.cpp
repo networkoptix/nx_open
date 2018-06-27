@@ -62,6 +62,8 @@ ServerPtzControllerPool::ServerPtzControllerPool(QObject *parent):
     connect(
         this, &ServerPtzControllerPool::controllerChanged,
         this, &ServerPtzControllerPool::at_controllerChanged);
+
+    ini().reload();
 }
 
 ServerPtzControllerPool::~ServerPtzControllerPool()

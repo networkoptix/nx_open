@@ -10,7 +10,7 @@ namespace ptz {
 
 struct PtzIniConfig: public nx::kit::IniConfig
 {
-    PtzIniConfig(): IniConfig("desktop_client.ini") {}
+    PtzIniConfig(): IniConfig("server_ptz.ini") {}
 
     NX_INI_STRING(
         "",

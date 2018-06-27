@@ -1,5 +1,7 @@
 #include "ptz_ini_config.h"
 
+#include <nx/fusion/model_functions.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace ptz {
@@ -8,7 +10,7 @@ namespace {
 
 Ptz::Capabilities deserializeCapabilities(const QString& serialized)
 {
-    return Ptz::Capabilities(serialized.toInt());
+    return QnLexical::deserialized<Ptz::Capabilities>(serialized);
 }
 
 } // namespace
