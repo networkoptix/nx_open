@@ -122,7 +122,7 @@ class VirtualBox(Hypervisor):
                 '--options', 'link',
                 '--register',
                 ])
-        except virtual_box_error('OBJECT_NOT_FOUND') as x:
+        except VMNotFound as x:
             _logger.error('Failed to clone %r: %s', original_vm_name, x.message)
             mo = re.search(r"Could not find a registered machine named '(.+)'", x.message)
             if not mo:
