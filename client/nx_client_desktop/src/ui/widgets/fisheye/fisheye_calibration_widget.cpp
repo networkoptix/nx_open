@@ -133,18 +133,23 @@ void QnFisheyeCalibrationWidget::at_calibrator_finished(int errorCode)
 void QnFisheyeCalibrationWidget::at_image_animationFinished()
 {
     emit autoCalibrationFinished();
+    const QString errorCaption = tr("Auto calibration failed");
+
     switch (m_lastError)
     {
         case QnFisheyeCalibrator::ErrorNotFisheyeImage:
-            QnMessageBox::critical(this,
-                tr("Auto calibration failed"), tr("Image is not round."));
+            QnMessageBox::critical(this, errorCaption, tr("Image is not round."));
             break;
 
         case QnFisheyeCalibrator::ErrorTooLowLight:
-            QnMessageBox::critical(this,
-                tr("Auto calibration failed"), tr("Image might be too dim."));
+            QnMessageBox::critical(this, errorCaption, tr("Image might be too dim."));
             break;
-
+        case QnFisheyeCalibrator::ErrorInvalidInput:
+            QnMessageBox::critical(this, errorCaption, tr("Invalid input image."));
+            break;
+        case QnFisheyeCalibrator::ErrorInternal:
+            QnMessageBox::critical(this, errorCaption, tr("Internal error."));
+            break;
         default:
             break;
     }
