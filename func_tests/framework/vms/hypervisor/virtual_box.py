@@ -194,15 +194,15 @@ class VirtualBox(Hypervisor):
         try:
             return self.host_os_access.run_command(['VBoxManage'] + args)
         except exit_status_error_cls(1) as x:
-            mo = re.search(r'Details: code VBOX_E_(\w+)', x.stderr)
-            if not mo:
-                raise
-            code = mo.group(1)
             first_line = x.stderr.splitlines()[0]
             prefix = 'VBoxManage: error: '
             if not first_line.startswith(prefix):
                 raise VirtualBoxError(x.stderr)
             message = first_line[len(prefix):]
+            mo = re.search(r'Details: code VBOX_E_(\w+)', x.stderr)
+            if not mo:
+                raise VirtualBoxError(message)
+            code = mo.group(1)
             if code == 'OBJECT_NOT_FOUND':
                 raise VMNotFound("Cannot find VM:\n{}".format(message))
             raise virtual_box_error(code)(message)

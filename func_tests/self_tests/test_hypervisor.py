@@ -75,6 +75,7 @@ def test_list(hypervisor):
         hypervisor.destroy(name)
     assert not set(names) & set(hypervisor.list_vm_names())
 
+
 def test_template_not_found_error(hypervisor):
     with pytest.raises(TemplateVMNotFound) as excinfo:
         hypervisor.clone('missing-vm-source', 'unused-vm-target')
