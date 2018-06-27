@@ -28,7 +28,7 @@ def linux_vm_info(vm_types):
 
 @pytest.fixture(scope='session')
 def windows_vm_info(vm_types):
-    with vm_types['linux'].obtained('raw-linux') as (info, index):
+    with vm_types['windows'].obtained('raw-windows') as (info, index):
         return info
 
 

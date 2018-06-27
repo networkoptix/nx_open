@@ -343,6 +343,7 @@ private:
     bool m_terminated;
     quint64 m_totalBytesReadPerRequest; //< total read bytes per request
     int m_totalRequestsSentViaCurrentConnection; //< total sent requests via single connection
+    int m_totalRequestsSent; //< total sent requests
     bool m_contentEncodingUsed;
     std::chrono::milliseconds m_sendTimeout;
     std::chrono::milliseconds m_responseReadTimeout;
@@ -361,7 +362,6 @@ private:
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
     int m_maxNumberOfRedirects = 5;
-    std::unique_ptr<AbstractStreamSocket> m_userDefinedSocket;
 
     virtual void stopWhileInAioThread() override;
 
@@ -372,7 +372,7 @@ private:
     void resetDataBeforeNewRequest();
     void initiateHttpMessageDelivery();
     bool canExistingConnectionBeUsed() const;
-    void initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> socket = std::unique_ptr<AbstractStreamSocket>());
+    void initiateTcpConnection();
     /**
      * @return Bytes parsed or -1 in case of error.
      */

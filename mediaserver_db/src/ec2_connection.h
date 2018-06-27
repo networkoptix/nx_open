@@ -3,8 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef EC2_CONNECTION_H
-#define EC2_CONNECTION_H
+#pragma once
 
 #include <memory>
 
@@ -17,7 +16,6 @@
 
 namespace ec2
 {
-
 	class LocalConnectionFactory;
 
     // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnection
@@ -53,5 +51,3 @@ namespace ec2
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
     typedef std::shared_ptr<nx::appserver::OrphanCameraWatcher> OrphanCameraWatcherPtr;
 }
-
-#endif  //EC2_CONNECTION_H

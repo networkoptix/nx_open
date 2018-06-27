@@ -44,6 +44,7 @@
 
 #include "ec_api_fwd.h"
 #include "transaction_timestamp.h"
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 class QnRestProcessorPool;
 class QnHttpConnectionListener;
@@ -51,10 +52,6 @@ class QnCommonModule;
 struct QnModuleInformation;
 
 namespace nx {
-
-namespace time_sync { 
-class TimeSyncManager; 
-}
 
 namespace vms {
 namespace discovery {
@@ -1043,11 +1040,11 @@ public:
     virtual QnCommonModule* commonModule() const = 0;
 
     virtual QnUuid routeToPeerVia(
-        const QnUuid& dstPeer, 
-        int* distance, 
+        const QnUuid& dstPeer,
+        int* distance,
         nx::network::SocketAddress* knownPeerAddress) const = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
-    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const = 0;
+    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const = 0;
 
     virtual ECConnectionNotificationManager* notificationManager()
     {
@@ -1214,7 +1211,7 @@ public:
 
     virtual void setConfParams(std::map<QString, QVariant> confParams) = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
-    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const = 0;
+    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const = 0;
 
     virtual void shutdown()
     {

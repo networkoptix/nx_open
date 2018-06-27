@@ -18,8 +18,9 @@ import requests.exceptions
 from requests.auth import HTTPDigestAuth
 
 DEFAULT_API_USER = 'admin'
-DEFAULT_API_PASSWORD = 'admin'
-STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, 'qweasd123']  # do not mask these passwords in log files
+INITIAL_API_PASSWORD = 'admin'
+DEFAULT_API_PASSWORD = 'qweasd123'
+STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, INITIAL_API_PASSWORD]  # do not mask these passwords in log files
 REST_API_TIMEOUT_SEC = 20
 MAX_CONTENT_LEN_TO_LOG = 1000
 
@@ -81,7 +82,7 @@ class RestApi(object):
     HttpError...401...
     """
 
-    def __init__(self, alias, hostname, port, username='admin', password='admin', ca_cert=None):
+    def __init__(self, alias, hostname, port, username='admin', password=INITIAL_API_PASSWORD, ca_cert=None):
         self._port = port
         self._hostname = hostname
         self._alias = alias
@@ -180,10 +181,12 @@ class RestApi(object):
         _logger.debug('JSON payload:\n%s', json.dumps(data, indent=4))
         return self.request('POST', path, json=data, **kwargs)
 
-    def request(self, method, path, secure=False, timeout=None, **kwargs):
+    def request(self, method, path, secure=False, timeout=None, auth=None, **kwargs):
         url = self.url(path, secure=secure)
         response = requests.request(
-            method, url, auth=self._auth, verify=str(self.ca_cert),
+            method, url,
+            auth=auth or self._auth,
+            verify=str(self.ca_cert),
             allow_redirects=False,
             timeout=timeout or REST_API_TIMEOUT_SEC,
             **kwargs)
