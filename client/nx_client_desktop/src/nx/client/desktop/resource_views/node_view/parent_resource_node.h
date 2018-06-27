@@ -13,10 +13,13 @@ class ParentResourceNode: public ResourceNode
 public:
     using RelationCheckFunction =
         std::function<bool (const QnResourcePtr& parent, const QnResourcePtr& child)>;
+    using NodeCreationFunction =
+        std::function<NodePtr (const QnResourcePtr& resource)>;
 
     static NodePtr create(
         const QnResourcePtr& resource,
-        const RelationCheckFunction& relationCheckFunction);
+        const RelationCheckFunction& relationCheckFunction,
+        const NodeCreationFunction& nodeCreationFunction = NodeCreationFunction());
 
 private:
     ParentResourceNode(const QnResourcePtr& resource);

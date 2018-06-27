@@ -20,6 +20,26 @@ namespace {
 
 using namespace nx::client::desktop;
 
+static const auto createLayoutParentNode =
+    [](const QnResourcePtr& resource) -> NodePtr
+    {
+        const auto layout = resource.dynamicCast<QnLayoutResource>();
+        if (!layout)
+            return NodePtr();
+
+        QSet<QnUuid> resourceIds;
+        for (const auto& itemData: layout->getItems())
+            resourceIds.insert(itemData.resource.id);
+
+        const auto relationCheckFunction =
+            [resourceIds](const QnResourcePtr& /*parent*/, const QnResourcePtr& child)
+            {
+                return resourceIds.contains(child->getId());
+            };
+
+        return ParentResourceNode::create(resource, relationCheckFunction);
+    };
+
 NodeList getUsers()
 {
     const auto commonModule = qnClientCoreModule->commonModule();
@@ -52,7 +72,8 @@ NodeList getUsers()
         {
             const auto user = parent.dynamicCast<QnUserResource>();
             const auto layout = child.dynamicCast<QnLayoutResource>();
-            if (!layout || !accessProvider->hasAccess(user, layout))
+
+            if (!layout || layout->flags().testFlag(Qn::local) || !accessProvider->hasAccess(user, layout))
                 return false;
 
             const auto parentId = layout->getParentId();
@@ -63,7 +84,7 @@ NodeList getUsers()
 
     for (const auto& userResource: accessibleUsers)
     {
-        const auto node = ParentResourceNode::create(userResource, isChildLayout);
+        const auto node = ParentResourceNode::create(userResource, isChildLayout, createLayoutParentNode);
         if (node->childrenCount() > 0)
             childNodes.append(node);
     }
