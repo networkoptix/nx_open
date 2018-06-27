@@ -52,21 +52,22 @@ private:
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
     std::vector<network::SocketAddress> m_httpEndpoint;
     std::vector<network::SocketAddress> m_httpsEndpoint;
-    view::GetPostTunnelProcessor m_getPostTunnelProcessor;
+    view::GetPostServerTunnelProcessor m_getPostServerTunnelProcessor;
+    view::GetPostClientTunnelProcessor m_getPostClientTunnelProcessor;
 
     void registerApiHandlers();
     void registerCompatibilityHandlers();
 
-    template<typename Handler, typename Arg>
+    template<typename Handler, typename ... Arg>
     void registerApiHandler(
         const nx::network::http::StringType& method,
-        Arg arg);
+        Arg... arg);
 
-    template<typename Handler, typename Arg>
+    template<typename Handler, typename ... Arg>
     void registerApiHandler(
         const char* path,
         const nx::network::http::StringType& method,
-        Arg arg);
+        Arg... arg);
 
     void loadSslCertificate();
 

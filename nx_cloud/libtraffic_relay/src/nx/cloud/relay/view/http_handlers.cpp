@@ -28,9 +28,10 @@ void CreateClientSessionHandler::prepareRequestData(
 
 //-------------------------------------------------------------------------------------------------
 
-const char* ConnectToPeerHandler::kPath = api::kClientSessionConnectionsPath;
+const char* ConnectToListeningPeerWithHttpUpgradeHandler::kPath =
+    api::kClientSessionConnectionsPath;
 
-ConnectToPeerHandler::ConnectToPeerHandler(
+ConnectToListeningPeerWithHttpUpgradeHandler::ConnectToListeningPeerWithHttpUpgradeHandler(
     controller::AbstractConnectSessionManager* connectSessionManager)
     :
     base_type(
@@ -42,7 +43,7 @@ ConnectToPeerHandler::ConnectToPeerHandler(
         nx::network::http::StatusCode::switchingProtocols);
 }
 
-controller::ConnectToPeerRequestEx ConnectToPeerHandler::prepareRequestData(
+controller::ConnectToPeerRequestEx ConnectToListeningPeerWithHttpUpgradeHandler::prepareRequestData(
     nx::network::http::HttpServerConnection* const connection,
     const nx::network::http::Request& /*httpRequest*/)
 {
