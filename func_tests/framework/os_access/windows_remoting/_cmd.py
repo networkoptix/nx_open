@@ -56,6 +56,7 @@ class _WinRMCommand(Command):
         self._command_id = None
 
     def send(self, stdin_bytes, is_last=False):
+        # See: https://msdn.microsoft.com/en-us/library/cc251742.aspx.
         assert not self.is_done
         _logger.getChild('stdin.size').debug(len(stdin_bytes))
         if len(stdin_bytes) < 8192:
@@ -102,6 +103,7 @@ class _WinRMCommand(Command):
         return exit_code, stdout_chunk, stderr_chunk
 
     def _send_signal(self, signal):
+        # See: https://msdn.microsoft.com/en-us/library/cc251743.aspx.
         rq = {
             'env:Envelope': self._protocol._get_soap_header(
                 resource_uri='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd',
