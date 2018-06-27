@@ -47,7 +47,7 @@
     "DISCONNECT FORM HEADER TEXT": "Megszünteti a kapcsolatot %PRODUCT_NAME% felhővel?",
     "FIRST NAME IS REQUIRED TEXT": "Utónév megadása szükséges",
     "LAST NAME IS REQUIRED TEXT": "Vezetéknév megadása szükséges",
-    "EMAIL IS REQUIRED TEXT": "Email megadása kötelező",
+    "EMAIL IS REQUIRED TEXT": "E-mail megadása kötelező",
     "EMAIL ALREADY REGISTERED TEXT": "Ez az e-mail már regisztrálva van %PRODUCT_NAME%",
     "EMAIL INVALID TEXT": "Adj meg egy érvényes Email-t",
     "PASSWORD IS REQUIRED TEXT": "Jelszó megadása szükséges",
