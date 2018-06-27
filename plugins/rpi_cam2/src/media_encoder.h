@@ -25,7 +25,7 @@ public:
         CameraManager* const cameraManager,
         nxpl::TimeProvider *const timeProvider,
         const CodecContext& codecContext,
-        const std::weak_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
 
     virtual ~MediaEncoder();
 
@@ -51,7 +51,7 @@ protected:
     CameraManager* m_cameraManager;
     nxpl::TimeProvider *const m_timeProvider;
     CodecContext m_videoCodecContext;
-    std::weak_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
+    std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
     mutable int m_maxBitrate;
 
     std::unique_ptr<StreamReader> m_streamReader;

@@ -13,7 +13,7 @@ class Packet
 public:
     Packet()
     {
-        av_init_packet(&m_packet);
+        init();
     }
 
     ~Packet()
@@ -29,6 +29,13 @@ public:
     void unref()
     {
         av_packet_unref(&m_packet);
+    }
+
+    void init()
+    {
+        av_init_packet(&m_packet);
+        m_packet.data = nullptr;
+        m_packet.size = 0;
     }
 
 private:

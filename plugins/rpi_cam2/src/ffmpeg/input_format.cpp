@@ -69,6 +69,11 @@ int InputFormat::setResolution(int width, int height)
     return setEntry("video_size", (std::to_string(width) + "x" + std::to_string(height)).c_str());
 }
 
+AVCodecID InputFormat::videoCodecID() const
+{
+    return m_formatContext->video_codec_id;
+}
+
 AVFormatContext * InputFormat::formatContext() const
 {
     return m_formatContext;

@@ -18,7 +18,7 @@ public:
         nxpl::TimeProvider *const timeProvider,
         const nxcip::CameraInfo& cameraInfo,
         const CodecContext& codecContext,
-        const std::weak_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
     virtual ~NativeStreamReader();
 
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;

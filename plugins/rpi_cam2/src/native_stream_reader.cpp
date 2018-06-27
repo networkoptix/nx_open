@@ -34,7 +34,7 @@ NativeStreamReader::NativeStreamReader(
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
     const CodecContext& codecContext,
-    const std::weak_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
+    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     StreamReader(
         parentRefManager,
@@ -51,25 +51,17 @@ NativeStreamReader::~NativeStreamReader()
 
 int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
-    //QnMutexLocker lock(&m_mutex);
     *lpPacket = nullptr;
 
-    int ffmpegError = ffmpeg::error::lastError();
-    if(ffmpegError < 0)
-    {
-        debug("ffmpegError: %s\n", ffmpeg::error::avStrError(ffmpegError).c_str());
-    }
-
-    std::shared_ptr<ffmpeg::StreamReader> streamReader = m_ffmpegStreamReader.lock();
-    if(!streamReader)
-        return nxcip::NX_OTHER_ERROR;
+    if(ffmpeg::error::hasError())
+        debug("ffmpegError: %s\n", ffmpeg::error::avStrError(ffmpeg::error::lastError()).c_str());
 
     ffmpeg::Packet packet;
-    int returnCode = streamReader->nextPacket(packet.ffmpegPacket());
+    int returnCode = m_ffmpegStreamReader->nextPacket(packet.ffmpegPacket());
     if(returnCode < 0)
         return nxcip::NX_IO_ERROR;
 
-    auto nxPacket = toNxPacket(packet.ffmpegPacket(), streamReader->codec()->codecID());
+    auto nxPacket = toNxPacket(packet.ffmpegPacket(), m_ffmpegStreamReader->codec()->codecID());
     *lpPacket = nxPacket.release();
 
     return nxcip::NX_NO_ERROR;
@@ -77,20 +69,17 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
 void NativeStreamReader::setFps(int fps)
 {
-    if (auto streamReader = m_ffmpegStreamReader.lock())
-        streamReader->setFps(fps);
+    m_ffmpegStreamReader->setFps(fps);
 }
 
 void NativeStreamReader::setResolution(const nxcip::Resolution& resolution)
 {
-    if (auto streamReader = m_ffmpegStreamReader.lock())
-        streamReader->setResolution(resolution.width, resolution.height);
+    m_ffmpegStreamReader->setResolution(resolution.width, resolution.height);
 }
 
 void NativeStreamReader::setBitrate(int bitrate)
 {
-    if (auto streamReader = m_ffmpegStreamReader.lock())
-        streamReader->setBitrate(bitrate);
+    m_ffmpegStreamReader->setBitrate(bitrate);
 }
 
 

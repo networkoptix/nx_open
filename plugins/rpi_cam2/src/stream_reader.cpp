@@ -19,7 +19,7 @@ StreamReader::StreamReader(
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
     const CodecContext& codecContext,
-    const std::weak_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
+    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     m_refManager(parentRefManager),
     m_timeProvider(timeProvider),

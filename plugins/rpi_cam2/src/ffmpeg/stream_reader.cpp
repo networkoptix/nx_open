@@ -5,7 +5,7 @@
 #endif
 
 extern "C" {
-#include <libavcodec/avcodec.h>
+//#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavdevice/avdevice.h>
 } // extern "C"
@@ -181,7 +181,6 @@ int StreamReader::initialize()
 
 void StreamReader::uninitialize()
 {
-    debug("%s\n", __FUNCTION__);
     if (m_decoder)
         m_decoder.reset(nullptr);
 

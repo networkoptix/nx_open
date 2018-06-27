@@ -18,6 +18,7 @@ extern "C" {
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/utils.h"
 #include "ffmpeg/codec.h"
+#include "ffmpeg/packet.h"
 #include "ffmpeg/error.h"
 
 namespace nx {
@@ -28,7 +29,7 @@ TranscodeStreamReader::TranscodeStreamReader(
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
     const CodecContext& codecContext,
-    std::weak_ptr<ffmpeg::StreamReader> ffmpegStreamReader)
+    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     StreamReader(
         parentRefManager,
@@ -47,36 +48,29 @@ TranscodeStreamReader::~TranscodeStreamReader()
 
 int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
-    QnMutexLocker lock(&m_mutex);
-
     *lpPacket = nullptr;
-
-    std::shared_ptr<ffmpeg::StreamReader> streamReader = m_ffmpegStreamReader.lock();
-    if(!streamReader)
-        return nxcip::NX_OTHER_ERROR;
 
     if(!ensureInitialized())
         return nxcip::NX_OTHER_ERROR;
 
     AVFrame * frame = av_frame_alloc();
-    int decodeCode = streamReader->nextFrame(frame);
+    int decodeCode = m_ffmpegStreamReader->nextFrame(frame);
     if(decodeCode < 0)
         return nxcip::NX_IO_ERROR;
 
     AVFrame * scaledFrame = nullptr;
     int scaleCode = scale(frame, &scaledFrame);
-    if(ffmpeg::error::updateIfError(scaleCode))
+    if(scaleCode < 0)
         return nxcip::NX_OTHER_ERROR;
 
-    av_init_packet(m_encodedPacket);
-
-    int encodeCode = encode(scaledFrame, m_encodedPacket);
+    ffmpeg::Packet encodePacket;
+    int encodeCode = encode(scaledFrame, encodePacket.ffmpegPacket());
     if(ffmpeg::error::updateIfError(encodeCode))
         return nxcip::NX_OTHER_ERROR;
 
-    *lpPacket = toNxPacket(m_encodedPacket, m_videoEncoder->codecID()).release();
+    *lpPacket = toNxPacket(encodePacket.ffmpegPacket(), m_videoEncoder->codecID()).release();
 
-    av_packet_unref(m_encodedPacket);
+    av_frame_free(&frame);
     av_freep(&scaledFrame->data[0]);
     av_frame_free(&scaledFrame);
 
@@ -113,11 +107,9 @@ void TranscodeStreamReader::setBitrate(int bitrate)
 }
 
 /*!
- * note! if the format of the input frame matches the supported pixel format of the encoder,
- *       this function returns the in frame!. if not, a new frame is allocated in the correct format
- *       and the contents of the input frame are copied to it. the caller is responsible for freeing
- *       the allocated frame, but check that it is different from the input frame before freeing both 
- *       frames!
+ * note! A new frame is allocated in the correct format and the contents of the input frame are 
+ *       copied to it. the caller is responsible for freeing the allocated frame, but check that 
+ *       it is different from the input frame before freeing both frames!
  * */
 int TranscodeStreamReader::scale(AVFrame * frame, AVFrame** outFrame) const
 {
@@ -137,7 +129,7 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame** outFrame) const
             *outFrame = nullptr;
         };
 
-    AVCodecContext * decoderContext = m_ffmpegStreamReader.lock()->codec()->codecContext();
+    AVCodecContext * decoderContext = m_ffmpegStreamReader->codec()->codecContext();
 
     const AVPixelFormat* supportedFormats = m_videoEncoder->codec()->pix_fmts;
     AVPixelFormat encoderFormat = supportedFormats
@@ -156,7 +148,7 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame** outFrame) const
     }
 
     struct SwsContext * imageConvertContext = sws_getCachedContext(
-        NULL, frame->width, frame->height,
+        nullptr, frame->width, frame->height,
         ffmpeg::utils::unDeprecatePixelFormat(decoderContext->pix_fmt),
         width, height, encoderFormat, SWS_BICUBIC, NULL, NULL, NULL);
 
@@ -198,13 +190,6 @@ int TranscodeStreamReader::initialize()
     int openCode = openVideoEncoder();
     if (ffmpeg::error::updateIfError(openCode))
         return openCode;
-
-    m_encodedPacket = av_packet_alloc();
-    if (!m_encodedPacket)
-    {
-        ffmpeg::error::setLastError(AVERROR(ENOMEM));
-        return AVERROR(ENOMEM);
-    }
 
     m_initialized = true;
     return 0;
@@ -248,8 +233,6 @@ void TranscodeStreamReader::setEncoderOptions(const std::unique_ptr<ffmpeg::Code
 
 void TranscodeStreamReader::uninitialize()
 {
-    if(m_encodedPacket)
-        av_packet_free(&m_encodedPacket);
     m_videoEncoder.reset(nullptr);
     m_initialized = false;
 }

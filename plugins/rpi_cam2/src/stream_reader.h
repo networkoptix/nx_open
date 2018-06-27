@@ -25,16 +25,7 @@ namespace webcam_plugin {
 
 namespace ffmpeg { class StreamReader; }
 
-class CodecContext;
-
-//!Transfers or transcodes packets from USB webcameras and streams them
-class StreamReader
-:
-    public nxcip::StreamReader
-{
-
-protected:
-    class TimeProfiler
+class TimeProfiler
     {
         typedef std::chrono::high_resolution_clock::time_point timepoint;
         timepoint startTime;
@@ -78,13 +69,19 @@ protected:
         }
     };
     
+
+//!Transfers or transcodes packets from USB webcameras and streams them
+class StreamReader
+:
+    public nxcip::StreamReader
+{
 public:
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
         nxpl::TimeProvider *const timeProvider,
         const nxcip::CameraInfo& cameraInfo,
         const CodecContext& codecContext,
-        const std::weak_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
     virtual ~StreamReader();
 
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
@@ -108,7 +105,7 @@ protected:
     
     QnMutex m_mutex;
 
-    std::weak_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
+    std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
 
 protected:
     std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID);

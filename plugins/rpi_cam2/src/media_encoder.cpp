@@ -15,7 +15,7 @@ MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
     nxpl::TimeProvider *const timeProvider,
     const CodecContext& codecContext,
-    const std::weak_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
+    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),

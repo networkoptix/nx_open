@@ -2,6 +2,10 @@
 
 #include "options.h"
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+}
+
 #include <string>
 
 class AVFormatContext;
@@ -23,6 +27,7 @@ public:
 
     int setFps(int fps);
     int setResolution(int width, int height);
+    AVCodecID videoCodecID() const;
 
     AVFormatContext * formatContext() const;
     AVInputFormat * inputFormat() const;
