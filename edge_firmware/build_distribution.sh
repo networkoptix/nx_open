@@ -473,7 +473,7 @@ copyEdge1SpecificFiles()
 copyAdditionalSysrootFilesIfNeeded()
 {
     local -r SYSROOT_LIB_DIR="$SYSROOT_DIR/usr/lib/arm-linux-gnueabihf"
-    local -r SYSROOT_BIN_DIR="$SYSROOT_DIR/usr/bin"
+    local -r SYSROOT_SBIN_DIR="$SYSROOT_DIR/sbin"
 
     if [ "$BOX" = "bpi" ]
     then
@@ -494,11 +494,11 @@ copyAdditionalSysrootFilesIfNeeded()
         echo "Copying (sysroot) libglib required for bananapi on Debian 8 \"Jessie\""
         cp -r "$SYSROOT_LIB_DIR/libglib"* "$LIB_INSTALL_DIR/"
         echo "Copying (sysroot) hdparm required for bananapi on Debian 8 \"Jessie\""
-        cp -r "$SYSROOT_BIN_DIR/hdparm" "$INSTALL_DIR/mediaserver/bin/"
+        cp -r "$SYSROOT_SBIN_DIR/hdparm" "$INSTALL_DIR/mediaserver/bin/"
     elif [ "$BOX" = "rpi" ]
     then
         echo "Copying (sysroot) hdparm"
-        cp -r "$SYSROOT_BIN_DIR/hdparm" "$INSTALL_DIR/mediaserver/bin/"
+        cp -r "$SYSROOT_SBIN_DIR/hdparm" "$INSTALL_DIR/mediaserver/bin/"
     fi
 }
 
