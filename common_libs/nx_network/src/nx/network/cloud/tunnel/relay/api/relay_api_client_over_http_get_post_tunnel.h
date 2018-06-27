@@ -6,6 +6,7 @@
 #include <nx/network/http/auth_cache.h>
 #include <nx/network/http/fusion_data_http_client.h>
 
+#include "detail/get_post_tunnel_context.h"
 //#include "relay_api_basic_client.h"
 #include "relay_api_client_over_http_upgrade.h"
 
@@ -27,49 +28,38 @@ public:
         const std::string& peerName,
         BeginListeningHandler completionHandler) override;
 
-    //virtual void openConnectionToTheTargetHost(
-    //    const std::string& sessionId,
-    //    OpenRelayConnectionHandler handler) override;
+    virtual void openConnectionToTheTargetHost(
+        const std::string& sessionId,
+        OpenRelayConnectionHandler handler) override;
 
 protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    struct TunnelContext
-    {
-        nx::utils::Url tunnelUrl;
-        BeginListeningHandler userHandler;
-        std::unique_ptr<nx::network::http::AsyncClient> httpClient;
-        BeginListeningResponse beginListeningResponse;
-        std::unique_ptr<network::AbstractStreamSocket> connection;
-        nx::Buffer serializedOpenUpChannelRequest;
-    };
+    using Tunnels = std::list<std::unique_ptr<detail::TunnelContext>>;
 
-    std::list<TunnelContext> m_tunnelsBeingEstablished;
+    Tunnels m_tunnelsBeingEstablished;
 
+    template<typename TunnelContext, typename UserHandler>
     void openDownChannel(
         const nx::utils::Url& tunnelUrl,
-        BeginListeningHandler completionHandler);
+        UserHandler completionHandler);
 
-    void onDownChannelOpened(
-        std::list<TunnelContext>::iterator tunnelCtxIter);
+    void onDownChannelOpened(Tunnels::iterator tunnelCtxIter);
 
-    void openUpChannel(
-        std::list<TunnelContext>::iterator tunnelCtxIter);
+    void openUpChannel(Tunnels::iterator tunnelCtxIter);
 
     nx::network::http::Request prepareOpenUpChannelRequest(
-        std::list<TunnelContext>::iterator tunnelCtxIter);
+        Tunnels::iterator tunnelCtxIter);
 
     void handleOpenUpTunnelResult(
-        std::list<TunnelContext>::iterator tunnelCtxIter,
+        Tunnels::iterator tunnelCtxIter,
         SystemError::ErrorCode systemErrorCode,
         std::size_t bytesTransferreded);
 
-    void cleanupFailedTunnel(
-        std::list<TunnelContext>::iterator tunnelCtxIter);
+    void cleanupFailedTunnel(Tunnels::iterator tunnelCtxIter);
 
-    void reportSuccess(
-        std::list<TunnelContext>::iterator tunnelCtxIter);
+    void reportSuccess(Tunnels::iterator tunnelCtxIter);
 };
 
 } // namespace nx::cloud::relay::api
