@@ -81,7 +81,7 @@ std::optional<api::AccountData> AccountDataObject::fetchAccountByEmail(
         if (!fetchAccountQuery.next())
             return std::nullopt;
     }
-    catch (nx::utils::db::Exception e)
+    catch (nx::utils::db::Exception& e)
     {
         NX_DEBUG(this, lm("Error fetching account %1 from DB. %2")
             .args(accountEmail, e.what()));
@@ -144,7 +144,7 @@ void AccountDataObject::insertEmailVerificationCode(
     {
         insertEmailVerificationQuery.exec();
     }
-    catch(nx::utils::db::Exception e)
+    catch(nx::utils::db::Exception& e)
     {
         NX_DEBUG(this, lm("Could not insert account (%1) verification code (%2) into DB. %3")
             .arg(accountEmail).arg(emailVerificationCode).arg(e.what()));
@@ -170,7 +170,7 @@ std::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmail(
     {
         fetchActivationCodesQuery.exec();
     }
-    catch (nx::utils::db::Exception e)
+    catch (nx::utils::db::Exception& e)
     {
         NX_DEBUG(this, lm("Could not fetch account %1 activation codes from DB. %2").
             arg(accountEmail).arg(e.what()));
@@ -325,7 +325,7 @@ void AccountDataObject::executeUpdateAccountQuery(
     {
         updateAccountQuery.exec();
     }
-    catch (nx::utils::db::Exception e)
+    catch (nx::utils::db::Exception& e)
     {
         NX_DEBUG(this, lm("Could not update account in DB. %1").arg(e.what()));
         throw;

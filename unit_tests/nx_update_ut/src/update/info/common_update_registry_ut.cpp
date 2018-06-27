@@ -29,7 +29,7 @@ protected:
     {
     }
 
-    enum RegistryNum
+    enum class RegistryNum
     {
         first,
         second

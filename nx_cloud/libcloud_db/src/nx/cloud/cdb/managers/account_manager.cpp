@@ -480,7 +480,7 @@ nx::utils::db::DBResult AccountManager::fetchAccountByEmail(
         *accountData = *account;
         return nx::utils::db::DBResult::ok;
     }
-    catch (nx::utils::db::Exception e)
+    catch (const nx::utils::db::Exception& e)
     {
         return e.dbResult();
     }
