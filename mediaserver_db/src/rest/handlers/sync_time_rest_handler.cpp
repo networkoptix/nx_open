@@ -21,8 +21,7 @@ int SyncTimeRestHandler::executeGet(
 SyncTimeData SyncTimeRestHandler::execute(nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager)
 {
     SyncTimeData reply;
-    bool isTimeTakenFromInternet = false;
-    reply.utcTimeMs = timeSyncManager->getSyncTime(&isTimeTakenFromInternet).count();
+    reply.utcTimeMs = timeSyncManager->getSyncTime(&reply.isTakenFromInternet).count();
     return reply;
 }
 
