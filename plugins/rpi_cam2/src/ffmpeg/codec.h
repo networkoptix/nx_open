@@ -22,15 +22,19 @@ public:
 
     static int readFrame(AVFormatContext * formatContext, AVPacket * outPacket);
 
+    int encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
+    int decode(AVFrame *outFrame, int *outGotFrame, AVPacket *packet) const;
+
     int encodeVideo(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decodeVideo(AVFormatContext* formatContext, AVFrame *outFrame, int *outGotPicture, AVPacket *packet) const;
+    int decodeVideo(AVFrame *outFrame, int *outGotPicture, AVPacket *packet) const;
 
     int encodeAudio(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decodeAudio(AVFormatContext* formatContext, AVFrame * frame, int* outGotFrame, AVPacket *packet) const;
+    int decodeAudio(AVFrame * frame, int* outGotFrame, AVPacket *packet) const;
 
     int initializeEncoder(AVCodecID codecID);
     int initializeEncoder(const char * codecName);
     int initializeDecoder(AVCodecParameters * codecParameters);
+    int initializeDecoder(AVCodecID codecID);
     int initializeDecoder(const char * codecName);
 
     void setFps(int fps);

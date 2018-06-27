@@ -52,9 +52,25 @@ StreamReader::~StreamReader()
     uninitialize();
 }
 
-StreamReader::CameraState StreamReader::cameraState()
+int StreamReader::addRef()
+{
+    return ++m_refCount;
+}
+
+int StreamReader::releaseRef()
+{
+    m_refCount = m_refCount > 0 ? m_refCount - 1 : 0;
+    return m_refCount;
+}
+
+StreamReader::CameraState StreamReader::cameraState() const
 {
     return m_cameraState;
+}
+
+AVCodecID StreamReader::decoderID() const
+{
+    return m_decoder->codecID();
 }
 
 const std::unique_ptr<ffmpeg::Codec>& StreamReader::codec()
@@ -95,21 +111,29 @@ void StreamReader::setResolution(int width, int height)
     }
 }
 
-int StreamReader::nextPacket(AVPacket * outPacket)
+int StreamReader::loadNextData(ffmpeg::Packet * copyPacket)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     if(!ensureInitialized())
         return error::lastError();
-    return m_decoder->readFrame(m_inputFormat->formatContext(), outPacket);
+
+    if(copyPacket && m_refCount > 1)
+        return m_currentPacket->copy(copyPacket);
+
+    m_currentPacket->unreference();
+    int readCode = m_decoder->readFrame(m_inputFormat->formatContext(), m_currentPacket->packet());
+    if(readCode < 0)
+        return readCode;
+    
+    if(copyPacket)
+        return m_currentPacket->copy(copyPacket);
+
+    return 0;
 }
 
-int StreamReader::nextFrame(AVFrame * outFrame)
+const std::unique_ptr<ffmpeg::Packet>& StreamReader::currentPacket() const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if(!ensureInitialized())
-        return error::lastError();
-    Packet packet;
-    return decodeFrame(packet.ffmpegPacket(), outFrame);
+    return m_currentPacket;
 }
 
 bool StreamReader::ensureInitialized()
@@ -119,7 +143,6 @@ bool StreamReader::ensureInitialized()
         {
             if(!error::hasError())
                 return;
-
 #ifdef __linux__
             int err = errno;
             NX_DEBUG(this) << "ensureInitialized(): errno: " << err;
@@ -151,24 +174,25 @@ int StreamReader::initialize()
     auto decoder = std::make_unique<Codec>();
 
     int initCode = inputFormat->initialize(deviceType());
-    if (error::updateIfError(initCode))
+    if (initCode < 0)
         return initCode;
 
     setInputFormatOptions(inputFormat);
 
     // todo initialize this differently for windows
     initCode = decoder->initializeDecoder("h264_mmal");
-    if (error::updateIfError(initCode))
+    if (initCode < 0)
         return initCode;
 
     int openCode = inputFormat->open(m_url.c_str());
-    if (error::updateIfError(openCode))
+    if (openCode < 0)
         return openCode;
         
     openCode = decoder->open();
-    if (error::updateIfError(openCode))
+    if (openCode < 0)
         return openCode;
 
+    m_currentPacket = std::make_unique<ffmpeg::Packet>();
     m_inputFormat = std::move(inputFormat);
     m_decoder = std::move(decoder);
 
@@ -202,19 +226,19 @@ void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inp
     inputFormat->setResolution(resolution.width, resolution.height);
 }
 
-int StreamReader::decodeFrame(AVPacket * packet, AVFrame * outFrame)
+int StreamReader::decode(AVPacket * packet, AVFrame * outFrame)
 {
-    int gotFrame;
-    switch(m_decoder->codec()->type)
-    {
-        case AVMEDIA_TYPE_VIDEO:
-            return m_decoder->decodeVideo(m_inputFormat->formatContext(), outFrame, &gotFrame, packet);
-        case AVMEDIA_TYPE_AUDIO:
-            return m_decoder->decodeAudio(m_inputFormat->formatContext(), outFrame, &gotFrame, packet);
-        default:
-        //todo add decode funcs for other types to Codec class
-        return AVERROR_UNKNOWN;
-    }
+    // int readCode;
+    // while((readCode = m_decoder->readFrame(m_inputFormat->formatContext(), packet)) >= 0)
+    // {
+         int decodeCode = 0;
+         int gotFrame = 0;
+         while(!gotFrame && decodeCode >= 0)
+            decodeCode = m_decoder->decode(outFrame, &gotFrame, packet);
+
+        return decodeCode;
+    //}
+    //return readCode;
 }
 
 } // namespace ffmpeg

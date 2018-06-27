@@ -56,12 +56,12 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(ffmpeg::error::hasError())
         debug("ffmpegError: %s\n", ffmpeg::error::avStrError(ffmpeg::error::lastError()).c_str());
 
-    ffmpeg::Packet packet;
-    int returnCode = m_ffmpegStreamReader->nextPacket(packet.ffmpegPacket());
-    if(returnCode < 0)
+    int loadCode = m_ffmpegStreamReader->loadNextData();
+    if(loadCode < 0)
         return nxcip::NX_IO_ERROR;
 
-    auto nxPacket = toNxPacket(packet.ffmpegPacket(), m_ffmpegStreamReader->codec()->codecID());
+    auto nxPacket = toNxPacket(m_ffmpegStreamReader->currentPacket()->packet(),
+        m_ffmpegStreamReader->decoderID());
     *lpPacket = nxPacket.release();
 
     return nxcip::NX_NO_ERROR;

@@ -1,3 +1,5 @@
+#pragma once
+
 extern "C"{
 #include <libavcodec/avcodec.h>
 } // extern "C"
@@ -11,35 +13,46 @@ namespace ffmpeg {
 class Packet
 {
 public:
-    Packet()
+    Packet():
+        m_packet(av_packet_alloc())
     {
-        init();
+        if(m_packet)
+            initialize();
+        else
+            error::setLastError(AVERROR(ENOMEM));
     }
 
     ~Packet()
     {
-        unref();
+        av_packet_free(&m_packet);
     }
 
-    AVPacket * ffmpegPacket()
+    AVPacket * packet() const
     {
-        return &m_packet;
+        return m_packet;
     }
 
-    void unref()
+    void initialize()
     {
-        av_packet_unref(&m_packet);
+        av_init_packet(m_packet);
+        m_packet->data = nullptr;
+        m_packet->size = 0;
     }
 
-    void init()
+    void unreference()
     {
-        av_init_packet(&m_packet);
-        m_packet.data = nullptr;
-        m_packet.size = 0;
+        av_packet_unref(m_packet);
+    }
+
+    int copy(Packet * outPacket) const
+    {
+        int copyCode = av_copy_packet(outPacket->m_packet, m_packet);
+        error::updateIfError(copyCode);
+        return copyCode;
     }
 
 private:
-    AVPacket m_packet;
+    AVPacket* m_packet;
 };
 
 } // namespace ffmpeg

@@ -3,6 +3,11 @@
 #include "utils.h"
 #include "error.h"
 
+extern "C" {
+#include <libavutil/avutil.h>
+#include <libavutil/error.h>
+}
+
 namespace nx {
 namespace webcam_plugin {
 namespace ffmpeg {
@@ -43,6 +48,32 @@ int Codec::readFrame(AVFormatContext * formatContext, AVPacket * outPacket)
     return readCode;
 }
 
+int Codec::encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const
+{
+    switch(m_codec->type)
+    {
+        case AVMEDIA_TYPE_VIDEO:
+            return encodeVideo(outPacket, frame, outGotPacket);
+        case AVMEDIA_TYPE_AUDIO:
+            return encodeAudio(outPacket, frame, outGotPacket);
+        default: // todo implement the rest of the encode functions
+            return AVERROR_ENCODER_NOT_FOUND;
+    }
+}
+
+int Codec::decode(AVFrame *outFrame, int *outGotFrame, AVPacket *packet) const
+{
+    switch(m_codec->type)
+    {
+        case AVMEDIA_TYPE_VIDEO:
+            return decodeVideo(outFrame, outGotFrame, packet);
+        case AVMEDIA_TYPE_AUDIO:
+            return decodeAudio(outFrame, outGotFrame, packet);
+        default: // todo implement the rest of the decode functions
+            return AVERROR_DECODER_NOT_FOUND;
+    }
+}
+
 int Codec::encodeVideo(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket) const
 {
     int encodeCode = avcodec_encode_video2(m_codecContext, outPacket, frame, outGotPacket);
@@ -51,16 +82,11 @@ int Codec::encodeVideo(AVPacket * outPacket, const AVFrame * frame, int * outGot
 }
 
 
-int Codec::decodeVideo(AVFormatContext* formatContext, AVFrame * outFrame, int * outGotPicture, AVPacket * packet) const
+int Codec::decodeVideo(AVFrame * outFrame, int * outGotPicture, AVPacket * packet) const
 {
-    int readCode;
-    while ((readCode = readFrame(formatContext, packet) >= 0))
-    {
-        int decodeCode = avcodec_decode_video2(m_codecContext, outFrame, outGotPicture, packet);
-        if (error::updateIfError(decodeCode) || *outGotPicture)
-            return decodeCode;
-    }
-    return readCode;
+    int decodeCode = avcodec_decode_video2(m_codecContext, outFrame, outGotPicture, packet);
+    error::updateIfError(decodeCode);
+    return decodeCode;
 }
 
 int Codec::encodeAudio(AVPacket * outPacket, const AVFrame * frame, int * outGotPacket) const
@@ -70,16 +96,11 @@ int Codec::encodeAudio(AVPacket * outPacket, const AVFrame * frame, int * outGot
     return encodeCode;
 }
 
-int Codec::decodeAudio(AVFormatContext* formatContext, AVFrame * outFrame, int* outGotFrame, AVPacket *packet) const
+int Codec::decodeAudio(AVFrame * outFrame, int* outGotFrame, AVPacket *packet) const
 {
-    int readCode;
-    while ((readCode = readFrame(formatContext, packet) >= 0))
-    {
-        int decodeCode = avcodec_decode_audio4(m_codecContext, outFrame, outGotFrame, packet);
-        if (error::updateIfError(decodeCode) || *outGotFrame)
-            return decodeCode;
-    }
-    return readCode;
+    int decodeCode = avcodec_decode_audio4(m_codecContext, outFrame, outGotFrame, packet);
+    error::updateIfError(decodeCode);
+    return decodeCode;
 }
 
 int Codec::initializeEncoder(AVCodecID codecID)
@@ -122,7 +143,18 @@ int Codec::initializeEncoder(const char * codecName)
 
 int Codec::initializeDecoder(AVCodecParameters * codecParameters)
 {
-    m_codec = avcodec_find_decoder(codecParameters->codec_id);
+    int initCode = initializeDecoder(codecParameters->codec_id);
+    if(initCode < 0)
+        return initCode;
+    
+    int paramToContextCode = avcodec_parameters_to_context(m_codecContext, codecParameters);
+    error::updateIfError(paramToContextCode);
+    return paramToContextCode;
+}
+
+int Codec::initializeDecoder(AVCodecID codecID)
+{
+    m_codec = avcodec_find_decoder(codecID);
     if (!m_codec)
     {
         error::setLastError(AVERROR_ENCODER_NOT_FOUND);
@@ -136,9 +168,7 @@ int Codec::initializeDecoder(AVCodecParameters * codecParameters)
         return AVERROR(ENOMEM);
     }
 
-    int paramToContextCode = avcodec_parameters_to_context(m_codecContext, codecParameters);
-    error::updateIfError(paramToContextCode);
-    return paramToContextCode;
+    return 0;
 }
 
 int Codec::initializeDecoder(const char * codecName)

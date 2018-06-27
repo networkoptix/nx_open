@@ -24,6 +24,19 @@ extern "C" {
 namespace nx {
 namespace webcam_plugin {
 
+namespace {
+
+int decode(const std::unique_ptr<ffmpeg::Codec>& codec, AVFrame * outFrame, ffmpeg::Packet& packet)
+{
+    int decodeCode = 0;
+    int gotFrame = 0;
+    while(!gotFrame && decodeCode >= 0)
+        decodeCode = codec->decode(outFrame, &gotFrame, packet.packet());
+    return decodeCode;
+}
+
+}
+
 TranscodeStreamReader::TranscodeStreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
@@ -53,10 +66,20 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(!ensureInitialized())
         return nxcip::NX_OTHER_ERROR;
 
-    AVFrame * frame = av_frame_alloc();
-    int decodeCode = m_ffmpegStreamReader->nextFrame(frame);
-    if(decodeCode < 0)
+    ffmpeg::Packet pkt;
+    if(m_ffmpegStreamReader->loadNextData(&pkt) < 0)
         return nxcip::NX_IO_ERROR;
+
+    //AVFrame * frame = m_ffmpegStreamReader->currentFrame();
+
+    AVFrame * frame = av_frame_alloc();
+    if(!frame)
+    {
+        NX_ASSERT(frame);
+        ffmpeg::error::setLastError(AVERROR(ENOMEM));
+        return nxcip::NX_OTHER_ERROR;
+    }
+    int decodeCode = decode(m_ffmpegStreamReader->codec(), frame, pkt);
 
     AVFrame * scaledFrame = nullptr;
     int scaleCode = scale(frame, &scaledFrame);
@@ -64,11 +87,11 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         return nxcip::NX_OTHER_ERROR;
 
     ffmpeg::Packet encodePacket;
-    int encodeCode = encode(scaledFrame, encodePacket.ffmpegPacket());
-    if(ffmpeg::error::updateIfError(encodeCode))
+    int encodeCode = encode(scaledFrame, encodePacket.packet());
+    if(encodeCode < 0)
         return nxcip::NX_OTHER_ERROR;
 
-    *lpPacket = toNxPacket(encodePacket.ffmpegPacket(), m_videoEncoder->codecID()).release();
+    *lpPacket = toNxPacket(encodePacket.packet(), m_videoEncoder->codecID()).release();
 
     av_frame_free(&frame);
     av_freep(&scaledFrame->data[0]);
@@ -147,6 +170,8 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame** outFrame) const
         return allocCode;
     }
 
+    debug("INPUT frame width, height: %d, %d\n", frame->width, frame->height);
+
     struct SwsContext * imageConvertContext = sws_getCachedContext(
         nullptr, frame->width, frame->height,
         ffmpeg::utils::unDeprecatePixelFormat(decoderContext->pix_fmt),
@@ -176,12 +201,9 @@ int TranscodeStreamReader::encode(AVFrame * frame, AVPacket * outPacket) const
 {
     int encodeCode = 0;
     int gotPacket = 0;
-    while(!gotPacket)
-    {
+    while(!gotPacket && encodeCode >= 0)
         int encodeCode = m_videoEncoder->encodeVideo(outPacket, frame, &gotPacket);
-        if(ffmpeg::error::updateIfError(encodeCode))
-            return encodeCode;
-    }
+        
     return encodeCode;
 }
 

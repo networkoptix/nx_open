@@ -8,6 +8,7 @@
 #include "forward_declarations.h"
 #include "input_format.h"
 #include "codec.h"
+#include "packet.h"
 
 namespace nx {
 namespace webcam_plugin {
@@ -28,7 +29,11 @@ public:
     StreamReader(const char * url, const CodecContext& codecParameters);
     virtual ~StreamReader();
     
-    CameraState cameraState();
+    int addRef();
+    int releaseRef();
+
+    CameraState cameraState() const;
+    AVCodecID decoderID() const;
 
     const std::unique_ptr<Codec>& codec();
     const std::unique_ptr<InputFormat>& inputFormat();
@@ -37,9 +42,9 @@ public:
     void setBitrate(int bitrate);
     void setResolution(int width, int height);
 
-    int nextPacket(AVPacket * outPacket);
-    int nextFrame(AVFrame * outFrame);
+    int loadNextData(Packet * copyPacket = nullptr);
 
+    const std::unique_ptr<Packet>& currentPacket() const;
 private:
     std::string m_url;
     CodecContext m_codecParams;
@@ -50,12 +55,16 @@ private:
     CameraState m_cameraState = kOff;
     std::mutex m_mutex;
 
+    std::unique_ptr<Packet> m_currentPacket;
+    AVFrame * m_currentFrame = nullptr;
+
+    int m_refCount = 0;
 private:
     bool ensureInitialized();
     int initialize();
     void uninitialize();
     void setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat);
-    int decodeFrame(AVPacket * packet, AVFrame* outFrame);
+    int decode(AVPacket * packet, AVFrame* outFrame);
 };
 
 } // namespace ffmpeg

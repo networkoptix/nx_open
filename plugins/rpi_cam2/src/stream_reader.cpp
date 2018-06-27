@@ -28,10 +28,12 @@ StreamReader::StreamReader(
     m_ffmpegStreamReader(ffmpegStreamReader)
 {
     NX_ASSERT(m_timeProvider);
+    m_ffmpegStreamReader->addRef();
 }
 
 StreamReader::~StreamReader()
 {
+    m_ffmpegStreamReader->releaseRef();
     m_timeProvider->releaseRef();
 }
 
