@@ -222,6 +222,7 @@ class Customization(models.Model):
 
     PREVIEW_STATUS = Choices((0, 'draft', 'draft'), (1, 'review', 'review'))
     preview_status = models.IntegerField(choices=PREVIEW_STATUS, default=PREVIEW_STATUS.draft)
+    public_release_history = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
