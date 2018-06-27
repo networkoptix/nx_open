@@ -13,9 +13,9 @@ void printTestRelayOptions(std::ostream* outStream)
 {
     *outStream <<
         "Test relay mode:\n"
-        "On success, process will exit and return 0"
-        "  --test-relay                 Enable mode\n"
-        "  --relay-url={URL}            E.g., http://relay.vmsproxy.com/\n"
+        "On success, process will exit and return 0\n"
+        "  --test-relay                     Enable mode\n"
+        "  --relay-url={URL}                E.g., http://relay.vmsproxy.com/\n"
         "  --listening-peer-host-name={globally unique hostname}. Optional\n";
 }
 

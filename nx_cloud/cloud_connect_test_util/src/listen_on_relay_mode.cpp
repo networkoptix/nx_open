@@ -61,9 +61,9 @@ void printListenOnRelayOptions(std::ostream* outStream)
 {
     *outStream <<
         "Listen on relay mode:\n"
-        "On success, service will be available for requests as http://peer-hostname.relayhost/"
-        "  --listen-on-relay            Enable mode\n"
-        "  --relay-url={URL}            E.g., http://relay.vmsproxy.com/\n"
+        "On success, service will be available for requests as http://peer-hostname.relayhost/\n"
+        "  --listen-on-relay                Enable mode\n"
+        "  --relay-url={URL}                E.g., http://relay.vmsproxy.com/\n"
         "  --listening-peer-host-name={globally unique hostname}. Optional\n";
 }
 
