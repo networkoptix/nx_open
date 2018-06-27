@@ -70,6 +70,7 @@ AsyncClient::AsyncClient():
     m_terminated(false),
     m_totalBytesReadPerRequest(0),
     m_totalRequestsSentViaCurrentConnection(0),
+    m_totalRequestsSent(0),
     m_contentEncodingUsed(true),
     m_sendTimeout(Timeouts::kDefaultSendTimeout),
     m_responseReadTimeout(Timeouts::kDefaultResponseReadTimeout),
@@ -88,7 +89,7 @@ AsyncClient::AsyncClient():
 AsyncClient::AsyncClient(std::unique_ptr<AbstractStreamSocket> socket):
     AsyncClient()
 {
-    m_userDefinedSocket = std::move(socket);
+    m_socket = std::move(socket);
 }
 
 AsyncClient::~AsyncClient()
@@ -720,6 +721,7 @@ void AsyncClient::initiateHttpMessageDelivery()
     }
 
     ++m_totalRequestsSentViaCurrentConnection;
+    ++m_totalRequestsSent;
     m_totalBytesReadPerRequest = 0;
 
     m_state = State::sInit;
@@ -742,9 +744,10 @@ void AsyncClient::initiateHttpMessageDelivery()
                     std::bind(&AsyncClient::asyncSendDone, this, _1, _2));
                 return;
             }
-
-            m_socket.reset();
-            initiateTcpConnection(std::move(m_userDefinedSocket));
+            // Keep socket for the very first request if it pass in constructor.
+            if (m_totalRequestsSent > 1)
+                m_socket.reset();
+            initiateTcpConnection();
         });
 }
 
@@ -768,7 +771,7 @@ bool AsyncClient::canExistingConnectionBeUsed() const
     return canUseExistingConnection;
 }
 
-void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> socket)
+void AsyncClient::initiateTcpConnection()
 {
     m_state = State::sInit;
 
@@ -779,11 +782,7 @@ void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> so
             m_contentLocationUrl.host(),
             m_contentLocationUrl.port(nx::network::http::defaultPortForScheme(m_contentLocationUrl.scheme().toLatin1())));
 
-    if (socket)
-    {
-        m_socket = std::move(socket);
-    }
-    else
+    if (!m_socket)
     {
         const int ipVersion =
             (bool)HostAddress(m_contentLocationUrl.host()).isPureIpV6()
@@ -821,7 +820,7 @@ void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> so
             std::bind(
                 &AsyncClient::asyncConnectDone,
                 this,
-                SystemError::getLastOSErrorCode()));
+                SystemError::noError));
     }
     else
     {

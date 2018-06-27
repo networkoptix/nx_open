@@ -56,7 +56,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
-#include <nx/time_sync/time_sync_manager.h>
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 using namespace nx;
 using namespace nx::vms::api;

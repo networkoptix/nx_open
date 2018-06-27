@@ -26,8 +26,7 @@
 #include "managers/updates_manager.h"
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
-#include "managers/time_manager_api.h"
-#include <nx/time_sync/time_sync_manager.h>
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 namespace ec2
 {
@@ -99,12 +98,12 @@ public:
     ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 
     virtual QnUuid routeToPeerVia(
-        const QnUuid& dstPeer, 
-        int* distance, 
+        const QnUuid& dstPeer,
+        int* distance,
         nx::network::SocketAddress* knownPeerAddress) const override;
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
-    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const override;
+    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override;
 protected:
     const AbstractECConnectionFactory* m_connectionFactory;
     QueryProcessorType* m_queryProcessor;
@@ -196,7 +195,7 @@ void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
 template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::stopReceivingNotifications()
 {
-    m_connectionFactory->timeSyncManager()->stop();	
+    m_connectionFactory->timeSyncManager()->stop();
     m_connectionFactory->messageBus()->disconnectAndJoin(this);
     m_connectionFactory->messageBus()->stop();
 }
@@ -519,7 +518,7 @@ TransactionMessageBusAdapter* BaseEc2Connection<QueryProcessorType>::messageBus(
 }
 
 template<class QueryProcessorType>
-nx::time_sync::TimeSyncManager* BaseEc2Connection<QueryProcessorType>::timeSyncManager() const
+nx::vms::time_sync::AbstractTimeSyncManager* BaseEc2Connection<QueryProcessorType>::timeSyncManager() const
 {
     return m_connectionFactory->timeSyncManager();
 }

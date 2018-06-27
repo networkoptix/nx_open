@@ -63,7 +63,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <api/global_settings.h>
-#include <nx/time_sync/legacy/time_manager.h>
+#include <nx/vms/time_sync/legacy/time_manager.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -917,8 +917,8 @@ bool QnDbManager::syncLicensesBetweenDB()
 
 template <typename FilterDataType, class ObjectType, class ObjectListType>
 bool QnDbManager::fillTransactionLogInternal(
-    ApiCommand::Value command, 
-    std::function<bool (ObjectType& data)> updater, 
+    ApiCommand::Value command,
+    std::function<bool (ObjectType& data)> updater,
     FilterDataType filter)
 {
     ObjectListType objects;
@@ -3450,7 +3450,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscDa
     query.addBindValue(name);
     if (!execSQLQuery(&query, Q_FUNC_INFO))
         return ErrorCode::dbError;
-    
+
     if (query.next())
         miscData.value = query.value(0).toByteArray();
     miscData.name = name;
@@ -4167,7 +4167,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, VideowallDataList& videow
     std::vector<VideowallItemWithRefData> items;
     QnSql::fetch_many(queryItems, &items);
 
-    mergeObjectListData(videowallList, items, &VideowallData::items, 
+    mergeObjectListData(videowallList, items, &VideowallData::items,
         &VideowallItemWithRefData::videowallGuid);
 
     QSqlQuery queryScreens(m_sdb);

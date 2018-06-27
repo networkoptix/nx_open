@@ -4,6 +4,7 @@
 #include <network/router.h>
 
 namespace nx {
+namespace vms {
 namespace time_sync {
 
 void ClientTimeSyncManager::updateTime()
@@ -14,4 +15,5 @@ void ClientTimeSyncManager::updateTime()
 }
 
 } // namespace time_sync
+} // namespace vms
 } // namespace nx

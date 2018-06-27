@@ -29,8 +29,8 @@ public:
 
     virtual ~ProxyConnectionProcessor();
 
-    static bool needProxyRequest(QnCommonModule* commonModule, const nx::network::http::Request& request);
-    static bool needStandardProxy(QnCommonModule* commonModule, const nx::network::http::Request& request);
+    static bool isProxyNeeded(QnCommonModule* commonModule, const nx::network::http::Request& request);
+    static bool isStandardProxyNeeded(QnCommonModule* commonModule, const nx::network::http::Request& request);
     static bool isCloudRequest(const nx::network::http::Request& request);
 
 protected:
