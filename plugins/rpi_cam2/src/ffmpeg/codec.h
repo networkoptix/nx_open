@@ -23,13 +23,13 @@ public:
     static int readFrame(AVFormatContext * formatContext, AVPacket * outPacket);
 
     int encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decode(AVFrame *outFrame, int *outGotFrame, AVPacket *packet) const;
+    int decode(AVFrame *outFrame, int *outGotFrame, const AVPacket *packet) const;
 
     int encodeVideo(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decodeVideo(AVFrame *outFrame, int *outGotPicture, AVPacket *packet) const;
+    int decodeVideo(AVFrame *outFrame, int *outGotPicture, const AVPacket *packet) const;
 
     int encodeAudio(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decodeAudio(AVFrame * frame, int* outGotFrame, AVPacket *packet) const;
+    int decodeAudio(AVFrame * frame, int* outGotFrame, const AVPacket *packet) const;
 
     int initializeEncoder(AVCodecID codecID);
     int initializeEncoder(const char * codecName);

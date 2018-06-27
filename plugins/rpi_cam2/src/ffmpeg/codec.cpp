@@ -61,7 +61,7 @@ int Codec::encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) 
     }
 }
 
-int Codec::decode(AVFrame *outFrame, int *outGotFrame, AVPacket *packet) const
+int Codec::decode(AVFrame *outFrame, int *outGotFrame, const AVPacket *packet) const
 {
     switch(m_codec->type)
     {
@@ -82,7 +82,7 @@ int Codec::encodeVideo(AVPacket * outPacket, const AVFrame * frame, int * outGot
 }
 
 
-int Codec::decodeVideo(AVFrame * outFrame, int * outGotPicture, AVPacket * packet) const
+int Codec::decodeVideo(AVFrame * outFrame, int * outGotPicture, const AVPacket * packet) const
 {
     int decodeCode = avcodec_decode_video2(m_codecContext, outFrame, outGotPicture, packet);
     error::updateIfError(decodeCode);
@@ -96,7 +96,7 @@ int Codec::encodeAudio(AVPacket * outPacket, const AVFrame * frame, int * outGot
     return encodeCode;
 }
 
-int Codec::decodeAudio(AVFrame * outFrame, int* outGotFrame, AVPacket *packet) const
+int Codec::decodeAudio(AVFrame * outFrame, int* outGotFrame, const AVPacket *packet) const
 {
     int decodeCode = avcodec_decode_audio4(m_codecContext, outFrame, outGotFrame, packet);
     error::updateIfError(decodeCode);
