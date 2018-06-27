@@ -3,7 +3,6 @@
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
 #include <nx_ec/ec_api.h>
-#include <nx/time_sync/time_sync_manager.h>
 
 namespace rest {
 namespace handlers {
@@ -19,11 +18,11 @@ int SyncTimeRestHandler::executeGet(
     return nx::network::http::StatusCode::ok;
 }
 
-SyncTimeData SyncTimeRestHandler::execute(nx::time_sync::TimeSyncManager* timeSyncManager)
+SyncTimeData SyncTimeRestHandler::execute(nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager)
 {
     SyncTimeData reply;
-    reply.isTakenFromInternet = timeSyncManager->isTimeTakenFromInternet();
-    reply.utcTimeMs = timeSyncManager->getSyncTime().count();
+    bool isTimeTakenFromInternet = false;
+    reply.utcTimeMs = timeSyncManager->getSyncTime(&isTimeTakenFromInternet).count();
     return reply;
 }
 

@@ -5,6 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/network/abstract_socket.h>
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 #include <common/common_module_aware.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/time.h>
@@ -50,9 +51,10 @@ public:
 struct QnRoute;
 
 namespace nx {
+namespace vms {
 namespace time_sync {
 
-class TimeSyncManager: public QObject, public QnCommonModuleAware
+class TimeSyncManager: public AbstractTimeSyncManager, public QnCommonModuleAware
 {
     Q_OBJECT
 public:
@@ -70,10 +72,8 @@ public:
     virtual void start();
 
     /** @return synchronized time (milliseconds from epoch, UTC). */
-    std::chrono::milliseconds getSyncTime() const;
-
-    /** @return True if current server has load time from internet at least once after start. */
-    bool isTimeTakenFromInternet() const;
+    virtual std::chrono::milliseconds getSyncTime(
+        bool* outIsTimeTakenFromInternet = nullptr) const override;
 
     void setClock(
         const std::shared_ptr<AbstractSystemClock>& systemClock,
@@ -82,10 +82,6 @@ public:
     std::chrono::milliseconds timeSyncInterval() const;
 
     QString idForToStringFromPtr() const;
-signals:
-    /** Emitted when synchronized time has been changed. */
-    void timeChanged(qint64 syncTimeMs);
-
 protected:
     using AbstractStreamSocketPtr = std::unique_ptr<nx::network::AbstractStreamSocket>;
 
@@ -115,4 +111,5 @@ private:
 };
 
 } // namespace time_sync
+} // namespace vms
 } // namespace nx

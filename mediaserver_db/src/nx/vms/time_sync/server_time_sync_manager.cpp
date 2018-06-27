@@ -16,9 +16,10 @@
 #include <transaction/message_bus_adapter.h>
 
 namespace nx {
+namespace vms {
 namespace time_sync {
 
-static const QByteArray kTimeDeltaParamName = "sync_time_delta";
+static const QByteArray kTimeDeltaParamName = "sync_time_delta"; //< For migration from previous version.
 
 ServerTimeSyncManager::ServerTimeSyncManager(
     QnCommonModule* commonModule,
@@ -259,4 +260,5 @@ void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
 }
 
 } // namespace time_sync
+} // namespace vms
 } // namespace nx
