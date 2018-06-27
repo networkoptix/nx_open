@@ -17,6 +17,9 @@ class Command(object):
     def receive(self, timeout_sec):  # type: (float) -> (bytes, bytes)
         return -1, b'', b''
 
+    def terminate(self):
+        pass
+
     def communicate(self, input=None, timeout_sec=None):
         if input is not None:
             # If input bytes not None but empty, send zero bytes once.

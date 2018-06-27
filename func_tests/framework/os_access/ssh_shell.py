@@ -89,6 +89,15 @@ class _SSHCommand(Command):
             self._channel.shutdown_read()  # Other side could be open by forked child.
         return exit_status, output_chunks.get('STDOUT'), output_chunks.get('STDERR')
 
+    def terminate(self):
+        bytes_sent = self._channel.send(chr(3))
+        if bytes_sent == 0:
+            raise RuntimeError("Channel already closed.")
+        if bytes_sent == 1:
+            self._logger.debug("Sent Ctrl+C")
+            return
+        assert False
+
 
 class SSH(PosixShell):
     def __init__(self, hostname, port, username, key_path):

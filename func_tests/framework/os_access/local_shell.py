@@ -115,6 +115,10 @@ class _LocalCommand(Command):
 
         return self.process.poll(), name2data.get('stdout'), name2data.get('stderr')
 
+    def terminate(self):
+        self.process.terminate()
+        return self.process.returncode
+
 
 class _LocalShell(PosixShell):
     def __repr__(self):

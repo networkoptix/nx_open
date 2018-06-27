@@ -101,6 +101,25 @@ class _WinRMCommand(Command):
             assert exit_code == -1
         return exit_code, stdout_chunk, stderr_chunk
 
+    def _send_signal(self, signal):
+        rq = {
+            'env:Envelope': self._protocol._get_soap_header(
+                resource_uri='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd',
+                action='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal',
+                shell_id=self._shell_id)
+            }
+        rq['env:Envelope']['env:Body'] = {
+            'rsp:Signal': {
+                '@xmlns:rsp': 'http://schemas.microsoft.com/wbem/wsman/1/windows/shell',
+                '@CommandId': self._command_id,
+                'rsp:Code': 'http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/' + signal,
+                }
+            }
+        response = self._protocol.send_message(xmltodict.unparse(rq))
+
+    def terminate(self):
+        self._send_signal('ctrl_c')
+
 
 def receive_stdout_and_stderr_until_done(self):
     raise NotImplementedError("Use Command.communicate")
