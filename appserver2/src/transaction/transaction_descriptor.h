@@ -21,7 +21,6 @@
 #include "abstract_persistent_storage.h"
 #include "nx_ec/access_helpers.h"
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_discovery_data.h"
 #include "nx_ec/data/api_statistics.h"
 
 #include <nx/utils/type_utils.h>
@@ -30,6 +29,7 @@
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/cleanup_db_data.h>
 #include <nx/vms/api/data/connection_data.h>
+#include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/layout_data.h>

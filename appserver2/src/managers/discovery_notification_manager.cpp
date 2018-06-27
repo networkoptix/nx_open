@@ -46,13 +46,13 @@ void QnDiscoveryNotificationManager::triggerNotification(
 }
 
 void QnDiscoveryNotificationManager::triggerNotification(
-    const QnTransaction<ApiDiscoveredServerData>& tran, NotificationSource /*source*/)
+    const QnTransaction<nx::vms::api::DiscoveredServerData>& tran, NotificationSource /*source*/)
 {
     emit discoveredServerChanged(tran.params);
 }
 
 void QnDiscoveryNotificationManager::triggerNotification(
-    const QnTransaction<ApiDiscoveredServerDataList>& tran, NotificationSource /*source*/)
+    const QnTransaction<nx::vms::api::DiscoveredServerDataList>& tran, NotificationSource /*source*/)
 {
     emit gotInitialDiscoveredServers(tran.params);
 }

@@ -7,7 +7,7 @@ namespace vms {
 namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (DiscoverPeerData)(DiscoveryData),
+    (DiscoverPeerData)(DiscoveryData)(DiscoveredServerData),
     (ubjson)(json)(xml)(csv_record),
     _Fields)
 

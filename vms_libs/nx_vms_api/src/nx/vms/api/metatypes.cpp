@@ -84,6 +84,8 @@ void Metatypes::initialize()
     qRegisterMetaType<DiscoveryData>();
     qRegisterMetaType<DiscoveryDataList>();
     qRegisterMetaType<DiscoverPeerData>();
+    qRegisterMetaType<DiscoveredServerData>();
+    qRegisterMetaType<DiscoveredServerDataList>();
     qRegisterMetaType<EventRuleData>();
     qRegisterMetaType<EventRuleDataList>();
     qRegisterMetaType<FullInfoData>();

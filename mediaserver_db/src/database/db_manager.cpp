@@ -34,7 +34,6 @@
 #include <utils/crypt/symmetrical.h>
 
 #include <nx_ec/data/api_conversion_functions.h>
-#include <nx_ec/data/api_discovery_data.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
@@ -43,6 +42,7 @@
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/license_data.h>

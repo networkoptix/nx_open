@@ -18,6 +18,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/std/cmath.h>
 #include <nx/utils/random.h>
+#include <nx/vms/api/data/update_sequence_data.h>
 
 namespace nx {
 namespace p2p {

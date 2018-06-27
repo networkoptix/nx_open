@@ -128,11 +128,12 @@ DECLARE_STRUCT_AND_LIST(MiscData)
 
 DECLARE_STRUCT_EX(DiscoverPeerData, (ubjson)(json)(xml)(csv_record))
 DECLARE_STRUCT_AND_LIST_EX(DiscoveryData, (ubjson)(json)(xml)(csv_record))
+DECLARE_STRUCT_AND_LIST_EX(DiscoveredServerData, (ubjson)(json)(xml)(csv_record))
 
 DECLARE_STRUCT_EX(FullInfoData, (ubjson)(json)(xml)(csv_record))
 
-DECLARE_STRUCT_EX(ModuleInformation, (eq)(ubjson)(json)(xml))
-DECLARE_STRUCT_EX(ModuleInformationWithAddresses, (eq)(ubjson)(json)(xml))
+DECLARE_STRUCT_EX(ModuleInformation, (eq)(ubjson)(json)(xml)(csv_record))
+DECLARE_STRUCT_EX(ModuleInformationWithAddresses, (eq)(ubjson)(json)(xml)(csv_record))
 
 #undef DECLARE_STRUCT
 #undef DECLARE_STRUCT_EX

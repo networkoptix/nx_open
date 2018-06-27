@@ -4,25 +4,24 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
 
-#include "common/common_module.h"
+#include <common/common_module.h>
+#include <common/static_common_module.h>
 #include <database/db_manager.h>
 #include <transaction/transaction.h>
-#include "transaction/ubjson_transaction_serializer.h"
+#include <transaction/ubjson_transaction_serializer.h>
+#include <utils/common/synctime.h>
+
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
-#include "utils/common/synctime.h"
-#include "nx/fusion/model_functions.h"
-#include "nx_ec/data/api_discovery_data.h"
-#include <common/static_common_module.h>
 
 using namespace nx;
 
-namespace ec2
-{
+namespace ec2 {
 
 QnTransactionLog::QnTransactionLog(
     detail::QnDbManager* db,
     QnUbjsonTransactionSerializer* tranSerializer)
-:
+    :
     m_dbManager(db),
     m_tranSerializer(tranSerializer),
     m_insertTransactionQuery(db->queryCachePool()),

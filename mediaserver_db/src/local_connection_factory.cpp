@@ -1550,9 +1550,9 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     regUpdate<UpdateInstallData>(p, ApiCommand::installUpdate);
 
     // AbstractDiscoveryManager::discoveredServerChanged
-    regUpdate<ApiDiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
+    regUpdate<DiscoveredServerData>(p, ApiCommand::discoveredServerChanged);
     // AbstractDiscoveryManager::discoveredServersList
-    regUpdate<ApiDiscoveredServerDataList>(p, ApiCommand::discoveredServersList);
+    regUpdate<DiscoveredServerDataList>(p, ApiCommand::discoveredServersList);
 
     // AbstractDiscoveryManager::discoverPeer
     regUpdate<DiscoverPeerData>(p, ApiCommand::discoverPeer);

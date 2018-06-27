@@ -89,7 +89,7 @@ signals:
 
     void syncTimeChanged(qint64 syncTime);
 
-    void discoveredServerChanged(const ec2::ApiDiscoveredServerData &discoveredServer);
+    void discoveredServerChanged(const nx::vms::api::DiscoveredServerData& discoveredServer);
 
 protected:
     virtual Qt::ConnectionType handlerConnectionType() const;

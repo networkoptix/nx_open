@@ -35,7 +35,7 @@ public:
     (arch)(platform)(modification)
 
 QN_FUSION_DECLARE_FUNCTIONS(SystemInformation,
-    (eq)(hash)(ubjson)(json)(xml)(datastream),
+    (eq)(hash)(ubjson)(json)(xml)(csv_record)(datastream),
     NX_VMS_API)
 
 } // namespace api

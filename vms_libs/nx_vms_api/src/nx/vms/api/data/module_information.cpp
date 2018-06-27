@@ -65,7 +65,7 @@ QString ModuleInformation::nxClientId()
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (ModuleInformation)(ModuleInformationWithAddresses),
-    (eq)(ubjson)(json)(xml),
+    (eq)(ubjson)(json)(xml)(csv_record),
     _Fields)
 
 } // namespace api

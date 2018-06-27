@@ -1,13 +1,19 @@
 #pragma once
 
-#include <nx_ec/data/api_discovery_data.h>
 #include <nx_ec/ec_api.h>
-#include <nx/vms/discovery/manager.h>
 #include <transaction/transaction.h>
 
-namespace ec2
-{
+#include <nx/vms/discovery/manager.h>
+#include <nx/vms/api/data/discovery_data.h>
 
+namespace ec2 {
+
+// TODO: #vkutin #muskov Think where to put these globals.
+nx::vms::api::DiscoveryData toApiDiscoveryData(
+    const QnUuid &id, const nx::utils::Url &url, bool ignore);
+nx::vms::api::DiscoveredServerDataList getServers(nx::vms::discovery::Manager* manager);
+nx::vms::api::DiscoveredServerData makeServer(
+    const nx::vms::discovery::ModuleEndpoint& module, const QnUuid& localSystemId);
 
 template<class QueryProcessorType>
 class QnDiscoveryManager: public AbstractDiscoveryManager
@@ -27,8 +33,6 @@ private:
     QueryProcessorType* const m_queryProcessor;
     Qn::UserAccessData m_userAccessData;
 };
-nx::vms::api::DiscoveryData toApiDiscoveryData(
-    const QnUuid &id, const nx::utils::Url &url, bool ignore);
 
 // TODO: Could probably be moved to mediaserver, as it is used only there.
 class QnDiscoveryMonitor: public QObject, public QnCommonModuleAware
@@ -47,7 +51,7 @@ private:
 
 private:
     TransactionMessageBusAdapter* m_messageBus;
-    std::map<QnUuid, ApiDiscoveredServerData> m_serverCache;
+    std::map<QnUuid, nx::vms::api::DiscoveredServerData> m_serverCache;
 };
 
 template<class QueryProcessorType>

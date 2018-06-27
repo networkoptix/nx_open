@@ -19,7 +19,9 @@
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/email_settings_data.h>
 #include <nx/vms/api/data/peer_alive_data.h>
-#include <nx_ec/data/api_discovery_data.h>
+#include <nx/vms/api/data/database_dump_data.h>
+#include <nx/vms/api/data/database_dump_to_file_data.h>
+#include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/reverse_connection_data.h>
 #include <nx/vms/api/data/client_info_data.h>
@@ -27,6 +29,7 @@
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/update_sequence_data.h>
 #include <nx/vms/api/data/user_role_data.h>
 #include <nx/vms/api/data/system_merge_history_record.h>
 #include "nx_ec/managers/abstract_server_manager.h"
@@ -610,13 +613,13 @@ protected:
 
 class AbstractDiscoveryNotificationManager: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-signals :
+signals:
     void peerDiscoveryRequested(const nx::utils::Url& url);
     void discoveryInformationChanged(const nx::vms::api::DiscoveryData& data, bool addInformation);
-    void discoveredServerChanged(const ApiDiscoveredServerData& discoveredServer);
-    void gotInitialDiscoveredServers(const ApiDiscoveredServerDataList& discoveredServers);
+    void discoveredServerChanged(const nx::vms::api::DiscoveredServerData& discoveredServer);
+    void gotInitialDiscoveredServers(const nx::vms::api::DiscoveredServerDataList& discoveredServers);
 };
 
 typedef std::shared_ptr<AbstractDiscoveryNotificationManager>

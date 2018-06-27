@@ -10,7 +10,7 @@ namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemInformation),
-    (eq)(hash)(ubjson)(json)(xml)(datastream),
+    (eq)(hash)(ubjson)(json)(xml)(csv_record)(datastream),
     _Fields)
 
 SystemInformation::SystemInformation(

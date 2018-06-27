@@ -15,9 +15,10 @@ QnUuid QnFakeMediaServerResource::getOriginalGuid() const
     return m_serverData.id;
 }
 
-void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData)
+void QnFakeMediaServerResource::setFakeServerModuleInformation(
+    const nx::vms::api::DiscoveredServerData& serverData)
 {
-    ec2::ApiDiscoveredServerData oldData;
+    nx::vms::api::DiscoveredServerData oldData;
     {
         QnMutexLocker lock(&m_mutex);
         if (m_serverData == serverData)

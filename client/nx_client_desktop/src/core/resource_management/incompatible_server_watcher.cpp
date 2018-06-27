@@ -10,6 +10,7 @@
 #include <network/connection_validator.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/module_information.h>
 
 namespace {
@@ -27,33 +28,30 @@ class QnIncompatibleServerWatcherPrivate : public QObject, public QnConnectionCo
     QnIncompatibleServerWatcher *q_ptr;
 
 public:
-    QnIncompatibleServerWatcherPrivate(QnIncompatibleServerWatcher *parent);
+    QnIncompatibleServerWatcherPrivate(QnIncompatibleServerWatcher* parent);
 
-    void at_resourcePool_statusChanged(const QnResourcePtr &resource);
-    void at_discoveredServerChanged(const ec2::ApiDiscoveredServerData &serverData);
+    void at_resourcePool_statusChanged(const QnResourcePtr& resource);
+    void at_discoveredServerChanged(const nx::vms::api::DiscoveredServerData& serverData);
 
-    void addResource(const ec2::ApiDiscoveredServerData &serverData);
+    void addResource(const nx::vms::api::DiscoveredServerData& serverData);
     void removeResource(const QnUuid &id);
     QnUuid getFakeId(const QnUuid &realId) const;
 
-    QnMediaServerResourcePtr makeResource(const ec2::ApiDiscoveredServerData &serverData) const;
+    QnMediaServerResourcePtr makeResource(
+        const nx::vms::api::DiscoveredServerData& serverData) const;
 
 public:
-    struct DiscoveredServerItem {
-        ec2::ApiDiscoveredServerData serverData;
-        bool keep;
-        bool removed;
+    struct DiscoveredServerItem
+    {
+        nx::vms::api::DiscoveredServerData serverData;
+        bool keep = false;
+        bool removed = false;
 
-        DiscoveredServerItem() :
-            keep(false),
-            removed(false)
-        {}
-
-        DiscoveredServerItem(const ec2::ApiDiscoveredServerData &serverData) :
-            serverData(serverData),
-            keep(false),
-            removed(false)
-        {}
+        DiscoveredServerItem() = default;
+        DiscoveredServerItem(const nx::vms::api::DiscoveredServerData& serverData):
+            serverData(serverData)
+        {
+        }
     };
 
     mutable QnMutex mutex;
@@ -136,11 +134,11 @@ void QnIncompatibleServerWatcher::keepServer(const QnUuid &id, bool keep)
 }
 
 void QnIncompatibleServerWatcher::createInitialServers(
-        const ec2::ApiDiscoveredServerDataList& discoveredServers)
+    const nx::vms::api::DiscoveredServerDataList& discoveredServers)
 {
     Q_D(QnIncompatibleServerWatcher);
 
-    for (const ec2::ApiDiscoveredServerData &discoveredServer: discoveredServers)
+    for (const auto& discoveredServer: discoveredServers)
         d->at_discoveredServerChanged(discoveredServer);
 }
 
@@ -190,7 +188,7 @@ void QnIncompatibleServerWatcherPrivate::at_resourcePool_statusChanged(const QnR
 }
 
 void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
-        const ec2::ApiDiscoveredServerData &serverData)
+    const nx::vms::api::DiscoveredServerData& serverData)
 {
     QnMutexLocker lock(&mutex);
     auto it = discoveredServerItemById.find(serverData.id);
@@ -247,7 +245,8 @@ void QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged(
     }
 }
 
-void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredServerData &serverData)
+void QnIncompatibleServerWatcherPrivate::addResource(
+    const nx::vms::api::DiscoveredServerData& serverData)
 {
     QnUuid id = getFakeId(serverData.id);
 
@@ -328,7 +327,7 @@ QnUuid QnIncompatibleServerWatcherPrivate::getFakeId(const QnUuid &realId) const
 }
 
 QnMediaServerResourcePtr QnIncompatibleServerWatcherPrivate::makeResource(
-    const ec2::ApiDiscoveredServerData& serverData) const
+    const nx::vms::api::DiscoveredServerData& serverData) const
 {
     QnFakeMediaServerResourcePtr server(new QnFakeMediaServerResource(commonModule()));
     server->setFakeServerModuleInformation(serverData);

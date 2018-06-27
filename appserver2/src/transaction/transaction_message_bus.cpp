@@ -17,8 +17,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/warnings.h>
 
-#include <nx_ec/data/api_discovery_data.h>
-
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>

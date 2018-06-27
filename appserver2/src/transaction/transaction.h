@@ -1061,7 +1061,7 @@ APPLY(1202, installUpdate, nx::vms::api::UpdateInstallData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(1301, discoveredServerChanged, ApiDiscoveredServerData, \
+APPLY(1301, discoveredServerChanged, nx::vms::api::DiscoveredServerData, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -1072,7 +1072,7 @@ APPLY(1301, discoveredServerChanged, ApiDiscoveredServerData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
-APPLY(1302, discoveredServersList, ApiDiscoveredServerDataList, \
+APPLY(1302, discoveredServersList, nx::vms::api::DiscoveredServerDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \

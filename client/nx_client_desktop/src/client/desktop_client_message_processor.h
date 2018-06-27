@@ -1,7 +1,8 @@
 #pragma once
 
 #include <client/client_message_processor.h>
-#include <nx_ec/data/api_discovery_data.h>
+
+#include <nx/vms/api/data_fwd.h>
 
 class QnIncompatibleServerWatcher;
 
@@ -22,7 +23,8 @@ protected:
     virtual QnResourceFactory* getResourceFactory() const override;
 
 private slots:
-    void at_gotInitialDiscoveredServers(const ec2::ApiDiscoveredServerDataList &discoveredServers);
+    void at_gotInitialDiscoveredServers(
+        const nx::vms::api::DiscoveredServerDataList& discoveredServers);
 
 private:
     QScopedPointer<QnIncompatibleServerWatcher> m_incompatibleServerWatcher;

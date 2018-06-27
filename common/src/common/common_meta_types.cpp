@@ -90,7 +90,6 @@
 #include <network/networkoptixmodulerevealcommon.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_discovery_data.h>
 
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
@@ -286,8 +285,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
-    qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");
-    qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

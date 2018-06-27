@@ -10,10 +10,8 @@ namespace ec2 {
 
 struct ApiTransactionData;
 struct ApiTranLogFilter;
-struct ApiDiscoveredServerData;
 
 typedef std::vector<ApiTransactionData> ApiTransactionDataList;
-typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 
 /**
  * Wrapper to be used for overloading as a distinct type for nx::vms::api::StorageData api requests.
@@ -24,13 +22,5 @@ struct ParentId
     ParentId() = default;
     ParentId(const QnUuid& id): id(id) {}
 };
-
-#define QN_EC2_API_DATA_TYPES \
-    (ApiDiscoveredServerData)
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    QN_EC2_API_DATA_TYPES,
-    (ubjson)(xml)(json)(sql_record)(csv_record)
-);
 
 } // namespace ec2

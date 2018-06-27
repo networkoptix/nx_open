@@ -23,9 +23,9 @@ public:
     void triggerNotification(
         const QnTransaction<nx::vms::api::DiscoveryDataList>& tran, NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiDiscoveredServerData>& tran, NotificationSource source);
+        const QnTransaction<nx::vms::api::DiscoveredServerData>& tran, NotificationSource source);
     void triggerNotification(
-        const QnTransaction<ApiDiscoveredServerDataList>& tran, NotificationSource source);
+        const QnTransaction<nx::vms::api::DiscoveredServerDataList>& tran, NotificationSource source);
 };
 
 using QnDiscoveryNotificationManagerPtr = std::shared_ptr<QnDiscoveryNotificationManager>;

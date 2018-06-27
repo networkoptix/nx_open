@@ -491,13 +491,15 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerData>&)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::DiscoveredServerData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerDataList>&)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::DiscoveredServerDataList>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;

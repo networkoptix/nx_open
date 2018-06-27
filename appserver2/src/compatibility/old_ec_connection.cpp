@@ -11,6 +11,8 @@
 #include "ec2_thread_pool.h"
 #include "transaction/transaction.h"
 
+#include <nx/vms/api/data/database_dump_data.h>
+
 namespace ec2
 {
     OldEcConnection::OldEcConnection(const QnConnectionInfo& connectionInfo)

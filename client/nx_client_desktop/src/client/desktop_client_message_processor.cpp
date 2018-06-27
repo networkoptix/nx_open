@@ -60,7 +60,7 @@ QnResourceFactory* QnDesktopClientMessageProcessor::getResourceFactory() const
 }
 
 void QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers(
-        const ec2::ApiDiscoveredServerDataList &discoveredServers)
+    const nx::vms::api::DiscoveredServerDataList& discoveredServers)
 {
     m_incompatibleServerWatcher->createInitialServers(discoveredServers);
 }
