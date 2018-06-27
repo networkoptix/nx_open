@@ -27,6 +27,8 @@ public:
             m_client->pleaseStopSync();
             m_client.reset();
         }
+
+        m_httpServer.reset();
     }
 
 protected:
