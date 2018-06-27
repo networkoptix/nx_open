@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <nx/fusion/model_functions.h>
-
 #include <database/migrations/add_history_attributes_to_transaction.h>
-#include <nx_ec/data/api_data.h>
+
+#include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/resource_data.h>
 #include <nx/vms/api/data/user_data.h>
 

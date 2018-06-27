@@ -256,8 +256,9 @@ namespace detail
         //getStorages
         ErrorCode getStorages(const QString& filterStr, nx::vms::api::StorageDataList& storageList);
         ErrorCode doQueryNoLock(
-            const ParentId& parentId, nx::vms::api::StorageDataList& storageList);
-        ErrorCode doQueryNoLock(const QnUuid& storageId, nx::vms::api::StorageDataList& storageList);
+            const nx::vms::api::ParentId& parentId, nx::vms::api::StorageDataList& storageList);
+        ErrorCode doQueryNoLock(
+            const QnUuid& storageId, nx::vms::api::StorageDataList& storageList);
 
         //get resource status
         ErrorCode doQueryNoLock(

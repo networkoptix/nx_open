@@ -1,23 +1,21 @@
-#include <gtest/gtest.h>
+#include "mock_stream_socket.h"
 
-#include <nx/utils/log/log.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/utils/std/cpp14.h>
+#include <gtest/gtest.h>
 
 #include <rest/handlers/ec2_update_http_handler.h>
 
-#include <nx/core/access/access_types.h>
-#include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
-
-#include <nx_ec/data/api_fwd.h>
-#include <nx_ec/data/api_data.h>
-
-#include "mock_stream_socket.h"
-#include <network/tcp_listener.h>
-#include "network/http_connection_listener.h"
-#include <rest/server/rest_connection_processor.h>
 #include <common/static_common_module.h>
+#include <core/resource_access/user_access_data.h>
+#include <network/tcp_listener.h>
+#include <network/http_connection_listener.h>
+#include <rest/server/rest_connection_processor.h>
+
+#include <nx/core/access/access_types.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/vms/api/data_fwd.h>
 
 namespace ec2 {
 namespace test {

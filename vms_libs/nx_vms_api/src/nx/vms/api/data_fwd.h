@@ -12,6 +12,8 @@ struct Data;
 class SoftwareVersion;
 class SystemInformation;
 
+struct ParentId;
+
 #define DECLARE_LIST(Type) \
     using Type##List = std::vector<Type>;
 

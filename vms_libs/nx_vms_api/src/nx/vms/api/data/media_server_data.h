@@ -118,6 +118,17 @@ struct NX_VMS_API MediaServerDataEx:
     (addParams) \
     (storages)
 
+/**
+ * Distinct from QnUuid wrapper type to be used for overload resolution in StorageData api requests.
+ */
+struct ParentId
+{
+    QnUuid id;
+
+    ParentId() = default;
+    ParentId(const QnUuid& id): id(id) {}
+};
+
 } // namespace api
 } // namespace vms
 } // namespace nx
