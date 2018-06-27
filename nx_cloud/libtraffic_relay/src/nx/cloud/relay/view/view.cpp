@@ -61,9 +61,10 @@ View::View(
     m_model(model),
     m_controller(controller),
     m_authenticationManager(m_authRestrictionList),
-    m_getPostTunnelProcessor(
+    m_getPostServerTunnelProcessor(
         m_settings,
-        &model->listeningPeerPool())
+        &model->listeningPeerPool()),
+    m_getPostClientTunnelProcessor(m_settings)
 {
     registerApiHandlers();
     loadSslCertificate();
@@ -131,13 +132,18 @@ void View::registerApiHandlers()
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
 
-    registerApiHandler<view::ConnectToPeerHandler>(
+    registerApiHandler<view::ConnectToListeningPeerWithHttpUpgradeHandler>(
         nx::network::http::Method::post,
         &m_controller->connectSessionManager());
 
-    registerApiHandler<view::CreatePostGetTunnelHandler>(
+    registerApiHandler<view::CreateGetPostServerTunnelHandler>(
         nx::network::http::Method::get,
-        &m_getPostTunnelProcessor);
+        &m_getPostServerTunnelProcessor);
+
+    registerApiHandler<view::CreateGetPostClientTunnelHandler>(
+        nx::network::http::Method::get,
+        &m_controller->connectSessionManager(),
+        &m_getPostClientTunnelProcessor);
 
     registerApiHandler<relaying::BeginListeningUsingConnectMethodHandler>(
         nx::network::http::Method::connect,
@@ -162,30 +168,32 @@ void View::registerCompatibilityHandlers()
     registerApiHandler<relaying::BeginListeningHandler>(
         nx::network::http::Method::options,
         &m_controller->listeningPeerManager());
-    registerApiHandler<view::ConnectToPeerHandler>(
+
+    registerApiHandler<view::ConnectToListeningPeerWithHttpUpgradeHandler>(
         nx::network::http::Method::options,
         &m_controller->connectSessionManager());
 }
 
-template<typename Handler, typename Arg>
+template<typename Handler, typename ... Arg>
 void View::registerApiHandler(
     const nx::network::http::StringType& method,
-    Arg arg)
+    Arg ... arg)
 {
-    registerApiHandler<Handler, Arg>(Handler::kPath, method, std::move(arg));
+    registerApiHandler<Handler, Arg...>(
+        Handler::kPath, method, std::move(arg)...);
 }
 
-template<typename Handler, typename Arg>
+template<typename Handler, typename ... Arg>
 void View::registerApiHandler(
     const char* path,
     const nx::network::http::StringType& method,
-    Arg arg)
+    Arg ... arg)
 {
     m_httpMessageDispatcher.registerRequestProcessor<Handler>(
         path,
-        [this, arg]() -> std::unique_ptr<Handler>
+        [this, arg...]() -> std::unique_ptr<Handler>
         {
-            return std::make_unique<Handler>(arg);
+            return std::make_unique<Handler>(arg...);
         },
         method);
 }
