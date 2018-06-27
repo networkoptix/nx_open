@@ -26,7 +26,7 @@ class _SSHCommand(Command):
 
     def __enter__(self):
         transport = self._ssh_client.get_transport()
-        self._channel = transport.open_session()
+        self._channel = transport.open_session()  # type: paramiko.Channel
         self._logger.debug("Run on %r:\n%s", self, self._script)
         self._channel.exec_command(self._script)
         self._open_streams = {
