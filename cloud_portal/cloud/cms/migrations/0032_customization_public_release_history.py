@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='customization',
             name='public_release_history',
-            field=models.BooleanField(default=True),
+            field=models.BooleanField(default=False),
         ),
     ]
