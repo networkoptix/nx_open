@@ -2,6 +2,7 @@
 
 #include <common/common_module.h>
 #include <network/connection_validator.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <transaction/message_bus_adapter.h>
 #include <api/global_settings.h>
 
@@ -36,7 +37,8 @@ nx::vms::api::DiscoveredServerData makeServer(
     const nx::vms::discovery::ModuleEndpoint& module, const QnUuid& localSystemId)
 {
     nx::vms::api::DiscoveredServerData serverData(module);
-    serverData.setEndpoints(std::vector<nx::network::SocketAddress>{module.endpoint});
+    ec2::setModuleInformationEndpoints(serverData, {module.endpoint});
+
     if (QnConnectionValidator::validateConnection(module) != Qn::SuccessConnectionResult)
     {
         serverData.status = nx::vms::api::ResourceStatus::incompatible;

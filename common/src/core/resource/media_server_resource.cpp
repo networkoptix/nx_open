@@ -4,6 +4,29 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
+#include <api/session_manager.h>
+#include <api/app_server_connection.h>
+#include <api/global_settings.h>
+#include <api/model/ping_reply.h>
+#include <api/network_proxy_factory.h>
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/media_server_user_attributes.h>
+#include <core/resource/server_backup_schedule.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource_management/resource_pool.h>
+#include <network/networkoptixmodulerevealcommon.h>
+#include <nx_ec/ec_proto_version.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <rest/server/json_rest_result.h>
+#include <utils/common/app_info.h>
+#include <utils/common/delete_later.h>
+#include <utils/common/sleep.h>
+#include <utils/common/util.h>
+
+#include <nx/api/analytics/driver_manifest.h>
 #include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -11,33 +34,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
-
-#include "api/session_manager.h"
-#include <api/app_server_connection.h>
-#include <api/model/ping_reply.h>
-#include <api/network_proxy_factory.h>
-
-#include <core/resource/storage_resource.h>
-#include <core/resource/security_cam_resource.h>
-#include <core/resource/media_server_user_attributes.h>
-#include <core/resource/server_backup_schedule.h>
-#include <core/resource_management/server_additional_addresses_dictionary.h>
-#include <core/resource_management/resource_pool.h>
-
-#include "nx_ec/ec_proto_version.h"
-
-#include <rest/server/json_rest_result.h>
-
-#include <utils/common/app_info.h>
-#include "utils/common/delete_later.h"
-#include "utils/common/sleep.h"
-#include "utils/common/util.h"
-#include "network/networkoptixmodulerevealcommon.h"
-#include "api/server_rest_connection.h"
-#include <common/common_module.h>
-#include <api/global_settings.h>
-
-#include <nx/api/analytics/driver_manifest.h>
 
 using namespace nx;
 
@@ -588,7 +584,7 @@ nx::vms::api::ModuleInformationWithAddresses
     QnMediaServerResource::getModuleInformationWithAddresses() const
 {
     nx::vms::api::ModuleInformationWithAddresses information = getModuleInformation();
-    information.setEndpoints(getAllAvailableAddresses());
+    ec2::setModuleInformationEndpoints(information, getAllAvailableAddresses());
     return information;
 }
 

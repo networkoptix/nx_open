@@ -154,4 +154,11 @@ void deserializeNetAddrList(
     QList<nx::network::SocketAddress>& target,
     int defaultPort);
 
+QList<nx::network::SocketAddress> moduleInformationEndpoints(
+    const nx::vms::api::ModuleInformationWithAddresses& data);
+
+void setModuleInformationEndpoints(
+    nx::vms::api::ModuleInformationWithAddresses& data,
+    const QList<nx::network::SocketAddress>& endpoints);
+
 } // namespace ec2

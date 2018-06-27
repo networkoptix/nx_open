@@ -49,39 +49,11 @@ struct NX_VMS_API ModuleInformation: Data
 
 struct NX_VMS_API ModuleInformationWithAddresses: ModuleInformation
 {
+    // If any of these addresses don't contain port, ModuleInformation::port must be used.
     QSet<QString> remoteAddresses;
 
     ModuleInformationWithAddresses() = default;
     ModuleInformationWithAddresses(const ModuleInformation& other): ModuleInformation(other) {}
-
-    template<typename SocketAddress>
-    std::set<SocketAddress> endpoints() const
-    {
-        std::set<SocketAddress> endpoints;
-        for (const auto& address: remoteAddresses)
-        {
-            SocketAddress endpoint(address);
-            if (endpoint.port == 0)
-                endpoint.port = (decltype(endpoint.port)) port;
-
-            endpoints.insert(std::move(endpoint));
-        }
-
-        return endpoints;
-    }
-
-    template<typename SocketAddressList>
-    void setEndpoints(const SocketAddressList& endpoints)
-    {
-        remoteAddresses.clear();
-        for (const auto& endpoint: endpoints)
-        {
-            if (endpoint.port == port)
-                remoteAddresses.insert(endpoint.address.toString());
-            else
-                remoteAddresses.insert(endpoint.toString());
-        }
-    }
 };
 
 #define ModuleInformation_Fields \

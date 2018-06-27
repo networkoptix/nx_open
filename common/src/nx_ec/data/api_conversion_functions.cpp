@@ -1051,4 +1051,34 @@ void fromApiToResourceList(const WebPageDataList& src, QnWebPageResourceList& ds
 }
 
 
+QList<nx::network::SocketAddress> moduleInformationEndpoints(
+    const nx::vms::api::ModuleInformationWithAddresses& data)
+{
+    QList<nx::network::SocketAddress> endpoints;
+    for (const auto& address: data.remoteAddresses)
+    {
+        nx::network::SocketAddress endpoint(address);
+        if (endpoint.port == 0)
+            endpoint.port = (quint16) data.port;
+
+        endpoints << std::move(endpoint);
+    }
+
+    return endpoints;
+}
+
+void setModuleInformationEndpoints(
+    nx::vms::api::ModuleInformationWithAddresses& data,
+    const QList<nx::network::SocketAddress>& endpoints)
+{
+    data.remoteAddresses.clear();
+    for (const auto& endpoint : endpoints)
+    {
+        if (endpoint.port == data.port)
+            data.remoteAddresses.insert(endpoint.address.toString());
+        else
+            data.remoteAddresses.insert(endpoint.toString());
+    }
+}
+
 } // namespace ec2

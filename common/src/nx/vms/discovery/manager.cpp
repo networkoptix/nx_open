@@ -4,6 +4,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
@@ -215,8 +216,8 @@ void Manager::initializeMulticastFinders(bool clientMode)
         [this](nx::vms::api::ModuleInformationWithAddresses module,
             nx::network::SocketAddress /*endpoint*/)
         {
-            m_moduleConnector->newEndpoints(
-                module.endpoints<nx::network::SocketAddress>(), module.id);
+            const auto endpoints = ec2::moduleInformationEndpoints(module);
+            m_moduleConnector->newEndpoints({endpoints.cbegin(), endpoints.cend()}, module.id);
         });
 
     if (!clientMode)
