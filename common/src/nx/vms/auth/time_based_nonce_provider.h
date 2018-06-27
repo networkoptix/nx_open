@@ -14,6 +14,10 @@ public:
     virtual QByteArray generateNonce() override;
     virtual bool isNonceValid(const QByteArray& nonce) const override;
 
+    /**
+     * Generate time based nonce. Function uses current system (synchronized) time
+     * if nonce time is not provided.
+     */
     static QByteArray generateTimeBasedNonce(
         std::chrono::microseconds nonceTime = std::chrono::microseconds::zero());
 private:

@@ -3648,7 +3648,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(commonModule()->moduleGUID().toQUuid(), m_universalTcpListener));
 
     m_universalTcpListener->setProxyHandler<nx::vms::network::ProxyConnectionProcessor>(
-        &nx::vms::network::ProxyConnectionProcessor::needProxyRequest,
+        &nx::vms::network::ProxyConnectionProcessor::isProxyNeeded,
         ec2ConnectionFactory->serverConnector());
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );

@@ -65,7 +65,7 @@ ProxyConnectionProcessor::~ProxyConnectionProcessor()
 	stop();
 }
 
-bool ProxyConnectionProcessor::needStandardProxy(QnCommonModule* commonModule, const nx::network::http::Request& request)
+bool ProxyConnectionProcessor::isStandardProxyNeeded(QnCommonModule* commonModule, const nx::network::http::Request& request)
 {
 	return isCloudRequest(request) || isProxyForCamera(commonModule, request);
 }
@@ -238,7 +238,7 @@ bool ProxyConnectionProcessor::replaceAuthHeader()
 	nx::network::http::header::DigestAuthorization originalAuthHeader;
 	if (!originalAuthHeader.parse(nx::network::http::getHeaderValue(d->request.headers, authHeaderName)))
 		return false;
-	if (needStandardProxy(commonModule(), d->request))
+	if (isStandardProxyNeeded(commonModule(), d->request))
 	{
 		return true; //< no need to update, it is non server proxy request
 	}
@@ -302,7 +302,7 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 {
 	Q_D(ProxyConnectionProcessor);
 
-	if (needStandardProxy(commonModule(), d->request))
+	if (isStandardProxyNeeded(commonModule(), d->request))
 	{
 		dstUrl = d->request.requestLine.url;
 	}
@@ -391,7 +391,7 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
 			if (QnNetworkResourcePtr camera = resourcePool()->getResourceById<QnNetworkResource>(cameraGuid))
 				dstRoute.addr = nx::network::SocketAddress(camera->getHostAddress(), camera->httpPort());
 		}
-		else if (needStandardProxy(commonModule(), d->request))
+		else if (isStandardProxyNeeded(commonModule(), d->request))
 		{
 			nx::utils::Url url = d->request.requestLine.url;
 			int defaultPort = getDefaultPortByProtocol(url.scheme());
@@ -580,7 +580,7 @@ void ProxyConnectionProcessor::doProxyRequest()
 
 	parseRequest();
 	QString path = d->request.requestLine.url.path();
-	// parse next request and change dst if required
+	// Parse next request and change dst if required.
 	nx::utils::Url dstUrl;
 	QnRoute dstRoute;
 	updateClientRequest(dstUrl, dstRoute);
@@ -678,7 +678,7 @@ bool ProxyConnectionProcessor::readSocketNonBlock(
 	return true;
 }
 
-bool ProxyConnectionProcessor::needProxyRequest(QnCommonModule* commonModule, const nx::network::http::Request& request)
+bool ProxyConnectionProcessor::isProxyNeeded(QnCommonModule* commonModule, const nx::network::http::Request& request)
 {
 	nx::network::http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
 	if (xServerGuidIter != request.headers.end())
@@ -693,7 +693,7 @@ bool ProxyConnectionProcessor::needProxyRequest(QnCommonModule* commonModule, co
 			return true;
 		}
 	}
-	return nx::vms::network::ProxyConnectionProcessor::needStandardProxy(commonModule, request);
+	return nx::vms::network::ProxyConnectionProcessor::isStandardProxyNeeded(commonModule, request);
 }
 
 } // namespace network

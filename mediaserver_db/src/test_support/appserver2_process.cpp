@@ -447,7 +447,7 @@ void Appserver2Process::registerHttpHandlers(
     ec2ConnectionFactory->registerTransactionListener(m_tcpListener);
 
     m_tcpListener->setProxyHandler<nx::vms::network::ProxyConnectionProcessor>(
-        &nx::vms::network::ProxyConnectionProcessor::needProxyRequest,
+        &nx::vms::network::ProxyConnectionProcessor::isProxyNeeded,
         ec2ConnectionFactory->serverConnector());
 }
 

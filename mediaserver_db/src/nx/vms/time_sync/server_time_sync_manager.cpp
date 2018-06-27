@@ -123,6 +123,7 @@ void ServerTimeSyncManager::initializeTimeFetcher()
 
 void ServerTimeSyncManager::setTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher)
 {
+    NX_ASSERT(!m_internetTimeSynchronizer);
     auto meanTimerFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
     meanTimerFetcher->addTimeFetcher(std::move(timeFetcher));
     m_internetTimeSynchronizer = std::move(meanTimerFetcher);
