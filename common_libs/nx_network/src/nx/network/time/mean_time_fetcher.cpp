@@ -12,7 +12,8 @@ namespace network {
 
 MeanTimeFetcher::TimeFetcherContext::TimeFetcherContext():
     utcMillis(-1),
-    errorCode(SystemError::noError)
+    errorCode(SystemError::noError),
+    rtt(std::chrono::milliseconds::zero())
 {
 }
 
@@ -65,7 +66,7 @@ void MeanTimeFetcher::getTimeAsyncInAioThread(
         ctx->utcMillis = -1;
         ctx->timeFetcher->getTimeAsync(std::bind(
             &MeanTimeFetcher::timeFetchingDone,
-            this, ctx.get(), _1, _2));
+            this, ctx.get(), _1, _2, _3));
         ++m_awaitedAnswers;
     }
 
@@ -85,9 +86,11 @@ void MeanTimeFetcher::addTimeFetcher(
 void MeanTimeFetcher::timeFetchingDone(
     TimeFetcherContext* ctx,
     qint64 utcMillis,
-    SystemError::ErrorCode errorCode)
+    SystemError::ErrorCode errorCode,
+    std::chrono::milliseconds rtt)
 {
     ctx->utcMillis = utcMillis;
+    ctx->rtt = rtt;
     ctx->errorCode = errorCode;
 
     NX_ASSERT(m_awaitedAnswers > 0);
@@ -96,13 +99,14 @@ void MeanTimeFetcher::timeFetchingDone(
 
     //all fetchers answered, analyzing results
     qint64 sumOfReceivedUtcTimesMillis = 0;
+    std::chrono::milliseconds sumOfReceivedRtt = std::chrono::milliseconds::zero();
     qint64 minUtcTimeMillis = std::numeric_limits<qint64>::max();
     size_t collectedValuesCount = 0;
     for (std::unique_ptr<TimeFetcherContext>& ctx: m_timeFetchers)
     {
         if (ctx->errorCode != SystemError::noError)
         {
-            nx::utils::swapAndCall(m_completionHandler, -1, ctx->errorCode);
+            nx::utils::swapAndCall(m_completionHandler, -1, ctx->errorCode, std::chrono::milliseconds::zero());
             return;
         }
 
@@ -110,13 +114,14 @@ void MeanTimeFetcher::timeFetchingDone(
         if ((minUtcTimeMillis != std::numeric_limits<qint64>::max()) &&
             (qAbs(ctx->utcMillis - minUtcTimeMillis) > m_maxDeviationMillis))
         {
-            nx::utils::swapAndCall(m_completionHandler, -1, SystemError::invalidData);
+            nx::utils::swapAndCall(m_completionHandler, -1, SystemError::invalidData, std::chrono::milliseconds::zero());
             return;
         }
 
         if (ctx->utcMillis < minUtcTimeMillis)
             minUtcTimeMillis = ctx->utcMillis;
-        sumOfReceivedUtcTimesMillis += ctx->utcMillis;
+        sumOfReceivedUtcTimesMillis += ctx->utcMillis - ctx->rtt.count() / 2;
+        sumOfReceivedRtt += ctx->rtt;
         ++collectedValuesCount;
     }
 
@@ -125,7 +130,8 @@ void MeanTimeFetcher::timeFetchingDone(
     nx::utils::swapAndCall(
         m_completionHandler,
         sumOfReceivedUtcTimesMillis / collectedValuesCount,
-        SystemError::noError);
+        SystemError::noError,
+        sumOfReceivedRtt / collectedValuesCount);
 }
 
 } // namespace network

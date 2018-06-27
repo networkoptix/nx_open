@@ -66,6 +66,7 @@ public:
         ValidateCallback callback) = 0;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
+    virtual bool hasAccessToTheUrl(const QString& url) const = 0;
 };
 
 class AbstractPeerManagerFactory

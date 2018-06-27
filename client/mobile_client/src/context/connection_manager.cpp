@@ -433,12 +433,6 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
                     }
                 });
 
-            connect(
-                ec2Connection->getTimeNotificationManager().get(),
-                &ec2::AbstractTimeNotificationManager::timeChanged,
-                QnSyncTime::instance(),
-                static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
-
             commonModule()->instance<nx::client::core::UserWatcher>()->setUserName(
                 connectionInfo.effectiveUserName.isEmpty()
                     ? url.userName()

@@ -125,7 +125,7 @@ class LightweightServer(Mediaserver):
         while utils.datetime_utc_now() - start_time < timeout:
             try:
                 # calling api/moduleInformation to check for SF_P2pSyncDone flag
-                response = self.api.api.moduleInformation.GET(timeout=60)
+                response = self.api.get('api/moduleInformation', timeout=60)
             except ReadTimeout:
                 # log.error('ReadTimeout when waiting for lws api/moduleInformation; will make core dump')
                 # self.service.make_core_dump()

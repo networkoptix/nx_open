@@ -10,17 +10,15 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/log/log.h>
-
 #include <nx/vms/cloud_integration/cloud_connection_manager.h>
+#include <nx/vms/cloud_integration/cloud_manager_group.h>
 
 #include <common/common_module.h>
 
-#include "proxy_sender_connection_processor.h"
 #include "universal_request_processor.h"
 
 QnUniversalTcpListener::QnUniversalTcpListener(
     QnCommonModule* commonModule,
-    const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager,
     const QHostAddress& address,
     int port,
     int maxConnections,
@@ -32,18 +30,33 @@ QnUniversalTcpListener::QnUniversalTcpListener(
         port,
         maxConnections,
         useSsl),
-    m_cloudConnectionManager(cloudConnectionManager),
     m_boundToCloud(false),
     m_httpModManager(new nx::network::http::HttpModManager())
 {
     m_cloudCredentials.serverId = commonModule->moduleGUID().toByteArray();
+}
+
+void QnUniversalTcpListener::setupAuthorizer(
+    TimeBasedNonceProvider* timeBasedNonceProvider,
+    nx::vms::cloud_integration::CloudManagerGroup& cloudManagerGroup)
+{
+    m_authenticator = std::make_unique<nx::mediaserver::Authenticator>(
+        commonModule(), timeBasedNonceProvider,
+        &cloudManagerGroup.authenticationNonceFetcher,
+        &cloudManagerGroup.userAuthenticator);
+}
+
+void QnUniversalTcpListener::setCloudConnectionManager(
+    const nx::vms::cloud_integration::CloudConnectionManager& cloudConnectionManager)
+{
     Qn::directConnect(
         &cloudConnectionManager, &nx::vms::cloud_integration::CloudConnectionManager::cloudBindingStatusChanged,
         this,
         [this, &cloudConnectionManager](bool /*boundToCloud*/)
-        {
-            onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
-        });
+    {
+        onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
+    });
+
     onCloudBindingStatusChanged(cloudConnectionManager.getSystemCredentials());
 }
 
@@ -51,26 +64,6 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 {
     stop();
     directDisconnectAll();
-}
-
-void QnUniversalTcpListener::addProxySenderConnections(
-    const nx::network::SocketAddress& proxyUrl,
-    int size)
-{
-    if (m_needStop)
-        return;
-
-    NX_LOG(lit("QnHttpConnectionListener: %1 reverse connection(s) to %2 is(are) needed")
-        .arg(size).arg(proxyUrl.toString()), cl_logDEBUG1);
-
-    for (int i = 0; i < size; ++i)
-    {
-        auto connect = new QnProxySenderConnection(
-            proxyUrl, commonModule()->moduleGUID(), this, needAuth());
-
-        connect->start();
-        addOwnership(connect);
-    }
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
@@ -193,6 +186,18 @@ void QnUniversalTcpListener::updateCloudConnectState(
 void QnUniversalTcpListener::applyModToRequest(nx::network::http::Request* request)
 {
     m_httpModManager->apply(request);
+}
+
+nx::mediaserver::Authenticator* QnUniversalTcpListener::authenticator() const
+{
+    return m_authenticator.get();
+}
+
+nx::mediaserver::Authenticator* QnUniversalTcpListener::authenticator(const QnTcpListener* listener)
+{
+    const auto universalListener = dynamic_cast<const QnUniversalTcpListener*>(listener);
+    NX_CRITICAL(universalListener);
+    return universalListener->authenticator();
 }
 
 bool QnUniversalTcpListener::isAuthentificationRequired(nx::network::http::Request& request)

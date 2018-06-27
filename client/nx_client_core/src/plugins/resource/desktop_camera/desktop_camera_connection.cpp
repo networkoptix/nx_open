@@ -307,7 +307,6 @@ void QnDesktopCameraConnection::run()
         }
 
         nx::utils::Url url(m_server->getApiUrl());
-        url.setScheme(lit("http"));
         url.setPath(lit("/desktop_camera"));
 
         if (!httpClient->doGet(url))

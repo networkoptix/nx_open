@@ -25,23 +25,6 @@
 namespace nx {
 namespace p2p {
 
-class ShareSocketDelegate: public nx::network::StreamSocketDelegate
-{
-    using base_type = nx::network::StreamSocketDelegate;
-public:
-    ShareSocketDelegate(QSharedPointer<nx::network::AbstractStreamSocket> socket):
-        base_type(socket.data()),
-        m_socket(std::move(socket))
-    {
-    }
-    ~ShareSocketDelegate()
-    {
-
-    }
-private:
-    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
-};
-
 // -------------------------- ConnectionProcessor ---------------------
 
 ConnectionProcessor::ConnectionProcessor(

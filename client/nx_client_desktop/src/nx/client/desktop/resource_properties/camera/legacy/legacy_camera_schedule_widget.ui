@@ -538,7 +538,10 @@
             <item row="0" column="0">
              <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,0">
               <property name="horizontalSpacing">
-               <number>5</number>
+               <number>8</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>10</number>
               </property>
               <item row="0" column="0">
                <widget class="QLabel" name="fpsLabel">
@@ -558,6 +561,12 @@
               </item>
               <item row="0" column="1">
                <widget class="QSpinBox" name="fpsSpinBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimum">
                  <number>1</number>
                 </property>

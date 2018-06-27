@@ -23,16 +23,11 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(RuntimeFlags)
  */
 struct ApiRuntimeData: nx::vms::api::DataWithVersion
 {
-    static const quint64 tpfPeerTimeSynchronizedWithInternetServer = 0x0008LL << 32;
-    static const quint64 tpfPeerTimeSetByUser = 0x0004LL << 32;
-    static const quint64 tpfPeerHasMonotonicClock = 0x0002LL << 32;
-    static const quint64 tpfPeerIsNotEdgeServer = 0x0001LL << 32;
-
     /**
      * This operator must not be replaced with fusion implementation as it skips brand and
      * customization checking.
      */
-    bool operator==(const ApiRuntimeData& other) const 
+    bool operator==(const ApiRuntimeData& other) const
     {
         return version == other.version
             && peer == other.peer
@@ -41,7 +36,6 @@ struct ApiRuntimeData: nx::vms::api::DataWithVersion
             && publicIP == other.publicIP
             && videoWallInstanceGuid == other.videoWallInstanceGuid
             && videoWallControlSession == other.videoWallControlSession
-            && serverTimePriority == other.serverTimePriority
             && prematureLicenseExperationDate == other.prematureLicenseExperationDate
             && hardwareIds == other.hardwareIds
             && updateStarted == other.updateStarted
@@ -66,9 +60,6 @@ struct ApiRuntimeData: nx::vms::api::DataWithVersion
     /** Videowall item id, governed by the current client instance's control session. */
     QnUuid videoWallControlSession;
 
-    /** Priority of this peer as the time synchronization server. */
-    quint64 serverTimePriority = 0;
-
     QVector<QString> hardwareIds;
 
     QString nx1mac;
@@ -84,7 +75,7 @@ struct ApiRuntimeData: nx::vms::api::DataWithVersion
 
 #define ApiRuntimeData_Fields DataWithVersion_Fields \
     (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate) \
-    (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority) \
+    (videoWallInstanceGuid)(videoWallControlSession) \
     (hardwareIds)(updateStarted)(nx1mac)(nx1serial) \
     (userId)(flags)(customization)
 

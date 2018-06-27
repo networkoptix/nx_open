@@ -316,7 +316,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::mergeSystems(
     if (!m_remoteModuleInformation.remoteAddresses.contains(url.host()))
     {
         nx::utils::Url simpleUrl;
-        simpleUrl.setScheme(lit("http"));
+        simpleUrl.setScheme(nx::network::http::urlSheme(m_remoteModuleInformation.sslAllowed));
         simpleUrl.setHost(url.host());
         if (url.port() != m_remoteModuleInformation.port)
             simpleUrl.setPort(url.port());

@@ -34,6 +34,7 @@ public:
         QnMediaServerNotificationManager* mediaServerManager,
         QnCameraNotificationManager* cameraManager,
         QnUserNotificationManager* userManager,
+        QnTimeNotificationManager* timeManager,
         QnBusinessEventNotificationManager* businessEventManager,
         QnLayoutNotificationManager* layoutManager,
         QnLayoutTourNotificationManager* layoutTourManager,
@@ -54,6 +55,7 @@ public:
             m_mediaServerManager,
             m_cameraManager,
             m_userManager,
+            m_timeManager,
             m_businessEventManager,
             m_layoutManager,
             m_layoutTourManager,
@@ -81,6 +83,7 @@ private:
     QnMediaServerNotificationManager* m_mediaServerManager;
     QnCameraNotificationManager* m_cameraManager;
     QnUserNotificationManager* m_userManager;
+    QnTimeNotificationManager* m_timeManager;
     QnBusinessEventNotificationManager* m_businessEventManager;
     QnLayoutNotificationManager* m_layoutManager;
     QnLayoutTourNotificationManager* m_layoutTourManager;

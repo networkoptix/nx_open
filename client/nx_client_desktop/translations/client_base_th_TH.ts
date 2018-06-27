@@ -3655,7 +3655,7 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>การสำรองข้อมูลประกอบด้วยเซิร์ฟเวอร์และการตั้งค่ากล้อง,ผู้ใช้เว็บเพจ,กิจกรรม ฯลฯ ไม่ได้บันทึกวิดีโอ</translation>
+      <translation>การสำรองข้อมูลประกอบด้วยเซิร์ฟเวอร์และการตั้งค่ากล้อง, ผู้ใช้เว็บเพจ, กิจกรรม ฯลฯ ไม่ได้บันทึกวิดีโอ</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
@@ -4469,7 +4469,7 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation>ตั้งเวลาที่จะใช้ในไคลเอ็นต์ (ไทม์ไลน์ timestamps ฯลฯ ) เมื่อเครื่องไคลเอ็นต์และเซิร์ฟเวอร์อยู่ในโซนเวลาที่ต่างกัน</translation>
+      <translation>ตั้งเวลาที่จะใช้ในไคลเอ็นต์ (ไทม์ไลน์ timestamps ฯลฯ) เมื่อเครื่องไคลเอ็นต์และเซิร์ฟเวอร์อยู่ในโซนเวลาที่ต่างกัน</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
@@ -4477,7 +4477,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>ระยะเวลาที่กล้องแต่ละรูปแบบจะปรากฏขึ้นหากคุณเริ่มทัวร์เค้าโครง</translation>
     </message>
   </context>
   <context>
@@ -5851,11 +5851,11 @@ to %1</source>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation>กำลังตรวจสอบการอัปเดต ...</translation>
+      <translation>กำลังตรวจสอบการอัปเดต...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation>กำลังตรวจสอบพื้นที่ว่าง ...</translation>
+      <translation>กำลังตรวจสอบพื้นที่ว่าง...</translation>
     </message>
   </context>
   <context>
@@ -7240,7 +7240,7 @@ to %1</source>
     </message>
     <message>
       <source>Finalizing %1...</source>
-      <translation>กำลังสรุป %1 ...</translation>
+      <translation>กำลังสรุป %1...</translation>
     </message>
   </context>
   <context>

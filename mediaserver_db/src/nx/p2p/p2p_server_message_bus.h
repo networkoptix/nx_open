@@ -70,7 +70,7 @@ private:
 	void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
 	void startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
 	P2pConnectionPtr findBestConnectionToSubscribe(
-		const QVector<ApiPersistentIdData>& viaList,
+		const QList<ApiPersistentIdData>& viaList,
 		QMap<P2pConnectionPtr, int> newSubscriptions) const;
 	void doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription);
 	void commitLazyData();

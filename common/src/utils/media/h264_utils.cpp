@@ -5,14 +5,8 @@
 
 namespace nx {
 namespace media_utils {
-namespace avc {
 
-bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr& data)
-{
-    return data->context &&
-        data->context->getExtradataSize() >= 7 &&
-        data->context->getExtradata()[0] == 1;
-}
+
 
 //dishonorably stolen from libavcodec source
 #ifndef AV_RB16
@@ -68,7 +62,7 @@ void readH264NALUsFromExtraData(
     }
 }
 
-void readH264NALUsFromAnnexBStream(
+void readNALUsFromAnnexBStream(
     const QnConstCompressedVideoDataPtr& data,
     std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
 {
@@ -91,6 +85,15 @@ void readH264NALUsFromAnnexBStream(
     }
 }
 
+namespace h264 {
+
+bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr& data)
+{
+    return data->context &&
+        data->context->getExtradataSize() >= 7 &&
+        data->context->getExtradata()[0] == 1;
+}
+
 std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
     const QnConstCompressedVideoDataPtr& videoData)
 {
@@ -98,7 +101,7 @@ std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
     if (isH264SeqHeaderInExtraData(videoData))
         readH264NALUsFromExtraData(videoData, &nalUnits);
     else
-        readH264NALUsFromAnnexBStream(videoData, &nalUnits);
+        readNALUsFromAnnexBStream(videoData, &nalUnits);
     return nalUnits;
 }
 
@@ -180,6 +183,7 @@ void extractSpsPps(
     }
 }
 
-} // namespace avc
+} // namespace h264
+
 } // namespace media_utils
 } // namespace nx

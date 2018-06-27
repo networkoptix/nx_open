@@ -184,7 +184,7 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         }
 
         case Qt::DecorationRole:
-            return QVariant::fromValue(qnSkin->pixmap(lit("events/analytics.png")));
+            return QVariant::fromValue(qnSkin->pixmap(lit("text_buttons/analytics.png")));
 
         case Qn::DescriptionTextRole:
             return description(object);

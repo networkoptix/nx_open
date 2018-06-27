@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation type="unfinished">Language Name</translation>
+      <translation>Italiano</translation>
     </message>
   </context>
   <context>
@@ -657,15 +657,15 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n Moduli I / O</numerusform>
-        <numerusform>%n Moduli I / O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n Moduli I / O</numerusform>
-        <numerusform>%n Moduli I / O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
+        <numerusform>%n Moduli I/O</numerusform>
       </translation>
     </message>
     <message>

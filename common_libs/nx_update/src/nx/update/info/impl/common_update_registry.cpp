@@ -50,17 +50,16 @@ public:
 
     bool ok() const
     {
-        return m_found;
+        return !m_versions.isEmpty();
     }
 
-    QnSoftwareVersion version() const { return m_version; }
+    QList<api::TargetVersionWithEula> versions() const { return m_versions; }
 
 protected:
     const UpdateRequestData& m_updateRequestData;
     const detail::CustomizationVersionToUpdate& m_customizationVersionToUpdate;
     const CustomizationData& m_customizationData;
-    mutable bool m_found = false;
-    mutable QnSoftwareVersion m_version;
+    mutable QList<api::TargetVersionWithEula> m_versions;
 
     bool hasNewerVersions(const QnSoftwareVersion& currentNxVersion) const
     {
@@ -79,17 +78,11 @@ protected:
             checkForUpdateData(*versionIt);
         }
 
-        if (!m_found)
-            return false;
-
         return true;
     }
 
     void checkForUpdateData(const QnSoftwareVersion& version) const
     {
-        if (m_found)
-            return;
-
         if (version <= m_updateRequestData.currentNxVersion)
             return;
 
@@ -104,15 +97,18 @@ protected:
             return;
         }
 
-        if (checkPackages(*updateIt, version))
-            m_version = version;
+        if (checkPackages(*updateIt, version) && !m_versions.contains(version))
+        {
+            m_versions.append(api::TargetVersionWithEula(
+                version,
+                updateIt.value().eulaVersion,
+                updateIt.value().eulaLink));
+        }
     }
 
-    virtual bool checkPackages(
-        const UpdateData& /*updateData*/,
+    virtual bool checkPackages(const UpdateData& /*updateData*/,
         const QnSoftwareVersion& /*version*/) const
     {
-        m_found = true;
         return true;
     }
 };
@@ -122,7 +118,7 @@ class FileDataFinder: public UpdateDataFinder
 public:
     FileDataFinder(
         const QString& baseUrl,
-        const UpdateFileRequestData& updateRequestData,
+        const UpdateRequestData& updateRequestData,
         const detail::CustomizationVersionToUpdate& customizationVersionToUpdate,
         const CustomizationData& customizationData)
         :
@@ -138,13 +134,16 @@ public:
 private:
     const QString& m_baseUrl;
     mutable FileData m_fileData;
+    mutable bool m_found = false;
 
     virtual bool checkPackages(
         const UpdateData& updateData,
         const QnSoftwareVersion& version) const override
     {
-        for (auto it = updateData.targetToPackage.cbegin();
-            it != updateData.targetToPackage.cend();
+        if (*m_updateRequestData.targetVersion != version)
+            return false;
+
+        for (auto it = updateData.targetToPackage.cbegin(); it != updateData.targetToPackage.cend();
             ++it)
         {
             checkPackage(it.key(), it.value(), version);
@@ -161,7 +160,7 @@ private:
         if (m_found)
             return;
 
-        if (!static_cast<const UpdateFileRequestData&>(m_updateRequestData).osVersion.matches(target))
+        if (!m_updateRequestData.osVersion.matches(target))
             return;
 
         m_fileData = fileData;
@@ -192,6 +191,8 @@ static const QString kCustomizationVersionNameKey = "customizationName";
 static const QString kCustomizationVersionVersionKey = "customizationVersion";
 static const QString kUpdateKey = "update";
 static const QString kCloudHostKey = "cloudHost";
+const static QString kEulaVersionKey = "eulaVersion";
+const static QString kEulaLinkKey = "eulaLink";
 static const QString kServerPackagesKey = "serverPackages";
 static const QString kClientPackagesKey = "clientPackages";
 static const QString kTargetKey = "target";
@@ -338,6 +339,8 @@ private:
     {
         QJsonObject updateObject;
         updateObject[kCloudHostKey] = updateData.cloudHost;
+        updateObject[kEulaVersionKey] = updateData.eulaVersion;
+        updateObject[kEulaLinkKey] = updateData.eulaLink;
         serializePackages(updateData.targetToPackage, updateObject, kServerPackagesKey);
         serializePackages(updateData.targetToClientPackage, updateObject, kClientPackagesKey);
         customizationVersionToUpdateObject[kUpdateKey] = updateObject;
@@ -683,6 +686,20 @@ private:
             return false;
         }
 
+        if (!updateObject.contains(kEulaLinkKey)
+            || !updateObject[kEulaLinkKey].isString())
+        {
+            m_ok = false;
+            return false;
+        }
+
+        if (!updateObject.contains(kEulaVersionKey)
+            || !updateObject[kEulaVersionKey].isDouble())
+        {
+            m_ok = false;
+            return false;
+        }
+
         if (!updateObject.contains(kServerPackagesKey)
             || !updateObject[kServerPackagesKey].isArray())
         {
@@ -698,6 +715,8 @@ private:
         }
 
         updateData.cloudHost = updateObject[kCloudHostKey].toString();
+        updateData.eulaLink = updateObject[kEulaLinkKey].toString();
+        updateData.eulaVersion = updateObject[kEulaVersionKey].toInt();
         deserializePackages(
             updateObject[kServerPackagesKey].toArray(),
             updateData.targetToPackage);
@@ -789,17 +808,32 @@ CommonUpdateRegistry::CommonUpdateRegistry(
 
 CommonUpdateRegistry::CommonUpdateRegistry(const QnUuid& selfPeerId): m_peerId(selfPeerId) {}
 
-ResultCode CommonUpdateRegistry::findUpdateFile(
-    const UpdateFileRequestData& updateRequestData,
+ResultCode CommonUpdateRegistry::findUpdateFile(const UpdateRequestData& updateRequestData,
     FileData* outFileData) const
 {
     NX_VERBOSE(this, lm("Requested update for %1").args(updateRequestData.toString()));
+
+    CustomizationData customizationData;
+    if (hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
+    {
+        FileDataFinder fileDataFinder(m_baseUrl, updateRequestData, m_customizationVersionToUpdate,
+            customizationData);
+
+        fileDataFinder.process();
+        if (fileDataFinder.ok())
+        {
+            *outFileData = fileDataFinder.fileData();
+            NX_INFO(this, lm("Update for %1 successfully found").args(updateRequestData.toString()));
+            return ResultCode::ok;
+        }
+    }
 
     for (const auto& manualDataEntry: m_manualData)
     {
         if (manualDataEntry.isClient == updateRequestData.isClient
             && manualDataEntry.nxVersion > updateRequestData.currentNxVersion
-            && manualDataEntry.osVersion == updateRequestData.osVersion)
+            && manualDataEntry.osVersion == updateRequestData.osVersion
+            && manualDataEntry.nxVersion == *updateRequestData.targetVersion)
         {
             if (outFileData)
                 *outFileData = FileData(manualDataEntry.file, QString(), -1, QByteArray());
@@ -807,24 +841,7 @@ ResultCode CommonUpdateRegistry::findUpdateFile(
         }
     }
 
-    CustomizationData customizationData;
-    if (!hasUpdateForCustomizationAndVersion(updateRequestData, &customizationData))
-        return ResultCode::noData;
-
-    FileDataFinder fileDataFinder(
-        m_baseUrl,
-        updateRequestData,
-        m_customizationVersionToUpdate,
-        customizationData);
-
-    fileDataFinder.process();
-    if (!fileDataFinder.ok())
-        return ResultCode::noData;
-
-    *outFileData = fileDataFinder.fileData();
-    NX_INFO(this, lm("Update for %1 successfully found").args(updateRequestData.toString()));
-
-    return ResultCode::ok;
+    return ResultCode::noData;
 }
 
 QList<QString> CommonUpdateRegistry::alternativeServers() const
@@ -901,15 +918,15 @@ bool CommonUpdateRegistry::equals(AbstractUpdateRegistry* other) const
 
 ResultCode CommonUpdateRegistry::latestUpdate(
     const UpdateRequestData& updateRequestData,
-    QnSoftwareVersion* outSoftwareVersion) const
+    QList<api::TargetVersionWithEula> *outSoftwareVersion) const
 {
     for (const auto& md: m_manualData)
     {
-        if (updateRequestData.currentNxVersion < md.nxVersion)
+        if (updateRequestData.currentNxVersion < md.nxVersion
+            && updateRequestData.osVersion == md.osVersion
+            && outSoftwareVersion && !outSoftwareVersion->contains(md.nxVersion))
         {
-            if (outSoftwareVersion)
-                *outSoftwareVersion = md.nxVersion;
-            return ResultCode::ok;
+            outSoftwareVersion->append(api::TargetVersionWithEula(md.nxVersion));
         }
     }
 
@@ -929,7 +946,7 @@ ResultCode CommonUpdateRegistry::latestUpdate(
         return ResultCode::noData;
     }
 
-    *outSoftwareVersion = updateDataFinder.version();
+    *outSoftwareVersion = updateDataFinder.versions();
     return ResultCode::ok;
 }
 
@@ -1037,41 +1054,18 @@ bool CommonUpdateRegistry::removeFileDataImpl(const QString& fileName, const QLi
     return result;
 }
 
+int CommonUpdateRegistry::updateVersion() const
+{
+    return m_metaData.updateManifestVersion;
+}
+
 void CommonUpdateRegistry::merge(AbstractUpdateRegistry* other)
 {
     auto otherCommonUpdateRegistry = dynamic_cast<CommonUpdateRegistry*>(other);
     if (!otherCommonUpdateRegistry)
         return;
 
-    bool hasNewVersions = false;
-    if (m_metaData.customizationDataList.isEmpty()
-        && !otherCommonUpdateRegistry->m_metaData.customizationDataList.isEmpty())
-    {
-        hasNewVersions = true;
-    }
-    else
-    {
-        for (const auto& customizationData: m_metaData.customizationDataList)
-        {
-            for (const auto& otherCustomizationData:
-                otherCommonUpdateRegistry->m_metaData.customizationDataList)
-            {
-                if (otherCustomizationData.versions.isEmpty() || customizationData.versions.isEmpty())
-                    continue;
-
-                if (otherCustomizationData.name == customizationData.name
-                    && otherCustomizationData.versions.last() > customizationData.versions.last())
-                {
-                    hasNewVersions = true;
-                    break;
-                }
-            }
-            if (hasNewVersions)
-                break;
-        }
-    }
-
-    if (hasNewVersions)
+    if (m_metaData.updateManifestVersion < otherCommonUpdateRegistry->m_metaData.updateManifestVersion)
     {
         m_metaData = otherCommonUpdateRegistry->m_metaData;
         m_customizationVersionToUpdate = otherCommonUpdateRegistry->m_customizationVersionToUpdate;
@@ -1110,13 +1104,21 @@ void CommonUpdateRegistry::mergeToRemovedData(const QString& fileName, const QLi
 
 QList<QnUuid> CommonUpdateRegistry::additionalPeers(const QString& fileName) const
 {
+    QList<QnUuid> result;
     for (const auto& md: m_manualData)
     {
         if (md.file == fileName)
-            return md.peers;
+        {
+            for (const auto& id: md.peers)
+            {
+                if (id != m_peerId)
+                    result.append(id);
+            }
+            return result;
+        }
     }
 
-    return QList<QnUuid>();
+    return result;
 }
 
 } // namespace impl

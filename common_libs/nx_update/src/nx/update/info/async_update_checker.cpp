@@ -91,7 +91,7 @@ private:
         }
 
         const QString build = QString::number(customizationData.versions[m_versionIndex].build());
-        m_rawDataProvider->getSpecificUpdateData(customizationData.name, build);
+        m_rawDataProvider->getSpecificUpdateData(customizationData.updatePrefix, build);
     }
 
     void fetchNextVersion()

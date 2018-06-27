@@ -22,7 +22,12 @@ HttpClient::HttpClient():
     m_terminated(false),
     m_maxInternalBufferSize(kDefaultMaxInternalBufferSize)
 {
-    instantiateHttpClient();
+}
+
+HttpClient::HttpClient(std::unique_ptr<nx::network::AbstractStreamSocket> socket):
+    HttpClient()
+{
+    m_socket = std::move(socket);
 }
 
 HttpClient::~HttpClient()
@@ -294,7 +299,7 @@ bool HttpClient::fetchResource(
 
 void HttpClient::instantiateHttpClient()
 {
-    m_asyncHttpClient = std::make_unique<nx::network::http::AsyncClient>();
+    m_asyncHttpClient = std::make_unique<nx::network::http::AsyncClient>(std::move(m_socket));
 
     m_asyncHttpClient->setOnResponseReceived(
         std::bind(&HttpClient::onResponseReceived, this));

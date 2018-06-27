@@ -205,6 +205,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     item->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     item->timeSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->timeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
+    item->timeSlider()->screenshotCursor()->setZValue(NxUi::CursorTooltipItemZOrder);
     item->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     item->speedSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->speedSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);

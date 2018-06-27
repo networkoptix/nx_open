@@ -72,10 +72,13 @@ private:
     QnInterpolator<T> m_sourceToTarget, m_targetToSource;
 };
 
-
 class QnSeparableVectorSpaceMapper: public QnSpaceMapper<QVector3D> {
 public:
-    QnSeparableVectorSpaceMapper(const QnSpaceMapperPtr<qreal> &xMapper, const QnSpaceMapperPtr<qreal> &yMapper, const QnSpaceMapperPtr<qreal> &zMapper) {
+    QnSeparableVectorSpaceMapper(
+        const QnSpaceMapperPtr<qreal> &xMapper,
+        const QnSpaceMapperPtr<qreal> &yMapper,
+        const QnSpaceMapperPtr<qreal> &zMapper)
+    {
         m_mappers[0] = xMapper;
         m_mappers[1] = yMapper;
         m_mappers[2] = zMapper;
@@ -100,6 +103,5 @@ public:
 private:
     std::array<QnSpaceMapperPtr<qreal>, 3> m_mappers;
 };
-
 
 #endif // QN_SPACE_MAPPER_H

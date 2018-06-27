@@ -156,6 +156,8 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_forcedAudioLayout(nullptr),
     m_disableRegisterFile(false)
 {
+    m_writeFrameFunc = av_write_frame;
+
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }
@@ -654,10 +656,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
         }
 
         auto startWriteTime = std::chrono::high_resolution_clock::now();
-        int ret = av_interleaved_write_frame(
-            m_recordingContextVector[i].formatCtx,
-            &avPkt
-        );
+        int ret = m_writeFrameFunc(m_recordingContextVector[i].formatCtx, &avPkt);
         auto endWriteTime = std::chrono::high_resolution_clock::now();
 
         m_recordingContextVector[i].totalWriteTimeNs +=
@@ -833,6 +832,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         if (auto videoData = std::dynamic_pointer_cast<const QnCompressedVideoData>(mediaData))
         {
             const int videoChannels = isTranscode ? 1 : layout->channelCount();
+            if (videoChannels > 1)
+                m_writeFrameFunc = av_interleaved_write_frame;
+
             for (int j = 0; j < videoChannels; ++j)
             {
                 AVStream* videoStream = avformat_new_stream(
@@ -876,7 +878,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
                     QnFfmpegHelper::copyAvCodecContex(videoStream->codec, m_videoTranscoder->getCodecContext());
                 }
-                else if (mediaData->context && mediaData->context->getWidth() > 0)
+                else if (mediaData->context && mediaData->context->getWidth() > 0 
+                         && !forceDefaultContext(mediaData))
                 {
                     QnFfmpegHelper::mediaContextToAvCodecContext(videoCodecCtx, mediaData->context);
                 }
@@ -1256,6 +1259,11 @@ void QnStreamRecorder::disableRegisterFile(bool disable)
 void QnStreamRecorder::setTranscodeFilters(const nx::core::transcoding::FilterChain& filters)
 {
     m_transcodeFilters = filters;
+}
+
+bool QnStreamRecorder::forceDefaultContext(const QnConstAbstractMediaDataPtr& /*mediaData*/) const
+{
+    return false;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

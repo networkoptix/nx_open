@@ -14,6 +14,8 @@ public:
     virtual QByteArray generateNonce() override;
     virtual bool isNonceValid(const QByteArray& nonce) const override;
 
+    static QByteArray generateTimeBasedNonce(
+        std::chrono::microseconds nonceTime = std::chrono::microseconds::zero());
 private:
     using NonceTime = std::chrono::microseconds;
     using TimePoint = std::chrono::steady_clock::time_point;

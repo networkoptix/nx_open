@@ -10,6 +10,7 @@ TARGET="/opt/$CUSTOMIZATION/mediaserver"
 BINTARGET="$TARGET/bin"
 LIBTARGET="$TARGET/lib"
 LIBPLUGINTARGET="$BINTARGET/plugins"
+LIBPLUGINTARGET_OPTIONAL="$BINTARGET/plugins_optional"
 SHARETARGET="$TARGET/share"
 ETCTARGET="$TARGET/etc"
 INITTARGET="/etc/init"
@@ -21,6 +22,7 @@ STAGE="$WORK_DIR/$ARTIFACT_NAME"
 BINSTAGE="$STAGE$BINTARGET"
 LIBSTAGE="$STAGE$LIBTARGET"
 LIBPLUGINSTAGE="$STAGE$LIBPLUGINTARGET"
+LIBPLUGINSTAGE_OPTIONAL="$STAGE$LIBPLUGINTARGET_OPTIONAL"
 SHARESTAGE="$STAGE$SHARETARGET"
 ETCSTAGE="$STAGE$ETCTARGET"
 INITSTAGE="$STAGE$INITTARGET"
@@ -33,6 +35,7 @@ SERVER_DEB_PATH="$BUILD_DIR/deb"
 SERVER_VOX_PATH="$SERVER_BIN_PATH/vox"
 SERVER_LIB_PATH="$BUILD_DIR/lib"
 SERVER_LIB_PLUGIN_PATH="$SERVER_BIN_PATH/plugins"
+SERVER_LIB_PLUGIN_OPTIONAL_PATH="$SERVER_BIN_PATH/plugins_optional"
 BUILD_INFO_TXT="$BUILD_DIR/build_info.txt"
 LOG_FILE="$LOGS_DIR/server-build-distribution.log"
 
@@ -42,6 +45,7 @@ buildDistribution()
     mkdir -p "$BINSTAGE"
     mkdir -p "$LIBSTAGE"
     mkdir -p "$LIBPLUGINSTAGE"
+    mkdir -p "$LIBPLUGINSTAGE_OPTIONAL"
     mkdir -p "$ETCSTAGE"
     mkdir -p "$SHARESTAGE"
     mkdir -p "$INITSTAGE"
@@ -66,6 +70,7 @@ buildDistribution()
         if [[ "$LIB_BASENAME" != libQt5* \
             && "$LIB_BASENAME" != libEnginio.so* \
             && "$LIB_BASENAME" != libqgsttools_p.* \
+            && "$LIB_BASENAME" != libtegra_video.* \
             && "$LIB_BASENAME" != libnx_client* ]]
         then
             echo "Copying $LIB_BASENAME"
@@ -74,11 +79,10 @@ buildDistribution()
     done
 
     # Copy mediaserver plugins.
-    local PLUGIN_FILENAME
+
     local PLUGINS=(
         generic_multicast_plugin
         genericrtspplugin
-        image_library_plugin
         it930x_plugin
         mjpg_link
     )
@@ -88,15 +92,28 @@ buildDistribution()
         dw_mtt_metadata_plugin
         vca_metadata_plugin
     )
+    local PLUGINS_OPTIONAL=(
+        stub_metadata_plugin
+    )
     if [ "$ENABLE_HANWHA" == "true" ]
     then
         PLUGINS+=( hanwha_metadata_plugin )
     fi
+
+    local PLUGIN_FILENAME
+    local PLUGIN
+
     for PLUGIN in "${PLUGINS[@]}"
     do
         PLUGIN_FILENAME="lib$PLUGIN.so"
         echo "Copying (plugin) $PLUGIN_FILENAME"
         cp "$SERVER_LIB_PLUGIN_PATH/$PLUGIN_FILENAME" "$LIBPLUGINSTAGE/"
+    done
+    for PLUGIN in "${PLUGINS_OPTIONAL[@]}"
+    do
+        PLUGIN_FILENAME="lib$PLUGIN.so"
+        echo "Copying (optional plugin) $PLUGIN_FILENAME"
+        cp "$SERVER_LIB_PLUGIN_OPTIONAL_PATH/$PLUGIN_FILENAME" "$LIBPLUGINSTAGE_OPTIONAL/"
     done
 
     echo "Copying Festival VOX files"

@@ -1,6 +1,11 @@
 #include <nx/utils/settings.h>
+
+#include <QJsonArray>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/literal.h>
+
+
 
 namespace nx {
 namespace utils {
@@ -8,13 +13,13 @@ namespace utils {
 void Settings::add(const QString& name, BaseOption* option)
 {
     NX_ASSERT(m_options.find(name) == m_options.end(), lit("Duplicate setting: %1.").arg(name));
-    m_options.insert(std::make_pair(name, option));
+    m_options.emplace(name, option);
 }
 
 bool Settings::load(const QSettings& settings)
 {
     QStringList keys = settings.allKeys();
-    for (auto& key: keys)
+    for (const auto& key: keys)
     {
         auto optionIt = m_options.find(key);
         if (optionIt == m_options.end())
@@ -46,6 +51,22 @@ bool Settings::save(QSettings& settings) const
         }
     }
     return true;
+}
+
+QJsonObject Settings::buildDocumentation() const
+{
+    QJsonObject documentation;
+    QJsonArray settings;
+    for (auto& option: m_options)
+    {
+        QJsonObject description;
+        description.insert("name", option.first);
+        description.insert("defaultValue", option.second->defaultValueVariant().toString());
+        description.insert("description", option.second->description());
+        settings << description;
+    }
+    documentation.insert("settings", settings);
+    return documentation;
 }
 
 } // namespace utils

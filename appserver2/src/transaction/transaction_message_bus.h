@@ -13,7 +13,6 @@
 #include "transaction_transport.h"
 #include "runtime_transaction_log.h"
 #include "transport_connection_info.h"
-#include <managers/time_manager.h>
 #include "ec_connection_notification_manager.h"
 #include <core/resource_access/resource_access_manager.h>
 
@@ -119,7 +118,8 @@ public slots:
     * If can't find route info then return null value.
     * Otherwise return route gateway.
     */
-    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+    virtual QnUuid routeToPeerVia(
+        const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
 
     virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 

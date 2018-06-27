@@ -11,9 +11,28 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/network/socket_delegate.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
+
+/** This class allows to convert sharedPointer to unique pointer */
+class ShareSocketDelegate: public nx::network::StreamSocketDelegate
+{
+    using base_type = nx::network::StreamSocketDelegate;
+public:
+    ShareSocketDelegate(QSharedPointer<nx::network::AbstractStreamSocket> socket):
+        base_type(socket.data()),
+        m_socket(std::move(socket))
+    {
+    }
+    ~ShareSocketDelegate()
+    {
+
+    }
+private:
+    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
+};
 
 class QnTCPConnectionProcessor: public QnLongRunnable, public QnCommonModuleAware
 {
@@ -75,6 +94,8 @@ public:
     int notFound(QByteArray& contentType);
     QnAuthSession authSession() const;
 
+    QnTcpListener* owner() const;
+
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
@@ -115,6 +136,7 @@ protected:
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
     void sendUnauthorizedResponse(nx::network::http::StatusCode::Value httpResult, const QByteArray& messageBody);
+
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 

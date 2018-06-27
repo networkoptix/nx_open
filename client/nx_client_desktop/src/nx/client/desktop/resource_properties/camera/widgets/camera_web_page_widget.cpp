@@ -20,6 +20,7 @@
 #include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <nx/client/desktop/common/widgets/web_widget.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/url/url_builder.h>
 
 #include <vms_gateway_embeddable.h>
 
@@ -168,16 +169,16 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
             return;
         }
 
-        // QUrl doesn't work if it isn't constructed from QString and uses credentials.
-        // It stays invalid with error code 'AuthorityPresentAndPathIsRelative'
-        //  --rvasilenko, Qt 5.2.1
-        const auto currentServerUrl = commonModule()->currentUrl();
-        QUrl targetUrl(lit("http://%1:%2/%3").arg(currentServerUrl.host(),
-            QString::number(currentServerUrl.port()), state.singleCameraProperties.settingsUrlPath));
-
         NX_ASSERT(d->credentials.login.hasValue() && d->credentials.password.hasValue());
-        targetUrl.setUserName(d->credentials.login());
-        targetUrl.setPassword(d->credentials.password());
+        const auto currentServerUrl = commonModule()->currentUrl();
+
+        const auto targetUrl = network::url::Builder()
+            .setScheme(lit("http"))
+            .setHost(currentServerUrl.host())
+            .setPort(currentServerUrl.port())
+            .setPath(state.singleCameraProperties.settingsUrlPath)
+            .setUserName(d->credentials.login())
+            .setPassword(d->credentials.password()).toUrl().toQUrl();
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
         if (gateway->isSslEnabled())

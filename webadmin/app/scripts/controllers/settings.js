@@ -120,7 +120,7 @@ angular.module('webadminApp')
             dialogs.confirmWithPassword(null, L.settings.confirmRestoreDefault, L.settings.confirmRestoreDefaultTitle).then(function(oldPassword){
 
                 mediaserver.checkCurrentPassword(oldPassword).then(function() {
-                    mediaserver.restoreFactoryDefaults().then(function (data) {
+                    mediaserver.restoreFactoryDefaults(oldPassword).then(function (data) {
                         if (data.data.error !== '0' && data.data.error !== 0) {
                             // Some Error has happened
                             dialogs.alert(data.data.errorString);
@@ -319,7 +319,7 @@ angular.module('webadminApp')
                     //1. Check password
                     return mediaserver.checkCurrentPassword(oldPassword).then(function() {
                         // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
-                        mediaserver.changeAdminPassword($scope.settings.rootPassword).then(function(result){
+                        mediaserver.changeAdminPassword($scope.settings.rootPassword, oldPassword).then(function(result){
                             resultHandler(result);
                             if($localStorage.login == Config.defaultLogin){
                                 mediaserver.login($localStorage.login, $scope.settings.rootPassword);

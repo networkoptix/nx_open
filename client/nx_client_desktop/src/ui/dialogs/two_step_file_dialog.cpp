@@ -8,7 +8,6 @@
 #include <QtWidgets/QLineEdit>
 
 #include <ui/style/custom_style.h>
-#include <ui/dialogs/common/file_dialog.h>
 
 #include <nx/utils/string.h>
 #include <nx/utils/app_info.h>
@@ -183,7 +182,7 @@ void QnTwoStepFileDialog::updateMode() {
 }
 
 void QnTwoStepFileDialog::at_browseFolderButton_clicked() {
-    QString dirName = QnFileDialog::getExistingDirectory(this,
+    QString dirName = QFileDialog::getExistingDirectory(this,
                                                         tr("Select folder..."),
                                                         ui->directoryLabel->text(),
                                                         directoryDialogOptions());
@@ -200,7 +199,7 @@ void QnTwoStepFileDialog::at_browseFolderButton_clicked() {
 }
 
 void QnTwoStepFileDialog::at_browseFileButton_clicked() {
-    QString fileName = QnFileDialog::getOpenFileName(this,
+    QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Select file..."),
                                                     ui->existingFileLabel->text(),
                                                     m_filter,

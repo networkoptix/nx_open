@@ -73,9 +73,9 @@ namespace nxcip_qt
         //!See nxcip::CameraDiscoveryManager::getVendorName
         QString getVendorName() const;
         //!See nxcip::CameraDiscoveryManager::findCameras
-        int findCameras( QVector<nxcip::CameraInfo>* const cameras, const QString& localInterfaceIPAddr );
+        int findCameras( QVector<nxcip::CameraInfo2>* const cameras, const QString& localInterfaceIPAddr );
         //!See nxcip::CameraDiscoveryManager::checkHostAddress
-        int checkHostAddress( QVector<nxcip::CameraInfo>* const cameras, const QString& url, const QString* login, const QString* password );
+        int checkHostAddress( QVector<nxcip::CameraInfo2>* const cameras, const QString& url, const QString* login, const QString* password );
         //!See nxcip::CameraDiscoveryManager::fromMDNSData
         int fromMDNSData( const QByteArray& mdnsResponsePacket, const QHostAddress& discoveredAddress, nxcip::CameraInfo* cameraInfo );
         //!See nxcip::CameraDiscoveryManager::fromUpnpData
@@ -104,8 +104,6 @@ namespace nxcip_qt
 
         //!See nxcip::BaseCameraManager::getMediaUrl
         int getMediaUrl( QString* const url ) const;
-        //!See nxcip::BaseCameraManager::setMediaUrl
-        int setMediaUrl(const QString& url);
         //!See nxcip::BaseCameraManager::getResolutionList
         int getResolutionList( QVector<nxcip::ResolutionInfo>* infoList ) const;
         //!See nxcip::BaseCameraManager::getMaxBitrate

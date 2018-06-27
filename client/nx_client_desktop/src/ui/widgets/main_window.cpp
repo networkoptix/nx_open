@@ -11,6 +11,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QStackedLayout>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QStackedWidget>
@@ -52,7 +53,6 @@
 #include <ui/workbench/handlers/workbench_permissions_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 #include <nx/client/desktop/export/workbench/workbench_export_handler.h>
-#include <nx/client/desktop/legacy/legacy_workbench_export_handler.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
 #include <ui/workbench/handlers/workbench_debug_handler.h>
@@ -124,24 +124,12 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-namespace
-{
-    void processWidgetsRecursively(QLayout *layout, std::function<void(QWidget*)> func)
-    {
-        for (int i = 0, count = layout->count(); i < count; i++)
-        {
-            QLayoutItem *item = layout->itemAt(i);
-            if (item->widget())
-                func(item->widget());
-            else if (item->layout())
-                processWidgetsRecursively(item->layout(), func);
-        }
-    }
+namespace {
 
     int minimalWindowWidth = 800;
     int minimalWindowHeight = 600;
 
-} // anonymous namespace
+} // namespace
 
 #ifdef Q_OS_MACX
 extern "C" {
@@ -169,7 +157,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
         qnRuntime->isDesktopMode()
             ? new QnWorkbenchWelcomeScreen(qnClientCoreModule->mainQmlEngine(), this)
             : nullptr),
-    m_currentPageHolder(new QStackedWidget(this)),
     m_titleBar(new QnMainWindowTitleBarWidget(this, context)),
     m_titleVisible(true),
     m_drawCustomFrame(false),
@@ -258,7 +245,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<WorkbenchExportHandler>();
-    context->instance<legacy::WorkbenchExportHandler>();
     context->instance<workbench::LayoutsHandler>();
     context->instance<PermissionsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
@@ -362,28 +348,26 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
 
     /* Layouts. */
 
-    m_viewLayout = new QVBoxLayout();
-    m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    m_viewLayout->setSpacing(0);
-    m_viewLayout->addWidget(m_currentPageHolder);
+    m_viewLayout = new QStackedLayout();
+    m_viewLayout->setContentsMargins({});
 
-    m_globalLayout = new QVBoxLayout();
-    m_globalLayout->setContentsMargins(0, 0, 0, 0);
+    // This extra holder is required to avoid switch to fullscreen graphics mode on Windows Vista+
+    const auto holder = new QWidget(this);
+    const auto topmostLayout = new QVBoxLayout(this);
+    topmostLayout->setContentsMargins({});
+    topmostLayout->addWidget(holder);
+
+    m_globalLayout = new QVBoxLayout(holder);
+    m_globalLayout->setContentsMargins({});
     m_globalLayout->setSpacing(0);
 
     m_globalLayout->addWidget(m_titleBar);
-    m_globalLayout->addLayout(m_viewLayout);
-    m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
+    m_globalLayout->addLayout(m_viewLayout, 1);
 
-    setLayout(m_globalLayout);
+    m_viewLayout->addWidget(m_view.data());
 
-    if (qnRuntime->isDesktopMode())
-        m_currentPageHolder->addWidget(new QWidget());
-
-    m_currentPageHolder->addWidget(m_view.data());
-
-    if (qnRuntime->isDesktopMode())
-        m_currentPageHolder->addWidget(m_welcomeScreen);
+    if (m_welcomeScreen)
+        m_viewLayout->addWidget(m_welcomeScreen);
 
     // Post-initialize.
     if (nx::utils::AppInfo::isMacOsX())
@@ -436,10 +420,10 @@ void MainWindow::updateWidgetsVisibility()
 {
     m_titleBar->setTabBarStuffVisible(!m_welcomeScreenVisible);
 
-    if (m_welcomeScreenVisible)
-        m_currentPageHolder->setCurrentWidget(m_welcomeScreen);
+    if (m_welcomeScreen && m_welcomeScreenVisible)
+        m_viewLayout->setCurrentWidget(m_welcomeScreen);
     else
-        m_currentPageHolder->setCurrentWidget(m_view.data());
+        m_viewLayout->setCurrentWidget(m_view.data());
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen).
     m_titleBar->setVisible(isTitleVisible());
@@ -637,7 +621,6 @@ void MainWindow::updateDecorationsState() {
     m_view->setLineWidth(windowTitleUsed ? 0 : 1);
 
     updateDwmState();
-    m_currentPageHolder->updateGeometry();
 }
 
 bool MainWindow::handleKeyPress(int key)
@@ -714,10 +697,10 @@ void MainWindow::updateDwmState()
         // TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
         setContentsMargins(1, 0, 0, 0); //FIXME
 #else
-        setContentsMargins(0, 0, 0, 0);
+        setContentsMargins({});
 #endif
 
-        m_viewLayout->setContentsMargins(0, 0, 0, 0);
+        m_viewLayout->setContentsMargins({});
     }
     else if (m_dwm->isSupported() && m_dwm->isCompositionEnabled() && false)
     { // TODO: Disable DWM for now.
@@ -732,7 +715,7 @@ void MainWindow::updateDwmState()
         m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
         m_dwm->enableBlurBehindWindow();
 
-        setContentsMargins(0, 0, 0, 0);
+        setContentsMargins({});
 
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),
@@ -771,7 +754,7 @@ void MainWindow::updateDwmState()
             m_dwm->disableBlurBehindWindow();
         }
 
-        setContentsMargins(0, 0, 0, 0);
+        setContentsMargins({});
 
         m_viewLayout->setContentsMargins(
             m_frameMargins.left(),

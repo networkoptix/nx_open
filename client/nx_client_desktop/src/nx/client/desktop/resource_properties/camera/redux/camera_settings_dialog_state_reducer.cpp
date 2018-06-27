@@ -362,16 +362,18 @@ State updateDuplicateLogicalIdInfo(State state)
     const auto isSameLogicalId =
         [&currentId, &currentLogicalId](const Camera& camera)
         {
-            return !camera->getLogicalId().isEmpty()
-                && camera->getLogicalId().toInt() == currentLogicalId
+            return camera->logicalId() == currentLogicalId
                 && camera->getId() != currentId;
         };
 
-    const auto duplicateCameras = qnClientCoreModule->commonModule()->resourcePool()->
-        getAllCameras().filtered(isSameLogicalId);
+    if (currentLogicalId > 0)
+    {
+        const auto duplicateCameras = qnClientCoreModule->commonModule()->resourcePool()->
+            getAllCameras().filtered(isSameLogicalId);
 
-    for (const auto& camera: duplicateCameras)
-        state.singleCameraSettings.sameLogicalIdCameraNames << camera->getName();
+        for (const auto& camera: duplicateCameras)
+            state.singleCameraSettings.sameLogicalIdCameraNames << camera->getName();
+    }
 
     return state;
 }
@@ -599,7 +601,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
             state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->getIOPorts());
         }
 
-        state.singleCameraSettings.logicalId.setBase(firstCamera->getLogicalId().toInt());
+        state.singleCameraSettings.logicalId.setBase(firstCamera->logicalId());
         state = updateDuplicateLogicalIdInfo(std::move(state));
 
         Qn::calculateMaxFps(
@@ -1156,7 +1158,7 @@ State CameraSettingsDialogStateReducer::generateLogicalId(State state)
     for (const auto& camera: cameras)
     {
         if (camera->getId() != currentId)
-            usedValues.insert(camera->getLogicalId().toInt());
+            usedValues.insert(camera->logicalId());
     }
 
     int previousValue = 0;

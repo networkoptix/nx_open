@@ -887,5 +887,6 @@ void QnGLRenderer::setFisheyeController(QnFisheyePtzController* controller)
 bool QnGLRenderer::isFisheyeEnabled() const
 {
     QnMutexLocker lock( &m_mutex );
-    return m_fisheyeController && m_fisheyeController->getCapabilities() != Qn::NoCapabilities;
+    return m_fisheyeController
+        && m_fisheyeController->getCapabilities(nx::core::ptz::Options())!= Qn::NoCapabilities;
 }

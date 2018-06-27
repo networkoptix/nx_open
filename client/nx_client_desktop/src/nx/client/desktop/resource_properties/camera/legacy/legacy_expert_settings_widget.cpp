@@ -25,7 +25,7 @@
 #include <ui/help/help_topics.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <ui/common/read_only.h>
 using namespace nx::client::desktop;
 
 namespace {
@@ -369,9 +369,23 @@ void LegacyExpertSettingsWidget::updateFromResources(const QnVirtualCameraResour
     else
         ui->checkBoxDisableNativePtzPresets->setCheckState(Qt::Unchecked);
 
+    const bool canSetupVideoStream = std::all_of(cameras.cbegin(), cameras.cend(),
+        [](const QnVirtualCameraResourcePtr& camera)
+        {
+            return !camera->isDtsBased()
+                && !camera->hasFlags(Qn::wearable_camera)
+                && camera->hasVideo();
+        });
+
+    ui->leftWidget->setEnabled(canSetupVideoStream);
+    ui->groupBoxArchive->setEnabled(canSetupVideoStream);
+    ui->groupBoxRTP->setEnabled(canSetupVideoStream);
+    ui->groupBoxPtzControl->setEnabled(canSetupVideoStream);
+    ui->restoreDefaultsButton->setEnabled(canSetupVideoStream);
+
     m_currentCameraId = cameras.front()->getId();
     ui->logicalIdSpinBox->setValue(cameras.size() == 1
-        ? cameras.front()->getLogicalId().toInt() : 0);
+        ? cameras.front()->logicalId() : 0);
     ui->logicalIdGroupBox->setEnabled(cameras.size() == 1);
 }
 
@@ -440,9 +454,9 @@ void LegacyExpertSettingsWidget::submitToResources(const QnVirtualCameraResource
         if (ui->logicalIdGroupBox->isEnabled())
         {
             if (ui->logicalIdSpinBox->value() > 0)
-                camera->setLogicalId(ui->logicalIdSpinBox->text());
+                camera->setLogicalId(ui->logicalIdSpinBox->value());
             else
-                camera->setLogicalId(QString());
+                camera->setLogicalId(0);
         }
     }
 }
@@ -472,7 +486,7 @@ int LegacyExpertSettingsWidget::generateFreeLogicalId() const
     {
         if (camera->getId() == m_currentCameraId)
             continue;
-        const auto id = camera->getLogicalId().toInt();
+        const auto id = camera->logicalId();
         if (id > 0)
             usedValues.insert(id);
     }
@@ -495,10 +509,11 @@ void LegacyExpertSettingsWidget::at_generateLogicalId()
 void LegacyExpertSettingsWidget::updateLogicalIdControls()
 {
     auto duplicateCameras = commonModule()->resourcePool()->getAllCameras().filtered(
-        [this](const QnVirtualCameraResourcePtr camera)
+        [this](const QnVirtualCameraResourcePtr& camera)
         {
-            return !camera->getLogicalId().isEmpty()
-                && camera->getLogicalId().toInt() == ui->logicalIdSpinBox->value()
+            const int logicalId = camera->logicalId();
+            return logicalId > 0
+                && logicalId == ui->logicalIdSpinBox->value()
                 && camera->getId() != m_currentCameraId;
         });
 
@@ -589,6 +604,25 @@ void LegacyExpertSettingsWidget::setSecondStreamEnabled(bool value)
     ui->secondStreamDisableCheckBox->setChecked(!value);
 }
 
+bool LegacyExpertSettingsWidget::isReadOnly() const
+{
+    return m_readOnly;
+}
+
+void LegacyExpertSettingsWidget::setReadOnly(bool readOnly)
+{
+    if (m_readOnly == readOnly)
+        return;
+
+    using ::setReadOnly;
+    setReadOnly(ui->leftWidget, readOnly);
+    setReadOnly(ui->rightWidget, readOnly);
+    setReadOnly(ui->restoreDefaultsButton, readOnly);
+
+    m_readOnly = readOnly;
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
+

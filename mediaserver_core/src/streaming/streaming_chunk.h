@@ -93,7 +93,7 @@ public:
      */
     bool openForModification();
     /**
-     * @return False if the internal buffer is filled. 
+     * @return False if the internal buffer is filled.
      *    True when some data has been read from the chunk.
      */
     bool wantMoreData() const;

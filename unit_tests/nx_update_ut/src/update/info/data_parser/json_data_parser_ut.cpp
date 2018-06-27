@@ -93,8 +93,8 @@ protected:
             test_support::updateTestDataList().cend(),
             [](const test_support::UpdateTestData& updateTestData)
             {
-                return updateTestData.customization == "default"
-                    && updateTestData.version == "16975";
+                return updateTestData.updatePrefix == "http://updates.networkoptix.com/default"
+                    && updateTestData.build == "16975";
             });
         ASSERT_NE(test_support::updateTestDataList().cend(), defaultUpdateIt);
         ASSERT_EQ(ResultCode::ok, m_parser->parseUpdateData(defaultUpdateIt->json, &m_updateData));

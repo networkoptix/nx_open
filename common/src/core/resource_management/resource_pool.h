@@ -238,7 +238,7 @@ public:
      * Returns resource list by logicalId. logicaId is a some camera tag used for intergration
      * with external systems.
      */
-    QnSecurityCamResourceList getResourcesByLogicalId(const QString& logicalId) const;
+    QnResourceList getResourcesByLogicalId(int value) const;
 
     QnResourcePtr getResourceByUniqueId(const QString& uniqueId) const;
 

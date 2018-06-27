@@ -49,7 +49,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        m_timeRequestResult = makeSyncCall<qint64, SystemError::ErrorCode>(
+        m_timeRequestResult = makeSyncCall<qint64, SystemError::ErrorCode, std::chrono::milliseconds>(
             std::bind(&TimeProtocolClientType::getTimeAsync,
                 m_timeProtocolClient.get(), _1));
     }
@@ -79,7 +79,7 @@ protected:
 private:
     std::unique_ptr<TimeProtocolServer> m_timeServer;
     std::unique_ptr<TimeProtocolClientType> m_timeProtocolClient;
-    std::tuple<qint64, SystemError::ErrorCode> m_timeRequestResult;
+    std::tuple<qint64, SystemError::ErrorCode, std::chrono::milliseconds> m_timeRequestResult;
     utils::test::ScopedTimeShift m_timeShift;
     boost::optional<SocketAddress> m_serverAddress;
 

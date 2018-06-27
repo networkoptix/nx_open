@@ -3,6 +3,7 @@
 #include <QtCore/QString>
 
 #include <common/common_globals.h>
+#include <nx/core/ptz/options.h>
 
 struct QnPtzObject
 {

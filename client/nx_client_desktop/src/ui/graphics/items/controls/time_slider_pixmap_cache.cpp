@@ -1,11 +1,15 @@
 #include "time_slider_pixmap_cache.h"
 
+#include <chrono>
+
 #include <QtWidgets/QApplication>
 #include <QtGui/QPainter>
 #include <QtGui/QFont>
 
 #include <ui/common/text_pixmap_cache.h>
 #include <platform/platform_abstraction.h>
+
+using std::chrono::milliseconds;
 
 QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(int numLevels, QObject *parent):
     QObject(parent),
@@ -17,12 +21,15 @@ QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(int numLevels, QObject *parent)
     m_tickmarkColors(numLevels, m_defaultColor),
     m_cache(QnTextPixmapCache::instance()),
     m_pixmapByShortPositionKey(numLevels),
-    m_pixmapByLongPositionKey(2 * 1024 * 1024) /* These are rarely reused once out of scope, so we don't want the cache to be large. */
+    // These are rarely reused once out of scope, so we don't want the cache to be large.
+    m_pixmapByLongPositionKey(2 * 1024 * 1024)
 {
+    // These are frequently reused, so we want the cache to be big.
     for (auto& newCache : m_pixmapByShortPositionKey)
-        newCache = new ShortKeyCache(64 * 1024 * 1024); /* These are frequently reused, so we want the cache to be big. */
+        newCache = new ShortKeyCache(64 * 1024 * 1024);
 
-    connect(qnPlatform->notifier(), &QnPlatformNotifier::timeZoneChanged, this, &QnTimeSliderPixmapCache::clear);
+    connect(qnPlatform->notifier(), &QnPlatformNotifier::timeZoneChanged,
+        this, &QnTimeSliderPixmapCache::clear);
 }
 
 QnTimeSliderPixmapCache::~QnTimeSliderPixmapCache()
@@ -116,7 +123,8 @@ void QnTimeSliderPixmapCache::setTickmarkColor(int level, const QColor& color)
     }
 }
 
-const QPixmap& QnTimeSliderPixmapCache::tickmarkTextPixmap(int level, qint64 position, int height, const QnTimeStep& step)
+const QPixmap& QnTimeSliderPixmapCache::tickmarkTextPixmap(
+    int level, milliseconds position, int height, const QnTimeStep& step)
 {
     level = qBound(0, level, numLevels() - 1);
     qint32 key = shortCacheKey(position, height, step);
@@ -125,12 +133,15 @@ const QPixmap& QnTimeSliderPixmapCache::tickmarkTextPixmap(int level, qint64 pos
     if (result)
         return *result;
 
-    result = new QPixmap(textPixmap(toShortString(position, step), height, m_tickmarkColors[level], m_tickmarkFonts[level]));
-    m_pixmapByShortPositionKey[level]->insert(key, result, result->width() * result->height() * result->depth() / 8);
+    result = new QPixmap(textPixmap(toShortString(position, step), height,
+        m_tickmarkColors[level], m_tickmarkFonts[level]));
+    m_pixmapByShortPositionKey[level]->insert(key, result,
+        result->width() * result->height() * result->depth() / 8);
     return *result;
 }
 
-const QPixmap& QnTimeSliderPixmapCache::dateTextPixmap(qint64 position, int height, const QnTimeStep& step)
+const QPixmap& QnTimeSliderPixmapCache::dateTextPixmap(
+    milliseconds position, int height, const QnTimeStep& step)
 {
     QnTimeStepLongCacheKey key = longCacheKey(position, height, step);
 
@@ -153,14 +164,16 @@ const QPixmap& QnTimeSliderPixmapCache::textPixmap(const QString& text, int heig
     return textPixmap(text, height, color, m_defaultFont);
 }
 
-const QPixmap& QnTimeSliderPixmapCache::textPixmap(const QString& text, int height, const QColor& color, const QFont& font)
+const QPixmap& QnTimeSliderPixmapCache::textPixmap(
+    const QString& text, int height, const QColor& color, const QFont& font)
 {
     QFont localFont(font);
     localFont.setPixelSize(height);
     return textPixmap(text, color, localFont);
 }
 
-const QPixmap& QnTimeSliderPixmapCache::textPixmap(const QString& text, const QColor& color, const QFont& font)
+const QPixmap& QnTimeSliderPixmapCache::textPixmap(
+    const QString& text, const QColor& color, const QFont& font)
 {
     return m_cache->pixmap(text, font, color);
 }

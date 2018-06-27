@@ -18,36 +18,30 @@
 #include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
 #include <transaction/message_bus_adapter.h>
-#include <managers/time_manager.h>
+#include <nx/time_sync/client_time_sync_manager.h>
 
 namespace ec2 {
 
 RemoteConnectionFactory::RemoteConnectionFactory(
     QnCommonModule* commonModule,
     Qn::PeerType peerType,
-    nx::utils::TimerManager* const timerManager,
     bool isP2pMode)
 :
     AbstractECConnectionFactory(commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+    m_timeSynchronizationManager(new nx::time_sync::ClientTimeSyncManager(
+        commonModule)),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false),
     m_remoteQueryProcessor(new ClientQueryProcessor(commonModule)),
     m_peerType(peerType)
 {
-    m_bus.reset(new TransactionMessageBusAdapter(
+    m_bus.reset(new ThreadsafeMessageBusAdapter(
         commonModule,
         m_jsonTranSerializer.get(),
         m_ubjsonTranSerializer.get()));
-
-	m_timeSynchronizationManager.reset(new TimeSynchronizationManager(
-        commonModule,
-		peerType,
-		timerManager,
-		&m_settingsInstance));
-    m_bus->setTimeSyncManager(m_timeSynchronizationManager.get());
 }
 
 void RemoteConnectionFactory::shutdown()
@@ -55,8 +49,6 @@ void RemoteConnectionFactory::shutdown()
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
 	// todo: introduce server and client TimeSynchronizationManager
-	if (m_timeSynchronizationManager)
-        m_timeSynchronizationManager->pleaseStop();
     pleaseStop();
     join();
 }
@@ -314,8 +306,7 @@ void RemoteConnectionFactory::remoteConnectionFinished(
 
     QnConnectionInfo connectionInfoCopy(connectionInfo);
     connectionInfoCopy.ecUrl = ecUrl;
-    connectionInfoCopy.ecUrl.setScheme(
-        connectionInfoCopy.allowSslConnections ? lit("https") : lit("http"));
+    connectionInfoCopy.ecUrl.setScheme(nx::network::http::urlSheme(connectionInfoCopy.allowSslConnections));
     connectionInfoCopy.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(ecUrl.host()))
     {
@@ -356,7 +347,8 @@ void RemoteConnectionFactory::remoteTestConnectionFinished(
         || errorCode == ErrorCode::forbidden
         || errorCode == ErrorCode::ldap_temporary_unauthorized
         || errorCode == ErrorCode::cloud_temporary_unauthorized
-        || errorCode == ErrorCode::disabled_user_unauthorized)
+        || errorCode == ErrorCode::disabled_user_unauthorized
+        || errorCode == ErrorCode::userLockedOut)
     {
         handler->done(reqId, errorCode, connectionInfo);
         QnMutexLocker lk(&m_mutex);
@@ -492,14 +484,14 @@ int RemoteConnectionFactory::testRemoteConnection(
     return reqId;
 }
 
-TimeSynchronizationManager* RemoteConnectionFactory::timeSyncManager() const
-{
-    return m_timeSynchronizationManager.get();
-}
-
 TransactionMessageBusAdapter* RemoteConnectionFactory::messageBus() const
 {
     return m_bus.get();
+}
+
+nx::time_sync::TimeSyncManager* RemoteConnectionFactory::timeSyncManager() const
+{
+    return m_timeSynchronizationManager.get();
 }
 
 } // namespace ec2

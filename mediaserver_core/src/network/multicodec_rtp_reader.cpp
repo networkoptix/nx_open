@@ -288,10 +288,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         // RTCP keep-alive packet
         if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT)
         {
-            for (const TrackInfo& track : m_tracks)
+            for (const TrackInfo& track: m_tracks)
             {
                 if (track.ioDevice)
-                    buildClientRTCPReport(track.ioDevice->getRtcpTrackNum());
+                    buildClientRTCPReport(track.rtcpChannelNumber);
             }
             m_rtcpReportTimer.restart();
         }
@@ -552,7 +552,6 @@ void QnMulticodecRtpReader::setRtpTransport( const RtpTransport::Value& value )
     m_rtpTransport = value;
 }
 
-
 CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
@@ -564,7 +563,6 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_RtpSession.setTransport(getRtpTransport());
     if (m_RtpSession.isTcpMode())
         m_RtpSession.setTCPReadBufferSize(SOCKET_READ_BUFFER_SIZE);
-
 
     const QnNetworkResource* nres = dynamic_cast<QnNetworkResource*>(getResource().data());
 
@@ -654,8 +652,9 @@ void QnMulticodecRtpReader::createTrackParsers()
             if (m_tracks[i].parser)
             {
                 m_tracks[i].parser->setTimeHelper(&m_timeHelper);
-                m_tracks[i].parser->setSdpInfo(m_RtpSession.getSdpByTrackNum(trackInfo[i]->trackNum));
+                m_tracks[i].parser->setSdpInfo(m_RtpSession.getSdpByTrackNum(trackInfo[i]->trackNumber));
                 m_tracks[i].ioDevice = trackInfo[i]->ioDevice;
+                m_tracks[i].rtcpChannelNumber = trackInfo[i]->interleaved.second;
 
                 auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
                 if (secResource)
