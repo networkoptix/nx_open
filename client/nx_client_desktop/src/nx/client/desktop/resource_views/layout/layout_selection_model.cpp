@@ -1,20 +1,134 @@
 #include "layout_selection_model.h"
 
 #include <nx/client/desktop/resource_views/layout/layout_selection_dialog_state.h>
+#include <client_core/client_core_module.h>
+#include <ui/style/resource_icon_cache.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
 
-namespace {
-
-} // namespace
 
 namespace nx {
 namespace client {
 namespace desktop {
 
+using State = LayoutSelectionDialogState;
+using LayoutData = State::LayoutData;
+
 struct LayoutsModel::Private
 {
-    LayoutsModel::State state;
+    State state;
     QHash<LayoutsModel::State::LayoutId, LayoutsModel::State::SubjectId> backRelations;
+
+    QVariant getTextData(const QModelIndex& index) const;
+    QVariant getCheckedData(const QModelIndex& index) const;
+    QVariant getNodeIcon(const QModelIndex& index) const;
+
+    bool isLayoutIndex(const QModelIndex& index) const;
+
+private:
+    QnUuid getLayoutId(const QModelIndex& index) const;
+    QnUuid getSubjectId(const QModelIndex& index) const;
+    LayoutData getLayoutData(const QModelIndex& index) const;
+    QString getSubjectName(const QModelIndex& index) const;
+
 };
+
+bool LayoutsModel::Private::isLayoutIndex(const QModelIndex& index) const
+{
+    return state.flatView || index.parent().isValid();
+}
+
+QnUuid LayoutsModel::Private::getLayoutId(const QModelIndex& index) const
+{
+    if (!isLayoutIndex(index))
+    {
+        NX_EXPECT(false, "Index does not point to the layout!");
+        return QnUuid();
+    }
+
+    const int row = index.row();
+    const auto parentIndex = index.parent();
+    if (parentIndex.isValid()) // It is layout
+    {
+        const auto subjectKey = state.subjects.keyAt(parentIndex.row());
+        const auto& layoutIds = state.relations[subjectKey];
+        return layoutIds[row];
+    }
+
+    if (state.flatView)
+        return state.layouts.keyAt(row);
+
+    NX_EXPECT(false, "Index does not point to the layout!");
+    return QnUuid();
+
+}
+
+QnUuid LayoutsModel::Private::getSubjectId(const QModelIndex& index) const
+{
+    if (!isLayoutIndex(index))
+        return state.subjects.keyAt(index.row());
+
+    NX_EXPECT(false, "Index does not point to the subject!");
+    return QnUuid();
+}
+
+LayoutData LayoutsModel::Private::getLayoutData(const QModelIndex& index) const
+{
+    const auto id = getLayoutId(index);
+    if (!id.isNull())
+        return state.layouts.value(id);
+
+    NX_EXPECT(false, "Index does not point to the layout!");
+    return LayoutData();
+}
+
+QString LayoutsModel::Private::getSubjectName(const QModelIndex& index) const
+{
+    const auto id = getSubjectId(index);
+    if (!id.isNull())
+        return state.subjects.value(id);
+
+    NX_EXPECT(false, "Index does not point to subject!");
+    return QString();
+}
+
+QVariant LayoutsModel::Private::getTextData(const QModelIndex& index) const
+{
+    return isLayoutIndex(index) ? getLayoutData(index).name : getSubjectName(index);
+}
+
+QVariant LayoutsModel::Private::getCheckedData(const QModelIndex& index) const
+{
+    if (index.column() != LayoutsModel::Columns::CheckMark)
+        return Qt::Unchecked;
+
+    if (isLayoutIndex(index))
+        return getLayoutData(index).checked ? Qt::Checked : Qt::Unchecked;
+
+
+    int checkedCount = 0;
+    const auto subjectId = state.subjects.keyAt(index.row());
+    const auto& layoutIds = state.relations[subjectId];
+    for (const auto layoutId: layoutIds)
+    {
+        if (state.layouts.value(layoutId).checked)
+            ++checkedCount;
+    }
+    if (!checkedCount)
+        return Qt::Unchecked;
+
+    return checkedCount == layoutIds.size() ? Qt::Checked : Qt::PartiallyChecked;
+}
+
+QVariant LayoutsModel::Private::getNodeIcon(const QModelIndex& index) const
+{
+    if (index.column() != Columns::Name)
+        return QVariant();
+
+    const auto resourceId = isLayoutIndex(index) ? getLayoutId(index) : getSubjectId(index);
+    const auto pool = qnClientCoreModule->commonModule()->resourcePool();
+    return qnResIconCache->icon(pool->getResourceById(resourceId));
+}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -139,34 +253,28 @@ QVariant LayoutsModel::data(const QModelIndex& index, int role) const
     if (!index.isValid() || index.column() > Columns::Name)
         return QVariant();
 
-    if (role == Qt::CheckStateRole)
-        return Qt::Checked;
-
-    if (role != Qt::DisplayRole)
-        return QVariant();
-
-
-    const int row = index.row();
-    const auto parentIndex = index.parent();
-    if (parentIndex.isValid()) // It is layout
+    switch(role)
     {
-        const auto subjectKey = d->state.subjects.keyAt(parentIndex.row());
-        const auto& layoutIds = d->state.relations[subjectKey];
-        const auto& layoutData = d->state.layouts.value(layoutIds[row]);
-        return layoutData.name;
+        case Qt::DisplayRole:
+            return d->getTextData(index);
+        case Qt::CheckStateRole:
+            return d->getCheckedData(index);
+        case Qt::DecorationRole:
+            return d->getNodeIcon(index);
+        default:
+            return QVariant();
     }
-    else if (d->state.flatView)
-    {
-        const auto layoutName = d->state.layouts.at(row).name;
-        return layoutName;
-    }
-    else
-    {
-        const auto subjectName = d->state.subjects.at(row);
-        return subjectName;
-    }
-
     return QVariant();
+}
+
+Qt::ItemFlags LayoutsModel::flags(const QModelIndex& index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
+
+    return index.column() == Columns::CheckMark && d->isLayoutIndex(index)
+        ? Qt::ItemIsSelectable
+        : Qt::NoItemFlags;
 }
 
 } // namespace desktop

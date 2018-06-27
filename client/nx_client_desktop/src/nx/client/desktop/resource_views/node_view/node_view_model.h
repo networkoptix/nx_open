@@ -8,20 +8,14 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class LayoutSelectionDialogState;
+class NodeViewState;
 
-class LayoutsModel: public ScopedModelOperations<QAbstractItemModel>
+class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractItemModel>;
-    using State = LayoutSelectionDialogState;
 
 public:
-    LayoutsModel(QObject* parent = nullptr);
-    virtual ~LayoutsModel() override;
-
-    void loadState(const State& state);
-
     enum Columns
     {
         Name,
@@ -29,7 +23,12 @@ public:
         Count
     };
 
-public: // Overrides section.
+    NodeViewModel(QObject* parent = nullptr);
+    virtual ~NodeViewModel();
+
+    void loadState(const NodeViewState& state);
+
+public: // Overrides section
     virtual QModelIndex index(
         int row,
         int column,

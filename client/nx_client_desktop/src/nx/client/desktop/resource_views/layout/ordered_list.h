@@ -23,8 +23,8 @@ public:
     void insert(const Key& key, const Data& data);
     void removeAt(int index);
 
-    const Data& value(const Key& index) const;
-    const Data& at(int index) const;
+    Data value(const Key& index) const;
+    Data at(int index) const;
 
     const Key& keyAt(int index) const;
 
@@ -62,7 +62,7 @@ void OrderedList<Key, Data>::removeAt(int index)
 }
 
 template<typename Key, typename Data>
-const Data& OrderedList<Key, Data>::value(const Key& key) const
+Data OrderedList<Key, Data>::value(const Key& key) const
 {
     const auto it = find(key);
     if (it != end())
@@ -73,7 +73,7 @@ const Data& OrderedList<Key, Data>::value(const Key& key) const
 }
 
 template<typename Key, typename Data>
-const Data& OrderedList<Key, Data>::at(int index) const
+Data OrderedList<Key, Data>::at(int index) const
 {
     return m_data.at(index).data;
 }
