@@ -12,7 +12,7 @@ CreateGetPostServerTunnelHandler::CreateGetPostServerTunnelHandler(
 }
 
 void CreateGetPostServerTunnelHandler::processRequest(
-    nx::network::http::HttpServerConnection* const connection,
+    nx::network::http::HttpServerConnection* const /*connection*/,
     nx::utils::stree::ResourceContainer /*authInfo*/,
     nx::network::http::Request request,
     nx::network::http::Response* const response,
