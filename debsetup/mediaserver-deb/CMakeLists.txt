@@ -32,6 +32,8 @@ nx_configure_directory(
     @ONLY
     OUTPUT_FILES_VARIABLE filtered)
 
+nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
+
 set(zip_file ${distribution_output_dir}/${artifact.name.server_update}.zip)
 set(deb_file ${distribution_output_dir}/${artifact.name.server}.deb)
 set(installer_output_list ${zip_file} ${deb_file})

@@ -143,11 +143,12 @@ buildDistribution()
         WebKitWidgets
         OpenGL
         Multimedia
-        MultimediaQuick_p
+        MultimediaQuick
         Qml
         Quick
         QuickWidgets
-        LabsTemplates
+        QuickTemplates2
+        QuickControls2
         X11Extras
         XcbQpa
         DBus
@@ -180,7 +181,7 @@ buildDistribution()
             libopenal.so.1
         distr_cpSysLib "$LIBSTAGE" libpng12.so.0 \
             || distr_cpSysLib "$LIBSTAGE" libpng.so
-        cp -P "$QT_DIR/lib"/libicu*.so* "$LIBSTAGE"
+        distr_cpSysLib "$LIBSTAGE" libicuuc.so libicudata.so libicui18n.so
     fi
 
     echo "Setting permissions"

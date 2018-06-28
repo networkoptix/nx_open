@@ -23,6 +23,7 @@ BINSTAGE="$STAGE$BINTARGET"
 LIBSTAGE="$STAGE$LIBTARGET"
 LIBPLUGINSTAGE="$STAGE$LIBPLUGINTARGET"
 LIBPLUGINSTAGE_OPTIONAL="$STAGE$LIBPLUGINTARGET_OPTIONAL"
+QT_PLUGIN_STAGE="$STAGE/$TARGET/plugins"
 SHARESTAGE="$STAGE$SHARETARGET"
 ETCSTAGE="$STAGE$ETCTARGET"
 INITSTAGE="$STAGE$INITTARGET"
@@ -46,6 +47,7 @@ buildDistribution()
     mkdir -p "$LIBSTAGE"
     mkdir -p "$LIBPLUGINSTAGE"
     mkdir -p "$LIBPLUGINSTAGE_OPTIONAL"
+    mkdir -p "$QT_PLUGIN_STAGE"
     mkdir -p "$ETCSTAGE"
     mkdir -p "$SHARESTAGE"
     mkdir -p "$INITSTAGE"
@@ -124,7 +126,7 @@ buildDistribution()
     if [ "$ARCH" != "arm" ]
     then
         echo "Copying libicu"
-        cp -P "$QT_DIR/lib"/libicu*.so* "$LIBSTAGE/"
+        distr_cpSysLib "$LIBSTAGE" libicuuc.so libicudata.so libicui18n.so
     fi
 
     local QT_LIBS=(
@@ -143,6 +145,18 @@ buildDistribution()
         FILE="libQt5$QT_LIB.so"
         echo "Copying (Qt) $FILE"
         cp -P "$QT_DIR/lib/$FILE"* "$LIBSTAGE/"
+    done
+
+    local -r QT_PLUGINS=(
+        sqldrivers/libqsqlite.so
+    )
+
+    for PLUGIN in "${QT_PLUGINS[@]}"
+    do
+        echo "Copying (Qt plugin) $PLUGIN"
+
+        mkdir -p "$QT_PLUGIN_STAGE/$(dirname $PLUGIN)"
+        cp -r "$QT_DIR/plugins/$PLUGIN" "$QT_PLUGIN_STAGE/$PLUGIN"
     done
 
     # Strip and remove rpath.
@@ -177,6 +191,7 @@ buildDistribution()
     # install -m 750 "$SERVER_BIN_PATH/root_tool" "$BINSTAGE/"
     install -m 755 "$SERVER_BIN_PATH/testcamera" "$BINSTAGE/"
     install -m 755 "$SERVER_BIN_PATH/external.dat" "$BINSTAGE/"
+    install -m 644 "$CURRENT_BUILD_DIR/qt.conf" "$BINSTAGE/"
     install -m 755 "$SCRIPTS_DIR/config_helper.py" "$BINSTAGE/"
     install -m 755 "$SCRIPTS_DIR/shell_utils.sh" "$BINSTAGE/"
 

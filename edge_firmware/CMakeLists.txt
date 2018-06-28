@@ -32,6 +32,8 @@ nx_configure_directory(
     @ONLY
     OUTPUT_FILES_VARIABLE filtered2)
 
+nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
+
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)
 
 add_custom_command(

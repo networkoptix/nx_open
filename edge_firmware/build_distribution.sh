@@ -167,14 +167,11 @@ copyBuildLibs()
         )
     fi
 
-    # OpenSSL (for latest debians).
-    if [ "$BOX" = "rpi" ] || [ "$BOX" = "bpi" ] || [ "$BOX" = "bananapi" ]
-    then
-        LIBS_TO_COPY+=(
-            libssl
-            libcrypto
-        )
-    fi
+    # OpenSSL.
+    LIBS_TO_COPY+=(
+        libssl
+        libcrypto
+    )
 
     if [ "$BOX" = "edge1" ]
     then
@@ -284,6 +281,28 @@ copyBins()
         echo "Creating symlink for rpath needed by mediaserver binary"
         ln -s "../lib" "$INSTALL_DIR/mediaserver/lib"
     fi
+
+    echo "Copying qt.conf"
+    cp -r "$CURRENT_BUILD_DIR/qt.conf" "$MEDIASERVER_BIN_INSTALL_DIR/"
+}
+
+# [in] INSTALL_DIR
+copyQtPlugins()
+{
+    local -r QT_PLUGINS_INSTALL_DIR="$INSTALL_DIR/mediaserver/plugins"
+    mkdir -p "$QT_PLUGINS_INSTALL_DIR"
+
+    local -r PLUGINS=(
+        sqldrivers/libqsqlite.so
+    )
+
+    for PLUGIN in "${PLUGINS[@]}"
+    do
+        echo "Copying (Qt plugin) $PLUGIN"
+
+        mkdir -p "$QT_PLUGINS_INSTALL_DIR/$(dirname $PLUGIN)"
+        cp -r "$QT_DIR/plugins/$PLUGIN" "$QT_PLUGINS_INSTALL_DIR/$PLUGIN"
+    done
 }
 
 # [in] MEDIASERVER_BIN_INSTALL_DIR
@@ -614,6 +633,7 @@ buildDistribution()
     copyBuildLibs
     copyQtLibs
     copyBins
+    copyQtPlugins
     copyMediaserverPlugins
     copyConf
     copyScripts
