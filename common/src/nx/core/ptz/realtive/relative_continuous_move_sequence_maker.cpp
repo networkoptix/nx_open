@@ -3,12 +3,30 @@
 #include <chrono>
 
 using namespace std::chrono;
+using namespace std::chrono_literals;
 
 namespace nx {
 namespace core {
 namespace ptz {
 
 namespace {
+
+milliseconds defaultCycleDuration(Component component)
+{
+    switch (component)
+    {
+        case Component::pan:
+        case Component::tilt:
+        case Component::rotation:
+            return 6s;
+        case Component::zoom:
+        case Component::focus:
+            return 10s;
+        default:
+            NX_ASSERT(false, "Wrong component type.");
+            return 6s;
+    }
+}
 
 TimedCommand makeComponentCommand(
     double value,
@@ -17,8 +35,12 @@ TimedCommand makeComponentCommand(
     const RelativeContinuousMoveComponentMapping& mapping)
 {
     const auto length = std::abs(value);
-    const auto cycleDuration
-        = duration_cast<milliseconds>(mapping.workingSpeed.cycleDuration);
+    const auto speed = mapping.workingSpeed.absoluteValue > 0.0
+        ? mapping.workingSpeed.absoluteValue
+        : 1.0;
+    const auto cycleDuration = mapping.workingSpeed.cycleDuration > 0ms
+        ? duration_cast<milliseconds>(mapping.workingSpeed.cycleDuration)
+        : defaultCycleDuration(componentType);
 
     const auto accelerationTime =
         duration_cast<milliseconds>(mapping.accelerationParameters.accelerationTime);
@@ -33,11 +55,7 @@ TimedCommand makeComponentCommand(
         + accelerationTime;
 
     ptz::Vector command;
-    command.setComponent(
-        value > 0
-        ? mapping.workingSpeed.absoluteValue
-        : -mapping.workingSpeed.absoluteValue,
-        componentType);
+    command.setComponent((value > 0) ? speed : -speed, componentType);
 
     return { command, options, commandDuration };
 }

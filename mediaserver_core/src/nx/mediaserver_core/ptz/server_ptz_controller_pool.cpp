@@ -21,38 +21,32 @@ namespace {
 
 core_ptz::RelativeContinuousMoveMapping relativeMoveMapping(const QnResourcePtr& resource)
 {
-#if 0
     static const QString kRelativeMoveMapping("relativeMoveMapping");
+    static const QString kSimpleRelativeMoveMapping("simpleRelativeMoveMapping");
+
     const auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return core_ptz::RelativeContinuousMoveMapping();
 
     const auto resourceData = qnStaticCommon->dataPool()->data(camera);
-    return resourceData.value<core_ptz::RelativeContinuousMoveMapping>(
-        kRelativeMoveMapping, core_ptz::RelativeContinuousMoveMapping());
-#else
-    using namespace std::chrono;
-    using namespace std::chrono_literals;
 
-    core_ptz::RelativeContinuousMoveMapping mapping;
-    core_ptz::RelativeContinuousMoveComponentMapping componentMapping;
-    componentMapping.workingSpeed.absoluteValue = 1.0;
-    componentMapping.workingSpeed.cycleDuration = 6000ms;
-    componentMapping.startRequestProcessingTime = 0ms;
-    componentMapping.stopRequestProcessingTime = 0ms;
-    componentMapping.accelerationParameters.accelerationTime = 0ms;
-    componentMapping.accelerationParameters.accelerationType = core_ptz::AccelerationType::linear;
-    componentMapping.decelerationParameters.accelerationTime = 0ms;
-    componentMapping.decelerationParameters.accelerationType = core_ptz::AccelerationType::linear;
+    if (resourceData.contains(kRelativeMoveMapping))
+    {
+        return resourceData.value<core_ptz::RelativeContinuousMoveMapping>(
+            kRelativeMoveMapping,
+            core_ptz::RelativeContinuousMoveMapping());
+    }
+    else if (resourceData.contains(kSimpleRelativeMoveMapping))
+    {
+        const auto simpleMapping =
+            resourceData.value<core_ptz::SimpleRelativeContinuousMoveMapping>(
+                kRelativeMoveMapping,
+                core_ptz::SimpleRelativeContinuousMoveMapping());
 
-    mapping.pan = componentMapping;
-    mapping.tilt = componentMapping;
-    mapping.rotation = componentMapping;
-    mapping.zoom = componentMapping;
-    mapping.focus = componentMapping;
+        return core_ptz::RelativeContinuousMoveMapping(simpleMapping);
+    }
 
-    return mapping;
-#endif
+    return core_ptz::RelativeContinuousMoveMapping();
 }
 
 QnPtzMapperPtr mapper(const QnSecurityCamResourcePtr& camera)
