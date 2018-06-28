@@ -1,9 +1,36 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.waiting import Wait
 
 _DEFAULT_COMMUNICATION_TIMEOUT_SEC = 10
+
+
+class CommandOutcome(object):
+    __metaclass__ = ABCMeta
+
+    def __repr__(self):
+        return '<{} {}>'.format(self.__class__.__name__, self.comment)
+
+    @property
+    def is_success(self):
+        return self.code == 0
+
+    @abstractproperty
+    def is_intended_termination(self):
+        return False
+
+    @property
+    def is_error(self):
+        return not self.is_success and not self.is_intended_termination
+
+    @abstractproperty
+    def code(self):
+        return 0
+
+    @abstractproperty
+    def comment(self):
+        return u''
 
 
 class Command(object):
@@ -14,8 +41,8 @@ class Command(object):
         return 0
 
     @abstractmethod
-    def receive(self, timeout_sec):  # type: (float) -> (bytes, bytes)
-        return -1, b'', b''
+    def receive(self, timeout_sec):
+        return CommandOutcome(), b'', b''
 
     @abstractmethod
     def terminate(self):
@@ -46,7 +73,7 @@ class Command(object):
     def check_output(self, input=None, timeout_sec=None):
         """Shortcut."""
         with self:
-            exit_status, stdout, stderr = self.communicate(input=input, timeout_sec=timeout_sec)
-        if exit_status != 0:
-            raise exit_status_error_cls(exit_status)(stdout, stderr)
+            outcome, stdout, stderr = self.communicate(input=input, timeout_sec=timeout_sec)
+        if outcome.is_error:
+            raise exit_status_error_cls(outcome.code)(stdout, stderr)
         return stdout

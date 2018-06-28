@@ -24,7 +24,7 @@ def test_terminate(command_to_terminate):
     with command_to_terminate as command:  # type: Command
         time.sleep(1)  # Allow command to warm up. Matters on Windows.
         command.terminate()
-        exit_status, stdout, stderr = command.communicate(timeout_sec=5)
+        outcome, stdout, stderr = command.communicate(timeout_sec=5)
+        assert outcome.is_intended_termination
         # TODO: Pseudo-terminal echoes commands, and that's OK. Is there a way to leave command output only?
         # assert not stdout
-        # assert 0 <= exit_status <= 255

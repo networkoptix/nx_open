@@ -7,7 +7,7 @@ import paramiko
 
 from framework.method_caching import cached_getter
 from framework.os_access.command import Command
-from framework.os_access.posix_shell import PosixShell, _BIG_CHUNK_THRESHOLD_CHARS, _STREAM_BUFFER_SIZE
+from framework.os_access.posix_shell import PosixOutcome, PosixShell, _BIG_CHUNK_THRESHOLD_CHARS, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
 _logger = logging.getLogger(__name__)
@@ -15,6 +15,23 @@ _logger = logging.getLogger(__name__)
 
 class SSHNotConnected(Exception):
     pass
+
+
+class _SSHCommandOutcome(PosixOutcome):
+    def __init__(self, exit_status):
+        assert isinstance(exit_status, int)
+        assert 0 <= exit_status <= 255
+        self._exit_status = exit_status
+
+    @property
+    def signal(self):
+        if 128 < self._exit_status < 128 + 32:
+            return self._exit_status - 128
+        return None
+
+    @property
+    def code(self):
+        return self._exit_status
 
 
 class _SSHCommand(Command):
@@ -76,7 +93,8 @@ class _SSHCommand(Command):
             exit_status = None
         if not self._open_streams:
             self._channel.shutdown_read()  # Other side could be open by forked child.
-        return exit_status, stdout, stderr
+        outcome = _SSHCommandOutcome(exit_status) if exit_status is not None else None
+        return outcome, stdout, stderr
 
 
 class _PseudoTerminalSSHCommand(_SSHCommand):
