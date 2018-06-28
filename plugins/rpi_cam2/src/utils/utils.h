@@ -3,7 +3,7 @@
 #include "device_data.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 namespace utils  {
 
 #define debug(...) fprintf(stderr, "[rpi_cam2] " __VA_ARGS__)
@@ -33,5 +33,5 @@ std::vector<ResolutionData> getResolutionList(
     nxcip::CompressionType targetCodecID);
 
 } // namespace utils
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

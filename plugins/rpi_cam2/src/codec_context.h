@@ -5,7 +5,7 @@
 #include <camera/camera_plugin.h>
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 class CodecContext    
 {
@@ -42,6 +42,6 @@ private:
     int m_bitrate;
 };
 
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx
 

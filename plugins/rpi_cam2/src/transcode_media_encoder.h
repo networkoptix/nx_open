@@ -3,7 +3,7 @@
 #include "media_encoder.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 class CameraManager;
 
@@ -24,4 +24,4 @@ public:
 };
 
 } // namespace nx 
-} // namespace webcam_plugin 
+} // namespace rpi_cam2 

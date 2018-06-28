@@ -11,7 +11,7 @@
 #include "ffmpeg/utils.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 namespace {
 
@@ -267,4 +267,4 @@ CodecContext CameraManager::getEncoderDefaults(int encoderIndex)
 }
 
 } // namespace nx
-} // namespace webcam_plugin
+} // namespace rpi_cam2

@@ -12,7 +12,7 @@
 #include "plugin.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager,
     nxpl::TimeProvider *const timeProvider)
@@ -47,7 +47,7 @@ unsigned int DiscoveryManager::releaseRef()
     return m_refManager.releaseRef();
 }
 
-static const char* VENDOR_NAME = "WEBCAM_PLUGIN";
+static const char* VENDOR_NAME = "rpi_cam2";
 
 void DiscoveryManager::getVendorName(char* buf) const
 {
@@ -107,4 +107,4 @@ int DiscoveryManager::getReservedModelList(char** /*modelList*/, int* count)
 }
 
 } // namespace nx 
-} // namespace webcam_plugin 
+} // namespace rpi_cam2 

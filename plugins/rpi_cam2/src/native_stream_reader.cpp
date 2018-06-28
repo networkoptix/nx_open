@@ -27,7 +27,7 @@
 #include "ffmpeg/packet.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 NativeStreamReader::NativeStreamReader(
     nxpt::CommonRefManager* const parentRefManager,
@@ -83,5 +83,5 @@ void NativeStreamReader::setBitrate(int bitrate)
 }
 
 
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

@@ -6,7 +6,7 @@ namespace nx { namespace ffmpeg { class StreamReader; } }
 namespace nx { namespace ffmpeg { class Codec; } }
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 //!Transfers or transcodes packets from USB webcameras and streams them
 class TranscodeStreamReader
@@ -46,5 +46,5 @@ private:
 
 };
 
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

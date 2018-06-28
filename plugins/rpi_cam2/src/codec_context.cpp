@@ -2,7 +2,7 @@
 #include "ffmpeg/utils.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 CodecContext::CodecContext():
     m_codecID(nxcip::AV_CODEC_ID_NONE),
@@ -82,5 +82,5 @@ std::string CodecContext::toString() const
         ", bitrate: " + std::to_string(m_bitrate);
 }
 
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

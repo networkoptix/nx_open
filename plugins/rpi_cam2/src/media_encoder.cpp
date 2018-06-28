@@ -9,7 +9,7 @@
 #include "ffmpeg/stream_reader.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
@@ -167,4 +167,4 @@ QString MediaEncoder::decodeCameraInfoUrl() const
 
 
 } // namespace nx
-} // namespace webcam_plugin
+} // namespace rpi_cam2

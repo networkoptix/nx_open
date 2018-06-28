@@ -22,7 +22,7 @@ extern "C" {
 #include "ffmpeg/error.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 namespace {
 
@@ -291,5 +291,5 @@ bool TranscodeStreamReader::ensureInitialized()
     return m_initialized;
 }
 
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 namespace utils {
 namespace v4l2 {
 
@@ -322,5 +322,5 @@ std::vector<ResolutionData> getResolutionList(
 
 } // namespace v4l2
 } // namespace utils
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

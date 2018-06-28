@@ -7,7 +7,7 @@
 #include "camera/camera_plugin.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 namespace utils {
 
 struct ResolutionData
@@ -45,5 +45,5 @@ private:
 };
 
 } // namespace utils
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

@@ -8,7 +8,7 @@
 #include "ffmpeg/stream_reader.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 TranscodeMediaEncoder::TranscodeMediaEncoder(
     CameraManager* const cameraManager, 
@@ -45,4 +45,4 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
 }
 
 } // namespace nx
-} // namespace webcam_plugin
+} // namespace rpi_cam2

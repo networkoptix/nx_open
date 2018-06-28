@@ -12,7 +12,7 @@ static constexpr nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
 }
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
@@ -101,5 +101,5 @@ std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(AVPacket *packet, AVCod
 //     return std::string(s.toLatin1().data());
 // }
 
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

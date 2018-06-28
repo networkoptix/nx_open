@@ -23,7 +23,7 @@ extern "C" {
 namespace nx{ namespace ffmpeg { class StreamReader; } }
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 class TimeProfiler
     {
@@ -112,5 +112,5 @@ protected:
     //QString decodeCameraInfoUrl() const;
 };
 
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

@@ -1,7 +1,7 @@
 #include "device_data.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 namespace utils {
 
 void DeviceData::setDeviceName(const std::string & deviceName)
@@ -24,5 +24,5 @@ std::string DeviceData::devicePath() const
 }
 
 } // namespace utils
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

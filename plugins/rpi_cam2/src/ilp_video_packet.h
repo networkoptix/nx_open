@@ -6,7 +6,7 @@
 class CyclicAllocator;
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 class ILPVideoPacket
     :
@@ -54,5 +54,5 @@ private:
     nxcip::CompressionType m_codecType;
 };
 
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx

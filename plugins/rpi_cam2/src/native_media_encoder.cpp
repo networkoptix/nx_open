@@ -7,7 +7,7 @@
 #include "utils/utils.h"
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 
 NativeMediaEncoder::NativeMediaEncoder(
     CameraManager* const cameraManager,
@@ -45,4 +45,4 @@ nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
 
 
 } // namespace nx
-} // namespace webcam_plugin
+} // namespace rpi_cam2

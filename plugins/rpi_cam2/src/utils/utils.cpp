@@ -2,7 +2,7 @@
 
 
 namespace nx {
-namespace webcam_plugin {
+namespace rpi_cam2 {
 namespace utils {
 
 std::vector<DeviceData> getDeviceList()
@@ -45,5 +45,5 @@ std::vector<ResolutionData> getResolutionList(
 }
 
 } // namespace utils
-} // namespace webcam_plugin
+} // namespace rpi_cam2
 } // namespace nx
