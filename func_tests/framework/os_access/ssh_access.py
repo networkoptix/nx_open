@@ -9,6 +9,7 @@ from framework.os_access.posix_access import PosixAccess
 from framework.os_access.ssh_shell import SSH
 from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.ssh_path import make_ssh_path_cls
+from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
 from framework.utils import RunningTime
 
 
@@ -50,3 +51,7 @@ class SSHAccess(RemoteAccess, PosixAccess):
         started_at = datetime.datetime.now(pytz.utc)
         self.run_command(['date', '--set', new_time.isoformat()])
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
+
+    @cached_property
+    def traffic_capture(self):
+        return SSHTrafficCapture(self.shell, self.Path.tmp() / 'traffic_capture')
