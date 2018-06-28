@@ -5,8 +5,6 @@
 namespace nx {
 namespace webcam_plugin {
 
-namespace ffmpeg { class StreamReader; }
-
 //!Transfers or transcodes packets from USB webcameras and streams them
 class NativeStreamReader
 :
@@ -18,7 +16,7 @@ public:
         nxpl::TimeProvider *const timeProvider,
         const nxcip::CameraInfo& cameraInfo,
         const CodecContext& codecContext,
-        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
     virtual ~NativeStreamReader();
 
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;

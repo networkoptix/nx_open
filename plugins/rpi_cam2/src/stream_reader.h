@@ -20,10 +20,10 @@ extern "C" {
 #include "codec_context.h"
 #include "ffmpeg/forward_declarations.h"
 
+namespace nx{ namespace ffmpeg { class StreamReader; } }
+
 namespace nx {
 namespace webcam_plugin {
-
-namespace ffmpeg { class StreamReader; }
 
 class TimeProfiler
     {

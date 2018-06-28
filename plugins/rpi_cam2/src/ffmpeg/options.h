@@ -4,7 +4,6 @@ struct AVDictionary;
 struct AVDictionaryEntry;
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg {
 
 class Options
@@ -21,5 +20,4 @@ protected:
 
 
 } // namespace ffmpeg
-} // namespace webcam_plugin
 } // namespace nx

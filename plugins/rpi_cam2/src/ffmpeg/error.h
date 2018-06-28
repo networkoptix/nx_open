@@ -3,7 +3,6 @@
 #include <string>
 
 namespace nx{
-namespace webcam_plugin{
 namespace ffmpeg {
 namespace error {
 
@@ -15,5 +14,4 @@ bool hasError();
 
 } // namespace error
 } // namespace ffmpeg
-} // namespace webcam_plugin
 } // namespace nx

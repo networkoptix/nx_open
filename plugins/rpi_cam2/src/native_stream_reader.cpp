@@ -34,7 +34,7 @@ NativeStreamReader::NativeStreamReader(
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
     const CodecContext& codecContext,
-    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
+    const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     StreamReader(
         parentRefManager,
@@ -53,8 +53,8 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    if(ffmpeg::error::hasError())
-        debug("ffmpegError: %s\n", ffmpeg::error::avStrError(ffmpeg::error::lastError()).c_str());
+    if(nx::ffmpeg::error::hasError())
+        debug("ffmpegError: %s\n", nx::ffmpeg::error::avStrError(nx::ffmpeg::error::lastError()).c_str());
 
     int loadCode = m_ffmpegStreamReader->loadNextData();
     if(loadCode < 0)

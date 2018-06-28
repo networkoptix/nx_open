@@ -12,7 +12,6 @@ class AVFormatContext;
 class AVInputFormat;
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg {
 
 class InputFormat : Options
@@ -38,5 +37,4 @@ private:
 };
 
 } // namespace ffmpeg
-} // namespace webcam_plugin
 } // namespace nx

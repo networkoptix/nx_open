@@ -8,7 +8,6 @@ extern "C" {
 }
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg {
 
 class Codec : Options
@@ -20,7 +19,7 @@ public:
     int open();
     void close();
 
-    static int readFrame(AVFormatContext * formatContext, AVPacket * outPacket);
+    static int readFrame(AVFormatContext *formatContext, AVPacket *outPacket);
 
     int encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
     int decode(AVFrame *outFrame, int *outGotFrame, const AVPacket *packet) const;
@@ -29,28 +28,28 @@ public:
     int decodeVideo(AVFrame *outFrame, int *outGotPicture, const AVPacket *packet) const;
 
     int encodeAudio(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
-    int decodeAudio(AVFrame * frame, int* outGotFrame, const AVPacket *packet) const;
+    int decodeAudio(AVFrame *frame, int *outGotFrame, const AVPacket *packet) const;
 
     int initializeEncoder(AVCodecID codecID);
-    int initializeEncoder(const char * codecName);
-    int initializeDecoder(AVCodecParameters * codecParameters);
+    int initializeEncoder(const char *codecName);
+
+    int initializeDecoder(AVCodecParameters *codecParameters);
     int initializeDecoder(AVCodecID codecID);
-    int initializeDecoder(const char * codecName);
+    int initializeDecoder(const char *codecName);
 
     void setFps(int fps);
     void setResolution(int width, int height);
     void setBitrate(int bitrate);
     void setPixelFormat(AVPixelFormat pixelFormat);
 
-    AVCodecContext* codecContext() const;
-    AVCodec* codec() const;
+    AVCodecContext * codecContext() const;
+    AVCodec * codec() const;
     AVCodecID codecID() const;
 
 private:
-    AVCodecContext * m_codecContext = nullptr;
-    AVCodec * m_codec = nullptr;
+    AVCodecContext *m_codecContext = nullptr;
+    AVCodec *m_codec = nullptr;
 };
 
 } //namespace ffmpeg
-} // namespace webcam_plugin
 } // namespace nx

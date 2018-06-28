@@ -10,10 +10,11 @@
 #include "device_data.h"
 #include "codec_context.h"
 
+namespace nx{ namespace ffmpeg { class StreamReader; } }
+
 namespace nx {
 namespace webcam_plugin {
 
-namespace ffmpeg { class StreamReader; }
 class CameraManager;
 
 class MediaEncoder
@@ -25,7 +26,7 @@ public:
         CameraManager* const cameraManager,
         nxpl::TimeProvider *const timeProvider,
         const CodecContext& codecContext,
-        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
 
     virtual ~MediaEncoder();
 
@@ -51,7 +52,7 @@ protected:
     CameraManager* m_cameraManager;
     nxpl::TimeProvider *const m_timeProvider;
     CodecContext m_videoCodecContext;
-    std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
+    std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
     mutable int m_maxBitrate;
 
     std::unique_ptr<StreamReader> m_streamReader;

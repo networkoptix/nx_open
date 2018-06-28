@@ -3,7 +3,6 @@
 #include <camera/camera_plugin.h>
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg{
 namespace utils{
 
@@ -160,7 +159,6 @@ nxcip::CompressionType toNxCompressionType(AVCodecID codecID)
         }
     }
 
-} // namespace av
 } // namespace utils
-} // namespace webcam_plugin
+} // namespace ffmpeg
 } // namesapce nx

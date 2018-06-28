@@ -9,7 +9,6 @@ extern "C" {
 #include "error.h"
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg {
 
 InputFormat::InputFormat():
@@ -85,5 +84,4 @@ AVInputFormat * InputFormat::inputFormat() const
 }
 
 } // namespace ffmpeg
-} // namespace webcam_plugin
 } // namespace nx

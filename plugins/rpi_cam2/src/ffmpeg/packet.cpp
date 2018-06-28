@@ -7,7 +7,6 @@ extern "C"{
 #include "error.h"
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg {
 
 Packet::Packet():
@@ -49,5 +48,4 @@ int Packet::copy(Packet * outPacket) const
 }
 
 } // namespace ffmpeg
-} // namespace webcam_plugin
 } // namespace nx

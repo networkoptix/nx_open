@@ -9,7 +9,6 @@ extern "C"{
 class AVPacket;
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg {
 
 class Packet
@@ -19,7 +18,7 @@ public:
     ~Packet();
 
     AVPacket * packet() const;
-    
+
     void initialize();
     void unreference();
     
@@ -30,5 +29,4 @@ private:
 };
 
 } // namespace ffmpeg
-} // namespace webcam_plugin
 } // namespace nx

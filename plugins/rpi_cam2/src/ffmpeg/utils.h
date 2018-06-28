@@ -9,7 +9,6 @@ extern "C" {
 #include <camera/camera_plugin_types.h>
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg {
 namespace utils {
 
@@ -21,8 +20,7 @@ AVPixelFormat unDeprecatePixelFormat(AVPixelFormat pixelFormat);
 nxcip::CompressionType toNxCompressionType(AVCodecID codecID);
 AVCodecID toAVCodecID(nxcip::CompressionType);
 
-} // namespace av
 } // namespace utils
-} // namespace webcam_plugin
+} // namespace ffmpeg
 } // namespace nx
 

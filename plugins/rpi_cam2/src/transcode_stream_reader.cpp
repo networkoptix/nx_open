@@ -26,12 +26,12 @@ namespace webcam_plugin {
 
 namespace {
 
-int decode(const std::unique_ptr<ffmpeg::Codec>& codec, AVFrame * outFrame, ffmpeg::Packet& packet)
+int decode(const std::unique_ptr<nx::ffmpeg::Codec>& codec, AVFrame * outFrame, const nx::ffmpeg::Packet* packet)
 {
     int decodeCode = 0;
     int gotFrame = 0;
     while(!gotFrame && decodeCode >= 0)
-        decodeCode = codec->decode(outFrame, &gotFrame, packet.packet());
+        decodeCode = codec->decode(outFrame, &gotFrame, packet->packet());
     return decodeCode;
 }
 
@@ -42,7 +42,7 @@ TranscodeStreamReader::TranscodeStreamReader(
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
     const CodecContext& codecContext,
-    const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
+    const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     StreamReader(
         parentRefManager,
@@ -66,27 +66,28 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(!ensureInitialized())
         return nxcip::NX_OTHER_ERROR;
 
-    ffmpeg::Packet pkt;
-    if(m_ffmpegStreamReader->loadNextData(&pkt) < 0)
+    nx::ffmpeg::Packet packet;
+    if(m_ffmpegStreamReader->loadNextData(&packet) < 0)
         return nxcip::NX_IO_ERROR;
 
-    //AVFrame * frame = m_ffmpegStreamReader->currentFrame();
-
     AVFrame * frame = av_frame_alloc();
+    NX_ASSERT(frame);
     if(!frame)
     {
-        NX_ASSERT(frame);
-        ffmpeg::error::setLastError(AVERROR(ENOMEM));
+        nx::ffmpeg::error::setLastError(AVERROR(ENOMEM));
         return nxcip::NX_OTHER_ERROR;
     }
-    int decodeCode = decode(m_ffmpegStreamReader->codec(), frame, pkt);
+
+    int decodeCode = decode(m_ffmpegStreamReader->codec(), frame, &packet);
+    if(decodeCode < 0)
+        return nxcip::NX_NO_DATA;
 
     AVFrame * scaledFrame = nullptr;
     int scaleCode = scale(frame, &scaledFrame);
     if(scaleCode < 0)
         return nxcip::NX_OTHER_ERROR;
 
-    ffmpeg::Packet encodePacket;
+    nx::ffmpeg::Packet encodePacket;
     int encodeCode = encode(scaledFrame, encodePacket.packet());
     if(encodeCode < 0)
         return nxcip::NX_OTHER_ERROR;
@@ -139,8 +140,8 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame** outFrame) const
     AVFrame* resultFrame = av_frame_alloc();
     if(!resultFrame)
     {
-        ffmpeg::error::setLastError(AVERROR(ENOMEM));
-        return ffmpeg::error::lastError();
+        nx::ffmpeg::error::setLastError(AVERROR(ENOMEM));
+        return nx::ffmpeg::error::lastError();
     }
 
     const auto reset = 
@@ -156,30 +157,28 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame** outFrame) const
 
     const AVPixelFormat* supportedFormats = m_videoEncoder->codec()->pix_fmts;
     AVPixelFormat encoderFormat = supportedFormats
-        ? ffmpeg::utils::unDeprecatePixelFormat(supportedFormats[0])
-        : ffmpeg::utils::suggestPixelFormat(m_videoEncoder->codecID());
+        ? nx::ffmpeg::utils::unDeprecatePixelFormat(supportedFormats[0])
+        : nx::ffmpeg::utils::suggestPixelFormat(m_videoEncoder->codecID());
 
     int width = m_codecContext.resolution().width;
     int height = m_codecContext.resolution().height;
 
     int allocCode = av_image_alloc(
         resultFrame->data, resultFrame->linesize, width, height, encoderFormat, 32);
-    if(ffmpeg::error::updateIfError(allocCode))
+    if(nx::ffmpeg::error::updateIfError(allocCode))
     {
         reset(false);
         return allocCode;
     }
 
-    debug("INPUT frame width, height: %d, %d\n", frame->width, frame->height);
-
     struct SwsContext * imageConvertContext = sws_getCachedContext(
         nullptr, frame->width, frame->height,
-        ffmpeg::utils::unDeprecatePixelFormat(decoderContext->pix_fmt),
+        nx::ffmpeg::utils::unDeprecatePixelFormat(decoderContext->pix_fmt),
         width, height, encoderFormat, SWS_BICUBIC, NULL, NULL, NULL);
 
     int scaleCode = sws_scale(imageConvertContext, frame->data, frame->linesize, 0, frame->height,
         resultFrame->data, resultFrame->linesize);
-    if(ffmpeg::error::updateIfError(scaleCode))
+    if(nx::ffmpeg::error::updateIfError(scaleCode))
     {
         reset(true);
         return scaleCode;
@@ -197,20 +196,20 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame** outFrame) const
     return 0;
 }
 
-int TranscodeStreamReader::encode(AVFrame * frame, AVPacket * outPacket) const
+int TranscodeStreamReader::encode(const AVFrame * frame, AVPacket * outPacket) const
 {
     int encodeCode = 0;
     int gotPacket = 0;
     while(!gotPacket && encodeCode >= 0)
-        int encodeCode = m_videoEncoder->encodeVideo(outPacket, frame, &gotPacket);
-        
+        int encodeCode = m_videoEncoder->encode(outPacket, frame, &gotPacket);
+
     return encodeCode;
 }
 
 int TranscodeStreamReader::initialize()
 {
     int openCode = openVideoEncoder();
-    if (ffmpeg::error::updateIfError(openCode))
+    if (nx::ffmpeg::error::updateIfError(openCode))
         return openCode;
 
     m_initialized = true;
@@ -221,7 +220,7 @@ int TranscodeStreamReader::openVideoEncoder()
 {
     NX_DEBUG(this) << "openVideoEncoder()";
 
-    auto encoder = std::make_unique<ffmpeg::Codec>();
+    auto encoder = std::make_unique<nx::ffmpeg::Codec>();
    
     //todo initialize the right decoder for windows
     int initCode = encoder->initializeEncoder("h264_omx");
@@ -238,7 +237,7 @@ int TranscodeStreamReader::openVideoEncoder()
     return 0;
 }
 
-void TranscodeStreamReader::setEncoderOptions(const std::unique_ptr<ffmpeg::Codec>& encoder)
+void TranscodeStreamReader::setEncoderOptions(const std::unique_ptr<nx::ffmpeg::Codec>& encoder)
 {
     AVCodecContext* encoderContext = encoder->codecContext();
     encoderContext->width = m_codecContext.resolution().width;
@@ -246,7 +245,7 @@ void TranscodeStreamReader::setEncoderOptions(const std::unique_ptr<ffmpeg::Code
     encoderContext->time_base = { 1, m_codecContext.fps() };
     encoderContext->framerate = { m_codecContext.fps(), 1 };
     encoderContext->bit_rate = m_codecContext.bitrate();
-    encoderContext->pix_fmt = ffmpeg::utils::suggestPixelFormat(encoderContext->codec_id);
+    encoderContext->pix_fmt = nx::ffmpeg::utils::suggestPixelFormat(encoderContext->codec_id);
 
     /* don't use global header. the rpi cam doesn't stream properly with global. */
     // encoderContext->flags = AV_CODEC_FLAG2_LOCAL_HEADER;
@@ -264,14 +263,14 @@ bool TranscodeStreamReader::ensureInitialized()
     auto printError =
         [this]()
         {
-            if(!ffmpeg::error::hasError())
+            if(!nx::ffmpeg::error::hasError())
                 return;
 
 #ifdef __linux__
             int err = errno;
             NX_DEBUG(this) << "ensureInitialized()::errno: " << err;
 #endif
-            NX_DEBUG(this) << "ensureInitialized()::m_lastAvError" << ffmpeg::error::lastError();
+            NX_DEBUG(this) << "ensureInitialized()::m_lastAvError" << nx::ffmpeg::error::lastError();
         };
 
     if(!m_initialized)

@@ -4,10 +4,11 @@
 
 #include <nx/utils/url.h>
 
+#include "utils/utils.h"
 #include "native_media_encoder.h"
 #include "transcode_media_encoder.h"
 #include "ffmpeg/stream_reader.h"
-#include "utils/utils.h"
+#include "ffmpeg/utils.h"
 
 namespace nx {
 namespace webcam_plugin {
@@ -27,6 +28,17 @@ nxcip::CompressionType getPriorityCodec(const std::vector<nxcip::CompressionType
             return codecID;
     }
     return nxcip::AV_CODEC_ID_NONE;
+}
+
+nx::ffmpeg::StreamReader::CodecParameters toFfmpegParameters(const CodecContext& codecContext)
+{
+    return nx::ffmpeg::StreamReader::CodecParameters(
+        nx::ffmpeg::utils::toAVCodecID(codecContext.codecID()),
+        codecContext.fps(),
+        codecContext.bitrate(),
+        codecContext.resolution().width,
+        codecContext.resolution().height
+    );
 }
 
 }
@@ -93,9 +105,9 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 {
     if(!m_ffmpegStreamReader)
     {
-        m_ffmpegStreamReader = std::make_shared<ffmpeg::StreamReader>(
-            decodeCameraInfoUrl().c_str(), 
-            getEncoderDefaults(0));
+        m_ffmpegStreamReader = std::make_shared<nx::ffmpeg::StreamReader>(
+            decodeCameraInfoUrl().c_str(),
+            toFfmpegParameters(getEncoderDefaults(0)));
     }
 
     switch(encoderIndex)

@@ -2,11 +2,11 @@
 
 #include "stream_reader.h"
 
+namespace nx { namespace ffmpeg { class StreamReader; } }
+namespace nx { namespace ffmpeg { class Codec; } }
+
 namespace nx {
 namespace webcam_plugin {
-
-namespace ffmpeg { class StreamReader; }
-namespace ffmpeg { class Codec; }
 
 //!Transfers or transcodes packets from USB webcameras and streams them
 class TranscodeStreamReader
@@ -19,7 +19,7 @@ public:
         nxpl::TimeProvider *const timeProvider,
         const nxcip::CameraInfo& cameraInfo,
         const CodecContext& codecContext,
-        const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader);
+        const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader);
     virtual ~TranscodeStreamReader();
 
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
@@ -29,20 +29,20 @@ public:
     virtual void setBitrate(int bitrate) override;
 
 private:
-    std::unique_ptr<ffmpeg::Codec> m_videoEncoder;
+    std::unique_ptr<nx::ffmpeg::Codec> m_videoEncoder;
 
     bool m_initialized = false;
     bool m_modified = true;
 
 private:
     int scale(AVFrame* frame, AVFrame ** outFrame) const;
-    int encode(AVFrame * frame, AVPacket * outPacket) const;
+    int encode(const AVFrame * frame, AVPacket * outPacket) const;
 
     bool ensureInitialized();
     int initialize();
     void uninitialize();
     int openVideoEncoder();
-    void setEncoderOptions(const std::unique_ptr<ffmpeg::Codec>&  encoder);
+    void setEncoderOptions(const std::unique_ptr<nx::ffmpeg::Codec>& encoder);
 
 };
 

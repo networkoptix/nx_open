@@ -8,10 +8,10 @@
 #include "codec_context.h"
 #include "plugin.h"
 
+namespace nx { namespace ffmpeg { class StreamReader; } }
+
 namespace nx {
 namespace webcam_plugin {
-
-namespace ffmpeg { class StreamReader; }
 
 class MediaEncoder;
 
@@ -54,7 +54,7 @@ protected:
     unsigned int m_capabilities;
     std::vector<std::unique_ptr<MediaEncoder>> m_encoders;
 
-    std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
+    std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
 
 private:
     CodecContext getEncoderDefaults(int encoderIndex);

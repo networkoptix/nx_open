@@ -9,7 +9,6 @@ extern "C" {
 }
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg {
 
 Codec::Codec():
@@ -80,7 +79,6 @@ int Codec::encodeVideo(AVPacket * outPacket, const AVFrame * frame, int * outGot
     error::updateIfError(encodeCode);
     return encodeCode;
 }
-
 
 int Codec::decodeVideo(AVFrame * outFrame, int * outGotPicture, const AVPacket * packet) const
 {
@@ -228,5 +226,4 @@ AVCodecID Codec::codecID() const
 }
 
 } // namespace ffmpeg
-} // namespace webcam_plugin
 } // namespace nx

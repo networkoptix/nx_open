@@ -20,7 +20,6 @@ extern "C" {
 #include "error.h"
 
 namespace nx {
-namespace webcam_plugin {
 namespace ffmpeg {
 
 namespace {
@@ -41,7 +40,7 @@ const char * deviceType()
 
 }
 
-StreamReader::StreamReader(const char * url, const CodecContext& codecParameters):
+StreamReader::StreamReader(const char * url, const StreamReader::CodecParameters& codecParameters):
     m_url(url),
     m_codecParams(codecParameters)
 {
@@ -85,28 +84,28 @@ const std::unique_ptr<ffmpeg::InputFormat>& StreamReader::inputFormat()
 
 void StreamReader::setFps(int fps)
 {
-    if(fps != m_codecParams.fps())
+    if(fps != m_codecParams.fps)
     {
-        m_codecParams.setFps(fps);
+        m_codecParams.fps = fps;
         m_cameraState = kModified;
     }
 }
 
 void StreamReader::setBitrate(int bitrate)
 {
-    if(bitrate != m_codecParams.bitrate())
+    if(bitrate != m_codecParams.bitrate)
     {
-        m_codecParams.setBitrate(bitrate);
+        m_codecParams.bitrate = bitrate;
         m_cameraState = kModified;
     }
 }
 
 void StreamReader::setResolution(int width, int height)
 {
-    nxcip::Resolution res = m_codecParams.resolution();
-    if(width != res.width || height != res.height)
+    
+    if(m_codecParams.width != width || m_codecParams.height != height)
     {
-        m_codecParams.setResolution({width, height});
+        m_codecParams.setResolution(width, height);
         m_cameraState = kModified;
     }
 }
@@ -217,30 +216,13 @@ void StreamReader::uninitialize()
 void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat)
 {
     AVFormatContext * context = inputFormat->formatContext();
-    context->video_codec_id = utils::toAVCodecID(m_codecParams.codecID());
+    context->video_codec_id = m_codecParams.codecID;
     context->flags |= AVFMT_FLAG_NOBUFFER;
     context->flags |= AVFMT_FLAG_DISCARD_CORRUPT;
     
-    inputFormat->setFps(m_codecParams.fps());
-    auto resolution = m_codecParams.resolution();
-    inputFormat->setResolution(resolution.width, resolution.height);
-}
-
-int StreamReader::decode(AVPacket * packet, AVFrame * outFrame)
-{
-    // int readCode;
-    // while((readCode = m_decoder->readFrame(m_inputFormat->formatContext(), packet)) >= 0)
-    // {
-         int decodeCode = 0;
-         int gotFrame = 0;
-         while(!gotFrame && decodeCode >= 0)
-            decodeCode = m_decoder->decode(outFrame, &gotFrame, packet);
-
-        return decodeCode;
-    //}
-    //return readCode;
+    inputFormat->setFps(m_codecParams.fps);
+    inputFormat->setResolution(m_codecParams.width, m_codecParams.height);
 }
 
 } // namespace ffmpeg
-} // namespace webcam_plugin
 } // namespace nx
