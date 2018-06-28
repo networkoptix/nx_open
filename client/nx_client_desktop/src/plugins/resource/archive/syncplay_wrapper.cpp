@@ -748,13 +748,14 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
     else if (reader->isEnabled() && value)
     {
         reader->setNavDelegate(0);
+        // use pause instead of pauseMedia. Prevent isMediaPaused=true value. So, pause thread physically but not change any playback logic
+        if (!reader->isPaused())
+            reader->pause();
+
         auto camera = reader->getResource().dynamicCast<QnSecurityCamResource>();
         if (camera && camera->getCameraCapabilities().testFlag(Qn::isSyncPlay))
             reader->getArchiveDelegate()->pleaseStop(); //< To avoid block other channels.
 
-        // use pause instead of pauseMedia. Prevent isMediaPaused=true value. So, pause thread physically but not change any playback logic
-        if (!reader->isPaused())
-            reader->pause();
         if (d->enabled && isSyncReader)
             reader->setNavDelegate(this);
     }
