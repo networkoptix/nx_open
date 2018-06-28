@@ -10,10 +10,22 @@
     login: admin
     password: Samsung1
 
+  recording:
+    fps: 30
+    streamQuality: high
+
   attributes:
     firmware: '2.01_171201'
     cameraCapabilities: 600
     ptzCapabilities: 420413452
+    bitrateInfos:
+      streams:
+        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [2, 10]}
+    mediaStreams:
+      streams:
+        encoderIndex=0: {'codec': 28, 'resolution': '1920x1080'}
+        encoderIndex=1: {'codec': 28, 'resolution': '640x360'}
+
 
 192.168.0.196:
   discovery:
@@ -25,7 +37,18 @@
     login: admin
     password: Samsung1
 
+  recording:
+    fps: 30
+    streamQuality: high
+
   attributes:
     firmware: '1.01_170520'
     cameraCapabilities: 600
     ptzCapabilities: 420413440
+    bitrateInfos:
+      streams:
+        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [1, 2]}
+    mediaStreams:
+      streams:
+          encoderIndex=0: {'codec': 28, 'resolution': '2560x1920'}
+          encoderIndex=1: {'codec': 28, 'resolution': '640x480'}

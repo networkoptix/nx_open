@@ -31,7 +31,7 @@ def test_cameras(mediaserver_installers):
 
     # TODO: Write results somewhere on HDD.
     print '-' * 80
-    print(yaml.safe_dump(stand.result, default_flow_style=False))
+    print(yaml.safe_dump(stand.result, default_flow_style=False, width=1000))
     assert stand.is_success
 
 
@@ -105,7 +105,7 @@ class Stand(object):
             discovered_cameras = {}
             for camera in self.server.get_cameras():
                 ip = urlparse(camera['url']).hostname
-                if ip.startswith(DISCOVERY_IP_PREFIX):
+                if ip and ip.startswith(DISCOVERY_IP_PREFIX):
                     discovered_cameras[ip] = camera
 
             logging.info('Discovered cameras: ' + ', '.join(discovered_cameras))
