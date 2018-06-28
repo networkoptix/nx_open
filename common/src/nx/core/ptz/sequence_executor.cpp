@@ -6,6 +6,12 @@ namespace nx {
 namespace core {
 namespace ptz {
 
+namespace {
+
+static const ptz::Vector kStopCommand(0.0, 0.0, 0.0, 0.0);
+
+} // namespace
+
 SequenceExecutor::SequenceExecutor(
     QnAbstractPtzController* controller,
     QThreadPool* threadPool)
@@ -38,7 +44,18 @@ bool SequenceExecutor::executeSequenceInternal()
         return false;
 
     if (m_sequence.empty())
+    {
+        m_isCommandRunning = true;
+        m_threadPool->start(
+            new nx::utils::FunctorWrapper<std::function<void()>>(
+                [this]()
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    m_controller->continuousMove(kStopCommand, ptz::Options());
+                    m_wait.wakeAll();
+                }));
         return true;
+    }
 
     const auto command = m_sequence.front();
     m_sequence.pop_front();

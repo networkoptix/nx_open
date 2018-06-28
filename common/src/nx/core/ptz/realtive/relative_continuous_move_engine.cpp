@@ -48,7 +48,7 @@ CommandSequence makeCommandSequence(
     const nx::core::ptz::RelativeContinuousMoveMapping& movementMapping)
 {
     // TODO: #dmishin implement iterators for nx::core::ptz::Vector.
-    static const std::vector<std::pair<const double*, Component>> kComponents = {
+    const std::vector<std::pair<const double*, Component>> kComponents = {
         {&relativeMovement.pan, Component::pan},
         {&relativeMovement.tilt, Component::tilt},
         {&relativeMovement.rotation, Component::rotation},
