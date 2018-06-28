@@ -301,6 +301,12 @@ void QnMessageBox::addButton(QAbstractButton* button, QDialogButtonBox::ButtonRo
     d->customButtons.append(button);
 }
 
+void QnMessageBox::setButtonEnabled(QDialogButtonBox::StandardButton targetButton, bool enabled)
+{
+    if (const auto control = button(targetButton))
+        control->setEnabled(enabled);
+}
+
 QPushButton* QnMessageBox::addCustomButton(
     QnMessageBoxCustomButton button,
     QDialogButtonBox::ButtonRole role,
@@ -610,13 +616,14 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,
                 stretch,
                 alignment
             );
+            break;
         case QnMessageBox::Layout::AfterMainLabel:
             ui->verticalLayout->insertWidget(
                 ui->verticalLayout->indexOf(ui->mainLabel) + 1,
                 widget,
                 stretch,
                 alignment);
-
+            break;
         default:
             break;
     }

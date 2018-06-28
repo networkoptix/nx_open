@@ -7,6 +7,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 struct QnHTTPRawResponse;
+class QnMessageBox;
 
 namespace Ui {
 class DatabaseManagementWidget;
@@ -32,6 +33,9 @@ private:
     void backupDb();
     void restoreDb();
     void restoreDbFromFile(const QString& fileName);
+
+    QString getFileName();
+    void setupMacOSRestoreDialog(QnMessageBox* parent, QString* fileName);
 
 private:
     QScopedPointer<Ui::DatabaseManagementWidget> ui;
