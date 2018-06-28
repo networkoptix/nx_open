@@ -13,7 +13,7 @@ import boto3
 import docker
 from requests.auth import HTTPDigestAuth
 
-CLOUD_CONNECT_TEST_UTIL_VERSION = '18.1.0.20026'
+CLOUD_CONNECT_TEST_UTIL_VERSION = '18.1.0.20100'
 RETRY_TIMEOUT = 5                                   # seconds
 
 log = logging.getLogger('simple_cloud_test')
@@ -290,14 +290,10 @@ class CloudSession(object):
 
         log.info('Got system ID: {}'.format(self.system_id))
 
-    def test_cloud_connect_base(self, extra_args=''):
+    def test_cctu_base(self, command):
         image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:{}'.format(
             CLOUD_CONNECT_TEST_UTIL_VERSION)
-        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
-            user=quote(self.email),
-            password=quote(self.password),
-            system_id=self.system_id,
-            extra_args=extra_args)
+
 
         log.info('Running image: {} command: {}'.format(image, command))
 
@@ -312,9 +308,18 @@ class CloudSession(object):
         log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
         container.remove()
 
-        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (extra_args: {})'.format(
-            extra_args)
+        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (command: {})'.format(
+            command)
         assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
+
+    def test_cloud_connect_base(self, extra_args=''):
+        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
+            user=quote(self.email),
+            password=quote(self.password),
+            system_id=self.system_id,
+            extra_args=extra_args)
+
+        self.test_cctu_base(command)
 
     @testmethod(metric='p2p_connections_failure', continue_if_fails=True)
     def test_cloud_connect_no_proxy(self):
@@ -346,7 +351,8 @@ class CloudSession(object):
         assert r.status_code == 200, 'ERROR: Status code is {}'.format(r.status_code)
 
     def test_traffic_relay(self, relay_name):
-        pass
+        command = '--log-level=DEBUG2 --test-relay --relay-url=http://{}.vmsproxy.com/'.format(relay_name)
+        self.test_cctu_base(command)
 
     @testmethod(metric='traffic_relay_failure', host='relay-la', continue_if_fails=True)
     def test_traffic_relay_la(self):
