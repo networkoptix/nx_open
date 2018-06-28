@@ -1,10 +1,13 @@
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QThreadPool>
 
 #include <core/ptz/proxy_ptz_controller.h>
 #include <nx/core/ptz/realtive/relative_move_engine.h>
-#include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
+#include <nx/core/ptz/sequence_maker.h>
+#include <nx/core/ptz/sequence_executor.h>
 
 namespace nx {
 namespace core {
@@ -17,8 +20,8 @@ class RelativeMoveWorkaroundController: public QnProxyPtzController
 public:
     RelativeMoveWorkaroundController(
         const QnPtzControllerPtr& controller,
-        const RelativeContinuousMoveMapping& mapping,
-        QThreadPool* threadPool);
+        const std::shared_ptr<SequenceMaker>& sequenceMaker,
+        const std::shared_ptr<SequenceExecutor>& sequenceExecutor);
 
     static bool extends(Ptz::Capabilities capabilities);
 
@@ -39,8 +42,8 @@ private:
         const nx::core::ptz::Options& options) const;
 
 private:
-    std::unique_ptr<RelativeMoveEngine> m_continuousMoveEngine;
     std::unique_ptr<RelativeMoveEngine> m_absoluteMoveEngine;
+    std::unique_ptr<RelativeMoveEngine> m_continuousMoveEngine;
 };
 
 } // namespace ptz

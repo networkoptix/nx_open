@@ -5,6 +5,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+#include <nx/utils/std/optional.h>
+
 #include <nx/core/ptz/component.h>
 
 namespace nx {

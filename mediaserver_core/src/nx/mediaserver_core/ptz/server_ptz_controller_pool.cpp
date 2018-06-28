@@ -9,6 +9,8 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_mapper.h>
 
+#include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
+
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver_core/ptz/ptz_ini_config.h>
 #include <nx/mediaserver_core/ptz/server_ptz_helpers.h>
@@ -19,6 +21,7 @@ namespace {
 
 core_ptz::RelativeContinuousMoveMapping relativeMoveMapping(const QnResourcePtr& resource)
 {
+#if 0
     static const QString kRelativeMoveMapping("relativeMoveMapping");
     const auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
@@ -27,6 +30,29 @@ core_ptz::RelativeContinuousMoveMapping relativeMoveMapping(const QnResourcePtr&
     const auto resourceData = qnStaticCommon->dataPool()->data(camera);
     return resourceData.value<core_ptz::RelativeContinuousMoveMapping>(
         kRelativeMoveMapping, core_ptz::RelativeContinuousMoveMapping());
+#else
+    using namespace std::chrono;
+    using namespace std::chrono_literals;
+
+    core_ptz::RelativeContinuousMoveMapping mapping;
+    core_ptz::RelativeContinuousMoveComponentMapping componentMapping;
+    componentMapping.workingSpeed.absoluteValue = 1.0;
+    componentMapping.workingSpeed.cycleDuration = 6000ms;
+    componentMapping.startRequestProcessingTime = 0ms;
+    componentMapping.stopRequestProcessingTime = 0ms;
+    componentMapping.accelerationParameters.accelerationTime = 0ms;
+    componentMapping.accelerationParameters.accelerationType = core_ptz::AccelerationType::linear;
+    componentMapping.decelerationParameters.accelerationTime = 0ms;
+    componentMapping.decelerationParameters.accelerationType = core_ptz::AccelerationType::linear;
+
+    mapping.pan = componentMapping;
+    mapping.tilt = componentMapping;
+    mapping.rotation = componentMapping;
+    mapping.zoom = componentMapping;
+    mapping.focus = componentMapping;
+
+    return mapping;
+#endif
 }
 
 QnPtzMapperPtr mapper(const QnSecurityCamResourcePtr& camera)

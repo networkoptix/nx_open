@@ -1,12 +1,14 @@
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QThreadPool>
 
 #include <core/ptz/abstract_ptz_controller.h>
 
+#include <nx/core/ptz/sequence_maker.h>
 #include <nx/core/ptz/sequence_executor.h>
 #include <nx/core/ptz/realtive/relative_move_engine.h>
-#include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
 
 namespace nx {
 namespace core {
@@ -17,8 +19,8 @@ class RelativeContinuousMoveEngine: public RelativeMoveEngine
 public:
     RelativeContinuousMoveEngine(
         QnAbstractPtzController* controller,
-        const RelativeContinuousMoveMapping& mapping,
-        QThreadPool* threadPool);
+        const std::shared_ptr<SequenceMaker>& sequenceMaker,
+        const std::shared_ptr<SequenceExecutor>& sequenceExecutor);
 
     virtual bool relativeMove(
         const nx::core::ptz::Vector& direction,
@@ -27,8 +29,8 @@ public:
     virtual bool relativeFocus(qreal direction, const nx::core::ptz::Options& options) override;
 
 private:
-    SequenceExecutor m_sequenceExecutor;
-    RelativeContinuousMoveMapping m_mapping;
+    std::shared_ptr<SequenceMaker> m_sequenceMaker;
+    std::shared_ptr<SequenceExecutor> m_sequenceExecutor;
 };
 
 } // namespace ptz

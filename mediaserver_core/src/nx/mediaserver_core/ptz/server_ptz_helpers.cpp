@@ -11,9 +11,12 @@
 #include <core/ptz/tour_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/workaround_ptz_controller.h>
+
 #include <nx/core/ptz/overriden_capabilities_ptz_controller.h>
+#include <nx/core/ptz/utils/continuous_move_sequence_executor.h>
 #include <nx/core/ptz/realtive/relative_move_workaround_controller.h>
 #include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
+#include <nx/core/ptz/realtive/relative_continuous_move_sequence_maker.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -156,8 +159,11 @@ QnPtzControllerPtr wrapController(
             {
                 original->reset(new core_ptz::RelativeMoveWorkaroundController(
                     *original,
-                    parameters.relativeMoveMapping,
-                    parameters.ptzPool->commandThreadPool()));
+                    std::make_shared<core_ptz::RelativeContinuousMoveSequenceMaker>(
+                        parameters.relativeMoveMapping),
+                    std::make_shared<core_ptz::ContinuousMoveSequenceExecutor>(
+                        original->data(),
+                        parameters.ptzPool->commandThreadPool())));
             }
         }
     };

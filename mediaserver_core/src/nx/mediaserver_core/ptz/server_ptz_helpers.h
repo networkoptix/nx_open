@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <functional>
 
 #include <core/resource/resource_fwd.h>
@@ -18,9 +19,11 @@ struct ControllerWrappingParameters
     Ptz::Capabilities capabilitiesToAdd;
     Ptz::Capabilities capabilitiesToRemove;
 
-    bool areNativePresetsDisabled = false;
     QnPtzMapperPtr absoluteMoveMapper;
     nx::core::ptz::RelativeContinuousMoveMapping relativeMoveMapping;
+
+    bool areNativePresetsDisabled = false;
+
     QnPtzControllerPool* ptzPool = nullptr;
     QnCommonModule* commonModule = nullptr;
 
