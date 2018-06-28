@@ -173,7 +173,9 @@ Clean up email noperm
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Ignore Error    Remove User Permissions    ${EMAIL NOPERM}
+    Register Keyword To Run On Failure    Failure Tasks
     Close Browser
 
 Clean up random emails
@@ -205,8 +207,10 @@ Reset user noperm first/last name
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
+    Register Keyword To Run On Failure    Failure Tasks
 
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
@@ -221,8 +225,10 @@ Reset user owner first/last name
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL OWNER}    ${password}    button=None
     Validate Log In
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    newFirstName
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    newLastName
+    Register Keyword To Run On Failure    Failure Tasks
 
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}

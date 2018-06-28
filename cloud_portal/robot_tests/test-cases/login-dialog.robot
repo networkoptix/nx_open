@@ -19,7 +19,9 @@ Open New Browser On Failure
 
 Restart
     Go To    ${url}
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log Out
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword Unless    ${status}    Log Out
     Go To    ${url}
 

@@ -11,7 +11,9 @@ ${url}         ${ENV}
 
 *** Keywords ***
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log Out
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword Unless    ${status}    Log Out
     Validate Log Out
     Go To    ${url}

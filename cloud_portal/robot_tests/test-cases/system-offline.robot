@@ -22,7 +22,9 @@ Log in to Autotests System
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
     Go To    ${url}
 

@@ -30,7 +30,9 @@ Check Log In
     Validate Log In
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
 
 Reset DB and Open New Browser On Failure
