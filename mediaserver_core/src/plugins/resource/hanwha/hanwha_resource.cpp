@@ -931,6 +931,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem()
     if (isNvr())
     {
         setCameraCapability(Qn::isPlaybackSpeedSupported, true);
+        setCameraCapability(Qn::isSyncPlay, true);
 
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));
