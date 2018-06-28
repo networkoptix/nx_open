@@ -41,6 +41,9 @@ namespace ec2
 
         virtual Timestamp getTransactionLogTime() const override;
         virtual void setTransactionLogTime(Timestamp value) override;
+
+        virtual void startReceivingNotifications() override;
+
     private:
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;

@@ -80,4 +80,9 @@ namespace ec2
             transactionLog->setTransactionLogTime(value);
     }
 
+    void Ec2DirectConnection::startReceivingNotifications()
+    {
+        m_orphanCameraWatcher->doStart();
+    }
+
 }

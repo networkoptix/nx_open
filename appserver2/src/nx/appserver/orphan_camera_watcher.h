@@ -19,6 +19,16 @@ namespace appserver {
  */
 class OrphanCameraWatcher : public QObject, public QnCommonModuleAware
 {
+    enum class UpdateIntervalType { manualInterval, shortInterval1, shortInterval2, longInterval };
+    /*
+     * Update interval type graph:
+     *
+     *              ------> manualInterval <----------        ------
+     *             |                ^                 |      |      |
+     *             |                |                 |      V      |
+     * ---> shortInterval1 ---> shortInterval2 ---> longInterval ---
+     */
+
     Q_OBJECT
     using base_type = QnCommonModuleAware;
 
@@ -31,6 +41,7 @@ public:
     void changeIntervalAsync(std::chrono::milliseconds interval);
 
 signals:
+    void doStart();
     void doChangeInterval(std::chrono::milliseconds interval);
 
 private:
@@ -38,7 +49,7 @@ private:
     Uuids m_previousOrphanCameras;
     QTimer m_timer;
     std::chrono::milliseconds m_updateInterval;
-    bool m_setDefaultUpdateInterval;
+    UpdateIntervalType m_updateIntervalType;
 };
 
 } // namespace appserver
