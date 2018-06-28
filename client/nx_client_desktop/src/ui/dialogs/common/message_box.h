@@ -105,6 +105,8 @@ public:
 public:
     virtual ~QnMessageBox();
 
+    void setButtonEnabled(QDialogButtonBox::StandardButton button, bool enabled);
+
     QPushButton* addCustomButton(
         QnMessageBoxCustomButton button,
         QDialogButtonBox::ButtonRole role,
