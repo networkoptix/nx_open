@@ -3337,7 +3337,7 @@ void MediaServerProcess::initializeLogging()
         nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
 
     logSettings = makeLogSettings(cmdLineArguments().systemLogLevel,
-        "systemLoglevel", toString(nx::utils::log::Level::info), "system_log");
+        "systemLoglevel", toString(nx::utils::log::Level::info), "hw_log");
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger(
@@ -3366,7 +3366,7 @@ void MediaServerProcess::initializeHardwareId()
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
     auto logSettings = makeLogSettings(cmdLineArguments().systemLogLevel,
-        "systemLoglevel", toString(nx::utils::log::Level::info), "system_log");
+        "systemLoglevel", toString(nx::utils::log::Level::info), "hw_log");
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger(
