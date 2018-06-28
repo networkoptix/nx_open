@@ -16,24 +16,19 @@ namespace nx {
 namespace appserver {
 
 using namespace std::literals::chrono_literals;
-static const std::chrono::milliseconds kDefaultUpdateInterval = 1min;
-static const std::chrono::milliseconds kFirstUpdateInterval = 15s;
+static const std::chrono::milliseconds kDefaultUpdateInterval = 15min;
 
 OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule)
     :
     base_type(commonModule),
-    m_updateInterval(kFirstUpdateInterval),
-    m_updateIntervalType(UpdateIntervalType::shortInterval1)
+    m_updateInterval(kDefaultUpdateInterval)
 {
     qRegisterMetaType<std::chrono::milliseconds>();
-
     connect(&m_timer, &QTimer::timeout, this, &OrphanCameraWatcher::update);
-    //start();
 
     connect(this, &OrphanCameraWatcher::doChangeInterval, this,
         [&](std::chrono::milliseconds interval)
         {
-            m_updateIntervalType = UpdateIntervalType::manualInterval;
             m_updateInterval = interval;
             m_timer.stop();
             this->start();
@@ -43,6 +38,7 @@ OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule)
     connect(this, &OrphanCameraWatcher::doStart, this,
         [&]()
         {
+            m_timer.stop();
             this->start();
         },
         Qt::QueuedConnection);
@@ -79,9 +75,6 @@ void OrphanCameraWatcher::update()
         {
             QnUuid uuid = cam->getId();
             currentOrphanCameras.insert(uuid);
-            NX_WARNING(this, lm("Orphan camera found. URL = %1. Parent id = %2.")
-                .args(cam->sourceUrl(Qn::CR_LiveVideo), parentId.toString()));
-
             NX_DEBUG(this, lm("%01 x %2 | %3 | %4 | %5")
                 .args(QString::number(idx).rightJustified(2, '0'),
                 cam->getId().toString(), cam->getModel(), cam->getUrl(), parentId.toString()));
@@ -111,24 +104,6 @@ void OrphanCameraWatcher::update()
     }
 
     m_previousOrphanCameras = currentOrphanCameras;
-
-    switch (m_updateIntervalType)
-    {
-        case UpdateIntervalType::manualInterval:
-            break; // Do nothing.
-        case UpdateIntervalType::shortInterval1:
-            m_updateIntervalType = UpdateIntervalType::shortInterval2;
-            break;
-        case UpdateIntervalType::shortInterval2:
-            m_updateInterval = kDefaultUpdateInterval;
-            m_timer.setInterval(m_updateInterval.count());
-            m_updateIntervalType = UpdateIntervalType::longInterval;
-            break;
-        case UpdateIntervalType::longInterval:
-            break; // Do nothing.
-        default:
-            break; // Do nothing.
-    }
 }
 
 void OrphanCameraWatcher::changeIntervalAsync(std::chrono::milliseconds interval)

@@ -14,21 +14,9 @@ class QnCommonModule;
 namespace nx {
 namespace appserver {
 
-/**
- * Monitor cameras without parent server and remove them.
- */
+/** Monitor cameras without parent server and remove them.*/
 class OrphanCameraWatcher : public QObject, public QnCommonModuleAware
 {
-    enum class UpdateIntervalType { manualInterval, shortInterval1, shortInterval2, longInterval };
-    /*
-     * Update interval type graph:
-     *
-     *              ------> manualInterval <----------        ------
-     *             |                ^                 |      |      |
-     *             |                |                 |      V      |
-     * ---> shortInterval1 ---> shortInterval2 ---> longInterval ---
-     */
-
     Q_OBJECT
     using base_type = QnCommonModuleAware;
 
@@ -49,7 +37,6 @@ private:
     Uuids m_previousOrphanCameras;
     QTimer m_timer;
     std::chrono::milliseconds m_updateInterval;
-    UpdateIntervalType m_updateIntervalType;
 };
 
 } // namespace appserver

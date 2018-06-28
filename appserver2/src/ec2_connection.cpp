@@ -82,6 +82,7 @@ namespace ec2
 
     void Ec2DirectConnection::startReceivingNotifications()
     {
+        base_type::startReceivingNotifications();
         m_orphanCameraWatcher->doStart();
     }
 
