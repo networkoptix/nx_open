@@ -23,9 +23,9 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
 
     connect(ui->tagsListLabel, &QLabel::linkActivated, this, [this](const QString &link) {
         if (m_selectedTags.contains(link))
-            m_selectedTags.remove(link);
+            m_selectedTags.removeAll(link);
         else
-            m_selectedTags.insert(link.trimmed());
+            m_selectedTags.push_back(link.trimmed());
         ui->tagsLineEdit->setText(QnCameraBookmark::tagsToString(m_selectedTags));
         updateTagsList();
     });
@@ -34,7 +34,7 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
     {
         m_selectedTags.clear();
         for(auto &tag: text.split(L',', QString::SkipEmptyParts).toSet())
-            m_selectedTags.insert(tag.trimmed());
+            m_selectedTags.push_back(tag.trimmed());
 
         updateTagsList();
     });
