@@ -181,7 +181,7 @@ struct QnCameraBookmarkTag
 
 struct QnCameraBookmarkTagWithId: public QnCameraBookmarkTag
 {
-    operator QString() { return name; }
+    operator QString() const { return name; }
 
     QnUuid bookmarkId;
 };

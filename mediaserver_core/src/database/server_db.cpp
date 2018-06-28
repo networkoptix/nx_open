@@ -1258,7 +1258,7 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
             {
                 QString trimmed = tag.trimmed();
                 if (!trimmed.isEmpty())
-                    result.push_back(tag.trimmed());
+                    result.insert(tag.trimmed());
             }
 
             return result;

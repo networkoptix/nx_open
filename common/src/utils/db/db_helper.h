@@ -224,6 +224,18 @@ public:
         }
     }
 
+    template <typename Container, typename Value>
+    static void insertToContainer(Container& container, const Value& value, decltype(&Container::insert))
+    {
+        container.insert(value);
+    }
+
+    template <typename Container, typename Value>
+    static void insertToContainer(Container& container, const Value& value, ...)
+    {
+        container.push_back(value);
+    }
+
     //!Same as above but does not require field "id" of type QnUuid
     /**
     * Function merges two sorted lists. First of them (data) contains placeholder
@@ -256,7 +268,7 @@ public:
                     typename MainDataVector::value_type& mergeTo,
                     typename SubDataVector::value_type& mergeWhat)
                 {
-                    (mergeTo.*subDataListField).push_back(mergeWhat);
+                    insertToContainer(mergeTo.*subDataListField, mergeWhat, 0);
                 });
     }
 
