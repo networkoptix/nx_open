@@ -17,6 +17,7 @@ class Command(object):
     def receive(self, timeout_sec):  # type: (float) -> (bytes, bytes)
         return -1, b'', b''
 
+    @abstractmethod
     def terminate(self):
         pass
 
