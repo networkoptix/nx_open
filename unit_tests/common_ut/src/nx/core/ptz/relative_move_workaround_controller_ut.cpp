@@ -3,6 +3,8 @@
 #include <nx/core/ptz/test_support/test_ptz_controller.h>
 #include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
 #include <nx/core/ptz/realtive/relative_move_workaround_controller.h>
+#include <nx/core/ptz/realtive/relative_continuous_move_sequence_maker.h>
+#include <nx/core/ptz/utils/continuous_move_sequence_executor.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -102,8 +104,11 @@ TEST(RelativeMoveWorkaround, relativeMoveProxy)
     QnPtzControllerPtr relativeMoveController(
         new ptz::RelativeMoveWorkaroundController(
             controller,
-            RelativeContinuousMoveMapping(),
-            threadPool.get()));
+            std::make_shared<ptz::RelativeContinuousMoveSequenceMaker>(
+                RelativeContinuousMoveMapping()),
+            std::make_shared<ptz::ContinuousMoveSequenceExecutor>(
+                controller.data(),
+                threadPool.get())));
 
     bool result = relativeMoveController->relativeMove(moveDirection, ptz::Options());
     ASSERT_TRUE(result);
@@ -162,8 +167,11 @@ TEST(RelativeMoveWorkaround, relativeMoveViaAbsoluteMove)
     QnPtzControllerPtr relativeMoveController(
         new ptz::RelativeMoveWorkaroundController(
             controller,
-            RelativeContinuousMoveMapping(),
-            threadPool.get()));
+            std::make_shared<ptz::RelativeContinuousMoveSequenceMaker>(
+                RelativeContinuousMoveMapping()),
+            std::make_shared<ptz::ContinuousMoveSequenceExecutor>(
+                controller.data(),
+                threadPool.get())));
 
     const ptz::Vector moveDirection(0.1, 0.2, 0.3, 0.4);
     const ptz::Vector expectedMoveResult(2, 4, 6, 8);
