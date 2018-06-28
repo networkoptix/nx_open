@@ -116,8 +116,7 @@ class _LocalCommand(Command):
         return self.process.poll(), name2data.get('stdout'), name2data.get('stderr')
 
     def terminate(self):
-        self.process.terminate()
-        return self.process.returncode
+        self.process.send_signal(2)  # SIGINT, which is sent by terminal when pressing Ctrl+C.
 
 
 class _LocalShell(PosixShell):
