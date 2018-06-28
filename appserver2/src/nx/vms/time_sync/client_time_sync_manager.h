@@ -1,8 +1,9 @@
 #pragma once
 
-#include <nx/time_sync/time_sync_manager.h>
+#include <nx/vms/time_sync/time_sync_manager.h>
 
 namespace nx {
+namespace vms {
 namespace time_sync {
 
 class ClientTimeSyncManager: public TimeSyncManager
@@ -16,4 +17,5 @@ protected:
 };
 
 } // namespace time_sync
+} // namespace vms
 } // namespace nx

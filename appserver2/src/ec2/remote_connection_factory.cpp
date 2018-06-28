@@ -19,7 +19,7 @@
 #include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
 #include <transaction/message_bus_adapter.h>
-#include <nx/time_sync/client_time_sync_manager.h>
+#include <nx/vms/time_sync/client_time_sync_manager.h>
 
 using namespace nx::vms;
 
@@ -33,7 +33,7 @@ RemoteConnectionFactory::RemoteConnectionFactory(
     AbstractECConnectionFactory(commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
-    m_timeSynchronizationManager(new nx::time_sync::ClientTimeSyncManager(
+    m_timeSynchronizationManager(new nx::vms::time_sync::ClientTimeSyncManager(
         commonModule)),
     m_terminated(false),
     m_runningRequests(0),
@@ -492,7 +492,7 @@ TransactionMessageBusAdapter* RemoteConnectionFactory::messageBus() const
     return m_bus.get();
 }
 
-nx::time_sync::TimeSyncManager* RemoteConnectionFactory::timeSyncManager() const
+nx::vms::time_sync::AbstractTimeSyncManager* RemoteConnectionFactory::timeSyncManager() const
 {
     return m_timeSynchronizationManager.get();
 }

@@ -9,9 +9,10 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/string.h>
 
+#include "client_mode.h"
 #include "listen_mode.h"
 #include "listen_on_relay_mode.h"
-#include "client_mode.h"
+#include "test_relay.h"
 
 void printHelp()
 {
@@ -19,6 +20,8 @@ void printHelp()
     nx::cctu::printListenOptions(&std::cout);
     std::cout << "\n";
     nx::cctu::printListenOnRelayOptions(&std::cout);
+    std::cout << "\n";
+    nx::cctu::printTestRelayOptions(&std::cout);
     std::cout << "\n";
     nx::cctu::printConnectOptions(&std::cout);
     std::cout << "\n";
@@ -62,6 +65,9 @@ int main(int argc, const char* argv[])
 
         if (args.get("listen-on-relay"))
             return nx::cctu::runInListenOnRelayMode(args);
+
+        if (args.get("test-relay"))
+            return nx::cctu::testRelay(args);
 
         if (args.get("connect"))
             return nx::cctu::runInConnectMode(args);

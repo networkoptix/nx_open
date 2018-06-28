@@ -41,6 +41,7 @@
 #include "nx_ec/managers/abstract_videowall_manager.h"
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <nx/vms/api/data/timestamp.h>
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 #include "ec_api_fwd.h"
 
@@ -49,11 +50,9 @@ class QnHttpConnectionListener;
 class QnCommonModule;
 
 namespace nx {
-
 namespace network { class SocketAddress; }
 
 namespace vms { namespace discovery { class Manager; }}
-namespace time_sync { class TimeSyncManager; }
 } // namespace nx
 
 //!Contains API classes for the new Server
@@ -1047,7 +1046,7 @@ public:
         int* distance,
         nx::network::SocketAddress* knownPeerAddress) const = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
-    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const = 0;
+    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const = 0;
 
     virtual ECConnectionNotificationManager* notificationManager()
     {
@@ -1214,7 +1213,7 @@ public:
 
     virtual void setConfParams(std::map<QString, QVariant> confParams) = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
-    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const = 0;
+    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const = 0;
 
     virtual void shutdown()
     {

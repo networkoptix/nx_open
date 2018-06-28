@@ -56,7 +56,7 @@
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/rule.h>
-#include <nx/time_sync/legacy/time_manager.h>
+#include <nx/vms/time_sync/legacy/time_manager.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";

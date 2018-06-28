@@ -2,8 +2,9 @@
 
 #include "rest/server/json_rest_handler.h"
 #include <api/model/time_reply.h>
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
-namespace nx { namespace time_sync { class TimeSyncManager; } }
+class QnCommonModule;
 
 namespace rest {
 namespace handlers {
@@ -19,7 +20,9 @@ public:
         const QnRestConnectionProcessor* owner) override;
 
     static QnJsonRestResult execute(
-        nx::time_sync::TimeSyncManager* timeSyncManager, const QnUuid& id);
+        nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager,
+        QnCommonModule* commonModule,
+        const QnUuid& id);
 };
 
 } // namespace handlers

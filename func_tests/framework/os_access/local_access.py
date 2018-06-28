@@ -9,7 +9,7 @@ from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload
 from framework.os_access.local_path import LocalPath
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
 from framework.os_access.posix_access import PosixAccess
-from framework.os_access.posix_shell import local_shell
+from framework.os_access.local_shell import local_shell
 
 
 class LocalAccess(PosixAccess):

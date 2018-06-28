@@ -242,7 +242,7 @@
 #include <nx/vms/network/proxy_connection.h>
 #include "nx/mediaserver/hls/hls_session_pool.h"
 #include "nx/mediaserver/hls/hls_server.h"
-#include <nx/time_sync/server_time_sync_manager.h>
+#include <nx/vms/time_sync/server_time_sync_manager.h>
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
@@ -1577,7 +1577,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:integer utcTimeMs Server synchronized time.
      *     %param:boolean isTakenFromInternet Whether the server has got the time from the internet.
      */
-    reg(nx::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1),
+    reg(nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1),
         new ::rest::handlers::SyncTimeRestHandler());
 
     /**%apidoc POST /ec2/forcePrimaryTimeServer
@@ -3653,7 +3653,7 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(commonModule()->moduleGUID().toQUuid(), m_universalTcpListener));
 
     m_universalTcpListener->setProxyHandler<nx::vms::network::ProxyConnectionProcessor>(
-        &nx::vms::network::ProxyConnectionProcessor::needProxyRequest,
+        &nx::vms::network::ProxyConnectionProcessor::isProxyNeeded,
         ec2ConnectionFactory->serverConnector());
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
@@ -4378,7 +4378,8 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow(webPrefix + lit("/api/camera_event.*"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/moduleInformation"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/gettime"), nx::network::http::AuthMethod::noAuth);
-    restrictions->allow(webPrefix + nx::time_sync::TimeSyncManager::kTimeSyncUrlPath, nx::network::http::AuthMethod::noAuth);
+    restrictions->allow(webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath,
+        nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/getTimeZones"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/getNonce"), nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + lit("/api/cookieLogin"), nx::network::http::AuthMethod::noAuth);

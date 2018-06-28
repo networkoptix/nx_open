@@ -3,14 +3,14 @@
 #include <nx_ec/ec_api.h>
 #include <transaction/transaction.h>
 
-namespace nx { namespace time_sync { class TimeSyncManager; }}
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 namespace ec2 {
 
-class QnTimeNotificationManager : public AbstractTimeNotificationManager
+class QnTimeNotificationManager: public AbstractTimeNotificationManager
 {
 public:
-    QnTimeNotificationManager(nx::time_sync::TimeSyncManager* timeSyncManager);
+    QnTimeNotificationManager(nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager);
     virtual ~QnTimeNotificationManager() override {}
 
     void triggerNotification(

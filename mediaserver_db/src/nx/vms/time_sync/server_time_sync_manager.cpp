@@ -17,9 +17,10 @@
 #include <nx/vms/api/data/misc_data.h>
 
 namespace nx {
+namespace vms {
 namespace time_sync {
 
-static const QByteArray kTimeDeltaParamName = "sync_time_delta";
+static const QByteArray kTimeDeltaParamName = "sync_time_delta"; //< For migration from previous version.
 
 ServerTimeSyncManager::ServerTimeSyncManager(
     QnCommonModule* commonModule,
@@ -123,6 +124,7 @@ void ServerTimeSyncManager::initializeTimeFetcher()
 
 void ServerTimeSyncManager::setTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher)
 {
+    NX_ASSERT(!m_internetTimeSynchronizer);
     auto meanTimerFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
     meanTimerFetcher->addTimeFetcher(std::move(timeFetcher));
     m_internetTimeSynchronizer = std::move(meanTimerFetcher);
@@ -260,4 +262,5 @@ void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
 }
 
 } // namespace time_sync
+} // namespace vms
 } // namespace nx

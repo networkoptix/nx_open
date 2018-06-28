@@ -19,6 +19,7 @@
 #include <common/static_common_module.h>
 
 namespace nx {
+namespace vms {
 namespace time_sync {
 
 const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
@@ -200,19 +201,15 @@ void TimeSyncManager::setSyncTimeInternal(std::chrono::milliseconds value)
     m_synchronizedOnClock = m_steadyClock->now();
 }
 
-std::chrono::milliseconds TimeSyncManager::getSyncTime() const
+std::chrono::milliseconds TimeSyncManager::getSyncTime(bool* outIsTimeTakenFromInternet) const
 {
     QnMutexLocker lock(&m_mutex);
+    if (outIsTimeTakenFromInternet)
+        *outIsTimeTakenFromInternet = m_isTimeTakenFromInternet;
     if (m_synchronizedTime == std::chrono::milliseconds::zero())
         return m_systemClock->millisSinceEpoch(); //< Network sync is not initialized yet.
-
     auto elapsed = m_steadyClock->now() - m_synchronizedOnClock;
     return m_synchronizedTime + elapsed;
-}
-
-bool TimeSyncManager::isTimeTakenFromInternet() const
-{
-    return m_isTimeTakenFromInternet;
 }
 
 void TimeSyncManager::doPeriodicTasks()
@@ -228,4 +225,5 @@ QString TimeSyncManager::idForToStringFromPtr() const
 }
 
 } // namespace time_sync
+} // namespace vms
 } // namespace nx

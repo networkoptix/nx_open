@@ -23,16 +23,16 @@ void printListenOptions(std::ostream* const outStream)
 {
     *outStream<<
     "Listen mode (can listen on local or cloud address):\n"
-    "  --listen                     Enable listen mode\n"
-    "  --ping                       Makes server to mirror data instead of spaming\n"
+    "  --listen                         Enable listen mode\n"
+    "  --ping                           Makes server to mirror data instead of spaming\n"
     "  --cloud-credentials={system_id}:{authentication_key}\n"
-    "                               Specify credentials to use to connect to mediator\n"
-    "  --server-id={server_id}      Id used when registering on mediator (optional)\n"
-    "  --server-count=N             Random generated server Ids (to emulate several servers)\n"
-    "  --local-address={ip:port}    Local address to listen (default: 127.0.0.1:0)\n"
-    "  --forward-address[=address]  Bind local address to mediator (default is local-address)\n"
-    "  --udt                        Use udt instead of tcp. Only if listening local address\n"
-    "  --ssl                        Uses SSL on top of server socket type\n";
+    "                                   Specify credentials to use to connect to mediator\n"
+    "  --server-id={server_id}          Id used when registering on mediator (optional)\n"
+    "  --server-count=N                 Random generated server Ids (to emulate several servers)\n"
+    "  --local-address={ip:port}        Local address to listen (default: 127.0.0.1:0)\n"
+    "  --forward-address[=address]      Bind local address to mediator (default is local-address)\n"
+    "  --udt                            Use udt instead of tcp. Only if listening local address\n"
+    "  --ssl                            Uses SSL on top of server socket type\n";
 }
 
 class CloudServerSocketGenerator

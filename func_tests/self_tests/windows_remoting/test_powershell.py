@@ -4,13 +4,12 @@ from textwrap import dedent
 
 import pytest
 
-from framework.os_access.windows_remoting._cmd import receive_stdout_and_stderr_until_done
+from framework.os_access.windows_power_shell_utils import power_shell_augment_script
 from framework.os_access.windows_remoting._powershell import (
     PowershellError,
     run_powershell_script,
     start_raw_powershell_script,
     )
-from framework.os_access.windows_power_shell_utils import power_shell_augment_script
 
 _logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ def test_start_script(winrm_shell):
         $y | ConvertTo-Json
         '''
     with start_raw_powershell_script(winrm_shell, powershell_command) as command:
-        stdout, stderr = receive_stdout_and_stderr_until_done(command)
+        _, stdout, stderr = command.communicate()
         assert json.loads(stdout.decode()) == 1234321
 
 

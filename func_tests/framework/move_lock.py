@@ -1,7 +1,7 @@
 import logging
 
 from framework.os_access.exceptions import exit_status_error_cls
-from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_shell import SSH
 from framework.os_access.ssh_path import SSHPath
 
 _logger = logging.getLogger(__name__)
@@ -16,6 +16,7 @@ class MoveLockNotAcquired(Exception):
 
 
 class MoveLock(object):
+    # TODO: Replace with lockfile (at least, it's in a pip/vendor)
     def __init__(self, ssh, path, timeout_sec=10):
         self._ssh = ssh  # type: SSH
         self._path = path  # type: SSHPath

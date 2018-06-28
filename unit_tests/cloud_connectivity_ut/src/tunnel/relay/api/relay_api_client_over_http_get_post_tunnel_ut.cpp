@@ -13,6 +13,13 @@ class RelayApiClientOverHttpGetPostTunnelTypeSet:
 public:
     using Client = ClientOverHttpGetPostTunnel;
 
+    ~RelayApiClientOverHttpGetPostTunnelTypeSet()
+    {
+        for (const auto& connection: m_connections)
+            connection->pleaseStopSync();
+        m_connections.clear();
+    }
+
     void initializeHttpServer(
         nx::network::http::TestHttpServer* httpServer,
         const std::string& baseUrlPath)
@@ -23,13 +30,16 @@ public:
             httpServer,
             baseUrlPath);
 
-        registerOpenClientTunnelViaUpgradeHandler(
-            httpServer,
-            baseUrlPath);
-
         httpServer->registerRequestProcessorFunc(
             network::url::normalizePath(
                 lm("%1/%2").args(baseUrlPath, kServerTunnelPath).toQString()),
+            std::bind(&RelayApiClientOverHttpGetPostTunnelTypeSet::openTunnelChannelDown, this,
+                _1, _2, _3, _4, _5),
+            nx::network::http::Method::get);
+
+        httpServer->registerRequestProcessorFunc(
+            network::url::normalizePath(
+                lm("%1/%2").args(baseUrlPath, kClientGetPostTunnelPath).toQString()),
             std::bind(&RelayApiClientOverHttpGetPostTunnelTypeSet::openTunnelChannelDown, this,
                 _1, _2, _3, _4, _5),
             nx::network::http::Method::get);
@@ -42,7 +52,6 @@ private:
         SystemError::ErrorCode /*closeReason*/,
         network::http::AsyncMessagePipeline* /*connection*/) override
     {
-        // TODO
     }
 
     void openTunnelChannelDown(

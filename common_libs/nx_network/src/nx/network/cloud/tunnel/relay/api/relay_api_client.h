@@ -24,7 +24,9 @@ using StartClientConnectSessionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode, CreateClientSessionResponse)>;
 
 using OpenRelayConnectionHandler =
-    nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<network::AbstractStreamSocket>)>;
+    nx::utils::MoveOnlyFunc<void(
+        ResultCode,
+        std::unique_ptr<network::AbstractStreamSocket>)>;
 
 using ClientFeedbackFunction = nx::utils::MoveOnlyFunc<void(ResultCode)>;
 

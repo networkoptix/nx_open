@@ -40,7 +40,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/network/socket_common.h>
-#include <nx/time_sync/time_sync_manager.h>
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/event_rule_data.h>

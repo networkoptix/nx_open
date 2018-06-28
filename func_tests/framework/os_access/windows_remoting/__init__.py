@@ -11,7 +11,7 @@ from framework.method_caching import cached_getter
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.windows_remoting._cim_query import CIMClass
 from ._cim_query import CIMQuery
-from ._cmd import Shell, run_command
+from ._cmd import Shell
 from ._powershell import run_powershell_script
 from .registry import _WindowsRegistryKey
 
@@ -58,18 +58,13 @@ class WinRM(object):
         shell.__enter__()
         return shell
 
-    def run_command(self, command, input=None):
-        command_str_list = command_args_to_str_list(command)
+    def command(self, args):
+        command_str_list = command_args_to_str_list(args)
         _logger.debug("Command: %s", list2cmdline(command_str_list))
-        exit_code, stdout_bytes, stderr_bytes = run_command(self._shell(), command_str_list, stdin_bytes=input)
-        _logger.debug(
-            "Outcome:\nexit code: %d\nstdout:\n%s\nstderr:\n%s",
-            exit_code,
-            stdout_bytes.decode('ascii', errors='replace'),
-            stderr_bytes.decode('ascii', errors='replace'))
-        if exit_code != 0:
-            raise exit_status_error_cls(exit_code)(stdout_bytes, stderr_bytes)
-        return stdout_bytes
+        return self._shell().start(*command_str_list)
+
+    def run_command(self, command, input=None):
+        return self.command(command).check_output(input)
 
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables)

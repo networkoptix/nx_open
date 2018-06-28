@@ -19,11 +19,10 @@
 #include <managers/updates_manager.h>
 #include <managers/misc_manager.h>
 #include <managers/discovery_manager.h>
-#include <managers/time_manager_api.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <transaction/message_bus_adapter.h>
 
-#include <nx/time_sync/time_sync_manager.h>
+#include <nx/vms/time_sync/time_sync_manager.h>
 
 namespace ec2 {
 
@@ -99,7 +98,7 @@ public:
         nx::network::SocketAddress* knownPeerAddress) const override;
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
-    virtual nx::time_sync::TimeSyncManager* timeSyncManager() const override;
+    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override;
 protected:
     const AbstractECConnectionFactory* m_connectionFactory;
     QueryProcessorType* m_queryProcessor;
@@ -514,7 +513,7 @@ TransactionMessageBusAdapter* BaseEc2Connection<QueryProcessorType>::messageBus(
 }
 
 template<class QueryProcessorType>
-nx::time_sync::TimeSyncManager* BaseEc2Connection<QueryProcessorType>::timeSyncManager() const
+nx::vms::time_sync::AbstractTimeSyncManager* BaseEc2Connection<QueryProcessorType>::timeSyncManager() const
 {
     return m_connectionFactory->timeSyncManager();
 }
