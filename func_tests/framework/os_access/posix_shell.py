@@ -22,7 +22,7 @@ class PosixShell(object):
 
     def run_command(self, args, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
-        return self.command(args, cwd=cwd, env=env).check_output(input=input,timeout_sec=timeout_sec)
+        return self.command(args, cwd=cwd, env=env).check_output(input=input, timeout_sec=timeout_sec)
 
     def run_sh_script(self, script, input=None, cwd=None, timeout_sec=_DEFAULT_TIMEOUT_SEC, env=None):
         """Shortcut. Deprecated."""
