@@ -3387,7 +3387,7 @@ ErrorCode QnDbManager::getStorages(const QString& filterStr, ApiStorageDataList&
     if (result != ErrorCode::ok)
         return result;
 
-    mergeObjectListData<ApiStorageData>(
+    mergeObjectListData<ApiStorageDataList>(
         storageList, params,
         &ApiStorageData::addParams,
         &ApiResourceParamWithRefData::resourceId);
@@ -3574,7 +3574,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
     ErrorCode result = fetchResourceParams( filter, params );
     if( result != ErrorCode::ok )
         return result;
-    mergeObjectListData<ApiCameraDataEx>(cameraExList, params, &ApiCameraDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
+    mergeObjectListData<ApiCameraDataExList>(cameraExList, params, &ApiCameraDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
 
     std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
     ErrorCode errCode = getScheduleTasks(scheduleTaskList);
@@ -3673,7 +3673,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiMediaServerDataExList&
     result = fetchResourceParams( filter, params );
     if( result != ErrorCode::ok )
         return result;
-    mergeObjectListData<ApiMediaServerDataEx>(serverExList, params, &ApiMediaServerDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
+    mergeObjectListData<ApiMediaServerDataExList>(serverExList, params, &ApiMediaServerDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
 
     //reading status info
     ApiResourceStatusDataList statusList;

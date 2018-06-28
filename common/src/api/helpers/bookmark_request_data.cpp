@@ -72,7 +72,7 @@ QnCameraBookmark bookmarkFromParams(const QnRequestParamList& params, QnResource
     else
         bookmark.cameraId = camera->getId();
 
-    bookmark.tags = params.allValues(kTagParam).toSet();
+    bookmark.tags = params.allValues(kTagParam).toVector();
     return bookmark;
 }
 
