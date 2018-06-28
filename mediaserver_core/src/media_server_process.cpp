@@ -3336,7 +3336,7 @@ void MediaServerProcess::initializeLogging()
         "systemLoglevel", toString(nx::utils::log::Level::info));
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
-        QLatin1String("system_log"), nx::utils::log::addLogger(
+        QLatin1String("hw_log"), nx::utils::log::addLogger(
             {
                 QnLog::HWID_LOG,
                 toString(typeid(nx::mediaserver::LicenseWatcher))
@@ -3364,7 +3364,7 @@ void MediaServerProcess::initializeHardwareId()
     auto logSettings = makeLogSettings(cmdLineArguments().systemLogLevel, "systemLoglevel", "info");
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
-        QLatin1String("system_log"), nx::utils::log::addLogger(
+        QLatin1String("hw_log"), nx::utils::log::addLogger(
             {
                 QnLog::HWID_LOG,
                 toString(typeid(nx::mediaserver::LicenseWatcher))
