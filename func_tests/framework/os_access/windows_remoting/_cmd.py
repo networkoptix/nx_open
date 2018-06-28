@@ -1,5 +1,6 @@
 import base64
 import logging
+from pprint import pformat
 
 import xmltodict
 from winrm.exceptions import WinRMTransportError
@@ -118,6 +119,7 @@ class _WinRMCommand(Command):
                 }
             }
         response = self._protocol.send_message(xmltodict.unparse(rq))
+        _logger.debug("Terminate response:\n%s", pformat(xmltodict.parse(response)))
 
     def terminate(self):
         self._send_signal('ctrl_c')
