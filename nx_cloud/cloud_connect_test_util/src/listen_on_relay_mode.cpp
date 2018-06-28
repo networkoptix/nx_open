@@ -39,7 +39,7 @@ ListenOnRelaySettings::ListenOnRelaySettings(
     if (auto relayUrl = args.get("relay-url"))
         m_baseRelayUrl = nx::utils::Url(*relayUrl);
     else
-        throw std::runtime_error("Missing required attribute \"relay-url\"");
+        throw std::invalid_argument("Missing required attribute \"relay-url\"");
 
     if (auto hostName = args.get("listening-peer-host-name"))
         m_listeningPeerHostName = hostName->toStdString();
