@@ -1049,22 +1049,26 @@ void initialize(Manager* manager, Action* root)
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
 
+    // Used in the context menu.
     factory(ShowInfoAction)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Show Info"))
-        .shortcut(lit("Alt+I"))
+        .shortcut(lit("I"))
         .condition(ConditionWrapper(new DisplayInfoCondition(false))
             && !condition::isLayoutTourReviewMode());
 
+    // Used in the context menu.
     factory(HideInfoAction)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Hide Info"))
-        .shortcut(lit("Alt+I"))
+        .shortcut(lit("I"))
         .condition(ConditionWrapper(new DisplayInfoCondition(true))
             && !condition::isLayoutTourReviewMode());
 
+    // Used via the hotkey.
     factory(ToggleInfoAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
+        .shortcut(lit("I"))
         .shortcut(lit("Alt+I"))
         .condition(ConditionWrapper(new DisplayInfoCondition())
             && !condition::isLayoutTourReviewMode());
@@ -1100,7 +1104,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Show Motion/Smart Search"))
         .conditionalText(ContextMenu::tr("Show Motion"), new NoArchiveCondition())
-        .shortcut(lit("Alt+G"))
+        .shortcut(lit("A"))
         .condition(ConditionWrapper(new SmartSearchCondition(false))
             && !condition::isLayoutTourReviewMode());
 
@@ -1109,7 +1113,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(ContextMenu::tr("Hide Motion/Smart Search"))
         .conditionalText(ContextMenu::tr("Hide Motion"), new NoArchiveCondition())
-        .shortcut(lit("Alt+G"))
+        .shortcut(lit("A"))
         .condition(ConditionWrapper(new SmartSearchCondition(true))
             && !condition::isLayoutTourReviewMode());
 
@@ -1122,6 +1126,7 @@ void initialize(Manager* manager, Action* root)
 
     factory(ToggleSmartSearchAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
+        .shortcut(lit("A"))
         .shortcut(lit("Alt+G"))
         .condition(ConditionWrapper(new SmartSearchCondition())
             && !condition::isLayoutTourReviewMode());

@@ -291,6 +291,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
             action::ToggleSyncAction, //< S
             action::JumpToEndAction,  //< X
             action::JumpToStartAction,//< Z
+            action::ToggleInfoAction, //< I
+            action::ToggleSmartSearchAction, //< A
 
             /* "Delete" button */
             action::DeleteVideowallMatrixAction,
