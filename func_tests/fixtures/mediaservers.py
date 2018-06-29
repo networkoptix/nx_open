@@ -46,15 +46,15 @@ def mediaserver_factory(mediaserver_installers, artifact_factory, ca):
 
 
 @pytest.fixture()
-def two_stopped_mediaservers(mediaserver_factory, two_vms, node_dir):
+def two_stopped_mediaservers(mediaserver_factory, two_vms, artifacts_dir):
     first_vm, second_vm = two_vms
     with mediaserver_factory.allocated_mediaserver('first', first_vm) as first_mediaserver:
         with mediaserver_factory.allocated_mediaserver('second', second_vm) as second_mediaserver:
             with first_mediaserver.os_access.traffic_capture.capturing() as first_cap:
                 with second_mediaserver.os_access.traffic_capture.capturing() as second_cap:
                     yield first_mediaserver, second_mediaserver
-            copy_file(first_cap, node_dir / 'first.cap')
-            copy_file(second_cap, node_dir / 'second.cap')
+            copy_file(first_cap, artifacts_dir / 'first.cap')
+            copy_file(second_cap, artifacts_dir / 'second.cap')
 
 
 @pytest.fixture()
@@ -78,11 +78,11 @@ def two_merged_mediaservers(two_separate_mediaservers):
 
 
 @pytest.fixture()
-def one_mediaserver(one_vm, mediaserver_factory, node_dir):
+def one_mediaserver(one_vm, mediaserver_factory, artifacts_dir):
     with mediaserver_factory.allocated_mediaserver('single', one_vm) as mediaserver:
         with mediaserver.os_access.traffic_capture.capturing() as single_cap:
             yield mediaserver
-        copy_file(single_cap, node_dir / 'single.cap')
+        copy_file(single_cap, artifacts_dir / 'single.cap')
 
 
 @pytest.fixture()
