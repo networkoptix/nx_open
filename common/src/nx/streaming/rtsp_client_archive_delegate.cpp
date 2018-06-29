@@ -997,5 +997,6 @@ bool QnRtspClientArchiveDelegate::hasVideo() const
 
 void QnRtspClientArchiveDelegate::pleaseStop()
 {
-    m_rtspSession->shutdown();
+    if (m_rtspSession->isOpened())
+        m_rtspSession->shutdown();
 }

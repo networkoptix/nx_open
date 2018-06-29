@@ -259,6 +259,17 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
     if (reader == 0)
         return;
 
+    connect(
+        reader, &QnLongRunnable::paused,
+        this,
+            [reader, this]()
+            {
+                auto camera = reader->getResource().dynamicCast<QnSecurityCamResource>();
+                if (camera && camera->getCameraCapabilities().testFlag(Qn::isSyncPlay))
+                    reader->getArchiveDelegate()->pleaseStop(); //< To avoid block other channels.
+            },
+            Qt::DirectConnection);
+
     qint64 currentTime = getDisplayedTime();
 
     QnMutexLocker lock( &d->timeMutex );
@@ -751,10 +762,6 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
         // use pause instead of pauseMedia. Prevent isMediaPaused=true value. So, pause thread physically but not change any playback logic
         if (!reader->isPaused())
             reader->pause();
-
-        auto camera = reader->getResource().dynamicCast<QnSecurityCamResource>();
-        if (camera && camera->getCameraCapabilities().testFlag(Qn::isSyncPlay))
-            reader->getArchiveDelegate()->pleaseStop(); //< To avoid block other channels.
 
         if (d->enabled && isSyncReader)
             reader->setNavDelegate(this);
