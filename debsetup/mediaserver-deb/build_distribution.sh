@@ -92,13 +92,14 @@ buildDistribution()
         dw_mtt_metadata_plugin
         vca_metadata_plugin
     )
-    local PLUGINS_OPTIONAL=(
-        stub_metadata_plugin
-    )
     if [ "$ENABLE_HANWHA" == "true" ]
     then
         PLUGINS+=( hanwha_metadata_plugin )
     fi
+
+    local PLUGINS_OPTIONAL=(
+        stub_metadata_plugin
+    )
 
     local PLUGIN_FILENAME
     local PLUGIN
@@ -109,6 +110,7 @@ buildDistribution()
         echo "Copying (plugin) $PLUGIN_FILENAME"
         cp "$SERVER_LIB_PLUGIN_PATH/$PLUGIN_FILENAME" "$LIBPLUGINSTAGE/"
     done
+
     for PLUGIN in "${PLUGINS_OPTIONAL[@]}"
     do
         PLUGIN_FILENAME="lib$PLUGIN.so"
