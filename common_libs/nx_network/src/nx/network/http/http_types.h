@@ -341,7 +341,7 @@ public:
     StringType toMultipartString(const ConstBufferRefType& boundary) const;
 
     void setCookie(const StringType& name, const StringType& value, const StringType& path = "/");
-    void removeCookie(const StringType& name);
+    void setDeletedCookie(const StringType& name);
     std::map<StringType, StringType> getCookies() const;
 };
 

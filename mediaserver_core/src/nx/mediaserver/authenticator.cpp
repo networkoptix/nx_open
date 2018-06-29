@@ -153,7 +153,7 @@ static void removeLegacyCookie(
     for (const auto& name: {"X-runtime-guid", "auth", "nx-vms-csrf-token"})
     {
         if (!request.getCookieValue(name).isEmpty())
-            response->removeCookie(name);
+            response->setDeletedCookie(name);
     }
 }
 
@@ -183,7 +183,7 @@ void Authenticator::removeAccessCookie(
         return;
 
     m_sessionKeys.remove(sessionKey);
-    response->removeCookie(kCookieRuntimeGuid);
+    response->setDeletedCookie(kCookieRuntimeGuid);
 }
 
 Qn::AuthResult Authenticator::tryAllMethods(
