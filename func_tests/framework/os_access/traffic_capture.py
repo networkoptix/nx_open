@@ -33,6 +33,6 @@ class TrafficCapture(object):
             time.sleep(1)
             command.terminate()
             exit_code, stdout, stderr = command.communicate(timeout_sec=5)  # Time to cleanup.
-            _logger.debug("Exit code: %d", exit_code)
+            _logger.debug("Exit code: %s", exit_code)
             _logger.debug("STDOUT:\n%s", stdout)
             _logger.debug("STDERR:\n%s", stderr)
