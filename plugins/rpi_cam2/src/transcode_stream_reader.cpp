@@ -128,7 +128,7 @@ void TranscodeStreamReader::setBitrate(int bitrate)
 int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame) const
 {
     const AVPixelFormat* supportedFormats = m_videoEncoder->codec()->pix_fmts;
-    
+
     AVPixelFormat encoderFormat = supportedFormats
         ? nx::ffmpeg::utils::unDeprecatePixelFormat(supportedFormats[0])
         : nx::ffmpeg::utils::suggestPixelFormat(m_videoEncoder->codecID());
@@ -147,7 +147,7 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame) const
         nullptr,
         nullptr,
         nullptr);
-    if(*imageConvertContext)
+    if(!imageConvertContext)
     {
         ffmpeg::error::setLastError(AVERROR(ENOMEM));
         return AVERROR(ENOMEM);
