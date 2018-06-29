@@ -20,7 +20,6 @@
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/widgets/system_settings/file_name_input_widget.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <utils/common/delayed.h>
@@ -132,6 +131,18 @@ void QnDatabaseManagementWidget::restoreDbFromFile(const QString& fileName)
         return;
     }
 
+    const auto button = QnMessageBox::question(this,
+        tr("Restore database?"),
+        tr("System configuration will be restored from backup,"
+           " Server application will be restarted."),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
+
+    if (button != QDialogButtonBox::Ok)
+    {
+        file.close();
+        return;
+    }
+
     ec2::ApiDatabaseDumpData data;
     data.data = file.readAll();
     file.close();
@@ -180,56 +191,23 @@ void QnDatabaseManagementWidget::restoreDbFromFile(const QString& fileName)
     }
 }
 
-void QnDatabaseManagementWidget::setupMacOSRestoreDialog(
-    QnMessageBox* parent,
-    QString* fileName)
+void QnDatabaseManagementWidget::restoreDb()
 {
-    parent->setButtonEnabled(QDialogButtonBox::Ok, false);
-    const auto widget = new QnFileNameInputWidget([this]() { return getFileName(); } );
-    connect(widget, &QnFileNameInputWidget::fileNameChanged, this,
-        [fileName, parent](const QString& value)
-        {
-            *fileName = value;
-            parent->setButtonEnabled(QDialogButtonBox::Ok, true);
-        });
-
-    parent->addCustomWidget(widget, QnMessageBox::Layout::Content);
-}
-
-QString QnDatabaseManagementWidget::getFileName()
-{
-    return QFileDialog::getOpenFileName(
+    QString fileName = QFileDialog::getOpenFileName(
         this,
         tr("Open Database Backup..."),
         qnSettings->lastDatabaseBackupDir(),
         tr("Database Backup Files") + lit( "(*.db)"),
-        nullptr,
+        NULL,
         QnCustomFileDialog::fileDialogOptions());
-}
 
-void QnDatabaseManagementWidget::restoreDb()
-{
-    const bool isMacOS = nx::utils::AppInfo::isMacOsX();
-    auto fileName = isMacOS ? QString() : getFileName();
-    if (!isMacOS && fileName.isEmpty())
+
+    if (fileName.isEmpty())
         return;
 
-    QnMessageBox dialog(
-        QnMessageBoxIcon::Question,
-        tr("Restore database?"),
-        tr("System configuration will be restored from backup,"
-           " Server application will be restarted."),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Ok,
-        this);
-
-    if (isMacOS)
-        setupMacOSRestoreDialog(&dialog, &fileName);
-
-    if (dialog.exec() != QDialogButtonBox::Ok)
-        return;
-
-    if (!fileName.isEmpty())
+    if (nx::utils::AppInfo::isMacOsX()) //< Workaround for hanging NSOpenPane "close" animation.
+        executeLater([this, fileName]() { restoreDbFromFile(fileName); });
+    else
         restoreDbFromFile(fileName);
 }
 
