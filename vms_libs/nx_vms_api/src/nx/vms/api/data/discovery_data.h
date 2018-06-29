@@ -42,4 +42,6 @@ struct NX_VMS_API DiscoveredServerData: ModuleInformationWithAddresses
 
 Q_DECLARE_METATYPE(nx::vms::api::DiscoverPeerData)
 Q_DECLARE_METATYPE(nx::vms::api::DiscoveryData)
+Q_DECLARE_METATYPE(nx::vms::api::DiscoveryDataList)
 Q_DECLARE_METATYPE(nx::vms::api::DiscoveredServerData)
+Q_DECLARE_METATYPE(nx::vms::api::DiscoveredServerDataList)

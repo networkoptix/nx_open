@@ -24,3 +24,6 @@ struct NX_VMS_API ConnectionData: Data
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::ConnectionData)
+Q_DECLARE_METATYPE(nx::vms::api::ConnectionDataList)

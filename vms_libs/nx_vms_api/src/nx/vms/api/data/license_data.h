@@ -40,4 +40,6 @@ struct NX_VMS_API DetailedLicenseData: Data
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::LicenseData)
+Q_DECLARE_METATYPE(nx::vms::api::LicenseDataList)
 Q_DECLARE_METATYPE(nx::vms::api::DetailedLicenseData)
+Q_DECLARE_METATYPE(nx::vms::api::DetailedLicenseDataList)

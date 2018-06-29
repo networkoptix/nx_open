@@ -46,3 +46,4 @@ struct NX_VMS_API SystemMergeHistoryRecord: Data
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::SystemMergeHistoryRecord)
+Q_DECLARE_METATYPE(nx::vms::api::SystemMergeHistoryRecordList)

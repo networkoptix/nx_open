@@ -25,3 +25,4 @@ struct NX_VMS_API KeyValueData: Data
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::KeyValueData)
+Q_DECLARE_METATYPE(nx::vms::api::KeyValueDataList)

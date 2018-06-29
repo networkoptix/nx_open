@@ -24,10 +24,15 @@ struct NX_VMS_API ResourceTypeData: IdData
     QString name;
     QString vendor;
     std::vector<QnUuid> parentId;
-    std::vector<PropertyTypeData> propertyTypes;
+    PropertyTypeDataList propertyTypes;
 };
 #define ResourceTypeData_Fields IdData_Fields (name)(vendor)(parentId)(propertyTypes)
 
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::PropertyTypeData)
+Q_DECLARE_METATYPE(nx::vms::api::PropertyTypeDataList)
+Q_DECLARE_METATYPE(nx::vms::api::ResourceTypeData)
+Q_DECLARE_METATYPE(nx::vms::api::ResourceTypeDataList)

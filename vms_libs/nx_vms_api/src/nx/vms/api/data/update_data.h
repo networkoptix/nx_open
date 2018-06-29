@@ -44,4 +44,5 @@ struct NX_VMS_API UpdateInstallData: Data
 
 Q_DECLARE_METATYPE(nx::vms::api::UpdateUploadData)
 Q_DECLARE_METATYPE(nx::vms::api::UpdateUploadResponseData)
+Q_DECLARE_METATYPE(nx::vms::api::UpdateUploadResponseDataList)
 Q_DECLARE_METATYPE(nx::vms::api::UpdateInstallData)

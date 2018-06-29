@@ -68,3 +68,4 @@ struct NX_VMS_API UserData: ResourceData
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::UserData)
+Q_DECLARE_METATYPE(nx::vms::api::UserDataList)

@@ -20,3 +20,4 @@ struct NX_VMS_API CloudSystemData: Data
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::CloudSystemData)
+Q_DECLARE_METATYPE(nx::vms::api::CloudSystemDataList)

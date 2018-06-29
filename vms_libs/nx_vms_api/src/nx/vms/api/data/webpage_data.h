@@ -20,3 +20,4 @@ struct NX_VMS_API WebPageData: ResourceData
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::WebPageData)
+Q_DECLARE_METATYPE(nx::vms::api::WebPageDataList)

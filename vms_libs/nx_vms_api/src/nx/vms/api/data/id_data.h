@@ -39,3 +39,6 @@ struct NX_VMS_API IdData: Data
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::IdData)
+Q_DECLARE_METATYPE(nx::vms::api::IdDataList)

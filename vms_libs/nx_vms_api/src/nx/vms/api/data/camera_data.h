@@ -40,3 +40,4 @@ struct NX_VMS_API CameraData: ResourceData
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::CameraData)
+Q_DECLARE_METATYPE(nx::vms::api::CameraDataList)

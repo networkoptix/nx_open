@@ -103,4 +103,7 @@ struct NX_VMS_API CameraAttributesData: Data
 } // namespace vms
 } // namespace nx
 
+Q_DECLARE_METATYPE(nx::vms::api::ScheduleTaskData)
+Q_DECLARE_METATYPE(nx::vms::api::ScheduleTaskWithRefData)
 Q_DECLARE_METATYPE(nx::vms::api::CameraAttributesData)
+Q_DECLARE_METATYPE(nx::vms::api::CameraAttributesDataList)

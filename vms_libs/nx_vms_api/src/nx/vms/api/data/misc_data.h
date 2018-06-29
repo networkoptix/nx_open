@@ -19,3 +19,4 @@ struct NX_VMS_API MiscData: KeyValueData
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::MiscData)
+Q_DECLARE_METATYPE(nx::vms::api::MiscDataList)

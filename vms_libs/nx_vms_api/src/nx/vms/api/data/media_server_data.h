@@ -134,6 +134,10 @@ struct ParentId
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::StorageData)
+Q_DECLARE_METATYPE(nx::vms::api::StorageDataList)
 Q_DECLARE_METATYPE(nx::vms::api::MediaServerData)
+Q_DECLARE_METATYPE(nx::vms::api::MediaServerDataList)
 Q_DECLARE_METATYPE(nx::vms::api::MediaServerDataEx)
+Q_DECLARE_METATYPE(nx::vms::api::MediaServerDataExList)
 Q_DECLARE_METATYPE(nx::vms::api::MediaServerUserAttributesData)
+Q_DECLARE_METATYPE(nx::vms::api::MediaServerUserAttributesDataList)

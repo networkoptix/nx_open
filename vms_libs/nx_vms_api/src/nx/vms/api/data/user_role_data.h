@@ -43,4 +43,6 @@ struct NX_VMS_API PredefinedRoleData: Data
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::UserRoleData)
+Q_DECLARE_METATYPE(nx::vms::api::UserRoleDataList)
 Q_DECLARE_METATYPE(nx::vms::api::PredefinedRoleData)
+Q_DECLARE_METATYPE(nx::vms::api::PredefinedRoleDataList)

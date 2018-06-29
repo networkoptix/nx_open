@@ -24,3 +24,5 @@ struct NX_VMS_API EmailSettingsData: Data
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::EmailSettingsData)

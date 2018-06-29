@@ -64,4 +64,6 @@ struct NX_VMS_API LayoutData: ResourceData
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::LayoutItemData)
+Q_DECLARE_METATYPE(nx::vms::api::LayoutItemDataList)
 Q_DECLARE_METATYPE(nx::vms::api::LayoutData)
+Q_DECLARE_METATYPE(nx::vms::api::LayoutDataList)

@@ -33,3 +33,8 @@ struct NX_VMS_API StoredFilePath: Data
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::StoredFileData)
+Q_DECLARE_METATYPE(nx::vms::api::StoredFileDataList)
+Q_DECLARE_METATYPE(nx::vms::api::StoredFilePath)
+Q_DECLARE_METATYPE(nx::vms::api::StoredFilePathList)
