@@ -5,9 +5,7 @@ from io import BytesIO
 from framework.installation.installation import Installation
 from framework.installation.installer import Version, find_customization, UnknownCustomization
 from framework.installation.upstart_service import UpstartService
-from framework.method_caching import cached_property
 from framework.os_access.exceptions import DoesNotExist
-from framework.os_access.path import copy_file
 from framework.os_access.posix_shell import PosixShell
 
 if sys.version_info[:2] == (2, 7):
@@ -53,12 +51,6 @@ class DebInstallation(Installation):
                 all_paths_exist = False
         return all_paths_exist
 
-    @cached_property
-    def service(self):
-        service_name = self.installer.customization.linux_service_name
-        stop_timeout_sec = 10  # 120 seconds specified in upstart conf file.
-        return UpstartService(self._posix_shell, service_name, stop_timeout_sec)
-
     def list_core_dumps(self):
         return self._bin.glob('core.*')
 
@@ -102,27 +94,3 @@ class DebInstallation(Installation):
         if self.installer.customization != installed_customization:
             return False
         return True
-
-    def install(self):
-        if self._can_be_reused():
-            return
-
-        remote_path = self.os_access.Path.tmp() / self.installer.path.name
-        remote_path.parent.mkdir(parents=True, exist_ok=True)
-        copy_file(self.installer.path, remote_path)
-        self.posix_access.ssh.run_sh_script(
-            # language=Bash
-            '''
-                # Commands and dependencies for trusty template.
-                CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
-                echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
-                sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
-                DEBIAN_FRONTEND=noninteractive dpkg -i "$DEB"
-                cp "$CONFIG" "$CONFIG_INITIAL"
-                ''',
-            env={
-                'DEB': remote_path,
-                'CONFIG': self._config,
-                'CONFIG_INITIAL': self._config_initial,
-                })
-        assert self.is_valid()
