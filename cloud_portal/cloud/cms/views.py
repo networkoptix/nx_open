@@ -243,6 +243,7 @@ def version(request, version_id=None):
 def response_attachment(data, filename, content_type):
     response = HttpResponse(data, content_type=content_type)
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    response.set_cookie('filename', filename, max_age=10);
     return response
 
 
