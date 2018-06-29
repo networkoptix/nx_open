@@ -56,10 +56,8 @@ int defaultPortForScheme(const StringType& scheme)
 
 StringType getHeaderValue(const HttpHeaders& headers, const StringType& headerName)
 {
-    HttpHeaders::const_iterator it = headers.lower_bound(headerName);
-    return it == headers.end() || strcasecmp(it->first, headerName) != 0
-        ? StringType()
-        : it->second;
+    const auto it = headers.find(headerName);
+    return it == headers.end() ? StringType() : it->second;
 }
 
 bool readHeader(
@@ -67,8 +65,8 @@ bool readHeader(
     const StringType& headerName,
     int* value)
 {
-    auto it = headers.lower_bound(headerName);
-    if (it == headers.end() || strcasecmp(it->first, headerName) != 0)
+    const auto it = headers.find(headerName);
+    if (it == headers.end())
         return false;
 
     *value = it->second.toInt();
@@ -77,19 +75,12 @@ bool readHeader(
 
 HttpHeaders::iterator insertOrReplaceHeader(HttpHeaders* const headers, const HttpHeader& newHeader)
 {
-    const auto name = newHeader.first.toLower();
+    const auto it = headers->find(newHeader.first);
+    if (it == headers->end())
+        return headers->insert(newHeader);
 
-    HttpHeaders::iterator existingHeaderIter = headers->lower_bound(name);
-    if ((existingHeaderIter != headers->end()) &&
-        (strcasecmp(existingHeaderIter->first, name) == 0))
-    {
-        existingHeaderIter->second = newHeader.second;  //replacing header
-        return existingHeaderIter;
-    }
-    else
-    {
-        return headers->insert(existingHeaderIter, newHeader);
-    }
+    it->second = newHeader.second;
+    return it;
 }
 
 HttpHeaders::iterator insertHeader(HttpHeaders* const headers, const HttpHeader& newHeader)
