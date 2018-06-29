@@ -2,6 +2,8 @@
 #include <nx/p2p/p2p_message_bus.h>
 #include "transaction_message_bus.h"
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 TransactionMessageBusAdapter::TransactionMessageBusAdapter(

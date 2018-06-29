@@ -225,11 +225,11 @@ void Controller::initializeDataSynchronizationEngine()
         m_systemManager.systemMarkedAsDeletedSubscription());
 
     m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, ::ec2::ApiSystemMergeHistoryRecord, int>(
+        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord, int>(
             [this](
                 nx::utils::db::QueryContext* queryContext,
                 const nx::String& /*systemId*/,
-                data_sync_engine::Command<::ec2::ApiSystemMergeHistoryRecord> data,
+                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data,
                 int*)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);

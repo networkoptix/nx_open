@@ -2,6 +2,7 @@
 
 #include <nx/api/updates2/updates2_status_data.h>
 #include <nx/update/info/abstract_update_registry.h>
+#include <nx/utils/software_version.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/update/manager/detail/updates2_status_data_ex.h>
@@ -21,7 +22,7 @@ class NX_UPDATE_API Updates2ManagerBase: public QObject
 public:
     Updates2ManagerBase();
     api::Updates2StatusData status();
-    api::Updates2StatusData download(const QnSoftwareVersion& targetVersion);
+    api::Updates2StatusData download(const nx::utils::SoftwareVersion& targetVersion);
     api::Updates2StatusData install();
     api::Updates2StatusData cancel();
     api::Updates2StatusData check();

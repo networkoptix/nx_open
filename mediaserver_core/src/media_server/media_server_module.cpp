@@ -66,6 +66,7 @@
 #include <nx/vms/network/reverse_connection_manager.h>
 #include <nx/vms/time_sync/server_time_sync_manager.h>
 
+using namespace nx;
 using namespace nx::mediaserver;
 
 namespace {

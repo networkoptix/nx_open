@@ -337,7 +337,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 if (model->actionParams().needConfirmation)
                 {
                     btn->setSubjectValidationPolicy(new QnRequiredPermissionSubjectPolicy(
-                        Qn::GlobalManageBookmarksPermission, tr("Manage Bookmarks")));
+                        GlobalPermission::manageBookmarks, tr("Manage Bookmarks")));
                 }
                 else
                 {

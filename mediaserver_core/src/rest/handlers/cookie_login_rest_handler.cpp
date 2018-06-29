@@ -14,6 +14,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
+#include <nx/network/app_info.h>
 #include "cookie_logout_rest_handler.h"
 #include "current_user_rest_handler.h"
 

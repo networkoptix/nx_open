@@ -90,20 +90,6 @@
 #include <network/networkoptixmodulerevealcommon.h>
 
 #include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_discovery_data.h>
-#include <nx_ec/data/api_resource_data.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
-#include <nx_ec/data/api_full_info_data.h>
-#include <nx/vms/api/data/event_rule_data.h> //< Required for the FullInfoData
-#include <nx/vms/api/data/resource_type_data.h> //< Required for the FullInfoData
-#include <nx/vms/api/data/webpage_data.h> //< Required for the FullInfoData
-#include <nx/vms/api/data/videowall_data.h> //< Required for the FullInfoData
-#include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_license_data.h>
-#include <nx/vms/api/data/layout_data.h>    //< Required for the FullInfoData
-#include <nx/vms/api/data/layout_tour_data.h>  //< Required for the FullInfoData
-#include <nx_ec/data/api_access_rights_data.h>
-#include <nx_ec/transaction_timestamp.h>
 
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
@@ -211,11 +197,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<QnTimePeriodList>();
     qRegisterMetaType<MultiServerPeriodDataList>();
 
-    qRegisterMetaType<QnSoftwareVersion>();
-    qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
-    qRegisterMetaType<QnSystemInformation>();
-    qRegisterMetaTypeStreamOperators<QnSystemInformation>();
-
     qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnCameraAdvancedParamValue>();
     qRegisterMetaType<QnCameraAdvancedParamValueList>();
@@ -287,11 +268,7 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::ResourceInfoLevel>();
     qRegisterMetaTypeStreamOperators<Qn::ResourceInfoLevel>();
 
-    qRegisterMetaType<QnModuleInformation>();
     qRegisterMetaType<QnGetNonceReply>();
-    qRegisterMetaType<QnModuleInformationWithAddresses>();
-    qRegisterMetaType<QList<QnModuleInformation>>();
-    qRegisterMetaType<QList<QnModuleInformationWithAddresses>>();
 
     qRegisterMetaType<QnConfigureReply>();
     qRegisterMetaType<QnUploadUpdateReply>();
@@ -303,32 +280,11 @@ void QnCommonMetaTypes::initialize()
 
     qRegisterMetaType<Qn::ConnectionResult>();
 
-    qRegisterMetaType<ec2::Timestamp>("Timestamp");
-
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::NotificationSource>();
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
-    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" );
-    qRegisterMetaType<ec2::ApiPeerData>("ApiPeerData");
-    qRegisterMetaType<ec2::ApiPeerData>();
-    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" );
-    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" );
-    qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");
-    qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
-    qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
-    qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
-
-    qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
-    qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
-    qRegisterMetaType<ec2::ApiUserRoleData>("ec2::ApiUserRoleData");
-    qRegisterMetaType<ec2::ApiPredefinedRoleData>("ec2::ApiPredefinedRoleData");
-    qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");  
-
-    qRegisterMetaType<ec2::ApiMediaServerData>("ec2::ApiMediaServerData");
-    qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
-    qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();

@@ -725,7 +725,7 @@ bool QnServerStreamRecorder::isRedundantSyncOn() const
     auto mediaServer = commonModule()->currentServer();
     NX_ASSERT(mediaServer);
 
-    if (mediaServer->getBackupSchedule().backupType != Qn::Backup_RealTime)
+    if (mediaServer->getBackupSchedule().backupType != nx::vms::api::BackupType::realtime)
         return false;
 
     auto cam = m_resource.dynamicCast<QnSecurityCamResource>();

@@ -970,7 +970,7 @@ ActionVisibility ToggleTitleBarCondition::check(const Parameters& /*parameters*/
 
 ActionVisibility NoArchiveCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
 {
-    return context->accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+    return context->accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
         ? InvisibleAction
         : EnabledAction;
 }
@@ -1684,7 +1684,7 @@ ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition)
     return new ScopedCondition(scope, std::move(condition));
 }
 
-ConditionWrapper hasGlobalPermission(Qn::GlobalPermission permission)
+ConditionWrapper hasGlobalPermission(GlobalPermission permission)
 {
     return new CustomBoolCondition(
         [permission](const Parameters& /*parameters*/, QnWorkbenchContext* context)

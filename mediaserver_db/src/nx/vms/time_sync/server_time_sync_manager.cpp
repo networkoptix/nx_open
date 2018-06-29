@@ -1,19 +1,20 @@
 #include "server_time_sync_manager.h"
 
+#include <api/global_settings.h>
+#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <common/common_module.h>
-#include <api/global_settings.h>
-#include <nx/utils/elapsed_timer.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
-#include <nx/network/time/time_protocol_client.h>
-#include <utils/common/rfc868_servers.h>
-#include <nx/network/socket_factory.h>
-#include <nx/network/http/http_client.h>
-#include <nx/utils/time.h>
-#include <utils/common/delayed.h>
-#include <transaction/transaction.h>
 #include <transaction/message_bus_adapter.h>
+#include <transaction/transaction.h>
+#include <utils/common/rfc868_servers.h>
+#include <utils/common/delayed.h>
+
+#include <nx/network/http/http_client.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/time/time_protocol_client.h>
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/time.h>
+#include <nx/vms/api/data/misc_data.h>
 
 namespace nx {
 namespace vms {
@@ -34,7 +35,7 @@ ServerTimeSyncManager::ServerTimeSyncManager(
         {
             const auto systemTimeDeltaMs = syncTimeMs - m_systemClock->millisSinceEpoch().count();
             auto connection = this->commonModule()->ec2Connection();
-            ec2::ApiMiscData deltaData(
+            vms::api::MiscData deltaData(
                 kTimeDeltaParamName,
                 QByteArray::number(systemTimeDeltaMs));
 
@@ -64,7 +65,7 @@ void ServerTimeSyncManager::broadcastSystemTime()
 {
     using namespace ec2;
     auto connection = commonModule()->ec2Connection();
-    QnTransaction<ApiPeerSyncTimeData> tran(
+    QnTransaction<nx::vms::api::PeerSyncTimeData> tran(
         ApiCommand::broadcastPeerSyncTime,
         commonModule()->moduleGUID());
     tran.params.syncTimeMs = getSyncTime().count();
@@ -186,7 +187,7 @@ QnRoute ServerTimeSyncManager::routeToNearestServerWithInternet()
     QnRoute result;
     for (const auto& server: servers)
     {
-        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP))
             continue;
         auto route = commonModule()->router()->routeTo(server->getId());
         if (route.distance < minDistance)
@@ -249,7 +250,7 @@ void ServerTimeSyncManager::updateTime()
 
 void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
 {
-    ec2::ApiMiscData deltaData;
+    vms::api::MiscData deltaData;
     auto miscManager = connection->getMiscManager(Qn::kSystemAccess);
     auto dbResult = miscManager->getMiscParamSync(kTimeDeltaParamName, &deltaData);
     if (dbResult != ec2::ErrorCode::ok)

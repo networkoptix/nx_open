@@ -29,7 +29,6 @@ struct UserPermissionsRemapData
     int permissions = 0;
 };
 
-
 bool doRemap(const QSqlDatabase& database, const UserPermissionsRemapData& data)
 {
     QSqlQuery query(database);
@@ -89,21 +88,21 @@ int migrateFromV26(int oldPermissions)
 int fixCustomFlag(int oldPermissions)
 {
     using boost::algorithm::any_of;
-    Qn::GlobalPermissions result =
-        static_cast<Qn::GlobalPermissions>(oldPermissions) & ~Qn::GlobalCustomUserPermission;
-    if (result.testFlag(Qn::GlobalAdminPermission))
-        return Qn::GlobalAdminPermission;
+    GlobalPermissions result =
+        oldPermissions & ~GlobalPermissions(GlobalPermission::customUser);
+    if (result.testFlag(GlobalPermission::admin))
+        return int(GlobalPermission::admin);
 
     const bool isPredefined = any_of(QnUserRolesManager::getPredefinedRoles(),
-        [result](const ApiPredefinedRoleData& role)
+        [result](const nx::vms::api::PredefinedRoleData& role)
         {
             return role.permissions == result;
         });
     if (!isPredefined)
-        result |= Qn::GlobalCustomUserPermission;
+        result |= GlobalPermission::customUser;
 
     QString logMessage = lit("Fix User Permissions Custom Flag: %1 -> %2")
-        .arg(QnLexical::serialized(static_cast<Qn::GlobalPermissions>(oldPermissions)))
+        .arg(QnLexical::serialized(static_cast<GlobalPermissions>(oldPermissions)))
         .arg(result);
     NX_LOG(logMessage, cl_logINFO);
 

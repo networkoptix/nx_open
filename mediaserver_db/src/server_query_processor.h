@@ -221,10 +221,10 @@ public:
      * @param handler Called upon request completion. Functor(ErrorCode).
      */
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiLicenseDataList>& tran, HandlerType handler)
+    void processUpdateAsync(QnTransaction<nx::vms::api::LicenseDataList>& tran, HandlerType handler)
     {
         NX_ASSERT(tran.command == ApiCommand::addLicenses);
-        return processMultiUpdateAsync<ApiLicenseDataList, ApiLicenseData>(
+        return processMultiUpdateAsync<nx::vms::api::LicenseDataList, nx::vms::api::LicenseData>(
             tran, handler, ApiCommand::addLicense);
     }
 
@@ -249,10 +249,10 @@ public:
     * @param handler Called upon request completion. Functor(ErrorCode).
     */
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiUserDataList>& tran, HandlerType handler)
+    void processUpdateAsync(QnTransaction<nx::vms::api::UserDataList>& tran, HandlerType handler)
     {
         NX_ASSERT(tran.command == ApiCommand::saveUsers);
-        return processMultiUpdateAsync<ApiUserDataList, ApiUserData>(
+        return processMultiUpdateAsync<nx::vms::api::UserDataList, nx::vms::api::UserData>(
             tran, handler, ApiCommand::saveUser);
     }
 
@@ -275,10 +275,10 @@ public:
      * @param handler Called upon request completion. Functor(ErrorCode).
      */
     template<class HandlerType>
-    void processUpdateAsync(QnTransaction<ApiStorageDataList>& tran, HandlerType handler)
+    void processUpdateAsync(QnTransaction<nx::vms::api::StorageDataList>& tran, HandlerType handler)
     {
         NX_ASSERT(tran.command == ApiCommand::saveStorages);
-        return processMultiUpdateAsync<ApiStorageDataList, ApiStorageData>(
+        return processMultiUpdateAsync<nx::vms::api::StorageDataList, nx::vms::api::StorageData>(
             tran, handler, ApiCommand::saveStorage);
     }
 
@@ -308,11 +308,11 @@ public:
      */
     template<class HandlerType>
     void processUpdateAsync(
-        QnTransaction<ApiMediaServerUserAttributesDataList>& tran, HandlerType handler)
+        QnTransaction<nx::vms::api::MediaServerUserAttributesDataList>& tran, HandlerType handler)
     {
         NX_ASSERT(tran.command == ApiCommand::saveMediaServerUserAttributesList);
         return processMultiUpdateAsync<
-            ApiMediaServerUserAttributesDataList, ApiMediaServerUserAttributesData>(
+            nx::vms::api::MediaServerUserAttributesDataList, nx::vms::api::MediaServerUserAttributesData>(
                 tran, handler, ApiCommand::saveMediaServerUserAttributes);
     }
 

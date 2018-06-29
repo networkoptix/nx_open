@@ -30,8 +30,8 @@ void toUrlParams(const QnUuid& id, QUrlQuery* query);
 
 bool parseHttpRequestParams(
     QnCommonModule* commonModule,
-    const QString& command, const QnRequestParamList& params, ParentId* id);
-void toUrlParams(const ParentId& id, QUrlQuery* query);
+    const QString& command, const QnRequestParamList& params, nx::vms::api::ParentId* id);
+void toUrlParams(const nx::vms::api::ParentId& id, QUrlQuery* query);
 
 bool parseHttpRequestParams(
     QnCommonModule* commonModule,

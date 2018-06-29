@@ -27,8 +27,8 @@ const static QString kFileName = "test.file.name";
 const static QString kUpdatesUrl = "test.url";
 const static QString kCloudHost = "test.cloud.host";
 const static QString kCustomization = "test.customization";
-const static QnSoftwareVersion kCurrentNxVersion = QnSoftwareVersion("1.0.0.1");
-const static QnSoftwareVersion kUpdateNxVersion = QnSoftwareVersion("5.0.0.1");
+const static nx::utils::SoftwareVersion kCurrentNxVersion("1.0.0.1");
+const static nx::utils::SoftwareVersion kUpdateNxVersion("5.0.0.1");
 const static QString kPlatform = "test.platform";
 const static QString kArch = "test.arch";
 const static QString kModification = "test.modification";
@@ -502,7 +502,7 @@ private:
 class Updates2Manager: public ::testing::Test, public AbstractExternalsSupplier
 {
 public:
-    const QnSoftwareVersion kNewVersion = QnSoftwareVersion("1.0.0.2");
+    const nx::utils::SoftwareVersion kNewVersion = nx::utils::SoftwareVersion("1.0.0.2");
 
 protected:
     virtual void SetUp() override

@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    QnStaticCommonModule staticCommon(Qn::PT_NotDefined, QString(), QString());
+    QnStaticCommonModule staticCommon(nx::vms::api::PeerType::notDefined, QString(), QString());
     //QnCommonModule common(false, nx::core::access::Mode::direct);
 
     QnFfmpegInitializer ffmpeg;

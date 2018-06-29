@@ -32,9 +32,9 @@ using namespace nx::vms::utils;
 
 namespace {
 
-const auto kUserRightsRefactoredVersion = QnSoftwareVersion(3, 0);
+static const nx::utils::SoftwareVersion kUserRightsRefactoredVersion(3, 0);
 
-} // anonymous namespace
+} // namespace
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),

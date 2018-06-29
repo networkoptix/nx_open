@@ -1,7 +1,7 @@
 #include "common_updates2_installer.h"
 #include <nx/update/installer/detail/zip_extractor.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/system_information.h>
+#include <utils/common/app_info.h>
 #include <QtCore>
 
 namespace nx {
@@ -38,9 +38,9 @@ QVariantMap CommonUpdates2Installer::updateInformation(const QString& outputPath
     return QJsonDocument::fromJson(updateInfoFile.readAll()).toVariant().toMap();
 }
 
-QnSystemInformation CommonUpdates2Installer::systemInformation() const
+nx::vms::api::SystemInformation CommonUpdates2Installer::systemInformation() const
 {
-    return QnSystemInformation::currentSystemInformation();
+    return QnAppInfo::currentSystemInformation();
 }
 
 bool CommonUpdates2Installer::checkExecutable(const QString& executableName) const

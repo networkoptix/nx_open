@@ -174,18 +174,18 @@ namespace ec2
             void onGetKvPairsDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceParamWithRefDataList&);
             void onGetStatusListDone            (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceStatusDataList&);
             void onSaveKvPairsDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::ResourceParamWithRefDataList&);
-            void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMiscData&);
+            void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::MiscData&);
             void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RulePtr&);
-            void onGetServersDone               (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataList&);
-            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerUserAttributesDataList&);
-            void onGetServersExDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataExList&);
-            void onGetStoragesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiStorageDataList&);
+            void onGetServersDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::MediaServerDataList&);
+            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const nx::vms::api::MediaServerUserAttributesDataList&);
+            void onGetServersExDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::MediaServerDataExList&);
+            void onGetStoragesDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::StorageDataList&);
             void onGetCamerasDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraDataList&);
             void onGetCameraUserAttributesDone  (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraAttributesDataList&);
             void onGetCamerasExDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::CameraDataExList&);
             void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const nx::vms::api::ServerFootageDataList&);
-            void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const ec2::ApiUserDataList&);
-            void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const ec2::ApiUserRoleDataList&);
+            void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const nx::vms::api::UserDataList&);
+            void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::UserRoleDataList&);
             void onGetEventRulesDone(int, ec2::ErrorCode, const nx::vms::api::EventRuleDataList&);
             void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
             void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const nx::vms::api::LayoutDataList&);
@@ -194,13 +194,13 @@ namespace ec2
             void onListDirectoryDone            (int reqID, const ec2::ErrorCode, const QStringList&);
             void onCurrentTimeDone              (int reqID, const ec2::ErrorCode, const qint64&);
             void onDumpDatabaseDone             (int reqID, const ec2::ErrorCode, const nx::vms::api::DatabaseDumpData&);
-            void onGetDiscoveryDataDone         (int reqID, const ec2::ErrorCode, const ec2::ApiDiscoveryDataList&);
+            void onGetDiscoveryDataDone         (int reqID, const ec2::ErrorCode, const nx::vms::api::DiscoveryDataList&);
             void onTestConnectionDone           (int reqID, const ec2::ErrorCode, const QnConnectionInfo&);
             void onConnectDone                  (int reqID, const ec2::ErrorCode, const AbstractECConnectionPtr &);
             void onGetVideowallsDone            (int reqID, const ec2::ErrorCode, const nx::vms::api::VideowallDataList&);
             void onGetWebPagesDone              (int reqID, const ec2::ErrorCode, const nx::vms::api::WebPageDataList&);
-            void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const ec2::ApiAccessRightsDataList&);
-            void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const ec2::ApiSystemMergeHistoryRecordList&);
+            void onGetAccessRightsDone          (int reqID, const ec2::ErrorCode, const nx::vms::api::AccessRightsDataList&);
+            void onGetSystemMergeHistoryDone    (int reqID, const ec2::ErrorCode, const nx::vms::api::SystemMergeHistoryRecordList&);
         };
 
 
@@ -223,16 +223,16 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(GetKvPairs,                  ec2::ErrorCode, nx::vms::api::ResourceParamWithRefDataList)
         DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, nx::vms::api::ResourceStatusDataList)
         DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, nx::vms::api::ResourceParamWithRefDataList)
-        DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, ec2::ApiMiscData)
-        DEFINE_TWO_ARG_HANDLER(GetSystemMergeHistory,       ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)
+        DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, nx::vms::api::MiscData)
+        DEFINE_TWO_ARG_HANDLER(GetSystemMergeHistory,       ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetServers,                  ec2::ErrorCode, ec2::ApiMediaServerDataList)
-        DEFINE_TWO_ARG_HANDLER(GetServersEx,                ec2::ErrorCode, ec2::ApiMediaServerDataExList)
-        DEFINE_TWO_ARG_HANDLER(GetServerUserAttributes,     ec2::ErrorCode, ec2::ApiMediaServerUserAttributesDataList)
-        DEFINE_TWO_ARG_HANDLER(GetStorages,                 ec2::ErrorCode, ec2::ApiStorageDataList)
+        DEFINE_TWO_ARG_HANDLER(GetServers,                  ec2::ErrorCode, nx::vms::api::MediaServerDataList)
+        DEFINE_TWO_ARG_HANDLER(GetServersEx,                ec2::ErrorCode, nx::vms::api::MediaServerDataExList)
+        DEFINE_TWO_ARG_HANDLER(GetServerUserAttributes,     ec2::ErrorCode, nx::vms::api::MediaServerUserAttributesDataList)
+        DEFINE_TWO_ARG_HANDLER(GetStorages,                 ec2::ErrorCode, nx::vms::api::StorageDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractCameraManager
@@ -263,13 +263,13 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractUserManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetUsers,                   ec2::ErrorCode, ec2::ApiUserDataList)
-        DEFINE_TWO_ARG_HANDLER(GetUserRoles,               ec2::ErrorCode, ec2::ApiUserRoleDataList)
+        DEFINE_TWO_ARG_HANDLER(GetUsers,                   ec2::ErrorCode, nx::vms::api::UserDataList)
+        DEFINE_TWO_ARG_HANDLER(GetUserRoles,               ec2::ErrorCode, nx::vms::api::UserRoleDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractAccessRightsManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetAccessRights,             ec2::ErrorCode, ec2::ApiAccessRightsDataList)
+        DEFINE_TWO_ARG_HANDLER(GetAccessRights,             ec2::ErrorCode, nx::vms::api::AccessRightsDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractEventRulesManager
@@ -294,7 +294,7 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractDiscoveryManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetDiscoveryData, ec2::ErrorCode, ec2::ApiDiscoveryDataList)
+        DEFINE_TWO_ARG_HANDLER(GetDiscoveryData, ec2::ErrorCode, nx::vms::api::DiscoveryDataList)
 
 
         //////////////////////////////////////////////////////////

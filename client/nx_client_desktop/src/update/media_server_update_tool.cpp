@@ -29,11 +29,11 @@ namespace {
 
     const bool defaultEnableClientUpdates = true;
 
-    QnSoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
+    nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
     {
-        QnSoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
+        nx::utils::SoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
         const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
-        for(const QnMediaServerResourcePtr &server: allServers)
+        for(const auto& server: allServers)
         {
             if (server->getVersion() < minimalVersion)
                 minimalVersion = server->getVersion();
@@ -172,8 +172,8 @@ QSet<QnUuid> QnMediaServerUpdateTool::actualTargetIds() const {
     return targets;
 }
 
-QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion,
-    const QString& targetChangeset) const
+QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(
+    const nx::utils::SoftwareVersion& targetVersion, const QString& targetChangeset) const
 {
     QUrlQuery query;
 
@@ -194,7 +194,7 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
         query.addQueryItem(lit("password"), passwordForBuild(key));
     }
 
-    QSet<QnSystemInformation> systemInformationList;
+    QSet<nx::vms::api::SystemInformation> systemInformationList;
     for (const auto& server: actualTargets())
     {
         bool incompatible = (server->getStatus() == Qn::Incompatible);
@@ -211,8 +211,10 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
         systemInformationList.insert(server->getSystemInfo());
     }
 
-    query.addQueryItem(lit("client"), QnSystemInformation::currentSystemInformation().toString().replace(L' ', L'_'));
-    foreach (const QnSystemInformation &systemInformation, systemInformationList)
+    query.addQueryItem(lit("client"),
+        QnAppInfo::currentSystemInformation().toString().replace(L' ', L'_'));
+
+    for (const auto& systemInformation: systemInformationList)
         query.addQueryItem(lit("server"), systemInformation.toString().replace(L' ', L'_'));
 
     query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
@@ -223,19 +225,27 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
     return url;
 }
 
-void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version, std::function<void(const QnCheckForUpdateResult &result)> func) {
-    QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+void QnMediaServerUpdateTool::checkForUpdates(const nx::utils::SoftwareVersion& version,
+    std::function<void(const QnCheckForUpdateResult& result)> func)
+{
+    QnUpdateTarget target(actualTargetIds(), version,
+        !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     checkForUpdates(target, func);
 }
 
-void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName, std::function<void(const QnCheckForUpdateResult &result)> func) {
-    QnUpdateTarget target(actualTargetIds(), fileName, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+void QnMediaServerUpdateTool::checkForUpdates(const QString& fileName,
+    std::function<void(const QnCheckForUpdateResult &result)> func)
+{
+    QnUpdateTarget target(actualTargetIds(), fileName,
+        !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     checkForUpdates(target, func);
 }
 
 
-void QnMediaServerUpdateTool::startUpdate(const QnSoftwareVersion &version /* = QnSoftwareVersion()*/) {
-    QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+void QnMediaServerUpdateTool::startUpdate(const nx::utils::SoftwareVersion& version /* = {}*/)
+{
+    QnUpdateTarget target(actualTargetIds(), version,
+        !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     startUpdate(target);
 }
 
@@ -244,8 +254,10 @@ void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
     startUpdate(target);
 }
 
-void QnMediaServerUpdateTool::startOnlineClientUpdate(const QnSoftwareVersion &version) {
-    QnUpdateTarget target(QSet<QnUuid>(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+void QnMediaServerUpdateTool::startOnlineClientUpdate(const nx::utils::SoftwareVersion& version)
+{
+    QnUpdateTarget target(QSet<QnUuid>(), version,
+        !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     startUpdate(target);
 }
 
@@ -260,7 +272,8 @@ bool QnMediaServerUpdateTool::canCancelUpdate() const
     return true;
 }
 
-bool QnMediaServerUpdateTool::cancelUpdate() {
+bool QnMediaServerUpdateTool::cancelUpdate()
+{
     if (!m_updateProcess)
         return true;
 
@@ -312,7 +325,6 @@ void QnMediaServerUpdateTool::checkForUpdates(
     m_checkUpdatesTask->start();
     setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
 }
-
 
 void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
 {

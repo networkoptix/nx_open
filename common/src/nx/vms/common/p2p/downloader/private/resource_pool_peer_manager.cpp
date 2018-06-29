@@ -129,7 +129,7 @@ bool ResourcePoolPeerManager::hasInternetConnection(const QnUuid& peerId) const
     if (!server)
         return false;
 
-    return server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    return server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
 }
 
 bool ResourcePoolPeerManager::hasAccessToTheUrl(const QString& url) const

@@ -30,7 +30,7 @@ public:
     void waitUntilAllServersAreInterconnected();
     void waitUntilAllServersSynchronizedData();
 
-    ApiSystemMergeHistoryRecordList waitUntilMergeHistoryIsAdded();
+    nx::vms::api::SystemMergeHistoryRecordList waitUntilMergeHistoryIsAdded();
 
     QnRestResult::Error prevMergeResult() const;
 

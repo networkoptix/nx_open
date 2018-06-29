@@ -21,7 +21,7 @@ QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
     connect(ui->checkVersionButton, &QPushButton::clicked, this,
         [this]
         {
-            QnSoftwareVersion v(ui->checkVersionlineEdit->text());
+            nx::utils::SoftwareVersion v(ui->checkVersionlineEdit->text());
             if (v.isNull())
                 v = qnStaticCommon->engineVersion();
 
@@ -39,7 +39,7 @@ QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
     connect(ui->getVersionsButton, &QPushButton::clicked, this,
         [this]
         {
-            QList<QnSoftwareVersion> versions;
+            QList<nx::utils::SoftwareVersion> versions;
             auto errCode = getInstalledVersions(&versions);
 
             QStringList text;

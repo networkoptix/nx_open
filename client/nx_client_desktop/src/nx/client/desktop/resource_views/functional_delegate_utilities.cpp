@@ -34,7 +34,7 @@ QVariant resourceVersionAccessor(const QnResourcePtr& ptr, int role)
 QnCustomizableItemDelegate* makeVersionStatusDelegate(QnWorkbenchContext* context, QObject* parent)
 {
     auto watcher = context->instance<QnWorkbenchVersionMismatchWatcher>();
-    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+    const auto latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
 
     auto delegate = new QnCustomizableItemDelegate(parent);
     delegate->setCustomInitStyleOption(
@@ -44,7 +44,8 @@ QnCustomizableItemDelegate* makeVersionStatusDelegate(QnWorkbenchContext* contex
             if (!ptr)
                 return;
 
-            bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(ptr->getVersion(), latestMsVersion, true);
+            const bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(
+                ptr->getVersion(), latestMsVersion, true);
             if (updateRequested)
             {
                 QColor color = qnGlobals->errorTextColor();

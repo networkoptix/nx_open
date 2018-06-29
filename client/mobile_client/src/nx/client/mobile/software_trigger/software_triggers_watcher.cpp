@@ -94,7 +94,7 @@ SoftwareTriggersWatcher::SoftwareTriggersWatcher(QObject* parent):
         this, &SoftwareTriggersWatcher::updateTriggers);
     connect(manager, &QnGlobalPermissionsManager::globalPermissionsChanged, this,
         [this, userWatcher]
-            (const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*permissions*/)
+            (const QnResourceAccessSubject& subject, GlobalPermissions /*permissions*/)
         {
             const auto user = userWatcher->user();
             if (subject != user)
@@ -182,7 +182,7 @@ void SoftwareTriggersWatcher::updateTriggerByRule(const nx::vms::event::RulePtr&
 {
     const auto id = rule->id();
     const auto currentUser = commonModule()->instance<nx::client::core::UserWatcher>()->user();
-    if (!globalPermissionsManager()->hasGlobalPermission(currentUser, Qn::GlobalUserInputPermission)
+    if (!globalPermissionsManager()->hasGlobalPermission(currentUser, GlobalPermission::userInput)
         || !appropriateSoftwareTriggerRule(rule, currentUser, m_resourceId))
     {
         tryRemoveTrigger(id);

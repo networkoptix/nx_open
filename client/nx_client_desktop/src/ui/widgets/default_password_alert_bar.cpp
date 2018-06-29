@@ -70,7 +70,7 @@ void QnDefaultPasswordAlertBar::updateState()
     static const auto kAskAdministratorText = L' ' +
         tr("Ask your system administrator to do it.");
 
-    const bool hasAdminAccess = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    const bool hasAdminAccess = accessController()->hasGlobalPermission(GlobalPermission::admin);
     const auto suffix = hasAdminAccess ? QString() : kAskAdministratorText;
     if (m_cameras.empty())
         setText(QString());

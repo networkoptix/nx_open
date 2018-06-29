@@ -9,30 +9,29 @@
 #include <QtCore/QPair>
 #include <QtCore/QList>
 
-#include "network/module_information.h"
-
 #include <api/model/connection_info.h>
-#include <api/model/email_attachment.h>
 
 #include <core/resource/videowall_control_message.h>
 #include <core/resource_access/user_access_data.h>
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
-#include <nx_ec/data/api_resource_data.h>
-#include <nx_ec/data/api_email_data.h>
-#include <nx_ec/data/api_peer_alive_data.h>
-#include <nx_ec/data/api_license_overflow_data.h>
-#include <nx_ec/data/api_discovery_data.h>
+#include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/data/email_settings_data.h>
+#include <nx/vms/api/data/peer_alive_data.h>
+#include <nx/vms/api/data/database_dump_data.h>
+#include <nx/vms/api/data/database_dump_to_file_data.h>
+#include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/camera_history_data.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
+#include <nx/vms/api/data/reverse_connection_data.h>
 #include <nx/vms/api/data/client_info_data.h>
+#include <nx/vms/api/data/misc_data.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
-#include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/data/api_access_rights_data.h>
-#include <nx_ec/data/api_user_role_data.h>
-#include <nx_ec/data/api_misc_data.h>
-#include <nx_ec/data/api_system_merge_history_record.h>
+#include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/update_sequence_data.h>
+#include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/api/data/system_merge_history_record.h>
 #include "nx_ec/managers/abstract_server_manager.h"
 #include "nx_ec/managers/abstract_camera_manager.h"
 #include "nx_ec/managers/abstract_user_manager.h"
@@ -41,24 +40,20 @@
 #include "nx_ec/managers/abstract_webpage_manager.h"
 #include "nx_ec/managers/abstract_videowall_manager.h"
 #include <nx_ec/managers/abstract_event_rules_manager.h>
+#include <nx/vms/api/data/timestamp.h>
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 #include "ec_api_fwd.h"
-#include "transaction_timestamp.h"
-#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 class QnRestProcessorPool;
 class QnHttpConnectionListener;
 class QnCommonModule;
-struct QnModuleInformation;
 
 namespace nx {
+namespace network { class SocketAddress; }
 
-namespace vms {
-namespace discovery {
-class Manager;
-}
-}
-}
+namespace vms { namespace discovery { class Manager; }}
+} // namespace nx
 
 //!Contains API classes for the new Server
 /*!
@@ -568,7 +563,7 @@ public:
         const QString& updateId,
         const QByteArray& data,
         qint64 offset,
-        const QnPeerSet& peers,
+        const nx::vms::api::PeerSet& peers,
         TargetType* target,
         HandlerType handler)
     {
@@ -606,7 +601,7 @@ protected:
         const QString& updateId,
         const QByteArray& data,
         qint64 offset,
-        const QnPeerSet& peers,
+        const nx::vms::api::PeerSet& peers,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int sendUpdateUploadResponce(
         const QString& updateId,
@@ -617,13 +612,13 @@ protected:
 
 class AbstractDiscoveryNotificationManager: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-signals :
+signals:
     void peerDiscoveryRequested(const nx::utils::Url& url);
-    void discoveryInformationChanged(const ApiDiscoveryData& data, bool addInformation);
-    void discoveredServerChanged(const ApiDiscoveredServerData& discoveredServer);
-    void gotInitialDiscoveredServers(const ApiDiscoveredServerDataList& discoveredServers);
+    void discoveryInformationChanged(const nx::vms::api::DiscoveryData& data, bool addInformation);
+    void discoveredServerChanged(const nx::vms::api::DiscoveredServerData& discoveredServer);
+    void gotInitialDiscoveredServers(const nx::vms::api::DiscoveredServerDataList& discoveredServers);
 };
 
 typedef std::shared_ptr<AbstractDiscoveryNotificationManager>
@@ -696,7 +691,7 @@ public:
                     handler)));
     }
 
-    ErrorCode getDiscoveryDataSync(ApiDiscoveryDataList* const discoveryDataList)
+    ErrorCode getDiscoveryDataSync(nx::vms::api::DiscoveryDataList* const discoveryDataList)
     {
         int (AbstractDiscoveryManager::*fn)(impl::GetDiscoveryDataHandlerPtr) = &
             AbstractDiscoveryManager::getDiscoveryData;
@@ -780,10 +775,11 @@ protected:
 
 class AbstractMiscNotificationManager: public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 public:
-signals :
-    void systemIdChangeRequested(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime);
+signals:
+    void systemIdChangeRequested(
+        const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime);
     void miscDataChanged(const QString& name, const QString& value);
 };
 
@@ -798,7 +794,7 @@ public:
     int changeSystemId(
         const QnUuid& systemId,
         qint64 sysIdTime,
-        Timestamp tranLogTime,
+        nx::vms::api::Timestamp tranLogTime,
         TargetType* target,
         HandlerType handler)
     {
@@ -812,7 +808,8 @@ public:
                     handler)));
     }
 
-    ErrorCode changeSystemIdSync(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime)
+    ErrorCode changeSystemIdSync(
+        const QnUuid& systemId, qint64 sysIdTime, nx::vms::api::Timestamp tranLogTime)
     {
         return impl::doSyncCall<impl::SimpleHandler>(
             [=](const impl::SimpleHandlerPtr& handler)
@@ -844,22 +841,25 @@ public:
 
     ErrorCode markLicenseOverflowSync(bool value, qint64 time)
     {
-        int (AbstractMiscManager::*fn)(bool, qint64, impl::SimpleHandlerPtr) = &AbstractMiscManager
-            ::markLicenseOverflow;
+        int (AbstractMiscManager::*fn)(bool, qint64, impl::SimpleHandlerPtr) =
+            &AbstractMiscManager::markLicenseOverflow;
+
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, value, time, std::placeholders::_1));
     }
 
-    ErrorCode saveMiscParamSync(const ec2::ApiMiscData& param)
+    ErrorCode saveMiscParamSync(const nx::vms::api::MiscData& param)
     {
-        int (AbstractMiscManager::*fn)(const ec2::ApiMiscData&, impl::SimpleHandlerPtr) = &
-            AbstractMiscManager::saveMiscParam;
+        int (AbstractMiscManager::*fn)(const nx::vms::api::MiscData&, impl::SimpleHandlerPtr) =
+            &AbstractMiscManager::saveMiscParam;
+
         return impl::doSyncCall<impl::SimpleHandler>(
             std::bind(fn, this, param, std::placeholders::_1));
     }
 
     template<class TargetType, class HandlerType>
-    int saveMiscParam(const ApiMiscData& data, TargetType* target, HandlerType handler)
+    int saveMiscParam(
+        const nx::vms::api::MiscData& data, TargetType* target, HandlerType handler)
     {
         return saveMiscParam(
             data,
@@ -871,7 +871,7 @@ public:
 
     template<class TargetType, class HandlerType>
     int saveRuntimeInfo(
-        const ApiRuntimeData& data,
+        const nx::vms::api::RuntimeData& data,
         TargetType* target,
         HandlerType handler)
     {
@@ -894,7 +894,8 @@ public:
                     handler)));
     }
 
-    ErrorCode getMiscParamSync(const QByteArray& paramName, ApiMiscData* const outData)
+    ErrorCode getMiscParamSync(
+        const QByteArray& paramName, nx::vms::api::MiscData* const outData)
     {
         return impl::doSyncCall<impl::GetMiscParamHandler>(
             [=](const impl::GetMiscParamHandlerPtr& handler)
@@ -904,10 +905,10 @@ public:
             outData);
     }
 
-    ErrorCode saveSystemMergeHistoryRecord(const ec2::ApiSystemMergeHistoryRecord& param)
+    ErrorCode saveSystemMergeHistoryRecord(const nx::vms::api::SystemMergeHistoryRecord& param)
     {
         int (AbstractMiscManager::*fn)(
-                const ec2::ApiSystemMergeHistoryRecord&,
+                const nx::vms::api::SystemMergeHistoryRecord&,
                 impl::SimpleHandlerPtr) =
             &AbstractMiscManager::saveSystemMergeHistoryRecord;
         return impl::doSyncCall<impl::SimpleHandler>(
@@ -923,7 +924,7 @@ public:
                 >(target, handler)));
     }
 
-    ErrorCode getSystemMergeHistorySync(ApiSystemMergeHistoryRecordList* const outData)
+    ErrorCode getSystemMergeHistorySync(nx::vms::api::SystemMergeHistoryRecordList* const outData)
     {
         return impl::doSyncCall<impl::GetSystemMergeHistoryHandler>(
             [this](const impl::GetSystemMergeHistoryHandlerPtr& handler)
@@ -937,23 +938,24 @@ protected:
     virtual int changeSystemId(
         const QnUuid& systemId,
         qint64 sysIdTime,
-        Timestamp tranLogTime,
+        nx::vms::api::Timestamp tranLogTime,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     virtual int cleanupDatabase(
         bool cleanupDbObjects,
         bool cleanupTransactionLog,
         impl::SimpleHandlerPtr handler) = 0;
-    virtual int saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler) = 0;
+    virtual int saveMiscParam(
+        const nx::vms::api::MiscData& param, impl::SimpleHandlerPtr handler) = 0;
     virtual int saveRuntimeInfo(
-        const ec2::ApiRuntimeData& data,
+        const nx::vms::api::RuntimeData& data,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int getMiscParam(
         const QByteArray& paramName,
         impl::GetMiscParamHandlerPtr handler) = 0;
 
     virtual int saveSystemMergeHistoryRecord(
-        const ApiSystemMergeHistoryRecord& param,
+        const nx::vms::api::SystemMergeHistoryRecord& param,
         impl::SimpleHandlerPtr handler) = 0;
     virtual int getSystemMergeHistory(impl::GetSystemMergeHistoryHandlerPtr handler) = 0;
 };
@@ -991,8 +993,8 @@ public:
     virtual void addRemotePeer(const QnUuid& id, const nx::utils::Url& _url) = 0;
     virtual void deleteRemotePeer(const QnUuid& id) = 0;
 
-    virtual Timestamp getTransactionLogTime() const = 0;
-    virtual void setTransactionLogTime(Timestamp value) = 0;
+    virtual nx::vms::api::Timestamp getTransactionLogTime() const = 0;
+    virtual void setTransactionLogTime(nx::vms::api::Timestamp value) = 0;
 
     virtual AbstractResourceManagerPtr getResourceManager(
         const Qn::UserAccessData& userAccessData) = 0;
@@ -1125,13 +1127,13 @@ signals :
         \param licenses
         \param cameraHistoryItems
     */
-    void initNotification(const ec2::ApiFullInfoData& fullData);
-    void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
+    void initNotification(const nx::vms::api::FullInfoData& fullData);
+    void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
 
-    void reverseConnectionRequested(const ec2::ApiReverseConnectionData& reverseConnetionData);
+    void reverseConnectionRequested(const nx::vms::api::ReverseConnectionData& reverseConnetionData);
 
-    void remotePeerFound(QnUuid data, Qn::PeerType peerType);
-    void remotePeerLost(QnUuid data, Qn::PeerType peerType);
+    void remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
+    void remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
     void remotePeerUnauthorized(const QnUuid& id);
     void newDirectConnectionEstablished(QnAbstractTransactionTransport* transport);
 

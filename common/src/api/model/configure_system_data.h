@@ -2,9 +2,9 @@
 
 #include "password_data.h"
 #include <nx/fusion/fusion/fusion_fwd.h>
-#include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/transaction_timestamp.h>
-#include <nx_ec/data/api_user_data.h>
+#include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/data/timestamp.h>
 
 struct ConfigureSystemData: public PasswordData
 {
@@ -34,10 +34,10 @@ struct ConfigureSystemData: public PasswordData
     QnUuid localSystemId;
     bool wholeSystem;
     qint64 sysIdTime;
-    ec2::Timestamp tranLogTime;
+    nx::vms::api::Timestamp tranLogTime;
     int port;
-    ec2::ApiMediaServerData foreignServer;
-    std::vector<ec2::ApiUserData> foreignUsers;
+    nx::vms::api::MediaServerData foreignServer;
+    std::vector<nx::vms::api::UserData> foreignUsers;
     nx::vms::api::ResourceParamDataList foreignSettings;
     nx::vms::api::ResourceParamWithRefDataList additionParams;
     bool rewriteLocalSettings;

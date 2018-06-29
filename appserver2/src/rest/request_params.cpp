@@ -95,14 +95,14 @@ void toUrlParams(const QnUuid& id, QUrlQuery* query)
 
 bool parseHttpRequestParams(
     QnCommonModule* /*commonModule*/,
-    const QString& /*command*/, const QnRequestParamList& params, ParentId* id)
+    const QString& /*command*/, const QnRequestParamList& params, nx::vms::api::ParentId* id)
 {
     // TODO: Consider renaming this parameter to parentId. Note that this is a breaking change that
     // affects all API methods which are registered with ParentId input data.
     return deserialize(params, lit("id"), &id->id);
 }
 
-void toUrlParams(const ParentId& id, QUrlQuery* query)
+void toUrlParams(const nx::vms::api::ParentId& id, QUrlQuery* query)
 {
     serialize(id.id, lit("id"), query);
 }

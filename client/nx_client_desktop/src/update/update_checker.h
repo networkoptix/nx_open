@@ -3,13 +3,11 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/software_version.h>
-
 class QNetworkAccessManager;
 
 struct QnUpdateInfo;
 
-class QnUpdateChecker : public QObject
+class QnUpdateChecker: public QObject
 {
     Q_OBJECT
 public:
@@ -17,19 +15,19 @@ public:
      * \param url                       Url of the update feed.
      * \param parent                    Parent object.
      */
-    QnUpdateChecker(const QUrl &url, QObject *parent = NULL);
+    QnUpdateChecker(const QUrl& url, QObject* parent = nullptr);
 
 public slots:
     void checkForUpdates();
 
 signals:
-    void updateAvailable(const QnUpdateInfo &info);
+    void updateAvailable(const QnUpdateInfo& info);
 
 private slots:
     void at_networkReply_finished();
 
 private:
-    QNetworkAccessManager *m_networkAccessManager;
+    QNetworkAccessManager* const m_networkAccessManager;
     QUrl m_url;
 };
 

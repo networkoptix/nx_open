@@ -37,6 +37,7 @@
 
 #include <nx/utils/string.h>
 #include <nx/utils/app_info.h>
+#include <nx/vms/api/data/resource_data.h>
 
 using namespace  nx::client::desktop;
 
@@ -198,7 +199,7 @@ bool QnAccessibleResourcesWidget::hasChanges() const
     if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-        if (m_permissionsModel->rawPermissions().testFlag(Qn::GlobalAccessAllMediaPermission) != checkedAll)
+        if (m_permissionsModel->rawPermissions().testFlag(GlobalPermission::accessAllMedia) != checkedAll)
             return true;
     }
 
@@ -215,13 +216,13 @@ void QnAccessibleResourcesWidget::loadDataToUi()
     if (m_controlsVisible)
     {
         bool hasAllMedia = m_permissionsModel->rawPermissions().testFlag(
-            Qn::GlobalAccessAllMediaPermission);
+            GlobalPermission::accessAllMedia);
 
         /* For custom users 'All Resources' must be unchecked by default */
         if (m_permissionsModel->subject().user())
         {
             hasAllMedia &= m_permissionsModel->rawPermissions().testFlag(
-                Qn::GlobalCustomUserPermission);
+                GlobalPermission::customUser);
         }
 
         QSet<QnUuid> checkedControls;
@@ -285,11 +286,11 @@ void QnAccessibleResourcesWidget::applyChanges()
     if (m_controlsVisible)
     {
         bool checkedAll = !m_controlsModel->checkedResources().isEmpty();
-        Qn::GlobalPermissions permissions = m_permissionsModel->rawPermissions();
+        GlobalPermissions permissions = m_permissionsModel->rawPermissions();
         if (checkedAll)
-            permissions |= Qn::GlobalAccessAllMediaPermission;
+            permissions |= GlobalPermission::accessAllMedia;
         else
-            permissions &= ~Qn::GlobalAccessAllMediaPermission;
+            permissions &= ~GlobalPermissions(GlobalPermission::accessAllMedia);
         m_permissionsModel->setRawPermissions(permissions);
     }
 
@@ -303,7 +304,8 @@ void QnAccessibleResourcesWidget::initControlsModel()
     if (!m_controlsVisible)
         return;
 
-    QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(qnResTypePool->getFixedResourceTypeId(kDummyResourceId)));
+    QnVirtualCameraResourcePtr dummy(new QnClientCameraResource(
+        nx::vms::api::ResourceData::getFixedTypeId(kDummyResourceId)));
     dummy->setName(tr("All Cameras & Resources"));
     /* Create separate dummy resource id for each filter, but once per application run. */
     dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));

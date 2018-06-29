@@ -11,6 +11,7 @@
 
 #include <utils/common/app_info.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/api/data/software_version.h>
 
 namespace {
 
@@ -22,14 +23,14 @@ const QString updatesCacheDirName = QnAppInfo::productNameShort() + lit("_update
 
 struct UpdateFileData
 {
-    QnSoftwareVersion version;
+    nx::vms::api::SoftwareVersion version;
     QString platform;
     QString arch;
     QString modification;
     QString cloudHost;
     QString executable;
     bool client = false;
-    QnSoftwareVersion minimalVersion;
+    nx::vms::api::SoftwareVersion minimalVersion;
 };
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
@@ -38,8 +39,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 bool verifyUpdatePackageInternal(
     QuaZipFile* infoFile,
-    QnSoftwareVersion* version = nullptr,
-    QnSystemInformation* sysInfo = nullptr,
+    nx::utils::SoftwareVersion* version = nullptr,
+    nx::vms::api::SystemInformation* sysInfo = nullptr,
     QString* cloudHost = nullptr,
     bool* isClient = nullptr)
 {
@@ -49,7 +50,8 @@ bool verifyUpdatePackageInternal(
     const auto data = infoFile->readAll();
     auto fileData = QJson::deserialized<UpdateFileData>(data);
 
-    QnSystemInformation locSysInfo(fileData.platform, fileData.arch, fileData.modification);
+    nx::vms::api::SystemInformation locSysInfo(
+        fileData.platform, fileData.arch, fileData.modification);
     if (!locSysInfo.isValid())
         return false;
 
@@ -68,13 +70,12 @@ bool verifyUpdatePackageInternal(
     return true;
 }
 
-} // anonymous namespace
-
+} // namespace
 
 bool verifyUpdatePackage(
     const QString& fileName,
-    QnSoftwareVersion* version,
-    QnSystemInformation* sysInfo,
+    nx::utils::SoftwareVersion* version,
+    nx::vms::api::SystemInformation* sysInfo,
     QString* cloudHost,
     bool* isClient)
 {
@@ -82,11 +83,10 @@ bool verifyUpdatePackage(
     return verifyUpdatePackageInternal(&infoFile, version, sysInfo, cloudHost, isClient);
 }
 
-
 bool verifyUpdatePackage(
     QIODevice* device,
-    QnSoftwareVersion* version,
-    QnSystemInformation* sysInfo,
+    nx::utils::SoftwareVersion* version,
+    nx::vms::api::SystemInformation* sysInfo,
     QString* cloudHost,
     bool* isClient)
 {
@@ -166,13 +166,13 @@ QString passwordForBuild(const QString& build)
     return password;
 }
 
-void clearUpdatesCache(const QnSoftwareVersion& versionToKeep)
+void clearUpdatesCache(const nx::utils::SoftwareVersion& versionToKeep)
 {
     QDir dir = updatesCacheDir();
     QStringList entries = dir.entryList(QDir::Files);
     for (const auto& fileName: entries)
     {
-        QnSoftwareVersion version;
+        nx::vms::api::SoftwareVersion version;
         if (verifyUpdatePackage(dir.absoluteFilePath(fileName), &version)
             && version == versionToKeep)
         {

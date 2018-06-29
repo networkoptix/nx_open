@@ -2,11 +2,13 @@
 
 #include "id_data.h"
 
+#include <QtCore/QString>
+
 namespace nx {
 namespace vms {
 namespace api {
 
-struct LayoutTourItemData: Data
+struct NX_VMS_API LayoutTourItemData: Data
 {
     QnUuid resourceId;
     int delayMs = 0;
@@ -17,13 +19,13 @@ struct LayoutTourItemData: Data
 };
 #define LayoutTourItemData_Fields (resourceId)(delayMs)
 
-struct LayoutTourSettings: Data
+struct NX_VMS_API LayoutTourSettings: Data
 {
     bool manual = false;
 };
 #define LayoutTourSettings_Fields (manual)
 
-struct LayoutTourData: IdData
+struct NX_VMS_API LayoutTourData: IdData
 {
     QnUuid parentId;
     QString name;
@@ -38,4 +40,8 @@ struct LayoutTourData: IdData
 } // namespace vms
 } // namespace nx
 
+Q_DECLARE_METATYPE(nx::vms::api::LayoutTourItemData)
+Q_DECLARE_METATYPE(nx::vms::api::LayoutTourItemDataList)
 Q_DECLARE_METATYPE(nx::vms::api::LayoutTourData)
+Q_DECLARE_METATYPE(nx::vms::api::LayoutTourDataList)
+Q_DECLARE_METATYPE(nx::vms::api::LayoutTourSettings)

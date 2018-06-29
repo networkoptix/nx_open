@@ -10,8 +10,8 @@ namespace
 #define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(                \
     before.fieldName != after.fieldName ? flag : QnServerField::NoField)
 
-QnServerFields getChanges(const QnModuleInformation& before
-    , const QnModuleInformation& after)
+QnServerFields getChanges(const nx::vms::api::ModuleInformation& before,
+    const nx::vms::api::ModuleInformation& after)
 {
     const auto fieldsResult =
         (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemName)
@@ -110,7 +110,7 @@ QnSystemDescription::ServersList QnSystemDescription::servers() const
     return result;
 }
 
-void QnSystemDescription::addServer(const QnModuleInformation& serverInfo,
+void QnSystemDescription::addServer(const nx::vms::api::ModuleInformation& serverInfo,
     int priority, bool online)
 {
     const bool containsServer = m_servers.contains(serverInfo.id);
@@ -137,14 +137,14 @@ bool QnSystemDescription::containsServer(const QnUuid& serverId) const
     return m_servers.contains(serverId);
 }
 
-QnModuleInformation QnSystemDescription::getServer(const QnUuid& serverId) const
+nx::vms::api::ModuleInformation QnSystemDescription::getServer(const QnUuid& serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO,
         "System does not contain specified server");
     return m_servers.value(serverId);
 }
 
-QnServerFields QnSystemDescription::updateServer(const QnModuleInformation& serverInfo)
+QnServerFields QnSystemDescription::updateServer(const nx::vms::api::ModuleInformation& serverInfo)
 {
     const auto it = m_servers.find(serverInfo.id);
     const bool containsServer = (it != m_servers.end());
@@ -276,7 +276,7 @@ bool QnSystemDescription::safeMode() const
 void QnSystemDescription::updateSafeModeState()
 {
     const bool newSafeModeState = std::any_of(m_servers.begin(), m_servers.end(),
-        [](const QnModuleInformation& info) { return helpers::isSafeMode(info); });
+        [](const nx::vms::api::ModuleInformation& info) { return helpers::isSafeMode(info); });
 
     if (newSafeModeState == m_safeMode)
         return;

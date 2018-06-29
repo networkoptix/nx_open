@@ -1,48 +1,48 @@
 #pragma once
 
 #include "p2p_fwd.h"
-#include <nx_ec/data/api_peer_data.h>
+
+#include <QtCore/QMap>
 
 namespace nx {
 namespace p2p {
 
-using namespace ec2;
-
 struct RoutingRecord
 {
     RoutingRecord() = default;
-    RoutingRecord(int distance, ec2::ApiPersistentIdData firstVia = ec2::ApiPersistentIdData());
+    RoutingRecord(int distance, vms::api::PersistentIdData firstVia = vms::api::PersistentIdData());
 
     qint32 distance = 0;
-    ec2::ApiPersistentIdData firstVia;
+    vms::api::PersistentIdData firstVia;
 };
 
-typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;
+using RoutingInfo = QMap<vms::api::PersistentIdData, RoutingRecord>;
 
 struct AlivePeerInfo
 {
     AlivePeerInfo() {}
-
-    qint32 distanceTo(const ApiPersistentIdData& peer) const;
+    qint32 distanceTo(const vms::api::PersistentIdData& peer) const;
 
     RoutingInfo routeTo; // key: route to, value - distance in hops
 };
-typedef QMap<ApiPersistentIdData, AlivePeerInfo> AlivePeersMap;
+
+using AlivePeersMap = QMap<vms::api::PersistentIdData, AlivePeerInfo>;
 
 struct RouteToPeerInfo
 {
     RouteToPeerInfo() {}
 
     qint32 minDistance(RoutingInfo* outViaList = nullptr) const;
-    qint32 distanceVia(const ApiPersistentIdData& peer) const;
+    qint32 distanceVia(const vms::api::PersistentIdData& peer) const;
     const RoutingInfo& routeVia() const { return m_routeVia; }
 
-    void remove(const ApiPersistentIdData& id)
+    void remove(const vms::api::PersistentIdData& id)
     {
         m_routeVia.remove(id);
         m_minDistance = kMaxDistance;
     }
-    void insert(const ApiPersistentIdData& id, const RoutingRecord& record)
+
+    void insert(const vms::api::PersistentIdData& id, const RoutingRecord& record)
     {
         m_routeVia[id] = record;
         m_minDistance = kMaxDistance;
@@ -52,29 +52,32 @@ private:
     RoutingInfo m_routeVia; // key: route via, value - distance in hops
     mutable int m_minDistance = kMaxDistance;
 };
-typedef QMap<ApiPersistentIdData, RouteToPeerInfo> RouteToPeerMap;
 
+using RouteToPeerMap = QMap<vms::api::PersistentIdData, RouteToPeerInfo>;
 
 struct BidirectionRoutingInfo
 {
-    BidirectionRoutingInfo(const ApiPersistentIdData& localPeer);
+    BidirectionRoutingInfo(const vms::api::PersistentIdData& localPeer);
 
     void clear();
-    void removePeer(const ApiPersistentIdData& via);
+    void removePeer(const vms::api::PersistentIdData& via);
     void addRecord(
-        const ApiPersistentIdData& via,
-        const ApiPersistentIdData& to,
+        const vms::api::PersistentIdData& via,
+        const vms::api::PersistentIdData& to,
         const RoutingRecord& record);
-    qint32 distanceTo(const ApiPersistentIdData& peer, RoutingInfo* outVia = nullptr) const;
+
+    qint32 distanceTo(const vms::api::PersistentIdData& peer, RoutingInfo* outVia = nullptr) const;
     qint32 distanceTo(const QnUuid& peerId, RoutingInfo* outVia = nullptr) const;
-    void updateLocalDistance(const ApiPersistentIdData& peer, qint32 sequence);
+    void updateLocalDistance(const vms::api::PersistentIdData& peer, qint32 sequence);
 
     AlivePeersMap alivePeers; //< alive peers in the system. key - route via, value - route to
     RouteToPeerMap allPeerDistances;  //< vice versa
+
 private:
     void addLocalPeer();
+
 private:
-    ApiPersistentIdData m_localPeer;
+    vms::api::PersistentIdData m_localPeer;
 };
 
 } // namespace p2p

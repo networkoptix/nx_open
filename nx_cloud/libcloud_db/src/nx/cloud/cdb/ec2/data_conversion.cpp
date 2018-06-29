@@ -1,10 +1,11 @@
 #include "data_conversion.h"
 
-#include <nx_ec/data/api_user_data.h>
-#include <nx/fusion/serialization/lexical.h>
-
 #include <nx_ec/data/api_fwd.h>
+
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/network/app_info.h>
 #include <nx/vms/api/data/id_data.h>
+#include <nx/vms/api/data/user_data.h>
 
 namespace nx {
 namespace cdb {
@@ -16,17 +17,17 @@ static const QnUuid kUserResourceTypeGuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7
 
 } // namespace
 
-api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permissions)
+api::SystemAccessRole permissionsToAccessRole(GlobalPermissions permissions)
 {
     switch (permissions)
     {
-        case Qn::GlobalLiveViewerPermissionSet:
+        case GlobalPermission::liveViewerPermissions:
             return api::SystemAccessRole::liveViewer;
-        case Qn::GlobalViewerPermissionSet:
+        case GlobalPermission::viewerPermissions:
             return api::SystemAccessRole::viewer;
-        case Qn::GlobalAdvancedViewerPermissionSet:
+        case GlobalPermission::advancedViewerPermissions:
             return api::SystemAccessRole::advancedViewer;
-        case Qn::GlobalAdminPermissionSet:
+        case GlobalPermission::adminPermissions:
             return api::SystemAccessRole::cloudAdmin;
         default:
             return api::SystemAccessRole::custom;
@@ -35,54 +36,54 @@ api::SystemAccessRole permissionsToAccessRole(Qn::GlobalPermissions permissions)
 
 void accessRoleToPermissions(
     api::SystemAccessRole accessRole,
-    Qn::GlobalPermissions* const permissions,
+    GlobalPermissions* const permissions,
     bool* const isAdmin)
 {
     *isAdmin = false;
     switch (accessRole)
     {
         case api::SystemAccessRole::owner:
-            *permissions = Qn::GlobalAdminPermissionSet;
+            *permissions = GlobalPermission::adminPermissions;
             *isAdmin = true;   //aka "owner"
             break;
         case api::SystemAccessRole::liveViewer:
-            *permissions = Qn::GlobalLiveViewerPermissionSet;
+            *permissions = GlobalPermission::liveViewerPermissions;
             break;
         case api::SystemAccessRole::viewer:
-            *permissions = Qn::GlobalViewerPermissionSet;
+            *permissions = GlobalPermission::viewerPermissions;
             break;
         case api::SystemAccessRole::advancedViewer:
-            *permissions = Qn::GlobalAdvancedViewerPermissionSet;
+            *permissions = GlobalPermission::advancedViewerPermissions;
             break;
         case api::SystemAccessRole::cloudAdmin:
-            *permissions = Qn::GlobalAdminPermissionSet;
+            *permissions = GlobalPermission::adminPermissions;
             break;
         case api::SystemAccessRole::custom:
         default:
-            *permissions = Qn::NoGlobalPermissions;
+            *permissions = {};
             break;
     }
 }
 
-void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
+void convert(const api::SystemSharing& from, vms::api::UserData* const to)
 {
     to->id = QnUuid::fromStringSafe(from.vmsUserId);
     to->typeId = kUserResourceTypeGuid;
     to->email = QString::fromStdString(from.accountEmail);
     to->name = to->email;
     to->permissions =
-        QnLexical::deserialized<Qn::GlobalPermissions>(
+        QnLexical::deserialized<GlobalPermissions>(
             QString::fromStdString(from.customPermissions));
     to->userRoleId = QnUuid::fromStringSafe(from.userRoleId);
     to->isEnabled = from.isEnabled;
     to->realm = nx::network::AppInfo::realm();
-    to->hash = "password_is_in_cloud";
-    to->digest = "password_is_in_cloud";
+    to->hash = vms::api::UserData::kCloudPasswordStub;
+    to->digest = vms::api::UserData::kCloudPasswordStub;
     to->isCloud = true;
     accessRoleToPermissions(from.accessRole, &to->permissions, &to->isAdmin);
 }
 
-void convert(const ::ec2::ApiUserData& from, api::SystemSharing* const to)
+void convert(const vms::api::UserData& from, api::SystemSharing* const to)
 {
     to->accountEmail = from.email.toStdString();
     to->customPermissions = QnLexical::serialized(from.permissions).toStdString();

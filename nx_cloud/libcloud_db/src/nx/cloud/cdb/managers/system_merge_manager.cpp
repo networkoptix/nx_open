@@ -69,7 +69,7 @@ void SystemMergeManager::startMergingSystems(
 }
 
 void SystemMergeManager::processMergeHistoryRecord(
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
     std::function<void(api::ResultCode)> completionHandler)
 {
     m_queryExecutor->executeUpdate(
@@ -89,7 +89,7 @@ void SystemMergeManager::processMergeHistoryRecord(
 
 void SystemMergeManager::processMergeHistoryRecord(
     nx::utils::db::QueryContext* queryContext,
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord)
 {
     NX_DEBUG(this, lm("Received notification that system %1 merge is complete. "
         "Marking system for deletion").args(mergeHistoryRecord.mergedSystemCloudId));
@@ -116,7 +116,7 @@ void SystemMergeManager::processMergeHistoryRecord(
 }
 
 bool SystemMergeManager::verifyMergeHistoryRecord(
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
     const data::SystemData& system)
 {
     if (!mergeHistoryRecord.verify(system.authKey.c_str()))
@@ -138,7 +138,7 @@ bool SystemMergeManager::verifyMergeHistoryRecord(
 
 void SystemMergeManager::updateCompletedMergeData(
     nx::utils::db::QueryContext* queryContext,
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord)
 {
     using namespace std::placeholders;
 
@@ -159,7 +159,7 @@ void SystemMergeManager::updateCompletedMergeData(
 }
 
 void SystemMergeManager::removeMergeInfoFromCache(
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord)
 {
     QnMutexLocker lock(&m_mutex);
 

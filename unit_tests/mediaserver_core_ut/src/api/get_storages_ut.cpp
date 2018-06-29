@@ -16,8 +16,8 @@ namespace {
  */
 #define NX_FIND_STORAGE_BY_NAME(...) ASSERT_NO_FATAL_FAILURE(findStorageByName(__VA_ARGS__))
 static void findStorageByName(
-    const ec2::ApiStorageDataList& storages,
-    ec2::ApiStorageData* outStorage,
+    const vms::api::StorageDataList& storages,
+    vms::api::StorageData* outStorage,
     const QString name,
     QnUuid parentId = QnUuid(),
     QnUuid id = QnUuid())
@@ -25,7 +25,7 @@ static void findStorageByName(
     ASSERT_TRUE(storages.size() > 0);
 
     const auto foundStorage = std::find_if(storages.cbegin(), storages.cend(),
-        [name](const ec2::ApiStorageData& s) { return s.name == name; });
+        [name](const vms::api::StorageData& s) { return s.name == name; });
 
     ASSERT_TRUE(foundStorage != storages.cend());
 
@@ -46,8 +46,8 @@ TEST(GetStorages, saveAndMerge)
     launcher.addSetting(QnServer::kNoInitStoragesOnStartup, "1");
     ASSERT_TRUE(launcher.start());
 
-    ec2::ApiStorageDataList storages;
-    ec2::ApiStorageData storage;
+    vms::api::StorageDataList storages;
+    vms::api::StorageData storage;
 
     NX_LOG("[TEST] Create a new storage with auto-generated id.", cl_logINFO);
     storage.name = "original name";

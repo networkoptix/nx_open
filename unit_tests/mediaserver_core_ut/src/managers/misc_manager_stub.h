@@ -22,7 +22,7 @@ protected:
     virtual int changeSystemId(
         const QnUuid& systemId,
         qint64 sysIdTime,
-        Timestamp tranLogTime,
+        nx::vms::api::Timestamp tranLogTime,
         impl::SimpleHandlerPtr handler) override;
 
     virtual int markLicenseOverflow(
@@ -36,7 +36,7 @@ protected:
         impl::SimpleHandlerPtr handler) override;
 
     virtual int saveMiscParam(
-        const ec2::ApiMiscData& param,
+        const nx::vms::api::MiscData& param,
         impl::SimpleHandlerPtr handler) override;
 
     virtual int getMiscParam(
@@ -44,11 +44,11 @@ protected:
         impl::GetMiscParamHandlerPtr handler) override;
 
     virtual int saveRuntimeInfo(
-        const ec2::ApiRuntimeData& data,
+        const nx::vms::api::RuntimeData& data,
         impl::SimpleHandlerPtr handler) override;
 
     virtual int saveSystemMergeHistoryRecord(
-        const ApiSystemMergeHistoryRecord& param,
+        const nx::vms::api::SystemMergeHistoryRecord& param,
         impl::SimpleHandlerPtr handler) override;
 
     virtual int getSystemMergeHistory(
@@ -66,8 +66,7 @@ class AbstractWorkAroundMiscDataSaver
 {
 public:
     virtual ~AbstractWorkAroundMiscDataSaver() = default;
-
-    virtual ErrorCode saveSync(const ApiMiscData& data) = 0;
+    virtual ErrorCode saveSync(const nx::vms::api::MiscData& data) = 0;
 };
 
 class WorkAroundMiscDataSaverStub:
@@ -76,8 +75,7 @@ class WorkAroundMiscDataSaverStub:
 {
 public:
     WorkAroundMiscDataSaverStub(MiscManagerStub* miscManager);
-
-    virtual ErrorCode saveSync(const ApiMiscData& /*data*/) override;
+    virtual ErrorCode saveSync(const nx::vms::api::MiscData& /*data*/) override;
 
 private:
     MiscManagerStub* m_miscManager;

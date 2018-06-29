@@ -25,7 +25,7 @@ namespace ec2
 
     public:
         RemoteEC2Connection(
-            Qn::PeerType peerType,
+            nx::vms::api::PeerType peerType,
             const AbstractECConnectionFactory* connectionFactory,
             const QnUuid& remotePeerId,
             const FixedUrlClientQueryProcessorPtr& queryProcessor,
@@ -38,11 +38,11 @@ namespace ec2
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
 
-        virtual Timestamp getTransactionLogTime() const override;
-        virtual void setTransactionLogTime(Timestamp value) override;
+        virtual nx::vms::api::Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(nx::vms::api::Timestamp value) override;
 
     private:
-        Qn::PeerType m_peerType;
+        nx::vms::api::PeerType m_peerType;
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         QnConnectionInfo m_connectionInfo;
         QnUuid m_remotePeerId;

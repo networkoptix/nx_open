@@ -185,7 +185,8 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
     }
 }
 
-api::Updates2StatusData Updates2ManagerBase::download(const QnSoftwareVersion& targetVersion)
+api::Updates2StatusData Updates2ManagerBase::download(
+    const nx::utils::SoftwareVersion& targetVersion)
 {
     QnMutexLocker lock(&m_mutex);
     if (m_currentStatus.state != api::Updates2StatusData::StatusCode::available)

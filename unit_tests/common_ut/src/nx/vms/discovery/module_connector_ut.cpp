@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/app_info.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket_global.h>
@@ -32,7 +34,8 @@ public:
         connector.setReconnectPolicy(kReconnectPolicy);
 
         connector.setConnectHandler(
-            [this](QnModuleInformation information, nx::network::SocketAddress endpoint, nx::network::HostAddress /*ip*/)
+            [this](nx::vms::api::ModuleInformation information,
+                nx::network::SocketAddress endpoint, nx::network::HostAddress /*ip*/)
             {
                 QnMutexLocker lock(&m_mutex);
                 auto& knownEndpoint = m_knownServers[information.id];
@@ -117,7 +120,9 @@ public:
 
     nx::network::SocketAddress addMediaserver(QnUuid id, nx::network::HostAddress ip = nx::network::HostAddress::localhost)
     {
-        QnModuleInformation module;
+        nx::vms::api::ModuleInformation module;
+        module.realm = nx::network::AppInfo::realm();
+        module.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
         module.id = id;
 
         QnJsonRestResult result;

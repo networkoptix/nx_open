@@ -110,7 +110,7 @@ int QnWearableCameraRestHandler::executeAdd(
     apiCamera.physicalId = QnUuid::createUuid().toSimpleString();
     apiCamera.fillId();
     apiCamera.manuallyAdded = true;
-    apiCamera.typeId = QnResourceTypePool::kWearableCameraTypeUuid;
+    apiCamera.typeId = nx::vms::api::CameraData::kWearableCameraTypeId;
     apiCamera.parentId = owner->commonModule()->moduleGUID();
     apiCamera.name = name;
     // Note that physical id is in path, not in host.

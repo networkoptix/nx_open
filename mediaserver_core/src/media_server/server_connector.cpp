@@ -3,7 +3,6 @@
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "nx/vms/discovery/manager.h"
-#include "network/module_information.h"
 #include <network/connection_validator.h>
 #include <nx/utils/log/log.h>
 #include "core/resource_management/resource_pool.h"

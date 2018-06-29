@@ -2,8 +2,8 @@
 
 #include <nx/utils/test_support/utils.h>
 
-#include <nx_ec/data/api_user_data.h>
 #include <nx/utils/db/request_execution_thread.h>
+#include <nx/vms/api/data/user_data.h>
 
 #include <nx/data_sync_engine/dao/memory/transaction_data_object_in_memory.h>
 #include <nx/cloud/cdb/ec2/data_conversion.h>
@@ -99,8 +99,8 @@ private:
     const nx::String m_systemId;
     std::int64_t m_peerSequence;
     data_sync_engine::dao::memory::TransactionDataObject m_transactionDataObject;
-    ::ec2::ApiUserData m_transactionData;
-    data_sync_engine::Command<::ec2::ApiUserData> m_lastAddedTransaction;
+    nx::vms::api::UserData m_transactionData;
+    data_sync_engine::Command<nx::vms::api::UserData> m_lastAddedTransaction;
     nx::utils::db::DbConnectionHolder m_dbConnectionHolder;
     std::shared_ptr<nx::utils::db::QueryContext> m_currentTran;
 
@@ -130,9 +130,9 @@ private:
         ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     }
 
-    data_sync_engine::Command<::ec2::ApiUserData> generateTransaction()
+    data_sync_engine::Command<nx::vms::api::UserData> generateTransaction()
     {
-        data_sync_engine::Command<::ec2::ApiUserData> transaction(m_peerGuid);
+        data_sync_engine::Command<nx::vms::api::UserData> transaction(m_peerGuid);
         transaction.command = ::ec2::ApiCommand::saveUser;
         transaction.persistentInfo.dbID = m_peerDbId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;

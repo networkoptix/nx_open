@@ -100,7 +100,7 @@ public:
     QTimer* suspendTimer = nullptr;
     int connectionHandle = kInvalidHandle;
     QnConnectionManager::State connectionState = QnConnectionManager::Disconnected;
-    QnSoftwareVersion connectionVersion;
+    nx::utils::SoftwareVersion connectionVersion;
     QnConnectionManager::ConnectionType connectionType = QnConnectionManager::NormalConnection;
 };
 
@@ -206,7 +206,7 @@ QString QnConnectionManager::currentPassword() const
     return d->url.isValid() ? d->url.password() : QString();
 }
 
-QnSoftwareVersion QnConnectionManager::connectionVersion() const
+nx::utils::SoftwareVersion QnConnectionManager::connectionVersion() const
 {
     Q_D(const QnConnectionManager);
     return d->connectionVersion;
@@ -388,7 +388,8 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
 
             if (status == Qn::IncompatibleVersionConnectionResult)
             {
-                infoParameter = connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat);
+                infoParameter = connectionInfo.version.toString(
+                    nx::utils::SoftwareVersion::BugfixFormat);
             }
             else if(status == Qn::IncompatibleCloudHostConnectionResult)
             {
@@ -516,7 +517,7 @@ void QnConnectionManagerPrivate::doDisconnect()
     commonModule()->sessionManager()->stop();
 
     setSystemName(QString());
-    connectionVersion = QnSoftwareVersion();
+    connectionVersion = {};
     emit q->connectionVersionChanged();
 
     updateConnectionState();

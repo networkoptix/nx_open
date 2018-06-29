@@ -6,14 +6,15 @@
 #include <utils/common/synctime.h>
 
 #include <recorder/storage_manager.h>
-#include <nx_ec/data/api_media_server_data.h>
 #include <core/resource_management/resource_pool.h>
-#include "common/common_module.h"
+#include <common/common_module.h>
 #include <utils/common/util.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/storage_resource.h>
+
+#include <nx/vms/api/types/resource_types.h>
 
 #include <numeric>
 
@@ -25,7 +26,7 @@ QnScheduleSync::QnScheduleSync(QnCommonModule* commonModule):
     m_forced(false),
     m_interrupted(false),
     m_failReported(false),
-    m_curDow(ec2::backup::Never),
+    m_curDow(vms::api::DayOfWeek::none),
     m_syncTimePoint(0),
     m_syncEndTimePoint(0)
 {
@@ -550,7 +551,7 @@ void QnScheduleSync::run()
             return;
 
         renewSchedule();
-        if (m_schedule.backupType == Qn::BackupType::Backup_RealTime)
+        if (m_schedule.backupType == vms::api::BackupType::realtime)
             updateLastSyncChunk();
 
         auto isItTimeForSync = [this] ()
@@ -559,27 +560,26 @@ void QnScheduleSync::run()
                 return SyncCode::Interrupted;
             if (m_forced)
                 return SyncCode::Ok;
-            if (m_schedule.backupType != Qn::Backup_Schedule)
+            if (m_schedule.backupType != vms::api::BackupType::scheduled)
                 return SyncCode::WrongBackupType;
 
-            if (m_schedule.backupDaysOfTheWeek == ec2::backup::Never)
+            if (m_schedule.backupDaysOfTheWeek == 0)
                 return SyncCode::WrongBackupType;
 
             QDateTime now = qnSyncTime->currentDateTime();
-            const Qt::DayOfWeek today = static_cast<Qt::DayOfWeek>(now.date().dayOfWeek());
+            const auto today = vms::api::dayOfWeek(Qt::DayOfWeek(now.date().dayOfWeek()));
+            const auto allowedDays = m_schedule.backupDaysOfTheWeek;
 
-            ec2::backup::DaysOfWeek allowedDays =
-                static_cast<ec2::backup::DaysOfWeek>(m_schedule.backupDaysOfTheWeek);
-
-            if (m_curDow == ec2::backup::Never || ec2::backup::fromQtDOW(today) != m_curDow) {
-                m_curDow = ec2::backup::fromQtDOW(today);
+            if (m_curDow == vms::api::DayOfWeek::none || today != m_curDow)
+            {
+                m_curDow = today;
                 m_interrupted = false; // new day - new life
             }
 
             if (m_interrupted)
                 return SyncCode::Interrupted;
 
-            if (allowedDays.testFlag(ec2::backup::fromQtDOW(today)))
+            if (allowedDays.testFlag(today))
             {
                 const auto curTime = now.time();
                 const bool nowIsPastTheBackupStartPoint =

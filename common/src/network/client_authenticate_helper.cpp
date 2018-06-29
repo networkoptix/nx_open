@@ -1,10 +1,10 @@
-
 #include "client_authenticate_helper.h"
 
-#include "utils/common/app_info.h"
-#include "utils/common/synctime.h"
-#include <nx/network/deprecated/simple_http_client.h>
+#include <utils/common/app_info.h>
+#include <utils/common/synctime.h>
 
+#include <nx/network/app_info.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 Qn::AuthResult QnClientAuthHelper::authenticate(
     const QAuthenticator& auth,

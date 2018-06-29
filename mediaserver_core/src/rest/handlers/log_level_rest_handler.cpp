@@ -17,7 +17,7 @@ static const QString kValueParam = lit("value");
 static bool hasPermission(const QnRestConnectionProcessor* processor)
 {
     return processor->commonModule()->resourceAccessManager()->hasGlobalPermission(
-        processor->accessRights(), Qn::GlobalPermission::GlobalAdminPermission);
+        processor->accessRights(), GlobalPermission::admin);
 }
 
 static QString levelString(const std::shared_ptr<Logger>& logger)
@@ -37,7 +37,7 @@ JsonRestResponse QnLogLevelRestHandler::executeGet(const JsonRestRequest& reques
     // TODO: Remove as soon as WEB client supports new API.
     if (request.params.contains(kIdParam))
         return manageLogLevelById(request);
-    
+
     if (request.params.empty())
     {
         std::map<QString, QString> levelsByName;
@@ -65,7 +65,7 @@ JsonRestResponse QnLogLevelRestHandler::executeGet(const JsonRestRequest& reques
         logger->setDefaultLevel(settings.primary);
         logger->setLevelFilters(settings.filters);
     }
-    
+
     return {levelString(logger)};
 }
 

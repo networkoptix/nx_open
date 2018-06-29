@@ -19,7 +19,7 @@ const QString moduleInfoStr(lit(", { seed: \"%1\" }, {peerType: \"%2\"}"));
 
 }
 
-RevealRequest::RevealRequest(const QnUuid& moduleGuid, Qn::PeerType peerType):
+RevealRequest::RevealRequest(const QnUuid& moduleGuid, nx::vms::api::PeerType peerType):
     m_moduleGuid(moduleGuid),
     m_peerType(peerType)
 {
@@ -45,8 +45,8 @@ bool RevealRequest::isValid(const quint8 *bufStart, const quint8 *bufEnd)
 }
 
 
-RevealResponse::RevealResponse(const QnModuleInformation &other)
-    : QnModuleInformation(other)
+RevealResponse::RevealResponse(const nx::vms::api::ModuleInformation& other):
+    nx::vms::api::ModuleInformation(other)
 {
 }
 
@@ -83,7 +83,7 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
 
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
     type = map.value(lit("application")).toString();
-    version = QnSoftwareVersion(map.value(lit("version")).toString());
+    version = nx::utils::SoftwareVersion(map.value(lit("version")).toString());
     systemInformation = map.value(lit("systemInformation")).toString();
     customization = map.value(lit("customization")).toString();
     brand = map.value(lit("brand")).toString();
@@ -95,7 +95,8 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
     port = static_cast<quint16>(map.value(lit("port")).toUInt());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
-    serverFlags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);
+    serverFlags = QnLexical::deserialized<nx::vms::api::ServerFlags>(
+        map.value(lit("flags")).toString(), nx::vms::api::SF_None);
     ecDbReadOnly = map.value(lit("ecDbReadOnly"), ecDbReadOnly).toBool();
     cloudSystemId =  map.value(lit("cloudSystemId")).toString();
     cloudHost = map.value(lit("cloudHost")).toString();

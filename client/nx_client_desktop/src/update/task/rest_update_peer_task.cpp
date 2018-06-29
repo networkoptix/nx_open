@@ -29,7 +29,7 @@ void QnRestUpdatePeerTask::setUpdateId(const QString& updateId)
     m_updateId = updateId;
 }
 
-void QnRestUpdatePeerTask::setVersion(const QnSoftwareVersion& version)
+void QnRestUpdatePeerTask::setVersion(const nx::utils::SoftwareVersion& version)
 {
     m_version = version;
 }

@@ -10,6 +10,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/http/http_types.h>
 
+#include <nx/vms/api/types_fwd.h>
 #include <nx/vms/auth/abstract_nonce_provider.h>
 #include <nx/vms/auth/abstract_user_data_provider.h>
 
@@ -100,8 +101,8 @@ protected:
         const QnResourcePtr& resource,
         ec2::NotificationSource /*source*/) override;
 
-    virtual void handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType) override;
-    virtual void handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType) override;
+    virtual void handleRemotePeerFound(QnUuid peer, nx::vms::api::PeerType peerType) override;
+    virtual void handleRemotePeerLost(QnUuid peer, nx::vms::api::PeerType peerType) override;
 
 protected:
     std::unique_ptr<nx::TestResourceFactory> m_factory;

@@ -13,7 +13,7 @@ namespace nx {
 namespace vms {
 namespace cloud_integration {
 
-class CloudManagerGroup;
+struct CloudManagerGroup;
 class CloudConnectionManager;
 
 } // namespace cloud_integration

@@ -1,5 +1,7 @@
 #include "videowall_resource.h"
 
+#include <nx/vms/api/data/videowall_data.h>
+
 QnVideoWallResource::QnVideoWallResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_autorun(false),
@@ -8,7 +10,7 @@ QnVideoWallResource::QnVideoWallResource(QnCommonModule* commonModule):
     m_matrices(new QnThreadsafeItemStorage<QnVideoWallMatrix>(&m_mutex, this))
 {
     addFlags(Qn::videowall | Qn::remote);
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kVideoWallTypeId));
+    setTypeId(nx::vms::api::VideowallData::kResourceTypeId);
 }
 
 Qn::ResourceStatus QnVideoWallResource::getStatus() const

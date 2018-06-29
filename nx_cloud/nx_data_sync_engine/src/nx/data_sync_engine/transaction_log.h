@@ -49,7 +49,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(
         ResultCode /*resultCode*/,
         std::vector<dao::TransactionLogRecord> /*serializedTransactions*/,
-        ::ec2::QnTranState /*readedUpTo*/)> TransactionsReadHandler;
+        vms::api::TranState /*readedUpTo*/)> TransactionsReadHandler;
 
     /**
      * Fills internal cache.
@@ -192,7 +192,7 @@ public:
         TransactionDataType transactionData)
     {
         int transactionSequence = 0;
-        ::ec2::Timestamp transactionTimestamp;
+        vms::api::Timestamp transactionTimestamp;
         std::tie(transactionSequence, transactionTimestamp) =
             generateNewTransactionAttributes(queryContext, systemId);
 
@@ -210,7 +210,7 @@ public:
         return transaction;
     }
 
-    ::ec2::QnTranState getTransactionState(const nx::String& systemId) const;
+    vms::api::TranState getTransactionState(const nx::String& systemId) const;
 
     /**
      * Asynchronously reads requested transactions from Db.
@@ -224,14 +224,14 @@ public:
      */
     void readTransactions(
         const nx::String& systemId,
-        boost::optional<::ec2::QnTranState> from,
-        boost::optional<::ec2::QnTranState> to,
+        boost::optional<vms::api::TranState> from,
+        boost::optional<vms::api::TranState> to,
         int maxTransactionsToReturn,
         TransactionsReadHandler completionHandler);
 
     void clearTransactionLogCacheForSystem(const nx::String& systemId);
 
-    ::ec2::Timestamp generateTransactionTimestamp(const nx::String& systemId);
+    vms::api::Timestamp generateTransactionTimestamp(const nx::String& systemId);
 
     void shiftLocalTransactionSequence(
         const nx::String& systemId,
@@ -276,7 +276,7 @@ private:
         ResultCode resultCode;
         std::vector<dao::TransactionLogRecord> transactions;
         /** (Read start state) + (readed transactions). */
-        ::ec2::QnTranState state;
+        vms::api::TranState state;
     };
 
     const QnUuid m_peerId;
@@ -297,8 +297,8 @@ private:
     nx::utils::db::DBResult fetchTransactions(
         nx::utils::db::QueryContext* connection,
         const nx::String& systemId,
-        const ::ec2::QnTranState& from,
-        const ::ec2::QnTranState& to,
+        const vms::api::TranState& from,
+        const vms::api::TranState& to,
         int maxTransactionsToReturn,
         TransactionReadResult* const outputData);
 
@@ -327,7 +327,7 @@ private:
         nx::utils::db::QueryContext* connection,
         const nx::String& systemId);
 
-    ::ec2::Timestamp generateNewTransactionTimestamp(
+    vms::api::Timestamp generateNewTransactionTimestamp(
         const QnMutexLockerBase& lock,
         VmsTransactionLogCache::TranId cacheTranId,
         const nx::String& systemId);
@@ -346,7 +346,7 @@ private:
         const QnMutexLockerBase& lock,
         const nx::String& systemId);
 
-    std::tuple<int, ::ec2::Timestamp> generateNewTransactionAttributes(
+    std::tuple<int, vms::api::Timestamp> generateNewTransactionAttributes(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId);
 

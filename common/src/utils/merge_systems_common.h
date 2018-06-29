@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtCore/QString>
-#include <network/module_information.h>
+#include <nx/vms/api/data_fwd.h>
 
 namespace utils {
 
@@ -28,7 +28,7 @@ enum Value
 
 QString toString(Value value);
 Value fromString(const QString& str);
-QString getErrorMessage(Value value, const QnModuleInformation& moduleInformation);
+QString getErrorMessage(Value value, const nx::vms::api::ModuleInformation& moduleInformation);
 
 } // namespace MergeSystemsStatus
 

@@ -26,8 +26,10 @@
 
 #include <nx/network/http/custom_headers.h>
 #include "api/global_settings.h"
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/aio/unified_pollset.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/rtsp/rtsp_types.h>
 
 #include <utils/common/app_info.h>
@@ -171,7 +173,7 @@ QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, cons
 			d->connectTimeout));
 	}
 
-	if (!d->dstSocket)
+    if (!d->dstSocket)
 	{
 
 #ifdef PROXY_STRICT_IP
@@ -187,7 +189,7 @@ QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, cons
 			return QString();
 		}
 
-		d->dstSocket =
+        d->dstSocket =
 			nx::network::SocketFactory::createStreamSocket(url.scheme() == lit("https"));
 		d->dstSocket->setRecvTimeout(d->connectTimeout.count());
 		d->dstSocket->setSendTimeout(d->connectTimeout.count());

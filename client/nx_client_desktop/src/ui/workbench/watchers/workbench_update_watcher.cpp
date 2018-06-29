@@ -33,28 +33,33 @@
 using namespace nx::client::desktop::ui;
 
 namespace {
-    const int kUpdatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
+    constexpr int kUpdatePeriodMSec = 60 * 60 * 1000; //< 1 hour.
 
-    const int kHoursPerDay = 24;
-    const int kMinutesPerHour = 60;
-    const int kSecsPerMinute = 60;
+    constexpr int kHoursPerDay = 24;
+    constexpr int kMinutesPerHour = 60;
+    constexpr int kSecsPerMinute = 60;
 
-    const int kTooLateDayOfWeek = Qt::Thursday;
+    constexpr int kTooLateDayOfWeek = Qt::Thursday;
 
 } // anonymous namespace
 
-QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent)
-    : QObject(parent)
-    , QnWorkbenchContextAware(parent)
-    , m_checker(nullptr)
-    , m_timer(new QTimer(this))
-    , m_notifiedVersion()
+QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject* parent):
+    QObject(parent),
+    QnWorkbenchContextAware(parent),
+    m_checker(
+        [this]() -> QnUpdateChecker*
+        {
+            const QUrl updateFeedUrl(qnSettings->updateFeedUrl());
+            return updateFeedUrl.isEmpty()
+                ? nullptr
+                : new QnUpdateChecker(updateFeedUrl, this);
+        }()),
+    m_timer(new QTimer(this)),
+    m_notifiedVersion()
 {
-    QUrl updateFeedUrl(qnSettings->updateFeedUrl());
-    if(updateFeedUrl.isEmpty())
+    if (!m_checker)
         return;
 
-    m_checker = new QnUpdateChecker(updateFeedUrl, this);
     connect(m_checker, &QnUpdateChecker::updateAvailable, this,
         &QnWorkbenchUpdateWatcher::at_checker_updateAvailable);
 
@@ -142,7 +147,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 {
     m_notifiedVersion = info.currentRelease;
 
-    const QnSoftwareVersion current = qnStaticCommon->engineVersion();
+    const auto current = qnStaticCommon->engineVersion();
     const bool majorVersionChange = ((info.currentRelease.major() > current.major())
         || (info.currentRelease.minor() > current.minor()));
 

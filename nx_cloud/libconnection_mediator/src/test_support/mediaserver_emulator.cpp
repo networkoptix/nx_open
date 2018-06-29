@@ -1,8 +1,12 @@
 #include "mediaserver_emulator.h"
 
+#include <rest/server/json_rest_result.h>
+
 #include <nx/fusion/serialization/json.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/app_info.h>
 #include <nx/network/cloud/cloud_connect_type.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
@@ -13,9 +17,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 #include <nx/utils/thread/barrier_handler.h>
-
-#include <network/module_information.h>
-#include <rest/server/json_rest_result.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace nx {
 namespace hpm {
@@ -50,7 +52,9 @@ public:
         }
         else
         {
-            QnModuleInformation moduleInformation;
+            nx::vms::api::ModuleInformation moduleInformation;
+            moduleInformation.realm = nx::network::AppInfo::realm();
+            moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
             moduleInformation.id = QnUuid::fromStringSafe(m_serverIdForModuleInformation.get());
             if (m_cloudSystemId)
                 moduleInformation.cloudSystemId = m_cloudSystemId.get();

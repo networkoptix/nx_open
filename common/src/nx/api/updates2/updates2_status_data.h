@@ -5,20 +5,19 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/utils/uuid.h>
-#include <utils/common/software_version.h>
-
+#include <nx/vms/api/data/software_version.h>
 
 namespace nx {
 namespace api {
 
 struct TargetVersionWithEula
 {
-    QnSoftwareVersion targetVersion;
+    nx::vms::api::SoftwareVersion targetVersion;
     int eulaVersion = -1;
     QString eulaLink;
 
     TargetVersionWithEula(
-        const QnSoftwareVersion& targetVersion,
+        const nx::vms::api::SoftwareVersion& targetVersion,
         int eulaVersion = -1,
         const QString& eulaLink = QString())
         :
@@ -26,7 +25,6 @@ struct TargetVersionWithEula
         eulaVersion(eulaVersion),
         eulaLink(eulaLink)
     {
-
     }
 
     TargetVersionWithEula() = default;

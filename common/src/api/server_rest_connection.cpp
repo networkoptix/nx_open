@@ -14,27 +14,26 @@
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
 #include <api/helpers/event_log_multiserver_request_data.h>
-#include <nx/api/mediaserver/image_request.h>
-
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx_ec/data/api_data.h>
-
-#include <nx/vms/event/rule_manager.h>
-#include <nx/vms/event/rule.h>
-#include <nx/fusion/model_functions.h>
 #include <network/router.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/network/http/http_types.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
-#include <common/common_module.h>
 
+#include <nx/api/mediaserver/image_request.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data_fwd.h>
+#include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/rule.h>
+
+using namespace nx;
 
 namespace {
 
@@ -136,13 +135,13 @@ QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
     if (!server)
         return QnMediaServerResourcePtr(); //< something wrong. No current server available
 
-    if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+    if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
         return server;
 
     // Current server doesn't have internet access. Try to find another one
     for (const auto server: commonModule()->resourcePool()->getAllServers(Qn::Online))
     {
-        if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
             return server;
     }
     return QnMediaServerResourcePtr(); //< no internet access found

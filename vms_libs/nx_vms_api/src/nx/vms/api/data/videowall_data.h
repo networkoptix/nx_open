@@ -1,14 +1,18 @@
 #pragma once
 
-#include "data.h"
 #include "id_data.h"
 #include "resource_data.h"
+
+#include <vector>
+#include <map>
+
+#include <QtCore/QString>
 
 namespace nx {
 namespace vms {
 namespace api {
 
-struct VideowallItemData: Data
+struct NX_VMS_API VideowallItemData: Data
 {
     QnUuid guid;
     QnUuid pcGuid;
@@ -22,7 +26,7 @@ struct VideowallItemData: Data
 #define VideowallItemData_Fields \
     (guid)(pcGuid)(layoutGuid)(name)(snapLeft)(snapTop)(snapRight)(snapBottom)
 
-struct VideowallScreenData: Data
+struct NX_VMS_API VideowallScreenData: Data
 {
     QnUuid pcGuid;
     int pcIndex = 0;
@@ -39,35 +43,36 @@ struct VideowallScreenData: Data
     (pcGuid)(pcIndex)(desktopLeft)(desktopTop)(desktopWidth)(desktopHeight) \
     (layoutLeft)(layoutTop)(layoutWidth)(layoutHeight)
 
-
-struct VideowallMatrixItemData: Data
+struct NX_VMS_API VideowallMatrixItemData: Data
 {
     QnUuid itemGuid;
     QnUuid layoutGuid;
 };
 #define VideowallMatrixItemData_Fields (itemGuid)(layoutGuid)
 
-
-struct VideowallMatrixData: IdData
+struct NX_VMS_API VideowallMatrixData: IdData
 {
     QString name;
-    std::vector<VideowallMatrixItemData> items;
+    VideowallMatrixItemDataList items;
 };
 #define VideowallMatrixData_Fields IdData_Fields (name)(items)
 
-
-struct VideowallData: ResourceData
+struct NX_VMS_API VideowallData: ResourceData
 {
+    VideowallData(): ResourceData(kResourceTypeId) {}
+
+    static const QString kResourceTypeName;
+    static const QnUuid kResourceTypeId;
+
     bool autorun = false;
 
-    std::vector<VideowallItemData> items;
-    std::vector<VideowallScreenData> screens;
-    std::vector<VideowallMatrixData> matrices;
+    VideowallItemDataList items;
+    VideowallScreenDataList screens;
+    VideowallMatrixDataList matrices;
 };
 #define VideowallData_Fields ResourceData_Fields (autorun)(items)(screens)(matrices)
 
-
-struct VideowallControlMessageData: Data
+struct NX_VMS_API VideowallControlMessageData: Data
 {
     int operation = 0;
     QnUuid videowallGuid;
@@ -81,4 +86,13 @@ struct VideowallControlMessageData: Data
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::VideowallData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallDataList)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallItemData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallItemDataList)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallScreenData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallScreenDataList)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixDataList)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixItemData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixItemDataList)
 Q_DECLARE_METATYPE(nx::vms::api::VideowallControlMessageData)

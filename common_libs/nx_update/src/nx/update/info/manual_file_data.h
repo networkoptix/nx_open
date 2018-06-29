@@ -1,9 +1,10 @@
 #pragma once
 
 #include <QtCore>
-#include <utils/common/software_version.h>
+
 #include <nx/utils/uuid.h>
 #include <nx/update/info/os_version.h>
+#include <nx/utils/software_version.h>
 
 namespace nx {
 namespace update {
@@ -16,14 +17,14 @@ struct NX_UPDATE_API ManualFileData
 {
     QString file;
     OsVersion osVersion;
-    QnSoftwareVersion nxVersion;
+    nx::utils::SoftwareVersion nxVersion;
     QList<QnUuid> peers;
     bool isClient = false;
 
     ManualFileData(
         const QString& file,
         const OsVersion& osVersion,
-        const QnSoftwareVersion& nxVersion,
+        const nx::utils::SoftwareVersion& nxVersion,
         bool isClient);
 
     ManualFileData() = default;

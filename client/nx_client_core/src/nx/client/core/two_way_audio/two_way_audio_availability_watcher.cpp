@@ -22,7 +22,7 @@ TwoWayAudioAvailabilityWatcher::TwoWayAudioAvailabilityWatcher(QObject* parent):
         this, &TwoWayAudioAvailabilityWatcher::updateAvailability);
     connect(manager, &QnGlobalPermissionsManager::globalPermissionsChanged, this,
         [this, userWatcher]
-            (const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*permissions*/)
+            (const QnResourceAccessSubject& subject, GlobalPermissions /*permissions*/)
         {
             const auto user = userWatcher->user();
             if (subject != user)
@@ -83,7 +83,7 @@ void TwoWayAudioAvailabilityWatcher::updateAvailability()
                 return false;
 
             const auto manager = globalPermissionsManager();
-            if (!manager->hasGlobalPermission(user, Qn::GlobalUserInputPermission))
+            if (!manager->hasGlobalPermission(user, GlobalPermission::userInput))
                 return false;
 
             if (m_camera->getStatus() != Qn::Online && m_camera->getStatus() != Qn::Recording)

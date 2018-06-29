@@ -964,7 +964,7 @@ void LegacyCameraScheduleWidget::updateLicensesLabelText()
 
 void LegacyCameraScheduleWidget::updateLicensesButtonVisible()
 {
-    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(Qn::GlobalAdminPermission));
+    ui->licensesButton->setVisible(accessController()->hasGlobalPermission(GlobalPermission::admin));
 }
 
 void LegacyCameraScheduleWidget::updateRecordSpinboxes()

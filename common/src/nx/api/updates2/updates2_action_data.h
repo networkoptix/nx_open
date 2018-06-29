@@ -2,9 +2,9 @@
 
 #include <QtCore>
 
-#include <utils/common/software_version.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
+#include <nx/vms/api/data/software_version.h>
 
 namespace nx {
 namespace api {
@@ -24,7 +24,7 @@ public:
     Q_ENUM(ActionCode)
 
     ActionCode action;
-    QnSoftwareVersion targetVersion;
+    nx::vms::api::SoftwareVersion targetVersion;
 };
 
 #define Updates2ActionData_Fields (action)(targetVersion)

@@ -147,7 +147,7 @@ protected:
 
     void whenMergeIsCompleted()
     {
-        ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
+        nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
         mergeHistoryRecord.mergedSystemCloudId = m_slaveSystem.id.c_str();
         mergeHistoryRecord.sign(m_slaveSystem.authKey.c_str());
 

@@ -5,7 +5,6 @@ endif()
 
 nx_add_target(nx_vms_api
     LIBRARY ${library_type}
-    NO_PCH
     PUBLIC_LIBS
         nx_utils nx_fusion)
 

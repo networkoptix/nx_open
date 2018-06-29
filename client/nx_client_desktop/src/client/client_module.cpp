@@ -133,7 +133,7 @@
 
 #include <ini.h>
 
-
+using namespace nx;
 using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -364,9 +364,9 @@ void QnClientModule::initSurfaceFormat()
 
 void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 {
-    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
-        ? Qn::PT_DesktopClient
-        : Qn::PT_VideowallClient;
+    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? vms::api::PeerType::desktopClient
+        : vms::api::PeerType::videowallClient;
     const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
     const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
 
@@ -496,7 +496,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 
     if (!startupParams.engineVersion.isEmpty())
     {
-        QnSoftwareVersion version(startupParams.engineVersion);
+        nx::utils::SoftwareVersion version(startupParams.engineVersion);
         if (!version.isNull())
         {
             qWarning() << "Starting with overridden version: " << version.toString();
@@ -738,11 +738,11 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
 {
     auto commonModule = m_clientCoreModule->commonModule();
 
-    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
-        ? Qn::PT_DesktopClient
-        : Qn::PT_VideowallClient;
+    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? vms::api::PeerType::desktopClient
+        : vms::api::PeerType::videowallClient;
 
-    ec2::ApiRuntimeData runtimeData;
+    nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;

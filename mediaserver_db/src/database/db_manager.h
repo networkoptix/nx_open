@@ -5,24 +5,22 @@
 #include <QtSql/QSqlError>
 
 #include <common/common_module_aware.h>
-
+#include <core/resource_access/user_access_data.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource/user_resource.h>
+#include <database/api/db_resource_api.h>
 #include <nx_ec/ec_api.h>
-#include <nx/vms/api/data/lock_data.h>
-#include "nx_ec/data/api_fwd.h"
-#include "nx_ec/data/api_misc_data.h"
+#include <nx_ec/data/api_fwd.h>
+#include <transaction/transaction.h>
+#include <transaction/transaction_log.h>
 #include <utils/db/db_helper.h>
-#include "nx_ec/data/api_runtime_data.h"
+
+#include <nx/fusion/serialization/sql.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
-#include "core/resource_access/user_access_data.h"
-#include "core/resource_access/resource_access_manager.h"
-#include "core/resource/user_resource.h"
-#include <nx/fusion/serialization/sql.h>
-
-#include <database/api/db_resource_api.h>
-
-#include "transaction/transaction.h"
-#include "transaction/transaction_log.h"
+#include <nx/vms/api/data_fwd.h>
+#include <nx/vms/api/data/runtime_data.h>
+#include <nx/vms/api/data/lock_data.h>
 #include <nx/vms/event/event_fwd.h>
 
 struct BeforeRestoreDbData;
@@ -244,8 +242,9 @@ namespace detail
             return doQueryNoLock(nx::vms::api::StoredFilePath(), data);
         }
 
-        ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
-        ErrorCode doQueryNoLock(const QByteArray& /*dummy*/, ApiSystemMergeHistoryRecordList& systemMergeHistory);
+        ErrorCode doQueryNoLock(const QByteArray &paramName, nx::vms::api::MiscData& miscData);
+        ErrorCode doQueryNoLock(const QByteArray& /*dummy*/,
+            nx::vms::api::SystemMergeHistoryRecordList& systemMergeHistory);
         //getResourceTypes
         ErrorCode doQueryNoLock(
             const std::nullptr_t& /*dummy*/,
@@ -255,10 +254,11 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::CameraDataList& cameraList);
 
         //getStorages
-        ErrorCode getStorages(const QString& filterStr, ApiStorageDataList& storageList);
+        ErrorCode getStorages(const QString& filterStr, nx::vms::api::StorageDataList& storageList);
         ErrorCode doQueryNoLock(
-            const ParentId& parentId, ApiStorageDataList& storageList);
-        ErrorCode doQueryNoLock(const QnUuid& storageId, ApiStorageDataList& storageList);
+            const nx::vms::api::ParentId& parentId, nx::vms::api::StorageDataList& storageList);
+        ErrorCode doQueryNoLock(
+            const QnUuid& storageId, nx::vms::api::StorageDataList& storageList);
 
         //get resource status
         ErrorCode doQueryNoLock(
@@ -274,10 +274,10 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::CameraDataExList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::MediaServerDataList& serverList);
 
         //getServersEx
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataExList& serverList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::MediaServerDataExList& serverList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(
@@ -285,16 +285,18 @@ namespace detail
             nx::vms::api::ServerFootageDataList& historyList);
 
         //getUserList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::UserDataList& userList);
 
         //getUserRoleList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& userRoleList);
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::UserRoleDataList& userRoleList);
 
         //getPredefinedRoles
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/,
+            nx::vms::api::PredefinedRoleDataList& rolesList);
 
         //getAccessRights
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/,
+            nx::vms::api::AccessRightsDataList& accessRightsList);
 
         //getVideowallList
         ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::VideowallDataList& videowallList);
@@ -313,26 +315,30 @@ namespace detail
             const QnUuid& resourceId,
             nx::vms::api::ResourceParamWithRefDataList& params);
 
-        // ApiFullInfo
-        ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data);
+        // FullInfoData
+        ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data);
 
-        // ApiFullInfo abridged for Mobile Client
-        ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
+        // FullInfoData abridged for Mobile Client
+        ErrorCode readFullInfoDataForMobileClient(
+            nx::vms::api::FullInfoData* data, const QnUuid& userId);
 
         //getLicenses
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLicenseDataList& data);
+        ErrorCode doQueryNoLock(
+            const std::nullptr_t& /*dummy*/, nx::vms::api::LicenseDataList& data);
 
-        // ApiDiscoveryDataList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList& data);
+        // DiscoveryDataList
+        ErrorCode doQueryNoLock(const QnUuid& id, nx::vms::api::DiscoveryDataList& data);
 
         //getMediaServerUserAttributesList
-        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
+        ErrorCode doQueryNoLock(const QnUuid& mServerId,
+            nx::vms::api::MediaServerUserAttributesDataList& serverAttrsList);
 
         //getTransactionLog
         ErrorCode doQueryNoLock(const ApiTranLogFilter&, ApiTransactionDataList& tranList);
 
         // Stub - acts as if nothing is found in the database. Needed for merge algorithm.
-        ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data);
+        ErrorCode doQueryNoLock(
+            const QnUuid& /*id*/, nx::vms::api::UpdateUploadResponseDataList& data);
 
         // getLayoutTours
         ErrorCode doQueryNoLock(
@@ -353,10 +359,11 @@ namespace detail
             const QnTransaction<nx::vms::api::CameraAttributesData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::CameraAttributesDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageData>& tran);
         ErrorCode executeTransactionInternal(
-            const QnTransaction<ApiMediaServerUserAttributesData>& tran);
+            const QnTransaction<nx::vms::api::MediaServerData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::StorageData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::MediaServerUserAttributesData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::LayoutData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::LayoutTourData>& tran);
@@ -374,9 +381,10 @@ namespace detail
             const QnTransaction<nx::vms::api::StoredFilePath>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::EventRuleData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UserData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UserRoleData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::AccessRightsData>& tran);
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ResetEventRulesData>& /*tran*/)
@@ -388,25 +396,28 @@ namespace detail
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::VideowallData>& tran);
         ErrorCode executeTransactionInternal(
-            const QnTransaction<ApiUpdateUploadResponceData>& tran);
+            const QnTransaction<nx::vms::api::UpdateUploadResponseData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::VideowallDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::WebPageData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::WebPageDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::DiscoveryData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::DatabaseDumpData>& tran);
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::ClientInfoData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiMiscData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemMergeHistoryRecord>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::MiscData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::SystemMergeHistoryRecord>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::IdData>& tran);
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran);
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::LicenseDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::LicenseData>& tran);
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::IdDataList>& /*tran*/)
@@ -416,7 +427,7 @@ namespace detail
         }
 
         ErrorCode executeTransactionInternal(
-            const QnTransaction<ApiMediaServerUserAttributesDataList>& /*tran*/)
+            const QnTransaction<nx::vms::api::MediaServerUserAttributesDataList>& /*tran*/)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -429,7 +440,8 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageDataList>& /*tran*/)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::StorageDataList>& /*tran*/)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -455,13 +467,7 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailData>&)
-        {
-            NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
-            return ErrorCode::notImplemented;
-        }
-
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiFullInfoData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::FullInfoData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -480,31 +486,33 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UpdateUploadData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerData>&)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::DiscoveredServerData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerDataList>&)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::DiscoveredServerDataList>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoverPeerData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::DiscoverPeerData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemIdData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::SystemIdData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -516,38 +524,38 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiRuntimeData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::RuntimeData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerAliveData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::PeerAliveData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateInstallData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::UpdateInstallData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSyncRequestData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::SyncRequestData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<QnTranStateResponse>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::TranStateResponse>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData>&);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::LicenseOverflowData>&);
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::CleanupDatabaseData>& tran);
 
         ErrorCode executeTransactionInternal(
             const QnTransaction<nx::vms::api::UpdateSequenceData>&)
@@ -556,19 +564,20 @@ namespace detail
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiTranSyncDoneData>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::TranSyncDoneData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList>&)
+        ErrorCode executeTransactionInternal(const QnTransaction<nx::vms::api::DiscoveryDataList>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiReverseConnectionData>&)
+        ErrorCode executeTransactionInternal(
+            const QnTransaction<nx::vms::api::ReverseConnectionData>&)
         {
             NX_ASSERT(false, Q_FUNC_INFO, "This is a non persistent transaction!");
             return ErrorCode::notImplemented;
@@ -577,7 +586,7 @@ namespace detail
         ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
-        ErrorCode saveMiscParam(const ApiMiscData &params);
+        ErrorCode saveMiscParam(const nx::vms::api::MiscData& params);
         ErrorCode readSettings(nx::vms::api::ResourceParamDataList& settings);
 
         ErrorCode insertOrReplaceResource(const nx::vms::api::ResourceData& data,
@@ -607,8 +616,10 @@ namespace detail
         ErrorCode removeParam(const nx::vms::api::ResourceParamWithRefData& data);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
-        ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
-        ErrorCode insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& attrs);
+        ErrorCode insertOrReplaceMediaServer(
+            const nx::vms::api::MediaServerData& data, qint32 internalId);
+        ErrorCode insertOrReplaceMediaServerUserAttributes(
+            const nx::vms::api::MediaServerUserAttributesData& attrs);
         ErrorCode removeServer(const QnUuid& guid);
         ErrorCode removeMediaServerUserAttributes(const QnUuid& guid);
 
@@ -620,11 +631,11 @@ namespace detail
 
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );
-        ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
+        ErrorCode insertOrReplaceUser(const nx::vms::api::UserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
-        ErrorCode insertOrReplaceUserRole(const ApiUserRoleData& data);
+        ErrorCode insertOrReplaceUserRole(const nx::vms::api::UserRoleData& data);
         ErrorCode removeUserRole( const QnUuid& guid );
-        ErrorCode setAccessRights(const ApiAccessRightsData& data);
+        ErrorCode setAccessRights(const nx::vms::api::AccessRightsData& data);
         ErrorCode cleanAccessRights(const QnUuid& userOrRoleId);
 
         ErrorCode saveVideowall(const nx::vms::api::VideowallData& params);
@@ -648,10 +659,10 @@ namespace detail
         ErrorCode removeBusinessRule( const QnUuid& id );
         ErrorCode updateBusinessRule(const nx::vms::api::EventRuleData& rule);
 
-        ErrorCode saveLicense(const ApiLicenseData& license);
-        ErrorCode saveLicense(const ApiLicenseData& license, QSqlDatabase& database);
-        ErrorCode removeLicense(const ApiLicenseData& license);
-        ErrorCode removeLicense(const ApiLicenseData& license, QSqlDatabase& database);
+        ErrorCode saveLicense(const nx::vms::api::LicenseData& license);
+        ErrorCode saveLicense(const nx::vms::api::LicenseData& license, QSqlDatabase& database);
+        ErrorCode removeLicense(const nx::vms::api::LicenseData& license);
+        ErrorCode removeLicense(const nx::vms::api::LicenseData& license, QSqlDatabase& database);
 
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
@@ -744,7 +755,7 @@ namespace detail
 
         template <class FilterDataType, class ObjectType, class ObjectListType>
         bool fillTransactionLogInternal(
-            ApiCommand::Value command, 
+            ApiCommand::Value command,
             std::function<bool (ObjectType& data)> updater = nullptr,
             FilterDataType filter = FilterDataType());
 
@@ -772,7 +783,7 @@ namespace detail
         bool fixDefaultBusinessRuleGuids();
         bool updateBusinessRulesTransactions();
 
-        ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
+        ErrorCode getLicenses(nx::vms::api::LicenseDataList& data, QSqlDatabase& database);
 
         /** Raise flags if db is not just created. Always returns true. */
         bool resyncIfNeeded(ResyncFlags flags);
@@ -821,18 +832,18 @@ namespace detail
     public:
         PersistentStorage(QnDbManager* db) : m_db(db) {}
 
-        virtual ApiMediaServerData getServer(const QnUuid& id) override
+        virtual nx::vms::api::MediaServerData getServer(const QnUuid& id) override
         {
-            ApiMediaServerDataList result;
+            nx::vms::api::MediaServerDataList result;
             m_db->doQueryNoLock(id, result);
-            return result.empty() ? ApiMediaServerData() : result[0];
+            return result.empty() ? nx::vms::api::MediaServerData() : result[0];
         }
 
-        virtual ec2::ApiUserData getUser(const QnUuid& id) override
+        virtual nx::vms::api::UserData getUser(const QnUuid& id) override
         {
-            ApiUserDataList result;
+            nx::vms::api::UserDataList result;
             m_db->doQueryNoLock(id, result);
-            return result.empty() ? ApiUserData() : result[0];
+            return result.empty() ? nx::vms::api::UserData() : result[0];
         }
 
     private:
@@ -852,15 +863,15 @@ public:
 
     ApiObjectType getObjectType(const QnUuid& objectId);
 
-    ErrorCode doQuery(std::nullptr_t /*dummy*/, ApiFullInfoData& data)
+    ErrorCode doQuery(std::nullptr_t /*dummy*/, nx::vms::api::FullInfoData& data)
     {
-        return readApiFullInfoDataComplete(&data);
+        return readFullInfoDataComplete(&data);
     }
 
-    ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data)
+    ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data)
     {
         const ErrorCode errorCode =
-            m_dbManager->readApiFullInfoDataComplete(data);
+            m_dbManager->readFullInfoDataComplete(data);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -888,7 +899,8 @@ public:
         return ErrorCode::ok;
     }
 
-    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
+    ErrorCode readFullInfoDataForMobileClient(
+        nx::vms::api::FullInfoData* data, const QnUuid& userId);
 
     QnDbHelper::QnDbTransaction* getTransaction();
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);

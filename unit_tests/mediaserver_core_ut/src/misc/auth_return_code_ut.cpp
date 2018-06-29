@@ -11,6 +11,7 @@
 #include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
 #include <nx/mediaserver/authenticator.h>
 #include <api/model/cookie_login_data.h>
 #include <network/authutil.h>
@@ -125,7 +126,7 @@ public:
     }
 
     void testServerReturnCodeForWrongPassword(
-        const ec2::ApiUserData& userDataToUse,
+        const nx::vms::api::UserData& userDataToUse,
         nx::network::http::AuthType authType,
         int expectedStatusCode,
         Qn::AuthResult expectedAuthResult)
@@ -199,9 +200,9 @@ public:
         ASSERT_EQ(expectedStatus, client.response()->statusLine.statusCode) << path.toStdString();
     }
 
-    ec2::ApiUserData userData;
-    ec2::ApiUserData ldapUserWithEmptyDigest;
-    ec2::ApiUserData ldapUserWithFilledDigest;
+    nx::vms::api::UserData userData;
+    nx::vms::api::UserData ldapUserWithEmptyDigest;
+    nx::vms::api::UserData ldapUserWithFilledDigest;
 
     static std::unique_ptr<MediaServerLauncher> server;
 

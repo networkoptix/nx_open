@@ -12,6 +12,8 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
+#include <nx/utils/log/log.h>
+
 // TODO: #Elric move to config?
 // see https://code.google.com/p/arxlib/source/browse/include/arx/Utility.h
 #ifndef _MSC_VER

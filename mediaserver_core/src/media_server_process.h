@@ -34,14 +34,13 @@
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
-struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
 struct BeforeRestoreDbData;
 class TimeBasedNonceProvider;
 
-namespace ec2 { 
+namespace ec2 {
 
-class CrashReporter; 
+class CrashReporter;
 class LocalConnectionFactory;
 
 } // namespace ec2
@@ -176,7 +175,7 @@ private:
     void prepareOsResources();
 
     std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
-    Qn::ServerFlags calcServerFlags();
+    nx::vms::api::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     void initPublicIpDiscoveryUpdate();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);

@@ -89,7 +89,7 @@
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec_proto_version.h>
-#include <nx_ec/data/api_user_data.h>
+#include <nx/vms/api/data/user_data.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_videowall_manager.h>
@@ -215,9 +215,9 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
+#include <utils/common/app_info.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
-#include <utils/common/system_information.h>
 #include <utils/common/util.h>
 #include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/ssl_socket.h>
@@ -355,12 +355,14 @@ bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 
 void addFakeVideowallUser(QnCommonModule* commonModule)
 {
-    ec2::ApiUserData fakeUserData;
-    fakeUserData.permissions = Qn::GlobalVideoWallModePermissionSet;
-    fakeUserData.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId);
+    nx::vms::api::UserData fakeUserData;
+    fakeUserData.realm = nx::network::AppInfo::realm();
+    fakeUserData.permissions = GlobalPermission::videowallModePermissions;
+
     auto fakeUser = ec2::fromApiToResource(fakeUserData);
     fakeUser->setId(Qn::kVideowallUserAccess.userId);
     fakeUser->setName(lit("Video wall"));
+
     commonModule->resourcePool()->addResource(fakeUser);
 }
 
@@ -721,9 +723,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         //read server's storages
         ec2::AbstractECConnectionPtr ec2Connection = messageProcessor->commonModule()->ec2Connection();
         ec2::ErrorCode rez;
-        ec2::ApiStorageDataList storages;
+        vms::api::StorageDataList storages;
 
-        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
+        while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(
+            QnUuid(), &storages)) != ec2::ErrorCode::ok)
         {
             NX_DEBUG(this, lm("Can't get storage list. Reason: %1").arg(rez));
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -822,7 +825,7 @@ QString getDefaultServerName()
 
 QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectionPtr ec2Connection)
 {
-    ec2::ApiMediaServerDataList servers;
+    nx::vms::api::MediaServerDataList servers;
 
     while (servers.empty() && !needToStop())
     {
@@ -839,7 +842,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
         if (server.id == serverGuid())
         {
             QnMediaServerResourcePtr qnServer(new QnMediaServerResource(commonModule()));
-            fromApiToResource(server, qnServer);
+            ec2::fromApiToResource(server, qnServer);
             return qnServer;
         }
     }
@@ -852,8 +855,8 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
     const QnMediaServerResourcePtr &server,
     bool isNewServerInstance)
 {
-    ec2::ApiMediaServerData apiServer;
-    fromResourceToApi(server, apiServer);
+    nx::vms::api::MediaServerData apiServer;
+    ec2::fromResourceToApi(server, apiServer);
 
     ec2::ErrorCode rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
     if (rez != ec2::ErrorCode::ok)
@@ -872,12 +875,12 @@ QnMediaServerResourcePtr MediaServerProcess::registerServer(
     if (!f.open(QFile::ReadOnly))
         return server;
     QByteArray data = f.readAll();
-    ec2::ApiMediaServerUserAttributesData userAttrsData;
+    nx::vms::api::MediaServerUserAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return server;
     userAttrsData.serverId = server->getId();
 
-    ec2::ApiMediaServerUserAttributesDataList attrsList;
+    nx::vms::api::MediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
     rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
     if (rez != ec2::ErrorCode::ok)
@@ -893,11 +896,12 @@ void MediaServerProcess::saveStorages(
     ec2::AbstractECConnectionPtr ec2Connection,
     const QnStorageResourceList& storages)
 {
-    ec2::ApiStorageDataList apiStorages;
-    fromResourceListToApi(storages, apiStorages);
+    nx::vms::api::StorageDataList apiStorages;
+    ec2::fromResourceListToApi(storages, apiStorages);
 
     ec2::ErrorCode rez;
-    while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages)) != ec2::ErrorCode::ok && !needToStop())
+    while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages))
+        != ec2::ErrorCode::ok && !needToStop())
     {
         NX_WARNING(this) << "Call to change server's storages failed. Reason: " << rez;
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -1269,8 +1273,8 @@ void MediaServerProcess::updateAddressesList()
     if (isStopping())
         return;
 
-    ec2::ApiMediaServerData prevValue;
-    fromResourceToApi(m_mediaServer, prevValue);
+    vms::api::MediaServerData prevValue;
+    ec2::fromResourceToApi(m_mediaServer, prevValue);
 
     nx::network::AddressFilters addressMask =
         nx::network::AddressFilter::ipV4
@@ -1306,8 +1310,8 @@ void MediaServerProcess::updateAddressesList()
         m_mediaServer->setPrimaryAddress(newAddress);
     }
 
-    ec2::ApiMediaServerData server;
-    fromResourceToApi(m_mediaServer, server);
+    vms::api::MediaServerData server;
+    ec2::fromResourceToApi(m_mediaServer, server);
     if (server != prevValue)
     {
         auto mediaServerManager =
@@ -1332,7 +1336,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
     server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
     server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
-    server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
+    server->setProperty(Qn::SYSTEM_RUNTIME, nx::vms::api::SystemInformation::currentSystemRuntime());
 
     if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents)
         server->setPanicMode(Qn::PM_None);
@@ -1375,18 +1379,19 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
     QnMediaServerResourcePtr server = resPool->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (server)
     {
-        Qn::ServerFlags serverFlags = server->getServerFlags();
+        auto serverFlags = server->getServerFlags();
         if (publicIp.isNull())
-            serverFlags &= ~Qn::SF_HasPublicIP;
+            serverFlags &= ~vms::api::SF_HasPublicIP;
         else
-            serverFlags |= Qn::SF_HasPublicIP;
+            serverFlags |= vms::api::SF_HasPublicIP;
+
         if (serverFlags != server->getServerFlags())
         {
             server->setServerFlags(serverFlags);
             ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
 
-            ec2::ApiMediaServerData apiServer;
-            fromResourceToApi(server, apiServer);
+            vms::api::MediaServerData apiServer;
+            ec2::fromResourceToApi(server, apiServer);
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
@@ -1553,9 +1558,9 @@ void MediaServerProcess::registerRestHandlers(
         [this, processorPool](
             const QString& path,
             QnRestRequestHandler* handler,
-            Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
+            GlobalPermission permission = GlobalPermission::none)
         {
-            processorPool->registerHandler(path, handler, permissions);
+            processorPool->registerHandler(path, handler, permission);
 
             const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
             if (!cameraIdUrlParams.isEmpty())
@@ -1563,8 +1568,8 @@ void MediaServerProcess::registerRestHandlers(
         };
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
-    const auto kAdmin = Qn::GlobalAdminPermission;
-    const auto kViewLogs = Qn::GlobalViewLogsPermission;
+    const auto kAdmin = GlobalPermission::admin;
+    const auto kViewLogs = GlobalPermission::viewLogs;
 
     /**%apidoc GET /api/synchronizedTime
      * This method is used for internal purpose to synchronize time between mediaservers and clients.
@@ -2861,28 +2866,28 @@ std::unique_ptr<nx::network::upnp::PortMapper> MediaServerProcess::initializeUpn
     return mapper;
 }
 
-Qn::ServerFlags MediaServerProcess::calcServerFlags()
+vms::api::ServerFlags MediaServerProcess::calcServerFlags()
 {
-    Qn::ServerFlags serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
+    vms::api::ServerFlags serverFlags = vms::api::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 
 #ifdef EDGE_SERVER
-    serverFlags |= Qn::SF_Edge;
+    serverFlags |= vms::api::SF_Edge;
 #endif
     if (QnAppInfo::isBpi())
     {
-        serverFlags |= Qn::SF_IfListCtrl | Qn::SF_timeCtrl;
+        serverFlags |= vms::api::SF_IfListCtrl | vms::api::SF_timeCtrl;
         if (QnStartLiteClientRestHandler::isLiteClientPresent())
-            serverFlags |= Qn::SF_HasLiteClient;
+            serverFlags |= vms::api::SF_HasLiteClient;
     }
 
     if (ini().forceLiteClient)
     {
         if (QnStartLiteClientRestHandler::isLiteClientPresent())
-            serverFlags |= Qn::SF_HasLiteClient;
+            serverFlags |= vms::api::SF_HasLiteClient;
     }
 
 #ifdef __arm__
-    serverFlags |= Qn::SF_ArmServer;
+    serverFlags |= vms::api::SF_ArmServer;
 
     struct stat st;
     memset(&st, 0, sizeof(st));
@@ -2892,22 +2897,22 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
         ::stat("/dev/sdc", &st) == 0 ||
         ::stat("/dev/sdd", &st) == 0;
     if (hddPresent)
-        serverFlags |= Qn::SF_Has_HDD;
+        serverFlags |= vms::api::SF_Has_HDD;
 #else
-    serverFlags |= Qn::SF_Has_HDD;
+    serverFlags |= vms::api::SF_Has_HDD;
 #endif
 
-    if (!(serverFlags & (Qn::SF_ArmServer | Qn::SF_Edge)))
-        serverFlags |= Qn::SF_SupportsTranscoding;
+    if (!(serverFlags & (vms::api::SF_ArmServer | vms::api::SF_Edge)))
+        serverFlags |= vms::api::SF_SupportsTranscoding;
 
     const QString appserverHostString = serverModule()->settings().appserverHost();
     bool isLocal = isLocalAppServer(appserverHostString);
     if (!isLocal)
-        serverFlags |= Qn::SF_RemoteEC;
+        serverFlags |= vms::api::SF_RemoteEC;
 
     initPublicIpDiscovery();
     if (!m_ipDiscovery->publicIP().isNull())
-        serverFlags |= Qn::SF_HasPublicIP;
+        serverFlags |= vms::api::SF_HasPublicIP;
 
     return serverFlags;
 }
@@ -3321,7 +3326,7 @@ void MediaServerProcess::run()
     if (!m_cmdLineArguments.engineVersion.isNull())
     {
         qWarning() << "Starting with overridden version: " << m_cmdLineArguments.engineVersion;
-        qnStaticCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
+        qnStaticCommon->setEngineVersion(nx::utils::SoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
 #ifdef Q_OS_WIN32
@@ -3428,11 +3433,11 @@ void MediaServerProcess::run()
     commonModule()->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), commonModule()->moduleGUID());
     connect(commonModule(), &QnCommonModule::systemIdentityTimeChanged, this, &MediaServerProcess::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
-    ec2::ApiRuntimeData runtimeData;
+    nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = commonModule()->moduleGUID();
     runtimeData.peer.instanceId = commonModule()->runningInstanceGUID();
     runtimeData.peer.persistentId = commonModule()->dbId();
-    runtimeData.peer.peerType = Qn::PT_Server;
+    runtimeData.peer.peerType = vms::api::PeerType::server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.customization = QnAppInfo::customizationName();
@@ -3468,7 +3473,7 @@ void MediaServerProcess::run()
     std::unique_ptr<ec2::LocalConnectionFactory> ec2ConnectionFactory(
         new ec2::LocalConnectionFactory(
             commonModule(),
-            Qn::PT_Server,
+            vms::api::PeerType::server,
             serverModule->settings().p2pMode(),
             m_universalTcpListener));
 
@@ -3660,10 +3665,10 @@ void MediaServerProcess::run()
     while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection);
-        ec2::ApiMediaServerData prevServerData;
+        vms::api::MediaServerData prevServerData;
         if (server)
         {
-            fromResourceToApi(server, prevServerData);
+            ec2::fromResourceToApi(server, prevServerData);
             foundOwnServerInDb = true;
         }
         else
@@ -3678,7 +3683,7 @@ void MediaServerProcess::run()
             server->setName(serverName);
         }
 
-        server->setServerFlags((Qn::ServerFlags) calcServerFlags());
+        server->setServerFlags(calcServerFlags());
 
         QHostAddress appserverHost;
         bool isLocal = isLocalAppServer(appserverHostString);
@@ -3696,7 +3701,7 @@ void MediaServerProcess::run()
             nx::network::SocketAddress(nx::network::HostAddress::localhost, m_universalTcpListener->getPort()));
 
         // used for statistics reported
-        server->setSystemInfo(QnSystemInformation::currentSystemInformation());
+        server->setSystemInfo(QnAppInfo::currentSystemInformation());
         server->setVersion(qnStaticCommon->engineVersion());
 
         QByteArray settingsAuthKey = nx::ServerSetting::getAuthKey();
@@ -3711,8 +3716,8 @@ void MediaServerProcess::run()
         if (settingsAuthKey != authKey)
             nx::ServerSetting::setAuthKey(authKey);
 
-        ec2::ApiMediaServerData newServerData;
-        fromResourceToApi(server, newServerData);
+        vms::api::MediaServerData newServerData;
+        ec2::fromResourceToApi(server, newServerData);
         if (prevServerData != newServerData)
         {
             m_mediaServer = registerServer(
@@ -3752,7 +3757,7 @@ void MediaServerProcess::run()
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
-    QnModuleInformation selfInformation = commonModule()->moduleInformation();
+    nx::vms::api::ModuleInformation selfInformation = commonModule()->moduleInformation();
     selfInformation.version = qnStaticCommon->engineVersion();
     selfInformation.sslAllowed = sslAllowed;
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
@@ -4143,7 +4148,7 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
     auto connection = commonModule()->ec2Connection();
     if (connection)
     {
-        ec2::QnTransaction<ec2::ApiRuntimeData> tran(
+        ec2::QnTransaction<nx::vms::api::RuntimeData> tran(
             ec2::ApiCommand::runtimeInfoChanged,
             commonModule()->moduleGUID());
         tran.params = runtimeInfo.data;
@@ -4163,8 +4168,8 @@ void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, c
         user->setName(login);
         user->setPasswordAndGenerateHash(password);
 
-        ec2::ApiUserData userData;
-        fromResourceToApi(user, userData);
+        nx::vms::api::UserData userData;
+        ec2::fromResourceToApi(user, userData);
 
         QnUuid userId = user->getId();
         m_updateUserRequests << userId;
@@ -4347,17 +4352,15 @@ int MediaServerProcess::main(int argc, char* argv[])
     textToWaveServer->waitForStarted();
 #endif
 
-    QnVideoService service( argc, argv );
+    QnVideoService service(argc, argv);
 
     m_staticCommonModule.reset(new QnStaticCommonModule(
-        Qn::PT_Server,
+        nx::vms::api::PeerType::server,
         QnAppInfo::productNameShort(),
         QnAppInfo::customizationName()));
 
-    int res = service.exec();
-    if (restartFlag && res == 0)
-        return 1;
-    return 0;
+    const int res = service.exec();
+    return (restartFlag && res == 0) ? 1 : 0;
 }
 
 const CmdLineArguments MediaServerProcess::cmdLineArguments() const
