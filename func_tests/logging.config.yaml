@@ -3,6 +3,7 @@
 # Structure is exactly as `logging.config.dictConfig` accepts.
 
 version: 1
+disable_existing_loggers: false
 formatters:
   default:
     format: '%(asctime)-15s %(name)s %(levelname)s %(message)s'

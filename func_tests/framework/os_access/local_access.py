@@ -54,5 +54,9 @@ class LocalAccess(PosixAccess):
                 destination)
         return destination
 
+    @property
+    def traffic_capture(self):
+        raise NotImplementedError("Traffic capture on local machine is prohibited intentionally")
+
 
 local_access = LocalAccess()

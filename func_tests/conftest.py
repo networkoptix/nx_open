@@ -109,6 +109,7 @@ def init_logging(request, work_dir):
         config_text = full_path.read_text()
         config = yaml.load(config_text)
         logging.config.dictConfig(config)
+        logging.info('Logging is initialized from "%s".', full_path)
 
     root_logger = logging.getLogger()
     file_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')

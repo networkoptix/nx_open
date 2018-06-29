@@ -7,10 +7,31 @@ import subprocess
 import time
 
 from framework.os_access.command import Command
-from framework.os_access.posix_shell import PosixShell, _DEFAULT_TIMEOUT_SEC, _STREAM_BUFFER_SIZE
+from framework.os_access.posix_shell import PosixOutcome, PosixShell, _DEFAULT_TIMEOUT_SEC, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
 _logger = logging.getLogger(__name__)
+
+
+class _LocalCommandOutcome(PosixOutcome):
+    def __init__(self, pythons_popen_returncode):
+        assert isinstance(pythons_popen_returncode, int)
+        assert -31 <= pythons_popen_returncode <= 255  # See: https://bugs.python.org/issue27167
+        self._returncode = pythons_popen_returncode
+
+    @property
+    def signal(self):
+        # See: subprocess.Popen#_handle_exitstatus
+        # See: https://bugs.python.org/issue27167
+        if self._returncode >= 0:
+            return None
+        return -self._returncode
+
+    @property
+    def code(self):
+        if self.signal:
+            return 128 + self.signal
+        return self._returncode
 
 
 class _LocalCommand(Command):
@@ -68,17 +89,24 @@ class _LocalCommand(Command):
             self.process.stdin.close()
             return len(bytes_buffer)
 
-    def _receive_exit_status(self, timeout_sec):
+    def _receive_outcome(self):
+        return_code = self.process.poll()
+        if return_code is not None:
+            return _LocalCommandOutcome(return_code)
+        return None
+
+    def _receive_outcome_only(self, timeout_sec):
         # TODO: When moved to Python 3, simply use `self.process.wait(timeout_sec)`.
         assert not self.fd2file
-        if self.process.poll() is None:
+        outcome = self._receive_outcome()
+        if outcome is None:
             self.interaction_logger.debug("Hasn't exited. Sleep for %.3f seconds.", timeout_sec)
             time.sleep(timeout_sec)
-        return self.process.poll(), None, None
+        return outcome, None, None
 
     def receive(self, timeout_sec):
         if not self.fd2file:
-            return self._receive_exit_status(timeout_sec)
+            return self._receive_outcome_only(timeout_sec)
 
         try:
             ready = self.poller.poll(int(math.ceil(timeout_sec * 1000)))
@@ -90,9 +118,10 @@ class _LocalCommand(Command):
 
         if not ready:
             self.interaction_logger.warning("Nothing on streams. Some still open.")
-            if self.process.poll() is not None:
+            outcome = self._receive_outcome()
+            if outcome is not None:
                 self.interaction_logger.error("Process exited but some streams open. Ignore them.")
-                return self.process.poll(), None, None
+                return outcome, None, None
             return None, None, None
 
         name2data = {}
@@ -113,11 +142,10 @@ class _LocalCommand(Command):
                 # Ignore hang up or errors.
                 self.close_unregister_and_remove(fd)
 
-        return self.process.poll(), name2data.get('stdout'), name2data.get('stderr')
+        return self._receive_outcome(), name2data.get('stdout'), name2data.get('stderr')
 
     def terminate(self):
-        self.process.terminate()
-        return self.process.returncode
+        self.process.send_signal(2)  # SIGINT, which is sent by terminal when pressing Ctrl+C.
 
 
 class _LocalShell(PosixShell):

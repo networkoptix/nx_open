@@ -14,6 +14,7 @@ from framework.os_access.windows_remoting import WinRM
 from framework.os_access.windows_remoting._powershell import PowershellError
 from framework.os_access.windows_remoting.env_vars import EnvVars
 from framework.os_access.windows_remoting.users import Users
+from framework.os_access.windows_traffic_capture import WindowsTrafficCapture
 from framework.utils import RunningTime
 
 
@@ -165,3 +166,7 @@ class WindowsAccess(RemoteAccess):
             "One of possible solutions, which can even be a cross-platform, "
             "is `mkdir` and `rmdir`, as long as these calls are atomic."
             )
+
+    @cached_property
+    def traffic_capture(self):
+        return WindowsTrafficCapture(self.Path.tmp() / 'NetworkTrafficCapture', self.winrm)

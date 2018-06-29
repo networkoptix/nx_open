@@ -71,10 +71,12 @@ QnTimeStepLongCacheKey longCacheKey(std::chrono::milliseconds msecs, int height,
 
 // TODO: #Elric #TR what to do with locale-translation inconsistencies?
 
+// Used for time label below ticks (both smaller and bigger).
 QString toShortString(std::chrono::milliseconds msecs, const QnTimeStep &step);
 
 QString toLongestShortString(const QnTimeStep &step);
 
+// Used for upper time labels in rectangles.
 QString toLongString(std::chrono::milliseconds msecs, const QnTimeStep &step);
 
 #endif // QN_TIME_STEP_H

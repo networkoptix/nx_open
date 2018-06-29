@@ -7,6 +7,7 @@ from pathlib2 import PureWindowsPath
 from framework.networking.interface import Networking
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
+from framework.os_access.traffic_capture import TrafficCapture
 from framework.utils import RunningTime
 
 
@@ -142,3 +143,7 @@ class OSAccess(object):
     @abstractmethod
     def lock(self, path, try_lock_timeout_sec=10):
         pass
+
+    @abstractproperty
+    def traffic_capture(self):
+        return TrafficCapture()

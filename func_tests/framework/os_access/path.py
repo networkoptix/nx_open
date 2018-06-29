@@ -1,4 +1,5 @@
 import logging
+import os
 from abc import ABCMeta, abstractmethod
 
 from pathlib2 import PurePath
@@ -61,6 +62,16 @@ class FileSystemPath(PurePath):
     @abstractmethod
     def write_text(self, data, encoding, errors):
         return 0
+
+    def ensure_empty_dir(self):
+        if self.exists():
+            self.rmtree()
+        self.mkdir(parents=True)
+
+    @classmethod
+    def tmp_file(cls, base_name):
+        random_name = os.urandom(6).encode('hex')
+        return cls.tmp().joinpath(base_name.stem + '-' + random_name).with_suffix(base_name.suffix)
 
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
