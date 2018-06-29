@@ -48,7 +48,7 @@ class Command(object):
     def terminate(self):
         pass
 
-    def communicate(self, input=None, timeout_sec=None):
+    def communicate(self, input=None, timeout_sec=_DEFAULT_COMMUNICATION_TIMEOUT_SEC):
         if input is not None:
             # If input bytes not None but empty, send zero bytes once.
             left_to_send = memoryview(input)
