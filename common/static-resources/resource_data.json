@@ -516,7 +516,9 @@
                 "Sony|SNT-EX154",
                 "Sony|SNT-EP154",
                 "Dahua|DHI-HCVR7108H*",
-                "Siqura|EVE FOUR"
+                "Siqura|EVE FOUR",
+                "Hikvision|DS-6708*",
+                "HIKVISION|DS-6708*"
             ],
             "analogEncoder": true
         },
@@ -771,6 +773,25 @@
                     "VideoEncoderConfigurationA02,VideoEncoderConfigurationA06",
                     "VideoEncoderConfigurationA03,VideoEncoderConfigurationA07",
                     "VideoEncoderConfigurationA04,VideoEncoderConfigurationA08"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "Hikvision|DS-6708*", "HIKVISION|DS-6708*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationA01,VideoEncoderConfigurationA09",
+                    "VideoEncoderConfigurationA02,VideoEncoderConfigurationA10",
+                    "VideoEncoderConfigurationA03,VideoEncoderConfigurationA11",
+                    "VideoEncoderConfigurationA04,VideoEncoderConfigurationA12",
+                    "VideoEncoderConfigurationA05,VideoEncoderConfigurationA13",
+                    "VideoEncoderConfigurationA06,VideoEncoderConfigurationA14",
+                    "VideoEncoderConfigurationA07,VideoEncoderConfigurationA15",
+                    "VideoEncoderConfigurationA08,VideoEncoderConfigurationA16"
                 ]
             }
         },
