@@ -23,6 +23,8 @@ class _LocalCommandOutcome(PosixOutcome):
     def signal(self):
         # See: subprocess.Popen#_handle_exitstatus
         # See: https://bugs.python.org/issue27167
+        if self._returncode >= 0:
+            return None
         return -self._returncode
 
     @property
