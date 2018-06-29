@@ -5,12 +5,11 @@
 namespace nx {
 namespace client {
 namespace desktop {
+namespace helpers {
 
-struct NodeViewState
-{
-    NodePtr rootNode;
-};
+NodePtr getParentedLayoutsNode();
 
-}// namespace desktop
+} // namespace helpers
+} // namespace desktop
 } // namespace client
 } // namespace nx

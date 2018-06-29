@@ -16,13 +16,6 @@ class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
     using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
-    enum Columns
-    {
-        Name,
-        CheckMark,
-        Count
-    };
-
     NodeViewModel(QObject* parent = nullptr);
     virtual ~NodeViewModel();
 

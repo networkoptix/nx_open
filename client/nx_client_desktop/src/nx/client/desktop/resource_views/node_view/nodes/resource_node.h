@@ -1,15 +1,15 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/client/desktop/resource_views/node_view/base_view_node.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class ResourceNode: public BaseViewNode
+class ResourceNode: public ViewNode
 {
-    using base_type = BaseViewNode;
+    using base_type = ViewNode;
 
 public:
     static NodePtr create(const QnResourcePtr& resource);

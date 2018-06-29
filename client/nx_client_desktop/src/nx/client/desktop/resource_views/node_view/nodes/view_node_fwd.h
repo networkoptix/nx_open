@@ -7,9 +7,9 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class BaseViewNode;
-using NodePtr = QSharedPointer<BaseViewNode>;
-using WeakNodePtr = QWeakPointer<BaseViewNode>;
+class ViewNode;
+using NodePtr = QSharedPointer<ViewNode>;
+using WeakNodePtr = QWeakPointer<ViewNode>;
 using NodeList = QList<NodePtr>;
 
 } // namespace desktop

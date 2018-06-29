@@ -1,18 +1,18 @@
 #pragma once
 
 #include <nx/utils/uuid.h>
-#include <nx/client/desktop/resource_views/node_view/view_node_fwd.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_fwd.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
 // TODO: Add description about addNode and cosntructor
-class BaseViewNode: public QEnableSharedFromThis<BaseViewNode>
+class ViewNode: public QEnableSharedFromThis<ViewNode>
 {
 public:
     static NodePtr create(const NodeList& children = NodeList());
-    virtual ~BaseViewNode();
+    virtual ~ViewNode();
 
     int childrenCount() const;
 
@@ -23,10 +23,12 @@ public:
 
     virtual QVariant data(int column, int role) const;
 
+    virtual Qt::ItemFlags flags(int column) const;
+
     NodePtr parent() const;
 
 protected:
-    BaseViewNode();
+    ViewNode();
 
     void setParent(const WeakNodePtr& value);
 

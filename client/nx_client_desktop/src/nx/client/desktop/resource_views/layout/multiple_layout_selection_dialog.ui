@@ -18,7 +18,7 @@
     <widget class="nx::client::desktop::SearchLineEdit" name="searchLineEdit" native="true"/>
    </item>
    <item>
-    <widget class="nx::client::desktop::TreeView" name="layoutsTree">
+    <widget class="nx::client::desktop::NodeViewWidget" name="layoutsTree">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -44,16 +44,10 @@
       <enum>QAbstractItemView::ExtendedSelection</enum>
      </property>
      <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectItems</enum>
-     </property>
-     <property name="rootIsDecorated">
-      <bool>false</bool>
+      <enum>QAbstractItemView::SelectRows</enum>
      </property>
      <property name="uniformRowHeights">
       <bool>true</bool>
-     </property>
-     <property name="itemsExpandable">
-      <bool>false</bool>
      </property>
      <property name="allColumnsShowFocus">
       <bool>true</bool>
@@ -73,11 +67,17 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>nx::client::desktop::TreeView</class>
-   <extends>QTreeView</extends>
-   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
+<customwidget>
+<class>nx::client::desktop::TreeView</class>
+    <extends>QTreeView</extends>
+    <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>  
+</customwidget>
+<customwidget>
+  <class>nx::client::desktop::NodeViewWidget</class>
+    <extends>nx::client::desktop::TreeView</extends>
+    <header location="global">nx/client/desktop/resource_views/node_view/node_view_widget.h</header>
   </customwidget>
+
   <customwidget>
    <class>nx::client::desktop::SearchLineEdit</class>
    <extends>QWidget</extends>

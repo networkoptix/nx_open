@@ -1,4 +1,4 @@
-#include "base_view_node.h"
+#include "view_node.h"
 
 #include <nx/utils/log/log.h>
 
@@ -6,61 +6,66 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-NodePtr BaseViewNode::create(const NodeList& children)
+NodePtr ViewNode::create(const NodeList& children)
 {
-    const NodePtr result(new BaseViewNode());
+    const NodePtr result(new ViewNode());
     for (const auto& child: children)
         result->addNode(child);
 
     return result;
 }
 
-BaseViewNode::BaseViewNode()
+ViewNode::ViewNode()
 {
 }
 
-BaseViewNode::~BaseViewNode()
+ViewNode::~ViewNode()
 {
 }
 
-void BaseViewNode::addNode(const NodePtr& node)
+void ViewNode::addNode(const NodePtr& node)
 {
     node->setParent(parentForChildren());
     m_nodes.append(node);
 }
 
-int BaseViewNode::childrenCount() const
+int ViewNode::childrenCount() const
 {
     return m_nodes.size();
 }
 
-NodePtr BaseViewNode::nodeAt(int index) const
+NodePtr ViewNode::nodeAt(int index) const
 {
     return m_nodes.at(index);
 }
 
-int BaseViewNode::indexOf(const NodePtr& node) const
+int ViewNode::indexOf(const NodePtr& node) const
 {
     return m_nodes.indexOf(node);
 }
 
-QVariant BaseViewNode::data(int /* column */, int /* role */) const
+QVariant ViewNode::data(int /* column */, int /* role */) const
 {
     return QVariant();
 }
 
-NodePtr BaseViewNode::parent() const
+Qt::ItemFlags ViewNode::flags(int /* column */) const
+{
+    return Qt::ItemIsEnabled;
+}
+
+NodePtr ViewNode::parent() const
 {
     return m_parent ? m_parent.lock() : NodePtr();
 }
 
-void BaseViewNode::setParent(const WeakNodePtr& value)
+void ViewNode::setParent(const WeakNodePtr& value)
 {
     if (m_parent != value)
         m_parent = value;
 }
 
-WeakNodePtr BaseViewNode::parentForChildren()
+WeakNodePtr ViewNode::parentForChildren()
 {
     const auto result = sharedFromThis();
     NX_EXPECT(result, "No shared pointer exists for current node");

@@ -1,14 +1,15 @@
 #include "node_view_model.h"
 
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
-#include <nx/client/desktop/resource_views/node_view/base_view_node.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 
 namespace {
 using namespace nx::client::desktop;
 
 NodePtr nodeFromIndex(const QModelIndex& index)
 {
-    return static_cast<BaseViewNode*>(index.internalPointer())->sharedFromThis();
+    return static_cast<ViewNode*>(index.internalPointer())->sharedFromThis();
 }
 
 bool firstLevelOrRootNode(const NodePtr& node)
@@ -84,7 +85,7 @@ QModelIndex NodeViewModel::index(
 
 QModelIndex NodeViewModel::parent(const QModelIndex& child) const
 {
-    if (!child.isValid() || child.column() > Columns::Name)
+    if (!child.isValid() || child.column() == NodeViewColumn::Name)
         QModelIndex();
 
     const auto node = nodeFromIndex(child);
@@ -101,7 +102,7 @@ int NodeViewModel::rowCount(const QModelIndex& parent) const
 
 int NodeViewModel::columnCount(const QModelIndex& parent) const
 {
-    return Columns::Count;
+    return 1;//Columns::Count;
 }
 
 bool NodeViewModel::hasChildren(const QModelIndex& parent) const
@@ -117,7 +118,11 @@ QVariant NodeViewModel::data(const QModelIndex& index, int role) const
 
 Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
 {
-    return Qt::NoItemFlags;
+    if (!index.isValid())
+        return base_type::flags(index);
+
+    const auto node = nodeFromIndex(index);
+    return node->flags(index.column());
 }
 
 } // namespace desktop

@@ -19,8 +19,6 @@ public:
     virtual ~MultipleLayoutSelectionDialog() override;
 
 private:
-    struct Private;
-    const QScopedPointer<Private> d;
     const QScopedPointer<Ui::MultipleLayoutSelectionDialog> ui;
 };
 

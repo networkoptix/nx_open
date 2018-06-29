@@ -1,6 +1,8 @@
 #include "resource_node.h"
 
 #include <core/resource/resource.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
+#include <ui/style/resource_icon_cache.h>
 
 namespace nx {
 namespace client {
@@ -21,8 +23,13 @@ QVariant ResourceNode::data(int column, int role) const
     switch(role)
     {
         case Qt::DisplayRole:
-            // TODO: add constants for columns
-            return column == 0 && m_resource ? m_resource->getName() : QString();
+            return column == NodeViewColumn::Name && m_resource
+                ? m_resource->getName()
+                : base_type::data(column, role);
+        case Qt::DecorationRole:
+            return column == NodeViewColumn::Name && m_resource
+                ? qnResIconCache->icon(m_resource)
+                : base_type::data(column, role);
         default:
             return base_type::data(column, role);
     }
