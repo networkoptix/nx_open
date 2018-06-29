@@ -11,7 +11,7 @@
 
 #include "syncplay_archive_delegate.h"
 #include "core/resource/resource.h"
-
+#include <core/resource/security_cam_resource.h>
 
 static const qint64 SYNC_EPS = 1000 * 500;
 static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
@@ -751,6 +751,11 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
         // use pause instead of pauseMedia. Prevent isMediaPaused=true value. So, pause thread physically but not change any playback logic
         if (!reader->isPaused())
             reader->pause();
+
+        auto camera = reader->getResource().dynamicCast<QnSecurityCamResource>();
+        if (camera && camera->getCameraCapabilities().testFlag(Qn::IsSyncPlay))
+            reader->getArchiveDelegate()->pleaseStop(); //< To avoid block other channels.
+
         if (d->enabled && isSyncReader)
             reader->setNavDelegate(this);
     }

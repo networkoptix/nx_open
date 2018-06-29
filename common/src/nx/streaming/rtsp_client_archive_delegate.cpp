@@ -994,3 +994,8 @@ bool QnRtspClientArchiveDelegate::hasVideo() const
 {
     return m_camera && m_camera->hasVideo(nullptr);
 }
+
+void QnRtspClientArchiveDelegate::pleaseStop()
+{
+    beforeClose();
+}
