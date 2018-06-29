@@ -47,7 +47,7 @@
     "DISCONNECT FORM HEADER TEXT": "是否從 %PRODUCT_NAME% 中斷開系統?",
     "FIRST NAME IS REQUIRED TEXT": "名為必填欄位",
     "LAST NAME IS REQUIRED TEXT": "姓為必填欄位",
-    "EMAIL IS REQUIRED TEXT": "電子郵件為必填欄位",
+    "EMAIL IS REQUIRED TEXT": "電子郵件是必填的",
     "EMAIL ALREADY REGISTERED TEXT": "此電子郵件已在 %PRODUCT_NAME% 中註冊",
     "EMAIL INVALID TEXT": "請輸入有效的 Email",
     "PASSWORD IS REQUIRED TEXT": "密碼是必填的",
@@ -57,7 +57,7 @@
     "PASSWORD TOO COMMON TEXT": "此密碼是很常用的組合",
     "PASSWORD IS WEAK TEXT": "使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
     "TERMS AND CONDITIONS ERROR TEXT": "請審閱並同意條款及條件和隱私政策, 以便繼續進行",
-    "THIS LINK IS BROKEN TEXT": "此連結已斷開,<br>\n            系統可能會從 %PRODUCT_NAME% 離線,<br>\n            登入權限可能會被取銷,<br>\n            或您可能已用其他帳號登入",
+    "THIS LINK IS BROKEN TEXT": "此連結已斷開,<br>\n            系統可能會從 %PRODUCT_NAME% 離線,<br>\n            於此系統的權限可能被註銷,<br>\n            或您可以用一個不同的帳號登錄",
     "PAGE NOT FOUND": "找不到頁面",
     "TAKE ME HOME": "回主頁面",
     "OPEN NX WITNESS BUTTON TEXT": "開啟 %VMS_NAME%"
