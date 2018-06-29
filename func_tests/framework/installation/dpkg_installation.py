@@ -11,6 +11,10 @@ _logger = logging.getLogger(__name__)
 class DpkgInstallation(DebInstallation):
     """Install mediaserver using dpkg, control it as upstart service"""
 
+    def __init__(self, posix_access, installer):
+        dir = posix_access.Path('/opt', installer.customization.linux_subdir)
+        super(DpkgInstallation, self).__init__(posix_access, installer, dir)
+
     @cached_property
     def service(self):
         service_name = self.installer.customization.linux_service_name

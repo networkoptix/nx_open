@@ -21,10 +21,10 @@ _logger = logging.getLogger(__name__)
 class DebInstallation(Installation):
     """Manage installation via dpkg"""
 
-    def __init__(self, posix_access, deb):
+    def __init__(self, posix_access, installer, dir):
         self._posix_shell = posix_access.shell  # type: PosixShell
-        self.installer = deb
-        self.dir = posix_access.Path('/opt', self.installer.customization.linux_subdir)
+        self.installer = installer
+        self.dir = dir
         self._bin = self.dir / 'bin'
         self.binary = self._bin / 'mediaserver-bin'
         self._config = self.dir / 'etc' / 'mediaserver.conf'
