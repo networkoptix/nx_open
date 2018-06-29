@@ -31,7 +31,6 @@ protected:
 private:
     void backupDb();
     void restoreDb();
-    void restoreDbFromFile(const QString& fileName);
 
 private:
     QScopedPointer<Ui::DatabaseManagementWidget> ui;

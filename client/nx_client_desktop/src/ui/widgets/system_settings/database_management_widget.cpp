@@ -4,7 +4,6 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/app_info.h>
 
 #include <common/common_module.h>
 
@@ -22,7 +21,6 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <utils/common/delayed.h>
 
 namespace {
 const QLatin1String dbExtension(".db");
@@ -113,8 +111,15 @@ void QnDatabaseManagementWidget::backupDb()
     QnMessageBox::success(this, tr("Database backed up to file"), fileName);
 }
 
-void QnDatabaseManagementWidget::restoreDbFromFile(const QString& fileName)
+void QnDatabaseManagementWidget::restoreDb()
 {
+    QString fileName = QFileDialog::getOpenFileName(
+        this,
+        tr("Open Database Backup..."),
+        qnSettings->lastDatabaseBackupDir(),
+        tr("Database Backup Files") + lit( "(*.db)"),
+        NULL,
+        QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())
         return;
 
@@ -189,26 +194,6 @@ void QnDatabaseManagementWidget::restoreDbFromFile(const QString& fileName)
 
         QnMessageBox::critical(this, tr("Failed to restore database"));
     }
-}
-
-void QnDatabaseManagementWidget::restoreDb()
-{
-    QString fileName = QFileDialog::getOpenFileName(
-        this,
-        tr("Open Database Backup..."),
-        qnSettings->lastDatabaseBackupDir(),
-        tr("Database Backup Files") + lit( "(*.db)"),
-        NULL,
-        QnCustomFileDialog::fileDialogOptions());
-
-
-    if (fileName.isEmpty())
-        return;
-
-    if (nx::utils::AppInfo::isMacOsX()) //< Workaround for hanging NSOpenPane "close" animation.
-        executeLater([this, fileName]() { restoreDbFromFile(fileName); });
-    else
-        restoreDbFromFile(fileName);
 }
 
 void QnDatabaseManagementWidget::setReadOnlyInternal(bool readOnly)
