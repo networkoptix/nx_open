@@ -70,6 +70,9 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
         setPageEnabled(UpdatesPage, !readOnly);
     });
     setPageEnabled(UpdatesPage, !commonModule()->isReadOnly());
+
+    connect(this, &QnGenericTabbedDialog::dialogClosed,
+        this, [generalWidget]() { generalWidget->resetWarnings(); });
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog() = default;
