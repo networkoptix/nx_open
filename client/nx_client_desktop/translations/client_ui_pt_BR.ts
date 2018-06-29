@@ -768,7 +768,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>ID de Input</translation>
     </message>
   </context>
   <context>
@@ -794,7 +794,7 @@
     <message>
       <location/>
       <source>Output ID:</source>
-      <translation type="unfinished">Output ID:</translation>
+      <translation>ID de &amp;Saída:</translation>
     </message>
   </context>
   <context>
@@ -1509,7 +1509,7 @@
     <message>
       <location/>
       <source>Locked to Hardware ID:</source>
-      <translation type="unfinished">Locked to Hardware ID:</translation>
+      <translation>Trancado ao ID do Hardware:</translation>
     </message>
   </context>
   <context>
@@ -1608,7 +1608,7 @@
     <message>
       <location/>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID do Hardware:</translation>
     </message>
   </context>
   <context>
@@ -1990,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation>Introduza um utilizador e password válido...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>Formulário</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>Nome ficheiro:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>Seleccionar ficheiro...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Procurar...</translation>
     </message>
   </context>
   <context>
