@@ -136,7 +136,7 @@ copyBuildLibs()
     fi
 
     # Libs for BananaPi-based Nx1 platform.
-    if [ "$BOX" = "bpi" ]
+    if [ "$BOX" = "bpi" ] && [ $LITE_CLIENT_SUPPORTED = 1 ]
     then
         LIBS_TO_COPY+=(
             libGLESv2
@@ -494,7 +494,7 @@ copyAdditionalSysrootFilesIfNeeded()
     local -r SYSROOT_LIB_DIR="$SYSROOT_DIR/usr/lib/arm-linux-gnueabihf"
     local -r SYSROOT_SBIN_DIR="$SYSROOT_DIR/sbin"
 
-    if [ "$BOX" = "bpi" ]
+    if [ "$BOX" = "bpi" ] && [ $LITE_CLIENT_SUPPORTED = 1 ]
     then
         local SYSROOT_LIBS_TO_COPY=(
             libopus
@@ -671,6 +671,7 @@ parseExtraArgs() # arg arg_n "$@"
 
 main()
 {
+    local -r LITE_CLIENT_SUPPORTED=0
     local -i LITE_CLIENT=1
     distr_EXTRA_HELP=" --no-client: Do not pack Lite Client."
     distr_PARSE_EXTRA_ARGS_FUNC=parseExtraArgs
