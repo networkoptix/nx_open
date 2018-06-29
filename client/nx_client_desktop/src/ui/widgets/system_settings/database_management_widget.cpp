@@ -4,7 +4,6 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/app_info.h>
 
 #include <common/common_module.h>
 
@@ -20,10 +19,8 @@
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/widgets/system_settings/file_name_input_widget.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <utils/common/delayed.h>
 
 namespace {
 const QLatin1String dbExtension(".db");
@@ -114,8 +111,15 @@ void QnDatabaseManagementWidget::backupDb()
     QnMessageBox::success(this, tr("Database backed up to file"), fileName);
 }
 
-void QnDatabaseManagementWidget::restoreDbFromFile(const QString& fileName)
+void QnDatabaseManagementWidget::restoreDb()
 {
+    QString fileName = QFileDialog::getOpenFileName(
+        this,
+        tr("Open Database Backup..."),
+        qnSettings->lastDatabaseBackupDir(),
+        tr("Database Backup Files") + lit( "(*.db)"),
+        NULL,
+        QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())
         return;
 
@@ -129,6 +133,18 @@ void QnDatabaseManagementWidget::restoreDbFromFile(const QString& fileName)
     if (!file.open(QIODevice::ReadOnly))
     {
         QnMessageBox::critical(this, tr("Failed to open file"), fileName);
+        return;
+    }
+
+    const auto button = QnMessageBox::question(this,
+        tr("Restore database?"),
+        tr("System configuration will be restored from backup,"
+           " Server application will be restarted."),
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
+
+    if (button != QDialogButtonBox::Ok)
+    {
+        file.close();
         return;
     }
 
@@ -178,59 +194,6 @@ void QnDatabaseManagementWidget::restoreDbFromFile(const QString& fileName)
 
         QnMessageBox::critical(this, tr("Failed to restore database"));
     }
-}
-
-void QnDatabaseManagementWidget::setupMacOSRestoreDialog(
-    QnMessageBox* parent,
-    QString* fileName)
-{
-    parent->setButtonEnabled(QDialogButtonBox::Ok, false);
-    const auto widget = new QnFileNameInputWidget([this]() { return getFileName(); } );
-    connect(widget, &QnFileNameInputWidget::fileNameChanged, this,
-        [fileName, parent](const QString& value)
-        {
-            *fileName = value;
-            parent->setButtonEnabled(QDialogButtonBox::Ok, true);
-        });
-
-    parent->addCustomWidget(widget, QnMessageBox::Layout::Content);
-}
-
-QString QnDatabaseManagementWidget::getFileName()
-{
-    return QFileDialog::getOpenFileName(
-        this,
-        tr("Open Database Backup..."),
-        qnSettings->lastDatabaseBackupDir(),
-        tr("Database Backup Files") + lit( "(*.db)"),
-        nullptr,
-        QnCustomFileDialog::fileDialogOptions());
-}
-
-void QnDatabaseManagementWidget::restoreDb()
-{
-    const bool isMacOS = nx::utils::AppInfo::isMacOsX();
-    auto fileName = isMacOS ? QString() : getFileName();
-    if (!isMacOS && fileName.isEmpty())
-        return;
-
-    QnMessageBox dialog(
-        QnMessageBoxIcon::Question,
-        tr("Restore database?"),
-        tr("System configuration will be restored from backup,"
-           " Server application will be restarted."),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Ok,
-        this);
-
-    if (isMacOS)
-        setupMacOSRestoreDialog(&dialog, &fileName);
-
-    if (dialog.exec() != QDialogButtonBox::Ok)
-        return;
-
-    if (!fileName.isEmpty())
-        restoreDbFromFile(fileName);
 }
 
 void QnDatabaseManagementWidget::setReadOnlyInternal(bool readOnly)
