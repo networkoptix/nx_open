@@ -43,7 +43,7 @@
 
 #include <nx/p2p/p2p_server_message_bus.h>
 #include <transaction/server_transaction_message_bus.h>
-#include <nx/time_sync/server_time_sync_manager.h>
+#include <nx/vms/time_sync/server_time_sync_manager.h>
 
 // TODO: #vkutin #gdm #fixme Check and fix API documentation after API refactoring!
 
