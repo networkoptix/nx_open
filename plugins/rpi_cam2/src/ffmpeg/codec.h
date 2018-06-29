@@ -19,8 +19,6 @@ public:
     int open();
     void close();
 
-    static int readFrame(AVFormatContext *formatContext, AVPacket *outPacket);
-
     int encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const;
     int decode(AVFrame *outFrame, int *outGotFrame, const AVPacket *packet) const;
 
@@ -45,6 +43,7 @@ public:
     AVCodecContext * codecContext() const;
     AVCodec * codec() const;
     AVCodecID codecID() const;
+    AVPixelFormat pixelFormat() const;
 
 private:
     AVCodecContext *m_codecContext = nullptr;

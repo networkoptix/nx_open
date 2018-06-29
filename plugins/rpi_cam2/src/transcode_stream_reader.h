@@ -4,6 +4,7 @@
 
 namespace nx { namespace ffmpeg { class StreamReader; } }
 namespace nx { namespace ffmpeg { class Codec; } }
+namespace nx { namespace ffmpeg { class Frame; } }
 
 namespace nx {
 namespace rpi_cam2 {
@@ -34,15 +35,19 @@ private:
     bool m_initialized = false;
     bool m_modified = true;
 
+    std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
+    std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
+    
 private:
-    int scale(AVFrame* frame, AVFrame ** outFrame) const;
+    int scale(AVFrame* frame, AVFrame * outFrame) const;
     int encode(const AVFrame * frame, AVPacket * outPacket) const;
 
     bool ensureInitialized();
     int initialize();
     void uninitialize();
     int openVideoEncoder();
-    void setEncoderOptions(const std::unique_ptr<nx::ffmpeg::Codec>& encoder);
+    int initializeScaledFrame(const std::unique_ptr<ffmpeg::Codec>& encoder);
+    void setEncoderOptions(const std::unique_ptr<ffmpeg::Codec>& encoder);
 
 };
 

@@ -17,6 +17,7 @@ extern "C" {
 #include "input_format.h"
 #include "codec.h"
 #include "packet.h"
+#include "frame.h"
 #include "error.h"
 
 namespace nx {
@@ -72,7 +73,7 @@ AVCodecID StreamReader::decoderID() const
     return m_decoder->codecID();
 }
 
-const std::unique_ptr<ffmpeg::Codec>& StreamReader::codec()
+const std::unique_ptr<ffmpeg::Codec>& StreamReader::decoder()
 {
     return m_decoder;
 }
@@ -86,6 +87,8 @@ void StreamReader::setFps(int fps)
 {
     if(fps != m_codecParams.fps)
     {
+        debug("ffmpeg::StreamReader::setFPS: %d\n", fps);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_codecParams.fps = fps;
         m_cameraState = kModified;
     }
@@ -95,6 +98,8 @@ void StreamReader::setBitrate(int bitrate)
 {
     if(bitrate != m_codecParams.bitrate)
     {
+        debug("ffmpeg::StreamReader::setBitrate: %d\n", bitrate);
+        std::lock_guard<std::mutex> lock(m_mutex);
         m_codecParams.bitrate = bitrate;
         m_cameraState = kModified;
     }
@@ -102,9 +107,10 @@ void StreamReader::setBitrate(int bitrate)
 
 void StreamReader::setResolution(int width, int height)
 {
-    
     if(m_codecParams.width != width || m_codecParams.height != height)
     {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        debug("ffmpeg::StreamReader::setResolution: %d, %d\n", width, height);
         m_codecParams.setResolution(width, height);
         m_cameraState = kModified;
     }
@@ -120,10 +126,10 @@ int StreamReader::loadNextData(ffmpeg::Packet * copyPacket)
         return m_currentPacket->copy(copyPacket);
 
     m_currentPacket->unreference();
-    int readCode = m_decoder->readFrame(m_inputFormat->formatContext(), m_currentPacket->packet());
+    int readCode = m_inputFormat->readFrame(m_currentPacket->packet());
     if(readCode < 0)
         return readCode;
-    
+
     if(copyPacket)
         return m_currentPacket->copy(copyPacket);
 
@@ -222,6 +228,23 @@ void StreamReader::setInputFormatOptions(const std::unique_ptr<InputFormat>& inp
     
     inputFormat->setFps(m_codecParams.fps);
     inputFormat->setResolution(m_codecParams.width, m_codecParams.height);
+}
+
+int StreamReader::decode(AVFrame * outFrame, const AVPacket * packet)
+{
+    int decodeSize = 0;
+    int gotFrame = 0;
+    while(!gotFrame)
+    {
+        decodeSize = m_decoder->decode(outFrame, &gotFrame, packet);
+        //debug("decoding, !gotFrame, decodeSize: %d\n", decodeSize);
+        if(decodeSize < 0 || gotFrame)
+        {
+            //debug("gotFrame, decodeSize: %d\n", decodeSize);
+            break;
+        }
+    }
+    return decodeSize;
 }
 
 } // namespace ffmpeg

@@ -40,13 +40,6 @@ void Codec::close()
         avcodec_free_context(&m_codecContext);
 }
 
-int Codec::readFrame(AVFormatContext * formatContext, AVPacket * outPacket)
-{
-    int readCode = av_read_frame(formatContext, outPacket);
-    error::updateIfError(readCode);
-    return readCode;
-}
-
 int Codec::encode(AVPacket *outPacket, const AVFrame *frame, int *outGotPacket) const
 {
     switch(m_codec->type)
@@ -223,6 +216,11 @@ AVCodec * Codec::codec() const
 AVCodecID Codec::codecID() const
 {
     return m_codecContext->codec_id;
+}
+
+AVPixelFormat Codec::pixelFormat() const
+{
+    return m_codecContext->pix_fmt;
 }
 
 } // namespace ffmpeg

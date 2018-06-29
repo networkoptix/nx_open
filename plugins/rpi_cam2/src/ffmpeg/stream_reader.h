@@ -57,7 +57,7 @@ public:
     CameraState cameraState() const;
     AVCodecID decoderID() const;
 
-    const std::unique_ptr<Codec>& codec();
+    const std::unique_ptr<Codec>& decoder();
     const std::unique_ptr<InputFormat>& inputFormat();
 
     void setFps(int fps);
@@ -85,6 +85,7 @@ private:
     int initialize();
     void uninitialize();
     void setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat);
+    int decode(AVFrame * outframe, const AVPacket * packet);
 };
 
 } // namespace ffmpeg

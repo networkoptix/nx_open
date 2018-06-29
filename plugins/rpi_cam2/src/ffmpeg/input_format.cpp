@@ -58,6 +58,13 @@ void InputFormat::close()
         avformat_close_input(&m_formatContext);
 }
 
+int InputFormat::readFrame(AVPacket * outPacket)
+{
+    int readCode = av_read_frame(m_formatContext, outPacket);
+    error::updateIfError(readCode);
+    return readCode;
+}
+
 int InputFormat::setFps(int fps)
 {
     return setEntry("framerate", std::to_string(fps).c_str());
@@ -71,6 +78,11 @@ int InputFormat::setResolution(int width, int height)
 AVCodecID InputFormat::videoCodecID() const
 {
     return m_formatContext->video_codec_id;
+}
+
+AVCodecID InputFormat::audioCodecID() const
+{
+    return m_formatContext->audio_codec_id;
 }
 
 AVFormatContext * InputFormat::formatContext() const
