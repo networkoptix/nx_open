@@ -731,21 +731,12 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
 
     fetchRelayInputInfo(onvifCapabilities);
 
-    static const int kInvalidRelayCount = -1;
+    static const auto kForcedInputCountParameter = "relayInputCountForced";
+    const bool isInputCountForced = resourceData.contains(kForcedInputCountParameter);
 
-    const auto forcedInputCount = resourceData.value<int>(
-        "relayInputCountForced",
-        kInvalidRelayCount);
-
-    const auto forcedOutputCount = resourceData.value<int>(
-        "relayOutputCountForced",
-        kInvalidRelayCount);
-
-    if (forcedInputCount != kInvalidRelayCount)
-        setCameraCapability(Qn::RelayInputCapability, forcedInputCount > 0);
-
-    if (forcedOutputCount != kInvalidRelayCount)
-        setCameraCapability(Qn::RelayOutputCapability, forcedOutputCount > 0);
+    int forcedInputCount = 0;
+    if (isInputCountForced)
+        forcedInputCount = resourceData.value<int>(kForcedInputCountParameter, 0);
 
     if (resourceData.contains("clearInputsTimeoutSec"))
     {
@@ -780,7 +771,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
         };
 
     auto inputCount = forcedInputCount;
-    if (inputCount < 0 &&
+    if (!isInputCountForced &&
         onvifCapabilities.Capabilities &&
         onvifCapabilities.Capabilities->Device &&
         onvifCapabilities.Capabilities->Device->IO &&
@@ -793,14 +784,18 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeIo(
             ->InputConnectors;
     }
 
-    auto inputPorts = generateInputPorts(inputCount);
     auto allPorts = getRelayOutputList();
+    const auto inputPorts = generateInputPorts(inputCount);
 
     m_inputPortCount = inputPorts.size();
+    const auto outputPortCount = allPorts.size();
+
     allPorts.insert(allPorts.cend(), inputPorts.cbegin(), inputPorts.cend());
     setIOPorts(std::move(allPorts));
 
     m_portNamePrefixToIgnore = resourceData.value<QString>("portNamePrefixToIgnore", QString());
+    setCameraCapability(Qn::RelayInputCapability, m_inputPortCount > 0);
+    setCameraCapability(Qn::RelayOutputCapability, outputPortCount > 0);
 
     return CameraDiagnostics::NoErrorResult();
 }
