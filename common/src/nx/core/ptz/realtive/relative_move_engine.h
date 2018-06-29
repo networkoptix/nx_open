@@ -10,6 +10,8 @@ namespace ptz {
 class RelativeMoveEngine
 {
 public:
+    virtual ~RelativeMoveEngine() = default;
+
     virtual bool relativeMove(
         const nx::core::ptz::Vector& direction,
         const nx::core::ptz::Options& options) = 0;

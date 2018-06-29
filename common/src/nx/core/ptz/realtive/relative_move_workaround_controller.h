@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QThreadPool>
 
 #include <core/ptz/proxy_ptz_controller.h>
