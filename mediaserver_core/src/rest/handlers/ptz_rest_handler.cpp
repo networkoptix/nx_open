@@ -142,7 +142,9 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     else
     {
         m_workers[sequence].inProgress = true;
-        QtConcurrent::run(std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
+        QtConcurrent::run(
+            qnPtzPool->commandThreadPool(),
+            std::bind(&QnPtzRestHandler::asyncExecutor, sequence, function));
     }
     return CODE_OK;
 }
