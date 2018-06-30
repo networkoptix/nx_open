@@ -37,7 +37,10 @@ def has_value(data_structure_name, context, customization, language):
     data_records = DataRecord.objects.filter(data_structure=data_structure,
                                              customization=customization,
                                              language=language)
-    return data_records.exists()
+    if not data_records.exists():
+        return False
+
+    return data_records.latest('id').value != ""
 
 
 @register.simple_tag
