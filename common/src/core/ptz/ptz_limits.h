@@ -16,6 +16,8 @@ struct QnPtzLimits
     qreal maxFov = 360;
     qreal minRotation = 0;
     qreal maxRotation = 360;
+    qreal minFocus = 0;
+    qreal maxFocus = 1.0;
     int maxPresetNumber = 0; //< -1 means unlimited
 
     qreal minPanSpeed = -1.0;
@@ -26,11 +28,13 @@ struct QnPtzLimits
     qreal maxZoomSpeed = 1.0;
     qreal minRotationSpeed = -1.0;
     qreal maxRotationSpeed = 1.0;
+    qreal minFocusSpeed = -1.0;
+    qreal maxFocusSpeed = 1.0;
 };
 #define QnPtzLimits_Fields (minPan)(maxPan)(minTilt)(maxTilt)(minFov)(maxFov)\
-    (minRotation)(maxRotation)(maxPresetNumber)\
+    (minRotation)(maxRotation)(minFocus)(maxFocus)(maxPresetNumber)\
     (minPanSpeed)(maxPanSpeed)(minTiltSpeed)(maxTiltSpeed)(minZoomSpeed)(maxZoomSpeed)\
-    (minRotationSpeed)(maxRotationSpeed)
+    (minRotationSpeed)(maxRotationSpeed)(minFocusSpeed)(maxFocusSpeed)
 
 Q_DECLARE_TYPEINFO(QnPtzLimits, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QnPtzLimits);
