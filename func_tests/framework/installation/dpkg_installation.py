@@ -22,9 +22,13 @@ class DpkgInstallation(DebInstallation):
         return UpstartService(self._posix_shell, service_name, stop_timeout_sec)
 
     def install(self):
-        if self._can_be_reused():
+        if self.identity == self.installer.identity:
+            _logger.info('Existing installation identity (%s) matches installer). Skipping installation.',
+                         self.identity)
             return
 
+        _logger.info('Existing installation identity (%s) does NOT match installer (%s). Performing installation...',
+                         self.identity, self.installer.identity)
         remote_path = self.os_access.Path.tmp() / self.installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
         copy_file(self.installer.path, remote_path)

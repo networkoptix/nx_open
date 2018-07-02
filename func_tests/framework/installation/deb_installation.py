@@ -3,8 +3,9 @@ import sys
 from io import BytesIO
 
 from framework.installation.installation import Installation
-from framework.installation.installer import Version, find_customization, UnknownCustomization
+from framework.installation.installer import InstallIdentity, UnknownCustomization
 from framework.installation.upstart_service import UpstartService
+from framework.method_caching import cached_property
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.posix_shell import PosixShell
 
@@ -74,23 +75,19 @@ class DebInstallation(Installation):
         except DoesNotExist:
             return None
 
-    def _can_be_reused(self):
+    @cached_property
+    def identity(self):
         if not self.is_valid():
-            return False
+            return None
         build_info_path = self.dir / 'build_info.txt'
         try:
             build_info_text = build_info_path.read_text(encoding='ascii')
         except DoesNotExist:
-            return False
+            return None
         build_info = dict(
             line.split('=', 1)
             for line in build_info_text.splitlines(False))
-        if self.installer.version != Version(build_info['version']):
-            return False
         try:
-            installed_customization = find_customization('customization_name', build_info['customization'])
+            return InstallIdentity.from_build_info(build_info)
         except UnknownCustomization:
-            return False
-        if self.installer.customization != installed_customization:
-            return False
-        return True
+            return None

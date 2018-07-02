@@ -19,6 +19,10 @@ def test_install(installation):
     assert installation.is_valid()
 
 
+def test_mediaserver_factory(one_mediaserver):
+    pass
+
+
 def test_group_install(linux_vm, mediaserver_installers, ca):
     group = UnpackedMediaserverGroup(linux_vm.os_access, mediaserver_installers['linux64'], linux_vm.os_access.Path('/tmp/srv'))
     installation, = group.make_installations(1701, 1)

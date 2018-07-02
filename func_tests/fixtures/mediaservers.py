@@ -34,7 +34,7 @@ def mediaserver_installers(request):
             continue
         _logger.info("File {}: {!r}".format(path, installer))
         installers.append(installer)
-    if len(set((installer.customization, installer.version) for installer in installers)) != 1:
+    if len(set((installer.identity.customization, installer.identity.version) for installer in installers)) != 1:
         raise ValueError("Only one version and customizations expected in {}: {}".format(installers_dir, installers))
     installers_by_platform = {installer.platform: installer for installer in installers}
     return installers_by_platform

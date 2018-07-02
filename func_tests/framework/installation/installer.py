@@ -112,6 +112,32 @@ def find_customization(field_name, field_value):
     return one
 
 
+class InstallIdentity(object):
+    '''Identity for installer or installation'''
+
+    @classmethod
+    def from_build_info(cls, build_info):
+        return cls(
+            Version(build_info['version']),
+            customization = find_customization('customization_name', build_info['customization']),
+            )
+
+    def __init__(self, version, customization):
+        self.version = version
+        self.customization = customization
+
+    def __str__(self):
+        return '{}:{}'.format(self.version, self.customization.customization_name)
+
+    def __eq__(self, other):
+        return (isinstance(other, InstallIdentity) and
+                self.version == other.version and
+                self.customization == other.customization)
+
+    def __hash__(self):
+        return hash((self.version,self.customization))
+
+
 class Installer(object):
     """Information that can be extracted from package name."""
     _extensions = {'linux64': 'deb', 'win64': 'exe'}
@@ -130,6 +156,7 @@ class Installer(object):
             raise PackageNameParseError("Extension of {} should be {}".format(path.name, platform_extension))
         self.version = Version(version_str)
         self.customization = find_customization('installer_name', installer_name)
+        self.identity = InstallIdentity(self.version, self.customization)
         self.path = path
 
     def __repr__(self):
