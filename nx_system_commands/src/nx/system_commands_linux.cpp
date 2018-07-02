@@ -258,7 +258,7 @@ SystemCommands::MountCode SystemCommands::mount(
                 if (execute(makeCommandString(credentialsFileName, domain, dialect)))
                 {
                     result = MountCode::ok;
-                    break;
+                    goto out;
                 }
 
                 std::cerr << "SystemCommands::mount: " << m_lastError << std::endl;
@@ -268,6 +268,7 @@ SystemCommands::MountCode SystemCommands::mount(
         }
     }
 
+out:
     if (unlink(credentialsFileName.c_str()))
         perror("unlink credentials file");
 
@@ -298,6 +299,8 @@ SystemCommands::UnmountCode SystemCommands::unmount(
         switch(errno)
         {
             case EINVAL:
+                result = UnmountCode::notMounted;
+                break;
             case ENOENT:
                 result = UnmountCode::notExists;
                 break;

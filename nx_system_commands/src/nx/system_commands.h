@@ -16,7 +16,8 @@ public:
         ok,
         busy,
         notExists,
-        noPermissions
+        noPermissions,
+        notMounted
     };
 
     enum class MountCode
@@ -95,6 +96,7 @@ public:
             case UnmountCode::busy: return "resource is busy";
             case UnmountCode::notExists: return "path not exists";
             case UnmountCode::noPermissions: return "no permissions";
+            case UnmountCode::notMounted: return "not mounted";
         }
 
         return "";
