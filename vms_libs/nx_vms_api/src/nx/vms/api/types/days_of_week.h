@@ -35,6 +35,8 @@ inline DayOfWeek dayOfWeek(Qt::DayOfWeek day)
     return DayOfWeek(1 << day);
 }
 
+/* Version for std::set is not supported by our current clang. */
+/*
 template<template <typename...> class Container, typename... ExtraArgs>
 inline DaysOfWeek daysOfWeek(const Container<Qt::DayOfWeek, ExtraArgs...>& days)
 {
@@ -44,6 +46,7 @@ inline DaysOfWeek daysOfWeek(const Container<Qt::DayOfWeek, ExtraArgs...>& days)
             return a | dayOfWeek(b);
         });
 }
+*/
 
 template<template <typename> class Container>
 inline DaysOfWeek daysOfWeek(const Container<Qt::DayOfWeek>& days)
