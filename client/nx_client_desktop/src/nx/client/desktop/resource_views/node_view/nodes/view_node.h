@@ -11,10 +11,11 @@ namespace desktop {
 class ViewNode: public QEnableSharedFromThis<ViewNode>
 {
 public:
-    static NodePtr create(const NodeList& children = NodeList());
+    static NodePtr create(const NodeList& children = NodeList(), bool checkable = false);
     virtual ~ViewNode();
 
     int childrenCount() const;
+    const NodeList& children() const;
 
     NodePtr nodeAt(int index) const;
 
@@ -27,8 +28,12 @@ public:
 
     NodePtr parent() const;
 
+    bool checkable() const;
+    bool checked() const;
+    void setChecked(bool value);
+
 protected:
-    ViewNode();
+    ViewNode(bool checkable);
 
     void setParent(const WeakNodePtr& value);
 
@@ -38,6 +43,8 @@ private:
     WeakNodePtr parentForChildren();
 
 private:
+    const bool m_checkable = false;
+    bool m_checked = false;
     WeakNodePtr m_parent;
     NodeList m_nodes;
 };

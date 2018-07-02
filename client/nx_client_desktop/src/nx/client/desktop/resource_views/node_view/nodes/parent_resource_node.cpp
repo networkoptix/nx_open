@@ -11,9 +11,10 @@ namespace desktop {
 NodePtr ParentResourceNode::create(
     const QnResourcePtr& resource,
     const RelationCheckFunction& relationCheckFunction,
-    const NodeCreationFunction& nodeCreationFunction)
+    const NodeCreationFunction& nodeCreationFunction,
+    bool checkable)
 {
-    auto raw = new ParentResourceNode(resource);
+    auto raw = new ParentResourceNode(resource, checkable);
     const auto result = NodePtr(raw);
     const auto pool = qnClientCoreModule->commonModule()->resourcePool();
 
@@ -32,8 +33,8 @@ NodePtr ParentResourceNode::create(
     return result;
 }
 
-ParentResourceNode::ParentResourceNode(const QnResourcePtr& resource):
-    base_type(resource)
+ParentResourceNode::ParentResourceNode(const QnResourcePtr& resource, bool checkable):
+    base_type(resource, checkable)
 {
 }
 

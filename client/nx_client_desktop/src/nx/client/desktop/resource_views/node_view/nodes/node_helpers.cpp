@@ -12,6 +12,18 @@
 #include <nx/client/desktop/resource_views/node_view/nodes/resource_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/parent_resource_node.h>
 
+namespace {
+
+using namespace nx::client::desktop;
+
+const auto createCheckableLayotNode =
+    [](const QnResourcePtr& resource) -> NodePtr
+    {
+        return ResourceNode::create(resource, true);
+    };
+
+} // namespace
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -61,7 +73,8 @@ NodePtr getParentedLayoutsNode()
 
     for (const auto& userResource: accessibleUsers)
     {
-        const auto node = ParentResourceNode::create(userResource, isChildLayout);
+        const auto node = ParentResourceNode::create(userResource,
+            isChildLayout, createCheckableLayotNode);
         if (node->childrenCount() > 0)
             childNodes.append(node);
     }

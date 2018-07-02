@@ -3,8 +3,10 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 namespace {
+
 using namespace nx::client::desktop;
 
 NodePtr nodeFromIndex(const QModelIndex& index)
@@ -35,6 +37,7 @@ struct NodeViewModel::Private
     NodeViewState state;
 
     QModelIndex getModelIndex(const NodePtr& node);
+//    void handleDataChanged(const QModelIndex& index, );
 };
 
 NodeViewModel::Private::Private(NodeViewModel* owner):
@@ -56,6 +59,7 @@ QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node)
 }
 
 //-------------------------------------------------------------------------------------------------
+
 NodeViewModel::NodeViewModel(QObject* parent):
     d(new Private(this))
 {
@@ -65,7 +69,12 @@ NodeViewModel::~NodeViewModel()
 {
 }
 
-void NodeViewModel::loadState(const NodeViewState& state)
+const NodeViewState& NodeViewModel::state() const
+{
+    return d->state;
+}
+
+void NodeViewModel::setState(const NodeViewState& state)
 {
     ScopedReset reset(this);
     d->state = state;
@@ -76,6 +85,9 @@ QModelIndex NodeViewModel::index(
     int column,
     const QModelIndex& parent) const
 {
+    if (!rowCount(parent))
+        return QModelIndex();
+
     const auto node = parent.isValid()
         ? nodeFromIndex(parent)->nodeAt(row).data()
         : d->state.rootNode->nodeAt(row).data();
@@ -102,7 +114,7 @@ int NodeViewModel::rowCount(const QModelIndex& parent) const
 
 int NodeViewModel::columnCount(const QModelIndex& parent) const
 {
-    return 1;//Columns::Count;
+    return NodeViewColumn::Count;
 }
 
 bool NodeViewModel::hasChildren(const QModelIndex& parent) const

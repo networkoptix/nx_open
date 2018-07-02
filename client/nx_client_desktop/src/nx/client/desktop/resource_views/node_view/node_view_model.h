@@ -19,7 +19,8 @@ public:
     NodeViewModel(QObject* parent = nullptr);
     virtual ~NodeViewModel();
 
-    void loadState(const NodeViewState& state);
+    const NodeViewState& state() const;
+    void setState(const NodeViewState& state);
 
 public: // Overrides section
     virtual QModelIndex index(

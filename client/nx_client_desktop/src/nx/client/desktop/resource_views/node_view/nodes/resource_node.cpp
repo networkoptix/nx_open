@@ -8,12 +8,13 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-NodePtr ResourceNode::create(const QnResourcePtr& resource)
+NodePtr ResourceNode::create(const QnResourcePtr& resource, bool checkable)
 {
-    return NodePtr(new ResourceNode(resource));
+    return NodePtr(new ResourceNode(resource, checkable));
 }
 
-ResourceNode::ResourceNode(const QnResourcePtr& resource):
+ResourceNode::ResourceNode(const QnResourcePtr& resource, bool checkable):
+    base_type(checkable),
     m_resource(resource)
 {
 }
@@ -30,11 +31,21 @@ QVariant ResourceNode::data(int column, int role) const
             return column == NodeViewColumn::Name && m_resource
                 ? qnResIconCache->icon(m_resource)
                 : base_type::data(column, role);
+        case Qt::CheckStateRole:
+            return column == NodeViewColumn::CheckMark && checkable() ? checked() : QVariant();
+
         default:
             return base_type::data(column, role);
     }
 }
 
+Qt::ItemFlags ResourceNode::flags(int column) const
+{
+    const auto baseFlags = base_type::flags(column);
+    return checkable() && column == NodeViewColumn::CheckMark
+        ? baseFlags | Qt::ItemIsUserCheckable
+        : baseFlags;
+}
 
 } // namespace desktop
 } // namespace client

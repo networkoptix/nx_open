@@ -19,10 +19,11 @@ public:
     static NodePtr create(
         const QnResourcePtr& resource,
         const RelationCheckFunction& relationCheckFunction,
-        const NodeCreationFunction& nodeCreationFunction = NodeCreationFunction());
+        const NodeCreationFunction& nodeCreationFunction = NodeCreationFunction(),
+        bool checkable = false);
 
 private:
-    ParentResourceNode(const QnResourcePtr& resource);
+    ParentResourceNode(const QnResourcePtr& resource, bool checkable);
 };
 
 } // namespace desktop

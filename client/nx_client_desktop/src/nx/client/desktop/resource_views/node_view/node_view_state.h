@@ -9,6 +9,8 @@ namespace desktop {
 struct NodeViewState
 {
     NodePtr rootNode;
+
+    bool checkable() const;
 };
 
 }// namespace desktop

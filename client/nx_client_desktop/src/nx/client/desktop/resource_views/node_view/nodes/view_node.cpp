@@ -6,16 +6,17 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-NodePtr ViewNode::create(const NodeList& children)
+NodePtr ViewNode::create(const NodeList& children, bool checkable)
 {
-    const NodePtr result(new ViewNode());
+    const NodePtr result(new ViewNode(checkable));
     for (const auto& child: children)
         result->addNode(child);
 
     return result;
 }
 
-ViewNode::ViewNode()
+ViewNode::ViewNode(bool checkable):
+    m_checkable(checkable)
 {
 }
 
@@ -32,6 +33,11 @@ void ViewNode::addNode(const NodePtr& node)
 int ViewNode::childrenCount() const
 {
     return m_nodes.size();
+}
+
+const NodeList& ViewNode::children() const
+{
+    return m_nodes;
 }
 
 NodePtr ViewNode::nodeAt(int index) const
@@ -57,6 +63,21 @@ Qt::ItemFlags ViewNode::flags(int /* column */) const
 NodePtr ViewNode::parent() const
 {
     return m_parent ? m_parent.lock() : NodePtr();
+}
+
+bool ViewNode::checkable() const
+{
+    return m_checkable;
+}
+
+bool ViewNode::checked() const
+{
+    return m_checked;
+}
+
+void ViewNode::setChecked(bool value)
+{
+    m_checked = value;
 }
 
 void ViewNode::setParent(const WeakNodePtr& value)

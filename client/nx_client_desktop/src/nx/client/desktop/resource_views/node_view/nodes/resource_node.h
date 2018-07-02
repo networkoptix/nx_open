@@ -12,10 +12,13 @@ class ResourceNode: public ViewNode
     using base_type = ViewNode;
 
 public:
-    static NodePtr create(const QnResourcePtr& resource);
-    ResourceNode(const QnResourcePtr& resource);
+    static NodePtr create(const QnResourcePtr& resource, bool checkable = false);
 
     virtual QVariant data(int column, int role) const override;
+    virtual Qt::ItemFlags flags(int column) const override;
+
+protected:
+    ResourceNode(const QnResourcePtr& resource, bool checkable);
 
 private:
     QnResourcePtr m_resource;
