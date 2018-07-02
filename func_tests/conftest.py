@@ -97,12 +97,12 @@ def artifacts_dir(node_dir, artifact_factory):
     yield dir
     for entry in dir.glob('*'):
         if not entry.suffix:
-            _logger.error("No suffix: %s", entry.name)
+            _logger.error("Won't store artifact: no suffix: %s", entry.name)
             continue
         if entry.suffix == '.cap' or entry.suffix == '.pcap':
             mime_type = 'application/cap'
         else:
-            _logger.error("Unknown suffix: %s", entry.name)
+            _logger.error("Won't store artifact: unknown suffix: %s", entry.name)
             continue
         type = ArtifactType(entry.suffix[1:], mime_type, entry.suffix)
         factory = artifact_factory([entry.stem], name=entry.stem, artifact_type=type)
