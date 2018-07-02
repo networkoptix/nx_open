@@ -14,7 +14,18 @@
 {% endblock %}
 
 {% block content %}
-<h1>Review changes in revision {{ version.id }}</h1>
+<h1>Review changes in revision {{ version.id }}
+	<span class="label
+	{% if version.state == "in review" %}
+		label-default
+	{% elif version.state == "current" %}
+		label-success
+	{% else %}
+		label-warning
+	{%endif%}
+	">{{version.state}}</span>
+
+</h1>
 <div class="module">
 	<div class="results">
 		<ul>

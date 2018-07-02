@@ -11,7 +11,7 @@ import requests
 from cloud import settings
 from django.shortcuts import redirect
 
-from cms.models import UserGroupsToCustomizationPermissions
+from cms.models import Customization, UserGroupsToCustomizationPermissions
 
 logger = logging.getLogger(__name__)
 
@@ -75,11 +75,13 @@ def language(request):
 @handle_exceptions
 def downloads_history(request):
     # TODO: later we can check specific permissions
-    customization = settings.CUSTOMIZATION
-    if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization, 'api.can_view_release'):
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+    can_view_releases = UserGroupsToCustomizationPermissions.check_permission(request.user, customization.name,
+                                                                              'api.can_view_release')
+    if not customization.public_release_history and not can_view_releases:
         raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
-    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization)
+    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization.name)
     downloads_json = requests.get(downloads_url)
     downloads_json.raise_for_status()
     downloads_json = downloads_json.json()

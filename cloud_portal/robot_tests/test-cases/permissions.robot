@@ -30,7 +30,9 @@ Check Log In
     Validate Log In
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
 
 Reset DB and Open New Browser On Failure
@@ -208,6 +210,12 @@ Delete user works
 
 Share with registered user - sends him notification
     [tags]    email
+    #log in as noperm to check language and change its language to the current testing language
+    #otherwise it may receive the notification in another language and fail the email subject comparison
+    Log In    ${EMAIL NOPERM}    ${password}
+    Validate Log In
+    Log Out
+    Validate Log Out
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}

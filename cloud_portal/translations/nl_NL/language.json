@@ -52,15 +52,15 @@
       "description": "Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "Viewer": {
-      "label": "Kijker",
+      "label": "Gebruiker 'Basis'",
       "description": "Kan live video bekijken en zoeken in het archief"
     },
     "Live Viewer": {
-      "label": "Live kijker",
+      "label": "Gebruiker 'Live'",
       "description": "Kan alleen live video bekijken"
     },
     "Advanced Viewer": {
-      "label": "Geavanceerde Kijker",
+      "label": "Gebruiker 'Geavanceerd'",
       "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
     },
     "Administrator": {
@@ -84,15 +84,15 @@
       "description": "Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "viewer": {
-      "label": "Kijker",
+      "label": "Gebruiker 'Basis'",
       "description": "Kan live video bekijken en zoeken in het archief"
     },
     "liveViewer": {
-      "label": "Live kijker",
+      "label": "Gebruiker 'Live'",
       "description": "Kan alleen live video bekijken"
     },
     "advancedViewer": {
-      "label": "Geavanceerde Kijker",
+      "label": "Gebruiker 'Geavanceerd'",
       "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
     },
     "custom": {

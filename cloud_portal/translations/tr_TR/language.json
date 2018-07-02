@@ -136,7 +136,7 @@
     "cantOpenClient": "%VMS_NAME% uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
     "thisSystem": "sistem",
-    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
+    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez."
   },
   "passwordRequirements": {
     "minLengthMessage": "Şifre en az 8 karakter içermelidir",

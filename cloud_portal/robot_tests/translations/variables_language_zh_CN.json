@@ -1,5 +1,5 @@
 {
-    "YOU HAVE NO SYSTEMS TEXT": "您沒有任何系統連接到 %PRODUCT_NAME%",
+    "YOU HAVE NO SYSTEMS TEXT": "你有没有连接到 %PRODUCT_NAME% 的系统",
     "LOG OUT BUTTON TEXT": "退出登录",
     "ACCOUNT SETTINGS BUTTON TEXT": "帐户设置",
     "RESET EMAIL SENT MESSAGE TEXT": "密码重置命令发送电子邮件 %email%",
@@ -11,7 +11,7 @@
     "ALREADY ACTIVATED TEXT": "已经激活帐户或确认码不正确",
     "AUTOTESTS OFFLINE TEXT": "离线",
     "NEW PERMISSIONS SAVED": "保存的新权限",
-    "PERMISSIONS WERE REMOVED FROM": "权限已从 %email% 中删除",
+    "PERMISSIONS WERE REMOVED FROM": "权限从 %email% 被刪除",
     "RESET SUCCESS MESSAGE TEXT": "密码成功保存",
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "您的帐户已成功保存",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "已成功激活您的帐户",
@@ -28,7 +28,7 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "可以查看实时视频，浏览存档，配置摄像头，控制云台等",
     "SHARE PERMISSIONS HINT VIEWER": "可以查看实时视频和浏览存档",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "只能查看实时视频",
-    "SHARE PERMISSIONS HINT CUSTOM": "请使用 %PRODUCT_NAME% 客户端应用程序以配置自订权限",
+    "SHARE PERMISSIONS HINT CUSTOM": "使用 %PRODUCT_NAME% 客户端应用程序可以设置自定义权限",
     "ACCOUNT TEXT": "帐户",
     "EDIT USER BUTTON TEXT": "编辑",
     "DELETE USER BUTTON TEXT": "删除",
@@ -57,7 +57,7 @@
     "PASSWORD TOO COMMON TEXT": "此密码是在世界顶级最受欢迎的密码",
     "PASSWORD IS WEAK TEXT": "使用数字、 上层和小写字母和特殊字符，使您更强的密码",
     "TERMS AND CONDITIONS ERROR TEXT": "请审阅并同意条款及条件和隐私政策, 以便继续进行",
-    "THIS LINK IS BROKEN TEXT": "此链结已断开,<br>\n            系统可能会从 %PRODUCT_NAME% 离线,<br>\n            登录权限可能会被取销,<br>\n            或您可能已用其他用户登入",
+    "THIS LINK IS BROKEN TEXT": "此链接已断开，<br>\n            系统可能会断开连接从 %PRODUCT_NAME%，<br>\n            访问此系统可能被吊销，<br>\n            或您可以登录到一个不同的帐户",
     "PAGE NOT FOUND": "找不到页面",
     "TAKE ME HOME": "带我回家",
     "OPEN NX WITNESS BUTTON TEXT": "打开 %VMS_NAME%"

@@ -34,8 +34,22 @@
     {% endfor %}
 
     <div class="submit-row">
-        <button class="btn btn-sm btn-primary" type="submit" name="Upload">Upload</button>
+        <button class="btn btn-sm btn-primary" type="submit" name="Upload" onclick="cookieInterval()">Upload</button>
     </div>
+    <script>
+        var checkCookie = function () {
+            var lastCookie = document.cookie;
+            return function () {
+                var currentCookie = document.cookie;
+                if (currentCookie != lastCookie) {
+                    window.location.reload()
+                }
+            };
+        }();
+        function cookieInterval() {hg
+            window.setInterval(checkCookie, 100);
+        }
+    </script>
 
 </form>
 {% endblock%}

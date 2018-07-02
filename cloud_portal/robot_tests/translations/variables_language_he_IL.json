@@ -1,8 +1,8 @@
 {
-    "YOU HAVE NO SYSTEMS TEXT": "אין לך מערכות המחוברות ל- {{PRODUCT_NAME}}",
+    "YOU HAVE NO SYSTEMS TEXT": "אין לך מערכות המחוברות ל- %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "יציאה",
     "ACCOUNT SETTINGS BUTTON TEXT": "הגדרות החשבון",
-    "RESET EMAIL SENT MESSAGE TEXT": "הוראות לאיפוס סיסמא נשלחות לדוא\"ל  %email%",
+    "RESET EMAIL SENT MESSAGE TEXT": "הוראות לאיפוס סיסמה נשלחות לדוא\"ל %email%",
     "CREATE ACCOUNT BUTTON TEXT": "צור חשבון",
     "TERMS AND CONDITIONS LINK TEXT": "תנאי שימוש",
     "RESEND ACTIVATION LINK BUTTON TEXT": "שלח את קישור ההפעלה שוב",
@@ -37,7 +37,7 @@
     "ADMIN TEXT": "מנהל",
     "ADV VIEWER TEXT": "צופה מתקדם",
     "VIEWER TEXT": "צופה",
-    "LIVE VIEWER TEXT": "צופה בוידאו חי",
+    "LIVE VIEWER TEXT": "צופה בשידור חי",
     "CUSTOM TEXT": "התאמה אישית",
     "YOUR SYSTEM TEXT": "המערכת שלך",
     "ACTIVATE YOUR ACCOUNT EMAIL SUBJECT": "הפעל את חשבונך",
@@ -57,7 +57,7 @@
     "PASSWORD TOO COMMON TEXT": "סיסמה זו חלשה מאחר והיא מהסיסמאות הפופולריות ביותר בעולם",
     "PASSWORD IS WEAK TEXT": "השתמש במספרים, אותיות גדולות וקטנות ותווים מיוחדים כדי להפוך את הסיסמה שלך חזקה יותר",
     "TERMS AND CONDITIONS ERROR TEXT": "נא לעיין ולהסכים לתנאים וההגבלות ולפרטיות המדיניות כדי להמשיך",
-    "THIS LINK IS BROKEN TEXT": "קישור זה אינו תקין, <br> ניתן לנתק את המערכת מ {{PRODUCT_NAME}}, <br> הגישה למערכת זו עשויה להישלל, <br> או שאתה יכול לנסות להיכנס עם חשבון אחר",
+    "THIS LINK IS BROKEN TEXT": "קישור זה אינו תקין, <br> ניתן לנתק את המערכת מ %PRODUCT_NAME%, <br> הגישה למערכת זו עשויה להישלל, <br> או שאתה עשוי להיכנס לחשבון אחר",
     "PAGE NOT FOUND": "דף לא נמצא",
     "TAKE ME HOME": "קח אותי לדף הבית",
     "OPEN NX WITNESS BUTTON TEXT": "פתח %VMS_NAME%"
