@@ -88,6 +88,10 @@ QSet<int> Screens::coveredBy(
     if (screenGeometries.empty())
         screenGeometries = geometries();
 
+    NX_ASSERT(!screenGeometries.empty());
+    if (screenGeometries.empty())
+        return {};
+
     auto safeGetGeometry =
         [&screenGeometries](int index)
         {
