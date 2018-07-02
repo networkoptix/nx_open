@@ -220,87 +220,87 @@
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation type="unfinished">Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</translation>
+      <translation>Переконайтеся, що модуль вводу / виводу підключений до мережі. Спробуйте його перезавантажити.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>Запит модуля вводу-виводу &quot;%1&quot; не вдалося з помилкою &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation type="unfinished">Unknown I/O module issue.</translation>
+      <translation>Невідома проблема з модулем введення / виводу.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module %1.</translation>
+      <translation>Модуль введення / виведення %1 повернув некоректні дані.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation type="unfinished">Too many media errors. Please open I/O module issues dialog for more details.</translation>
+      <translation>Занадто багато помилок медіа. Відкрийте діалог помилок пристрою для подробиць.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation type="unfinished">Device initialization process is in progress.</translation>
+      <translation>Пристрій в процесі ініціалізації.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation type="unfinished">Camera initialization process is in progress.</translation>
+      <translation>Камера в процесі ініціалізації.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation type="unfinished">I/O Module initialization process is in progress.</translation>
+      <translation>Модуль вводу/виводу в процесі ініціалізації.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation type="unfinished">Make sure port %1 is accessible (e.g. forwarded).</translation>
+      <translation>Переконайтеся, що порт %1 доступний (наприклад, переадресовується).</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
+      <translation>Якщо це не допомагає, відновіть заводські налаштування за замовчуванням на веб-сторінці пристрою.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the camera web-page.</translation>
+      <translation>Якщо це не допомагає, відновіть заводські налаштування на веб-сторінці камери.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the I/O module web-page.</translation>
+      <translation>Якщо це не допомагає, відновіть заводські налаштування за замовчуванням на веб-сторінці модуля вводу / виводу.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Failed to connect to media port %2.</translation>
+      <translation>Неможливо відкрити медіа посилання %1. Помилка підключення до медіа порту %2.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation type="unfinished">Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</translation>
+      <translation>Неможливо відкрити медіа посилання %1. Підключення до порту %2 скасовано.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse device response. URL %1, request name %2.</translation>
+      <translation>Не вдається проаналізувати відповідь пристрою. URL %1, ім'я запиту %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse camera response. URL %1, request name %2.</translation>
+      <translation>Не вдалося проаналізувати відповідь камери. URL %1, ім'я запиту %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse I/O module response. URL %1, request name %2.</translation>
+      <translation>Не вдалося проаналізувати відповідь модуля вводу / виводу. URL %1, ім'я запиту %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation type="unfinished">No supported media tracks at URL %1.</translation>
+      <translation>Немає підтримуваних медіа-треків по посиланню %1.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation type="unfinished">Not authorized. URL %1.</translation>
+      <translation>Не авторизований. URL %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Unsupported media protocol %2.</translation>
+      <translation>Неможливо відкрити медіа посилання %1. Непідтримуваний протокол %2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>Камера була відновлена ​​з архіву. Видаліть камеру та додайте її знову, щоб переглянути відео в реальному часі.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
@@ -323,128 +323,128 @@
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
-      <translation type="unfinished">Audio context was not specified.</translation>
+      <translation>Аудіопоток не визначено.</translation>
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation type="unfinished">Could not find encoder for codec %1.</translation>
+      <translation>Не знайдено енкодер для кодека %1.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Неможливо ініціалізувати звуковий кодек.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
-      <translation type="unfinished">Could not initialize audio decoder.</translation>
+      <translation>Помилка ініціалізації кодувальника звуку.</translation>
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
-      <translation type="unfinished">Could not find decoder for codec %1.</translation>
+      <translation>Не знайдено декодер для кодека %1.</translation>
     </message>
     <message>
       <source>Could not initialize resampling context, error code: %1</source>
-      <translation type="unfinished">Could not initialize resampling context, error code: %1</translation>
+      <translation>Не вдалося ініціалізувати контекст, код помилки: %1</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers, error code: %1</source>
-      <translation type="unfinished">Could not allocate sample buffers, error code: %1</translation>
+      <translation>Не вдається виділити буфер зразка, код помилки: %1</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not send audio frame to encoder, Error code: %1.</translation>
+      <translation>Чи не вдалося відправити звукові дані кодувальнику, код помилки: %1.</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio packet from encoder, Error code: %1.</translation>
+      <translation>Не вдалося отримати аудіо пакет від кодувальника, код помилки: %1.</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation type="unfinished">Could not receive audio frame from decoder, Error code: %1.</translation>
+      <translation>Не вдалося отримати звукові дані від декодера, код помилки: %1.</translation>
     </message>
   </context>
   <context>
     <name>QnFfmpegTranscoder</name>
     <message>
       <source>Container %1 was not found in FFMPEG library.</source>
-      <translation type="unfinished">Container %1 was not found in FFMPEG library.</translation>
+      <translation>Контейнер %1 не був знайдений у бібліотеці FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output context for format %1.</source>
-      <translation type="unfinished">Could not create output context for format %1.</translation>
+      <translation>Неможливо створити вихідний потік для формату %1.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>Неможливо створити буфер для запису потоку.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation type="unfinished">Could not perform direct stream copy because frame size is undefined.</translation>
+      <translation>Неможливо виконати копію прямого потоку, оскільки розмір кадру не визначено.</translation>
     </message>
     <message>
       <source>Could not find codec %1.</source>
-      <translation type="unfinished">Could not find codec %1.</translation>
+      <translation>Не вдалося знайти кодек %1.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with container %1.</translation>
+      <translation>Відео або аудіо кодек несумісний з форматом %1.</translation>
     </message>
   </context>
   <context>
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation type="unfinished">Could not find encoder for codec %1.</translation>
+      <translation>Не знайдено енкодер для кодека %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>Помилка ініціалізації кодувальника відео.</translation>
     </message>
   </context>
   <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation type="unfinished">Analog</translation>
+      <translation>Аналоговий</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation type="unfinished">Professional</translation>
+      <translation>Професійний</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Відеостіна</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Модуль вводу/виводу</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Починається</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Аналоговий кодувальник</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation type="unfinished">Analog Licenses</translation>
+      <translation>Ліцензії на аналогову камеру</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation type="unfinished">Professional Licenses</translation>
+      <translation>Професійні ліцензії</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation type="unfinished">Edge Licenses</translation>
+      <translation>Ліцензії Edge</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
@@ -724,88 +724,88 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Середній</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Висока</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Найкраще</translation>
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Попередньо встановлене</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Не визначено</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation type="unfinished">Lst</translation>
+      <translation>Найг</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation type="unfinished">Lo</translation>
+      <translation>Низьк</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation type="unfinished">Me</translation>
+      <translation>Середн</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation type="unfinished">Hi</translation>
+      <translation>Вис</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation type="unfinished">Bst</translation>
+      <translation>Кращ</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation type="unfinished">Ps</translation>
+      <translation>Перед</translation>
     </message>
   </context>
   <context>
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+      <translation>Відповідний контейнер у бібліотеці FFMPEG не знайдено.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
+      <translation>Неможливо створити файл для запису відео.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>Неможливо створити буфер для запису потоку.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
+      <translation>Неможливо створити буфер для звукового потоку.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
+      <translation>Невірна інформація про звуковий кодек.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+      <translation>Відео або аудіо кодек несумісний із вибраним форматом.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation type="unfinished">File write error. Not enough free space.</translation>
+      <translation>Помилка запису файлу. Не вистачає вільного простору.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>Недійсний тип ресурсу для експорту даних.</translation>
     </message>
     <message>
       <source>No data exported.</source>
@@ -816,34 +816,34 @@
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>Безіменна система</translation>
     </message>
   </context>
   <context>
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ОК</translation>
     </message>
     <message>
       <source>Not Found</source>
-      <translation type="unfinished">Not Found</translation>
+      <translation>Не знайдено</translation>
     </message>
     <message>
       <source>Not Implemented</source>
-      <translation type="unfinished">Not Implemented</translation>
+      <translation>Не реалізовано</translation>
     </message>
     <message>
       <source>Unsupported Transport</source>
-      <translation type="unfinished">Unsupported Transport</translation>
+      <translation>Непідтримуваний транспорт</translation>
     </message>
     <message>
       <source>Internal Server Error</source>
-      <translation type="unfinished">Internal Server Error</translation>
+      <translation>Внутрішня помилка сервера</translation>
     </message>
     <message>
       <source>Invalid Parameter</source>
-      <translation type="unfinished">Invalid Parameter</translation>
+      <translation>Недійсний параметр</translation>
     </message>
   </context>
   <context>
@@ -1013,105 +1013,105 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation type="unfinished">OpenCL transcoding is not implemented.</translation>
+      <translation>Переодування OpenCL не реалізовано.</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
-      <translation type="unfinished">Unknown transcoding method.</translation>
+      <translation>Невідомий метод перекодування.</translation>
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation type="unfinished">OpenCLTranscode is not implemented.</translation>
+      <translation>OpenCLTranscode не реалізований.</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation type="unfinished">Unknown transcode method</translation>
+      <translation>Невідомий метод перекодування</translation>
     </message>
   </context>
   <context>
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Власник</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Адміністратор</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation type="unfinished">Advanced Viewer</translation>
+      <translation>Перегляд і налаштування</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation type="unfinished">Viewer</translation>
+      <translation>Відео з камер і архів</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation type="unfinished">Live Viewer</translation>
+      <translation>Відео в реальному часі</translation>
     </message>
     <message>
       <source>Custom Role</source>
-      <translation type="unfinished">Custom Role</translation>
+      <translation>Особлива роль</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Особливі</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
-      <translation type="unfinished">Can manage all cameras and bookmarks.</translation>
+      <translation>Можна керувати всіма камерами та закладками.</translation>
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation type="unfinished">Can view all cameras and export video.</translation>
+      <translation>Можна переглядати всі відеокамери та експортувати відео.</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation type="unfinished">Can view live video from all cameras.</translation>
+      <translation>Може дивитися відео в реальному часі зі всіх камер.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation type="unfinished">Custom user role.</translation>
+      <translation>Особлива роль.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation type="unfinished">Custom permissions.</translation>
+      <translation>Спеціальні дозволи.</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
-      <translation type="unfinished">Has access to whole System and can do everything.</translation>
+      <translation>Має доступ до всієї системи і може робити все.</translation>
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation type="unfinished">Has access to whole System and can manage it. Can create users.</translation>
+      <translation>Має доступ до всієї системи і може керувати нею. Може створити користувачів.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Закладка</translation>
     </message>
     <message>
       <source>Panic recording</source>
-      <translation type="unfinished">Panic recording</translation>
+      <translation>Запис по тривозі</translation>
     </message>
     <message>
       <source>Write to log</source>
-      <translation type="unfinished">Write to log</translation>
+      <translation>Записати в журнал</translation>
     </message>
     <message>
       <source>Show notification</source>
-      <translation type="unfinished">Show notification</translation>
+      <translation>Показати сповіщення</translation>
     </message>
     <message>
       <source>Repeat sound</source>
-      <translation type="unfinished">Repeat sound</translation>
+      <translation>Повторити звук</translation>
     </message>
     <message>
       <source>Play sound</source>
-      <translation type="unfinished">Play sound</translation>
+      <translation>Відтворити звук</translation>
     </message>
     <message>
       <source>Speak</source>
@@ -1336,45 +1336,45 @@
     </message>
     <message>
       <source>Event: %1</source>
-      <translation type="unfinished">Event: %1</translation>
+      <translation>Подія: %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation type="unfinished">Source: %1</translation>
+      <translation>Джерело: %1</translation>
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation type="unfinished">Caption: %1</translation>
+      <translation>Заголовок: %1</translation>
     </message>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>Вхідний порт: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation type="unfinished">Reason: %1</translation>
+      <translation>Причина: %1</translation>
     </message>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>Конфліктна адреса: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation type="unfinished">MAC #%1: %2</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation type="unfinished">Conflicting Server #%1: %2</translation>
+      <translation>Конфліктний сервер №%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation type="unfinished">Conflicting Server: %1</translation>
+      <translation>Конфліктний сервер: %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Тригер: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1384,202 +1384,202 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n раз, перший: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n разів, перше: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n разів, перше: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n разів, перше: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">Time: %1 on %2</translation>
+      <translation>Час: %2 %1</translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+      <translation>
+        <numerusform>Перший прояв: %2 %1 (всього %n ​​рази)</numerusform>
+        <numerusform>Перший прояв: %2 %1 (всього %n ​​рази)</numerusform>
+        <numerusform>Перший прояв: %2 %1 (всього %n ​​рази)</numerusform>
+        <numerusform>Перший прояв: %2 %1 (всього %n ​​рази)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
+        <numerusform>Немає даних, отриманих протягом останніх %n секунд.</numerusform>
       </translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Підключення до пристрою було несподівано закрито.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Підключення до камери (основний потік) було несподівано закрито.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Підключення до камери (вторинний потік) було несподівано закрито.</translation>
     </message>
     <message>
       <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation type="unfinished">RTP packet loss detected, prev seq.=%1 next seq.=%2.</translation>
+      <translation>Виявлено втрату пакету RTP, prev seq. =%1 наступний рядок =%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>Виявлено втрату RTP пакетів.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Пристрій не відповідає на запити мережі.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>З'єднання із сервером втрачено.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Відбулася несподівана зупинка сервера.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>Помилка введення / виведення на %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
+      <translation>Недостатньо швидкості HDD/SSD для запису на %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>Диск &quot;%1&quot; переповнений. Диск містить занадто багато даних, що не відносяться до системи.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Системний диск &quot;%1&quot; майже повний.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation type="unfinished">Archive backup failed: No available backup storages with sufficient free space</translation>
+      <translation>Не вдалося зберегти резервну копію архіву: відсутні резервні сховища з достатнім вільним простором</translation>
     </message>
     <message>
       <source>Archive backup failed: Target storage failure</source>
-      <translation type="unfinished">Archive backup failed: Target storage failure</translation>
+      <translation>Помилка резервного копіювання архіву: Помилка цільового сховища</translation>
     </message>
     <message>
       <source>Archive backup failed: Source file open/read error</source>
-      <translation type="unfinished">Archive backup failed: Source file open/read error</translation>
+      <translation>Помилка резервного копіювання архіву: Помилка читання початкового файлу</translation>
     </message>
     <message>
       <source>Archive backup failed: Target file create/write error</source>
-      <translation type="unfinished">Archive backup failed: Target file create/write error</translation>
+      <translation>Помилка резервного копіювання архіву: Помилка запису цільового файлу</translation>
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation type="unfinished">Archive backup failed: File catalog error</translation>
+      <translation>Не вдалося зберегти архівування: помилка каталогу файлів</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</translation>
+      <translation>Створення резервних копій архіву завершено не в повному обсязі, так як час, відведений на резервне копіювання, минув. Резервне копіювання виконано до %1</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
-      <translation type="unfinished">Archive backup is successfully completed</translation>
+      <translation>Створення резервних копій архіву успішно завершено</translation>
     </message>
     <message>
       <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation type="unfinished">Archive backup is canceled by user. Data is backed up to %1</translation>
+      <translation>Резервне копіювання скасовано користувачем. Резервне копіювання виконано до %1</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following devices:</translation>
+      <translation>Недостатньо ліцензій Запис вимкнено на наступних пристроях:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following cameras:</translation>
+      <translation>Недостатньо ліцензій Запис вимкнено на наступних камерах:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation type="unfinished">Not enough licenses. Recording has been disabled on following I/O modules:</translation>
+      <translation>Недостатньо ліцензій Запис було відключено на наступних модулях вводу / виводу:</translation>
     </message>
     <message>
       <source>start</source>
-      <translation type="unfinished">start</translation>
+      <translation>починається</translation>
     </message>
     <message>
       <source>stop</source>
-      <translation type="unfinished">stop</translation>
+      <translation>закінчується</translation>
     </message>
     <message>
       <source>While %1</source>
-      <translation type="unfinished">While %1</translation>
+      <translation>Поки %1</translation>
     </message>
     <message>
       <source>On %1 %2</source>
-      <translation type="unfinished">On %1 %2</translation>
+      <translation>Коли %2 %1</translation>
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>Назва тригера</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Роль</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n користувач</numerusform>
+        <numerusform>%n користувача</numerusform>
+        <numerusform>%n користувачів</numerusform>
+        <numerusform>%n користувачів</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
+      <translation>
+        <numerusform>%n роль</numerusform>
+        <numerusform>%n ролі</numerusform>
+        <numerusform>%n ролі</numerusform>
+        <numerusform>%n ролей</numerusform>
       </translation>
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Всі адміністратори</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Всі користувачі</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Виберіть принаймні одного користувача</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Програмний тригер</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Програмний тригер %1 на %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Програмний тригер %1 активований кілька разів</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>Відправити email</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Підтвердити</translation>
     </message>
     <message>
       <source>Analytics Event</source>
@@ -1595,7 +1595,7 @@
     <name>utils::QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Віддалена камера</translation>
     </message>
   </context>
 </TS>

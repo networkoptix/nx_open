@@ -367,7 +367,7 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
             h >>= descr->log2_chroma_h;
             w >>= descr->log2_chroma_w;
         }
-        copyPlane(data[i], frame->data[i], w, linesize[i], frame->linesize[i], h);
+        copyPlane(data[i], frame->data[i], w * descr->comp[i].step, linesize[i], frame->linesize[i], h);
     }
 }
 
