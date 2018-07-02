@@ -101,7 +101,7 @@ namespace ec2
             query.addBindValue(internalUserId);
             if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO) || !query.next())
                 return 0;
-            return query.value(0).toInt();
+            return GlobalPermissions(query.value(0).toInt());
         }
 
         /** Add default live viewer resources permissions. */

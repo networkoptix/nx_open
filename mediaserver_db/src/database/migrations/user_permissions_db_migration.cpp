@@ -85,8 +85,9 @@ int migrateFromV26(int oldPermissions)
     return result;
 }
 
-int fixCustomFlag(int oldPermissions)
+int fixCustomFlag(int oldPermissionsValue)
 {
+    GlobalPermissions oldPermissions(oldPermissionsValue);
     using boost::algorithm::any_of;
     GlobalPermissions result =
         oldPermissions & ~GlobalPermissions(GlobalPermission::customUser);
@@ -102,7 +103,7 @@ int fixCustomFlag(int oldPermissions)
         result |= GlobalPermission::customUser;
 
     QString logMessage = lit("Fix User Permissions Custom Flag: %1 -> %2")
-        .arg(QnLexical::serialized(static_cast<GlobalPermissions>(oldPermissions)))
+        .arg(QnLexical::serialized(oldPermissions))
         .arg(result);
     NX_LOG(logMessage, cl_logINFO);
 
