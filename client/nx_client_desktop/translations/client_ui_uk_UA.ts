@@ -2007,7 +2007,7 @@
     <message>
       <location/>
       <source>Select file...</source>
-      <translation type="unfinished">Select file...</translation>
+      <translation>Обрати файл...</translation>
     </message>
     <message>
       <location/>
