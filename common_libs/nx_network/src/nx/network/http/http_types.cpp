@@ -54,6 +54,11 @@ int defaultPortForScheme(const StringType& scheme)
     return -1;
 }
 
+int defaultPort(bool isSecure)
+{
+    return isSecure ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
+}
+
 StringType getHeaderValue(const HttpHeaders& headers, const StringType& headerName)
 {
     const auto it = headers.find(headerName);

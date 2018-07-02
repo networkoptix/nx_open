@@ -214,12 +214,6 @@ QString ProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, cons
 	return QString();
 }
 
-QUrl ProxyConnectionProcessor::getDefaultProxyUrl()
-{
-	Q_D(ProxyConnectionProcessor);
-	return QUrl(lit("http://localhost:%1").arg(d->owner->getPort()));
-}
-
 /**
 * Server nonce could be local since v.3.0. It cause authentication issue while proxing request.
 * This function replace user information to the serverAuth key credentials to guarantee

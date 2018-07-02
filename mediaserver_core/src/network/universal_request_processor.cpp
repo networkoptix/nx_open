@@ -268,8 +268,18 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
 
 bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
 {
-    Q_D(QnUniversalRequestProcessor);
     const auto schemeString = QString::fromUtf8(scheme);
+    Q_D(QnUniversalRequestProcessor);
+
+    const auto listener = dynamic_cast<QnHttpConnectionListener*>(d->owner);
+    if (listener && listener->isProxy(d->request))
+    {
+        NX_ASSERT(false, lm("Unable to redirect sheme %1 for proxy").arg(schemeString));
+        d->response.messageBody = STATIC_FORBIDDEN_HTML;
+        sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
+        return true;
+    }
+
     nx::utils::Url url(d->request.requestLine.url);
     if (url.scheme() == schemeString)
     {

@@ -229,9 +229,10 @@ void HttpClient::setAuthType(AuthType value)
         m_asyncHttpClient->setAuthType(value);
 }
 
-void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
+void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure)
 {
     m_proxyEndpoint = proxyEndpoint;
+    m_isProxySecure = isSecure;
 }
 
 void HttpClient::setDisablePrecalculatedAuthorization(bool value)
@@ -348,7 +349,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         if (m_authType)
             m_asyncHttpClient->setAuthType(*m_authType);
         if (m_proxyEndpoint)
-            m_asyncHttpClient->setProxyVia(*m_proxyEndpoint);
+            m_asyncHttpClient->setProxyVia(*m_proxyEndpoint, m_isProxySecure);
 
         m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
         m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);

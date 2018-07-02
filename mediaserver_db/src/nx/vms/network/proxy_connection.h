@@ -50,7 +50,6 @@ private:
     void doRawProxy();
     void doSmartProxy();
     bool openProxyDstConnection();
-    QUrl getDefaultProxyUrl();
     bool updateClientRequest(nx::utils::Url& dstUrl, QnRoute& dstRoute);
     bool replaceAuthHeader();
 

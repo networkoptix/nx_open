@@ -64,6 +64,7 @@ typedef nx::Buffer StringType;
 int NX_NETWORK_API strcasecmp(const StringType& one, const StringType& two);
 
 int NX_NETWORK_API defaultPortForScheme(const StringType& scheme);
+int NX_NETWORK_API defaultPort(bool isSecure);
 
 /**
  * Comparator for case-insensitive comparison in STL associative containers.
