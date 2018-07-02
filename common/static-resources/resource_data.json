@@ -594,7 +594,9 @@
                 "Sony|SNT-EX154",
                 "Sony|SNT-EP154",
                 "Dahua|DHI-HCVR7108H*",
-                "Siqura|EVE FOUR"
+                "Siqura|EVE FOUR",
+                "Hikvision|DS-6708*",
+                "HIKVISION|DS-6708*"
             ],
             "analogEncoder": true
         },
@@ -861,6 +863,25 @@
         },
         {
             "keys": [
+                "Hikvision|DS-6708*", "HIKVISION|DS-6708*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationA01,VideoEncoderConfigurationA09",
+                    "VideoEncoderConfigurationA02,VideoEncoderConfigurationA10",
+                    "VideoEncoderConfigurationA03,VideoEncoderConfigurationA11",
+                    "VideoEncoderConfigurationA04,VideoEncoderConfigurationA12",
+                    "VideoEncoderConfigurationA05,VideoEncoderConfigurationA13",
+                    "VideoEncoderConfigurationA06,VideoEncoderConfigurationA14",
+                    "VideoEncoderConfigurationA07,VideoEncoderConfigurationA15",
+                    "VideoEncoderConfigurationA08,VideoEncoderConfigurationA16"
+                ]
+            }
+        },
+        {
+            "keys": [
                 "Hikvision|DS-2CD6362F-I*|V5.0.*", "Hikvision|DS-2CD6362F-I*|V5.3.*", "Hikvision|DS-2CD6362F-I*|V5.1.*", "Hikvision|DS-2CD6362F-I*|V5.2.*", "Hikvision|HNCA12-FEA"
             ],
             "forcedOnvifParams":
@@ -923,7 +944,9 @@
                 "Hikvision|DS-2DE4A220IW-DE",
                 "HIKVISION|DS-2CD4032FWD*",
                 "HIKVISION|DS-2CD2142FWD*",
-                "hikvision|DS-2CD2142FWD*"
+                "hikvision|DS-2CD2142FWD*",
+                "Hikvision|DS-6716*", "HIKVISION|DS-6716*",
+                "Hikvision|DS-6708*", "HIKVISION|DS-6708*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -2780,6 +2803,11 @@
                     }
                 }
             }
+        },
+        {
+            "keys": ["2nt|2N IP Verso", "2nt|2N IP Force"],
+            "relayInputCountForced": 2,
+            "onvifInputPortAliases": ["onvif_input_1", "input1"]
         }
     ]
 }

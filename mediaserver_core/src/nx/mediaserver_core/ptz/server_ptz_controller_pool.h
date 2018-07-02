@@ -1,21 +1,23 @@
-#ifndef QN_SERVER_PTZ_CONTROLLER_POOL_H
-#define QN_SERVER_PTZ_CONTROLLER_POOL_H
+#pragma once
 
-#include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/ptz_object.h>
-#include "nx_ec/impl/ec_api_impl.h"
+#include <core/ptz/ptz_controller_pool.h>
+
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
+namespace nx {
+namespace mediaserver_core {
+namespace ptz {
 
-class QnServerPtzControllerPool: public QnPtzControllerPool
+class ServerPtzControllerPool: public QnPtzControllerPool
 {
     Q_OBJECT
     typedef QnPtzControllerPool base_type;
 
 public:
-    QnServerPtzControllerPool(QObject *parent = NULL);
-    ~QnServerPtzControllerPool();
+    ServerPtzControllerPool(QObject *parent = NULL);
+    virtual ~ServerPtzControllerPool();
 
 protected:
     virtual void registerResource(const QnResourcePtr &resource) override;
@@ -23,7 +25,6 @@ protected:
     virtual QnPtzControllerPtr createController(const QnResourcePtr &resource) const override;
 
 private slots:
-    void at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
     void at_cameraPropertyChanged(const QnResourcePtr &resource, const QString& key);
 
     void at_controllerAboutToBeChanged(const QnResourcePtr &resource);
@@ -34,4 +35,6 @@ private:
     QHash<QnResourcePtr, QnPtzObject> activeObjectByResource;
 };
 
-#endif // QN_SERVER_PTZ_CONTROLLER_POOL_H
+} // namespace ptz
+} // namespace mediaserver_core
+} // namespace nx

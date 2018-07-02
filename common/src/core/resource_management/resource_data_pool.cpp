@@ -29,6 +29,8 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceDataPool
 QnResourceDataPool::QnResourceDataPool(QObject *parent):
     QObject(parent)
 {
+    // TODO: #dmishin move declaration of vendor short names
+    // to resource_data.json or some other config.
     m_shortVendorByName.insert(lit("digital watchdog"), lit("dw"));
     m_shortVendorByName.insert(lit("digital_watchdog"), lit("dw"));
     m_shortVendorByName.insert(lit("digitalwatchdog"), lit("dw"));
@@ -40,6 +42,7 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
     m_shortVendorByName.insert(lit("norbain"), lit("vista"));
     m_shortVendorByName.insert(lit("flir systems"), lit("flir"));
     m_shortVendorByName.insert(lit("hanwha techwin"), lit("hanwha"));
+    m_shortVendorByName.insert(lit("2n telecommunications"), lit("2nt"));
 }
 
 QnResourceDataPool::~QnResourceDataPool() {

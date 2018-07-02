@@ -235,7 +235,7 @@
 
 #include "platform/hardware_information.h"
 #include "platform/platform_abstraction.h"
-#include "core/ptz/server_ptz_controller_pool.h"
+#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
 #include "plugins/resource/acti/acti_resource.h"
 #include "common/common_module.h"
 #include <nx/vms/network/reverse_connection_listener.h>
@@ -3149,7 +3149,7 @@ void MediaServerProcess::initializeLogging()
 
     logSettings.level.parse(cmdLineArguments().systemLogLevel,
         settings.systemLogLevel(), toString(nx::utils::log::Level::info));
-    logSettings.logBaseName = "system_log";
+    logSettings.logBaseName = "hw_log";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger(
@@ -3183,7 +3183,7 @@ void MediaServerProcess::initializeHardwareId()
 
     logSettings.level.parse(cmdLineArguments().systemLogLevel,
         serverModule()->settings().systemLogLevel(), toString(nx::utils::log::Level::info));
-    logSettings.logBaseName = "system_log";
+    logSettings.logBaseName = "hw_log";
     nx::utils::log::initialize(
         logSettings, qApp->applicationName(), binaryPath,
         nx::utils::log::addLogger(

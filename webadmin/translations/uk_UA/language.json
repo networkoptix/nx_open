@@ -1,5 +1,5 @@
 {
-    "language_name": "LANGUAGE_NAME",
+    "language_name": "Українська",
     "dialogs": {
         "okButton": "Ok",
         "openLink": "Visit this link",
@@ -178,15 +178,15 @@
     "common": {
         "voiceCommands": {
             "search": "find + [text for searchbar]",
-            "pause": "pause",
+            "pause": "пауза",
             "help": "help | show commands",
-            "collapse all servers": "collapse all servers",
+            "collapse all servers": "згорнути всі сервери",
             "collapse server": "collapse server + [server name]",
-            "play": "play",
-            "clear search": "clear search",
+            "play": "відтворити",
+            "clear search": "очистити вікно пошуку",
             "live": "go to live | show me live",
-            "expand all servers": "expand all servers",
-            "stop listening": "stop listening",
+            "expand all servers": "розгорнути всі сервери",
+            "stop listening": "припинити прослуховування",
             "expand server": "expand server + [server name]",
             "view": "view + [camera name]"
         },
@@ -200,9 +200,9 @@
             "transcoding": "Transcoding",
             "copyActiveText": "copied to clipboard"
         },
-        "searchCamPlaceholder": "Search",
+        "searchCamPlaceholder": "Пошук",
         "cameraStates": {
-            "noFormat": "This browser does not support video playback from this camera.",
+            "noFormat": "Цей веб-переглядач не підтримує відтворення відео з цієї камери.",
             "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
             "iosVideoTooLarge": "iOS does not support video larger than fullHD (2MP: 1920x1080).",
             "unauthorized": "Authentication required",
@@ -213,13 +213,13 @@
             "error": "Error",
             "offline": "Offline",
             "noData": "No data",
-            "flashRequired": "Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing videos."
+            "flashRequired": "Будь ласка, <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановіть Adobe Flash</a> для відтворення відео."
         },
-        "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
+        "chromeCastWarning": "Chromecast ресурсоємний і може спричинити проблеми на вашому сервері.",
         "resolution": {
-            "high": "High",
-            "auto": "Auto",
-            "low": "Low"
+            "high": "Високий",
+            "auto": "Автоматично",
+            "low": "Низький"
         }
     }
 }

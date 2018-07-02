@@ -5,7 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
-namespace mediaserver {
+namespace mediaserver_core {
 namespace ptz {
 
 class MappedPresetManager
@@ -46,5 +46,5 @@ private:
 };
 
 } // namespace ptz
-} // namespace mediaserver
+} // namespace mediaserver_core
 } // namespace nx

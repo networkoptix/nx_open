@@ -79,13 +79,15 @@ Ptz::Capabilities extendedCapabilities(Ptz::Capabilities originalCapabilities)
 
 RelativeMoveWorkaroundController::RelativeMoveWorkaroundController(
     const QnPtzControllerPtr& controller,
-    const RelativeContinuousMoveMapping& mapping,
-    QThreadPool* threadPool)
+    const std::shared_ptr<SequenceMaker>& sequenceMaker,
+    const std::shared_ptr<SequenceExecutor>& sequenceExecutor)
     :
     base_type(controller),
-    m_continuousMoveEngine(
-        std::make_unique<RelativeContinuousMoveEngine>(controller.data(), mapping, threadPool)),
-    m_absoluteMoveEngine(std::make_unique<RelativeAbsoluteMoveEngine>(controller.data()))
+    m_absoluteMoveEngine(std::make_unique<RelativeAbsoluteMoveEngine>(controller.data())),
+    m_continuousMoveEngine(std::make_unique<RelativeContinuousMoveEngine>(
+        controller.data(),
+        sequenceMaker,
+        sequenceExecutor))
 {
 }
 

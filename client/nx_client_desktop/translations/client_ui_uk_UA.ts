@@ -1700,7 +1700,7 @@
     <message>
       <location/>
       <source>Language</source>
-      <translation type="unfinished">Language</translation>
+      <translation>Мова</translation>
     </message>
     <message>
       <location/>
@@ -1990,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation type="unfinished">Enter a valid username and password...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation type="unfinished">Filename:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>Обрати файл...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>

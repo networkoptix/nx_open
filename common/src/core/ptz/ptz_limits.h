@@ -25,7 +25,7 @@ struct QnPtzLimits
     qreal minZoomSpeed = -1.0;
     qreal maxZoomSpeed = 1.0;
     qreal minRotationSpeed = -1.0;
-    qreal maxRotationSpeed = -1.0;
+    qreal maxRotationSpeed = 1.0;
 };
 #define QnPtzLimits_Fields (minPan)(maxPan)(minTilt)(maxTilt)(minFov)(maxFov)\
     (minRotation)(maxRotation)(maxPresetNumber)\

@@ -3636,7 +3636,7 @@ ErrorCode QnDbManager::getStorages(const QString& filterStr, StorageDataList& st
     if (result != ErrorCode::ok)
         return result;
 
-    mergeObjectListData<StorageData>(
+    mergeObjectListData<StorageDataList>(
         storageList, params,
         &StorageData::addParams,
         &ResourceParamWithRefData::resourceId);
@@ -3833,7 +3833,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, CameraDataExList& cameraE
     ErrorCode result = fetchResourceParams( filter, params );
     if( result != ErrorCode::ok )
         return result;
-    mergeObjectListData<CameraDataEx>(cameraExList, params, &CameraDataEx::addParams, &ResourceParamWithRefData::resourceId);
+    mergeObjectListData<CameraDataExList>(cameraExList, params, &CameraDataEx::addParams, &ResourceParamWithRefData::resourceId);
 
     std::vector<ScheduleTaskWithRefData> scheduleTaskList;
     ErrorCode errCode = getScheduleTasks(scheduleTaskList);
@@ -3932,7 +3932,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, MediaServerDataExList& se
     result = fetchResourceParams( filter, params );
     if( result != ErrorCode::ok )
         return result;
-    mergeObjectListData<MediaServerDataEx>(serverExList, params, &MediaServerDataEx::addParams, &ResourceParamWithRefData::resourceId);
+    mergeObjectListData<MediaServerDataExList>(serverExList, params, &MediaServerDataEx::addParams, &ResourceParamWithRefData::resourceId);
 
     //reading status info
     ResourceStatusDataList statusList;

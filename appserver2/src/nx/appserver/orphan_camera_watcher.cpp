@@ -1,6 +1,7 @@
 #include "nx/appserver/orphan_camera_watcher.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
@@ -8,23 +9,37 @@
 #include <core/resource/camera_resource.h>
 #include <nx_ec/dummy_handler.h>
 
+#include <nx/kit/debug.h>
+
 #include <nx/utils/log/log.h>
+
 
 namespace nx {
 namespace appserver {
 
-static const int kDefaultUpdateIntervalMs = 1000 * 60 * 30;
+using namespace std::literals::chrono_literals;
+static const std::chrono::milliseconds kDefaultUpdateInterval = 15min;
 
-OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule):
-    base_type(commonModule), m_updateIntervalMs(kDefaultUpdateIntervalMs)
+OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule)
+    :
+    base_type(commonModule),
+    m_updateInterval(kDefaultUpdateInterval)
 {
+    qRegisterMetaType<std::chrono::milliseconds>();
     connect(&m_timer, &QTimer::timeout, this, &OrphanCameraWatcher::update);
-    start();
 
     connect(this, &OrphanCameraWatcher::doChangeInterval, this,
-        [&](int ms)
+        [&](std::chrono::milliseconds interval)
         {
-            m_updateIntervalMs = ms;
+            m_updateInterval = interval;
+            m_timer.stop();
+            this->start();
+        },
+        Qt::QueuedConnection);
+
+    connect(this, &OrphanCameraWatcher::doStart, this,
+        [&]()
+        {
             m_timer.stop();
             this->start();
         },
@@ -34,7 +49,7 @@ OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule):
 void OrphanCameraWatcher::start()
 {
     update();
-    m_timer.start(m_updateIntervalMs);
+    m_timer.start(m_updateInterval.count());
 }
 
 void OrphanCameraWatcher::update()
@@ -50,17 +65,33 @@ void OrphanCameraWatcher::update()
     QnVirtualCameraResourceList cameraResourceList = pool->getAllCameras(QnResourcePtr());
 
     Uuids currentOrphanCameras;
+    int idx = 0;
+    NX_DEBUG(this, "Detected camera list. Orphan cameras are marked with 'x'."
+        " Format: Number * Camera Id | Model | Camera Url | Parent Id");
     for (const QnVirtualCameraResourcePtr &cam: cameraResourceList)
     {
+        ++idx;
         QnUuid parentId = cam->getParentId();
         auto res = pool->getResourceById(parentId);
         if (res == nullptr)
         {
             QnUuid uuid = cam->getId();
             currentOrphanCameras.insert(uuid);
-            NX_WARNING(this, lm("Orphan camera found. URL = 1%. Parent id = %2.").args(cam->sourceUrl(Qn::CR_LiveVideo), parentId));
+            NX_DEBUG(this, lm("%01 x %2 | %3 | %4 | %5")
+                .args(QString::number(idx).rightJustified(2, '0'),
+                cam->getId().toString(), cam->getModel(), cam->getUrl(), parentId.toString()));
+        }
+        else
+        {
+            NX_DEBUG(this, lm("%1   %2 | %3 | %4 | %5")
+                .args(QString::number(idx).rightJustified(2, '0'),
+                cam->getId().toString(), cam->getModel(), cam->getUrl(), parentId.toString()));
         }
     }
+    if (currentOrphanCameras.empty())
+        NX_DEBUG(this, lm("No orphan cameras found."));
+    else
+        NX_DEBUG(this, lm("%1 orphan camera(s) found.").args(QString::number(currentOrphanCameras.size())));
 
     Uuids longlivedOrphanCameras;
     std::set_intersection(m_previousOrphanCameras.begin(), m_previousOrphanCameras.end(),
@@ -77,9 +108,9 @@ void OrphanCameraWatcher::update()
     m_previousOrphanCameras = currentOrphanCameras;
 }
 
-void OrphanCameraWatcher::changeIntervalAsync(int ms)
+void OrphanCameraWatcher::changeIntervalAsync(std::chrono::milliseconds interval)
 {
-    emit doChangeInterval(ms);
+    emit doChangeInterval(interval);
 }
 
 } // namespace appserver

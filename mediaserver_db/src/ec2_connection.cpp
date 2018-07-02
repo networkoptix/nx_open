@@ -81,4 +81,9 @@ void Ec2DirectConnection::setTransactionLogTime(nx::vms::api::Timestamp value)
         transactionLog->setTransactionLogTime(value);
 }
 
+void Ec2DirectConnection::startReceivingNotifications()
+{
+    base_type::startReceivingNotifications();
+    m_orphanCameraWatcher->doStart();
+}
 } // namespace ec2

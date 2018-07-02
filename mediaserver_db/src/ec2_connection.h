@@ -23,6 +23,8 @@ class LocalConnectionFactory;
 // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnection
 class Ec2DirectConnection: public BaseEc2Connection<ServerQueryProcessorAccess>
 {
+    using base_type = BaseEc2Connection<ServerQueryProcessorAccess>;
+
 public:
     Ec2DirectConnection(
         const LocalConnectionFactory* connectionFactory,
@@ -44,6 +46,7 @@ public:
     virtual void setTransactionLogTime(nx::vms::api::Timestamp value) override;
 
     ec2::detail::QnDbManager* getDb() const;
+    virtual void startReceivingNotifications() override;
 
 private:
     const QnConnectionInfo m_connectionInfo;

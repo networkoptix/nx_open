@@ -53,6 +53,11 @@ public:
         const QnCameraBookmarkSearchFilter& filter, QnCameraBookmarkList& result);
 
     bool containsBookmark(const QnUuid& bookmarkId) const;
+
+    bool getBookmarks(
+        const QList<QnUuid>& cameraIds,
+        const QnCameraBookmarkSearchFilter& filter,
+        QnCameraBookmarkList& result);
     QnCameraBookmarkTagList getBookmarkTags(int limit = std::numeric_limits<int>().max());
 
     bool addBookmark(const QnCameraBookmark& bookmark);

@@ -5,11 +5,28 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+#include <nx/utils/std/optional.h>
+
 #include <nx/core/ptz/component.h>
 
 namespace nx {
 namespace core {
 namespace ptz {
+
+struct SimpleRelativeContinuousMoveMapping
+{
+    std::chrono::milliseconds panCycleDuration{ 0 };
+    std::chrono::milliseconds tiltCycleDuration{ 0 };
+    std::chrono::milliseconds rotationCycleDuration{ 0 };
+    std::chrono::milliseconds zoomCycleDuration{ 0 };
+    std::chrono::milliseconds focusCycleDuration{ 0 };
+};
+#define SimpleRelativeContinuousMoveMapping_Fields \
+    (panCycleDuration)\
+    (tiltCycleDuration)\
+    (rotationCycleDuration)\
+    (zoomCycleDuration)\
+    (focusCycleDuration)
 
 struct Speed
 {
@@ -37,6 +54,9 @@ struct AccelerationParameters
 
 struct RelativeContinuousMoveComponentMapping
 {
+    RelativeContinuousMoveComponentMapping() = default;
+    RelativeContinuousMoveComponentMapping(const Speed& speed);
+
     Speed workingSpeed;
 
     std::chrono::milliseconds startRequestProcessingTime{0};
@@ -53,6 +73,9 @@ struct RelativeContinuousMoveComponentMapping
 
 struct RelativeContinuousMoveMapping
 {
+    RelativeContinuousMoveMapping() = default;
+    RelativeContinuousMoveMapping(const SimpleRelativeContinuousMoveMapping& mapping);
+
     RelativeContinuousMoveComponentMapping pan;
     RelativeContinuousMoveComponentMapping tilt;
     RelativeContinuousMoveComponentMapping rotation;
@@ -66,7 +89,8 @@ struct RelativeContinuousMoveMapping
 #define CONTINUOUS_PTZ_MAPPING_TYPES (Speed)\
     (AccelerationParameters)\
     (RelativeContinuousMoveMapping)\
-    (RelativeContinuousMoveComponentMapping)
+    (RelativeContinuousMoveComponentMapping)\
+    (SimpleRelativeContinuousMoveMapping)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(CONTINUOUS_PTZ_MAPPING_TYPES, (json)(eq))
 
@@ -74,5 +98,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(CONTINUOUS_PTZ_MAPPING_TYPES, (json)(eq))
 } // namespace core
 } // namespace nx
 
+Q_DECLARE_METATYPE(nx::core::ptz::SimpleRelativeContinuousMoveMapping);
 Q_DECLARE_METATYPE(nx::core::ptz::RelativeContinuousMoveMapping);
 QN_FUSION_DECLARE_FUNCTIONS(nx::core::ptz::AccelerationType, (lexical));

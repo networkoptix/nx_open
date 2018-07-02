@@ -10,6 +10,7 @@
 namespace nx {
 namespace core {
 namespace ptz {
+namespace test_support {
 
 #define FUNC_TYPE(METHOD) std::function<typename nx::utils::meta::SignatureExtractor<\
     decltype(&QnAbstractPtzController::METHOD)>::type>
@@ -56,6 +57,7 @@ class TestPtzController: public QnAbstractPtzController
     using base_type = QnAbstractPtzController;
 public:
     TestPtzController();
+    TestPtzController(const QnResourcePtr& resource);
 
     virtual Ptz::Capabilities getCapabilities(
         const nx::core::ptz::Options& options) const override;
@@ -233,6 +235,7 @@ private:
     std::optional<QnPtzData> m_predefinedData;
 };
 
+} // namespace test_support
 } // namespace ptz
 } // namespace core
 } // namespace nx

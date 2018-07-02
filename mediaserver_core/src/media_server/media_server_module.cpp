@@ -32,7 +32,7 @@
 #include <recorder/file_deletor.h>
 
 #include <core/resource/avi/avi_resource.h>
-#include <core/ptz/server_ptz_controller_pool.h>
+#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
 #include <core/dataprovider/data_provider_factory.h>
 
 #include <recorder/storage_db_pool.h>
@@ -128,7 +128,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
-    store(new QnServerPtzControllerPool(commonModule()));
+    store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
 
     store(new QnStorageDbPool(commonModule()));
 

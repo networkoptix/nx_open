@@ -45,6 +45,7 @@ public:
 
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
     virtual bool hasVideo() const override;
+    virtual void pleaseStop() override;
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);

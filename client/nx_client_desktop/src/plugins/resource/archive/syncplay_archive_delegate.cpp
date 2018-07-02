@@ -156,3 +156,8 @@ bool QnSyncPlayArchiveDelegate::hasVideo() const
 {
     return m_ownerDelegate->hasVideo();
 }
+
+void QnSyncPlayArchiveDelegate::pleaseStop()
+{
+    return m_ownerDelegate->pleaseStop();
+}

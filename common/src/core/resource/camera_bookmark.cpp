@@ -565,6 +565,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnCameraBookmark)(QnCameraBookmarkTag),
+    (QnCameraBookmark)(QnCameraBookmarkTag)(QnCameraBookmarkTagWithId),
     (sql_record)(json)(ubjson)(xml)(csv_record)(eq),
     _Fields)
