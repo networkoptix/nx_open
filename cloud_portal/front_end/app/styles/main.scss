@@ -24,9 +24,6 @@ html {
 }
 
 body {
-    /* Margin bottom by footer height */
-    margin-bottom : 200px;
-
     @include media-breakpoint-up(lg) {
         margin-bottom : 80px;
     }
@@ -60,6 +57,11 @@ footer {
     border-top       : 1px solid $common-border-color;
     padding-bottom   : 2px;
     background-color : $body-bg;
+
+    @include media-breakpoint-down(md) {
+        position   : relative;
+        margin-top : 1rem;
+    }
 
     .row {
         margin-left : 0;
