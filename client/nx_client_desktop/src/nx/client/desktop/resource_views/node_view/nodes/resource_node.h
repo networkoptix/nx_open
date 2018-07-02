@@ -15,7 +15,6 @@ public:
     static NodePtr create(const QnResourcePtr& resource, bool checkable = false);
 
     virtual QVariant data(int column, int role) const override;
-    virtual Qt::ItemFlags flags(int column) const override;
 
 protected:
     ResourceNode(const QnResourcePtr& resource, bool checkable);

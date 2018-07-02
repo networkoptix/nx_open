@@ -31,20 +31,9 @@ QVariant ResourceNode::data(int column, int role) const
             return column == NodeViewColumn::Name && m_resource
                 ? qnResIconCache->icon(m_resource)
                 : base_type::data(column, role);
-        case Qt::CheckStateRole:
-            return column == NodeViewColumn::CheckMark && checkable() ? checked() : QVariant();
-
         default:
             return base_type::data(column, role);
     }
-}
-
-Qt::ItemFlags ResourceNode::flags(int column) const
-{
-    const auto baseFlags = base_type::flags(column);
-    return checkable() && column == NodeViewColumn::CheckMark
-        ? baseFlags | Qt::ItemIsUserCheckable
-        : baseFlags;
 }
 
 } // namespace desktop

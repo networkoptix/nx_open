@@ -11,6 +11,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/guarded_callback.h>
 
 namespace {
 
@@ -66,8 +67,10 @@ UserWatcher::UserWatcher(QObject* parent) :
     );
 
     connect(this, &UserWatcher::userNameChanged, this, updateUserResource);
-    connect(this, &UserWatcher::userChanged, this,
-        [this]() { setUserName(user()->getName()); });
+
+    const auto updateUserName =
+        [this](const QnUserResourcePtr& user) { setUserName(user->getName()); };
+    connect(this, &UserWatcher::userChanged, this, guarded(this, updateUserName));
 }
 
 const QnUserResourcePtr& UserWatcher::user() const

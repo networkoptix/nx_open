@@ -7,7 +7,10 @@
 
 #include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_store.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
+
+#include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
 
 namespace nx {
 namespace client {
@@ -21,6 +24,7 @@ struct NodeViewWidget::Private
 
     NodeViewWidget& owner;
     NodeViewModel model;
+    NodeViewStore store;
 };
 
 NodeViewWidget::Private::Private(NodeViewWidget& owner):
@@ -48,10 +52,21 @@ NodeViewWidget::NodeViewWidget(QWidget* parent):
     d(new Private(*this))
 {
     setModel(&d->model);
-
     setProperty(style::Properties::kSideIndentation,
         QVariant::fromValue(QnIndents(0, 1)));
     setIndentation(style::Metrics::kDefaultIconSize);
+
+    connect(&d->store, &NodeViewStore::stateChanged, &d->model,
+        [this]()
+        {
+            d->model.setState(d->store.state());
+        });
+
+    connect(&d->model, &NodeViewModel::checkedChanged, &d->store,
+        [this](const ViewNode::Path& path, Qt::CheckState checkedState)
+        {
+            d->store.setNodeChecked(path, checkedState);
+        });
 }
 
 NodeViewWidget::~NodeViewWidget()
@@ -60,7 +75,7 @@ NodeViewWidget::~NodeViewWidget()
 
 void NodeViewWidget::loadState(const NodeViewState& state)
 {
-    d->model.setState(state);
+    d->store.setState(state);
     d->updateColumns();
 }
 

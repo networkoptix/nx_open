@@ -11,7 +11,9 @@ using namespace nx::client::desktop;
 
 NodePtr nodeFromIndex(const QModelIndex& index)
 {
-    return static_cast<ViewNode*>(index.internalPointer())->sharedFromThis();
+    return index.isValid()
+        ? static_cast<ViewNode*>(index.internalPointer())->sharedFromThis()
+        : NodePtr();
 }
 
 bool firstLevelOrRootNode(const NodePtr& node)
@@ -37,7 +39,6 @@ struct NodeViewModel::Private
     NodeViewState state;
 
     QModelIndex getModelIndex(const NodePtr& node);
-//    void handleDataChanged(const QModelIndex& index, );
 };
 
 NodeViewModel::Private::Private(NodeViewModel* owner):
@@ -122,6 +123,16 @@ bool NodeViewModel::hasChildren(const QModelIndex& parent) const
     return rowCount(parent) > 0;
 }
 
+bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+    const auto node = nodeFromIndex(index);
+    if (!node || role != Qt::CheckStateRole || index.column() != NodeViewColumn::CheckMark)
+        return base_type::setData(index, value, role);
+
+    emit checkedChanged(node->path(), value.value<Qt::CheckState>());
+    return true;
+}
+
 QVariant NodeViewModel::data(const QModelIndex& index, int role) const
 {
     const auto node = nodeFromIndex(index);
@@ -130,11 +141,8 @@ QVariant NodeViewModel::data(const QModelIndex& index, int role) const
 
 Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
 {
-    if (!index.isValid())
-        return base_type::flags(index);
-
     const auto node = nodeFromIndex(index);
-    return node->flags(index.column());
+    return node ? node->flags(index.column()) : base_type::flags(index);
 }
 
 } // namespace desktop

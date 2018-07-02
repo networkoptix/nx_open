@@ -11,6 +11,9 @@ namespace desktop {
 class ViewNode: public QEnableSharedFromThis<ViewNode>
 {
 public:
+    struct PathInternal;
+    using Path = std::shared_ptr<PathInternal>;
+
     static NodePtr create(const NodeList& children = NodeList(), bool checkable = false);
     virtual ~ViewNode();
 
@@ -18,6 +21,9 @@ public:
     const NodeList& children() const;
 
     NodePtr nodeAt(int index) const;
+
+    NodePtr nodeAt(const Path& path);
+    Path path(); //< TODO: think abount const
 
     // TODO: refactor this O(N) complexity
     int indexOf(const NodePtr& node) const;
@@ -29,8 +35,10 @@ public:
     NodePtr parent() const;
 
     bool checkable() const;
-    bool checked() const;
-    void setChecked(bool value);
+    Qt::CheckState checkedState() const;
+    void setCheckedState(Qt::CheckState value);
+
+    void clone() const;
 
 protected:
     ViewNode(bool checkable);
@@ -40,11 +48,11 @@ protected:
     void addNode(const NodePtr& node);
 
 private:
-    WeakNodePtr parentForChildren();
+    WeakNodePtr currentSharedNode();
 
 private:
     const bool m_checkable = false;
-    bool m_checked = false;
+    Qt::CheckState m_checkedState = Qt::Unchecked;
     WeakNodePtr m_parent;
     NodeList m_nodes;
 };

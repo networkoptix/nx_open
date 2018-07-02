@@ -3,6 +3,7 @@
 #include <QtCore/QAbstractItemModel>
 
 #include <nx/utils/scoped_model_operations.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 
 namespace nx {
 namespace client {
@@ -33,8 +34,12 @@ public: // Overrides section
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual bool hasChildren(const QModelIndex& parent = QModelIndex()) const override;
 
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+
+signals:
+    void checkedChanged(const ViewNode::Path& path, Qt::CheckState state);
 
 private:
     struct Private;

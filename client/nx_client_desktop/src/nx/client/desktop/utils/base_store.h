@@ -32,6 +32,7 @@ public:
     BaseStore(QObject* parent = nullptr);
 
     const State& state() const;
+    void setState(const State& state);
 
     using ReduceFunction = std::function<State (State&&)>;
     void execute(ReduceFunction reduce);
@@ -43,11 +44,10 @@ private:
 
 template<typename State>
 BaseStore<State>::BaseStore(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    m_actionInProgress(false)
 {
 }
-
-//template<typename State> const State& state() const;
 
 template<typename State>
 void BaseStore<State>::execute(BaseStore::ReduceFunction reduce)
@@ -64,6 +64,12 @@ template<typename State>
 const State& BaseStore<State>::state() const
 {
     return m_state;
+}
+
+template<typename State>
+void BaseStore<State>::setState(const State& state)
+{
+    execute([state](const State& /* oldState */) { return state; });
 }
 
 } // namespace desktop

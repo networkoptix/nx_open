@@ -25,6 +25,16 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+//NodeViewState::NodeViewState(const NodeViewState& other)
+//{
+
+//}
+
+//NodeViewState& NodeViewState::operator=(const NodeViewState& other)
+//{
+//    return *this;
+//}
+
 bool NodeViewState::checkable() const
 {
     return checkableInternal(rootNode);

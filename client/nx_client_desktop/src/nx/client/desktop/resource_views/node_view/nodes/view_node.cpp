@@ -1,10 +1,18 @@
 #include "view_node.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+struct ViewNode::PathInternal
+{
+    QVector<int> indicies;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 NodePtr ViewNode::create(const NodeList& children, bool checkable)
 {
@@ -26,7 +34,7 @@ ViewNode::~ViewNode()
 
 void ViewNode::addNode(const NodePtr& node)
 {
-    node->setParent(parentForChildren());
+    node->setParent(currentSharedNode());
     m_nodes.append(node);
 }
 
@@ -45,19 +53,43 @@ NodePtr ViewNode::nodeAt(int index) const
     return m_nodes.at(index);
 }
 
+NodePtr ViewNode::nodeAt(const Path& path)
+{
+    auto currentNode = currentSharedNode().toStrongRef();
+    for (const int index: path->indicies)
+        currentNode = currentNode->nodeAt(index);
+    return currentNode;
+}
+
+ViewNode::Path ViewNode::path()
+{
+    const auto parentNode = parent();
+    if (!parentNode)
+        return Path(new PathInternal());
+
+    auto currentPath = parentNode->path();
+    currentPath->indicies.append(parentNode->indexOf(currentSharedNode()));
+    return currentPath;
+}
+
 int ViewNode::indexOf(const NodePtr& node) const
 {
     return m_nodes.indexOf(node);
 }
 
-QVariant ViewNode::data(int /* column */, int /* role */) const
+QVariant ViewNode::data(int column, int role) const
 {
-    return QVariant();
+    return role == Qt::CheckStateRole && column == NodeViewColumn::CheckMark && checkable()
+        ? checkedState()
+        : QVariant();
 }
 
-Qt::ItemFlags ViewNode::flags(int /* column */) const
+Qt::ItemFlags ViewNode::flags(int column) const
 {
-    return Qt::ItemIsEnabled;
+    static constexpr auto baseFlags = Qt::ItemIsEnabled;
+    return checkable() && column == NodeViewColumn::CheckMark
+        ? baseFlags | Qt::ItemIsUserCheckable | Qt::ItemIsEditable
+        : baseFlags;
 }
 
 NodePtr ViewNode::parent() const
@@ -70,14 +102,14 @@ bool ViewNode::checkable() const
     return m_checkable;
 }
 
-bool ViewNode::checked() const
+Qt::CheckState ViewNode::checkedState() const
 {
-    return m_checked;
+    return m_checkedState;
 }
 
-void ViewNode::setChecked(bool value)
+void ViewNode::setCheckedState(Qt::CheckState value)
 {
-    m_checked = value;
+    m_checkedState = value;
 }
 
 void ViewNode::setParent(const WeakNodePtr& value)
@@ -86,7 +118,7 @@ void ViewNode::setParent(const WeakNodePtr& value)
         m_parent = value;
 }
 
-WeakNodePtr ViewNode::parentForChildren()
+WeakNodePtr ViewNode::currentSharedNode()
 {
     const auto result = sharedFromThis();
     NX_EXPECT(result, "No shared pointer exists for current node");
