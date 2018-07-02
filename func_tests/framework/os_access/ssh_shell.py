@@ -2,12 +2,13 @@ import logging
 import select
 import socket
 from abc import ABCMeta
+from contextlib import contextmanager
 
 import paramiko
 
 from framework.method_caching import cached_getter
-from framework.os_access.command import Command
-from framework.os_access.posix_shell import PosixOutcome, PosixShell, _BIG_CHUNK_THRESHOLD_CHARS, _STREAM_BUFFER_SIZE
+from framework.os_access.command import Command, Run
+from framework.os_access.posix_shell import PosixOutcome, PosixShell, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
 _logger = logging.getLogger(__name__)
@@ -34,83 +35,51 @@ class _SSHCommandOutcome(PosixOutcome):
         return self._exit_status
 
 
-class _SSHCommand(Command):
+class _SSHRun(Run):
     __metaclass__ = ABCMeta
 
-    _logger = _logger.getChild('_SSHCommand')
+    def __init__(self, channel):  # type: (paramiko.Channel) -> None
+        super(_SSHRun, self).__init__()
+        self._channel = channel
 
-    def __init__(self, ssh_client, script):
-        super(_SSHCommand, self).__init__()
-        self._ssh_client = ssh_client
-        self._script = script
-        self._channel = None  # type: paramiko.Channel
-        self._open_streams = None  # type: dict
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
-
-    def _receive_output(self, timeout_sec):
-        self._channel.setblocking(False)
-        output_chunks = {}
-        # TODO: Check on Windows. Paramiko uses sockets on Windows as prescribed in Python docs.
-        select.select([self._channel], [], [], timeout_sec)
-        for key, (recv, output_logger) in list(self._open_streams.items()):  # Copy dict items.
-            try:
-                output_chunk = recv(_STREAM_BUFFER_SIZE)
-            except socket.timeout:
-                output_logger.debug("No data but not closed.")
-                output_chunks[key] = b''
-                continue  # Next stream might have data on it.
-            if not output_chunk:
-                output_logger.debug("Closed from the other side.")
-                output_chunks[key] = None
-                del self._open_streams[key]
-                continue
-            output_logger.debug("Received: %d bytes.", len(output_chunk))
-            output_chunks[key] = output_chunk
-            if len(output_chunk) > _BIG_CHUNK_THRESHOLD_CHARS:
-                output_logger.debug("Big chunk: %d bytes", len(output_chunk))
-            else:
-                try:
-                    output_logger.debug("Text:\n%s", output_chunk.decode('ascii'))
-                except UnicodeDecodeError:
-                    output_logger.debug("Binary: %d bytes", len(output_chunk))
-        return output_chunks.get('STDOUT'), output_chunks.get('STDERR')
+    @property
+    def outcome(self):
+        if not self._channel.exit_status_ready():
+            return None
+        return _SSHCommandOutcome(self._channel.exit_status)
 
     def receive(self, timeout_sec):
-        if not self._open_streams:
-            self._channel.status_event.wait(timeout_sec)
-            stdout, stderr = None, None
-        else:
-            stdout, stderr = self._receive_output(timeout_sec)
-        self._logger.debug("Exit status: %r.", self._channel.exit_status)
-        if self._channel.exit_status != -1:
-            assert 0 <= self._channel.exit_status <= 255
-            if self._open_streams:
-                self._logger.error("Remote process exited but streams left open. Child forked?")
-            exit_status = self._channel.exit_status
-        else:
-            exit_status = None
-        if not self._open_streams:
-            self._channel.shutdown_read()  # Other side could be open by forked child.
-        outcome = _SSHCommandOutcome(exit_status) if exit_status is not None else None
-        return outcome, stdout, stderr
+        self._channel.setblocking(False)
+        # TODO: Check on Windows. Paramiko uses sockets on Windows as prescribed in Python docs.
+        # TODO: Wait for exit status too.
+        select.select([self._channel], [], [], timeout_sec)
+        for recv in [self._channel.recv, self._channel.recv_stderr]:
+            try:
+                chunk = recv(_STREAM_BUFFER_SIZE)
+            except socket.timeout:  # Non-blocking: times out immediately if no data.
+                yield b''
+            else:
+                stream_is_closed = len(chunk) == 0  # Exactly as said in its docstring.
+                if stream_is_closed:
+                    yield None
+                else:
+                    yield chunk
 
 
-class _PseudoTerminalSSHCommand(_SSHCommand):
-    def __enter__(self):
-        self._channel = self._ssh_client.invoke_shell()  # type: paramiko.Channel
-        self._logger.debug("Getting banner.")
-        stdout = self._channel.recv(100500)  # Receive banner and prompt.
-        self._logger.debug("Banner:\n%s", stdout.decode())
-        self._logger.debug("Run on %r:\n%s", self, self._script)
-        self._channel.send(self._script)
+class _PseudoTerminalSSHRun(_SSHRun):
+    _logger = _logger.getChild('_PseudoTerminalSSHRun')
+
+    def __init__(self, channel, script):
+        super(_PseudoTerminalSSHRun, self).__init__(channel)
+        self._channel.get_pty()
+        self._channel.invoke_shell()
+        self._logger.debug("Run: %s", script)
+        self._channel.send(script)
         self._channel.send('\n')
         self._open_streams = {
             "STDOUT": (self._channel.recv, self._logger.getChild('stdout')),
             "STDERR": (self._channel.recv_stderr, self._logger.getChild('stderr')),
             }
-        return self
 
     def send(self, input, is_last=False):
         raise NotImplementedError(
@@ -132,17 +101,17 @@ class _PseudoTerminalSSHCommand(_SSHCommand):
         assert bytes_sent == 1
 
 
-class _StraightforwardSSHCommand(_SSHCommand):
-    def __enter__(self):
-        transport = self._ssh_client.get_transport()
-        self._channel = transport.open_session()  # type: paramiko.Channel
-        self._logger.debug("Run on %r:\n%s", self, self._script)
-        self._channel.exec_command(self._script)
+class _StraightforwardSSHRun(_SSHRun):
+    _logger = _logger.getChild('_StraightforwardSSHRun')
+
+    def __init__(self, channel, script):
+        super(_StraightforwardSSHRun, self).__init__(channel)
+        self._logger.debug("Run on %r:\n%s", self, script)
+        self._channel.exec_command(script)
         self._open_streams = {
             "STDOUT": (self._channel.recv, self._logger.getChild('stdout')),
             "STDERR": (self._channel.recv_stderr, self._logger.getChild('stderr')),
             }
-        return self
 
     def send(self, input, is_last=False):
         self._channel.settimeout(10)  # Must never time out assuming process always open stdin and read from it.
@@ -166,6 +135,23 @@ class _StraightforwardSSHCommand(_SSHCommand):
             "use pseudo-terminal, which can send Ctrl+C, but it has its own restrictions")
 
 
+class _SSHCommand(Command):
+    __metaclass__ = ABCMeta
+
+    def __init__(self, ssh_client, script, terminal=False):  # type: (paramiko.SSHClient, str, bool) -> None
+        self._ssh_client = ssh_client
+        self._script = script
+        self._terminal = terminal
+
+    @contextmanager
+    def running(self):
+        with self._ssh_client.get_transport().open_session() as channel:
+            if self._terminal:
+                yield _PseudoTerminalSSHRun(channel, self._script)
+            else:
+                yield _StraightforwardSSHRun(channel, self._script)
+
+
 class SSH(PosixShell):
     def __init__(self, hostname, port, username, key_path):
         self._hostname = hostname
@@ -182,7 +168,7 @@ class SSH(PosixShell):
 
     def terminal_command(self, args, cwd=None, env=None):
         script = sh_augment_script(sh_command_to_script(args), cwd=cwd, env=env, set_eux=False, shebang=False)
-        return _PseudoTerminalSSHCommand(self._client(), script)
+        return _SSHCommand(self._client(), script, terminal=True)
 
     @cached_getter
     def _client(self):
@@ -204,7 +190,7 @@ class SSH(PosixShell):
 
     def sh_script(self, script, cwd=None, env=None):
         augmented_script = sh_augment_script(script, cwd, env)
-        return _StraightforwardSSHCommand(self._client(), augmented_script)
+        return _SSHCommand(self._client(), augmented_script)
 
     def is_working(self):
         try:

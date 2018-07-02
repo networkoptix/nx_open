@@ -8,6 +8,7 @@ _logger = logging.getLogger(__name__)
 class Wait(object):
     def __init__(self, until, timeout_sec=30, attempts_limit=100, log_continue=_logger.debug, log_stop=_logger.error):
         self._until = until
+        assert timeout_sec is not None
         self._timeout_sec = timeout_sec
         self._started_at = timeit.default_timer()
         self._last_checked_at = self._started_at

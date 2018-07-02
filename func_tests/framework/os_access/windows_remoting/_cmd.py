@@ -1,11 +1,12 @@
 import base64
 import logging
+from contextlib import closing
 from pprint import pformat
 
 import xmltodict
 from winrm.exceptions import WinRMTransportError
 
-from framework.os_access.command import Command, CommandOutcome
+from framework.os_access.command import Command, CommandOutcome, Run
 
 _logger = logging.getLogger(__name__)
 
@@ -59,37 +60,24 @@ class _WinRMCommandOutcome(CommandOutcome):
         return "{} ({})".format(name, comment)
 
 
-class _WinRMCommand(Command):
+class _WinRMRun(Run):
     def __init__(self, protocol, shell_id, command, *arguments):
-        super(_WinRMCommand, self).__init__()
+        # Rewrite with bigger MaxEnvelopeSize, currently hardcoded to 150k, while 8M needed.
         self._protocol = protocol
         self._shell_id = shell_id
-        self._command_id = None
-        self._command = command
-        self._arguments = arguments
-        self.is_done = False
-
-    def __enter__(self):
-        # Rewrite with bigger MaxEnvelopeSize, currently hardcoded to 150k, while 8M needed.
-        _logger.getChild('command').debug(' '.join([self._command] + list(self._arguments)))
+        _logger.getChild('command').debug(' '.join([command] + list(arguments)))
         self._command_id = self._protocol.run_command(
             self._shell_id,
-            self._command, self._arguments,
+            command, arguments,
             console_mode_stdin=False,
             skip_cmd_shell=True)
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        try:
-            self._protocol.cleanup_command(self._shell_id, self._command_id)
-        except WinRMTransportError as e:
-            _logger.exception("XML:\n%s", e.response_text)
-            raise
-        self._command_id = None
+        # TODO: Prohibit writes when passing up.
+        self._is_done = False
+        self._outcome = None
 
     def send(self, stdin_bytes, is_last=False):
         # See: https://msdn.microsoft.com/en-us/library/cc251742.aspx.
-        assert not self.is_done
+        assert not self._is_done
         _logger.getChild('stdin.size').debug(len(stdin_bytes))
         if len(stdin_bytes) < 8192:
             _logger.getChild('stdin.data').debug(bytes(stdin_bytes).decode(errors='backslashreplace'))
@@ -117,23 +105,36 @@ class _WinRMCommand(Command):
             _logger.getChild('stdin').debug("Sent:\n%s", stdin_text)
         return sent_bytes
 
+    @property
+    def outcome(self):
+        return self._outcome
+
     def receive(self, timeout_sec):
         # TODO: Support timeouts.
-        assert not self.is_done
-        _logger.getChild('stdout').debug("Receive")
+        if self._is_done:
+            return None, None
+        _logger.getChild('stdout').debug("Receive.")
         # noinspection PyProtectedMember
-        stdout_chunk, stderr_chunk, exit_code, self.is_done = self._protocol._raw_get_command_output(
+        stdout_chunk, stderr_chunk, exit_code, is_done = self._protocol._raw_get_command_output(
             self._shell_id, self._command_id)
+        assert isinstance(stdout_chunk, bytes)
+        assert isinstance(stderr_chunk, bytes)
+        assert isinstance(exit_code, int)
+        assert isinstance(is_done, bool)
+        if is_done:
+            self._is_done = True
+        else:
+            assert not self._is_done
         _logger.getChild('stdout.size').debug(len(stdout_chunk))
         if len(stdout_chunk) < 8192:
             _logger.getChild('stdout.data').debug(stdout_chunk.decode(errors='backslashreplace'))
         _logger.getChild('stderr.data').debug(stderr_chunk.decode(errors='backslashreplace'))
-        if self.is_done:
-            assert isinstance(exit_code, int)
-            return _WinRMCommandOutcome(exit_code), stdout_chunk, stderr_chunk
+        if self._is_done:  # TODO: What if process is done but streams are not closed? Is that possible?
+            assert 0 <= exit_code <= 0xFFFFFFFF
+            self._outcome = _WinRMCommandOutcome(exit_code)
         else:
             assert exit_code == -1
-            return None, stdout_chunk, stderr_chunk
+        return stdout_chunk, stderr_chunk
 
     def _send_signal(self, signal):
         # See: https://msdn.microsoft.com/en-us/library/cc251743.aspx.
@@ -155,6 +156,23 @@ class _WinRMCommand(Command):
 
     def terminate(self):
         self._send_signal('ctrl_c')
+
+    def close(self):
+        try:
+            self._protocol.cleanup_command(self._shell_id, self._command_id)
+        except WinRMTransportError as e:
+            _logger.exception("XML:\n%s", e.response_text)
+
+
+class _WinRMCommand(Command):
+    def __init__(self, protocol, shell_id, command, *arguments):
+        self._protocol = protocol
+        self._shell_id = shell_id
+        self._command = command
+        self._arguments = arguments
+
+    def running(self):
+        return closing(_WinRMRun(self._protocol, self._shell_id, self._command, *self._arguments))
 
 
 def receive_stdout_and_stderr_until_done(self):

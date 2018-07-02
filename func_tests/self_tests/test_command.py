@@ -1,8 +1,10 @@
+import binascii
+import os
 import time
 
 import pytest
 
-from framework.os_access.command import Command
+from framework.os_access.command import Run
 from framework.os_access.local_shell import local_shell
 
 pytest_plugins = ['fixtures.ad_hoc_ssh']
@@ -25,27 +27,35 @@ def command(request):
 
 @pytest.mark.parametrize('command', ['local', 'ssh_terminal', 'windows'], indirect=True)
 def test_terminate(command):
-    with command as command:  # type: Command
+    with command.running() as run:  # type: Run
         time.sleep(1)  # Allow command to warm up. Matters on Windows.
-        command.terminate()
-        outcome, stdout, stderr = command.communicate(timeout_sec=5)
-        assert outcome.is_intended_termination
+        run.terminate()
+        stdout, stderr = run.communicate(timeout_sec=5)
+        assert run.outcome.is_intended_termination
         # TODO: Pseudo-terminal echoes commands, and that's OK. Is there a way to leave command output only?
         # assert not stdout
 
 
 @pytest.mark.parametrize('command', ['local', 'ssh', 'windows'], indirect=True)
 def test_interaction(command):
-    with command:
-        command.send(b'qwe\n')
+    with command.running() as run:
+        run.send(b'qwe\n')
         # TODO: Make `expect` method which expects bytes on stdout to avoid dumb waits.
         time.sleep(.1)  # Let command to receive and send data back.
-        outcome, stdout, _ = command.receive(10)
-        assert outcome is None
+        stdout, _ = run.receive(10)
+        assert run.outcome is None
         assert stdout.rstrip(b'\r\n') == b'qwe'
-        command.send(b'asd\n', is_last=True)
+        run.send(b'asd\n', is_last=True)
         time.sleep(.1)  # Let command to receive and send data back.
-        outcome, stdout, _ = command.receive(10)
-        assert outcome is not None
-        assert outcome.is_success
+        stdout, _ = run.receive(10)
+        assert run.outcome is not None
+        assert run.outcome.is_success
         assert stdout.rstrip(b'\r\n') == b'asd'
+
+
+@pytest.mark.parametrize('command', ['local', 'ssh', 'windows'], indirect=True)
+def test_much_data_and_exit(command):
+    data = binascii.hexlify(os.urandom(10000))
+    with command.running() as run:
+        stdout, stderr = run.communicate(input=data, timeout_sec=5000)
+    assert stdout.rstrip(b'\r\n') == data
