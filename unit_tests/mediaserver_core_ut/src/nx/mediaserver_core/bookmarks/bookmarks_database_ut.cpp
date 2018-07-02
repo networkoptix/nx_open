@@ -17,6 +17,9 @@ namespace mediaserver_core {
 namespace bookmarks {
 namespace test {
 
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
 class BookmarksDatabaseTest: public ::testing::Test
 {
 public:
@@ -48,8 +51,8 @@ TEST_F(BookmarksDatabaseTest, DISABLED_speedTest)
     cameras << QnUuid("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
 
     QnCameraBookmarkSearchFilter filter;
-    filter.endTimeMs = QDateTime::currentMSecsSinceEpoch();
-    filter.startTimeMs = filter.endTimeMs - 1000 * 3600 * 24LL * 1;
+    filter.endTimeMs = milliseconds(QDateTime::currentMSecsSinceEpoch());
+    filter.startTimeMs = filter.endTimeMs - 24h;
     nx::utils::ElapsedTimer timer;
     timer.restart();
     QnCameraBookmarkList result;
@@ -65,14 +68,14 @@ TEST_F(BookmarksDatabaseTest, selectTest)
     QnUuid cameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
     QnUuid cameraId2("6FD1F239-CEBC-81BF-C2D4-59789E2CEF05");
 
-    const auto endTimeMs = QDateTime::currentMSecsSinceEpoch();
-    const auto periodMs = 1000 * 3600 * 24LL * 30;
+    const auto endTimeMs = milliseconds(QDateTime::currentMSecsSinceEpoch());
+    const auto periodMs = 24h * 30;
     const auto startTimeMs = endTimeMs - periodMs;
 
     QnCameraBookmark bookmark;
     bookmark.cameraId = cameraId1;
     bookmark.startTimeMs = startTimeMs + periodMs / 2;
-    bookmark.durationMs = 100;
+    bookmark.durationMs = 100ms;
     bookmark.name = "bookmarkMid";
     bookmark.guid = QnUuid::createUuid();
     bookmark.tags << "tag1" << "tag2";
@@ -84,7 +87,7 @@ TEST_F(BookmarksDatabaseTest, selectTest)
     bookmark.guid = QnUuid::createUuid();
     qnServerDb->addBookmark(bookmark);
 
-    bookmark.startTimeMs = endTimeMs + 1;
+    bookmark.startTimeMs = endTimeMs + 1ms;
     bookmark.name = "bookmarRight";
     bookmark.guid = QnUuid::createUuid();
     qnServerDb->addBookmark(bookmark);
