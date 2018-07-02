@@ -3,7 +3,11 @@
 
 #include <type_traits>
 
+#include <QtCore/QFlags>
+
 #include <nx/fusion/fusion/fusion.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical_enum.h>
 
 namespace QnDebugSerialization {
 
