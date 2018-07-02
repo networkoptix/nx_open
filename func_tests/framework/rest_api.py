@@ -7,7 +7,6 @@ which automatically translated to
 But for POST method keyword parameters are translated to json request body.
 """
 import base64
-import csv
 import hashlib
 import json
 import logging
@@ -112,17 +111,12 @@ class RestApi(object):
             ca_cert=self.ca_cert)
 
     def auth_key(self, method):
+        # `requests.auth.HTTPDigestAuth.build_digest_header` does the same but it substitutes empty path with '/'.
+        # No straightforward way of getting key has been found.
+        # This method is used only for specific tests, so there is no need to save one HTTP request.
         path = ''
-        header = self._auth.build_digest_header(method, path)
-        if header is None:  # First time requested.
-            response = self.get('api/getNonce')
-            realm, nonce = response['realm'], response['nonce']
-        else:
-            key, value = header.split(' ', 1)
-            assert key.lower() == 'digest'
-            info = dict(csv.reader(value.split(', '), delimiter='=', doublequote=False))
-            realm, nonce = info['realm'], info['nonce']
-        # requests.auth.HTTPDigestAuth.build_digest_header does the same but it substitutes empty path with '/'.
+        response = self.get('api/getNonce')
+        realm, nonce = response['realm'], response['nonce']
         ha1 = hashlib.md5(':'.join([self.user.lower(), realm, self.password]).encode()).hexdigest()
         ha2 = hashlib.md5(':'.join([method, path]).encode()).hexdigest()  # Empty path.
         digest = hashlib.md5(':'.join([ha1, nonce, ha2]).encode()).hexdigest()
