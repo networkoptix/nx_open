@@ -3,27 +3,6 @@
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
 
-.dropdown {
-    @media (max-width : $collapse-second-width) {
-        position : inherit;
-
-        .dropdown-menu {
-            right : 0 !important;
-        }
-    }
-}
-
-.dropdown-menu {
-    & li {
-        & > a {
-            &:hover {
-                background-color : $light5;
-                color            : $dark9;
-            }
-        }
-    }
-}
-
 .popup {
     &.arrow {
         left: 17px;

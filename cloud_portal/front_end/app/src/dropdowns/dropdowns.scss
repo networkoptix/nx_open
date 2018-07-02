@@ -1,3 +1,13 @@
+.dropdown {
+    @media (max-width : $collapse-second-width) {
+        position : inherit;
+
+        .dropdown-menu {
+            right : 0 !important;
+        }
+    }
+}
+
 .dropdown-toggle {
     padding-right: 32px !important;
 
@@ -17,6 +27,11 @@
     & li > a {
         @media (max-width : $collapse-second-width) {
             line-height : 2rem;
+        }
+
+        &:hover {
+            background-color : $light5;
+            color            : $dark9;
         }
     }
 }
