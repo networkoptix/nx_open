@@ -192,6 +192,10 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
             SWS_BICUBIC, NULL, NULL, NULL);
     }
 
+    // ffmpeg can return null context
+    if (!scaleContext)
+        return nullptr;
+
     AVFrame* dstFrame = av_frame_alloc();
     int numBytes = avpicture_get_size(dstAvFormat, srcFrame->linesize[0], srcFrame->height);
     if (numBytes <= 0)
