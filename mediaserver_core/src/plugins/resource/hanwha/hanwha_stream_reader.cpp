@@ -77,9 +77,7 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
     }
 
-    if (m_hanwhaResource->isNvr())
-        m_rtpReader.setTimePolicy(TimePolicy::forceCameraTime);
-    else if (role == Qn::ConnectionRole::CR_Archive)
+    if (role == Qn::ConnectionRole::CR_Archive)
         m_rtpReader.setTimePolicy(TimePolicy::onvifExtension);
     else
         m_rtpReader.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
