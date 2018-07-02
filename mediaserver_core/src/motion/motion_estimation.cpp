@@ -8,6 +8,8 @@
 #include <QtGui/QColor>
 #include <QtCore/QDebug>
 
+#include <nx/network/socket_common.h>
+
 #include <utils/media/sse_helper.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
