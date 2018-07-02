@@ -22,6 +22,7 @@ static const int kHanwhaAbsoluteMoveCoefficient = 10000;
 } // namespace
 
 using namespace nx::core;
+namespace core_ptz = nx::core::ptz;
 
 HanwhaPtzController::HanwhaPtzController(const HanwhaResourcePtr& resource):
     QnBasicPtzController(resource),
@@ -39,7 +40,7 @@ Ptz::Capabilities HanwhaPtzController::getCapabilities(const nx::core::ptz::Opti
     return itr->second;
 }
 
-void HanwhaPtzController::setPtzCapabilities(const CapabilitiesMap& capabilities)
+void HanwhaPtzController::setPtzCapabilities(const HanwhaPtzCapabilitiesMap& capabilities)
 {
     m_ptzCapabilities = capabilities;
 }
@@ -55,9 +56,17 @@ void HanwhaPtzController::setPtzTraits(const QnPtzAuxilaryTraitList& traits)
     m_ptzTraits = traits;
 }
 
-void HanwhaPtzController::setConfigurationalPtzRanges(const RangeMap& ranges)
+void HanwhaPtzController::setPtzRanges(const HanwhaPtzRangeMap& ranges)
 {
-    m_commandStreamer = std::make_unique<HanwhaPtzCommandStreamer>(m_hanwhaResource, ranges);
+    m_ptzRanges = ranges;
+
+    const auto configurationalRangesItr = ranges.find(core_ptz::Type::configurational);
+    if (configurationalRangesItr != ranges.cend())
+    {
+        m_commandStreamer = std::make_unique<HanwhaPtzCommandStreamer>(
+            m_hanwhaResource,
+            configurationalRangesItr->second);
+    }
 }
 
 bool HanwhaPtzController::continuousMove(
@@ -160,6 +169,34 @@ bool HanwhaPtzController::absoluteMove(
         });
 
     return response.isSuccessful();
+}
+
+bool HanwhaPtzController::relativeMove(
+    const nx::core::ptz::Vector& relativeMovementVector,
+    const nx::core::ptz::Options& options)
+{
+    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
+    const auto hanwhaRelativeMovement = toHanwhaRelativeMovement(relativeMovementVector);
+    if (hanwhaRelativeMovement == std::nullopt)
+        return false;
+
+    const auto response = helper.control(
+        "ptzcontrol/relative",
+        {
+            {kHanwhaChannelProperty, channel()},
+            {kHanwhaPanProperty, QString::number(hanwhaRelativeMovement->pan, 'f', 2)},
+            {kHanwhaTiltProperty, QString::number(hanwhaRelativeMovement->tilt, 'f', 2)},
+            {kHanwhaZoomProperty, QString::number(hanwhaRelativeMovement->zoom, 'f', 2)}
+        });
+
+    return response.isSuccessful();
+}
+
+bool HanwhaPtzController::relativeFocus(
+    qreal relativeMovement,
+    const nx::core::ptz::Options& options)
+{
+    return false;
 }
 
 bool HanwhaPtzController::viewportMove(
@@ -359,6 +396,22 @@ QString HanwhaPtzController::channel() const
     return QString::number(m_hanwhaResource->getChannel());
 }
 
+std::optional<HanwhaRange> HanwhaPtzController::range(
+    nx::core::ptz::Type ptzType,
+    const HanwhaPtzParameterName& parameterName) const
+{
+    const auto typeItr = m_ptzRanges.find(ptzType);
+    if (typeItr == m_ptzRanges.cend())
+        return std::nullopt;
+
+    const auto& ranges = typeItr->second;
+    const auto rangeItr = ranges.find(parameterName);
+    if (rangeItr != ranges.cend())
+        return rangeItr->second;
+
+    return std::nullopt;
+}
+
 nx::core::ptz::Vector HanwhaPtzController::toHanwhaSpeed(
     const nx::core::ptz::Vector& speed) const
 {
@@ -396,6 +449,59 @@ nx::core::ptz::Vector HanwhaPtzController::toHanwhaPosition(
     const nx::core::ptz::Vector& position) const
 {
     return position; //< TODO: #dmishin implement
+}
+
+std::optional<nx::core::ptz::Vector> HanwhaPtzController::toHanwhaRelativeMovement(
+    const nx::core::ptz::Vector& relativeMovement) const
+{
+    core_ptz::Vector result;
+    auto convert =
+        [this](const HanwhaPtzParameterName& parameterName, double parameterValue)
+            -> std::optional<double>
+        {
+            const auto parameterRange = range(core_ptz::Type::operational, parameterName);
+            if (parameterRange == std::nullopt)
+                return std::nullopt;
+
+            const auto value = parameterRange->mapValue(parameterValue);
+            if (value == std::nullopt)
+                return std::nullopt;
+
+            bool success = false;
+            const auto numericValue = value->toDouble(&success);
+            if (success)
+                return numericValue;
+
+            return std::nullopt;
+        };
+
+    struct ParameterToConvert
+    {
+        double* converted;
+        const double& valueToConvert;
+        const QString parameterName;
+    };
+
+    static const QString kRelativePrefix("Relative.%1");
+    const std::vector<ParameterToConvert> parametersToConvert = {
+        {&result.pan, relativeMovement.pan, kRelativePrefix.arg(kHanwhaPanProperty)},
+        {&result.tilt, relativeMovement.tilt, kRelativePrefix.arg(kHanwhaTiltProperty)},
+        {&result.zoom, relativeMovement.zoom, kRelativePrefix.arg(kHanwhaZoomProperty)}
+    };
+
+    for (auto parameter: parametersToConvert)
+    {
+        if (qFuzzyIsNull(parameter.valueToConvert))
+            continue;
+
+        const auto convertedValue = convert(parameter.parameterName, parameter.valueToConvert);
+        if (convertedValue == std::nullopt)
+            return std::nullopt;
+
+        *parameter.converted = *convertedValue;
+    }
+
+    return result;
 }
 
 QString HanwhaPtzController::toHanwhaFocusCommand(qreal speed) const

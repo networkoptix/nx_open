@@ -55,6 +55,7 @@ bool ContinuousMoveSequenceExecutor::executeSequenceInternal(bool isContinuation
                 {
                     QnMutexLocker lock(&m_mutex);
                     m_controller->continuousMove(kStopCommand, ptz::Options());
+                    m_isCommandRunning = false;
                     m_wait.wakeAll();
                 }));
         return true;
