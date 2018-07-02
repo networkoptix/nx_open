@@ -461,6 +461,7 @@ void QnFileStorageResource::removeOldDirs()
         switch (result)
         {
             case nx::SystemCommands::UnmountCode::ok:
+            case nx::SystemCommands::UnmountCode::notMounted:
                 if (!qnServerModule->rootTool()->removePath(entry.absoluteFilePath()))
                 {
                     NX_ERROR(typeid(QnFileStorageResource),
