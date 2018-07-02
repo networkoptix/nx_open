@@ -93,7 +93,7 @@ def node_dir(request, work_dir):
 @pytest.fixture()
 def artifacts_dir(node_dir, artifact_factory):
     dir = node_dir / 'artifacts'
-    dir.mkdir()
+    dir.mkdir(exist_ok=True)
     yield dir
     for entry in dir.glob('*'):
         if not entry.suffix:
