@@ -159,7 +159,7 @@ qint64 getDiskFreeSpace(const QString& root)
         if (!newRoot.isEmpty())
             return getDiskFreeSpace(newRoot); // try parent folder
     }
-    return totalNumberOfFreeBytes;
+    return freeBytesAvailableToCaller;
 };
 
 qint64 getDiskTotalSpace(const QString& root)
