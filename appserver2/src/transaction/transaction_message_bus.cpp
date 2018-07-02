@@ -163,7 +163,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
 #ifdef _DEBUG
     if (m_alivePeers.isEmpty())
     {
-        QnTranState runtimeState;
+        api::TranState runtimeState;
         QList<QnTransaction<api::RuntimeData>> result;
         m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
         const bool validPeerId = result.size() == 1 && result[0].peerID == commonModule()->moduleGUID();
