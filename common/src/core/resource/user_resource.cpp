@@ -95,13 +95,13 @@ Qn::UserRole QnUserResource::userRole() const
 
     switch (permissions)
     {
-        case GlobalPermission::advancedViewerPermissions:
+        case (int) GlobalPermission::advancedViewerPermissions:
             return Qn::UserRole::advancedViewer;
 
-        case GlobalPermission::viewerPermissions:
+        case (int) GlobalPermission::viewerPermissions:
             return Qn::UserRole::viewer;
 
-        case GlobalPermission::liveViewerPermissions:
+        case (int) GlobalPermission::liveViewerPermissions:
             return Qn::UserRole::liveViewer;
 
         default:
