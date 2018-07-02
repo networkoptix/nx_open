@@ -147,6 +147,7 @@ edge_firmware/isd/*.tar.gz
 **/Makefile
 
 cloud_portal/tmp
+cloud_portal/front_end/package-lock.json
 cloud_portal/front_end/node_modules
 cloud_portal/front_end/app/images/promo
 cloud_portal/front_end/app/images/favicon.ico
