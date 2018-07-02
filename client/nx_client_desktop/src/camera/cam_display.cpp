@@ -433,6 +433,13 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
 
 }
 
+bool QnCamDisplay::useRealTimeHurryUp() const
+{
+    auto camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
+    return m_isRealTimeSource
+        || (camera && camera->getCameraCapabilities().testFlag(Qn::DeviceBasedSync));
+}
+
 bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 {
     // simple data provider/streamer/streamreader has the same delay, but who cares ?
@@ -491,15 +498,18 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
     }
 
-    if (m_isRealTimeSource && vd && !isPrebuffering)
+    if (useRealTimeHurryUp() && vd && !isPrebuffering)
     {
         qint64 queueLen = m_lastQueuedVideoTime - m_lastVideoPacketTime;
         //qDebug() << "queueLen" << queueLen/1000 << "ms";
 
         if (queueLen == 0)
         {
-            if (m_liveMaxLenReached)
-                m_liveBufferSize = qMin(maximumLiveBufferMkSecs(), m_liveBufferSize * 1.2); // increase buffer
+		    // This function is used for LIVE mode and archive playback with external synchronization
+            // like Hanwha NVR. Don't increase buffer for archive mode to make item synchronization more
+            /// precise.
+            if (m_liveMaxLenReached && vd->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
+                m_liveBufferSize = qMin(maximumLiveBufferMkSecs(), m_liveBufferSize * 1.2);
             m_liveMaxLenReached = false;
             //qDebug() << "zerro queueLen. set queue to=" << m_liveBufferSize;
             m_delay.afterdelay();
@@ -1100,8 +1110,12 @@ void QnCamDisplay::processNewSpeed(float speed)
 
 bool QnCamDisplay::useSync(QnConstAbstractMediaDataPtr md)
 {
-    //return m_extTimeSrc && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_BOF)) && !m_singleShotMode;
-    return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(md->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_PlayUnsync));
+    auto camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
+    return
+        m_extTimeSrc
+        && m_extTimeSrc->isEnabled()
+        && !(md->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_PlayUnsync))
+        && !(camera && camera->getCameraCapabilities().testFlag(Qn::DeviceBasedSync));
 }
 
 void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)

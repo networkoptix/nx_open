@@ -46,7 +46,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         isDefaultPasswordCapability         = 0x400, //< Camera has default password now.
         isOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
         isPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
-        isSyncPlay                          = 0x4000, //< For NVR if channels are depend on each other and can play synchronously only.
+        DeviceBasedSync                     = 0x4000, //< For NVR if channels are depend on each other and can play synchronously only.
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)

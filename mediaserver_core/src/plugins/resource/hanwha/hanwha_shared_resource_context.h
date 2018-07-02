@@ -93,6 +93,17 @@ private:
 
 using ClientId = QnUuid;
 
+struct SeekPosition
+{
+    static const qint64 kInvalidPosition = std::numeric_limits<qint64>::min();
+
+    SeekPosition(qint64 value = kInvalidPosition);
+    bool canJoinPosition(const SeekPosition& position) const;
+
+    nx::utils::ElapsedTimer timer;
+    qint64 position = kInvalidPosition;
+};
+
 struct SessionContext
 {
     SessionContext(const QString& sessionId, const QnUuid& clientId):
@@ -102,6 +113,7 @@ struct SessionContext
 
     QString sessionId;
     ClientId clientId;
+    SeekPosition lastSeekPos;
 };
 
 using SessionContextPtr = QSharedPointer<SessionContext>;

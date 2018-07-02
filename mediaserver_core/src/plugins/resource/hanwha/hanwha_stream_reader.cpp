@@ -266,7 +266,15 @@ void HanwhaStreamReader::setPositionUsec(qint64 value)
 {
     m_lastTimestampUsec = value;
     m_timeSinceLastFrame.invalidate();
+
+    static QnMutex sessionMutex;
+    QnMutexLocker lock(&sessionMutex);
+    SeekPosition newPosition(value);
+    if (m_sessionContext && m_sessionContext->lastSeekPos.canJoinPosition(newPosition))
+        return;
     m_rtpReader.setPositionUsec(value);
+    if (m_sessionContext)
+        m_sessionContext->lastSeekPos = newPosition;
 }
 
 void HanwhaStreamReader::setRateControlEnabled(bool enabled)

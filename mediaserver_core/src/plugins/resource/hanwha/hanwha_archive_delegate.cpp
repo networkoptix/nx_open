@@ -245,6 +245,8 @@ void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
     m_playbackMode = mode;
     m_isSeekAlignedByChunkBorder = false; //< I expect this variable is not required any more since we can sends empty frames before first video packet.
     auto& rtspClient = m_streamReader->rtspClient();
+    rtspClient.setAdditionAttribute("Require", "onvif-replay");
+    rtspClient.setAdditionAttribute("Immediate", "yes");
     switch (mode)
     {
         case PlaybackMode::ThumbNails:

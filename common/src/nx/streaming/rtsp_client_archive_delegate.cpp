@@ -909,8 +909,12 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
-    if (m_camera && m_camera->isGroupPlayOnly())
-        return; // avoid close/open for VMAX
+    if (m_camera
+        && (m_camera->isGroupPlayOnly()
+            || m_camera->getCameraCapabilities().testFlag(Qn::DeviceBasedSync)))
+    {
+        return; // avoid close/open for NVR
+    }
 
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
     bool longNoData = ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10;
