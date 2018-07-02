@@ -15,9 +15,9 @@
 #include <nx_ec/dummy_handler.h>
 #include <nx/utils/argument_parser.h>
 #include <core/resource/media_server_resource.h>
-#include <ini.h>
 
 #include <atomic>
+
 
 namespace nx {
 namespace p2p {
@@ -371,8 +371,6 @@ public:
 
 TEST_F(P2pOrphanCamerasEraseTest, a_server_looks_for_orphan_cameras_and_erases_them)
 {
-    const_cast<bool&>(ec2::ini().isP2pMode) = true;
-
     givenThreeSyncronizedServersAndTwoCamerasOnServer0();
 
     whenDisconnectServer2();

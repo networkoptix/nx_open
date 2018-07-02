@@ -1071,10 +1071,12 @@ bool QnServerDb::getBookmarks(
 
     if (filter.isValid())
     {
-        if (filter.endTimeMs < milliseconds(INT64_MAX))
-            addFilter("start_time <= :maxEndTimeMs", filter.endTimeMs.count());
-        if (filter.startTimeMs > 0ms)
-            addFilter("start_time + duration >= :minStartTimeMs", filter.startTimeMs.count());
+        const qint64 startTimeMs = filter.startTimeMs.count();
+        const qint64 endTimeMs = filter.endTimeMs.count();
+        if (endTimeMs < INT64_MAX)
+            addFilter("start_time <= :maxEndTimeMs", endTimeMs);
+        if (startTimeMs > 0)
+            addFilter("start_time + duration >= :minStartTimeMs", startTimeMs);
     }
     if (!filter.text.isEmpty())
     {
