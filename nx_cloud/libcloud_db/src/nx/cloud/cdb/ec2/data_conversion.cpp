@@ -21,13 +21,13 @@ api::SystemAccessRole permissionsToAccessRole(GlobalPermissions permissions)
 {
     switch (permissions)
     {
-        case GlobalPermission::liveViewerPermissions:
+        case (int) GlobalPermission::liveViewerPermissions:
             return api::SystemAccessRole::liveViewer;
-        case GlobalPermission::viewerPermissions:
+        case (int) GlobalPermission::viewerPermissions:
             return api::SystemAccessRole::viewer;
-        case GlobalPermission::advancedViewerPermissions:
+        case (int) GlobalPermission::advancedViewerPermissions:
             return api::SystemAccessRole::advancedViewer;
-        case GlobalPermission::adminPermissions:
+        case (int) GlobalPermission::adminPermissions:
             return api::SystemAccessRole::cloudAdmin;
         default:
             return api::SystemAccessRole::custom;
