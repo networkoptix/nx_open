@@ -23,7 +23,7 @@ class MoveLock(object):
         self._timeout_sec = timeout_sec
 
     def __repr__(self):
-        return '<{} on {}>'.format(self.__class__.__name__, self._ssh)
+        return '<MoveLock {!r}>'.format(self._path)
 
     def __enter__(self):
         # Implemented as single bash script to speedup locking.

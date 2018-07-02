@@ -54,6 +54,9 @@ class SSHPath(FileSystemPath, PurePosixPath):
     def tmp(cls):
         return cls('/tmp/func_tests')
 
+    def __repr__(self):
+        return '<SSHPath {!s} on {!r}>'.format(self, self._ssh)
+
     def exists(self):
         try:
             self._ssh.run_command(['test', '-e', self])
