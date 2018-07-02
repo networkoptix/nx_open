@@ -20,6 +20,34 @@ using namespace nx::core;
 static const int DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
 static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
+namespace {
+
+static const int kDefaultPanRange = 360;
+static const int kDefaultTiltRange = 180;
+static const int kDefaultZoomRange = 9999;
+static const int kDefaultFocusRange = 9999;
+
+int range(double minValue, double maxValue, int defaultValue)
+{
+    if (qFuzzyEquals(minValue, maxValue) || maxValue < minValue)
+        return defaultValue;
+
+    return maxValue - minValue;
+}
+
+ptz::Vector toAxisRelativeMovement(const ptz::Vector& movementVector, const QnPtzLimits& limits)
+{
+    ptz::Vector result;
+    result.pan = movementVector.pan * range(limits.minPan, limits.maxPan, kDefaultPanRange);
+    result.tilt = movementVector.tilt * range(limits.minTilt, limits.maxTilt, kDefaultTiltRange);
+    result.zoom = movementVector.zoom * range(limits.minFov, limits.maxFov, kDefaultZoomRange);
+    result.focus = movementVector.focus * range(limits.minFocus, limits.maxFocus, kDefaultFocusRange);
+
+    return result;
+}
+
+} // namespace
+
 // TODO: #Elric #EC2 use QnIniSection
 
 // -------------------------------------------------------------------------- //
@@ -138,14 +166,41 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap& params)
     if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsoluteZoom").arg(channel), false))
         m_capabilities |= Ptz::AbsoluteZoomCapability;
 
-    if(!params.value<bool>(lit("root.PTZ.Various.V%1.PanEnabled").arg(channel), true))
-        m_capabilities &= ~(Ptz::ContinuousPanCapability | Ptz::AbsolutePanCapability);
+    if (params.value<bool>(lit("root.PTZ.Support.S%1.RelativePan").arg(channel), false))
+        m_capabilities |= Ptz::RelativePanCapability;
 
-    if(!params.value<bool>(lit("root.PTZ.Various.V%1.TiltEnabled").arg(channel), true))
-        m_capabilities &= ~(Ptz::ContinuousTiltCapability | Ptz::AbsoluteTiltCapability);
+    if (params.value<bool>(lit("root.PTZ.Support.S%1.RelativeTilt").arg(channel), false))
+        m_capabilities |= Ptz::RelativeTiltCapability;
 
-    if(!params.value<bool>(lit("root.PTZ.Various.V%1.ZoomEnabled").arg(channel), true))
-        m_capabilities &= ~(Ptz::ContinuousZoomCapability | Ptz::AbsoluteZoomCapability);
+    if (params.value<bool>(lit("root.PTZ.Support.S%1.RelativeZoom").arg(channel), false))
+        m_capabilities |= Ptz::RelativeZoomCapability;
+
+    if (params.value<bool>(lit("root.PTZ.Support.S%1.RelativeFocus").arg(channel), false))
+        m_capabilities |= Ptz::RelativeFocusCapability;
+
+    if (!params.value<bool>(lit("root.PTZ.Various.V%1.PanEnabled").arg(channel), true))
+    {
+        m_capabilities &= ~(Ptz::ContinuousPanCapability
+            | Ptz::AbsolutePanCapability
+            | Ptz::RelativePanCapability);
+    }
+
+    if (!params.value<bool>(lit("root.PTZ.Various.V%1.TiltEnabled").arg(channel), true))
+    {
+        m_capabilities &= ~(Ptz::ContinuousTiltCapability
+            | Ptz::AbsoluteTiltCapability
+            | Ptz::RelativeTiltCapability);
+    }
+
+    if (!params.value<bool>(lit("root.PTZ.Various.V%1.ZoomEnabled").arg(channel), true))
+    {
+        m_capabilities &= ~(Ptz::ContinuousZoomCapability
+            | Ptz::AbsoluteZoomCapability
+            | Ptz::RelativeZoomCapability);
+    }
+
+    if (!params.value<bool>(QString("root.PTZ.Various.V%1.FocusEnabled").arg(channel), true))
+        m_capabilities &= ~Ptz::RelativeFocusCapability;
 
     /* Note that during continuous move axis takes care of image rotation automagically. */
     qreal rotation = params.value(lit("root.Image.I0.Appearance.Rotation"), 0.0); // TODO: #Elric I0? Not I%1?
@@ -165,6 +220,7 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap& params)
         limits.minTilt <= limits.maxTilt &&
         limits.minFov <= limits.maxFov
     ) {
+        m_rawLimits = limits;
         /* These are in 1/10th of a degree, so we convert them away. */
         limits.minFov /= 10.0;
         limits.maxFov /= 10.0;
@@ -182,6 +238,21 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap& params)
         m_cameraTo35mmEquivZoom = m_35mmEquivToCameraZoom.inversed();
     } else {
         m_capabilities &= ~Ptz::AbsolutePtzCapabilities;
+        m_capabilities &= ~Ptz::RelativePanTiltCapabilities;
+    }
+
+    if (params.value(QString("root.PTZ.Limit.L%1.MinZoom").arg(channel), &m_rawLimits.minFov)
+        && params.value(QString("root.PTZ.Limit.L%1.MaxZoom").arg(channel), &m_rawLimits.maxFov))
+    {
+        m_capabilities &= ~Ptz::RelativeZoomCapability;
+        m_rawLimits.minFov = 0;
+        m_rawLimits.maxFov = 0;
+    }
+
+    if (params.value(QString("root.PTZ.Limit.L%1.MinFocus").arg(channel), &m_rawLimits.minFocus)
+        && params.value(QString("root.PTZ.Limit.L%1.MaxFocus").arg(channel), &m_rawLimits.maxFocus))
+    {
+        m_capabilities &= ~Ptz::RelativeFocusCapability;
     }
 
     QByteArray body;
@@ -381,6 +452,54 @@ bool QnAxisPtzController::absoluteMove(
             position.tilt,
             m_35mmEquivToCameraZoom(qDegreesTo35mmEquiv(position.zoom)),
             speed * 100));
+}
+
+bool QnAxisPtzController::relativeMove(
+    const nx::core::ptz::Vector& relativeMovementVector,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Relative movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(m_resource->getName(), m_resource->getId()));
+
+        return false;
+    }
+
+    const auto axisRelativeMovementVector = toAxisRelativeMovement(
+        relativeMovementVector,
+        m_rawLimits);
+
+    return query(lm("com/ptz.cgi?rpan=%1&rtilt=%2&rzoom=%3")
+        .args(
+            axisRelativeMovementVector.pan,
+            axisRelativeMovementVector.tilt,
+            axisRelativeMovementVector.zoom));
+}
+
+bool QnAxisPtzController::relativeFocus(
+    qreal relativeFocusMovement,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Relative focus - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+            .args(m_resource->getName(), m_resource->getId()));
+
+        return false;
+    }
+
+    ptz::Vector axisVector;
+    axisVector.focus = relativeFocusMovement;
+    axisVector = toAxisRelativeMovement(axisVector, m_rawLimits);
+
+    return query(lm("com/ptz.cgi?rfocus=%1").args(axisVector.focus));
 }
 
 bool QnAxisPtzController::getPosition(

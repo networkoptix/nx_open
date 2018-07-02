@@ -429,6 +429,7 @@ public:
     int doGetNode(_onvifPtz__GetNode& request, _onvifPtz__GetNodeResponse& response);
     int doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);
     int doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response);
+    int doRelativeMove(RelativeMoveReq& request, RelativeMoveResp& response);
     int gotoPreset(GotoPresetReq& request, GotoPresetResp& response);
     int setPreset(SetPresetReq& request, SetPresetResp& response);
     int getPresets(GetPresetsReq& request, GetPresetsResp& response);

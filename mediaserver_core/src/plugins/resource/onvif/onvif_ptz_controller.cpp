@@ -12,6 +12,8 @@
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/assert.h>
 #include <common/static_common_module.h>
 
 #include "soap_wrapper.h"
@@ -47,6 +49,28 @@ static const Namespace kOverridenNamespaces[] = {
     },
     {nullptr, nullptr, nullptr, nullptr}
 };
+
+std::unique_ptr<PtzSoapWrapper> makePtzSoapWrapper(
+    const QnPlOnvifResourcePtr& resource,
+    const char* floatFormat,
+    const char* doubleFormat)
+{
+    const auto ptzUrl = resource->getPtzUrl();
+    if (ptzUrl.isEmpty())
+        return nullptr;
+
+    const auto auth = resource->getAuth();
+    auto ptz = std::make_unique<PtzSoapWrapper>(
+        ptzUrl.toStdString(),
+        auth.user(),
+        auth.password(),
+        resource->getTimeDrift());
+
+    ptz->getProxy()->soap->float_format = floatFormat;
+    ptz->getProxy()->soap->double_format = doubleFormat;
+
+    return ptz;
+}
 
 } // namespace
 
@@ -151,14 +175,18 @@ Ptz::Capabilities QnOnvifPtzController::initMove() {
     // TODO: #PTZ #Elric we can init caps by examining spaces in response!
 
     Ptz::Capabilities configCapabilities;
-    if(response.PTZConfiguration[0]->DefaultContinuousPanTiltVelocitySpace)
+    if (response.PTZConfiguration[0]->DefaultContinuousPanTiltVelocitySpace)
         configCapabilities |= Ptz::ContinuousPanCapability | Ptz::ContinuousTiltCapability;
-    if(response.PTZConfiguration[0]->DefaultContinuousZoomVelocitySpace)
+    if (response.PTZConfiguration[0]->DefaultContinuousZoomVelocitySpace)
         configCapabilities |= Ptz::ContinuousZoomCapability;
-    if(response.PTZConfiguration[0]->DefaultAbsolutePantTiltPositionSpace)
+    if (response.PTZConfiguration[0]->DefaultAbsolutePantTiltPositionSpace)
         configCapabilities |= Ptz::AbsolutePanCapability | Ptz::AbsoluteTiltCapability;
-    if(response.PTZConfiguration[0]->DefaultAbsoluteZoomPositionSpace)
+    if (response.PTZConfiguration[0]->DefaultAbsoluteZoomPositionSpace)
         configCapabilities |= Ptz::AbsoluteZoomCapability;
+    if (response.PTZConfiguration[0]->DefaultRelativePanTiltTranslationSpace)
+        configCapabilities |= Ptz::RelativePanTiltCapabilities;
+    if (response.PTZConfiguration[0]->DefaultRelativeZoomTranslationSpace)
+        configCapabilities |= Ptz::RelativeZoomCapability;
 
     _onvifPtz__GetNode nodeRequest;
     _onvifPtz__GetNodeResponse nodeResponse;
@@ -208,6 +236,19 @@ Ptz::Capabilities QnOnvifPtzController::initMove() {
             m_limits.maxFov = spaces->AbsoluteZoomPositionSpace[0]->XRange->Max;
             nodeCapabilities |= Ptz::AbsoluteZoomCapability;
         }
+    }
+
+    if (!spaces->RelativePanTiltTranslationSpace.empty()
+        && spaces->RelativePanTiltTranslationSpace[0])
+    {
+        if (spaces->RelativePanTiltTranslationSpace[0]->XRange)
+            nodeCapabilities |= Ptz::RelativePanTiltCapabilities;
+    }
+
+    if (!spaces->RelativeZoomTranslationSpace.empty() && spaces->RelativeZoomTranslationSpace[0])
+    {
+        if (spaces->RelativeZoomTranslationSpace[0]->XRange)
+            nodeCapabilities |= Ptz::RelativeZoomCapability;
     }
 
     Ptz::Capabilities result = configCapabilities & nodeCapabilities;
@@ -512,6 +553,46 @@ bool QnOnvifPtzController::absoluteMove(
         qnWarning("Execution of PTZ absolute move command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
 
     return result;
+}
+
+bool QnOnvifPtzController::relativeMove(
+    const nx::core::ptz::Vector& relativeMovementVector,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(this, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        return false;
+    }
+
+    auto wrapper = makePtzSoapWrapper(m_resource, m_floatFormat, m_doubleFormat);
+
+    onvifXsd__Vector2D panTilt;
+    panTilt.x = relativeMovementVector.pan;
+    panTilt.y = relativeMovementVector.tilt;
+
+    onvifXsd__Vector1D zoom;
+    zoom.x = relativeMovementVector.zoom;
+
+    onvifXsd__PTZVector translation;
+    translation.PanTilt = &panTilt;
+    translation.Zoom = &zoom;
+
+    RelativeMoveReq request;
+    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.Speed = nullptr; //< Always use the default speed.
+    request.Translation = &translation;
+
+    RelativeMoveResp response;
+    if (!wrapper->doRelativeMove(request, response))
+    {
+        NX_ERROR(this, lm("Failed to perform relative movement. Resource %1 (%2), error: %3")
+            .args(m_resource->getName(), m_resource->getId(), wrapper->getLastError()));
+
+        return false;
+    }
+
+    return true;
 }
 
 bool QnOnvifPtzController::getPosition(

@@ -656,7 +656,7 @@ int MediaSoapWrapper::addAudioOutputConfiguration(AddAudioOutputConfigurationReq
 }
 
 int MediaSoapWrapper::addAudioDecoderConfiguration(
-    AddAudioDecoderConfigurationReq& request, 
+    AddAudioDecoderConfigurationReq& request,
     AddAudioDecoderConfigurationResp& response)
 {
     beforeMethodInvocation();
@@ -865,6 +865,12 @@ int PtzSoapWrapper::doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& r
 {
     beforeMethodInvocation();
     return m_soapProxy->AbsoluteMove(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::doRelativeMove(RelativeMoveReq& request, RelativeMoveResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->RelativeMove(m_endpoint, NULL, &request, &response);
 }
 
 int PtzSoapWrapper::gotoPreset(GotoPresetReq& request, GotoPresetResp& response)
