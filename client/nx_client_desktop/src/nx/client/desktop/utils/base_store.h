@@ -19,11 +19,12 @@ public:
 
 signals:
     void stateChanged();
+    void patchApplied();
 };
 
 } // namespace details
 
-template<typename State>
+template<typename State, typename Patch>
 class BaseStore: public details::StoreDetail
 {
     using base_type = details::StoreDetail;
@@ -37,20 +38,25 @@ public:
     using ReduceFunction = std::function<State (State&&)>;
     void execute(ReduceFunction reduce);
 
+    using ApplyPatchFunction = std::function<State (State&&)>;
+    void applyPatch(const Patch& patch);
+    const Patch& lastPatch() const;
+
 private:
     State m_state;
+    Patch m_lastPatch;
     bool m_actionInProgress;
 };
 
-template<typename State>
-BaseStore<State>::BaseStore(QObject* parent):
+template<typename State, typename Patch>
+BaseStore<State, Patch>::BaseStore(QObject* parent):
     base_type(parent),
     m_actionInProgress(false)
 {
 }
 
-template<typename State>
-void BaseStore<State>::execute(BaseStore::ReduceFunction reduce)
+template<typename State, typename Patch>
+void BaseStore<State, Patch>::execute(BaseStore::ReduceFunction reduce)
 {
     if (!reduce || m_actionInProgress)
         return;
@@ -60,14 +66,32 @@ void BaseStore<State>::execute(BaseStore::ReduceFunction reduce)
     emit stateChanged();
 }
 
-template<typename State>
-const State& BaseStore<State>::state() const
+template<typename State, typename Patch>
+void BaseStore<State, Patch>::applyPatch(const Patch& patch)
+{
+    if (m_actionInProgress)
+        return;
+
+    const QScopedValueRollback<bool> guard(m_actionInProgress, true);
+    m_state = patch.apply(std::move(m_state));
+    m_lastPatch = patch;
+    emit patchApplied();
+}
+
+template<typename State, typename Patch>
+const Patch& BaseStore<State, Patch>::lastPatch() const
+{
+    return m_lastPatch;
+}
+
+template<typename State, typename Patch>
+const State& BaseStore<State, Patch>::state() const
 {
     return m_state;
 }
 
-template<typename State>
-void BaseStore<State>::setState(const State& state)
+template<typename State, typename Patch>
+void BaseStore<State, Patch>::setState(const State& state)
 {
     execute([state](const State& /* oldState */) { return state; });
 }

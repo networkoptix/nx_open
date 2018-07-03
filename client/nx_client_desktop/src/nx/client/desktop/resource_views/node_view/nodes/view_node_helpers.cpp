@@ -27,8 +27,8 @@ ViewNode::Data getNodeData(
     Qt::CheckState checkedState = Qt::Unchecked)
 {
     ViewNode::Data nodeData;
-    nodeData.checkable = checkable;
-    nodeData.checkedState = checkedState;
+    if (checkable)
+        nodeData.data[ViewNode::CheckMarkColumn][Qt::CheckStateRole] = checkedState;
 
     nodeData.data[ViewNode::NameColumn][Qt::DisplayRole] = resource->getName();
     nodeData.data[ViewNode::NameColumn][Qt::DecorationRole] = qnResIconCache->icon(resource);

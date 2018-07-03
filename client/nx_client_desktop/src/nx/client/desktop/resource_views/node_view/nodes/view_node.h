@@ -9,6 +9,8 @@ namespace desktop {
 
 class ViewNode: public QEnableSharedFromThis<ViewNode>
 {
+    struct PathInternal;
+
 public:
     enum Column
     {
@@ -27,14 +29,11 @@ public:
         using RoleValueHash = QHash<Role, QVariant>;
         using ColumnDataHash = QHash<Column, RoleValueHash>;
 
-        bool checkable = false;
-        Qt::CheckState checkedState = Qt::Unchecked;
         ColumnFlagHash flags;
         ColumnDataHash data;
     };
 
 public:
-    struct PathInternal;
     using Path = std::shared_ptr<PathInternal>;
 
     static NodePtr create(const Data& data);
@@ -60,10 +59,11 @@ public:
     NodePtr parent() const;
 
     bool checkable() const;
-    Qt::CheckState checkedState() const;
 
     const Data& nodeData() const;
     void setNodeData(const Data& data);
+
+    void applyData(const Data::ColumnDataHash& data);
 
 private:
     ViewNode(const Data& data);
@@ -75,6 +75,9 @@ private:
     const QScopedPointer<Private> d;
 };
 
+uint qHash(const nx::client::desktop::ViewNode::Path& path);
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
+

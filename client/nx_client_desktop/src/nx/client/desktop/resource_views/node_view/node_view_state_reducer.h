@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_state.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
 
 namespace nx {
 namespace client {
@@ -10,8 +10,7 @@ namespace desktop {
 class NodeViewStateReducer
 {
 public:
-    static NodeViewState setNodeChecked(
-        const NodeViewState& state,
+    static NodeViewStatePatch setNodeChecked(
         const ViewNode::Path& path,
         Qt::CheckState checkedState);
 

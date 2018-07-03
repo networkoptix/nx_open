@@ -61,6 +61,12 @@ NodeViewWidget::NodeViewWidget(QWidget* parent):
             d->model.setState(d->store.state());
         });
 
+    connect(&d->store, &NodeViewStore::patchApplied, &d->model,
+        [this]()
+        {
+            d->model.applyPatch(d->store.lastPatch());
+        });
+
     connect(&d->model, &NodeViewModel::checkedChanged, &d->store,
         [this](const ViewNode::Path& path, Qt::CheckState checkedState)
         {

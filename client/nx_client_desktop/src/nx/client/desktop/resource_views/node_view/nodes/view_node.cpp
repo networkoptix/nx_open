@@ -131,12 +131,16 @@ NodePtr ViewNode::parent() const
 
 bool ViewNode::checkable() const
 {
-    return d->nodeData.checkable;
-}
+    const auto it = d->nodeData.data.find(ViewNode::CheckMarkColumn);
+    if (it == d->nodeData.data.end())
+        return false;
 
-Qt::CheckState ViewNode::checkedState() const
-{
-    return d->nodeData.checkedState;
+    const auto& roleData = it.value();
+    const auto checkedStateIt = roleData.find(Qt::CheckStateRole);
+    if (checkedStateIt == roleData.end())
+        return false;
+
+    return !checkedStateIt.value().isNull();
 }
 
 const ViewNode::Data& ViewNode::nodeData() const
@@ -148,9 +152,20 @@ void ViewNode::setNodeData(const Data& data)
 {
     d->nodeData = data;
     d->nodeData.flags[CheckMarkColumn] = getFlags(checkable());
-    d->nodeData.data[CheckMarkColumn][Qt::CheckStateRole] = checkable()
-        ? d->nodeData.checkedState
-        : QVariant();
+}
+
+void ViewNode::applyData(const Data::ColumnDataHash& data)
+{
+    for (auto it = data.begin(); it != data.end(); ++it)
+    {
+        const int column = it.key();
+        const auto& roleData = it.value();
+        for (auto itRoleData = roleData.begin(); itRoleData != roleData.end(); ++itRoleData)
+        {
+            const int role = itRoleData.key();
+            d->nodeData.data[column][role] = itRoleData.value();
+        }
+    }
 }
 
 WeakNodePtr ViewNode::currentSharedNode()
@@ -160,6 +175,12 @@ WeakNodePtr ViewNode::currentSharedNode()
     return result.toWeakRef();
 }
 
+uint qHash(const nx::client::desktop::ViewNode::Path& path)
+{
+    return qHash(path->indicies);
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx
+

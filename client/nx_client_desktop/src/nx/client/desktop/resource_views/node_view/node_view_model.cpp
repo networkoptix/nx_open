@@ -1,6 +1,7 @@
 #include "node_view_model.h"
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 
 namespace {
@@ -36,7 +37,7 @@ struct NodeViewModel::Private
     NodeViewModel* const owner;
     NodeViewState state;
 
-    QModelIndex getModelIndex(const NodePtr& node);
+    QModelIndex getModelIndex(const NodePtr& node, int column = ViewNode::NameColumn);
 };
 
 NodeViewModel::Private::Private(NodeViewModel* owner):
@@ -44,7 +45,7 @@ NodeViewModel::Private::Private(NodeViewModel* owner):
 {
 }
 
-QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node)
+QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int column)
 {
     const auto parentNode = node->parent();
     if (!parentNode) //< It is invisible root node.
@@ -54,7 +55,7 @@ QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node)
         ? getModelIndex(parentNode)
         : QModelIndex(); //< It is top-level node
 
-    return owner->index(parentNode->indexOf(node), 0, parentIndex);
+    return owner->index(parentNode->indexOf(node), column, parentIndex);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -77,6 +78,28 @@ void NodeViewModel::setState(const NodeViewState& state)
 {
     ScopedReset reset(this);
     d->state = state;
+}
+
+void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
+{
+    // TODO: #future uses: add handling of tree structure changes
+    d->state = patch.apply(std::move(d->state));
+    for (auto it = patch.changedData.begin(); it != patch.changedData.end(); ++it)
+    {
+        const auto& path = it.key();
+        const auto& data = it.value();
+        const auto node = d->state.rootNode->nodeAt(path);
+        if (!node)
+            continue;
+
+        for (auto itColumnData = data.begin(); itColumnData != data.end(); ++itColumnData)
+        {
+            const int column = itColumnData.key();
+            const auto nodeIndex = d->getModelIndex(node, column);
+            const auto roles = itColumnData.value().keys();
+            emit dataChanged(nodeIndex, nodeIndex, roles.toVector());
+        }
+    }
 }
 
 QModelIndex NodeViewModel::index(

@@ -8,11 +8,7 @@ namespace desktop {
 
 void NodeViewStore::setNodeChecked(const ViewNode::Path& path, Qt::CheckState checkedState)
 {
-    execute(
-        [path, checkedState](const NodeViewState& state)
-        {
-            return NodeViewStateReducer::setNodeChecked(state, path, checkedState);
-        });
+    applyPatch(NodeViewStateReducer::setNodeChecked(path, checkedState));
 }
 
 } // namespace desktop

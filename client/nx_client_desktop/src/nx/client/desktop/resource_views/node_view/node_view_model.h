@@ -10,6 +10,7 @@ namespace client {
 namespace desktop {
 
 class NodeViewState;
+class NodeViewStatePatch;
 
 class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
 {
@@ -22,6 +23,7 @@ public:
 
     const NodeViewState& state() const;
     void setState(const NodeViewState& state);
+    void applyPatch(const NodeViewStatePatch& patch);
 
 public: // Overrides section
     virtual QModelIndex index(

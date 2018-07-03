@@ -13,6 +13,6 @@ struct NodeViewState
     bool checkable() const;
 };
 
-}// namespace desktop
+} // namespace desktop
 } // namespace client
 } // namespace nx

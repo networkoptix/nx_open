@@ -5,17 +5,13 @@ namespace client {
 namespace desktop {
 
 
-NodeViewState NodeViewStateReducer::setNodeChecked(
-    const NodeViewState& state,
+NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     const ViewNode::Path& path,
     Qt::CheckState checkedState)
 {
-    NodeViewState copy(state);
-    const auto node = copy.rootNode->nodeAt(path);
-    auto data = node->nodeData();
-    data.checkedState = checkedState;
-    node->setNodeData(data);
-    return copy;
+    NodeViewStatePatch patch;
+    patch.changedData[path][ViewNode::CheckMarkColumn][Qt::CheckStateRole] = checkedState;
+    return patch;
 }
 
 } // namespace desktop
