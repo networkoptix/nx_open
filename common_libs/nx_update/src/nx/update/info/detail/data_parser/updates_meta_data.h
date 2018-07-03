@@ -26,6 +26,7 @@ struct CustomizationData
 {
     QString name;
     QString updatePrefix;
+    QString releaseNotesUrl;
     QList<nx::utils::SoftwareVersion> versions;
 };
 

@@ -62,7 +62,7 @@ protected:
         request.currentNxVersion = nx::utils::SoftwareVersion("3.1.0");
         request.osVersion = osVersion;
 
-        ASSERT_EQ(ResultCode::ok, m_registry.latestUpdate(request, nullptr));
+        ASSERT_EQ(ResultCode::ok, m_registry.latestUpdate(request, nullptr, nullptr));
 
         auto referencePeers = additionalPeers;
         std::sort(

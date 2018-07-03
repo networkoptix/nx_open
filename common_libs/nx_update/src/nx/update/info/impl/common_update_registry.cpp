@@ -42,8 +42,10 @@ public:
         {
             NX_INFO(this, lm("No update package found for %1")
                 .args(m_updateRequestData.toString()));
+            return;
         }
 
+        m_releaseNotesUrl = m_customizationData.releaseNotesUrl;
     }
 
     virtual ~UpdateDataFinder() = default;
@@ -54,12 +56,14 @@ public:
     }
 
     QList<api::TargetVersionWithEula> versions() const { return m_versions; }
+    QString releaseNotesUrl() const { return m_releaseNotesUrl; }
 
 protected:
     const UpdateRequestData& m_updateRequestData;
     const detail::CustomizationVersionToUpdate& m_customizationVersionToUpdate;
     const CustomizationData& m_customizationData;
     mutable QList<api::TargetVersionWithEula> m_versions;
+    mutable QString m_releaseNotesUrl;
 
     bool hasNewerVersions(const nx::utils::SoftwareVersion& currentNxVersion) const
     {
@@ -915,7 +919,8 @@ bool CommonUpdateRegistry::equals(AbstractUpdateRegistry* other) const
 
 ResultCode CommonUpdateRegistry::latestUpdate(
     const UpdateRequestData& updateRequestData,
-    QList<api::TargetVersionWithEula> *outSoftwareVersion) const
+    QList<api::TargetVersionWithEula> *outSoftwareVersion,
+    QString *outReleaseNotesUrl) const
 {
     for (const auto& md: m_manualData)
     {
@@ -944,7 +949,11 @@ ResultCode CommonUpdateRegistry::latestUpdate(
         return ResultCode::noData;
     }
 
-    *outSoftwareVersion = updateDataFinder.versions();
+    if (outSoftwareVersion)
+        *outSoftwareVersion = updateDataFinder.versions();
+    if (outReleaseNotesUrl)
+        *outReleaseNotesUrl = updateDataFinder.releaseNotesUrl();
+
     return ResultCode::ok;
 }
 

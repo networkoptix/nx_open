@@ -135,6 +135,8 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
         case api::Updates2StatusData::StatusCode::checking:
         {
             QList<api::TargetVersionWithEula> targetVersions;
+            QString releaseNotesUrl;
+
             if (!m_updateRegistry)
             {
                 setStatus(
@@ -145,7 +147,8 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
 
             if (m_updateRegistry->latestUpdate(
                     detail::UpdateRequestDataFactory::create(isClient(), /* targetVersion */ nullptr),
-                    &targetVersions) != update::info::ResultCode::ok)
+                    &targetVersions,
+                    &releaseNotesUrl) != update::info::ResultCode::ok)
             {
                 setStatus(
                     api::Updates2StatusData::StatusCode::notAvailable,
@@ -181,7 +184,8 @@ void Updates2ManagerBase::refreshStatusAfterCheck()
             setStatus(
                 api::Updates2StatusData::StatusCode::available,
                 "Update is available",
-                targetVersions);
+                targetVersions,
+                releaseNotesUrl);
             break;
         }
         default:
@@ -324,6 +328,7 @@ void Updates2ManagerBase::setStatus(
     api::Updates2StatusData::StatusCode code,
     const QString& message,
     const QList<api::TargetVersionWithEula> targets,
+    const QString& releaseNotesUrl,
     double progress)
 {
     detail::Updates2StatusDataEx newStatusData(
@@ -332,6 +337,7 @@ void Updates2ManagerBase::setStatus(
         code,
         message,
         targets,
+        releaseNotesUrl,
         progress);
 
     writeStatusToFile(newStatusData);
@@ -339,6 +345,7 @@ void Updates2ManagerBase::setStatus(
     m_currentStatus.lastRefreshTime = newStatusData.lastRefreshTime;
     m_currentStatus.message = newStatusData.message;
     m_currentStatus.targets = targets;
+    m_currentStatus.releaseNotesUrl = releaseNotesUrl;
     m_currentStatus.progress = newStatusData.progress;
     m_currentStatus.serverId = newStatusData.serverId;
     m_currentStatus.state = newStatusData.state;
@@ -521,7 +528,9 @@ void Updates2ManagerBase::onFileInformationChanged(const FileInformation& fileIn
     {
         setStatus(
             api::Updates2StatusData::StatusCode::downloading,
-            lit("Downloading update file: %1").arg(fileInformation.name), QList<api::TargetVersionWithEula>(),
+            lit("Downloading update file: %1").arg(fileInformation.name),
+            QList<api::TargetVersionWithEula>(),
+            QString(),
             (double) fileInformation.downloadedChunks.count(true) / fileInformation.downloadedChunks.size());
     }
 }

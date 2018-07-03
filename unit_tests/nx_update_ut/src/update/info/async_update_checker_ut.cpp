@@ -117,68 +117,88 @@ private:
     void assertUpdateDataContent() const
     {
         QList<api::TargetVersionWithEula> softwareVersions;
+        QString releaseNotesUrl;
+
         ResultCode resultCode = m_updateRegistry->latestUpdate(
             UpdateRequestData(
                 "nxvms.com", "default", SoftwareVersion(2, 0, 0, 0), ubuntuX64(), nullptr, false),
-            &softwareVersions);
+            &softwareVersions,
+            &releaseNotesUrl);
         assertLatestUpdateResult(
             resultCode,
             SoftwareVersion("3.1.0.16975"),
             softwareVersions,
+            "http://www.networkoptix.com/all-nx-witness-release-notes",
+            releaseNotesUrl,
             false);
 
         resultCode = m_updateRegistry->latestUpdate(
             UpdateRequestData(
                 "nxvms.com", "default", SoftwareVersion(4, 0, 0, 0),
                 ubuntuX64(), nullptr, false),
-            &softwareVersions);
+            &softwareVersions,
+            &releaseNotesUrl);
         assertLatestUpdateResult(
             resultCode,
             SoftwareVersion("3.1.0.16975"),
             softwareVersions,
+            "http://www.networkoptix.com/all-nx-witness-release-notes",
+            releaseNotesUrl,
             true);
 
         resultCode = m_updateRegistry->latestUpdate(
             UpdateRequestData(
                 "nxvms.com", "default", SoftwareVersion(3, 2, 0, 0), ubuntuX64(), nullptr, false),
-            &softwareVersions);
+            &softwareVersions,
+            &releaseNotesUrl);
         assertLatestUpdateResult(
             resultCode,
             SoftwareVersion("3.1.0.16975"),
             softwareVersions,
+            "http://www.networkoptix.com/all-nx-witness-release-notes",
+            releaseNotesUrl,
             true);
 
         resultCode = m_updateRegistry->latestUpdate(
             UpdateRequestData(
                 "invalid.host.com", "default", SoftwareVersion(2, 1, 0, 0),
                 ubuntuX64(), nullptr, false),
-            &softwareVersions);
+            &softwareVersions,
+            &releaseNotesUrl);
         assertLatestUpdateResult(
             resultCode,
             SoftwareVersion("3.1.0.16975"),
             softwareVersions,
+            "http://www.networkoptix.com/all-nx-witness-release-notes",
+            releaseNotesUrl,
             true);
 
         resultCode = m_updateRegistry->latestUpdate(
             UpdateRequestData(
                 "qcloud.vista-cctv.com", "vista", SoftwareVersion(2, 1, 0, 0),
                 ubuntuX64(), nullptr, false),
-            &softwareVersions);
+            &softwareVersions,
+            &releaseNotesUrl);
         assertLatestUpdateResult(
             resultCode,
             SoftwareVersion("3.1.0.16975"),
             softwareVersions,
+            "http://updates.vista-cctv.com/release_notes_vista.html",
+            releaseNotesUrl,
             false);
 
         resultCode = m_updateRegistry->latestUpdate(
             UpdateRequestData(
                 "tricom.cloud-demo.hdw.mx", "tricom", SoftwareVersion(2, 1, 0, 0),
                 ubuntuX64(), nullptr, false),
-            &softwareVersions);
+            &softwareVersions,
+            &releaseNotesUrl);
         assertLatestUpdateResult(
             resultCode,
             SoftwareVersion("3.0.0.14532"),
             softwareVersions,
+            "http://www.networkoptix.com/all-nx-witness-release-notes",
+            releaseNotesUrl,
             false);
     }
 
@@ -186,6 +206,8 @@ private:
         const ResultCode resultCode,
         const SoftwareVersion& expectedVersion,
         const QList<api::TargetVersionWithEula>& actualVersions,
+        const QString& expectedReleaseNotesUrl,
+        const QString& actualReleaseNotesUrl,
         const bool shouldFail) const
     {
         if (shouldFail)
@@ -194,13 +216,16 @@ private:
             return;
         }
 
+        ASSERT_EQ(expectedReleaseNotesUrl, actualReleaseNotesUrl);
         ASSERT_EQ(ResultCode::ok, resultCode);
         ASSERT_TRUE(std::any_of(
             actualVersions.begin(),
             actualVersions.end(),
             [&expectedVersion](const api::TargetVersionWithEula& v)
             {
-                return v.targetVersion == expectedVersion;
+                return v.targetVersion == expectedVersion
+                    && v.eulaVersion == 2
+                    && v.eulaLink == "http://new.eula.com/eulaText";
             }));
     }
 
