@@ -3,6 +3,9 @@
 
 #include "digital_watchdog_resource.h"
 
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/assert.h>
+
 using namespace nx::core;
 
 namespace {
@@ -56,7 +59,12 @@ bool QnDwPtzController::continuousMove(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Continuous movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
         return false;
     }
 
@@ -76,7 +84,12 @@ bool QnDwPtzController::getFlip(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Getting flip - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
         return false;
     }
 

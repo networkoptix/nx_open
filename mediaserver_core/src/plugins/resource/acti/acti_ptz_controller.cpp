@@ -4,6 +4,9 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/assert.h>
+
 #include "acti_resource.h"
 
 using namespace nx::core;
@@ -386,7 +389,12 @@ bool QnActiPtzController::continuousMove(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Continuous movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(d->resource->getName(), d->resource->getId()));
+
         return false;
     }
 
@@ -401,7 +409,12 @@ bool QnActiPtzController::absoluteMove(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Absolute movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(d->resource->getName(), d->resource->getId()));
+
         return false;
     }
 
@@ -424,7 +437,12 @@ bool QnActiPtzController::getPosition(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Getting current position - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(d->resource->getName(), d->resource->getId()));
+
         return false;
     }
 
@@ -449,7 +467,12 @@ bool QnActiPtzController::getFlip(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Getting flip - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(d->resource->getName(), d->resource->getId()));
+
         return false;
     }
 
