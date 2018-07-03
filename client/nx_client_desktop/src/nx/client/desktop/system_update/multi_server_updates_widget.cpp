@@ -44,8 +44,6 @@
 
 #include <ui/models/resource/resource_list_model.h>
 
-#include "download_tool.h"
-
 #include <update/low_free_space_warning.h>
 
 #include <utils/applauncher_utils.h>
@@ -858,8 +856,8 @@ bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
                 messageBox->setText(tr("Failed to download update packages"));
 
                 QString text;
-                text += htmpParagraph(tr("Please make sure there is enough free storage space and network connection is stable."));
-                text += htmpParagraph(tr("If the problem persists, please contact Customer Support."));
+                text += htmlParagraph(tr("Please make sure there is enough free storage space and network connection is stable."));
+                text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
                 messageBox->setInformativeText(text);
 
                 auto tryAgain = messageBox->addButton(tr("Try again"),
@@ -893,8 +891,8 @@ bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
                 messageBox->setText(tr("Failed to download update packages to some servers"));
 
                 QString text;
-                text += htmpParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
-                text += htmpParagraph(tr("If the problem persists, please contact Customer Support."));
+                text += htmlParagraph(tr("Please make sure they have enough free storage space and stable network connection."));
+                text += htmlParagraph(tr("If the problem persists, please contact Customer Support."));
                 messageBox->setInformativeText(text);
 
                 auto tryAgain = messageBox->addButton(tr("Try again"),
