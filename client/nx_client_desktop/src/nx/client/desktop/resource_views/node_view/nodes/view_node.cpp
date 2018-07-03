@@ -1,7 +1,18 @@
 #include "view_node.h"
 
 #include <nx/utils/log/log.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
+
+namespace {
+
+Qt::ItemFlags getFlags(bool checkable)
+{
+    static constexpr Qt::ItemFlags baseFlags = Qt::ItemIsEnabled;
+    return checkable
+        ? baseFlags | Qt::ItemIsUserCheckable | Qt::ItemIsEditable
+        : baseFlags;
+}
+
+} // namespace
 
 namespace nx {
 namespace client {
@@ -14,43 +25,59 @@ struct ViewNode::PathInternal
 
 //-------------------------------------------------------------------------------------------------
 
-NodePtr ViewNode::create(const NodeList& children, bool checkable)
+struct ViewNode::Private
 {
-    const NodePtr result(new ViewNode(checkable));
-    for (const auto& child: children)
-        result->addNode(child);
+    ViewNode::Data nodeData;
+    WeakNodePtr parent;
+    NodeList nodes;
+};
 
+//-------------------------------------------------------------------------------------------------
+
+NodePtr ViewNode::create(const Data& data)
+{
+    return NodePtr(new ViewNode(data));
+}
+
+NodePtr ViewNode::create(const NodeList& children)
+{
+    return create(Data(), children);
+}
+
+NodePtr ViewNode::create(const Data& data, const NodeList& children)
+{
+    const auto result = create(data);
+    for (const auto& child: children)
+    {
+        child->d->parent = result;
+        result->d->nodes.append(child);
+    }
     return result;
 }
 
-ViewNode::ViewNode(bool checkable):
-    m_checkable(checkable)
+ViewNode::ViewNode(const Data& data):
+    d(new Private())
 {
+    setNodeData(data);
 }
 
 ViewNode::~ViewNode()
 {
 }
 
-void ViewNode::addNode(const NodePtr& node)
-{
-    node->setParent(currentSharedNode());
-    m_nodes.append(node);
-}
-
 int ViewNode::childrenCount() const
 {
-    return m_nodes.size();
+    return d->nodes.size();
 }
 
 const NodeList& ViewNode::children() const
 {
-    return m_nodes;
+    return d->nodes;
 }
 
 NodePtr ViewNode::nodeAt(int index) const
 {
-    return m_nodes.at(index);
+    return d->nodes.at(index);
 }
 
 NodePtr ViewNode::nodeAt(const Path& path)
@@ -74,48 +101,56 @@ ViewNode::Path ViewNode::path()
 
 int ViewNode::indexOf(const NodePtr& node) const
 {
-    return m_nodes.indexOf(node);
+    return d->nodes.indexOf(node);
 }
 
 QVariant ViewNode::data(int column, int role) const
 {
-    return role == Qt::CheckStateRole && column == NodeViewColumn::CheckMark && checkable()
-        ? checkedState()
-        : QVariant();
+    const auto columnIt = d->nodeData.data.find(column);
+    if (columnIt == d->nodeData.data.end())
+        return QVariant();
+
+    const auto& columnData = columnIt.value();
+    const auto dataIt = columnData.find(role);
+    if (dataIt == columnData.end())
+        return QVariant();
+
+    return dataIt.value();
 }
 
 Qt::ItemFlags ViewNode::flags(int column) const
 {
-    static constexpr auto baseFlags = Qt::ItemIsEnabled;
-    return checkable() && column == NodeViewColumn::CheckMark
-        ? baseFlags | Qt::ItemIsUserCheckable | Qt::ItemIsEditable
-        : baseFlags;
+    const auto flagIt = d->nodeData.flags.find(column);
+    return flagIt == d->nodeData.flags.end() ? Qt::ItemIsEnabled : flagIt.value();
 }
 
 NodePtr ViewNode::parent() const
 {
-    return m_parent ? m_parent.lock() : NodePtr();
+    return d->parent ? d->parent.lock() : NodePtr();
 }
 
 bool ViewNode::checkable() const
 {
-    return m_checkable;
+    return d->nodeData.checkable;
 }
 
 Qt::CheckState ViewNode::checkedState() const
 {
-    return m_checkedState;
+    return d->nodeData.checkedState;
 }
 
-void ViewNode::setCheckedState(Qt::CheckState value)
+const ViewNode::Data& ViewNode::nodeData() const
 {
-    m_checkedState = value;
+    return d->nodeData;
 }
 
-void ViewNode::setParent(const WeakNodePtr& value)
+void ViewNode::setNodeData(const Data& data)
 {
-    if (m_parent != value)
-        m_parent = value;
+    d->nodeData = data;
+    d->nodeData.flags[CheckMarkColumn] = getFlags(checkable());
+    d->nodeData.data[CheckMarkColumn][Qt::CheckStateRole] = checkable()
+        ? d->nodeData.checkedState
+        : QVariant();
 }
 
 WeakNodePtr ViewNode::currentSharedNode()

@@ -7,15 +7,41 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-// TODO: Add description about addNode and cosntructor
 class ViewNode: public QEnableSharedFromThis<ViewNode>
 {
+public:
+    enum Column
+    {
+        NameColumn,
+        CheckMarkColumn,
+
+        ColumnCount
+    };
+
+    struct Data
+    {
+        using Column = int;
+        using Role = int;
+
+        using ColumnFlagHash = QHash<Column, Qt::ItemFlags>;
+        using RoleValueHash = QHash<Role, QVariant>;
+        using ColumnDataHash = QHash<Column, RoleValueHash>;
+
+        bool checkable = false;
+        Qt::CheckState checkedState = Qt::Unchecked;
+        ColumnFlagHash flags;
+        ColumnDataHash data;
+    };
+
 public:
     struct PathInternal;
     using Path = std::shared_ptr<PathInternal>;
 
-    static NodePtr create(const NodeList& children = NodeList(), bool checkable = false);
-    virtual ~ViewNode();
+    static NodePtr create(const Data& data);
+    static NodePtr create(const NodeList& children);
+    static NodePtr create(const Data& data, const NodeList& children);
+
+    ~ViewNode();
 
     int childrenCount() const;
     const NodeList& children() const;
@@ -25,36 +51,28 @@ public:
     NodePtr nodeAt(const Path& path);
     Path path(); //< TODO: think abount const
 
-    // TODO: refactor this O(N) complexity
     int indexOf(const NodePtr& node) const;
 
-    virtual QVariant data(int column, int role) const;
+    QVariant data(int column, int role) const;
 
-    virtual Qt::ItemFlags flags(int column) const;
+    Qt::ItemFlags flags(int column) const;
 
     NodePtr parent() const;
 
     bool checkable() const;
     Qt::CheckState checkedState() const;
-    void setCheckedState(Qt::CheckState value);
 
-    void clone() const;
-
-protected:
-    ViewNode(bool checkable);
-
-    void setParent(const WeakNodePtr& value);
-
-    void addNode(const NodePtr& node);
+    const Data& nodeData() const;
+    void setNodeData(const Data& data);
 
 private:
+    ViewNode(const Data& data);
+
     WeakNodePtr currentSharedNode();
 
 private:
-    const bool m_checkable = false;
-    Qt::CheckState m_checkedState = Qt::Unchecked;
-    WeakNodePtr m_parent;
-    NodeList m_nodes;
+    struct Private;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace desktop

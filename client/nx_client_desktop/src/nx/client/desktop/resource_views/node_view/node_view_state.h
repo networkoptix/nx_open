@@ -8,9 +8,6 @@ namespace desktop {
 
 struct NodeViewState
 {
-//    NodeViewState(const NodeViewState& other);
-//    NodeViewState& operator=(const NodeViewState& other);
-
     NodePtr rootNode;
 
     bool checkable() const;

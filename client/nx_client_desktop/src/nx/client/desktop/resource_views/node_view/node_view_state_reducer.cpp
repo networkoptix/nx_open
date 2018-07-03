@@ -12,7 +12,9 @@ NodeViewState NodeViewStateReducer::setNodeChecked(
 {
     NodeViewState copy(state);
     const auto node = copy.rootNode->nodeAt(path);
-    node->setCheckedState(checkedState);
+    auto data = node->nodeData();
+    data.checkedState = checkedState;
+    node->setNodeData(data);
     return copy;
 }
 

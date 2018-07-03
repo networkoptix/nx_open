@@ -8,7 +8,6 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_store.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
 
@@ -38,11 +37,11 @@ void NodeViewWidget::Private::updateColumns()
 
     header->setStretchLastSection(false);
 
-    header->setSectionResizeMode(NodeViewColumn::Name, QHeaderView::Stretch);
-    header->setSectionResizeMode(NodeViewColumn::CheckMark, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(ViewNode::NameColumn, QHeaderView::Stretch);
+    header->setSectionResizeMode(ViewNode::CheckMarkColumn, QHeaderView::ResizeToContents);
 
     if (!model.state().checkable())
-        header->setSectionHidden(NodeViewColumn::CheckMark, true);
+        header->setSectionHidden(ViewNode::CheckMarkColumn, true);
 }
 
 //-------------------------------------------------------------------------------------------------

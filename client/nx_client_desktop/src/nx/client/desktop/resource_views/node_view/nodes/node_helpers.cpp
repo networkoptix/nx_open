@@ -7,20 +7,34 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/client/core/watchers/user_watcher.h>
-
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/resource_node.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/parent_resource_node.h>
+
+#include <ui/style/resource_icon_cache.h>
 
 namespace {
 
 using namespace nx::client::desktop;
 
-const auto createCheckableLayotNode =
+const auto createCheckableLayoutNode =
     [](const QnResourcePtr& resource) -> NodePtr
     {
-        return ResourceNode::create(resource, true);
+        return helpers::createResourceNode(resource, true);
     };
+
+ViewNode::Data getNodeData(
+    const QnResourcePtr& resource,
+    bool checkable = false,
+    Qt::CheckState checkedState = Qt::Unchecked)
+{
+    ViewNode::Data nodeData;
+    nodeData.checkable = checkable;
+    nodeData.checkedState = checkedState;
+
+    nodeData.data[ViewNode::NameColumn][Qt::DisplayRole] = resource->getName();
+    nodeData.data[ViewNode::NameColumn][Qt::DecorationRole] = qnResIconCache->icon(resource);
+
+    return nodeData;
+}
 
 } // namespace
 
@@ -29,7 +43,7 @@ namespace client {
 namespace desktop {
 namespace helpers {
 
-NodePtr getParentedLayoutsNode()
+NodePtr createParentedLayoutsNode()
 {
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto accessProvider = commonModule->resourceAccessProvider();
@@ -73,14 +87,49 @@ NodePtr getParentedLayoutsNode()
 
     for (const auto& userResource: accessibleUsers)
     {
-        const auto node = ParentResourceNode::create(userResource,
-            isChildLayout, createCheckableLayotNode);
+        const auto node = createParentResourceNode(userResource,
+            isChildLayout, createCheckableLayoutNode);
         if (node->childrenCount() > 0)
             childNodes.append(node);
     }
 
     return ViewNode::create(childNodes);
 }
+
+NodePtr createResourceNode(
+    const QnResourcePtr& resource,
+    bool checkable,
+    Qt::CheckState checkedState)
+{
+    return resource ? ViewNode::create(getNodeData(resource, checkable, checkedState)) : NodePtr();
+}
+
+NodePtr createParentResourceNode(
+    const QnResourcePtr& resource,
+    const RelationCheckFunction& relationCheckFunction,
+    const NodeCreationFunction& nodeCreationFunction,
+    bool checkable,
+    Qt::CheckState checkedState)
+{
+    const auto pool = qnClientCoreModule->commonModule()->resourcePool();
+
+    const NodeCreationFunction creationFunction = nodeCreationFunction
+        ? nodeCreationFunction
+        : [](const QnResourcePtr& resource) -> NodePtr { return createResourceNode(resource); };
+
+    NodeList childrent;
+    for (const auto childResource: pool->getResources())
+    {
+        if (!relationCheckFunction(resource, childResource))
+            continue;
+
+        if (const auto node = creationFunction(childResource))
+            childrent.append(node);
+    }
+
+    return ViewNode::create(getNodeData(resource), childrent);
+}
+
 } // namespace helpers
 } // namespace desktop
 } // namespace client
