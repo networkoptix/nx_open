@@ -437,6 +437,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     if (d->display())
         d->display()->removeRenderer(m_renderer);
 
+    m_renderer->notInUse();
     m_renderer->destroyAsync();
 
     for (auto* data : m_binaryMotionMask)
@@ -504,6 +505,7 @@ void QnMediaResourceWidget::initRenderer()
     m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QnMediaResourceWidget::updateAspectRatio);
+    m_renderer->inUse();
 }
 
 void QnMediaResourceWidget::initDisplay()
