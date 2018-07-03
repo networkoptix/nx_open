@@ -656,6 +656,7 @@ namespace detail
             ResyncVideoWalls        = 0x1000,
             ResyncWebPages          = 0x2000,
             ResyncUserAccessRights  = 0x4000,
+            ResyncResourceProperties = 0x8000,
         };
         Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
 

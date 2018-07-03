@@ -647,6 +647,17 @@ bool QnDbManager::init(const QUrl& dbUrl)
                     return false;
             }
 
+            if (m_resyncFlags.testFlag(ResyncResourceProperties))
+            {
+                if (!fillTransactionLogInternal<
+                        QnUuid,
+                        ApiResourceParamWithRefData,
+                        ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
+                {
+                    return false;
+                }
+            }
+
         }
 
         // Set admin user's password
@@ -1664,7 +1675,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return resyncIfNeeded(ResyncCameraAttributes);
 
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
-        return ec2::migration::ptz::addRotationToPresets(m_sdb);
+    {
+        return ec2::migration::ptz::addRotationToPresets(m_sdb)
+            && resyncIfNeeded(ResyncResourceProperties);
+    }
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
