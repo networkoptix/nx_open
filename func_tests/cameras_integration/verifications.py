@@ -51,6 +51,15 @@ def _stage(**kwargs):
     return lambda c: _register_stage(c, **kwargs)
 
 
+KEY_VALUE_FIXES = {
+    'encoderIndex': {0: 'primary', 1: 'secondary'},
+}
+
+
+def fix_key_value(key, value):
+    return KEY_VALUE_FIXES.get(key, {}).get(value, value)
+
+
 class Verifier(object):
     def __init__(self, server, id):
         self.server = server
@@ -73,22 +82,30 @@ class Verifier(object):
     def expect_dict(self, expected, actual, path='camera'):
         for key, expected_value in expected.iteritems():
             if '=' in key:
+                if not isinstance(actual, list):
+                    self.errors.append('{}.{} is {}, expected to be a list'.format(
+                        path, key, type(actual)))
+                    continue
+
                 item = self._search_item(*key.split('='), items=actual)
                 if item:
                     self.expect_values(expected_value, item, '{}[{}]'.format(path, key))
-                else:
-                    self.errors.append('{} does not have item with {}'.format(path, key))
+                    continue
+
+                self.errors.append('{} does not have item with {}'.format(path, key))
+
             else:
-                value_path = '{}.{}'.format(path, key)
-                if key in actual:
-                    self.expect_values(expected_value, actual[key], value_path)
-                else:
-                    self.errors.append('{} does not exit'.format(value_path))
+                if not isinstance(actual, dict):
+                    self.errors.append('{}.{} is {}, expected to be a dict'.format(
+                        path, key, type(actual)))
+                    continue
+
+                self.expect_values(expected_value, actual.get(key), '{}.{}'.format(path, key))
 
     @staticmethod
     def _search_item(key, value, items):
         for item in items:
-            if str(item.get(key)) == value:
+            if str(fix_key_value(key, item.get(key))) == value:
                 return item
 
 
@@ -108,7 +125,7 @@ def authorization(verifier, login=None, password=None):
         return
 
     verifier.errors.append('Unexpected status: ' + status)
-    if status == 'Unauthorized':
+    if login and status == 'Unauthorized':
         verifier.server.set_camera_credentials(verifier.data['id'], login, password)
 
 

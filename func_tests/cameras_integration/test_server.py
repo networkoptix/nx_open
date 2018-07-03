@@ -15,8 +15,7 @@ DISCOVERY_RETRY_COUNT = 10
 DISCOVERY_RETRY_DELAY_S = 10
 
 # TODO: Pass this file by test paramiters.
-with open(os.path.dirname(__file__) + '/expected_cameras.yaml') as f:
-    EXPECTED_CAMERAS = yaml.load(f)
+EXPECTED_CAMERAS_FILE = os.path.dirname(__file__) + '/expected_cameras.yaml'
 
 
 # TODO: Make this test work with fresh configured server on VM with bridged interface.
@@ -88,18 +87,25 @@ class RetryWithDelay(object):
 class Stand(object):
     def __init__(self, server):
         self.server = server
-        self.cameras = {}
+        self.server_information = self.server.api.get('api/moduleInformation')
+        self.actual_cameras = {}
+        self.expected_cameras = {}
+        with open(EXPECTED_CAMERAS_FILE) as f:
+            for ip, rules in yaml.load(f).iteritems():
+                stages = self._filter_stages(rules)
+                if stages.has_key('discovery'):
+                    self.expected_cameras[ip] = stages
 
     @property
     def result(self):
-        return {ip: camera.to_dict() for ip, camera in self.cameras.iteritems()}
+        return {ip: camera.to_dict() for ip, camera in self.actual_cameras.iteritems()}
 
     @property
     def is_success(self):
-        return all(camera for camera in self.cameras.itervalues())
+        return all(camera for camera in self.actual_cameras.itervalues())
 
     def discover_cameras(self):
-        logging.info('Expected cameras: ' + ', '.join(EXPECTED_CAMERAS.keys()))
+        logging.info('Expected cameras: ' + ', '.join(self.expected_cameras.keys()))
         retry = RetryWithDelay(DISCOVERY_RETRY_COUNT, DISCOVERY_RETRY_DELAY_S)
         while retry.next_try():
             discovered_cameras = {}
@@ -109,15 +115,15 @@ class Stand(object):
                     discovered_cameras[ip] = camera
 
             logging.info('Discovered cameras: ' + ', '.join(discovered_cameras))
-            if all(ip in discovered_cameras for ip in EXPECTED_CAMERAS):
+            if all(ip in discovered_cameras for ip in self.expected_cameras):
                 break  # < Found everything what was expected.
 
-        for ip in EXPECTED_CAMERAS:
-            self.cameras[ip] = Camera(discovered_cameras.get(ip), is_expected=True)
+        for ip in self.expected_cameras:
+            self.actual_cameras[ip] = Camera(discovered_cameras.get(ip), is_expected=True)
 
         for ip, data in discovered_cameras.iteritems():
-            if ip not in EXPECTED_CAMERAS:
-                self.cameras[ip] = Camera(data, is_expected=False)
+            if ip not in self.expected_cameras:
+                self.actual_cameras[ip] = Camera(data, is_expected=False)
 
     def execute_verification_stages(self):
         for stage in verifications.STAGES:
@@ -127,22 +133,21 @@ class Stand(object):
                     break
 
             if stage.is_essential:
-                for camera in self.cameras.itervalues():
+                for camera in self.actual_cameras.itervalues():
                     result = camera.stages.get(stage.name)
                     if result is not None and not result:
                         camera.has_essential_failure = True
 
-
     def _execute_verification_stage(self, stage):
         error_count = 0
-        for ip, camera in self.cameras.iteritems():
+        for ip, camera in self.actual_cameras.iteritems():
             if camera.has_essential_failure:
                 continue  # < Does not make sense to verify anything else.
 
             if camera.stages.get(stage.name):
                 continue  # < This stage is already passed.
 
-            stage_expect = EXPECTED_CAMERAS.get(ip, {}).get(stage.name)
+            stage_expect = self.expected_cameras.get(ip, {}).get(stage.name)
             if stage_expect is None:
                 continue  # < This stage is not expected for this camera.
 
@@ -155,3 +160,32 @@ class Stand(object):
             camera.stages[stage.name] = result
 
         return not error_count
+
+    def _filter_stages(self, rules):
+        conditional = {}
+        for name, stage in rules.items():
+            try:
+                base_name, condition = name.split(' if ')
+            except ValueError:
+                pass
+            else:
+                del rules[name]
+                if eval(condition, self.server_information):
+                    base_stage = conditional.setdefault(base_name.strip(), {})
+                    self._merge_stage_dict(base_stage, stage, may_override=False)
+
+        for name, stage in conditional.iteritems():
+            base_stage = rules.setdefault(name, {})
+            self._merge_stage_dict(base_stage, stage, may_override=True)
+
+        return rules
+
+    @classmethod
+    def _merge_stage_dict(cls, destination, source, may_override):
+        for key, value in source.iteritems():
+            if isinstance(value, dict):
+                cls._merge_stage(destination[key], value, may_override)
+            else:
+                if destination.has_key(key) and not may_override:
+                    raise ValueError('Conflict in stage')
+                destination[key] = value

@@ -1,7 +1,33 @@
 # TODO: This is a local test, production file should be prepared separately.
 
-192.168.0.173:
+192.168.0.30:
   discovery:
+    physicalId: 64-76-57-80-00-97
+    vendor: ISD
+    model: ISDcam
+
+  authorization:
+    password: auto
+
+  recording:
+    fps: 30
+    streamQuality: high
+
+  attributes:
+    firmware: "2.9.0114\r\n"
+    cameraCapabilities:
+    ptzCapabilities:
+    bitrateInfos:
+      streams:
+        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [0.1, 1]}
+    mediaStreams:
+      streams:
+        encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
+        encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
+
+
+192.168.0.173:
+  discovery if version >= '3.1.1':
     physicalId: 00-09-18-50-C8-23
     vendor: Hanwha Techwin
     model: SNZ-6320
@@ -23,12 +49,12 @@
         encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [2, 10]}
     mediaStreams:
       streams:
-        encoderIndex=0: {'codec': 28, 'resolution': '1920x1080'}
-        encoderIndex=1: {'codec': 28, 'resolution': '640x360'}
+        encoderIndex=primary: {'codec': 28, 'resolution': '1920x1080'}
+        encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
 
 
 192.168.0.196:
-  discovery:
+  discovery if version >= '3.1.1':
     physicalId: 00-09-18-51-DE-4B
     vendor: Hanwha Techwin
     model: XND-8080RV
@@ -47,8 +73,8 @@
     ptzCapabilities: 420413440
     bitrateInfos:
       streams:
-        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [1, 2]}
+        encoderIndex=primary: {'actualFps': [25, 35], 'actualBitrate': [1, 5]}
     mediaStreams:
       streams:
-          encoderIndex=0: {'codec': 28, 'resolution': '2560x1920'}
-          encoderIndex=1: {'codec': 28, 'resolution': '640x480'}
+          encoderIndex=primary: {'codec': 28, 'resolution': '2560x1920'}
+          encoderIndex=secondary: {'codec': 28, 'resolution': '640x480'}
