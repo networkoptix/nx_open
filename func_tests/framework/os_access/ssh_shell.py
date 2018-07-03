@@ -52,7 +52,12 @@ class _SSHRun(Run):
         self._channel.setblocking(False)
         # TODO: Check on Windows. Paramiko uses sockets on Windows as prescribed in Python docs.
         # TODO: Wait for exit status too.
-        select.select([self._channel], [], [], timeout_sec)
+        try:
+            select.select([self._channel], [], [], timeout_sec)
+        except ValueError as e:
+            if e.message == "filedescriptor out of range in select()":
+                raise RuntimeError("Limit of file descriptors are reached; use `ulimit -n`")
+            raise
         for recv in [self._channel.recv, self._channel.recv_stderr]:
             try:
                 chunk = recv(_STREAM_BUFFER_SIZE)
