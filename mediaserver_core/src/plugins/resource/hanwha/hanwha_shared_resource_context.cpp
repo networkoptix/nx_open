@@ -36,7 +36,6 @@ static const QUrl cleanUrl(QUrl url)
 using namespace nx::core::resource;
 using namespace nx::mediaserver::resource;
 
-
 SeekPosition::SeekPosition(qint64 value) : position(value)
 {
     timer.restart();

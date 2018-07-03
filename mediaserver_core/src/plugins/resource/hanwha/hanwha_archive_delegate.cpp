@@ -158,6 +158,11 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
 
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
+    makeScopeGuard([this, timeUsec]()
+        {
+            m_currentPositionUsec = timeUsec;
+        });
+
     if (!m_isSeekAlignedByChunkBorder)
     {
         m_streamReader->setPositionUsec(timeUsec);

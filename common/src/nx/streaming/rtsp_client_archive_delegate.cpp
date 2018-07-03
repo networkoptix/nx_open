@@ -642,9 +642,11 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 startTime, qint64 endTime)
     return seek(startTime, true);
 }
 
-
 qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
+    NX_DEBUG(this, lm("Set position %1 for device %2").args(mksecToDateTime(time),
+        m_camera ? m_camera->getUniqueId() : lit("'Unknown device'")));
+
     m_blockReopening = false;
 
     //if (time == m_position)
@@ -854,6 +856,12 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
     m_quality = quality;
     m_qualityFastSwitch = fastSwitch;
     m_resolution = resolution;
+
+    if (!isRealTimeSource() && m_camera
+        && m_camera->getCameraCapabilities().testFlag(Qn::DualStreamingForLiveOnly))
+    {
+        return false;
+    }
 
     if (m_quality == MEDIA_Quality_CustomResolution)
     {

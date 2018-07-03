@@ -1169,6 +1169,9 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
+    if (m_resource)
+        NX_VERBOSE(this, lm("Set position %1 for device %2").args(mksecToDateTime(mksec), m_resource->getUniqueId()));
+
     qint64 newTime = mksec;
     m_playbackMaskSync.lock();
     newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
