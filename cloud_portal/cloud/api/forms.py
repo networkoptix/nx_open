@@ -35,6 +35,8 @@ class GroupAdminForm(forms.ModelForm):
         if self.instance.pk:
             # Populate the users field with the current Group users.
             self.fields['users'].initial = self.instance.user_set.all()
+            self.fields['customizations'].initial = UserGroupsToCustomizationPermissions.objects.filter(group=self.instance).values_list(
+                'customization', flat=True).distinct()
 
     def save_m2m(self):
         # Add the users to the Group.
