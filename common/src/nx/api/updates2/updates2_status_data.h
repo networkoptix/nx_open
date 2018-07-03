@@ -78,6 +78,7 @@ public:
 
 #define Updates2StatusData_Fields (serverId)(state)(message)(targets)(releaseNotesUrl)(progress)
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Updates2StatusData::StatusCode)
 QN_FUSION_DECLARE_FUNCTIONS(Updates2StatusData::StatusCode, (lexical)(numeric))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusData), (json)(ubjson)(eq))
 
