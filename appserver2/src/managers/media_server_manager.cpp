@@ -3,6 +3,8 @@
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 
+#include <rest/request_type_wrappers.h>
+
 namespace ec2
 {
     QnMediaServerNotificationManager::QnMediaServerNotificationManager()
@@ -177,7 +179,7 @@ namespace ec2
         {
             handler->done( reqID, errorCode, storages );
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ParentId, ec2::ApiStorageDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnStorageParentId, ec2::ApiStorageDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getStorages, mediaServerId, queryDoneHandler );
         return reqID;
     }

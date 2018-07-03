@@ -137,16 +137,6 @@ typedef std::vector<ApiWebPageData> ApiWebPageDataList;
 typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
 
-/**
- * Wrapper to be used for overloading as a distinct type for ApiStorageData api requests.
- */
-struct ParentId
-{
-    QnUuid id;
-    ParentId() = default;
-    ParentId(const QnUuid& id): id(id) {}
-};
-
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\

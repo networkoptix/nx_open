@@ -3420,11 +3420,11 @@ ErrorCode QnDbManager::getStorages(const QString& filterStr, ApiStorageDataList&
  * /ec2/getStorages: get storages filtered by parentServerId.
  */
 ErrorCode QnDbManager::doQueryNoLock(
-    const ParentId& parentId, ApiStorageDataList& storageList)
+    const QnStorageParentId& parentId, ApiStorageDataList& storageList)
 {
     QString filterStr;
-    if (!parentId.id.isNull())
-        filterStr = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(parentId.id));
+    if (!parentId.isNull())
+        filterStr = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(parentId));
 
     return getStorages(filterStr, storageList);
 }

@@ -19,6 +19,8 @@
 #include "core/resource/user_resource.h"
 #include <nx/fusion/serialization/sql.h>
 
+#include <rest/request_type_wrappers.h>
+
 #include <database/api/db_resource_api.h>
 
 #include "transaction/transaction.h"
@@ -246,7 +248,7 @@ namespace detail
         //getStorages
         ErrorCode getStorages(const QString& filterStr, ApiStorageDataList& storageList);
         ErrorCode doQueryNoLock(
-            const ParentId& parentId, ApiStorageDataList& storageList);
+            const QnStorageParentId& parentId, ApiStorageDataList& storageList);
         ErrorCode doQueryNoLock(const QnUuid& storageId, ApiStorageDataList& storageList);
 
         //get resource status

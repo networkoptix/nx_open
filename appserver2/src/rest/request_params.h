@@ -4,6 +4,8 @@
 #include <utils/common/request_param.h>
 #include <nx_ec/data/api_fwd.h>
 
+#include "request_type_wrappers.h"
+
 class QUrlQuery;
 class QnCommonModule;
 
@@ -26,12 +28,16 @@ bool parseHttpRequestParams(
     QnCommonModule* commonModule,
     const QString& command, const QnRequestParamList& params, QnCameraUuid* id);
 
+bool parseHttpRequestParams(
+    QnCommonModule* commonModule,
+    const QString& command, const QnRequestParamList& params, QnLayoutUuid* id);
+
 void toUrlParams(const QnUuid& id, QUrlQuery* query);
 
 bool parseHttpRequestParams(
     QnCommonModule* commonModule,
-    const QString& command, const QnRequestParamList& params, ParentId* id);
-void toUrlParams(const ParentId& id, QUrlQuery* query);
+    const QString& command, const QnRequestParamList& params, QnStorageParentId* id);
+void toUrlParams(const QnStorageParentId& id, QUrlQuery* query);
 
 bool parseHttpRequestParams(
     QnCommonModule* commonModule,

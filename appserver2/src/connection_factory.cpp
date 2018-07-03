@@ -27,6 +27,8 @@
 #include "rest/ec2_update_http_handler.h"
 #include "rest/time_sync_rest_handler.h"
 #include "rest/server/rest_connection_processor.h"
+#include "rest/request_type_wrappers.h"
+
 #include "transaction/transaction.h"
 #include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
@@ -889,7 +891,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value false
      *         %value true
      */
-    regGet<ParentId, ApiStorageDataList>(p, ApiCommand::getStorages);
+    regGet<QnStorageParentId, ApiStorageDataList>(p, ApiCommand::getStorages);
 
     // AbstractLicenseManager::addLicenses
     regUpdate<ApiLicenseDataList>(p, ApiCommand::addLicenses);
@@ -1338,7 +1340,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %return List of layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */
-    regGet<QnUuid, ApiLayoutDataList>(p, ApiCommand::getLayouts);
+    regGet<QnLayoutUuid, ApiLayoutDataList>(p, ApiCommand::getLayouts);
 
     /**%apidoc POST /ec2/saveLayout
      * Save layout.
