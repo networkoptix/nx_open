@@ -14,14 +14,15 @@ namespace plugins {
 
 enum class HanwhaConfigurationalPtzCommandType
 {
+    undefined,
     zoom,
     focus,
-    ptr
+    ptr //< Pan, tilt, rotation.
 };
 
 struct HanwhaConfigurationalPtzCommand
 {
-    HanwhaConfigurationalPtzCommandType command;
+    HanwhaConfigurationalPtzCommandType command = HanwhaConfigurationalPtzCommandType::undefined;
     nx::core::ptz::Vector speed;
 };
 
