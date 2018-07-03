@@ -236,6 +236,7 @@ protected:
     SqlExecutorStub executor;
 };
 
+#if 0
 
 TEST_F(PersistentScheduler, initialization)
 {
@@ -378,6 +379,8 @@ TEST_F(PersistentScheduler, tasksLoadedFromDb)
     whenSchedulerAndUserInitialized();
     thenTimersShouldHaveFiredSeveralTimes();
 }
+
+#endif
 
 } // namespace test
 } // namespace cdb
