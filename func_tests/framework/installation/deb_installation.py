@@ -22,9 +22,8 @@ _logger = logging.getLogger(__name__)
 class DebInstallation(Installation):
     """Manage installation via dpkg"""
 
-    def __init__(self, posix_access, installer, dir):
+    def __init__(self, posix_access, dir):
         self._posix_shell = posix_access.shell  # type: PosixShell
-        self.installer = installer
         self.dir = dir
         self._bin = self.dir / 'bin'
         self.binary = self._bin / 'mediaserver-bin'
@@ -87,7 +86,4 @@ class DebInstallation(Installation):
         build_info = dict(
             line.split('=', 1)
             for line in build_info_text.splitlines(False))
-        try:
-            return InstallIdentity.from_build_info(build_info)
-        except UnknownCustomization:
-            return None
+        return InstallIdentity.from_build_info(build_info)

@@ -11,28 +11,28 @@ _logger = logging.getLogger(__name__)
 class DpkgInstallation(DebInstallation):
     """Install mediaserver using dpkg, control it as upstart service"""
 
-    def __init__(self, posix_access, installer):
-        dir = posix_access.Path('/opt', installer.customization.linux_subdir)
-        super(DpkgInstallation, self).__init__(posix_access, installer, dir)
+    def __init__(self, posix_access, dir):
+        dir = posix_access.Path('/opt', dir)
+        super(DpkgInstallation, self).__init__(posix_access, dir)
 
     @cached_property
     def service(self):
-        service_name = self.installer.customization.linux_service_name
+        service_name = self.identity.customization.linux_service_name
         stop_timeout_sec = 10  # 120 seconds specified in upstart conf file.
         return UpstartService(self._posix_shell, service_name, stop_timeout_sec)
 
-    def install(self):
-        if self.identity == self.installer.identity:
+    def install(self, installer):
+        if self.identity == installer.identity:
             _logger.info(
                 'Skip installation: Existing installation identity (%s) matches installer).', self.identity)
             return
 
         _logger.info(
             'Perform installation: Existing installation identity (%s) does NOT match installer (%s).',
-            self.identity, self.installer.identity)
-        remote_path = self.os_access.Path.tmp() / self.installer.path.name
+            self.identity, installer.identity)
+        remote_path = self.os_access.Path.tmp() / installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
-        copy_file(self.installer.path, remote_path)
+        copy_file(installer.path, remote_path)
         self.posix_access.ssh.run_sh_script(
             # language=Bash
             '''

@@ -43,9 +43,8 @@ class UnpackedMediaserverGroup(object):
 
     def make_installations(self, base_port, count):
         self._ensure_unpacked()
-        return [UnpackInstallation(
+        return [CopyInstallation(
                     self._posix_access,
-                    self._installer,
                     self._root_dir / 'server-{:03d}'.format(idx),
                     self._dist_dir,
                     base_port + idx,
@@ -53,11 +52,11 @@ class UnpackedMediaserverGroup(object):
                 for idx in range(count)]
     
         
-class UnpackInstallation(DebInstallation):
+class CopyInstallation(DebInstallation):
     """Install mediaserver by copying unpacket deb contents, control it by custom scripts"""
 
-    def __init__(self, posix_access, installer, dir, dist_dir, server_port):
-        super(UnpackInstallation, self).__init__(posix_access, installer, dir)
+    def __init__(self, posix_access, dir, dist_dir, server_port):
+        super(CopyInstallation, self).__init__(posix_access, dir)
         self._dist_dir = dist_dir
         self._server_port = server_port
         self._template_renderer = TemplateRenderer()
@@ -66,7 +65,7 @@ class UnpackInstallation(DebInstallation):
     def service(self):
         return LinuxAdHocService(self._posix_shell, self.dir)
 
-    def install(self):
+    def install(self, unused_installer):
         self.dir.ensure_empty_dir()
         self.posix_access.run_command(['cp', '-a'] + self._dist_dir.glob('*') + [self.dir])
         self._write_control_script()

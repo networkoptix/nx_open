@@ -92,7 +92,8 @@ def vm_factory(request, hypervisor, vm_types):
 
 @pytest.fixture(
     scope='session',
-    params=vm_types_configuration().keys())
+    params=[name for name, conf in vm_types_configuration().items()
+                if not conf.get('custom')])
 def one_vm_type(request):
     return request.param
 

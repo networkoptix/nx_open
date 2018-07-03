@@ -14,10 +14,10 @@ _logger = logging.getLogger(__name__)
 class WindowsInstallation(Installation):
     """Manage installation on Windows"""
 
-    def __init__(self, windows_access, installer):  # type: (WindowsAccess, Installer) -> None
-        self.installer = installer
+    def __init__(self, windows_access, identity):  # type: (WindowsAccess, InstallIdentity) -> None
+        self._identity = identity
         program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
-        customization = installer.customization
+        customization = identity.customization
         self.dir = program_files_dir / customization.windows_installation_subdir
         self.binary = self.dir / 'mediaserver.exe'
         self.info = self.dir / 'build_info.txt'
@@ -31,6 +31,10 @@ class WindowsInstallation(Installation):
         self.windows_access = windows_access
 
     @property
+    def identity(self):
+        return self._identity
+
+    @property
     def os_access(self):
         return self.windows_access
 
@@ -42,21 +46,21 @@ class WindowsInstallation(Installation):
 
     @cached_property
     def service(self):
-        service_name = self.installer.customization.windows_service_name
+        service_name = self._identity.customization.windows_service_name
         return WindowsService(self.windows_access.winrm, service_name)
 
-    def _upload_installer(self):
-        remote_path = self.os_access.Path.tmp() / self.installer.path.name
+    def _upload_installer(self, installer):
+        remote_path = self.os_access.Path.tmp() / installer.path.name
         if not remote_path.exists():
             remote_path.parent.mkdir(parents=True, exist_ok=True)
-            copy_file(self.installer.path, remote_path)
+            copy_file(installer.path, remote_path)
         return remote_path
 
     def _backup_configuration(self):
         self._config_key.copy_values_to(self._config_key_backup)
 
-    def install(self):
-        remote_installer_path = self._upload_installer()
+    def install(self, installer):
+        remote_installer_path = self._upload_installer(installer)
         remote_log_path = remote_installer_path.parent / (remote_installer_path.name + '.install.log')
         self.windows_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
         self._backup_configuration()

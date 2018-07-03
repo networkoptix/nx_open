@@ -55,3 +55,42 @@ vm_types:
             protocol: tcp
             guest_port: 445
             host_port_offset: 4
+  linux_multi:
+    custom: true  # do not return this vm type from vm_types fixture and thus parameterize all others
+    os_family: linux
+    power_on_timeout_sec: 120
+    vm:
+      registry_path: ~/.func_tests/trusty-multi-registry.yaml
+      name_format: trusty-multi-{vm_index}
+      limit: 10
+      mac_address_format: 0A-00-00-03-{vm_index:02X}-0{nic_index:01X}
+      template_vm: trusty-template
+      template_url: smb://qanas/rw/gsovetov/func_tests/trusty-template.ova
+      port_forwarding:
+        host_ports_base: 37000
+        host_ports_per_vm: 10
+        forwarded_ports:
+          product-1:
+            protocol: tcp
+            guest_port: 7001
+            host_port_offset: 1
+          product-2:
+            protocol: tcp
+            guest_port: 7002
+            host_port_offset: 2
+          product-3:
+            protocol: tcp
+            guest_port: 7003
+            host_port_offset: 3
+          product-4:
+            protocol: tcp
+            guest_port: 7004
+            host_port_offset: 4
+          product-5:
+            protocol: tcp
+            guest_port: 7005
+            host_port_offset: 5
+          ssh:
+            protocol: tcp
+            guest_port: 22
+            host_port_offset: 6
