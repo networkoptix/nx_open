@@ -1,5 +1,7 @@
 from django.contrib import admin
-from models import *
+from .models import *
+from django.contrib.auth.models import Group
+from .forms import *
 # Register your models here.
 from cloud import settings
 from cms.admin import CMSAdmin
@@ -72,3 +74,14 @@ class AccountLoginHistoryAdmin(admin.ModelAdmin):
 
     clean_old_records.short_description = "Remove messages older than {} days".format(
         settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
+
+
+admin.site.unregister(Group)
+
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    # Use our custom form.
+    form = GroupAdminForm
+    # Filter permissions horizontal as well.
+    filter_horizontal = ['permissions']
