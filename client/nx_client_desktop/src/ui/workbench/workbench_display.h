@@ -12,6 +12,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/client/desktop/camera/camera_fwd.h>
+
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 #include <ui/animation/animation_timer_listener.h>
@@ -38,8 +40,6 @@ class QnWorkbenchItem;
 
 class QnWorkbenchLayout;
 class QnResourceWidget;
-class QnResourceDisplay;
-typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class ViewportAnimator;
 class WidgetAnimator;
 class QnCurtainAnimator;
