@@ -478,6 +478,8 @@ protected:
     QnMutex m_mutex;
 };
 
+#if 0
+
 TEST_F(SchedulerIntegrationTest, TwoUsersScheduleTasks)
 {
     whenTwoUsersScheduleTwoTasksEach();
@@ -624,6 +626,8 @@ TEST_F(SchedulerIntegrationTest, UnsubscribeFromExpiredTask)
     andWhenSchedulerWorksForSomeTime();
     thenNoNewFires();
 }
+
+#endif
 
 } // namespace test
 } // namespace cdb
