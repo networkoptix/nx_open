@@ -3,6 +3,7 @@
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <recording/time_period_list.h>
 #include <plugins/resource/avi/thumbnails_archive_delegate.h>
+#include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -47,6 +48,13 @@ public:
     virtual CameraDiagnostics::Result lastError() const override;
 private:
     bool isForwardDirection() const;
+
+    qint64 currentPositionUsec() const;
+    void updateCurrentPositionUsec(
+        qint64 positionUsec,
+        bool isForwardPlayback,
+        bool force);
+
 private:
     std::unique_ptr<QnThumbnailsArchiveDelegate> m_thumbnailsDelegate;
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
@@ -57,6 +65,7 @@ private:
     PlaybackMode m_playbackMode = PlaybackMode::Archive;
     CameraDiagnostics::Result m_lastOpenResult {CameraDiagnostics::NoErrorResult()};
     bool m_isSeekAlignedByChunkBorder = false;
+    SessionContextPtr m_sessionContext;
 };
 
 } // namespace plugins

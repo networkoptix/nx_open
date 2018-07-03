@@ -305,6 +305,11 @@ void HanwhaStreamReader::setOverlappedId(nx::core::resource::OverlappedId overla
     m_overlappedId = overlappedId;
 }
 
+SessionContextPtr HanwhaStreamReader::sessionContext()
+{
+    return m_sessionContext;
+}
+
 QnRtspClient& HanwhaStreamReader::rtspClient()
 {
     return m_rtpReader.rtspClient();

@@ -27,6 +27,7 @@ public:
     void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec);
     void setOverlappedId(nx::core::resource::OverlappedId overlappedId);
 
+    SessionContextPtr sessionContext();
 protected:
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired,
