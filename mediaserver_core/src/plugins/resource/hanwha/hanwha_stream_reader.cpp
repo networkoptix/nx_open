@@ -8,6 +8,7 @@
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_ini_config.h"
 
 #include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
@@ -266,21 +267,22 @@ void HanwhaStreamReader::setPositionUsec(qint64 value)
     m_lastTimestampUsec = value;
     m_timeSinceLastFrame.invalidate();
 
-#if 1
-    // Send single seek for all channels
-    static QnMutex sessionMutex;
-    QnMutexLocker lock(&sessionMutex);
-    if (m_sessionContext)
+    if (ini().enableSingleSeekPerGroup)
     {
-        SeekPosition newPosition(value);
-        if (m_rtpReader.isStreamOpened()
-            && m_sessionContext->lastSeekPos.canJoinPosition(newPosition))
+        // Send single seek for all channels
+        static QnMutex sessionMutex;
+        QnMutexLocker lock(&sessionMutex);
+        if (m_sessionContext)
         {
-            return;
+            SeekPosition newPosition(value);
+            if (m_rtpReader.isStreamOpened()
+                && m_sessionContext->lastSeekPos.canJoinPosition(newPosition))
+            {
+                return;
+            }
+            m_sessionContext->lastSeekPos = newPosition;
         }
-        m_sessionContext->lastSeekPos = newPosition;
     }
-#endif
 
     NX_ASSERT(value != AV_NOPTS_VALUE && value != DATETIME_NOW);
     NX_DEBUG(this, lm("Set position %1 for device %2").args(mksecToDateTime(value), m_resource->getUniqueId()));
