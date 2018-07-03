@@ -1,4 +1,4 @@
-#include "node_helpers.h"
+#include "view_node_helpers.h"
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>

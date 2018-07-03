@@ -2,7 +2,7 @@
 #include "ui_multiple_layout_selection_dialog.h"
 
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 
 //namespace {
