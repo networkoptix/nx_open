@@ -171,9 +171,9 @@ class SSH(PosixShell):
             '-i', self._key_path,
             ]))
 
-    def command(self, args, cwd=None, env=None):
+    def command(self, args, cwd=None, env=None, set_eux=True):
         script = sh_command_to_script(args)
-        return self.sh_script(script, cwd=cwd, env=env)
+        return self.sh_script(script, cwd=cwd, env=env, set_eux=set_eux)
 
     def terminal_command(self, args, cwd=None, env=None):
         script = sh_augment_script(sh_command_to_script(args), cwd=cwd, env=env, set_eux=False, shebang=False)
@@ -197,8 +197,8 @@ class SSH(PosixShell):
     def __del__(self):
         self._client().close()
 
-    def sh_script(self, script, cwd=None, env=None):
-        augmented_script = sh_augment_script(script, cwd, env)
+    def sh_script(self, script, cwd=None, env=None, set_eux=True):
+        augmented_script = sh_augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
         return _SSHCommand(self._client(), augmented_script)
 
     def is_working(self):
