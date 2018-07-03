@@ -1242,7 +1242,7 @@ ActionVisibility PtzCondition::check(const QnResourceWidgetList& widgets, QnWork
 
 bool PtzCondition::check(const QnPtzControllerPtr &controller)
 {
-    return controller && controller->hasCapabilities(m_capabilities, nx::core::ptz::Options());
+    return controller && controller->hasCapabilities(m_capabilities);
 }
 
 ActionVisibility NonEmptyVideowallCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)

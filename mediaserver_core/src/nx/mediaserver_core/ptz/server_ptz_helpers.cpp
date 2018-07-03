@@ -59,7 +59,7 @@ Ptz::Capabilities capabilities(const QnPtzControllerPtr& controller)
         NX_ASSERT(false, lit("Controller should exist"));
         return Ptz::NoPtzCapabilities;
     }
-    return controller->getCapabilities(core_ptz::Options());
+    return controller->getCapabilities();
 }
 
 Ptz::Capabilities overridenCapabilities(

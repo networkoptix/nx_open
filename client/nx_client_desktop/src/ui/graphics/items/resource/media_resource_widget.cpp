@@ -2356,7 +2356,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
     else
     {
         /* Stop all ptz activity. */
-        ptzController()->continuousMove(nx::core::ptz::Vector(), nx::core::ptz::Options());
+        ptzController()->continuousMove(nx::core::ptz::Vector());
         suspendHomePtzController();
     }
 
@@ -2397,8 +2397,7 @@ void QnMediaResourceWidget::at_zoomRectChanged()
         m_ptzController->absoluteMove(
             Qn::LogicalPtzCoordinateSpace,
             QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()),
-            2.0,
-            nx::core::ptz::Options());
+            2.0);
     }
 }
 

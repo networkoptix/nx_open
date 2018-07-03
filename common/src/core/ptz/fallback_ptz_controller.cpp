@@ -147,62 +147,62 @@ bool QnFallbackPtzController::getFlip(
 
 bool QnFallbackPtzController::createPreset(const QnPtzPreset& preset)
 {
-    return baseController(ptz::Options())->createPreset(preset);
+    return baseController({nx::core::ptz::Type::operational})->createPreset(preset);
 }
 bool QnFallbackPtzController::updatePreset(const QnPtzPreset& preset)
 {
-    return baseController(ptz::Options())->updatePreset(preset);
+    return baseController({nx::core::ptz::Type::operational})->updatePreset(preset);
 }
 
 bool QnFallbackPtzController::removePreset(const QString& presetId)
 {
-    return baseController(ptz::Options())->removePreset(presetId);
+    return baseController({nx::core::ptz::Type::operational})->removePreset(presetId);
 }
 
 bool QnFallbackPtzController::activatePreset(const QString& presetId, qreal speed)
 {
-    return baseController(ptz::Options())->activatePreset(presetId, speed);
+    return baseController({nx::core::ptz::Type::operational})->activatePreset(presetId, speed);
 }
 
 bool QnFallbackPtzController::getPresets(QnPtzPresetList* presets) const
 {
-    return baseController(ptz::Options())->getPresets(presets);
+    return baseController({nx::core::ptz::Type::operational})->getPresets(presets);
 }
 
 bool QnFallbackPtzController::createTour(const QnPtzTour& tour)
 {
-    return baseController(ptz::Options())->createTour(tour);
+    return baseController({nx::core::ptz::Type::operational})->createTour(tour);
 }
 
 bool QnFallbackPtzController::removeTour(const QString& tourId)
 {
-    return baseController(ptz::Options())->removeTour(tourId);
+    return baseController({nx::core::ptz::Type::operational})->removeTour(tourId);
 }
 
 bool QnFallbackPtzController::activateTour(const QString& tourId)
 {
-    return baseController(ptz::Options())->activateTour(tourId);
+    return baseController({nx::core::ptz::Type::operational})->activateTour(tourId);
 }
 
 bool QnFallbackPtzController::getTours(QnPtzTourList* tours) const
 {
-    return baseController(ptz::Options())->getTours(tours);
+    return baseController({nx::core::ptz::Type::operational})->getTours(tours);
 }
 
 bool QnFallbackPtzController::getActiveObject(QnPtzObject* activeObject) const
 {
-    return baseController(ptz::Options())->getActiveObject(activeObject);
+    return baseController({nx::core::ptz::Type::operational})->getActiveObject(activeObject);
 }
 
 bool QnFallbackPtzController::updateHomeObject(
     const QnPtzObject& homeObject)
 {
-    return baseController(ptz::Options())->updateHomeObject(homeObject);
+    return baseController({nx::core::ptz::Type::operational})->updateHomeObject(homeObject);
 }
 
 bool QnFallbackPtzController::getHomeObject(QnPtzObject* homeObject) const
 {
-    return baseController(ptz::Options())->getHomeObject(homeObject);
+    return baseController({nx::core::ptz::Type::operational})->getHomeObject(homeObject);
 }
 
 bool QnFallbackPtzController::getAuxilaryTraits(

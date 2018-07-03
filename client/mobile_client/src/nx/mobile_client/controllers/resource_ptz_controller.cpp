@@ -66,7 +66,7 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
 
 Ptz::Capabilities ResourcePtzController::operationalCapabilities() const
 {
-    return getCapabilities(nx::core::ptz::Options());
+    return getCapabilities({nx::core::ptz::Type::operational});
 }
 
 QString ResourcePtzController::resourceId() const
@@ -103,7 +103,7 @@ bool ResourcePtzController::available() const
 Ptz::Traits ResourcePtzController::auxTraits() const
 {
     QnPtzAuxilaryTraitList traits;
-    if (!getAuxilaryTraits(&traits, nx::core::ptz::Options()))
+    if (!getAuxilaryTraits(&traits, {nx::core::ptz::Type::operational}))
         return Ptz::NoPtzTraits;
 
     Ptz::Traits result = Ptz::NoPtzTraits;
@@ -124,7 +124,7 @@ int ResourcePtzController::presetsCount() const
 
 int ResourcePtzController::activePresetIndex() const
 {
-    if (!supports(Qn::GetActiveObjectPtzCommand, nx::core::ptz::Options()))
+    if (!supports(Qn::GetActiveObjectPtzCommand))
         return -1;
 
     QnPtzObject activeObject;
@@ -191,7 +191,10 @@ int ResourcePtzController::indexOfPreset(const QString& id) const
 bool ResourcePtzController::setAutoFocus()
 {
     return auxTraits().testFlag(Ptz::ManualAutoFocusPtzTrait)
-        && runAuxilaryCommand(Ptz::ManualAutoFocusPtzTrait, QString(), nx::core::ptz::Options());
+        && runAuxilaryCommand(
+            Ptz::ManualAutoFocusPtzTrait,
+            QString(),
+            {nx::core::ptz::Type::operational});
 }
 
 } // namespace mobile
