@@ -90,8 +90,10 @@ class Run(object):
                     _logger.error("Process exited, streams open: %r", streams_open)
                     break
                 raise Timeout(timeout_sec)
-        for name in ['stdout', 'stderr']:
-            yield b''.join(streams[name]['chunks'])
+        return [
+            b''.join(streams['stdout']['chunks']),
+            b''.join(streams['stderr']['chunks']),
+            ]
 
 
 class Command(object):

@@ -66,17 +66,19 @@ class _SSHRun(Run):
             if e.message == "filedescriptor out of range in select()":
                 raise RuntimeError("Limit of file descriptors are reached; use `ulimit -n`")
             raise
+        chunks = []
         for recv in [self._channel.recv, self._channel.recv_stderr]:
             try:
                 chunk = recv(_STREAM_BUFFER_SIZE)
             except socket.timeout:  # Non-blocking: times out immediately if no data.
-                yield b''
+                chunks.append(b'')
             else:
                 stream_is_closed = len(chunk) == 0  # Exactly as said in its docstring.
                 if stream_is_closed:
-                    yield None
+                    chunks.append(None)
                 else:
-                    yield chunk
+                    chunks.append(chunk)
+        return chunks
 
 
 class _PseudoTerminalSSHRun(_SSHRun):
