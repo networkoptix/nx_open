@@ -18,6 +18,20 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+namespace {
+
+constexpr qreal kPreviewTimeFraction = 0.5;
+
+std::chrono::microseconds midTime(const QnTimePeriod& period, qreal fraction = kPreviewTimeFraction)
+{
+    using namespace std::chrono;
+    return period.isInfinite()
+        ? microseconds(DATETIME_NOW)
+        : microseconds(milliseconds(qint64(period.startTimeMs + period.durationMs * fraction)));
+}
+
+} // namespace
+
 MotionSearchListModel::MotionSearchListModel(QObject* parent):
     base_type(parent),
     d(new Private(this))
@@ -49,6 +63,7 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
     if (!isValid(index))
         return QVariant();
 
+    using namespace std::chrono;
     switch (role)
     {
         case Qt::DisplayRole:
@@ -61,11 +76,14 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
             return QnBusiness::eventHelpId(vms::api::EventType::cameraMotionEvent);
 
         case Qn::TimestampRole:
-        case Qn::PreviewTimeRole:
-        {
-            return QVariant::fromValue(std::chrono::microseconds(std::chrono::milliseconds(
+            return QVariant::fromValue(microseconds(milliseconds(
                 d->period(index.row()).startTimeMs)).count());
-        }
+
+        case Qn::PreviewTimeRole:
+            return QVariant::fromValue(midTime(d->period(index.row())).count());
+
+        case Qn::ForcePrecisePreviewRole:
+            return true;
 
         case Qn::DurationRole:
             return QVariant::fromValue(d->period(index.row()).durationMs);
@@ -85,7 +103,7 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
                 .arg(tr("Start"))
                 .arg(start.toString(Qt::RFC2822Date))
                 .arg(tr("Duration"))
-                .arg(core::HumanReadable::timeSpan(std::chrono::milliseconds(period.durationMs)));
+                .arg(core::HumanReadable::timeSpan(milliseconds(period.durationMs)));
         }
 
         default:
