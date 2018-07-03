@@ -21,7 +21,7 @@ class SSHNotConnected(Exception):
 class _SSHCommandOutcome(PosixOutcome):
     def __init__(self, exit_status):
         assert isinstance(exit_status, int)
-        assert 0 <= exit_status <= 255
+        assert 0 <= exit_status <= 255 or exit_status == -1
         self._exit_status = exit_status
 
     @property
@@ -32,7 +32,15 @@ class _SSHCommandOutcome(PosixOutcome):
 
     @property
     def code(self):
+        if self._exit_status == -1:
+            return None
         return self._exit_status
+
+    @property
+    def comment(self):
+        if self._exit_status == -1:
+            return "Unknown exit status: server hasn't sent it"
+        return super(_SSHCommandOutcome, self).comment
 
 
 class _SSHRun(Run):
