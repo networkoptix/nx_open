@@ -164,14 +164,14 @@ class _LocalShell(PosixShell):
         return kwargs
 
     @classmethod
-    def command(cls, command, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
+    def command(cls, command, cwd=None, env=None):
         kwargs = cls._make_kwargs(cwd, env)
         command = [str(arg) for arg in command]
         _logger.debug('Run command:\n%s', sh_command_to_script(command))
         return _LocalCommand(command, shell=False, **kwargs)
 
     @classmethod
-    def sh_script(cls, script, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
+    def sh_script(cls, script, cwd=None, env=None):
         augmented_script_to_run = sh_augment_script(script, None, None)
         augmented_script_to_log = sh_augment_script(script, cwd, env)
         _logger.debug('Run:\n%s', augmented_script_to_log)
