@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth.models import Group
 
+from cms.models import Customization, UserGroupsToCustomizationPermissions
+
 User = get_user_model()
 
 
@@ -20,6 +22,12 @@ class GroupAdminForm(forms.ModelForm):
         widget=FilteredSelectMultiple('users', False)
     )
 
+    customizations = forms.ModelMultipleChoiceField(
+        queryset=Customization.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple('customizations', False)
+    )
+
     def __init__(self, *args, **kwargs):
         # Do the normal form initialisation.
         super(GroupAdminForm, self).__init__(*args, **kwargs)
@@ -31,6 +39,11 @@ class GroupAdminForm(forms.ModelForm):
     def save_m2m(self):
         # Add the users to the Group.
         self.instance.user_set = self.cleaned_data['users']
+        self.instance.customizations_set = self.cleaned_data['customizations']
+
+        for customization in self.cleaned_data['customizations']:
+            if not UserGroupsToCustomizationPermissions.objects.filter(group=self.instance, customization=customization).exists():
+                UserGroupsToCustomizationPermissions(group=self.instance, customization=customization).save()
 
     def save(self, *args, **kwargs):
         # Default save
