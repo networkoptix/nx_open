@@ -113,7 +113,7 @@ def find_customization(field_name, field_value):
 
 
 class InstallIdentity(object):
-    '''Identity for installer or installation'''
+    """Identity for installer or installation"""
 
     @classmethod
     def from_build_info(cls, build_info):
@@ -128,6 +128,9 @@ class InstallIdentity(object):
 
     def __str__(self):
         return '{}:{}'.format(self.version, self.customization.customization_name)
+
+    def __repr__(self):
+        return '<InstallationIdentity {!s}>'.format(self)
 
     def __eq__(self, other):
         return (isinstance(other, InstallIdentity) and

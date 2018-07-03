@@ -23,12 +23,13 @@ class DpkgInstallation(DebInstallation):
 
     def install(self):
         if self.identity == self.installer.identity:
-            _logger.info('Existing installation identity (%s) matches installer). Skipping installation.',
-                         self.identity)
+            _logger.info(
+                'Skip installation: Existing installation identity (%s) matches installer).', self.identity)
             return
 
-        _logger.info('Existing installation identity (%s) does NOT match installer (%s). Performing installation...',
-                         self.identity, self.installer.identity)
+        _logger.info(
+            'Perform installation: Existing installation identity (%s) does NOT match installer (%s).',
+            self.identity, self.installer.identity)
         remote_path = self.os_access.Path.tmp() / self.installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
         copy_file(self.installer.path, remote_path)
