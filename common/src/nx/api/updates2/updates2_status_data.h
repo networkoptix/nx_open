@@ -31,7 +31,7 @@ struct TargetVersionWithEula
 };
 
 #define TargetVersionWithEula_Fields (targetVersion)(eulaVersion)(eulaLink)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((TargetVersionWithEula), (json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((TargetVersionWithEula), (json)(ubjson)(eq))
 
 struct Updates2StatusData
 {
@@ -74,8 +74,10 @@ public:
 };
 
 #define Updates2StatusData_Fields (serverId)(state)(message)(targets)(progress)
-QN_FUSION_DECLARE_FUNCTIONS(Updates2StatusData::StatusCode, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusData), (json)(eq))
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Updates2StatusData::StatusCode)
+QN_FUSION_DECLARE_FUNCTIONS(Updates2StatusData::StatusCode, (lexical)(numeric))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2StatusData), (json)(ubjson)(eq))
 
 } // namespace api
 } // namespace nx

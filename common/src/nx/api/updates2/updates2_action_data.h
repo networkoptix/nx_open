@@ -27,9 +27,11 @@ public:
     nx::vms::api::SoftwareVersion targetVersion;
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Updates2ActionData::ActionCode)
+
 #define Updates2ActionData_Fields (action)(targetVersion)
 QN_FUSION_DECLARE_FUNCTIONS(Updates2ActionData::ActionCode, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2ActionData), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Updates2ActionData), (json)(ubjson))
 
 } // namespace api
 } // namespace nx

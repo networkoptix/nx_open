@@ -35,6 +35,7 @@ public:
     bool idle() const;
     bool isCheckingUpdates() const;
 
+    // Targets are the group of the servers to be updated
     QnMediaServerResourceList targets() const;
     void setTargets(const QSet<QnUuid>& targets, bool client = false);
 

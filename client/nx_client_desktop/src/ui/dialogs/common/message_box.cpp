@@ -693,7 +693,9 @@ int QnMessageBox::exec()
     d->detectEscapeButton();
     if (d->buttonDetection)
         d->stylizeButtons();
-    NX_ASSERT(d->escapeButton);
+
+    // We really can survive without proper escape button.
+    //NX_ASSERT(d->escapeButton);
 
     if (d->informativeLabels.isEmpty() && d->customWidgets.isEmpty() && !isCheckBoxEnabled())
     {

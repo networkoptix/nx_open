@@ -81,6 +81,9 @@ void Updates2ManagerBase::checkForGlobalDictionaryUpdate()
 
 void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/, bool forced)
 {
+    if (!m_updateRegistry)
+        return;
+
     auto onExitGuard = makeScopeGuard([this]() { remoteUpdateCompleted(); });
     if (!forced)
     {
@@ -104,6 +107,7 @@ void Updates2ManagerBase::checkForRemoteUpdate(utils::TimerId /*timerId*/, bool 
     auto remoteRegistry = getRemoteRegistry();
     auto globalRegistry = getGlobalRegistry();
     QByteArray serializedUpdatedRegistry;
+    if (remoteRegistry)
     {
         QnMutexLocker lock(&m_mutex);
         m_updateRegistry->merge(remoteRegistry.get());
@@ -198,7 +202,7 @@ api::Updates2StatusData Updates2ManagerBase::download(
     const auto result = m_updateRegistry->findUpdateFile(
         detail::UpdateRequestDataFactory::create(isClient(), &targetVersion),
         &fileData);
-    NX_ASSERT(result == update::info::ResultCode::ok);
+    //NX_ASSERT(result == update::info::ResultCode::ok);
 
     if (result != update::info::ResultCode::ok)
     {

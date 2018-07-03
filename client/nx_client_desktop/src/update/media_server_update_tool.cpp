@@ -384,4 +384,3 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
 
     m_updateProcess->start();
 }
-
