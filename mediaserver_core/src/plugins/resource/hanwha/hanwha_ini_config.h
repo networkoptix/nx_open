@@ -13,8 +13,15 @@ struct HanwhaIni: public nx::kit::IniConfig
     NX_INI_FLAG(
         1,
         enableSingleSeekPerGroup,
-        "Send single PLAY request on archive seek operation for NVRs.");
-    NX_INI_FLAG(0, enableEdge, "Enable import from SD card.");
+        "Send single PLAY request on archive seek operation for NVRs");
+
+    NX_INI_FLAG(
+        1,
+        enableArchivePositionExtrapolation,
+        "Enable archive position extrapolation "
+        "when no data is received from NVR during some period");
+
+    NX_INI_FLAG(0, enableEdge, "Enable import from SD card");
     NX_INI_FLAG(0, disableBypass, "Disable bypass for all NVRs");
 };
 

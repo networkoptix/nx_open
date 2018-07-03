@@ -345,34 +345,38 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     const auto context = m_hanwhaResource->sharedContext();
     const int speed = m_rtpReader.rtspClient().getScale();
     qint64 currentTimeMs = m_lastTimestampUsec / 1000;
-#if 1
-    // Extrapolate current position in case of NVR doesn't send packets. It need for sync play mode
-    if (m_timeSinceLastFrame.isValid())
-        currentTimeMs += m_timeSinceLastFrame.elapsedMs() * speed;
-    const bool isForwardSearch = speed >= 0;
-    const auto timeline = context->overlappedTimeline(m_hanwhaResource->getChannel());
-    NX_ASSERT(timeline.size() <= 1, lit("There should be only one overlapped ID for NVRs"));
-    if (timeline.size() != 1)
-        return QnAbstractMediaDataPtr();
 
-    const auto chunks = timeline.cbegin()->second;
-    if (chunks.containTime(currentTimeMs))
+    if (ini().enableArchivePositionExtrapolation)
     {
-        if (m_timeSinceLastFrame.isValid()
-            && m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTime)
+        // Extrapolate current position if NVR doesn't send packets during some period.
+        // It is needed for sync play mode.
+        if (m_timeSinceLastFrame.isValid())
+            currentTimeMs += m_timeSinceLastFrame.elapsedMs() * speed;
+        const bool isForwardSearch = speed >= 0;
+        const auto timeline = context->overlappedTimeline(m_hanwhaResource->getChannel());
+        NX_ASSERT(timeline.size() <= 1, lit("There should be only one overlapped ID for NVRs"));
+        if (timeline.size() != 1)
+            return QnAbstractMediaDataPtr();
+
+        const auto chunks = timeline.cbegin()->second;
+        if (chunks.containTime(currentTimeMs))
         {
-            return QnAbstractMediaDataPtr(); //< Don't forecast position too fast.
+            if (m_timeSinceLastFrame.isValid()
+                && m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTime)
+            {
+                return QnAbstractMediaDataPtr(); //< Don't forecast position too fast.
+            }
+        }
+        else
+        {
+            auto itr = chunks.findNearestPeriod(currentTimeMs, isForwardSearch);
+            if (itr == chunks.end())
+                currentTimeMs = isForwardSearch ? DATETIME_NOW : 0;
+            else
+                currentTimeMs = isForwardSearch ? itr->startTimeMs : itr->endTimeMs();
         }
     }
-    else
-    {
-        auto itr = chunks.findNearestPeriod(currentTimeMs, isForwardSearch);
-        if (itr == chunks.end())
-            currentTimeMs = isForwardSearch ? DATETIME_NOW : 0;
-        else
-            currentTimeMs = isForwardSearch ? itr->startTimeMs : itr->endTimeMs();
-    }
-#endif
+
     QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
     rez->timestamp = currentTimeMs * 1000;
     if (speed < 0)
