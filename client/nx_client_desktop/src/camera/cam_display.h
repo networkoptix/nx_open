@@ -194,6 +194,7 @@ private:
         qint64 timestampUs,
         QnAbstractStreamDataProvider* dataProvider,
         QnAbstractMediaData::MediaFlags flags);
+        bool useRealTimeHurryUp() const;
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];

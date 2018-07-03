@@ -21,6 +21,7 @@ static const int kMaxConcurrentRequestNumber = 3;
 static const std::chrono::seconds kCacheUrlTimeout(10);
 static const std::chrono::seconds kCacheDataTimeout(30);
 static const QString kObsoleteInterfaceParameter = lit("Network1");
+static const std::chrono::milliseconds kPositionAggregationTimeout(1000);
 
 static const QUrl cleanUrl(QUrl url)
 {
@@ -34,6 +35,19 @@ static const QUrl cleanUrl(QUrl url)
 
 using namespace nx::core::resource;
 using namespace nx::mediaserver::resource;
+
+
+SeekPosition::SeekPosition(qint64 value) : position(value)
+{
+    timer.restart();
+}
+bool SeekPosition::canJoinPosition(const SeekPosition& value) const
+{
+    return
+        position != kInvalidPosition
+        && value.position == position
+        && !timer.hasExpired(kPositionAggregationTimeout);
+}
 
 HanwhaSharedResourceContext::HanwhaSharedResourceContext(
     const AbstractSharedResourceContext::SharedId& sharedId)

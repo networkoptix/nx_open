@@ -39,6 +39,8 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* 
 
     setChannelCount(1);
 
+    connect(this, &QnAbstractRenderer::canBeDestroyed, this, &QObject::deleteLater);
+
 #ifdef TEST_FISHEYE_CALIBRATOR
     m_isCircleDetected = false;
 #endif
