@@ -12,15 +12,12 @@ namespace plugins {
 namespace {
 
 template<typename T>
-math::Sign sign(T number)
+nx::utils::math::Sign sign(T number)
 {
     if (qFuzzyIsNull(number))
-        return math::Sign::zero;
+        return nx::utils::math::Sign::zero;
 
-    if (number < 0)
-        return math::Sign::negative;
-
-    return math::Sign::positive;
+    return nx::utils::math::sign(number);
 }
 
 template<typename T>
