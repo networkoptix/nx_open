@@ -81,11 +81,11 @@ class Run(object):
                     assert not stream['closed']
                     stream['chunks'].append(chunk)
                     streams_open.append(name)
-            if self.outcome and not streams_open:
+            if self.outcome is not None and not streams_open:
                 _logger.debug("Process exited, streams closed.")
                 break
             if not wait.again():
-                if self.outcome:
+                if self.outcome is not None:
                     assert streams_open
                     _logger.error("Process exited, streams open: %r", streams_open)
                     break
