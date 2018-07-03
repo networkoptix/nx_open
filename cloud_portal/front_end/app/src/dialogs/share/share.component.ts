@@ -95,7 +95,7 @@ export class ShareModalContent {
         this.buttonText = this.language.sharing.shareConfirmButton;
         this.isNewShare = !this.user;
 
-        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'liveViewer'}};
+        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'Live Viewer'}};
 
         if (!this.isNewShare) {
             this.account
