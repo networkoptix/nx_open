@@ -49,7 +49,7 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/html.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <nx/client/desktop/utils/upload_worker.h>
+#include <nx/client/desktop/utils/upload_manager.h>
 #include <utils/connection_diagnostics_helper.h>
 
 #include "server_update_tool.h"
@@ -170,6 +170,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     m_updatesTool.reset(new ServerUpdateTool(this));
     m_updatesModel.reset(new ServerUpdatesModel(this));
     m_updateManager.reset(new updates2::ClientUpdates2Manager(commonModule()));
+    m_uploadManager.reset(new UploadManager());
 
     // I wonder whether it is blocking call?
     m_updateManager->atServerStart();
@@ -351,6 +352,7 @@ void MultiServerUpdatesWidget::at_stateCheckTimer()
                 if (!status.targets.empty())
                 {
                     nx::api::TargetVersionWithEula tv = status.targets.front();
+                    m_localUpdateInfo.latestVersion = tv.targetVersion;
                     m_haveUpdate = true;
                     doneChecking = true;
                 }
@@ -363,6 +365,7 @@ void MultiServerUpdatesWidget::at_stateCheckTimer()
             {
                 m_haveUpdate = false;
                 doneChecking = true;
+                qDebug() << "check for update error message" << status.message;
                 // Some default
             }
 
@@ -384,6 +387,8 @@ void MultiServerUpdatesWidget::at_stateCheckTimer()
 
         m_lastStatus = status.state;
     }
+
+
     // Maybe we should not call it right here
     m_updatesTool->requestRemoteUpdateState();
 
@@ -553,7 +558,7 @@ void MultiServerUpdatesWidget::at_updateItemCommand(std::shared_ptr<UpdateItem> 
             item->skipped = false;
             // TODO: Should we really stop it?
             m_updatesTool->requestUpdateAction(
-                nx::api::Updates2ActionData::ActionCode::download, { id });
+                nx::api::Updates2ActionData::ActionCode::download, { id }, m_localUpdateInfo.latestVersion);
         }
 
         // Server was in 'error' state and we decided to retry.
@@ -563,7 +568,7 @@ void MultiServerUpdatesWidget::at_updateItemCommand(std::shared_ptr<UpdateItem> 
             m_serversActive.insert(id);
             // TODO: Should we really stop it?
             m_updatesTool->requestUpdateAction(
-                nx::api::Updates2ActionData::ActionCode::download, { id });
+                nx::api::Updates2ActionData::ActionCode::download, { id }, m_localUpdateInfo.latestVersion);
         }
 
         if (m_serversActive.empty())
@@ -656,7 +661,7 @@ void MultiServerUpdatesWidget::at_startUpdateAction()
 
         moveTowardsState(WidgetUpdateState::RemoteDownloading, targets);
         auto action = nx::api::Updates2ActionData::ActionCode::download;
-        m_updatesTool->requestUpdateAction(action, targets);
+        m_updatesTool->requestUpdateAction(action, targets, m_localUpdateInfo.latestVersion);
     }
     else if (m_updateStateCurrent == WidgetUpdateState::ReadyInstall)
     {
@@ -670,7 +675,7 @@ void MultiServerUpdatesWidget::at_startUpdateAction()
         qDebug() << "MultiServerUpdatesWidget::at_downloadUpdate() - starting installation";
         moveTowardsState(WidgetUpdateState::Installing, targets);
         auto action = nx::api::Updates2ActionData::ActionCode::install;
-        m_updatesTool->requestUpdateAction(action, targets);
+        m_updatesTool->requestUpdateAction(action, targets, m_localUpdateInfo.latestVersion);
     }
     else
     {
@@ -844,7 +849,8 @@ bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
                 {
                     auto serversToUpdate = m_serversComplete;
                     m_updatesTool->requestUpdateAction(
-                        nx::api::Updates2ActionData::ActionCode::install, serversToUpdate);
+                        nx::api::Updates2ActionData::ActionCode::install, serversToUpdate,
+                        m_localUpdateInfo.latestVersion);
                     moveTowardsState(WidgetUpdateState::Installing, serversToUpdate);
                 }
             }
@@ -872,7 +878,9 @@ bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
                 {
                     auto serversToRetry = m_serversFailed;
                     m_updatesTool->requestUpdateAction(
-                        nx::api::Updates2ActionData::ActionCode::download, serversToRetry);
+                        nx::api::Updates2ActionData::ActionCode::download,
+                        serversToRetry,
+                        m_localUpdateInfo.latestVersion);
                     moveTowardsState(WidgetUpdateState::RemoteDownloading, serversToRetry);
                 }
                 else if (clicked == cancelUpdate)
@@ -909,7 +917,8 @@ bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
                 {
                     auto serversToRetry = m_serversFailed;
                     m_updatesTool->requestUpdateAction(
-                        nx::api::Updates2ActionData::ActionCode::install, serversToRetry);
+                        nx::api::Updates2ActionData::ActionCode::install, serversToRetry,
+                        m_localUpdateInfo.latestVersion);
                     moveTowardsState(WidgetUpdateState::ReadyInstall, serversToRetry);
                 }
                 else if (clicked == skipFailed)
@@ -917,7 +926,8 @@ bool MultiServerUpdatesWidget::processRemoteChanges(bool force)
                     // Start installing process for servers that have succeded downloading
                     auto serversToIntall = m_serversIssued;
                     m_updatesTool->requestUpdateAction(
-                        nx::api::Updates2ActionData::ActionCode::install, serversToIntall);
+                        nx::api::Updates2ActionData::ActionCode::install, serversToIntall,
+                        m_localUpdateInfo.latestVersion);
                     moveTowardsState(WidgetUpdateState::Installing, serversToIntall);
                 }
                 else if (clicked == cancelUpdate)
@@ -1334,14 +1344,24 @@ void MultiServerUpdatesWidget::checkForUpdates(bool fromInternet)
         case LocalStatusCode::available:
         case LocalStatusCode::notAvailable:
         case LocalStatusCode::error:
+        case LocalStatusCode::checking:
+        {
             qDebug() << "MultiServerUpdatesWidget::checkForUpdates() - forced";
-            m_updateManager->check();
+            if (status.state != LocalStatusCode::checking)
+                m_updateManager->check();
+            m_lastStatus = LocalStatusCode::checking;
             m_checking = true;
             m_updateLocalStateChanged = true;
+
+            // We force update check for all remote peers as well
+            auto targets = m_updatesModel->getAllServers();
+            auto action = nx::api::Updates2ActionData::ActionCode::check;
+            m_updatesTool->requestUpdateAction(action, targets);
             loadDataToUi();
             break;
+        }
         default:
-            qDebug() << "MultiServerUpdatesWidget::checkForUpdates() - invalid state to issue another check";
+            qDebug() << "MultiServerUpdatesWidget::checkForUpdates() - invalid state to issue another check: " << toString(status.state);
             break;
     }
 }

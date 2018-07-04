@@ -88,7 +88,10 @@ public:
 
     // Sends POST to /api/updates2/status for each target
     // Result can be obtained by polling getServerStatusChanges
-    void requestUpdateAction(nx::api::Updates2ActionData::ActionCode action, QSet<QnUuid> targets);
+    void requestUpdateAction(
+        nx::api::Updates2ActionData::ActionCode action,
+        QSet<QnUuid> targets,
+        nx::vms::api::SoftwareVersion version = nx::vms::api::SoftwareVersion());
 
     // Sends GET to /api/updates2/status/all and stores response in m_statusRequest
     void requestRemoteUpdateState();

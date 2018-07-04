@@ -30,7 +30,7 @@ namespace desktop {
 
 class ServerUpdateTool;
 class ServerUpdatesModel;
-class UploadWorker;
+class UploadManager;
 
 class DownloadTool;
 
@@ -190,7 +190,7 @@ private:
 
     std::unique_ptr<updates2::ClientUpdates2Manager> m_updateManager;
 
-    std::unique_ptr<UploadWorker> m_uploadWorker;
+    std::unique_ptr<UploadManager> m_uploadManager;
 
     // Do we allow client to push updates?
     bool m_enableClientUpdates;
@@ -198,13 +198,12 @@ private:
     WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::Initial;
     WidgetUpdateState m_updateStateTarget = WidgetUpdateState::Initial;
 
+    // We have issued an update for this version.
+    // It can differ from m_localUpdateInfo.latestVersion.
     nx::utils::SoftwareVersion m_targetVersion;
+    // Was ist das?
     QString m_targetChangeset;
-
     QString m_localFileName;
-
-
-    //QnCheckForUpdateResult m_lastUpdateCheckResult;
 
     struct LocalUpdateInfo
     {

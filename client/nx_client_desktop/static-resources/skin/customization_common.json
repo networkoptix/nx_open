@@ -533,6 +533,14 @@
         }
     },
 
+    "nx::client::desktop::ServerUpdatesModel": {
+        "colors": {
+            "latest": "green_l2",
+            "target": "yellow_core",
+            "error": "red_l2"
+        }
+    },
+
     "QnStatusOverlayWidget": {
         "palette": { "default": {
             "window": "dark5.setAlpha(217)",

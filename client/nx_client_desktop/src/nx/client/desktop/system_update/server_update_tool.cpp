@@ -27,6 +27,7 @@
 
 #include <api/server_rest_connection.h>
 
+// There is a lot of obsolete code here. We use new update manager now, it automates all update routines.
 namespace
 {
     nx::utils::SoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
@@ -125,7 +126,8 @@ void ServerUpdateTool::finishUpdate(const QnUpdateResult &result)
 }
 
 /**
- * Generates URL for specified versio
+ * Generates URL for specified version
+ * TODO: It seems to be obsolete since we use new update manager
  */
 QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
     const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool)
@@ -373,7 +375,8 @@ void ServerUpdateTool::requestUpdateActionAll(nx::api::Updates2ActionData::Actio
 }
 
 void ServerUpdateTool::requestUpdateAction(nx::api::Updates2ActionData::ActionCode action,
-    QSet<QnUuid> targets)
+    QSet<QnUuid> targets,
+    nx::vms::api::SoftwareVersion version)
 {
     auto callback = [this](bool success, rest::Handle handle, rest::ServerConnection::UpdateStatus response)
         {
@@ -390,6 +393,7 @@ void ServerUpdateTool::requestUpdateAction(nx::api::Updates2ActionData::ActionCo
             continue;
 
         nx::api::Updates2ActionData request;
+        request.targetVersion = version;
         request.action = action;
 
         connection->sendUpdateCommand(request, callback);
