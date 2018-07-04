@@ -981,12 +981,12 @@ void PtzInstrument::at_zoomOutButton_released()
     at_zoomButton_activated(0.0);
 }
 
-void PtzInstrument::at_zoomButton_activated(qreal speed)
+void PtzInstrument::at_zoomButton_activated(qreal zoomSpeed)
 {
     PtzImageButtonWidget* button = checked_cast<PtzImageButtonWidget*>(sender());
 
     if (QnMediaResourceWidget* widget = button->target())
-        ptzMove(widget, nx::core::ptz::Vector(0.0, 0.0, 0.0, speed), true);
+        ptzMove(widget, nx::core::ptz::Vector(0.0, 0.0, 0.0, zoomSpeed), true);
 }
 
 void PtzInstrument::at_focusInButton_pressed()
