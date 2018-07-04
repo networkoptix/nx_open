@@ -1,10 +1,4 @@
-/**********************************************************
-* 11 feb 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_WAIT_CONDITION_H
-#define NX_WAIT_CONDITION_H
+#pragma once
 
 #ifdef USE_OWN_MUTEX
 
@@ -61,5 +55,3 @@ private:
     const std::chrono::milliseconds m_timeout;
     const std::chrono::steady_clock::time_point m_startTime;
 };
-
-#endif //NX_WAIT_CONDITION_H

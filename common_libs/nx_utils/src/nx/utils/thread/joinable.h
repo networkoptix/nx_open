@@ -1,20 +1,16 @@
-/**********************************************************
-* 27 sep 2013
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef QNJOINABLE_H
-#define QNJOINABLE_H
-
-
-//!Interface to wait for instance finishes its tasks before destruction
+/**
+ * Should be implemented by classes that want to allow user to wait for
+ * object has finished its asynchronous tasks.
+ */
 class NX_UTILS_API QnJoinable
 {
 public:
-    virtual ~QnJoinable() {}
+    virtual ~QnJoinable() = default;
 
-    //!Blocks till instance does what it should before destruction
+    /**
+     * Blocks till object does what it should before destruction.
+     */
     virtual void join() = 0;
 };
-
-#endif  //QNJOINABLE_H

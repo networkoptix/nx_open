@@ -1,8 +1,3 @@
-/**********************************************************
-* 11 feb 2015
-* akolesnikov
-***********************************************************/
-
 #ifdef USE_OWN_MUTEX
 
 #include "wait_condition.h"
@@ -13,17 +8,14 @@
 
 #include "mutex_impl.h"
 
-
 class QnWaitConditionImpl
 {
 public:
     QWaitCondition cond;
 };
 
-
-QnWaitCondition::QnWaitCondition()
-:
-    m_impl( new QnWaitConditionImpl() )
+QnWaitCondition::QnWaitCondition():
+    m_impl(new QnWaitConditionImpl())
 {
 }
 
@@ -33,12 +25,12 @@ QnWaitCondition::~QnWaitCondition()
     m_impl = nullptr;
 }
 
-bool QnWaitCondition::wait( QnMutex* mutex, unsigned long time )
+bool QnWaitCondition::wait(QnMutex* mutex, unsigned long time)
 {
     mutex->m_impl->beforeMutexUnlocked();
-    const bool res = m_impl->cond.wait( &mutex->m_impl->mutex, time );
+    const bool res = m_impl->cond.wait(&mutex->m_impl->mutex, time);
     //TODO #ak pass proper parameters to the following call
-    mutex->m_impl->afterMutexLocked( nullptr, 0, (size_t)this );
+    mutex->m_impl->afterMutexLocked(nullptr, 0, (size_t)this);
     return res;
 }
 
