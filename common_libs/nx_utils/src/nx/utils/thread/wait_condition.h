@@ -1,13 +1,13 @@
 #pragma once
 
-#ifdef USE_OWN_MUTEX
-
-#include <chrono>
-#include <climits>
-#include <memory>
-
 #include "mutex.h"
 
+#include <chrono>
+
+#ifdef USE_OWN_MUTEX
+
+#include <climits>
+#include <memory>
 
 class QnWaitConditionImpl;
 

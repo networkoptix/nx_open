@@ -1,10 +1,10 @@
-#ifdef USE_OWN_MUTEX
-
 #include "wait_condition.h"
 
-#include <QtCore/QWaitCondition>
-
 #include <nx/utils/time.h>
+
+#ifdef USE_OWN_MUTEX
+
+#include <QtCore/QWaitCondition>
 
 #include "mutex_impl.h"
 
@@ -44,6 +44,8 @@ void QnWaitCondition::wakeOne()
     return m_impl->cond.wakeOne();
 }
 
+#endif
+
 //-------------------------------------------------------------------------------------------------
 
 WaitConditionTimer::WaitConditionTimer(
@@ -74,5 +76,3 @@ bool WaitConditionTimer::wait(QnMutex* mutex)
         mutex,
         duration_cast<milliseconds>(m_timeout - timePassed).count());
 }
-
-#endif
