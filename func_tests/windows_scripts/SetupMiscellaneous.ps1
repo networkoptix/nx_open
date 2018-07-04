@@ -11,7 +11,6 @@ Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Power' 'HibernateEnable
 Set-Service SSDPSRV -StartupType Disabled
 Set-Service fdPHost -StartupType Disabled
 Set-Service FDResPub -StartupType Disabled
-Set-Service BITS -StartupType Disabled  # Background downloads.
 Set-Service DusmSvc -StartupType Disabled  # Data usage metrics.
 Set-Service HomeGroupProvider -StartupType Disabled
 Set-Service lfsvc -StartupType Disabled  # Geolocation.
