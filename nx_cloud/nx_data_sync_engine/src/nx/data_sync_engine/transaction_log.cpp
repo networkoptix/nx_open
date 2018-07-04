@@ -90,7 +90,7 @@ void TransactionLog::readTransactions(
     using namespace std::placeholders;
 
     if (!from)
-        from = {};
+        from = vms::api::TranState{};
 
     if (!to)
     {
