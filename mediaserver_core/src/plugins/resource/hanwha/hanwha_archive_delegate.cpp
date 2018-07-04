@@ -50,6 +50,7 @@ bool HanwhaArchiveDelegate::open(const QnResourcePtr &/*resource*/,
 {
     m_streamReader->setRateControlEnabled(m_rateControlEnabled);
     m_lastOpenResult = m_streamReader->openStreamInternal(false, QnLiveStreamParams());
+    m_sessionContext = m_streamReader->sessionContext();
     if (!m_lastOpenResult && m_errorHandler)
         m_errorHandler(lit("Can not open stream"));
 
@@ -104,8 +105,9 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
 
     if (!m_streamReader->isStreamOpened())
     {
-        if (m_currentPositionUsec != AV_NOPTS_VALUE)
-            m_streamReader->setPositionUsec(m_currentPositionUsec);
+        const auto currentPosition = currentPositionUsec();
+        if (currentPosition != AV_NOPTS_VALUE)
+            m_streamReader->setPositionUsec(currentPosition);
         if (!open(m_streamReader->m_resource, /*archiveIntegrityWatcher*/ nullptr))
         {
             if (auto mediaStreamEvent = m_lastOpenResult.toMediaStreamEvent())
@@ -124,8 +126,9 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
     if (!result)
         return result;
 
-    m_currentPositionUsec = result->timestamp;
-    if (!isForwardDirection())
+    bool isForwardPlayback = isForwardDirection();
+    updateCurrentPositionUsec(result->timestamp, isForwardPlayback, /*force*/ false);
+    if (!isForwardPlayback)
     {
         result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
         result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
@@ -156,8 +159,30 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
     return rtspClient.getScale() >= 0;
 }
 
+qint64 HanwhaArchiveDelegate::currentPositionUsec() const
+{
+    qint64 currentPosition = AV_NOPTS_VALUE;
+    if (const auto sessionContext = m_sessionContext)
+        currentPosition = sessionContext->currentPositionUsec();
+
+    return currentPosition;
+}
+
+void HanwhaArchiveDelegate::updateCurrentPositionUsec(
+    qint64 positionUsec, bool isForwardPlayback, bool force)
+{
+    if (const auto sessionContext = m_sessionContext)
+        sessionContext->updateCurrentPositionUsec(positionUsec, isForwardPlayback, force);
+}
+
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
+    makeScopeGuard(
+        [this, timeUsec]()
+        {
+            updateCurrentPositionUsec(timeUsec, isForwardDirection(), /*force*/ true);
+        });
+
     if (!m_isSeekAlignedByChunkBorder)
     {
         m_streamReader->setPositionUsec(timeUsec);
@@ -184,10 +209,10 @@ qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
     else if (!itr->contains(timeMs))
         timeUsec = isForwardDirection() ? itr->startTimeMs * 1000 : itr->endTimeMs() * 1000 - BACKWARD_SEEK_STEP;
 
-    if (m_playbackMode == PlaybackMode::ThumbNails && m_currentPositionUsec == timeUsec)
+    if (m_playbackMode == PlaybackMode::ThumbNails && currentPositionUsec() == timeUsec)
         return timeUsec; //< Ignore two thumbnails in the row from the same position.
 
-    m_currentPositionUsec = timeUsec;
+    updateCurrentPositionUsec(timeUsec, isForwardDirection(), true);
     m_streamReader->setPositionUsec(timeUsec);
     return timeUsec;
 }
@@ -206,6 +231,7 @@ QnConstResourceAudioLayoutPtr HanwhaArchiveDelegate::getAudioLayout()
 
 void HanwhaArchiveDelegate::beforeClose()
 {
+    m_sessionContext.reset();
     m_streamReader->pleaseStop();
 }
 

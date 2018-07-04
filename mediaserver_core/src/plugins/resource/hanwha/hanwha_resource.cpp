@@ -986,6 +986,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
     {
         setCameraCapability(Qn::IsPlaybackSpeedSupported, true);
         setCameraCapability(Qn::DeviceBasedSync, true);
+        setCameraCapability(Qn::DualStreamingForLiveOnly, true);
 
         const auto sunapiSupportAttribute = m_attributes.attribute<bool>(
             lit("Media/Protocol.SUNAPI/%1").arg(getChannel()));

@@ -451,6 +451,26 @@ HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
     return {CameraDiagnostics::NoErrorResult(), bypassParameter != boost::none};
 }
 
+qint64 SessionContext::currentPositionUsec() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_lastPositionUsec;
+}
+
+void SessionContext::updateCurrentPositionUsec(
+    qint64 positionUsec,
+    bool isForwardPlayback,
+    bool force)
+{
+    QnMutexLocker lock(&m_mutex);
+    const bool isGoodPosition = isForwardPlayback
+        ? (positionUsec > m_lastPositionUsec)
+        : (positionUsec < m_lastPositionUsec);
+
+    if (force || isGoodPosition)
+        m_lastPositionUsec = positionUsec;
+}
+
 } // namespace plugins
 } // namespace mediaserver_core
 } // namespace nx

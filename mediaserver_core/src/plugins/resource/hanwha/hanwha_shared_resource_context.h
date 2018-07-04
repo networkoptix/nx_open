@@ -104,6 +104,16 @@ struct SessionContext
     QString sessionId;
     ClientId clientId;
     SeekPosition lastSeekPos;
+
+    qint64 currentPositionUsec() const;
+    void updateCurrentPositionUsec(
+        qint64 positionUsec,
+        bool isForwardPlayback,
+        bool force);
+
+private:
+    mutable QnMutex m_mutex;
+    qint64 m_lastPositionUsec = AV_NOPTS_VALUE;
 };
 
 using SessionContextPtr = QSharedPointer<SessionContext>;
