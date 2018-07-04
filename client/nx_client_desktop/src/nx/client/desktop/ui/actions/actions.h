@@ -1030,11 +1030,6 @@ enum IDType
     ToggleTitleBarAction,
 
     /**
-     * Shows/hides tree.
-     */
-    ToggleTreeAction,
-
-    /**
      * Pins/unpins tree.
      */
     PinTreeAction,
@@ -1053,8 +1048,6 @@ enum IDType
      * Shows/hides timeline.
      */
     ToggleTimelineAction,
-
-    ToggleNotificationsAction,
 
     PinNotificationsAction,
 

@@ -1840,21 +1840,10 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Minimize")) //< To be displayed on button tooltip
         .icon(qnSkin->icon("titlebar/dropdown.png"));
 
-    factory(ToggleTreeAction)
-        .flags(NoTarget)
-        .text(ContextMenu::tr("Show Tree")) //< To be displayed on button tooltip
-        .toggledText(ContextMenu::tr("Hide Tree"))
-        .condition(condition::treeNodeType(ResourceTreeNodeType::root));
-
     factory(ToggleTimelineAction)
         .flags(NoTarget)
         .text(ContextMenu::tr("Show Timeline")) //< To be displayed on button tooltip
         .toggledText(ContextMenu::tr("Hide Timeline"));
-
-    factory(ToggleNotificationsAction)
-        .flags(NoTarget)
-        .text(ContextMenu::tr("Show Notifications")) //< To be displayed on button tooltip
-        .toggledText(ContextMenu::tr("Hide Notifications"));
 
     factory(PinNotificationsAction)
         .flags(Notifications | NoTarget)

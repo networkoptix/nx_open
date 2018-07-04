@@ -136,14 +136,10 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     base_type(settings, parentWidget, parent),
     backgroundItem(new QnControlBackgroundWidget(Qt::RightEdge, parentWidget)),
     item(new QnNotificationsCollectionWidget(parentWidget, 0, context())),
-    pinButton(NxUi::newPinButton(parentWidget, context(),
-        action::PinNotificationsAction)),
     xAnimator(new VariantAnimator(this)),
 
-    m_ignoreClickEvent(false),
-    m_visible(false),
     m_showButton(NxUi::newBlinkingShowHideButton(parentWidget, context(),
-        action::ToggleNotificationsAction)),
+        action::PinNotificationsAction)),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
@@ -169,8 +165,6 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     }
 
     action(action::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
-    pinButton->setFocusProxy(item);
-    pinButton->setZValue(ControlItemZOrder);
     connect(action(action::PinNotificationsAction), &QAction::toggled, this,
         [this](bool checked)
         {
@@ -179,18 +173,13 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
             emit geometryChanged();
         });
 
-    action(action::ToggleNotificationsAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    m_opened = (settings.state == Qn::PaneState::Opened);
+    setShowButtonIcon();
     m_showButton->setTransform(QTransform::fromScale(-1, 1));
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
     setHelpTopic(m_showButton, Qn::MainWindow_Pin_Help);
     item->setBlinker(m_showButton);
-    connect(action(action::ToggleNotificationsAction), &QAction::toggled, this,
-        [this](bool checked)
-        {
-            if (!m_ignoreClickEvent)
-                setOpened(checked, true);
-        });
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(m_showButton);
@@ -223,7 +212,6 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(backgroundItem));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
-    m_opacityAnimatorGroup->addAnimator(opacityAnimator(pinButton));
 
     /* Create a shadow: */
     auto shadow = new QnEdgeShadowWidget(item, item, Qt::LeftEdge, NxUi::kShadowThickness);
@@ -243,7 +231,7 @@ bool NotificationsWorkbenchPanel::isPinned() const
 
 bool NotificationsWorkbenchPanel::isOpened() const
 {
-    return action(action::ToggleNotificationsAction)->isChecked();
+    return m_opened;;
 }
 
 void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -254,8 +242,7 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(action::ToggleNotificationsAction)->setChecked(opened);
+    m_opened = opened;
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened
@@ -270,6 +257,8 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
         xAnimator->animateTo(newX);
     else
         item->setX(newX);
+
+    setShowButtonIcon();
 
     emit openedChanged(opened, animate);
 }
@@ -305,7 +294,6 @@ void NotificationsWorkbenchPanel::setOpacity(qreal opacity, bool animate)
     {
         m_opacityAnimatorGroup->pause();
         opacityAnimator(item)->setTargetValue(opacity);
-        opacityAnimator(pinButton)->setTargetValue(opacity);
         opacityAnimator(backgroundItem)->setTargetValue(opacity);
         opacityAnimator(m_showButton)->setTargetValue(opacity);
         m_opacityAnimatorGroup->start();
@@ -314,7 +302,6 @@ void NotificationsWorkbenchPanel::setOpacity(qreal opacity, bool animate)
     {
         m_opacityAnimatorGroup->stop();
         item->setOpacity(opacity);
-        pinButton->setOpacity(opacity);
         backgroundItem->setOpacity(opacity);
         m_showButton->setOpacity(opacity);
     }
@@ -347,6 +334,14 @@ void NotificationsWorkbenchPanel::setShowButtonUsed(bool used)
     m_showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
 }
 
+void NotificationsWorkbenchPanel::setShowButtonIcon()
+{
+    m_showButton->setIcon(qnSkin->icon(m_opened
+        ? "panel/slide_pin.png"
+        : "panel/slide_right.png",
+        "panel/slide_left.png"));
+}
+
 void NotificationsWorkbenchPanel::updateControlsGeometry()
 {
     auto parentWidgetRect = m_parentWidget->rect();
@@ -359,11 +354,6 @@ void NotificationsWorkbenchPanel::updateControlsGeometry()
         qMin(parentWidgetRect.right(), paintGeometry.left()),
         (parentWidgetRect.top() + parentWidgetRect.bottom() - m_showButton->size().height()) / 2
     ));
-
-    if (nx::client::desktop::ini().unifiedEventPanel)
-        pinButton->setPos(headerGeometry.topRight() + QPointF(1.0 - pinButton->size().width(), 1.0));
-    else
-        pinButton->setPos(headerGeometry.topLeft() + QPointF(1.0, 1.0));
 
     emit geometryChanged();
 }
