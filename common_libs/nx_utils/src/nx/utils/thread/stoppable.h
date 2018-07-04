@@ -1,15 +1,11 @@
-/**********************************************************
-* 28 jan 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef QNSTOPPABLE_H
-#define QNSTOPPABLE_H
+#pragma once
 
 #include <functional>
 #include <vector>
 
-/** Abstract class providing interface to stop doing anything without object destruction */
+/**
+ * Abstract class providing interface to stop doing anything without object destruction.
+ */
 class NX_UTILS_API QnStoppable
 {
 public:
@@ -17,5 +13,3 @@ public:
 
     virtual void pleaseStop() = 0;
 };
-
-#endif  //QNSTOPPABLE_H

@@ -20,8 +20,7 @@ DbRequestExecutionThread::DbRequestExecutionThread(
     m_state(ConnectionState::initializing),
     m_terminated(false),
     m_numberOfFailedRequestsInARow(0),
-    m_dbConnectionHolder(connectionOptions),
-    m_queueReaderId(queryExecutorQueue->generateReaderId())
+    m_dbConnectionHolder(connectionOptions)
 {
 }
 
@@ -33,14 +32,11 @@ DbRequestExecutionThread::~DbRequestExecutionThread()
         m_queryExecutionThread.join();
     }
     m_dbConnectionHolder.close();
-
-    queryExecutorQueue()->removeReaderFromTerminatedList(m_queueReaderId);
 }
 
 void DbRequestExecutionThread::pleaseStop()
 {
     m_terminated = true;
-    queryExecutorQueue()->addReaderToTerminatedList(m_queueReaderId);
 }
 
 void DbRequestExecutionThread::join()
@@ -66,7 +62,8 @@ void DbRequestExecutionThread::start()
 
 void DbRequestExecutionThread::queryExecutionThreadMain()
 {
-    constexpr const std::chrono::milliseconds kTaskWaitTimeout = std::chrono::seconds(1);
+    constexpr const std::chrono::milliseconds kTaskWaitTimeout =
+        std::chrono::milliseconds(50);
 
     auto invokeOnClosedHandlerGuard = makeScopeGuard(
         [onClosedHandler = std::move(m_onClosedHandler)]()
@@ -87,8 +84,8 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
 
     while (!m_terminated && m_state == ConnectionState::opened)
     {
-        boost::optional<std::unique_ptr<AbstractExecutor>> task =
-            queryExecutorQueue()->pop(kTaskWaitTimeout, m_queueReaderId);
+        std::optional<std::unique_ptr<AbstractExecutor>> task =
+            queryExecutorQueue()->pop(kTaskWaitTimeout);
         if (!task)
         {
             if (connectionOptions().inactivityTimeout > std::chrono::seconds::zero() &&
