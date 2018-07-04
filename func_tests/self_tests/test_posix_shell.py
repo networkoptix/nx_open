@@ -100,3 +100,60 @@ def test_streams_closed_early_but_process_timed_out(posix_shell):
 
 def test_streams_closed_early_and_process_on_time(posix_shell):
     posix_shell.run_command(['python', '-c', _early_closing_streams_script, 2], timeout_sec=5)
+
+
+# language=Python
+_wait_for_any_data_script = r'''
+import sys
+
+sys.stdin.read(1)
+'''
+
+
+def test_receive_times_out(posix_shell):
+    acceptable_error_sec = 0.1
+    timeout_sec = 2
+    command = posix_shell.command(['python', '-c', _wait_for_any_data_script], set_eux=False)
+    with command.running() as run:
+        begin = timeit.default_timer()
+        output_line, stderr = run.receive(timeout_sec)
+        end = timeit.default_timer()
+        assert stderr == b''
+        assert output_line == b''
+        assert timeout_sec < end - begin < timeout_sec + acceptable_error_sec
+        _, _ = run.communicate(input=b' ', timeout_sec=acceptable_error_sec)
+    assert run.outcome.is_success
+
+
+# language=Python
+_delayed_cat = r'''
+import sys
+import time
+
+if __name__ == '__main__':
+    sleep_time_sec = float(sys.argv[1])
+    while True:
+        line = sys.stdin.readline()
+        if line == '\n':
+            break
+        time.sleep(sleep_time_sec)
+        sys.stdout.write(line)
+        sys.stdout.flush()
+'''
+
+
+def test_receive_with_delays(posix_shell):
+    delay_sec = 2
+    acceptable_error_sec = 0.1
+    timeout_tolerance_sec = 0.2
+    with posix_shell.command(['python', '-c', _delayed_cat, delay_sec], set_eux=False).running() as run:
+        second_begin = timeit.default_timer()
+        input_line = b'test line\n'
+        run.send(input_line)
+        second_output_line, second_stderr = run.receive(delay_sec + timeout_tolerance_sec)
+        second_check = timeit.default_timer()
+        assert second_stderr == b''
+        assert second_output_line == input_line
+        assert delay_sec < second_check - second_begin < delay_sec + acceptable_error_sec
+        run.communicate(b'\n', delay_sec + timeout_tolerance_sec)
+    assert run.outcome.is_success
