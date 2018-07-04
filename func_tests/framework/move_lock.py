@@ -17,7 +17,7 @@ class MoveLockNotAcquired(Exception):
 
 class MoveLock(object):
     # TODO: Replace with lockfile (at least, it's in a pip/vendor)
-    def __init__(self, ssh, path, timeout_sec=10):
+    def __init__(self, ssh, path, timeout_sec=60):
         self._ssh = ssh  # type: SSH
         self._path = path  # type: SSHPath
         self._timeout_sec = timeout_sec
