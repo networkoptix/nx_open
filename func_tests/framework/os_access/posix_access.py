@@ -64,6 +64,7 @@ class PosixAccess(OSAccess):
         try:
             self.shell.run_command([
                 'smbget',
+                '--quiet',  # Usual progress output has outrageous rate.
                 '--guest',  # Force guest authentication.
                 '--outputfile', destination,
                 url,
