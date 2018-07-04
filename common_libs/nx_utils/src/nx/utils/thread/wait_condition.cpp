@@ -44,6 +44,8 @@ void QnWaitCondition::wakeOne()
     return m_impl->cond.wakeOne();
 }
 
+#endif
+
 //-------------------------------------------------------------------------------------------------
 
 WaitConditionTimer::WaitConditionTimer(
@@ -74,5 +76,3 @@ bool WaitConditionTimer::wait(QnMutex* mutex)
         mutex,
         duration_cast<milliseconds>(m_timeout - timePassed).count());
 }
-
-#endif
