@@ -8,6 +8,11 @@ New-Item 'HKLM:\SYSTEM\CurrentControlSet\Control\Network\NewNetworkWindowOff' -F
 Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Power' 'HibernateFileSizePercent' 0
 Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Power' 'HibernateEnabled' 0
 
+# See: https://docs.microsoft.com/de-de/security-updates/windowsupdateservices/18127499
+New-Item 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -Force
+Set-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' 'NoAutoUpdate' 1
+Set-Service wuauserv -StartupType Disabled
+
 Set-Service SSDPSRV -StartupType Disabled
 Set-Service fdPHost -StartupType Disabled
 Set-Service FDResPub -StartupType Disabled
