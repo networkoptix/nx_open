@@ -497,17 +497,13 @@ void LayoutThumbnailLoader::doLoadAsync()
     // Pixel-accurate calculations will be done in Private::finalizeOutputImage.
     QRectF bounding;
     if (!d->layout->fixedSize().isEmpty())
-    {
         bounding = d->layout->backgroundRect(d->layout->fixedSize());
-    }
-    else
-    {
-        for (const auto& [item, resource]: validItems)
-            bounding = bounding.united(item.combinedGeometry);
 
-        if (hasBackground)
-            bounding = bounding.united(backgroundRect);
-    }
+    for (const auto& [item, resource]: validItems)
+        bounding = bounding.united(item.combinedGeometry);
+
+    if (hasBackground)
+        bounding = bounding.united(backgroundRect);
 
     if (bounding.isEmpty())
     {
