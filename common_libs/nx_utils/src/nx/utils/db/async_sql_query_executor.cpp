@@ -197,6 +197,11 @@ void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
     m_queryQueue.setConcurrentModificationQueryLimit(value);
 }
 
+void AsyncSqlQueryExecutor::setQueryPriority(QueryType queryType, int newPriority)
+{
+    m_queryQueue.setQueryPriority(queryType, newPriority);
+}
+
 bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const
 {
     // TODO: #ak Check for non-busy threads.
