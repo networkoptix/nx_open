@@ -12,8 +12,7 @@
 #include "detail/query_queue.h"
 #include "request_executor.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 enum class ConnectionState
 {
@@ -49,5 +48,4 @@ private:
     QueryExecutorQueue* const m_queryExecutorQueue;
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

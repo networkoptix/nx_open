@@ -8,8 +8,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 constexpr static std::chrono::minutes kDefaultStatisticsAggregationPeriod = std::chrono::minutes(1);
 static const std::string kCdbStructureName = "cdb_BF58C070-B0E6-4327-BB2E-417A68AAA53D";
@@ -134,5 +133,4 @@ DBResult InstanceController::configureSqliteInstance(
     return DBResult::ok;
 }
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

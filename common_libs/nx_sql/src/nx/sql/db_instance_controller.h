@@ -7,8 +7,7 @@
 #include "db_structure_updater.h"
 #include "types.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 class NX_SQL_API InstanceController
 {
@@ -36,5 +35,4 @@ private:
     DBResult configureSqliteInstance(QueryContext* queryContext);
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

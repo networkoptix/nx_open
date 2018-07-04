@@ -9,9 +9,7 @@
 
 #include "base_db_test.h"
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 static const std::string kCdbStructureName = "test";
 
@@ -369,6 +367,4 @@ TEST_F(
     thenScriptsOfAnotherSchemaWereExecuted();
 }
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

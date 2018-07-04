@@ -5,9 +5,7 @@
 
 #include <nx/sql/db_statistics_collector.h>
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 class DbStatisticsCollector:
     public ::testing::Test
@@ -200,6 +198,4 @@ TEST_F(DbStatisticsCollector, expired_elements_are_removed)
     assertStatisticsIsCalculatedByLastRecords(2);
 }
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

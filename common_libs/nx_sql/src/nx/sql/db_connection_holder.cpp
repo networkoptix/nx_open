@@ -7,8 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 DbConnectionHolder::DbConnectionHolder(const ConnectionOptions& connectionOptions):
     m_connectionOptions(connectionOptions)
@@ -122,5 +121,4 @@ std::shared_ptr<nx::sql::QueryContext> DbConnectionHolder::createNewTran()
         deleter);
 }
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

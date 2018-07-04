@@ -9,9 +9,7 @@
 
 #include "../async_sql_query_executor.h"
 
-namespace nx {
-namespace sql {
-namespace detail {
+namespace nx::sql::detail {
 
 namespace {
 
@@ -313,6 +311,4 @@ QByteArray DbStructureUpdater::fixSqlDialect(
     return script;
 }
 
-} // namespace detail
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::detail

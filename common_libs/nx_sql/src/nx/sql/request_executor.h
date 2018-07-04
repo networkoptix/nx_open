@@ -14,8 +14,7 @@
 #include "types.h"
 #include "query_context.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 class StatisticsCollector;
 
@@ -300,5 +299,4 @@ private:
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> m_completionHandler;
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

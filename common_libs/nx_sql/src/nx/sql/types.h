@@ -8,8 +8,7 @@
 
 class QnSettings;
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 enum class DBResult
 {
@@ -90,5 +89,4 @@ private:
     DBResult m_dbResult;
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

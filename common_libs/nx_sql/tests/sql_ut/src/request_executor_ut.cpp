@@ -7,9 +7,7 @@
 #include <nx/sql/db_connection_holder.h>
 #include <nx/sql/request_executor.h>
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 class DbRequestExecutor:
     public BaseDbTest
@@ -63,6 +61,4 @@ TEST_F(DbRequestExecutor, handles_exception)
     thenExceptionIsHandledAndErrorCodeIsReturned();
 }
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

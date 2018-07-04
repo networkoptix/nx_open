@@ -4,8 +4,7 @@
 
 #include <nx/utils/time.h>
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 //-------------------------------------------------------------------------------------------------
 // BaseExecutor
@@ -212,5 +211,4 @@ void SelectExecutor::reportErrorWithoutExecution(DBResult errorCode)
     m_completionHandler(nullptr, errorCode);
 }
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

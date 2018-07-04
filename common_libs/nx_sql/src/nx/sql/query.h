@@ -6,8 +6,7 @@
 
 #include "types.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 /**
  * Follows same conventions as QSqlQuery except error reporting:
@@ -44,5 +43,4 @@ private:
     DBResult getLastErrorCode();
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

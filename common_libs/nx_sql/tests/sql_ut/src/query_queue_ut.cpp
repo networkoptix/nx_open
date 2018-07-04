@@ -8,10 +8,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
-namespace nx {
-namespace sql {
-namespace detail {
-namespace test {
+namespace nx::sql::detail::test {
 
 namespace {
 
@@ -231,7 +228,4 @@ TEST_F(QueryQueue, select_query_priority_can_be_raised)
     assertSelectQueryIsReadFromQueue();
 }
 
-} // namespace test
-} // namespace detail
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::detail::test

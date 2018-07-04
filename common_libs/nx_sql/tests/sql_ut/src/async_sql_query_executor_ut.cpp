@@ -19,9 +19,7 @@
 
 #include "base_db_test.h"
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 struct Company
 {
@@ -669,6 +667,4 @@ TEST_F(DbAsyncSqlQueryExecutorCursor, cursor_query_cleaned_up_when_after_early_c
 
 // TEST_F(DbAsyncSqlQueryExecutorCursor, many_cursors_do_not_block_queries)
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

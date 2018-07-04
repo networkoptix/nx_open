@@ -7,8 +7,7 @@
 #include "types.h"
 #include "query_context.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 class NX_SQL_API DbConnectionHolder
 {
@@ -45,5 +44,4 @@ private:
     DbConnectionHolder& operator=(const DbConnectionHolder&) = delete;
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

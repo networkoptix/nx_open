@@ -6,8 +6,7 @@
 
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 class AsyncSqlQueryExecutor;
 
@@ -55,5 +54,4 @@ private:
     const QnUuid m_id;
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

@@ -12,9 +12,7 @@
 
 #include "../request_executor.h"
 
-namespace nx {
-namespace sql {
-namespace detail {
+namespace nx::sql::detail {
 
 class NX_SQL_API QueryQueue
 {
@@ -103,6 +101,4 @@ private:
     void removeExpiredElements(QnMutexLockerBase* lock);
 };
 
-} // namespace detail
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::detail

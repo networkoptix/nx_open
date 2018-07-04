@@ -6,8 +6,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/deprecated_settings.h>
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 const char* toString(DBResult result)
 {
@@ -196,5 +195,4 @@ DBResult Exception::dbResult() const
     return m_dbResult;
 }
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

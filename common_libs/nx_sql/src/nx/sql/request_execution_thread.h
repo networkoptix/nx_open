@@ -9,8 +9,7 @@
 #include "db_connection_holder.h"
 #include "request_executor.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 /**
  * Connection can be closed by timeout or due to error.
@@ -49,5 +48,4 @@ private:
     static bool isDbErrorRecoverable(DBResult dbResult);
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

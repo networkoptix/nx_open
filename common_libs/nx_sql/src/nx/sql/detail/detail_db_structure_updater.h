@@ -11,8 +11,7 @@
 
 #include "../types.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 class AbstractAsyncSqlQueryExecutor;
 class QueryContext;
@@ -20,8 +19,8 @@ class QueryContext;
 namespace detail {
 
 /**
- * Updates specified DB scheme. 
- * Multiple objects can be used to update mutiple schemes 
+ * Updates specified DB scheme.
+ * Multiple objects can be used to update mutiple schemes
  * (e.g., db_version_data table and application scheme).
  */
 class NX_SQL_API DbStructureUpdater
@@ -132,5 +131,5 @@ private:
 };
 
 } // namespace detail
-} // namespace sql
-} // namespace nx
+
+} // namespace nx::sql

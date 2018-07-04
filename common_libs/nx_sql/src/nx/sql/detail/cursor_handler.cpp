@@ -2,9 +2,7 @@
 
 #include <nx/utils/type_utils.h>
 
-namespace nx {
-namespace sql {
-namespace detail {
+namespace nx::sql::detail {
 
 void CursorHandlerPool::add(
     QnUuid id,
@@ -125,6 +123,4 @@ void CleanUpDroppedCursorsExecutor::executeCursor(QSqlDatabase* const /*connecti
     // No need to do anything. Cleanup is done before this call.
 }
 
-} // namespace detail
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::detail

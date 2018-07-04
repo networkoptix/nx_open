@@ -6,9 +6,7 @@
 
 #include <nx/sql/types.h>
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 constexpr int argc = 3;
 const char* args[] = {
@@ -58,6 +56,4 @@ TEST_F(DbConnectionOptions, custom_default_values_are_not_overwritten)
     assertIfNotOnlySpecifiedFieldsWereOverridden();
 }
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

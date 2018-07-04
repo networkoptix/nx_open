@@ -8,8 +8,7 @@
 #include "sql_query_execution_helper.h"
 #include "query.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 void AbstractAsyncSqlQueryExecutor::executeSqlSync(QByteArray sqlStatement)
 {
@@ -305,5 +304,4 @@ void AsyncSqlQueryExecutor::addCursorProcessingThread(const QnMutexLockerBase& l
         createNewConnectionThread(lock, connectionOptions, &m_cursorTaskQueue);
 }
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

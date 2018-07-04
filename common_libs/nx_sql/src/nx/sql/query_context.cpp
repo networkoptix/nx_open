@@ -1,7 +1,6 @@
 #include "query_context.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 QueryContext::QueryContext(
     QSqlDatabase* const connection,
@@ -32,5 +31,4 @@ const Transaction* QueryContext::transaction() const
     return m_transaction;
 }
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

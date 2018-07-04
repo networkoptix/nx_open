@@ -6,9 +6,7 @@
 #include <nx/sql/query.h>
 #include <nx/utils/test_support/utils.h>
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 BasicFixture::BasicFixture():
     nx::utils::test::TestWithTemporaryDirectory("utils_ut", "")
@@ -95,6 +93,4 @@ AsyncSqlQueryExecutor& FixtureWithQueryExecutorOnly::asyncSqlQueryExecutor()
     return *m_queryExecutor;
 }
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

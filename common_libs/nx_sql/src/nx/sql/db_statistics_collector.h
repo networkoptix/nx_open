@@ -9,8 +9,7 @@
 
 #include "types.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 struct NX_SQL_API QueryExecutionInfo
 {
@@ -95,5 +94,4 @@ private:
         std::chrono::milliseconds value);
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

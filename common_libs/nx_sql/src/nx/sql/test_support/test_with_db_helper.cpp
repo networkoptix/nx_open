@@ -7,9 +7,7 @@
 #include "../db_connection_holder.h"
 #include "../sql_query_execution_helper.h"
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 boost::optional<nx::sql::ConnectionOptions> TestWithDbHelper::sDbConnectionOptions;
 
@@ -69,6 +67,4 @@ void TestWithDbHelper::cleanDatabase()
     }
 }
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

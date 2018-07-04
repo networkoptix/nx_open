@@ -7,8 +7,7 @@
 #include "query.h"
 #include "types.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 DbStructureUpdater::DbStructureUpdater(
     const std::string& schemaName,
@@ -202,5 +201,4 @@ void DbStructureUpdater::setDbSchemaName(
     setDbSchemaNameQuery.exec();
 }
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

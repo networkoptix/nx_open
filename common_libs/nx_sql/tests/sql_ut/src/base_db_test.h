@@ -13,9 +13,7 @@
 #include <nx/sql/types.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 // TODO: #ak Fix weird class names in this file.
 
@@ -124,6 +122,4 @@ private:
     std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;
 };
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

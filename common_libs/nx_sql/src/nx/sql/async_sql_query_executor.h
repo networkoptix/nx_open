@@ -23,8 +23,7 @@
 #include "query.h"
 #include "query_context.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 class NX_SQL_API AbstractAsyncSqlQueryExecutor
 {
@@ -315,5 +314,4 @@ private:
     void addCursorProcessingThread(const QnMutexLockerBase& lock);
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

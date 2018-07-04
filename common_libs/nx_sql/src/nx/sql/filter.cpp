@@ -2,8 +2,7 @@
 
 #include <nx/utils/log/log_message.h>
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 SqlFilterField::SqlFilterField(
     const char* name,
@@ -93,5 +92,4 @@ QString generateWhereClauseExpression(const InnerJoinFilterFields& filter)
     return result;
 }
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

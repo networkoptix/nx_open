@@ -2,9 +2,7 @@
 
 #include <nx/utils/time.h>
 
-namespace nx {
-namespace sql {
-namespace detail {
+namespace nx::sql::detail {
 
 const int QueryQueue::kDefaultPriority;
 
@@ -212,6 +210,4 @@ void QueryQueue::removeExpiredElements(QnMutexLockerBase* lock)
     }
 }
 
-} // namespace detail
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::detail

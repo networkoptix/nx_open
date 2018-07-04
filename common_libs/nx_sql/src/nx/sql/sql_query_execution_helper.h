@@ -6,8 +6,7 @@
 
 #include <nx/utils/uuid.h>
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 class NX_SQL_API SqlQueryExecutionHelper
 {
@@ -30,5 +29,4 @@ public:
         bool optional = true);
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

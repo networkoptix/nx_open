@@ -6,9 +6,7 @@
 
 #include "../types.h"
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 class NX_SQL_API TestWithDbHelper:
     public utils::test::TestWithTemporaryDirectory
@@ -31,6 +29,4 @@ private:
     void cleanDatabase();
 };
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

@@ -8,9 +8,7 @@
 
 #include "base_db_test.h"
 
-namespace nx {
-namespace sql {
-namespace test {
+namespace nx::sql::test {
 
 class DbRequestExecutionThread:
     public BaseDbTest
@@ -52,6 +50,4 @@ TEST_F(DbRequestExecutionThread, stops_after_termination_request)
     verifyThatThreadHasStopped();
 }
 
-} // namespace test
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::test

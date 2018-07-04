@@ -8,8 +8,7 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 DbRequestExecutionThread::DbRequestExecutionThread(
     const ConnectionOptions& connectionOptions,
@@ -176,5 +175,4 @@ bool DbRequestExecutionThread::isDbErrorRecoverable(DBResult dbResult)
     }
 }
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql

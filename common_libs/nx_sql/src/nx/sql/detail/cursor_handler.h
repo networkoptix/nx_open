@@ -10,9 +10,7 @@
 #include "../request_executor.h"
 #include "../query.h"
 
-namespace nx {
-namespace sql {
-namespace detail {
+namespace nx::sql::detail {
 
 class AbstractCursorHandler
 {
@@ -223,6 +221,4 @@ protected:
     virtual void executeCursor(QSqlDatabase* const connection) override;
 };
 
-} // namespace detail
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql::detail

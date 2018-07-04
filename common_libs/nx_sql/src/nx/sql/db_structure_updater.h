@@ -2,8 +2,7 @@
 
 #include "detail/detail_db_structure_updater.h"
 
-namespace nx {
-namespace sql {
+namespace nx::sql {
 
 /**
  * Updates are executed in order they have been added to DbStructureUpdater instance.
@@ -48,7 +47,7 @@ public:
     unsigned int maxKnownVersion() const;
 
     /**
-     * By default, update is done to the maximum known version. 
+     * By default, update is done to the maximum known version.
      * I.e., every script/function is applied.
      */
     void setVersionToUpdateTo(unsigned int version);
@@ -71,5 +70,4 @@ private:
         const std::string& schemaName);
 };
 
-} // namespace sql
-} // namespace nx
+} // namespace nx::sql
