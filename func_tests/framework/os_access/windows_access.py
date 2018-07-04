@@ -8,6 +8,7 @@ import tzlocal.windows_tz
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
 from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, exit_status_error_cls
+from framework.os_access.os_access_interface import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
@@ -74,8 +75,8 @@ class WindowsAccess(RemoteAccess):
 
         return SpecificSMBPath
 
-    def run_command(self, command, input=None):
-        return self.winrm.run_command(command, input=input)
+    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        return self.winrm.run_command(command, input=input, timeout_sec=timeout_sec)
 
     def is_accessible(self):
         return self.winrm.is_working()

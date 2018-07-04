@@ -11,6 +11,7 @@ from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
 from framework.utils import RunningTime
 
+DEFAULT_RUN_TIMEOUT_SEC = 60
 _DEFAULT_DOWNLOAD_TIMEOUT_SEC = 30 * 60
 
 _logger = logging.getLogger(__name__)
@@ -84,7 +85,7 @@ class OSAccess(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def run_command(self, command, input=None):  # type: (list, bytes) -> bytes
+    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):  # type: (list, bytes, int) -> bytes
         """For applications with cross-platform CLI"""
         return b'stdout'
 
