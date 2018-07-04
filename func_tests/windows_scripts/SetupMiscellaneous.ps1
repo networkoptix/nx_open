@@ -20,3 +20,5 @@ Set-Service DusmSvc -StartupType Disabled  # Data usage metrics.
 Set-Service HomeGroupProvider -StartupType Disabled
 Set-Service lfsvc -StartupType Disabled  # Geolocation.
 Set-Service wlidsvc -StartupType Disabled  # Sign-in with MS Live account.
+
+Set-Service sshd -StartupType Automatic
