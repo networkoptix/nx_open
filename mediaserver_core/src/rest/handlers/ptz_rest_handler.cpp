@@ -310,7 +310,6 @@ int QnPtzRestHandler::executeContinuousMove(
 {
     NX_VERBOSE(this, lit("Start execute ContinuousMove. params=%1").arg(toString(params)));
 
-    qreal xSpeed, ySpeed, zSpeed;
     nx::core::ptz::Vector speedVector;
     nx::core::ptz::Options options;
 
