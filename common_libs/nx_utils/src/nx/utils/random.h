@@ -1,9 +1,11 @@
 #pragma once
 
+#include <initializer_list>
 #include <random>
 #include <limits>
 #include <type_traits>
-#include <QByteArray>
+
+#include <QtCore/QByteArray>
 
 #include "qt_random_device.h"
 
@@ -147,7 +149,7 @@ Type number(
 template<typename RandomDevice>
 QByteArray generateName(RandomDevice& randomDevice, int length)
 {
-    static const char kAlphaAndDigits[] = 
+    static const char kAlphaAndDigits[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     static const size_t kDigitsCount = 10;
     static_assert(kDigitsCount < sizeof(kAlphaAndDigits), "Check kAlphaAndDigits array");
@@ -158,11 +160,11 @@ QByteArray generateName(RandomDevice& randomDevice, int length)
     QByteArray str;
     str.resize(length);
     str[0] = kAlphaAndDigits[
-        nx::utils::random::number(randomDevice) % 
+        nx::utils::random::number(randomDevice) %
             (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
     for (int i = 1; i < length; ++i)
     {
-        str[i] = kAlphaAndDigits[nx::utils::random::number(randomDevice) % 
+        str[i] = kAlphaAndDigits[nx::utils::random::number(randomDevice) %
             (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
     }
 
@@ -192,6 +194,13 @@ const typename Container::value_type& choice(const Container& container)
 {
     auto position = number<typename Container::size_type>(0, container.size() - 1);
     return *std::next(container.begin(), position);
+}
+
+template<typename T>
+T choice(std::initializer_list<T> values)
+{
+    auto position = number<typename std::initializer_list<T>::size_type>(0, values.size() - 1);
+    return *std::next(values.begin(), position);
 }
 
 } // namespace random
