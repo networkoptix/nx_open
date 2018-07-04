@@ -1,3 +1,4 @@
+import logging
 from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import datetime
 
@@ -9,6 +10,8 @@ from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
 from framework.utils import RunningTime
+
+_logger = logging.getLogger(__name__)
 
 
 class _AllPorts(object):
@@ -117,6 +120,7 @@ class OSAccess(object):
         return self.Path()
 
     def download(self, source_url, destination_dir):
+        _logger.info("Download %s to %r.", source_url, destination_dir)
         if source_url.startswith('http://') or source_url.startswith('https://'):
             return self._download_by_http(source_url, destination_dir)
         if source_url.startswith('smb://'):
