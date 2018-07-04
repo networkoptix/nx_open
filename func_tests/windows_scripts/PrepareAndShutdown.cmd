@@ -13,4 +13,4 @@ copy /V /Y %~dp0\FirstLogon.ps1 C:\Users\Public\Desktop\FirstLogon.ps1
 
 @echo SysPrep will shutdown machine. GUI instance, which was shown at startup in Audit mode is killed.
 TaskKill /IM SysPrep.exe /F
-C:\Windows\System32\SysPrep\SysPrep.exe /generalize /oobe /shutdown /unattend:%~dp0\Autounattend.xml
+C:\Windows\System32\SysPrep\SysPrep.exe /generalize /oobe /shutdown /unattend:%~dp0\DeployAutounattend.xml
