@@ -12,15 +12,21 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
+#include <nx/client/desktop/common/utils/item_view_utils.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
 
-struct NodeViewWidget::Private
+struct NodeViewWidget::Private: public QObject
 {
     Private(NodeViewWidget& owner);
 
     void updateColumns();
+    void handleClicked(const QModelIndex& index);
+    void handleCheckedChanged(const ViewNode::Path& path, Qt::CheckState checkedState);
+    void handlePatchApplied();
+    void handleStateChanged();
 
     NodeViewWidget& owner;
     NodeViewModel model;
@@ -45,6 +51,23 @@ void NodeViewWidget::Private::updateColumns()
         header->setSectionHidden(node_view::checkMarkColumn, true);
 }
 
+void NodeViewWidget::Private::handleCheckedChanged(
+    const ViewNode::Path& path,
+    Qt::CheckState checkedState)
+{
+    store.setNodeChecked(path, checkedState);
+}
+
+void NodeViewWidget::Private::handlePatchApplied()
+{
+    model.applyPatch(store.lastPatch());
+}
+
+void NodeViewWidget::Private::handleStateChanged()
+{
+    model.setState(store.state());
+}
+
 //-------------------------------------------------------------------------------------------------
 
 NodeViewWidget::NodeViewWidget(QWidget* parent):
@@ -55,23 +78,11 @@ NodeViewWidget::NodeViewWidget(QWidget* parent):
     setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 1)));
     setIndentation(style::Metrics::kDefaultIconSize);
 
-    connect(&d->store, &NodeViewStore::stateChanged, &d->model,
-        [this]()
-        {
-            d->model.setState(d->store.state());
-        });
+    ItemViewUtils::autoToggleOnRowClick(this, node_view::checkMarkColumn); //< TODO: add selection modifiers stuff
 
-    connect(&d->store, &NodeViewStore::patchApplied, &d->model,
-        [this]()
-        {
-            d->model.applyPatch(d->store.lastPatch());
-        });
-
-    connect(&d->model, &NodeViewModel::checkedChanged, &d->store,
-        [this](const ViewNode::Path& path, Qt::CheckState checkedState)
-        {
-            d->store.setNodeChecked(path, checkedState);
-        });
+    connect(&d->store, &NodeViewStore::stateChanged, d, &Private::handleStateChanged);
+    connect(&d->store, &NodeViewStore::patchApplied, d, &Private::handlePatchApplied);
+    connect(&d->model, &NodeViewModel::checkedChanged, d, &Private::handleCheckedChanged);
 }
 
 NodeViewWidget::~NodeViewWidget()
@@ -87,6 +98,11 @@ void NodeViewWidget::setState(const NodeViewState& state)
 const NodeViewState& NodeViewWidget::state() const
 {
     return d->store.state();
+}
+
+void NodeViewWidget::applyPatch(const NodeViewStatePatch& patch)
+{
+    d->store.applyPatch(patch);
 }
 
 } // namespace desktop
