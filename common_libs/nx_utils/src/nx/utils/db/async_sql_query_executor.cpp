@@ -27,6 +27,8 @@ void AbstractAsyncSqlQueryExecutor::executeSqlSync(QByteArray sqlStatement)
 
 static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
 
+const int AsyncSqlQueryExecutor::kDefaultQueryPriority = detail::QueryQueue::kDefaultPriority;
+
 AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     const ConnectionOptions& connectionOptions)
     :
@@ -195,6 +197,11 @@ int AsyncSqlQueryExecutor::openCursorCount() const
 void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
 {
     m_queryQueue.setConcurrentModificationQueryLimit(value);
+}
+
+void AsyncSqlQueryExecutor::setQueryPriority(QueryType queryType, int newPriority)
+{
+    m_queryQueue.setQueryPriority(queryType, newPriority);
 }
 
 bool AsyncSqlQueryExecutor::isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const

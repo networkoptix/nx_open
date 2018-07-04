@@ -125,6 +125,8 @@ class NX_UTILS_API AsyncSqlQueryExecutor:
     public AbstractAsyncSqlQueryExecutor
 {
 public:
+    static const int kDefaultQueryPriority;
+
     AsyncSqlQueryExecutor(const ConnectionOptions& connectionOptions);
     virtual ~AsyncSqlQueryExecutor();
 
@@ -160,6 +162,11 @@ public:
      * @param value Zero - no limit. By default, zero.
      */
     void setConcurrentModificationQueryLimit(int value);
+
+    /**
+     * By default, each query type has same priority of kDefaultQueryPriority.
+     */
+    void setQueryPriority(QueryType queryType, int newPriority);
 
     std::size_t pendingQueryCount() const;
 

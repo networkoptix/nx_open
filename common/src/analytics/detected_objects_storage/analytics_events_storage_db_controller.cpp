@@ -11,6 +11,11 @@ DbController::DbController(
     :
     base_type(connectionOptions)
 {
+    // Raising SELECT query priority so that those queries are not blocked by numerous INSERT.
+    queryExecutor().setQueryPriority(
+        utils::db::QueryType::lookup,
+        utils::db::AsyncSqlQueryExecutor::kDefaultQueryPriority + 1);
+
     dbStructureUpdater().addUpdateScript(kCreateAnalyticsEventsSchema);
     dbStructureUpdater().addUpdateScript(kAnalyticsDbMoreIndexes);
     dbStructureUpdater().addUpdateScript(kAnalyticsDbEvenMoreIndexes);

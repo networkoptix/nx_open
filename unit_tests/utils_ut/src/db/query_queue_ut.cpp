@@ -1,8 +1,10 @@
+#include <deque>
 #include <thread>
 
 #include <gtest/gtest.h>
 
 #include <nx/utils/db/detail/query_queue.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -71,18 +73,63 @@ protected:
             std::bind(&QueryQueue::processTimedOutQuery, this, _1));
     }
 
+    void raiseSelectQueryPriority()
+    {
+        m_queryQueue.setQueryPriority(
+            QueryType::lookup,
+            detail::QueryQueue::kDefaultPriority + 1);
+    }
+
+    void addSeveralQueriesOfDifferentType()
+    {
+        const int queryCount = 17;
+        for (int i = 0; i < queryCount; ++i)
+        {
+            const auto queryType = nx::utils::random::choice(
+                {QueryType::modification, QueryType::lookup});
+            pushQuery(queryType);
+        }
+    }
+
+    void addSelectQuery()
+    {
+        pushQuery(QueryType::lookup);
+    }
+
     void addMultipleModificationQueries()
     {
-        const int kQueryCount = 10;
-        for (int i = 0; i < kQueryCount; ++i)
-            m_queryQueue.push(std::make_unique<QueryExecutorStub>(QueryType::modification));
+        const int queryCount = 10;
+        for (int i = 0; i < queryCount; ++i)
+            pushQuery(QueryType::modification);
+    }
+
+    void whenQueryTimeoutPasses()
+    {
+        std::this_thread::sleep_for(kQueryTimeout * 2);
     }
 
     void whenQueryTimedOut()
     {
-        std::this_thread::sleep_for(kQueryTimeout * 2);
+        whenQueryTimeoutPasses();
+
         ASSERT_FALSE(static_cast<bool>(m_queryQueue.pop(std::chrono::milliseconds(1))));
         m_timedOutQueries.pop();
+    }
+
+    void whenPopWithTimeout()
+    {
+        m_prevPosResult = m_queryQueue.pop(std::chrono::milliseconds(1));
+    }
+
+    void thenTimedOutQueriesAreReported()
+    {
+        ASSERT_FALSE(m_queryQueue.pop(std::chrono::milliseconds(1)));
+
+        while (!m_queryTypes.empty())
+        {
+            ASSERT_EQ(m_queryTypes.front(), m_timedOutQueries.pop());
+            m_queryTypes.pop_front();
+        }
     }
 
     void thenAnotherModificationQueryCanBeReadFromTheQueue()
@@ -97,20 +144,67 @@ protected:
         ASSERT_TRUE(static_cast<bool>(m_queryQueue.pop()));
     }
 
+    void thenEmptyValueIsReturned()
+    {
+        ASSERT_FALSE(static_cast<bool>(m_prevPosResult));
+    }
+
+    void assertQueriesArePoppedInTheSameOrderAsPushed()
+    {
+        while (!m_queryTypes.empty())
+        {
+            ASSERT_EQ(m_queryTypes.front(), (*m_queryQueue.pop())->queryType());
+            m_queryTypes.pop_front();
+        }
+    }
+
+    void assertSelectQueryIsReadFromQueue()
+    {
+        const auto query = m_queryQueue.pop();
+        ASSERT_TRUE(static_cast<bool>(query));
+        ASSERT_EQ(QueryType::lookup, (*query)->queryType());
+    }
+
     detail::QueryQueue& queryQueue()
     {
         return m_queryQueue;
     }
 
 private:
+    std::optional<std::unique_ptr<AbstractExecutor>> m_prevPosResult;
     detail::QueryQueue m_queryQueue;
-    nx::utils::SyncQueue<int /*dummy*/> m_timedOutQueries;
+    nx::utils::SyncQueue<QueryType> m_timedOutQueries;
+    std::deque<QueryType> m_queryTypes;
 
-    void processTimedOutQuery(std::unique_ptr<AbstractExecutor> /*query*/)
+    void processTimedOutQuery(std::unique_ptr<AbstractExecutor> query)
     {
-        m_timedOutQueries.push(0 /*dummy*/);
+        m_timedOutQueries.push(query->queryType());
+    }
+
+    void pushQuery(QueryType queryType)
+    {
+        m_queryQueue.push(std::make_unique<QueryExecutorStub>(queryType));
+        m_queryTypes.push_back(queryType);
     }
 };
+
+//-------------------------------------------------------------------------------------------------
+
+TEST_F(QueryQueue, timeout_is_supported)
+{
+    whenPopWithTimeout();
+    thenEmptyValueIsReturned();
+}
+
+TEST_F(QueryQueue, expired_queries_are_reported)
+{
+    enableQueueItemTimeout();
+
+    addSeveralQueriesOfDifferentType();
+    whenQueryTimeoutPasses();
+
+    thenTimedOutQueriesAreReported();
+}
 
 TEST_F(QueryQueue, modification_query_limit_correctly_updated_on_query_timeout)
 {
@@ -120,6 +214,22 @@ TEST_F(QueryQueue, modification_query_limit_correctly_updated_on_query_timeout)
     addMultipleModificationQueries();
     whenQueryTimedOut();
     thenAnotherModificationQueryCanBeReadFromTheQueue();
+}
+
+TEST_F(QueryQueue, event_query_has_same_priority_by_default)
+{
+    addSeveralQueriesOfDifferentType();
+    assertQueriesArePoppedInTheSameOrderAsPushed();
+}
+
+TEST_F(QueryQueue, select_query_priority_can_be_raised)
+{
+    raiseSelectQueryPriority();
+
+    addMultipleModificationQueries();
+    addSelectQuery();
+
+    assertSelectQueryIsReadFromQueue();
 }
 
 } // namespace test

@@ -43,7 +43,6 @@ private:
     std::atomic<bool> m_terminated;
     int m_numberOfFailedRequestsInARow;
     DbConnectionHolder m_dbConnectionHolder;
-    const nx::utils::QueueReaderId m_queueReaderId;
 
     void queryExecutionThreadMain();
     void closeConnection();
