@@ -8,19 +8,17 @@ namespace layout_id_helper {
 
 QnLayoutResourcePtr findLayoutByFlexibleId(QnResourcePool* resourcePool, const QString& flexibleId)
 {
-    QnResourcePtr result;
-    const QnUuid uuid = QnUuid::fromStringSafe(flexibleId);
-    if (!uuid.isNull())
-        result = resourcePool->getResourceById(uuid);
-    if (!result)
-    {
-        auto resourceList = resourcePool->getResourcesByLogicalId(flexibleId.toInt());
-        if (!resourceList.isEmpty())
-            result = resourceList.front();
-    }
+    if (const QnUuid uuid = QnUuid::fromStringSafe(flexibleId); !uuid.isNull())
+        return resourcePool->getResourceById<QnLayoutResource>(uuid);
 
-    // If the found resource is not a camera, return null.
-    return result.dynamicCast<QnLayoutResource>();
+    if (const int logicalId = flexibleId.toInt(); logicalId > 0)
+    {
+        auto layoutsList = resourcePool->getResourcesByLogicalId(logicalId)
+            .filtered<QnLayoutResource>();
+        if (!layoutsList.isEmpty())
+            return layoutsList.front();
+    }
+    return QnLayoutResourcePtr();
 }
 
 QnUuid flexibleIdToId(QnResourcePool* resourcePool, const QString& flexibleId)

@@ -1336,7 +1336,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getLayouts
      * Return list of user layout
      * %param[default] format
-     * %param[opt] id Layout unique id. If omitted, return data for all layouts.
+     * %param[opt] id Layout unique ID or logical ID. If omitted, return data for all layouts.
      * %return List of layout objects in the requested format.
      * %// AbstractLayoutManager::getLayouts
      */
@@ -1470,6 +1470,9 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param locked Whether the layout is locked.
      *     %value false
      *     %value true
+     * %param fixedWidth Fixed width of the layout in cells (integer).
+     * %param fixedHeight Fixed height of the layout in cells (integer).
+     * %param logicalId Logical ID of the layout, set by user (integer).
      * %param backgroundImageFilename
      * %param backgroundWidth Width of the background image in pixels (integer).
      * %param backgroundHeight Height of the background image in pixels (integer).
