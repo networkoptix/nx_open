@@ -115,7 +115,6 @@ TEST_F(QnJsonTextFixture, chronoTypes)
     ASSERT_EQ(std::chrono::milliseconds(50), QJson::deserialized<std::chrono::milliseconds>("\"50\""));
 }
 
-
 TEST_F(QnJsonTextFixture, QtStringTypes)
 {
     //ASSERT_EQ(kHelloWorld, QJson::serialized(kHelloWorld.toUtf8())); -- not supported, returns base64
