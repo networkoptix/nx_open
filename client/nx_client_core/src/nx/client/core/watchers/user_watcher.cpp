@@ -69,7 +69,7 @@ UserWatcher::UserWatcher(QObject* parent) :
     connect(this, &UserWatcher::userNameChanged, this, updateUserResource);
 
     const auto updateUserName =
-        [this](const QnUserResourcePtr& user) { setUserName(user->getName()); };
+        [this](const QnUserResourcePtr& user) { setUserName(user ? user->getName() : QString()); };
     connect(this, &UserWatcher::userChanged, this, guarded(this, updateUserName));
 }
 
