@@ -3,61 +3,69 @@ import logging
 
 from framework.camera import Camera
 
-STAGES = []
+STAGES = []  # Filled by _stage decorator.
 
 _logger = logging.getLogger(__name__)
 
 
+def _stage(is_essential=False, retry_count=0, retry_delay_s=10):
+    def decorator(action):
+        # TODO: Better make it a helper class.
+        def stage(server, camera_id, **kwargs):
+            verifier = Verifier(server, camera_id)
+            try:
+                action(verifier, **kwargs)
+            except Exception:
+                return Result.on_exception(errors=verifier.errors)
+            if verifier.errors:
+                return Result(errors=verifier.errors)
+            return Result()
+
+        stage.name = action.__name__
+        stage.is_essential = is_essential
+        stage.retry_count = retry_count
+        stage.retry_delay_s = retry_delay_s
+        STAGES.append(stage)
+        return stage
+
+    return decorator
+
+
+_KEY_VALUE_FIXES = {
+    'encoderIndex': {0: 'primary', 1: 'secondary'},
+}
+
+
+def _fix_key_value(key, value):
+    return _KEY_VALUE_FIXES.get(key, {}).get(value, value)
+
+
 class Result(object):
-    def __init__(self, errors=[], is_exception=False):
+    def __init__(self, errors=[], exception_traceback=[]):
         self.errors = errors
-        self.exception = traceback.format_exc().strip() if is_exception else None
+        self.exception_traceback = exception_traceback
 
     def __nonzero__(self):
-        return not self.errors and not self.exception
+        return not self.errors and not self.exception_traceback
 
     def __repr__(self):
-        return repr(self.to_dict())
+        if self:
+            return '{}()'.format(type(self).__name__)
+        return '{}(errors={}, exception_traceback={})'.format(
+            type(self).__name__, repr(self.errors), repr(self.exception_traceback))
 
     def to_dict(self):
         d = dict(status=('ok' if self else 'error'))
         if self.errors:
             d['errors'] = self.errors
-        if self.exception:
-            d['exception'] = self.exception.split('\n')
+        if self.exception_traceback:
+            d['exception'] = self.exception_traceback
         return d
 
-
-def _register_stage(action, is_essential=False, retry_count=0, retry_delay_s=10):
-    def stage(server, camera_id, **kwargs):
-        verifier = Verifier(server, camera_id)
-        try:
-            action(verifier, **kwargs)
-        except:
-            return Result(is_exception=True, errors=verifier.errors)
-        if verifier.errors:
-            return Result(errors=verifier.errors)
-        return Result()
-
-    stage.name = action.__name__
-    stage.is_essential = is_essential
-    stage.retry_count = retry_count
-    stage.retry_delay_s = retry_delay_s
-    STAGES.append(stage)
-    return stage
-
-
-def _stage(**kwargs):
-    return lambda c: _register_stage(c, **kwargs)
-
-
-KEY_VALUE_FIXES = {
-    'encoderIndex': {0: 'primary', 1: 'secondary'},
-}
-
-
-def fix_key_value(key, value):
-    return KEY_VALUE_FIXES.get(key, {}).get(value, value)
+    @classmethod
+    def on_exception(cls, *args, **kwargs):
+        trace = traceback.format_exc().strip().split('\n')
+        return cls(exception_traceback=trace, *args, **kwargs)
 
 
 class Verifier(object):
@@ -87,7 +95,7 @@ class Verifier(object):
                         path, key, type(actual)))
                     continue
 
-                item = self._search_item(*key.split('='), items=actual)
+                item = self._search_item(*key.split('=', 1), items=actual)
                 if item:
                     self.expect_values(expected_value, item, '{}[{}]'.format(path, key))
                     continue
@@ -105,7 +113,7 @@ class Verifier(object):
     @staticmethod
     def _search_item(key, value, items):
         for item in items:
-            if str(fix_key_value(key, item.get(key))) == value:
+            if str(_fix_key_value(key, item.get(key))) == value:
                 return item
 
 

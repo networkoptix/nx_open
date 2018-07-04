@@ -3,6 +3,7 @@ import os
 import time
 import logging
 from urlparse import urlparse
+from pathlib2 import Path
 
 from framework.installation.make_installation import make_installation
 from framework.installation.mediaserver import Mediaserver
@@ -15,11 +16,11 @@ DISCOVERY_RETRY_COUNT = 10
 DISCOVERY_RETRY_DELAY_S = 10
 
 # TODO: Pass this file by test paramiters.
-EXPECTED_CAMERAS_FILE = os.path.dirname(__file__) + '/expected_cameras.yaml'
+EXPECTED_CAMERAS_FILE = Path(__file__).parent / 'expected_cameras.yaml'
 
 
 # TODO: Make this test work with fresh configured server on VM with bridged interface.
-def test_cameras(mediaserver_installers):
+def test_cameras(mediaserver_installers, work_dir):
     installation = make_installation(mediaserver_installers, 'linux', local_access)
     server = Mediaserver(local_access, installation, password='qweasd123')
     time.sleep(1)  # TODO: Remove when server is integrated as normal test.
@@ -28,9 +29,13 @@ def test_cameras(mediaserver_installers):
     stand.discover_cameras()
     stand.execute_verification_stages()
 
-    # TODO: Write results somewhere on HDD.
-    print '-' * 80
-    print(yaml.safe_dump(stand.result, default_flow_style=False, width=1000))
+    def save_yaml(data, file_name):
+        serialized = yaml.safe_dump(data, default_flow_style=False, width=1000)
+        (work_dir / (file_name + '.yaml')).write_bytes(serialized)
+
+    save_yaml(stand.result, 'test_result')
+    save_yaml(server.get_resources('ec2/getCamerasEx'), 'discovered_cameras')
+    save_yaml(server.api.get('api/moduleInformation'), 'server_information')
     assert stand.is_success
 
 
@@ -68,6 +73,7 @@ class Camera(object):
         return d
 
 
+# TODO: implement by class Wait?
 class RetryWithDelay(object):
     def __init__(self, retry_count, retry_delay_s):
         self.attempts = 0
@@ -90,11 +96,10 @@ class Stand(object):
         self.server_information = self.server.api.get('api/moduleInformation')
         self.actual_cameras = {}
         self.expected_cameras = {}
-        with open(EXPECTED_CAMERAS_FILE) as f:
-            for ip, rules in yaml.load(f).iteritems():
-                stages = self._filter_stages(rules)
-                if stages.has_key('discovery'):
-                    self.expected_cameras[ip] = stages
+        for ip, rules in yaml.load(EXPECTED_CAMERAS_FILE.read_bytes()).iteritems():
+            stages = self._filter_stages(rules)
+            if stages.has_key('discovery'):
+                self.expected_cameras[ip] = stages
 
     @property
     def result(self):

@@ -66,6 +66,7 @@ def parse_json_fields(data):
 
 
 def encode_camera_credentials(login, password):
+    # Do not try to understand this code, this is hardcoded the same way as in common library.
     data = ':'.join([login, password])
     data += chr(0) * (16 - (len(data) % 16))
     key = '4453D6654C634636990B2E5AA69A1312'.decode('hex')
