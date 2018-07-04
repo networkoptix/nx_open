@@ -11,8 +11,7 @@
 #include "../query.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace detail {
 
 class AbstractCursorHandler
@@ -30,9 +29,9 @@ class CursorHandler:
     public AbstractCursorHandler
 {
 public:
-    using PrepareCursorFunc = MoveOnlyFunc<void(SqlQuery*)>;
-    using ReadRecordFunc = MoveOnlyFunc<void(SqlQuery*, Record*)>;
-    using CursorCreatedHandler = MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)>;
+    using PrepareCursorFunc = nx::utils::MoveOnlyFunc<void(SqlQuery*)>;
+    using ReadRecordFunc = nx::utils::MoveOnlyFunc<void(SqlQuery*, Record*)>;
+    using CursorCreatedHandler = nx::utils::MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)>;
 
     CursorHandler(
         PrepareCursorFunc prepareCursorFunc,
@@ -163,7 +162,7 @@ public:
     FetchCursorDataExecutor(
         CursorHandlerPool* cursorContextPool,
         QnUuid cursorId,
-        MoveOnlyFunc<void(DBResult, Record)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
         :
         base_type(cursorContextPool),
         m_cursorId(cursorId),
@@ -205,7 +204,7 @@ protected:
 
 private:
     QnUuid m_cursorId;
-    MoveOnlyFunc<void(DBResult, Record)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(DBResult, Record)> m_completionHandler;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -225,6 +224,5 @@ protected:
 };
 
 } // namespace detail
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

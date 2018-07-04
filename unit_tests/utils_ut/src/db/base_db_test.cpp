@@ -7,8 +7,7 @@
 #include <nx/utils/test_support/utils.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace test {
 
 BasicFixture::BasicFixture():
@@ -42,7 +41,7 @@ void BasicFixture::initializeDatabase()
 void BasicFixture::executeUpdate(const QString& queryText)
 {
     const auto dbResult = executeQuery(
-        [queryText](nx::utils::db::QueryContext* queryContext)
+        [queryText](nx::sql::QueryContext* queryContext)
         {
             SqlQuery query(*queryContext->connection());
             query.prepare(queryText);
@@ -97,6 +96,5 @@ AsyncSqlQueryExecutor& FixtureWithQueryExecutorOnly::asyncSqlQueryExecutor()
 }
 
 } // namespace test
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

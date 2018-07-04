@@ -136,7 +136,7 @@ public:
     std::list<network::SocketAddress> endpointsToListen() const;
 
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
-    const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
+    const nx::sql::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
     std::optional<network::server::UserLockerSettings> loginLockout() const;
     const Notification& notification() const;
@@ -149,12 +149,12 @@ public:
     const Http& http() const;
     const VmsGateway& vmsGateway() const;
 
-    void setDbConnectionOptions(const nx::utils::db::ConnectionOptions& options);
+    void setDbConnectionOptions(const nx::sql::ConnectionOptions& options);
 
 private:
     nx::utils::log::Settings m_logging;
     nx::utils::log::Settings m_vmsSynchronizationLogging;
-    nx::utils::db::ConnectionOptions m_dbConnectionOptions;
+    nx::sql::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
     std::optional<network::server::UserLockerSettings> m_loginLockout;
     Notification m_notification;

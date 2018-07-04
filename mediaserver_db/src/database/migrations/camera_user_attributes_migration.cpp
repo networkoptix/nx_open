@@ -29,7 +29,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     MIGRATION_PARAM_TYPES, (sql_record), _Fields)
 
 using ScheduleTasks = std::vector<ScheduleTaskThresholdsWithRefData>;
-using nx::utils::db::SqlQueryExecutionHelper;
+using nx::sql::SqlQueryExecutionHelper;
 
 bool fetchScheduleTasks(const QSqlDatabase& database, ScheduleTasks& scheduleTasks)
 {

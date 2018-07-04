@@ -7,8 +7,7 @@
 #include "types.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 class NX_UTILS_API Transaction
 {
@@ -43,6 +42,5 @@ private:
     void notifyOnTransactionCompletion(DBResult dbResult);
 };
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

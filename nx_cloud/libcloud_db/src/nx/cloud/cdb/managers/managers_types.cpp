@@ -5,32 +5,32 @@
 namespace nx {
 namespace cdb {
 
-api::ResultCode dbResultToApiResult(nx::utils::db::DBResult dbResult)
+api::ResultCode dbResultToApiResult(nx::sql::DBResult dbResult)
 {
     switch (dbResult)
     {
-        case nx::utils::db::DBResult::ok:
-        case nx::utils::db::DBResult::endOfData:
+        case nx::sql::DBResult::ok:
+        case nx::sql::DBResult::endOfData:
             return api::ResultCode::ok;
 
-        case nx::utils::db::DBResult::notFound:
+        case nx::sql::DBResult::notFound:
             return api::ResultCode::notFound;
 
-        case nx::utils::db::DBResult::cancelled:
+        case nx::sql::DBResult::cancelled:
             return api::ResultCode::retryLater;
 
-        case nx::utils::db::DBResult::ioError:
-        case nx::utils::db::DBResult::statementError:
-        case nx::utils::db::DBResult::connectionError:
+        case nx::sql::DBResult::ioError:
+        case nx::sql::DBResult::statementError:
+        case nx::sql::DBResult::connectionError:
             return api::ResultCode::dbError;
 
-        case nx::utils::db::DBResult::retryLater:
+        case nx::sql::DBResult::retryLater:
             return api::ResultCode::retryLater;
 
-        case nx::utils::db::DBResult::uniqueConstraintViolation:
+        case nx::sql::DBResult::uniqueConstraintViolation:
             return api::ResultCode::alreadyExists;
 
-        case nx::utils::db::DBResult::logicError:
+        case nx::sql::DBResult::logicError:
             return api::ResultCode::unknownError;
     }
 

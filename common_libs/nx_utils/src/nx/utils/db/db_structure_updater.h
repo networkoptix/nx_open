@@ -3,8 +3,7 @@
 #include "detail/detail_db_structure_updater.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 /**
  * Updates are executed in order they have been added to DbStructureUpdater instance.
@@ -15,7 +14,7 @@ namespace db {
 class NX_UTILS_API DbStructureUpdater
 {
 public:
-    using UpdateFunc = MoveOnlyFunc<DBResult(QueryContext*)>;
+    using UpdateFunc = nx::utils::MoveOnlyFunc<DBResult(QueryContext*)>;
 
     DbStructureUpdater(
         const std::string& schemaName,
@@ -72,6 +71,5 @@ private:
         const std::string& schemaName);
 };
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

@@ -18,48 +18,48 @@ class AbstractSystemDataObject
 public:
     virtual ~AbstractSystemDataObject() = default;
 
-    virtual nx::utils::db::DBResult insert(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult insert(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemData& system,
         const std::string& accountId) = 0;
 
-    virtual nx::utils::db::DBResult selectSystemSequence(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult selectSystemSequence(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         std::uint64_t* const sequence) = 0;
 
-    virtual nx::utils::db::DBResult markSystemForDeletion(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult markSystemForDeletion(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId) = 0;
 
-    virtual nx::utils::db::DBResult deleteSystem(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult deleteSystem(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId) = 0;
 
-    virtual nx::utils::db::DBResult execSystemNameUpdate(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult execSystemNameUpdate(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data) = 0;
 
-    virtual nx::utils::db::DBResult execSystemOpaqueUpdate(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult execSystemOpaqueUpdate(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data) = 0;
 
-    virtual nx::utils::db::DBResult updateSystemStatus(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult updateSystemStatus(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         api::SystemStatus systemStatus) = 0;
 
-    virtual nx::utils::db::DBResult fetchSystems(
-        nx::utils::db::QueryContext* queryContext,
-        const nx::utils::db::InnerJoinFilterFields& filterFields,
+    virtual nx::sql::DBResult fetchSystems(
+        nx::sql::QueryContext* queryContext,
+        const nx::sql::InnerJoinFilterFields& filterFields,
         std::vector<data::SystemData>* const systems) = 0;
 
     virtual boost::optional<data::SystemData> fetchSystemById(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId) = 0;
 
-    virtual nx::utils::db::DBResult deleteExpiredSystems(
-        nx::utils::db::QueryContext* queryContext) = 0;
+    virtual nx::sql::DBResult deleteExpiredSystems(
+        nx::sql::QueryContext* queryContext) = 0;
 };
 
 class SystemDataObjectFactory

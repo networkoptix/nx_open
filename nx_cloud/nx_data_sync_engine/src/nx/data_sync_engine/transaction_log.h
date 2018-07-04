@@ -40,7 +40,7 @@ QString toString(const CommandHeader& tran);
  * In this case transactions will reported to AbstractOutgoingTransactionDispatcher
  * in ascending sequence order.
  *
- * @note Calls with the same nx::utils::db::QueryContext object MUST happen within single thread.
+ * @note Calls with the same nx::sql::QueryContext object MUST happen within single thread.
  */
 class NX_DATA_SYNC_ENGINE_API TransactionLog
 {
@@ -57,25 +57,25 @@ public:
      */
     TransactionLog(
         const QnUuid& peerId,
-        nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
+        nx::sql::AsyncSqlQueryExecutor* const dbManager,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
     /**
      * Begins SQL DB transaction and passes that to dbOperationsFunc.
-     * @note nx::utils::db::DBResult::retryLater can be reported to onDbUpdateCompleted if
+     * @note nx::sql::DBResult::retryLater can be reported to onDbUpdateCompleted if
      *      there are already too many requests for transaction
      * @note In case of error dbUpdateFunc can be skipped
      */
     void startDbTransaction(
         const nx::String& systemId,
-        nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, nx::utils::db::DBResult)> onDbUpdateCompleted);
+        nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, nx::sql::DBResult)> onDbUpdateCompleted);
 
     /**
      * @note This call should be made only once when generating first transaction.
      */
-    nx::utils::db::DBResult updateTimestampHiForSystem(
-        nx::utils::db::QueryContext* connection,
+    nx::sql::DBResult updateTimestampHiForSystem(
+        nx::sql::QueryContext* connection,
         const nx::String& systemId,
         quint64 newValue);
 
@@ -84,8 +84,8 @@ public:
      *      db::DBResult::cancelled is returned.
      */
     template<typename TransactionDataType>
-    nx::utils::db::DBResult checkIfNeededAndSaveToLog(
-        nx::utils::db::QueryContext* connection,
+    nx::sql::DBResult checkIfNeededAndSaveToLog(
+        nx::sql::QueryContext* connection,
         const nx::String& systemId,
         const SerializableTransaction<TransactionDataType>& transaction)
     {
@@ -105,8 +105,8 @@ public:
                     .arg(transaction.get())
                     .arg(calculateTransactionHash(transaction.get())),
                 cl_logDEBUG1);
-            // Returning nx::utils::db::DBResult::cancelled if transaction should be skipped.
-            return nx::utils::db::DBResult::cancelled;
+            // Returning nx::sql::DBResult::cancelled if transaction should be skipped.
+            return nx::sql::DBResult::cancelled;
         }
 
         return saveToDb(
@@ -118,8 +118,8 @@ public:
     }
 
     template<typename TransactionDataType>
-    nx::utils::db::DBResult generateTransactionAndSaveToLog(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult generateTransactionAndSaveToLog(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::ApiCommand::Value commandCode,
         TransactionDataType transactionData)
@@ -135,8 +135,8 @@ public:
      * This method should be used when generating new transactions.
      */
     template<typename TransactionDataType>
-    nx::utils::db::DBResult saveLocalTransaction(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult saveLocalTransaction(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
         Command<TransactionDataType> transaction)
     {
@@ -166,7 +166,7 @@ public:
             transaction,
             transactionHash,
             serializedTransaction);
-        if (result != nx::utils::db::DBResult::ok)
+        if (result != nx::sql::DBResult::ok)
             return result;
 
         auto transactionSerializer = std::make_unique<
@@ -181,12 +181,12 @@ public:
             dbTranContext.cacheTranId,
             std::move(transactionSerializer));
 
-        return nx::utils::db::DBResult::ok;
+        return nx::sql::DBResult::ok;
     }
 
     template<typename TransactionDataType>
     Command<TransactionDataType> prepareLocalTransaction(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::ApiCommand::Value commandCode,
         TransactionDataType transactionData)
@@ -267,7 +267,7 @@ private:
     };
 
     typedef nx::utils::SafeMap<
-        std::pair<nx::utils::db::QueryContext*, nx::String>,
+        std::pair<nx::sql::QueryContext*, nx::String>,
         DbTransactionContext
     > DbTransactionContextMap;
 
@@ -280,7 +280,7 @@ private:
     };
 
     const QnUuid m_peerId;
-    nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractOutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     mutable QnMutex m_mutex;
     DbTransactionContextMap m_dbTransactionContexts;
@@ -289,13 +289,13 @@ private:
     std::unique_ptr<dao::AbstractTransactionDataObject> m_transactionDataObject;
 
     /** Fills transaction state cache. */
-    nx::utils::db::DBResult fillCache();
-    nx::utils::db::DBResult fetchTransactionState(nx::utils::db::QueryContext* connection);
+    nx::sql::DBResult fillCache();
+    nx::sql::DBResult fetchTransactionState(nx::sql::QueryContext* connection);
     /**
      * Selects transactions from DB by condition.
      */
-    nx::utils::db::DBResult fetchTransactions(
-        nx::utils::db::QueryContext* connection,
+    nx::sql::DBResult fetchTransactions(
+        nx::sql::QueryContext* connection,
         const nx::String& systemId,
         const ::ec2::QnTranState& from,
         const ::ec2::QnTranState& to,
@@ -303,13 +303,13 @@ private:
         TransactionReadResult* const outputData);
 
     bool isShouldBeIgnored(
-        nx::utils::db::QueryContext* connection,
+        nx::sql::QueryContext* connection,
         const nx::String& systemId,
         const CommandHeader& transaction,
         const QByteArray& transactionHash);
 
-    nx::utils::db::DBResult saveToDb(
-        nx::utils::db::QueryContext* connection,
+    nx::sql::DBResult saveToDb(
+        nx::sql::QueryContext* connection,
         const nx::String& systemId,
         const CommandHeader& transaction,
         const QByteArray& transactionHash,
@@ -324,7 +324,7 @@ private:
 
     int generateNewTransactionSequence(
         const QnMutexLockerBase& lock,
-        nx::utils::db::QueryContext* connection,
+        nx::sql::QueryContext* connection,
         const nx::String& systemId);
 
     ::ec2::Timestamp generateNewTransactionTimestamp(
@@ -333,13 +333,13 @@ private:
         const nx::String& systemId);
 
     void onDbTransactionCompleted(
-        nx::utils::db::QueryContext* dbConnection,
+        nx::sql::QueryContext* dbConnection,
         const nx::String& systemId,
-        nx::utils::db::DBResult dbResult);
+        nx::sql::DBResult dbResult);
 
     DbTransactionContext& getDbTransactionContext(
         const QnMutexLockerBase& lock,
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const nx::String& systemId);
 
     TransactionLogContext* getTransactionLogContext(
@@ -347,15 +347,15 @@ private:
         const nx::String& systemId);
 
     std::tuple<int, ::ec2::Timestamp> generateNewTransactionAttributes(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId);
 
     void updateTimestampHiInCache(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
         quint64 newValue);
 
-    static ResultCode dbResultToApiResult(nx::utils::db::DBResult dbResult);
+    static ResultCode dbResultToApiResult(nx::sql::DBResult dbResult);
 };
 
 } // namespace data_sync_engine

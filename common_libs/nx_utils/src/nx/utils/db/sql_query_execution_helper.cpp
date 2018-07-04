@@ -8,8 +8,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 namespace {
 
@@ -143,6 +142,5 @@ void SqlQueryExecutionHelper::bindId(QSqlQuery* query,
         query->bindValue(parameter, id.toRfc4122());
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

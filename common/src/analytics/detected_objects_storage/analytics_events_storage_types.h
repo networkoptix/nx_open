@@ -114,7 +114,7 @@ enum class ResultCode
     error,
 };
 
-ResultCode dbResultToResultCode(nx::utils::db::DBResult dbResult);
+ResultCode dbResultToResultCode(nx::sql::DBResult dbResult);
 
 nx::network::http::StatusCode::Value toHttpStatusCode(ResultCode resultCode);
 ResultCode fromHttpStatusCode(nx::network::http::StatusCode::Value statusCode);

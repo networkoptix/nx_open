@@ -1,13 +1,13 @@
 #pragma once
 
+#include <future>
+
 #include <boost/optional.hpp>
 
-#include <nx/utils/std/future.h>
 #include <nx/utils/uuid.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 class AsyncSqlQueryExecutor;
 
@@ -35,7 +35,7 @@ public:
 
     boost::optional<Record> next()
     {
-        promise<std::tuple<DBResult, Record>> recordFetched;
+        std::promise<std::tuple<DBResult, Record>> recordFetched;
         m_asyncSqlQueryExecutor->fetchNextRecordFromCursor<Record>(
             m_id,
             [this, &recordFetched](DBResult resultCode, Record record)
@@ -55,6 +55,5 @@ private:
     const QnUuid m_id;
 };
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

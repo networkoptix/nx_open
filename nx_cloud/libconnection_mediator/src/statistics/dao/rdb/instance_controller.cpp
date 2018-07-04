@@ -8,8 +8,8 @@ namespace stats {
 namespace dao {
 namespace rdb {
 
-InstanceController::InstanceController(const nx::utils::db::ConnectionOptions& connectionOptions):
-    nx::utils::db::InstanceController(connectionOptions)
+InstanceController::InstanceController(const nx::sql::ConnectionOptions& connectionOptions):
+    nx::sql::InstanceController(connectionOptions)
 {
     dbStructureUpdater().addUpdateScript(kCreateConnectSessionStatisticsTable);
 

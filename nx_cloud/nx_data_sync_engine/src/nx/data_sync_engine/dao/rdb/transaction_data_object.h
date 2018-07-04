@@ -14,17 +14,17 @@ class TransactionDataObject:
     public AbstractTransactionDataObject
 {
 public:
-    virtual nx::utils::db::DBResult insertOrReplaceTransaction(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult insertOrReplaceTransaction(
+        nx::sql::QueryContext* queryContext,
         const TransactionData& transactionData) override;
 
-    virtual nx::utils::db::DBResult updateTimestampHiForSystem(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult updateTimestampHiForSystem(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
         quint64 newValue) override;
 
-    virtual nx::utils::db::DBResult fetchTransactionsOfAPeerQuery(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult fetchTransactionsOfAPeerQuery(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
         const QString& peerId,
         const QString& dbInstanceId,

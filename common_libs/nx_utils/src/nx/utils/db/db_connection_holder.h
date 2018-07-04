@@ -8,8 +8,7 @@
 #include "query_context.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 class NX_UTILS_API DbConnectionHolder
 {
@@ -30,7 +29,7 @@ public:
 
     void close();
 
-    std::shared_ptr<nx::utils::db::QueryContext> begin();
+    std::shared_ptr<nx::sql::QueryContext> begin();
 
 private:
     QSqlDatabase m_dbConnection;
@@ -40,12 +39,11 @@ private:
     bool tuneConnection();
     bool tuneMySqlConnection();
 
-    std::shared_ptr<nx::utils::db::QueryContext> createNewTran();
+    std::shared_ptr<nx::sql::QueryContext> createNewTran();
 
     DbConnectionHolder(const DbConnectionHolder&) = delete;
     DbConnectionHolder& operator=(const DbConnectionHolder&) = delete;
 };
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

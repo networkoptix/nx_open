@@ -9,7 +9,7 @@ namespace nx {
 namespace analytics {
 namespace storage {
 
-using namespace nx::utils::db;
+using namespace nx::sql;
 
 static const int kUsecInMs = 1000;
 
@@ -199,7 +199,7 @@ void EventsStorage::insertEventAttributes(
 
 void EventsStorage::prepareCursorQuery(
     const Filter& filter,
-    nx::utils::db::SqlQuery* query)
+    nx::sql::SqlQuery* query)
 {
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
@@ -208,7 +208,7 @@ void EventsStorage::prepareCursorQuery(
     if (!sqlQueryFilter.empty())
     {
         sqlQueryFilterStr = lm("WHERE %1").args(
-            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
+            nx::sql::generateWhereClauseExpression(sqlQueryFilter));
     }
 
     // TODO: #ak Think over limit in the following query.
@@ -224,11 +224,11 @@ void EventsStorage::prepareCursorQuery(
         eventsFilteredByFreeTextSubQuery,
         sqlQueryFilterStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
-    nx::utils::db::bindFields(query, sqlQueryFilter);
+    nx::sql::bindFields(query, sqlQueryFilter);
 }
 
-nx::utils::db::DBResult EventsStorage::selectObjects(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult EventsStorage::selectObjects(
+    nx::sql::QueryContext* queryContext,
     const Filter& filter,
     std::vector<DetectedObject>* result)
 {
@@ -241,12 +241,12 @@ nx::utils::db::DBResult EventsStorage::selectObjects(
 
     queryTrackInfo(queryContext, result);
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 void EventsStorage::prepareLookupQuery(
     const Filter& filter,
-    nx::utils::db::SqlQuery* query)
+    nx::sql::SqlQuery* query)
 {
     QString eventsFilteredByFreeTextSubQuery;
     const auto sqlQueryFilter =
@@ -255,7 +255,7 @@ void EventsStorage::prepareLookupQuery(
     if (!sqlQueryFilter.empty())
     {
         sqlQueryFilterStr = lm("WHERE %1").args(
-            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
+            nx::sql::generateWhereClauseExpression(sqlQueryFilter));
     }
 
     QString sqlLimitStr;
@@ -293,24 +293,24 @@ void EventsStorage::prepareLookupQuery(
         kMaxFilterEventsResultSize,
         sqlLimitStr,
         filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC").toQString());
-    nx::utils::db::bindFields(query, sqlQueryFilter);
+    nx::sql::bindFields(query, sqlQueryFilter);
 }
 
-nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
+nx::sql::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
     const Filter& filter,
     QString* eventsFilteredByFreeTextSubQuery)
 {
-    nx::utils::db::InnerJoinFilterFields sqlFilter;
+    nx::sql::InnerJoinFilterFields sqlFilter;
     if (!filter.deviceId.isNull())
     {
-        nx::utils::db::SqlFilterFieldEqual filterField(
+        nx::sql::SqlFilterFieldEqual filterField(
             "device_guid", ":deviceId", QnSql::serialized_field(filter.deviceId));
         sqlFilter.push_back(std::move(filterField));
     }
 
     if (!filter.objectId.isNull())
     {
-        nx::utils::db::SqlFilterFieldEqual filterField(
+        nx::sql::SqlFilterFieldEqual filterField(
             "object_id", ":objectId", QnSql::serialized_field(filter.objectId));
         sqlFilter.push_back(std::move(filterField));
     }
@@ -342,27 +342,27 @@ nx::utils::db::InnerJoinFilterFields EventsStorage::prepareSqlFilterExpression(
 
 void EventsStorage::addObjectTypeIdToFilter(
     const std::vector<QnUuid>& objectTypeIds,
-    nx::utils::db::InnerJoinFilterFields* sqlFilter)
+    nx::sql::InnerJoinFilterFields* sqlFilter)
 {
     // TODO: #ak Add support for every objectTypeId specified.
 
-    nx::utils::db::SqlFilterFieldEqual filterField(
+    nx::sql::SqlFilterFieldEqual filterField(
         "object_type_id", ":objectTypeId", QnSql::serialized_field(objectTypeIds.front()));
     sqlFilter->push_back(std::move(filterField));
 }
 
 void EventsStorage::addTimePeriodToFilter(
     const QnTimePeriod& timePeriod,
-    nx::utils::db::InnerJoinFilterFields* sqlFilter)
+    nx::sql::InnerJoinFilterFields* sqlFilter)
 {
-    nx::utils::db::SqlFilterFieldGreaterOrEqual startTimeFilterField(
+    nx::sql::SqlFilterFieldGreaterOrEqual startTimeFilterField(
         "timestamp_usec_utc",
         ":startTimeUsec",
         QnSql::serialized_field(timePeriod.startTimeMs * kUsecInMs));
     sqlFilter->push_back(std::move(startTimeFilterField));
 
     const auto endTimeMs = timePeriod.startTimeMs + timePeriod.durationMs;
-    nx::utils::db::SqlFilterFieldLess endTimeFilterField(
+    nx::sql::SqlFilterFieldLess endTimeFilterField(
         "timestamp_usec_utc",
         ":endTimeUsec",
         QnSql::serialized_field(endTimeMs * kUsecInMs));
@@ -371,27 +371,27 @@ void EventsStorage::addTimePeriodToFilter(
 
 void EventsStorage::addBoundingBoxToFilter(
     const QRectF& boundingBox,
-    nx::utils::db::InnerJoinFilterFields* sqlFilter)
+    nx::sql::InnerJoinFilterFields* sqlFilter)
 {
-    nx::utils::db::SqlFilterFieldLessOrEqual topLeftXFilter(
+    nx::sql::SqlFilterFieldLessOrEqual topLeftXFilter(
         "box_top_left_x",
         ":boxTopLeftX",
         QnSql::serialized_field(boundingBox.bottomRight().x()));
     sqlFilter->push_back(std::move(topLeftXFilter));
 
-    nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightXFilter(
+    nx::sql::SqlFilterFieldGreaterOrEqual bottomRightXFilter(
         "box_bottom_right_x",
         ":boxBottomRightX",
         QnSql::serialized_field(boundingBox.topLeft().x()));
     sqlFilter->push_back(std::move(bottomRightXFilter));
 
-    nx::utils::db::SqlFilterFieldLessOrEqual topLeftYFilter(
+    nx::sql::SqlFilterFieldLessOrEqual topLeftYFilter(
         "box_top_left_y",
         ":boxTopLeftY",
         QnSql::serialized_field(boundingBox.bottomRight().y()));
     sqlFilter->push_back(std::move(topLeftYFilter));
 
-    nx::utils::db::SqlFilterFieldGreaterOrEqual bottomRightYFilter(
+    nx::sql::SqlFilterFieldGreaterOrEqual bottomRightYFilter(
         "box_bottom_right_y",
         ":boxBottomRightY",
         QnSql::serialized_field(boundingBox.topLeft().y()));
@@ -499,7 +499,7 @@ void EventsStorage::mergeObjects(DetectedObject from, DetectedObject* to)
 }
 
 void EventsStorage::queryTrackInfo(
-    nx::utils::db::QueryContext* queryContext,
+    nx::sql::QueryContext* queryContext,
     std::vector<DetectedObject>* result)
 {
     SqlQuery trackInfoQuery(*queryContext->connection());
@@ -521,8 +521,8 @@ void EventsStorage::queryTrackInfo(
     }
 }
 
-nx::utils::db::DBResult EventsStorage::selectTimePeriods(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult EventsStorage::selectTimePeriods(
+    nx::sql::QueryContext* queryContext,
     const Filter& filter,
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
@@ -534,7 +534,7 @@ nx::utils::db::DBResult EventsStorage::selectTimePeriods(
     if (!sqlQueryFilter.empty())
     {
         sqlQueryFilterStr = lm("WHERE %1").args(
-            nx::utils::db::generateWhereClauseExpression(sqlQueryFilter));
+            nx::sql::generateWhereClauseExpression(sqlQueryFilter));
     }
 
     // TODO: #ak Aggregate in query.
@@ -547,15 +547,15 @@ nx::utils::db::DBResult EventsStorage::selectTimePeriods(
         %2
         ORDER BY timestamp_usec_utc ASC
     )sql").args(eventsFilteredByFreeTextSubQuery, sqlQueryFilterStr));
-    nx::utils::db::bindFields(&query, sqlQueryFilter);
+    nx::sql::bindFields(&query, sqlQueryFilter);
 
     query.exec();
     loadTimePeriods(query, options, result);
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 void EventsStorage::loadTimePeriods(
-    nx::utils::db::SqlQuery& query,
+    nx::sql::SqlQuery& query,
     const TimePeriodsLookupOptions& options,
     QnTimePeriodList* result)
 {
@@ -575,8 +575,8 @@ void EventsStorage::loadTimePeriods(
         *result, options.detailLevel);
 }
 
-nx::utils::db::DBResult EventsStorage::cleanupData(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult EventsStorage::cleanupData(
+    nx::sql::QueryContext* queryContext,
     const QnUuid& deviceId,
     std::chrono::milliseconds oldestDataToKeepTimestamp)
 {
@@ -595,7 +595,7 @@ nx::utils::db::DBResult EventsStorage::cleanupData(
         (qint64) microseconds(oldestDataToKeepTimestamp).count());
 
     deleteEventsQuery.exec();
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 //-------------------------------------------------------------------------------------------------

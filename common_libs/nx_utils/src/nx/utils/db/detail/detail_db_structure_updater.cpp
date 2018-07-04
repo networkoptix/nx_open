@@ -10,8 +10,7 @@
 #include "../async_sql_query_executor.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace detail {
 
 namespace {
@@ -126,7 +125,7 @@ void DbStructureUpdater::updateStruct(QueryContext* const queryContext)
 }
 
 DbStructureUpdater::DbSchemaState DbStructureUpdater::analyzeDbSchemaState(
-    nx::utils::db::QueryContext* const queryContext)
+    nx::sql::QueryContext* const queryContext)
 {
     DbStructureUpdater::DbSchemaState dbSchemaState{ m_initialVersion, false };
 
@@ -145,7 +144,7 @@ DbStructureUpdater::DbSchemaState DbStructureUpdater::analyzeDbSchemaState(
 }
 
 DBResult DbStructureUpdater::createInitialSchema(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     DbSchemaState* dbSchemaState)
 {
     dbSchemaState->version = 1;
@@ -172,7 +171,7 @@ DBResult DbStructureUpdater::createInitialSchema(
 }
 
 DBResult DbStructureUpdater::applyScriptsMissingInCurrentDb(
-    nx::utils::db::QueryContext* queryContext,
+    nx::sql::QueryContext* queryContext,
     DbSchemaState* dbState)
 {
     while (gotScriptForUpdate(dbState))
@@ -195,7 +194,7 @@ bool DbStructureUpdater::gotScriptForUpdate(DbSchemaState* dbState) const
 }
 
 DBResult DbStructureUpdater::applyNextUpdateScript(
-    nx::utils::db::QueryContext* queryContext,
+    nx::sql::QueryContext* queryContext,
     DbSchemaState* dbState)
 {
     NX_LOGX(lm("Updating structure to version %1").arg(dbState->version), cl_logDEBUG2);
@@ -216,7 +215,7 @@ DBResult DbStructureUpdater::applyNextUpdateScript(
 }
 
 DBResult DbStructureUpdater::updateDbVersion(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     const DbSchemaState& dbSchemaState)
 {
     QSqlQuery updateDbVersionQuery(*queryContext->connection());
@@ -231,7 +230,7 @@ DBResult DbStructureUpdater::updateDbVersion(
 
 bool DbStructureUpdater::execDbUpdate(
     const DbUpdate& dbUpdate,
-    nx::utils::db::QueryContext* const queryContext)
+    nx::sql::QueryContext* const queryContext)
 {
     if (!dbUpdate.dbTypeToSqlScript.empty())
     {
@@ -241,7 +240,7 @@ bool DbStructureUpdater::execDbUpdate(
 
     if (dbUpdate.func)
     {
-        if (dbUpdate.func(queryContext) != nx::utils::db::DBResult::ok)
+        if (dbUpdate.func(queryContext) != nx::sql::DBResult::ok)
         {
             NX_LOGX(lm("Error executing update function"), cl_logWARNING);
             return false;
@@ -253,7 +252,7 @@ bool DbStructureUpdater::execDbUpdate(
 
 bool DbStructureUpdater::execStructureUpdateTask(
     const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
-    nx::utils::db::QueryContext* const queryContext)
+    nx::sql::QueryContext* const queryContext)
 {
     const auto driverType = m_queryExecutor->connectionOptions().driverType;
 
@@ -286,7 +285,7 @@ std::map<RdbmsDriverType, QByteArray>::const_iterator DbStructureUpdater::select
 }
 
 bool DbStructureUpdater::execSqlScript(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     QByteArray sqlScript,
     RdbmsDriverType sqlScriptDialect)
 {
@@ -315,6 +314,5 @@ QByteArray DbStructureUpdater::fixSqlDialect(
 }
 
 } // namespace detail
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

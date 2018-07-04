@@ -13,8 +13,7 @@
 #include "../request_executor.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace detail {
 
 class NX_UTILS_API QueryQueue
@@ -105,6 +104,5 @@ private:
 };
 
 } // namespace detail
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

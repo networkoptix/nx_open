@@ -124,72 +124,72 @@ private:
     const Settings& m_settings;
     DbController m_dbController;
 
-    nx::utils::db::DBResult savePacket(
-        nx::utils::db::QueryContext*,
+    nx::sql::DBResult savePacket(
+        nx::sql::QueryContext*,
         common::metadata::ConstDetectionMetadataPacketPtr packet);
     /**
      * @return Inserted event id.
      * Throws on error.
      */
     std::int64_t insertEvent(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const common::metadata::DetectionMetadataPacket& packet,
         const common::metadata::DetectedObject& detectedObject);
     /**
      * Throws on error.
      */
     void insertEventAttributes(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         std::int64_t eventId,
         const std::vector<common::metadata::Attribute>& eventAttributes);
 
-    void prepareCursorQuery(const Filter& filter, nx::utils::db::SqlQuery* query);
+    void prepareCursorQuery(const Filter& filter, nx::sql::SqlQuery* query);
 
-    nx::utils::db::DBResult selectObjects(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult selectObjects(
+        nx::sql::QueryContext* queryContext,
         const Filter& filter,
         std::vector<DetectedObject>* result);
 
-    void prepareLookupQuery(const Filter& filter, nx::utils::db::SqlQuery* query);
-    nx::utils::db::InnerJoinFilterFields prepareSqlFilterExpression(
+    void prepareLookupQuery(const Filter& filter, nx::sql::SqlQuery* query);
+    nx::sql::InnerJoinFilterFields prepareSqlFilterExpression(
         const Filter& filter,
         QString* eventsFilteredByFreeTextSubQuery);
     void addObjectTypeIdToFilter(
         const std::vector<QnUuid>& objectTypeIds,
-        nx::utils::db::InnerJoinFilterFields* sqlFilter);
+        nx::sql::InnerJoinFilterFields* sqlFilter);
     void addTimePeriodToFilter(
         const QnTimePeriod& timePeriod,
-        nx::utils::db::InnerJoinFilterFields* sqlFilter);
+        nx::sql::InnerJoinFilterFields* sqlFilter);
     void addBoundingBoxToFilter(
         const QRectF& boundingBox,
-        nx::utils::db::InnerJoinFilterFields* sqlFilter);
+        nx::sql::InnerJoinFilterFields* sqlFilter);
 
     void loadObjects(
-        nx::utils::db::SqlQuery& selectEventsQuery,
+        nx::sql::SqlQuery& selectEventsQuery,
         const Filter& filter,
         std::vector<DetectedObject>* result);
     void loadObject(
-        nx::utils::db::SqlQuery* selectEventsQuery,
+        nx::sql::SqlQuery* selectEventsQuery,
         DetectedObject* object);
     void mergeObjects(DetectedObject from, DetectedObject* to);
 
     void queryTrackInfo(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         std::vector<DetectedObject>* result);
 
-    nx::utils::db::DBResult selectTimePeriods(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult selectTimePeriods(
+        nx::sql::QueryContext* queryContext,
         const Filter& filter,
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
     void loadTimePeriods(
-        nx::utils::db::SqlQuery& query,
+        nx::sql::SqlQuery& query,
         const TimePeriodsLookupOptions& options,
         QnTimePeriodList* result);
 
-    nx::utils::db::DBResult cleanupData(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult cleanupData(
+        nx::sql::QueryContext* queryContext,
         const QnUuid& deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 };

@@ -3,8 +3,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 Transaction::Transaction(QSqlDatabase* const connection):
     m_connection(connection),
@@ -88,6 +87,5 @@ void Transaction::notifyOnTransactionCompletion(DBResult dbResult)
     m_onTransactionCompletedHandlers.clear();
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

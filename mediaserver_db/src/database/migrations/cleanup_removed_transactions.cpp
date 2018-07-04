@@ -9,7 +9,7 @@
 
 #include <nx/utils/db/sql_query_execution_helper.h>
 
-using namespace nx::utils::db;
+using namespace nx::sql;
 
 namespace {
 

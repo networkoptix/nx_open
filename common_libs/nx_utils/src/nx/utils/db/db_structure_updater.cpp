@@ -8,8 +8,7 @@
 #include "types.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 DbStructureUpdater::DbStructureUpdater(
     const std::string& schemaName,
@@ -68,7 +67,7 @@ bool DbStructureUpdater::updateStructSync()
         m_queryExecutor->executeUpdateQuerySync(
             std::bind(&DbStructureUpdater::updateStructInternal, this, _1));
     }
-    catch (const db::Exception& e)
+    catch (const sql::Exception& e)
     {
         NX_ERROR(this, lm("Error updating db schema \"%1\". %2").arg(m_schemaName).arg(e.what()));
         return false;
@@ -203,6 +202,5 @@ void DbStructureUpdater::setDbSchemaName(
     setDbSchemaNameQuery.exec();
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

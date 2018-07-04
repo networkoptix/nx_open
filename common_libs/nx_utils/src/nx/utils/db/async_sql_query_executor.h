@@ -24,8 +24,7 @@
 #include "query_context.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 class NX_UTILS_API AbstractAsyncSqlQueryExecutor
 {
@@ -38,80 +37,80 @@ public:
     // Asynchronous operations.
 
     virtual void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) = 0;
 
     virtual void executeUpdateWithoutTran(
-        nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) = 0;
 
     virtual void executeSelect(
-        nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) = 0;
 
     //---------------------------------------------------------------------------------------------
     // Synchronous operations.
 
     virtual DBResult execSqlScriptSync(
         const QByteArray& script,
-        nx::utils::db::QueryContext* const queryContext) = 0;
+        nx::sql::QueryContext* const queryContext) = 0;
 
     /**
-     * @param queryFunc throws nx::utils::db::Exception.
-     * @throws nx::utils::db::Exception.
+     * @param queryFunc throws nx::sql::Exception.
+     * @throws nx::sql::Exception.
      */
     template<typename QueryFunc>
     void executeUpdateQuerySync(QueryFunc queryFunc)
     {
-        nx::utils::promise<nx::utils::db::DBResult> queryDonePromise;
+        nx::utils::promise<nx::sql::DBResult> queryDonePromise;
         executeUpdate(
-            [&queryFunc](nx::utils::db::QueryContext* queryContext)
+            [&queryFunc](nx::sql::QueryContext* queryContext)
             {
                 queryFunc(queryContext);
-                return nx::utils::db::DBResult::ok;
+                return nx::sql::DBResult::ok;
             },
             [&queryDonePromise](
-                nx::utils::db::QueryContext*,
-                nx::utils::db::DBResult dbResult)
+                nx::sql::QueryContext*,
+                nx::sql::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
         const auto dbResult = queryDonePromise.get_future().get();
-        if (dbResult != nx::utils::db::DBResult::ok)
-            throw nx::utils::db::Exception(dbResult);
+        if (dbResult != nx::sql::DBResult::ok)
+            throw nx::sql::Exception(dbResult);
     }
 
     /**
-     * @throws nx::utils::db::Exception.
+     * @throws nx::sql::Exception.
      */
     void executeSqlSync(QByteArray sqlStatement);
 
     /**
-     * @param queryFunc throws nx::utils::db::Exception.
-     * @throws nx::utils::db::Exception.
+     * @param queryFunc throws nx::sql::Exception.
+     * @throws nx::sql::Exception.
      */
     template<typename QueryFunc>
-    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type
+    typename std::result_of<QueryFunc(nx::sql::QueryContext*)>::type
         executeSelectQuerySync(QueryFunc queryFunc)
     {
-        typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type result;
+        typename std::result_of<QueryFunc(nx::sql::QueryContext*)>::type result;
 
-        nx::utils::promise<nx::utils::db::DBResult> queryDonePromise;
+        nx::utils::promise<nx::sql::DBResult> queryDonePromise;
         executeSelect(
-            [&queryFunc, &result](nx::utils::db::QueryContext* queryContext)
+            [&queryFunc, &result](nx::sql::QueryContext* queryContext)
             {
                 result = queryFunc(queryContext);
-                return nx::utils::db::DBResult::ok;
+                return nx::sql::DBResult::ok;
             },
             [&queryDonePromise](
-                nx::utils::db::QueryContext*,
-                nx::utils::db::DBResult dbResult)
+                nx::sql::QueryContext*,
+                nx::sql::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
         const auto dbResult = queryDonePromise.get_future().get();
-        if (dbResult != nx::utils::db::DBResult::ok)
-            throw nx::utils::db::Exception(dbResult);
+        if (dbResult != nx::sql::DBResult::ok)
+            throw nx::sql::Exception(dbResult);
 
         return result;
     }
@@ -136,20 +135,20 @@ public:
      * Overload for updates with no input data.
      */
     virtual void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override;
 
     virtual void executeUpdateWithoutTran(
-        nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override;
 
     virtual void executeSelect(
-        nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override;
 
     virtual DBResult execSqlScriptSync(
         const QByteArray& script,
-        nx::utils::db::QueryContext* const queryContext) override;
+        nx::sql::QueryContext* const queryContext) override;
 
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
@@ -184,11 +183,11 @@ public:
     template<typename InputData, typename OutputData>
     void executeUpdate(
         nx::utils::MoveOnlyFunc<
-            DBResult(nx::utils::db::QueryContext*, const InputData&, OutputData* const)
+            DBResult(nx::sql::QueryContext*, const InputData&, OutputData* const)
         > dbUpdateFunc,
         InputData input,
         nx::utils::MoveOnlyFunc<
-            void(nx::utils::db::QueryContext*, DBResult, InputData, OutputData)
+            void(nx::sql::QueryContext*, DBResult, InputData, OutputData)
         > completionHandler)
     {
         scheduleQuery<UpdateWithOutputExecutor<InputData, OutputData>>(
@@ -203,10 +202,10 @@ public:
     template<typename InputData>
     void executeUpdate(
         nx::utils::MoveOnlyFunc<
-            DBResult(nx::utils::db::QueryContext*, const InputData&)> dbUpdateFunc,
+            DBResult(nx::sql::QueryContext*, const InputData&)> dbUpdateFunc,
         InputData input,
         nx::utils::MoveOnlyFunc<
-            void(nx::utils::db::QueryContext*, DBResult, InputData)> completionHandler)
+            void(nx::sql::QueryContext*, DBResult, InputData)> completionHandler)
     {
         scheduleQuery<UpdateExecutor<InputData>>(
             std::move(dbUpdateFunc),
@@ -216,9 +215,9 @@ public:
 
     template<typename Record>
     void createCursor(
-        MoveOnlyFunc<void(SqlQuery*)> prepareCursorFunc,
-        MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
-        MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(SqlQuery*)> prepareCursorFunc,
+        nx::utils::MoveOnlyFunc<void(SqlQuery*, Record*)> readRecordFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult, QnUuid /*cursorId*/)> completionHandler)
     {
         {
             QnMutexLocker lock(&m_mutex);
@@ -239,7 +238,7 @@ public:
     template<typename Record>
     void fetchNextRecordFromCursor(
         QnUuid id,
-        MoveOnlyFunc<void(DBResult, Record)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(DBResult, Record)> completionHandler)
     {
         auto task = std::make_unique<detail::FetchCursorDataExecutor<Record>>(
             &m_cursorProcessorContexts.front()->cursorContextPool,
@@ -316,6 +315,5 @@ private:
     void addCursorProcessingThread(const QnMutexLockerBase& lock);
 };
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

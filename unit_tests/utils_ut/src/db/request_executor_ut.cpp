@@ -8,8 +8,7 @@
 #include <nx/utils/db/request_executor.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace test {
 
 class DbRequestExecutor:
@@ -65,6 +64,5 @@ TEST_F(DbRequestExecutor, handles_exception)
 }
 
 } // namespace test
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

@@ -3,8 +3,7 @@
 #include <QtSql/QSqlError>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 SqlQuery::SqlQuery(QSqlDatabase connection):
     m_sqlQuery(connection)
@@ -110,6 +109,5 @@ DBResult SqlQuery::getLastErrorCode()
     }
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

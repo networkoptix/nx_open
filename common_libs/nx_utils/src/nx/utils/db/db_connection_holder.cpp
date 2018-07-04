@@ -8,8 +8,7 @@
 #include <nx/utils/uuid.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 DbConnectionHolder::DbConnectionHolder(const ConnectionOptions& connectionOptions):
     m_connectionOptions(connectionOptions)
@@ -70,7 +69,7 @@ void DbConnectionHolder::close()
     QSqlDatabase::removeDatabase(m_connectionName);
 }
 
-std::shared_ptr<nx::utils::db::QueryContext> DbConnectionHolder::begin()
+std::shared_ptr<nx::sql::QueryContext> DbConnectionHolder::begin()
 {
     return createNewTran();
 }
@@ -104,10 +103,10 @@ bool DbConnectionHolder::tuneMySqlConnection()
     return true;
 }
 
-std::shared_ptr<nx::utils::db::QueryContext> DbConnectionHolder::createNewTran()
+std::shared_ptr<nx::sql::QueryContext> DbConnectionHolder::createNewTran()
 {
     auto deleter =
-        [](nx::utils::db::QueryContext* queryContext)
+        [](nx::sql::QueryContext* queryContext)
         {
             if (queryContext->transaction()->isActive())
                 queryContext->transaction()->rollback();
@@ -115,14 +114,13 @@ std::shared_ptr<nx::utils::db::QueryContext> DbConnectionHolder::createNewTran()
             delete queryContext;
         };
 
-    auto transaction = std::make_unique<nx::utils::db::Transaction>(dbConnection());
-    if (transaction->begin() != nx::utils::db::DBResult::ok)
+    auto transaction = std::make_unique<nx::sql::Transaction>(dbConnection());
+    if (transaction->begin() != nx::sql::DBResult::ok)
         return nullptr;
-    return std::shared_ptr<nx::utils::db::QueryContext>(
-        new nx::utils::db::QueryContext(dbConnection(), transaction.release()),
+    return std::shared_ptr<nx::sql::QueryContext>(
+        new nx::sql::QueryContext(dbConnection(), transaction.release()),
         deleter);
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

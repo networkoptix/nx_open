@@ -10,8 +10,7 @@
 #include "base_db_test.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace test {
 
 static const std::string kCdbStructureName = "test";
@@ -22,7 +21,7 @@ class TestAsyncSqlQueryExecutor:
 public:
     typedef nx::utils::MoveOnlyFunc<DBResult(
         const QByteArray& script,
-        nx::utils::db::QueryContext* const queryContext)> CustomExecSqlScriptFunc;
+        nx::sql::QueryContext* const queryContext)> CustomExecSqlScriptFunc;
 
     TestAsyncSqlQueryExecutor(AbstractAsyncSqlQueryExecutor* _delegate):
         m_delegate(_delegate)
@@ -39,24 +38,24 @@ public:
     // Asynchronous operations.
 
     virtual void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override
     {
         m_delegate->executeUpdate(
             std::move(dbUpdateFunc), std::move(completionHandler));
     }
 
     virtual void executeUpdateWithoutTran(
-        nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override
     {
         m_delegate->executeUpdateWithoutTran(
             std::move(dbUpdateFunc), std::move(completionHandler));
     }
 
     virtual void executeSelect(
-        nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override
     {
         m_delegate->executeSelect(std::move(dbSelectFunc), std::move(completionHandler));
     }
@@ -66,7 +65,7 @@ public:
 
     virtual DBResult execSqlScriptSync(
         const QByteArray& script,
-        nx::utils::db::QueryContext* const queryContext) override
+        nx::sql::QueryContext* const queryContext) override
     {
         if (m_customExecSqlScriptFunc)
             return m_customExecSqlScriptFunc(script, queryContext);
@@ -119,7 +118,7 @@ protected:
 
     virtual DBResult execSqlScript(
         const QByteArray& script,
-        nx::utils::db::QueryContext* const /*queryContext*/)
+        nx::sql::QueryContext* const /*queryContext*/)
     {
         m_executedScripts.push_back(script);
         return DBResult::ok;
@@ -142,7 +141,7 @@ public:
     {
         initializeDatabase();
 
-        m_dbUpdater = std::make_unique<db::DbStructureUpdater>(
+        m_dbUpdater = std::make_unique<sql::DbStructureUpdater>(
             kCdbStructureName,
             &testAsyncSqlQueryExecutor());
     }
@@ -213,7 +212,7 @@ protected:
     }
 
 private:
-    std::unique_ptr<nx::utils::db::DbStructureUpdater> m_dbUpdater;
+    std::unique_ptr<nx::sql::DbStructureUpdater> m_dbUpdater;
     std::multimap<QByteArray, RdbmsDriverType> m_registeredScripts;
     std::map<RdbmsDriverType, QByteArray> m_dbTypeToScript;
     bool m_updateResult;
@@ -221,13 +220,13 @@ private:
     void initializeDatabase()
     {
         // Creating initial structure.
-        nx::utils::db::DbStructureUpdater updater(kCdbStructureName, &asyncSqlQueryExecutor());
+        nx::sql::DbStructureUpdater updater(kCdbStructureName, &asyncSqlQueryExecutor());
         ASSERT_TRUE(updater.updateStructSync());
     }
 
     virtual DBResult execSqlScript(
         const QByteArray& script,
-        nx::utils::db::QueryContext* const queryContext) override
+        nx::sql::QueryContext* const queryContext) override
     {
         auto dbResult = base_type::execSqlScript(script, queryContext);
         if (dbResult != DBResult::ok)
@@ -294,7 +293,7 @@ class DbStructureUpdaterMultipleSchemas:
 protected:
     void givenUpdatedDb()
     {
-        db::DbStructureUpdater updater(
+        sql::DbStructureUpdater updater(
             firstSchemaName,
             &testAsyncSqlQueryExecutor());
         addScripts(&updater, firstSchemaName, nullptr);
@@ -318,7 +317,7 @@ protected:
 
     void whenLaunchedUpdaterWithAnotherSchema()
     {
-        db::DbStructureUpdater updater(
+        sql::DbStructureUpdater updater(
             secondSchemaName,
             &testAsyncSqlQueryExecutor());
         addScripts(&updater, secondSchemaName, &m_expectedScripts);
@@ -340,7 +339,7 @@ private:
     int m_initialDbVersion = 0;
 
     void addScripts(
-        db::DbStructureUpdater* updater,
+        sql::DbStructureUpdater* updater,
         const std::string& schemaName,
         std::list<QByteArray>* scripts)
     {
@@ -371,6 +370,5 @@ TEST_F(
 }
 
 } // namespace test
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

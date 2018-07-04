@@ -26,12 +26,12 @@ class Cursor:
     public AbstractCursor
 {
 public:
-    Cursor(std::unique_ptr<nx::utils::db::Cursor<DetectedObject>> dbCursor);
+    Cursor(std::unique_ptr<nx::sql::Cursor<DetectedObject>> dbCursor);
 
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
 
 private:
-    std::unique_ptr<nx::utils::db::Cursor<DetectedObject>> m_dbCursor;
+    std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_dbCursor;
     common::metadata::DetectionMetadataPacketPtr m_nextPacket;
 
     common::metadata::DetectionMetadataPacketPtr toDetectionMetadataPacket(

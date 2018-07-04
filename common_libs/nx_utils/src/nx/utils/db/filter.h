@@ -9,8 +9,7 @@
 #include "query.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 struct NX_UTILS_API SqlFilterField
 {
@@ -73,6 +72,5 @@ NX_UTILS_API void bindFields(SqlQuery* const query, const InnerJoinFilterFields&
 
 NX_UTILS_API QString generateWhereClauseExpression(const InnerJoinFilterFields& filter);
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

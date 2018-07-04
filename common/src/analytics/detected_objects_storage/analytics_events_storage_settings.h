@@ -11,7 +11,7 @@ namespace storage {
 class Settings
 {
 public:
-    nx::utils::db::ConnectionOptions dbConnectionOptions;
+    nx::sql::ConnectionOptions dbConnectionOptions;
 
     void load(const QnSettings& settings);
 };

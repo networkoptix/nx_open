@@ -8,11 +8,10 @@
 #include "../sql_query_execution_helper.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace test {
 
-boost::optional<nx::utils::db::ConnectionOptions> TestWithDbHelper::sDbConnectionOptions;
+boost::optional<nx::sql::ConnectionOptions> TestWithDbHelper::sDbConnectionOptions;
 
 TestWithDbHelper::TestWithDbHelper(QString moduleName, QString tmpDir):
     utils::test::TestWithTemporaryDirectory(moduleName, tmpDir)
@@ -36,18 +35,18 @@ TestWithDbHelper::~TestWithDbHelper()
 {
 }
 
-const nx::utils::db::ConnectionOptions& TestWithDbHelper::dbConnectionOptions() const
+const nx::sql::ConnectionOptions& TestWithDbHelper::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
 }
 
-nx::utils::db::ConnectionOptions& TestWithDbHelper::dbConnectionOptions()
+nx::sql::ConnectionOptions& TestWithDbHelper::dbConnectionOptions()
 {
     return m_dbConnectionOptions;
 }
 
 void TestWithDbHelper::setDbConnectionOptions(
-    const nx::utils::db::ConnectionOptions& connectionOptions)
+    const nx::sql::ConnectionOptions& connectionOptions)
 {
     sDbConnectionOptions = connectionOptions;
 }
@@ -71,6 +70,5 @@ void TestWithDbHelper::cleanDatabase()
 }
 
 } // namespace test
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

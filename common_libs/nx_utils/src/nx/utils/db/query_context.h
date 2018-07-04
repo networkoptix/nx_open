@@ -4,8 +4,7 @@
 #include "types.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 class NX_UTILS_API QueryContext
 {
@@ -28,6 +27,5 @@ private:
     Transaction* const m_transaction;
 };
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

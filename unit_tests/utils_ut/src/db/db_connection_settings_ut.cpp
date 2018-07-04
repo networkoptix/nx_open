@@ -7,8 +7,7 @@
 #include <nx/utils/db/types.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace test {
 
 constexpr int argc = 3;
@@ -60,6 +59,5 @@ TEST_F(DbConnectionOptions, custom_default_values_are_not_overwritten)
 }
 
 } // namespace test
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

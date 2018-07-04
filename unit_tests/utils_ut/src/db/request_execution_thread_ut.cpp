@@ -9,8 +9,7 @@
 #include "base_db_test.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace test {
 
 class DbRequestExecutionThread:
@@ -25,7 +24,7 @@ public:
 protected:
     void givenRunningThread()
     {
-        m_thread = std::make_unique<nx::utils::db::DbRequestExecutionThread>(
+        m_thread = std::make_unique<nx::sql::DbRequestExecutionThread>(
             connectionOptions(),
             &m_queryExecutorQueue);
         m_thread->start();
@@ -43,7 +42,7 @@ protected:
 
 private:
     QueryExecutorQueue m_queryExecutorQueue;
-    std::unique_ptr<nx::utils::db::DbRequestExecutionThread> m_thread;
+    std::unique_ptr<nx::sql::DbRequestExecutionThread> m_thread;
 };
 
 TEST_F(DbRequestExecutionThread, stops_after_termination_request)
@@ -54,6 +53,5 @@ TEST_F(DbRequestExecutionThread, stops_after_termination_request)
 }
 
 } // namespace test
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

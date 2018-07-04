@@ -7,14 +7,14 @@ namespace analytics {
 namespace storage {
 
 DbController::DbController(
-    const nx::utils::db::ConnectionOptions& connectionOptions)
+    const nx::sql::ConnectionOptions& connectionOptions)
     :
     base_type(connectionOptions)
 {
     // Raising SELECT query priority so that those queries are not blocked by numerous INSERT.
     queryExecutor().setQueryPriority(
-        utils::db::QueryType::lookup,
-        utils::db::AsyncSqlQueryExecutor::kDefaultQueryPriority + 1);
+        sql::QueryType::lookup,
+        sql::AsyncSqlQueryExecutor::kDefaultQueryPriority + 1);
 
     dbStructureUpdater().addUpdateScript(kCreateAnalyticsEventsSchema);
     dbStructureUpdater().addUpdateScript(kAnalyticsDbMoreIndexes);

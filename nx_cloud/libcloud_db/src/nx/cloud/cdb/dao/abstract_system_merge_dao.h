@@ -35,14 +35,14 @@ class AbstractSystemMergeDao
 public:
     virtual ~AbstractSystemMergeDao() = default;
 
-    virtual std::vector<MergeInfo> fetchAll(utils::db::QueryContext* queryContext) = 0;
+    virtual std::vector<MergeInfo> fetchAll(sql::QueryContext* queryContext) = 0;
 
     virtual void save(
-        utils::db::QueryContext* queryContext,
+        sql::QueryContext* queryContext,
         const MergeInfo& mergeInfo) = 0;
 
     virtual void removeMergeBySlaveSystemId(
-        utils::db::QueryContext* queryContext,
+        sql::QueryContext* queryContext,
         const std::string& slaveSystemId) = 0;
 };
 
@@ -50,7 +50,7 @@ public:
 
 using SystemMergeDaoFactoryFunction =
     std::unique_ptr<AbstractSystemMergeDao>(
-        nx::utils::db::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
 
 class SystemMergeDaoFactory:
     public nx::utils::BasicFactory<SystemMergeDaoFactoryFunction>
@@ -64,7 +64,7 @@ public:
 
 private:
     std::unique_ptr<AbstractSystemMergeDao> defaultFactoryFunction(
-        nx::utils::db::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
 };
 
 } // namespace dao

@@ -7,8 +7,7 @@
 #include "../types.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace test {
 
 class NX_UTILS_API TestWithDbHelper:
@@ -18,21 +17,20 @@ public:
     TestWithDbHelper(QString moduleName, QString tmpDir);
     ~TestWithDbHelper();
 
-    const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
-    nx::utils::db::ConnectionOptions& dbConnectionOptions();
+    const nx::sql::ConnectionOptions& dbConnectionOptions() const;
+    nx::sql::ConnectionOptions& dbConnectionOptions();
 
     static void setDbConnectionOptions(
-        const nx::utils::db::ConnectionOptions& connectionOptions);
+        const nx::sql::ConnectionOptions& connectionOptions);
 
 private:
-    nx::utils::db::ConnectionOptions m_dbConnectionOptions;
+    nx::sql::ConnectionOptions m_dbConnectionOptions;
 
-    static boost::optional<nx::utils::db::ConnectionOptions> sDbConnectionOptions;
+    static boost::optional<nx::sql::ConnectionOptions> sDbConnectionOptions;
 
     void cleanDatabase();
 };
 
 } // namespace test
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

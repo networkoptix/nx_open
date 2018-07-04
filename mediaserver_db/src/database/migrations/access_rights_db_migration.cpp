@@ -12,7 +12,7 @@
 #include <nx/utils/log/log_main.h>
 #include <common/common_module.h>
 
-using namespace nx::utils::db;
+using namespace nx::sql;
 
 namespace ec2 {
 namespace db {

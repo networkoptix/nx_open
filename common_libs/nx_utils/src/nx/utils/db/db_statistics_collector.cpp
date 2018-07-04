@@ -3,8 +3,7 @@
 #include <nx/utils/time.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 QueryExecutionInfo::QueryExecutionInfo():
     waitForExecutionDuration(std::chrono::milliseconds::zero())
@@ -223,6 +222,5 @@ void StatisticsCollector::updateMinMax(
     result->max = std::max(result->max, value);
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

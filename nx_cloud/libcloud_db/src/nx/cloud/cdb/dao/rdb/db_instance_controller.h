@@ -10,11 +10,11 @@ namespace dao {
 namespace rdb {
 
 class DbInstanceController:
-    public nx::utils::db::InstanceController
+    public nx::sql::InstanceController
 {
 public:
     DbInstanceController(
-        const nx::utils::db::ConnectionOptions& dbConnectionOptions,
+        const nx::sql::ConnectionOptions& dbConnectionOptions,
         boost::optional<unsigned int> dbVersionToUpdateTo = boost::none);
 
     bool isUserAuthRecordsMigrationNeeded() const;

@@ -7,12 +7,11 @@
 #include "types.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 /**
  * Follows same conventions as QSqlQuery except error reporting:
- * methods of this class throw nx::utils::db::Exception on error.
+ * methods of this class throw nx::sql::Exception on error.
  */
 class NX_UTILS_API SqlQuery
 {
@@ -45,6 +44,5 @@ private:
     DBResult getLastErrorCode();
 };
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

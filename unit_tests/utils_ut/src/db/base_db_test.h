@@ -14,8 +14,7 @@
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace test {
 
 // TODO: #ak Fix weird class names in this file.
@@ -41,14 +40,14 @@ protected:
     template<typename RecordStructure>
     std::vector<RecordStructure> executeSelect(const QString& queryText)
     {
-        nx::utils::promise<nx::utils::db::DBResult> queryCompletedPromise;
+        nx::utils::promise<nx::sql::DBResult> queryCompletedPromise;
         auto future = queryCompletedPromise.get_future();
 
         std::vector<RecordStructure> records;
 
         asyncSqlQueryExecutor().executeSelect(
             [queryText, &records](
-                nx::utils::db::QueryContext* queryContext)
+                nx::sql::QueryContext* queryContext)
             {
                 QSqlQuery query(*queryContext->connection());
                 query.prepare(queryText);
@@ -58,7 +57,7 @@ protected:
                 return DBResult::ok;
             },
             [&queryCompletedPromise](
-                nx::utils::db::QueryContext* /*queryContext*/,
+                nx::sql::QueryContext* /*queryContext*/,
                 DBResult dbResult)
             {
                 queryCompletedPromise.set_value(dbResult);
@@ -72,13 +71,13 @@ protected:
     template<typename DbQueryFunc>
     DBResult executeQuery(DbQueryFunc dbQueryFunc)
     {
-        nx::utils::promise<nx::utils::db::DBResult> queryCompletedPromise;
+        nx::utils::promise<nx::sql::DBResult> queryCompletedPromise;
 
         //starting async operation
         asyncSqlQueryExecutor().executeUpdate(
             dbQueryFunc,
             [&queryCompletedPromise](
-                nx::utils::db::QueryContext* /*queryContext*/, DBResult dbResult)
+                nx::sql::QueryContext* /*queryContext*/, DBResult dbResult)
             {
                 queryCompletedPromise.set_value(dbResult);
             });
@@ -126,6 +125,5 @@ private:
 };
 
 } // namespace test
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

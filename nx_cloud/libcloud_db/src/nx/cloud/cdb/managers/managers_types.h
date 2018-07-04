@@ -13,7 +13,7 @@
 namespace nx {
 namespace cdb {
 
-api::ResultCode dbResultToApiResult(nx::utils::db::DBResult);
+api::ResultCode dbResultToApiResult(nx::sql::DBResult);
 
 api::ResultCode ec2ResultToResult(data_sync_engine::ResultCode resultCode);
 

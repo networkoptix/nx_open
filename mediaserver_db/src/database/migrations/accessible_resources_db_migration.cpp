@@ -33,10 +33,10 @@ namespace ec2
                 FROM vms_layoutitem li
                 JOIN vms_resource r on r.id = li.layout_id order by r.parent_guid
             )";
-            if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+            if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
                 return false;
 
-            if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+            if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
                 return false;
 
             while (query.next())
@@ -60,10 +60,10 @@ namespace ec2
                 FROM vms_resource r
                 JOIN vms_camera c on c.resource_ptr_id = r.id ORDER BY r.guid
             )";
-            if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+            if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
                 return false;
 
-            if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+            if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
                 return false;
 
             while (query.next())
@@ -83,10 +83,10 @@ namespace ec2
         {
             QSqlQuery query(database);
             query.setForwardOnly(true);
-            if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, "SELECT id from vms_resource where guid = ?", Q_FUNC_INFO))
+            if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, "SELECT id from vms_resource where guid = ?", Q_FUNC_INFO))
                 return 0;
             query.addBindValue(guid.toRfc4122());
-            if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO) || !query.next())
+            if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO) || !query.next())
                 return 0;
             return query.value(0).toInt();
         }
@@ -95,10 +95,10 @@ namespace ec2
         {
             QSqlQuery query(database);
             query.setForwardOnly(true);
-            if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, "SELECT rights from vms_userprofile where user_id = ?", Q_FUNC_INFO))
+            if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, "SELECT rights from vms_userprofile where user_id = ?", Q_FUNC_INFO))
                 return 0;
             query.addBindValue(internalUserId);
-            if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO) || !query.next())
+            if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO) || !query.next())
                 return 0;
             return query.value(0).toInt();
         }
@@ -121,11 +121,11 @@ namespace ec2
             QSqlQuery query(database);
             query.setForwardOnly(true);
             QString sqlText = QString("UPDATE vms_userprofile set rights = :permissions where user_id = :id");
-            if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+            if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
                 return false;
             query.bindValue(":id", internalUserId);
             query.bindValue(":permissions", newPermissions);
-            return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+            return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
         }
 
         /** Add custom available cameras */
@@ -149,13 +149,13 @@ namespace ec2
 
                 QSqlQuery query(database);
                 query.setForwardOnly(true);
-                if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+                if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
                     return false;
 
                 query.bindValue(":guid", userGuid);
                 query.bindValue(":resource_ptr_id", internalId);
 
-                if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+                if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
                     return false;
             }
 

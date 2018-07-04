@@ -6,8 +6,7 @@
 #include "request_execution_thread.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 RequestExecutorFactory::RequestExecutorFactory():
     base_type(std::bind(&RequestExecutorFactory::defaultFactoryFunction, this,
@@ -30,6 +29,5 @@ std::unique_ptr<BaseRequestExecutor> RequestExecutorFactory::defaultFactoryFunct
         queryExecutorQueue);
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

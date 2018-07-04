@@ -9,8 +9,7 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 DbRequestExecutionThread::DbRequestExecutionThread(
     const ConnectionOptions& connectionOptions,
@@ -177,6 +176,5 @@ bool DbRequestExecutionThread::isDbErrorRecoverable(DBResult dbResult)
     }
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

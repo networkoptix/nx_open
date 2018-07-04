@@ -212,12 +212,12 @@ public:
     typedef Command<TransactionDataType> Ec2Transaction;
 
     typedef nx::utils::MoveOnlyFunc<
-        nx::utils::db::DBResult(
-            nx::utils::db::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)
+        nx::sql::DBResult(
+            nx::sql::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)
     > ProcessEc2TransactionFunc;
 
     typedef nx::utils::MoveOnlyFunc<
-        void(nx::utils::db::QueryContext*, nx::utils::db::DBResult, AuxiliaryArgType)
+        void(nx::sql::QueryContext*, nx::sql::DBResult, AuxiliaryArgType)
     > OnTranProcessedFunc;
 
     /**
@@ -263,7 +263,7 @@ private:
             [this,
                 auxiliaryArgPtr,
                 transactionContext = std::move(transactionContext)](
-                    nx::utils::db::QueryContext* queryContext) mutable
+                    nx::sql::QueryContext* queryContext) mutable
             {
                 return processTransactionInDbConnectionThread(
                     queryContext,
@@ -271,8 +271,8 @@ private:
                     auxiliaryArgPtr);
             },
             [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
-                nx::utils::db::QueryContext* queryContext,
-                nx::utils::db::DBResult dbResult) mutable
+                nx::sql::QueryContext* queryContext,
+                nx::sql::DBResult dbResult) mutable
             {
                 dbProcessingCompleted(
                     queryContext,
@@ -282,8 +282,8 @@ private:
             });
     }
 
-    nx::utils::db::DBResult processTransactionInDbConnectionThread(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult processTransactionInDbConnectionThread(
+        nx::sql::QueryContext* queryContext,
         TransactionContext transactionContext,
         AuxiliaryArgType* const auxiliaryArg)
     {
@@ -296,7 +296,7 @@ private:
         const auto transactionCommand =
             transactionContext.transaction.get().command;
 
-        if (dbResultCode == nx::utils::db::DBResult::cancelled)
+        if (dbResultCode == nx::sql::DBResult::cancelled)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
@@ -306,7 +306,7 @@ private:
                 cl_logDEBUG1);
             return dbResultCode;
         }
-        else if (dbResultCode != nx::utils::db::DBResult::ok)
+        else if (dbResultCode != nx::sql::DBResult::ok)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
@@ -323,7 +323,7 @@ private:
             transactionContext.transportHeader.systemId,
             std::move(transactionContext.transaction.take()),
             auxiliaryArg);
-        if (dbResultCode != nx::utils::db::DBResult::ok)
+        if (dbResultCode != nx::sql::DBResult::ok)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error processing transaction %1 received from %2. %3")
@@ -336,8 +336,8 @@ private:
     }
 
     void dbProcessingCompleted(
-        nx::utils::db::QueryContext* queryContext,
-        nx::utils::db::DBResult dbResult,
+        nx::sql::QueryContext* queryContext,
+        nx::sql::DBResult dbResult,
         AuxiliaryArgType auxiliaryArg,
         TransactionProcessedHandler completionHandler)
     {
@@ -346,12 +346,12 @@ private:
 
         switch (dbResult)
         {
-            case nx::utils::db::DBResult::ok:
-            case nx::utils::db::DBResult::cancelled:
+            case nx::sql::DBResult::ok:
+            case nx::sql::DBResult::cancelled:
                 return completionHandler(ResultCode::ok);
             default:
                 return completionHandler(
-                    dbResult == nx::utils::db::DBResult::retryLater
+                    dbResult == nx::sql::DBResult::retryLater
                     ? ResultCode::retryLater
                     : ResultCode::dbError);
         }

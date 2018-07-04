@@ -7,12 +7,12 @@ namespace analytics {
 namespace storage {
 
 class DbController:
-    public nx::utils::db::InstanceController
+    public nx::sql::InstanceController
 {
-    using base_type = nx::utils::db::InstanceController;
+    using base_type = nx::sql::InstanceController;
 
 public:
-    DbController(const nx::utils::db::ConnectionOptions& connectionOptions);
+    DbController(const nx::sql::ConnectionOptions& connectionOptions);
 
     using base_type::initialize;
 };

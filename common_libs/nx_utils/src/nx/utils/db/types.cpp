@@ -7,8 +7,7 @@
 #include <nx/utils/deprecated_settings.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 const char* toString(DBResult result)
 {
@@ -197,6 +196,5 @@ DBResult Exception::dbResult() const
     return m_dbResult;
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

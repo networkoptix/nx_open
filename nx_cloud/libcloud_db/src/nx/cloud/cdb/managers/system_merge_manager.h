@@ -41,7 +41,7 @@ public:
         std::function<void(api::ResultCode)> completionHandler) = 0;
 
     virtual void processMergeHistoryRecord(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord) = 0;
 };
 
@@ -54,7 +54,7 @@ public:
         AbstractSystemManager* systemManager,
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         AbstractVmsGateway* vmsGateway,
-        nx::utils::db::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
     virtual ~SystemMergeManager() override;
 
     virtual void startMergingSystems(
@@ -68,7 +68,7 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 
     virtual void processMergeHistoryRecord(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord) override;
 
     virtual void modifySystemBeforeProviding(api::SystemDataEx* system) override;
@@ -85,7 +85,7 @@ private:
     AbstractSystemManager* m_systemManager = nullptr;
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     AbstractVmsGateway* m_vmsGateway;
-    nx::utils::db::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
+    nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
     QnMutex m_mutex;
     // TODO: #ak Replace with std::set when c++17 is supported.
     std::map<MergeRequestContext*, std::unique_ptr<MergeRequestContext>> m_currentRequests;
@@ -110,11 +110,11 @@ private:
 
     void processUpdateSystemResult(
         MergeRequestContext* mergeRequestContext,
-        nx::utils::db::QueryContext* queryContext,
-        nx::utils::db::DBResult dbResult);
+        nx::sql::QueryContext* queryContext,
+        nx::sql::DBResult dbResult);
 
-    nx::utils::db::DBResult updateSystemStateInDb(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult updateSystemStateInDb(
+        nx::sql::QueryContext* queryContext,
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToMergeBeMerged);
 
@@ -125,7 +125,7 @@ private:
         const data::SystemData& system);
 
     void updateCompletedMergeData(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord);
 
     void removeMergeInfoFromCache(

@@ -3,8 +3,7 @@
 #include <nx/utils/type_utils.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace detail {
 
 void CursorHandlerPool::add(
@@ -127,6 +126,5 @@ void CleanUpDroppedCursorsExecutor::executeCursor(QSqlDatabase* const /*connecti
 }
 
 } // namespace detail
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

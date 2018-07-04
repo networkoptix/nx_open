@@ -13,21 +13,21 @@ class SystemMergeDao:
     public AbstractSystemMergeDao
 {
 public:
-    SystemMergeDao(utils::db::AsyncSqlQueryExecutor* queryExecutor);
+    SystemMergeDao(sql::AsyncSqlQueryExecutor* queryExecutor);
 
     virtual std::vector<MergeInfo> fetchAll(
-        utils::db::QueryContext* queryContext) override;
+        sql::QueryContext* queryContext) override;
 
     virtual void save(
-        utils::db::QueryContext* queryContext,
+        sql::QueryContext* queryContext,
         const MergeInfo& mergeInfo) override;
 
     virtual void removeMergeBySlaveSystemId(
-        utils::db::QueryContext* queryContext,
+        sql::QueryContext* queryContext,
         const std::string& slaveSystemId) override;
 
 private:
-    utils::db::AsyncSqlQueryExecutor* m_queryExecutor;
+    sql::AsyncSqlQueryExecutor* m_queryExecutor;
 };
 
 } // namespace rdb

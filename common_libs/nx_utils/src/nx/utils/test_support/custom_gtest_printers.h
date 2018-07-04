@@ -36,10 +36,5 @@ namespace utils {
 
 NX_UTILS_API void PrintTo(const Url& val, ::std::ostream* os);
 
-namespace db {
-
-NX_UTILS_API void PrintTo(const DBResult val, ::std::ostream* os);
-
-} // namespace db
 } // namespace utils
 } // namespace nx

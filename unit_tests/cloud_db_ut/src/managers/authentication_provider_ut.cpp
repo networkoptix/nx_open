@@ -354,12 +354,12 @@ private:
         m_systemSharingManager.add(sharing);
 
         ASSERT_EQ(
-            nx::utils::db::DBResult::ok,
+            nx::sql::DBResult::ok,
             m_authenticationProvider->afterSharingSystem(
                 nullptr, sharing, SharingType::sharingWithExistingAccount));
     }
 
-    nx::utils::db::DBResult onSaveResourceAttribute(
+    nx::sql::DBResult onSaveResourceAttribute(
         const std::string& systemId,
         const nx::vms::api::ResourceParamWithRefData& data)
     {
@@ -370,7 +370,7 @@ private:
                 QJson::deserialized<api::AuthInfo>(data.value.toUtf8()));
         }
 
-        return nx::utils::db::DBResult::ok;
+        return nx::sql::DBResult::ok;
     }
 
     void assertUserAuthRecordsAreValidForSystem(const std::string& systemId)
@@ -439,7 +439,7 @@ TEST_F(AuthenticationProvider, afterSharingSystem_uses_system_wide_nonce_for_eve
 
 TEST_F(AuthenticationProvider, afterSharingSystem_throws_on_not_found_account)
 {
-    ASSERT_THROW(whenSharingSystemWithNotExistingAccount(), nx::utils::db::Exception);
+    ASSERT_THROW(whenSharingSystemWithNotExistingAccount(), nx::sql::Exception);
 }
 
 TEST_F(AuthenticationProvider, afterSharingSystem_generates_update_user_transaction)

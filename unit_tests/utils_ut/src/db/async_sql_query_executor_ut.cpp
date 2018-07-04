@@ -20,8 +20,7 @@
 #include "base_db_test.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace test {
 
 struct Company
@@ -163,7 +162,7 @@ protected:
         m_issuedRequestCount = connectionOptions().maxConnectionCount * 20;
         for (int i = 0; i < m_issuedRequestCount; ++i)
         {
-            if (random::number<bool>())
+            if (nx::utils::random::number<bool>())
                 issueSelect();
             else
                 issueUpdate();
@@ -301,7 +300,7 @@ private:
     void emulateQueryError(DBResult dbResultToEmulate)
     {
         const auto dbResult = executeQuery(
-            [dbResultToEmulate](nx::utils::db::QueryContext* /*queryContext*/)
+            [dbResultToEmulate](nx::sql::QueryContext* /*queryContext*/)
             {
                 return dbResultToEmulate;
             });
@@ -364,7 +363,7 @@ private:
         SqlQuery query(*queryContext->connection());
         query.prepare(
             lm("INSERT INTO company (name, yearFounded) VALUES ('%1', %2)")
-                .args(nx::utils::generateRandomName(7), random::number<int>(1, 2017)));
+                .args(nx::utils::generateRandomName(7), nx::utils::random::number<int>(1, 2017)));
         query.exec();
         return DBResult::ok;
     }
@@ -671,6 +670,5 @@ TEST_F(DbAsyncSqlQueryExecutorCursor, cursor_query_cleaned_up_when_after_early_c
 // TEST_F(DbAsyncSqlQueryExecutorCursor, many_cursors_do_not_block_queries)
 
 } // namespace test
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

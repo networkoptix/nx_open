@@ -13,7 +13,7 @@
 class QSqlDatabase;
 
 class QnDbHelper:
-    public nx::utils::db::SqlQueryExecutionHelper
+    public nx::sql::SqlQueryExecutionHelper
 {
 public:
     class QnDbTransaction

@@ -24,7 +24,7 @@ namespace cdb {
 
 class CdbLauncher:
     public utils::test::ModuleLauncher<CloudDbServicePublic>,
-    public nx::utils::db::test::TestWithDbHelper
+    public nx::sql::test::TestWithDbHelper
 {
 public:
     CdbLauncher(QString tmpDir = QString());

@@ -9,8 +9,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 namespace detail {
 namespace test {
 
@@ -234,6 +233,5 @@ TEST_F(QueryQueue, select_query_priority_can_be_raised)
 
 } // namespace test
 } // namespace detail
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

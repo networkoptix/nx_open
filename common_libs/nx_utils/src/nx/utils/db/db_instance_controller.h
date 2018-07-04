@@ -8,8 +8,7 @@
 #include "types.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 class NX_UTILS_API InstanceController
 {
@@ -37,6 +36,5 @@ private:
     DBResult configureSqliteInstance(QueryContext* queryContext);
 };
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

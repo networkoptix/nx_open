@@ -9,10 +9,10 @@ namespace dao {
 namespace rdb {
 
 class InstanceController:
-    public nx::utils::db::InstanceController
+    public nx::sql::InstanceController
 {
 public:
-    InstanceController(const nx::utils::db::ConnectionOptions& connectionOptions);
+    InstanceController(const nx::sql::ConnectionOptions& connectionOptions);
 };
 
 } // namespace rdb

@@ -6,8 +6,7 @@
 #include "base_request_executor.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 using CreateRequestExecutorFunc =
     std::unique_ptr<BaseRequestExecutor>(
@@ -15,9 +14,9 @@ using CreateRequestExecutorFunc =
         QueryExecutorQueue* const queryExecutorQueue);
 
 class NX_UTILS_API RequestExecutorFactory:
-    public BasicFactory<CreateRequestExecutorFunc>
+    public nx::utils::BasicFactory<CreateRequestExecutorFunc>
 {
-    using base_type = BasicFactory<CreateRequestExecutorFunc>;
+    using base_type = nx::utils::BasicFactory<CreateRequestExecutorFunc>;
 
 public:
     RequestExecutorFactory();
@@ -30,6 +29,5 @@ private:
         QueryExecutorQueue* const queryExecutorQueue);
 };
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

@@ -9,8 +9,7 @@
 #include "query.h"
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 void AbstractAsyncSqlQueryExecutor::executeSqlSync(QByteArray sqlStatement)
 {
@@ -82,8 +81,8 @@ const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
 }
 
 void AsyncSqlQueryExecutor::executeUpdate(
-    nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler)
 {
     scheduleQuery<UpdateWithoutAnyDataExecutor>(
         std::move(dbUpdateFunc),
@@ -91,8 +90,8 @@ void AsyncSqlQueryExecutor::executeUpdate(
 }
 
 void AsyncSqlQueryExecutor::executeUpdateWithoutTran(
-    nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
+    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler)
 {
     scheduleQuery<UpdateWithoutAnyDataExecutorNoTran>(
         std::move(dbUpdateFunc),
@@ -100,8 +99,8 @@ void AsyncSqlQueryExecutor::executeUpdateWithoutTran(
 }
 
 void AsyncSqlQueryExecutor::executeSelect(
-    nx::utils::MoveOnlyFunc<DBResult(nx::utils::db::QueryContext*)> dbSelectFunc,
-    nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
+    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler)
 {
     scheduleQuery<SelectExecutor>(
         std::move(dbSelectFunc),
@@ -110,9 +109,9 @@ void AsyncSqlQueryExecutor::executeSelect(
 
 DBResult AsyncSqlQueryExecutor::execSqlScriptSync(
     const QByteArray& script,
-    nx::utils::db::QueryContext* const queryContext)
+    nx::sql::QueryContext* const queryContext)
 {
-    return nx::utils::db::SqlQueryExecutionHelper::execSQLScript(script, *queryContext->connection())
+    return nx::sql::SqlQueryExecutionHelper::execSQLScript(script, *queryContext->connection())
         ? DBResult::ok
         : DBResult::ioError;
 }
@@ -306,6 +305,5 @@ void AsyncSqlQueryExecutor::addCursorProcessingThread(const QnMutexLockerBase& l
         createNewConnectionThread(lock, connectionOptions, &m_cursorTaskQueue);
 }
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx

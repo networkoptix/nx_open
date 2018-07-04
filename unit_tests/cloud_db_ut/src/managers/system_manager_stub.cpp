@@ -12,34 +12,34 @@ boost::optional<api::SystemData> SystemManagerStub::findSystemById(const std::st
     return it->second;
 }
 
-nx::utils::db::DBResult SystemManagerStub::fetchSystemById(
-    nx::utils::db::QueryContext* /*queryContext*/,
+nx::sql::DBResult SystemManagerStub::fetchSystemById(
+    nx::sql::QueryContext* /*queryContext*/,
     const std::string& systemId,
     data::SystemData* const system)
 {
     auto x = findSystemById(systemId);
     if (!x)
-        return nx::utils::db::DBResult::notFound;
+        return nx::sql::DBResult::notFound;
 
     system->api::SystemData::operator=(*x);
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemManagerStub::updateSystemStatus(
-    nx::utils::db::QueryContext* /*queryContext*/,
+nx::sql::DBResult SystemManagerStub::updateSystemStatus(
+    nx::sql::QueryContext* /*queryContext*/,
     const std::string& systemId,
     api::SystemStatus systemStatus)
 {
     const auto it = m_systems.find(systemId);
     if (it == m_systems.end())
-        return nx::utils::db::DBResult::notFound;
+        return nx::sql::DBResult::notFound;
 
     it->second.status = systemStatus;
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemManagerStub::markSystemForDeletion(
-    nx::utils::db::QueryContext* const queryContext,
+nx::sql::DBResult SystemManagerStub::markSystemForDeletion(
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId)
 {
     return updateSystemStatus(queryContext, systemId, api::SystemStatus::deleted_);
