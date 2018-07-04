@@ -11,6 +11,8 @@ from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
 from framework.utils import RunningTime
 
+_DEFAULT_DOWNLOAD_TIMEOUT_SEC = 30 * 60
+
 _logger = logging.getLogger(__name__)
 
 
@@ -119,25 +121,25 @@ class OSAccess(object):
     def make_fake_disk(self, name, size_bytes):
         return self.Path()
 
-    def download(self, source_url, destination_dir):
+    def download(self, source_url, destination_dir, timeout_sec=_DEFAULT_DOWNLOAD_TIMEOUT_SEC):
         _logger.info("Download %s to %r.", source_url, destination_dir)
         if source_url.startswith('http://') or source_url.startswith('https://'):
-            return self._download_by_http(source_url, destination_dir)
+            return self._download_by_http(source_url, destination_dir, timeout_sec)
         if source_url.startswith('smb://'):
             hostname, path_str = source_url[len('smb://'):].split('/', 1)
             path = PureWindowsPath(path_str)
-            return self._download_by_smb(hostname, path, destination_dir)
+            return self._download_by_smb(hostname, path, destination_dir, timeout_sec)
         if source_url.startswith('file://'):
             local_path = LocalPath(source_url[len('file://'):])
             return self._take_local(local_path, destination_dir)
         raise NotImplementedError("Unknown scheme: {}".format(source_url))
 
     @abstractmethod
-    def _download_by_http(self, source_url, destination_dir):
+    def _download_by_http(self, source_url, destination_dir, timeout_sec):
         return self.Path()
 
     @abstractmethod
-    def _download_by_smb(self, source_hostname, source_path, destination_dir):
+    def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
         return self.Path()
 
     @abstractmethod

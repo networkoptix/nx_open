@@ -133,22 +133,22 @@ class WindowsAccess(RemoteAccess):
     def make_fake_disk(self, name, size_bytes):
         raise NotImplementedError()
 
-    def _download_by_http(self, source_url, destination_dir):
+    def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
             raise AlreadyDownloaded(
                 "Cannot download {!s} to {!s}".format(source_url, destination_dir),
                 destination)
-        variables = {'out': str(destination), 'url': source_url}
+        variables = {'out': str(destination), 'url': source_url, 'timeoutSec': timeout_sec}
         # language=PowerShell
         try:
-            self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url', variables)
+            self.winrm.run_powershell_script('Invoke-WebRequest -OutFile $out $url -TimeoutSec $timeoutSec', variables)
         except PowershellError as e:
             raise CannotDownload(str(e))
         return destination
 
-    def _download_by_smb(self, source_hostname, source_path, destination_dir):
+    def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
         raise NotImplementedError(
             "Cannot download \\\\{!s}\\{!s}. ".format(source_hostname, source_path) +
             "Downloading from SMB share is not yet supported for Windows remote machines. "

@@ -35,7 +35,7 @@ class PosixAccess(OSAccess):
             env={'MOUNT_POINT': mount_point, 'IMAGE': image_path, 'SIZE': size_bytes})
         return mount_point
 
-    def _download_by_http(self, source_url, destination_dir):
+    def _download_by_http(self, source_url, destination_dir, timeout_sec):
         _, file_name = source_url.rsplit('/', 1)
         destination = destination_dir / file_name
         if destination.exists():
@@ -43,16 +43,19 @@ class PosixAccess(OSAccess):
                 "Cannot download {!s} to {!s}".format(source_url, destination_dir),
                 destination)
         try:
-            self.shell.run_command([
-                'wget',
-                '--no-clobber', source_url,  # Don't overwrite file.
-                '--output-document', destination,
-                ])
+            self.shell.run_command(
+                [
+                    'wget',
+                    '--no-clobber', source_url,  # Don't overwrite file.
+                    '--output-document', destination,
+                    ],
+                timeout_sec=timeout_sec,
+                )
         except NonZeroExitStatus as e:
             raise CannotDownload(e.stderr)
         return destination
 
-    def _download_by_smb(self, source_hostname, source_path, destination_dir):
+    def _download_by_smb(self, source_hostname, source_path, destination_dir, timeout_sec):
         url = 'smb://{!s}/{!s}'.format(source_hostname, '/'.join(source_path.parts))
         destination = destination_dir / source_path.name
         if destination.exists():
@@ -62,13 +65,16 @@ class PosixAccess(OSAccess):
                 destination)
         # TODO: Decide on authentication based on username and password from URL.
         try:
-            self.shell.run_command([
-                'smbget',
-                '--quiet',  # Usual progress output has outrageous rate.
-                '--guest',  # Force guest authentication.
-                '--outputfile', destination,
-                url,
-                ])
+            self.shell.run_command(
+                [
+                    'smbget',
+                    '--quiet',  # Usual progress output has outrageous rate.
+                    '--guest',  # Force guest authentication.
+                    '--outputfile', destination,
+                    url,
+                    ],
+                timeout_sec=timeout_sec,
+                )
         except NonZeroExitStatus as e:
             raise CannotDownload(e.stderr)
         return destination
