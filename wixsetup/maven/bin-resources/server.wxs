@@ -120,6 +120,9 @@
                 <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
             </Component>
             <Component>
+                <File Id="nx_sql.dll" Name="nx_sql.dll" Source="$(var.SourceDir)/nx_sql.dll" DiskId="4" />
+            </Component>
+            <Component>
                 <File Id="nx_vms_api.dll" Name="nx_vms_api.dll" Source="$(var.SourceDir)/nx_vms_api.dll" DiskId="4" />
             </Component>
             <Component>

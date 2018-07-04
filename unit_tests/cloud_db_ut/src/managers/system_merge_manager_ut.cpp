@@ -116,7 +116,7 @@ protected:
     void whenMoveSlaveSystemTo(api::SystemStatus systemStatus)
     {
         ASSERT_EQ(
-            nx::utils::db::DBResult::ok,
+            nx::sql::DBResult::ok,
             m_systemManagerStub.updateSystemStatus(nullptr, m_slaveSystem.id, systemStatus));
     }
 
@@ -226,7 +226,7 @@ private:
         const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
     {
         queryExecutor().executeUpdateQuerySync(
-            [this, &mergeHistoryRecord](nx::utils::db::QueryContext* queryContext)
+            [this, &mergeHistoryRecord](nx::sql::QueryContext* queryContext)
             {
                 m_systemMergeManager->processMergeHistoryRecord(
                     queryContext,

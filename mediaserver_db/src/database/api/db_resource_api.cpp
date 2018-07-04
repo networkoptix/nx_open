@@ -67,7 +67,7 @@ qint32 getResourceInternalId(
         {
             const QString s = R"sql(SELECT id from vms_resource where guid = ?)sql";
             q->setForwardOnly(true);
-            return nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(q, s, Q_FUNC_INFO);
+            return nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(q, s, Q_FUNC_INFO);
         });
 
     if (!query)
@@ -102,7 +102,7 @@ bool insertOrReplaceResource(
                     WHERE id = :internalId
                 )sql";
 
-                return nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(q, s, Q_FUNC_INFO);
+                return nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(q, s, Q_FUNC_INFO);
             });
 
         if (query)
@@ -118,7 +118,7 @@ bool insertOrReplaceResource(
                     VALUES (:id, :typeId, :parentId, :name, :url)
                 )sql";
 
-                return nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(q, s, Q_FUNC_INFO);
+                return nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(q, s, Q_FUNC_INFO);
             });
     }
 
@@ -126,7 +126,7 @@ bool insertOrReplaceResource(
         return false;
 
     QnSql::bind(data, query.get());
-    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(query.get(), Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(query.get(), Q_FUNC_INFO))
         return false;
 
     if (*internalId == 0)
@@ -139,11 +139,11 @@ bool deleteResourceInternal(QueryContext* context, int internalId)
 {
     const QString queryStr(R"sql(DELETE FROM vms_resource where id = ?)sql");
     QSqlQuery query(context->database());
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(internalId);
-    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 } // namespace api

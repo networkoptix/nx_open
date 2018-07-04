@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/query_context.h>
 
 #include <nx/vms/api/data/resource_data.h>
 
@@ -15,8 +15,8 @@ class AbstractVmsP2pCommandBus
 public:
     virtual ~AbstractVmsP2pCommandBus() = default;
 
-    virtual nx::utils::db::DBResult saveResourceAttribute(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult saveResourceAttribute(
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         nx::vms::api::ResourceParamWithRefData data) = 0;
 };
@@ -29,8 +29,8 @@ class VmsP2pCommandBus:
 public:
     VmsP2pCommandBus(data_sync_engine::SyncronizationEngine* syncronizationEngine);
 
-    virtual nx::utils::db::DBResult saveResourceAttribute(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult saveResourceAttribute(
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         nx::vms::api::ResourceParamWithRefData data) override;
 

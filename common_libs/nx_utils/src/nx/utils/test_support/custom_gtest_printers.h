@@ -7,7 +7,6 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
-#include "../db/types.h"
 #include "../url.h"
 
 NX_UTILS_API void PrintTo(const QByteArray& val, ::std::ostream* os);
@@ -36,10 +35,5 @@ namespace utils {
 
 NX_UTILS_API void PrintTo(const Url& val, ::std::ostream* os);
 
-namespace db {
-
-NX_UTILS_API void PrintTo(const DBResult val, ::std::ostream* os);
-
-} // namespace db
 } // namespace utils
 } // namespace nx

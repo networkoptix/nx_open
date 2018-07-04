@@ -265,7 +265,7 @@ private:
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
         data_sync_engine::ConnectionManager*,
-        nx::utils::db::AsyncSqlQueryExecutor*)
+        nx::sql::AsyncSqlQueryExecutor*)
     {
         auto systemHealthInfoProvider = std::make_unique<SystemHealthInfoProviderStub>();
         m_systemHealthInfoProviderStub = systemHealthInfoProvider.get();

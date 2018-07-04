@@ -6,9 +6,9 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/request_execution_thread.h>
-#include <nx/utils/db/test_support/test_with_db_helper.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/request_execution_thread.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <nx_ec/ec_proto_version.h>
 
@@ -66,7 +66,7 @@ public:
         const auto dbResult = executeUpdateQuerySync(
             std::bind(&data_sync_engine::TransactionLog::updateTimestampHiForSystem,
                 m_transactionLog.get(), _1, systemId, getSystem(0).systemSequence));
-        ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
+        ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
 protected:
@@ -132,13 +132,13 @@ protected:
 
     void commitTran()
     {
-        ASSERT_EQ(nx::utils::db::DBResult::ok, m_activeQuery->transaction()->commit());
+        ASSERT_EQ(nx::sql::DBResult::ok, m_activeQuery->transaction()->commit());
         m_activeQuery.reset();
     }
 
     void rollbackTran()
     {
-        ASSERT_EQ(nx::utils::db::DBResult::ok, m_activeQuery->transaction()->rollback());
+        ASSERT_EQ(nx::sql::DBResult::ok, m_activeQuery->transaction()->rollback());
         m_activeQuery.reset();
     }
 
@@ -235,7 +235,7 @@ protected:
             queryContext.get(),
             m_systemId.c_str(),
             data_sync_engine::SerializableTransaction<::ec2::ApiUserData>(std::move(transaction)));
-        ASSERT_EQ(nx::utils::db::DBResult::cancelled, resultCode);
+        ASSERT_EQ(nx::sql::DBResult::cancelled, resultCode);
     }
 
     void assertMaxTimestampSequenceIsUsed()
@@ -250,8 +250,8 @@ private:
     const QnUuid m_otherPeerDbId;
     int m_otherPeerSequence;
     ::ec2::ApiUserData m_transactionData;
-    std::shared_ptr<nx::utils::db::QueryContext> m_activeQuery;
-    nx::utils::db::DbConnectionHolder m_dbConnectionHolder;
+    std::shared_ptr<nx::sql::QueryContext> m_activeQuery;
+    nx::sql::DbConnectionHolder m_dbConnectionHolder;
     boost::optional<Command<::ec2::ApiUserData>> m_initialTransaction;
     std::uint64_t m_lastUsedSequence = 0;
 
@@ -268,7 +268,7 @@ private:
         transactionLog()->shiftLocalTransactionSequence(m_systemId.c_str(), 100);
     }
 
-    std::shared_ptr<nx::utils::db::QueryContext> getQueryContext()
+    std::shared_ptr<nx::sql::QueryContext> getQueryContext()
     {
         // TODO: method is not clear
         if (m_activeQuery)
@@ -276,24 +276,24 @@ private:
         return createNewTran();
     }
 
-    std::shared_ptr<nx::utils::db::QueryContext> createNewTran()
+    std::shared_ptr<nx::sql::QueryContext> createNewTran()
     {
         auto deleter =
-            [](nx::utils::db::QueryContext* queryContext)
+            [](nx::sql::QueryContext* queryContext)
             {
                 if (queryContext->transaction()->isActive())
                 {
-                    ASSERT_EQ(nx::utils::db::DBResult::ok, queryContext->transaction()->commit());
+                    ASSERT_EQ(nx::sql::DBResult::ok, queryContext->transaction()->commit());
                 }
                 delete queryContext->transaction();
                 delete queryContext;
             };
 
         QSqlDatabase* dbConnection = m_dbConnectionHolder.dbConnection();
-        nx::utils::db::Transaction* transaction = new nx::utils::db::Transaction(dbConnection);
-        NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, transaction->begin());
-        return std::shared_ptr<nx::utils::db::QueryContext>(
-            new nx::utils::db::QueryContext(dbConnection, transaction),
+        nx::sql::Transaction* transaction = new nx::sql::Transaction(dbConnection);
+        NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, transaction->begin());
+        return std::shared_ptr<nx::sql::QueryContext>(
+            new nx::sql::QueryContext(dbConnection, transaction),
             deleter);
     }
 
@@ -375,7 +375,7 @@ private:
             queryContext.get(),
             m_systemId.c_str(),
             data_sync_engine::UbjsonSerializedTransaction<::ec2::ApiUserData>(std::move(transaction)));
-        ASSERT_TRUE(dbResult == nx::utils::db::DBResult::ok || dbResult == nx::utils::db::DBResult::cancelled)
+        ASSERT_TRUE(dbResult == nx::sql::DBResult::ok || dbResult == nx::sql::DBResult::cancelled)
             << "Got " << toString(dbResult);
     }
 
@@ -508,8 +508,8 @@ public:
             m_system.id.c_str(),
             std::bind(&TestTransactionController::doSomeDataModifications, this, _1),
             [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-                nx::utils::db::QueryContext* queryContext,
-                nx::utils::db::DBResult dbResult)
+                nx::sql::QueryContext* queryContext,
+                nx::sql::DBResult dbResult)
             {
                 onDbTranCompleted(queryContext, dbResult);
             });
@@ -536,7 +536,7 @@ private:
     QnWaitCondition m_cond;
     nx::utils::Counter m_startedAsyncCallsCounter;
 
-    nx::utils::db::DBResult doSomeDataModifications(nx::utils::db::QueryContext* queryContext)
+    nx::sql::DBResult doSomeDataModifications(nx::sql::QueryContext* queryContext)
     {
         prepareData();
 
@@ -566,7 +566,7 @@ private:
 
                 case State::done:
                     setCompletedState(State::done);
-                    return nx::utils::db::DBResult::ok;
+                    return nx::sql::DBResult::ok;
 
                 default:
                     NX_GTEST_ASSERT_TRUE(false);
@@ -574,7 +574,7 @@ private:
             }
         }
 
-        return nx::utils::db::DBResult::ok;
+        return nx::sql::DBResult::ok;
     }
 
     void setCompletedState(State completedState)
@@ -601,11 +601,11 @@ private:
         // It does not matter for transaction log whether we save application data or not.
         // TODO #ak But, it is still better to mockup data access object here.
         //NX_GTEST_ASSERT_EQ(
-        //    nx::utils::db::DBResult::ok,
+        //    nx::sql::DBResult::ok,
         //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
     }
 
-    void addTransactionToLog(nx::utils::db::QueryContext* queryContext)
+    void addTransactionToLog(nx::sql::QueryContext* queryContext)
     {
         ::ec2::ApiUserData userData;
         cdb::ec2::convert(m_sharing, &userData);
@@ -616,7 +616,7 @@ private:
             m_sharing.systemId.c_str(),
             ::ec2::ApiCommand::saveUser,
             std::move(userData));
-        ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
+        ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
     void proceedToState(State targetState)
@@ -638,8 +638,8 @@ private:
     }
 
     void onDbTranCompleted(
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult /*dbResult*/)
+        nx::sql::QueryContext* /*queryContext*/,
+        nx::sql::DBResult /*dbResult*/)
     {
     }
 
@@ -700,11 +700,11 @@ protected:
                 getSystem(0).id.c_str(),
                 std::bind(&TransactionLogOverlappingTransactions::shareSystemToRandomUser, this, _1, i),
                 [this, &transactionsToWait, &cond](
-                    nx::utils::db::QueryContext*, nx::utils::db::DBResult dbResult)
+                    nx::sql::QueryContext*, nx::sql::DBResult dbResult)
                 {
-                    if (dbResult != nx::utils::db::DBResult::cancelled)
+                    if (dbResult != nx::sql::DBResult::cancelled)
                     {
-                        ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
+                        ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
                     }
 
                     QnMutexLocker lk(&m_mutex);
@@ -751,8 +751,8 @@ private:
     std::vector<int> m_transactionOrder;
     int m_transactionToExecuteThreshold = 0;
 
-    nx::utils::db::DBResult shareSystemToRandomUser(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult shareSystemToRandomUser(
+        nx::sql::QueryContext* queryContext,
         int originalTransactionIndex)
     {
         cdb::api::SystemSharingEx sharing;
@@ -766,7 +766,7 @@ private:
         // It does not matter for transaction log whether we save application data or not.
         // TODO #ak But, it is still better to mockup data access object here.
         //NX_GTEST_ASSERT_EQ(
-        //    nx::utils::db::DBResult::ok,
+        //    nx::sql::DBResult::ok,
         //    systemSharingController().insertOrReplaceSharing(queryContext, sharing));
 
         ::ec2::ApiUserData userData;
@@ -778,13 +778,13 @@ private:
             sharing.systemId.c_str(),
             ::ec2::ApiCommand::saveUser,
             std::move(userData));
-        NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
+        NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
 
         // Making sure transactions are completed in the order
         // different from the one they were added.
         yieldToOtherTransactions(originalTransactionIndex);
 
-        return nx::utils::db::DBResult::ok;
+        return nx::sql::DBResult::ok;
     }
 
     void yieldToOtherTransactions(int originalTransactionIndex)

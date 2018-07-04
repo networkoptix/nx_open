@@ -20,7 +20,7 @@ nx_add_target(common LIBRARY
         ffmpeg
         detection_plugin_interface
         nx_vms_api
-        nx_network nx_utils nx_fusion
+        nx_network nx_utils nx_sql nx_fusion
         nx_plugin_utils
         cloud_db_client
 )
