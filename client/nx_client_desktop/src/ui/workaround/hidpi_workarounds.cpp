@@ -31,6 +31,9 @@ namespace {
  */
 QPoint screenRelatedToGlobal(const QPoint& point, QScreen* sourceScreen)
 {
+    if (!sourceScreen)
+        return point;
+
     const auto geometry = sourceScreen->geometry();
     if (geometry.contains(point))
         return point;
