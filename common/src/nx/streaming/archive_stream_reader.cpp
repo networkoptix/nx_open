@@ -612,6 +612,8 @@ begin_label:
         return result;
     }
 
+    if (m_delegate->startTime() == qint64(AV_NOPTS_VALUE))
+        return createEmptyPacket(reverseMode); //< No data at archive
     QnCompressedVideoDataPtr videoData;
 
     if (m_skipFramesToTime != 0)

@@ -509,7 +509,7 @@ QnRtspClient::QnRtspClient(
     //m_rtpIo(*this),
     m_transport(TRANSPORT_UDP),
     m_selectedAudioChannel(0),
-    m_startTime(AV_NOPTS_VALUE),
+    m_startTime(DATETIME_NOW),
     m_openedTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
