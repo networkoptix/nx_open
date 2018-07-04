@@ -17,6 +17,7 @@ from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
 
+_DEFAULT_QUICK_RUN_TIMEOUT_SEC = 10
 _INTERNAL_NIC_INDICES = [2, 3, 4, 5, 6, 7, 8]
 
 
@@ -92,7 +93,7 @@ class VirtualBox(Hypervisor):
 
     def import_vm(self, vm_image_path, vm_name):
         # `import` is reserved name...
-        self._vbox_manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name])
+        self._vbox_manage(['import', vm_image_path, '--vsys', 0, '--vmname', vm_name], timeout_sec=600)
         self._vbox_manage(['snapshot', vm_name, 'take', 'template'])
 
     def export_vm(self, vm_name, vm_image_path):
@@ -190,9 +191,9 @@ class VirtualBox(Hypervisor):
             vm_names.append(name)
         return vm_names
 
-    def _vbox_manage(self, args):
+    def _vbox_manage(self, args, timeout_sec=_DEFAULT_QUICK_RUN_TIMEOUT_SEC):
         try:
-            return self.host_os_access.run_command(['VBoxManage'] + args)
+            return self.host_os_access.run_command(['VBoxManage'] + args, timeout_sec=timeout_sec)
         except exit_status_error_cls(1) as x:
             first_line = x.stderr.splitlines()[0]
             prefix = 'VBoxManage: error: '
