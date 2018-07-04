@@ -40,7 +40,7 @@ void QueryQueue::push(value_type value)
 
         const auto priority = getPriority(*value);
         auto elementIter = m_elementsByPriority.emplace(
-            priority, ElementContext{std::move(value)});
+            priority, ElementContext{std::move(value), std::nullopt});
 
         if (m_itemStayTimeout)
             addElementExpirationTimer(elementIter);
@@ -109,7 +109,7 @@ std::optional<QueryQueue::value_type> QueryQueue::popPostponedElement()
         removeExpirationTimer(m_postponedElements.front());
         auto value = std::move(m_postponedElements.front().value);
         m_postponedElements.pop_front();
-        return value;
+        return std::move(value);
     }
 
     return std::nullopt;
@@ -164,7 +164,7 @@ void QueryQueue::addElementExpirationTimer(
 {
     auto timerIter = m_elementExpirationTimers.emplace(
         nx::utils::monotonicTime() + *m_itemStayTimeout,
-        ElementExpirationContext{elementIter});
+        ElementExpirationContext{elementIter, std::nullopt});
     elementIter->second.timerIter = timerIter;
 }
 
