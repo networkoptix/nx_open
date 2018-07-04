@@ -63,15 +63,15 @@ TEST_F(BookmarksDatabaseTest, selectTest)
 {
     ASSERT_TRUE(mediaServerLauncher->start());
 
-    QnUuid cameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
-    QnUuid cameraId2("6FD1F239-CEBC-81BF-C2D4-59789E2CEF05");
+    static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
+    static const QnUuid kCameraId2("6FD1F239-CEBC-81BF-C2D4-59789E2CEF05");
 
     const auto startTimeMs = 500;
     const auto periodMs = 1000;
     const auto endTimeMs = startTimeMs + periodMs;
 
     QnCameraBookmark bookmark;
-    bookmark.cameraId = cameraId1;
+    bookmark.cameraId = kCameraId1;
     bookmark.startTimeMs = startTimeMs + periodMs / 2;
     bookmark.durationMs = 100;
     bookmark.name = "bookmarkMid";
@@ -92,12 +92,12 @@ TEST_F(BookmarksDatabaseTest, selectTest)
 
     bookmark.startTimeMs = startTimeMs - bookmark.durationMs / 2;
     bookmark.name = "bookmarkMid 2";
-    bookmark.cameraId = cameraId2;
+    bookmark.cameraId = kCameraId2;
     bookmark.guid = QnUuid::createUuid();
     qnServerDb->addBookmark(bookmark);
 
     QList<QnUuid> cameras;
-    cameras << cameraId1;
+    cameras << kCameraId1;
 
     QnCameraBookmarkSearchFilter filter;
     filter.endTimeMs = endTimeMs;

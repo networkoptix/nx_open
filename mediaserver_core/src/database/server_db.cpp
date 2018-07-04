@@ -1140,17 +1140,17 @@ bool QnServerDb::getBookmarksInternal(
 {
     QString queryTemplate = QString(R"(
         SELECT
-        guid as guid,
-        name as name,
-        start_time as startTimeMs,
-        duration as durationMs,
-        start_time + duration as endTimeMs,
-        description as description,
-        timeout as timeout,
-        camera_guid as cameraId,
-        creator_guid as creatorId,
-        created as creationTimeStampMs,
-        (SELECT group_concat(name) FROM bookmark_tags t where t.bookmark_guid = guid) as tags
+            guid as guid,
+            name as name,
+            start_time as startTimeMs,
+            duration as durationMs,
+            start_time + duration as endTimeMs,
+            description as description,
+            timeout as timeout,
+            camera_guid as cameraId,
+            creator_guid as creatorId,
+            created as creationTimeStampMs,
+            (SELECT group_concat(name) FROM bookmark_tags t where t.bookmark_guid = guid) as tags
         FROM bookmarks
         WHERE %1
     )");

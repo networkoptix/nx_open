@@ -179,14 +179,6 @@ struct QnCameraBookmarkTag
 };
 #define QnCameraBookmarkTag_Fields (name)(count)
 
-struct QnCameraBookmarkTagWithId: public QnCameraBookmarkTag
-{
-    operator QString() const { return name; }
-
-    QnUuid bookmarkId;
-};
-#define QnCameraBookmarkTagWithId_Fields QnCameraBookmarkTag_Fields(bookmarkId)
-
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
 bool operator<(qint64 first, const QnCameraBookmark &other);
 bool operator<(const QnCameraBookmark &first, qint64 other);
@@ -203,7 +195,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json)(metatype)(eq))
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (QnCameraBookmark)(QnCameraBookmarkTag)(QnCameraBookmarkTagWithId),
+    (QnCameraBookmark)(QnCameraBookmarkTag),
     (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
 
 #endif //QN_CAMERA_BOOKMARK_H
