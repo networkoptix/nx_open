@@ -290,6 +290,7 @@ copyBins()
 copyMediaserverPlugins()
 {
     mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins"
+    mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins_optional"
 
     if [ "$BOX" = "edge1" ]
     then
@@ -300,23 +301,44 @@ copyMediaserverPlugins()
         return
     fi
 
-    if [ -d "$BIN_BUILD_DIR/plugins" ]
+    local PLUGINS=(
+        generic_multicast_plugin
+        genericrtspplugin
+        it930x_plugin
+        mjpg_link
+    )
+    PLUGINS+=(
+        hikvision_metadata_plugin
+        axis_metadata_plugin
+        dw_mtt_metadata_plugin
+        vca_metadata_plugin
+    )
+    if [ "$ENABLE_HANWHA" == "true" ]
     then
-        local FILE
-        for FILE in "$BIN_BUILD_DIR/plugins/"*
-        do
-            if [[ -f $FILE ]] && [[ $FILE != *.debug ]]
-            then
-                if [ "$ENABLE_HANWHA" != "true" ] && [[ "$FILE" == *hanwha* ]]
-                then
-                    continue
-                fi
-
-                echo "Copying plugins/$(basename "$FILE")"
-                cp -r "$FILE" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
-            fi
-        done
+        PLUGINS+=( hanwha_metadata_plugin )
     fi
+
+    local PLUGINS_OPTIONAL=(
+        stub_metadata_plugin
+    )
+
+    local PLUGIN
+    local PLUGIN_FILENAME
+    local -r PLUGIN_BIN_DIR="$BIN_BUILD_DIR/plugins"
+
+    for PLUGIN in "${PLUGINS[@]}"
+    do
+        PLUGIN_FILENAME="lib$PLUGIN.so"
+        echo "Copying (plugin) $PLUGIN_FILENAME"
+        cp "$PLUGIN_BIN_DIR/$PLUGIN_FILENAME" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
+    done
+
+    for PLUGIN in "${PLUGINS_OPTIONAL[@]}"
+    do
+        PLUGIN_FILENAME="lib$PLUGIN.so"
+        echo "Copying (optional plugin) $PLUGIN_FILENAME"
+        cp "$PLUGIN_BIN_DIR/$PLUGIN_FILENAME" "$MEDIASERVER_BIN_INSTALL_DIR/plugins_optional/"
+    done
 }
 
 # [in] INSTALL_DIR
