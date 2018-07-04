@@ -40,9 +40,21 @@ namespace
         if (nonEmptySources.size() == 1)
         {
             const QnCameraBookmarkList &result = *nonEmptySources.front();
-            if (result.size() <= limit)
-                return result;
-            return result.mid(0, limit);
+            return result.size() <= limit ? result : result.mid(0, limit);
+        }
+        else if (nonEmptySources.size() == 2)
+        {
+            QnCameraBookmarkList result;
+            const auto& source = nonEmptySources;
+
+            result.resize(source[0]->size() + source[1]->size());
+            auto itr = std::set_union(
+                source[0]->constBegin(), source[0]->constEnd(),
+                source[1]->constBegin(), source[1]->constEnd(),
+                result.begin(), pred);
+            if (!result.empty())
+                result.resize(itr - result.begin());
+            return result.size() <= limit ? result : result.mid(0, limit);
         }
 
         typedef QPair<QnCameraBookmarkList::const_iterator

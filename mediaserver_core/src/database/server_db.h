@@ -84,6 +84,14 @@ private:
     bool cleanupAuditLog();
 
     QString getRequestStr(const QnEventLogRequestData& request) const;
+    bool getBookmarksInternal(
+        const QList<QnUuid>& cameraIds,
+        const QnCameraBookmarkSearchFilter &filter,
+        QnCameraBookmarkList &result);
+    bool getMaxBookmarksMaxDurationMs(
+        const QList<QnUuid>& cameraIds,
+        const QnCameraBookmarkSearchFilter& filter,
+        qint64* outResult) const;
 private:
     qint64 m_lastCleanuptime;
     qint64 m_auditCleanuptime;

@@ -49,7 +49,8 @@ TEST_F(BookmarksDatabaseTest, DISABLED_speedTest)
 
     QnCameraBookmarkSearchFilter filter;
     filter.endTimeMs = QDateTime::currentMSecsSinceEpoch();
-    filter.startTimeMs = filter.endTimeMs - 1000 * 3600 * 24LL * 1;
+    filter.startTimeMs = filter.endTimeMs - 1000 * 3600 * 24LL * 30;
+    filter.limit = 100;
     nx::utils::ElapsedTimer timer;
     timer.restart();
     QnCameraBookmarkList result;
@@ -65,9 +66,9 @@ TEST_F(BookmarksDatabaseTest, selectTest)
     QnUuid cameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
     QnUuid cameraId2("6FD1F239-CEBC-81BF-C2D4-59789E2CEF05");
 
-    const auto endTimeMs = QDateTime::currentMSecsSinceEpoch();
-    const auto periodMs = 1000 * 3600 * 24LL * 30;
-    const auto startTimeMs = endTimeMs - periodMs;
+    const auto startTimeMs = 500;
+    const auto periodMs = 1000;
+    const auto endTimeMs = startTimeMs + periodMs;
 
     QnCameraBookmark bookmark;
     bookmark.cameraId = cameraId1;

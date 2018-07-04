@@ -235,6 +235,33 @@ vms::event::EventParameters convertOldEventParameters(
     return result;
 }
 
+QString createBookmarksFilterSortPart(const QnCameraBookmarkSearchFilter& filter)
+{
+    static const auto kOrderByTemplate = lit(" ORDER BY %1 %2, guid ");
+
+    const auto order = filter.orderBy.order == Qt::AscendingOrder ? lit("ASC") : lit("DESC");
+    switch (filter.orderBy.column)
+    {
+        case Qn::BookmarkName:
+            return kOrderByTemplate.arg(lit("book.name"), order);
+        case Qn::BookmarkStartTime:
+            return kOrderByTemplate.arg(lit("startTimeMs"), order);
+        case Qn::BookmarkCreationTime:
+            return kOrderByTemplate.arg(lit("creationTimeStampMs"), order);
+        case Qn::BookmarkDuration:
+            return kOrderByTemplate.arg(lit("durationMs"), order);
+        case Qn::BookmarkCameraName:
+            return kOrderByTemplate.arg(lit("cameraId"), order);
+        case Qn::BookmarkCreator:
+            return kOrderByTemplate.arg(lit("creatorId"), order);
+        case Qn::BookmarkTags:
+            return lit(""); // No sort by db
+        default:
+            NX_ASSERT(false, Q_FUNC_INFO, "Invalid sorting column value");
+            return lit("");
+    }
+}
+
 int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
 {
     if (filter.sparsing.used)
@@ -1034,42 +1061,84 @@ bool QnServerDb::getBookmarks(
     return getBookmarks(cameraIds, filter, result);
 }
 
+
+bool QnServerDb::getMaxBookmarksMaxDurationMs(
+    const QList<QnUuid>& cameraIds,
+    const QnCameraBookmarkSearchFilter& filter,
+    qint64* outResult) const
+{
+    *outResult = 0;
+
+    QSet<QString> cameraStringIds;
+    for (const auto& id : cameraIds)
+        cameraStringIds << guidToSqlString(id);
+    QString queryTemplate = QString(R"(SELECT max(duration) FROM bookmarks WHERE %1)");
+
+    QList<QVariant> bindings;
+
+    QString filterText = lit("camera_guid in (%1)").arg(cameraStringIds.toList().join(","));
+
+    const auto queryStr = queryTemplate.arg(filterText);
+
+    QnWriteLocker lock(&m_mutex);
+    QSqlQuery query(m_sdb);
+
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    for (const auto& b: bindings)
+        query.addBindValue(b);
+
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+
+    if (query.next())
+        *outResult = query.value(0).toLongLong();
+    return true;
+}
+
 bool QnServerDb::getBookmarks(
     const QList<QnUuid>& cameraIds,
     const QnCameraBookmarkSearchFilter& filter,
     QnCameraBookmarkList& result)
 {
-    QSet<QString> cameraStringIds;
-    for (const auto& id: cameraIds)
-        cameraStringIds <<guidToSqlString(id);
+    bool hasTimeRange = filter.startTimeMs > 0 && filter.endTimeMs < INT64_MAX;
 
-    if (cameraStringIds.empty())
-        return false;
-
-    QList<QVariant> bindings;
-    QString filterText = lit("camera_guid in (%1)").arg(cameraStringIds.toList().join(","));
-
-    auto addFilter =
-        [&](const QString& filter, const QVariant& value)
-        {
-            filterText += lit(" AND %1").arg(filter);
-            bindings << value;
-        };
-
-    if (filter.isValid())
+    if (hasTimeRange)
     {
-        if (filter.endTimeMs < INT64_MAX)
-            addFilter("start_time <= :maxEndTimeMs", filter.endTimeMs);
-        if (filter.startTimeMs > 0)
-            addFilter("start_time + duration >= :minStartTimeMs", filter.startTimeMs);
-    }
-    if (!filter.text.isEmpty())
-    {
-        addFilter("rowid in (SELECT docid FROM fts_bookmarks WHERE fts_bookmarks MATCH :text)",
-            filter.text);
+        QnMultiServerCameraBookmarkList bookmarks;
+        bookmarks.resize(2);
+
+        qint64 maxDurationMs = 0;
+        if (!getMaxBookmarksMaxDurationMs(cameraIds, filter, &maxDurationMs))
+            return false;
+
+        QnCameraBookmarkList result2;
+        QnCameraBookmarkSearchFilter filter2(filter);
+        filter2.endTimeMs = filter.startTimeMs;
+        filter2.startTimeMs = filter.startTimeMs - maxDurationMs;
+
+        if (!getBookmarksInternal(cameraIds, filter, bookmarks[0]))
+            return false;
+
+        if (!getBookmarksInternal(cameraIds, filter2, bookmarks[1]))
+            return false;
+
+        result = QnCameraBookmark::mergeCameraBookmarks(
+            commonModule(), bookmarks, filter.orderBy,  QnBookmarkSparsingOptions(), filter.limit);
+
+        return true;
     }
 
-    QString queryStr = QString(R"(
+    return getBookmarksInternal(cameraIds, filter, result);
+}
+
+bool QnServerDb::getBookmarksInternal(
+    const QList<QnUuid>& cameraIds,
+    const QnCameraBookmarkSearchFilter& filter,
+    QnCameraBookmarkList& result)
+{
+    QString queryTemplate = QString(R"(
         SELECT
         guid as guid,
         name as name,
@@ -1080,27 +1149,51 @@ bool QnServerDb::getBookmarks(
         timeout as timeout,
         camera_guid as cameraId,
         creator_guid as creatorId,
-        created as creationTimeStampMs
+        created as creationTimeStampMs,
+        (SELECT group_concat(name) FROM bookmark_tags t where t.bookmark_guid = guid) as tags
         FROM bookmarks
         WHERE %1
-        ORDER BY guid
-    )").arg(filterText);
+    )");
+
+    QList<QVariant> bindings;
+
+    QSet<QString> cameraStringIds;
+    for (const auto& id: cameraIds)
+        cameraStringIds << guidToSqlString(id);
+    QString filterText = lit("camera_guid in (%1)").arg(cameraStringIds.toList().join(","));
+
+    auto addFilter = [&](
+        const QString& filter,
+        const QVariant& value,
+        const QVariant& value2 = QVariant())
+    {
+        filterText += lit(" AND %1").arg(filter);
+        bindings.push_back(value);
+        if (!value2.isNull())
+            bindings.push_back(value2);
+    };
+
+    if (filter.startTimeMs > 0 && filter.endTimeMs < INT64_MAX)
+        addFilter("start_time between ? AND ?", filter.startTimeMs, filter.endTimeMs);
+    else if (filter.endTimeMs < INT64_MAX)
+        addFilter("start_time <= ?", filter.endTimeMs);
+    else if (filter.startTimeMs > 0)
+        addFilter("start_time + duration  >= ?", filter.startTimeMs);
+
+    if (!filter.text.isEmpty())
+    {
+        addFilter(
+            "rowid in (SELECT docid FROM fts_bookmarks WHERE fts_bookmarks MATCH ?)", filter.text);
+    }
+
+    QString queryStr = queryTemplate.arg(filterText);
+    queryStr += createBookmarksFilterSortPart(filter);
 
     const auto limit = getBookmarksQueryLimit(filter);
     if (limit != QnCameraBookmarkSearchFilter::kNoLimit)
         queryStr += lit(" LIMIT %1").arg(limit);
 
-    QString bookmarkTagsQueryStr = QString(R"(
-        SELECT
-        bookmark_tags.bookmark_guid as bookmarkId,
-        bookmark_tags.name
-        FROM bookmarks
-        JOIN bookmark_tags ON bookmarks.guid = bookmark_tags.bookmark_guid
-        WHERE bookmarks.camera_guid in (%1)
-        ORDER BY bookmarks.guid
-    )").arg(cameraStringIds.toList().join(","));
-
-    std::vector<QnCameraBookmarkTagWithId> tags;
+    NX_VERBOSE(this, lit("Got getBookmarks query: %1").arg(queryStr));
     {
         QnWriteLocker lock(&m_mutex);
         QSqlQuery query(m_sdb);
@@ -1111,27 +1204,23 @@ bool QnServerDb::getBookmarks(
         for (const auto& b: bindings)
             query.addBindValue(b);
 
-        QSqlQuery tagsQuery(m_sdb);
-        tagsQuery.setForwardOnly(true);
-        if (!prepareSQLQuery(&tagsQuery, bookmarkTagsQueryStr, Q_FUNC_INFO))
-            return false;
-
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return false;
 
-        if (!execSQLQuery(&tagsQuery, Q_FUNC_INFO))
-            return false;
+        QnSqlIndexMapping mapping = QnSql::mapping<QnCameraBookmark>(query);
+        QSqlRecord queryInfo = query.record();
+        const int tagsFiledIdx = queryInfo.indexOf("tags");
 
-        QnSql::fetch_many(query, &result);
-        QnSql::fetch_many(tagsQuery, &tags);
+        while (query.next())
+        {
+            QnCameraBookmark bookmark;
+            QnSql::fetch(mapping, query.record(), &bookmark);
+            bookmark.tags = query.value(
+                tagsFiledIdx).toString().split(lit(","),
+                QString::SkipEmptyParts).toSet();
+            result.push_back(std::move(bookmark));
+        }
     }
-    mergeObjectListData(
-        result, tags,
-        &QnCameraBookmark::tags,
-        &QnCameraBookmark::guid,
-        &QnCameraBookmarkTagWithId::bookmarkId);
-
-    QnCameraBookmark::sortBookmarks(commonModule(), result, filter.orderBy);
 
     return true;
 }
