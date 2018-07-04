@@ -1,5 +1,8 @@
 #!/bin/bash
-NAME=${1:?}-${2:-template}
+
+set -eux
+
+NAME=${1:?"Usage: ./configure-vm.sh <vm_name>"}
 
 if [[ $NAME = win* ]]; then
   VBoxManage modifyvm $NAME --cpus 2
@@ -43,6 +46,3 @@ VBoxManage modifyvm $NAME --nictype5 virtio
 VBoxManage modifyvm $NAME --nictype6 virtio
 VBoxManage modifyvm $NAME --nictype7 virtio
 VBoxManage modifyvm $NAME --nictype8 virtio
-
-VBoxManage snapshot $NAME delete template
-VBoxManage snapshot $NAME take template
