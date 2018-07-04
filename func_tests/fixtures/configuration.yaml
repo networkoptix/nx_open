@@ -8,7 +8,7 @@ vm_types:
       limit: 100
       mac_address_format: 0A-00-00-01-{vm_index:02X}-0{nic_index:01X}
       template_vm: trusty-template
-      template_url: smb://qanas/rw/gsovetov/func_tests/trusty-template.ova
+      template_url: smb://qanas/rw/gsovetov/func_tests/trusty-template-20180704.ova
       port_forwarding:
         host_ports_base: 33000
         host_ports_per_vm: 10
