@@ -27,6 +27,8 @@ void AbstractAsyncSqlQueryExecutor::executeSqlSync(QByteArray sqlStatement)
 
 static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
 
+const int AsyncSqlQueryExecutor::kDefaultQueryPriority = detail::QueryQueue::kDefaultPriority;
+
 AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     const ConnectionOptions& connectionOptions)
     :
