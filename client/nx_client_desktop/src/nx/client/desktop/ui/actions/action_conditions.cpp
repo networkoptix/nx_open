@@ -1822,6 +1822,16 @@ ConditionWrapper canExportBookmark()
         });
 }
 
+ConditionWrapper currentLayoutIsVideowallScreen()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            const auto layout = context->workbench()->currentLayout();
+            return layout && !layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull();
+        });
+}
+
 } // namespace condition
 
 

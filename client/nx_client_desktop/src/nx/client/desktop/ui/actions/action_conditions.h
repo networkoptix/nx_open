@@ -632,6 +632,8 @@ ConditionWrapper canExportLayout();
 
 ConditionWrapper canExportBookmark();
 
+ConditionWrapper currentLayoutIsVideowallScreen();
+
 } // namespace condition
 
 } // namespace action

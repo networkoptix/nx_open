@@ -463,6 +463,8 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
         connect(action(action::DeleteVideowallMatrixAction), &QAction::triggered, this,
             &QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered);
+        connect(action(action::VideoWallScreenSettingsAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_videoWallScreenSettingsAction_triggered);
 
         connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
             &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
@@ -2155,6 +2157,27 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
     }
 
     saveVideowalls(videoWalls);
+}
+
+void QnWorkbenchVideoWallHandler::at_videoWallScreenSettingsAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    QnVideoWallItemIndexList videoWallItems = parameters.videoWallItems();
+    if (videoWallItems.empty())
+        return;
+
+    const auto& index = videoWallItems.first();
+    auto layout = resourcePool()->getResourceById<QnLayoutResource>(index.item().layout);
+    if (!layout)
+    {
+        layout = constructLayout(QnResourceList());
+        layout->setParentId(index.videowall()->getId());
+        layout->setName(index.item().name);
+        resourcePool()->addResource(layout);
+        resetLayout(QnVideoWallItemIndexList() << index, layout);
+    }
+
+    menu()->trigger(action::LayoutSettingsAction, layout);
 }
 
 void QnWorkbenchVideoWallHandler::at_radassAction_triggered()

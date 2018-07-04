@@ -959,6 +959,16 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false)
         .condition(new DetachFromVideoWallCondition());
 
+    factory()
+        .flags(Tree | VideoWallReviewScene | SingleTarget | VideoWallItemTarget)
+        .separator();
+
+    factory(VideoWallScreenSettingsAction)
+        .flags(Tree | VideoWallReviewScene | SingleTarget | VideoWallItemTarget)
+        .requiredGlobalPermission(Qn::GlobalControlVideoWallPermission)
+        .text(ContextMenu::tr("Screen Settings..."))
+        .condition(!condition::isSafeMode());
+
     factory(SaveLayoutAction)
         .flags(TitleBar | Tree | SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::SavePermission)
@@ -1616,6 +1626,8 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | NoTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission)
         .text(ContextMenu::tr("Layout Settings..."))
+        .conditionalText(ContextMenu::tr("Screen Settings..."),
+            condition::currentLayoutIsVideowallScreen())
         .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
             && !condition::tourIsRunning());
 
