@@ -22,14 +22,9 @@ class DpkgInstallation(DebInstallation):
         return UpstartService(self._posix_shell, service_name, stop_timeout_sec)
 
     def install(self, installer):
-        if self.identity == installer.identity:
-            _logger.info(
-                'Skip installation: Existing installation identity (%s) matches installer).', self.identity)
+        if not self.should_reinstall(installer):
             return
 
-        _logger.info(
-            'Perform installation: Existing installation identity (%s) does NOT match installer (%s).',
-            self.identity, installer.identity)
         remote_path = self.os_access.Path.tmp() / installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
         copy_file(installer.path, remote_path)
@@ -49,3 +44,4 @@ class DpkgInstallation(DebInstallation):
                 'CONFIG_INITIAL': self._config_initial,
                 })
         assert self.is_valid()
+        self._identity = installer.identity

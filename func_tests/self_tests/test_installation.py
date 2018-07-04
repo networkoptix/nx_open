@@ -24,8 +24,12 @@ def linux_multi_vm(vm_factory):
 def test_group_install(artifact_factory, mediaserver_installers, ca, linux_multi_vm):
     installer = installer_by_vm_type(mediaserver_installers, vm_type='linux')
     group = UnpackedMediaserverGroup(
-        linux_multi_vm.os_access, mediaserver_installers['linux64'], linux_multi_vm.os_access.Path('/tmp/srv'))
-    installation_list = group.make_installations(7001, 5)
+        posix_access=linux_multi_vm.os_access,
+        installer=installer_by_vm_type(mediaserver_installers, 'linux'),
+        root_dir=linux_multi_vm.os_access.Path('/tmp/srv'),
+        base_port=7001,
+        )
+    installation_list = group.allocate_many(5)
     server_list = [setup_clean_mediaserver('server', installation, installer, ca)
                    for installation in installation_list]
     try:

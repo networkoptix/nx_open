@@ -22,6 +22,8 @@ _logger = logging.getLogger(__name__)
 class DebInstallation(Installation):
     """Manage installation via dpkg"""
 
+    _NOT_SET = object()
+
     def __init__(self, posix_access, dir):
         self._posix_shell = posix_access.shell  # type: PosixShell
         self.dir = dir
@@ -33,6 +35,7 @@ class DebInstallation(Installation):
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
         self.posix_access = posix_access
+        self._identity = self._NOT_SET
 
     @property
     def os_access(self):
@@ -74,8 +77,15 @@ class DebInstallation(Installation):
         except DoesNotExist:
             return None
 
-    @cached_property
+    # returns None if server is not installed (yet)
+    # cached_property does not fit because we need to invalidate it after .install()
+    @property
     def identity(self):
+        if self._identity is self._NOT_SET:
+            self._identity = self._discover_identity()
+        return self._identity
+
+    def _discover_identity(self):
         if not self.is_valid():
             return None
         build_info_path = self.dir / 'build_info.txt'
@@ -87,3 +97,14 @@ class DebInstallation(Installation):
             line.split('=', 1)
             for line in build_info_text.splitlines(False))
         return InstallIdentity.from_build_info(build_info)
+
+    def should_reinstall(self, installer):
+        if self.identity == installer.identity:
+            _logger.info(
+                'Skip installation: Existing installation identity (%s) matches installer).', self.identity)
+            return False
+        else:
+            _logger.info(
+                'Perform installation: Existing installation identity (%s) does NOT match installer (%s).',
+                self.identity, installer.identity)
+            return True
