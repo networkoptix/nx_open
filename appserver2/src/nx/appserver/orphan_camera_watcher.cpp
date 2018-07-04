@@ -30,7 +30,6 @@ OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule)
         [&](std::chrono::milliseconds interval)
         {
             m_updateInterval = interval;
-            m_timer.stop();
             this->start();
         },
         Qt::QueuedConnection);
@@ -38,7 +37,6 @@ OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule)
     connect(this, &OrphanCameraWatcher::doStart, this,
         [&]()
         {
-            m_timer.stop();
             this->start();
         },
         Qt::QueuedConnection);
@@ -46,6 +44,7 @@ OrphanCameraWatcher::OrphanCameraWatcher(QnCommonModule* commonModule)
 
 void OrphanCameraWatcher::start()
 {
+    m_timer.stop();
     update();
     m_timer.start(m_updateInterval.count());
 }
