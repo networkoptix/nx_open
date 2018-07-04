@@ -64,7 +64,7 @@ class ReciprocalPortMap(object):
 
     Local is machine this code is running on.
     Remote is machine this code access.
-    This object comes either from remote physical machine configuration of from hypervisor.
+    This object comes either from remote physical machine configuration or from hypervisor.
     Interface is symmetric.
     """
 
