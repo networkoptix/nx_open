@@ -38,12 +38,14 @@ QnVideowallSettingsDialog::QnVideowallSettingsDialog(QWidget *parent) :
     ui(new Ui::QnVideowallSettingsDialog)
 {
     ui->setupUi(this);
+    setResizeToContentsMode(Qt::Vertical);
 }
 
 QnVideowallSettingsDialog::~QnVideowallSettingsDialog() {}
 
 void QnVideowallSettingsDialog::loadFromResource(const QnVideoWallResourcePtr &videowall) {
     ui->autoRunCheckBox->setChecked(videowall->isAutorun());
+    ui->enableTimelineCheckBox->setChecked(videowall->isTimelineEnabled());
 
     bool shortcutsSupported = qnPlatform->shortcuts()->supported();
     ui->shortcutCheckbox->setVisible(shortcutsSupported);
@@ -59,6 +61,7 @@ void QnVideowallSettingsDialog::loadFromResource(const QnVideoWallResourcePtr &v
 
 void QnVideowallSettingsDialog::submitToResource(const QnVideoWallResourcePtr &videowall) {
     videowall->setAutorun(ui->autoRunCheckBox->isChecked());
+    videowall->setTimelineEnabled(ui->enableTimelineCheckBox->isChecked());
 
     if (!qnPlatform->shortcuts()->supported())
         return;

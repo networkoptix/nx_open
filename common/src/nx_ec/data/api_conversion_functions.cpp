@@ -913,6 +913,7 @@ void fromApiToResource(const ApiVideowallData& src, QnVideoWallResourcePtr& dst)
     fromApiToResource(static_cast<const ApiResourceData&>(src), dst.data());
 
     dst->setAutorun(src.autorun);
+    dst->setTimelineEnabled(src.timeline);
     QnVideoWallItemList outItems;
     for (const ApiVideowallItemData& item: src.items)
     {
@@ -947,6 +948,7 @@ void fromResourceToApi(const QnVideoWallResourcePtr& src, ApiVideowallData& dst)
     fromResourceToApi(src, static_cast<ApiResourceData&>(dst));
 
     dst.autorun = src->isAutorun();
+    dst.timeline = src->isTimelineEnabled();
 
     const QnVideoWallItemMap& resourceItems = src->items()->getItems();
     dst.items.clear();

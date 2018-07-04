@@ -2216,11 +2216,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         };
     handleAutoRunChanged(videoWall);
 
-    connect(videoWall, &QnVideoWallResource::autorunChanged, this,
-        [handleAutoRunChanged](const QnResourcePtr &resource)
-        {
-            handleAutoRunChanged(resource.dynamicCast<QnVideoWallResource>());
-        });
+    connect(videoWall, &QnVideoWallResource::autorunChanged, this, handleAutoRunChanged);
 
     connect(videoWall, &QnVideoWallResource::pcAdded, this,
         [this](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
@@ -2245,6 +2241,18 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
             connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode);
             connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode);
             setVideoWallAutorunEnabled(videoWall->getId(), videoWall->isAutorun());
+
+            auto handleTimelineEnabledChanged =
+                [](const QnVideoWallResourcePtr& videoWall)
+                {
+                    qnRuntime->setVideoWallWithTimeLine(videoWall->isTimelineEnabled());
+                };
+
+            connect(videoWall, &QnVideoWallResource::timelineEnabledChanged, this,
+                handleTimelineEnabledChanged);
+
+            handleTimelineEnabledChanged(videoWall);
+
             if (m_videoWallMode.ready)
                 openVideoWallItem(videoWall);
         }

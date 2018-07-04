@@ -64,15 +64,15 @@ struct ApiVideowallMatrixData: ApiIdData
 
 struct ApiVideowallData: ApiResourceData
 {
-    ApiVideowallData(): autorun(false) {}
-
-    bool autorun;
+    bool autorun = false;
+    bool timeline = false;
 
     std::vector<ApiVideowallItemData> items;
     std::vector<ApiVideowallScreenData> screens;
     std::vector<ApiVideowallMatrixData> matrices;
 };
-#define ApiVideowallData_Fields ApiResourceData_Fields (autorun)(items)(screens)(matrices)
+#define ApiVideowallData_Fields ApiResourceData_Fields (autorun)(items)(screens)(matrices) \
+    (timeline)
 
 
 struct ApiVideowallControlMessageData: ApiData

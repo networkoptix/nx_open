@@ -218,6 +218,18 @@ void QnLayoutResource::updateInternal(const QnResourcePtr &other, Qn::NotifierLi
             notifiers << [r = toSharedPointer(this)]{ emit r->lockedChanged(r); };
         }
 
+        if (m_fixedSize != localOther->m_fixedSize)
+        {
+            m_fixedSize = localOther->m_fixedSize;
+            notifiers << [r = toSharedPointer(this)]{ emit r->fixedSizeChanged(r); };
+        }
+
+        if (m_logicalId != localOther->m_logicalId)
+        {
+            m_logicalId = localOther->m_logicalId;
+            notifiers << [r = toSharedPointer(this)]{ emit r->logicalIdChanged(r); };
+        }
+
         setItemsUnderLockInternal(m_items.data(), localOther->m_items.data(), notifiers);
     }
 }

@@ -3889,11 +3889,22 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiVideowallDataList& vid
     if (!id.isNull())
         filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
     query.setForwardOnly(true);
-    query.prepare(lit("\
-        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, l.autorun \
-        FROM vms_videowall l \
-        JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid \
-    ").arg(filterStr));
+
+    const QString videowallQueryStr(R"sql(
+        SELECT
+            r.guid as id,
+            r.guid,
+            r.xtype_guid as typeId,
+            r.parent_guid as parentId,
+            r.name,
+            r.url,
+            l.autorun,
+            l.timeline
+        FROM vms_videowall l
+        JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid
+    )sql");
+
+    query.prepare(videowallQueryStr.arg(filterStr));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -4655,9 +4666,22 @@ ErrorCode QnDbManager::removeVideowall(const QnUuid& guid) {
 }
 
 ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId) {
+
+    const QString queryStr(R"sql(
+        INSERT OR REPLACE INTO vms_videowall (
+            autorun,
+            timeline,
+            resource_ptr_id
+        )
+        VALUES (
+            :autorun,
+            :timeline,
+            :internalId
+        )
+    )sql");
+
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_videowall (autorun, resource_ptr_id) VALUES\
-                     (:autorun, :internalId)");
+    insQuery.prepare(queryStr);
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec())
