@@ -41,6 +41,7 @@ qt_plugins = [
 nx_libraries = [
     'nx_vms_utils',
     'nx_utils',
+    'nx_sql',
     'nx_network',
     'nx_kit',
     'nx_vms_api',

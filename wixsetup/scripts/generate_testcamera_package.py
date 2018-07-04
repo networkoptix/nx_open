@@ -18,6 +18,7 @@ qt_libraries = [
 
 nx_libraries = [
     'nx_utils',
+    'nx_sql',
     'nx_network',
     'nx_kit',
     'nx_vms_api',
