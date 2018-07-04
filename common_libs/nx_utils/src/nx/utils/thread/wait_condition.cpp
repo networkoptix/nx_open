@@ -1,10 +1,10 @@
-#ifdef USE_OWN_MUTEX
-
 #include "wait_condition.h"
 
-#include <QtCore/QWaitCondition>
-
 #include <nx/utils/time.h>
+
+#ifdef USE_OWN_MUTEX
+
+#include <QtCore/QWaitCondition>
 
 #include "mutex_impl.h"
 
