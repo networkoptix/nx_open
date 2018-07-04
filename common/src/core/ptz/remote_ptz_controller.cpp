@@ -24,10 +24,7 @@ QnRemotePtzController::~QnRemotePtzController()
 Ptz::Capabilities QnRemotePtzController::getCapabilities(
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != nx::core::ptz::Type::operational)
-        return Ptz::NoPtzCapabilities;
-
-    Ptz::Capabilities result = m_resource->getPtzCapabilities();
+    Ptz::Capabilities result = m_resource->getPtzCapabilities(options.type);
     if (!result)
         return Ptz::NoPtzCapabilities;
 

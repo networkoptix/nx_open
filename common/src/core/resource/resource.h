@@ -16,6 +16,7 @@
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_constants.h>
+#include <nx/core/ptz/type.h>
 
 #include <common/common_globals.h>
 #include "shared_resource_pointer.h"
@@ -47,7 +48,12 @@ class QnResource: public QObject, public QnFromThisToShared<QnResource>
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
-    Q_PROPERTY(Ptz::Capabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
+
+    // TODO: #dmishin maybe it's worth to expose configurational ptz capabilities also?
+    // BTW what do PTZ capabilities do in the base resource class?
+    Q_PROPERTY(Ptz::Capabilities ptzCapabilities
+        READ operationalPtzCapabilities
+        WRITE setOperationalPtzCapabilities)
 public:
 
     QnResource(QnCommonModule* commonModule = nullptr);
@@ -155,12 +161,23 @@ public:
     /**
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
     */
-    Ptz::Capabilities getPtzCapabilities() const;
+    Ptz::Capabilities getPtzCapabilities(
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational) const;
 
     /** Check if camera has any of provided capabilities. */
-    bool hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const;
-    void setPtzCapabilities(Ptz::Capabilities capabilities);
-    void setPtzCapability(Ptz::Capabilities capability, bool value);
+    bool hasAnyOfPtzCapabilities(
+        Ptz::Capabilities capabilities,
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational) const;
+    void setPtzCapabilities(
+        Ptz::Capabilities capabilities,
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational);
+    void setPtzCapability(
+        Ptz::Capabilities capability,
+        bool value,
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational);
+
+    Ptz::Capabilities operationalPtzCapabilities() const;
+    void setOperationalPtzCapabilities(Ptz::Capabilities capabilites);
 
     /* Note that these functions hide property API inherited from QObject.
      * This is intended as this API cannot be used with QnResource anyway

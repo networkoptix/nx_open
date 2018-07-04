@@ -29,6 +29,8 @@
 
 #include <nx/utils/log/assert.h>
 
+namespace core_ptz = nx::core::ptz;
+
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
 
@@ -878,25 +880,65 @@ void QnResource::setUniqId(const QString& value)
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
 }
 
-Ptz::Capabilities QnResource::getPtzCapabilities() const
+Ptz::Capabilities QnResource::getPtzCapabilities(nx::core::ptz::Type ptzType) const
+{
+    switch (ptzType)
+    {
+        case core_ptz::Type::operational:
+            return operationalPtzCapabilities();
+        case core_ptz::Type::configurational:
+            return Ptz::Capabilities(getProperty(Qn::kConfigurationalPtzCapabilities).toInt());
+        default:
+            NX_ASSERT(false, "Wrong ptz type, we should never be here");
+            return Ptz::NoPtzCapabilities;
+    }
+}
+
+bool QnResource::hasAnyOfPtzCapabilities(
+    Ptz::Capabilities capabilities,
+    nx::core::ptz::Type ptzType) const
+{
+    return getPtzCapabilities(ptzType) & capabilities;
+}
+
+void QnResource::setPtzCapabilities(Ptz::Capabilities capabilities, nx::core::ptz::Type ptzType)
+{
+    switch (ptzType)
+    {
+        case core_ptz::Type::operational:
+        {
+            if (hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME)) //< Why do we need this check?
+                setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+        }
+        case core_ptz::Type::configurational:
+        {
+            setProperty(Qn::kConfigurationalPtzCapabilities, static_cast<int>(capabilities));
+        }
+        default:
+            NX_ASSERT(false, "Wrong ptz type, we should never be here");
+    }
+
+}
+
+void QnResource::setPtzCapability(
+    Ptz::Capabilities capability,
+    bool value,
+    nx::core::ptz::Type ptzType)
+{
+    setPtzCapabilities(value
+        ? (getPtzCapabilities(ptzType) | capability)
+        : (getPtzCapabilities(ptzType) & ~capability), ptzType);
+}
+
+Ptz::Capabilities QnResource::operationalPtzCapabilities() const
 {
     return Ptz::Capabilities(getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
 }
 
-bool QnResource::hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const
-{
-    return getPtzCapabilities() & capabilities;
-}
-
-void QnResource::setPtzCapabilities(Ptz::Capabilities capabilities)
+void QnResource::setOperationalPtzCapabilities(Ptz::Capabilities capabilities)
 {
     if (hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
         setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
-}
-
-void QnResource::setPtzCapability(Ptz::Capabilities capability, bool value)
-{
-    setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
 }
 
 void QnResource::setCommonModule(QnCommonModule* commonModule)
