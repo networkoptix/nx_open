@@ -10,6 +10,8 @@
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <recording/time_period_list.h>
 
+#include <plugins/resource/hanwha/hanwha_information.h>
+
 extern "C" {
 
 // For const AV_NOPTS_VALUE.
@@ -70,7 +72,7 @@ public:
 
     virtual ~HanwhaChunkLoader();
 
-    void start(bool isNvr);
+    void start(const HanwhaInformation& information);
     bool isStarted() const;
 
     qint64 startTimeUsec(int channelNumber) const;
@@ -134,7 +136,7 @@ private:
 
     std::chrono::milliseconds timeSinceLastTimelineUpdate() const;
 
-    void setUpThreadUnsafe();
+    void setUpThreadUnsafe(const HanwhaInformation& information);
 
     void at_httpClientDone();
     void at_gotChunkData();

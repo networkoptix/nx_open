@@ -36,7 +36,6 @@ static const QUrl cleanUrl(QUrl url)
 using namespace nx::core::resource;
 using namespace nx::mediaserver::resource;
 
-
 SeekPosition::SeekPosition(qint64 value) : position(value)
 {
     timer.restart();
@@ -113,7 +112,7 @@ nx::utils::RwLock* HanwhaSharedResourceContext::requestLock()
     return &m_requestLock;
 }
 
-void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr)
+void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, const HanwhaInformation& info)
 {
     {
         QnMutexLocker lock(&m_servicesMutex);
@@ -135,10 +134,12 @@ void HanwhaSharedResourceContext::startServices(bool hasVideoArchive, bool isNvr
         }
     }
 
-    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...").arg(isNvr));
+    NX_VERBOSE(this, lm("Starting services (is NVR: %1)...")
+        .arg(info.deviceType == HanwhaDeviceType::nvr));
+
     m_timeSynchronizer->start(this);
     if (hasVideoArchive)
-        m_chunkLoader->start(isNvr);
+        m_chunkLoader->start(info);
 }
 
 void HanwhaSharedResourceContext::cleanupUnsafe()

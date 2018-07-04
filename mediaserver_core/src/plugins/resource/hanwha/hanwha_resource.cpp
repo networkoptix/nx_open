@@ -840,7 +840,11 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
             std::chrono::seconds(qnGlobalSettings->hanwhaChunkReaderMessageBodyTimeoutSeconds())
         });
 
-    CameraDiagnostics::Result result = initSystem();
+    const auto info = m_sharedContext->information();
+    if (!info)
+        return info.diagnostics;
+
+    CameraDiagnostics::Result result = initSystem(info.value);
     if (!result)
         return result;
 
@@ -880,7 +884,7 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
         return result;
 
     const bool hasVideoArchive = isNvr() || hasCameraCapabilities(Qn::RemoteArchiveCapability);
-    sharedContext->startServices(hasVideoArchive, isNvr());
+    sharedContext->startServices(hasVideoArchive, info.value);
 
     // it's saved in isDefaultPasswordGuard
     isDefaultPassword = getAuth() == HanwhaResourceSearcher::getDefaultAuth();
@@ -959,27 +963,23 @@ QnAbstractPtzController* HanwhaResource::createPtzControllerInternal() const
     return controller;
 }
 
-CameraDiagnostics::Result HanwhaResource::initSystem()
+CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& info)
 {
     if (QnResource::isStopping())
         return CameraDiagnostics::ServerTerminatedResult();
 
-    auto info = sharedContext()->information();
-    if (!info)
-        return info.diagnostics;
-
-    m_deviceType = info->deviceType;
+    m_deviceType = info.deviceType;
     const auto nxDeviceType = fromHanwhaToNxDeviceType(deviceType());
 
     // Set device type only for NVRs and encoders due to optimization purposes.
     if (nx::core::resource::isProxyDeviceType(nxDeviceType))
         setDeviceType(nxDeviceType);
 
-    if (!info->firmware.isEmpty())
-        setFirmware(info->firmware);
+    if (!info.firmware.isEmpty())
+        setFirmware(info.firmware);
 
-    m_attributes = std::move(info->attributes);
-    m_cgiParameters = std::move(info->cgiParameters);
+    m_attributes = std::move(info.attributes);
+    m_cgiParameters = std::move(info.cgiParameters);
     m_isChannelConnectedViaSunapi = true;
 
     if (isNvr())
