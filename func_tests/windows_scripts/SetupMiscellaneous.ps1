@@ -22,3 +22,5 @@ Set-Service lfsvc -StartupType Disabled  # Geolocation.
 Set-Service wlidsvc -StartupType Disabled  # Sign-in with MS Live account.
 
 Set-Service sshd -StartupType Automatic
+
+Rename-Computer -NewName FTVM -Force
