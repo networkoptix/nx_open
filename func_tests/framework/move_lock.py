@@ -43,8 +43,9 @@ class MoveLock(object):
                             rm -v "$temp_file"
                             exit 2
                         fi
-                        ns=1$(date +%N)
-                        wait_ms=$(( (ns - 1000000000) % 500 ))
+                        # Wait for random period from 0 to 500 ms.
+                        ns=1$(date +%N)  # Get random, prepend with 1 to avoid interpreting as octal.
+                        wait_ms=$(( (ns - 1000000000) % 500 ))  # Remove 1, get random in [0, 500).
                         left_ms=$((left_ms - wait_ms))
                         sleep $(printf "0.%03d" $wait_ms)
                     done
