@@ -17,7 +17,8 @@ public:
     NodeViewWidget(QWidget* parent = nullptr);
     virtual ~NodeViewWidget() override;
 
-    void loadState(const NodeViewState& state);
+    void setState(const NodeViewState& state);
+    const NodeViewState& state() const;
 
 private:
     struct Private;

@@ -1,8 +1,9 @@
 #include "node_view_model.h"
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 namespace {
 
@@ -37,7 +38,7 @@ struct NodeViewModel::Private
     NodeViewModel* const owner;
     NodeViewState state;
 
-    QModelIndex getModelIndex(const NodePtr& node, int column = ViewNode::NameColumn);
+    QModelIndex getModelIndex(const NodePtr& node, int column = node_view::nameColumn);
 };
 
 NodeViewModel::Private::Private(NodeViewModel* owner):
@@ -119,7 +120,7 @@ QModelIndex NodeViewModel::index(
 
 QModelIndex NodeViewModel::parent(const QModelIndex& child) const
 {
-    if (!child.isValid() || child.column() == ViewNode::NameColumn)
+    if (!child.isValid() || child.column() == node_view::nameColumn)
         QModelIndex();
 
     const auto node = nodeFromIndex(child);
@@ -136,7 +137,7 @@ int NodeViewModel::rowCount(const QModelIndex& parent) const
 
 int NodeViewModel::columnCount(const QModelIndex& parent) const
 {
-    return ViewNode::ColumnCount;
+    return node_view::columnCount;
 }
 
 bool NodeViewModel::hasChildren(const QModelIndex& parent) const
@@ -147,7 +148,7 @@ bool NodeViewModel::hasChildren(const QModelIndex& parent) const
 bool NodeViewModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     const auto node = nodeFromIndex(index);
-    if (!node || role != Qt::CheckStateRole || index.column() != ViewNode::CheckMarkColumn)
+    if (!node || role != Qt::CheckStateRole || index.column() != node_view::checkMarkColumn)
         return base_type::setData(index, value, role);
 
     emit checkedChanged(node->path(), value.value<Qt::CheckState>());

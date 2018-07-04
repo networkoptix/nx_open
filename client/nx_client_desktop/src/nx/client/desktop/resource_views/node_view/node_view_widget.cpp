@@ -10,6 +10,7 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_store.h>
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 namespace nx {
 namespace client {
@@ -37,11 +38,11 @@ void NodeViewWidget::Private::updateColumns()
 
     header->setStretchLastSection(false);
 
-    header->setSectionResizeMode(ViewNode::NameColumn, QHeaderView::Stretch);
-    header->setSectionResizeMode(ViewNode::CheckMarkColumn, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(node_view::nameColumn, QHeaderView::Stretch);
+    header->setSectionResizeMode(node_view::checkMarkColumn, QHeaderView::ResizeToContents);
 
     if (!model.state().checkable())
-        header->setSectionHidden(ViewNode::CheckMarkColumn, true);
+        header->setSectionHidden(node_view::checkMarkColumn, true);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -51,8 +52,7 @@ NodeViewWidget::NodeViewWidget(QWidget* parent):
     d(new Private(*this))
 {
     setModel(&d->model);
-    setProperty(style::Properties::kSideIndentation,
-        QVariant::fromValue(QnIndents(0, 1)));
+    setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 1)));
     setIndentation(style::Metrics::kDefaultIconSize);
 
     connect(&d->store, &NodeViewStore::stateChanged, &d->model,
@@ -78,10 +78,15 @@ NodeViewWidget::~NodeViewWidget()
 {
 }
 
-void NodeViewWidget::loadState(const NodeViewState& state)
+void NodeViewWidget::setState(const NodeViewState& state)
 {
     d->store.setState(state);
     d->updateColumns();
+}
+
+const NodeViewState& NodeViewWidget::state() const
+{
+    return d->store.state();
 }
 
 } // namespace desktop

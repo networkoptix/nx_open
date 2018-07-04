@@ -8,6 +8,7 @@
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 #include <ui/style/resource_icon_cache.h>
 
@@ -21,48 +22,43 @@ const auto createCheckableLayoutNode =
         return helpers::createResourceNode(resource, true);
     };
 
-ViewNode::Data getNodeData(
+QnUuid getResourceId(const NodePtr& node)
+{
+    return node->data(node_view::nameColumn, node_view::idRole).value<QnUuid>();
+}
+
+bool isSelected(const NodePtr& node)
+{
+    const auto variantState = node->data(node_view::checkMarkColumn, Qt::CheckStateRole);
+    return !variantState.isNull() && variantState.value<Qt::CheckState>() == Qt::Checked;
+}
+
+ViewNode::Data getResourceNodeData(
     const QnResourcePtr& resource,
     bool checkable = false,
     Qt::CheckState checkedState = Qt::Unchecked)
 {
     ViewNode::Data nodeData;
     if (checkable)
-        nodeData.data[ViewNode::CheckMarkColumn][Qt::CheckStateRole] = checkedState;
+        nodeData.data[node_view::checkMarkColumn][Qt::CheckStateRole] = checkedState;
 
-    nodeData.data[ViewNode::NameColumn][Qt::DisplayRole] = resource->getName();
-    nodeData.data[ViewNode::NameColumn][Qt::DecorationRole] = qnResIconCache->icon(resource);
-
+    nodeData.data[node_view::nameColumn][Qt::DisplayRole] = resource->getName();
+    nodeData.data[node_view::nameColumn][Qt::DecorationRole] = qnResIconCache->icon(resource);
+    nodeData.data[node_view::nameColumn][node_view::idRole] = QVariant::fromValue(resource->getId());
     return nodeData;
 }
 
-} // namespace
-
-namespace nx {
-namespace client {
-namespace desktop {
-namespace helpers {
-
-NodePtr createParentedLayoutsNode()
+using UserResourceList = QList<QnUserResourcePtr>;
+NodePtr createUserLayoutsNode(const UserResourceList& users)
 {
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto accessProvider = commonModule->resourceAccessProvider();
     const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
-    const auto currentUser = userWatcher->user();
-    const auto currentUserId = currentUser->getId();
-
-    NodeList childNodes;
-    const auto pool = qnClientCoreModule->commonModule()->resourcePool();
-
-    const auto filterUser =
-        [accessProvider, currentUser](const QnResourcePtr& resource)
-        {
-            return accessProvider->hasAccess(currentUser, resource.dynamicCast<QnUserResource>());
-        };
+    const auto currentUserId = userWatcher->user()->getId();
 
     QSet<QnUuid> accessibleUserIds;
-    QList<QnUserResourcePtr> accessibleUsers;
-    for (const auto& userResource: pool->getResources<QnUserResource>(filterUser))
+    UserResourceList accessibleUsers;
+    for (const auto& userResource: users)
     {
         accessibleUserIds.insert(userResource->getId());
         accessibleUsers.append(userResource);
@@ -85,9 +81,10 @@ NodePtr createParentedLayoutsNode()
                 || (!accessibleUserIds.contains(parentId) && userId == currentUserId);
         };
 
+    NodeList childNodes;
     for (const auto& userResource: accessibleUsers)
     {
-        const auto node = createParentResourceNode(userResource,
+        const auto node = helpers::createParentResourceNode(userResource,
             isChildLayout, createCheckableLayoutNode);
         if (node->childrenCount() > 0)
             childNodes.append(node);
@@ -96,19 +93,59 @@ NodePtr createParentedLayoutsNode()
     return ViewNode::create(childNodes);
 }
 
+} // namespace
+
+namespace nx {
+namespace client {
+namespace desktop {
+namespace helpers {
+
+NodePtr createParentedLayoutsNode()
+{
+    const auto commonModule = qnClientCoreModule->commonModule();
+    const auto accessProvider = commonModule->resourceAccessProvider();
+    const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
+    const auto currentUser = userWatcher->user();
+
+    const auto pool = qnClientCoreModule->commonModule()->resourcePool();
+
+    const auto filterUser =
+        [accessProvider, currentUser](const QnResourcePtr& resource)
+        {
+            return accessProvider->hasAccess(currentUser, resource.dynamicCast<QnUserResource>());
+        };
+
+    UserResourceList accessibleUsers;
+    for (const auto& userResource: pool->getResources<QnUserResource>(filterUser))
+        accessibleUsers.append(userResource);
+
+    return createUserLayoutsNode(accessibleUsers);
+}
+
+NodePtr createCurrentUserLayoutsNode()
+{
+    const auto commonModule = qnClientCoreModule->commonModule();
+    const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
+    const auto currentUser = userWatcher->user();
+    const auto root = createUserLayoutsNode({currentUser});
+    return root->children().first();
+}
+
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
     bool checkable,
     Qt::CheckState checkedState)
 {
-    return resource ? ViewNode::create(getNodeData(resource, checkable, checkedState)) : NodePtr();
+    return resource
+        ? ViewNode::create(getResourceNodeData(resource, checkable, checkedState))
+        : NodePtr();
 }
 
 NodePtr createParentResourceNode(
     const QnResourcePtr& resource,
     const RelationCheckFunction& relationCheckFunction,
     const NodeCreationFunction& nodeCreationFunction,
-    bool checkable,
+    bool checkable, //TODO : use it
     Qt::CheckState checkedState)
 {
     const auto pool = qnClientCoreModule->commonModule()->resourcePool();
@@ -117,17 +154,36 @@ NodePtr createParentResourceNode(
         ? nodeCreationFunction
         : [](const QnResourcePtr& resource) -> NodePtr { return createResourceNode(resource); };
 
-    NodeList childrent;
+    NodeList children;
     for (const auto childResource: pool->getResources())
     {
         if (!relationCheckFunction(resource, childResource))
             continue;
 
         if (const auto node = creationFunction(childResource))
-            childrent.append(node);
+            children.append(node);
     }
 
-    return ViewNode::create(getNodeData(resource), childrent);
+    return ViewNode::create(getResourceNodeData(resource), children);
+}
+
+QnResourceList getLeafSelectedResources(const NodePtr& node)
+{
+    if (!node->isLeaf())
+    {
+        QnResourceList result;
+        for (const auto child: node->children())
+            result += getLeafSelectedResources(child);
+        return result;
+    }
+
+    if (!isSelected(node))
+        return QnResourceList();
+
+    const auto resourceId = getResourceId(node);
+    const auto pool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto resource = pool->getResourceById(resourceId);
+    return resource ? QnResourceList({resource}) : QnResourceList();
 }
 
 } // namespace helpers

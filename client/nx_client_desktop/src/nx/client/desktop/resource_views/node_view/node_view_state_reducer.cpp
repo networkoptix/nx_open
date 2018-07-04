@@ -1,5 +1,7 @@
 #include "node_view_state_reducer.h"
 
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -10,7 +12,7 @@ NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
     Qt::CheckState checkedState)
 {
     NodeViewStatePatch patch;
-    patch.changedData[path][ViewNode::CheckMarkColumn][Qt::CheckStateRole] = checkedState;
+    patch.changedData[path][node_view::checkMarkColumn][Qt::CheckStateRole] = checkedState;
     return patch;
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/button_box_dialog.h>
 
 namespace Ui { class MultipleLayoutSelectionDialog; }
@@ -14,8 +15,10 @@ class MultipleLayoutSelectionDialog : public QnButtonBoxDialog
     using base_type = QnButtonBoxDialog;
 
 public:
-    MultipleLayoutSelectionDialog(QWidget *parent = nullptr);
+    static bool getLayouts(QWidget* parent, QnResourceList& resources);
 
+private:
+    MultipleLayoutSelectionDialog(QWidget *parent = nullptr);
     virtual ~MultipleLayoutSelectionDialog() override;
 
 private:

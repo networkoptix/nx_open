@@ -12,14 +12,6 @@ class ViewNode: public QEnableSharedFromThis<ViewNode>
     struct PathInternal;
 
 public:
-    enum Column
-    {
-        NameColumn,
-        CheckMarkColumn,
-
-        ColumnCount
-    };
-
     struct Data
     {
         using Column = int;
@@ -42,6 +34,7 @@ public:
 
     ~ViewNode();
 
+    bool isLeaf() const;
     int childrenCount() const;
     const NodeList& children() const;
 
@@ -52,6 +45,7 @@ public:
 
     int indexOf(const NodePtr& node) const;
 
+    bool hasData(int column, int role) const;
     QVariant data(int column, int role) const;
 
     Qt::ItemFlags flags(int column) const;

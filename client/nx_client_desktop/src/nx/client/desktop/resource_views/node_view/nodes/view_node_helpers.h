@@ -9,6 +9,7 @@ namespace desktop {
 namespace helpers {
 
 NodePtr createParentedLayoutsNode();
+NodePtr createCurrentUserLayoutsNode();
 
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
@@ -25,6 +26,8 @@ NodePtr createParentResourceNode(
     const NodeCreationFunction& nodeCreationFunction = NodeCreationFunction(),
     bool checkable = false,
     Qt::CheckState checkedState = Qt::Unchecked);
+
+QnResourceList getLeafSelectedResources(const NodePtr& rootNode);
 
 } // namespace helpers
 } // namespace desktop

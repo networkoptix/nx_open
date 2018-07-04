@@ -1,6 +1,7 @@
 #include "view_node.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 namespace {
 
@@ -63,6 +64,11 @@ ViewNode::ViewNode(const Data& data):
 
 ViewNode::~ViewNode()
 {
+}
+
+bool ViewNode::isLeaf() const
+{
+    return childrenCount() == 0;
 }
 
 int ViewNode::childrenCount() const
@@ -131,7 +137,7 @@ NodePtr ViewNode::parent() const
 
 bool ViewNode::checkable() const
 {
-    const auto it = d->nodeData.data.find(ViewNode::CheckMarkColumn);
+    const auto it = d->nodeData.data.find(node_view::checkMarkColumn);
     if (it == d->nodeData.data.end())
         return false;
 
@@ -151,7 +157,7 @@ const ViewNode::Data& ViewNode::nodeData() const
 void ViewNode::setNodeData(const Data& data)
 {
     d->nodeData = data;
-    d->nodeData.flags[CheckMarkColumn] = getFlags(checkable());
+    d->nodeData.flags[node_view::checkMarkColumn] = getFlags(checkable());
 }
 
 void ViewNode::applyData(const Data::ColumnDataHash& data)

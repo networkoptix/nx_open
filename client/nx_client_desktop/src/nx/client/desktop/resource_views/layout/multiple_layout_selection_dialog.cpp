@@ -4,6 +4,7 @@
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 
 //namespace {
 
@@ -37,6 +38,17 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+bool MultipleLayoutSelectionDialog::getLayouts(QWidget* parent, QnResourceList& resources)
+{
+    MultipleLayoutSelectionDialog dialog(parent);
+
+    if (dialog.exec() != QDialog::Accepted)
+        return false;
+
+    resources = helpers::getLeafSelectedResources(dialog.ui->layoutsTree->state().rootNode);
+    return true;
+}
+
 MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::MultipleLayoutSelectionDialog)
@@ -44,7 +56,8 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     ui->setupUi(this);
 
     const auto tree = ui->layoutsTree;
-    tree->loadState({helpers::createParentedLayoutsNode()});
+    //    tree->setState({helpers::createParentedLayoutsNode()});
+    tree->setState({helpers::createCurrentUserLayoutsNode()});
     tree->setExpandsOnDoubleClick(true);
     tree->expandAll();
 }
