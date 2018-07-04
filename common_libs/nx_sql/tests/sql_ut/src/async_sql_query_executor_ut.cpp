@@ -3,12 +3,11 @@
 
 #include <QtCore/QDir>
 
-#include <nx/fusion/model_functions.h>
-#include <nx/fusion/serialization/sql.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/string.h>
 #include <nx/utils/test_support/utils.h>
 
 #include <nx/sql/async_sql_query_executor.h>
@@ -37,12 +36,11 @@ struct Company
     }
 };
 
-#define Company_Fields (name)(yearFounded)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (Company),
-    (sql_record),
-    _Fields)
+void readSqlRecord(SqlQuery* query, Company* company)
+{
+    company->name = query->value("name").toString().toStdString();
+    company->yearFounded = query->value("yearFounded").toInt();
+}
 
 //-------------------------------------------------------------------------------------------------
 // DbRequestExecutionThreadTestWrapper
@@ -543,7 +541,7 @@ protected:
         ++m_cursorsRequested;
         asyncSqlQueryExecutor().createCursor<Company>(
             std::bind(&DbAsyncSqlQueryExecutorCursor::prepareCursorQuery, this, _1),
-            std::bind(&DbAsyncSqlQueryExecutorCursor::readCompanyRecord, this, _1, _2),
+            std::bind(&readSqlRecord, _1, _2),
             std::bind(&DbAsyncSqlQueryExecutorCursor::saveCursor, this, _1, _2));
     }
 
@@ -612,11 +610,6 @@ private:
     void prepareCursorQuery(SqlQuery* query)
     {
         query->prepare("SELECT * FROM company");
-    }
-
-    void readCompanyRecord(SqlQuery* query, Company* company)
-    {
-        QnSql::fetch(QnSql::mapping<Company>(query->impl()), query->record(), company);
     }
 
     void saveCursor(DBResult /*resultCode*/, QnUuid cursorId)

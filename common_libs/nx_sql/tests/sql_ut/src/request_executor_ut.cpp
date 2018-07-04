@@ -16,7 +16,7 @@ public:
     DbRequestExecutor()
     {
         initializeDatabase();
-        
+
         m_dbConnectionHolder = std::make_unique<DbConnectionHolder>(connectionOptions());
     }
 

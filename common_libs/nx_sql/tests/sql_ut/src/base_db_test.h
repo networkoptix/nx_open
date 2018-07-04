@@ -5,13 +5,11 @@
 #include <QtCore/QString>
 #include <QtSql/QSqlQuery>
 
-#include <nx/fusion/serialization/sql.h>
-#include <nx/utils/test_support/utils.h>
-
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/db_instance_controller.h>
 #include <nx/sql/types.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
+#include <nx/utils/test_support/utils.h>
 
 namespace nx::sql::test {
 
@@ -47,11 +45,17 @@ protected:
             [queryText, &records](
                 nx::sql::QueryContext* queryContext)
             {
-                QSqlQuery query(*queryContext->connection());
+                sql::SqlQuery query(*queryContext->connection());
                 query.prepare(queryText);
-                if (!query.exec())
-                    return DBResult::ioError;
-                QnSql::fetch_many(query, &records);
+                query.exec();
+
+                while (query.next())
+                {
+                    RecordStructure data;
+                    readSqlRecord(&query, &data);
+                    records.push_back(std::move(data));
+                }
+
                 return DBResult::ok;
             },
             [&queryCompletedPromise](
