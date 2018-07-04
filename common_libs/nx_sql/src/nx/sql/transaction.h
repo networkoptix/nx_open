@@ -9,7 +9,7 @@
 namespace nx {
 namespace sql {
 
-class NX_UTILS_API Transaction
+class NX_SQL_API Transaction
 {
 public:
     Transaction(QSqlDatabase* const connection);

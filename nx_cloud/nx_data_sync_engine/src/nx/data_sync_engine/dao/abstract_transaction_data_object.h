@@ -4,8 +4,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include "../serialization/ubjson_serialized_transaction.h"
 

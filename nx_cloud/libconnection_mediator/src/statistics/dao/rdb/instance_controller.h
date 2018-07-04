@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/db/db_instance_controller.h>
+#include <nx/sql/db_instance_controller.h>
 
 namespace nx {
 namespace hpm {

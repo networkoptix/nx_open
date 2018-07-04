@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include <nx/cloud/cdb/api/auth_provider.h>
 

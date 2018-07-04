@@ -29,7 +29,7 @@ enum class DBResult
     endOfData,
 };
 
-NX_UTILS_API const char* toString(DBResult value);
+NX_SQL_API const char* toString(DBResult value);
 
 enum class RdbmsDriverType
 {
@@ -40,10 +40,10 @@ enum class RdbmsDriverType
     oracle
 };
 
-NX_UTILS_API const char* toString(RdbmsDriverType value);
-NX_UTILS_API RdbmsDriverType rdbmsDriverTypeFromString(const char* str);
+NX_SQL_API const char* toString(RdbmsDriverType value);
+NX_SQL_API RdbmsDriverType rdbmsDriverTypeFromString(const char* str);
 
-class NX_UTILS_API ConnectionOptions
+class NX_SQL_API ConnectionOptions
 {
 public:
     RdbmsDriverType driverType;
@@ -75,7 +75,7 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_UTILS_API Exception:
+class NX_SQL_API Exception:
     public std::runtime_error
 {
     using base_type = std::runtime_error;

@@ -26,7 +26,7 @@
 namespace nx {
 namespace sql {
 
-class NX_UTILS_API AbstractAsyncSqlQueryExecutor
+class NX_SQL_API AbstractAsyncSqlQueryExecutor
 {
 public:
     virtual ~AbstractAsyncSqlQueryExecutor() = default;
@@ -120,7 +120,7 @@ public:
  * Executes DB request asynchronously.
  * Scales DB operations on multiple threads
  */
-class NX_UTILS_API AsyncSqlQueryExecutor:
+class NX_SQL_API AsyncSqlQueryExecutor:
     public AbstractAsyncSqlQueryExecutor
 {
 public:

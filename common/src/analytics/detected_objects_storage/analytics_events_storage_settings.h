@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/db/types.h>
+#include <nx/sql/types.h>
 
 class QnSettings;
 

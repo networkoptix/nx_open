@@ -3,7 +3,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
 
-#include <nx/utils/db/db_statistics_collector.h>
+#include <nx/sql/db_statistics_collector.h>
 
 namespace nx {
 namespace sql {

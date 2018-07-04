@@ -6,7 +6,7 @@
 
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/subscription.h>
 
 #include <nx/data_sync_engine/connection_manager.h>

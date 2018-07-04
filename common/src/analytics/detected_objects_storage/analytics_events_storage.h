@@ -4,8 +4,8 @@
 #include <vector>
 
 #include <nx/utils/basic_factory.h>
-#include <nx/utils/db/filter.h>
-#include <nx/utils/db/query.h>
+#include <nx/sql/filter.h>
+#include <nx/sql/query.h>
 #include <nx/utils/move_only_func.h>
 
 #include <analytics/common/object_detection_metadata.h>

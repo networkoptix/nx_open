@@ -6,7 +6,7 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/db/db_instance_controller.h>
+#include <nx/sql/db_instance_controller.h>
 
 #include <nx/data_sync_engine/serialization/transaction_serializer.h>
 #include <nx/data_sync_engine/transaction_log.h>

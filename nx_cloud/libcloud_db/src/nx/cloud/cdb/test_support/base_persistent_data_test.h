@@ -8,7 +8,7 @@
 #include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
 #include <nx/cloud/cdb/dao/rdb/dao_rdb_user_authentication.h>
 
-#include <nx/utils/db/test_support/test_with_db_helper.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <nx/cloud/cdb/settings.h>
 

@@ -4,8 +4,8 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/utils/db/db_connection_holder.h>
-#include <nx/utils/db/request_executor.h>
+#include <nx/sql/db_connection_holder.h>
+#include <nx/sql/request_executor.h>
 
 namespace nx {
 namespace sql {

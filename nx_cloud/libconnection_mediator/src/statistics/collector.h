@@ -4,7 +4,7 @@
 
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 
 #include "connection_statistics_info.h"
 #include "dao/abstract_data_object.h"

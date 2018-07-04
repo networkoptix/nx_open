@@ -24,7 +24,7 @@ enum class ConnectionState
 
 using QueryExecutorQueue = detail::QueryQueue;
 
-class NX_UTILS_API BaseRequestExecutor:
+class NX_SQL_API BaseRequestExecutor:
     public QnStoppable,
     public QnJoinable
 {

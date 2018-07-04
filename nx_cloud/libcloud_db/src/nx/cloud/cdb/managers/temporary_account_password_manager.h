@@ -7,7 +7,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 
 #include <nx/utils/counter.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/stree/resourcecontainer.h>
 #include <nx/utils/thread/mutex.h>
 

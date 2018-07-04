@@ -6,9 +6,9 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/request_execution_thread.h>
-#include <nx/utils/db/test_support/test_with_db_helper.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/request_execution_thread.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <nx_ec/ec_proto_version.h>
 

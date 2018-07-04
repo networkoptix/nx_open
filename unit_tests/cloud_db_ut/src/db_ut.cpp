@@ -4,8 +4,8 @@
 
 #include <QtCore/QDir>
 
-#include <nx/utils/db/request_executor_factory.h>
-#include <nx/utils/db/request_execution_thread.h>
+#include <nx/sql/request_executor_factory.h>
+#include <nx/sql/request_execution_thread.h>
 
 #include "functional_tests/test_setup.h"
 #include "functional_tests/test_email_manager.h"

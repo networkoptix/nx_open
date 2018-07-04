@@ -10,7 +10,7 @@
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/basic_service_settings.h>
-#include <nx/utils/db/types.h>
+#include <nx/sql/types.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/deprecated_settings.h>

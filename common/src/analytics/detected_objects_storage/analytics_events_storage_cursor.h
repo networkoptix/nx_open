@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/sql_cursor.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/sql_cursor.h>
 
 #include <analytics/common/object_detection_metadata.h>
 

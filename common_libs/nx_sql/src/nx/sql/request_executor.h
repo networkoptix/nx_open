@@ -25,7 +25,7 @@ enum class QueryType
     modification,
 };
 
-class NX_UTILS_API AbstractExecutor
+class NX_SQL_API AbstractExecutor
 {
 public:
     virtual ~AbstractExecutor() = default;
@@ -40,7 +40,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 // BaseExecutor
 
-class NX_UTILS_API BaseExecutor:
+class NX_SQL_API BaseExecutor:
     public AbstractExecutor
 {
 public:
@@ -240,7 +240,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 // UpdateWithoutAnyDataExecutor
 
-class NX_UTILS_API UpdateWithoutAnyDataExecutor:
+class NX_SQL_API UpdateWithoutAnyDataExecutor:
     public BaseExecutor
 {
     using base_type = BaseExecutor;
@@ -261,7 +261,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 // UpdateWithoutAnyDataExecutorNoTran
 
-class NX_UTILS_API UpdateWithoutAnyDataExecutorNoTran:
+class NX_SQL_API UpdateWithoutAnyDataExecutorNoTran:
     public BaseExecutor
 {
     using base_type = BaseExecutor;
@@ -282,7 +282,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 // SelectExecutor
 
-class NX_UTILS_API SelectExecutor:
+class NX_SQL_API SelectExecutor:
     public BaseExecutor
 {
     using base_type = BaseExecutor;

@@ -10,7 +10,7 @@
 namespace nx {
 namespace sql {
 
-class NX_UTILS_API DbConnectionHolder
+class NX_SQL_API DbConnectionHolder
 {
 public:
     DbConnectionHolder(const ConnectionOptions& connectionOptions);

@@ -2,9 +2,9 @@
 
 #include <chrono>
 
-#include <nx/utils/db/filter.h>
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/filter.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include "../account_data_object.h"
 

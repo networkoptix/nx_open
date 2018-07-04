@@ -11,7 +11,7 @@
 namespace nx {
 namespace sql {
 
-struct NX_UTILS_API SqlFilterField
+struct NX_SQL_API SqlFilterField
 {
     const char* name;
     const char* placeHolderName;
@@ -25,7 +25,7 @@ struct NX_UTILS_API SqlFilterField
         const char* comparisonOperator);
 };
 
-struct NX_UTILS_API SqlFilterFieldEqual:
+struct NX_SQL_API SqlFilterFieldEqual:
     SqlFilterField
 {
     SqlFilterFieldEqual(
@@ -34,7 +34,7 @@ struct NX_UTILS_API SqlFilterFieldEqual:
         QVariant value);
 };
 
-struct NX_UTILS_API SqlFilterFieldGreaterOrEqual:
+struct NX_SQL_API SqlFilterFieldGreaterOrEqual:
     SqlFilterField
 {
     SqlFilterFieldGreaterOrEqual(
@@ -43,7 +43,7 @@ struct NX_UTILS_API SqlFilterFieldGreaterOrEqual:
         QVariant value);
 };
 
-struct NX_UTILS_API SqlFilterFieldLess:
+struct NX_SQL_API SqlFilterFieldLess:
     SqlFilterField
 {
     SqlFilterFieldLess(
@@ -52,7 +52,7 @@ struct NX_UTILS_API SqlFilterFieldLess:
         QVariant value);
 };
 
-struct NX_UTILS_API SqlFilterFieldLessOrEqual:
+struct NX_SQL_API SqlFilterFieldLessOrEqual:
     SqlFilterField
 {
     SqlFilterFieldLessOrEqual(
@@ -66,11 +66,11 @@ using InnerJoinFilterFields = std::vector<SqlFilterField>;
 /**
  * @return fieldName1=placeHolderName1#separator...fieldNameN=placeHolderNameN
  */
-NX_UTILS_API QString joinFields(const InnerJoinFilterFields& fields, const QString& separator);
-NX_UTILS_API void bindFields(QSqlQuery* const query, const InnerJoinFilterFields& fields);
-NX_UTILS_API void bindFields(SqlQuery* const query, const InnerJoinFilterFields& fields);
+NX_SQL_API QString joinFields(const InnerJoinFilterFields& fields, const QString& separator);
+NX_SQL_API void bindFields(QSqlQuery* const query, const InnerJoinFilterFields& fields);
+NX_SQL_API void bindFields(SqlQuery* const query, const InnerJoinFilterFields& fields);
 
-NX_UTILS_API QString generateWhereClauseExpression(const InnerJoinFilterFields& filter);
+NX_SQL_API QString generateWhereClauseExpression(const InnerJoinFilterFields& filter);
 
 } // namespace sql
 } // namespace nx

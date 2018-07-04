@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 
 #include "../abstract_system_merge_dao.h"
 

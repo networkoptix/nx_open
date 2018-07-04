@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-#include <nx/utils/db/db_statistics_collector.h>
+#include <nx/sql/db_statistics_collector.h>
 
 namespace nx {
 namespace sql {

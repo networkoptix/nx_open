@@ -6,7 +6,7 @@
 namespace nx {
 namespace sql {
 
-class NX_UTILS_API QueryContext
+class NX_SQL_API QueryContext
 {
 public:
     QueryContext(

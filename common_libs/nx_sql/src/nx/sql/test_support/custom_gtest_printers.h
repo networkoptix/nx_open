@@ -4,6 +4,6 @@
 
 namespace nx::sql {
 
-NX_UTILS_API void PrintTo(const DBResult val, ::std::ostream* os);
+NX_SQL_API void PrintTo(const DBResult val, ::std::ostream* os);
 
 } // namespace nx::sql

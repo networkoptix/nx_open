@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/db/db_structure_updater.h>
+#include <nx/sql/db_structure_updater.h>
 
 namespace nx {
 namespace data_sync_engine {

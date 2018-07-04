@@ -7,7 +7,7 @@
 #include <nx/cloud/cdb/api/auth_provider.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "account_manager.h"

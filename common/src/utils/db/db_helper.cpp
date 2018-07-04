@@ -5,7 +5,7 @@
 #include <QtSql/QSqlRecord>
 #include <QtSql/QSqlError>
 
-#include <nx/utils/db/sql_query_execution_helper.h>
+#include <nx/sql/sql_query_execution_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/kit/ini_config.h>
 

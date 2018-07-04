@@ -13,7 +13,7 @@
 
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/id.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 
 #include <transaction/transaction_descriptor.h>
 

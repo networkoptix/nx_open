@@ -11,7 +11,7 @@ namespace sql {
  * NOTE: This class methods are not thread-safe.
  * NOTE: Always updates internal auxiliary schema first.
  */
-class NX_UTILS_API DbStructureUpdater
+class NX_SQL_API DbStructureUpdater
 {
 public:
     using UpdateFunc = nx::utils::MoveOnlyFunc<DBResult(QueryContext*)>;

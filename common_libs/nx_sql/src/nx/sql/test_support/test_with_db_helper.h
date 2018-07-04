@@ -10,7 +10,7 @@ namespace nx {
 namespace sql {
 namespace test {
 
-class NX_UTILS_API TestWithDbHelper:
+class NX_SQL_API TestWithDbHelper:
     public utils::test::TestWithTemporaryDirectory
 {
 public:

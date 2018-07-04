@@ -7,7 +7,6 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
-#include "../db/types.h"
 #include "../url.h"
 
 NX_UTILS_API void PrintTo(const QByteArray& val, ::std::ostream* os);

@@ -16,7 +16,7 @@ namespace sql {
  * Connection can be closed by timeout or due to error.
  * Use DbRequestExecutionThread::isOpen to test it.
  */
-class NX_UTILS_API DbRequestExecutionThread:
+class NX_SQL_API DbRequestExecutionThread:
     public BaseRequestExecutor
 {
 public:

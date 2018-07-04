@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql.h>
-#include <nx/utils/db/query.h>
+#include <nx/sql/query.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 

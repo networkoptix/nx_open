@@ -12,7 +12,7 @@
 namespace nx {
 namespace sql {
 
-struct NX_UTILS_API QueryExecutionInfo
+struct NX_SQL_API QueryExecutionInfo
 {
     boost::optional<DBResult> result;
     std::chrono::milliseconds waitForExecutionDuration;
@@ -21,7 +21,7 @@ struct NX_UTILS_API QueryExecutionInfo
     QueryExecutionInfo();
 };
 
-struct NX_UTILS_API DurationStatistics
+struct NX_SQL_API DurationStatistics
 {
     std::chrono::milliseconds min;
     std::chrono::milliseconds max;
@@ -30,7 +30,7 @@ struct NX_UTILS_API DurationStatistics
     DurationStatistics();
 };
 
-struct NX_UTILS_API QueryStatistics
+struct NX_SQL_API QueryStatistics
 {
     std::chrono::milliseconds statisticalPeriod;
     int requestsSucceeded;
@@ -42,7 +42,7 @@ struct NX_UTILS_API QueryStatistics
     QueryStatistics();
 };
 
-class NX_UTILS_API StatisticsCollector
+class NX_SQL_API StatisticsCollector
 {
 public:
     StatisticsCollector(std::chrono::milliseconds period);

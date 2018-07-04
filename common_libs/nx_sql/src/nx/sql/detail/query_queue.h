@@ -16,7 +16,7 @@ namespace nx {
 namespace sql {
 namespace detail {
 
-class NX_UTILS_API QueryQueue
+class NX_SQL_API QueryQueue
 {
 public:
     using value_type = std::unique_ptr<AbstractExecutor>;

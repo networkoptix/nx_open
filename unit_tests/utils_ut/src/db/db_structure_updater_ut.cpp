@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-#include <nx/utils/db/db_structure_updater.h>
+#include <nx/sql/db_structure_updater.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "base_db_test.h"

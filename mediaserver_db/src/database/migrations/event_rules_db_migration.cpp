@@ -8,7 +8,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/db/sql_query_execution_helper.h>
+#include <nx/sql/sql_query_execution_helper.h>
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/rule.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/query_context.h>
 
 #include <nx/vms/api/data/resource_data.h>
 

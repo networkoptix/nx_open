@@ -4,7 +4,7 @@
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/uuid.h>
 
-#include <nx/utils/db/types.h>
+#include <nx/sql/types.h>
 
 namespace nx {
 namespace sql {

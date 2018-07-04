@@ -9,7 +9,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 
 #include "persistent_scheduler_db_helper.h"
 #include "persistent_scheduler_common.h"

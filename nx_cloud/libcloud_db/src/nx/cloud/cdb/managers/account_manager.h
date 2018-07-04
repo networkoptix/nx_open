@@ -8,8 +8,8 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/filter.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/filter.h>
 
 #include "cache.h"
 #include "extension_pool.h"

@@ -92,7 +92,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_UTILS_API CursorHandlerPool
+class NX_SQL_API CursorHandlerPool
 {
 public:
     void add(QnUuid id, std::unique_ptr<AbstractCursorHandler> cursorHandler);
@@ -110,7 +110,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_UTILS_API BasicCursorOperationExecutor:
+class NX_SQL_API BasicCursorOperationExecutor:
     public BaseExecutor
 {
     using base_type = BaseExecutor;
@@ -131,7 +131,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_UTILS_API CursorCreator:
+class NX_SQL_API CursorCreator:
     public BasicCursorOperationExecutor
 {
     using base_type = BasicCursorOperationExecutor;

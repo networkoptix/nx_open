@@ -13,7 +13,7 @@ using CreateRequestExecutorFunc =
         const ConnectionOptions& connectionOptions,
         QueryExecutorQueue* const queryExecutorQueue);
 
-class NX_UTILS_API RequestExecutorFactory:
+class NX_SQL_API RequestExecutorFactory:
     public nx::utils::BasicFactory<CreateRequestExecutorFunc>
 {
     using base_type = nx::utils::BasicFactory<CreateRequestExecutorFunc>;

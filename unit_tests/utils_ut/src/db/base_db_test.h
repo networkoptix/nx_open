@@ -8,9 +8,9 @@
 #include <nx/fusion/serialization/sql.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/db_instance_controller.h>
-#include <nx/utils/db/types.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/db_instance_controller.h>
+#include <nx/sql/types.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
 namespace nx {

@@ -13,7 +13,7 @@ namespace sql {
  * Follows same conventions as QSqlQuery except error reporting:
  * methods of this class throw nx::sql::Exception on error.
  */
-class NX_UTILS_API SqlQuery
+class NX_SQL_API SqlQuery
 {
 public:
     SqlQuery(QSqlDatabase connection);

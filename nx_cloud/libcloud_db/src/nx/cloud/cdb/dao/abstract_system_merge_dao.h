@@ -5,10 +5,10 @@
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/basic_factory.h>
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/filter.h>
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/filter.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include "../data/system_data.h"
 

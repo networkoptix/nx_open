@@ -9,7 +9,7 @@
 namespace nx {
 namespace sql {
 
-class NX_UTILS_API SqlQueryExecutionHelper
+class NX_SQL_API SqlQueryExecutionHelper
 {
 public:
     static bool execSQLQuery(const QString& query, QSqlDatabase& database, const char* details);

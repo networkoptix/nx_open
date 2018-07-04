@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/aio/timer.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/log/log.h>
 

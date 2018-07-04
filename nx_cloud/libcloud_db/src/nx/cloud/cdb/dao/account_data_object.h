@@ -3,8 +3,8 @@
 #include <chrono>
 
 #include <nx/utils/basic_factory.h>
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 #include <nx/utils/std/optional.h>
 
 #include "../data/account_data.h"

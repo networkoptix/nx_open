@@ -1,8 +1,8 @@
 #pragma once
 
-#include <nx/utils/db/query_context.h>
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/db_structure_updater.h>
+#include <nx/sql/query_context.h>
+#include <nx/sql/types.h>
+#include <nx/sql/db_structure_updater.h>
 #include <nx/utils/uuid.h>
 
 #include "persistent_scheduler_common.h"

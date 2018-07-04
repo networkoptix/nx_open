@@ -3,7 +3,7 @@
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
 
-#include <nx/utils/db/query.h>
+#include <nx/sql/query.h>
 #include <nx/utils/test_support/utils.h>
 
 namespace nx {

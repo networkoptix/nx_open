@@ -5,7 +5,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/utils/uuid.h>
-#include <nx/utils/db/sql_query_execution_helper.h>
+#include <nx/sql/sql_query_execution_helper.h>
 
 namespace ec2 {
 namespace db {

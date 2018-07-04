@@ -10,7 +10,7 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/basic_service_settings.h>
-#include <nx/utils/db/types.h>
+#include <nx/sql/types.h>
 #include <nx/utils/std/optional.h>
 
 #include <nx/data_sync_engine/p2p_sync_settings.h>

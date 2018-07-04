@@ -24,7 +24,7 @@ namespace detail {
  * Multiple objects can be used to update mutiple schemes 
  * (e.g., db_version_data table and application scheme).
  */
-class NX_UTILS_API DbStructureUpdater
+class NX_SQL_API DbStructureUpdater
 {
 public:
     using UpdateFunc = nx::utils::MoveOnlyFunc<DBResult(QueryContext*)>;

@@ -22,8 +22,8 @@
 #include <nx_ec/data/api_user_data.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/filter.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/filter.h>
 
 #include <nx/data_sync_engine/transaction_log.h>
 

@@ -4,7 +4,7 @@
 
 #include <nx/utils/std/cpp14.h>
 
-#include <nx/utils/db/request_execution_thread.h>
+#include <nx/sql/request_execution_thread.h>
 
 #include "base_db_test.h"
 

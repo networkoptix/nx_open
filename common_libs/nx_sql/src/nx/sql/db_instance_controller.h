@@ -10,7 +10,7 @@
 namespace nx {
 namespace sql {
 
-class NX_UTILS_API InstanceController
+class NX_SQL_API InstanceController
 {
 public:
     InstanceController(const ConnectionOptions& dbConnectionOptions);
