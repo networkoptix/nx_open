@@ -2,7 +2,8 @@ from abc import ABCMeta, abstractproperty
 
 from framework.move_lock import MoveLock
 from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, NonZeroExitStatus
-from framework.os_access.os_access_interface import DEFAULT_RUN_TIMEOUT_SEC, OSAccess
+from framework.os_access.os_access_interface import OSAccess
+from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.posix_shell import PosixShell
 
 

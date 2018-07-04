@@ -5,9 +5,9 @@ from contextlib import contextmanager
 from framework.os_access.exceptions import Timeout, exit_status_error_cls
 from framework.waiting import Wait
 
-_DEFAULT_COMMUNICATION_TIMEOUT_SEC = 10
-
 _logger = logging.getLogger(__name__)
+
+DEFAULT_RUN_TIMEOUT_SEC = 60
 
 
 class CommandOutcome(object):
@@ -57,7 +57,7 @@ class Run(object):
     def outcome(self):
         return CommandOutcome()
 
-    def communicate(self, input=None, timeout_sec=_DEFAULT_COMMUNICATION_TIMEOUT_SEC):
+    def communicate(self, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         if input is not None:
             # If input bytes not None but empty, send zero bytes once.
             left_to_send = memoryview(input)
@@ -103,10 +103,11 @@ class Command(object):
     def running(self):
         yield Run()
 
-    def check_output(self, input=None, timeout_sec=_DEFAULT_COMMUNICATION_TIMEOUT_SEC):
+    def check_output(self, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
         """Shortcut."""
         with self.running() as run:
             stdout, stderr = run.communicate(input=input, timeout_sec=timeout_sec)
         if run.outcome.is_error:
             raise exit_status_error_cls(run.outcome.code)(stdout, stderr)
         return stdout
+

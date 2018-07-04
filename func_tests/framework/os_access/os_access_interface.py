@@ -6,12 +6,12 @@ from netaddr import IPAddress
 from pathlib2 import PureWindowsPath
 
 from framework.networking.interface import Networking
+from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import FileSystemPath
 from framework.os_access.traffic_capture import TrafficCapture
 from framework.utils import RunningTime
 
-DEFAULT_RUN_TIMEOUT_SEC = 60
 _DEFAULT_DOWNLOAD_TIMEOUT_SEC = 30 * 60
 
 _logger = logging.getLogger(__name__)
