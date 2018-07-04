@@ -78,7 +78,7 @@ NodeViewWidget::NodeViewWidget(QWidget* parent):
     setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 1)));
     setIndentation(style::Metrics::kDefaultIconSize);
 
-    ItemViewUtils::autoToggleOnRowClick(this, node_view::checkMarkColumn); //< TODO: add selection modifiers stuff
+    ItemViewUtils::setupDefaultAutoToggle(this, node_view::checkMarkColumn);
 
     connect(&d->store, &NodeViewStore::stateChanged, d, &Private::handleStateChanged);
     connect(&d->store, &NodeViewStore::patchApplied, d, &Private::handlePatchApplied);
