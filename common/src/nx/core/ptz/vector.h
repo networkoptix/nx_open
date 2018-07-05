@@ -64,6 +64,18 @@ public:
 
     Vector operator/(double scalar) const;
 
+    Vector& operator+=(const Vector& other);
+
+    Vector& operator-=(const Vector& other);
+
+    Vector& operator*=(const Vector& other);
+
+    Vector& operator*=(double scalar);
+
+    Vector& operator/=(const Vector& other);
+
+    Vector& operator/=(double scalar);
+
     double length() const;
 
     double lengthSquared() const;
