@@ -3,13 +3,14 @@
 #include <QtCore/QDir>
 
 #include <nx/utils/log/log_message.h>
+#include <nx/utils/std/optional.h>
 
 #include "../db_connection_holder.h"
 #include "../sql_query_execution_helper.h"
 
 namespace nx::sql::test {
 
-boost::optional<nx::sql::ConnectionOptions> TestWithDbHelper::sDbConnectionOptions;
+std::optional<nx::sql::ConnectionOptions> TestWithDbHelper::sDbConnectionOptions;
 
 TestWithDbHelper::TestWithDbHelper(QString moduleName, QString tmpDir):
     utils::test::TestWithTemporaryDirectory(moduleName, tmpDir)

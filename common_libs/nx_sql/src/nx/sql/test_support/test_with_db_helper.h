@@ -1,8 +1,7 @@
 #pragma once
 
-#include <boost/optional.hpp>
-
 #include <nx/utils/test_support/test_with_temporary_directory.h>
+#include <nx/utils/std/optional.h>
 
 #include "../types.h"
 
@@ -24,7 +23,7 @@ public:
 private:
     nx::sql::ConnectionOptions m_dbConnectionOptions;
 
-    static boost::optional<nx::sql::ConnectionOptions> sDbConnectionOptions;
+    static std::optional<nx::sql::ConnectionOptions> sDbConnectionOptions;
 
     void cleanDatabase();
 };
