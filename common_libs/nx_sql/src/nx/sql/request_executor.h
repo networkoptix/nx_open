@@ -212,12 +212,12 @@ public:
 
     virtual DBResult doQuery(QueryContext* queryContext) override
     {
-        return invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input);
+        return this->invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input);
     }
 
     virtual void reportSuccess(QueryContext* queryContext) override
     {
-        invokeCompletionHandler(queryContext, DBResult::ok);
+        this->invokeCompletionHandler(queryContext, DBResult::ok);
     }
 
 private:
@@ -260,12 +260,12 @@ public:
 
     virtual DBResult doQuery(QueryContext* queryContext) override
     {
-        return invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input, &m_output);
+        return this->invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input, &m_output);
     }
 
     virtual void reportSuccess(QueryContext* queryContext) override
     {
-        invokeCompletionHandler(queryContext, DBResult::ok, std::move(m_output));
+        this->invokeCompletionHandler(queryContext, DBResult::ok, std::move(m_output));
     }
 
 private:
