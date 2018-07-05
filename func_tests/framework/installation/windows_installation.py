@@ -57,6 +57,7 @@ class WindowsInstallation(Installation):
         return remote_path
 
     def _backup_configuration(self):
+        self._config_key_backup.create()  # OK if already exists.
         self._config_key.copy_values_to(self._config_key_backup)
 
     def install(self, installer):
