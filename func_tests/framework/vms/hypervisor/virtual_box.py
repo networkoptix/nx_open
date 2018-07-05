@@ -39,11 +39,11 @@ def virtual_box_error(code):
 
 class VirtualBoxVm(Vm):
     @staticmethod
-    def _parse_port_forwarding(raw_info):
+    def _parse_port_forwarding(raw_dict):
         ports_dict = {}
         for index in range(10):  # Arbitrary.
             try:
-                raw_value = raw_info['Forwarding({})'.format(index)]
+                raw_value = raw_dict['Forwarding({})'.format(index)]
             except KeyError:
                 break
             tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
@@ -56,9 +56,9 @@ class VirtualBoxVm(Vm):
         return ports_dict
 
     @staticmethod
-    def _parse_host_address(raw_info):
+    def _parse_host_address(raw_dict):
         try:
-            nat_network = IPNetwork(raw_info['natnet1'])
+            nat_network = IPNetwork(raw_dict['natnet1'])
         except KeyError:
             # See: https://www.virtualbox.org/manual/ch09.html#idm8375
             nat_nic_index = 1
@@ -69,33 +69,34 @@ class VirtualBoxVm(Vm):
         return host_address_from_vm
 
     @staticmethod
-    def _parse_nic_occupation(raw_info):
+    def _parse_nic_occupation(raw_dict):
         macs = {}
         networks = {}
         for nic_index in _INTERNAL_NIC_INDICES:
             try:
-                raw_mac = raw_info['macaddress{}'.format(nic_index)]
+                raw_mac = raw_dict['macaddress{}'.format(nic_index)]
             except KeyError:
                 _logger.error("NIC %d: not present.", nic_index)
                 continue
             macs[nic_index] = EUI(raw_mac)
-            if raw_info['nic{}'.format(nic_index)] == 'null':
+            if raw_dict['nic{}'.format(nic_index)] == 'null':
                 networks[nic_index] = None
                 _logger.info("NIC %d (%s): empty", nic_index, macs[nic_index])
             else:
-                networks[nic_index] = raw_info['intnet{}'.format(nic_index)]
+                networks[nic_index] = raw_dict['intnet{}'.format(nic_index)]
                 _logger.info("NIC %d (%s): %s", nic_index, macs[nic_index], networks[nic_index])
         return macs, networks
 
     @classmethod
-    def from_raw_info(cls, raw_info):
-        name = raw_info['name']
+    def from_raw_output(cls, raw_output):
+        raw_dict = dict(csv.reader(raw_output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
+        name = raw_dict['name']
         _logger.info("Parse raw VM info of %s.", name)
         ports_map = ReciprocalPortMap(
-            OneWayPortMap.forwarding(cls._parse_port_forwarding(raw_info)),
-            OneWayPortMap.direct(cls._parse_host_address(raw_info)))
-        macs, networks = cls._parse_nic_occupation(raw_info)
-        return cls(name, ports_map, macs, networks, raw_info['VMState'] == 'running')
+            OneWayPortMap.forwarding(cls._parse_port_forwarding(raw_dict)),
+            OneWayPortMap.direct(cls._parse_host_address(raw_dict)))
+        macs, networks = cls._parse_nic_occupation(raw_dict)
+        return cls(name, ports_map, macs, networks, raw_dict['VMState'] == 'running')
 
 
 class VirtualBox(Hypervisor):
@@ -103,11 +104,6 @@ class VirtualBox(Hypervisor):
 
     def __init__(self, host_os_access):
         super(VirtualBox, self).__init__(host_os_access)
-
-    def _get_info(self, vm_name):
-        output = self._vbox_manage(['showvminfo', vm_name, '--machinereadable'])
-        raw_info = dict(csv.reader(output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
-        return raw_info
 
     def import_vm(self, vm_image_path, vm_name):
         # `import` is reserved name...
@@ -128,8 +124,8 @@ class VirtualBox(Hypervisor):
         self._vbox_manage(['modifyvm', vm_name, '--description', 'For testing purposes. Can be deleted.'])
 
     def find(self, vm_name):
-        raw_info = self._get_info(vm_name)
-        info = VirtualBoxVm.from_raw_info(raw_info)
+        output = self._vbox_manage(['showvminfo', vm_name, '--machinereadable'])
+        info = VirtualBoxVm.from_raw_output(output)
         return info
 
     def clone(self, original_vm_name, clone_vm_name):
