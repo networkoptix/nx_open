@@ -1,10 +1,10 @@
 import logging
 from pprint import pformat
-from subprocess import call, check_call
+from subprocess import check_call
 
 import pytest
 
-from framework.vms.hypervisor import VMInfo, VMNotFound, TemplateVMNotFound
+from framework.vms.hypervisor import TemplateVMNotFound, VMNotFound, Vm
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
