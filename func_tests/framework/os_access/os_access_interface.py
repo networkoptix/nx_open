@@ -153,4 +153,4 @@ class OSAccess(object):
 
     @abstractproperty
     def traffic_capture(self):
-        return TrafficCapture()
+        return TrafficCapture(self.Path.tmp())
