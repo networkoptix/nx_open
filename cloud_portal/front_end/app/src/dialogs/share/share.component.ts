@@ -60,7 +60,7 @@ export class ShareModalContent {
     }
 
     processAccessRoles() {
-        const roles = this.system.accessRoles || this.configService.accessRoles.predefinedRoles;
+        const roles = this.system.accessRoles || this.configService.config.accessRoles.predefinedRoles;
         this.accessRoles = roles.filter((role) => {
             if (!(role.isOwner || role.isAdmin && !this.system.isMine)) {
                 role.optionLabel = this.language.accessRoles[role.name].label || role.name;

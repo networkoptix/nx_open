@@ -272,59 +272,6 @@ button {
         outline    : none !important;
         outline    : 0 !important;
     }
-
-    &.dropdown-toggle {
-        display : flex;
-        padding : 5px 10px;
-
-        &::after {
-            display : none;
-        }
-
-        &:hover {
-            .arrow {
-                &::after {
-                    border-top-color : $light3;
-                    transition       : border-top-color 0.2s ease-in-out;
-                }
-
-                &.up::after {
-                    border-bottom-color : $light3;
-                    border-top-color    : transparent;
-                    transition          : border-bottom-color 0.2s ease-in-out;
-                }
-            }
-        }
-
-        .arrow {
-            position         : relative;
-            bottom           : auto;
-            right            : 0;
-            margin-left      : 10px !important;
-            margin-top       : 6px;
-            border-top-color : $dark_core;
-            border-width     : 6px;
-
-            &:after {
-                bottom           : 2px;
-                border-top-color : $light2;
-            }
-
-            &.up {
-                top                 : auto;
-                left                : auto;
-                border-top-width    : 0;
-                border-bottom-color : $dark_core;
-                margin-top          : 0;
-
-                &:after {
-                    bottom              : 2px;
-                    border-bottom-color : $light2;
-                    border-top-color    : transparent;
-                }
-            }
-        }
-    }
 }
 
 .btn.btn-default, .btn.btn-dropdown-toggle {

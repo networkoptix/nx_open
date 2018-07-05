@@ -12,11 +12,11 @@
     </div>
     <div class="col-sm-6">
         <div class="buttons-panel">
-            <button class="btn btn-default"
+            <a class="btn btn-default"
                     ng-disabled="!system.isAvailable"
                     title="{{system.stateMessage}}"
                     ng-click="share()" ng-if="system.permissions.editUsers">
-                <span class="glyphicon glyphicon-share"></span> Share</button>
+                <span class="glyphicon glyphicon-share"></span> Share</a>
             &nbsp;
             <open-client-button system="system"></open-client-button>
         </div>
