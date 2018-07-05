@@ -880,7 +880,7 @@ void QnResource::setUniqId(const QString& value)
     NX_ASSERT(false, Q_FUNC_INFO, "Not implemented");
 }
 
-Ptz::Capabilities QnResource::getPtzCapabilities(nx::core::ptz::Type ptzType) const
+Ptz::Capabilities QnResource::getPtzCapabilities(core_ptz::Type ptzType) const
 {
     switch (ptzType)
     {
@@ -901,7 +901,7 @@ bool QnResource::hasAnyOfPtzCapabilities(
     return getPtzCapabilities(ptzType) & capabilities;
 }
 
-void QnResource::setPtzCapabilities(Ptz::Capabilities capabilities, nx::core::ptz::Type ptzType)
+void QnResource::setPtzCapabilities(Ptz::Capabilities capabilities, core_ptz::Type ptzType)
 {
     switch (ptzType)
     {
@@ -923,7 +923,7 @@ void QnResource::setPtzCapabilities(Ptz::Capabilities capabilities, nx::core::pt
 void QnResource::setPtzCapability(
     Ptz::Capabilities capability,
     bool value,
-    nx::core::ptz::Type ptzType)
+    core_ptz::Type ptzType)
 {
     setPtzCapabilities(value
         ? (getPtzCapabilities(ptzType) | capability)
