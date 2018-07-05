@@ -909,10 +909,12 @@ void QnResource::setPtzCapabilities(Ptz::Capabilities capabilities, core_ptz::Ty
         {
             if (hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME)) //< Why do we need this check?
                 setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+            break;
         }
         case core_ptz::Type::configurational:
         {
             setProperty(Qn::kConfigurationalPtzCapabilities, static_cast<int>(capabilities));
+            break;
         }
         default:
             NX_ASSERT(false, "Wrong ptz type, we should never be here");
