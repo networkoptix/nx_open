@@ -11,6 +11,10 @@
 
     @media (max-width : $collapse-first-width) {
         right : 0;
+        left  : auto !important;
+    }
+
+    @media (max-width : $collapse-second-width) {
         left  : 0 !important;
     }
 
@@ -45,7 +49,7 @@
             }
 
             & .system-owner {
-                color : $blue10;
+                color : $light16;
             }
 
             & .glyphicon-home {

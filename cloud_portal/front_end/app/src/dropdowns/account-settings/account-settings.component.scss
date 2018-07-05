@@ -11,7 +11,11 @@
 
     @media (max-width : $collapse-first-width) {
         right : 0;
-        left  : 0 !important;
+        left  : auto !important;
+    }
+
+    @media (max-width : $collapse-second-width) {
+        left : 0 !important;
     }
 
     & li > a {

@@ -80,6 +80,9 @@
     .dropdown-menu {
         margin-top       : 0;
         background-color : $light4;
+        border-bottom    : none;
+        border-left      : none;
+        border-right     : none;
 
         .dropdown-item {
             display      : flex;
