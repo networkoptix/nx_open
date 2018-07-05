@@ -116,13 +116,10 @@ void GetPostTunnelProcessor<RequestSpecificData>::onMessage(
         return;
     }
 
-    TunnelContext tunnelContext;
-    {
-        QnMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
-        tunnelContext = std::move(tunnelIter->second);
-        m_tunnelsInProgress.erase(tunnelIter);
-    }
+    auto tunnelContext = std::move(tunnelIter->second);
+    m_tunnelsInProgress.erase(tunnelIter);
 
     NX_VERBOSE(this, lm("Successfully opened GET/POST tunnel. Url %1")
         .args(tunnelContext.urlPath));
