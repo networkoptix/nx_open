@@ -11,16 +11,24 @@
     }
 
     &.show {
-        a {
-            background-color: transparentize($light5, 0.75);
+        .dropdown-toggle {
+            background-color : $light5;
+        }
+
+        .dropdown-toggle-transparent {
+            background-color : transparentize($light5, 0.75) !important;
         }
     }
 
     .dropdown-toggle {
-        display : flex;
-        padding : 5px 32px 5px 10px;
+        display          : flex;
+        padding          : 5px 32px 5px 10px;
+        background-color : $light4;
 
         &:hover {
+            background-color : $light5 !important;
+            color            : $dark9 !important;
+
             .arrow {
                 &::after {
                     border-top-color : $light3;
@@ -70,22 +78,45 @@
     }
 
     .dropdown-menu {
-        margin-top : 0;
+        margin-top       : 0;
+        background-color : $light4;
 
         .dropdown-item {
-            display     : flex;
-            align-items : center;
+            display      : flex;
+            align-items  : center;
+            padding-left : 12px;
         }
 
-        & li > a {
-            @media (max-width : $collapse-second-width) {
-                line-height : 2rem;
+        & li {
+            &.active {
+                a {
+                    background-color : $light16 !important;
+                    color            : $light1;
+
+                    &:hover {
+                        color : $light1;
+                    }
+                }
             }
 
-            &:hover {
-                background-color : $light5;
-                color            : $dark9;
+            & > a {
+                @media (max-width : $collapse-second-width) {
+                    line-height : 2rem;
+                }
+
+                &:hover {
+                    background-color : $light5;
+                    color            : $dark9;
+                }
             }
+        }
+    }
+
+    .dropdown-toggle-transparent {
+        background-color : transparent;
+
+        &:hover {
+            background-color : transparentize($light5, 0.75) !important;
         }
     }
 }
