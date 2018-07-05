@@ -2,12 +2,11 @@
 
 #include <vector>
 
-#include <boost/optional.hpp>
-
 #include <QtCore/QByteArray>
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/optional.h>
 
 #include "../types.h"
 
@@ -88,7 +87,7 @@ private:
     unsigned int m_initialVersion;
     std::map<unsigned int, QByteArray> m_fullSchemaScriptByVersion;
     std::vector<DbUpdate> m_updateScripts;
-    boost::optional<unsigned int> m_versionToUpdateTo;
+    std::optional<unsigned int> m_versionToUpdateTo;
 
     DbSchemaState analyzeDbSchemaState(nx::sql::QueryContext* const queryContext);
 

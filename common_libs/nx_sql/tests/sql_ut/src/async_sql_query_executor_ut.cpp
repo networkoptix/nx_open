@@ -625,7 +625,7 @@ private:
             everyCursorDepleted = true;
             for (auto& cursorContext: m_cursors)
             {
-                boost::optional<Company> record = cursorContext.cursor->next();
+                std::optional<Company> record = cursorContext.cursor->next();
                 if (!record)
                     continue;
                 cursorContext.recordsRead.push_back(std::move(*record));

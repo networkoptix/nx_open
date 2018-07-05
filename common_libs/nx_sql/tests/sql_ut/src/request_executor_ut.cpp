@@ -2,10 +2,9 @@
 
 #include <memory>
 
-#include <boost/optional.hpp>
-
 #include <nx/sql/db_connection_holder.h>
 #include <nx/sql/request_executor.h>
+#include <nx/utils/std/optional.h>
 
 namespace nx::sql::test {
 
@@ -39,7 +38,7 @@ protected:
 
 private:
     std::unique_ptr<DbConnectionHolder> m_dbConnectionHolder;
-    boost::optional<DBResult> m_expectedResult;
+    std::optional<DBResult> m_expectedResult;
     DBResult m_executeResult = DBResult::ok;
     DBResult m_resultProvidedToCompletionHandler = DBResult::ok;
 

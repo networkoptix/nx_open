@@ -2,8 +2,7 @@
 
 #include <future>
 
-#include <boost/optional.hpp>
-
+#include <nx/utils/std/optional.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::sql {
@@ -32,7 +31,7 @@ public:
         m_asyncSqlQueryExecutor->removeCursor(m_id);
     }
 
-    boost::optional<Record> next()
+    std::optional<Record> next()
     {
         std::promise<std::tuple<DBResult, Record>> recordFetched;
         m_asyncSqlQueryExecutor->fetchNextRecordFromCursor<Record>(
@@ -46,7 +45,7 @@ public:
         if (std::get<0>(result) == DBResult::ok)
             return std::get<1>(result);
 
-        return boost::none;
+        return std::nullopt;
     }
 
 private:

@@ -3,12 +3,11 @@
 #include <chrono>
 #include <functional>
 
-#include <boost/optional.hpp>
-
 #include <QtSql/QSqlDatabase>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/std/optional.h>
 
 #include "db_statistics_collector.h"
 #include "types.h"
