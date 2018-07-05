@@ -60,11 +60,11 @@ View::View(
     m_settings(settings),
     m_model(model),
     m_controller(controller),
-    m_authenticationManager(m_authRestrictionList),
     m_getPostServerTunnelProcessor(
         m_settings,
         &model->listeningPeerPool()),
-    m_getPostClientTunnelProcessor(m_settings)
+    m_getPostClientTunnelProcessor(m_settings),
+    m_authenticationManager(m_authRestrictionList)
 {
     registerApiHandlers();
     loadSslCertificate();
