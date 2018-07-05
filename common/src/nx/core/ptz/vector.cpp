@@ -76,6 +76,11 @@ void Vector::setComponent(double value, Component component)
     }
 }
 
+bool Vector::operator==(const Vector& other) const
+{
+    return qFuzzyEquals(*this, other);
+}
+
 Vector Vector::operator+(const Vector& other) const
 {
     return Vector(
@@ -224,6 +229,11 @@ bool Vector::isNull() const
     return qFuzzyIsNull(*this);
 }
 
+bool Vector::isValid() const
+{
+    return qIsNaN(*this);
+}
+
 Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType) const
 {
     if (restrictionType == LimitsType::position)
@@ -275,7 +285,7 @@ Vector operator*(double scalar, const Vector& ptzVector)
     return ptzVector * scalar;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json)(eq), PtzVector_Fields, (optional, true));
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json), PtzVector_Fields, (optional, true));
 
 } // namespace ptz
 } // namespace core

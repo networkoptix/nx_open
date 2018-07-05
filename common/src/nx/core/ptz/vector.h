@@ -51,6 +51,7 @@ public:
     double focus = 0.0;
 
     // If you need more freedom degrees fill free to extend this struct.
+    bool operator==(const Vector& other) const;
 
     Vector operator+(const Vector& other) const;
 
@@ -84,6 +85,8 @@ public:
 
     bool isNull() const;
 
+    bool isValid() const;
+
     Vector restricted(const QnPtzLimits& limits, LimitsType restrictionType) const;
 
     static Vector rangeVector(const QnPtzLimits& limits, LimitsType limitsType);
@@ -93,7 +96,7 @@ Vector operator*(const Vector& ptzVector, double scalar);
 Vector operator*(double scalar, const Vector& ptzVector);
 
 #define PtzVector_Fields (pan)(tilt)(rotation)(zoom)(focus)
-QN_FUSION_DECLARE_FUNCTIONS(Vector, (json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(Vector, (json))
 
 } // namespace ptz
 } // namespace core
@@ -108,7 +111,8 @@ inline bool qFuzzyEquals(const nx::core::ptz::Vector& lhs, const nx::core::ptz::
     return ::qFuzzyEquals(lhs.pan, rhs.pan)
         && ::qFuzzyEquals(lhs.tilt, rhs.tilt)
         && ::qFuzzyEquals(lhs.rotation, rhs.rotation)
-        && ::qFuzzyEquals(lhs.zoom, rhs.zoom);
+        && ::qFuzzyEquals(lhs.zoom, rhs.zoom)
+        && ::qFuzzyEquals(lhs.focus, rhs.focus);
 }
 
 inline bool qFuzzyIsNull(const nx::core::ptz::Vector& ptzVector)
@@ -116,7 +120,8 @@ inline bool qFuzzyIsNull(const nx::core::ptz::Vector& ptzVector)
     return ::qFuzzyIsNull(ptzVector.pan)
         && ::qFuzzyIsNull(ptzVector.tilt)
         && ::qFuzzyIsNull(ptzVector.rotation)
-        && ::qFuzzyIsNull(ptzVector.zoom);
+        && ::qFuzzyIsNull(ptzVector.zoom)
+        && ::qFuzzyIsNull(ptzVector.focus);
 }
 
 inline bool qIsNaN(const nx::core::ptz::Vector& ptzVector)
@@ -124,7 +129,8 @@ inline bool qIsNaN(const nx::core::ptz::Vector& ptzVector)
     return ::qIsNaN(ptzVector.pan)
         || ::qIsNaN(ptzVector.tilt)
         || ::qIsNaN(ptzVector.rotation)
-        || ::qIsNaN(ptzVector.zoom);
+        || ::qIsNaN(ptzVector.zoom)
+        || ::qIsNaN(ptzVector.focus);
 }
 
 template<>
