@@ -176,10 +176,7 @@ class VirtualBox(Hypervisor):
 
     def plug(self, vm_name, network_name):
         info = self.find(vm_name)
-        try:
-            slot = next(slot for slot in info.networks if info.networks[slot] is None)
-        except StopIteration:
-            raise VMAllAdaptersBusy(vm_name, info.networks)
+        slot = info.find_vacant_nic()
         self._vbox_manage([
             'controlvm', vm_name,
             'nic{}'.format(slot), 'intnet', network_name])

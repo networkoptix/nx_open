@@ -18,6 +18,12 @@ class Vm(object):
             return '<VM {!s} (stopped)>'.format(self.name)
         return '<VM {!s}>'.format(self.name)
 
+    def find_vacant_nic(self):
+        for key, occupation in self.networks.items():
+            if occupation is None:
+                return key
+        raise VMAllAdaptersBusy(self.name, self.networks)
+
 
 class VMNotFound(Exception):
     pass
