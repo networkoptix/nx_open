@@ -39,8 +39,8 @@ def has_value(data_structure_name, context, customization, language):
                                              language=language)
     if not data_records.exists():
         return False
-
-    return data_records.latest('id').value != ""
+    record_value = data_records.latest('id').value
+    return record_value != "" and data_structure.default != record_value
 
 
 @register.simple_tag
