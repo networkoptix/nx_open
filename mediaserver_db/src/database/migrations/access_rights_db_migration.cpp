@@ -8,7 +8,6 @@
 #include <database/db_manager.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/db/sql_query_execution_helper.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/api/data/access_rights_data.h>
 
