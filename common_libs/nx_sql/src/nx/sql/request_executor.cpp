@@ -132,17 +132,7 @@ UpdateWithoutAnyDataExecutorNoTran::UpdateWithoutAnyDataExecutorNoTran(
     base_type(std::move(completionHandler)),
     m_dbUpdateFunc(std::move(dbUpdateFunc))
 {
-}
-
-DBResult UpdateWithoutAnyDataExecutorNoTran::executeQuery(QSqlDatabase* const connection)
-{
-    // TODO: Remove this method and make base class run without transaction.
-
-    QueryContext queryContext(connection, nullptr);
-    auto result = invokeDbQueryFunc(m_dbUpdateFunc, &queryContext);
-    result = detailResultCode(connection, result);
-    invokeCompletionHandler(&queryContext, result);
-    return result;
+    setExternalTransaction(nullptr); //< Run without transaction.
 }
 
 DBResult UpdateWithoutAnyDataExecutorNoTran::doQuery(QueryContext* queryContext)
