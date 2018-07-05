@@ -36,9 +36,9 @@ else
     LIB_INSTALL_PATH="$INSTALL_PATH/mediaserver/lib"
 fi
 
-LOG_FILE="$LOGS_DIR/create_arm_installer.log"
+LOG_FILE="$LOGS_DIR/build_distribution.log"
 
-WORK_DIR="create_arm_installer_tmp"
+WORK_DIR="build_distribution_tmp"
 
 #--------------------------------------------------------------------------------------------------
 

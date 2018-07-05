@@ -16,7 +16,7 @@ INITTARGET="/etc/init"
 INITDTARGET="/etc/init.d"
 SYSTEMDTARGET="/etc/systemd/system"
 
-WORK_DIR="stagebase"
+WORK_DIR="server_build_distribution_tmp"
 STAGE="$WORK_DIR/$ARTIFACT_NAME"
 BINSTAGE="$STAGE$BINTARGET"
 LIBSTAGE="$STAGE$LIBTARGET"
@@ -34,7 +34,7 @@ SERVER_VOX_PATH="$SERVER_BIN_PATH/vox"
 SERVER_LIB_PATH="$BUILD_DIR/lib"
 SERVER_LIB_PLUGIN_PATH="$SERVER_BIN_PATH/plugins"
 BUILD_INFO_TXT="$BUILD_DIR/build_info.txt"
-LOG_FILE="$LOGS_DIR/server-build-distribution.log"
+LOG_FILE="$LOGS_DIR/server_build_distribution.log"
 
 buildDistribution()
 {
