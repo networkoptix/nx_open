@@ -1189,11 +1189,19 @@ bool QnServerDb::getBookmarksInternal(
     };
 
     if (filter.startTimeMs.count() > 0 && filter.endTimeMs.count() < std::numeric_limits<qint64>().max())
-        addFilter("start_time between ? AND ?", filter.startTimeMs.count(), filter.endTimeMs.count());
+    {
+        addFilter("start_time between ? AND ?",
+            QVariant(filter.startTimeMs.count()),
+            QVariant(filter.endTimeMs.count()));
+    }
     else if (filter.endTimeMs.count() < std::numeric_limits<qint64>().max())
-        addFilter("start_time <= ?", filter.endTimeMs.count());
+    {
+        addFilter("start_time <= ?", QVariant(filter.endTimeMs.count()));
+    }
     else if (filter.startTimeMs.count() > 0)
-        addFilter("start_time + duration  >= ?", filter.startTimeMs.count());
+    {
+        addFilter("start_time + duration  >= ?", QVariant(filter.startTimeMs.count()));
+    }
 
     if (!filter.text.isEmpty())
     {
