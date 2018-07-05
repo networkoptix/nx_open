@@ -42,13 +42,15 @@ public:
         const QVector4D& vector,
         const ComponentVector<4>& components);
 
-    void setComponent(double value, Component component);
-
     double pan = 0.0;
     double tilt = 0.0;
     double rotation = 0.0;
     double zoom = 0.0;
     double focus = 0.0;
+
+    double component(Component component) const;
+
+    void setComponent(double value, Component component);
 
     // If you need more freedom degrees fill free to extend this struct.
     bool operator==(const Vector& other) const;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/core/ptz/type.h>
-#include <nx/fusion/model_functions.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
 namespace core {
@@ -12,7 +12,7 @@ struct Options
     Type type = Type::operational;
 };
 #define PtzOptions_Fields (type)
-QN_FUSION_DECLARE_FUNCTIONS(Options, (json))
+QN_FUSION_DECLARE_FUNCTIONS(Options, (json)(eq))
 
 } // namespace ptz
 } // namespace core

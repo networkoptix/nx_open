@@ -75,6 +75,7 @@ struct RelativeContinuousMoveMapping
 {
     RelativeContinuousMoveMapping() = default;
     RelativeContinuousMoveMapping(const SimpleRelativeContinuousMoveMapping& mapping);
+    RelativeContinuousMoveMapping(const std::vector<Speed>& componentSpeed);
 
     RelativeContinuousMoveComponentMapping pan;
     RelativeContinuousMoveComponentMapping tilt;

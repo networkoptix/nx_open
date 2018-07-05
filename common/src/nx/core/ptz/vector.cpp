@@ -52,6 +52,21 @@ Vector::Vector(const QVector4D& vector, const ComponentVector<4>& components)
     setComponent(vector.w(), components[3]);
 }
 
+double Vector::component(Component component) const
+{
+    switch (component)
+    {
+        case Component::pan: return pan;
+        case Component::tilt: return tilt;
+        case Component::rotation: return rotation;
+        case Component::zoom: return zoom;
+        case Component::focus: return focus;
+        default:
+            NX_ASSERT(false, lit("Wrong component. We should never be here"));
+            return qQNaN<double>();
+    }
+}
+
 void Vector::setComponent(double value, Component component)
 {
     switch (component)
