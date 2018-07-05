@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <functional>
+#include <tuple>
 
 #include <QtSql/QSqlDatabase>
 
@@ -93,24 +94,18 @@ private:
 //-------------------------------------------------------------------------------------------------
 // UpdateExecutor
 
-/**
- * Executor of data update requests without output data.
- */
-template<typename InputData>
-class UpdateExecutor:
+template<typename ... CompletionHandlerArgs>
+class BaseUpdateExecutor:
     public BaseExecutor
 {
     using base_type = BaseExecutor;
 
 public:
-    UpdateExecutor(
-        nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&)> dbUpdateFunc,
-        InputData&& input,
-        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData)> completionHandler)
-    :
+    using CompletionHandler =
+        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, CompletionHandlerArgs...)>;
+
+    BaseUpdateExecutor(CompletionHandler completionHandler):
         base_type(QueryType::modification),
-        m_dbUpdateFunc(std::move(dbUpdateFunc)),
-        m_input(std::move(input)),
         m_completionHandler(std::move(completionHandler))
     {
     }
@@ -120,21 +115,20 @@ public:
         Transaction transaction(connection);
         QueryContext queryContext(connection, &transaction);
 
-        auto completionHandler = std::move(m_completionHandler);
         auto result = transaction.begin();
         if (result != DBResult::ok)
         {
             result = lastDBError(connection);
-            completionHandler(&queryContext, result, std::move(m_input));
+            invokeCompletionHandlerWithDefaultValues(&queryContext, result);
             return result;
         }
 
-        result = invokeDbQueryFunc(m_dbUpdateFunc, &queryContext, m_input);
+        result = doQuery(&queryContext);
         if (result != DBResult::ok)
         {
             result = detailResultCode(connection, result);
             transaction.rollback();
-            completionHandler(&queryContext, result, std::move(m_input));
+            invokeCompletionHandlerWithDefaultValues(&queryContext, result);
             return result;
         }
 
@@ -143,23 +137,99 @@ public:
         {
             result = lastDBError(connection);
             connection->rollback();
-            completionHandler(&queryContext, result, std::move(m_input));
+            invokeCompletionHandlerWithDefaultValues(&queryContext, result);
             return result;
         }
 
-        completionHandler(&queryContext, DBResult::ok, std::move(m_input));
+        reportSuccess(&queryContext);
         return DBResult::ok;
     }
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
-        m_completionHandler(nullptr, errorCode, InputData());
+        invokeCompletionHandlerWithDefaultValues(nullptr, errorCode);
+    }
+
+protected:
+    virtual DBResult doQuery(QueryContext* queryContext) = 0;
+
+    virtual void reportSuccess(QueryContext* queryContext) = 0;
+
+    void invokeCompletionHandler(
+        QueryContext* queryContext,
+        DBResult resultCode,
+        CompletionHandlerArgs... args)
+    {
+        CompletionHandler completionHandler;
+        completionHandler.swap(m_completionHandler);
+
+        std::apply(
+            completionHandler,
+            std::tuple_cat(
+                std::make_tuple(queryContext, resultCode),
+                std::make_tuple(std::move(args)...)));
+    }
+
+private:
+    CompletionHandler m_completionHandler;
+
+    void invokeCompletionHandlerWithDefaultValues(
+        QueryContext* queryContext,
+        DBResult errorCode)
+    {
+        CompletionHandler completionHandler;
+        completionHandler.swap(m_completionHandler);
+
+        std::tuple<CompletionHandlerArgs...> defaultArgs;
+        std::apply(
+            completionHandler,
+            std::tuple_cat(std::make_tuple(queryContext, errorCode), std::move(defaultArgs)));
+    }
+};
+
+/**
+ * Executor of data update requests without output data.
+ */
+template<typename InputData>
+class UpdateExecutor:
+    public BaseUpdateExecutor<>
+{
+    using base_type = BaseUpdateExecutor<>;
+
+public:
+    UpdateExecutor(
+        nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&)> dbUpdateFunc,
+        InputData&& input,
+        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData)> completionHandler)
+    :
+        base_type(std::bind(&UpdateExecutor::invokeCompletionHandler2, this,
+            std::placeholders::_1, std::placeholders::_2)),
+        m_dbUpdateFunc(std::move(dbUpdateFunc)),
+        m_input(std::move(input)),
+        m_completionHandler(std::move(completionHandler))
+    {
+    }
+
+    virtual DBResult doQuery(QueryContext* queryContext) override
+    {
+        return this->invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input);
+    }
+
+    virtual void reportSuccess(QueryContext* queryContext) override
+    {
+        this->invokeCompletionHandler(queryContext, DBResult::ok);
     }
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&)> m_dbUpdateFunc;
     InputData m_input;
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData)> m_completionHandler;
+
+    void invokeCompletionHandler2(
+        QueryContext* queryContext, DBResult dbResult)
+    {
+        m_completionHandler(queryContext, dbResult, std::move(m_input));
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -170,9 +240,9 @@ private:
  */
 template<typename InputData, typename OutputData>
 class UpdateWithOutputExecutor:
-    public BaseExecutor
+    public BaseUpdateExecutor<OutputData>
 {
-    using base_type = BaseExecutor;
+    using base_type = BaseUpdateExecutor<OutputData>;
 
 public:
     UpdateWithOutputExecutor(
@@ -180,89 +250,65 @@ public:
         InputData&& input,
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData, OutputData&&)> completionHandler)
     :
-        base_type(QueryType::modification),
+        base_type(std::bind(&UpdateWithOutputExecutor::invokeCompletionHandler2, this,
+            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)),
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_input(std::move(input)),
         m_completionHandler(std::move(completionHandler))
     {
     }
 
-    virtual DBResult executeQuery(QSqlDatabase* const connection) override
+    virtual DBResult doQuery(QueryContext* queryContext) override
     {
-        Transaction transaction(connection);
-        QueryContext queryContext(connection, &transaction);
-
-        auto completionHandler = std::move(m_completionHandler);
-        auto result = transaction.begin();
-        if (result != DBResult::ok)
-        {
-            result = lastDBError(connection);
-            completionHandler(&queryContext, result, std::move(m_input), OutputData());
-            return result;
-        }
-
-        OutputData output;
-        result = invokeDbQueryFunc(m_dbUpdateFunc, &queryContext, m_input, &output);
-        if (result != DBResult::ok)
-        {
-            result = detailResultCode(connection, result);
-            transaction.rollback();
-            completionHandler(&queryContext, result, std::move(m_input), OutputData());
-            return result;
-        }
-
-        result = transaction.commit();
-        if (result != DBResult::ok)
-        {
-            result = lastDBError(connection);
-            connection->rollback();
-            completionHandler(&queryContext, result, std::move(m_input), OutputData());
-            return result;
-        }
-
-        completionHandler(&queryContext, DBResult::ok, std::move(m_input), std::move(output));
-        return DBResult::ok;
+        return this->invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input, &m_output);
     }
 
-    virtual void reportErrorWithoutExecution(DBResult errorCode) override
+    virtual void reportSuccess(QueryContext* queryContext) override
     {
-        m_completionHandler(nullptr, errorCode, InputData(), OutputData());
+        this->invokeCompletionHandler(queryContext, DBResult::ok, std::move(m_output));
     }
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&, OutputData* const)> m_dbUpdateFunc;
     InputData m_input;
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData, OutputData&&)> m_completionHandler;
+    OutputData m_output;
+
+    void invokeCompletionHandler2(
+        QueryContext* queryContext, DBResult dbResult, OutputData outputData)
+    {
+        m_completionHandler(queryContext, dbResult, std::move(m_input), std::move(outputData));
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
 // UpdateWithoutAnyDataExecutor
 
 class NX_SQL_API UpdateWithoutAnyDataExecutor:
-    public BaseExecutor
+    public BaseUpdateExecutor<>
 {
-    using base_type = BaseExecutor;
+    using base_type = BaseUpdateExecutor<>;
 
 public:
     UpdateWithoutAnyDataExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
 
-    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
-    virtual void reportErrorWithoutExecution(DBResult errorCode) override;
+    virtual DBResult doQuery(QueryContext* queryContext) override;
+
+    virtual void reportSuccess(QueryContext* queryContext) override;
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> m_dbUpdateFunc;
-    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> m_completionHandler;
 };
 
 //-------------------------------------------------------------------------------------------------
 // UpdateWithoutAnyDataExecutorNoTran
 
 class NX_SQL_API UpdateWithoutAnyDataExecutorNoTran:
-    public BaseExecutor
+    public BaseUpdateExecutor<>
 {
-    using base_type = BaseExecutor;
+    using base_type = BaseUpdateExecutor<>;
 
 public:
     UpdateWithoutAnyDataExecutorNoTran(
@@ -270,11 +316,13 @@ public:
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
 
     virtual DBResult executeQuery(QSqlDatabase* const connection) override;
-    virtual void reportErrorWithoutExecution(DBResult errorCode) override;
+
+    virtual DBResult doQuery(QueryContext* queryContext) override;
+
+    virtual void reportSuccess(QueryContext* queryContext) override;
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> m_dbUpdateFunc;
-    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> m_completionHandler;
 };
 
 //-------------------------------------------------------------------------------------------------
