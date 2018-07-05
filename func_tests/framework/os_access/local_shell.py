@@ -93,8 +93,6 @@ class _LocalRun(Run):
         return self._process.poll()
 
     def _poll_streams(self, timeout_sec):
-        if self.outcome is not None:
-            _logger.warning("Process exited but some streams open. Go on.")
         try:
             return self._poller.poll(int(math.ceil(timeout_sec * 1000)))
         except select.error as e:
