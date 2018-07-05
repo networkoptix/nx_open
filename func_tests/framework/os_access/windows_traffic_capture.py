@@ -6,9 +6,7 @@ class WindowsTrafficCapture(TrafficCapture):
         super(WindowsTrafficCapture, self).__init__(dir)
         self._winrm = winrm
 
-    def _make_capturing_command(self, capture_path):
-        size_limit_bytes = 500 * 1024 * 1024
-        timeout_sec = 600
+    def _make_capturing_command(self, capture_path, size_limit_bytes, duration_limit_sec):
         command = self._winrm.command([
             'NMCap',
             '/CaptureProcesses', '/RecordFilters', '/RecordConfig',
@@ -17,6 +15,6 @@ class WindowsTrafficCapture(TrafficCapture):
             # Here may come filter in Network Monitor language.
             '/Networks', '*',  # All network interfaces.
             '/File', '{}:{}'.format(capture_path, size_limit_bytes),  # File path and size limit.
-            '/StopWhen', '/TimeAfter', timeout_sec, 'seconds',  # If teardown is not performed, stop at some moment.
+            '/StopWhen', '/TimeAfter', duration_limit_sec, 'seconds',
             ])
         return command
