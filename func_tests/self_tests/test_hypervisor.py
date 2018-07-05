@@ -47,7 +47,7 @@ def clone_name(hypervisor):
 
 
 def test_find(hypervisor, dummy):
-    assert isinstance(hypervisor.find(dummy), VMInfo)
+    assert isinstance(hypervisor.find(dummy), Vm)
 
 
 def test_clone(hypervisor, template, clone_name):

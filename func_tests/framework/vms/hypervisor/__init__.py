@@ -1,8 +1,22 @@
 """Classes and functions unrelated to specific VM hypervisor (VirtualBox, libvirt, etc...)"""
-from collections import namedtuple
+from abc import ABCMeta
 from pprint import pformat
 
-VMInfo = namedtuple('VMInfo', ['name', 'port_map', 'macs', 'networks', 'is_running'])  # TODO: Rename to VMHardware.
+
+class Vm(object):
+    __metaclass__ = ABCMeta
+
+    def __init__(self, name, port_map, macs, networks, is_running):
+        self.name = name
+        self.port_map = port_map
+        self.macs = macs
+        self.networks = networks
+        self.is_running = is_running
+
+    def __repr__(self):
+        if not self.is_running:
+            return '<VM {!s} (stopped)>'.format(self.name)
+        return '<VM {!s}>'.format(self.name)
 
 
 class VMNotFound(Exception):

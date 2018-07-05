@@ -10,7 +10,7 @@ from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
-from framework.vms.hypervisor import TemplateVMNotFound, VMAllAdaptersBusy, VMInfo, VMNotFound
+from framework.vms.hypervisor import TemplateVMNotFound, VMAllAdaptersBusy, Vm, VMNotFound
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.vms.port_forwarding import calculate_forwarded_ports
 from framework.waiting import wait_for_true
@@ -37,47 +37,65 @@ def virtual_box_error(code):
     return type('VirtualBoxError_{}'.format(code), (SpecificVirtualBoxError,), {})
 
 
-def vm_info_from_raw_info(raw_info):
-    ports_dict = {}
-    for index in range(10):  # Arbitrary.
+class VirtualBoxVm(Vm):
+    @staticmethod
+    def _parse_port_forwarding(raw_info):
+        ports_dict = {}
+        for index in range(10):  # Arbitrary.
+            try:
+                raw_value = raw_info['Forwarding({})'.format(index)]
+            except KeyError:
+                break
+            tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
+            # Hostname is given with port because knowledge that VMs are accessible through
+            # forwarded port is not part of logical interface. Other possibility is to make virtual network
+            # in which host can access VMs on IP level. One more option is special Machine which is accessible by IP
+            # and forwards ports to target VMs.
+            ports_dict[protocol, int(guest_port)] = int(host_port)
+        _logger.info("Forwarded ports:\n%s", pformat(ports_dict))
+        return ports_dict
+
+    @staticmethod
+    def _parse_host_address(raw_info):
         try:
-            raw_value = raw_info['Forwarding({})'.format(index)]
+            nat_network = IPNetwork(raw_info['natnet1'])
         except KeyError:
-            break
-        tag, protocol, host_address, host_port, guest_address, guest_port = raw_value.split(',')
-        # Hostname is given with port because knowledge that VMs are accessible through
-        # forwarded port is not part of logical interface. Other possibility is to make virtual network
-        # in which host can access VMs on IP level. One more option is special Machine which is accessible by IP
-        # and forwards ports to target VMs.
-        ports_dict[protocol, int(guest_port)] = int(host_port)
-    try:
-        nat_network = IPNetwork(raw_info['natnet1'])
-    except KeyError:
-        # See: https://www.virtualbox.org/manual/ch09.html#idm8375
-        nat_nic_index = 1
-        nat_network = IPNetwork('10.0.{}.0/24'.format(nat_nic_index + 2))
-    host_address_from_vm = nat_network.ip + 2
-    ports_map = ReciprocalPortMap(
-        OneWayPortMap.forwarding(ports_dict),
-        OneWayPortMap.direct(host_address_from_vm))
-    macs = {}
-    networks = {}
-    for nic_index in _INTERNAL_NIC_INDICES:
-        try:
-            raw_mac = raw_info['macaddress{}'.format(nic_index)]
-        except KeyError:
-            _logger.warning("Skip NIC %d is not present in Machine %s.", nic_index, raw_info['name'])
-            continue
-        macs[nic_index] = EUI(raw_mac)
-        if raw_info['nic{}'.format(nic_index)] == 'null':
-            networks[nic_index] = None
-            _logger.debug("NIC %d (%s): empty", nic_index, macs[nic_index])
-        else:
-            networks[nic_index] = raw_info['intnet{}'.format(nic_index)]
-            _logger.debug("NIC %d (%s): %s", nic_index, macs[nic_index], networks[nic_index])
-    parsed_info = VMInfo(raw_info['name'], ports_map, macs, networks, raw_info['VMState'] == 'running')
-    _logger.info("Parsed info:\n%s", pformat(parsed_info))
-    return parsed_info
+            # See: https://www.virtualbox.org/manual/ch09.html#idm8375
+            nat_nic_index = 1
+            nat_network = IPNetwork('10.0.{}.0/24'.format(nat_nic_index + 2))
+        host_address_from_vm = nat_network.ip + 2
+        _logger.debug("Host IP network: %s.", nat_network)
+        _logger.info("Host IP address: %s.", host_address_from_vm)
+        return host_address_from_vm
+
+    @staticmethod
+    def _parse_nic_occupation(raw_info):
+        macs = {}
+        networks = {}
+        for nic_index in _INTERNAL_NIC_INDICES:
+            try:
+                raw_mac = raw_info['macaddress{}'.format(nic_index)]
+            except KeyError:
+                _logger.error("NIC %d: not present.", nic_index)
+                continue
+            macs[nic_index] = EUI(raw_mac)
+            if raw_info['nic{}'.format(nic_index)] == 'null':
+                networks[nic_index] = None
+                _logger.info("NIC %d (%s): empty", nic_index, macs[nic_index])
+            else:
+                networks[nic_index] = raw_info['intnet{}'.format(nic_index)]
+                _logger.info("NIC %d (%s): %s", nic_index, macs[nic_index], networks[nic_index])
+        return macs, networks
+
+    @classmethod
+    def from_raw_info(cls, raw_info):
+        name = raw_info['name']
+        _logger.info("Parse raw VM info of %s.", name)
+        ports_map = ReciprocalPortMap(
+            OneWayPortMap.forwarding(cls._parse_port_forwarding(raw_info)),
+            OneWayPortMap.direct(cls._parse_host_address(raw_info)))
+        macs, networks = cls._parse_nic_occupation(raw_info)
+        return cls(name, ports_map, macs, networks, raw_info['VMState'] == 'running')
 
 
 class VirtualBox(Hypervisor):
@@ -111,7 +129,7 @@ class VirtualBox(Hypervisor):
 
     def find(self, vm_name):
         raw_info = self._get_info(vm_name)
-        info = vm_info_from_raw_info(raw_info)
+        info = VirtualBoxVm.from_raw_info(raw_info)
         return info
 
     def clone(self, original_vm_name, clone_vm_name):
