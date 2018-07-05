@@ -174,7 +174,7 @@ class VirtualBox(Hypervisor):
     def power_off(self, vm_name):
         self._vbox_manage(['controlvm', vm_name, 'poweroff'])
 
-    def plug(self, vm_name, network_name):
+    def plug_internal(self, vm_name, network_name):
         info = self.find(vm_name)
         slot = info.find_vacant_nic()
         self._vbox_manage([

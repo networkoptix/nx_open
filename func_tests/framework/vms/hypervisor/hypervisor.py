@@ -44,7 +44,7 @@ class Hypervisor(object):
         pass
 
     @abstractmethod
-    def plug(self, vm_name, network_name):
+    def plug_internal(self, vm_name, network_name):
         pass
 
     @abstractmethod
