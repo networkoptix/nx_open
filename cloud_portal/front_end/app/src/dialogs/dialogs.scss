@@ -111,6 +111,10 @@
             color            : $light16;
             padding          : 0.5rem 0 0 0;
         }
+
+        p:last-of-type {
+            margin-bottom : 1rem;
+        }
     }
 
     &-footer {
