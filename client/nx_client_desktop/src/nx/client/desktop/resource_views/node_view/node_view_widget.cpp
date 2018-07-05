@@ -1,6 +1,7 @@
 #include "node_view_widget.h"
 
 #include <QtWidgets/QHeaderView>
+#include <QtCore/QSortFilterProxyModel>
 
 #include <ui/style/helper.h>
 #include <ui/common/indents.h>
@@ -31,10 +32,19 @@ struct NodeViewWidget::Private: public QObject
     NodeViewWidget& owner;
     NodeViewModel model;
     NodeViewStore store;
+    QSortFilterProxyModel* proxy = nullptr;
+    ItemViewUtils::CheckableCheckFunction checkableCheck;
 };
 
 NodeViewWidget::Private::Private(NodeViewWidget& owner):
-    owner(owner)
+    owner(owner),
+    checkableCheck(
+        [this](const QModelIndex& index) -> bool
+        {
+            const auto mappedIndex = proxy ? proxy->mapToSource(index) : index;
+            const auto node = NodeViewModel::nodeFromIndex(mappedIndex);
+            return node ? node->checkable() : false;
+        })
 {
 }
 
@@ -78,7 +88,7 @@ NodeViewWidget::NodeViewWidget(QWidget* parent):
     setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 1)));
     setIndentation(style::Metrics::kDefaultIconSize);
 
-    ItemViewUtils::setupDefaultAutoToggle(this, node_view::checkMarkColumn);
+    ItemViewUtils::setupDefaultAutoToggle(this, node_view::checkMarkColumn, d->checkableCheck);
 
     connect(&d->store, &NodeViewStore::stateChanged, d, &Private::handleStateChanged);
     connect(&d->store, &NodeViewStore::patchApplied, d, &Private::handlePatchApplied);
@@ -103,6 +113,13 @@ const NodeViewState& NodeViewWidget::state() const
 void NodeViewWidget::applyPatch(const NodeViewStatePatch& patch)
 {
     d->store.applyPatch(patch);
+}
+
+void NodeViewWidget::setProxyModel(QSortFilterProxyModel* proxy)
+{
+    proxy->setSourceModel(&d->model);
+    setModel(proxy);
+    d->proxy = proxy;
 }
 
 } // namespace desktop

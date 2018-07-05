@@ -22,11 +22,6 @@ const auto createCheckableLayoutNode =
         return helpers::createResourceNode(resource, true);
     };
 
-QnUuid getResourceId(const NodePtr& node)
-{
-    return node->data(node_view::nameColumn, node_view::idRole).value<QnUuid>();
-}
-
 bool isSelected(const NodePtr& node)
 {
     const auto variantState = node->data(node_view::checkMarkColumn, Qt::CheckStateRole);
@@ -44,7 +39,7 @@ ViewNode::Data getResourceNodeData(
 
     nodeData.data[node_view::nameColumn][Qt::DisplayRole] = resource->getName();
     nodeData.data[node_view::nameColumn][Qt::DecorationRole] = qnResIconCache->icon(resource);
-    nodeData.data[node_view::nameColumn][node_view::idRole] = QVariant::fromValue(resource->getId());
+    nodeData.data[node_view::nameColumn][node_view::resourceRole] = QVariant::fromValue(resource);
     return nodeData;
 }
 
@@ -180,10 +175,13 @@ QnResourceList getLeafSelectedResources(const NodePtr& node)
     if (!isSelected(node))
         return QnResourceList();
 
-    const auto resourceId = getResourceId(node);
-    const auto pool = qnClientCoreModule->commonModule()->resourcePool();
-    const auto resource = pool->getResourceById(resourceId);
+    const auto resource = getResource(node);
     return resource ? QnResourceList({resource}) : QnResourceList();
+}
+
+QnResourcePtr getResource(const NodePtr& node)
+{
+    return node->data(node_view::nameColumn, node_view::resourceRole).value<QnResourcePtr>();
 }
 
 } // namespace helpers

@@ -9,13 +9,6 @@ namespace {
 
 using namespace nx::client::desktop;
 
-NodePtr nodeFromIndex(const QModelIndex& index)
-{
-    return index.isValid()
-        ? static_cast<ViewNode*>(index.internalPointer())->sharedFromThis()
-        : NodePtr();
-}
-
 bool firstLevelOrRootNode(const NodePtr& node)
 {
     if (!node)
@@ -165,6 +158,13 @@ Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
 {
     const auto node = nodeFromIndex(index);
     return node ? node->flags(index.column()) : base_type::flags(index);
+}
+
+NodePtr NodeViewModel::nodeFromIndex(const QModelIndex& index)
+{
+    return index.isValid()
+        ? static_cast<ViewNode*>(index.internalPointer())->sharedFromThis()
+        : NodePtr();
 }
 
 } // namespace desktop

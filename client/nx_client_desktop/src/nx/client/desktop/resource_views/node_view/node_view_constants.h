@@ -15,7 +15,7 @@ enum Column
 
 enum Role
 {
-    idRole = Qt::UserRole
+    resourceRole = Qt::UserRole
 };
 
 } // namespace node_view

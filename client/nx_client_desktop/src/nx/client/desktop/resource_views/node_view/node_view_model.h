@@ -40,6 +40,9 @@ public: // Overrides section
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
+public:
+    static NodePtr nodeFromIndex(const QModelIndex& index);
+
 signals:
     void checkedChanged(const ViewNode::Path& path, Qt::CheckState state);
 

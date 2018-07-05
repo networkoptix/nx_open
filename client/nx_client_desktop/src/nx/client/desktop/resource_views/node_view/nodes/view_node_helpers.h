@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_fwd.h>
 
@@ -28,6 +29,10 @@ NodePtr createParentResourceNode(
     Qt::CheckState checkedState = Qt::Unchecked);
 
 QnResourceList getLeafSelectedResources(const NodePtr& rootNode);
+
+bool isCheckable(const NodePtr& node);
+
+QnResourcePtr getResource(const NodePtr& node);
 
 } // namespace helpers
 } // namespace desktop

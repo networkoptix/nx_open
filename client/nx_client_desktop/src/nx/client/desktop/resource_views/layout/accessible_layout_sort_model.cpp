@@ -1,0 +1,57 @@
+#include "accessible_layout_sort_model.h"
+
+#include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
+
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+#include <nx/client/core/watchers/user_watcher.h>
+
+#include <nx/client/desktop/resource_views/node_view/node_view_model.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
+
+QnUuid getCurrentUserId()
+{
+    const auto commonModule = qnClientCoreModule->commonModule();
+    const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
+    const auto currentUser = userWatcher->user();
+    return currentUser->getId();
+}
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+AccessibleLayoutSortModel::AccessibleLayoutSortModel(QObject* parent)
+{
+
+}
+
+bool AccessibleLayoutSortModel::lessThan(
+    const QModelIndex& sourceLeft,
+    const QModelIndex& sourceRight) const
+{
+    const auto left = NodeViewModel::nodeFromIndex(sourceLeft);
+    const auto right = NodeViewModel::nodeFromIndex(sourceLeft);
+    if (!left || !right)
+        return base_type::lessThan(sourceLeft, sourceRight);
+
+    const bool isUser = left->childrenCount() > 0 || right->childrenCount() > 0;
+    if (isUser)
+    {
+        const auto leftResource = helpers::getResource(left);
+        const auto rightResource = helpers::getResource(right);
+        const auto currentUserId = getCurrentUserId();
+        if (leftResource->getId() == currentUserId)
+            return false;
+        if (rightResource->getId() == currentUserId)
+            return true;
+    }
+    return base_type::lessThan(sourceLeft, sourceRight);
+}
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
+

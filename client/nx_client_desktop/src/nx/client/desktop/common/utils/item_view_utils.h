@@ -19,31 +19,53 @@ enum class BatchToggleMode
 class ItemViewUtils
 {
 public:
-    /* Inverts check box at specified index. */
-    static void toggleCheckBox(QAbstractItemModel* model, const QModelIndex& index);
+    using CheckableCheckFunction = std::function<bool (const QModelIndex& index)>;
 
-    static void toggleCheckBox(QAbstractItemView* view,
-        const QModelIndex& index, int checkBoxColumn);
+    /* Inverts check box at specified index. */
+    static void toggleCheckBox(
+        QAbstractItemModel* model,
+        const QModelIndex& index,
+        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
+
+    static void toggleCheckBox(
+        QAbstractItemView* view,
+        const QModelIndex& index,
+        int checkBoxColumn,
+        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
 
     /* Batch-toggles check boxes at selected rows, with specified toggle mode. */
-    static void toggleSelectedRows(QAbstractItemView* view, int checkBoxColumn,
-        BatchToggleMode toggleMode = BatchToggleMode::unify);
+    static void toggleSelectedRows(
+        QAbstractItemView* view,
+        int checkBoxColumn,
+        BatchToggleMode toggleMode = BatchToggleMode::unify,
+        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
 
     /* Sets up automatic toggle of a check box when its row is clicked. */
-    static void autoToggleOnRowClick(QAbstractItemView* view, int checkBoxColumn,
-        Qt::KeyboardModifiers prohibitedKeyboardModifiers = Qt::NoModifier);
+    static void autoToggleOnRowClick(
+        QAbstractItemView* view,
+        int checkBoxColumn,
+        Qt::KeyboardModifiers prohibitedKeyboardModifiers = Qt::NoModifier,
+        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
 
     /* Sets up automatic toggle of check boxes at selected rows when Space key is pressed. */
-    static void autoToggleOnSpaceKey(TreeView* view, int checkBoxColumn,
-        BatchToggleMode toggleMode = BatchToggleMode::unify);
+    static void autoToggleOnSpaceKey(
+        TreeView* view, int checkBoxColumn,
+        BatchToggleMode toggleMode = BatchToggleMode::unify,
+        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
 
     // Sets up automatic toggle of check boxes when shift-click selection is performed:
     // check boxes in all affected rows are set to the state of originating row check box.
-    static void autoToggleOnShiftClick(TreeView* view, int checkBoxColumn);
+    static void autoToggleOnShiftClick(
+        TreeView* view,
+        int checkBoxColumn,
+        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
 
     // Default setup for automatic check box toggle.
     // Takes view's selection mode into consideration.
-    static void setupDefaultAutoToggle(TreeView* view, int checkBoxColumn);
+    static void setupDefaultAutoToggle(
+        TreeView* view,
+        int checkBoxColumn,
+        const CheckableCheckFunction& checkableCheck = CheckableCheckFunction());
 
 private:
     ItemViewUtils() = default;

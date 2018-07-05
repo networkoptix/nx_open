@@ -3,6 +3,8 @@
 #include <utils/common/connective.h>
 #include <nx/client/desktop/common/widgets/tree_view.h>
 
+class QSortFilterProxyModel;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -23,6 +25,8 @@ public:
     const NodeViewState& state() const;
 
     void applyPatch(const NodeViewStatePatch& patch);
+
+    void setProxyModel(QSortFilterProxyModel* proxy);
 
 private:
     struct Private;
