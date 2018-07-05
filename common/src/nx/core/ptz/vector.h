@@ -92,7 +92,7 @@ public:
 Vector operator*(const Vector& ptzVector, double scalar);
 Vector operator*(double scalar, const Vector& ptzVector);
 
-#define PtzVector_Fields (pan)(tilt)(rotation)(zoom)
+#define PtzVector_Fields (pan)(tilt)(rotation)(zoom)(focus)
 QN_FUSION_DECLARE_FUNCTIONS(Vector, (json)(eq))
 
 } // namespace ptz
