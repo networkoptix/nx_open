@@ -55,10 +55,10 @@ protected:
             QFile::remove(dbPath);
         }
 
-        dbOptions.driverType = nx::utils::db::RdbmsDriverType::sqlite;
+        dbOptions.driverType = nx::sql::RdbmsDriverType::sqlite;
         dbOptions.dbName = dbPath;
 
-        executor = std::make_unique<nx::utils::db::AsyncSqlQueryExecutor>(dbOptions);
+        executor = std::make_unique<nx::sql::AsyncSqlQueryExecutor>(dbOptions);
         ASSERT_TRUE(executor->init());
 
         dbHelper = std::unique_ptr<SchedulerDbHelper>(new SchedulerDbHelper(executor.get()));
@@ -459,8 +459,8 @@ protected:
     }
 
     QString dbPath;
-    nx::utils::db::ConnectionOptions dbOptions;
-    std::unique_ptr<nx::utils::db::AsyncSqlQueryExecutor> executor;
+    nx::sql::ConnectionOptions dbOptions;
+    std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> executor;
     std::unique_ptr<SchedulerDbHelper> dbHelper;
     std::unique_ptr<PersistentScheduler> scheduler;
     std::unique_ptr<SchedulerUser> user1;

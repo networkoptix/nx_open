@@ -66,13 +66,5 @@ void PrintTo(const Url& val, ::std::ostream* os)
     *os << val.toString().toStdString();
 }
 
-namespace db {
-
-void PrintTo(const DBResult val, ::std::ostream* os)
-{
-    *os << toString(val);
-}
-
-} // namespace db
 } // namespace utils
 } // namespace nx

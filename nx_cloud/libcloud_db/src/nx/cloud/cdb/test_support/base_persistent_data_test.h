@@ -8,7 +8,7 @@
 #include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
 #include <nx/cloud/cdb/dao/rdb/dao_rdb_user_authentication.h>
 
-#include <nx/utils/db/test_support/test_with_db_helper.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <nx/cloud/cdb/settings.h>
 
@@ -19,7 +19,7 @@ namespace test {
 class DaoHelper
 {
 public:
-    DaoHelper(const nx::utils::db::ConnectionOptions& dbConnectionOptions);
+    DaoHelper(const nx::sql::ConnectionOptions& dbConnectionOptions);
 
     void initializeDatabase();
 
@@ -39,20 +39,20 @@ public:
 
     void setDbVersionToUpdateTo(unsigned int dbVersion);
 
-    nx::utils::db::AsyncSqlQueryExecutor& queryExecutor();
+    nx::sql::AsyncSqlQueryExecutor& queryExecutor();
 
 protected:
     const std::unique_ptr<dao::rdb::DbInstanceController>& persistentDbManager() const;
 
     template<typename QueryFunc, typename... OutputData>
-    nx::utils::db::DBResult executeUpdateQuerySync(QueryFunc queryFunc)
+    nx::sql::DBResult executeUpdateQuerySync(QueryFunc queryFunc)
     {
-        nx::utils::promise<nx::utils::db::DBResult> queryDonePromise;
+        nx::utils::promise<nx::sql::DBResult> queryDonePromise;
         m_persistentDbManager->queryExecutor().executeUpdate(
             queryFunc,
             [&queryDonePromise](
-                nx::utils::db::QueryContext*,
-                nx::utils::db::DBResult dbResult,
+                nx::sql::QueryContext*,
+                nx::sql::DBResult dbResult,
                 OutputData... /*outputData*/)
             {
                 queryDonePromise.set_value(dbResult);
@@ -61,14 +61,14 @@ protected:
     }
 
     template<typename QueryFunc>
-    nx::utils::db::DBResult executeSelectQuerySync(QueryFunc queryFunc)
+    nx::sql::DBResult executeSelectQuerySync(QueryFunc queryFunc)
     {
-        nx::utils::promise<nx::utils::db::DBResult> queryDonePromise;
+        nx::utils::promise<nx::sql::DBResult> queryDonePromise;
         m_persistentDbManager->queryExecutor().executeSelect(
             queryFunc,
             [&queryDonePromise](
-                nx::utils::db::QueryContext*,
-                nx::utils::db::DBResult dbResult)
+                nx::sql::QueryContext*,
+                nx::sql::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
@@ -76,7 +76,7 @@ protected:
     }
 
     /**
-     * @param queryFunc throws nx::utils::db::Exception.
+     * @param queryFunc throws nx::sql::Exception.
      */
     template<typename QueryFunc, typename... OutputData>
     void executeUpdateQuerySyncThrow(QueryFunc queryFunc)
@@ -86,10 +86,10 @@ protected:
     }
 
     /**
-     * @param queryFunc throws nx::utils::db::Exception.
+     * @param queryFunc throws nx::sql::Exception.
      */
     template<typename QueryFunc>
-    typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type
+    typename std::result_of<QueryFunc(nx::sql::QueryContext*)>::type
         executeSelectQuerySyncThrow(QueryFunc queryFunc)
     {
         return m_persistentDbManager->queryExecutor()
@@ -97,7 +97,7 @@ protected:
     }
 
 private:
-    nx::utils::db::ConnectionOptions m_dbConnectionOptions;
+    nx::sql::ConnectionOptions m_dbConnectionOptions;
     conf::Settings m_settings;
     std::unique_ptr<dao::rdb::DbInstanceController> m_persistentDbManager;
     dao::rdb::AccountDataObject m_accountDbController;
@@ -112,7 +112,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class BasePersistentDataTest:
-    public nx::utils::db::test::TestWithDbHelper,
+    public nx::sql::test::TestWithDbHelper,
     public DaoHelper
 {
 public:

@@ -11,7 +11,7 @@ namespace cdb {
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
     data_sync_engine::SyncronizationEngine* const syncronizationEngine,
-    const nx::utils::db::InstanceController& dbInstanceController)
+    const nx::sql::InstanceController& dbInstanceController)
     :
     m_moduleGuid(moduleGuid),
     m_syncronizationEngine(syncronizationEngine),

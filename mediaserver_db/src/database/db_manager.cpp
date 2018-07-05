@@ -1558,7 +1558,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
 bool QnDbManager::cleanupDanglingDbObjects()
 {
     const QString kCleanupScript(":/updates/68_cleanup_db.sql");
-    return nx::utils::db::SqlQueryExecutionHelper::execSQLFile(kCleanupScript, m_sdb);
+    return nx::sql::SqlQueryExecutionHelper::execSQLFile(kCleanupScript, m_sdb);
 }
 
 bool QnDbManager::fixBusinessRules()

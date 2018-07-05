@@ -1,8 +1,8 @@
 #pragma once
 
-#include <nx/utils/db/filter.h>
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/filter.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include "../abstract_system_data_object.h"
 
@@ -17,48 +17,48 @@ class SystemDataObject:
 public:
     SystemDataObject(const conf::Settings& settings);
 
-    virtual nx::utils::db::DBResult insert(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult insert(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemData& system,
         const std::string& accountId) override;
 
-    virtual nx::utils::db::DBResult selectSystemSequence(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult selectSystemSequence(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         std::uint64_t* const sequence) override;
 
-    virtual nx::utils::db::DBResult markSystemForDeletion(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult markSystemForDeletion(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId) override;
 
-    virtual nx::utils::db::DBResult deleteSystem(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult deleteSystem(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId) override;
 
-    virtual nx::utils::db::DBResult execSystemNameUpdate(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult execSystemNameUpdate(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data) override;
 
-    virtual nx::utils::db::DBResult execSystemOpaqueUpdate(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult execSystemOpaqueUpdate(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data) override;
 
-    virtual nx::utils::db::DBResult updateSystemStatus(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult updateSystemStatus(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         api::SystemStatus systemStatus) override;
 
-    virtual nx::utils::db::DBResult fetchSystems(
-        nx::utils::db::QueryContext* queryContext,
-        const nx::utils::db::InnerJoinFilterFields& filterFields,
+    virtual nx::sql::DBResult fetchSystems(
+        nx::sql::QueryContext* queryContext,
+        const nx::sql::InnerJoinFilterFields& filterFields,
         std::vector<data::SystemData>* const systems) override;
 
     virtual boost::optional<data::SystemData> fetchSystemById(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId) override;
 
-    virtual nx::utils::db::DBResult deleteExpiredSystems(
-        nx::utils::db::QueryContext* queryContext) override;
+    virtual nx::sql::DBResult deleteExpiredSystems(
+        nx::sql::QueryContext* queryContext) override;
 
 private:
     const conf::Settings& m_settings;

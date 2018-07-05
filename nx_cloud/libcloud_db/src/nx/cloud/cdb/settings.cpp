@@ -187,7 +187,7 @@ Settings::Settings():
         QnLibCloudDbAppInfo::applicationName(),
         kModuleName)
 {
-    m_dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::mysql;
+    m_dbConnectionOptions.driverType = nx::sql::RdbmsDriverType::mysql;
     m_dbConnectionOptions.hostName = "127.0.0.1";
     m_dbConnectionOptions.port = 3306;
     m_dbConnectionOptions.dbName = "nx_cloud";
@@ -225,7 +225,7 @@ const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
     return m_vmsSynchronizationLogging;
 }
 
-const nx::utils::db::ConnectionOptions& Settings::dbConnectionOptions() const
+const nx::sql::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
 }
@@ -286,7 +286,7 @@ const VmsGateway& Settings::vmsGateway() const
 }
 
 void Settings::setDbConnectionOptions(
-    const nx::utils::db::ConnectionOptions& options)
+    const nx::sql::ConnectionOptions& options)
 {
     m_dbConnectionOptions = options;
 }

@@ -33,7 +33,7 @@ namespace cdb {
 // CdbLauncher
 
 CdbLauncher::CdbLauncher(QString tmpDir):
-    nx::utils::db::test::TestWithDbHelper("cdb", tmpDir),
+    nx::sql::test::TestWithDbHelper("cdb", tmpDir),
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
@@ -991,14 +991,14 @@ api::ResultCode CdbLauncher::mergeSystems(
 
 bool CdbLauncher::isStartedWithExternalDb() const
 {
-    const nx::utils::db::ConnectionOptions connectionOptions = dbConnectionOptions();
+    const nx::sql::ConnectionOptions connectionOptions = dbConnectionOptions();
     return !connectionOptions.dbName.isEmpty();
 }
 
 bool CdbLauncher::placePreparedDB(const QString& dbDumpPath)
 {
     //starting with old db
-    const nx::utils::db::ConnectionOptions connectionOptions = dbConnectionOptions();
+    const nx::sql::ConnectionOptions connectionOptions = dbConnectionOptions();
     if (!connectionOptions.dbName.isEmpty())
         return false; //test is started with external DB: ignoring
 

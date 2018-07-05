@@ -4,8 +4,8 @@
 
 #include <QtCore/QDir>
 
-#include <nx/utils/db/request_executor_factory.h>
-#include <nx/utils/db/request_execution_thread.h>
+#include <nx/sql/request_executor_factory.h>
+#include <nx/sql/request_execution_thread.h>
 
 #include "functional_tests/test_setup.h"
 #include "functional_tests/test_email_manager.h"
@@ -77,26 +77,26 @@ TEST_F(DbRegress, general)
 namespace {
 
 class QueryExecutorStub:
-    public nx::utils::db::DbRequestExecutionThread
+    public nx::sql::DbRequestExecutionThread
 {
-    using base_type = nx::utils::db::DbRequestExecutionThread;
+    using base_type = nx::sql::DbRequestExecutionThread;
 
 public:
     QueryExecutorStub(
-        const nx::utils::db::ConnectionOptions& connectionOptions,
-        nx::utils::db::QueryExecutorQueue* const queryExecutorQueue)
+        const nx::sql::ConnectionOptions& connectionOptions,
+        nx::sql::QueryExecutorQueue* const queryExecutorQueue)
         :
         base_type(connectionOptions, queryExecutorQueue)
     {
     }
 
-    void setForcedDbResult(boost::optional<nx::utils::db::DBResult> forcedDbResult)
+    void setForcedDbResult(boost::optional<nx::sql::DBResult> forcedDbResult)
     {
         m_forcedDbResult = forcedDbResult;
     }
 
 protected:
-    virtual void processTask(std::unique_ptr<nx::utils::db::AbstractExecutor> task) override
+    virtual void processTask(std::unique_ptr<nx::sql::AbstractExecutor> task) override
     {
         if (m_forcedDbResult)
             task->reportErrorWithoutExecution(*m_forcedDbResult);
@@ -105,7 +105,7 @@ protected:
     }
 
 private:
-    boost::optional<nx::utils::db::DBResult> m_forcedDbResult;
+    boost::optional<nx::sql::DBResult> m_forcedDbResult;
 };
 
 } // namespace
@@ -125,13 +125,13 @@ public:
 
         // Installing sql query executor that always reports timedout.
         m_requestExecutorFactoryBak =
-            nx::utils::db::RequestExecutorFactory::instance().setCustomFunc(
+            nx::sql::RequestExecutorFactory::instance().setCustomFunc(
                 std::bind(&DbFailure::createInfiniteLatencyDbQueryExecutorFactory, this, _1, _2));
     }
 
     ~DbFailure()
     {
-        nx::utils::db::RequestExecutorFactory::instance().setCustomFunc(
+        nx::sql::RequestExecutorFactory::instance().setCustomFunc(
             std::move(m_requestExecutorFactoryBak));
     }
 
@@ -145,7 +145,7 @@ protected:
 
     void givenInfiniteLatencyDb()
     {
-        m_prevDbQueryExecutor->setForcedDbResult(nx::utils::db::DBResult::retryLater);
+        m_prevDbQueryExecutor->setForcedDbResult(nx::sql::DBResult::retryLater);
     }
 
     void whenIssueDataModificationRequest()
@@ -166,7 +166,7 @@ protected:
     }
 
 private:
-    nx::utils::db::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
+    nx::sql::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
     nx::utils::SyncQueue<api::ResultCode> m_requestResultCodeQueue;
     std::unique_ptr<api::Connection> m_cdbConnection;
     QueryExecutorStub* m_prevDbQueryExecutor = nullptr;
@@ -176,10 +176,10 @@ private:
         m_requestResultCodeQueue.push(resultCode);
     }
 
-    std::unique_ptr<nx::utils::db::BaseRequestExecutor>
+    std::unique_ptr<nx::sql::BaseRequestExecutor>
         createInfiniteLatencyDbQueryExecutorFactory(
-            const nx::utils::db::ConnectionOptions& connectionOptions,
-            nx::utils::db::QueryExecutorQueue* const queryExecutorQueue)
+            const nx::sql::ConnectionOptions& connectionOptions,
+            nx::sql::QueryExecutorQueue* const queryExecutorQueue)
     {
         auto result = std::make_unique<QueryExecutorStub>(
             connectionOptions,

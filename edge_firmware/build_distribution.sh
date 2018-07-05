@@ -104,6 +104,7 @@ copyBuildLibs()
         libnx_network
         libnx_update
         libnx_utils
+        libnx_sql
         libnx_vms_api
         libnx_sdk
         libnx_plugin_utils

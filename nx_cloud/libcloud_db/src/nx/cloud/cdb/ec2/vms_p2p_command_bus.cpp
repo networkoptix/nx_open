@@ -13,8 +13,8 @@ VmsP2pCommandBus::VmsP2pCommandBus(
 {
 }
 
-nx::utils::db::DBResult VmsP2pCommandBus::saveResourceAttribute(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult VmsP2pCommandBus::saveResourceAttribute(
+    nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     nx::vms::api::ResourceParamWithRefData data)
 {

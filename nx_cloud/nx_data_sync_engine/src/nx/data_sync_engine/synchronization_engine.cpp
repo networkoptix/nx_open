@@ -8,7 +8,7 @@ namespace data_sync_engine {
 SyncronizationEngine::SyncronizationEngine(
     const QnUuid& moduleGuid,
     const Settings& settings,
-    nx::utils::db::AsyncSqlQueryExecutor* const dbManager)
+    nx::sql::AsyncSqlQueryExecutor* const dbManager)
     :
     m_structureUpdater(dbManager),
     m_transactionLog(

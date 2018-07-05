@@ -6,7 +6,7 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/db/db_instance_controller.h>
+#include <nx/sql/db_instance_controller.h>
 
 #include <nx/data_sync_engine/serialization/transaction_serializer.h>
 #include <nx/data_sync_engine/transaction_log.h>
@@ -27,7 +27,7 @@ public:
     MaintenanceManager(
         const QnUuid& moduleGuid,
         data_sync_engine::SyncronizationEngine* const syncronizationEngine,
-        const nx::utils::db::InstanceController& dbInstanceController);
+        const nx::sql::InstanceController& dbInstanceController);
     ~MaintenanceManager();
 
     void getVmsConnections(
@@ -52,7 +52,7 @@ public:
 private:
     const QnUuid m_moduleGuid;
     data_sync_engine::SyncronizationEngine* const m_syncronizationEngine;
-    const nx::utils::db::InstanceController& m_dbInstanceController;
+    const nx::sql::InstanceController& m_dbInstanceController;
     nx::network::aio::Timer m_timer;
     nx::utils::Counter m_startedAsyncCallsCounter;
 

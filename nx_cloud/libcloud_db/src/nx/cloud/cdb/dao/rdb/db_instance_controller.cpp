@@ -11,10 +11,10 @@ namespace dao {
 namespace rdb {
 
 DbInstanceController::DbInstanceController(
-    const nx::utils::db::ConnectionOptions& dbConnectionOptions,
+    const nx::sql::ConnectionOptions& dbConnectionOptions,
     boost::optional<unsigned int> dbVersionToUpdateTo)
     :
-    nx::utils::db::InstanceController(dbConnectionOptions),
+    nx::sql::InstanceController(dbConnectionOptions),
     m_userAuthRecordsMigrationNeeded(false)
 {
     initializeStructureMigration();
@@ -24,8 +24,8 @@ DbInstanceController::DbInstanceController(
     if (!initialize())
     {
         NX_LOG(lit("Failed to initialize DB connection"), cl_logALWAYS);
-        throw nx::utils::db::Exception(
-            nx::utils::db::DBResult::ioError,
+        throw nx::sql::Exception(
+            nx::sql::DBResult::ioError,
             "Failed to initialize connection to DB");
     }
 }

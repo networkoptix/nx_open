@@ -51,7 +51,7 @@ private:
 
     std::unique_ptr<AbstractCollector> createCollector(
         const conf::Statistics& settings,
-        nx::utils::db::AsyncSqlQueryExecutor* sqlQueryExecutor)
+        nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor)
     {
         m_collectorCreated = true;
         return (*m_factoryFuncBak)(settings, sqlQueryExecutor);
