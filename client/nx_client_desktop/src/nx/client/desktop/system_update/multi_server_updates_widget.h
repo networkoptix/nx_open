@@ -12,9 +12,10 @@
 #include <nx/vms/api/data/software_version.h>
 
 #include <update/updates_common.h>
-#include "client_updates2_manager.h"
 
+#include "updates_manager.h"
 #include "update_data.h"
+#include "server_update_tool.h"
 
 struct QnLowFreeSpaceWarning;
 
@@ -28,7 +29,6 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class ServerUpdateTool;
 class ServerUpdatesModel;
 class UploadManager;
 
@@ -67,14 +67,9 @@ public:
     bool canCancelUpdate() const;
     bool isUpdating() const;
 
-    void at_updateFinished(const QnUpdateResult& result);
-    void at_selfUpdateFinished(const QnUpdateResult& result);
-    // Notifications from UpdateTool
-    // We move from notification model to poll model, so no need for this methods
-    //void at_tool_stageChanged(QnFullUpdateStage stage);
-    //void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
-    void at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
-    //void at_tool_updatesCheckCanceled();
+    //void at_updateFinished(const QnUpdateResult& result);
+    //void at_selfUpdateFinished(const QnUpdateResult& result);
+
     void at_modelDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 
 protected:
@@ -92,8 +87,6 @@ protected:
     void setModeSpecificBuild();
     void setModeLatestAvailable();
     void hideStatusColumns(bool value);
-
-    void downloadClientUpdates();
 
 private:
     // UI Mode for picking the source of update.
@@ -155,6 +148,11 @@ private:
     ProgressInfo calculateActionProgress() const;
 
     bool processRemoteChanges(bool force = false);
+    // Part of processRemoteChanges FSM processor.
+    void processRemoteInitialState();
+    void processRemoteDownloading(const ServerUpdateTool::UpdateStatus& remoteStatus);
+    void processRemoteInstalling(const ServerUpdateTool::UpdateStatus& remoteStatus);
+
     bool processLegacyChanges(bool force = false);
 
     // Advances UI FSM towards selected state
@@ -172,28 +170,20 @@ private:
     bool m_haveUpdate = false;
 
     UpdateSourceMode m_updateSourceMode = UpdateSourceMode::LatestVersion;
-    // Task to check client updates from the internet.
-    // We create it every time we issue another check for updates.
-    // This class likes to self-destruct when request is finished.
-    //QPointer<CheckForUpdatesTool> m_checkUpdatesTask;
 
     std::unique_ptr<ServerUpdateTool> m_updatesTool;
     std::unique_ptr<ServerUpdatesModel> m_updatesModel;
     std::unique_ptr<QnSortedServerUpdatesModel> m_sortedModel;
-    // We use this one to download self-update locally.
-    // There can be the case, when the server has no internet, but the client has.
-    // So we could download update files for the server and push it manually.
-    //std::unique_ptr<DownloadTool> m_downloader;
 
     // We cache previous state of update manger to notice changes in it.
-    nx::api::Updates2StatusData::StatusCode m_lastStatus;
+    nx::api::Updates2StatusData::StatusCode m_lastStatus = LocalStatusCode::error;
 
-    std::unique_ptr<updates2::ClientUpdates2Manager> m_updateManager;
+    std::unique_ptr<UpdatesManager> m_updateManager;
 
     std::unique_ptr<UploadManager> m_uploadManager;
 
     // Do we allow client to push updates?
-    bool m_enableClientUpdates;
+    bool m_enableClientUpdates = true;
 
     WidgetUpdateState m_updateStateCurrent = WidgetUpdateState::Initial;
     WidgetUpdateState m_updateStateTarget = WidgetUpdateState::Initial;
@@ -214,6 +204,8 @@ private:
     }m_localUpdateInfo;
 
     nx::utils::Url m_releaseNotesUrl;
+    // URL of update path.
+    QUrl m_updateSourcePath;
 
     // Watchdog timer for the case when update has taken too long.
     std::unique_ptr<QTimer> m_longUpdateWarningTimer = nullptr;
@@ -223,9 +215,7 @@ private:
 
     qint64 m_lastAutoUpdateCheck = 0;
 
-    // URL of update path.
-    QUrl m_updateSourcePath;
-
+    // This sets are changed every time we are initiating some update action.
     // Set of servers that are currently active.
     QSet<QnUuid> m_serversActive;
     // Set of servers that are used for the current task.

@@ -1,16 +1,12 @@
-#include "client_updates2_installer.h"
+#include "updates_installer.h"
 
 #include <client/client_settings.h>
 #include <client/client_module.h>
-
-//#include <media_server/serverutil.h>
-
 #include <common/static_common_module.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace updates2 {
 
 namespace {
 
@@ -24,12 +20,12 @@ const QString kUpdateLogFileName = lit("update.log");
 
 } // namespace
 
-QString ClientUpdates2Installer::dataDirectoryPath() const
+QString UpdatesInstaller::dataDirectoryPath() const
 {
     return getDataDirectory();
 }
 
-bool ClientUpdates2Installer::initializeUpdateLog(
+bool UpdatesInstaller::initializeUpdateLog(
     const QString& targetVersion,
     QString* logFileName) const
 {
@@ -62,7 +58,6 @@ bool ClientUpdates2Installer::initializeUpdateLog(
     return true;
 }
 
-} // namespace updates2
 } // namespace desktop
 } // namespace client
 } // namespace nx

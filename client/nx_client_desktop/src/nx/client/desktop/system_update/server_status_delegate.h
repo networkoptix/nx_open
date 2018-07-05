@@ -15,7 +15,8 @@ struct UpdateItem;
 class ServerStatusItemDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
-    typedef QStyledItemDelegate base_type;
+
+    using base_type = QStyledItemDelegate;
 
 public:
     explicit ServerStatusItemDelegate(QWidget *parent = 0);

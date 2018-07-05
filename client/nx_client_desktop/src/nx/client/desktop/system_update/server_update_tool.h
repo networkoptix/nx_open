@@ -16,12 +16,6 @@
 
 #include <api/server_rest_connection.h>
 
-//class QnCheckForUpdatesPeerTask;
-class QnUploadUpdatesPeerTask;
-class QnInstallUpdatesPeerTask;
-class QnRestUpdatePeerTask;
-struct QnLowFreeSpaceWarning;
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -40,15 +34,7 @@ public:
 
     void setResourceFeed(QnResourcePool* pool);
 
-    //QList<QnMediaServerResourcePtr> getOfflineServers() const;
-    //QList<QnMediaServerResourcePtr> getIncompatibleServers() const;
-
     using UpdateStatus = std::map<QnUuid, nx::api::Updates2StatusData>;
-
-    QnFullUpdateStage stage() const;
-
-    bool isUpdating() const;
-    bool idle() const;
 
     struct LegacyUpdateStatus
     {
@@ -63,23 +49,13 @@ public:
     static QUrl generateUpdatePackageUrl(const nx::utils::SoftwareVersion &targetVersion,
         const QString& targetChangeset, const QSet<QnUuid>& targets, QnResourcePool* resourcePool);
 
-    // Old update API
-   // void startUpdate(const QnSoftwareVersion &version = QnSoftwareVersion());
-    //void startUpdate(const QString &fileName);
-    void startOnlineClientUpdate(const QSet<QnUuid>& targets, const nx::utils::SoftwareVersion &version, bool enableClientUpdates);
-
-    bool canCancelUpdate() const;
-    bool cancelUpdate();
-
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
+
     // Try to get status changes from the server
     // Should be non-blocking and fast.
     // Check if we've got update for all the servers
     bool getServersStatusChanges(UpdateStatus& status);
-
-    // Check if update status for legacy updater has changed
-    bool getLegacyUpdateStatusChanges(LegacyUpdateStatus& status);
 
     // Wrappers for REST API
     // Sends POST to /api/updates2/status/all
@@ -96,20 +72,7 @@ public:
     // Sends GET to /api/updates2/status/all and stores response in m_statusRequest
     void requestRemoteUpdateState();
 
-signals:
-    void stageChanged(QnFullUpdateStage stage);
-    void stageProgressChanged(QnFullUpdateStage stage, int progress);
-    //void peerStageChanged(const QnUuid &peerId, QnPeerUpdateStage stage);
-    //void peerStageProgressChanged(const QnUuid &peerId, QnPeerUpdateStage stage, int progress);
-
-    //void targetsChanged(const QSet<QnUuid> &targets);
-
-    void updateFinished(QnUpdateResult result);
-    void lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
-
 private:
-    void startUpdate(const QnUpdateTarget &target);
-
     // Handlers for resource updates
     void at_resourceAdded(const QnResourcePtr &resource);
     void at_resourceRemoved(const QnResourcePtr &resource);
@@ -120,24 +83,17 @@ private:
     // Handler for status update from a single server
     void at_updateStatusResponse(bool success, rest::Handle handle, const nx::api::Updates2StatusData& response);
 
-    void finishUpdate(const QnUpdateResult &result);
-
     // Werapper to get REST connection to specified server.
     // For testing purposes. We can switch there to a dummy http server.
     rest::QnConnectionPtr getServerConnection(const QnMediaServerResourcePtr& server);
 
 private:
-    QnFullUpdateStage m_stage;
 
-    QPointer<QnUpdateProcess> m_updateProcess;
     // Container for remote state
     // We keep temporary state updates here. Client will pull this data periodically
     UpdateStatus m_remoteUpdateStatus;
     bool m_checkingRemoteUpdateStatus = false;
-    // Update status for legacy update system.
-    // It is handled in the same polling way.
-    LegacyUpdateStatus m_legacyStatus;
-    bool m_legacyStatusChanged = false;
+
     // Servers we do work with.
     std::map<QnUuid, QnMediaServerResourcePtr> m_activeServers;
 

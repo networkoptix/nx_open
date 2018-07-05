@@ -81,8 +81,15 @@ public:
         {
             switch (data->state)
             {
-            case StatusCode::preparing:
             case StatusCode::checking:
+                m_left->setHidden(false);
+                m_left->setText(tr("Checking for updates..."));
+                //m_left->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+                m_animated = true;
+                m_left->setIcon(m_owner->getCurrentAnimationFrame());
+                m_right->setHidden(true);
+                break;
+            case StatusCode::preparing:
                 m_left->setHidden(true);
                 progressHidden = false;
                 m_progress->setMinimum(0);
@@ -103,7 +110,7 @@ public:
                 break;
             case StatusCode::installing:
                 m_left->setHidden(false);
-                m_left->setText(tr("Installing updates...."));
+                m_left->setText(tr("Installing updates..."));
                 //m_left->setIcon(qnSkin->icon("text_buttons/refresh.png"));
                 m_animated = true;
                 m_left->setIcon(m_owner->getCurrentAnimationFrame());
@@ -134,8 +141,9 @@ public:
                 errorStyle = true;
                 break;
             default:
+                // In fact we should not be here. All the states should be handled accordingly
                 m_left->setHidden(false);
-                m_left->setText(tr("Unhandled state: ") + data->statusMessage);
+                m_left->setText(lit("Unhandled state: ") + data->statusMessage);
                 errorStyle = true;
                 break;
             }
@@ -168,6 +176,7 @@ protected:
             return;
         m_left->setIcon(m_owner->getCurrentAnimationFrame());
     }
+
 private:
     QPushButton* m_left;
     QProgressBar* m_progress;

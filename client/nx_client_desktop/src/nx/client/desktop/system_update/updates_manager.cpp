@@ -1,4 +1,4 @@
-#include "client_updates2_manager.h"
+#include "updates_manager.h"
 
 #include <nx/api/updates2/updates2_status_data.h>
 #include <nx/update/info/sync_update_checker.h>
@@ -22,8 +22,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace updates2 {
-
 
 using namespace vms::common::p2p::downloader;
 
@@ -34,45 +32,44 @@ static const QString kFileName = "update.status";
 
 } // namespace
 
-ClientUpdates2Manager::ClientUpdates2Manager(QnCommonModule* commonModule):
+UpdatesManager::UpdatesManager(QnCommonModule* commonModule):
     CommonUpdates2Manager(commonModule), m_downloader(QDir(), commonModule)
 {
 }
 
-ClientUpdates2Manager::~ClientUpdates2Manager()
+UpdatesManager::~UpdatesManager()
 {
     m_installer.stopSync();
 }
 
-qint64 ClientUpdates2Manager::refreshTimeout() const
+qint64 UpdatesManager::refreshTimeout() const
 {
     //return qnClientModule->settings().checkForUpdateTimeout();
     return kAutoCheckIntervalMs;
 }
 
-AbstractDownloader* ClientUpdates2Manager::downloader()
+AbstractDownloader* UpdatesManager::downloader()
 {
     return &m_downloader;
 }
 
-update::info::AbstractUpdateRegistryPtr ClientUpdates2Manager::getRemoteRegistry()
+update::info::AbstractUpdateRegistryPtr UpdatesManager::getRemoteRegistry()
 {
     auto updateUrl = qnSettings->updateFeedUrl();
     return update::info::checkSync(peerId(), updateUrl);
 }
 
-QString ClientUpdates2Manager::filePath() const
+QString UpdatesManager::filePath() const
 {
     //return qnClientModule->settings().dataDir() + QDir::separator() + kFileName;
     return qApp->applicationFilePath();
 }
 
-update::installer::detail::AbstractUpdates2Installer* ClientUpdates2Manager::installer()
+update::installer::detail::AbstractUpdates2Installer* UpdatesManager::installer()
 {
     return &m_installer;
 }
 
-} // namespace updates2
 } // namespace desktop
 } // namespace client
 } // namespace nx

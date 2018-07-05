@@ -4,21 +4,20 @@
 #include <nx/update/manager/common_updates2_manager.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 
-#include "client_updates2_installer.h"
+#include "updates_installer.h"
 
 namespace nx {
 namespace client {
 namespace desktop {
-namespace updates2 {
 
-class ClientUpdates2Manager: public nx::update::CommonUpdates2Manager
+class UpdatesManager: public nx::update::CommonUpdates2Manager
 {
 public:
-    ClientUpdates2Manager(QnCommonModule* commonModule);
-    ~ClientUpdates2Manager();
+    UpdatesManager(QnCommonModule* commonModule);
+    ~UpdatesManager();
 
 private:
-    ClientUpdates2Installer m_installer;
+    UpdatesInstaller m_installer;
     vms::common::p2p::downloader::Downloader m_downloader;
 
     virtual update::info::AbstractUpdateRegistryPtr getRemoteRegistry() override;
@@ -28,7 +27,6 @@ private:
     virtual update::installer::detail::AbstractUpdates2Installer* installer() override;
 };
 
-} // namespace updates2
 } // namespace desktop
 } // namespace client
 } // namespace nx

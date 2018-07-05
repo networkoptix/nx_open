@@ -5,9 +5,8 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace updates2 {
 
-class ClientUpdates2Installer: public update::CommonUpdates2Installer
+class UpdatesInstaller: public update::CommonUpdates2Installer
 {
 private:
     virtual QString dataDirectoryPath() const override;
@@ -16,7 +15,6 @@ private:
         QString* logFileName) const override;
 };
 
-} // namespace updates2
 } // namespace desktop
 } // namespace client
 } // namespace nx

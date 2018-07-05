@@ -68,7 +68,7 @@ QSet<QnUuid> ServerUpdatesModel::getAllServers() const
 QSet<QnUuid> ServerUpdatesModel::getServersInState(StatusCode state) const
 {
     QSet<QnUuid> result;
-    for (const auto& item : m_items)
+    for (const auto& item: m_items)
     {
         if (!item->server)
             continue;

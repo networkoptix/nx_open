@@ -49,18 +49,12 @@ namespace client {
 namespace desktop {
 
 ServerUpdateTool::ServerUpdateTool(QObject* parent):
-    base_type(parent),
-    m_stage(QnFullUpdateStage::Init)
+    base_type(parent)
 {
 }
 
 ServerUpdateTool::~ServerUpdateTool()
 {
-    if (m_updateProcess)
-    {
-        m_updateProcess->stop();
-        delete m_updateProcess;
-    }
 }
 
 void ServerUpdateTool::setResourceFeed(QnResourcePool* pool)
@@ -99,30 +93,6 @@ void ServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource)
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
-}
-
-QnFullUpdateStage ServerUpdateTool::stage() const
-{
-    return m_stage;
-}
-
-bool ServerUpdateTool::isUpdating() const
-{
-    return m_updateProcess;
-}
-
-bool ServerUpdateTool::idle() const
-{
-    return m_stage == QnFullUpdateStage::Init;
-}
-
-void ServerUpdateTool::finishUpdate(const QnUpdateResult &result)
-{
-    m_updateProcess->deleteLater();
-    m_updateProcess = nullptr;
-
-    /* We must emit signal after m_updateProcess clean, so ::isUpdating() will return false. */
-    emit updateFinished(result);
 }
 
 /**
@@ -184,151 +154,6 @@ QUrl ServerUpdateTool::generateUpdatePackageUrl(const nx::utils::SoftwareVersion
     return url;
 }
 
-#ifdef FUCK_THIS
-void ServerUpdateTool::startUpdate(const QnSoftwareVersion &version /* = QnSoftwareVersion()*/) {
-    QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
-    startUpdate(target);
-}
-
-void ServerUpdateTool::startUpdate(const QString &fileName) {
-    QnUpdateTarget target(actualTargetIds(), fileName, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
-    startUpdate(target);
-}
-#endif
-
-void ServerUpdateTool::startOnlineClientUpdate(const QSet<QnUuid>& targets, const nx::utils::SoftwareVersion& version, bool enableClientUpdates)
-{
-    // !enableClientUpdates || qnSettings->isClientUpdateDisabled()
-    QnUpdateTarget target(targets, version, enableClientUpdates);
-    startUpdate(target);
-}
-
-bool ServerUpdateTool::canCancelUpdate() const
-{
-    if (!m_updateProcess)
-        return true;
-
-    if (m_stage == QnFullUpdateStage::Servers)
-        return false;
-
-    return true;
-}
-
-bool ServerUpdateTool::cancelUpdate()
-{
-    if (!m_updateProcess)
-        return true;
-
-    if (m_stage == QnFullUpdateStage::Servers)
-        return false;
-
-    m_updateProcess->stop();
-
-    return true;
-}
-
-void ServerUpdateTool::startUpdate(const QnUpdateTarget& target)
-{
-    if (m_updateProcess)
-        return;
-
-    QSet<QnUuid> incompatibleTargets;
-    bool clearTargetsWhenFinished = false;
-
-    /*
-    if (m_targets.isEmpty())
-    {
-        clearTargetsWhenFinished = true;
-        setTargets(target.targets, defaultEnableClientUpdates);
-
-        for (const auto& id: target.targets)
-        {
-            const auto server = resourcePool()->getIncompatibleServerById(id)
-                .dynamicCast<QnFakeMediaServerResource>();
-            if (!server)
-                continue;
-
-            const auto realId = server->getOriginalGuid();
-            if (realId.isNull())
-                continue;
-
-            incompatibleTargets.insert(realId);
-            qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(realId, true);
-        }
-    }*/
-
-    m_updateProcess = new QnUpdateProcess(target);
-
-    connect(m_updateProcess, &QnUpdateProcess::stageChanged, this,
-        [this](QnFullUpdateStage stage)
-        {
-            if (stage == m_legacyStatus.stage)
-                return;
-            m_legacyStatus.stage = stage;
-            m_legacyStatusChanged = true;
-        });
-
-    connect(m_updateProcess, &QnUpdateProcess::progressChanged,
-        this, [this](int progress)
-        {
-            if (progress != m_legacyStatus.progress)
-            {
-                m_legacyStatus.progress = progress;
-                m_legacyStatusChanged = true;
-            }
-        });
-
-    connect(m_updateProcess, &QnUpdateProcess::peerStageChanged,
-        this, [this](const QnUuid &peerId, QnPeerUpdateStage stage)
-        {
-            // TODO: We could do a mapping from old update stage to a new one
-            if (m_legacyStatus.peerStage[peerId] != stage)
-            {
-                m_legacyStatus.peerStage[peerId] = stage;
-                m_legacyStatus.peerProgress[peerId] = 0;
-                m_legacyStatusChanged = true;
-            }
-        });
-
-    // This event is quite redundant
-    connect(m_updateProcess, &QnUpdateProcess::peerStageProgressChanged,
-        this, [this](const QnUuid &peerId, QnPeerUpdateStage stage, int progress)
-        {
-            if (m_legacyStatus.peerStage[peerId] != stage
-                || m_legacyStatus.peerProgress[peerId] != progress)
-            {
-                m_legacyStatus.peerStage[peerId] = stage;
-                m_legacyStatus.peerProgress[peerId] = progress;
-                m_legacyStatusChanged = true;
-            }
-        });
-
-    connect(m_updateProcess, &QnUpdateProcess::targetsChanged,
-        this, [this](const QSet<QnUuid> &targets)
-        {
-            // When can it happen?
-        });
-
-    // This seems to be very serious
-    connect(m_updateProcess, &QnUpdateProcess::lowFreeSpaceWarning,
-        this, &ServerUpdateTool::lowFreeSpaceWarning, Qt::BlockingQueuedConnection);
-
-    connect(m_updateProcess, &QnUpdateProcess::updateFinished, this,
-        [this, incompatibleTargets, clearTargetsWhenFinished](const QnUpdateResult& result)
-        {
-            finishUpdate(result);
-
-            const auto watcher = qnDesktopClientMessageProcessor->incompatibleServerWatcher();
-            for (const auto& id : incompatibleTargets)
-                watcher->keepServer(id, false);
-
-            //if (clearTargetsWhenFinished)
-            //    setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
-        });
-
-    m_updateProcess->start();
-}
-
 bool ServerUpdateTool::hasRemoteChanges() const
 {
     bool result = false;
@@ -343,15 +168,6 @@ bool ServerUpdateTool::getServersStatusChanges(UpdateStatus& status)
     if (m_remoteUpdateStatus.empty())
         return false;
     status = std::move(m_remoteUpdateStatus);
-    return true;
-}
-
-bool ServerUpdateTool::getLegacyUpdateStatusChanges(LegacyUpdateStatus& status)
-{
-    if (!m_legacyStatusChanged)
-        return false;
-    status = m_legacyStatus;
-    m_legacyStatusChanged = false;
     return true;
 }
 
