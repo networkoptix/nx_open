@@ -10,7 +10,7 @@ class SSHTrafficCapture(TrafficCapture):
     def _make_capturing_command(self, capture_path, size_limit_bytes, duration_limit_sec):
         return self.shell.terminal_command([
             'tshark',
-            '-a', 'filesize:' + size_limit_bytes // 1024,
-            '-a', 'duration:' + duration_limit_sec,
+            '-a', 'filesize:{:d}'.format(size_limit_bytes // 1024),
+            '-a', 'duration:{:d}'.format(duration_limit_sec),
             '-w', capture_path,
             ])
