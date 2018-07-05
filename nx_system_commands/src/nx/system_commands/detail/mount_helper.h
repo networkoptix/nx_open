@@ -9,6 +9,10 @@
 namespace nx {
 namespace system_commands {
 
+#ifdef WIN32
+using uid_t = unsigned int;
+#endif
+
 class MountHelperBase
 {
 public:
