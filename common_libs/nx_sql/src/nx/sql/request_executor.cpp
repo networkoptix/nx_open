@@ -107,51 +107,19 @@ UpdateWithoutAnyDataExecutor::UpdateWithoutAnyDataExecutor(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler)
     :
-    base_type(QueryType::modification),
-    m_dbUpdateFunc(std::move(dbUpdateFunc)),
-    m_completionHandler(std::move(completionHandler))
+    base_type(std::move(completionHandler)),
+    m_dbUpdateFunc(std::move(dbUpdateFunc))
 {
 }
 
-DBResult UpdateWithoutAnyDataExecutor::executeQuery(QSqlDatabase* const connection)
+DBResult UpdateWithoutAnyDataExecutor::doQuery(QueryContext* queryContext)
 {
-    Transaction transaction(connection);
-    QueryContext queryContext(connection, &transaction);
-
-    auto completionHandler = std::move(m_completionHandler);
-    auto result = transaction.begin();
-    if (result != DBResult::ok)
-    {
-        result = lastDBError(connection);
-        completionHandler(&queryContext, result);
-        return result;
-    }
-
-    result = invokeDbQueryFunc(m_dbUpdateFunc, &queryContext);
-    if (result != DBResult::ok)
-    {
-        result = detailResultCode(connection, result);
-        transaction.rollback();
-        completionHandler(&queryContext, result);
-        return result;
-    }
-
-    result = transaction.commit();
-    if (result != DBResult::ok)
-    {
-        result = lastDBError(connection);
-        connection->rollback();
-        completionHandler(&queryContext, result);
-        return result;
-    }
-
-    completionHandler(&queryContext, DBResult::ok);
-    return DBResult::ok;
+    return invokeDbQueryFunc(m_dbUpdateFunc, queryContext);
 }
 
-void UpdateWithoutAnyDataExecutor::reportErrorWithoutExecution(DBResult errorCode)
+void UpdateWithoutAnyDataExecutor::reportSuccess(QueryContext* queryContext)
 {
-    m_completionHandler(nullptr, errorCode);
+    invokeCompletionHandler(queryContext, DBResult::ok);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -161,25 +129,30 @@ UpdateWithoutAnyDataExecutorNoTran::UpdateWithoutAnyDataExecutorNoTran(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler)
     :
-    base_type(QueryType::modification),
-    m_dbUpdateFunc(std::move(dbUpdateFunc)),
-    m_completionHandler(std::move(completionHandler))
+    base_type(std::move(completionHandler)),
+    m_dbUpdateFunc(std::move(dbUpdateFunc))
 {
 }
 
 DBResult UpdateWithoutAnyDataExecutorNoTran::executeQuery(QSqlDatabase* const connection)
 {
-    auto completionHandler = std::move(m_completionHandler);
+    // TODO: Remove this method and make base class run without transaction.
+
     QueryContext queryContext(connection, nullptr);
     auto result = invokeDbQueryFunc(m_dbUpdateFunc, &queryContext);
     result = detailResultCode(connection, result);
-    completionHandler(&queryContext, result);
+    invokeCompletionHandler(&queryContext, result);
     return result;
 }
 
-void UpdateWithoutAnyDataExecutorNoTran::reportErrorWithoutExecution(DBResult errorCode)
+DBResult UpdateWithoutAnyDataExecutorNoTran::doQuery(QueryContext* queryContext)
 {
-    m_completionHandler(nullptr, errorCode);
+    return invokeDbQueryFunc(m_dbUpdateFunc, queryContext);
+}
+
+void UpdateWithoutAnyDataExecutorNoTran::reportSuccess(QueryContext* queryContext)
+{
+    invokeCompletionHandler(queryContext, DBResult::ok);
 }
 
 //-------------------------------------------------------------------------------------------------
