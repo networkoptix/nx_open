@@ -1415,10 +1415,17 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
     for (const auto& descriptor: kRangeDescriptors)
     {
         const auto& parameters = m_cgiParameters;
+        if (descriptor.cgiParameter.isEmpty())
+        {
+            NX_ASSERT(false, "Descriptor should have main CGI parameter.");
+            continue;
+        }
         auto parameter = parameters.parameter(descriptor.cgiParameter);
-
         if (!parameterIsOk(parameter))
         {
+            if (descriptor.alternativeCgiParameter.isEmpty())
+                continue;
+
             const auto alternativeParameter = parameters.parameter(
                 descriptor.alternativeCgiParameter);
 
