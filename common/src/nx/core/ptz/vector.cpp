@@ -182,13 +182,21 @@ Vector& Vector::operator/=(const Vector& other)
 Vector& Vector::operator/=(double scalar)
 {
     if (scalar == 0)
-        return qQNaN<Vector>();
-
-    pan /= scalar;
-    tilt /= scalar;
-    rotation /= scalar;
-    zoom /= scalar;
-    focus /= scalar;
+    {
+        pan = qQNaN<double>();
+        tilt = qQNaN<double>();
+        rotation /= qQNaN<double>();
+        zoom /= qQNaN<double>();
+        focus /= qQNaN<double>();
+    }
+    else
+    {
+        pan /= scalar;
+        tilt /= scalar;
+        rotation /= scalar;
+        zoom /= scalar;
+        focus /= scalar;
+    }
     return *this;
 }
 
