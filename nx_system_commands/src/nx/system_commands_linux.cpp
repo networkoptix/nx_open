@@ -1,5 +1,6 @@
 #include "system_commands.h"
 #include "system_commands/domain_socket/detail/send_linux.h"
+#include "system_commands/detail/mount_helper.h"
 
 #include <algorithm>
 #include <assert.h>
@@ -10,6 +11,7 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
+#include <functional>
 #include <pwd.h>
 #include <set>
 #include <signal.h>
@@ -184,97 +186,81 @@ bool SystemCommands::execute(
     return true;
 }
 
+class MountHelper: public system_commands::MountHelperBase
+{
+public:
+    using system_commands::MountHelperBase::MountHelperBase;
+
+    void setOsMountDelegate(
+        std::function<SystemCommands::MountCode(const std::string&)> osMountDelegate)
+    {
+        m_osMountDelegate = osMountDelegate;
+    }
+
+    void setIsPathAllowedDelegate(std::function<bool(const std::string&)> isPathAllowedDelegate)
+    {
+        m_isPathAllowedDelegate = isPathAllowedDelegate;
+    }
+
+    void setCredentialsFileNameDelegate(
+        std::function<std::string(const std::string&, const std::string&)> credentialsFileNameDelegate)
+    {
+        m_credentialsFileNameDelegate = credentialsFileNameDelegate;
+    }
+
+private:
+    std::function<SystemCommands::MountCode(const std::string&)> m_osMountDelegate;
+    std::function<bool(const std::string&)> m_isPathAllowedDelegate;
+    std::function<std::string(const std::string&, const std::string&)> m_credentialsFileNameDelegate;
+
+    virtual SystemCommands::MountCode osMount(const std::string& command) override
+    {
+        return m_osMountDelegate(command);
+    }
+
+    virtual bool isMountPathAllowed(const std::string& path) const override
+    {
+        return m_isPathAllowedDelegate(path);
+    }
+
+    virtual std::string credentialsFileName(
+        const std::string& username,
+        const std::string& password) const override
+    {
+        return m_credentialsFileNameDelegate(username, password);
+    }
+
+    virtual uid_t gid() const override { return kRealGid; }
+    virtual uid_t uid() const override { return kRealUid; }
+};
 
 SystemCommands::MountCode SystemCommands::mount(
     const std::string& url, const std::string& directory,
     const boost::optional<std::string>& username,
     const boost::optional<std::string>& password, bool reportViaSocket, int socketPostfix)
 {
-    MountCode result= MountCode::otherError;
-    if (!checkMountPermissions(directory))
-    {
-        if (reportViaSocket)
-            system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
-
-        return result;
-    }
-
-    if (url.find("//") != 0)
-    {
-        m_lastError = format("% is not an SMB url", url);
-        if (reportViaSocket)
-            system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
-
-        return result;
-    }
-
-    auto makeCommandString =
-        [&url, &directory](
-            const std::string& credentialsFileName,
-            const std::string& domain,
-            const std::string& dialect)
+    MountHelper mountHelper(username, password);
+    mountHelper.setCredentialsFileNameDelegate(
+        [this](const std::string& username, const std::string& password)
         {
-            std::ostringstream command;
-            command << "mount -t cifs '" << url << "' '" << directory << "'"
-                << " -o uid=" << kRealUid << ",gid=" << kRealGid
-                << ",credentials=" << credentialsFileName;
+            return makeCredentialsFile(username, password, &m_lastError);
+        });
 
-            if (!domain.empty())
-                command << ",domain=" << domain;
+    mountHelper.setIsPathAllowedDelegate(
+        [this](const std::string& path) { return checkMountPermissions(path); });
 
-            if (!dialect.empty())
-                command << ",vers=" << dialect;
-
-            return command.str();
-        };
-
-    std::string passwordString = password ? *password : "";
-    std::string userNameString = username ? *username : "guest";
-    std::string userProvidedDomain;
-    std::string credentialsFileName;
-
-    if (auto pos = userNameString.find("\\");
-        pos != std::string::npos && pos != userNameString.size() - 1)
-    {
-        userProvidedDomain = userNameString.substr(pos + 1);
-        userNameString = userNameString.substr(0, pos);
-    }
-
-    std::vector<std::string> domains = { "WORKGROUP", "" };
-    if (!userProvidedDomain.empty())
-        domains.push_back(userProvidedDomain);
-
-    bool gotWrongCredentialsError = false;
-    for (const auto& domain: domains)
-    {
-        for (const auto& passwordCandidate: {passwordString, std::string("123")})
+    mountHelper.setOsMountDelegate(
+        [this](const std::string& command)
         {
-            credentialsFileName = makeCredentialsFile(userNameString, passwordCandidate, &m_lastError);
-            if (credentialsFileName.empty())
-                continue;
+            if (execute(command))
+                return MountCode::ok;
 
-            for (const auto& dialect: {"", "2.0", "1.0"})
-            {
-                if (execute(makeCommandString(credentialsFileName, domain, dialect)))
-                {
-                    result = MountCode::ok;
-                    goto out;
-                }
+            return (m_lastError.find("13") != std::string::npos) //< 'Permission denied' error code
+                ? MountCode::wrongCredentials
+                : MountCode::otherError;
+        });
 
-                std::cerr << "SystemCommands::mount: " << m_lastError << std::endl;
-                if (m_lastError.find("13") != std::string::npos) //< 'Permission denied' error code
-                    gotWrongCredentialsError = true;
-            }
-        }
-    }
-
-out:
-    if (unlink(credentialsFileName.c_str()))
-        perror("unlink credentials file");
-
-    if (gotWrongCredentialsError && result != MountCode::ok)
-        result = MountCode::wrongCredentials;
-
+    auto result = mountHelper.mount(url, directory);
     if (reportViaSocket)
         system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
 
