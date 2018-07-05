@@ -1070,9 +1070,9 @@ bool QnServerDb::getMaxBookmarksMaxDurationMs(
     *outResult = 0;
 
     QSet<QString> cameraStringIds;
-    for (const auto& id : cameraIds)
+    for (const auto& id: cameraIds)
         cameraStringIds << guidToSqlString(id);
-    QString queryTemplate = QString(R"(SELECT max(duration) FROM bookmarks WHERE %1)");
+    static const QString queryTemplate = QString(R"(SELECT max(duration) FROM bookmarks WHERE %1)");
 
     QList<QVariant> bindings;
 
@@ -1102,11 +1102,12 @@ bool QnServerDb::getBookmarks(
     const QnCameraBookmarkSearchFilter& filter,
     QnCameraBookmarkList& result)
 {
-    bool hasTimeRange = filter.startTimeMs > 0 && filter.endTimeMs < INT64_MAX;
-
-    if (hasTimeRange)
+    bool isRangeClosed = filter.startTimeMs > 0 && filter.endTimeMs < INT64_MAX;
+    if (isRangeClosed)
     {
         QnMultiServerCameraBookmarkList bookmarks;
+
+        // Optimization. Do two separate SQL requests to force SqLite use index.
         bookmarks.resize(2);
 
         qint64 maxDurationMs = 0;
