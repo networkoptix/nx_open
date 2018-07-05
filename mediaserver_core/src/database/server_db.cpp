@@ -235,33 +235,6 @@ vms::event::EventParameters convertOldEventParameters(
     return result;
 }
 
-QString createBookmarksFilterSortPart(const QnCameraBookmarkSearchFilter& filter)
-{
-    static const auto kOrderByTemplate = lit(" ORDER BY %1 %2, guid ");
-
-    const auto order = filter.orderBy.order == Qt::AscendingOrder ? lit("ASC") : lit("DESC");
-    switch (filter.orderBy.column)
-    {
-        case Qn::BookmarkName:
-            return kOrderByTemplate.arg(lit("book.name"), order);
-        case Qn::BookmarkStartTime:
-            return kOrderByTemplate.arg(lit("startTimeMs"), order);
-        case Qn::BookmarkCreationTime:
-            return kOrderByTemplate.arg(lit("creationTimeStampMs"), order);
-        case Qn::BookmarkDuration:
-            return kOrderByTemplate.arg(lit("durationMs"), order);
-        case Qn::BookmarkCameraName:
-            return kOrderByTemplate.arg(lit("cameraId"), order);
-        case Qn::BookmarkCreator:
-            return kOrderByTemplate.arg(lit("creatorId"), order);
-        case Qn::BookmarkTags:
-            return lit(""); // No sort by db
-        default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Invalid sorting column value");
-            return lit("");
-    }
-}
-
 int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
 {
     if (filter.sparsing.used)
@@ -1126,12 +1099,21 @@ bool QnServerDb::getBookmarks(
             return false;
 
         result = QnCameraBookmark::mergeCameraBookmarks(
-            commonModule(), bookmarks, filter.orderBy,  QnBookmarkSparsingOptions(), filter.limit);
-
-        return true;
+            commonModule(),
+            bookmarks,
+            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime),
+            QnBookmarkSparsingOptions(),
+            filter.limit);
+    }
+    else
+    {
+        if (!getBookmarksInternal(cameraIds, filter, result))
+            return false;
     }
 
-    return getBookmarksInternal(cameraIds, filter, result);
+    QnCameraBookmark::sortBookmarks(commonModule(), result, filter.orderBy);
+    return true;
+
 }
 
 bool QnServerDb::getBookmarksInternal(
@@ -1154,6 +1136,7 @@ bool QnServerDb::getBookmarksInternal(
             (SELECT group_concat(name) FROM bookmark_tags t where t.bookmark_guid = guid) as tags
         FROM bookmarks
         WHERE %1
+        ORDER BY camera_guid, start_time
     )");
 
     QList<QVariant> bindings;
@@ -1188,11 +1171,9 @@ bool QnServerDb::getBookmarksInternal(
     }
 
     QString queryStr = queryTemplate.arg(filterText);
-    queryStr += createBookmarksFilterSortPart(filter);
 
-    const auto limit = getBookmarksQueryLimit(filter);
-    if (limit != QnCameraBookmarkSearchFilter::kNoLimit)
-        queryStr += lit(" LIMIT %1").arg(limit);
+    if (filter.limit != QnCameraBookmarkSearchFilter::kNoLimit)
+        queryStr += lit(" LIMIT %1").arg(filter.limit);
 
     NX_VERBOSE(this, lit("Got getBookmarks query: %1").arg(queryStr));
     {

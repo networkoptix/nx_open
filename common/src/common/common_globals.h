@@ -547,7 +547,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
                                 // by database, not manually, which is faster.
         BookmarkCreator,        //< Sorted manually!
         BookmarkTags,           //< Sorted manually!
-        BookmarkCameraName      //< Sorted manually!
+        BookmarkCameraName,      //< Sorted manually!
+        BookmarkCameraThenStartTime,
     };
 
     /**

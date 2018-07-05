@@ -109,6 +109,20 @@ namespace
         return (isAscending ? ascPred : descPred);
     }
 
+    bool compareCameraThenStartTimeAsc(const QnCameraBookmark &first, const QnCameraBookmark &second)
+    {
+        if (first.cameraId != second.cameraId)
+            return first.cameraId.toRfc4122() < second.cameraId.toRfc4122();
+        return first.startTimeMs < second.startTimeMs;
+    }
+
+    bool compareCameraThenStartTimeDesc(const QnCameraBookmark &first, const QnCameraBookmark &second)
+    {
+        if (first.cameraId != second.cameraId)
+            return first.cameraId.toRfc4122() > second.cameraId.toRfc4122();
+        return first.startTimeMs > second.startTimeMs;
+    }
+
     BinaryPredicate createPredicate(QnCommonModule* commonModule, const QnBookmarkSortOrder &sortOrder)
     {
         const bool isAscending = (sortOrder.order == Qt::AscendingOrder);
@@ -130,6 +144,10 @@ namespace
                     {
                         return bookmark.startTimeMs;
                     }, isAscending);
+            }
+            case Qn::BookmarkCameraThenStartTime:
+            {
+                return isAscending ? compareCameraThenStartTimeAsc : compareCameraThenStartTimeDesc;
             }
             case Qn::BookmarkDuration:
             {
