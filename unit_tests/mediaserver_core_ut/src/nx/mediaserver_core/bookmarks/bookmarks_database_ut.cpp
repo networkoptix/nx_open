@@ -52,7 +52,8 @@ TEST_F(BookmarksDatabaseTest, DISABLED_speedTest)
 
     QnCameraBookmarkSearchFilter filter;
     filter.endTimeMs = milliseconds(QDateTime::currentMSecsSinceEpoch());
-    filter.startTimeMs = filter.endTimeMs - 24h;
+    filter.startTimeMs = milliseconds(filter.endTimeMs.count() - 1000 * 3600 * 24LL * 30);
+    filter.limit = 100;
     nx::utils::ElapsedTimer timer;
     timer.restart();
     QnCameraBookmarkList result;
@@ -65,45 +66,45 @@ TEST_F(BookmarksDatabaseTest, selectTest)
 {
     ASSERT_TRUE(mediaServerLauncher->start());
 
-    QnUuid cameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
-    QnUuid cameraId2("6FD1F239-CEBC-81BF-C2D4-59789E2CEF05");
+    static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
+    static const QnUuid kCameraId2("6FD1F239-CEBC-81BF-C2D4-59789E2CEF05");
 
-    const auto endTimeMs = milliseconds(QDateTime::currentMSecsSinceEpoch());
-    const auto periodMs = 24h * 30;
-    const auto startTimeMs = endTimeMs - periodMs;
+    const auto startTimeMs = 500;
+    const auto periodMs = 1000;
+    const auto endTimeMs = startTimeMs + periodMs;
 
     QnCameraBookmark bookmark;
-    bookmark.cameraId = cameraId1;
-    bookmark.startTimeMs = startTimeMs + periodMs / 2;
-    bookmark.durationMs = 100ms;
+    bookmark.cameraId = kCameraId1;
+    bookmark.startTimeMs = milliseconds(startTimeMs + periodMs / 2);
+    bookmark.durationMs = milliseconds(100);
     bookmark.name = "bookmarkMid";
     bookmark.guid = QnUuid::createUuid();
     bookmark.tags << "tag1" << "tag2";
     qnServerDb->addBookmark(bookmark);
 
-    bookmark.startTimeMs = startTimeMs - bookmark.durationMs / 2;
+    bookmark.startTimeMs = milliseconds(startTimeMs - bookmark.durationMs.count() / 2);
     bookmark.name = "bookmarkLeft";
     bookmark.tags.clear();
     bookmark.guid = QnUuid::createUuid();
     qnServerDb->addBookmark(bookmark);
 
-    bookmark.startTimeMs = endTimeMs + 1ms;
+    bookmark.startTimeMs = milliseconds(endTimeMs + 1);
     bookmark.name = "bookmarRight";
     bookmark.guid = QnUuid::createUuid();
     qnServerDb->addBookmark(bookmark);
 
-    bookmark.startTimeMs = startTimeMs - bookmark.durationMs / 2;
+    bookmark.startTimeMs = milliseconds(startTimeMs - bookmark.durationMs.count() / 2);
     bookmark.name = "bookmarkMid 2";
-    bookmark.cameraId = cameraId2;
+    bookmark.cameraId = kCameraId2;
     bookmark.guid = QnUuid::createUuid();
     qnServerDb->addBookmark(bookmark);
 
     QList<QnUuid> cameras;
-    cameras << cameraId1;
+    cameras << kCameraId1;
 
     QnCameraBookmarkSearchFilter filter;
-    filter.endTimeMs = endTimeMs;
-    filter.startTimeMs = startTimeMs;
+    filter.endTimeMs = milliseconds(endTimeMs);
+    filter.startTimeMs = milliseconds(startTimeMs);
     filter.limit = 100;
 
     QnCameraBookmarkList result;

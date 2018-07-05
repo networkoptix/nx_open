@@ -643,6 +643,8 @@ ConditionWrapper wearableCameraUploadEnabled();
 /** Whether wearable camera upload can be cancelled. */
 ConditionWrapper canCancelWearableCameraUpload();
 
+ConditionWrapper currentLayoutIsVideowallScreen();
+
 } // namespace condition
 
 } // namespace action

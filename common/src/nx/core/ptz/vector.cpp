@@ -129,6 +129,69 @@ Vector Vector::operator/(double scalar) const
         focus / scalar);
 }
 
+Vector& Vector::operator+=(const Vector& other)
+{
+    pan += other.pan;
+    tilt += other.tilt;
+    rotation += other.rotation;
+    zoom += other.zoom;
+    focus += other.focus;
+    return *this;
+}
+
+Vector& Vector::operator-=(const Vector& other)
+{
+    pan -= other.pan;
+    tilt -= other.tilt;
+    rotation -= other.rotation;
+    zoom -= other.zoom;
+    focus -= other.focus;
+    return *this;
+}
+
+Vector& Vector::operator*=(const Vector& other)
+{
+    pan *= other.pan;
+    tilt *= other.tilt;
+    rotation *= other.rotation;
+    zoom *= other.zoom;
+    focus *= other.focus;
+    return *this;
+}
+
+Vector& Vector::operator*=(double scalar)
+{
+    pan *= scalar;
+    tilt *= scalar;
+    rotation *= scalar;
+    zoom *= scalar;
+    focus *= scalar;
+    return *this;
+}
+
+Vector& Vector::operator/=(const Vector& other)
+{
+    (other.pan == 0) ? (pan /= other.pan) : qQNaN<double>();
+    (other.tilt == 0) ? (tilt /= other.tilt) : qQNaN<double>();
+    (other.rotation == 0) ? (rotation /= other.rotation) : qQNaN<double>();
+    (other.zoom == 0) ? (zoom /= other.zoom) : qQNaN<double>();
+    (other.focus == 0) ? (focus /= other.focus) : qQNaN<double>();
+    return *this;
+}
+
+Vector& Vector::operator/=(double scalar)
+{
+    if (scalar == 0)
+        return qQNaN<Vector>();
+
+    pan /= scalar;
+    tilt /= scalar;
+    rotation /= scalar;
+    zoom /= scalar;
+    focus /= scalar;
+    return *this;
+}
+
 double Vector::length() const
 {
     return std::sqrt(lengthSquared());

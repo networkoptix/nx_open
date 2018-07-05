@@ -420,7 +420,12 @@ bool QnAxisPtzController::continuousMove(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Continuous movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(m_resource->getName(), m_resource->getId()));
+
         return false;
     }
 
@@ -439,7 +444,12 @@ bool QnAxisPtzController::absoluteMove(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Absolute movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(m_resource->getName(), m_resource->getId()));
+
         return false;
     }
 
@@ -490,7 +500,7 @@ bool QnAxisPtzController::relativeFocus(
             this,
             lm("Relative focus - wrong PTZ type. "
                 "Only operational PTZ is supported. Resource %1 (%2)")
-            .args(m_resource->getName(), m_resource->getId()));
+                .args(m_resource->getName(), m_resource->getId()));
 
         return false;
     }
@@ -509,7 +519,12 @@ bool QnAxisPtzController::getPosition(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Getting current position - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(m_resource->getName(), m_resource->getId()));
+
         return false;
     }
 
@@ -546,7 +561,12 @@ bool QnAxisPtzController::getLimits(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Getting limits - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(m_resource->getName(), m_resource->getId()));
+
         return false;
     }
 
@@ -563,7 +583,12 @@ bool QnAxisPtzController::getFlip(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Getting flip - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(m_resource->getName(), m_resource->getId()));
+
         return false;
     }
 

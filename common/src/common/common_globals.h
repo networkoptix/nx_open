@@ -49,7 +49,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         IsOldFirmwareCapability             = 0x800, //< Camera has too old firmware.
         CustomMediaUrlCapability            = 0x1000, //< Camera's streams are editable.
         IsPlaybackSpeedSupported            = 0x2000, //< For NVR which support playback speed 1,2,4 e.t.c natively.
-        IsSyncPlay                          = 0x4000, //< For NVR if channels are depend on each other and can play synchronously only.
+        DeviceBasedSync                     = 0x4000, //< For NVR if channels are depend on each other and can play synchronously only.
+        DualStreamingForLiveOnly            = 0x8000,
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)

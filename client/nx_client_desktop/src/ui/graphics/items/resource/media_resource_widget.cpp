@@ -390,6 +390,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     if (d->display())
         d->display()->removeRenderer(m_renderer);
 
+    m_renderer->notInUse();
     m_renderer->destroyAsync();
 
     for (auto* data : m_binaryMotionMask)
@@ -457,6 +458,7 @@ void QnMediaResourceWidget::initRenderer()
     m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QnMediaResourceWidget::updateAspectRatio);
+    m_renderer->inUse();
 }
 
 void QnMediaResourceWidget::initDisplay()
@@ -2360,7 +2362,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
     else
     {
         /* Stop all ptz activity. */
-        ptzController()->continuousMove(nx::core::ptz::Vector(), nx::core::ptz::Options());
+        ptzController()->continuousMove(nx::core::ptz::Vector());
         suspendHomePtzController();
     }
 
@@ -2401,8 +2403,7 @@ void QnMediaResourceWidget::at_zoomRectChanged()
         m_ptzController->absoluteMove(
             Qn::LogicalPtzCoordinateSpace,
             QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()),
-            2.0,
-            nx::core::ptz::Options());
+            2.0);
     }
 }
 

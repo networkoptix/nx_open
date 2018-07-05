@@ -1,9 +1,12 @@
 #ifdef ENABLE_ONVIF
 
 #include "dlink_ptz_controller.h"
-#include "nx/utils/math/fuzzy.h"
 #include "plugins/resource/onvif/onvif_resource.h"
-#include "nx/utils/thread/long_runnable.h"
+
+#include <nx/utils/math/fuzzy.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/assert.h>
 
 using namespace nx::core;
 //static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
@@ -78,7 +81,12 @@ bool QnDlinkPtzController::continuousMove(
 {
     if (options.type != ptz::Type::operational)
     {
-        NX_ASSERT(false, lit("Wrong PTZ type. Only operational PTZ is supported"));
+        NX_WARNING(
+            this,
+            lm("Continuous movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
         return false;
     }
 

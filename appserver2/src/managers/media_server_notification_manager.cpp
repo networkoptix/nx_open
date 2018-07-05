@@ -1,4 +1,5 @@
 #include "media_server_notification_manager.h"
+#include <rest/request_type_wrappers.h>
 
 using namespace nx;
 

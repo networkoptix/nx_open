@@ -1279,7 +1279,7 @@ ActionVisibility PtzCondition::check(const QnResourceWidgetList& widgets, QnWork
 
 bool PtzCondition::check(const QnPtzControllerPtr &controller)
 {
-    return controller && controller->hasCapabilities(m_capabilities, nx::core::ptz::Options());
+    return controller && controller->hasCapabilities(m_capabilities);
 }
 
 ActionVisibility NonEmptyVideowallCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
@@ -1878,6 +1878,16 @@ ConditionWrapper canCancelWearableCameraUpload()
             return state.isRunning()
                 ? (state.isCancellable() ? EnabledAction : DisabledAction)
                 : InvisibleAction;
+        });
+}
+
+ConditionWrapper currentLayoutIsVideowallScreen()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            const auto layout = context->workbench()->currentLayout();
+            return layout && !layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull();
         });
 }
 

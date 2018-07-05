@@ -30,12 +30,10 @@ QnTourPtzController::QnTourPtzController(
         lit("ptzTours"), QnPtzTourHash(), this)),
     m_executor(new QnTourPtzExecutor(baseController, threadPool))
 {
-    NX_ASSERT(!baseController->hasCapabilities(
-        Ptz::AsynchronousPtzCapability,
-        nx::core::ptz::Options()));
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
 
     // TODO: #Elric implement it in a saner way
-    if (!baseController->hasCapabilities(Ptz::VirtualPtzCapability, nx::core::ptz::Options()))
+    if (!baseController->hasCapabilities(Ptz::VirtualPtzCapability))
         m_executor->moveToThread(executorThread);
 
     m_adaptor->setResource(baseController->resource());

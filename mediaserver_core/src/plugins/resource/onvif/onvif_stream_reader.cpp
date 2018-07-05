@@ -604,7 +604,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::bindTwoWayAudioToProfile(
     AddAudioOutputConfigurationResp addAudioOutputConfigurationResponse;
 
     addAudioOutputConfigurationRequest.ProfileToken = profileToken.toStdString();
-    addAudioOutputConfigurationRequest.ConfigurationToken = 
+    addAudioOutputConfigurationRequest.ConfigurationToken =
         m_onvifRes->audioOutputConfigurationToken().toStdString();
     int soapRes = soapWrapper.addAudioOutputConfiguration(
         addAudioOutputConfigurationRequest, addAudioOutputConfigurationResponse);
@@ -716,7 +716,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::sendProfileToCamera(
             if (!result)
             {
                 const auto errorMessage = result.toString(m_onvifRes->resourcePool());
-                NX_WARNING(this, 
+                NX_WARNING(this,
                     lm("Error binding two way audio to profile %1 for camera %2. Error: %3")
                     .args(info.profileToken, m_onvifRes->getUrl(), errorMessage));
             }

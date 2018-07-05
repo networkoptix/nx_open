@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/qt_enums.h>
 
 #include <nx/fusion/nx_fusion_test_fixture.h>
 
@@ -78,6 +79,14 @@ TEST_F(QnLexicalTextFixture, flagsNumeric)
     nx::TestFlags flags = nx::Flag0;
     ASSERT_TRUE(QnLexical::deserialize(value, &flags));
     ASSERT_EQ(nx::Flag1|nx::Flag2, flags);
+}
+
+TEST_F(QnLexicalTextFixture, qtEnums)
+{
+    const QString value = "Horizontal|Vertical";
+    Qt::Orientations flags;
+    ASSERT_TRUE(QnLexical::deserialize(value, &flags));
+    ASSERT_EQ(Qt::Orientation::Horizontal | Qt::Orientation::Vertical, flags);
 }
 
 TEST_F(QnLexicalTextFixture, bitArray)

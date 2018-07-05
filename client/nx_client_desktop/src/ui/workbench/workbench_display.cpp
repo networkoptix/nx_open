@@ -1492,34 +1492,32 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const
 {
     const auto layout = workbench()->currentLayout();
+
+    QRect boundingRect = layout->boundingRect();
+    if (boundingRect.isNull())
+        boundingRect = QRect(0, 0, 1, 1);
+
+    QRect background = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
+    if (!background.isEmpty())
+        boundingRect = boundingRect.united(background);
+
+    QRect minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRect>();
+    if (!minimalBoundingRect.isEmpty())
+        boundingRect = boundingRect.united(minimalBoundingRect);
+
     if (const auto layoutResource = layout->resource())
     {
         QSize fixedSize = layoutResource->fixedSize();
         if (!fixedSize.isEmpty())
-            return workbench()->mapper()->mapFromGridF(QnLayoutResource::backgroundRect(fixedSize));
+            boundingRect = boundingRect.united(QnLayoutResource::backgroundRect(fixedSize));
     }
-
-    QRect layoutBoundingRect = layout->boundingRect();
-    if (layoutBoundingRect.isNull())
-        layoutBoundingRect = QRect(0, 0, 1, 1);
-
-    QRect backgroundBoundingRect = gridBackgroundItem()
-        ? gridBackgroundItem()->sceneBoundingRect()
-        : QRect();
-
-    QRectF sceneBoundingRect = (backgroundBoundingRect.isNull())
-        ? layoutBoundingRect
-        : layoutBoundingRect.united(backgroundBoundingRect);
-
-    QRect minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRect>();
-    if (!minimalBoundingRect.isEmpty())
-        sceneBoundingRect = sceneBoundingRect.united(minimalBoundingRect);
 
     /* Do not add additional spacing in following cases: */
     const bool adjustSpace = !qnRuntime->isVideoWallMode()  //< Videowall client.
-        && backgroundBoundingRect.isNull()                  //< There is a layout background.
+        && background.isEmpty(           )                  //< There is a layout background.
         && !workbench()->currentLayout()->flags().testFlag(QnLayoutFlag::FillViewport);
 
+    QRectF sceneBoundingRect(boundingRect);
     static const qreal d = 0.015;
     if (adjustSpace)
         sceneBoundingRect = sceneBoundingRect.adjusted(-d, -d, d, d);
@@ -1927,13 +1925,6 @@ void QnWorkbenchDisplay::at_layout_zoomLinkRemoved(QnWorkbenchItem *item, QnWork
 
 void QnWorkbenchDisplay::at_layout_boundingRectChanged(const QRect &oldRect, const QRect &newRect)
 {
-    const auto layout = workbench()->currentLayout();
-    if (const auto layoutResource = layout->resource())
-    {
-        if (!layoutResource->fixedSize().isEmpty())
-            return;
-    }
-
     QRect backgroundBoundingRect = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
 
     QRect oldBoundingRect = (backgroundBoundingRect.isNull())

@@ -19,6 +19,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
 #include <nx/vms/api/data_fwd.h>
+#include <rest/request_type_wrappers.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/data/lock_data.h>
 #include <nx/vms/event/event_fwd.h>
@@ -256,7 +257,7 @@ namespace detail
         //getStorages
         ErrorCode getStorages(const QString& filterStr, nx::vms::api::StorageDataList& storageList);
         ErrorCode doQueryNoLock(
-            const nx::vms::api::ParentId& parentId, nx::vms::api::StorageDataList& storageList);
+            const nx::vms::api::StorageParentId& parentId, nx::vms::api::StorageDataList& storageList);
         ErrorCode doQueryNoLock(
             const QnUuid& storageId, nx::vms::api::StorageDataList& storageList);
 
@@ -739,7 +740,8 @@ namespace detail
             ResyncWebPages          = 0x2000,
             ResyncUserAccessRights  = 0x4000,
             ResyncGlobalSettings    = 0x8000,
-        };
+            ResyncResourceProperties = 0x10000,
+       };
         Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
 
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
