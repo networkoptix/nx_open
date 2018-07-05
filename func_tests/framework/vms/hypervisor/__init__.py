@@ -6,11 +6,12 @@ from pprint import pformat
 class Vm(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, name, port_map, macs, networks, is_running):
+    def __init__(self, name, port_map, macs, networks, bridged, is_running):
         self.name = name
         self.port_map = port_map
         self.macs = macs
         self.networks = networks
+        self.bridged = bridged
         self.is_running = is_running
 
     def __repr__(self):

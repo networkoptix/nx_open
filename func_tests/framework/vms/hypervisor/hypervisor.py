@@ -48,6 +48,10 @@ class Hypervisor(object):
         pass
 
     @abstractmethod
+    def plug_bridged(self, vm_name, host_nic):
+        pass
+
+    @abstractmethod
     def unplug_all(self, vm_name):
         pass
 
