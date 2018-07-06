@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <nx/core/ptz/test_support/test_ptz_controller.h>
-#include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
-#include <nx/core/ptz/realtive/relative_move_workaround_controller.h>
-#include <nx/core/ptz/realtive/relative_continuous_move_sequence_maker.h>
+#include <nx/core/ptz/relative/relative_continuous_move_mapping.h>
+#include <nx/core/ptz/relative/relative_move_workaround_controller.h>
+#include <nx/core/ptz/relative/relative_continuous_move_sequence_maker.h>
 #include <nx/core/ptz/utils/continuous_move_sequence_executor.h>
 
 #include <nx/fusion/model_functions.h>

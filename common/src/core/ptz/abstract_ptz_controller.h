@@ -149,7 +149,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
         const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) = 0;
 
     /**
-     * Moves the camera realtive to its current position.
+     * Moves the camera relative to its current position.
      *
      * This function is expected to be implemented if this controller has
      * at least one of the <tt>Ptz::RelativePtrzCapabilities</tt>.
