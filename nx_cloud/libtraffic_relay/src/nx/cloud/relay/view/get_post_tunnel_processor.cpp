@@ -117,7 +117,7 @@ void GetPostTunnelProcessor<RequestSpecificData>::onMessage(
     {
         NX_DEBUG(this, lm("Invalid up channel. Url %1")
             .args(tunnelIter->second.urlPath));
-        closeConnection(&lock, SystemError::invalidData, tunnelIter->first);
+        closeConnection(lock, SystemError::invalidData, tunnelIter->first);
         return;
     }
 
@@ -153,12 +153,12 @@ void GetPostTunnelProcessor<RequestSpecificData>::closeConnection(
     network::http::AsyncMessagePipeline* connection)
 {
     QnMutexLocker lock(&m_mutex);
-    closeConnection(&lock, closeReason, connection);
+    closeConnection(lock, closeReason, connection);
 }
 
 template<typename RequestSpecificData>
 void GetPostTunnelProcessor<RequestSpecificData>::closeConnection(
-    QnMutexLockerBase* lock,
+    const QnMutexLockerBase& /*lock*/,
     SystemError::ErrorCode /*closeReason*/,
     network::http::AsyncMessagePipeline* connection)
 {

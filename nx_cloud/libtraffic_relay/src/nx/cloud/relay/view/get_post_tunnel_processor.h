@@ -51,7 +51,7 @@ private:
         network::http::AsyncMessagePipeline* /*connection*/) override;
 
     void closeConnection(
-        QnMutexLockerBase* lock,
+        const QnMutexLockerBase& lock,
         SystemError::ErrorCode /*closeReason*/,
         network::http::AsyncMessagePipeline* /*connection*/);
 
