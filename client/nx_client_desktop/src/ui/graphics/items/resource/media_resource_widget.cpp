@@ -1604,6 +1604,10 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (m_entropixProgress >= 0)
         paintProgress(painter, rect, m_entropixProgress);
 
+    if(m_showWatermark)
+        paintWatermark(painter, rect);
+
+
     if (client::desktop::ini().showVideoQualityOverlay
         && hasVideo()
         && !d->resource->hasFlags(Qn::local))
@@ -1783,6 +1787,16 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
     {
         paintFilledRegionPath(painter, rect, m_motionSensitivity[channel].getMotionMaskPath(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
     }
+}
+
+void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
+{
+    QPixmap Pixmap(100, 100);
+    Pixmap.fill(QColor(0, 100, 30, 100));
+    QPainter ppainter(&Pixmap);
+    ppainter.setPen(Qt::blue);
+    ppainter.drawText(20, 50, "Watermark");
+    painter->drawPixmap(rect, Pixmap, Pixmap.rect());
 }
 
 QnPtzControllerPtr QnMediaResourceWidget::ptzController() const

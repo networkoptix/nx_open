@@ -492,6 +492,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxWearableArchiveSynchronizationThreadsDefault,
         this);
 
+    m_watermarkSettings = new QnJsonResourcePropertyAdaptor<QnWatermarkSettings>(
+        kWatermarkSettingsName,
+        watermarkSettings(),
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
@@ -551,6 +556,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_edgeRecordingEnabledAdaptor
         << m_maxRemoteArchiveSynchronizationThreads
         << m_maxWearableArchiveSynchronizationThreads
+        << m_watermarkSettings
         ;
 
     if (isHanwhaEnabledCustomization())
@@ -1288,6 +1294,16 @@ bool QnGlobalSettings::cloudConnectRelayingEnabled() const
 bool QnGlobalSettings::takeCameraOwnershipWithoutLock() const
 {
     return m_takeCameraOwnershipWithoutLock->value();
+}
+
+QnWatermarkSettings QnGlobalSettings::watermarkSettings() const
+{
+    return m_watermarkSettings->value();
+}
+
+void QnGlobalSettings::setWatermarkSettings(const QnWatermarkSettings& settings) const
+{
+    m_watermarkSettings->setValue(settings);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

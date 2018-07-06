@@ -12,6 +12,7 @@
 #include <utils/common/connective.h>
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
+#include <utils/common/watermark_settings.h>
 #include <utils/common/optional.h>
 
 #include <common/common_globals.h>
@@ -73,7 +74,6 @@ const QString kNameSystemName(lit("systemName"));
 const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
 
-
 const QString ldapUri(lit("ldapUri"));
 const QString ldapAdminDn(lit("ldapAdminDn"));
 const QString ldapAdminPassword(lit("ldapAdminPassword"));
@@ -86,6 +86,8 @@ const QString kNameCloudAuthKey(lit("cloudAuthKey"));
 const QString kNameUpnpPortMappingEnabled(lit("upnpPortMappingEnabled"));
 const QString kConnectionKeepAliveTimeoutKey(lit("ec2ConnectionKeepAliveTimeoutSec"));
 const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
+
+const QString kWatermarkSettingsName(lit("watermarkSettings"));
 
 } // namespace settings_names
 } // namespace nx
@@ -309,6 +311,9 @@ public:
     int maxWearableArchiveSynchronizationThreads() const;
     void setMaxWearableArchiveSynchronizationThreads(int newValue);
 
+    QnWatermarkSettings watermarkSettings() const;
+    void setWatermarkSettings(const QnWatermarkSettings & settings) const;
+
 signals:
     void initialized();
 
@@ -335,6 +340,7 @@ signals:
     void timeSynchronizationSettingsChanged();
     void cloudConnectUdpHolePunchingEnabledChanged();
     void cloudConnectRelayingEnabledChanged();
+    void watermarkChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -442,6 +448,8 @@ private:
 
     QnResourcePropertyAdaptor<int>* m_maxRemoteArchiveSynchronizationThreads = nullptr;
     QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
+
+    QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettings = nullptr;
 
     AdaptorList m_allAdaptors;
 

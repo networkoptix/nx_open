@@ -201,6 +201,7 @@ protected:
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
+    void paintWatermark(QPainter *painter, const QRectF &rect);
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
     void paintProgress(QPainter* painter, const QRectF& rect, int progress);
 
@@ -383,6 +384,9 @@ private:
 
     /** Whether motion label positions data is valid. */
     mutable bool m_motionLabelPositionsValid = false;
+
+    /** Whether username watermark is shown. */
+    bool m_showWatermark = true;
 
     QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
 
