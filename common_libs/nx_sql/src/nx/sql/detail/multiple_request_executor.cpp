@@ -10,9 +10,9 @@ MultipleQueryExecutor::MultipleQueryExecutor(
 {
 }
 
-void MultipleQueryExecutor::reportErrorWithoutExecution(DBResult /*errorCode*/)
+void MultipleQueryExecutor::reportErrorWithoutExecution(DBResult errorCode)
 {
-    // TODO
+    reportQueryFailure(m_queries.begin(), m_queries.end(), errorCode);
 }
 
 DBResult MultipleQueryExecutor::executeQuery(AbstractDbConnection* const connection)
