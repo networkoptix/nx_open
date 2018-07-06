@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>出现未知的错误。</translation>
+      <translation>未知的错误.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -53,11 +53,6 @@
       <translation>发现的系统 %1 有不兼容的版本 %2。</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>无法连接到另一个系统，因为当前的系统已连接到 %1。</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>发现的系统 %1 是在安全模式下。</translation>
@@ -68,19 +63,33 @@
       <translation>不能配置远程系统 %1。</translation>
     </message>
     <message>
+      <source>New System</source>
+      <translation>新系统</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>发现的系统%1与当前系统不兼容。</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>无法连接到另一个系统，因为当前的系统已连接到 %1。</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>这两个系统连接到 %1。合并不是允许的。</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>这些系统都采用了不同的 %1 URL。合并不是允许的。</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>云系统只可以与非云合并。系统名称和密码取自云系统。</translation>
     </message>
   </context>
   <context>
@@ -246,18 +255,6 @@
       <translation>请确认端口 %1可用(如转发).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在设备设置。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>首先，尝试打开记录 （如果它是关闭的） 和降低 fps 的相机设置。</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在 I/O 模块设置。</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>如果它没有帮助，恢复出厂默认设置设备 web 页上的。</translation>
     </message>
@@ -304,6 +301,22 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>摄像机是从归档中恢复。删除摄像机并重新添加以观看直播视频。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在设备设置 (错误&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>首先，尝试打开记录 （如果它是关闭的） 和降低 fps 的相机设置 (错误&quot;%1&quot;).。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在 I/O 模块设置 (错误&quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>请更新固件。最小支持版本是 %1。当前版本是 %2</translation>
     </message>
   </context>
   <context>
@@ -463,7 +476,7 @@
     </message>
     <message>
       <source>Free</source>
-      <translation>免费</translation>
+      <translation>可用</translation>
     </message>
     <message>
       <source>Free license</source>
@@ -471,11 +484,19 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>时效性</translation>
+      <translation>时间</translation>
     </message>
     <message>
       <source>Time Licenses</source>
       <translation>时效性授权</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>桥接</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>桥接授权</translation>
     </message>
   </context>
   <context>
@@ -533,11 +554,11 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知错误</translation>
+      <translation>未知的错误</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>找不到匹配硬件 Id 的服务器</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>找不到匹配硬件 ID 的服务器</translation>
     </message>
   </context>
   <context>
@@ -638,11 +659,11 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>未知</translation>
+      <translation>未知的</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>免费许可</translation>
+      <translation>免费授权</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -653,12 +674,12 @@
       <translation>水印︰ %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>硬件 Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>时效性授权</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>硬件 ID: %1</translation>
     </message>
   </context>
   <context>
@@ -756,6 +777,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>数据导出非法资源类型.</translation>
     </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>没有数据导出。</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -826,7 +851,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>分</translation>
     </message>
     <message>
       <source>y</source>
@@ -961,15 +986,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>高级操作员</translation>
+      <translation>高级浏览者</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>操作员</translation>
+      <translation>浏览者</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>实时操作员</translation>
+      <translation>实时浏览者</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1279,13 +1304,13 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n次，第一次：%2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 次，第一次︰ %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1440,7 +1465,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>所有用户</translation>
+      <translation>All 用户</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1465,6 +1490,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>接受</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>分析事件</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 在 %2</translation>
     </message>
   </context>
   <context>

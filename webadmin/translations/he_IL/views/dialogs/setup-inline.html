@@ -278,14 +278,15 @@
         <div class="form-group" validate-field>
 
             <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
-                   typeahead="system as system.visibleName for system in discoveredUrls | filter: {isNew:false, visibleName: $viewValue} | limitTo:8"
-                   typeahead-input-formatter="getSystemName($model)"
-                   typeahead-focus-on-select="false"
-                   typeahead-min-length="0"
-                   typeahead-show-hint="true"
-                   typeahead-focus-first="false"
-                   typeahead-focus
+                   uib-typeahead="system as system.visibleName for system in discoveredUrls | filter: {isNew:false, visibleName: $viewValue} | limitTo:8"
+                   uib-typeahead-input-formatter="getSystemName($model)"
+                   uib-typeahead-focus-on-select="false"
+                   uib-typeahead-min-length="0"
+                   uib-typeahead-show-hint="true"
+                   uib-typeahead-focus-first="false"
+                   uib-typeahead-focus
  placeholder="כתובת המערכת הקיימת URL (https://host:port)"
+                   ng-change="clearRemoteError()"
                    required
  class="form-control">
 

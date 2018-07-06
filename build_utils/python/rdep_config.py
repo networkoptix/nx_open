@@ -25,9 +25,8 @@ class ConfigHelper:
     def add_section(self, section):
         if not self.__config.has_section(section):
             self.__config.add_section(section)
-
-        with open(self.__file_name, "w") as file:
-            self.__config.write(file)
+            with open(self.__file_name, "w") as file:
+                self.__config.write(file)
 
     def get_items(self, section):
         return self.__config.items(section)
@@ -52,7 +51,6 @@ class RdepConfig(ConfigHelper):
 
     def __init__(self):
         ConfigHelper.__init__(self, os.path.join(os.path.expanduser("~")))
-        self.add_section("General")
 
     def get_name(self):
         return self.get_value("General", "name", "").strip()

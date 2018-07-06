@@ -1,7 +1,7 @@
 #ifdef ENABLE_ISD
 
 #include <utils/math/math.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include "isd_stream_reader.h"
 #include "isd_resource.h"
@@ -39,10 +39,10 @@ QnPlIsdResource::QnPlIsdResource()
 
 void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
-    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
 
     QAuthenticator auth = getAuth();
 
@@ -54,10 +54,11 @@ void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHa
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
+        nx::network::http::HttpHeaders /*httpResponseHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
-            statusCode != nx_http::StatusCode::ok )
+            statusCode != nx::network::http::StatusCode::ok )
         {
             return completionHandler( false );
         }
@@ -69,7 +70,7 @@ void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHa
         completionHandler( macAddress == resourceMac.toLatin1() );
     };
 
-    nx_http::downloadFileAsync(
+    nx::network::http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -83,14 +84,18 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
 }
 
-CameraDiagnostics::Result QnPlIsdResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlIsdResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
 {
-    QnPhysicalCameraResource::initInternal();
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
 
+CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
+{
     updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("admin"));
 
-
-    QUrl apiRequestUrl;
+    nx::utils::Url apiRequestUrl;
     apiRequestUrl.setScheme( lit("http") );
 
     QAuthenticator auth = getAuth();
@@ -98,7 +103,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     apiRequestUrl.setUserName( auth.user() );
     apiRequestUrl.setPassword( auth.password() );
     apiRequestUrl.setHost( getHostAddress() );
-    apiRequestUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiRequestUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
 
 
     //reading resolution list
@@ -225,7 +230,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     setFirmware( QLatin1String( sepPos != -1 ? cameraFirmwareVersion.mid( sepPos+1 ) : cameraFirmwareVersion ) );
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
-    //setMotionType( Qn::MT_SoftwareGrid );
+    //setMotionType( Qn::MotionType::MT_SoftwareGrid );
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -246,48 +251,34 @@ QSize QnPlIsdResource::getSecondaryResolution() const
 
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
-    return new QnISDStreamReader(toSharedPointer());
+    return new QnISDStreamReader(toSharedPointer(this));
 }
 
 void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)
 {
 }
 
-QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const QnISDStreamReader* rtspReader = dynamic_cast<const QnISDStreamReader*>(dataProvider);
-        if (rtspReader && rtspReader->getDPAudioLayout())
-            return rtspReader->getDPAudioLayout();
-        else
-            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
-    }
-    else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
-}
-
-
 void QnPlIsdResource::setMaxFps(int f)
 {
     setProperty(MAX_FPS_PARAM_NAME, f);
 }
 
-CameraDiagnostics::Result QnPlIsdResource::doISDApiRequest( const QUrl& apiRequestUrl, QByteArray* const msgBody )
+CameraDiagnostics::Result QnPlIsdResource::doISDApiRequest( const nx::utils::Url& apiRequestUrl, QByteArray* const msgBody )
 {
-    int statusCode = nx_http::StatusCode::ok;
+    int statusCode = nx::network::http::StatusCode::ok;
 
-    SystemError::ErrorCode errorCode = nx_http::downloadFileSync(
+    SystemError::ErrorCode errorCode = nx::network::http::downloadFileSync(
         apiRequestUrl,
         &statusCode,
         msgBody );
     if( errorCode != SystemError::noError )
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult( apiRequestUrl.host(), apiRequestUrl.port() );
-    if( statusCode == nx_http::StatusCode::unauthorized )
+    if( statusCode == nx::network::http::StatusCode::unauthorized )
     {
         setStatus(Qn::Unauthorized);
         return CameraDiagnostics::NotAuthorisedResult( apiRequestUrl.toString() );
     }
-    else if( statusCode != nx_http::StatusCode::ok )
+    else if( statusCode != nx::network::http::StatusCode::ok )
     {
         return CameraDiagnostics::CameraResponseParseErrorResult( apiRequestUrl.toString(), apiRequestUrl.path() );
     }

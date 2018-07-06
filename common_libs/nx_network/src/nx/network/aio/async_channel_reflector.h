@@ -53,7 +53,7 @@ public:
     }
 
     /**
-     * Calling it not from aio thread results in 
+     * Calling it not from aio thread results in
      * blocking cancellation of I/O on underlying channel.
      */
     std::unique_ptr<ChannelToReflectType> takeChannel()
@@ -89,7 +89,7 @@ private:
 
     void onDataRead(SystemError::ErrorCode sysErrorCode, std::size_t bytesRead)
     {
-        if (sysErrorCode != SystemError::noError && 
+        if (sysErrorCode != SystemError::noError &&
             socketCannotRecoverFromError(sysErrorCode))
         {
             return reportDone(sysErrorCode);

@@ -17,9 +17,9 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
-#include <QtCore/QUrl>
 
 #include <nx/utils/thread/stoppable.h>
+#include <nx/utils/url.h>
 
 #include "rdir_synchronization_operation.h"
 #include "list_directory_operation.h"
@@ -120,11 +120,11 @@ public:
         \param mirrors these urls are tried in their order
     */
     RDirSyncher(
-        const std::forward_list<QUrl>& mirrors,
+        const std::forward_list<nx::utils::Url>& mirrors,
         const QString& localDirPath,
         RDirSyncher::EventReceiver* const eventReceiver );
     RDirSyncher(
-        const QUrl& baseUrl,
+        const nx::utils::Url& baseUrl,
         const QString& localDirPath,
         RDirSyncher::EventReceiver* const eventReceiver );
     virtual ~RDirSyncher();
@@ -192,7 +192,7 @@ private:
         int retryCount;
     };
 
-    std::forward_list<QUrl> m_mirrors;
+    std::forward_list<nx::utils::Url> m_mirrors;
     const QString m_localDirPath;
     EventReceiver* m_eventReceiver;
     std::list<SynchronizationTask> m_syncTasks;
@@ -203,7 +203,7 @@ private:
     State m_state;
     QString m_lastErrorText;
     QString m_failedEntryPath;
-    QUrl m_currentMirror;
+    nx::utils::Url m_currentMirror;
 
     //!Starts multiple operations by calling \a RDirSyncher::startNextOperation()
     void startOperations( std::list<RSyncEventTrigger*>& eventToTrigger );
@@ -216,7 +216,7 @@ private:
     /*!
         \return true, if switched to another mirror. false, if no mirrors left
     */
-    bool useNextMirror( const QUrl& hintMirror );
+    bool useNextMirror( const nx::utils::Url& hintMirror );
 };
 
 #endif  //RDIR_SYNCHER_H

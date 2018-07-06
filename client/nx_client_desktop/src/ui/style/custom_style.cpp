@@ -7,29 +7,58 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QGraphicsOpacityEffect>
+#include <QtWidgets/QApplication>
 
 #include <ui/style/generic_palette.h>
 #include <ui/style/nx_style.h>
 #include <ui/style/helper.h>
 #include <ui/common/palette.h>
-#include <ui/common/page_size_adjuster.h>
 #include <ui/style/globals.h>
+#include <utils/math/color_transformations.h>
 
-#include <utils/common/object_companion.h>
+#include <nx/client/desktop/common/utils/object_companion.h>
+#include <nx/client/desktop/common/utils/page_size_adjuster.h>
 
+using namespace nx::client::desktop;
 
-void setWarningStyle(QWidget *widget)
+// TODO: #vkutin Default disabledOpacity to style::Hints::kDisabledItemOpacity in new versions.
+void setWarningStyle(QWidget* widget, qreal disabledOpacity)
 {
-    setPaletteColor(widget, QPalette::ButtonText, qnGlobals->errorTextColor());
-    setPaletteColor(widget, QPalette::WindowText, qnGlobals->errorTextColor());
-    setPaletteColor(widget, QPalette::Text, qnGlobals->errorTextColor());
+    auto palette = widget->palette();
+    setWarningStyle(&palette, disabledOpacity);
+    widget->setPalette(palette);
 }
 
-void setWarningStyle(QPalette *palette)
+void resetStyle(QWidget* widget)
 {
-    palette->setColor(QPalette::ButtonText, qnGlobals->errorTextColor());
-    palette->setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    palette->setColor(QPalette::Text, qnGlobals->errorTextColor());
+    const auto style = widget->style() ? widget->style() : qApp->style();
+    style->unpolish(widget);
+    widget->setPalette(QPalette());
+    style->polish(widget);
+}
+
+void setWarningStyle(QPalette* palette, qreal disabledOpacity)
+{
+    const auto color = qnGlobals->errorTextColor();
+    palette->setColor(QPalette::ButtonText, color);
+    palette->setColor(QPalette::WindowText, color);
+    palette->setColor(QPalette::Text, color);
+
+    if (qFuzzyIsNull(disabledOpacity - 1.0))
+        return;
+
+    const auto disabledColor = toTransparent(color, disabledOpacity);
+    palette->setColor(QPalette::Disabled, QPalette::ButtonText, disabledColor);
+    palette->setColor(QPalette::Disabled, QPalette::WindowText, disabledColor);
+    palette->setColor(QPalette::Disabled, QPalette::Text, disabledColor);
+}
+
+void setWarningStyleOn(QWidget* widget, bool on, qreal disabledOpacity)
+{
+    if (on)
+        setWarningStyle(widget, disabledOpacity);
+    else
+        resetStyle(widget);
 }
 
 QString setWarningStyleHtml( const QString &source )
@@ -44,7 +73,7 @@ void resetButtonStyle(QAbstractButton* button)
     button->update();
 }
 
-void setAccentStyle(QAbstractButton *button)
+void setAccentStyle(QAbstractButton* button)
 {
     button->setProperty(style::Properties::kAccentStyleProperty, true);
     button->update();
@@ -66,7 +95,7 @@ void autoResizePagesToContents(QStackedWidget* pages,
     bool resizeToVisible,
     std::function<void()> extraHandler)
 {
-    QnStackedWidgetPageSizeAdjuster::install(pages, visiblePagePolicy, resizeToVisible, extraHandler);
+    StackedWidgetPageSizeAdjuster::install(pages, visiblePagePolicy, resizeToVisible, extraHandler);
 }
 
 void autoResizePagesToContents(QTabWidget* pages,
@@ -74,7 +103,7 @@ void autoResizePagesToContents(QTabWidget* pages,
     bool resizeToVisible,
     std::function<void()> extraHandler)
 {
-    QnTabWidgetPageSizeAdjuster::install(pages, visiblePagePolicy, resizeToVisible, extraHandler);
+    TabWidgetPageSizeAdjuster::install(pages, visiblePagePolicy, resizeToVisible, extraHandler);
 }
 
 void fadeWidget(

@@ -21,6 +21,7 @@
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource/resource_compare_helper.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <ui/style/noptix_style.h>
 #include <ui/style/helper.h>
@@ -33,9 +34,47 @@
 
 #include <utils/common/event_processors.h>
 
+#include <nx/utils/app_info.h>
+
+#include <ini.h>
+
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
 // -------------------------------------------------------------------------- //
+
+using namespace nx::client::desktop;
+
+namespace {
+
+void setFlag(QWidget* widget, int flag, bool value)
+{
+    auto flags = widget->windowFlags();
+    if (value)
+        flags |= Qt::BypassGraphicsProxyWidget;
+    else
+        flags & ~Qt::BypassGraphicsProxyWidget;
+
+    widget->setWindowFlags(flags);
+}
+
+// Must correlate with QnResourceTreeWidget::filterTags() method.
+static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
+    {
+        QnResourceSearchQuery::kAllowAllNodeTypes,
+        QnResourceSearchQuery::kAllowAllNodeTypes,
+        ResourceTreeNodeType::filteredServers,
+        ResourceTreeNodeType::filteredCameras,
+        ResourceTreeNodeType::filteredLayouts,
+        ResourceTreeNodeType::layoutTours,
+        ResourceTreeNodeType::filteredVideowalls,
+        ResourceTreeNodeType::webPages,
+        ResourceTreeNodeType::filteredUsers,
+        ResourceTreeNodeType::localResources
+    });
+
+
+} // namespace
+
 class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel
 {
     typedef QnResourceSearchProxyModel base_type;
@@ -72,25 +111,30 @@ private:
      * videowall nodes, which are pinned between Layouts and WebPages. Also if the system has one
      * server, ServersNode is not displayed, so server/edge node must be displayed on it's place.
      */
-    qreal nodeOrder(const QModelIndex &index) const
+    static qreal nodeOrder(const QModelIndex &index)
     {
-        Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-        if (nodeType != Qn::ResourceNode)
-            return nodeType;
+        using NodeType = ResourceTreeNodeType;
 
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        const auto order = [](NodeType t) { return static_cast<qreal>(t); };
+
+        const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
+
+        if (nodeType == NodeType::edge)
+            return order(NodeType::servers);
+
+        if (nodeType != NodeType::resource)
+            return order(nodeType);
+
+        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         const bool isVideoWall = resource->hasFlags(Qn::videowall);
         if (isVideoWall)
-            return 0.5 * (Qn::LayoutsNode + Qn::WebPagesNode);
+            return 0.5 * (order(NodeType::layouts) + order(NodeType::webPages));
 
         const bool isServer = resource->hasFlags(Qn::server);
         if (isServer)
-            return Qn::ServersNode;
+            return order(NodeType::servers);
 
-        if (nodeType == Qn::EdgeNode)
-            return Qn::ServersNode;
-
-        return nodeType;
+        return order(nodeType);
     }
 
 
@@ -122,6 +166,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
+    initializeNewFilter();
     initializeFilter();
 
     m_itemDelegate = new QnResourceItemDelegate(this);
@@ -129,6 +174,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->resourcesTreeView->setItemDelegateForColumn(Qn::NameColumn, m_itemDelegate);
     ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation,
         QVariant::fromValue(QnIndents(0, 1)));
+    ui->resourcesTreeView->setIndentation(style::Metrics::kDefaultIconSize);
 
     ui->resourcesTreeView->setConfirmExpandDelegate(
         [](const QModelIndex& index) -> bool
@@ -138,17 +184,20 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
             return !resource || !resource->hasFlags(Qn::layout);
         });
 
-    connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
+    connect(ui->resourcesTreeView, &TreeView::enterPressed, this,
         [this](const QModelIndex& index){emit activated(index, false); });
-    connect(ui->resourcesTreeView, &QnTreeView::doubleClicked, this,
+    connect(ui->resourcesTreeView, &TreeView::doubleClicked, this,
         [this](const QModelIndex& index){emit activated(index, true); });
 
-    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this,
+    connect(ui->resourcesTreeView, &TreeView::spacePressed, this,
         &QnResourceTreeWidget::at_treeView_spacePressed);
-    connect(ui->resourcesTreeView, &QnTreeView::clicked, this,
+    connect(ui->resourcesTreeView, &TreeView::clicked, this,
         &QnResourceTreeWidget::at_treeView_clicked);
+    connect(ui->resourcesTreeView, &TreeView::verticalScrollbarVisibilityChanged,
+        this, &QnResourceTreeWidget::updateShortcutHintVisibility);
 
     ui->resourcesTreeView->installEventFilter(this);
+    setFilterVisible(false);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget()
@@ -163,7 +212,7 @@ QAbstractItemModel *QnResourceTreeWidget::model() const
         : nullptr;
 }
 
-void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
+void QnResourceTreeWidget::setModel(QAbstractItemModel *model, NewSearchOption searchOption)
 {
     if (m_resourceProxyModel)
     {
@@ -194,7 +243,19 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
             &QnResourceTreeWidget::afterRecursiveOperation);
         expandNodeIfNeeded(QModelIndex());
 
-        updateFilter();
+        static constexpr int kOldFilterPage = 0;
+        static constexpr int kNewFilterPageIndex = 1;
+        if (ini().enableResourceFiltering && searchOption == allowNewSearch)
+        {
+            ui->filter->setCurrentIndex(kNewFilterPageIndex);
+            updateNewFilter();
+        }
+        else
+        {
+            ui->filter->setCurrentIndex(kOldFilterPage);
+            updateOldFilter();
+        }
+
         updateColumns();
     }
     else
@@ -329,17 +390,11 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
     */
 
-    if (flags & Qn::BypassGraphicsProxy)
-    {
-        ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
-        ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
-    }
-    else
-    {
-        ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() &~Qt::BypassGraphicsProxyWidget);
-        ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() &~Qt::BypassGraphicsProxyWidget);
-    }
-
+    const bool setBypassFlag = flags & Qn::BypassGraphicsProxy;
+    const auto widgets = QList<QWidget*>(
+        {ui->resourcesTreeView, ui->oldFilterLineEdit, ui->newFilterLineEdit});
+    for (const auto widget: widgets)
+        setFlag(widget, Qn::BypassGraphicsProxy, setBypassFlag);
 }
 
 Qn::GraphicsTweaksFlags QnResourceTreeWidget::graphicsTweaks()
@@ -350,6 +405,10 @@ Qn::GraphicsTweaksFlags QnResourceTreeWidget::graphicsTweaks()
 void QnResourceTreeWidget::setFilterVisible(bool visible)
 {
     ui->filter->setVisible(visible);
+
+    static const auto kDefaultMargins = QMargins(0, 8, 0, 0);
+    static const auto kMarginsWithFilter = QMargins(0, 0, 0, 0);
+    layout()->setContentsMargins(visible ? kMarginsWithFilter : kDefaultMargins);
 }
 
 bool QnResourceTreeWidget::isFilterVisible() const
@@ -435,18 +494,52 @@ void QnResourceTreeWidget::updateColumns()
     ui->resourcesTreeView->header()->setSectionResizeMode(Qn::NameColumn, QHeaderView::Stretch);
 }
 
-void QnResourceTreeWidget::updateFilter()
+void QnResourceTreeWidget::updateShortcutHintVisibility()
 {
-    QString filter = ui->filterLineEdit->text();
+    const bool hasFilterText = !ui->newFilterLineEdit->text().trimmed().isEmpty();
+    const bool hiddenScrollBar = !ui->resourcesTreeView->verticalScrollBarIsVisible();
+
+    const bool hintIsVisible = ini().enableResourceFiltering && hasFilterText && hiddenScrollBar;
+    ui->shortcutHintWidget->setVisible(hintIsVisible);
+}
+
+void QnResourceTreeWidget::updateOldFilter()
+{
+    QString filter = ui->oldFilterLineEdit->text();
 
     /* Don't allow empty filters. */
     if (!filter.isEmpty() && filter.trimmed().isEmpty())
     {
-        ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
+        ui->oldFilterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
         return;
     }
 
     m_resourceProxyModel->setQuery(filter);
+}
+
+void QnResourceTreeWidget::updateNewFilter()
+{
+    const auto filterEdit = ui->newFilterLineEdit;
+    const auto queryText = filterEdit->text();
+
+    /* Don't allow empty filters. */
+    const auto trimmed = queryText.trimmed();
+    updateShortcutHintVisibility();
+
+    if (trimmed.isEmpty())
+        filterEdit->clear();
+
+    const auto index = filterEdit->selectedTagIndex();
+    if (index >= kTagIndexToAllowedNodeMapping.size())
+    {
+        NX_EXPECT(false, "Wrong tag index");
+        return;
+    }
+
+    const auto allowedNode = index == -1
+        ? QnResourceSearchQuery::kAllowAllNodeTypes
+        : kTagIndexToAllowedNodeMapping.at(index);
+    m_resourceProxyModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
 }
 
 
@@ -525,7 +618,7 @@ void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 {
     bool needExpand = m_autoExpandPolicy
         ? m_autoExpandPolicy(index)
-        : true;
+        : false;
 
     if (needExpand)
         ui->resourcesTreeView->expand(index);
@@ -533,20 +626,38 @@ void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }
 
+QStringList QnResourceTreeWidget::filterTags()
+{
+    // Must correlate with kTagIndexToAllowedNodeMapping.
+    static const auto kFilterCategories = QStringList({
+        tr("All types"),
+        QString(), // splitter
+        tr("Servers"),
+        tr("Cameras & Devices"),
+        tr("Layouts"),
+        tr("Layout Tours"),
+        tr("Video Walls"),
+        tr("Web Pages"),
+        tr("Users"),
+        tr("Local Files")});
+
+    return kFilterCategories;
+}
+
 void QnResourceTreeWidget::initializeFilter()
 {
     // TODO: #vkutin replace with SearchLineEdit
-    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
+    ui->oldFilterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
         QLineEdit::LeadingPosition);
-    ui->filterLineEdit->setClearButtonEnabled(true);
+    ui->oldFilterLineEdit->setClearButtonEnabled(true);
     ui->filter->setVisible(false);
 
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
-        &QnResourceTreeWidget::updateFilter);
-    connect(ui->filterLineEdit, &QLineEdit::editingFinished, this,
-        &QnResourceTreeWidget::updateFilter);
+    connect(ui->oldFilterLineEdit, &QLineEdit::textChanged, this,
+        &QnResourceTreeWidget::updateOldFilter);
+    connect(ui->oldFilterLineEdit, &QLineEdit::editingFinished, this,
+        &QnResourceTreeWidget::updateOldFilter);
 
-    installEventHandler(ui->filterLineEdit, QEvent::KeyPress, this,
+    installEventHandler(ui->oldFilterLineEdit, QEvent::KeyPress, this,
         [this](QObject* /*object*/, QEvent* event)
         {
             const auto keyEvent = static_cast<QKeyEvent*>(event);
@@ -563,6 +674,34 @@ void QnResourceTreeWidget::initializeFilter()
                     break;
             }
         });
+}
+
+void QnResourceTreeWidget::initializeNewFilter()
+{
+    ui->filter->setVisible(false);
+
+    const auto ctrlKey = nx::utils::AppInfo::isMacOsX() ? Qt::Key_Meta : Qt::Key_Control;
+    ui->shortcutHintWidget->setDescriptions({
+        {QKeySequence(Qt::Key_Enter), tr("add to current layout")},
+        {QKeySequence(ctrlKey, Qt::Key_Enter), tr("open all at a new layout")}});
+    updateShortcutHintVisibility();
+
+    const auto filterEdit = ui->newFilterLineEdit;
+    filterEdit->setPlaceholderText(tr("Cameras & Resources"));
+    filterEdit->setTags(filterTags());
+    filterEdit->setClearingTagIndex(0);
+
+    connect(filterEdit, &SearchEdit::textChanged,
+        this, &QnResourceTreeWidget::updateNewFilter);
+    connect(filterEdit, &SearchEdit::editingFinished,
+        this, &QnResourceTreeWidget::updateNewFilter);
+    connect(filterEdit, &SearchEdit::selectedTagIndexChanged,
+        this, &QnResourceTreeWidget::updateNewFilter);
+
+    connect(filterEdit, &SearchEdit::enterPressed,
+        this, &QnResourceTreeWidget::filterEnterPressed);
+    connect(filterEdit, &SearchEdit::ctrlEnterPressed,
+        this, &QnResourceTreeWidget::filterCtrlEnterPressed);
 }
 
 void QnResourceTreeWidget::update(const QnResourcePtr& resource)

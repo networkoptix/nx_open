@@ -2,7 +2,11 @@
 
 #include <QtCore/QHash>
 
+#include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/future.h>
 #include <utils/common/delayed.h>
 
 #include "private/storage.h"
@@ -31,8 +35,9 @@ private:
 private:
     QnMutex mutex;
     QScopedPointer<Storage> storage;
-    QHash<QString, Worker*> workers;
+    QHash<QString, std::shared_ptr<Worker>> workers;
     AbstractPeerManagerFactory* peerManagerFactory = nullptr;
+    std::unique_ptr<AbstractPeerManagerFactory> peerManagerFactoryOwner;
 };
 
 DownloaderPrivate::DownloaderPrivate(Downloader* q):
@@ -45,7 +50,6 @@ void DownloaderPrivate::createWorker(const QString& fileName)
 {
     QnMutexLocker lock(&mutex);
 
-    NX_ASSERT(!workers.contains(fileName));
     if (workers.contains(fileName))
         return;
 
@@ -54,13 +58,16 @@ void DownloaderPrivate::createWorker(const QString& fileName)
     if (status != FileInformation::Status::downloaded
         && status != FileInformation::Status::uploading)
     {
-        Q_Q(Downloader);
-        auto worker = new Worker(
-            fileName, storage.data(), peerManagerFactory->createPeerManager());
+        auto peerPolicy = storage->fileInformation(fileName).peerPolicy;
+        auto worker = std::make_shared<Worker>(
+            fileName,
+            storage.data(),
+            peerManagerFactory->createPeerManager(peerPolicy));
         workers[fileName] = worker;
 
-        connect(worker, &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
-        connect(worker, &Worker::failed, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker.get(), &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker.get(), &Worker::failed, this, &DownloaderPrivate::at_workerFinished);
+        connect(worker.get(), &Worker::chunkDownloadFailed, this->q_ptr, &Downloader::chunkDownloadFailed);
 
         worker->start();
     }
@@ -68,22 +75,30 @@ void DownloaderPrivate::createWorker(const QString& fileName)
 
 void DownloaderPrivate::at_workerFinished(const QString& fileName)
 {
-    auto worker = workers.take(fileName);
-    if (!worker)
-        return;
+    Worker::State state;
+    {
+        QnMutexLocker lock(&mutex);
+        auto worker = workers.take(fileName);
+        if (!worker)
+            return;
+
+        state = worker->state();
+        worker->stop();
+    }
 
     Q_Q(Downloader);
 
-    const auto state = worker->state();
     if (state == Worker::State::finished)
         emit q->downloadFinished(fileName);
     else
         emit q->downloadFailed(fileName);
-
-    delete worker;
 }
 
 //-------------------------------------------------------------------------------------------------
+
+AbstractDownloader::AbstractDownloader(QObject* parent):
+    QObject(parent)
+{}
 
 Downloader::Downloader(
     const QDir& downloadsDirectory,
@@ -91,26 +106,40 @@ Downloader::Downloader(
     AbstractPeerManagerFactory* peerManagerFactory,
     QObject* parent)
     :
-    QObject(parent),
+    AbstractDownloader(parent),
     QnCommonModuleAware(commonModule),
     d_ptr(new DownloaderPrivate(this))
 {
     Q_D(Downloader);
     d->storage.reset(new Storage(downloadsDirectory));
 
-    if (peerManagerFactory)
-        d->peerManagerFactory = peerManagerFactory;
-    else
-        d->peerManagerFactory = new ResourcePoolPeerManagerFactory(commonModule);
+    connect(d->storage.data(), &Storage::fileAdded, this, &Downloader::fileAdded);
+    connect(d->storage.data(), &Storage::fileDeleted, this, &Downloader::fileDeleted);
+    connect(d->storage.data(), &Storage::fileInformationChanged, this,
+        &Downloader::fileInformationChanged);
+    connect(d->storage.data(), &Storage::fileStatusChanged, this, &Downloader::fileStatusChanged);
 
-    for (const auto& fileName: d->storage->files())
+    d->peerManagerFactory = peerManagerFactory;
+    if (!d->peerManagerFactory)
+    {
+        auto factory = std::make_unique<ResourcePoolPeerManagerFactory>(commonModule);
+        d->peerManagerFactory = factory.get();
+        d->peerManagerFactoryOwner = std::move(factory);
+    }
+}
+
+void Downloader::atServerStart()
+{
+    Q_D(Downloader);
+    for (const auto& fileName : d->storage->files())
         d->createWorker(fileName);
 }
 
 Downloader::~Downloader()
 {
     Q_D(Downloader);
-    qDeleteAll(d->workers);
+    for (auto& worker: d->workers)
+        worker->stop();
 }
 
 QStringList Downloader::files() const
@@ -177,11 +206,16 @@ ResultCode Downloader::writeFileChunk(
     return d->storage->writeFileChunk(fileName, chunkIndex, buffer);
 }
 
-ResultCode Downloader::deleteFile(
-    const QString& fileName,
-    bool deleteData)
+ResultCode Downloader::deleteFile(const QString& fileName, bool deleteData)
 {
     Q_D(Downloader);
+    {
+        QnMutexLocker lock(&d->mutex);
+        auto worker = d->workers.take(fileName);
+        if (worker)
+            worker->stop();
+    }
+
     return d->storage->deleteFile(fileName, deleteData);
 }
 
@@ -189,6 +223,63 @@ QVector<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
 {
     Q_D(Downloader);
     return d->storage->getChunkChecksums(fileName);
+}
+
+void Downloader::validateAsync(const QString& url, int expectedSize,
+    std::function<void(bool)> callback)
+{
+    auto httpClient = createHttpClient();
+    httpClient->doHead(url,
+        [httpClient, url, callback, expectedSize](
+            network::http::AsyncHttpClientPtr asyncClient) mutable
+        {
+            if (asyncClient->failed()
+                || !asyncClient->response()
+                || asyncClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
+            {
+                auto response = asyncClient->response();
+                NX_WARNING(
+                    typeid(Downloader),
+                    lm("[Downloader, validate] Validate %1 http request failed. Http client failed: %2, has response: %3, status code: %4")
+                    .args(url, asyncClient->failed(), (bool) response,
+                       !response ? -1 : response->statusLine.statusCode));
+
+                return callback(false);
+            }
+
+            auto& responseHeaders = asyncClient->response()->headers;
+            auto contentLengthItr = responseHeaders.find("Content-Length");
+            const bool hasHeader = contentLengthItr != responseHeaders.cend();
+
+            if (!hasHeader || contentLengthItr->second.toInt() != expectedSize)
+            {
+                NX_WARNING(
+                    typeid(Downloader),
+                    lm("[Downloader, validate] %1. Content-Length: %2, fileInformation.size: %3")
+                    .args(url,
+                        hasHeader ? contentLengthItr->second.toInt() : -1,
+                        expectedSize));
+
+                return callback(false);
+            }
+
+            NX_VERBOSE(typeid(Downloader), lm("[Downloader, validate] %1. Success").args(url));
+            callback(true);
+        });
+}
+
+bool Downloader::validate(const QString& url, int expectedSize)
+{
+    nx::utils::promise<bool> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+
+    validateAsync(url, expectedSize,
+        [&readyPromise](bool success) mutable
+        {
+            readyPromise.set_value(success);
+        });
+
+    return readyFuture.get();
 }
 
 } // namespace downloader

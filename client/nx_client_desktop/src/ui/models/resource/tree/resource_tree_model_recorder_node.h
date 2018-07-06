@@ -13,6 +13,10 @@ public:
     virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
     virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
 
+protected:
+    virtual QIcon calculateIcon() const override;
+    virtual nx::client::desktop::CameraExtraStatus calculateCameraExtraStatus() const override;
+
 private:
     void updateName(const QnVirtualCameraResourcePtr& camera);
 };

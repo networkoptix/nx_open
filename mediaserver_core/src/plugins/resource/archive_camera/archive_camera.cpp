@@ -13,9 +13,11 @@ void QnArchiveCamResourceSearcher::pleaseStop()  {}
 
 QnResourceList QnArchiveCamResourceSearcher::findResources() { return QnResourceList(); }
 
-QnResourcePtr QnArchiveCamResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnArchiveCamResourceSearcher::createResource(const QnUuid& resourceTypeId,
+    const QnResourceParams& params)
 {
-    static auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
+    static auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("",
+        QnArchiveCamResource::cameraName());
     if (resourceTypeId == archiveCamTypeId)
         return QnArchiveCamResourcePtr(new QnArchiveCamResource(params));
     return QnArchiveCamResourcePtr();
@@ -23,12 +25,13 @@ QnResourcePtr QnArchiveCamResourceSearcher::createResource(const QnUuid &resourc
 
 QString QnArchiveCamResourceSearcher::manufacture() const  { return kArchiveCamName; }
 
-QList<QnResourcePtr> QnArchiveCamResourceSearcher::checkHostAddr(const QUrl& /*url*/, const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
+QList<QnResourcePtr> QnArchiveCamResourceSearcher::checkHostAddr(const nx::utils::Url & /*url*/,
+    const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
 {
     return QList<QnResourcePtr>();
 }
 
-QnArchiveCamResource::QnArchiveCamResource(const QnResourceParams &params)
+QnArchiveCamResource::QnArchiveCamResource(const QnResourceParams& params)
 {
     setId(params.resID);
     setUrl(params.url);
@@ -58,7 +61,14 @@ void QnArchiveCamResource::setMotionMaskPhysical(int /*channel*/)
 {
 }
 
-CameraDiagnostics::Result QnArchiveCamResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnArchiveCamResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result QnArchiveCamResource::initializeCameraDriver()
 {
     return CameraDiagnostics::LiveVideoIsNotSupportedResult();
 }
@@ -67,4 +77,3 @@ QnAbstractStreamDataProvider* QnArchiveCamResource::createLiveDataProvider()
 {
     return nullptr;
 }
-

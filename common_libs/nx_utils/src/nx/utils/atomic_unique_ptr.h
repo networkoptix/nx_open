@@ -72,6 +72,16 @@ public:
         return get();
     }
 
+    T& operator*()
+    {
+        return *get();
+    }
+
+    const T& operator*() const
+    {
+        return *get();
+    }
+
     operator bool_type() const
     {
         return m_ptr.load()
@@ -82,6 +92,12 @@ public:
 private:
     std::atomic<T*> m_ptr;
 };
+
+template<typename T, typename ... Param>
+AtomicUniquePtr<T> make_atomic_unique(Param&& ... params)
+{
+    return AtomicUniquePtr<T>(new T(std::forward<Param>(params)...));
+}
 
 }   //utils
 }   //nx

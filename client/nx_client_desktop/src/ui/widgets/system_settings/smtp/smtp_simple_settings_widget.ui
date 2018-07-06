@@ -12,16 +12,16 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QnInputField" name="emailInputField" native="true"/>
+    <widget class="nx::client::desktop::InputField" name="emailInputField" native="true"/>
    </item>
    <item>
-    <widget class="QnInputField" name="passwordInputField" native="true"/>
+    <widget class="nx::client::desktop::InputField" name="passwordInputField" native="true"/>
    </item>
    <item>
-    <widget class="QnInputField" name="signatureInputField" native="true"/>
+    <widget class="nx::client::desktop::InputField" name="signatureInputField" native="true"/>
    </item>
    <item>
-    <widget class="QnInputField" name="supportInputField" native="true"/>
+    <widget class="nx::client::desktop::InputField" name="supportInputField" native="true"/>
    </item>
    <item>
     <spacer name="verticalSpacer">
@@ -40,9 +40,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnInputField</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

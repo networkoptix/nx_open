@@ -30,7 +30,7 @@ namespace ec2
         backup::DaysOfWeek fromQtDOW(QList<Qt::DayOfWeek> days);
     }
 
-    struct ApiStorageData: ApiResourceData
+    struct ApiStorageData: nx::vms::api::ResourceData
     {
         ApiStorageData():
             spaceLimit(0),
@@ -43,11 +43,11 @@ namespace ec2
         qint64          spaceLimit;
         bool            usedForWriting;
         QString         storageType;
-        std::vector<ApiResourceParamData> addParams;
+        nx::vms::api::ResourceParamDataList addParams;
         bool            isBackup;              // is storage used for backup
     };
 #define ApiStorageData_Fields   \
-    ApiResourceData_Fields      \
+    ResourceData_Fields      \
     (spaceLimit)                \
     (usedForWriting)            \
     (storageType)               \
@@ -55,7 +55,7 @@ namespace ec2
     (isBackup)
 
 
-    struct ApiMediaServerData: ApiResourceData
+    struct ApiMediaServerData: nx::vms::api::ResourceData
     {
         ApiMediaServerData():
             flags(Qn::SF_None)
@@ -69,12 +69,12 @@ namespace ec2
         QString         systemInfo;
         QString         authKey;
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (networkAddresses)(flags)(version)(systemInfo)(authKey)
+#define ApiMediaServerData_Fields ResourceData_Fields (networkAddresses)(flags)(version)(systemInfo)(authKey)
 
     QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerData, (eq))
 
 
-    struct ApiMediaServerUserAttributesData: ApiData
+    struct ApiMediaServerUserAttributesData: nx::vms::api::Data
     {
         QnUuid serverId;
         QString serverName;
@@ -89,7 +89,7 @@ namespace ec2
         int backupBitrate; //< Bitrate cap in bytes per second. Negative value if not capped. Not capped by default.
 
         ApiMediaServerUserAttributesData();
-        QnUuid getIdForMerging() const { return serverId; } //< See ApiIdData::getIdForMerging().
+        QnUuid getIdForMerging() const { return serverId; } //< See IdData::getIdForMerging().
 
         static DeprecatedFieldNames* getDeprecatedFieldNames()
         {
@@ -122,23 +122,25 @@ namespace ec2
         ApiMediaServerData,
         ApiMediaServerUserAttributesData
     {
-        ApiMediaServerDataEx(): ApiMediaServerData(), ApiMediaServerUserAttributesData(), status(Qn::Offline) {}
+        ApiMediaServerDataEx():
+            ApiMediaServerData(),
+            ApiMediaServerUserAttributesData()
+        {
+        }
 
-        Qn::ResourceStatus status;
-        std::vector<ApiResourceParamData> addParams;
+        nx::vms::api::ResourceStatus status = nx::vms::api::ResourceStatus::offline;
+        nx::vms::api::ResourceParamDataList addParams;
         ApiStorageDataList storages;
 
         ApiMediaServerDataEx( const ApiMediaServerDataEx& mediaServerData )
         :
-            ApiMediaServerData(mediaServerData),
-            status( Qn::Offline )
+            ApiMediaServerData(mediaServerData)
         {
         }
 
         ApiMediaServerDataEx( ApiMediaServerData&& mediaServerData )
         :
-            ApiMediaServerData( std::move( mediaServerData ) ),
-            status( Qn::Offline )
+            ApiMediaServerData( std::move( mediaServerData ) )
         {
         }
 

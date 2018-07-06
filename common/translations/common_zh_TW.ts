@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>未知錯誤.</translation>
+      <translation>未知的錯誤.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -53,11 +53,6 @@
       <translation>找到的系統 %1 為不相容的版本 %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>無法連接到另一個系統, 因為目前的系統已連接到 %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>找到的系統 %1 在安全模式下.</translation>
@@ -68,19 +63,33 @@
       <translation>無法配置遠端系統 %1.</translation>
     </message>
     <message>
+      <source>New System</source>
+      <translation>新系統</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>找到的系統 %1 與目前的系統不相容。</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>無法連接到另一個系統, 因為目前的系統已連接到 %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>這兩個系統都連接到 %1. 不允許合併.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>這些系統用了不同的 %1 URL建立. 不允許合併.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>雲端系統只可以與非雲端系統合併. 系統名稱和密碼將取自雲端系統.</translation>
     </message>
   </context>
   <context>
@@ -123,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>從伺服器 %1: "%2" 接收到錯誤回應.</translation>
+      <translation>從伺服器 %1: &quot;%2&quot; 接收到錯誤回應.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -246,18 +255,6 @@
       <translation>請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>若無幫助, 請在設備 Web 頁面上還原預設值.</translation>
     </message>
@@ -305,6 +302,22 @@
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>攝影機是從錄影資料中找回的. 刪除相機並重加一遍以瀏覽即時影像.</translation>
     </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;)..</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps (错误&quot;%1&quot;)..</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>請更新韌體. 至少更新到 %1. 目前版本是 %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -318,7 +331,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器.</translation>
+      <translation>無法初始化聲音編碼器。</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -471,11 +484,19 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>時效性</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <source>Time Licenses</source>
       <translation>時效性授權</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>橋接</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>橋接授權</translation>
     </message>
   </context>
   <context>
@@ -536,7 +557,7 @@
       <translation>未知的錯誤</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>找不到符合硬體ID的伺服器</translation>
     </message>
   </context>
@@ -653,12 +674,12 @@
       <translation>浮水印: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>硬體 Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>時效性授權</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>硬體 ID: %1</translation>
     </message>
   </context>
   <context>
@@ -756,6 +777,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>無效的資料匯出資源類型.</translation>
     </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>未匯出任何資料.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -826,7 +851,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>分</translation>
     </message>
     <message>
       <source>y</source>
@@ -961,15 +986,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>進階瀏覽</translation>
+      <translation>進階瀏覽者</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>瀏覽</translation>
+      <translation>瀏覽者</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>即時影像瀏覽</translation>
+      <translation>即時影像瀏覽者</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -977,7 +1002,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>自定</translation>
+      <translation>自訂</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1279,7 +1304,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1425,7 +1450,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n 使用者</numerusform>
+        <numerusform>%n 個使用者</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1465,6 +1490,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>確認</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>分析事件</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 於 %2</translation>
     </message>
   </context>
   <context>

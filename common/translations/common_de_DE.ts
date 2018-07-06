@@ -53,11 +53,6 @@
       <translation>Das erkannte System %1 hat eine inkompatible Version %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Kann keine Verbindung zum anderen System herstellen, weil das aktuelle System bereits mit %1 verbunden ist.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Das erkannte System %1 ist im abgesicherten Modus.</translation>
@@ -68,19 +63,33 @@
       <translation>Das Remote-System %1 konnte nicht konfiguriert werden.</translation>
     </message>
     <message>
+      <source>New System</source>
+      <translation>Neues System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>Die entdeckte System %1 ist inkompatibel mit dem aktuellen System.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kann keine Verbindung zum anderen System herstellen, weil das aktuelle System bereits mit %1 verbunden ist.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1system kann nur mit einer nicht-%1 zusammengeführt werden. Systemname und Passwort werden vom %1system übernommen.</translation>
+    </message>
+    <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Beide Systeme sind mit %1 verbunden. Zusammenführung ist nicht erlaubt.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Diese Systeme sind mit verschiedenen %1 URL erstellt worden. Zusammenführung ist nicht zulässig.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Das Cloudsystem kann nur mit einer nicht-Cloud zusammengeführt werden. Systemname und Passwort werden vom Cloudsystem übernommen.</translation>
     </message>
   </context>
   <context>
@@ -246,18 +255,6 @@
       <translation>Stellen Sie sicher, dass Port %1 erreichbar ist (Portweiterleitung).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Geräteeinstellungen.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Kameraeinstellungen.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den I/O-Einstellungen.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Wenn das nicht hilft, stellen Sie das Gerät über die Webseite auf Werkseinstellungen.</translation>
     </message>
@@ -304,6 +301,22 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Die Kamera wurde aus dem Archiv wiederhergestellt. Löschen Sie die Kamera und fügen Sie sie erneut hinzu, um das Live-Video anzuzeigen.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Geräteeinstellungen (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den Kameraeinstellungen (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (falls ausgeschaltet) und verringern Sie die fps in den I/O-Einstellungen (Fehler &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Bitte aktualisieren Sie Firmware. Minimale unterstützte Version ist %1. Aktuelle Version ist %2</translation>
     </message>
   </context>
   <context>
@@ -477,6 +490,14 @@
       <source>Time Licenses</source>
       <translation>Zeitlizenzen</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Bridge-Lizenz(en)</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -540,7 +561,7 @@
       <translation>Unbekannter Fehler</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>Server mit passender Hardware-ID wurde nicht gefunden</translation>
     </message>
   </context>
@@ -663,12 +684,12 @@
       <translation>Wasserzeichen: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Hardware-ID: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Zeitlizenz</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Hardware-ID: %1</translation>
     </message>
   </context>
   <context>
@@ -765,6 +786,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Ungültige Ressourcentyp für den Datenexport.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Keine Daten wurden exportiert.</translation>
     </message>
   </context>
   <context>
@@ -1095,7 +1120,7 @@
     <message numerus="yes">
       <source>Motion on Cameras</source>
       <translation>
-        <numerusform>Bewegung auf Kameras</numerusform>
+        <numerusform>Bewegung auf Kamera</numerusform>
         <numerusform>Bewegung auf Kameras</numerusform>
       </translation>
     </message>
@@ -1138,35 +1163,35 @@
     <message numerus="yes">
       <source>Input Signal on Devices</source>
       <translation>
-        <numerusform>Eingangssignal auf Geräten</numerusform>
+        <numerusform>Eingangssignal auf Gerät</numerusform>
         <numerusform>Eingangssignal auf Geräten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
       <translation>
-        <numerusform>Eingangssignal auf Kameras</numerusform>
+        <numerusform>Eingangssignal auf Kamera</numerusform>
         <numerusform>Eingangssignal auf Kameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>Geräte getrennt</numerusform>
-        <numerusform>Geräte getrennt</numerusform>
+        <numerusform>Gerät getrennt</numerusform>
+        <numerusform>Geräten getrennt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>Kameras getrennt</numerusform>
+        <numerusform>Kamera getrennt</numerusform>
         <numerusform>Kameras getrennt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>IP-Adresskonflikt auf mehreren Geräten</numerusform>
+        <numerusform>IP-Adresskonflikt auf mehreren Gerät</numerusform>
         <numerusform>IP-Adresskonflikt auf mehreren Geräten</numerusform>
       </translation>
     </message>
@@ -1174,7 +1199,7 @@
       <source>Cameras IP Conflict</source>
       <translation>
         <numerusform>IP-Adresskonflikt auf einer Kamera</numerusform>
-        <numerusform>IP-Adresskonflikt auf einer Kamera</numerusform>
+        <numerusform>IP-Adresskonflikt auf einer Kameras</numerusform>
       </translation>
     </message>
     <message>
@@ -1304,7 +1329,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1495,6 +1520,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Bestätigen</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Analytik-Ereignis</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 bei %2</translation>
     </message>
   </context>
   <context>

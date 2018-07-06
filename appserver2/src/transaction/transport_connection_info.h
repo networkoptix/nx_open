@@ -11,7 +11,7 @@ namespace ec2
     struct QnTransportConnectionInfo
     {
         QnUuid remotePeerId;
-        QUrl url;
+        nx::utils::Url url;
         QString state;
         bool isIncoming = false;
         bool isStarted = false;

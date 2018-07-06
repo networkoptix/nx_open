@@ -37,6 +37,7 @@ struct QnManualResourceSearchStatus {
 
 #define QnManualResourceSearchStatus_Fields (state)(current)(total)
 
+// TODO: #wearable better split this struct in two. name, vendor & existsInPool unused in add requests.
 struct QnManualResourceSearchEntry {
     QString name;
     QString url;
@@ -89,5 +90,5 @@ struct QnManualCameraSearchReply {
 
 #define QnManualCameraSearchReply_Fields (status)(processUuid)(cameras)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnManualResourceSearchStatus)(QnManualResourceSearchEntry)(QnManualCameraSearchReply), (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnManualResourceSearchStatus)(QnManualResourceSearchEntry)(QnManualCameraSearchReply), (json)(ubjson)(metatype))
 

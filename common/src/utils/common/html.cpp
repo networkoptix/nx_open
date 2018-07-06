@@ -142,7 +142,7 @@ QString htmlFormattedParagraph(const QString &text, int pixelSize, bool isBold /
     return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
 
-QString makeHref(const QString& text, const QUrl& url)
+QString makeHref(const QString& text, const nx::utils::Url& url)
 {
     return makeHref(text, url.toString());
 }
@@ -150,6 +150,16 @@ QString makeHref(const QString& text, const QUrl& url)
 QString makeHref(const QString& text, const QString& link)
 {
     return lit("<a href=\"%2\">%1</a>").arg(text, link);
+}
+
+QString makeMailHref(const QString& text, const QString& mail)
+{
+    return lit("<a href=\"mailto:%2\">%1</a>").arg(text, mail);
+}
+
+QString makeMailHref(const QString& text, const QUrl& mail)
+{
+    return makeMailHref(text, mail.toString());
 }
 
 QString escapeHtml(const QString& input)
@@ -221,3 +231,9 @@ bool mightBeHtml(const QStringList& lines)
         [](const QString& line) { return mightBeHtml(line); });
 }
 
+QString ensureHtml(const QString& source)
+{
+    return mightBeHtml(source)
+        ? source
+        : Qt::convertFromPlainText(source);
+}

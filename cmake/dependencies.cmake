@@ -1,237 +1,111 @@
-function(detect_package_versions)
-    set(_qt_version "5.6.2")
-    set(_boost_version "1.60.0")
-    set(_openssl_version "1.0.2e")
-    set(_ffmpeg_version "3.1.1")
-    set(_quazip_version "0.7.1")
-    set(_onvif_version "2.1.2-io2")
-    set(_sigar_version "1.7")
-    set(_openldap_version "2.4.42")
-    set(_sasl2_version "2.1.26")
-    set(_openal_version "1.16")
-    set(_libjpeg-turbo_version "1.4.2")
-    set(_festival_version "2.4")
-    set(_gtest_version "1.7.0")
-    set(_gmock_version "1.7.0")
-    set(_directx_version "JUN2010")
-    set(_cassandra_version "2.7.0")
+set(customWebAdminVersion "" CACHE STRING
+    "Custom version for server-external package")
+mark_as_advanced(customWebAdminVersion)
+set(customWebAdminPackageDirectory "" CACHE STRING
+    "Custom location of server-external package")
+mark_as_advanced(customWebAdminPackageDirectory)
 
-    if(WINDOWS)
-        set(_qt_version "5.6.1-1")
+function(_nx_create_vms_configuration)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(prefer_debug_packages "True")
+    else()
+        set(prefer_debug_packages "False")
     endif()
 
-    if(LINUX AND box STREQUAL "none")
-        set(_qt_version "5.6.2-2")
-    endif()
+    set(content "def cmake_to_bool(value): return value.lower() in ('on', 'true')\n\n")
+    string(APPEND content "PACKAGES_DIR = '${PACKAGES_DIR}'\n")
+    string(APPEND content "rdepSync = cmake_to_bool('${rdepSync}')\n")
+    string(APPEND content "prefer_debug_packages = ${prefer_debug_packages}\n")
+    string(APPEND content "cmake_include_file = '${CMAKE_BINARY_DIR}/dependencies.cmake'\n")
+    string(APPEND content "platform = '${platform}'\n")
+    string(APPEND content "arch = '${arch}'\n")
+    string(APPEND content "rdep_target = '${rdep_target}'\n")
+    string(APPEND content "box = '${box}'\n")
+    string(APPEND content "branch = '${branch}'\n")
+    string(APPEND content "customization = '${customization}'\n")
+    string(APPEND content "releaseVersion = '${releaseVersion}'\n")
+    string(APPEND content "shortReleaseVersion = '${releaseVersion.short}'\n")
+    string(APPEND content "customWebAdminVersion = '${customWebAdminVersion}'\n")
+    string(APPEND content "customWebAdminPackageDirectory = '${customWebAdminPackageDirectory}'\n")
+    string(APPEND content "withMediaServer = cmake_to_bool('${withMediaServer}')\n")
+    string(APPEND content "withTrayTool = cmake_to_bool('${withTrayTool}')\n")
+    string(APPEND content "withNxTool = cmake_to_bool('${withNxTool}')\n")
+    string(APPEND content "withDesktopClient = cmake_to_bool('${withDesktopClient}')\n")
+    string(APPEND content "withMobileClient = cmake_to_bool('${withMobileClient}')\n")
+    string(APPEND content "withClouds = cmake_to_bool('${withClouds}')\n")
+    string(APPEND content "withTestCamera = cmake_to_bool('${withTestCamera}')\n")
+    string(APPEND content "withTests = cmake_to_bool('${withTests}')\n")
 
-    if(MACOSX)
-        set(_qt_version "5.6.2-2")
-        set(_ffmpeg_version "3.1.1-2")
-        set(_openssl_version "1.0.2e-2")
-        set(_quazip_version "0.7.3")
-        set(_festival_version "2.1")
-    endif()
-
-    if(ANDROID)
-        set(_qt_version "5.6.2-2")
-        set(_openssl_version "1.0.2g")
-        set(_openal_version "1.17.2")
-    endif()
-
-    if(IOS)
-        set(_openssl_version "1.0.1i")
-        set(_libjpeg-turbo_version "1.4.1")
-    endif()
-
-    if(box MATCHES "bpi|bananapi")
-        set(_openssl_version "1.0.0j")
-        set(_quazip_version "0.7")
-    endif()
-
-    if(box STREQUAL "bananapi")
-        set(_ffmpeg_version "3.1.1-bananapi")
-        set(_qt_version "5.6.1")
-        set(_openssl_version "1.0.0j")
-    endif()
-
-    if(box STREQUAL "rpi")
-        set(_qt_version "5.6.1")
-        set(_quazip_version "0.7.2")
-        set(_openssl_version "1.0.0j")
-    endif()
-
-    if(box STREQUAL "edge1")
-        set(_qt_version "5.6.1")
-        set(_openssl_version "1.0.1f")
-        set(_quazip_version "0.7.2")
-    endif()
-
-    set(qt_version ${_qt_version} CACHE STRING "")
-    set(boost_version ${_boost_version} CACHE STRING "")
-    set(openssl_version ${_openssl_version} CACHE STRING "")
-    set(ffmpeg_version ${_ffmpeg_version} CACHE STRING "")
-    set(quazip_version ${_quazip_version} CACHE STRING "")
-    set(onvif_version ${_onvif_version} CACHE STRING "")
-    set(sigar_version ${_sigar_version} CACHE STRING "")
-    set(openldap_version ${_openldap_version} CACHE STRING "")
-    set(sasl2_version ${_sasl2_version} CACHE STRING "")
-    set(openal_version ${_openal_version} CACHE STRING "")
-    set(libjpeg-turbo_version ${_libjpeg-turbo_version} CACHE STRING "")
-    set(festival_version ${_festival_version} CACHE STRING "")
-    set(festival-vox_version ${festival_version} PARENT_SCOPE)
-    set(gtest_version ${_gtest_version} CACHE STRING "")
-    set(gmock_version ${_gmock_version} CACHE STRING "")
-    set(directx_version ${_directx_version} CACHE STRING "")
-    set(cassandra_version ${_cassandra_version} CACHE STRING "")
-    set(server-external_version "" CACHE STRING "")
-    set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
+    file(WRITE ${CMAKE_BINARY_DIR}/vms_configuration.py ${content})
+    nx_store_known_file(${CMAKE_BINARY_DIR}/vms_configuration.py)
 endfunction()
 
-function(get_dependencies)
-    if (WINDOWS OR (LINUX AND NOT ANDROID))
-        set(haveServer TRUE)
+_nx_create_vms_configuration()
+
+if(WIN32)
+    set(_sep ";")
+else()
+    set(_sep ":")
+endif()
+
+set(ENV{PYTHONPATH} "${CMAKE_SOURCE_DIR}/build_utils/python${_sep}${CMAKE_BINARY_DIR}")
+execute_process(
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
+    RESULT_VARIABLE sync_result
+)
+
+if(NOT sync_result STREQUAL "0")
+    message(FATAL_ERROR "error: Packages sync failed")
+endif()
+
+if(WIN32)
+    set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
+endif()
+
+if(customWebAdminPackageDirectory)
+    nx_copy_package(${customWebAdminPackageDirectory})
+endif()
+
+include(${CMAKE_BINARY_DIR}/dependencies.cmake)
+
+foreach(package_dir ${synched_package_dirs})
+    if(NOT EXISTS ${package_dir}/.nocopy)
+        nx_copy_package(${package_dir})
+    endif()
+endforeach()
+
+file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
+
+function(copy_linux_cpp_runtime)
+    execute_process(COMMAND
+        ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/linux/copy_system_library.py
+            --compiler ${CMAKE_CXX_COMPILER}
+            --flags "${CMAKE_CXX_FLAGS}"
+            --dest-dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+            --list
+            ${cpp_runtime_libs}
+        RESULT_VARIABLE result
+        OUTPUT_VARIABLE output
+    )
+
+    if(NOT result EQUAL 0)
+        message(FATAL_ERROR "Cannot copy C++ runtime libraries.")
     endif()
 
-    if ((LINUX AND arch STREQUAL "x64") OR (WINDOWS AND arch STREQUAL "x64") OR MACOSX)
-        nx_rdep_add_package(cassandra)
-    endif()
-
-    if (WINDOWS OR MACOSX OR (LINUX AND NOT ANDROID AND box MATCHES "none|tx1"))
-        set(haveDesktopClient TRUE)
-    endif()
-
-    if (box MATCHES "none|bpi")
-        set(haveMobileClient TRUE)
-    endif()
-
-    if(WINDOWS OR MACOSX
-        OR (LINUX AND NOT arch STREQUAL "x86" AND NOT ANDROID AND box MATCHES "none|bpi|tx1"))
-
-        set(haveTests TRUE)
-    endif()
-
-    nx_rdep_add_package(qt PATH_VARIABLE QT_DIR)
-    file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
-    set(QT_DIR ${QT_DIR} PARENT_SCOPE)
-
-    nx_rdep_add_package(any/boost)
-
-    if(haveServer OR haveDesktopClient OR haveTests)
-        nx_rdep_add_package(any/qtservice)
-        nx_rdep_add_package(any/qtsinglecoreapplication)
-    endif()
-
-    if(WIN32)
-        set(nxKitLibraryType "SHARED" CACHE STRING "" FORCE)
-    endif()
-    nx_rdep_add_package(any/nx_kit)
-
-    nx_rdep_add_package(openssl)
-    nx_rdep_add_package(ffmpeg)
-
-    if(box MATCHES "bpi|bananapi")
-        nx_rdep_add_package(sysroot)
-        nx_rdep_add_package(opengl-es-mali)
-    endif()
-
-    if(box MATCHES "rpi")
-        nx_rdep_add_package(cifs-utils)
-    endif()
-
-    if(haveTests)
-        nx_rdep_add_package(gtest)
-        nx_rdep_add_package(gmock)
-    endif()
-
-    if(ANDROID OR WINDOWS OR box MATCHES "bpi")
-        nx_rdep_add_package(openal)
-    endif()
-
-    if(NOT ANDROID AND NOT IOS)
-        nx_rdep_add_package(quazip)
-    endif()
-
-    if(WINDOWS)
-        nx_rdep_add_package(directx)
-        nx_rdep_add_package("vcredist-2015" PATH_VARIABLE VC14RedistPath)
-        set(VC14RedistPath ${VC14RedistPath} PARENT_SCOPE)
-        nx_rdep_add_package("vmaxproxy-2.1")
-    endif()
-
-    if(box STREQUAL "edge1")
-        nx_rdep_add_package(cpro-1.0.0)
-    endif()
-
-    if(haveDesktopClient)
-        nx_rdep_add_package(any/qtsingleapplication)
-        nx_rdep_add_package(any/help)
-    endif()
-
-    if(haveMobileClient)
-        nx_rdep_add_package(any/qtsingleguiapplication)
-    endif()
-
-    if(haveDesktopClient OR haveMobileClient)
-        nx_rdep_add_package(any/roboto-fonts)
-    endif()
-
-    if((haveServer OR haveDesktopClient) AND NOT box STREQUAL "edge1")
-        nx_rdep_add_package(festival)
-        if(NOT "${festival-vox_version}" STREQUAL "system")
-            nx_rdep_add_package(any/festival-vox)
-        endif()
-    endif()
-
-    if(ANDROID OR IOS)
-        nx_rdep_add_package(libjpeg-turbo)
-    endif()
-
-    if(haveServer)
-        nx_rdep_add_package(any/nx_sdk-1.6.0)
-        nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
-        nx_rdep_add_package(onvif)
-        nx_rdep_add_package(sigar)
-
-        nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
-        set(APIDOCTOOL_PATH ${APIDOCTOOL_PATH} PARENT_SCOPE)
-
-        if(server-external_version)
-            nx_rdep_add_package(any/server-external)
-        else()
-            nx_rdep_add_package(any/server-external-${branch} OPTIONAL
-                PATH_VARIABLE server_external_path)
-            if(NOT server_external_path)
-                nx_rdep_add_package(any/server-external-${releaseVersion.short})
-            endif()
-        endif()
-
-        if(LINUX AND arch MATCHES "arm|aarch64")
-            nx_rdep_add_package(openldap)
-            nx_rdep_add_package(sasl2)
-        endif()
-    endif()
-
-    if(box STREQUAL "bpi")
-        nx_rdep_add_package(libvdpau-sunxi-1.0-deb7)
-        nx_rdep_add_package(proxy-decoder-deb7)
-        nx_rdep_add_package(ldpreloadhook-1.0-deb7)
-        nx_rdep_add_package(libpixman-0.34.0-deb7)
-        nx_rdep_add_package(libcedrus-1.0-deb7)
-
-        nx_rdep_add_package(libstdc++-6.0.19)
-
-        nx_rdep_add_package(fontconfig-2.11.0)
-        nx_rdep_add_package(additional-fonts)
-        nx_rdep_add_package(libvdpau-1.0.4.1)
-
-        nx_rdep_add_package(read-edid-3.0.2)
-        nx_rdep_add_package(a10-display)
-        nx_rdep_add_package(uboot-2014.04-10733-gbb5691c-dirty-vanilla)
-    endif()
-
-    nx_rdep_add_package("any/certificates-${customization}" PATH_VARIABLE certificates_path)
-    set(certificates_path ${certificates_path} PARENT_SCOPE)
+    nx_split_string(files "${output}")
+    nx_store_known_files(${files})
 endfunction()
 
-detect_package_versions()
-get_dependencies()
+if(LINUX)
+    set(cpp_runtime_libs libstdc++.so.6 libatomic.so.1 libgcc_s.so.1)
+
+    if(arch MATCHES "x64|x86")
+        if(arch STREQUAL "x64")
+            list(APPEND cpp_runtime_libs libmvec.so.1)
+        endif()
+
+        copy_linux_cpp_runtime()
+    endif()
+
+    string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
+endif()

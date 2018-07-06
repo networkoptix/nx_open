@@ -13,9 +13,10 @@
 #include <utils/common/instance_storage.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
-#include "network/module_information.h"
-#include "nx_ec/data/api_runtime_data.h"
+#include <network/module_information.h>
+#include <nx_ec/data/api_runtime_data.h>
 #include <utils/common/value_cache.h>
+#include <plugins/native_sdk/common_plugin_container.h>
 
 class QSettings;
 class QnSessionManager;
@@ -80,7 +81,7 @@ public:
     using QnInstanceStorage::instance;
     using QnInstanceStorage::store;
 
-    void bindModuleinformation(const QnMediaServerResourcePtr &server);
+    void bindModuleInformation(const QnMediaServerResourcePtr &server);
 
     QnSessionManager* sessionManager() const
     {
@@ -199,7 +200,7 @@ public:
     QnUuid remoteGUID() const;
 
     /** Url we are currently connected to. */
-    QUrl currentUrl() const;
+    nx::utils::Url currentUrl() const;
 
     /** Server we are currently connected to. */
     QnMediaServerResourcePtr currentServer() const;
@@ -238,16 +239,28 @@ public:
 
     QnCommonMessageProcessor* messageProcessor() const;
 
-    template <class MessageProcessorType> void createMessageProcessor()
+    template <class MessageProcessorType>
+    MessageProcessorType* createMessageProcessor()
     {
-        createMessageProcessorInternal(new MessageProcessorType(this));
+        const auto processor = new MessageProcessorType(this);
+        createMessageProcessorInternal(processor);
+        return processor;
     }
+
     void deleteMessageProcessor();
 
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
 
     QnUuid videowallGuid() const;
     void setVideowallGuid(const QnUuid &uuid);
+
+    /**
+     * Turn on/off connections to the remove peers. 
+     * Media server will not receive connections from another peers while it is disabled.
+     * Hive mode is enabled by default.
+     */
+    void setStandAloneMode(bool value);
+    bool isStandAloneMode() const;
 
     /** instanceCounter used for unit test purpose only */
 signals:
@@ -256,6 +269,7 @@ signals:
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void runningInstanceGUIDChanged();
+    void standAloneModeChanged(bool value);
 private:
     void createMessageProcessorInternal(QnCommonMessageProcessor* messageProcessor);
     void resetCachedValue();
@@ -306,5 +320,7 @@ private:
     QnLayoutTourManager* m_layoutTourManager = nullptr;
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
 
+    // TODO: #dmishin move these factories to server module
     QnUuid m_videowallGuid;
+    bool m_standaloneMode = false;
 };

@@ -13,10 +13,11 @@ class QnBuildNumberDialog : public QnButtonBoxDialog
     using base_type = QnButtonBoxDialog;
 
 public:
-    explicit QnBuildNumberDialog(QWidget* parent = nullptr);
+    explicit QnBuildNumberDialog(QWidget* parent);
     virtual ~QnBuildNumberDialog();
 
     int buildNumber() const;
+    QString changeset() const;
     QString password() const;
 
     virtual void accept() override;

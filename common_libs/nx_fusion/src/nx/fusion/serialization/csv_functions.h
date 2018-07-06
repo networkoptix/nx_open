@@ -16,6 +16,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/utils/latin1_array.h>
+#include <nx/utils/url.h>
 
 #include "collection_fwd.h"
 #include "csv.h"
@@ -61,6 +62,11 @@ void serialize(const QnUuid &value, QnCsvStreamWriter<Output> *stream) {
 
 template<class Output>
 void serialize(const QUrl &value, QnCsvStreamWriter<Output> *stream) {
+    stream->writeUtf8Field(value.toEncoded());
+}
+
+template<class Output>
+void serialize(const nx::utils::Url& value, QnCsvStreamWriter<Output> *stream) {
     stream->writeUtf8Field(value.toEncoded());
 }
 

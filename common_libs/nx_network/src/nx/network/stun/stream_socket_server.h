@@ -1,16 +1,11 @@
-/**********************************************************
-* 19 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef STUN_STREAM_SOCKET_SERVER_H
-#define STUN_STREAM_SOCKET_SERVER_H
+#pragma once
 
 #include <nx/network/connection_server/stream_socket_server.h>
 
 #include "server_connection.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class MessageDispatcher;
@@ -18,7 +13,7 @@ class MessageDispatcher;
 class SocketServer:
     public nx::network::server::StreamSocketServer<SocketServer, ServerConnection>
 {
-    using base_type = 
+    using base_type =
         nx::network::server::StreamSocketServer<SocketServer, ServerConnection>;
 
 public:
@@ -27,13 +22,13 @@ public:
         bool sslRequired,
         network::NatTraversalSupport natTraversalSupport
             = network::NatTraversalSupport::enabled)
-    :
+        :
         base_type(sslRequired, natTraversalSupport),
         m_dispatcher(dispatcher)
     {
     }
 
-    ~SocketServer()
+    virtual ~SocketServer() override
     {
         pleaseStopSync();
     }
@@ -53,6 +48,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx
-
-#endif  //STUN_STREAM_SOCKET_SERVER_H

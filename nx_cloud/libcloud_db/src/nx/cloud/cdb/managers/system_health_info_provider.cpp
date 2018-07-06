@@ -5,13 +5,12 @@
 #include <nx/utils/time.h>
 
 #include "managers_types.h"
-#include "../ec2/connection_manager.h"
 
 namespace nx {
 namespace cdb {
 
 SystemHealthInfoProvider::SystemHealthInfoProvider(
-    ec2::ConnectionManager* ec2ConnectionManager,
+    data_sync_engine::ConnectionManager* ec2ConnectionManager,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager)
     :
     m_ec2ConnectionManager(ec2ConnectionManager),
@@ -65,15 +64,16 @@ void SystemHealthInfoProvider::getSystemHealthHistory(
 }
 
 void SystemHealthInfoProvider::onSystemStatusChanged(
-    std::string systemId, api::SystemHealth systemHealth)
+    const std::string& systemId,
+    data_sync_engine::SystemStatusDescriptor statusDescription)
 {
     using namespace std::placeholders;
 
-    NX_LOGX(lm("System %1 changed health state to %2")
-        .arg(systemId).arg(QnLexical::serialized(systemHealth)), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("System %1 changed health state to %2")
+        .args(systemId, statusDescription.isOnline ? "online" : "offline"));
 
     api::SystemHealthHistoryItem healthHistoryItem;
-    healthHistoryItem.state = systemHealth;
+    healthHistoryItem.state = statusDescription.isOnline ? api::SystemHealth::online : api::SystemHealth::offline;
     healthHistoryItem.timestamp = nx::utils::utcTime();
 
     m_dbManager->executeUpdate(
@@ -86,6 +86,30 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
             NX_LOGX(lm("Save system %1 history item finished with result %2")
                 .arg(systemId).arg(dbResult), cl_logDEBUG2);
         });
+}
+
+//-------------------------------------------------------------------------------------------------
+
+using namespace std::placeholders;
+
+SystemHealthInfoProviderFactory::SystemHealthInfoProviderFactory():
+    base_type(std::bind(&SystemHealthInfoProviderFactory::defaultFactory, this, _1, _2))
+{
+}
+
+SystemHealthInfoProviderFactory& SystemHealthInfoProviderFactory::instance()
+{
+    static SystemHealthInfoProviderFactory staticInstance;
+    return staticInstance;
+}
+
+std::unique_ptr<AbstractSystemHealthInfoProvider> SystemHealthInfoProviderFactory::defaultFactory(
+    data_sync_engine::ConnectionManager* ec2ConnectionManager,
+    nx::utils::db::AsyncSqlQueryExecutor* const dbManager)
+{
+    return std::make_unique<SystemHealthInfoProvider>(
+        ec2ConnectionManager,
+        dbManager);
 }
 
 } // namespace cdb

@@ -6,7 +6,7 @@
 
 MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
     m_workDirResource(tmpDir),
-    m_serverEndpoint(HostAddress::localhost, 0),
+    m_serverEndpoint(nx::network::HostAddress::localhost, 0),
     m_firstStartup(true)
 {
     if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
@@ -20,9 +20,9 @@ MediaServerLauncher::~MediaServerLauncher()
     stop();
 }
 
-SocketAddress MediaServerLauncher::endpoint() const
+nx::network::SocketAddress MediaServerLauncher::endpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_mediaServerProcess->getTcpPort());
+    return nx::network::SocketAddress(nx::network::HostAddress::localhost, m_mediaServerProcess->getTcpPort());
 }
 
 int MediaServerLauncher::port() const
@@ -59,14 +59,14 @@ void MediaServerLauncher::prepareToStart()
     }
 
     QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
-    char* argv[] = { "", "-e", configFileOption.data() };
+    const char* argv[] = { "", "-e", configFileOption.data() };
     const int argc = 3;
 
     m_configFile.flush();
     m_configFile.close();
 
     m_mediaServerProcess.reset();
-    m_mediaServerProcess.reset(new MediaServerProcess(argc, argv));
+    m_mediaServerProcess.reset(new MediaServerProcess(argc, (char**) argv));
     connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this, &MediaServerLauncher::started);
 
     m_firstStartup = false;
@@ -124,7 +124,7 @@ bool MediaServerLauncher::stopAsync()
     return true;
 }
 
-QUrl MediaServerLauncher::apiUrl() const
+nx::utils::Url MediaServerLauncher::apiUrl() const
 {
-    return QUrl(lit("http://") + endpoint().toString());
+    return nx::utils::Url(lit("http://") + endpoint().toString());
 }

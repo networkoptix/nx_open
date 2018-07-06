@@ -40,6 +40,13 @@ public:
         const std::string& systemId,
         const std::string& accountId) = 0;
 
+    /**
+     * @return System id list.
+     */
+    virtual std::vector<std::string> fetchSystemsWithExpiredAuthRecords(
+        nx::utils::db::QueryContext* const queryContext,
+        int systemCountLimit) = 0;
+
     virtual void insertUserAuthRecords(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId,
@@ -53,6 +60,10 @@ public:
     virtual void deleteAccountAuthRecords(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& accountId) = 0;
+
+    virtual void deleteSystemAuthRecords(
+        nx::utils::db::QueryContext* const queryContext,
+        const std::string& systemId) = 0;
 };
 
 } // namespace dao

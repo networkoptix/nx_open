@@ -13,12 +13,14 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 
+using namespace nx::client::desktop;
+
 namespace
 {
     const qreal kTransparent = 0.0;
     const qreal kOpaque = 1.0;
 
-}
+} // namespace
 
 QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
     AnimatorGroup(parent),
@@ -46,6 +48,7 @@ void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain)
     {
         stop();
         removeAnimator(m_curtainOpacityAnimator);
+        delete m_curtainOpacityAnimator;
         m_curtainOpacityAnimator = nullptr;
     }
 
@@ -53,7 +56,7 @@ void QnCurtainAnimator::setCurtainItem(QnCurtainItem *curtain)
     {
         m_curtainOpacityAnimator = opacityAnimator(curtain, m_frameOpacityAnimator->speed());
         curtain->setOpacity(kTransparent);
-        addAnimator(m_curtainOpacityAnimator);
+        addAnimator(m_curtainOpacityAnimator); //< Here we will take animator ownership.
     }
 }
 

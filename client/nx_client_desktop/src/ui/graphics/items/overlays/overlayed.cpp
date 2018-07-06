@@ -11,6 +11,8 @@
 
 #include <utils/common/warnings.h>
 
+using nx::client::desktop::Rotation;
+
 detail::OverlayedBase::OverlayWidget::OverlayWidget()
     : visibility(OverlayVisibility::Invisible)
     , widget(nullptr)
@@ -23,12 +25,13 @@ detail::OverlayedBase::OverlayWidget::OverlayWidget()
 void detail::OverlayedBase::initOverlayed(QGraphicsWidget *widget) {
     m_widget = widget;
     m_overlayVisible = false;
-    m_overlayRotation = Qn::Angle0;
+    m_overlayRotation = Rotation(0);
 }
 
 void detail::OverlayedBase::updateOverlaysRotation() {
-    Qn::FixedRotation overlayRotation = fixedRotationFromDegrees(m_widget->rotation());
-    if(overlayRotation != m_overlayRotation) {
+    const auto overlayRotation = Rotation::closestStandardRotation(m_widget->rotation());
+    if (overlayRotation != m_overlayRotation)
+    {
         m_overlayRotation = overlayRotation;
         updateOverlayWidgetsGeometry();
     }
@@ -142,8 +145,11 @@ void detail::OverlayedBase::updateOverlayWidgetsGeometry()
         {
             overlay.rotationTransform->setAngle(m_overlayRotation);
 
-            if(m_overlayRotation == Qn::Angle90 || m_overlayRotation == Qn::Angle270)
+            if (qFuzzyEquals(m_overlayRotation.value(), 90)
+                || qFuzzyEquals(m_overlayRotation.value(), 270))
+            {
                 size.transpose();
+            }
         }
 
         if (overlay.boundWidget)

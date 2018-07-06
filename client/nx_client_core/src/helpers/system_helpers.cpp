@@ -14,7 +14,7 @@ namespace helpers {
 struct Credentials {};
 const utils::log::Tag kCredentialsLogTag(typeid(Credentials));
 
-void storeConnection(const QnUuid& localSystemId, const QString& systemName, const QUrl& url)
+void storeConnection(const QnUuid& localSystemId, const QString& systemName, const nx::utils::Url& url)
 {
     const auto cleanUrl = QnUrlHelper(url).cleanUrl();
 
@@ -28,7 +28,7 @@ void storeConnection(const QnUuid& localSystemId, const QString& systemName, con
     qnClientCoreSettings->setRecentLocalConnections(connections);
 }
 
-void removeConnection(const QnUuid& localSystemId, const QUrl& url)
+void removeConnection(const QnUuid& localSystemId, const nx::utils::Url& url)
 {
     auto connections = qnClientCoreSettings->recentLocalConnections();
 

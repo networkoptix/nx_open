@@ -15,120 +15,18 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/param.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <utils/license_usage_helper.h>
 
 #include <nx_ec/data/api_tran_state_data.h>
 
-#include "managers/business_event_manager.h"
-#include "managers/camera_manager.h"
-#include "managers/discovery_manager.h"
-#include "managers/layout_manager.h"
-#include <managers/layout_tour_manager.h>
-#include "managers/license_manager.h"
-#include "managers/media_server_manager.h"
-#include "managers/misc_manager.h"
-#include "managers/resource_manager.h"
-#include "managers/stored_file_manager.h"
-#include "managers/updates_manager.h"
-#include "managers/user_manager.h"
-#include "managers/videowall_manager.h"
-#include "managers/webpage_manager.h"
-#include <database/db_manager.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
+
+#include "ec_connection_notification_manager.h"
 
 namespace ec2 {
-namespace access_helpers {
 
 namespace detail {
-std::vector<QString> getRestrictedKeysByMode(Mode mode)
-{
-    using namespace nx::settings_names;
-
-    switch (mode)
-    {
-        case Mode::read:
-            return {
-                kNamePassword,
-                ldapAdminPassword,
-                kNameCloudAuthKey,
-                Qn::CAMERA_CREDENTIALS_PARAM_NAME,
-                Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME
-            };
-        case Mode::write:
-            return {
-                kNameCloudSystemId,
-                kNameCloudAuthKey,
-                kCloudHostName,
-                kNameLocalSystemId
-            };
-    }
-
-    return std::vector<QString>();
-}
-}
-
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, KeyValueFilterType* keyValue)
-{
-    auto in_ = [] (const std::vector<QString>& vec, const QString& value)
-    {
-        return std::any_of(vec.cbegin(), vec.cend(), [&value](const QString& s) { return s == value; });
-    };
-
-    if (in_(detail::getRestrictedKeysByMode(mode), keyValue->first) && accessData != Qn::kSystemAccess)
-        return false;
-
-    return true;
-}
-
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key)
-{
-    QString dummy = lit("dummy");
-
-    KeyValueFilterType kv(key, &dummy);
-    return kvSystemOnlyFilter(mode, accessData, &kv);
-}
-
-bool kvSystemOnlyFilter(Mode mode, const Qn::UserAccessData& accessData, const QString& key, QString* value)
-{
-    KeyValueFilterType kv(key, value);
-    return kvSystemOnlyFilter(mode, accessData, &kv);
-}
-
-void applyValueFilters(
-    Mode mode,
-    const Qn::UserAccessData& accessData,
-    KeyValueFilterType* keyValue,
-    const FilterFunctorListType& filterList,
-    bool* allowed)
-{
-    if (allowed)
-        *allowed = true;
-
-    for (auto filter : filterList)
-    {
-        bool isAllowed = filter(mode, accessData, keyValue);
-
-        if (allowed && !isAllowed)
-            *allowed = false;
-    }
-}
-
-}
-
-namespace detail {
-
-template<typename T, typename F>
-ErrorCode saveTransactionImpl(const QnTransaction<T>& tran, ec2::QnTransactionLog *tlog, F f)
-{
-    QByteArray serializedTran = tlog->serializer()->serializedTransaction(tran);
-    return tlog->saveToDB(tran, f(tran.params), serializedTran);
-}
-
-template<typename T, typename F>
-ErrorCode saveSerializedTransactionImpl(const QnTransaction<T>& tran, const QByteArray& serializedTran, QnTransactionLog *tlog, F f)
-{
-    return tlog->saveToDB(tran, f(tran.params), serializedTran);
-}
 
 struct InvalidGetHashHelper
 {
@@ -137,56 +35,6 @@ struct InvalidGetHashHelper
     {
         // NX_ASSERT(0, Q_FUNC_INFO, "Invalid transaction for hash!");
         return QnUuid();
-    }
-};
-
-template<typename GetHash>
-struct DefaultSaveTransactionHelper
-{
-    template<typename Param>
-    ErrorCode operator ()(const QnTransaction<Param>& tran, QnTransactionLog* tlog)
-    {
-        return saveTransactionImpl(tran, tlog, m_getHash);
-    }
-
-    DefaultSaveTransactionHelper(GetHash getHash): m_getHash(getHash) {}
-private:
-    GetHash m_getHash;
-};
-
-template<typename GetHash>
-constexpr auto createDefaultSaveTransactionHelper(GetHash getHash)
-{
-    return DefaultSaveTransactionHelper<GetHash>(getHash);
-}
-
-template<typename GetHash>
-struct DefaultSaveSerializedTransactionHelper
-{
-    template<typename Param>
-    ErrorCode operator ()(const QnTransaction<Param> &tran, const QByteArray &serializedTran, QnTransactionLog *tlog)
-    {
-        return saveSerializedTransactionImpl(tran, serializedTran, tlog, m_getHash);
-    }
-
-    DefaultSaveSerializedTransactionHelper(GetHash getHash): m_getHash(getHash) {}
-private:
-    GetHash m_getHash;
-};
-
-template<typename GetHash>
-constexpr auto createDefaultSaveSerializedTransactionHelper(GetHash getHash)
-{
-    return DefaultSaveSerializedTransactionHelper<GetHash>(getHash);
-}
-
-struct InvalidSaveSerializedTransactionHelper
-{
-    template<typename Param>
-    ErrorCode operator ()(const QnTransaction<Param> &, const QByteArray &, QnTransactionLog *)
-    {
-        NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-        return ErrorCode::notImplemented;
     }
 };
 
@@ -205,6 +53,29 @@ struct CreateHashByIdHelper
     QnUuid operator ()(const Param &param) { return param.id; }
 };
 
+template<typename ClassType, typename FieldType>
+struct CreateHashFromCustomField
+{
+    using MemberPointer = FieldType ClassType::*;
+
+    MemberPointer memberPointer;
+
+    CreateHashFromCustomField(MemberPointer memberPointer):
+        memberPointer(memberPointer) {}
+
+    QnUuid operator ()(const ClassType& param)
+    {
+        return guidFromArbitraryData(param.*memberPointer);
+    }
+};
+
+template<typename ClassType, typename FieldType>
+CreateHashFromCustomField<ClassType, FieldType> makeCreateHashFromCustomFieldHelper(
+    FieldType ClassType::*memberPointer)
+{
+    return CreateHashFromCustomField<ClassType, FieldType>(memberPointer);
+}
+
 struct CreateHashByUserIdHelper
 {
     template<typename Param>
@@ -221,8 +92,8 @@ struct CreateHashByIdRfc4122Helper
     QnUuid operator ()(const Param &param) \
     {
         if (m_additionalData.isNull())
-            return QnTransactionLog::makeHash(param.id.toRfc4122());
-        return QnTransactionLog::makeHash(param.id.toRfc4122(), m_additionalData);
+            return QnAbstractTransaction::makeHash(param.id.toRfc4122());
+        return QnAbstractTransaction::makeHash(param.id.toRfc4122(), m_additionalData);
     }
 
 private:
@@ -231,7 +102,7 @@ private:
 
 struct CreateHashForResourceParamWithRefDataHelper
 {
-    QnUuid operator ()(const ApiResourceParamWithRefData &param)
+    QnUuid operator ()(const nx::vms::api::ResourceParamWithRefData& param)
     {
         QCryptographicHash hash(QCryptographicHash::Md5);
         hash.addData("res_params");
@@ -241,35 +112,59 @@ struct CreateHashForResourceParamWithRefDataHelper
     }
 };
 
-void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, const NotificationParams &notificationParams)
+void apiIdDataTriggerNotificationHelper(
+    const QnTransaction<nx::vms::api::IdData>& tran,
+    const NotificationParams& notificationParams)
 {
     switch (tran.command)
     {
         case ApiCommand::removeServerUserAttributes:
-            return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.mediaServerNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeResource:
         case ApiCommand::removeResourceStatus:
-            return notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.resourceNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeCamera:
-            return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.cameraNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeMediaServer:
         case ApiCommand::removeStorage:
-            return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.mediaServerNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeUser:
         case ApiCommand::removeUserRole:
-            return notificationParams.userNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.userNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeEventRule:
-            return notificationParams.businessEventNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.businessEventNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeLayout:
-            return notificationParams.layoutNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.layoutNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeLayoutTour:
-            return notificationParams.layoutTourNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.layoutTourNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeVideowall:
-            return notificationParams.videowallNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.videowallNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeWebPage:
-            return notificationParams.webPageNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.webPageNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeCameraUserAttributes:
-            return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.cameraNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::forcePrimaryTimeServer:
         case ApiCommand::removeAccessRights:
             //#ak no notification needed
@@ -279,39 +174,39 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
     }
 }
 
-QnUuid createHashForServerFootageDataHelper(const ApiServerFootageData &params)
+QnUuid createHashForServerFootageDataHelper(const nx::vms::api::ServerFootageData& params)
 {
-    return QnTransactionLog::makeHash(params.serverGuid.toRfc4122(), "history");
+    return QnAbstractTransaction::makeHash(params.serverGuid.toRfc4122(), "history");
 }
 
-QnUuid createHashForApiCameraAttributesDataHelper(const ApiCameraAttributesData &params)
+QnUuid createHashForApiCameraAttributesDataHelper(const nx::vms::api::CameraAttributesData& params)
 {
-    return QnTransactionLog::makeHash(params.cameraId.toRfc4122(), "camera_attributes");
+    return QnAbstractTransaction::makeHash(params.cameraId.toRfc4122(), "camera_attributes");
 }
 
 QnUuid createHashForApiAccessRightsDataHelper(const ApiAccessRightsData& params)
 {
-    return QnTransactionLog::makeHash(params.userId.toRfc4122(), "access_rights");
+    return QnAbstractTransaction::makeHash(params.userId.toRfc4122(), "access_rights");
 }
 
 QnUuid createHashForApiLicenseDataHelper(const ApiLicenseData &params)
 {
-    return QnTransactionLog::makeHash(params.key, "ApiLicense");
+    return QnAbstractTransaction::makeHash(params.key, "ApiLicense");
 }
 
 QnUuid createHashForApiMediaServerUserAttributesDataHelper(const ApiMediaServerUserAttributesData &params)
 {
-    return QnTransactionLog::makeHash(params.serverId.toRfc4122(), "server_attributes");
+    return QnAbstractTransaction::makeHash(params.serverId.toRfc4122(), "server_attributes");
 }
 
-QnUuid createHashForApiStoredFileDataHelper(const ApiStoredFileData &params)
+QnUuid createHashForApiStoredFileDataHelper(const nx::vms::api::StoredFileData& params)
 {
-    return QnTransactionLog::makeHash(params.path.toUtf8());
+    return QnAbstractTransaction::makeHash(params.path.toUtf8());
 }
 
 QnUuid createHashForApiDiscoveryDataHelper(const ApiDiscoveryData& params)
 {
-    return QnTransactionLog::makeHash("discovery_data", params);
+    return QnAbstractTransaction::makeHash("discovery_data", params);
 }
 
 struct CameraNotificationManagerHelper
@@ -437,14 +332,20 @@ struct EmptyNotificationHelper
     void operator ()(const QnTransaction<Param> &, const NotificationParams &) {}
 };
 
-void apiIdDataListTriggerNotificationHelper(const QnTransaction<ApiIdDataList> &tran, const NotificationParams &notificationParams)
+void apiIdDataListTriggerNotificationHelper(
+    const QnTransaction<nx::vms::api::IdDataList>& tran,
+    const NotificationParams& notificationParams)
 {
     switch (tran.command)
     {
         case ApiCommand::removeStorages:
-            return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.mediaServerNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeResources:
-            return notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
+            return notificationParams.resourceNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         default:
             NX_ASSERT(false);
     }
@@ -557,20 +458,19 @@ struct ModifyResourceAccess
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
         QnResourcePtr target = resPool->getResourceById(param.id);
 
-        if (isRemove)
-            return commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
-
         bool result = false;
-        if (!target)
+        if (isRemove)
+            result = commonModule->resourceAccessManager()->hasPermission(userResource, target, Qn::RemovePermission);
+        else if (!target)
             result = commonModule->resourceAccessManager()->canCreateResource(userResource, param);
         else
             result = commonModule->resourceAccessManager()->canModifyResource(userResource, target, param);
 
         if (!result)
-            NX_LOG(lit("Modify resource access returned false for transaction %1. User resource isNull: %2. Target resource isNull %3")
-                .arg(getTransactionDescriptorByParam<Param>()->getName())
-                .arg(!(bool)userResource)
-                .arg(!(bool)target),
+            NX_LOG(lit("%1 resource access returned false. User resource: %3. Target resource: %4")
+                .arg(isRemove ? "Remove" : "Modify")
+                .arg(userResource ? userResource->getId().toString() : QString())
+                .arg(target ? target->getId().toString() : QString()),
                 cl_logWARNING);
 
         return result;
@@ -581,13 +481,16 @@ struct ModifyResourceAccess
 
 struct ModifyCameraDataAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiCameraData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::CameraData& param)
     {
         if (!hasSystemAccess(accessData))
         {
             if (!param.physicalId.isEmpty() && !param.id.isNull())
             {
-                auto expectedId = ApiCameraData::physicalIdToId(param.physicalId);
+                auto expectedId = nx::vms::api::CameraData::physicalIdToId(param.physicalId);
                 if (expectedId != param.id)
                     return false;
             }
@@ -644,21 +547,33 @@ struct ReadResourceAccessOut
 
 struct ReadResourceParamAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiResourceParamWithRefData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        nx::vms::api::ResourceParamWithRefData& param)
     {
         if (resourceAccessHelper(commonModule, accessData, param.resourceId, Qn::ReadPermission))
         {
-            operator()(commonModule, accessData, static_cast<ApiResourceParamData&>(param));
+            operator()(
+                commonModule,
+                accessData,
+                static_cast<nx::vms::api::ResourceParamData&>(param));
             return true;
         }
         return false;
     }
 
-    bool operator()(QnCommonModule*, const Qn::UserAccessData& accessData, ApiResourceParamData& param)
+    bool operator()(
+        QnCommonModule*,
+        const Qn::UserAccessData& accessData,
+        nx::vms::api::ResourceParamData& param)
     {
         namespace ahlp = access_helpers;
         ahlp::FilterFunctorListType filters = {
-            static_cast<bool (*)(ahlp::Mode, const Qn::UserAccessData&, ahlp::KeyValueFilterType*)>(&ahlp::kvSystemOnlyFilter)
+            static_cast<bool (*)(
+                ahlp::Mode,
+                const Qn::UserAccessData&,
+                ahlp::KeyValueFilterType*)>(&ahlp::kvSystemOnlyFilter)
         };
 
         bool allowed;
@@ -674,7 +589,10 @@ struct ReadResourceParamAccess
 
 struct ReadResourceParamAccessOut
 {
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
+    RemotePeerAccess operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::ResourceParamWithRefData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.resourceId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
@@ -686,7 +604,10 @@ struct ModifyResourceParamAccess
 {
     ModifyResourceParamAccess(bool isRemove): isRemove(isRemove) {}
 
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiResourceParamWithRefData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::ResourceParamWithRefData& param)
     {
         if (hasSystemAccess(accessData))
             return true;
@@ -694,7 +615,8 @@ struct ModifyResourceParamAccess
         if (isRemove)
         {
             const auto& resPool = commonModule->resourcePool();
-            commonModule->resourceAccessManager()->hasPermission(resPool->getResourceById<QnUserResource>(accessData.userId),
+            commonModule->resourceAccessManager()->hasPermission(
+                resPool->getResourceById<QnUserResource>(accessData.userId),
                 resPool->getResourceById(param.resourceId),
                 Qn::RemovePermission);
         }
@@ -711,15 +633,25 @@ struct ModifyResourceParamAccess
 
 struct ReadFootageDataAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::ServerFootageData& param)
     {
-        return resourceAccessHelper(commonModule, accessData, param.serverGuid, Qn::ReadPermission);
+        return resourceAccessHelper(
+            commonModule,
+            accessData,
+            param.serverGuid,
+            Qn::ReadPermission);
     }
 };
 
 struct ReadFootageDataAccessOut
 {
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
+    RemotePeerAccess operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::ServerFootageData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverGuid, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
@@ -729,15 +661,25 @@ struct ReadFootageDataAccessOut
 
 struct ModifyFootageDataAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiServerFootageData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::ServerFootageData& param)
     {
-        return resourceAccessHelper(commonModule, accessData, param.serverGuid, Qn::SavePermission);
+        return resourceAccessHelper(
+            commonModule,
+            accessData,
+            param.serverGuid,
+            Qn::SavePermission);
     }
 };
 
 struct ReadCameraAttributesAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::CameraAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.cameraId, Qn::ReadPermission);
     }
@@ -745,23 +687,31 @@ struct ReadCameraAttributesAccess
 
 struct ReadCameraAttributesAccessOut
 {
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
+    RemotePeerAccess operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::CameraAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.cameraId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
 };
+
 struct ModifyCameraAttributesAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiCameraAttributesData& param)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::CameraAttributesData& param)
     {
         if (accessData == Qn::kSystemAccess)
             return true;
 
         if (!resourceAccessHelper(commonModule, accessData, param.cameraId, Qn::SavePermission))
         {
-            qWarning() << "save ApiCameraAttributesData forbidden because no save permissions. id=" << param.cameraId;
+            qWarning() << "save CameraAttributesData forbidden because no save permissions. id="
+                << param.cameraId;
             return false;
         }
 
@@ -769,21 +719,26 @@ struct ModifyCameraAttributesAccess
         QnVirtualCameraResourceList cameras;
 
         const auto& resPool = commonModule->resourcePool();
-        auto camera = resPool->getResourceById(param.cameraId).dynamicCast<QnVirtualCameraResource>();
+        auto camera = resPool->getResourceById(param.cameraId).dynamicCast<QnVirtualCameraResource
+        >();
         if (!camera)
         {
-            qWarning() << "save ApiCameraAttributesData forbidden because camera object is not exists. id=" << param.cameraId;
+            qWarning() <<
+                "save CameraAttributesData forbidden because camera object is not exists. id="
+                << param.cameraId;
             return false;
         }
 
         // Check the license if and only if recording goes from 'off' to 'on' state
-        const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+        const bool prevScheduleEnabled = camera->isLicenseUsed();
         if (prevScheduleEnabled != param.scheduleEnabled)
         {
             licenseUsageHelper.propose(camera, param.scheduleEnabled);
             if (licenseUsageHelper.isOverflowForCamera(camera))
             {
-                qWarning() << "save ApiCameraAttributesData forbidden because no license to enable recording. id=" << param.cameraId;
+                qWarning() <<
+                    "save CameraAttributesData forbidden because no license to enable recording. id="
+                    << param.cameraId;
                 return false;
             }
         }
@@ -793,40 +748,46 @@ struct ModifyCameraAttributesAccess
 
 struct ModifyCameraAttributesListAccess
 {
-    void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiCameraAttributesDataList& param)
+    void operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        nx::vms::api::CameraAttributesDataList& param)
     {
         if (accessData == Qn::kSystemAccess)
             return;
 
-        for (const auto& p : param)
+        for (const auto& p: param)
+        {
             if (!resourceAccessHelper(commonModule, accessData, p.cameraId, Qn::SavePermission))
             {
-                param = ApiCameraAttributesDataList();
+                param = {};
                 return;
             }
+        }
 
         QnCamLicenseUsageHelper licenseUsageHelper(commonModule);
         QnVirtualCameraResourceList cameras;
 
         const auto& resPool = commonModule->resourcePool();
-        for (const auto& p : param)
+        for (const auto& p: param)
         {
-            auto camera = resPool->getResourceById(p.cameraId).dynamicCast<QnVirtualCameraResource>();
+            auto camera = resPool->getResourceById(p.cameraId).dynamicCast<QnVirtualCameraResource
+            >();
             if (!camera)
             {
-                param = ApiCameraAttributesDataList();
+                param = {};
                 return;
             }
             cameras.push_back(camera);
-            const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+            const bool prevScheduleEnabled = camera->isLicenseUsed();
             if (prevScheduleEnabled != p.scheduleEnabled)
                 licenseUsageHelper.propose(camera, p.scheduleEnabled);
         }
 
-        for (const auto& camera : cameras)
+        for (const auto& camera: cameras)
             if (licenseUsageHelper.isOverflowForCamera(camera))
             {
-                param = ApiCameraAttributesDataList();
+                param = {};
                 return;
             }
     }
@@ -907,7 +868,7 @@ struct AdminOnlyAccessOut
 
 struct RemoveUserRoleAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiIdData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const nx::vms::api::IdData& param)
     {
         if (!AdminOnlyAccess()(commonModule, accessData, param))
         {
@@ -931,13 +892,19 @@ struct RemoveUserRoleAccess
 
 struct VideoWallControlAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
+    bool operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::VideowallControlMessageData&)
     {
         if (hasSystemAccess(accessData))
             return true;
         const auto& resPool = commonModule->resourcePool();
-        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalControlVideoWallPermission);
+        auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource
+        >();
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(
+            userResource,
+            Qn::GlobalControlVideoWallPermission);
         if (!result)
         {
             QString userName = userResource ? userResource->fullName() : lit("Unknown user");
@@ -954,7 +921,7 @@ struct LayoutTourAccess
     bool operator()(
         QnCommonModule* /*commonModule*/,
         const Qn::UserAccessData& accessData,
-        const ApiLayoutTourData& tour)
+        const nx::vms::api::LayoutTourData& tour)
     {
         return hasSystemAccess(accessData)
             || tour.parentId.isNull()
@@ -967,7 +934,7 @@ struct LayoutTourAccessById
     bool operator()(
         QnCommonModule* commonModule,
         const Qn::UserAccessData& accessData,
-        const ApiIdData& tourId)
+        const nx::vms::api::IdData& tourId)
     {
         const auto tour = commonModule->layoutTourManager()->tour(tourId.id);
         return !tour.isValid() //< Allow everyone to work with tours which are already deleted.
@@ -1036,15 +1003,28 @@ struct FilterListByAccess<ModifyResourceAccess>
 template<>
 struct FilterListByAccess<ModifyResourceParamAccess>
 {
-    FilterListByAccess(bool isRemove): isRemove(isRemove) {}
-
-    void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiResourceParamWithRefDataList& outList)
+    FilterListByAccess(bool isRemove): isRemove(isRemove)
     {
-        outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData, commonModule, this](const ApiResourceParamWithRefData &param)
-        {
-            return !ModifyResourceParamAccess(isRemove)(commonModule, accessData, param);
-        }), outList.end());
+    }
+
+    void operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        nx::vms::api::ResourceParamWithRefDataList& outList)
+    {
+        outList.erase(
+            std::remove_if(
+                outList.begin(),
+                outList.end(),
+                [&accessData, commonModule, this](
+                const nx::vms::api::ResourceParamWithRefData& param)
+                    {
+                        return !ModifyResourceParamAccess(isRemove)(
+                            commonModule,
+                            accessData,
+                            param);
+                    }),
+            outList.end());
     }
 
     bool isRemove;
@@ -1102,41 +1082,50 @@ struct ReadListAccessOut
 struct RegularTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, AbstractPersistentStorage*)
     {
         return TransactionType::Regular;
+    }
+};
+
+struct CloudTransactionType
+{
+    template<typename Param>
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, AbstractPersistentStorage*)
+    {
+        return TransactionType::Cloud;
     }
 };
 
 struct LocalTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, AbstractPersistentStorage*)
     {
         return TransactionType::Local;
     }
 };
 
-ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db)
+ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, AbstractPersistentStorage* db)
 {
-    ApiMediaServerDataList serverDataList;
-    ec2::ErrorCode errorCode = db->doQueryNoLock(id, serverDataList);
-
-    if (errorCode != ErrorCode::ok || serverDataList.empty())
+    ApiMediaServerData server = db->getServer(id);
+    if (server.id.isNull())
         return ec2::TransactionType::Unknown;
-
     return TransactionType::Local;
 }
 
 struct SetStatusTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiResourceStatusData& params, detail::QnDbManager* db)
+    ec2::TransactionType::Value operator()(
+        QnCommonModule* commonModule,
+        const nx::vms::api::ResourceStatusData& params,
+        AbstractPersistentStorage* db)
     {
         const auto& resPool = commonModule->resourcePool();
         QnResourcePtr resource = resPool->getResourceById<QnResource>(params.id);
         if (!resource)
             return getStatusTransactionTypeFromDb(params.id, db);
-        if(resource.dynamicCast<QnMediaServerResource>())
+        if (resource.dynamicCast<QnMediaServerResource>())
             return TransactionType::Local;
         else
             return TransactionType::Regular;
@@ -1145,7 +1134,7 @@ struct SetStatusTransactionType
 
 struct SaveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule*, const ApiUserData& params, detail::QnDbManager* /*db*/)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const ApiUserData& params, AbstractPersistentStorage* /*db*/)
     {
         return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
     }
@@ -1155,13 +1144,19 @@ struct SetResourceParamTransactionType
 {
     ec2::TransactionType::Value operator()(
 		QnCommonModule*,
-        const ApiResourceParamWithRefData& param,
-        detail::QnDbManager* /*db*/)
+        const nx::vms::api::ResourceParamWithRefData& param,
+        AbstractPersistentStorage* /*db*/)
     {
         if (param.resourceId == QnUserResource::kAdminGuid &&
             param.name == nx::settings_names::kNameSystemName)
         {
             // System rename MUST be propagated to Nx Cloud
+            return TransactionType::Cloud;
+        }
+
+        if (param.name == nx::cdb::api::kVmsUserAuthInfoAttributeName ||
+            param.name == Qn::USER_FULL_NAME)
+        {
             return TransactionType::Cloud;
         }
 
@@ -1171,20 +1166,18 @@ struct SetResourceParamTransactionType
 
 ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
     const QnUuid& id,
-    detail::QnDbManager* db)
+    AbstractPersistentStorage* db)
 {
-    ApiUserDataList userDataList;
-    ec2::ErrorCode errorCode = db->doQueryNoLock(id, userDataList);
-
-    if (errorCode != ErrorCode::ok || userDataList.empty())
+    ApiUserData userData = db->getUser(id);
+    if (userData.id.isNull())
         return ec2::TransactionType::Unknown;
 
-    return userDataList[0].isCloud ? TransactionType::Cloud : TransactionType::Regular;
+    return userData.isCloud ? TransactionType::Cloud : TransactionType::Regular;
 }
 
 struct RemoveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const ApiIdData& params, detail::QnDbManager* db)
+    ec2::TransactionType::Value operator()(QnCommonModule* commonModule, const nx::vms::api::IdData& params, AbstractPersistentStorage* db)
     {
         const auto& resPool = commonModule->resourcePool();
         auto user = resPool->getResourceById<QnUserResource>(params.id);
@@ -1215,8 +1208,6 @@ struct RemoveUserTransactionType
         isSystem, \
         #Key, \
         getHashFunc, \
-        createDefaultSaveTransactionHelper(getHashFunc), \
-        createDefaultSaveSerializedTransactionHelper(getHashFunc), \
         [](const QnAbstractTransaction &tran) { return QnTransaction<ParamType>(tran); },  \
         triggerNotificationFunc, \
         checkSavePermissionFunc, \

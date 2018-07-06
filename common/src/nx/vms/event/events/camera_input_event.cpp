@@ -15,7 +15,7 @@ CameraInputEvent::CameraInputEvent(
     qint64 timeStamp,
     const QString& inputPortID)
     :
-    base_type(cameraInputEvent, resource, toggleState, timeStamp),
+    base_type(EventType::cameraInputEvent, resource, toggleState, timeStamp),
     m_inputPortID(inputPortID)
 {
 }

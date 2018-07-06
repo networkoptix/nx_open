@@ -8,7 +8,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 
-#include <core/dataprovider/abstract_ondemand_data_provider.h>
+#include <providers/abstract_ondemand_data_provider.h>
 #include <streaming/ondemand_media_data_provider.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/timer_manager.h>
@@ -21,6 +21,7 @@
 class StreamingChunkCacheKey;
 class StreamingChunkTranscoderThread;
 class QnTranscoder;
+class QnVideoCameraPool;
 
 /**
  * Reads source stream (from archive or media cache) and transcodes it to required format.
@@ -41,14 +42,14 @@ public:
         /** Transcoding can be stopped only just before GOP. */
         fStopTranscodingAtGOPBoundary = 0x01,
         /**
-         * Try to include begin of range in resulting chunk, i.e., 
+         * Try to include begin of range in resulting chunk, i.e.,
          * start transcoding with GOP, including supplyed start timestamp.
          * Otherwise, transcoding is started with first GOP following start timestamp.
          */
         fBeginOfRangeInclusive = 0x02,
         /**
          * Actual only with fStopTranscodingAtGOPBoundary specified.
-         * If specified, transcoding stops just before GOP, following specified ending timestamp. 
+         * If specified, transcoding stops just before GOP, following specified ending timestamp.
          * Otherwise, transcoding stops at GOP that includes end timestamp
          */
         fEndOfRangeInclusive = 0x04
@@ -57,12 +58,15 @@ public:
     /**
      * @param flags Combination of input flags.
      */
-    StreamingChunkTranscoder(QnResourcePool* resPool, Flags flags);
+    StreamingChunkTranscoder(
+        QnResourcePool* resPool,
+        QnVideoCameraPool* videoCameraPool,
+        Flags flags);
     ~StreamingChunkTranscoder();
 
     /**
      * Starts transcoding of resource transcodeParams.srcResourceUniqueID.
-     * Requested data (transcodeParams.startTimestamp()) may be in future. 
+     * Requested data (transcodeParams.startTimestamp()) may be in future.
      *   In this case transcoding will start as soon as source data is available.
      * @param chunk Transcoded stream is passed to chunk->appendData.
      * @return False, if transcoding could not be started by any reason. True, otherwise.
@@ -88,26 +92,31 @@ private:
         TranscodeContext();
     };
 
-    bool m_terminated{ false };
+    QnResourcePool* m_resPool = nullptr;
+    QnVideoCameraPool* m_videoCameraPool = nullptr;
     Flags m_flags;
+    bool m_terminated = false;
     QnMutex m_mutex;
     /** map<transcoding id, data>. */
     std::map<int, TranscodeContext> m_scheduledTranscodings;
     /** map<task id, transcoding id>. */
     std::map<quint64, int> m_taskIDToTranscode;
-    QAtomicInt m_transcodeIDSeq{ 1 };
+    QAtomicInt m_transcodeIDSeq = 1;
     std::vector<StreamingChunkTranscoderThread*> m_transcodeThreads;
     DataSourceCache m_dataSourceCache;
-    QnResourcePool* m_resPool{ nullptr };
 
     DataSourceContextPtr prepareDataSourceContext(
         QnSecurityCamResourcePtr cameraResource,
         QnVideoCameraPtr camera,
         const StreamingChunkCacheKey& transcodeParams);
-    AbstractOnDemandDataProviderPtr createMediaDataProvider(
-        QnSecurityCamResourcePtr cameraResource,
+    AbstractOnDemandDataProviderPtr createLiveMediaDataProvider(
+        const VideoCameraLocker& /*locker*/,
         QnVideoCameraPtr camera,
         const StreamingChunkCacheKey& transcodeParams);
+    AbstractOnDemandDataProviderPtr createArchiveReader(
+        QnSecurityCamResourcePtr cameraResource,
+        const StreamingChunkCacheKey& transcodeParams,
+        const QnUuid& clientId);
 
     bool startTranscoding(
         int transcodingID,
@@ -121,6 +130,7 @@ private:
     std::unique_ptr<QnTranscoder> createTranscoder(
         const QnSecurityCamResourcePtr& mediaResource,
         const StreamingChunkCacheKey& transcodeParams);
+    QnVideoCameraPool* videoCameraPool();
 
 private slots:
     void onTranscodingFinished(

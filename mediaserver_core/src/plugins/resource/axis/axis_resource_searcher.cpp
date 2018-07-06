@@ -19,6 +19,8 @@ namespace
 {
     const QString kTestCredentialsUrl = lit("axis-cgi/param.cgi?action=list&group=root.Network.Bonjour.FriendlyName");
     const int kDefaultAxisTimeout = 4000;
+    static const QString kChannelNumberSuffix(lit("_channel_")); //< For physicalId.
+    static const QString kUrlChannelNumber(lit("channel"));
 }
 
 QnPlAxisResourceSearcher::QnPlAxisResourceSearcher(QnCommonModule* commonModule):
@@ -51,7 +53,6 @@ QnResourcePtr QnPlAxisResourceSearcher::createResource(const QnUuid &resourceTyp
 
     NX_LOG(lit("Create Axis camera resource. TypeID %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
-
     return result;
 
 }
@@ -61,8 +62,7 @@ QString QnPlAxisResourceSearcher::manufacture() const
     return QnPlAxisResource::MANUFACTURE;
 }
 
-
-QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
 
@@ -75,9 +75,8 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
     int timeout = 4000; // TODO: #Elric we should probably increase this one. In some cases 4 secs is not enough.
 
-
     if (port < 0)
-        port = nx_http::DEFAULT_HTTP_PORT;
+        port = nx::network::http::DEFAULT_HTTP_PORT;
 
     CLHttpStatus status;
     //QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
@@ -89,7 +88,6 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
         return QList<QnResourcePtr>();
     QString response = QString(QLatin1String(response1.append(response2)));
     QStringList lines = response.split(QLatin1String("\n"), QString::SkipEmptyParts);
-
 
     QString name;
     QString mac;
@@ -112,10 +110,8 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     name = name.left(name.lastIndexOf(QLatin1Char('-')));
     name.replace(QLatin1Char('-'), QString());
 
-
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
-
 
     QnUuid typeId = qnResTypePool->getLikeResourceTypeId(manufacture(), name);
     if (typeId.isNull())
@@ -129,8 +125,8 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     resource->setTypeId(typeId);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(mac));
-    QUrl finalUrl(url);
+    resource->setMAC(nx::network::QnMacAddress(mac));
+    nx::utils::Url finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
     resource->setUrl(finalUrl.toString());
@@ -140,8 +136,11 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     QList<QnResourcePtr> result;
     result << resource;
 
-    if (!isSearchAction)
+    QUrlQuery urlQuery(url.query());
+    if (isSearchAction)
         addMultichannelResources(result);
+    else if (urlQuery.hasQueryItem(kUrlChannelNumber))
+        setChannelToResource(resource, urlQuery.queryItemValue(kUrlChannelNumber).toInt());
 
     return result;
 }
@@ -149,19 +148,15 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     QnResourceList& result,
     const QByteArray& responseData,
-    const QHostAddress& discoveryAddress,
+    const QHostAddress& /*discoveryAddress*/,
     const QHostAddress& foundHostAddress )
 {
-    Q_UNUSED(discoveryAddress)
-    Q_UNUSED(foundHostAddress)
-
     QString smac;
     QString name;
 
     QList<QnNetworkResourcePtr> local_results;
 
     int iqpos = responseData.indexOf("AXIS");
-
 
     if (iqpos<0)
         return local_results;
@@ -178,7 +173,11 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     for (int i = iqpos; i < macpos; i++)
     {
-        name += QLatin1Char(responseData[i]);
+        const unsigned char c = responseData.at(i);
+        if (c < 0x20 || c == 0x7F) // Control char.
+            name += QLatin1Char('?');
+        else
+            name += QLatin1Char(c); //< Assume Latin-1 encoding.
     }
 
     int macpos2 = responseData.indexOf(prefix2, macpos);
@@ -192,17 +191,13 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     if (macpos+12 > responseData.size())
         return local_results;
 
-
     //macpos++; // -
 
     while(responseData.at(macpos)==' ')
         ++macpos;
 
-
     if (macpos+12 > responseData.size())
         return local_results;
-
-
 
     for (int i = 0; i < 12; i++)
     {
@@ -211,7 +206,6 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
         smac += QLatin1Char(responseData[macpos + i]);
     }
-
 
     //response.fromDatagram(responseData);
 
@@ -239,9 +233,9 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(smac));
+    resource->setMAC(nx::network::QnMacAddress(smac));
 
-    quint16 port = nx_http::DEFAULT_HTTP_PORT;
+    quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     QnMdnsPacket packet;
     if (packet.fromDatagram(responseData))
     {
@@ -280,7 +274,7 @@ bool QnPlAxisResourceSearcher::testCredentials(
     const QAuthenticator& auth) const
 {
     auto host = url.host();
-    auto port = url.port(nx_http::DEFAULT_HTTP_PORT);
+    auto port = url.port(nx::network::http::DEFAULT_HTTP_PORT);
 
     CLHttpStatus status;
     auto response = downloadFile(status, kTestCredentialsUrl, host, port, kDefaultAxisTimeout, auth);
@@ -301,6 +295,9 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
     if (existingResource)
         return existingResource->getAuth();
 
+    if (discoveryMode() != DiscoveryMode::fullyEnabled)
+        return QAuthenticator();
+
     auto resData = qnStaticCommon->dataPool()->data(resource->getVendor(), resource->getModel());
     auto possibleCredentials = resData.value<QList<nx::common::utils::Credentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
@@ -313,6 +310,23 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
     }
 
     return QAuthenticator();
+}
+
+void QnPlAxisResourceSearcher::setChannelToResource(const QnPlAxisResourcePtr& resource, int value)
+{
+    QUrl url(resource->getUrl());
+    QUrlQuery q(url.query());
+    q.removeAllQueryItems(kUrlChannelNumber);
+    q.addQueryItem(kUrlChannelNumber, QString::number(value));
+    url.setQuery(q);
+    resource->setUrl(url.toString());
+
+    const auto physicalId = resource->getPhysicalId();
+    if (physicalId.indexOf(kChannelNumberSuffix) == -1)
+    {
+        resource->setPhysicalId(physicalId + kChannelNumberSuffix + QString::number(value));
+        resource->setName(resource->getName() + QString(QLatin1String("-channel %1")).arg(value));
+    }
 }
 
 template <typename T>
@@ -332,7 +346,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
         firstResource->setGroupName(physicalId);
         firstResource->setGroupId(physicalId);
 
-        firstResource->setPhysicalId(physicalId + QLatin1String("_channel_") + QString::number(1));
+        setChannelToResource(firstResource, 1);
 
         for (uint i = 2; i <= channels; ++i)
         {
@@ -355,7 +369,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 
             resource->setUrl(firstResource->getUrl());
 
-            resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));
+            setChannelToResource(resource, i);
 
             result.push_back(resource);
         }

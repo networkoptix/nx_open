@@ -5,12 +5,12 @@
 #include <utils/common/connective.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/disconnect_helper.h>
-#include <nx/utils/collection.h>
+#include <nx/utils/algorithm/index_of.h>
 #include <network/system_description.h>
 #include <client_core/client_core_settings.h>
 
 namespace {
-using UrlsList = QList<QUrl>;
+using UrlsList = QList<nx::utils::Url>;
 
 bool isSamePort(int first, int second)
 {
@@ -56,14 +56,14 @@ private:
         const QnSystemDescriptionPtr& systemDescription,
         const QnUuid& serverId);
 
-    typedef QPair<QnUuid, QUrl> ServerIdHostPair;
+    typedef QPair<QnUuid, nx::utils::Url> ServerIdHostPair;
     typedef QList<ServerIdHostPair> ServerIdHostList;
     void updateServerHost(
         const QnSystemDescriptionPtr& systemDescription,
         const QnUuid& serverId);
     bool updateServerHostInternal(
         const ServerIdHostList::iterator& it,
-        const QUrl& host);
+        const nx::utils::Url& host);
 
     void removeServer(
         const QnSystemDescriptionPtr& systemDescription,
@@ -261,7 +261,7 @@ void QnSystemHostsModel::HostsModel::updateServerHost(
 
 bool QnSystemHostsModel::HostsModel::updateServerHostInternal(
     const ServerIdHostList::iterator& it,
-    const QUrl& host)
+    const nx::utils::Url& host)
 {
     if (it == m_hosts.end())
         return false;
@@ -337,8 +337,8 @@ bool QnSystemHostsModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const auto leftUrl = sourceLeft.data(UrlRole).toUrl();
-    const auto rightUrl = sourceRight.data(UrlRole).toUrl();
+    const auto leftUrl = nx::utils::Url::fromQUrl(sourceLeft.data(UrlRole).toUrl());
+    const auto rightUrl = nx::utils::Url::fromQUrl(sourceRight.data(UrlRole).toUrl());
     if (!leftUrl.isValid() || !rightUrl.isValid())
     {
         NX_ASSERT(false, "Urls should be valid");
@@ -347,10 +347,10 @@ bool QnSystemHostsModel::lessThan(
 
     const auto recentUrls = hostsModel()->recentConnectionUrls();
     const auto getIndexOfConnection =
-        [recentUrls](const QUrl& url) -> int
+        [recentUrls](const nx::utils::Url& url) -> int
         {
-            return qnIndexOf(recentUrls,
-                [url, recentUrls](const QUrl& recentUrl)
+            return nx::utils::algorithm::index_of(recentUrls,
+                [url, recentUrls](const nx::utils::Url& recentUrl)
                 {
                     return ((recentUrl.host() == url.host())
                         && isSamePort(recentUrl.port(), url.port()));

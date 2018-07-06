@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <string>
 
-#ifdef crc32
-#undef crc32
+#if defined(crc32)
+    #undef crc32
 #endif
 
 namespace nx {

@@ -19,6 +19,7 @@
 #include <utils/common/app_info.h>
 
 #include <nx/utils/string.h>
+#include <nx/network/app_info.h>
 
 class QnUserListModelPrivate : public Connective<QObject>, public QnConnectionContextAware
 {
@@ -313,10 +314,15 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
                 {
                     switch (user->userType())
                     {
-                        case QnUserType::Local  : return tr("Local user");
-                        case QnUserType::Cloud  : return tr("Cloud user");
-                        case QnUserType::Ldap   : return tr("LDAP user");
-                        default                 : break;
+                        case QnUserType::Local:
+                            return tr("Local user");
+                        case QnUserType::Cloud:
+                            return tr("%1 user", "%1 is the short cloud name (like Cloud)")
+                                .arg(nx::network::AppInfo::shortCloudName());
+                        case QnUserType::Ldap:
+                            return tr("LDAP user");
+                        default:
+                            break;
                     }
 
                     break;

@@ -16,3 +16,6 @@
 class QnClientStorageResource;
 typedef QnSharedResourcePointer<QnClientStorageResource> QnClientStorageResourcePtr;
 typedef QnSharedResourcePointerList<QnClientStorageResource> QnClientStorageResourceList;
+
+class QnFakeMediaServerResource;
+using QnFakeMediaServerResourcePtr = QnSharedResourcePointer<QnFakeMediaServerResource>;

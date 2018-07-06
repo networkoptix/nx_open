@@ -6,6 +6,16 @@ namespace nx {
 namespace cdb {
 namespace test {
 
+template<typename Predicate>
+void waitForPredicateBecomeTrue(Predicate p, const char* description)
+{
+    while (!p())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::cout <<"Waiting for " << description << std::endl;
+    }
+}
+
 class SchedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
 {
 public:
@@ -130,12 +140,17 @@ public:
 
     void setShouldUnsubscribe(const QnUuid& taskId, UnsubscribeCb unsubscribeCb)
     {
+        QnMutexLocker lock(&m_mutex);
         m_unsubscribeId = taskId;
         m_unsubscribeCallback = std::move(unsubscribeCb);
         m_shouldUnsubscribe = true;
     }
 
-    void setShouldSubscribe() { m_shouldSubscribe = true; }
+    void setShouldSubscribe()
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_shouldSubscribe = true;
+    }
 
     TaskMap tasks()
     {

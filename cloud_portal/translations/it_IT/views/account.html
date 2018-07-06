@@ -1,6 +1,6 @@
 
 <div class="container" ng-if="accountMode">
-    <h1>account</h1>
+    <h1>Account</h1>
     <form name="accountForm" class="form-horizontal" novalidate>
 
         <div class="form-group">
@@ -29,19 +29,11 @@
             </div>
         </div>
         <div class="form-group"  validate-field>
-            <label for="lastName"  class="col-sm-4 control-label"> Lingua </label>
+            <label for="lastName"  class="col-sm-4 control-label">Lingua</label>
             <div class="col-sm-4">
                 <language-select account-mode="true" ng-model="account.language"></language-select>
             </div>
             <div class="col-sm-4">
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-sm-offset-4 col-sm-4">
-                <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Iscriviti alle newsletter via email</label>
-                </div>
             </div>
         </div>
 

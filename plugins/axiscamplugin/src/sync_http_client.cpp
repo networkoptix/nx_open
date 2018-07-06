@@ -5,6 +5,8 @@
 
 #include "sync_http_client.h"
 
+#include <cassert>
+
 #include <QThread>
 
 #include "sync_http_client_delegate.h"
@@ -44,7 +46,7 @@ SyncHttpClient::~SyncHttpClient()
 
 QNetworkReply::NetworkError SyncHttpClient::get( const QNetworkRequest& request )
 {
-    NX_ASSERT( QThread::currentThread() != m_networkAccessManager->thread() );
+    assert( QThread::currentThread() != m_networkAccessManager->thread() );
 
     QNetworkRequest requestCopy( request );
     QUrl requestUrlCopy = requestCopy.url();

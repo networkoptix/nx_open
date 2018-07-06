@@ -7,6 +7,7 @@
 #include <nx/network/url/url_builder.h>
 
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -16,7 +17,7 @@
 #include <relay/relay_cluster_client_factory.h>
 #include <test_support/mediaserver_emulator.h>
 
-#include "functional_tests/mediator_functional_test.h"
+#include "mediator_functional_test.h"
 
 namespace nx {
 namespace hpm {
@@ -48,7 +49,7 @@ public:
     }
 
 protected:
-    // TODO: #ak Get rid of this method.
+    // TODO: #ak Get rid of this method. Logically, it is a duplicate of a givenListeningServer.
     void givenListeningMediaServer()
     {
         m_mediaServerEmulator = addRandomServer(system(), boost::none);
@@ -84,13 +85,13 @@ protected:
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
-        data::ListeningPeers listeningPeers;
+        nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
+        api::ListeningPeers listeningPeers;
 
         for (;;)
         {
             std::tie(statusCode, listeningPeers) = getListeningPeers();
-            ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
+            ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
             if (listeningPeers.systems.find(m_system.id) == listeningPeers.systems.end())
                 break;
 
@@ -128,9 +129,9 @@ protected:
     {
         using namespace std::placeholders;
 
-        auto stunClient = std::make_shared<nx::stun::AsyncClient>();
+        auto stunClient = std::make_shared<nx::network::stun::AsyncClient>();
         stunClient->connect(nx::network::url::Builder()
-            .setScheme(nx::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
+            .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
         stunClient->setOnConnectionClosedHandler(
             std::bind(&ListeningPeer::saveConnectionClosedEvent, this, stunClient.get(), _1));
         auto connection = std::make_unique<nx::hpm::api::MediatorServerTcpConnection>(
@@ -164,8 +165,8 @@ private:
     nx::hpm::AbstractCloudDataProvider::System m_system;
     std::unique_ptr<MediaServerEmulator> m_mediaServerEmulator;
     nx::String m_serverId;
-    std::vector<std::shared_ptr<nx::stun::AsyncClient>> m_serverConnections;
-    nx::utils::SyncQueue<nx::stun::AsyncClient*> m_closeConnectionEvents;
+    std::vector<std::shared_ptr<nx::network::stun::AsyncClient>> m_serverConnections;
+    nx::utils::SyncQueue<nx::network::stun::AsyncClient*> m_closeConnectionEvents;
     nx::utils::SyncQueue<std::tuple<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse>>
         m_listenResponseQueue;
 
@@ -177,7 +178,7 @@ private:
     }
 
     void saveConnectionClosedEvent(
-        nx::stun::AsyncClient* stunClient,
+        nx::network::stun::AsyncClient* stunClient,
         SystemError::ErrorCode /*systemErrorCode*/)
     {
         m_closeConnectionEvents.push(stunClient);
@@ -234,10 +235,10 @@ TEST_F(ListeningPeer, peer_disconnect)
 
     givenListeningServer();
 
-    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
-    data::ListeningPeers listeningPeers;
+    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
+    api::ListeningPeers listeningPeers;
     std::tie(statusCode, listeningPeers) = getListeningPeers();
-    ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
+    ASSERT_EQ(nx::network::http::StatusCode::ok, statusCode);
     ASSERT_EQ(1U, listeningPeers.systems.size());
 
     whenCloseConnectionToMediator();
@@ -327,7 +328,7 @@ protected:
     }
 
 private:
-    boost::optional<RelayClusterClientFactory::Function> m_factoryFuncBak;
+    std::optional<RelayClusterClientFactory::Function> m_factoryFuncBak;
     IteratableRelayClusterClient* m_relayClient = nullptr;
 
     void installIteratableRelayClusterClient()

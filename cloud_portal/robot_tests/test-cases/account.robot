@@ -14,11 +14,13 @@ ${LAST NAME IS REQUIRED}       //span[@ng-if='accountForm.lastName.$touched && a
 *** Keywords ***
 Verify In Account Page
     Location Should Be    ${url}/account
-    Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT LANGUAGE DROPDOWN}    ${ACCOUNT SUBSCRIBE CHECKBOX}    ${ACCOUNT DROPDOWN}
+    Wait Until Elements Are Visible    ${ACCOUNT EMAIL}    ${ACCOUNT FIRST NAME}    ${ACCOUNT LAST NAME}    ${ACCOUNT SAVE}    ${ACCOUNT LANGUAGE DROPDOWN}    ${ACCOUNT DROPDOWN}
     sleep    .5
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
     Validate Log Out
     Go To    ${url}
@@ -55,73 +57,6 @@ Accessing the account page from a direct link while logged out asks for login, o
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
     Verify in account page
-
-Check box is checked when registering with it checked
-    [tags]    email
-    ${random email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${random email}    ${password}
-    Activate    ${random email}
-    Log In    ${random email}    ${password}
-    Validate Log In
-    Go To    ${url}/account
-    Verify In Account Page
-    ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Be True    "${checked}"
-
-Check box is not checked when registering with it not checked
-    [tags]    email
-    ${random email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${random email}    ${password}    false
-    Activate    ${random email}
-    Log In    ${random email}    ${password}
-    Validate Log In
-    Go To    ${url}/account
-    Verify In Account Page
-    ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Not Be True    ${checked}
-
-Unchecking check box and saving maintains that setting
-    [tags]    email
-    ${random email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${random email}    ${password}
-    Activate    ${random email}
-    Log In    ${random email}    ${password}
-    Validate Log In
-    Go To    ${url}/account
-    Verify In Account Page
-
-    Click Element    ${ACCOUNT SUBSCRIBE CHECKBOX}
-    Click Button    ${ACCOUNT SAVE}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
-    Open Browser and go to URL    ${url}/account
-    Log In    ${random email}    ${password}    button=None
-    Validate Log In
-    ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Not Be True    "${checked}"=="true"
-
-Checking check box and saving maintains that setting
-    [tags]    email
-    ${random email}    Get Random Email    ${BASE EMAIL}
-    Go To    ${url}/register
-    Register    mark    hamill    ${random email}    ${password}    false
-    Activate    ${random email}
-    Log In    ${random email}    ${password}
-    Validate Log In
-    Go To    ${url}/account
-    Verify In Account Page
-    Click Element    ${ACCOUNT SUBSCRIBE CHECKBOX}
-    Click Button    ${ACCOUNT SAVE}
-    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
-    Close Browser
-    Open Browser and go to URL    ${url}/account
-    Log In    ${random email}    ${password}    button=None
-    Validate Log In
-    ${checked}    Get Element Attribute    ${ACCOUNT SUBSCRIBE CHECKBOX}    checked
-    Should Be True    "${checked}"
 
 Changing first name and saving maintains that setting
     Go To    ${url}/account
@@ -228,5 +163,6 @@ Langauge is changeable on the account page
     Wait Until Element Is Visible    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
     Click Element    //form[@name='accountForm']//a[@ng-click='changeLanguage(lang.language)']/span[@lang='${LANGUAGE}']
     Click Button    ${ACCOUNT SAVE}
+    Sleep    1
     Verify In Account Page
     Wait Until Element Is Visible    //h1['${ACCOUNT TEXT}']

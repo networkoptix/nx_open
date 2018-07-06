@@ -1,7 +1,7 @@
 #pragma once
 
 #include "event_type.h"
-#include "../socket.h"
+#include "pollable.h"
 
 namespace nx {
 namespace network {

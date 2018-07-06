@@ -20,7 +20,7 @@ namespace nx
         {
         }
 
-        QnModbusAsyncClient::QnModbusAsyncClient(const SocketAddress& endpoint) :
+        QnModbusAsyncClient::QnModbusAsyncClient(const nx::network::SocketAddress& endpoint) :
             m_state(ModbusClientState::disconnected),
             m_modbusConnection(nullptr),
             m_requestSequenceNumber(0),
@@ -34,7 +34,7 @@ namespace nx
             stopWhileInAioThread();
         }
 
-        void QnModbusAsyncClient::setEndpoint(const SocketAddress& endpoint)
+        void QnModbusAsyncClient::setEndpoint(const nx::network::SocketAddress& endpoint)
         {
             post(
                 [this, endpoint]()
@@ -61,7 +61,7 @@ namespace nx
             auto handler = [this](SystemError::ErrorCode errorCode) { onConnectionDone(errorCode); };
 
             bool kSslNeeded = false;
-            auto connectionSocket = SocketFactory::createStreamSocket(
+            auto connectionSocket = nx::network::SocketFactory::createStreamSocket(
                 kSslNeeded, nx::network::NatTraversalSupport::disabled);
 
             connectionSocket->bindToAioThread(getAioThread());

@@ -48,6 +48,9 @@
 <table class="description" style="color: #263137;border: none;border-spacing: 0;width: 100%;padding: 10px 20px;background-color: #F8F9FA;margin-top: 15px">
     <thead>
         <tr>
+            {{#sourceIcon}}
+                <th style="line-height: 30px"></th>
+            {{/sourceIcon}}
             <th style="line-height: 30px">Camera</th>
             <th style="line-height: 30px">Time</th>
         </tr>
@@ -56,6 +59,11 @@
         {{#reasonContext}}
             {{#disabledCameras}}
                 <tr>
+                    {{#sourceIcon}}
+                    <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">
+                        <img src="{{sourceIcon}}" style="max-width: 100%" />
+                    </td>
+                    {{/sourceIcon}}
                     <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px">{{.}}</td>
                     <td style="vertical-align: top;text-align: left;padding-right: 5px;padding-top: 3px;padding-bottom: 3px;white-space: nowrap">{{{timestamp}}}</td>
                 </tr>

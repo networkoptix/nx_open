@@ -35,5 +35,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'NTN';
 Config.cloud.productName = 'NTN Cloud';
-
+Config.defaultLanguage = 'en_US';
 Config.supportedLanguages = ['en_US'];

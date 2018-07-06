@@ -8,30 +8,37 @@ namespace {
     const QString mirrirParamId = lit("mirrormode1");
 }
 
-QnDwPtzController::QnDwPtzController(const QnDigitalWatchdogResourcePtr &resource):
+QnDwPtzController::QnDwPtzController(const QnDigitalWatchdogResourcePtr& resource):
     base_type(resource),
     m_resource(resource)
 {
-    connect(resource.data(), &QnDigitalWatchdogResource::advancedParameterChanged, this, &QnDwPtzController::at_physicalParamChanged);
+    connect(resource.data(), &QnDigitalWatchdogResource::advancedParameterChanged, this,
+        &QnDwPtzController::at_physicalParamChanged);
     updateFlipState();
 }
 
 void QnDwPtzController::updateFlipState() {
     Qt::Orientations flip = 0;
 
-    QString flipValue;
-    if(m_resource->getParamPhysical(flipParamId, flipValue)) {
-        if (flipValue.toInt() == 1)
+    const auto flipValue = m_resource->getAdvancedParameter(flipParamId);
+    if (flipValue)
+    {
+        if (flipValue->toInt() == 1)
             flip ^= Qt::Vertical | Qt::Horizontal;
-    } else {
+    }
+    else
+    {
         return;
     }
 
-    QString mirrorValue;
-    if (m_resource->getParamPhysical(mirrirParamId, mirrorValue)) {
-        if (mirrorValue.toInt() == 1)
+    const auto mirrorValue = m_resource->getAdvancedParameter(mirrirParamId);
+    if (mirrorValue)
+    {
+        if (mirrorValue->toInt() == 1)
             flip ^= Qt::Horizontal;
-    } else {
+    }
+    else
+    {
         return;
     }
 
@@ -59,11 +66,11 @@ bool QnDwPtzController::getFlip(Qt::Orientations *flip) const
     return true;
 }
 
-void QnDwPtzController::at_physicalParamChanged(const QString& id, const QString& value) {
-    Q_UNUSED(value);
+void QnDwPtzController::at_physicalParamChanged(const QString& id, const QString& /*value*/)
+{
+    // DW cameras doesn't show actual settings if read it immediately.
     if (id == flipParamId || id == mirrirParamId)
-        QTimer::singleShot(500, this, SLOT(updateFlipState())); // DW cameras doesn't show actual settings if read it immediately
+        QTimer::singleShot(500, this, SLOT(updateFlipState()));
 }
-
 
 #endif // ENABLE_ONVIF

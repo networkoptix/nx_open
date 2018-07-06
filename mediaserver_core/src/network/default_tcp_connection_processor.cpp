@@ -3,7 +3,7 @@
 #include "network/tcp_listener.h"
 
 QnDefaultTcpConnectionProcessor::QnDefaultTcpConnectionProcessor(
-    QSharedPointer<AbstractStreamSocket> socket, 
+    QSharedPointer<nx::network::AbstractStreamSocket> socket, 
     QnTcpListener* owner):
     QnTCPConnectionProcessor(socket, owner)
 {

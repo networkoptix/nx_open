@@ -2,7 +2,9 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace test {
 
@@ -13,8 +15,8 @@ struct Serializable
 
 #define Serializable_Fields (dummyInt)
 
-bool serializeToHeaders(nx_http::HttpHeaders* where, const Serializable& what);
-bool deserializeFromHeaders(const nx_http::HttpHeaders& from, Serializable* what);
+bool serializeToHeaders(nx::network::http::HttpHeaders* where, const Serializable& what);
+bool deserializeFromHeaders(const nx::network::http::HttpHeaders& from, Serializable* what);
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Serializable),
@@ -22,4 +24,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 } // namespace test
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

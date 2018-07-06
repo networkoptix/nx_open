@@ -15,7 +15,7 @@ namespace aio {
 /**
  * Interface for any entity that support asynchronous read/write operations.
  */
-class AbstractAsyncChannel:
+class NX_NETWORK_API AbstractAsyncChannel:
     public BasicPollable
 {
 public:
@@ -23,17 +23,28 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
+        IoCompletionHandler handler) = 0;
 
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
+        IoCompletionHandler handler) = 0;
+
+    /**
+     * Cancel async socket operation. cancellationDoneHandler is invoked when cancelled.
+     * @param eventType event to cancel.
+     */
+    virtual void cancelIOAsync(
+        nx::network::aio::EventType eventType,
+        nx::utils::MoveOnlyFunc<void()> handler) final;
 
     /**
      * Does not block if called within object's aio thread.
      * If called from any other thread then returns after asynchronous handler completion.
      */
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) = 0;
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) final;
+
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) = 0;
 };
 
 } // namespace aio

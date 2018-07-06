@@ -37,8 +37,6 @@ private:
     void at_closeLayoutAction_triggered();
     void at_closeAllButThisLayoutAction_triggered();
     void at_removeFromServerAction_triggered();
-    void at_shareLayoutAction_triggered();
-    void at_stopSharingLayoutAction_triggered();
     void at_openNewTabAction_triggered();
     void at_removeLayoutItemAction_triggered();
     void at_removeLayoutItemFromSceneAction_triggered();
@@ -52,8 +50,6 @@ private:
     void saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user);
 
     void removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave);
-
-    void shareLayoutWith(const QnLayoutResourcePtr &layout, const QnResourceAccessSubject &subject);
 
     struct LayoutChange
     {
@@ -73,7 +69,6 @@ private:
     bool confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts);
     bool confirmChangeLocalLayout(const QnUserResourcePtr& user, const LayoutChange& change);
     bool confirmDeleteLocalLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
-    bool confirmStopSharingLayouts(const QnResourceAccessSubject& subject, const QnLayoutResourceList& layouts);
     bool confirmChangeVideoWallLayout(const LayoutChange& change);
 
     /** If user has custom access rights, he must be given direct access to cameras on changed local layout. */

@@ -24,7 +24,8 @@ var SystemPage = function () {
         liveViewer: 'Can only view live video'
     };
 
-    this.systemsList = element.all(by.repeater('system in systems'));
+    //this.systemsList = element.all(by.repeater('system in systems'));
+    this.systemsList = this.helper.allSystems;
     this.secondSystem = element.all(by.repeater('system in systems')).get(1);
     this.ownedSystem = element.all(by.cssContainingText('h2', this.systemName)).first();
 

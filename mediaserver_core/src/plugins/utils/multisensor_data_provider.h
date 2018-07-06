@@ -2,8 +2,10 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <core/dataprovider/stream_mixer.h>
-#include <core/dataprovider/spush_media_stream_provider.h>
+#include <providers/stream_mixer.h>
+#include <providers/spush_media_stream_provider.h>
+
+class QnOnvifStreamReader;
 
 namespace nx {
 namespace plugins {
@@ -12,7 +14,7 @@ namespace utils {
 class MultisensorDataProvider : public CLServerPushStreamReader
 {
 public:
-    MultisensorDataProvider(const QnResourcePtr& res);
+    MultisensorDataProvider(const QnPlOnvifResourcePtr& res);
     virtual ~MultisensorDataProvider();
 
 protected:
@@ -32,7 +34,6 @@ protected:
 private:
     QnPlOnvifResourcePtr m_onvifRes;
     QnStreamMixer m_dataSource;
-
 private:
     void initSubChannels();
 

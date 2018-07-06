@@ -4,7 +4,6 @@
 #include <nx/utils/math/fuzzy.h>
 
 #include "constrained_geometrically.h"
-#include "geometry.h"
 #include "frame_section.h"
 
 /**

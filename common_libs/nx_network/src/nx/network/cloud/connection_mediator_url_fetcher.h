@@ -7,9 +7,9 @@ namespace network {
 namespace cloud {
 
 using MediatorUrlHandler = nx::utils::MoveOnlyFunc<void(
-    nx_http::StatusCode::Value /*result code*/,
-    QUrl /*tcp url*/,
-    QUrl /*udp url*/)>;
+    nx::network::http::StatusCode::Value /*result code*/,
+    nx::utils::Url /*tcp url*/,
+    nx::utils::Url /*udp url*/)>;
 
 class NX_NETWORK_API ConnectionMediatorUrlFetcher:
     public BasicCloudModuleUrlFetcher<MediatorUrlHandler>
@@ -23,7 +23,7 @@ public:
      * Retrieves endpoint if unknown.
      * If endpoint is known, then calls handler directly from this method.
      */
-    void get(nx_http::AuthInfo auth, Handler handler);
+    void get(nx::network::http::AuthInfo auth, Handler handler);
     void get(Handler handler);
 
 protected:
@@ -31,13 +31,13 @@ protected:
         const nx::utils::stree::ResourceContainer& searchResult) override;
     virtual void invokeHandler(
         const Handler& handler,
-        nx_http::StatusCode::Value statusCode) override;
+        nx::network::http::StatusCode::Value statusCode) override;
 
 private:
     struct MediatorHostDescriptor
     {
-        QUrl tcpUrl;
-        QUrl udpUrl;
+        nx::utils::Url tcpUrl;
+        nx::utils::Url udpUrl;
     };
 
     boost::optional<MediatorHostDescriptor> m_mediatorHostDescriptor;

@@ -7,14 +7,31 @@ angular.module('cloudApp')
     account, $q, system, $poll, page, $timeout, systemsProvider) {
 
         var systemId = $routeParams.systemId;
+        $scope.debugMode = Config.allowDebugMode;
 
 
         account.requireLogin().then(function(account){
             $scope.account = account;
             $scope.system = system(systemId, account.email);
             $scope.gettingSystem.run();
+
+            $scope.$watch('system.info.name',function(value){
+                page.title(value ? value + ' -' : '');
+                systemsProvider.forceUpdateSystems();
+            });
         });
 
+        function getMergeTarget(targetSystemId){
+            return _.find(systemsProvider.systems, function(system){
+                return targetSystemId == system.id;
+            });
+        }
+
+        function setMergeStatus(mergeInfo){
+            $scope.currentlyMerging = true;
+            $scope.isMaster = mergeInfo.role ? mergeInfo.role != Config.systemStatuses.slave : mergeInfo.masterSystemId == $scope.system.id;
+            $scope.mergeTargetSystem = getMergeTarget(mergeInfo.anotherSystemId);
+        }
         // Retrieve system info
         $scope.gettingSystem = process.init(function(){
             return $scope.system.getInfo(true); // Force reload system info when opening page
@@ -33,6 +50,10 @@ angular.module('cloudApp')
             },
             errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
+            $scope.canMerge = $scope.system.canMerge && $scope.system.isOnline;
+            if($scope.system.mergeInfo){
+                setMergeStatus($scope.system.mergeInfo);
+            }
             $scope.systemNoAccess = false;
             loadUsers();
             if($scope.system.permissions.editUsers){
@@ -41,6 +62,8 @@ angular.module('cloudApp')
                 delayedUpdateSystemInfo();
             }
         });
+
+
         var pollingSystemUpdate = null;
         function delayedUpdateSystemInfo(){
             pollingSystemUpdate = $poll(function(){
@@ -75,16 +98,16 @@ angular.module('cloudApp')
             $location.path('/systems/' + systemId, false);
         }
 
-        function reloadSystems(){
-            systemsProvider.forceUpdateSystems();
-            $location.path('/systems');
+        function updateAndGoToSystems(){
+            $scope.userDisconnectSystem = true;
+            systemsProvider.forceUpdateSystems().then(function(){$location.path('/systems')});
         }
 
         $scope.disconnect = function(){
             if($scope.system.isMine){
                 // User is the owner. Deleting system means unbinding it and disconnecting all accounts
                 // dialogs.confirm(L.system.confirmDisconnect, L.system.confirmDisconnectTitle, L.system.confirmDisconnectAction, 'danger').
-                dialogs.disconnect(systemId).then(reloadSystems);
+                dialogs.disconnect(systemId).then(updateAndGoToSystems);
             }
         };
 
@@ -98,7 +121,7 @@ angular.module('cloudApp')
                         },{
                             successMessage: L.system.successDeleted.replace('{{systemName}}', $scope.system.info.name),
                             errorPrefix: L.errorCodes.cantUnshareWithMeSystemPrefix
-                        }).then(reloadSystems);
+                        }).then(updateAndGoToSystems);
                         $scope.deletingSystem.run();
                     });
             }
@@ -107,6 +130,12 @@ angular.module('cloudApp')
         $scope.rename = function(){
             return dialogs.rename(systemId, $scope.system.info.name).then(function(finalName){
                 $scope.system.info.name = finalName;
+            });
+        };
+
+        $scope.mergeSystems = function(){
+            dialogs.merge($scope.system).then(function(mergeInfo){
+                setMergeStatus(mergeInfo);
             });
         };
 
@@ -150,19 +179,14 @@ angular.module('cloudApp')
                         delayedUpdateSystemInfo();
                     },function(){
                         $scope.locked[user.email] = false;
-                        $scope.system.getUsers()
-                        delayedUpdateSystemInfo();
                     });
                     $scope.unsharing.run();
                 }, function(){
                     $scope.locked[user.email] = false;
+                    $scope.system.getUsers()
+                    delayedUpdateSystemInfo();
                 });
         };
-
-        $scope.$watch('system.info.name',function(value){
-            page.title(value ? value + ' -' : '');
-            systemsProvider.forceUpdateSystems();
-        });
 
         function normalizePermissionString(permissions){
             return permissions.split('|').sort().join('|');
@@ -180,9 +204,11 @@ angular.module('cloudApp')
         }
         var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 
-        $scope.$on('$destroy', function( event ) {
+        $scope.$on('$destroy', function() {
             cancelSubscription();
-            dialogs.dismissNotifications();
+           if( typeof($scope.userDisconnectSystem) === 'undefined'){
+               dialogs.dismissNotifications();
+           }
         });
 
 

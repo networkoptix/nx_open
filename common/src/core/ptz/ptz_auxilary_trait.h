@@ -1,16 +1,12 @@
-#ifndef QN_PTZ_AUXILARY_TRAIT_H
-#define QN_PTZ_AUXILARY_TRAIT_H
+#pragma once
 
 #include <QtCore/QString>
-
-#ifndef Q_MOC_RUN
-#include <boost/operators.hpp>
-#endif
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/ptz_constants.h>
 
-class QnPtzAuxilaryTrait: public boost::equality_comparable1<QnPtzAuxilaryTrait> {
+class QnPtzAuxilaryTrait
+{
 public:
     QnPtzAuxilaryTrait(): m_standardTrait(Ptz::NoPtzTraits) {}
     QnPtzAuxilaryTrait(const QString &name);
@@ -35,7 +31,3 @@ private:
 
 Q_DECLARE_METATYPE(QnPtzAuxilaryTrait)
 Q_DECLARE_METATYPE(QnPtzAuxilaryTraitList)
-
-
-#endif // QN_PTZ_AUXILARY_TRAIT_H
-

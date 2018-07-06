@@ -5,15 +5,19 @@
 #include <QtGui/QPainter>
 
 #include <core/resource/resource_fwd.h>
-
+#include <core/resource_management/resource_pool.h>
 #include <ui/customization/customized.h>
 
-class QnCameraThumbnailManager;
-class QnBusyIndicator;
+class CameraThumbnailManager;
+class QnResourcePool;
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class BusyIndicator;
+class LayoutThumbnailLoader;
+
 namespace ui {
 
 class LayoutPreviewPainter: public Customized<QObject>
@@ -27,7 +31,7 @@ class LayoutPreviewPainter: public Customized<QObject>
     using base_type = Customized<QObject>;
 
 public:
-    LayoutPreviewPainter(QnCameraThumbnailManager* thumbnailManager, QObject* parent = nullptr);
+    LayoutPreviewPainter(QnResourcePool* resourcePool, QObject* parent = nullptr);
     virtual ~LayoutPreviewPainter() override;
 
     QnLayoutResourcePtr layout() const;
@@ -48,31 +52,25 @@ public:
     void paint(QPainter* painter, const QRect& paintRect);
 
 private:
-    struct ThumbnailInfo
-    {
-        ThumbnailInfo();
-        ThumbnailInfo(const QPixmap& pixmap);
-        ThumbnailInfo(Qn::ThumbnailStatus status, bool ignoreTrasformation, const QPixmap& pixmap);
-
-        Qn::ThumbnailStatus status;
-        bool ignoreTrasformation;
-        QPixmap pixmap;
-    };
-
-    ThumbnailInfo thumbnailForItem(const QnLayoutItemData& item) const;
-    void paintItem(QPainter* painter, const QRectF& itemRect, const QnLayoutItemData& item);
-
+    void at_updateThumbnailStatus(Qn::ThumbnailStatus status);
+    void at_updateThumbnailImage(const QImage& image);
 private:
     QnLayoutResourcePtr m_layout;
-
-    // TODO: #GDM #3.1 singletons are not safe in such cases
-    QnCameraThumbnailManager* m_thumbnailManager;
 
     QColor m_frameColor;
     QColor m_backgroundColor;
     QColor m_itemBackgroundColor;
     QColor m_fontColor;
-    QScopedPointer<QnBusyIndicator> m_busyIndicator;
+    QScopedPointer<BusyIndicator> m_busyIndicator;
+
+    QPixmap m_layoutThumbnail;
+
+    // We need resource pool to pass it to m_layoutThumbnailProvider.
+    QPointer<QnResourcePool> m_resourcePool;
+    // Status of resource loading.
+    Qn::ResourceStatusOverlay m_overlayStatus = Qn::NoDataOverlay;
+
+    std::unique_ptr<nx::client::desktop::LayoutThumbnailLoader> m_layoutThumbnailProvider;
 };
 
 } // namespace ui

@@ -6,11 +6,12 @@
 #include <QtCore/QUrl>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 struct QnConnectionData
 {
     QnConnectionData();
-    QnConnectionData(const QString &name, const QUrl &url,
+    QnConnectionData(const QString &name, const nx::utils::Url &url,
         const QnUuid& localId);
 
     bool isValid() const;
@@ -20,7 +21,7 @@ struct QnConnectionData
     bool operator!=(const QnConnectionData &other) const;
 
     QString name;
-    QUrl url;
+    nx::utils::Url url;
     QnUuid localId;
 };
 

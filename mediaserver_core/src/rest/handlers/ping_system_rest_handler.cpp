@@ -9,7 +9,7 @@
 #include "network/tcp_connection_priv.h"
 #include <network/connection_validator.h>
 #include "utils/common/app_info.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/custom_headers.h>
 #include <rest/server/rest_connection_processor.h>
 #include <licensing/license_validator.h>
@@ -22,14 +22,12 @@ namespace
 }
 
 int QnPingSystemRestHandler::executeGet(
-        const QString &path,
-        const QnRequestParams &params,
-        QnJsonRestResult &result,
+        const QString& /*path*/,
+        const QnRequestParams& params,
+        QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
-
-    QUrl url = params.value(lit("url"));
+    nx::utils::Url url = params.value(lit("url"));
     QString getKey = params.value(lit("getKey"));
 
     if (url.isEmpty())
@@ -59,16 +57,15 @@ int QnPingSystemRestHandler::executeGet(
         moduleInformation = remoteModuleInformation(url, getKey, status);
         if (status != CL_HTTP_SUCCESS)
         {
-            if (status == nx_http::StatusCode::unauthorized)
+            if (status == nx::network::http::StatusCode::unauthorized)
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
-            else if (status == nx_http::StatusCode::forbidden)
+            else if (status == nx::network::http::StatusCode::forbidden)
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("FORBIDDEN"));
             else
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
             return CODE_OK;
         }
     }
-
 
     if (moduleInformation.systemName.isEmpty())
     {
@@ -114,7 +111,7 @@ int QnPingSystemRestHandler::executeGet(
 }
 
 QnModuleInformation QnPingSystemRestHandler::remoteModuleInformation(
-        const QUrl &url,
+        const nx::utils::Url &url,
         const QString& getKey,
         int &status)
 {

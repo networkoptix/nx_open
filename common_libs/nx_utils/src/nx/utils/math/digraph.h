@@ -24,8 +24,8 @@
     \param NodeKey Requirements: comparable, copyable
     \param VerticeKeyType Comparable type
     \param EdgeDataType Data stored with edge type
-    \note Class methods are not thread-safe
-    \note Edge loops are allowed
+    NOTE: Class methods are not thread-safe
+    NOTE: Edge loops are allowed
 */
 template<class VerticeKeyType, class EdgeDataType, class Comp = std::less<VerticeKeyType>>
 class Digraph
@@ -53,8 +53,8 @@ public:
 
     //!Creates edge between two vertices. If either vertice does not exists, it is added first
     /*!
-        \return \a true if added, \a false if edge already exists
-        \note Loops are allowed
+        \return true if added, false if edge already exists
+        NOTE: Loops are allowed
     */
     template<
         class VerticeOneRef,
@@ -98,7 +98,7 @@ public:
 
     /*!
         \param foundPath In case of success, vertices along found path are stored here.
-            \a from and \a to are included. Can be \a nullptr
+            from and to are included. Can be nullptr
     */
     bool findAnyPath(
         const vertice_key_type& from,
@@ -114,7 +114,7 @@ public:
             []( const edge_data_type& ){ return true; } );
     }
 
-    //!Finds any path between two vertices using only edges for which \a edgeSelectionPred returns \a true
+    //!Finds any path between two vertices using only edges for which edgeSelectionPred returns true
     template<class EdgeSelectionPredicateType>
     bool findAnyPathIf(
         const vertice_key_type& from,

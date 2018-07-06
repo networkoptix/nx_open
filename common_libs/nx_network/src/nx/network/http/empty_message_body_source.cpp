@@ -1,6 +1,8 @@
 #include "empty_message_body_source.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 EmptyMessageBodySource::EmptyMessageBodySource(
     StringType contentType,
@@ -41,4 +43,6 @@ void EmptyMessageBodySource::readAsync(
         });
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -1,17 +1,17 @@
+set(nx_enable_werror ON)
+
 add_subdirectory(cloud_db_client)
 
 if(withClouds OR withDesktopClient)
-    add_subdirectory(libvms_gateway)
+    add_subdirectory(librelaying)
+    add_subdirectory(libvms_gateway_core)
 endif()
 
 if(withClouds)
-    if(LINUX)
-        add_compile_options("-Werror" "-Wall" "-Wextra")
-    endif()
-
     add_subdirectory(vms_gateway)
     add_subdirectory(libconnection_mediator)
     add_subdirectory(connection_mediator)
+    add_subdirectory(nx_data_sync_engine)
     add_subdirectory(libcloud_db)
     add_subdirectory(cloud_db)
     add_subdirectory(libtraffic_relay)
@@ -23,3 +23,5 @@ if(withClouds)
         add_subdirectory(tests)
     endif()
 endif()
+
+add_custom_target(cloud-backend DEPENDS cloud_db_client vms_gateway connection_mediator cloud_db traffic_relay time_server cloud_connect_test_util)

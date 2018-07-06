@@ -40,7 +40,7 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor
 
 public:
     QnRestConnectionProcessor(
-        QSharedPointer<AbstractStreamSocket> socket,
+        QSharedPointer<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
     virtual ~QnRestConnectionProcessor();
     void setAuthNotRequired(bool noAuth);
@@ -49,8 +49,8 @@ public:
     void setAccessRights(const Qn::UserAccessData& accessRights);
 
     //!Rest handler can use following methods to access http request/response directly
-    const nx_http::Request& request() const;
-    nx_http::Response* response() const;
+    const nx::network::http::Request& request() const;
+    nx::network::http::Response* response() const;
     QnTcpListener* owner() const;
 
 protected:

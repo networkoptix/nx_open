@@ -4,7 +4,7 @@
 
 #include <core/resource/resource.h>
 
-#include <nx/utils/collection.h>
+#include <nx/utils/algorithm/index_of.h>
 
 QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr& baseController):
     base_type(baseController),
@@ -163,8 +163,10 @@ bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryT
 
 bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
 {
+    // TODO: #GDM There is something really wrong with the thread safety in these classes.
+    const auto base = baseController();
     // TODO: #Elric should be base_type::getData => bad design =(
-    if (!baseController()->getData(query, data))
+    if (!base || !base->getData(query, data))
         return false;
 
     const QnMutexLocker locker(&m_mutex);
@@ -183,7 +185,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::CreatePresetPtzCommand:
             if (m_data.fields & Qn::PresetsPtzField) {
                 QnPtzPreset preset = data.value<QnPtzPreset>();
-                int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == preset.id; });
+                int idx = nx::utils::algorithm::index_of(m_data.presets,
+                    [&](const QnPtzPreset &old) { return old.id == preset.id; });
                 if (idx < 0) {
                     m_data.presets.append(preset);
                     changedFields |= Qn::PresetsPtzField;
@@ -196,7 +199,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::UpdatePresetPtzCommand:
             if (m_data.fields & Qn::PresetsPtzField) {
                 QnPtzPreset preset = data.value<QnPtzPreset>();
-                int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == preset.id; });
+                int idx = nx::utils::algorithm::index_of(m_data.presets,
+                    [&](const QnPtzPreset &old) { return old.id == preset.id; });
                 if (idx >= 0 && m_data.presets[idx] != preset) {
                     m_data.presets[idx] = preset;
                     changedFields |= Qn::PresetsPtzField;
@@ -206,7 +210,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::RemovePresetPtzCommand:
             if (m_data.fields & Qn::PresetsPtzField) {
                 QString presetId = data.value<QString>();
-                int idx = qnIndexOf(m_data.presets, [&](const QnPtzPreset &old) { return old.id == presetId; });
+                int idx = nx::utils::algorithm::index_of(m_data.presets,
+                    [&](const QnPtzPreset &old) { return old.id == presetId; });
                 if (idx >= 0) {
                     m_data.presets.removeAt(idx);
                     changedFields |= Qn::PresetsPtzField;
@@ -216,7 +221,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::CreateTourPtzCommand:
             if (m_data.fields & Qn::ToursPtzField) {
                 QnPtzTour tour = data.value<QnPtzTour>();
-                int idx = qnIndexOf(m_data.tours, [&](const QnPtzTour &old) { return old.id == tour.id; });
+                int idx = nx::utils::algorithm::index_of(m_data.tours,
+                    [&](const QnPtzTour &old) { return old.id == tour.id; });
                 if (idx < 0) {
                     m_data.tours.append(tour);
                     changedFields |= Qn::ToursPtzField;
@@ -229,7 +235,8 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::RemoveTourPtzCommand:
             if (m_data.fields & Qn::PresetsPtzField) {
                 QString tourId = data.value<QString>();
-                int idx = qnIndexOf(m_data.tours, [&](const QnPtzTour &old) { return old.id == tourId; });
+                int idx = nx::utils::algorithm::index_of(m_data.tours,
+                    [&](const QnPtzTour &old) { return old.id == tourId; });
                 if (idx >= 0) {
                     m_data.tours.removeAt(idx);
                     changedFields |= Qn::ToursPtzField;

@@ -4,11 +4,11 @@
 #include <type_traits>
 
 /**
- * A wrapper class that can be used to wrap values before invoking an 
+ * A wrapper class that can be used to wrap values before invoking an
  * overloaded function.
- * 
+ *
  * It adds global namespace into ADL namespace lookup list and prevents
- * user-defined type conversions from kicking in when picking the function 
+ * user-defined type conversions from kicking in when picking the function
  * to invoke.
  */
 template<class T>

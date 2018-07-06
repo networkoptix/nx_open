@@ -35,6 +35,7 @@ public:
         Qn::PeerType localPeerType = Qn::PeerType::PT_NotDefined,
         const QString& brand = QString(),
         const QString& customization = QString(),
+        const QString& customCloudHost = QString(),
         QObject *parent = nullptr);
     virtual ~QnStaticCommonModule();
 

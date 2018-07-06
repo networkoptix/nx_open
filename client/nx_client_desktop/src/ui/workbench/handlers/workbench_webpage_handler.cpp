@@ -42,7 +42,7 @@ QnWorkbenchWebPageHandler::~QnWorkbenchWebPageHandler()
 
 void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
 {
-    QScopedPointer<QnWebpageDialog> dialog(new QnWebpageDialog(mainWindow()));
+    QScopedPointer<QnWebpageDialog> dialog(new QnWebpageDialog(mainWindowWidget()));
     dialog->setWindowTitle(tr("New Web Page"));
     if (!dialog->exec())
         return;
@@ -82,7 +82,7 @@ void QnWorkbenchWebPageHandler::at_editWebPageAction_triggered()
     const auto oldName = webPage->getName();
     const auto oldUrl = webPage->getUrl();
 
-    QScopedPointer<QnWebpageDialog> dialog(new QnWebpageDialog(mainWindow()));
+    QScopedPointer<QnWebpageDialog> dialog(new QnWebpageDialog(mainWindowWidget()));
     dialog->setWindowTitle(tr("Edit Web Page"));
     dialog->setName(oldName);
     dialog->setUrl(oldUrl);

@@ -3,18 +3,12 @@
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
-
 #include <common/common_module.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource_access/resource_access_manager.h>
-
 #include <core/resource/user_resource.h>
-
-#include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/models/resource_properties/user_settings_model.h>
@@ -24,13 +18,13 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-
-#include <nx/utils/string.h>
-
-#include <utils/common/app_info.h>
 #include <utils/email/email.h>
 
-using namespace nx::client::desktop::ui;
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/network/app_info.h>
+#include <nx/utils/string.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -56,14 +50,13 @@ QString processedEmail(const QString& source)
 
 } // unnamed namespace
 
-
 QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::UserSettingsWidget()),
     m_model(model),
     m_rolesModel(new QnUserRolesModel(this, QnUserRolesModel::DefaultRoleFlags)),
-    m_aligner(new QnAligner(this)),
+    m_aligner(new Aligner(this)),
     m_lastUserTypeIndex(kCloudIndex) //< actual only for cloud systems (when selector is visible)
 {
     ui->setupUi(this);
@@ -79,7 +72,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
         ui->cloudEmailInputField };
 
     ui->userTypeComboBox->insertItem(kLocalIndex, tr("Local"));
-    ui->userTypeComboBox->insertItem(kCloudIndex, tr("Cloud"));
+    ui->userTypeComboBox->insertItem(kCloudIndex, nx::network::AppInfo::shortCloudName());
     ui->userTypeComboBox->setMinimumWidth(qMax(kUserTypeComboMinimumWidth,
         ui->userTypeComboBox->minimumSizeHint().width()));
 
@@ -87,6 +80,10 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     setHelpTopic(ui->roleLabel, ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
+
+    ui->userTypeHint->addHintLine(tr("<b>Local users</b> belong to this system only and are fully managed by system administrators."));
+    ui->userTypeHint->addHintLine(tr("<b>Cloud users</b> can have access to many systems. Administrators can manage their rights only."));
+    ui->userTypeHint->setHelpTopic(Qn::NewUser_Help);
 
     ui->roleComboBox->setModel(m_rolesModel);
 
@@ -98,14 +95,14 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     connect(m_rolesModel, &QnUserRolesModel::rowsRemoved,
         this, &QnUserSettingsWidget::updateRoleComboBox);
 
-    connect(ui->loginInputField, &QnInputField::textChanged, this,
+    connect(ui->loginInputField, &InputField::textChanged, this,
         [this](const QString& text)
         {
             ui->cloudPanelWidget->setEmail(text);
             ui->cloudEmailInputField->setText(processedEmail(text));
         });
 
-    connect(ui->nameInputField, &QnInputField::textChanged, this,
+    connect(ui->nameInputField, &InputField::textChanged, this,
         [this](const QString& text)
         {
             ui->cloudPanelWidget->setFullName(text);
@@ -128,7 +125,9 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     connect(ui->editRolesButton, &QPushButton::clicked, this,
         [this]
         {
-            menu()->trigger(action::UserRolesAction, {Qn::UuidRole, selectedUserRoleId()});
+            menu()->trigger(ui::action::UserRolesAction, ui::action::Parameters()
+                .withArgument(Qn::UuidRole, selectedUserRoleId())
+                .withArgument(Qn::ParentWidgetRole, QPointer<QWidget>(this)));
         });
 
     autoResizePagesToContents(ui->mainStackedWidget,
@@ -138,7 +137,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     setupInputFields();
 
-    m_aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    m_aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     m_aligner->registerTypeAccessor<QnCloudUserPanelWidget>(
         QnCloudUserPanelWidget::createIconWidthAccessor());
     m_aligner->setSkipInvisible(false);
@@ -224,7 +223,7 @@ void QnUserSettingsWidget::loadDataToUi()
     updateRoleComboBox();
     updateControlsAccess();
 
-    ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(
+    ui->passwordInputField->setValidator(defaultPasswordValidator(
         m_model->mode() != QnUserSettingsModel::NewUser));
 
     ui->loginInputField->setText(m_model->user()->getName());
@@ -345,10 +344,10 @@ void QnUserSettingsWidget::applyChanges()
 
 bool QnUserSettingsWidget::canApplyChanges() const
 {
-    auto checkFields = [](QList<QnInputField*> fields)
+    auto checkFields = [](QList<InputField*> fields)
         {
             return std::all_of(fields.cbegin(), fields.cend(),
-                 [](QnInputField* field)
+                 [](InputField* field)
                  {
                      return field->isValid();
                  });
@@ -391,7 +390,7 @@ void QnUserSettingsWidget::setupInputFields()
         [this](const QString& text)
         {
             if (text.trimmed().isEmpty())
-                return Qn::ValidationResult(tr("Login cannot be empty."));
+                return ValidationResult(tr("Login cannot be empty."));
 
             for (const QnUserResourcePtr& user : resourcePool()->getResources<QnUserResource>())
             {
@@ -401,10 +400,10 @@ void QnUserSettingsWidget::setupInputFields()
                 if (user->getName().toLower() != text.toLower())
                     continue;
 
-                return Qn::ValidationResult(tr("User with specified login already exists."));
+                return ValidationResult(tr("User with specified login already exists."));
             }
 
-            return Qn::kValidResult;
+            return ValidationResult::kValid;
         });
 
     auto updatePasswordValidator =
@@ -416,15 +415,15 @@ void QnUserSettingsWidget::setupInputFields()
                 updatePasswordPlaceholders();
 
                 ui->passwordInputField->setValidator(
-                    Qn::defaultPasswordValidator(
+                    defaultPasswordValidator(
                         !mustUpdatePassword(),
                         tr("User has been renamed. Password must be updated.")),
                     false);
             }
         };
 
-    connect(ui->loginInputField, &QnInputField::textChanged, this, updatePasswordValidator);
-    connect(ui->loginInputField, &QnInputField::editingFinished, this,
+    connect(ui->loginInputField, &InputField::textChanged, this, updatePasswordValidator);
+    connect(ui->loginInputField, &InputField::editingFinished, this,
         [this]()
         {
             if (ui->loginInputField->isValid() && m_model->mode() == QnUserSettingsModel::OtherSettings)
@@ -438,16 +437,16 @@ void QnUserSettingsWidget::setupInputFields()
     ui->nameInputField->setTitle(tr("Name"));
 
     ui->emailInputField->setTitle(tr("Email"));
-    ui->emailInputField->setValidator(Qn::defaultEmailValidator());
+    ui->emailInputField->setValidator(defaultEmailValidator());
 
     ui->cloudEmailInputField->setTitle(tr("Email"));
     ui->cloudEmailInputField->setValidator(
         [this](const QString& text)
         {
             if (m_model->mode() != QnUserSettingsModel::NewUser)
-                return Qn::kValidResult;
+                return ValidationResult::kValid;
 
-            auto result = Qn::defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
+            auto result = defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
             if (result.state != QValidator::Acceptable)
                 return result;
 
@@ -460,14 +459,17 @@ void QnUserSettingsWidget::setupInputFields()
                 if (user->getEmail().toLower() != email)
                     continue;
 
-                return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
+                return ValidationResult(
+                    tr("%1 user with specified email already exists.",
+                        "%1 is the short cloud name (like Cloud)")
+                    .arg(nx::network::AppInfo::shortCloudName()));
             }
 
-            result = Qn::defaultEmailValidator()(text);
+            result = defaultEmailValidator()(text);
             return result;
         });
 
-    connect(ui->cloudEmailInputField, &QnInputField::textChanged, this,
+    connect(ui->cloudEmailInputField, &InputField::textChanged, this,
         [this]
         {
             ui->cloudEmailInputField->setText(processedEmail(ui->cloudEmailInputField->text()));
@@ -478,7 +480,7 @@ void QnUserSettingsWidget::setupInputFields()
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
     ui->passwordInputField->setPasswordIndicatorEnabled(true);
 
-    connect(ui->passwordInputField, &QnInputField::textChanged, this,
+    connect(ui->passwordInputField, &InputField::textChanged, this,
         [this]()
         {
             updatePasswordPlaceholders();
@@ -490,38 +492,38 @@ void QnUserSettingsWidget::setupInputFields()
             }
         });
 
-    connect(ui->confirmPasswordInputField, &QnInputField::textChanged,
+    connect(ui->confirmPasswordInputField, &InputField::textChanged,
         this, &QnUserSettingsWidget::updatePasswordPlaceholders);
 
-    connect(ui->passwordInputField, &QnInputField::editingFinished,
-        ui->confirmPasswordInputField, &QnInputField::updateDisplayStateDelayed);
+    connect(ui->passwordInputField, &InputField::editingFinished,
+        ui->confirmPasswordInputField, &InputField::updateDisplayStateDelayed);
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
-    ui->confirmPasswordInputField->setValidator(Qn::defaultConfirmationValidator(
+    ui->confirmPasswordInputField->setValidator(defaultConfirmationValidator(
         [this]() { return ui->passwordInputField->text(); },
         tr("Passwords do not match.")));
 
     for (auto field: inputFields())
-        connect(field, &QnInputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
+        connect(field, &InputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
 }
 
-QList<QnInputField*> QnUserSettingsWidget::inputFields() const
+QList<InputField*> QnUserSettingsWidget::inputFields() const
 {
     return m_localInputFields + m_cloudInputFields;
 }
 
-QList<QnInputField*> QnUserSettingsWidget::localInputFields() const
+QList<InputField*> QnUserSettingsWidget::localInputFields() const
 {
     return m_localInputFields;
 }
 
-QList<QnInputField*> QnUserSettingsWidget::cloudInputFields() const
+QList<InputField*> QnUserSettingsWidget::cloudInputFields() const
 {
     return m_cloudInputFields;
 }
 
-QList<QnInputField*> QnUserSettingsWidget::relevantInputFields() const
+QList<InputField*> QnUserSettingsWidget::relevantInputFields() const
 {
     if (m_model->mode() == QnUserSettingsModel::NewUser)
         return inputFields();

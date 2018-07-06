@@ -100,7 +100,10 @@ bool isValidAddress(const QString& address);
 
 struct QnEmailSmtpServerPreset {
     QnEmailSmtpServerPreset();
-    QnEmailSmtpServerPreset(const QString &server, QnEmail::ConnectionType connectionType = QnEmail::Tls, int port = 0);
+    QnEmailSmtpServerPreset(
+        const QString& server,
+        QnEmail::ConnectionType connectionType = QnEmail::ConnectionType::tls,
+        int port = 0);
 
     bool isNull() const {
         return server.isEmpty();

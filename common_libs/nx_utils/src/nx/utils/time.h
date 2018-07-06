@@ -2,6 +2,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <QtCore/QDateTime>
 
 #include <chrono>
 
@@ -15,6 +16,8 @@ NX_UTILS_API std::chrono::system_clock::time_point utcTime();
 
 /** Should be used instead of ::time(). */
 NX_UTILS_API std::chrono::seconds timeSinceEpoch();
+
+NX_UTILS_API std::chrono::milliseconds millisSinceEpoch();
 
 /**
  * @return By default, std::chrono::steady_clock::now () is returned.
@@ -46,6 +49,11 @@ NX_UTILS_API QString getCurrentTimeZoneId();
  * @return false on error or unsupported platform, true on success.
  */
 NX_UTILS_API bool setDateTime(qint64 millisecondsSinceEpoch);
+
+/**
+ * @return QDateTime object corresponding to the given offset from Unix epoch.
+ */
+NX_UTILS_API QDateTime fromOffsetSinceEpoch(const std::chrono::nanoseconds& offset);
 
 /**
  * Rounds timePoint down to DurationTypeToRoundTo type.

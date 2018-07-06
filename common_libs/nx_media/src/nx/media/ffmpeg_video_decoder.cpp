@@ -224,7 +224,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
 QSize FfmpegVideoDecoder::s_maxResolution;
 
 FfmpegVideoDecoder::FfmpegVideoDecoder(
-    const ResourceAllocatorPtr& /*allocator*/,
+    const RenderContextSynchronizerPtr& /*synchronizer*/,
     const QSize& /*resolution*/)
     :
     AbstractVideoDecoder(),

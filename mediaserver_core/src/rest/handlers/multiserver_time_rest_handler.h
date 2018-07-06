@@ -10,12 +10,13 @@ class QnMultiserverTimeRestHandler: public QnFusionRestHandler
 public:
     QnMultiserverTimeRestHandler(const QString& getTimeApiMethodPath);
 
-    int executeGet(
+    virtual int executeGet(
         const QString& path,
         const QnRequestParamList& params,
         QByteArray& result,
         QByteArray& contentType,
-        const QnRestConnectionProcessor *processor) override;
+        const QnRestConnectionProcessor *owner) override;
+
 private:
-    QString m_urlPath;
+    QString m_getTimeApiMethodPath;
 };

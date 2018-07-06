@@ -1,5 +1,6 @@
 #include "outgoing_tunnel_connection_watcher.h"
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -82,6 +83,13 @@ void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
         std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this, _1));
 }
 
+std::string OutgoingTunnelConnectionWatcher::toString() const
+{
+    return m_tunnelConnection
+        ? m_tunnelConnection->toString()
+        : std::string();
+}
+
 void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)
 {
     NX_ASSERT(isInSelfAioThread());
@@ -91,7 +99,7 @@ void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)
 
     decltype(m_tunnelConnection) tunnelConnection;
     tunnelConnection.swap(m_tunnelConnection);
-    
+
     decltype(m_onTunnelClosedHandler) onTunnelClosedHandler;
     onTunnelClosedHandler.swap(m_onTunnelClosedHandler);
 

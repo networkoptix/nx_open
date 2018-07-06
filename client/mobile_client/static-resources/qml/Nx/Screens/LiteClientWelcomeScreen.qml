@@ -17,7 +17,7 @@ PageBase
 
     Component.onCompleted:
     {
-        var baseUrl = Nx.url(getInitialUrl())
+        var baseUrl = NxGlobals.url(getInitialUrl())
 
         var url = "http://" + baseUrl.address()
             + "/static/index.html"

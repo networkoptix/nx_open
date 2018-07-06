@@ -31,12 +31,12 @@ public:
     virtual bool hasChanges() const override;
 
 private:
-    QList<nx::vms::event::EventType> watchedEvents() const;
-    quint64 watchedSystemHealth() const;
+    QList<nx::vms::api::EventType> watchedEvents() const;
+    QSet<QnSystemHealth::MessageType> watchedSystemHealth() const;
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
-    QMap<nx::vms::event::EventType, QCheckBox*> m_businessRulesCheckBoxes;
+    QMap<nx::vms::api::EventType, QCheckBox*> m_businessRulesCheckBoxes;
     QMap<QnSystemHealth::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
     bool m_updating;

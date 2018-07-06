@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 4, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "account_data.h"
 
 #include <nx/fusion/model_functions.h>
@@ -17,9 +12,8 @@ namespace api {
 
 using namespace nx::network;
 
-////////////////////////////////////////////////////////////
-//// class AccountRegistrationData
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AccountRegistrationData
 
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, email)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, passwordHa1)
@@ -27,7 +21,7 @@ MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, passwordHa1Sha256)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, fullName)
 MAKE_FIELD_NAME_STR_CONST(AccountRegistrationData, customization)
 
-bool loadFromUrlQuery( const QUrlQuery& urlQuery, AccountRegistrationData* const accountData )
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountRegistrationData* const accountData)
 {
     accountData->email = 
         urlQuery.queryItemValue(AccountRegistrationData_email_field).toStdString();
@@ -63,9 +57,8 @@ void serializeToUrlQuery(const AccountRegistrationData& data, QUrlQuery* const u
 }
 
 
-////////////////////////////////////////////////////////////
-//// class AccountConfirmationCode
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AccountConfirmationCode
 
 MAKE_FIELD_NAME_STR_CONST(AccountConfirmationCode, code)
 
@@ -89,9 +82,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json)(sql_record),
     _Fields)
 
-////////////////////////////////////////////////////////////
-//// class AccountUpdateData
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AccountUpdateData
 
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, passwordHa1)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, passwordHa1Sha256)
@@ -170,9 +162,8 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, AccountUpdateData* dat
     return true;
 }
 
-////////////////////////////////////////////////////////////
-//// class AccountEmail
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AccountEmail
 
 MAKE_FIELD_NAME_STR_CONST(AccountEmail, email)
 
@@ -193,9 +184,8 @@ void serializeToUrlQuery(const AccountEmail& data, QUrlQuery* const urlQuery)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((AccountEmail), (json), _Fields, (optional, false))
 
-////////////////////////////////////////////////////////////
-//// class TemporaryCredentials
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class TemporaryCredentials
 
 MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsTimeouts, expirationPeriod)
 MAKE_FIELD_NAME_STR_CONST(TemporaryCredentialsTimeouts, autoProlongationEnabled)
@@ -272,9 +262,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-}   //api
-}   //cdb
-}   //nx
+} // namespace api
+} // namespace cdb
+} // namespace nx
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, AccountStatus,
     (nx::cdb::api::AccountStatus::invalid, "invalid")

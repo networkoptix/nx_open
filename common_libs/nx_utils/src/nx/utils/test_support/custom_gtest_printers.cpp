@@ -18,6 +18,8 @@ void PrintTo(const QUrl& val, ::std::ostream* os)
     *os << val.toString().toStdString();
 }
 
+//-------------------------------------------------------------------------------------------------
+
 namespace std {
 namespace chrono {
 
@@ -53,3 +55,18 @@ void PrintTo(const system_clock::time_point& val, ::std::ostream* os)
 
 } // namespace chrono
 } // namespace std
+
+//-------------------------------------------------------------------------------------------------
+
+namespace nx {
+namespace utils {
+namespace db {
+
+void PrintTo(const DBResult val, ::std::ostream* os)
+{
+    *os << toString(val);
+}
+
+} // namespace db
+} // namespace utils
+} // namespace nx

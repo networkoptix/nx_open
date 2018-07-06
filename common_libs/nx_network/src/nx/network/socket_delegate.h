@@ -8,10 +8,11 @@ namespace nx {
 namespace network {
 
 /**
- * Base for some class that wants to extend socket functionality a bit 
+ * Base for some class that wants to extend socket functionality a bit
  * and delegate rest of API calls to existing implementation.
  */
 template<typename SocketInterfaceToImplement>
+// requires std::is_base_of<AbstractSocket, SocketInterfaceToImplement>::value
 class SocketDelegate:
     public SocketInterfaceToImplement
 {
@@ -95,6 +96,16 @@ public:
         return m_target->getReuseAddrFlag(val);
     }
 
+    virtual bool setReusePortFlag(bool value) override
+    {
+        return m_target->setReusePortFlag(value);
+    }
+
+    virtual bool getReusePortFlag(bool* value) const override
+    {
+        return m_target->getReusePortFlag(value);
+    }
+
     virtual bool setNonBlockingMode(bool val) override
     {
         return m_target->setNonBlockingMode(val);
@@ -140,6 +151,11 @@ public:
         return m_target->setSendTimeout(ms);
     }
 
+    virtual bool setIpv6Only(bool val) override
+    {
+        return m_target->setIpv6Only(val);
+    }
+
     virtual Pollable* pollable() override
     {
         return m_target->pollable();
@@ -177,9 +193,9 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override
+        std::chrono::milliseconds timeout) override
     {
-        return this->m_target->connect(remoteSocketAddress, timeoutMillis);
+        return this->m_target->connect(remoteSocketAddress, timeout);
     }
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override
@@ -216,14 +232,18 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
+    /*
+     * Warning! Buffer should live at least till asynchronous send occurres, so
+     * do not use buffers with local scope here.
+     */
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
+        IoCompletionHandler handler) override
     {
         return this->m_target->sendAsync(buffer, std::move(handler));
     }
@@ -235,14 +255,8 @@ public:
         return this->m_target->registerTimer(timeout, std::move(handler));
     }
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        return this->m_target->cancelIOAsync(eventType, std::move(handler));
-    }
-
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override
+protected:
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override
     {
         return this->m_target->cancelIOSync(eventType);
     }
@@ -259,7 +273,6 @@ class NX_NETWORK_API StreamSocketDelegate:
 public:
     StreamSocketDelegate(AbstractStreamSocket* target);
 
-    virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
@@ -279,10 +292,11 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
     virtual bool listen(int backlog = kDefaultBacklogSize) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
+
+protected:
+    virtual void cancelIoInAioThread() override;
 };
 
 } // namespace network

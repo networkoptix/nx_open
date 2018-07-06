@@ -19,7 +19,7 @@
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
 
-#include "abstract_resource_allocator.h"
+#include "abstract_render_context_synchronizer.h"
 
 namespace nx {
 namespace media {

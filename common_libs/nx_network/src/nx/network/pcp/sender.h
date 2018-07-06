@@ -4,6 +4,8 @@
 #include "messaging.h"
 #include <nx/network/socket_factory.h>
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 class NX_NETWORK_API Sender
@@ -36,5 +38,7 @@ QDataStream& operator<<(QDataStream& s, const Sender::EmptyMessage&)
 { return s; }
 
 } // namespace pcp
+} // namespace network
+} // namespace nx
 
 #endif // SENDER_H

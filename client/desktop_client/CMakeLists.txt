@@ -1,2 +1,10 @@
-nx_add_target(desktop_client EXECUTABLE
+nx_add_target(desktop_client EXECUTABLE SIGNED
     PUBLIC_LIBS qtsingleapplication nx_kit nx_client_desktop)
+
+if(LINUX)
+    # Security requirement (see hardening-check).
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -pie")
+endif()
+
+string(REPLACE ".exe" "" binary_name ${client.binary.name})
+set_target_properties(desktop_client PROPERTIES OUTPUT_NAME ${binary_name})

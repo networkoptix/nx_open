@@ -1,6 +1,6 @@
 # Sample configuration file for --tests-config-file option
 
-# By default mediaservers are run in separate vagrant boxes each.
+# By default mediaservers are run in separate vagrant VMs each.
 # If a test requires mediaserver installed on some physical host,
 #  this host can be provided in 'hosts' section:
 hosts:

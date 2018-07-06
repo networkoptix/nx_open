@@ -3,6 +3,7 @@
 
 #include <QtNetwork/QNetworkProxy>
 #include <nx/utils/singleton.h>
+#include <nx/utils/url.h>
 
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
@@ -22,8 +23,8 @@ public:
     QnNetworkProxyFactory(QnCommonModule* commonModule);
     virtual ~QnNetworkProxyFactory();
 
-    virtual QUrl urlToResource(
-        const QUrl &baseUrl,
+    virtual nx::utils::Url urlToResource(
+        const nx::utils::Url &baseUrl,
         const QnResourcePtr &resource,
         const QString &proxyQueryParameterName = QString()) const;
 

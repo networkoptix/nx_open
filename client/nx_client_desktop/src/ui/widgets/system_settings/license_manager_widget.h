@@ -94,7 +94,7 @@ private:
 
     void deactivateLicenses(const QnLicenseList& licenses);
 
-    bool confirmDeactivation(const QStringList& extras);
+    bool confirmDeactivation(const QnLicenseList& licenses);
 
     QString getLicenseDescription(const QnLicensePtr& license) const;
 

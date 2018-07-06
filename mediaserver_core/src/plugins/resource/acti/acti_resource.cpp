@@ -10,7 +10,7 @@
 #include <nx_ec/dummy_handler.h>
 
 #include <api/app_server_connection.h>
-#include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
+#include <streaming/mjpeg_stream_reader.h>
 #include <utils/common/synctime.h>
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
@@ -59,7 +59,8 @@ QnActiResource::QnActiResource() :
     m_hasAudio(false),
     m_outputCount(0),
     m_inputCount(0),
-    m_inputMonitored(false)
+    m_inputMonitored(false),
+    m_advancedParametersProvider(this)
 {
     m_audioTransmitter.reset(new ActiAudioTransmitter(this));
     setVendor(lit("ACTI"));
@@ -90,10 +91,10 @@ QnActiResource::~QnActiResource()
 
 void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
-    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
 
     QAuthenticator auth = getAuth();
 
@@ -104,10 +105,11 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
+        nx::network::http::HttpHeaders /*httpHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
-            statusCode != nx_http::StatusCode::ok )
+            statusCode != nx::network::http::StatusCode::ok )
         {
             return completionHandler( false );
         }
@@ -121,7 +123,7 @@ void QnActiResource::checkIfOnlineAsync( std::function<void(bool)> completionHan
         completionHandler(mac == resourceMac);
     };
 
-    nx_http::downloadFileAsync(
+    nx::network::http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -146,7 +148,7 @@ void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnActiResource::createLiveDataProvider()
 {
-    return new QnActiStreamReader(toSharedPointer());
+    return new QnActiStreamReader(toSharedPointer(this));
 }
 
 QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
@@ -185,7 +187,7 @@ CLHttpStatus QnActiResource::makeActiRequest(
     QByteArray* const msgBody,
     QString* const localAddress )
 {
-    CLSimpleHTTPClient client(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator());
+    CLSimpleHTTPClient client(url.host(), url.port(nx::network::http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator());
     QString pattern(QLatin1String("cgi-bin/%1?USER=%2&PWD=%3&%4"));
     CLHttpStatus status = client.doGET(pattern.arg(group).arg(auth.user()).arg(auth.password()).arg(command));
     if (status == CL_HTTP_SUCCESS) {
@@ -236,7 +238,6 @@ QnActiResource::ActiSystemInfo QnActiResource::parseSystemInfo(const QByteArray&
 
     return result;
 }
-
 
 void QnActiResource::cameraMessageReceived( const QString& path, const QnRequestParamList& /*params*/ )
 {
@@ -309,7 +310,8 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
         {"D", "6.03"},
         {"E", "6.03"},
         {"B", "6.03"},
-        {"I", "6.03"}
+        {"I", "6.03"},
+        {"AB2L", ""} //< Any firmware version.
     };
 
     QByteArray version;
@@ -325,16 +327,102 @@ bool QnActiResource::isRtspAudioSupported(const QByteArray& platform, const QByt
 
     for (uint i = 0; i < sizeof(rtspAudio) / sizeof(rtspAudio[0]); ++i)
     {
-        if (platform == rtspAudio[i][0] && version >= rtspAudio[i][1])
-            return true;
+        if (platform == rtspAudio[i][0])
+        {
+            const auto minSupportedVersion = rtspAudio[i][1];
+            if (version < minSupportedVersion)
+            {
+                NX_WARNING(this,
+                    lm("RTSP audio is not supported for camera %1. "
+                       "Camera firmware %2, platform %3, minimal firmware %4")
+                    .args(getPhysicalId(), version, platform, minSupportedVersion));
+            }
+
+            return version >= minSupportedVersion;
+        }
     }
 
+    NX_WARNING(this, lm("RTSP audio is not supported for camera %1. Camera firmware %2, platform %3")
+        .args(getPhysicalId(), version, platform));
     return false;
 }
 
-CameraDiagnostics::Result QnActiResource::initInternal()
+QString QnActiResource::formatResolutionStr(const QSize& resolution)
 {
-    QnPhysicalCameraResource::initInternal();
+    return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
+}
+
+QString QnActiResource::bestPrimaryCodec() const
+{
+    return  m_availableEncoders.contains("H264") ? "H264" : "MJPEG";
+}
+
+CameraDiagnostics::Result QnActiResource::maxFpsForSecondaryResolution(
+    const QString& secondaryCodec,
+    const QSize& secondaryResolution,
+    int* outFps)
+{
+    CLHttpStatus status;
+    auto result = makeActiRequest(
+        lit("encoder"),
+        lit("FPS_CAP_QUERY_ALL=DUAL,%1,%2,%3,%4")
+        .arg(bestPrimaryCodec())
+        .arg(formatResolutionStr(m_resolutionList[0].last()))
+        .arg(secondaryCodec)
+        .arg(formatResolutionStr(secondaryResolution)),
+        status);
+    ;
+    if (status != CL_HTTP_SUCCESS)
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            lit("FPS_CAP_QUERY_ALL"),
+            "Can't detect max fps for secondary stream");
+    }
+
+    QList<QByteArray> stringFps = result.split(';').last().split(',');
+    QList<int> fps;
+    for (const QByteArray& data: stringFps)
+        fps << data.toInt();
+    if (fps.isEmpty())
+    {
+        return CameraDiagnostics::RequestFailedResult(
+            lit("FPS_CAP_QUERY_ALL"),
+            lit("Empty fps list for resolution %1x%2")
+            .arg(secondaryResolution.width(), secondaryResolution.height()));
+    }
+    std::sort(fps.begin(), fps.end());
+    *outFps = fps.last();
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
+nx::mediaserver::resource::StreamCapabilityMap QnActiResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
+{
+    using namespace nx::mediaserver::resource;
+
+    const auto& resolutionList = m_resolutionList[(int)streamIndex];
+
+    StreamCapabilityMap result;
+
+    for (const auto& codec: m_availableEncoders)
+    {
+        for (const auto& resolution: resolutionList)
+        {
+            StreamCapabilityKey key;
+            key.codec = codec;
+            key.resolution = resolution;
+
+            nx::media::CameraStreamCapability capabilities;
+            if (streamIndex == Qn::StreamIndex::secondary)
+                capabilities.maxFps = m_maxSecondaryFps[resolution];
+            result.insert(key, capabilities);
+        }
+    }
+    return result;
+}
+
+CameraDiagnostics::Result QnActiResource::initializeCameraDriver()
+{
     CLHttpStatus status;
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
@@ -360,7 +448,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     auto report = parseSystemInfo(serverReport);
 
     setFirmware(report.value(kActiFirmawareVersionParamName));
-    setMAC(QnMacAddress(report.value(kActiMacAddressParamName)));
+    setMAC(nx::network::QnMacAddress(report.value(kActiMacAddressParamName)));
 
     m_platform = report.value(kActiPlatformParamName)
         .trimmed()
@@ -373,7 +461,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     {
         auto encoders = encodersStr.split(',');
         for (const auto& encoder: encoders)
-            m_availableEncoders.insert(encoder.trimmed());
+            m_availableEncoders.insert(toActiEncoderString(encoder.trimmed()));
     }
     else
     {
@@ -477,46 +565,33 @@ CameraDiagnostics::Result QnActiResource::initInternal()
             QString::fromUtf8(resolutions));
     }
 
-    QList<QSize> availResolutions = parseResolutionStr(resolutions);
-    if (availResolutions.isEmpty() || availResolutions[0].isEmpty())
+    auto availResolutions = parseResolutionStr(resolutions);
+    if (availResolutions.isEmpty() || availResolutions.isEmpty())
     {
         return CameraDiagnostics::CameraInvalidParams(
             lit("Resolution list is empty"));
     }
+    m_resolutionList[(int) Qn::StreamIndex::primary] = availResolutions;
 
-    m_resolution[0] = availResolutions.first();
-
-    if (dualStreaming) {
+    if (dualStreaming)
+    {
         resolutions = makeActiRequest(
             lit("system"),
             lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"),
             status);
 
-        if (status == CL_HTTP_SUCCESS)
+        if (status != CL_HTTP_SUCCESS)
         {
-            availResolutions = parseResolutionStr(resolutions);
-            int maxSecondaryRes =
-                SECONDARY_STREAM_MAX_RESOLUTION.width()
-                * SECONDARY_STREAM_MAX_RESOLUTION.height();
-
-            float currentAspect = getResolutionAspectRatio(m_resolution[0]);
-
-            m_resolution[1] = getNearestResolution(
-                SECONDARY_STREAM_DEFAULT_RESOLUTION,
-                currentAspect,
-                maxSecondaryRes,
-                availResolutions);
-
-            if (m_resolution[1] == EMPTY_RESOLUTION_PAIR)
-            {
-                // try to get resolution ignoring aspect ration
-                m_resolution[1] = getNearestResolution(
-                    SECONDARY_STREAM_DEFAULT_RESOLUTION,
-                    0.0,
-                    maxSecondaryRes,
-                    availResolutions);
-            }
+            return CameraDiagnostics::RequestFailedResult(
+                lit("CHANNEL=2&VIDEO_RESOLUTION_CAP"),
+                QString::fromUtf8(resolutions));
         }
+
+        availResolutions = parseResolutionStr(resolutions);
+        int maxSecondaryRes =
+            SECONDARY_STREAM_MAX_RESOLUTION.width()
+            * SECONDARY_STREAM_MAX_RESOLUTION.height();
+        m_resolutionList[(int) Qn::StreamIndex::secondary] = availResolutions;
     }
 
     // disable extra data aka B2 frames for RTSP (disable value:1, enable: 2)
@@ -543,16 +618,18 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     auto fpsList = fpsString.split(';');
 
-    for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i)
     {
-        QList<QByteArray> fps = fpsList[i].split(',');
+        QnMutexLocker lock(&m_mutex);
+        for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i)
+        {
+            QList<QByteArray> fps = fpsList[i].split(',');
 
-        for(const QByteArray& data: fps)
-            m_availFps[i] << data.toInt();
+            for (const QByteArray& data : fps)
+                m_availFps[i] << data.toInt();
 
-        std::sort(m_availFps[i].begin(), m_availFps[i].end());
+            std::sort(m_availFps[i].begin(), m_availFps[i].end());
+        }
     }
-
     auto rtspPortString = makeActiRequest(lit("system"), lit("V2_PORT_RTSP"), status);
 
     if (status != CL_HTTP_SUCCESS)
@@ -583,13 +660,34 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
     setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
-    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0);
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolutionList[1].isEmpty() ? 1 : 0);
     QString serialNumber = report.value(QnActiResourceSearcher::kSystemInfoProductionIdParamName);
     if (!serialNumber.isEmpty())
         setProperty(QnActiResourceSearcher::kSystemInfoProductionIdParamName, serialNumber);
 
+    auto result = detectMaxFpsForSecondaryCodec();
+    if (!result)
+        return result;
+
     saveParams();
 
+    return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result QnActiResource::detectMaxFpsForSecondaryCodec()
+{
+    const auto& resolutionList = m_resolutionList[(int)Qn::StreamIndex::secondary];
+    for (const auto& codec: m_availableEncoders)
+    {
+        for (const auto& resolution: resolutionList)
+        {
+            int fps = 0;
+            auto result = maxFpsForSecondaryResolution(codec, resolution, &fps);
+            if (!result)
+                return result;
+            m_maxSecondaryFps.insert(resolution, fps);
+        }
+    }
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -611,7 +709,6 @@ bool QnActiResource::SetupAudioInput()
         return false;
     }
 }
-
 
 bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
@@ -693,7 +790,6 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
     if( responseStatusCode != CL_HTTP_SUCCESS )
         return false;
 
-
         //registering events (one event per input port)
             //GET /cgi-bin/cmd/encoder?EVENT_CONFIG HTTP/1.1\r\n
             //response:
@@ -739,13 +835,13 @@ void QnActiResource::stopInputPortMonitoringAsync()
     m_inputMonitored = false;
 
     QAuthenticator auth = getAuth();
-    QUrl url = getUrl();
+    nx::utils::Url url = getUrl();
     url.setPath(lit("/cgi-bin/%1").arg(lit("encoder")));
     url.setQuery(lit("USER=%1&PWD=%2&%3").arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr));
-    nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
-    connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
-        ec2::DummyHandler::instance(), [httpClient](nx_http::AsyncHttpClientPtr) mutable {
+    connect( httpClient.get(), &nx::network::http::AsyncHttpClient::done,
+        ec2::DummyHandler::instance(), [httpClient](nx::network::http::AsyncHttpClientPtr) mutable {
             httpClient->disconnect( nullptr, (const char*)nullptr );
             httpClient.reset();
         },
@@ -756,19 +852,6 @@ void QnActiResource::stopInputPortMonitoringAsync()
 bool QnActiResource::isInputPortMonitored() const
 {
     return m_inputMonitored;
-}
-
-QnConstResourceAudioLayoutPtr QnActiResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (isAudioEnabled()) {
-        const QnActiStreamReader* actiReader = dynamic_cast<const QnActiStreamReader*>(dataProvider);
-        if (actiReader && actiReader->getDPAudioLayout())
-            return actiReader->getDPAudioLayout();
-        else
-            return QnPhysicalCameraResource::getAudioLayout(dataProvider);
-    }
-    else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
 QString QnActiResource::getRtspUrl(int actiChannelNum) const
@@ -783,8 +866,48 @@ QString QnActiResource::getRtspUrl(int actiChannelNum) const
     return url.toString();
 }
 
+QnCameraAdvancedParamValueMap QnActiResource::getApiParameters(const QSet<QString>& ids)
+{
+    QnCameraAdvancedParamValueList result;
+    bool success = true;
+    const auto params = getParamsByIds(ids);
+    const auto queries = buildGetParamsQueries(params);
+    const auto queriesResults = executeParamsQueries(queries, success);
+    parseParamsQueriesResult(queriesResults, params, result);
+    return result;
+}
+
+QSet<QString> QnActiResource::setApiParameters(const QnCameraAdvancedParamValueMap& values)
+{
+    bool success;
+    QSet<QString> idList;
+    for(const auto& value: values.toValueList())
+        idList.insert(value.id);
+
+    QnCameraAdvancedParamValueList result;
+    const auto params = getParamsByIds(idList);
+    const auto valueList = values.toValueList();
+    const auto queries = buildSetParamsQueries(valueList);
+    const auto queriesResults = executeParamsQueries(queries, success);
+    parseParamsQueriesResult(queriesResults, params, result);
+
+    const auto maintenanceQueries = buildMaintenanceQueries(valueList);
+    if(!maintenanceQueries.empty())
+    {
+        executeParamsQueries(maintenanceQueries, success);
+        return success ? idList : QSet<QString>();
+    }
+
+    QSet<QString> resultIds;
+    for (const auto value: result)
+        resultIds.insert(value.id);
+
+    return resultIds;
+}
+
 int QnActiResource::getMaxFps() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_availFps[0].last();
 }
 
@@ -796,19 +919,9 @@ QString QnActiResource::formatBitrateString(int bitrateKbps) const
     return bitrateToDefaultString(bitrateKbps);
 }
 
-QSet<QString> QnActiResource::getAvailableEncoders() const
-{
-    return m_availableEncoders;
-}
-
 RtpTransport::Value QnActiResource::getDesiredTransport() const
 {
     return m_desiredTransport;
-}
-
-QSize QnActiResource::getResolution(Qn::ConnectionRole role) const
-{
-    return (role == Qn::CR_LiveVideo ? m_resolution[0] : m_resolution[1]);
 }
 
 int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
@@ -819,7 +932,9 @@ int QnActiResource::roundFps(int srcFps, Qn::ConnectionRole role) const
     for (int i = 0; i < availFps.size(); ++i)
     {
         int distance = qAbs(availFps[i] - srcFps);
-        if (distance <= minDistance) { // preffer higher fps if same distance
+        if (distance <= minDistance)
+        {
+            // Prefer higher fps on the same distance
             minDistance = distance;
             result = availFps[i];
         }
@@ -849,12 +964,12 @@ bool QnActiResource::isAudioSupported() const
     return m_hasAudio;
 }
 
-bool QnActiResource::hasDualStreaming() const
+bool QnActiResource::hasDualStreamingInternal() const
 {
     return getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME).toInt() > 0;
 }
 
-QnAbstractPtzController *QnActiResource::createPtzControllerInternal()
+QnAbstractPtzController *QnActiResource::createPtzControllerInternal() const
 {
     return new QnActiPtzController(toSharedPointer(this));
 }
@@ -961,66 +1076,6 @@ void QnActiResource::initializeIO( const ActiSystemInfo& systemInfo )
     setIOPorts(ports);
 }
 
-bool QnActiResource::getParamPhysical(const QString& id, QString& value)
-{
-    QSet<QString> idList = {id};
-    QnCameraAdvancedParamValueList result;
-    if(!getParamsPhysical(idList, result))
-        return false;
-
-    auto it = std::find_if(result.cbegin(), result.cend(), [&id](const QnCameraAdvancedParamValue& paramValue) {
-        return paramValue.id == id;
-    });
-
-    if(it == result.cend())
-        return false;
-
-    value = it->value;
-    return true;
-}
-
-bool QnActiResource::setParamPhysical(const QString& id, const QString& value)
-{
-    QnCameraAdvancedParamValueList values = {QnCameraAdvancedParamValue(id, value)};
-    QnCameraAdvancedParamValueList result;
-
-    return setParamsPhysical(values, result);
-}
-
-bool QnActiResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList &result)
-{
-    bool success = true;
-    const auto params = getParamsByIds(idList);
-    const auto queries = buildGetParamsQueries(params);
-    const auto queriesResults = executeParamsQueries(queries, success);
-    parseParamsQueriesResult(queriesResults, params, result);
-
-    return result.size() == idList.size();
-}
-
-bool QnActiResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
-{
-    bool success;
-    QSet<QString> idList;
-
-    for(const auto& value: values)
-        idList.insert(value.id);
-
-    const auto params = getParamsByIds(idList);
-    const auto queries = buildSetParamsQueries(values);
-    const auto queriesResults = executeParamsQueries(queries, success);
-    parseParamsQueriesResult(queriesResults, params, result);
-
-    const auto maintenanceQueries = buildMaintenanceQueries(values);
-    if(!maintenanceQueries.empty())
-    {
-        executeParamsQueries(maintenanceQueries, success);
-        return success;
-    }
-
-    return result.size() == values.size();
-}
-
 /*
  * Operations with maintenance params should be performed when every other param is already changed.
  * Also maintenance params must not get into queries that obtain param values.
@@ -1035,27 +1090,27 @@ QList<QnCameraAdvancedParameter> QnActiResource::getParamsByIds(const QSet<QStri
     QList<QnCameraAdvancedParameter> params;
     for(const auto& id: idList)
     {
-        auto param = m_advancedParameters.getParameterById(id);
+        auto param = m_advancedParametersProvider.getParameterById(id);
         params.append(param);
     }
     return  params;
 }
 
-QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet<QString> &idList) const
+QMap<QString, QnCameraAdvancedParameter> QnActiResource::getParamsMap(const QSet<QString>& idList) const
 {
     QMap<QString, QnCameraAdvancedParameter> params;
     for(const auto& id: idList)
-        params[id] = m_advancedParameters.getParameterById(id);
+        params[id] = m_advancedParametersProvider.getParameterById(id);
 
     return  params;
 }
 
 /*
  * Replaces placeholders in param query with actual values retrieved from camera.
- * Needed when user changes not all params in agregate parameter.
+ * Needed when user changes not all params in aggregate parameter.
  * Example: WB_GAIN=127,%WB_R_GAIN becomes WB_GAIN=127,245
  */
-QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo> &queries) const
+QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, CameraAdvancedParamQueryInfo>& queries) const
 {
     CLHttpStatus status;
     QMap<QString, QString> setQueries;
@@ -1086,7 +1141,8 @@ QMap<QString, QString> QnActiResource::resolveQueries(QMap<QString, QnCameraAdva
 /*
  * Used by resolveQueries function. Performs opertaions with parameter strings
  */
-QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, const QString &valueFromCamera) const
+QString QnActiResource::fillMissingParams(const QString& unresolvedTemplate,
+    const QString& valueFromCamera) const
 {
     auto templateValues = unresolvedTemplate.split(",");
     auto cameraValues = valueFromCamera.split(",");
@@ -1102,7 +1158,8 @@ QString QnActiResource::fillMissingParams(const QString &unresolvedTemplate, con
     return templateValues.join(',');
 }
 
-boost::optional<QString> QnActiResource::tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const
+boost::optional<QString> QnActiResource::tryToGetSystemInfoValue(const ActiSystemInfo& report,
+    const QString& key) const
 {
     auto modifiedKey = key;
 
@@ -1120,7 +1177,8 @@ boost::optional<QString> QnActiResource::tryToGetSystemInfoValue(const ActiSyste
     return boost::none;
 }
 
-QMap<QString, QString> QnActiResource::buildGetParamsQueries(const QList<QnCameraAdvancedParameter> &params) const
+QMap<QString, QString> QnActiResource::buildGetParamsQueries(
+    const QList<QnCameraAdvancedParameter>& params) const
 {
     QSet<QString> agregates;
     QMap<QString, QString> queries;
@@ -1144,11 +1202,12 @@ QMap<QString, QString> QnActiResource::buildGetParamsQueries(const QList<QnCamer
     return queries;
 }
 
-QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvancedParamValueList &values) const
+QMap<QString, QString> QnActiResource::buildSetParamsQueries(
+    const QnCameraAdvancedParamValueList& values) const
 {
     QMap<QString, QString> paramToAgregate;
     QMap<QString, QString> paramToValue;
-    QMap<QString, QnCameraAdvancedParamQueryInfo> agregateToCmd;
+    QMap<QString, CameraAdvancedParamQueryInfo> agregateToCmd;
 
     for(const auto& val: values)
         paramToValue[val.id] = val.value;
@@ -1173,7 +1232,7 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
 
         paramToAgregate[id] = agregate;
 
-        QnCameraAdvancedParamQueryInfo info;
+        CameraAdvancedParamQueryInfo info;
         info.group = getParamGroup(paramsMap[id]);
         info.cmd = args;
         agregateToCmd[agregate] = info;
@@ -1189,7 +1248,8 @@ QMap<QString, QString> QnActiResource::buildSetParamsQueries(const QnCameraAdvan
     return resolveQueries(agregateToCmd);
 }
 
-QMap<QString, QString> QnActiResource::buildMaintenanceQueries(const QnCameraAdvancedParamValueList &values) const
+QMap<QString, QString> QnActiResource::buildMaintenanceQueries(
+    const QnCameraAdvancedParamValueList& values) const
 {
     QSet<QString> paramsIds;
     QMap<QString, QString> queries;
@@ -1209,7 +1269,8 @@ QMap<QString, QString> QnActiResource::buildMaintenanceQueries(const QnCameraAdv
  * Executes the queries, parses the response and returns map (paramName => paramValue).
  * paramName and paramValue are raw strings that we got from camera (no parsing of agregate params).
  */
-QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries, bool& isSuccessful) const
+QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, QString>& queries,
+    bool& isSuccessful) const
 {
     CLHttpStatus status;
     QMap<QString, QString> result;
@@ -1230,9 +1291,9 @@ QMap<QString, QString> QnActiResource::executeParamsQueries(const QMap<QString, 
  * This function performs parsing of agregate params.
  */
 void QnActiResource::parseParamsQueriesResult(
-    const QMap<QString, QString> &queriesResult,
-    const QList<QnCameraAdvancedParameter> &params,
-    QnCameraAdvancedParamValueList &result) const
+    const QMap<QString, QString>& queriesResult,
+    const QList<QnCameraAdvancedParameter>& params,
+    QnCameraAdvancedParamValueList& result) const
 {
 
     QMap<QString, QString> parsed;
@@ -1260,8 +1321,7 @@ void QnActiResource::parseParamsQueriesResult(
     }
 }
 
-
-QString QnActiResource::getParamCmd(const QnCameraAdvancedParameter &param) const
+QString QnActiResource::getParamCmd(const QnCameraAdvancedParameter& param) const
 {
     return param.writeCmd.isEmpty() ?
         param.id + lit("=%") + param.id :
@@ -1274,7 +1334,8 @@ QString QnActiResource::getParamCmd(const QnCameraAdvancedParameter &param) cons
  * Example: paramValue = "1,2,3", mask="%param1,%param2".
  * Two items will be added to map: param1 => "1" , param2 => "2,3"
  */
-void QnActiResource::extractParamValues(const QString &paramValue, const QString &mask, QMap<QString, QString>& result) const
+void QnActiResource::extractParamValues(const QString& paramValue, const QString& mask,
+    QMap<QString, QString>& result) const
 {
 
     const auto paramNames = mask.split(',');
@@ -1291,7 +1352,7 @@ void QnActiResource::extractParamValues(const QString &paramValue, const QString
     }
 }
 
-QString QnActiResource::getParamGroup(const QnCameraAdvancedParameter &param) const
+QString QnActiResource::getParamGroup(const QnCameraAdvancedParameter& param) const
 {
     return param.readCmd.isEmpty() ? CAMERA_PARAMETER_GROUP_DEFAULT : param.readCmd;
 }
@@ -1315,7 +1376,8 @@ bool QnActiResource::parseParameter(const QString& paramStr, QnCameraAdvancedPar
     return success;
 }
 
-void QnActiResource::parseCameraParametersResponse(const QByteArray& response, QnCameraAdvancedParamValueList& result) const
+void QnActiResource::parseCameraParametersResponse(const QByteArray& response,
+    QnCameraAdvancedParamValueList& result) const
 {
     auto lines = response.split('\n');
     for(const auto& line: lines)
@@ -1328,7 +1390,8 @@ void QnActiResource::parseCameraParametersResponse(const QByteArray& response, Q
     }
 }
 
-void QnActiResource::parseCameraParametersResponse(const QByteArray& response, QMap<QString, QString>& result) const
+void QnActiResource::parseCameraParametersResponse(const QByteArray& response,
+    QMap<QString, QString>& result) const
 {
     auto lines = response.split('\n');
     for(const auto& line: lines)
@@ -1341,7 +1404,8 @@ void QnActiResource::parseCameraParametersResponse(const QByteArray& response, Q
     }
 }
 
-QString QnActiResource::convertParamValueToDeviceFormat(const QString &paramValue, const QnCameraAdvancedParameter &param) const
+QString QnActiResource::convertParamValueToDeviceFormat(const QString& paramValue,
+    const QnCameraAdvancedParameter& param) const
 {
     auto tmp = paramValue;
 
@@ -1353,7 +1417,8 @@ QString QnActiResource::convertParamValueToDeviceFormat(const QString &paramValu
     return tmp;
 }
 
-QString QnActiResource::convertParamValueFromDeviceFormat(const QString &paramValue, const QnCameraAdvancedParameter &param) const
+QString QnActiResource::convertParamValueFromDeviceFormat(const QString& paramValue,
+    const QnCameraAdvancedParameter& param) const
 {
     QString tmp = paramValue;
     if(param.dataType == QnCameraAdvancedParameter::DataType::Enumeration )
@@ -1370,7 +1435,8 @@ QString QnActiResource::convertParamValueFromDeviceFormat(const QString &paramVa
     return tmp;
 }
 
-bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& templateFilename)
+bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params,
+    const QString& templateFilename)
 {
     QFile paramsTemplateFile(templateFilename);
 #ifdef _DEBUG
@@ -1388,8 +1454,7 @@ bool QnActiResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPara
 
 void QnActiResource::fetchAndSetAdvancedParameters()
 {
-    QnMutexLocker lock( &m_physicalParamsMutex );
-    m_advancedParameters.clear();
+    m_advancedParametersProvider.clear();
 
     auto templateFile = getAdvancedParametersTemplate();
     QnCameraAdvancedParams params;
@@ -1399,8 +1464,7 @@ void QnActiResource::fetchAndSetAdvancedParameters()
         return;
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters(params);
-    m_advancedParameters = params.filtered(supportedParams);
-    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
+    m_advancedParametersProvider.assign(params.filtered(supportedParams));
 }
 
 QString QnActiResource::getAdvancedParametersTemplate() const
@@ -1411,7 +1475,8 @@ QString QnActiResource::getAdvancedParametersTemplate() const
         DEFAULT_ADVANCED_PARAMETERS_TEMPLATE : advancedParametersTemplate;
 }
 
-QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(const QnCameraAdvancedParams &allParams) const
+QSet<QString> QnActiResource::calculateSupportedAdvancedParameters(
+    const QnCameraAdvancedParams& allParams) const
 {
     QList<QnCameraAdvancedParameter> paramsList;
     QSet<QString> result;
@@ -1452,6 +1517,19 @@ void QnActiResource::initialize2WayAudio(const ActiSystemInfo& systemInfo)
 
     if (systemInfo[kTwoAudioParamName] == kTwoWayAudioDeviceType)
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+}
+
+std::vector<nx::mediaserver::resource::Camera::AdvancedParametersProvider*>
+    QnActiResource::advancedParametersProviders()
+{
+    return {&m_advancedParametersProvider};
+}
+
+QString QnActiResource::toActiEncoderString(const QString& value)
+{
+    if (value.contains(lit("JPEG")))
+        return lit("MJPEG");
+    return "H264"; //< Default value.
 }
 
 #endif // #ifdef ENABLE_ACTI

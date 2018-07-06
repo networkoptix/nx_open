@@ -1,11 +1,10 @@
-pytest
+urllib3>=1.22
+pytest==3.0.7
 pytest-timeout
-pytest-capturelog
 pytest-cpp
 pytz
 tzlocal
-requests>=2.12.5
-python-vagrant
+requests>=2.18.4
 Jinja2
 python-debian>=0.1.28
 netaddr
@@ -14,3 +13,11 @@ hachoir-parser
 hachoir-metadata
 pytest-instafail
 pyyaml
+pathlib2==2.3.0
+pylru==1.0.9
+datadiff==2.0.0
+pywinrm==0.3.0
+xmltodict==0.11.0
+cryptography==2.2.2
+pysmb==1.1.22
+pytest-lazy-fixture==0.4.0

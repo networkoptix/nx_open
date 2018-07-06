@@ -1,21 +1,15 @@
-#ifndef QN_PTZ_TOUR_H
-#define QN_PTZ_TOUR_H
+#pragma once
 
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 
-#ifndef Q_MOC_RUN
-#include <boost/operators.hpp>
-#endif
-
 #include "ptz_fwd.h"
 
-struct QnPtzTourSpot: public boost::equality_comparable1<QnPtzTourSpot> {
+struct QnPtzTourSpot
+{
     QnPtzTourSpot(): stayTime(0), speed(1.0) {}
     QnPtzTourSpot(const QString &presetId, qint64 stayTime, qreal speed): presetId(presetId), stayTime(stayTime), speed(speed) {}
-
-    friend bool operator==(const QnPtzTourSpot &l, const QnPtzTourSpot &r);
 
     QString presetId;
     qint64 stayTime;
@@ -23,13 +17,11 @@ struct QnPtzTourSpot: public boost::equality_comparable1<QnPtzTourSpot> {
 };
 #define QnPtzTourSpot_Fields (presetId)(stayTime)(speed)
 
-
-struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
+struct QnPtzTour
+{
     QnPtzTour() {}
     QnPtzTour(const QnPtzTour &tour): id(tour.id), name(tour.name), spots(tour.spots) {}
     QnPtzTour(const QString &id, const QString &name, const QnPtzTourSpotList &spots): id(id), name(name), spots(spots) {}
-
-    friend bool operator==(const QnPtzTour &l, const QnPtzTour &r);
 
     /**
      * @brief isValid                   Check validity of the tour.
@@ -53,5 +45,3 @@ struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
 Q_DECLARE_METATYPE(QnPtzTourSpot)
 Q_DECLARE_METATYPE(QnPtzTour)
 Q_DECLARE_METATYPE(QnPtzTourList)
-
-#endif // QN_PTZ_TOUR_H

@@ -1,51 +1,53 @@
 #include "auth_restriction_list.h"
 
-#include <nx/utils/match/wildcard.h>
+namespace nx {
+namespace network {
+namespace http {
 
-namespace nx_http {
+const AuthMethod::Values AuthMethodRestrictionList::kDefaults =
+    AuthMethod::cookie | AuthMethod::http |
+    AuthMethod::videowall | AuthMethod::urlQueryParam;
 
-unsigned int AuthMethodRestrictionList::getAllowedAuthMethods(
-    const nx_http::Request& request) const
+AuthMethod::Values AuthMethodRestrictionList::getAllowedAuthMethods(
+    const nx::network::http::Request& request) const
 {
     QString path = request.requestLine.url.path();
-    // TODO: #ak Replace mid and chop with single midRef call.
-    while (path.startsWith(lit("//")))
-        path = path.mid(1);
-    while (path.endsWith(L'/'))
-        path.chop(1);
+    AuthMethod::Values allowed = kDefaults;
 
-    unsigned int allowed =
-        AuthMethod::cookie | AuthMethod::http | 
-        AuthMethod::videowall | AuthMethod::urlQueryParam;
-    for (std::pair<QString, unsigned int> allowRule: m_allowed)
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& rule: m_allowed)
     {
-        if (!wildcardMatch(allowRule.first, path))
-            continue;
-        allowed |= allowRule.second;
+        if (rule.second.expression.exactMatch(path))
+            allowed |= rule.second.methods;
     }
 
-    for (std::pair<QString, unsigned int> denyRule: m_denied)
+    for (const auto& rule: m_denied)
     {
-        if (!wildcardMatch(denyRule.first, path))
-            continue;
-        allowed &= ~denyRule.second;
+        if (rule.second.expression.exactMatch(path))
+            allowed &= ~rule.second.methods;
     }
 
     return allowed;
 }
 
-void AuthMethodRestrictionList::allow(
-    const QString& pathMask,
-    AuthMethod::Value method)
+AuthMethodRestrictionList::Rule::Rule(const QString& expression, AuthMethod::Values methods):
+    expression(QLatin1String("/*") + expression + QLatin1String("/?")),
+    methods(methods)
 {
-    m_allowed[pathMask] = method;
 }
 
-void AuthMethodRestrictionList::deny(
-    const QString& pathMask,
-    AuthMethod::Value method)
+void AuthMethodRestrictionList::allow(const QString& pathMask, AuthMethod::Values method)
 {
-    m_denied[pathMask] = method;
+    QnMutexLocker lock(&m_mutex);
+    m_allowed.emplace(pathMask, Rule(pathMask, method));
 }
 
-} // namespace nx_http
+void AuthMethodRestrictionList::deny(const QString& pathMask, AuthMethod::Values method)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_denied.emplace(pathMask, Rule(pathMask, method));
+}
+
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -27,7 +27,7 @@ QnHttpConnectionListener::~QnHttpConnectionListener()
     stop();
 }
 
-bool QnHttpConnectionListener::isProxy(const nx_http::Request& request)
+bool QnHttpConnectionListener::isProxy(const nx::network::http::Request& request)
 {
     return m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(commonModule(), request);
 }
@@ -38,7 +38,7 @@ bool QnHttpConnectionListener::needAuth() const
 }
 
 QnHttpConnectionListener::InstanceFunc QnHttpConnectionListener::findHandler(
-    const QByteArray& protocol, const nx_http::Request& request)
+    const QByteArray& protocol, const nx::network::http::Request& request)
 {
     if (isProxy(request))
         return m_proxyInfo.proxyHandler;
@@ -81,7 +81,7 @@ QnHttpConnectionListener::InstanceFunc QnHttpConnectionListener::findHandler(
     return 0;
 }
 
-QSharedPointer<AbstractStreamSocket> QnHttpConnectionListener::getProxySocket(
+QSharedPointer<nx::network::AbstractStreamSocket> QnHttpConnectionListener::getProxySocket(
     const QString& guid, int timeout, const SocketRequest& socketRequest)
 {
     NX_LOG(lit("QnHttpConnectionListener: reverse connection from %1 is needed")
@@ -101,7 +101,7 @@ QSharedPointer<AbstractStreamSocket> QnHttpConnectionListener::getProxySocket(
                 NX_LOG(lit(
                     "QnHttpConnectionListener: reverse connection from %1 was waited too long (%2 ms)")
                     .arg(guid).arg(elapsed), cl_logERROR);
-                return QSharedPointer<AbstractStreamSocket>();
+                return QSharedPointer<nx::network::AbstractStreamSocket>();
             }
 
             if (serverPool.requested == 0 || //< Was not requested by another thread.
@@ -126,7 +126,7 @@ QSharedPointer<AbstractStreamSocket> QnHttpConnectionListener::getProxySocket(
 }
 
 bool QnHttpConnectionListener::registerProxyReceiverConnection(
-    const QString& guid, QSharedPointer<AbstractStreamSocket> socket)
+    const QString& guid, QSharedPointer<nx::network::AbstractStreamSocket> socket)
 {
     QnMutexLocker lock(&m_proxyMutex);
     auto serverPool = m_proxyPool.find(guid);

@@ -6,6 +6,7 @@
 #include "storage_space_reply.h"
 #include "storage_status_reply.h"
 #include "time_reply.h"
+#include "hardware_ids_reply.h"
 #include "statistics_reply.h"
 #include "connection_info.h"
 #include "test_email_settings_reply.h"
@@ -22,6 +23,10 @@
 #include "audit/audit_record.h"
 #include "licensing/hardware_info.h"
 #include "backup_status_reply.h"
+#include "wearable_camera_reply.h"
+#include "wearable_status_reply.h"
+#include "wearable_prepare_data.h"
+#include "wearable_prepare_reply.h"
 #include <utils/email/email.h>
 
 #define QN_MS_API_DATA_TYPES \
@@ -36,6 +41,7 @@
     (QnStatisticsReply)\
     (QnTimeReply)\
     (ApiServerDateTimeData)\
+    (ApiServerHardwareIdsData)\
     (QnTestEmailSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\
@@ -47,12 +53,18 @@
     (QnUpdateFreeSpaceReply)\
     (QnCloudHostCheckReply)\
     (QnRecordingStatsData)\
-    (QnCamRecordingStatsData)\
+    (QnCamRecordingStatsData)
 
 #define QN_MS_API_COMPARABLE_DATA_TYPES \
     (QnStorageSpaceData)\
     (QnStorageScanData)\
-    (QnBackupStatusData)
+    (QnBackupStatusData)\
+    (QnWearableCameraReply)\
+    (QnWearableStatusReply)\
+    (QnWearablePrepareData)\
+    (QnWearablePrepareDataElement)\
+    (QnWearablePrepareReply)\
+    (QnWearablePrepareReplyElement)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(csv_record), _Fields)

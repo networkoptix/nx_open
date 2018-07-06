@@ -14,10 +14,10 @@ namespace stree {
 class NX_UTILS_API StreeManager
 {
 public:
-    /*!
-        Performs initial parsing
-        \throw \a std::runtime_error in case of parse error
-    */
+    /**
+     * Performs initial parsing.
+     * @throw std::runtime_error in case of parse error.
+     */
     StreeManager(
         const nx::utils::stree::ResourceNameSet& resourceNameSet,
         const QString& xmlFilePath) noexcept(false);

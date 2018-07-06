@@ -3,6 +3,8 @@
 #include <set>
 #include <utility>
 
+#include <nx/utils/time.h>
+
 namespace nx {
 namespace cdb {
 namespace dao {
@@ -12,6 +14,8 @@ boost::optional<std::string> UserAuthentication::fetchSystemNonce(
     nx::utils::db::QueryContext* const /*queryContext*/,
     const std::string& systemId)
 {
+    QnMutexLocker locker(&m_mutex);
+
     auto it = m_systemIdToNonce.find(systemId);
     if (it == m_systemIdToNonce.end())
         return boost::none;
@@ -23,6 +27,8 @@ void UserAuthentication::insertOrReplaceSystemNonce(
     const std::string& systemId,
     const std::string& nonce)
 {
+    QnMutexLocker locker(&m_mutex);
+
     m_systemIdToNonce[systemId] = nonce;
 }
 
@@ -31,11 +37,41 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     const std::string& systemId,
     const std::string& accountId)
 {
+    QnMutexLocker locker(&m_mutex);
+
     auto it = m_userAuthInfo.find(std::make_pair(systemId, accountId));
     if (it == m_userAuthInfo.end())
         return api::AuthInfo();
 
     return it->second;
+}
+
+std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
+    nx::utils::db::QueryContext* const /*queryContext*/,
+    int systemCountLimit)
+{
+    QnMutexLocker locker(&m_mutex);
+
+    std::set<std::string> systems;
+
+    const auto currentTime = nx::utils::utcTime();
+
+    for (const auto& userAuthInfo: m_userAuthInfo)
+    {
+        for (const auto& record: userAuthInfo.second.records)
+        {
+            if (record.expirationTime > currentTime)
+                continue;
+
+            systems.insert(userAuthInfo.first.first);
+            break;
+        }
+
+        if (systems.size() >= (unsigned int)systemCountLimit)
+            break;
+    }
+
+    return std::vector<std::string>(systems.cbegin(), systems.cend());
 }
 
 void UserAuthentication::insertUserAuthRecords(
@@ -44,14 +80,18 @@ void UserAuthentication::insertUserAuthRecords(
     const std::string& accountId,
     const api::AuthInfo& userAuthRecords)
 {
+    QnMutexLocker locker(&m_mutex);
+
     m_userAuthInfo[std::make_pair(systemId, accountId)] = userAuthRecords;
 }
 
-std::vector<AbstractUserAuthentication::SystemInfo> 
+std::vector<AbstractUserAuthentication::SystemInfo>
     UserAuthentication::fetchAccountSystems(
         nx::utils::db::QueryContext* const /*queryContext*/,
         const std::string& accountId)
 {
+    QnMutexLocker locker(&m_mutex);
+
     std::vector<SystemInfo> result;
     std::set<std::string> systemsAdded;
 
@@ -78,12 +118,31 @@ void UserAuthentication::deleteAccountAuthRecords(
     nx::utils::db::QueryContext* const /*queryContext*/,
     const std::string& accountId)
 {
+    QnMutexLocker locker(&m_mutex);
+
     for (auto it = m_userAuthInfo.begin(); it != m_userAuthInfo.end(); )
     {
         if (it->first.second == accountId)
             it = m_userAuthInfo.erase(it);
         else
             ++it;
+    }
+}
+
+void UserAuthentication::deleteSystemAuthRecords(
+    nx::utils::db::QueryContext* const /*queryContext*/,
+    const std::string& systemId)
+{
+    QnMutexLocker locker(&m_mutex);
+
+    for (auto it = m_userAuthInfo.lower_bound({systemId, std::string()});
+        it != m_userAuthInfo.end();
+        )
+    {
+        if (it->first.first != systemId)
+            break;
+
+        it = m_userAuthInfo.erase(it);
     }
 }
 

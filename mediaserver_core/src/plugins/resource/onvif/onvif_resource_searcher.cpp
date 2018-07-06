@@ -12,7 +12,7 @@
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
-#include "core/dataprovider/live_stream_provider.h"
+#include <providers/live_stream_provider.h>
 
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"
@@ -23,6 +23,8 @@
 #include "soap_wrapper.h"
 #include <onvif/soapStub.h>
 #include "gsoap_async_call_wrapper.h"
+
+#include <plugins/resource/hikvision/hikvision_resource.h>
 
 namespace {
 
@@ -85,7 +87,7 @@ QString OnvifResourceSearcher::manufacture() const
     return QnPlOnvifResource::MANUFACTURE;
 }
 
-int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
+int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
 {
     typedef GSoapAsyncCallWrapper <
         DeviceSoapWrapper,
@@ -93,14 +95,10 @@ int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
         _onvifDevice__GetSystemDateAndTimeResponse
     > GSoapDeviceGetSystemDateAndTimeAsyncWrapper;
 
+    QnMutex mutex;
+    QnWaitCondition waitCond;
     std::vector<std::unique_ptr<GSoapDeviceGetSystemDateAndTimeAsyncWrapper>> requestList;
     int result = -1;
-
-    QnMutex mutex;
-
-    QnWaitCondition waitCond;
-    QnMutexLocker lock(&mutex);
-
     int workers = kOnvifDeviceAltPorts.size();
     for (auto port: kOnvifDeviceAltPorts)
     {
@@ -118,28 +116,38 @@ int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
         asyncWrapper->callAsync(
             request,
             [&, port](int soapResultCode)
-        {
-            QnMutexLocker lock(&mutex);
-            if (soapResultCode == SOAP_OK && result == -1)
-                result = port;
-            --workers;
-            waitCond.wakeAll();
-        }
-        );
+            {
+                QnMutexLocker lock(&mutex);
+                if (soapResultCode == SOAP_OK && result == -1)
+                    result = port;
+
+                --workers;
+                waitCond.wakeAll();
+            });
+
         requestList.push_back(std::move(asyncWrapper));
     }
 
-    while (workers > 0 && result == -1)
-        waitCond.wait(&mutex);
+    QnMutexLocker lock(&mutex);
+    const auto deadline = std::chrono::steady_clock::now() + kManualDiscoveryConnectTimeout;
+    while (workers > 0)
+    {
+        const auto timeLeftMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+            deadline - std::chrono::steady_clock::now()).count();
 
-    lock.unlock();
-    requestList.clear();
-    return result > 0 ? result : kDefaultOnvifPort;
+        if (timeLeftMs <= 0 || !waitCond.wait(&mutex, (unsigned long) timeLeftMs))
+            break;
+
+        if (result != -1)
+            return result;
+    }
+
+    return kDefaultOnvifPort;
 }
 
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& _url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const nx::utils::Url& _url, const QAuthenticator& auth, bool isSearchAction)
 {
-    QUrl url(_url);
+    nx::utils::Url url(_url);
 
     if( !url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
@@ -150,7 +158,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& _url, cons
     return checkHostAddrInternal(url, auth, isSearchAction);
 }
 
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if (shouldStop())
         return QList<QnResourcePtr>();
@@ -162,7 +170,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     if (!typePtr)
         return resList;
 
-    const int onvifPort = url.port(nx_http::DEFAULT_HTTP_PORT);
+    const int onvifPort = url.port(nx::network::http::DEFAULT_HTTP_PORT);
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
     QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
@@ -173,6 +181,14 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(url.host()).arg(onvifPort).arg(onvifUrl);
     resource->setUrl(deviceUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
+
+    // TODO: Move out to some helper class, to remove direct link to hikvision.
+    if (isSearchAction)
+    {
+        nx::mediaserver_core::plugins::HikvisionResource::tryToEnableIntegrationProtocols(
+            deviceUrl,
+            auth);
+    }
 
     // optimization. do not pull resource every time if resource already in pool
     if (rpResource)
@@ -222,6 +238,15 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         QString modelName = resource->getModel();
 
         auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
+        const auto manufacturerReplacement = resData.value<QString>(
+            Qn::ONVIF_MANUFACTURER_REPLACEMENT);
+
+        if (!manufacturerReplacement.isEmpty())
+        {
+            manufacturer = manufacturerReplacement;
+            resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
+        }
+
         if (resource->getMAC().isNull() && resData.value<bool>(lit("isMacAddressMandatory"), true))
             return resList;
 
@@ -269,7 +294,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if(!resource->getUniqueId().isEmpty())
         {
             auto maxChannels = resource->getMaxChannels();
-            resource->detectVideoSourceCount();
+            resource->fetchChannelCount();
             //if (channel > 0)
             //    resource->updateToChannel(channel-1);
             resList << resource;
@@ -278,7 +303,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
                 .value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
             // checking for multichannel encoders
-            if (doMultichannelCheck && !shouldAppearAsSingleChannel)
+            if (isSearchAction && !shouldAppearAsSingleChannel)
             {
                 if (resource->getMaxChannels() > 1)
                 {

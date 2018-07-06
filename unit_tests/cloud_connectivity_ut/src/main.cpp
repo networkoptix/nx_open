@@ -11,5 +11,7 @@ int main(int argc, char** argv)
         {
             nx::network::ssl::Engine::useRandomCertificate("cloud_connect_ut");
             return nx::utils::test::DeinitFunctions();
-        });
+        },
+        nx::network::InitializationFlags::none,
+        nx::utils::test::GtestRunFlag::gtestThrowOnFailure);
 }

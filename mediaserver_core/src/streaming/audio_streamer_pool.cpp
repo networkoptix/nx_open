@@ -4,10 +4,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <camera/camera_pool.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <proxy/2wayaudio/proxy_audio_transmitter.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/mediaserver/resource/camera.h>
+#include <media_server/media_server_module.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 namespace
 {
@@ -29,30 +32,32 @@ QnAudioStreamerPool::QnAudioStreamerPool(QnCommonModule* commonModule):
 {
 }
 
-QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QnUuid& clientId) const
+QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QString& sourceId) const
 {
-    for (const auto& res : resourcePool()->getResourcesWithFlag(Qn::desktop_camera))
+    if (auto camera = resourcePool()->getResourceByUniqueId(sourceId))
     {
-        if (QnUuid::fromStringSafe(res->getUniqueId()) == clientId ||
-            res->getId() == clientId)
-        {
-            return qnCameraPool->getVideoCamera(res);
-        }
+        NX_ASSERT(camera->hasFlags(Qn::desktop_camera));
+        if (camera->hasFlags(Qn::desktop_camera))
+            return qnCameraPool->getVideoCamera(camera);
     }
     return QnVideoCameraPtr();
 }
 
-QnSecurityCamResourcePtr QnAudioStreamerPool::getTransmitDestination(const QnUuid& resourceId) const
+nx::mediaserver::resource::CameraPtr QnAudioStreamerPool::getTransmitDestination(const QnUuid& resourceId) const
 {
-    auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
+    auto resource = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(resourceId);
     if (!resource)
-        return QnSecurityCamResourcePtr();
+        return nx::mediaserver::resource::CameraPtr();
     if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
-        return QnSecurityCamResourcePtr();
+        return nx::mediaserver::resource::CameraPtr();
     return resource;
 }
 
-bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString &error, const QnRequestParams &params)
+bool QnAudioStreamerPool::startStopStreamToResource(const QString& sourceId,
+    const QnUuid& resourceId,
+    Action action,
+    QString& error,
+    const QnRequestParams& params)
 {
     auto resource = getTransmitDestination(resourceId);
     if (!resource)
@@ -62,11 +67,11 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
         return false;
     }
 
-    auto sourceCam = getTransmitSource(clientId);
+    auto sourceCam = getTransmitSource(sourceId);
     if (!sourceCam)
     {
         error = lit("Client PC with id '%1' is not found.")
-            .arg(clientId.toString());
+            .arg(sourceId);
         return false;
     }
 
@@ -74,7 +79,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     if(!desktopDataProvider)
     {
         error = lit("Client PC with id '%1' is found but not ready to stream audio yet.")
-            .arg(clientId.toString());
+            .arg(sourceId);
         return false;
     }
 
@@ -92,7 +97,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     }
     else
     {
-        QString key = clientId.toString() + resourceId.toString();
+        QString key = sourceId + resourceId.toString();
         auto& proxyTransmitter = m_proxyTransmitters[key];
         if (!proxyTransmitter)
             proxyTransmitter.reset(new QnProxyAudioTransmitter(resource, params));
@@ -160,13 +165,13 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
         return m_actionDataProviders[actionKey];
 
     QnAbstractStreamDataProviderPtr provider;
-    if (type == nx::vms::event::playSoundAction)
+    if (type == nx::vms::api::ActionType::playSoundAction)
     {
         const auto filePath = lit("dbfile://notifications/") + params.url;
         QnAviResourcePtr resource(new QnAviResource(filePath));
         resource->setCommonModule(commonModule());
         resource->setStatus(Qn::Online);
-        provider.reset(resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+        provider.reset(qnServerModule->dataProviderFactory()->createDataProvider(resource));
     }
     else
     {

@@ -9,15 +9,10 @@
 namespace nx {
 namespace hpm {
 
-AbstractCloudDataProvider::~AbstractCloudDataProvider()
-{
-}
-
-
 static AbstractCloudDataProviderFactory::FactoryFunc cloudDataProviderFactoryFunc;
 
 std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::create(
-    const boost::optional<QUrl>& cdbUrl,
+    const boost::optional<nx::utils::Url>& cdbUrl,
     const std::string& user,
     const std::string& password,
     std::chrono::milliseconds updateInterval,
@@ -43,7 +38,7 @@ std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::cre
     }
 }
 
-AbstractCloudDataProviderFactory::FactoryFunc 
+AbstractCloudDataProviderFactory::FactoryFunc
     AbstractCloudDataProviderFactory::setFactoryFunc(FactoryFunc factoryFunc)
 {
     auto prevFunc = std::move(cloudDataProviderFactoryFunc);
@@ -91,7 +86,7 @@ const std::chrono::milliseconds CloudDataProvider::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 5 );
 
 static nx::cdb::api::ConnectionFactory* makeConnectionFactory(
-    const boost::optional<QUrl>& cdbUrl)
+    const boost::optional<nx::utils::Url>& cdbUrl)
 {
     auto factory = createConnectionFactory();
     if (factory && cdbUrl)
@@ -103,7 +98,7 @@ static nx::cdb::api::ConnectionFactory* makeConnectionFactory(
 }
 
 CloudDataProvider::CloudDataProvider(
-    const boost::optional<QUrl>& cdbUrl,
+    const boost::optional<nx::utils::Url>& cdbUrl,
     const std::string& user,
     const std::string& password,
     std::chrono::milliseconds updateInterval,

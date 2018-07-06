@@ -6,10 +6,13 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">Wijzig de naam van het systeem</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Ontkoppel van <span class="product-name"> {{PRODUCT_NAME}} </span></button>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Samenvoegen met een ander systeem</button>
+        </p>
+        <hr></hr>
+        <button class="btn btn-default" ng-click="disconnect()">Ontkoppel van <span class="product-name"> %PRODUCT_NAME% </span></button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>Eigenaar</h2>
@@ -25,5 +28,22 @@
             <button class="btn btn-default" ng-click="rename()">Wijzig de naam van het systeem</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Ontkoppel van mijn account</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            zal worden samengevoegd met dit systeem</div>
+        <hr></hr>
+        <div class="merge-info-text">Afhankelijk van de grootte van de database kan dit enkele uren duren</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>Dit systeem wordt samengevoegd tot <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>Afhankelijk van de grootte van de database kan dit enkele uren duren.</p>
+            <p>Tot het samenvoegen is voltooid, kunt u zich aanmelden bij dit systeem en video bekijken, maar kunt u geen instellingen wijzigen.</p>
+            <p>Wanneer het samenvoegen is voltooid, worden alle gebruikers en camera's van dit systeem beschikbaar in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. Systeem, en dit systeem zal worden verwijderd.</p>
+        </div>
     </div>
 </div>

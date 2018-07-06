@@ -5,7 +5,7 @@
 #include <QtWidgets/QGraphicsAnchorLayout>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -30,6 +30,9 @@
 
 #include <utils/common/warnings.h>
 #include <nx/utils/collection.h>
+#include <utils/screen_utils.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -47,7 +50,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     m_videowall(base_type::resource().dynamicCast<QnVideoWallResource>()),
     m_mainOverlayWidget(new QnViewportBoundWidget(this)),
     m_layout(new QGraphicsAnchorLayout()),
-    m_thumbnailManager(context->instance<QnCameraThumbnailManager>())
+    m_thumbnailManager(context->instance<CameraThumbnailManager>())
 {
     NX_ASSERT(m_videowall, "QnVideowallScreenWidget was created with a non-videowall resource.");
     m_thumbnailManager->setAutoRotate(false); //< TODO: VMS-6759
@@ -72,7 +75,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(
     connect(m_videowall, &QnVideoWallResource::itemChanged, this,
         &QnVideowallScreenWidget::at_videoWall_itemChanged);
 
-    connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this,
+    connect(m_thumbnailManager, &CameraThumbnailManager::thumbnailReady, this,
         &QnVideowallScreenWidget::at_thumbnailReady);
 
 }
@@ -118,7 +121,8 @@ QString QnVideowallScreenWidget::calculateTitleText() const
     int pcVisualIdx = idx + 1;
     QString base = tr("PC %1").arg(pcVisualIdx);
 
-    QSet<int> screens = m_items.first().screenSnaps.screens();
+    auto screens = nx::gui::Screens::coveredBy(m_items.first().screenSnaps).toList();
+    std::sort(screens.begin(), screens.end());
     if (screens.isEmpty())
         return base;
 
@@ -133,7 +137,7 @@ QString QnVideowallScreenWidget::calculateTitleText() const
         "%2 will be substituted by _list_ of displays",
         screens.size())
         .arg(pcVisualIdx)
-        .arg(screenIndices.join(lit(" ,")));
+        .arg(screenIndices.join(lit(", ")));
 }
 
 Qn::ResourceStatusOverlay QnVideowallScreenWidget::calculateStatusOverlay() const
@@ -246,7 +250,8 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
 
     NX_ASSERT(*existing == oldItem);
 
-    if (existing->screenSnaps.screens() != item.screenSnaps.screens())
+    if (nx::gui::Screens::coveredBy(existing->screenSnaps)
+        != nx::gui::Screens::coveredBy(item.screenSnaps))
     {
         // if there are more than one item on the widget, this one will be updated from outside
         if (m_items.size() == 1)
@@ -292,7 +297,7 @@ void QnVideowallScreenWidget::updateItems()
         QnVideoWallPcData pc = m_videowall->pcs()->getItem(m_items.first().pcUuid);
 
         QRect totalDesktopGeometry;
-        QSet<int> screens = m_items.first().screenSnaps.screens();
+        QSet<int> screens = nx::gui::Screens::coveredBy(m_items.first().screenSnaps);
         for (const auto& screen: pc.screens)
         {
             if (screens.contains(screen.index))

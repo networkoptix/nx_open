@@ -26,10 +26,10 @@ void Timer::start(
     std::chrono::milliseconds timeout,
     nx::utils::MoveOnlyFunc<void()> timerFunc)
 {
-    // TODO: #ak m_aioService.registerTimer currently does not support zero timeouts, 
+    // TODO: #ak m_aioService.registerTimer currently does not support zero timeouts,
     // so using following hack
     if (timeout == std::chrono::milliseconds::zero())
-        timeout = std::chrono::milliseconds(1); 
+        timeout = std::chrono::milliseconds(1);
 
     m_handler = std::move(timerFunc);
     m_timeout = timeout;
@@ -77,7 +77,7 @@ void Timer::cancelSync()
 
 void Timer::stopWhileInAioThread()
 {
-    m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut, true);
+    m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut);
     m_handler = nullptr;
 }
 
@@ -100,7 +100,7 @@ void Timer::eventTriggered(Pollable* sock, aio::EventType eventType) throw()
 
     QnMutexLocker lock(&m_mutex);
     if (internalTimerId == m_internalTimerId)
-        m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut, true);
+        m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut);
 }
 
 } // namespace aio

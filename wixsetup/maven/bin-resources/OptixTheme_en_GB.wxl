@@ -17,7 +17,7 @@
   <String Id="ClientOnly">Client only</String>
   <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
   <String Id="ServerOnly">Server only</String>
-  <String Id="ServerOnlyDesc">The Server application is used to to store System information and archives</String>
+  <String Id="ServerOnlyDesc">The Server application is used to store System information and archives</String>
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Close</String>
   <String Id="InstallAcceptCheckbox">I agree to the license terms and conditions</String>

@@ -16,6 +16,7 @@
 				<xs:attribute type="xs:string" name="id" use="required"/>				
 				<xs:attribute type="DataType" name="dataType" use="required"/>
 				<xs:attribute type="xs:string" name="name" use="required"/>
+                <xs:attribute type="xs:string" name="confirmation" use="optional"/>                
 				<xs:attribute type="xs:string" name="description" use="optional"/>
 				<xs:attribute type="xs:string" name="range" use="optional"/>
 				<xs:attribute type="xs:string" name="tag" use="optional"/>

@@ -11,21 +11,19 @@ class ScopeGuard
 {
 public:
     /** Creates disarmed guard */
-    ScopeGuard()
-        : m_fired(true)
+    ScopeGuard():
+        m_fired(true)
     {
     }
 
     /** Creates guard holding @param callback */
-    ScopeGuard(Callback callback)
-    :
+    ScopeGuard(Callback callback):
         m_callback(std::move(callback)),
         m_fired(false)
     {
     }
 
-    ScopeGuard(ScopeGuard&& rhs)
-    :
+    ScopeGuard(ScopeGuard&& rhs):
         m_callback(std::move(rhs.m_callback)),
         m_fired(rhs.m_fired)
     {

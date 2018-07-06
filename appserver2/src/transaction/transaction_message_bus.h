@@ -3,19 +3,19 @@
 #include <memory>
 
 #include <QtCore/QElapsedTimer>
-#include <QTime>
 
 #include <common/common_module.h>
 
 #include <nx_ec/ec_api.h>
-#include "nx_ec/data/api_lock_data.h"
+#include <nx/vms/api/data/lock_data.h>
 #include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
-#include <nx/network/http/asynchttpclient.h>
 #include "transaction_transport.h"
-#include <transaction/transaction_log.h>
 #include "runtime_transaction_log.h"
 #include "transport_connection_info.h"
+#include <managers/time_manager.h>
+#include "ec_connection_notification_manager.h"
+#include <core/resource_access/resource_access_manager.h>
 
 #include "transaction_message_bus_base.h"
 
@@ -23,58 +23,32 @@ class QTimer;
 class QnRuntimeTransactionLog;
 
 namespace ec2 {
+
 class ECConnectionNotificationManager;
 class TimeSynchronizationManager;
 
-class QnTransactionMessageBus:
-    public TransactionMessageBusBase
+class QnTransactionMessageBus: public TransactionMessageBusBase
 {
-    Q_OBJECT;
+    Q_OBJECT
     using base_type = TransactionMessageBusBase;
+
 public:
     QnTransactionMessageBus(
-        detail::QnDbManager* db,
         Qn::PeerType peerType,
         QnCommonModule* commonModule,
         QnJsonTransactionSerializer* jsonTranSerializer,
         QnUbjsonTransactionSerializer* ubjsonTranSerializer);
 
-    virtual ~QnTransactionMessageBus();
+    ~QnTransactionMessageBus() override;
 
     //void addConnectionToPeer(const QUrl& url);
     //void removeConnectionFromPeer(const QUrl& url);
-    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
+    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
 
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
-    void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
-        ConnectionLockGuard connectionLockGuard,
-        QSharedPointer<AbstractStreamSocket> socket,
-        ConnectionType::Type connectionType,
-        const ApiPeerData& remotePeer,
-        qint64 remoteSystemIdentityTime,
-        const nx_http::Request& request,
-        const QByteArray& contentEncoding,
-        std::function<void()> ttFinishCallback,
-        const Qn::UserAccessData &userAccessData);
     bool moveConnectionToReadyForStreaming(const QnUuid& connectionGuid);
-    //!Report socket to receive transactions from
-    /*!
-        \param requestBuf Contains serialized \a request and (possibly) partial (or full) message body
-    */
-    void gotIncomingTransactionsConnectionFromRemotePeer(
-        const QnUuid& connectionGuid,
-        QSharedPointer<AbstractStreamSocket> socket,
-        const ApiPeerData &remotePeer,
-        qint64 remoteSystemIdentityTime,
-        const nx_http::Request& request,
-        const QByteArray& requestBuf);
-    //!Process transaction received via standard HTTP server interface
-    bool gotTransactionFromRemotePeer(
-        const QnUuid& connectionGuid,
-        const nx_http::Request& request,
-        const QByteArray& requestMsgBody);
     //!Blocks till connection \a connectionGuid is ready to accept new transactions
     void waitForNewTransactionsReady(const QnUuid& connectionGuid);
     void connectionFailure(const QnUuid& connectionGuid);
@@ -124,13 +98,15 @@ public:
     AlivePeersMap aliveClientPeers() const;
 
     virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
+    virtual QSet<QnUuid> directlyConnectedServerPeers() const override;
     virtual void dropConnections() override;
-signals:
-    void gotLockRequest(ApiLockData);
-    //void gotUnlockRequest(ApiLockData);
-    void gotLockResponse(ApiLockData);
 
-    public slots:
+signals:
+    void gotLockRequest(nx::vms::api::LockData);
+    //void gotUnlockRequest(nx::vms::api::LockData);
+    void gotLockResponse(nx::vms::api::LockData);
+
+public slots:
     void reconnectAllPeers();
 
     /*
@@ -145,13 +121,12 @@ signals:
 private:
     friend class QnTransactionTransport;
     friend struct GotTransactionFuction;
-    friend struct SendTransactionToTransportFuction;
 
     bool isExists(const QnUuid& removeGuid) const;
     bool isConnecting(const QnUuid& removeGuid) const;
 
+protected:
     typedef QMap<QnUuid, QnTransactionTransport*> QnConnectionMap;
-
 private:
     template<class T>
     void sendTransactionInternal(const QnTransaction<T>& tran, const QnTransactionTransportHeader &header)
@@ -192,62 +167,268 @@ private:
     }
 
     template <class T>
-    void sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader);
-
-    template <class T>
     void gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
 
-    void onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<ApiSyncRequestData> &tran);
-    void onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran);
+	void onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran);
     void onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData> &tran);
-    void onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran);
-    void queueSyncRequest(QnTransactionTransport* transport);
+    void onGotDistributedMutexTransaction(const QnTransaction<nx::vms::api::LockData>& tran);
 
     void connectToPeerEstablished(const ApiPeerData &peerInfo);
     void connectToPeerLost(const QnUuid& id);
     void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
-    bool isPeerUsing(const QUrl& url);
+    bool isPeerUsing(const nx::utils::Url& url);
     void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
     bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
 
+protected:
     /*
     * Return true if alive transaction accepted or false if it should be ignored (offline data is deprecated)
     */
-    bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader);
+    virtual bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport, const QnTransactionTransportHeader* ttHeader);
 
+	virtual bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
+
+	void resyncWithPeer(QnTransactionTransport* transport);
+
+	virtual void onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<ApiSyncRequestData> &tran);
+	virtual void queueSyncRequest(QnTransactionTransport* transport);
+	virtual bool sendInitialData(QnTransactionTransport* transport);
+	virtual void fillExtraAliveTransactionParams(ApiPeerAliveData* outAliveData);
+	virtual void logTransactionState();
+
+	virtual void handleIncomingTransaction(
+		QnTransactionTransport* sender,
+		Qn::SerializationFormat tranFormat,
+		QByteArray serializedTran,
+		const QnTransactionTransportHeader &transportHeader);
+
+    virtual ErrorCode updatePersistentMarker(
+        const QnTransaction<nx::vms::api::UpdateSequenceData>& tran);
+
+	void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
+
+    template<typename T>
+    void proxyTransaction(
+        const QnTransaction<T>& tran,
+        const QnTransactionTransportHeader& transportHeader)
+    {
+        if (ApiPeerData::isClient(m_localPeerType))
+            return;
+
+        auto newTransportHeader = transportHeader;
+        ++newTransportHeader.distance;
+        if (newTransportHeader.flags.testFlag(Qn::TT_ProxyToClient))
+        {
+            const auto clients = aliveClientPeers().keys().toSet();
+            if (clients.isEmpty())
+                return;
+
+            newTransportHeader.dstPeers = clients;
+            newTransportHeader.processedPeers += clients;
+            newTransportHeader.processedPeers += commonModule()->moduleGUID();
+
+            for (QnTransactionTransport* transport: m_connections)
+            {
+                if (transport->remotePeer().isClient() && transport->isReadyToSend(tran.command))
+                    transport->sendTransaction(tran, newTransportHeader);
+            }
+
+            return;
+        }
+
+        // Proxy incoming transaction to other peers.
+        if (!newTransportHeader.dstPeers.isEmpty()
+            && (newTransportHeader.dstPeers - newTransportHeader.processedPeers).isEmpty())
+        {
+            return; //< All dstPeers are already processed.
+        }
+
+        const auto oldProcessedPeers = newTransportHeader.processedPeers;
+
+        // Do not put clients peers to processed list in case if client just reconnected to other
+        // server and previous server hasn't got update yet.
+        newTransportHeader.processedPeers += connectedServerPeers();
+        newTransportHeader.processedPeers += commonModule()->moduleGUID();
+
+        QSet<QnUuid> proxyList;
+        for (QnTransactionTransport* transport: m_connections)
+        {
+            const auto remoteId = transport->remotePeer().id;
+            if (oldProcessedPeers.contains(remoteId) || !transport->isReadyToSend(tran.command))
+                continue;
+
+            transport->sendTransaction(tran, newTransportHeader);
+            proxyList += remoteId;
+        }
+
+        if (!proxyList.isEmpty()
+            && nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
+        {
+            NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("proxy transaction %1 to %2").args(
+                tran.toString(), proxyList));
+        }
+    }
+
+    template<typename T>
+    bool processSpecialTransaction(
+        const QnTransaction<T>& tran,
+        QnTransactionTransport* sender,
+        const QnTransactionTransportHeader& transportHeader)
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        // Do not perform any logic (aka sequence update) for foreign transaction. Just proxy.
+        if (!transportHeader.dstPeers.isEmpty()
+            && !transportHeader.dstPeers.contains(commonModule()->moduleGUID()))
+        {
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
+            {
+                NX_DEBUG(QnLog::EC2_TRAN_LOG, lm("skip transaction %1 %2 for peers %3").args(
+                    tran.toString(), toString(transportHeader), transportHeader.dstPeers));
+            }
+
+            proxyTransaction(tran, transportHeader);
+            return true;
+        }
+
+        updateLastActivity(sender, transportHeader);
+
+        const auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
+        const auto transactionHash =
+            transactionDescriptor ? transactionDescriptor->getHashFunc(tran.params) : QnUuid();
+
+        if (!checkSequence(transportHeader, tran, sender))
+            return true;
+
+        if (!sender->isReadSync(tran.command))
+        {
+            printTransaction("reject transaction (no readSync)",
+                tran, transactionHash, transportHeader, sender);
+            return true;
+        }
+
+        if (tran.isLocal() && ApiPeerData::isServer(m_localPeerType))
+        {
+            printTransaction("reject local transaction",
+                tran, transactionHash, transportHeader, sender);
+            return true;
+        }
+
+        printTransaction("got transaction", tran, transactionHash, transportHeader, sender);
+
+        // Process system transactions.
+        switch (tran.command)
+        {
+            case ApiCommand::lockRequest:
+            case ApiCommand::lockResponse:
+            case ApiCommand::unlockRequest:
+                onGotDistributedMutexTransaction(tran);
+                break;
+            case ApiCommand::tranSyncRequest:
+                onGotTransactionSyncRequest(sender, tran);
+                return true; //< Do not proxy.
+            case ApiCommand::tranSyncResponse:
+                onGotTransactionSyncResponse(sender, tran);
+                return true; //< Do not proxy.
+            case ApiCommand::tranSyncDone:
+                onGotTransactionSyncDone(sender, tran);
+                return true; //< Do not proxy.
+            case ApiCommand::peerAliveInfo:
+                onGotServerAliveInfo(tran, sender, transportHeader);
+                return true; //< Do not proxy. This call contains built in proxy.
+            case ApiCommand::forcePrimaryTimeServer:
+                if (m_timeSyncManager)
+                    m_timeSyncManager->onGotPrimariTimeServerTran(tran);
+                break;
+            case ApiCommand::broadcastPeerSyncTime:
+                if (m_timeSyncManager)
+                    m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
+                return true; //< Do not proxy.
+            case ApiCommand::broadcastPeerSystemTime:
+            case ApiCommand::getKnownPeersSystemTime:
+                return true; //< Ignore deprecated transactions.
+            case ApiCommand::runtimeInfoChanged:
+                if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
+                    return true; //< Already processed. Do not proxy and ignore the transaction.
+                if (m_handler)
+                    m_handler->triggerNotification(tran, NotificationSource::Remote);
+                break;
+            case ApiCommand::updatePersistentSequence:
+                updatePersistentMarker(tran);
+                break;
+            case ApiCommand::installUpdate:
+            case ApiCommand::uploadUpdate:
+            case ApiCommand::changeSystemId:
+            {
+                // Transactions listed here should not go to the DbManager.
+                // We are only interested in relevant notifications triggered.
+                // Also they are allowed only if sender is Admin.
+                if (!commonModule()->resourceAccessManager()->hasGlobalPermission(
+                    sender->getUserAccessData(), Qn::GlobalAdminPermission))
+                {
+                    NX_WARNING(QnLog::EC2_TRAN_LOG,
+                        lm("Can't handle transaction %1 because of no administrator rights. "
+                           "Reopening connection...").arg(ApiCommand::toString(tran.command)));
+
+                    sender->setState(QnTransactionTransport::Error);
+                    return true;
+                }
+
+                if (m_handler)
+                    m_handler->triggerNotification(tran, NotificationSource::Remote);
+                break;
+            }
+            case ApiCommand::getFullInfo:
+                sender->setWriteSync(true);
+                if (m_handler)
+                    m_handler->triggerNotification(tran, NotificationSource::Remote);
+                break;
+            default:
+                return false; // Not a special case transaction.
+        }
+
+        proxyTransaction(tran, transportHeader);
+        return true;
+    }
+
+private:
     QnPeerSet connectedServerPeers() const;
-
-    void sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState);
 
     void addAlivePeerInfo(const ApiPeerData& peerData, const QnUuid& gotFromPeer, int distance);
     void removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive = false);
-    bool sendInitialData(QnTransactionTransport* transport);
-    void printTranState(const QnTranState& tranState);
-    template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
-    void updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* transport);
-    void proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader);
     void removeTTSequenceForPeer(const QnUuid& id);
-    bool isSyncInProgress() const;
     void removePeersWithTimeout(const QSet<QnUuid>& lostPeers);
     QSet<QnUuid> checkAlivePeerRouteTimeout();
     void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
     void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
     void sendDelayedAliveTran();
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
+    nx::utils::Url updateOutgoingUrl(const QnUuid& peer, const nx::utils::Url& srcUrl) const;
 
-    QUrl updateOutgoingUrl(const QUrl& srcUrl) const;
-private slots:
+    static void printTransaction(
+        const char* prefix,
+        const QnAbstractTransaction& tran,
+        const QnUuid& hash,
+        const QnTransactionTransportHeader& transportHeader,
+        QnTransactionTransport* sender);
+
+protected slots:
     void at_stateChanged(QnTransactionTransport::State state);
     void at_gotTransaction(
         Qn::SerializationFormat tranFormat,
         QByteArray serializedTran,
         const QnTransactionTransportHeader &transportHeader);
     void doPeriodicTasks();
-    bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
-    void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
+    void at_peerIdDiscovered(const nx::utils::Url &url, const QnUuid& id);
     void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
     void emitRemotePeerUnauthorized(const QnUuid& id);
     void onEc2ConnectionSettingsChanged(const QString& key);
+
+protected:
+	QnConnectionMap m_connections;
+	std::shared_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
+	bool m_restartPending = false;
+	QVector<QnTransactionTransport*> m_connectingConnections;
 
 private:
     struct RemoteUrlConnectInfo
@@ -263,19 +444,14 @@ private:
         QnUuid id;
     };
 
-    QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
-    QTimer* m_timer;
-    QnConnectionMap m_connections;
-
-    QVector<QnTransactionTransport*> m_connectingConnections;
+    QMap<nx::utils::Url, RemoteUrlConnectInfo> m_remoteUrls;
+    QTimer* m_timer = nullptr;
 
     QMap<ApiPersistentIdData, int> m_lastTransportSeq;
 
     // alive control
     QElapsedTimer m_aliveSendTimer;
     QElapsedTimer m_currentTimeTimer;
-    std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
-    bool m_restartPending;
 
     struct DelayedAliveData
     {
@@ -290,5 +466,4 @@ private:
 
 };
 
-} //namespace ec2
-
+} // namespace ec2

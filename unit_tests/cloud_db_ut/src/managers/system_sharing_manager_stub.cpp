@@ -26,6 +26,22 @@ boost::optional<api::SystemSharingEx> SystemSharingManagerStub::getSystemSharing
     return sharingIter->second;
 }
 
+std::vector<api::SystemSharingEx> SystemSharingManagerStub::fetchSystemUsers(
+    utils::db::QueryContext* /*queryContext*/,
+    const std::string& systemId)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    std::vector<api::SystemSharingEx> result;
+    for (const auto& sharing: m_sharings)
+    {
+        if (sharing.first.second == systemId)
+            result.push_back(sharing.second);
+    }
+
+    return result;
+}
+
 void SystemSharingManagerStub::addSystemSharingExtension(
     AbstractSystemSharingExtension* /*extension*/)
 {

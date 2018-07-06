@@ -1,34 +1,28 @@
 *** Settings ***
-
-Library           SeleniumLibrary    screenshot_root_directory=\Screenshots    run_on_failure=Failure Tasks
+Library           SeleniumLibrary    run_on_failure=Failure Tasks
 Library           NoptixImapLibrary/
 Library           String
 Library           NoptixLibrary/
 Resource          variables.robot
+Resource          ${variables_file}
 
 *** variables ***
-@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu
 ${headless}    false
+${directory}    ${SCREENSHOTDIRECTORY}
+${variables_file}    variables-env.robot
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    Run Keyword Unless    "${headless}"=="true" and "${BROWSER}" == "Chrome"   Open Browser    ${ENV}    ${BROWSER}
-    Run Keyword If    "${headless}"=="true" and "${BROWSER}" == "Chrome"    Headless Startup
+    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
+    Open Browser    ${ENV}    ${BROWSER}
 #    Maximize Browser Window
     Set Selenium Speed    0
     Check Language
     Go To    ${url}
 
-Headless Startup
-    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-    : FOR    ${option}    IN    @{chrome_arguments}
-    \    Call Method    ${options}    add_argument    ${option}
-    Create Webdriver    Chrome    chrome_options=${options}
-    Go To    ${ENV}
-
 Check Language
-    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}
+    Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/following-sibling::ul//a[@ng-click='changeLanguage(lang.language)']/span[@lang='en_US']
     Register Keyword To Run On Failure    NONE
     ${status}    ${value}=    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${LANGUAGE DROPDOWN}/span[@lang='${LANGUAGE}']    2
     Register Keyword To Run On Failure    Failure Tasks
@@ -56,23 +50,27 @@ Validate Log In
     Check Language
 
 Log Out
+    Wait Until Page Does Not Contain Element    ${BACKDROP}
+    Wait Until Page Contains Element    ${LOG OUT BUTTON}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Click Element    ${ACCOUNT DROPDOWN}
+    Click Link    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
     Click Link    ${LOG OUT BUTTON}
     Validate Log Out
 
 Validate Log Out
+    Wait Until Element Is Not Visible    ${BACKDROP}
     Wait Until Element Is Visible    ${ANONYMOUS BODY}
 
 Register
-    [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=true
-    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER EMAIL INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
+    [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false
+    Wait Until Elements Are Visible    ${REGISTER FIRST NAME INPUT}    ${REGISTER LAST NAME INPUT}    ${REGISTER PASSWORD INPUT}    ${CREATE ACCOUNT BUTTON}
     Input Text    ${REGISTER FIRST NAME INPUT}    ${first name}
     Input Text    ${REGISTER LAST NAME INPUT}    ${last name}
-    Input Text    ${REGISTER EMAIL INPUT}    ${email}
+    ${read only}    Run Keyword And Return Status    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT LOCKED}
+    Run Keyword Unless    ${read only}    Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
-    Run Keyword If    "${checked}"=="false"    Click Element    ${REGISTER SUBSCRIBE CHECKBOX}
+    Run Keyword If    "${checked}"=="false"    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
     Click Button    ${CREATE ACCOUNT BUTTON}
 
 Validate Register Success
@@ -94,8 +92,11 @@ Get Email Link
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
     Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
-    Run Keyword If    "${link type}"=="reset"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
-    ${links}    Get Links From Email    ${email}
+    Run Keyword If    "${link type}"=="restore_password"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
+    Run Keyword If    "${link type}"=="register"    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
+    ${links}    Get NX Links From Email    ${email}    ${link type}
+    log    ${links}
     Delete Email    ${email}
     Close Mailbox
     Return From Keyword    ${links}
@@ -134,7 +135,7 @@ Remove User Permissions
     Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     Wait Until Element Is Visible    ${DELETE USER BUTTON}
     Click Button    ${DELETE USER BUTTON}
-    ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    {{email}}    ${user email}
+    ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    %email%    ${user email}
     Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
     Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${user email}')]
 
@@ -158,7 +159,7 @@ Verify In System
     Wait Until Element Is Visible    //h1[@ng-if='gettingSystem.success' and contains(text(), '${system name}')]
 
 Failure Tasks
-    Capture Page Screenshot    selenium-screenshot-{index}.png
+    Capture Page Screenshot    selenium-screenshot-${LANGUAGE}{index}.png
 
 Wait Until Elements Are Visible
     [arguments]    @{elements}
@@ -172,7 +173,9 @@ Clean up email noperm
     Log In    ${EMAIL OWNER}    ${password}
     Validate Log In
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Ignore Error    Remove User Permissions    ${EMAIL NOPERM}
+    Register Keyword To Run On Failure    Failure Tasks
     Close Browser
 
 Clean up random emails
@@ -194,7 +197,7 @@ Find and remove emails
     \  Click Element    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span['&nbsp&nbspDelete']
     \  Wait Until Element Is Visible    ${DELETE USER BUTTON}
     \  Click Button    ${DELETE USER BUTTON}
-    \  ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    {{email}}    ${email}
+    \  ${PERMISSIONS WERE REMOVED FROM EMAIL}    Replace String    ${PERMISSIONS WERE REMOVED FROM}    %email%    ${email}
     \  Check For Alert    ${PERMISSIONS WERE REMOVED FROM EMAIL}
     \  Wait Until Element Is Not Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${email}')]
 
@@ -204,8 +207,10 @@ Reset user noperm first/last name
     Go To    ${url}/account
     Log In    ${EMAIL NOPERM}    ${password}    button=None
     Validate Log In
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    nameChanged
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    nameChanged
+    Register Keyword To Run On Failure    Failure Tasks
 
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
@@ -220,8 +225,10 @@ Reset user owner first/last name
     Open Browser and go to URL    ${url}/account
     Log In    ${EMAIL OWNER}    ${password}    button=None
     Validate Log In
+    Register Keyword To Run On Failure    NONE
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    newFirstName
     Run Keyword And Ignore Error    Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    newLastName
+    Register Keyword To Run On Failure    Failure Tasks
 
     Clear Element Text    ${ACCOUNT FIRST NAME}
     Input Text    ${ACCOUNT FIRST NAME}    ${TEST FIRST NAME}
@@ -249,4 +256,28 @@ Make sure notowner is in the system
     Go To    ${url}/systems/${AUTO_TESTS SYSTEM ID}
     ${status}    Run Keyword And Return Status    Wait Until Element Is Visible    ${NOT OWNER IN SYSTEM}
     Run Keyword Unless    ${status}    Add notowner
+    Close Browser
+
+Reset System Names
+    Open Browser and go to URL    ${url}/systems/${AUTOTESTS OFFLINE SYSTEM ID}
+    Log In    ${EMAIL OWNER}    ${BASE PASSWORD}    None
+    Validate Log In
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests 2
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests 2
+
+    Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
+    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Click Button    ${RENAME SYSTEM}
+    Wait Until Elements Are Visible    ${RENAME CANCEL}    ${RENAME SAVE}    ${RENAME INPUT}
+    Clear Element Text    ${RENAME INPUT}
+    Input Text    ${RENAME INPUT}    Auto Tests
+    Click Button    ${RENAME SAVE}
+    Check For Alert    ${SYSTEM NAME SAVED}
+    Verify In System    Auto Tests
     Close Browser

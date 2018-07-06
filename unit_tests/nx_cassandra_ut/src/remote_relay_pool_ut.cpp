@@ -3,8 +3,8 @@
 #include <utility>
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
-#include <model/remote_relay_peer_pool.h>
-#include <model/../settings.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
+#include <nx/cloud/relay/settings.h>
 #include <nx/casssandra/async_cassandra_connection.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/thread/cf/wrappers.h>
@@ -22,7 +22,7 @@ class TestRelayPool: public RemoteRelayPeerPool
 {
 public:
     using RemoteRelayPeerPool::RemoteRelayPeerPool;
-    cassandra::AsyncConnection* getConnection()
+    cassandra::AbstractAsyncConnection* getConnection()
     {
         return nx::cloud::relay::model::RemoteRelayPeerPool::getConnection();
     }
@@ -39,21 +39,11 @@ protected:
 
     virtual void SetUp() override
     {
-        m_relayToDomainTestData.push_back(
-            std::make_tuple("87C86E7B-3EAE-42F7-97FB-528FC1C0A25F",
-                "relayHost1", "someServer.nx.com"));
-        m_relayToDomainTestData.push_back(
-            std::make_tuple("BFF1EA22-56F3-4433-92A3-B412B733282F",
-                "relayHost2", "someServer.nx.network.com"));
-        m_relayToDomainTestData.push_back(
-            std::make_tuple("1160E08E-0893-4CDF-8551-F86919FEF853",
-                "relayHost3", "someServer2.nx.network.ru"));
-        m_relayToDomainTestData.push_back(
-            std::make_tuple("3CB0A381-A6A1-4905-A1E9-E1CF743A7042",
-                "relayHost4", "someServer3.com"));
-        m_relayToDomainTestData.push_back(
-            std::make_tuple("68094200-0598-46B9-AE5D-9F08DF45C062",
-                "relayHost5", "someServer4.subdomain.nx.network.org"));
+        m_relayToDomainTestData.push_back(std::make_tuple(m_thisNodeId, "someServer.nx.com"));
+        m_relayToDomainTestData.push_back(std::make_tuple("relayHost2", "someServer.nx.network.com"));
+        m_relayToDomainTestData.push_back(std::make_tuple("relayHost3", "someServer2.nx.network.ru"));
+        m_relayToDomainTestData.push_back(std::make_tuple("relayHost4", "someServer3.com"));
+        m_relayToDomainTestData.push_back(std::make_tuple("relayHost5", "someServer4.subdomain.nx.network.org"));
     }
 
     void givenDbWithNotExistentCdbKeyspace() {}
@@ -67,28 +57,27 @@ protected:
     void whenRelayPoolObjectHasBeenCreated()
     {
         std::vector<const char*> argv;
-        argv.push_back("cassandra/host");
+        argv.push_back("-cassandra/host");
         argv.push_back(options()->host.c_str());
 
         conf::Settings settings;
         settings.load(argv.size(), argv.data());
 
         m_relayPool.reset(new TestRelayPool(settings));
+        m_relayPool->setNodeId(m_thisNodeId);
+        ASSERT_TRUE(m_relayPool->connectToDb());
     }
 
     void whenFivePeersHaveBeenAdded()
     {
         for (const auto& relayToDomain: m_relayToDomainTestData)
-        {
-            ASSERT_TRUE(m_relayPool->addPeer(std::get<2>(relayToDomain),
-                std::get<1>(relayToDomain)).get());
-        }
+            ASSERT_TRUE(m_relayPool->addPeer(std::get<1>(relayToDomain)).get());
     }
 
     void whenFivePeersHaveBeenRemoved()
     {
         for (const auto& relayToDomain : m_relayToDomainTestData)
-            ASSERT_TRUE(m_relayPool->removePeer(std::get<2>(relayToDomain)).get());
+            ASSERT_TRUE(m_relayPool->removePeer(std::get<1>(relayToDomain)).get());
     }
 
     void whenTableIsFilledWithTestData()
@@ -104,12 +93,11 @@ protected:
             {
                 return m_relayPool->getConnection()->prepareQuery(
                     "INSERT INTO cdb.relay_peers ( \
-                                relay_id, \
-                                relay_host, \
+                                node_id, \
                                 domain_suffix_1, \
                                 domain_suffix_2, \
                                 domain_suffix_3, \
-                                domain_name_tail ) VALUES(?, ?, ?, ?, ?, ?);")
+                                domain_name_tail ) VALUES(?, ?, ?, ?, ?);")
                     .then(
                         [this, sharedContext](
                             cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
@@ -119,11 +107,9 @@ protected:
 
                             cassandra::Query& query = prepareResult.second;
                             const auto& testData = m_relayToDomainTestData[sharedContext->index];
-                            NX_ASSERT(query.bind("relay_id",
-                                cassandra::Uuid(std::get<0>(testData))));
-                            NX_ASSERT(query.bind("relay_host", std::get<1>(testData)));
+                            NX_ASSERT(query.bind("node_id", std::get<0>(testData)));
 
-                            auto splitDomainResult = getDomainParts(std::get<2>(testData));
+                            auto splitDomainResult = getDomainParts(std::get<1>(testData));
                             const auto& reversedParts = splitDomainResult.first;
                             const auto& domainTailString = splitDomainResult.second;
                             NX_ASSERT(!reversedParts.empty());
@@ -156,12 +142,11 @@ protected:
     {
         auto replaceResult = m_relayPool->getConnection()->prepareQuery(
             "INSERT INTO cdb.relay_peers ( \
-                relay_id, \
-                relay_host, \
+                node_id, \
                 domain_suffix_1, \
                 domain_suffix_2, \
                 domain_suffix_3, \
-                domain_name_tail ) VALUES(?, ?, ?, ?, ?, ?);")
+                domain_name_tail ) VALUES(?, ?, ?, ?, ?);")
             .then(
                 [this](cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
                 {
@@ -169,10 +154,7 @@ protected:
                     NX_ASSERT(prepareResult.first == CASS_OK);
 
                     auto& query = prepareResult.second;
-                    NX_ASSERT(query.bind(
-                        "relay_id",
-                        cassandra::Uuid("74DFEB4A-1FBD-49AD-B840-5F477A7B4A72")));
-                    NX_ASSERT(query.bind("relay_host", "new_host"));
+                    NX_ASSERT(query.bind("node_id", "new_host"));
                     NX_ASSERT(query.bind("domain_suffix_1", "com"));
                     NX_ASSERT(query.bind("domain_suffix_2", "nx"));
                     NX_ASSERT(query.bind("domain_suffix_3", "someServer"));
@@ -246,9 +228,8 @@ protected:
         ASSERT_EQ(CASS_OK, selectResult.first);
 
         boost::optional<std::string> suffix1, suffix2, suffix3, domainTail, relayHost;
-        boost::optional<cassandra::Uuid> relayId;
-
         int rowCount = 0;
+
         while (selectResult.second.next())
         {
             ++rowCount;
@@ -257,26 +238,22 @@ protected:
             ASSERT_TRUE(selectResult.second.get(2, &suffix3));
             ASSERT_TRUE(selectResult.second.get(3, &domainTail));
             ASSERT_TRUE(selectResult.second.get(4, &relayHost));
-            ASSERT_TRUE(selectResult.second.get(5, &relayId));
 
-            ASSERT_TRUE((bool)relayId);
             ASSERT_TRUE((bool)relayHost);
             ASSERT_TRUE((bool)suffix1);
             ASSERT_TRUE((bool)suffix2);
             ASSERT_TRUE((bool)suffix3);
             ASSERT_TRUE((bool)domainTail);
 
-            ASSERT_FALSE(relayId->uuidString.empty());
-
             auto testDataIt = std::find_if(m_relayToDomainTestData.cbegin(),
                 m_relayToDomainTestData.cend(),
-                [&](const std::tuple<std::string, std::string, std::string>& tp)
+                [&](const std::tuple<std::string, std::string>& tp)
                 {
-                    auto splitDomainResult = getDomainParts(std::get<2>(tp));
+                    auto splitDomainResult = getDomainParts(std::get<1>(tp));
                     const auto& reversedParts = splitDomainResult.first;
                     const auto& domainTailString = splitDomainResult.second;
 
-                    if (relayHost != std::get<1>(tp))
+                    if (relayHost != m_thisNodeId)
                         return false;
 
                     if (reversedParts[0] != *suffix1)
@@ -309,9 +286,7 @@ protected:
         ASSERT_EQ((int)m_relayToDomainTestData.size(), rowCount);
     }
 
-    bool verifyFindRelayResult(
-        const std::string& domain,
-        const std::vector<std::string>& candidates)
+    bool verifyFindRelayResult(const std::string& domain, const std::vector<std::string>& candidates)
     {
         auto relayHost = m_relayPool->findRelayByDomain(domain).get();
         for (const auto& candidate: candidates)
@@ -340,7 +315,8 @@ protected:
 
 private:
     std::unique_ptr<TestRelayPool> m_relayPool;
-    std::vector<std::tuple<std::string, std::string, std::string>> m_relayToDomainTestData;
+    std::vector<std::tuple<std::string, std::string>> m_relayToDomainTestData;
+    std::string m_thisNodeId = "relayHost1";
 };
 
 TEST_F(RemoteRelayPeerPool, CreateDbStructure_NeededStructureDoesNotExist)

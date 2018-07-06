@@ -34,7 +34,7 @@
 
 #include <utils/license_usage_helper.h>
 #include <nx/utils/string.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -750,19 +750,17 @@ void QnServerResourceWidget::updateHud(bool animate /*= true*/) {
 }
 
 
-QString QnServerResourceWidget::calculateTitleText() const {
-    enum {
-        kMaxNameLength = 30
-    };
+QString QnServerResourceWidget::calculateTitleText() const
+{
+    static const auto kMaxNameLength = 30;
+    const auto name = nx::utils::elideString(
+        QnResourceDisplayInfo(m_resource).toString(Qn::RI_WithUrl), kMaxNameLength);
 
-    QString name = nx::utils::elideString(QnResourceDisplayInfo(m_resource).toString(Qn::RI_WithUrl), kMaxNameLength);
+    if (m_resource->getStatus() != Qn::Online)
+        return name;
 
-    qint64 uptimeMs = m_resource->getStatus() == Qn::Online
-        ? m_manager->uptimeMs(m_resource)
-        : 0;
-    return uptimeMs > 0
-        ? tr("%1 (up %2)").arg(name, QTimeSpan(uptimeMs).toApproximateString())
-        : name;
+    const auto uptimeMs = std::chrono::milliseconds(m_manager->uptimeMs(m_resource));
+    return tr("%1 (up %2)").arg(name, nx::client::core::HumanReadable::timeSpan(uptimeMs));
 }
 
 int QnServerResourceWidget::calculateButtonsVisibility() const

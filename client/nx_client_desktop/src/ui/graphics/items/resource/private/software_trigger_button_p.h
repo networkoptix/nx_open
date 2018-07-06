@@ -8,13 +8,15 @@
 #include "../software_trigger_button.h"
 
 class HoverFocusProcessor;
-class QnBusyIndicatorGraphicsWidget;
 class QnStyledTooltipWidget;
 class QTimer;
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class BusyIndicatorGraphicsWidget;
+
 namespace ui {
 namespace graphics {
 
@@ -50,7 +52,7 @@ public:
     void setState(SoftwareTriggerButton::State state);
 
     bool isLive() const;
-    void setLive(bool value);
+    bool setLive(bool value); // Returns true if value has changed.
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget);
@@ -86,7 +88,7 @@ private:
     QnStyledTooltipWidget* const m_toolTip;
     HoverFocusProcessor* const m_toolTipHoverProcessor;
     SoftwareTriggerButton::State m_state = SoftwareTriggerButton::State::Default;
-    QScopedPointer<QnBusyIndicatorGraphicsWidget> m_busyIndicator;
+    QScopedPointer<BusyIndicatorGraphicsWidget> m_busyIndicator;
     QPointer<QTimer> m_scheduledChangeTimer = nullptr;
     bool m_imagesDirty = false;
 

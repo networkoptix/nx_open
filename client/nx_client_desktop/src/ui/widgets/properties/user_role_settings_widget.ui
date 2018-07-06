@@ -39,7 +39,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QnInputField" name="nameInputField" native="true"/>
+      <widget class="nx::client::desktop::InputField" name="nameInputField" native="true"/>
      </item>
     </layout>
    </item>
@@ -56,7 +56,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QnTreeView" name="usersListTreeView">
+      <widget class="nx::client::desktop::TreeView" name="usersListTreeView">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
          <horstretch>0</horstretch>
@@ -124,14 +124,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTreeView</class>
+   <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnInputField</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

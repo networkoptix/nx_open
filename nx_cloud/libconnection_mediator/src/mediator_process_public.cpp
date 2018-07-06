@@ -5,8 +5,7 @@
 namespace nx {
 namespace hpm {
 
-MediatorProcessPublic::MediatorProcessPublic(int argc, char **argv)
-:
+MediatorProcessPublic::MediatorProcessPublic(int argc, char **argv):
     m_impl(new MediatorProcess(argc, argv))
 {
 }

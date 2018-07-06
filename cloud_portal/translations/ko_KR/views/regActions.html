@@ -53,20 +53,19 @@
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">유효한 이메일을 입력하여 주시기 바랍니다</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">이 이메일은 이미 {{PRODUCT_NAME}} 에 등록되었습니다</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">상기 이메일은 이미 %PRODUCT_NAME%에 등록되었습니다</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
         <div class="form-group" validate-field>
-            <div class="col-sm-offset-4 col-sm-8">
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
-                        I agree to the <a href="/content/eula" target="_blank">Terms and Conditions</a> and
-                        <a href="%PRIVACY_LINK%" target="_blank">Privacy policy</a>
+                        나는 <a href="/content/eula" target="_blank"> 이용 약관과 </a> 및 <a href="%PRIVACY_LINK%" target="_blank"> 개인 정보 보호 정책 </a>에 동의합니다.
                     </label>
                     <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
-                        Please review and agree to the Terms and Conditions and Privacy policy in order to proceed
+                        다음으로 진행하려면 이용 약관과 개인 정보 정책을 읽고 동의해야 합니다.
                     </p>
                 </div>
             </div>

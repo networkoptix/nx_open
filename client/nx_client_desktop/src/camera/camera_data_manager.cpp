@@ -10,9 +10,9 @@
 
 #include <nx/utils/log/log.h>
 
-QnCameraDataManager::QnCameraDataManager(QObject *parent /*= 0*/):
+QnCameraDataManager::QnCameraDataManager(QnCommonModule* commonModule, QObject* parent):
     QObject(parent),
-    QnCommonModuleAware(parent)
+    QnCommonModuleAware(commonModule)
 {
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
@@ -23,18 +23,18 @@ QnCameraDataManager::QnCameraDataManager(QObject *parent /*= 0*/):
                 m_loaderByResource.remove(mediaResource);
             }
 
-            if (resource->getId() == commonModule()->remoteGUID())
+            if (resource->getId() == this->commonModule()->remoteGUID())
                 updateCurrentServer();
         });
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
-            if (resource->getId() == commonModule()->remoteGUID())
+            if (resource->getId() == this->commonModule()->remoteGUID())
                 updateCurrentServer();
         });
 
-    connect(commonModule(), &QnCommonModule::remoteIdChanged, this,
+    connect(commonModule, &QnCommonModule::remoteIdChanged, this,
         &QnCameraDataManager::updateCurrentServer);
 }
 

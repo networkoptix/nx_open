@@ -13,7 +13,7 @@
 int QnPlSonyResource::MAX_RESOLUTION_DECREASES_NUM = 3;
 static const int INPUT_MONITOR_TIMEOUT_SEC = 5;
 
-using namespace nx_http;
+using namespace nx::network::http;
 
 QnPlSonyResource::QnPlSonyResource()
 {
@@ -21,7 +21,7 @@ QnPlSonyResource::QnPlSonyResource()
 }
 
 QnPlSonyResource::~QnPlSonyResource() {
-    nx_http::AsyncHttpClientPtr inputMonitorHttpClient;
+    nx::network::http::AsyncHttpClientPtr inputMonitorHttpClient;
     {
         QnMutexLocker lk(&m_inputPortMutex);
         inputMonitorHttpClient = std::move(m_inputMonitorHttpClient);
@@ -36,10 +36,10 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     if (!result || isCameraControlDisabled())
         return result;
 
-    std::string confToken = getPrimaryVideoEncoderId().toStdString();
-    if (confToken.empty()) {
+    auto capabilities = primaryVideoCapabilities();
+    std::string confToken = capabilities.id.toStdString();
+    if (confToken.empty())
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getPrimaryVideoEncoderId"), QString());
-    }
 
     QAuthenticator auth = getAuth();
     QString login = auth.user();
@@ -59,24 +59,17 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfiguration"), soapWrapperGet.getLastError());
     }
 
-    typedef QSharedPointer<QList<QSize> > ResolutionListPtr;
-    ResolutionListPtr resolutionListPtr(0);
-    {
-        QnMutexLocker lock( &m_mutex );
-        resolutionListPtr = ResolutionListPtr(new QList<QSize>(m_resolutionList)); //Sorted desc
-    }
-
     MediaSoapWrapper soapWrapper(endpoint.c_str(), login, password, getTimeDrift());
     SetVideoConfigReq request;
     request.Configuration = confResponse.Configuration;
-    request.Configuration->Encoding = getCodec(true) == H264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
+    request.Configuration->Encoding = capabilities.isH264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
     request.ForcePersistence = false;
     SetVideoConfigResp response;
 
     int triesNumLeft = MAX_RESOLUTION_DECREASES_NUM;
-    QList<QSize>::iterator it = resolutionListPtr->begin();
+    auto it = capabilities.resolutions.begin();
 
-    for (; it != resolutionListPtr->end() && triesNumLeft > 0; --triesNumLeft)
+    for (; it != capabilities.resolutions.end() && triesNumLeft > 0; --triesNumLeft)
     {
         request.Configuration->Resolution->Width = it->width();
         request.Configuration->Resolution->Height = it->height();
@@ -101,26 +94,22 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
             }
         }
 
-        if (soapRes == SOAP_OK) {
+        if (soapRes == SOAP_OK)
             break;
-        }
 
         qWarning() << "QnPlSonyResource::updateResourceCapabilities: resolution " << it->width()
             << " x " << it->height() << " dropped. UniqueId: " << getUniqueId();
-        it = resolutionListPtr->erase(it);
+        it = capabilities.resolutions.erase(it);
     }
 
-    if (soapRes != SOAP_OK) {
+    if (soapRes != SOAP_OK)
         return CameraDiagnostics::RequestFailedResult( lit("setVideoEncoderConfiguration"), soapWrapper.getLastError() );
-    }
 
     if (triesNumLeft == MAX_RESOLUTION_DECREASES_NUM) {
         return CameraDiagnostics::NoErrorResult();
     }
 
-    QnMutexLocker lock( &m_mutex );
-    m_resolutionList = *resolutionListPtr.data();
-
+    setPrimaryVideoCapabilities(capabilities);
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -168,7 +157,7 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     }
 
     QAuthenticator auth = getAuth();
-    QUrl requestUrl;
+    nx::utils::Url requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_HTTP_PORT) );
 
@@ -177,17 +166,17 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 
     requestUrl.setPath(lit("/command/alarmdata.cgi"));
     requestUrl.setQuery(lit("interval=%1").arg(INPUT_MONITOR_TIMEOUT_SEC));
-    m_inputMonitorHttpClient = nx_http::AsyncHttpClient::create();
+    m_inputMonitorHttpClient = nx::network::http::AsyncHttpClient::create();
     connect(
-        m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        m_inputMonitorHttpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
         this, &QnPlSonyResource::onMonitorResponseReceived,
         Qt::DirectConnection );
     connect(
-        m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+        m_inputMonitorHttpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
         this, &QnPlSonyResource::onMonitorMessageBodyAvailable,
         Qt::DirectConnection );
     connect(
-        m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::done,
+        m_inputMonitorHttpClient.get(), &nx::network::http::AsyncHttpClient::done,
         this, &QnPlSonyResource::onMonitorConnectionClosed,
         Qt::DirectConnection );
     m_inputMonitorHttpClient->setTotalReconnectTries( AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
@@ -199,7 +188,7 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 
 void QnPlSonyResource::stopInputPortMonitoringAsync()
 {
-    nx_http::AsyncHttpClientPtr inputMonitorHttpClient;
+    nx::network::http::AsyncHttpClientPtr inputMonitorHttpClient;
     {
         QnMutexLocker lk( &m_inputPortMutex );
         inputMonitorHttpClient = std::move(m_inputMonitorHttpClient);
@@ -295,7 +284,7 @@ void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClientPtr httpClient 
 
     auto response = httpClient->response();
     if (static_cast<bool>(response) &&
-        response->statusLine.statusCode != nx_http::StatusCode::ok)
+        response->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
         return;
     }

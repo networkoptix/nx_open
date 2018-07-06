@@ -2,6 +2,9 @@
 
 #include <api/global_settings.h>
 #include <core/resource_management/resource_discovery_manager.h>
+#include <nx/utils/app_info.h>
+
+#include <camera_vendors.h>
 
 #include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
 #include <plugins/resource/desktop_camera/desktop_camera_deleter.h>
@@ -16,12 +19,18 @@
 #include <plugins/resource/d-link/dlink_resource_searcher.h>
 #include <plugins/resource/flex_watch/flexwatch_resource_searcher.h>
 #include <plugins/resource/flir/flir_resource_searcher.h>
-#include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
+#if defined(ENABLE_IQINVISION)
+    #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
+#endif
 #include <plugins/resource/isd/isd_resource_searcher.h>
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
-#include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
+#include <plugins/resource/wearable/wearable_camera_resource_searcher.h>
 #include <plugins/resource/archive_camera/archive_camera.h>
+
+#if defined(ENABLE_HANWHA)
+    #include <plugins/resource/hanwha/hanwha_resource_searcher.h>
+#endif
 
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <common/common_module.h>
@@ -42,7 +51,9 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     QnDesktopCameraDeleter* autoDeleter = new QnDesktopCameraDeleter(this);
     Q_UNUSED(autoDeleter); /* Class instance will be auto-deleted in our dtor. */
 #endif  //ENABLE_DESKTOP_CAMERA
-
+#ifdef ENABLE_WEARABLE
+    m_searchers << new QnWearableCameraResourceSearcher(commonModule);
+#endif
 
 #ifndef EDGE_SERVER
     #ifdef ENABLE_ARECONT
@@ -60,14 +71,14 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     #ifdef ENABLE_ACTI
         m_searchers << new QnActiResourceSearcher(commonModule);
     #endif
-    #ifdef ENABLE_STARDOT
-        m_searchers << new QnStardotResourceSearcher(commonModule);
-    #endif
-    #ifdef ENABLE_IQE
+    #ifdef ENABLE_IQINVISION
         m_searchers << new QnPlIqResourceSearcher(commonModule);
     #endif
     #ifdef ENABLE_ISD
         m_searchers << new QnPlISDResourceSearcher(commonModule);
+    #endif
+    #ifdef ENABLE_HANWHA
+        m_searchers << new nx::mediaserver_core::plugins::HanwhaResourceSearcher(commonModule);
     #endif
 
     #ifdef ENABLE_ADVANTECH

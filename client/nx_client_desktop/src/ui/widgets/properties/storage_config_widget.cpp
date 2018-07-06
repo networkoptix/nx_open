@@ -27,7 +27,7 @@
 
 #include <server/server_storage_manager.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/item_view_hover_tracker.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <ui/delegates/switch_item_delegate.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/dialogs/backup_settings_dialog.h>
@@ -48,12 +48,14 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/unused.h>
 
 #include <utils/math/color_transformations.h>
 
 #include <common/common_globals.h>
+
+using namespace nx::client::desktop;
 
 namespace
 {
@@ -87,7 +89,7 @@ namespace
         typedef QStyledItemDelegate base_type;
 
     public:
-        explicit StorageTableItemDelegate(QnItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
+        explicit StorageTableItemDelegate(ItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
             base_type(parent),
             m_hoverTracker(hoverTracker),
             m_editedRow(-1)
@@ -166,9 +168,9 @@ namespace
             }
         }
 
-        virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+        virtual QWidget* createEditor(QWidget* /*parent*/, const QStyleOptionViewItem& /*option*/,
+            const QModelIndex& /*index*/) const override
         {
-            QN_UNUSED(parent, option, index);
             return nullptr;
         }
 
@@ -178,7 +180,7 @@ namespace
         }
 
     private:
-        QPointer<QnItemViewHoverTracker> m_hoverTracker;
+        QPointer<ItemViewHoverTracker> m_hoverTracker;
         int m_editedRow;
     };
 
@@ -186,7 +188,7 @@ namespace
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
         {
-            return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
+            return camera->getActualBackupQualities() != Qn::CameraBackupQuality::CameraBackup_Disabled;
         };
 
         QnVirtualCameraResourceList serverCameras = resourcePool->getAllCameras(QnResourcePtr(), true);
@@ -253,10 +255,14 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
 
     setHelpTopic(this, Qn::ServerSettings_Storages_Help);
-    setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_StoragesBackup_Help);
+    setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_ArchiveRestoring_Help);
 
-    auto hoverTracker = new QnItemViewHoverTracker(ui->storageView);
-    hoverTracker->setAutomaticMouseCursor(true);
+    ui->rebuildBackupButtonHint->addHintLine(tr("Creates a backup of local System configurations that can be restored in case of failure."));
+    ui->rebuildBackupButtonHint->addHintLine(tr("Backup includes registry flags, file systems, and server settings related to archive, events, and audit trail logs.Does not backup archives."));
+    ui->rebuildBackupButtonHint->setHelpTopic(Qn::SystemSettings_Server_Backup_Help);
+
+    auto hoverTracker = new ItemViewHoverTracker(ui->storageView);
+    hoverTracker->setMouseCursorRole(Qn::ItemMouseCursorRole);
 
     auto itemDelegate = new StorageTableItemDelegate(hoverTracker, this);
     ui->storageView->setItemDelegate(itemDelegate);
@@ -284,7 +290,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
         ui->storageView->update(index);
     };
 
-    connect(ui->storageView, &QnTreeView::clicked, this, itemClicked);
+    connect(ui->storageView, &TreeView::clicked, this, itemClicked);
 
     connect(ui->backupPages, &QStackedWidget::currentChanged,
         this, &QnStorageConfigWidget::updateRealtimeBackupMovieStatus);
@@ -490,7 +496,7 @@ void QnStorageConfigWidget::loadDataToUi()
     m_backupSchedule = m_server->getBackupSchedule();
     m_camerasToBackup = getCurrentSelectedCameras(resourcePool());
 
-    updateDisabledStoragesWarning(false);
+    setWarningText(QString());
 
     updateRebuildInfo();
     updateBackupInfo();
@@ -551,8 +557,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
     }
     else if (index.column() == QnStorageListModel::CheckBoxColumn)
     {
-        updateDisabledStoragesWarning(
-            index.data(Qt::CheckStateRole).toInt() == Qt::Unchecked && hasChanges());
+        setWarningText(calculateWarningMessage());
     }
 
     emit hasChangesChanged();
@@ -648,14 +653,13 @@ bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& sto
     return storages.size() != existingStorages.size();
 }
 
-
 void QnStorageConfigWidget::applyChanges()
 {
     if (isReadOnly())
         return;
 
     QnStorageResourceList storagesToUpdate;
-    ec2::ApiIdDataList storagesToRemove;
+    nx::vms::api::IdDataList storagesToRemove;
 
     applyCamerasToBackup(m_camerasToBackup, m_quality);
     applyStoragesChanges(storagesToUpdate, m_model->storages());
@@ -676,7 +680,6 @@ void QnStorageConfigWidget::applyChanges()
     if (!storagesToUpdate.empty())
         qnServerStorageManager->saveStorages(storagesToUpdate);
 
-
     if (!storagesToRemove.empty())
         qnServerStorageManager->deleteStorages(storagesToRemove);
 
@@ -686,14 +689,8 @@ void QnStorageConfigWidget::applyChanges()
             { server->setBackupSchedule(m_backupSchedule); });
     }
 
-    updateDisabledStoragesWarning(false);
+    setWarningText(QString());
     emit hasChangesChanged();
-}
-
-void QnStorageConfigWidget::updateDisabledStoragesWarning(bool visible)
-{
-    ui->storagesWarningLabel->setVisible(visible);
-    ui->storagesGroupBox->layout()->activate();
 }
 
 void QnStorageConfigWidget::startRebuid(bool isMain)
@@ -775,7 +772,6 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
             continue;
         validStorages << storage;
     }
-
 
     // TODO: #GDM what if there is only one storage - and it is backup?
     // TODO: #GDM what if there are no storages at all?
@@ -874,19 +870,19 @@ QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
 {
-    qint64 deltaMs = qnSyncTime->currentDateTime().toMSecsSinceEpoch() - backupTimeMs;
-    bool inTheFuture = deltaMs < 0;
+    auto deltaMs = qnSyncTime->currentDateTime().toMSecsSinceEpoch() - backupTimeMs;
+    const auto inTheFuture = deltaMs < 0;
     if (inTheFuture)
         deltaMs = -deltaMs;
 
     if (inTheFuture || deltaMs > kMinDeltaForMessageMs)
     {
-        QTimeSpan span(deltaMs);
-        span.normalize();
-
+        const auto duration = std::chrono::milliseconds(std::abs(deltaMs));
+        using HumanReadable = nx::client::core::HumanReadable;
+        const auto timeSpan = HumanReadable::timeSpan(duration);
         return inTheFuture
-            ? tr("in %1").arg(span.toApproximateString())
-            : tr("%1 before now").arg(span.toApproximateString());
+            ? tr("in %1").arg(timeSpan)
+            : tr("%1 before now").arg(timeSpan);
     }
 
     return QString();
@@ -959,6 +955,48 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
     }
 }
 
+QString QnStorageConfigWidget::calculateWarningMessage() const
+{
+    bool hasDisabledStorage = false;
+    bool hasUsbStorage = false;
+    for (const auto& storageData: m_model->storages())
+    {
+        const auto storage = resourcePool()->getResourceById<QnStorageResource>(storageData.id);
+        if (!storage || storage->getParentId() != m_server->getId())
+            continue;
+
+        // Storage was not modified.
+        if (storageData.isUsed == storage->isUsedForWriting())
+            continue;
+
+        if (!storageData.isUsed)
+            hasDisabledStorage = true;
+
+        if (storageData.isUsed && storageData.storageType == lit("usb"))
+            hasUsbStorage = true;
+    }
+
+    QStringList errorMessages;
+    if (hasDisabledStorage)
+    {
+        errorMessages << tr("Recording to disabled storage will stop. "
+            "However, deleting outdated footage from it will continue.");
+    }
+    if (hasUsbStorage)
+        errorMessages << tr("Recording was enabled on the USB storage");
+
+    return errorMessages.join(L'\n');
+}
+
+void QnStorageConfigWidget::setWarningText(const QString& message)
+{
+    const bool wasHidden = ui->storagesWarningLabel->isHidden();
+    ui->storagesWarningLabel->setHidden(message.isEmpty());
+    ui->storagesWarningLabel->setText(message);
+    if (wasHidden != ui->storagesWarningLabel->isHidden())
+        ui->storagesGroupBox->layout()->activate();
+}
+
 void QnStorageConfigWidget::updateIntervalLabels()
 {
     if (m_lastPerformedBackupTimeMs <= 0)
@@ -1013,7 +1051,7 @@ void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceLi
 
     const auto qualityForCamera = [cameras, quality](const QnVirtualCameraResourcePtr& camera)
     {
-        return (cameras.contains(camera) ? quality : Qn::CameraBackup_Disabled);
+        return (cameras.contains(camera) ? quality : Qn::CameraBackupQuality::CameraBackup_Disabled);
     };
 
     /* Update all default cameras and all cameras that we have changed. */

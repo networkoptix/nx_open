@@ -53,20 +53,19 @@
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Lütfen geçerli bir Eposta girin</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Bu e-posta, {{PRODUCT_NAME}}'de zaten kayıtlı</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Bu e-posta, %PRODUCT_NAME% 'de zaten kayıtlı</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
         <div class="form-group" validate-field>
-            <div class="col-sm-offset-4 col-sm-8">
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
-                        I agree to the <a href="/content/eula" target="_blank">Terms and Conditions</a> and
-                        <a href="%PRIVACY_LINK%" target="_blank">Privacy policy</a>
+                        <a href="/content/eula" target="_blank"> Şartlar ve Koşullarını kabul ediyorum </a> ve <a href="%PRIVACY_LINK%" target="_blank"> Gizlilik politikası </a>
                     </label>
                     <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
-                        Please review and agree to the Terms and Conditions and Privacy policy in order to proceed
+                        Devam etmek için lütfen Şartlar ve Koşullar ve Gizlilik politikasını inceleyin ve kabul edin
                     </p>
                 </div>
             </div>

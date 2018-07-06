@@ -15,7 +15,6 @@ public:
     void setImageSize(int width, int height);
     void setDrawDetailTextMode(bool value); // draw detail text instead of match info
 protected:
-    virtual void resizeEvent(QResizeEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
 
 public slots:
@@ -28,9 +27,6 @@ private:
     QByteArray m_sign;
     QByteArray m_signFromFrame;
     QnMutex m_mutex;
-    QRect m_videoRect;
-    double m_textureWidth;
-    double m_textureHeight;
     bool m_finished;
     int m_progress;
     QTimer m_timer;

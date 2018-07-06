@@ -14,8 +14,10 @@
 #include <utils/common/app_info.h>
 #include <network/system_helpers.h>
 
-#include "ec2_connection.h"
 #include <licensing/license_validator.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <common/common_module.h>
+#include <nx/fusion/serialization/json.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);
@@ -70,14 +72,16 @@ namespace ec2
         for (auto& ms : mediaServers) outData->mediaservers.push_back(std::move(ms));
 
 
-        ApiCameraDataExList cameras;
+        nx::vms::api::CameraDataExList cameras;
         errCode = m_ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasExSync(&cameras);
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        for (ApiCameraDataEx& cam: cameras)
+        for (auto& cam: cameras)
+        {
             if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
                 outData->cameras.push_back(std::move(cam));
+        }
 
         QnLicenseList licenses;
         errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
@@ -101,7 +105,7 @@ namespace ec2
 
         for (auto& br: bRules)
         {
-            ApiBusinessRuleData apiData;
+            nx::vms::api::EventRuleData apiData;
             fromResourceToApi(br, apiData);
             outData->businessRules.push_back(std::move(apiData));
         }
@@ -117,8 +121,9 @@ namespace ec2
 
         for (auto& u : users) outData->users.push_back(std::move(u));
 
-        #undef dbManager_queryOrReturn
-        #undef dbManager_queryOrReturn_uuid
+        errCode = m_ec2Connection->getVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&outData->videowalls);
+        if (errCode != ErrorCode::ok)
+            return errCode;
 
         outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
         return ErrorCode::ok;
@@ -264,8 +269,8 @@ namespace ec2
             return res;
         }
 
-        m_httpClient = nx_http::AsyncHttpClient::create();
-        connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+        m_httpClient = nx::network::http::AsyncHttpClient::create();
+        connect(m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
                 this, &Ec2StaticticsReporter::finishReport, Qt::DirectConnection);
 
         m_httpClient->setUserName(AUTH_USER);
@@ -273,7 +278,7 @@ namespace ec2
 
         const QString configApi = settings->statisticsReportServerApi();
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
-        const QUrl url = lit("%1/%2").arg(serverApi).arg(kServerReportApi);
+        const nx::utils::Url url = lit("%1/%2").arg(serverApi).arg(kServerReportApi);
         const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
         m_httpClient->doPost(url, contentType, QJson::serialized(data));
 
@@ -286,7 +291,7 @@ namespace ec2
         return ErrorCode::ok;
     }
 
-    void Ec2StaticticsReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient)
+    void Ec2StaticticsReporter::finishReport(nx::network::http::AsyncHttpClientPtr httpClient)
     {
         const auto& settings = m_ec2Connection->commonModule()->globalSettings();
 

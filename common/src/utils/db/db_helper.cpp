@@ -16,8 +16,13 @@ struct Ini: public nx::kit::IniConfig
     Ini(): IniConfig("db_helper.ini") { reload(); }
 
     NX_INI_STRING("", tuneDb, "SQL stataments ceparated by ';' to execute after DB open.");
+};
+
+static Ini& ini()
+{
+    static Ini ini;
+    return ini;
 }
-config;
 
 } // namespace
 
@@ -81,7 +86,7 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
     }
 #endif
 
-    const auto tuneQueries = QString::fromLatin1(config.tuneDb)
+    const auto tuneQueries = QString::fromLatin1(ini().tuneDb)
         .split(QChar::fromLatin1(';'), QString::SkipEmptyParts);
     for (const auto& queryLine: tuneQueries)
     {
@@ -96,7 +101,6 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
 
     return true;
 }
-
 
 void QnDbHelper::QnDbTransaction::rollback()
 {
@@ -223,7 +227,6 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
     while (existsUpdatesQuery.next())
         existUpdates << existsUpdatesQuery.value(0).toString();
 
-
     QDir dir(dirName);
     for(const QFileInfo& entry: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
     {
@@ -255,14 +258,12 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
     return true;
 }
 
-bool QnDbHelper::beforeInstallUpdate(const QString& updateName)
+bool QnDbHelper::beforeInstallUpdate(const QString& /*updateName*/)
 {
-    Q_UNUSED(updateName);
     return true;
 }
 
-bool QnDbHelper::afterInstallUpdate(const QString& updateName)
+bool QnDbHelper::afterInstallUpdate(const QString& /*updateName*/)
 {
-    Q_UNUSED(updateName);
     return true;
 }

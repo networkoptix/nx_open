@@ -1,24 +1,26 @@
 #include "crc32.h"
 
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-#include <zlib.h>
+#if defined(__APPLE__) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
+    #include <zlib.h>
 #else
-#include <QtZlib/zlib.h>
+    #include <QtZlib/zlib.h>
 #endif
 
-// On some platforms zconf.h defined crc32 as z_crc32, sometimes - not.
-#ifdef crc32
-#   undef crc32
-#else
-#   define z_crc32 crc32
-#endif
+static inline uLong zlib_crc32(uLong crc, const Bytef *buf, uInt len)
+{
+    return crc32(crc, buf, len);
+}
 
 namespace nx {
 namespace utils {
 
+#if defined(crc32)
+    #undef crc32
+#endif
+
 std::uint32_t crc32(const char* data, std::size_t size)
 {
-    return ::z_crc32(0, (const Bytef*)data, (unsigned long)size);
+    return zlib_crc32(0, (const Bytef*) data, (unsigned long) size);
 }
 
 std::uint32_t crc32(const std::string& str)

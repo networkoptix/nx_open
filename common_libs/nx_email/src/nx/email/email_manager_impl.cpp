@@ -17,9 +17,9 @@
 namespace {
     SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct)
     {
-        if (ct == QnEmail::Ssl)
+        if (ct == QnEmail::ConnectionType::ssl)
             return SmtpClient::SslConnection;
-        else if (ct == QnEmail::Tls)
+        else if (ct == QnEmail::ConnectionType::tls)
             return SmtpClient::TlsConnection;
 
         return SmtpClient::TcpConnection;

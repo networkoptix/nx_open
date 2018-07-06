@@ -41,19 +41,54 @@
      </property>
      <widget class="QWidget" name="noUserRolesPage">
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</string>
+          <string>There are no custom user roles yet.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
-         <property name="wordWrap">
-          <bool>true</bool>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Click &quot;New role&quot; button to create one.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -71,7 +106,7 @@ Click &quot;New role&quot; button to create one.</string>
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="QnPanel" name="userRolesPanel" native="true">
+    <widget class="nx::client::desktop::Panel" name="userRolesPanel" native="true">
      <property name="minimumSize">
       <size>
        <width>200</width>
@@ -95,7 +130,7 @@ Click &quot;New role&quot; button to create one.</string>
        <number>0</number>
       </property>
       <item>
-       <widget class="QnTreeView" name="userRolesTreeView">
+       <widget class="nx::client::desktop::TreeView" name="userRolesTreeView">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
           <horstretch>0</horstretch>
@@ -200,14 +235,14 @@ Click &quot;New role&quot; button to create one.</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTreeView</class>
+   <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -14,13 +14,13 @@ class NX_UTILS_API Transaction
 {
 public:
     Transaction(QSqlDatabase* const connection);
-    /** Does \a rollback(), if \a commit() or \a rollback() has not been called yet. */
+    /** Does rollback(), if commit() or rollback() has not been called yet. */
     ~Transaction();
 
     Transaction(const Transaction&) = delete;
     Transaction& operator=(const Transaction&) = delete;
 
-    /** This method should not be here. Instead, \a connection->begin() should return transaction. */
+    /** This method should not be here. Instead, connection->begin() should return transaction. */
     DBResult begin();
     DBResult commit();
     DBResult rollback();

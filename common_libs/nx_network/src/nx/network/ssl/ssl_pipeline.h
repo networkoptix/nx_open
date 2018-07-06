@@ -13,7 +13,7 @@ namespace network {
 namespace ssl {
 
 /**
- * @note Not thread-safe.
+ * NOTE: Not thread-safe.
  */
 class NX_NETWORK_API Pipeline:
     public utils::bstream::Converter
@@ -30,6 +30,9 @@ public:
 
     virtual bool eof() const override;
     virtual bool failed() const override;
+
+    bool performHandshake();
+    bool isHandshakeCompleted() const;
 
     bool isReadThirsty() const;
     bool isWriteThirsty() const;
@@ -57,7 +60,7 @@ private:
 
     template<typename Func, typename Data>
         int performSslIoOperation(Func sslFunc, Data* data, size_t size);
-    int doHandshake();
+    int performHandshakeInternal();
     int bioRead(void* buffer, unsigned int bufferLen);
     int bioWrite(const void* buffer, unsigned int bufferLen);
 

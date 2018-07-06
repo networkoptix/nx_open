@@ -9,6 +9,9 @@
 
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <nx/client/core/utils/geometry.h>
+
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -165,7 +168,7 @@ bool ResizingInstrument::mousePressEvent(QWidget* viewport, QMouseEvent* event)
     if (section == Qt::TitleBarArea)
     {
         m_startPinPoint =
-            cwiseDiv(widget->mapFromScene(view->mapToScene(event->pos())), m_startSize);
+            Geometry::cwiseDiv(widget->mapFromScene(view->mapToScene(event->pos())), m_startSize);
 
         /* Make sure we don't get NaNs in startPinPoint. */
         if (qFuzzyIsNull(m_startSize.width()))
@@ -214,7 +217,7 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
      * A better way would be to calculate local rotation at cursor position,
      * but currently there is not need for such precision. */
     const auto rect = widget->rect();
-    auto rotation = qRadiansToDegrees(QnGeometry::atan2(
+    auto rotation = qRadiansToDegrees(Geometry::atan2(
         widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())));
     if (section == Qt::TitleBarArea)
     {
@@ -297,7 +300,7 @@ void ResizingInstrument::dragMove(DragInfo* info)
     if (m_section == Qt::TitleBarArea)
     {
         QPointF itemPos = widget->mapFromScene(info->mouseScenePos());
-        newPos = widget->mapToParent(itemPos - QnGeometry::cwiseMul(m_startPinPoint, newSize));
+        newPos = widget->mapToParent(itemPos - Geometry::cwiseMul(m_startPinPoint, newSize));
     }
     else
     {

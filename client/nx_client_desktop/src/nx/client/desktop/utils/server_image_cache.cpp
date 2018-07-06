@@ -6,7 +6,7 @@
 
 #include <utils/common/id.h>
 #include <nx/utils/uuid.h>
-#include <utils/threaded_image_loader.h>
+#include <nx/client/desktop/image_providers/threaded_image_loader.h>
 
 namespace nx {
 namespace client {
@@ -27,27 +27,31 @@ QSize ServerImageCache::getMaxImageSize() const {
 }
 
 
-QString ServerImageCache::cachedImageFilename(const QString &sourcePath) {
+QString ServerImageCache::cachedImageFilename(const QString &sourcePath)
+{
+    static const QSet<QString> kAllowedExtensions{lit("png"), lit("jpg"), lit("jpeg")};
+
     QString ext = QFileInfo(sourcePath).suffix();
-    if (ext.isEmpty())
+    if (!kAllowedExtensions.contains(ext))
         ext = lit("png");
 
     QString uuid = guidFromArbitraryData(sourcePath.toUtf8()).toString();
     return uuid.mid(1, uuid.size() - 2) + L'.' + ext;
 }
 
-void ServerImageCache::storeImage(const QString &filePath, const qreal targetAspectRatio) {
+void ServerImageCache::storeImage(const QString &filePath, const QnAspectRatio& aspectRatio)
+{
     QString newFilename = cachedImageFilename(filePath);
 
     ensureCacheFolder();
 
-    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
+    auto loader = new ThreadedImageLoader(this);
     loader->setInput(filePath);
     loader->setSize(getMaxImageSize());
-    loader->setAspectRatio(targetAspectRatio);
+    loader->setAspectRatio(aspectRatio);
     loader->setOutput(getFullPath(newFilename));
-    connect(loader, SIGNAL(finished(QString)), this, SLOT(at_imageConverted(QString)));
-    connect(loader, SIGNAL(finished(QString)), loader, SLOT(deleteLater()));
+    connect(loader, &ThreadedImageLoader::imageSaved, this, &ServerImageCache::at_imageConverted);
+    connect(loader, &ThreadedImageLoader::imageSaved, loader, &QObject::deleteLater);
     loader->start();
 }
 

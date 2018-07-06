@@ -147,6 +147,52 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation>Słowa kluczowe oddzielone spacją</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>Nagłówek zawiera:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>Opis zawiera:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation>Typ zdarzenia:</translation>
+    </message>
+  </context>
+  <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Fixed Archive Length</source>
+      <translation>Stała długość archiwum</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>Min. dni</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>Max. dni</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -334,6 +380,34 @@
     </message>
   </context>
   <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation>Informacje zakładki</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Usuń</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>Szerokość obszaru</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Rozmiar czcionki</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation>Dołącz opis</translation>
+    </message>
+  </context>
+  <context>
     <name>BookmarkWidget</name>
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
@@ -369,7 +443,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>Odśwież</translation>
     </message>
@@ -409,7 +483,7 @@
     <message>
       <location/>
       <source>When</source>
-      <translation>Kiedy</translation>
+      <translation>Jeśli</translation>
     </message>
     <message>
       <location/>
@@ -419,7 +493,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>W</translation>
+      <translation>Na</translation>
     </message>
   </context>
   <context>
@@ -567,72 +641,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>Ustawienia zaawansowane są niedostępne</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation>Przeczytałem podręcznik i jestem świadom ryzyka</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation>Kontrola ustawień kamery</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>Uwaga! Spowoduje to, że ustawienia jakości i płynności wideo (kl./s) w harmonogramie nagrywania przestaną mieć znaczenie.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation>Kontrola drugiego strumienia</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation>Zmień jakość drugiego strumienia</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation>Nie używaj</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation>Niska jakość</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation>Średnia jakość</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation>Wysoka jakość</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>Uwaga! Wybranie wysokiej jakości może spowodować większe obciążenie procesora i sieci, a także może powodować inne problemy.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation>Kontrola archiwum</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>Nie archiwizuj pierwszego strumienia</translation>
     </message>
@@ -640,11 +651,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation>Nie archiwizuj drugiego strumienia</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation>Kontrola strumieniowania mediów</translation>
     </message>
     <message>
       <location/>
@@ -673,43 +679,8 @@
     </message>
     <message>
       <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>Uwaga! Ustawienie niskiej jakości spowoduje zmniejszenie szczegółowości obrazu.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion detection control</source>
-      <translation>Kontrola detekcji ruchu</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
       <translation>Wymuszaj detekcję ruchu dla strumienia:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation>Przeliczaj bitrate w stosunku do GOP zamiast do czasu (zwiększy to bitrate dla kamery)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation>Zachowaj ustawienia strumieni i profile kamer</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation>Opcja &quot;Zezwalaj systemowi na optymalizowanie ustawień w kamerze&quot; jest wyłączona w administracji systemem.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation>Uwaga! Nie zmieniaj tych ustawień, chyba że jesteś całkowicie pewny ich potencjalnego wpływu na wydajność systemu.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation>Sterowanie PTZ</translation>
     </message>
     <message>
       <location/>
@@ -721,12 +692,87 @@
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>Uwaga! Fabryczne presety kamery nie będą dostępne.</translation>
     </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation>Nie zmieniaj tych ustawień, chyba że jesteś całkowicie pewny ich potencjalnego wpływu na wydajność systemu.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation>Ustawienia kamery</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation>Zachowaj ustawienia strumieni i profile kamer</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation>Ustawienia jakości i płynności (FPS) w harmonogramie nagrywania przestaną mieć znaczenie.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation>Obliczaj bitrate na GOP zamiast bitrate na sekundę</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation>Zwiększy to bitrate dla kamery.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>Drugi strumień</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation>Wyłącz drugi strumień</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>Detekcja ruchu</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation>Archiwum</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation>Strumieniowanie mediów</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Generuj</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Zresetuj</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>ID logiczny</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>ID wejścia</translation>
     </message>
   </context>
@@ -752,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>ID wyjściowe:</translation>
     </message>
   </context>
@@ -787,26 +833,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation>Nie nagrywaj</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation>Stała długość archiwum</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>Min. dni</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>Max. dni</translation>
     </message>
     <message>
       <location/>
@@ -868,6 +894,11 @@
       <source>Motion + Lo-Res</source>
       <translation>Ruch + Niska rozdzielczość</translation>
     </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>Bitrate</translation>
+    </message>
   </context>
   <context>
     <name>ChangeUserPasswordDialog</name>
@@ -883,11 +914,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Nie wylogowuj</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Nieprawidłowy e-mail lub hasło</translation>
     </message>
   </context>
   <context>
@@ -942,6 +968,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>Opis zawiera:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Kategoria</translation>
     </message>
   </context>
   <context>
@@ -1022,6 +1056,16 @@
       <source>HTTP URL</source>
       <translation>URL HTTP</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>Typ uwierzytelniania</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>Typ zapytania</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -1032,31 +1076,70 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
+    <name>ExportLayoutSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>Eksportuj szybkie streszczenie</translation>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>Ustawienia eksportu</translation>
     </message>
     <message>
       <location/>
-      <source>Initial Video Length</source>
-      <translation>Początkowa długość wideo</translation>
+      <source>Make read-only</source>
+      <translation>Ustaw jako tylko do odczytu</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>Ustawienia eksportu</translation>
     </message>
     <message>
       <location/>
-      <source>Exported Video Length</source>
-      <translation>Eksportowana długość wideo</translation>
+      <source>Apply Filters</source>
+      <translation>Zastosuj filtry</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>Interwał klatek</translation>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation>Obracanie, Dewarping, Korekcja obrazu itp.</translation>
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>Prędkość szybkiego streszczenia</translation>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation>Stosowanie filtrów i nakładanie elementów na obraz wymaga transkodowania, które zwiększy użycie procesora i może zająć sporo czasu.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation>Eksport wideo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation>Pojedyncza kamera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation>Ustawienia eksportu</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation>Multi-wideo</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation>Przeglądaj...</translation>
     </message>
   </context>
   <context>
@@ -1204,6 +1287,39 @@
       <location/>
       <source>Rotation</source>
       <translation>Rotacja</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation>Obraz</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Usuń</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation>Rozmiar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>Przezroczystość</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>Domyślnie</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Przeglądaj...</translation>
     </message>
   </context>
   <context>
@@ -1397,7 +1513,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>Przypisane trwale do ID sprzętu:</translation>
     </message>
   </context>
@@ -1496,7 +1612,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>ID sprzętu</translation>
     </message>
   </context>
@@ -1623,8 +1739,8 @@
     </message>
     <message>
       <location/>
-      <source>Showreel cycle</source>
-      <translation>Cykl sekwencji</translation>
+      <source>Tour cycle</source>
+      <translation>Cykl trasy</translation>
     </message>
   </context>
   <context>
@@ -1671,6 +1787,24 @@
       <location/>
       <source>Expert</source>
       <translation>Ekspert</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation>Nowa kamera przenośna...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation>Do serwera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Kamera przenośna&quot; to wirtualna pamięć dla plików wideo, którą można przesłać na dowolny serwer w systemie i uzyskać dostęp przez dowolnego użytkownika.</translation>
     </message>
   </context>
   <context>
@@ -1747,12 +1881,12 @@
     <message>
       <location/>
       <source>Create Tour</source>
-      <translation>Utwórz cykl</translation>
+      <translation>Utwórz trasę</translation>
     </message>
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>Rozpocznij cykl</translation>
+      <translation>Rozpocznij trasę</translation>
     </message>
     <message>
       <location/>
@@ -1767,7 +1901,7 @@
     <message>
       <location/>
       <source>No Tour Selected</source>
-      <translation>Nie wybrano cyklu</translation>
+      <translation>Nie wybrano trasy</translation>
     </message>
     <message>
       <location/>
@@ -1882,11 +2016,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>Nie wylogowuj</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Nieprawidłowy e-mail lub hasło</translation>
     </message>
   </context>
   <context>
@@ -2132,6 +2261,39 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>Umieść skrót na pulpicie.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation>Szybki przegląd</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation>Początkowa długość wideo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation>Eksportowana długość wideo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation>Szybkość</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation>Interwał klatek</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation>Resetuj szybkość</translation>
     </message>
   </context>
   <context>
@@ -2521,11 +2683,6 @@
       <source>Reset</source>
       <translation>Zresetuj</translation>
     </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation>TextLabel</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2699,11 +2856,6 @@
       <source>Backup Settings...</source>
       <translation>Ustawienia backupu...</translation>
     </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Nagrywanie na wyłączonym archiwum zostanie wstrzymane. Jednak usuwanie przestarzałego materiału z tego archiwum będzie nadal kontynuowane.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2774,7 +2926,7 @@
     <message>
       <location/>
       <source>Enable audit trail</source>
-      <translation>Włącz dziennik dostępu</translation>
+      <translation>Zapisuj dziennik dostępu</translation>
     </message>
     <message>
       <location/>
@@ -2788,6 +2940,34 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation>Tekst</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Usuń</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Rozmiar czcionki</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation>Wpisz zwykły tekst lub HTML</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>Szerokość obszaru</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
@@ -2798,6 +2978,29 @@
       <location/>
       <source>Sync time with the Internet</source>
       <translation>Synchronizuj czas z Internetem</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation>Czas</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Rozmiar czcionki</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation>Format</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Usuń</translation>
     </message>
   </context>
   <context>
@@ -2835,14 +3038,18 @@
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Nie ma jeszcze żadnych niestandardowych grup użytkowników. Kliknij przycisk &quot;Nowa grupa&quot;, aby je utworzyć.</translation>
+      <source>New role</source>
+      <translation>Nowa grupa</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Nowa grupa</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Nie ma jeszcze niestandardowych grup użytkowników.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Kliknij &quot;Nowa grupa&quot; , aby ją utworzyć.</translation>
     </message>
   </context>
   <context>
@@ -2861,6 +3068,50 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>Edytuj grupy...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Motion Detection</source>
+      <translation>Detekcja ruchu</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation>Wykryj ruch w przesłanym filmie</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>Czułość</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Cancel</source>
+      <translation>Anuluj</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Upload Video</source>
+      <translation>Prześlij wideo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation>Prześlij plik...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation>Prześlij folder...</translation>
     </message>
   </context>
   <context>

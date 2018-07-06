@@ -347,6 +347,22 @@
         <source>Best quality</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Transcoding is disabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding is not supported for this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding is not supported for ARM servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ResourcesScreen</name>

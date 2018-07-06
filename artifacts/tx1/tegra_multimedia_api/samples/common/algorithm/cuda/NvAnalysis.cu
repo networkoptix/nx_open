@@ -27,6 +27,7 @@
  */
 
 #include <cuda.h>
+#include <cstdio>
 #include "NvAnalysis.h"
 
 #define BOX_W 32
@@ -67,6 +68,7 @@ convertIntToFloatKernel(CUdeviceptr pDevPtr, int width, int height,
 
     if (col < width && row < height)
     {
+        // Distinct planes of B, G and R components
         for (int k = 0; k < 3; k++)
         {
             pdata[width * height * k + row * width + col] =
@@ -75,14 +77,91 @@ convertIntToFloatKernel(CUdeviceptr pDevPtr, int width, int height,
     }
 }
 
+__global__ void
+convertIntToFloatWithMeanKernel(
+    int* rgba,
+    int width,
+    int height,
+    void* cuda_buf,
+    int pitch,
+    float3 mean)
+{
+    const int x = blockIdx.x * blockDim.x + threadIdx.x;
+	const int y = blockIdx.y * blockDim.y + threadIdx.y;
+	const int n = width * height;
+	
+	if( x >= width || y >= height )
+		return;
+
+    char* input = (char*)rgba;
+    float* output = (float*) cuda_buf;
+    int pxStart = (y * width + x) * 4;
+
+#if 0
+    // first one is alpha
+	output[n * 0 + y * width + x] = input[pxStart + 1] - mean.x; //< Blue
+	output[n * 1 + y * width + x] = input[pxStart + 2] - mean.y; //< Green
+	output[n * 2 + y * width + x] = input[pxStart + 3] - mean.z; //< Red
+#else
+	output[n * 0 + y * width + x] = input[pxStart + 2] - mean.x; //< Blue
+	output[n * 1 + y * width + x] = input[pxStart + 1] - mean.y; //< Green
+	output[n * 2 + y * width + x] = input[pxStart + 0] - mean.z; //< Red
+#endif
+
+#if 0
+    if ((x == 0 && y == 0))
+    {
+        for (int i =0 ; i < 100; i++)
+        {
+            printf("KERNEL INPUT %i %i\n", i, input[i]);
+        }   
+    }
+#endif
+}
+
+
 int convertIntToFloat(CUdeviceptr pDevPtr, int width, int height,
         void* cuda_buf, int pitch)
 {
     dim3 threadsPerBlock(32, 32);
     dim3 blocks(width/threadsPerBlock.x, height/threadsPerBlock.y);
 
-    convertIntToFloatKernel<<<blocks, threadsPerBlock>>>(pDevPtr, width,
-                height, cuda_buf, pitch);
+    convertIntToFloatKernel<<<blocks, threadsPerBlock>>>(
+        pDevPtr,
+        width,
+        height,
+        cuda_buf,
+        pitch);
 
     return 0;
 }
+
+int convertIntToFloatWithMean(
+    int* rgbaDevicePtr,
+    int width,
+    int height,
+    void* cuda_buf,
+    int pitch,
+    float3 mean)
+{
+    dim3 threadsPerBlock(32, 32);
+    dim3 blocks(width/threadsPerBlock.x, height/threadsPerBlock.y);
+
+#if 0
+    printf("Converting int to float with mean: width %i, height %i, pitch %i\n",
+        width,
+        height,
+        pitch);
+#endif
+
+    convertIntToFloatWithMeanKernel<<<blocks, threadsPerBlock>>>(
+        rgbaDevicePtr,
+        width,
+        height,
+        cuda_buf,
+        pitch,
+        mean);
+
+    return 0;
+}
+

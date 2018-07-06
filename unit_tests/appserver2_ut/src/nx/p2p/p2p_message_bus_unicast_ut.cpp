@@ -2,7 +2,8 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx_ec/data/api_camera_data.h>
+#include <chrono>
+#include <nx/vms/api/data/camera_data.h>
 #include <core/resource_access/user_access_data.h>
 
 #include <nx/p2p/p2p_message_bus.h>
@@ -19,6 +20,8 @@ namespace nx {
 namespace p2p {
 namespace test {
 
+static const std::chrono::milliseconds kWaitTimeout(1000 * 15);
+
 class MessageBusUnicast: public P2pMessageBusTestBase
 {
 public:
@@ -32,20 +35,9 @@ public:
         }
     }
 protected:
-    static const int kWaitTimeout = 1000 * 10;
-
     bool isAllServersOnlineCond()
     {
         return m_alivePeers.size() == 3;
-    }
-
-    void waitForCondition(std::function<bool ()> condition)
-    {
-        QElapsedTimer timer;
-        timer.restart();
-        while (!condition() && timer.elapsed() < kWaitTimeout)
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        ASSERT_TRUE(condition());
     }
 
     void startAllServers(std::function<void(std::vector<Appserver2Ptr>&)> serverConnectFunc)
@@ -59,6 +51,7 @@ protected:
             auto intervals = bus->delayIntervals();
             intervals.sendPeersInfoInterval = std::chrono::milliseconds(1);
             intervals.outConnectionsInterval = std::chrono::milliseconds(1);
+            intervals.subscribeIntervalLow = std::chrono::milliseconds(1);
             bus->setDelayIntervals(intervals);
             QObject::connect(
                 server->moduleInstance()->commonModule()->messageProcessor(),
@@ -86,22 +79,24 @@ protected:
     void testMain()
     {
         startAllServers(sequenceConnect);
-        waitForCondition(std::bind(&MessageBusUnicast::isAllServersOnlineCond, this));
+        ASSERT_TRUE(
+            waitForCondition(std::bind(&MessageBusUnicast::isAllServersOnlineCond, this), kWaitTimeout)
+        );
 
         const auto connection = m_servers[0]->moduleInstance()->ecConnection();
         MessageBus* bus = connection->messageBus()->dynamicCast<MessageBus*>();
-        QnTransaction<ApiBusinessActionData> transaction(
+        QnTransaction<nx::vms::api::EventActionData> transaction(
             m_servers[0]->moduleInstance()->commonModule()->moduleGUID());
         transaction.command = ec2::ApiCommand::broadcastAction;
         QnPeerSet dstPeers;
         dstPeers << m_servers[2]->moduleInstance()->commonModule()->moduleGUID();
         dstPeers << m_servers[3]->moduleInstance()->commonModule()->moduleGUID();
         bus->sendTransaction(transaction, dstPeers);
-        waitForCondition(
+        ASSERT_TRUE(waitForCondition(
             [this]()
             {
                 return m_actionReceived == 2;
-            });
+            }, kWaitTimeout));
     }
 
 private:

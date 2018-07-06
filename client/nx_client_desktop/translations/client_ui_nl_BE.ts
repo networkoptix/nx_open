@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Ondersteuning</translation>
+      <translation>Support</translation>
     </message>
     <message>
       <location/>
@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Intel HD grafisch display kan worden geconfronteerd met kwesties als vervagen is ingeschakeld. Wij raden aan deze optie ongewijzigd te laten.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Vervagen uitschakelen</translation>
     </message>
   </context>
   <context>
@@ -144,6 +144,52 @@
       <location/>
       <source>Instant</source>
       <translation>Instant</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation>Trefwoorden scheiden met een spatie</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>Onderschrift bevat:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>Beschrijving bevat:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation>Gebeurtenistype:</translation>
+    </message>
+  </context>
+  <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Fixed Archive Length</source>
+      <translation>Gefixeerde archieflengte</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>Min. aantal dagen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>Automatisch</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>Max. aantal dagen</translation>
     </message>
   </context>
   <context>
@@ -334,6 +380,34 @@
     </message>
   </context>
   <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation>Bladwijzer Info</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>Breedte van opmaakgebied</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Tekstgrootte</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation>Voeg beschrijving toe</translation>
+    </message>
+  </context>
+  <context>
     <name>BookmarkWidget</name>
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
@@ -369,7 +443,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>Verversen</translation>
     </message>
@@ -442,7 +516,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>Gebeurtenissenlog...</translation>
+      <translation>Logboek...</translation>
     </message>
     <message>
       <location/>
@@ -567,72 +641,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>Geavanceerde instellingen zijn niet beschikbaar</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation>Ik heb de handleiding gelezen en de risico's begrepen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation>Camera instellingen bediening</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>Waarschuwing! Hierdoor worden de kwaliteit en de framerate (FPS) instellingen in het opnameschema irrelevant.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation>Secundaire Stream Control</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation>Overschrijven van secundaire stream kwaliteit</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation>Niet gebruiken</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation>Lage kwaliteit</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation>Gemiddelde kwaliteit</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation>Hoge kwaliteit</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>Waarschuwing! Het selecteren van hoge kwaliteit kan uw CPU en netwerk prestaties beïnvloeden en kunnen problemen veroorzaken.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation>Archief beheer</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>Primaire stream niet archiveren</translation>
     </message>
@@ -640,11 +651,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation>Secundaire stream niet archiveren</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation>Media streaming beheer</translation>
     </message>
     <message>
       <location/>
@@ -673,43 +679,8 @@
     </message>
     <message>
       <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>Waarschuwing! Lage kwaliteit kan resulteren in een lage resolutie afbeelding.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion detection control</source>
-      <translation>Bewegingsdetectie instellingen</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
       <translation>Forceer bewegingsdetectie voor stream:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation>Bereken bitrate per GOP in plaats van bitrate per seconde (het zal de bitrate verhogen voor de camera)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation>Bewaar de camera streams- en profielinstellingen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation>&quot;Sta het systeem toe om de camera-instellingen te optimaliseren&quot; is uitgeschakeld in systeembeheer.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation>Waarschuwing! Wijzig deze instellingen niet tenzij u absoluut zeker van hun potentiële impact op de systeemprestaties.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation>PTZ bediening</translation>
     </message>
     <message>
       <location/>
@@ -721,13 +692,88 @@
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>Waarschuwing! Oorspronkelijke camerapresets zullen niet meer beschikbaar zijn.</translation>
     </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation>Wijzig deze instellingen niet tenzij u absoluut zeker van hun potentiële impact op de systeemprestaties.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation>Camera-instellingen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation>Bewaar de camera streams- en profielinstellingen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation>Instellingen voor kwaliteit en beeldsnelheid (FPS) in het opnameschema worden niet meer relevant.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation>Bereken bitrate per GOP in plaats van bitrate per seconde</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation>Het verhoogt de bitrate voor de camera.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>Secundair stream</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation>Schakel secundaire stream uit</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>Bewegingsdetectie</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation>Archief</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation>Mediastreaming</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Genereer</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Reset</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>Logische ID</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Input ID</translation>
+      <source>Input ID</source>
+      <translation type="unfinished">Input ID</translation>
     </message>
   </context>
   <context>
@@ -752,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>Uitgang ID:</translation>
     </message>
   </context>
@@ -787,26 +833,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation>Niet opnemen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation>Gefixeerde archieflengte</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>Automatisch</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>Min. aantal dagen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>Max. aantal dagen</translation>
     </message>
     <message>
       <location/>
@@ -868,6 +894,11 @@
       <source>Motion + Lo-Res</source>
       <translation>Beweging + Lo-Res</translation>
     </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>Bitrate</translation>
+    </message>
   </context>
   <context>
     <name>ChangeUserPasswordDialog</name>
@@ -883,11 +914,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>Blijf ingelogd</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Incorrecte email of wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -945,6 +971,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Categorie</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -982,7 +1016,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event regels...</translation>
+      <translation>Gebeurtenisregels...</translation>
     </message>
   </context>
   <context>
@@ -1022,6 +1056,16 @@
       <source>HTTP URL</source>
       <translation>HTTP URL</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>Authenticatie type</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>Aanvraag type</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -1032,31 +1076,70 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
+    <name>ExportLayoutSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>Rapid review exporteren</translation>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>Exportinstellingen</translation>
     </message>
     <message>
       <location/>
-      <source>Initial Video Length</source>
-      <translation>Oorspronkelijke videolengte</translation>
+      <source>Make read-only</source>
+      <translation>Maak alleen-lezen</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>Exportinstellingen</translation>
     </message>
     <message>
       <location/>
-      <source>Exported Video Length</source>
-      <translation>Geëxporteerde videolengte</translation>
+      <source>Apply Filters</source>
+      <translation>Filters toepassen</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>Frame interval</translation>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation>Rotatie, Dewarping, Beeldverbetering etc.</translation>
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>Rapid review snelheid</translation>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation>Filters toepassen en het toevoegen van overlays vereisen transcoding die CPU-gebruik zal toenemen en kan aanzienlijke tijd duren.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation>Video exporteren</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation>Enkele camera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation>Exportinstellingen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation>Multi-Video</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation>Bladeren...</translation>
     </message>
   </context>
   <context>
@@ -1207,6 +1290,39 @@
     </message>
   </context>
   <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation>Afbeelding</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation>Grootte</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>Transparantie</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>Standaard</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Bladeren...</translation>
+    </message>
+  </context>
+  <context>
     <name>ImagePreviewDialog</name>
     <message>
       <location filename="../src/ui/dialogs/image_preview_dialog.ui"/>
@@ -1345,7 +1461,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen via LDAP...</translation>
+      <translation>Gebruikers ophalen van LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -1397,8 +1513,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Gelieerd aan hardware ID:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Gelieerd aan Hardware ID:</translation>
     </message>
   </context>
   <context>
@@ -1496,8 +1612,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Hardware ID</translation>
+      <source>Hardware ID</source>
+      <translation type="unfinished">Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -1623,8 +1739,8 @@
     </message>
     <message>
       <location/>
-      <source>Showreel cycle</source>
-      <translation>Showreel cyclus</translation>
+      <source>Tour cycle</source>
+      <translation>Toer cyclus</translation>
     </message>
   </context>
   <context>
@@ -1671,6 +1787,24 @@
       <location/>
       <source>Expert</source>
       <translation>Expert</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation>Nieuwe draagbare camera...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation>Naar server</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Draagbare camera&quot; is een virtuele opslag voor videobestanden, die kan worden geüpload naar elke server binnen uw systeem en toegankelijk is voor elke gebruiker.</translation>
     </message>
   </context>
   <context>
@@ -1883,11 +2017,6 @@
       <source>Stay logged in</source>
       <translation>Blijf ingelogd</translation>
     </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Incorrecte email of wachtwoord</translation>
-    </message>
   </context>
   <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -1945,7 +2074,7 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Toevoegen...</translation>
+      <translation>Voeg toe...</translation>
     </message>
     <message>
       <location/>
@@ -2132,6 +2261,39 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>Plaats de snelkoppeling op het bureaublad.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation>Versnelde weergave</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation>Initiële videolengte</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation>Geëxporteerde videolengte</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation>Snelheid</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation>Frames interval</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation>Reset snelheid</translation>
     </message>
   </context>
   <context>
@@ -2521,11 +2683,6 @@
       <source>Reset</source>
       <translation>Reset</translation>
     </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation>Text label</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2699,11 +2856,6 @@
       <source>Backup Settings...</source>
       <translation>Backup-instellingen...</translation>
     </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Opname van de uitgeschakelde opslag zal stoppen. Echter, overschrijven dan de oudste beelden gaat gewoon door.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2788,6 +2940,34 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation>Tekst</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Letter grootte</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation>Geef onbewerkte tekst of HTML in</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>Breedte van het tekstvak</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
@@ -2798,6 +2978,29 @@
       <location/>
       <source>Sync time with the Internet</source>
       <translation>Tijdsynchronisatie met het internet</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation>Tijdstempel</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Letter grootte</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation>Formaat</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
     </message>
   </context>
   <context>
@@ -2835,14 +3038,18 @@
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Er zijn nog geen aangepaste gebruikersrollen. Klik op de &quot;Nieuwe rol&quot; knop om deze aan ​​te maken.</translation>
+      <source>New role</source>
+      <translation>Nieuwe rol</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Nieuwe rol</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Er zijn nog geen aangepaste gebruikersprofielen.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Klik op de &quot;Nieuw profiel&quot; -knop om er een te maken.</translation>
     </message>
   </context>
   <context>
@@ -2861,6 +3068,50 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>Rollen bewerken...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Motion Detection</source>
+      <translation>Bewegingsdetectie</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation>Beweging detecteren in de geüploade video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>Gevoeligheid</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Upload Video</source>
+      <translation>Upload Video</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation>Upload bestand...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation>Upload map...</translation>
     </message>
   </context>
   <context>

@@ -23,21 +23,12 @@ namespace ec2
     /**
     * This structure contains all runtime data per peer. Runtime data is absent in a DB.
     */
-    struct ApiRuntimeData: ApiDataWithVersion
+    struct ApiRuntimeData: nx::vms::api::DataWithVersion
     {
         static const quint64 tpfPeerTimeSynchronizedWithInternetServer  = 0x0008LL << 32;
         static const quint64 tpfPeerTimeSetByUser                       = 0x0004LL << 32;
         static const quint64 tpfPeerHasMonotonicClock                   = 0x0002LL << 32;
         static const quint64 tpfPeerIsNotEdgeServer                     = 0x0001LL << 32;
-
-        ApiRuntimeData():
-            ApiDataWithVersion(),
-            prematureLicenseExperationDate(0),
-            serverTimePriority(0),
-            updateStarted(false),
-            flags(RF_None)
-
-        {}
 
         /* This operator must not be replaced with fusion implementation as is skips brand
          * and customization checking */
@@ -66,7 +57,7 @@ namespace ec2
         QString brand;
         QString customization;
         QString publicIP;
-        qint64 prematureLicenseExperationDate;
+        qint64 prematureLicenseExperationDate = 0;
 
         /** Guid of the videowall instance for the running videowall clients. */
         QnUuid videoWallInstanceGuid;
@@ -75,22 +66,22 @@ namespace ec2
         QnUuid videoWallControlSession;
 
         /** Priority of this peer as the time synchronization server. */
-        quint64 serverTimePriority;
+        quint64 serverTimePriority = 0;
 
         QVector<QString> hardwareIds;
 
         QString nx1mac;
         QString nx1serial;
 
-        bool updateStarted;
+        bool updateStarted = false;
 
         /** Id of the user, under which peer is logged in (for client peers only) */
         QnUuid userId;
 
-        RuntimeFlags flags;
+        RuntimeFlags flags = RF_None;
     };
 
-#define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
+#define ApiRuntimeData_Fields DataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
                                                         (hardwareIds)(updateStarted)(nx1mac)(nx1serial)\
                                                         (userId)(flags)(customization)

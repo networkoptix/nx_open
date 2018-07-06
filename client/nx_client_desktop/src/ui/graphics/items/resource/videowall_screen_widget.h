@@ -7,9 +7,9 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 
 class QnVideoWallItem;
-class QnCameraThumbnailManager;
 class QGraphicsAnchorLayout;
 class QGraphicsWidget;
+namespace nx { namespace client { namespace desktop { class CameraThumbnailManager; }}}
 
 /** Class for displaying single screen of the videowall resource on the scene. */
 class QnVideowallScreenWidget: public QnResourceWidget
@@ -58,6 +58,6 @@ private:
 
     bool m_layoutUpdateRequired = true;
 
-    QnCameraThumbnailManager* m_thumbnailManager = nullptr;
+    nx::client::desktop::CameraThumbnailManager* m_thumbnailManager = nullptr;
     QHash<QnUuid, QPixmap> m_thumbs;
 };

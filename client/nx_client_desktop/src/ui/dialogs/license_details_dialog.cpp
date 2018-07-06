@@ -10,9 +10,9 @@
 
 #include <ui/style/custom_style.h>
 
-#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/common/widgets/clipboard_button.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWidget *parent /* = NULL*/):
     base_type(parent),
@@ -66,7 +66,7 @@ QString QnLicenseDetailsDialog::licenseDescription(const QnLicensePtr &license) 
     result << tr("Generic:");
     addStringValue(tr("License Type"), license->displayName());
     addStringValue(tr("License Key"), QString::fromUtf8(license->key()));
-    addStringValue(tr("Locked to Hardware Id"), license->hardwareId());
+    addStringValue(tr("Locked to Hardware ID"), license->hardwareId());
     result << QString(); //spacer
     result << tr("Features:");
     if (license->type() == Qn::LC_VideoWall) {

@@ -109,3 +109,7 @@ class NoptixLibrary(object):
                 if sub_text != header_str.strip():
                     raise Exception(header_str+' was not '+sub_text)      
         conn.logout()
+
+    def get_browser_log(self):
+        seleniumlib = BuiltIn().get_library_instance('SeleniumLibrary')
+        return seleniumlib.driver.get_log('browser')

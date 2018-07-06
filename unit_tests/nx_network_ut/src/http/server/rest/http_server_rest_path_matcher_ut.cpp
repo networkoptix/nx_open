@@ -2,7 +2,9 @@
 
 #include <nx/network/http/server/rest/http_server_rest_path_matcher.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace rest {
 namespace test {
@@ -11,22 +13,22 @@ class RestPathMatcher:
     public ::testing::Test
 {
 protected:
-    void assertPathRegistered(const nx_http::StringType& restPath, int val)
+    void assertPathRegistered(const nx::network::http::StringType& restPath, int val)
     {
         ASSERT_TRUE(m_dictionary.add(restPath, val));
     }
 
-    void assertPathNotRegistered(const nx_http::StringType& restPath, int val)
+    void assertPathNotRegistered(const nx::network::http::StringType& restPath, int val)
     {
         ASSERT_FALSE(m_dictionary.add(restPath, val));
     }
 
     void assertPathMatches(
-        const nx_http::StringType& path,
+        const nx::network::http::StringType& path,
         int expectedValue,
-        std::vector<nx_http::StringType> expectedParams)
+        std::vector<nx::network::http::StringType> expectedParams)
     {
-        std::vector<nx_http::StringType> params;
+        std::vector<nx::network::http::StringType> params;
         const auto& result = m_dictionary.match(path, &params);
 
         ASSERT_TRUE(static_cast<bool>(result));
@@ -34,9 +36,9 @@ protected:
         ASSERT_EQ(expectedParams, params);
     }
 
-    void assertPathNotMatched(const nx_http::StringType& path)
+    void assertPathNotMatched(const nx::network::http::StringType& path)
     {
-        std::vector<nx_http::StringType> params;
+        std::vector<nx::network::http::StringType> params;
         ASSERT_FALSE(m_dictionary.match(path, &params));
     }
 
@@ -97,4 +99,6 @@ TEST_F(RestPathMatcher, registering_conflicting_handler)
 } // namespace test
 } // namespace rest
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

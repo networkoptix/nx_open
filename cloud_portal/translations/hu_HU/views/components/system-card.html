@@ -6,11 +6,13 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">Renszer átnevezése</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">{{PRODUCT_NAME}}</span>
-leválasztása</button>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Egyesítés egy másik rendszerrel</button>
+        </p>
+        <hr></hr>
+        <button class="btn btn-default" ng-click="disconnect()">Leválasztás <span class="product-name">%PRODUCT_NAME%</span> termékről</button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>Tulajdonos</h2>
@@ -26,5 +28,22 @@ leválasztása</button>
             <button class="btn btn-default" ng-click="rename()">Renszer átnevezése</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Leválasztás a fiókomról</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong> 
+hozzá lett csatlakoztatva a rendszerhez</div>
+        <hr></hr>
+        <div class="merge-info-text">Az adatbázis méretétől függően ez akár több óráig is eltarthat</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>Ez a rendszer hozzá lett csatlakoztatva a <strong>{{mergeTargetSystem.name}}</strong> rendszerhez</div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>Az adatbázis méretétől függően ez akár több óráig is eltarthat.</p>
+            <p>Amíg az egyesítés befejeződik, be tud jelentkezni a rendszerbe és megtekinthet videókat, de közben nem módosíthatja a beállításokat.</p>
+            <p>Amikor az egyesítés befejeződött, a rendszer összes felhasználója és kamerája elérhető lesz a <span class="merge-system-name">{{mergeTargetSystem.name}}</span>  rendszerben. A rendszer, és ez a rendszer is törlésre kerül.</p>
+        </div>
     </div>
 </div>

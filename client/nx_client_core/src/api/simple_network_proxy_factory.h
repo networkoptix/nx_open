@@ -15,7 +15,7 @@ public:
 
 
     virtual QNetworkProxy proxyToResource(const QnResourcePtr &resource, QnMediaServerResourcePtr* const via = nullptr) const override;
-    virtual QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName = QString()) const override;
+    virtual nx::utils::Url urlToResource(const nx::utils::Url &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName = QString()) const override;
 };
 
 #endif // QNSIMPLENETWORKPROXYFACTORY_H

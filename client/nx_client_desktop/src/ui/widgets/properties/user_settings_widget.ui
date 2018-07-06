@@ -78,6 +78,16 @@
               </property>
              </widget>
             </item>
+             <item>
+               <widget class="nx::client::desktop::HintButton" name="userTypeHint">
+                 <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                   </sizepolicy>
+                 </property>
+               </widget>
+             </item>
             <item>
              <widget class="QComboBox" name="userTypeComboBox"/>
             </item>
@@ -134,28 +144,28 @@
               <number>8</number>
              </property>
              <item>
-              <widget class="QnInputField" name="loginInputField" native="true"/>
+              <widget class="nx::client::desktop::InputField" name="loginInputField" native="true"/>
              </item>
              <item>
-              <widget class="QnInputField" name="nameInputField" native="true"/>
+              <widget class="nx::client::desktop::InputField" name="nameInputField" native="true"/>
              </item>
              <item>
-              <widget class="QnInputField" name="emailInputField" native="true"/>
+              <widget class="nx::client::desktop::InputField" name="emailInputField" native="true"/>
              </item>
             </layout>
            </item>
            <item>
-            <widget class="QnInputField" name="passwordInputField" native="true"/>
+            <widget class="nx::client::desktop::InputField" name="passwordInputField" native="true"/>
            </item>
            <item>
-            <widget class="QnInputField" name="confirmPasswordInputField" native="true"/>
+            <widget class="nx::client::desktop::InputField" name="confirmPasswordInputField" native="true"/>
            </item>
           </layout>
          </widget>
          <widget class="QWidget" name="newCloudUserPage">
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
-            <widget class="QnInputField" name="cloudEmailInputField" native="true"/>
+            <widget class="nx::client::desktop::InputField" name="cloudEmailInputField" native="true"/>
            </item>
           </layout>
          </widget>
@@ -282,9 +292,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnInputField</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -298,6 +308,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+    <class>nx::client::desktop::HintButton</class>
+    <extends>QWidget</extends>
+    <header location="global">nx/client/desktop/common/widgets/hint_button.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

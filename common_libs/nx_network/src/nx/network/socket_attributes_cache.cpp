@@ -34,6 +34,7 @@ bool verifySocketAttributes(
     }
 
     return verifyAttribute(socket, &AbstractSocket::getReuseAddrFlag, attributes.reuseAddrFlag)
+        && verifyAttribute(socket, &AbstractSocket::getReusePortFlag, attributes.reusePortFlag)
         && verifyAttribute(socket, &AbstractSocket::getNonBlockingMode, attributes.nonBlockingMode)
         && verifyAttribute(socket, &AbstractSocket::getSendBufferSize, attributes.sendBufferSize)
         && verifyAttribute(socket, &AbstractSocket::getRecvBufferSize, attributes.recvBufferSize)

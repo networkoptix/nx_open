@@ -79,7 +79,7 @@ window.FlashlsAPI = function(flashObject) {
         requestFragment: function(data) {},
         abortFragment: function(data) {}
     };
-};
+}
 
 FlashlsAPI.prototype.kill = function(){
     delete window[this.id];

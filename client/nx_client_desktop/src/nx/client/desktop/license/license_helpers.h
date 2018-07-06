@@ -19,6 +19,8 @@ struct RequestInfo
     QString name;
     QString email;
     QStringList reason;
+    QString systemName;
+    QString localUser;
 };
 
 class Deactivator

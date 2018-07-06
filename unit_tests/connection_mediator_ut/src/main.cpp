@@ -13,5 +13,6 @@ int main(int argc, char** argv)
         {
             return nx::utils::test::DeinitFunctions();
         },
-        nx::network::InitializationFlags::disableUdt);
+        nx::network::InitializationFlags::disableUdt,
+        nx::utils::test::GtestRunFlag::gtestThrowOnFailure);
 }

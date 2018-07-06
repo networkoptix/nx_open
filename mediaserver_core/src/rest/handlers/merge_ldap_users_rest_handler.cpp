@@ -12,6 +12,7 @@
 #include <ldap/ldap_manager.h>
 #include "api/app_server_connection.h"
 
+#include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/data/api_user_data.h>
 
@@ -20,20 +21,18 @@
 #include <network/authenticate_helper.h>
 
 int QnMergeLdapUsersRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams &/*params*/,
+    const QByteArray& /*body*/,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QN_UNUSED(path, params, body);
-
     QnLdapUsers ldapUsers;
     Qn::LdapResult ldapResult = qnAuthHelper->ldapManager()->fetchUsers(ldapUsers);
     if (ldapResult != Qn::Ldap_NoError)
 	{
         result.setError(QnRestResult::CantProcessRequest, QnLdapManager::errorMessage(ldapResult));
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     ec2::AbstractUserManagerPtr userManager = owner->commonModule()->ec2Connection()->getUserManager(owner->accessRights());
@@ -87,5 +86,5 @@ int QnMergeLdapUsersRestHandler::executePost(
         }
     }
 
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

@@ -13,8 +13,8 @@ class AbstractMediaServerNotificationManager : public QObject
     Q_OBJECT
 public:
 signals:
-    void addedOrUpdated(const ec2::ApiMediaServerData& server, NotificationSource source);
-    void storageChanged(const ec2::ApiStorageData& storage, NotificationSource source);
+    void addedOrUpdated(const ec2::ApiMediaServerData& server, ec2::NotificationSource source);
+    void storageChanged(const ec2::ApiStorageData& storage, ec2::NotificationSource source);
     void removed(const QnUuid& id);
     void storageRemoved(const QnUuid& id);
     void userAttributesChanged(const ec2::ApiMediaServerUserAttributesData& attributes);
@@ -87,6 +87,14 @@ typedef std::shared_ptr<AbstractMediaServerNotificationManager> AbstractMediaSer
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        ErrorCode removeSync(const QnUuid& id)
+        {
+            return impl::doSyncCall<impl::SimpleHandler>([=](const impl::SimpleHandlerPtr &handler)
+            {
+                return this->remove(id, handler);
+            });
+        }
+
         /*!
         \param handler Functor with params: (ErrorCode)
         */
@@ -128,18 +136,26 @@ typedef std::shared_ptr<AbstractMediaServerNotificationManager> AbstractMediaSer
         \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType>
-        int removeStorages(const ec2::ApiIdDataList& storages, TargetType* target, HandlerType handler)
+        int removeStorages(
+            const nx::vms::api::IdDataList& storages,
+            TargetType* target,
+            HandlerType handler)
         {
-            return removeStorages(storages, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+            return removeStorages(
+                storages,
+                std::static_pointer_cast<impl::SimpleHandler>(
+                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
+                        target,
+                        handler)));
         }
 
-        ErrorCode removeStoragesSync(const ec2::ApiIdDataList& storages)
+        ErrorCode removeStoragesSync(const nx::vms::api::IdDataList& storages)
         {
-            return impl::doSyncCall<impl::SimpleHandler>([=](const impl::SimpleHandlerPtr &handler)
-            {
-                return this->removeStorages(storages, handler);
-            });
+            return impl::doSyncCall<impl::SimpleHandler>(
+                [=](const impl::SimpleHandlerPtr& handler)
+                {
+                    return this->removeStorages(storages, handler);
+                });
         }
 
         /*!
@@ -197,7 +213,7 @@ typedef std::shared_ptr<AbstractMediaServerNotificationManager> AbstractMediaSer
         virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;
         virtual int saveUserAttributes(const ec2::ApiMediaServerUserAttributesDataList& serverAttrs, impl::SimpleHandlerPtr handler) = 0;
         virtual int saveStorages(const ec2::ApiStorageDataList& storages, impl::SimpleHandlerPtr handler) = 0;
-        virtual int removeStorages(const ec2::ApiIdDataList& storages, impl::SimpleHandlerPtr handler) = 0;
+        virtual int removeStorages(const nx::vms::api::IdDataList& storages, impl::SimpleHandlerPtr handler) = 0;
         virtual int getUserAttributes(const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler) = 0;
         virtual int getStorages(const QnUuid& mediaServerId, impl::GetStoragesHandlerPtr handler) = 0;
     };

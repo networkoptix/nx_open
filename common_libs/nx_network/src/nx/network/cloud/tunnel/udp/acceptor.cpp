@@ -1,6 +1,5 @@
 #include "acceptor.h"
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/socket_global.h>
 
 #include "incoming_tunnel_connection.h"
@@ -89,6 +88,12 @@ void TunnelAcceptor::pleaseStop(
         });
 }
 
+std::string TunnelAcceptor::toString() const
+{
+    return lm("UDP hole punching acceptor. remote endpoints %1")
+        .container(m_peerAddresses).toStdString();
+}
+
 void TunnelAcceptor::connectionAckResult(
     nx::hpm::api::ResultCode code)
 {
@@ -96,7 +101,7 @@ void TunnelAcceptor::connectionAckResult(
     if (code != hpm::api::ResultCode::ok)
     {
         NX_LOGX(lm("connectionAck error: %1")
-            .arg(QnLexical::serialized(code)), cl_logWARNING);
+            .arg(nx::hpm::api::toString(code)), cl_logWARNING);
 
         // TODO: #mux code translation
         return executeAcceptHandler(SystemError::connectionAbort);
@@ -205,9 +210,7 @@ void TunnelAcceptor::executeAcceptHandler(
         return;
     }
 
-    const auto handler = std::move(m_acceptHandler);
-    m_acceptHandler = nullptr;
-    return handler(code, std::move(connection));
+    nx::utils::swapAndCall(m_acceptHandler, code, std::move(connection));
 }
 
 } // namespace udp

@@ -1,61 +1,52 @@
-/**********************************************************
-* 24 sep 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "uuid.h"
 
 #include <type_traits>
 #include <nx/utils/log/assert.h>
+#include <QCryptographicHash>
 
 QnUuid::QnUuid()
 {
 }
 
-QnUuid::QnUuid( const char* text )
-:
-    m_uuid( text ? QByteArray::fromRawData( text, static_cast<int>(strlen(text)) ) : QByteArray() )
+QnUuid::QnUuid(const char* text):
+    m_uuid(text ? QByteArray::fromRawData(text, static_cast<int>(strlen(text))) : QByteArray())
 {
 }
 
-QnUuid::QnUuid( const QString& text )
-:
-    m_uuid( text )
+QnUuid::QnUuid(const QString& text):
+    m_uuid(text)
 {
-    if( !text.isEmpty() )
+    if (!text.isEmpty())
     {
         NX_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-            text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
+            text.size() == 38);    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
 }
 
-QnUuid::QnUuid( const QByteArray& text )
-:
-    m_uuid( text )
+QnUuid::QnUuid(const QByteArray& text):
+    m_uuid(text)
 {
-    if( !text.isEmpty() )
+    if (!text.isEmpty())
     {
         NX_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-            text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
+            text.size() == 38);    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
 }
 
-QnUuid::QnUuid( const std::string& text )
-:
-    m_uuid( QByteArray(text.c_str()) )
+QnUuid::QnUuid(const std::string& text):
+    m_uuid(QByteArray(text.c_str()))
 {
-    if( !text.empty() )
+    if (!text.empty())
     {
         NX_ASSERT(
             text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-            text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
+            text.size() == 38);    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
 }
 
-QnUuid::QnUuid(const QUuid &uuid)
-:
+QnUuid::QnUuid(const QUuid &uuid):
     m_uuid(uuid)
 {
 }
@@ -88,7 +79,7 @@ const QString QnUuid::toString() const
 QString QnUuid::toSimpleString() const
 {
     const auto& s = toString();
-    return s.mid( 1, s.length() - 2 );
+    return s.mid(1, s.length() - 2);
 }
 
 QByteArray QnUuid::toSimpleByteArray() const
@@ -100,7 +91,7 @@ QByteArray QnUuid::toSimpleByteArray() const
 std::string QnUuid::toStdString() const
 {
     const auto& byteArray = toByteArray();
-    return std::string( byteArray.constData(), byteArray.size() );
+    return std::string(byteArray.constData(), byteArray.size());
 }
 
 QUuid QnUuid::toQUuid() const
@@ -131,11 +122,11 @@ bool QnUuid::operator>(const QnUuid& other) const
 QnUuid QnUuid::fromRfc4122(const QByteArray& bytes)
 {
     QnUuid _uuid;
-    _uuid.m_uuid = QUuid::fromRfc4122( bytes );
+    _uuid.m_uuid = QUuid::fromRfc4122(bytes);
     return _uuid;
 }
 
-QnUuid QnUuid::fromHardwareId( const QString& hwid )
+QnUuid QnUuid::fromHardwareId(const QString& hwid)
 {
     if (hwid.length() != 34)
         return QnUuid();
@@ -172,16 +163,37 @@ QnUuid QnUuid::fromStringSafe(const std::string& uuid)
     return QnUuid(QUuid(QByteArray::fromRawData(uuid.c_str(), (int)uuid.size())));
 }
 
-QnUuid QnUuid::createUuidFromPool(const QUuid &baseId, uint offset) {
-    static_assert(sizeof(uint) <= sizeof(decltype(QUuid::data1)), "Offset type must be not greater than storage field size.");
+QnUuid QnUuid::fromArbitraryData(const QByteArray& data)
+{
+    QCryptographicHash md5Hash(QCryptographicHash::Md5);
+    md5Hash.addData(data);
+    QByteArray bytes = md5Hash.result();
+    return fromRfc4122(bytes);
+}
+
+QnUuid QnUuid::fromArbitraryData(const QString& data)
+{
+    return fromArbitraryData(data.toUtf8());
+}
+
+QnUuid QnUuid::fromArbitraryData(const std::string& data)
+{
+    return fromArbitraryData(QByteArray::fromRawData(data.data(), (int)data.size()));
+}
+
+QnUuid QnUuid::createUuidFromPool(const QUuid &baseId, uint offset)
+{
+    static_assert(
+        sizeof(uint) <= sizeof(decltype(QUuid::data1)),
+        "Offset type must be not greater than storage field size.");
     QUuid result = baseId;
     result.data1 += offset;
     return QnUuid(result);
 }
 
-uint qHash( const QnUuid& uuid, uint seed ) throw()
+uint qHash(const QnUuid& uuid, uint seed) throw()
 {
-    return qHash( uuid.getQUuid(), seed );
+    return qHash(uuid.getQUuid(), seed);
 }
 
 QDataStream& operator<<(QDataStream& s, const QnUuid& id)

@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location, dialogs, systemAPI) {
+    .controller('AdvancedCtrl', ['$scope', '$uibModal', '$log', 'mediaserver', '$location', 'dialogs', 'systemAPI',
+    function ($scope, $uibModal, $log, mediaserver,$location, dialogs, systemAPI) {
 
 
         mediaserver.getUser().then(function(user){
@@ -80,7 +81,10 @@ angular.module('webadminApp')
         $scope.reduceArchiveWarning = false;
 
         mediaserver.getStorages().then(function (r) {
-            $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
+            $scope.storages = _.filter(r.data.reply.storages, function(storage){
+                return storage.storageId != '{00000000-0000-0000-0000-000000000000}';
+            });
+            $scope.storages = _.sortBy($scope.storages, function(storage){
                 return formatUrl(storage.url);
             });
             for(var i = 0; i<$scope.storages.length;i++){
@@ -217,7 +221,7 @@ angular.module('webadminApp')
         };
 
         $scope.restartServer = function(passPort){
-            $modal.open({
+            $uibModal.open({
                 templateUrl: Config.viewsDir + 'restart.html',
                 controller: 'RestartCtrl',
                 resolve:{
@@ -228,4 +232,4 @@ angular.module('webadminApp')
             });
         };
 
-    });
+    }]);

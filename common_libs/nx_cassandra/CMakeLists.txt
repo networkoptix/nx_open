@@ -3,11 +3,7 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-if(LINUX)
-    add_compile_options("-Werror" "-Wall" "-Wextra")
-endif()
-
-nx_add_target(nx_cassandra LIBRARY ${library_type}
+nx_add_target(nx_cassandra LIBRARY ${library_type} WERROR
     PUBLIC_LIBS
         boost
         cassandra

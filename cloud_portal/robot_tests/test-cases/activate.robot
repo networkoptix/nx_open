@@ -11,7 +11,9 @@ ${url}         ${ENV}
 
 *** Keywords ***
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log Out
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword Unless    ${status}    Log Out
     Validate Log Out
     Go To    ${url}
@@ -77,9 +79,27 @@ should trim leading and trailing spaces
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
 
-#These are blocked by CLOUD-1624
-#should display Open Nx Witness button after activation, if user is registered by link /register/?from=client
-#should display Open Nx Witness button after activation, if user is registered by link /register/?from=mobile
+should display Open Nx Witness button after activation, if user is registered by link /register/?from=client
+    [tags]    email
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register?from=client
+    Register    ${SPACE}mark${SPACE}    ${SPACE}hamill${SPACE}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+    Wait Until Element Is Visible    ${OPEN NX WITNESS BUTTON FROM =}
+
+
+should display Open Nx Witness button after activation, if user is registered by link /register/?from=mobile
+    [tags]    email
+    ${email}    Get Random Email    ${BASE EMAIL}
+    Go To    ${url}/register?from=mobile
+    Register    ${SPACE}mark${SPACE}    ${SPACE}hamill${SPACE}    ${email}    ${password}
+    Activate    ${email}
+    Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
+    Validate Log In
+    Wait Until Element Is Visible    ${OPEN NX WITNESS BUTTON FROM =}
+
 
 link works and suggests to log out user, if he was logged in, buttons operate correctly
     [tags]    email

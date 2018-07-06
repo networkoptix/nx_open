@@ -64,14 +64,6 @@ void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& 
     m_adminPassword = password;
     m_originalTargetId = server->getOriginalGuid();
 
-    if (auto fakeServer = server.dynamicCast<QnFakeMediaServerResource>())
-    {
-        QAuthenticator authenticator;
-        authenticator.setUser(helpers::kFactorySystemUser);
-        authenticator.setPassword(m_adminPassword);
-        fakeServer->setAuthenticator(authenticator);
-    }
-
     updateServer();
 }
 

@@ -10,11 +10,14 @@
 
 class QnResourceTreeModelNodeFactory
 {
+    using NodeType = nx::client::desktop::ResourceTreeNodeType;
 public:
-    static QnResourceTreeModelNodePtr createNode(Qn::NodeType nodeType,
+    static QnResourceTreeModelNodePtr createNode(
+        NodeType nodeType,
         QnResourceTreeModel* model, bool initialize = true);
 
-    static QnResourceTreeModelNodePtr createNode(Qn::NodeType nodeType, const QnUuid& id,
+    static QnResourceTreeModelNodePtr createNode(
+        NodeType nodeType, const QnUuid& id,
         QnResourceTreeModel* model, bool initialize = true);
 
     static QnResourceTreeModelNodePtr createLocalSystemNode(const QString& systemName,

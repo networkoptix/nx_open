@@ -85,7 +85,7 @@ bool QnAdamModbusIOManager::startIOMonitoring()
     auto host = url.host();
     auto port = url.port(nx::modbus::kDefaultModbusPort);
 
-    SocketAddress endpoint(host, port);
+    nx::network::SocketAddress endpoint(host, port);
 
     m_client.setEndpoint(endpoint);
     m_outputClient.setEndpoint(endpoint);

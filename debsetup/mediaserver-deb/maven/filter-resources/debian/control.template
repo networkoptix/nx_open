@@ -1,17 +1,17 @@
-Package: ${deb.customization.company.name}-mediaserver
-Source: ${deb.customization.company.name}-mediaserver
+Package: @deb.customization.company.name@-mediaserver
+Source: @deb.customization.company.name@-mediaserver
 Version: VERSION
 Installed-Size: INSTALLED_SIZE
-Architecture: ${target.arch}
-Maintainer: ${company.name} <${supportEmail}>
+Architecture: @target.arch@
+Maintainer: @company.name@ <@supportEmail@>
 Pre-Depends: debconf
-Depends: ${common.depends}${arch.depends}
+Depends: @common.depends@@arch.depends@
 Recommends:
 Suggests:
-Conflicts: ${deb.customization.company.name}-mediaserver-1.2 (<< VERSION), ${deb.customization.company.name}-entcontroller (<< VERSION)
-Replaces: ${deb.customization.company.name}-mediaserver-1.2 (<< VERSION), ${deb.customization.company.name}-entcontroller (<< VERSION)
-Provides: ${deb.customization.company.name}-mediaserver, ${deb.customization.company.name}-entcontroller
+Conflicts: @deb.customization.company.name@-mediaserver-1.2 (<< VERSION), @deb.customization.company.name@-entcontroller (<< VERSION)
+Replaces: @deb.customization.company.name@-mediaserver-1.2 (<< VERSION), @deb.customization.company.name@-entcontroller (<< VERSION)
+Provides: @deb.customization.company.name@-mediaserver, @deb.customization.company.name@-entcontroller
 Section: database
 Priority: optional
-Homepage: ${companyUrl}
-Description: ${company.name} ${mediaserver.display.name}
+Homepage: @companyUrl@
+Description: @company.name@ @mediaserver.display.name@

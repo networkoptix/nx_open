@@ -11,10 +11,11 @@ namespace db {
 //-------------------------------------------------------------------------------------------------
 // BaseExecutor
 
-BaseExecutor::BaseExecutor():
+BaseExecutor::BaseExecutor(QueryType queryType):
     m_statisticsCollector(nullptr),
     m_creationTime(nx::utils::monotonicTime()),
-    m_queryExecuted(false)
+    m_queryExecuted(false),
+    m_queryType(queryType)
 {
 }
 
@@ -30,6 +31,9 @@ BaseExecutor::~BaseExecutor()
 
     if (m_statisticsCollector)
         m_statisticsCollector->recordQuery(m_queryStatistics);
+
+    if (m_onBeforeDestructionHandler)
+        m_onBeforeDestructionHandler();
 }
 
 DBResult BaseExecutor::execute(QSqlDatabase* const connection)
@@ -44,9 +48,19 @@ DBResult BaseExecutor::execute(QSqlDatabase* const connection)
 
     m_queryStatistics.result = executeQuery(connection);
 
-    m_queryStatistics.executionDuration = 
+    m_queryStatistics.executionDuration =
         duration_cast<milliseconds>(nx::utils::monotonicTime() - executionStartTime);
     return *m_queryStatistics.result;
+}
+
+QueryType BaseExecutor::queryType() const
+{
+    return m_queryType;
+}
+
+void BaseExecutor::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    m_onBeforeDestructionHandler = std::move(handler);
 }
 
 void BaseExecutor::setStatisticsCollector(StatisticsCollector* statisticsCollector)
@@ -95,6 +109,7 @@ UpdateWithoutAnyDataExecutor::UpdateWithoutAnyDataExecutor(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler)
     :
+    base_type(QueryType::modification),
     m_dbUpdateFunc(std::move(dbUpdateFunc)),
     m_completionHandler(std::move(completionHandler))
 {
@@ -148,6 +163,7 @@ UpdateWithoutAnyDataExecutorNoTran::UpdateWithoutAnyDataExecutorNoTran(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler)
     :
+    base_type(QueryType::modification),
     m_dbUpdateFunc(std::move(dbUpdateFunc)),
     m_completionHandler(std::move(completionHandler))
 {
@@ -175,6 +191,7 @@ SelectExecutor::SelectExecutor(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler)
     :
+    base_type(QueryType::lookup),
     m_dbSelectFunc(std::move(dbSelectFunc)),
     m_completionHandler(std::move(completionHandler))
 {
@@ -186,7 +203,8 @@ DBResult SelectExecutor::executeQuery(QSqlDatabase* const connection)
     QueryContext queryContext(connection, nullptr);
     auto result = invokeDbQueryFunc(m_dbSelectFunc, &queryContext);
     result = detailResultCode(connection, result);
-    completionHandler(&queryContext, result);
+    if (completionHandler)
+        completionHandler(&queryContext, result);
     return result;
 }
 

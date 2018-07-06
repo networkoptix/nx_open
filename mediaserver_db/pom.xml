@@ -1,0 +1,69 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>4.0.0-SNAPSHOT</version>
+        <relativePath>../cpp</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>4.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mediaserver_db</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx VMS MediaServer DB Library</name>
+
+    <properties>
+        <guid>${mediaserver_db.guid}</guid>
+        <!--Global libs-->
+        <template>lib</template>
+
+        <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
+        <global.libs>-lappserver2 -lcommon -lcloud_db_client -lnx_vms_api -lnx_network -lnx_fusion -lnx_utils -lnx_kit</global.libs>
+        <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32  -lSecur32 -lwinmm</windows.oslibs>
+        <linux.oslibs>-lswscale</linux.oslibs>
+        <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
+        <android.oslibs>-lz</android.oslibs>
+
+        <windows.defines>_USING_V110_SDK71_</windows.defines>
+        <rdep.packages>openssl ffmpeg</rdep.packages>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>appserver2</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>

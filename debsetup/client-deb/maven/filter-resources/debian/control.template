@@ -1,17 +1,17 @@
-Package: ${deb.customization.company.name}-client
-Source: ${deb.customization.company.name}-client
+Package: @deb.customization.company.name@-client
+Source: @deb.customization.company.name@-client
 Version: VERSION
 Installed-Size: INSTALLED_SIZE
-Architecture: ${target.arch}
-Maintainer: ${company.name} <${supportEmail}>
+Architecture: @target.arch@
+Maintainer: @company.name@ <@supportEmail@>
 Pre-Depends: debconf
-Depends: ${common.depends}${arch.depends}
-Recommends: 
-Suggests: 
-Conflicts: ${deb.customization.company.name}-client-1.2 (<< VERSION)
-Replaces: ${deb.customization.company.name}-client-1.2 (<< VERSION)
-Provides: ${deb.customization.company.name}-client
+Depends: @common.depends@@arch.depends@
+Recommends:
+Suggests:
+Conflicts: @deb.customization.company.name@-client-1.2 (<< VERSION)
+Replaces: @deb.customization.company.name@-client-1.2 (<< VERSION)
+Provides: @deb.customization.company.name@-client
 Section: database
 Priority: optional
-Homepage: ${companyUrl}
-Description: ${client.display.name}
+Homepage: @companyUrl@
+Description: @client.display.name@

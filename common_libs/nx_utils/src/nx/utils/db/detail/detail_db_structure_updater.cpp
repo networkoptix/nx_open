@@ -62,6 +62,7 @@ DbStructureUpdater::DbStructureUpdater(
 void DbStructureUpdater::setInitialVersion(unsigned int version)
 {
     m_initialVersion = version;
+    m_updateScripts.erase(m_updateScripts.begin());
 }
 
 void DbStructureUpdater::addUpdateScript(QByteArray updateScript)
@@ -90,7 +91,7 @@ void DbStructureUpdater::addFullSchemaScript(
 
 unsigned int DbStructureUpdater::maxKnownVersion() const
 {
-    return m_initialVersion + m_updateScripts.size();
+    return m_initialVersion + (unsigned int) m_updateScripts.size();
 }
 
 void DbStructureUpdater::setVersionToUpdateTo(unsigned int version)
@@ -220,7 +221,7 @@ DBResult DbStructureUpdater::updateDbVersion(
 {
     QSqlQuery updateDbVersionQuery(*queryContext->connection());
     updateDbVersionQuery.prepare(R"sql(
-        REPLACE INTO db_version_data(schema_name, db_version) 
+        REPLACE INTO db_version_data(schema_name, db_version)
         VALUES (:schemaName, :dbVersion)
     )sql");
     updateDbVersionQuery.bindValue(":schemaName", QString::fromStdString(m_schemaName));

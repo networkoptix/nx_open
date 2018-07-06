@@ -24,6 +24,8 @@ static const int kFallbackLowQualityLines = 360;
 static const int kHighQualityFallbackThreshold = 560;
 static const QSize kMaxTranscodingResolution(1920, 1080);
 static const QSize kDefaultAspect(16, 9);
+static const int kWidthRoundingFactor = 16;
+static const int kHeightRoundingFactor = 4;
 
 /**
  * If a particular stream is missing, its out parameters are not assigned a value.
@@ -37,12 +39,12 @@ void findCameraStreams(
 {
     for (const auto& stream: camera->mediaStreams().streams)
     {
-        if (stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX) //< High
+        if (stream.getEncoderIndex() == Qn::StreamIndex::primary) //< High
         {
             *outHighCodec = (AVCodecID) stream.codec;
             *outHighResolution = stream.getResolution();
         }
-        else if (stream.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX) //< Low
+        else if (stream.getEncoderIndex() == Qn::StreamIndex::secondary) //< Low
         {
             *outLowCodec = (AVCodecID) stream.codec;
             *outLowResolution = stream.getResolution();
@@ -56,21 +58,24 @@ static QSize limitResolution(const QSize& desiredResolution, const QSize& limit)
         return desiredResolution;
 
     QSize result = desiredResolution;
+    const float aspectRatio = result.width() / (float) result.height();
 
     if (result.width() > limit.width())
     {
-        result.setHeight((result.height() * limit.width()) / result.width());
+        result.setHeight(qPower2Round(floor(0.5 + limit.width() / aspectRatio), kHeightRoundingFactor));
         result.setWidth(limit.width());
     }
 
     if (result.height() > limit.height())
     {
-        result.setWidth((result.width() * limit.height()) / result.height());
+        result.setWidth(qPower2Round(floor(0.5 + limit.height() * aspectRatio), kWidthRoundingFactor));
         result.setHeight(limit.height());
     }
 
-    NX_ASSERT(result.width() <= limit.width());
-    NX_ASSERT(result.height() <= limit.height());
+    if (result.width() > limit.width())
+        result.setWidth(limit.width());
+    if (result.height() > limit.height())
+        result.setHeight(limit.height());
 
     return result;
 }
@@ -127,27 +132,6 @@ static QSize transcodingResolution(
     return result;
 }
 
-static bool isTranscodingSupported(
-    bool liveMode, qint64 positionMs, const QnVirtualCameraResourcePtr& camera)
-{
-    if (!VideoDecoderRegistry::instance()->isTranscodingEnabled())
-        return false;
-
-    auto module = camera->commonModule();
-    NX_ASSERT(module);
-    if (!module)
-        return false;
-
-    QnMediaServerResourcePtr server = liveMode
-        ? camera->getParentServer()
-        : module->cameraHistoryPool()->getMediaServerOnTime(camera, positionMs);
-
-    if (!server)
-        return false;
-
-    return server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding);
-}
-
 /**
  * @return Transcoding resolution, or invalid (default) QSize if transcoding is not possible.
  */
@@ -160,7 +144,8 @@ static Result applyTranscodingIfPossible(
     const QSize& desiredResolution,
     const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
-    if (!isTranscodingSupported(liveMode, positionMs, camera))
+    if (transcodingSupportStatus(camera, positionMs, liveMode, TranscodingRequestType::simple)
+        != Player::TranscodingSupported)
     {
         NX_LOG(lit("[media_player] Transcoding is not supported for the camera."),
             cl_logDEBUG1);
@@ -416,6 +401,38 @@ Result chooseVideoQuality(
 
     logResult();
     return result;
+}
+
+Player::TranscodingSupportStatus transcodingSupportStatus(
+    const QnVirtualCameraResourcePtr& camera,
+    qint64 positionMs,
+    bool liveMode,
+    TranscodingRequestType requestType)
+{
+    if (!VideoDecoderRegistry::instance()->isTranscodingEnabled())
+        return Player::TranscodingDisabled;
+
+    const QnMediaServerResourcePtr& server = liveMode
+        ? camera->getParentServer()
+        : camera->commonModule()->cameraHistoryPool()->getMediaServerOnTime(camera, positionMs);
+
+    if (!server)
+        return Player::TranscodingNotSupported;
+
+    if (server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding))
+        return Player::TranscodingSupported;
+
+    if (requestType == TranscodingRequestType::detailed)
+    {
+        if (server->getVersion() < QnSoftwareVersion(3, 0))
+            return Player::TranscodingNotSupportedForServersOlder30;
+
+        const auto& info = server->getSystemInfo();
+        if (info.arch == lit("arm") || info.arch == lit("aarch64"))
+            return Player::TranscodingNotSupportedForArmServers;
+    }
+
+    return Player::TranscodingNotSupported;
 }
 
 Result::Result(Player::VideoQuality quality, const QSize& frameSize):

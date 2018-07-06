@@ -5,19 +5,11 @@
 #include <QtCore/QStringList>
 #include <QtCore/QMetaType>
 
-#include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/api/types/smtp_types.h>
 
-#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
-Q_OBJECT
-#endif
-QN_DECLARE_METAOBJECT_HEADER(QnEmail, ConnectionType, )
+namespace QnEmail {
 
-    enum ConnectionType {
-        Unsecure = 0,
-        Ssl = 1,
-        Tls = 2
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ConnectionType)
+using ConnectionType = nx::vms::api::ConnectionType;
 
 } // namespace QnEmail
 
@@ -28,8 +20,6 @@ class  QnEmailAddress;
 enum class SmtpReplyCode;
 enum class SmtpError;
 struct SmtpOperationResult;
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::ConnectionType), (metatype)(lexical))
 
 #endif // QN_EMAIL_FWD_H
 

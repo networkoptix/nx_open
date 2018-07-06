@@ -18,6 +18,8 @@ class QnBookmarkQueriesCache;
 class QnCameraBookmarksQuery;
 class QnCameraBookmarkAggregation;
 
+namespace nx { namespace utils { class PendingOperation; } }
+
 // @brief Caches specified count of bookmarks for all cameras.
 // Gives access to merged bookmarks for current selected item.
 // Gives access to bookmarks of each layout item.
@@ -41,6 +43,9 @@ public:
         const QnVirtualCameraResourcePtr &camera
         , qint64 positionMs);
 
+    QString textFilter() const;
+    void setTextFilter(const QString& value);
+
 private:
     void onResourceRemoved(const QnResourcePtr &resource);
 
@@ -50,6 +55,8 @@ private:
     void tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr &camera);
     void onTimelineWindowChanged(qint64 startTimeMs
         , qint64 endTimeMs);
+
+    void setTimelineBookmarks(const QnCameraBookmarkList& bookmarks);
 
 private:
     void setCurrentCamera(const QnVirtualCameraResourcePtr &camera);
@@ -68,7 +75,7 @@ private:
     QnVirtualCameraResourcePtr m_currentCamera;
 
     TimerPtr m_updateStaticQueriesTimer;
-    TimerPtr m_delayedTimer;
-    QElapsedTimer m_delayedUpdateCounter;
+    nx::utils::PendingOperation* m_updateQueryOperation;
     QnCameraBookmarkSearchFilter m_timlineFilter;
+    QString m_textFilter;
 };

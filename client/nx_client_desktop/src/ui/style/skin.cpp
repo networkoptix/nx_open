@@ -5,6 +5,7 @@
 #include <QtCore/QFileInfo>
 
 #include <QtGui/QImage>
+#include <QtGui/QPainter>
 #include <QtGui/QPixmapCache>
 #include <QtWidgets/QStyleFactory>
 
@@ -206,4 +207,16 @@ QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode,
 bool QnSkin::isHiDpi()
 {
     return qApp->devicePixelRatio() > 1.0;
+}
+
+QPixmap QnSkin::colorize(const QPixmap& source, const QColor& color)
+{
+    QPixmap result(source);
+    result.detach();
+
+    QPainter painter(&result);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+    painter.fillRect(QRect(QPoint(), result.size() / result.devicePixelRatio()), color);
+
+    return result;
 }

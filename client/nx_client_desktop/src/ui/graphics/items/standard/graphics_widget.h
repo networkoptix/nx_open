@@ -4,14 +4,14 @@
 #include <QtWidgets/QGraphicsWidget>
 
 #include <ui/common/frame_section_queryable.h>
-#include <ui/common/margins.h>
 
 #include "graphics_style.h"
 
 class GraphicsWidgetPrivate;
 
-class GraphicsWidget: public QGraphicsWidget, public FrameSectionQueryable {
-    Q_OBJECT;
+class GraphicsWidget: public QGraphicsWidget, public FrameSectionQueryable
+{
+    Q_OBJECT
 
     typedef QGraphicsWidget base_type;
 
@@ -87,9 +87,9 @@ public:
     qreal resizeEffectRadius() const;
     void setResizeEffectRadius(qreal resizeEffectRadius);
 
-    MarginsF contentsMargins() const;
+    QMarginsF contentsMargins() const;
     using base_type::setContentsMargins;
-    void setContentsMargins(const MarginsF &margins);
+    void setContentsMargins(const QMarginsF &margins);
 
     /**
      * \returns                         The area inside the widget's margins.

@@ -5,10 +5,15 @@ namespace nx {
 namespace mediaserver_core {
 namespace plugins {
 
+
 AviMotionArchiveDelegate::AviMotionArchiveDelegate():
     QnAviArchiveDelegate()
 {
     m_motionEstimation.setChannelNum(0);
+}
+
+AviMotionArchiveDelegate::~AviMotionArchiveDelegate()
+{
 }
 
 QnAbstractMediaDataPtr AviMotionArchiveDelegate::getNextData()
@@ -48,7 +53,7 @@ QnMetaDataV1Ptr AviMotionArchiveDelegate::analyzeMotion(const QnAbstractMediaDat
     if (!video)
         return nullptr;
 
-    bool result = m_motionEstimation.analizeFrame(video);
+    bool result = m_motionEstimation.analyzeFrame(video);
 
     if (!result)
         return nullptr;

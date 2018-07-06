@@ -10,9 +10,9 @@ OnvifResource::OnvifResource()
 {
 }
 
-CameraDiagnostics::Result OnvifResource::initInternal()
+CameraDiagnostics::Result OnvifResource::initializeCameraDriver()
 {
-    return QnPlOnvifResource::initInternal();
+    return QnPlOnvifResource::initializeCameraDriver();
 }
 
 } // namespace flir

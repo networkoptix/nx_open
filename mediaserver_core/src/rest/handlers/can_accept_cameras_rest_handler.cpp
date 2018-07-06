@@ -14,29 +14,28 @@
 #include "core/resource_management/resource_pool.h"
 #include <rest/server/rest_connection_processor.h>
 
-
 static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) {
     return input.checkHostAddr();
 }
 
 int QnCanAcceptCameraRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
-
     QnCameraListReply inCameras;
     QnCameraListReply outCameras;
     //QnSecurityCamResourceList manualCamList;
-    QnManualCameraInfoMap manualCamList;
+    std::vector<QnManualCameraInfo> manualCameraList;
     std::deque<QnSecurityCamResourcePtr> camerasToPing;
     QJson::deserialize(body, &inCameras);
 
-    const QSet<QString>& discoveredCameras = owner->commonModule()->resourceDiscoveryManager()->lastDiscoveredIds();
+    QSet<QString> discoveredCameras;
+    auto commonModule = owner->commonModule();
+    for (const auto& res: commonModule->resourceDiscoveryManager()->lastDiscoveredResources())
+        discoveredCameras.insert(res->getUniqueId());
 
     for(const QString& uniqueID: inCameras.uniqueIdList)
     {
@@ -53,7 +52,7 @@ int QnCanAcceptCameraRestHandler::executePost(
 
         if (camera->isManuallyAdded())
         {
-            owner->commonModule()->resourceDiscoveryManager()->fillManualCamInfo(manualCamList, camera);
+            manualCameraList.push_back(commonModule->resourceDiscoveryManager()->manualCameraInfo(camera));
             continue;
         }
 
@@ -64,7 +63,7 @@ int QnCanAcceptCameraRestHandler::executePost(
     }
 
     // add manual cameras
-    QFuture<QnResourceList> manualDiscoveryResults = QtConcurrent::mapped(manualCamList, &CheckHostAddrAsync);
+    QFuture<QnResourceList> manualDiscoveryResults = QtConcurrent::mapped(manualCameraList, &CheckHostAddrAsync);
     //checking cameras with unicast
     nx::utils::concurrent::Future<bool> camerasToPingResults( camerasToPing.size() );
     for( size_t i = 0; i < camerasToPing.size(); ++i )
@@ -98,5 +97,5 @@ int QnCanAcceptCameraRestHandler::executePost(
     }
 
     result.setReply( outCameras );
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

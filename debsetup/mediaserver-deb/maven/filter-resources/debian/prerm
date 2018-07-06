@@ -5,7 +5,7 @@
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
-COMPANY_NAME="${deb.customization.company.name}"
+COMPANY_NAME="@deb.customization.company.name@"
 
 BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
 ETC_DIR="$BASE_DIR/etc"
@@ -35,13 +35,13 @@ then
         CHOICES="$CHOICES, $RESTORE$version (Last used: $mtime)"
     done
 
-    db_subst ${deb.customization.company.name}-mediaserver/removeDatabase choices $CHOICES
-    db_set ${deb.customization.company.name}-mediaserver/removeDatabase "$KEEP"
-    db_fset ${deb.customization.company.name}-mediaserver/removeDatabase seen false
+    db_subst @deb.customization.company.name@-mediaserver/removeDatabase choices $CHOICES
+    db_set @deb.customization.company.name@-mediaserver/removeDatabase "$KEEP"
+    db_fset @deb.customization.company.name@-mediaserver/removeDatabase seen false
 
-    db_input high ${deb.customization.company.name}-mediaserver/removeDatabase || true
+    db_input high @deb.customization.company.name@-mediaserver/removeDatabase || true
     db_go || true
-    db_get ${deb.customization.company.name}-mediaserver/removeDatabase
+    db_get @deb.customization.company.name@-mediaserver/removeDatabase
 
     if [ "$RET" = "$REMOVE" ]; then
         rm -f /opt/$COMPANY_NAME/mediaserver/var/ecs.sqlite

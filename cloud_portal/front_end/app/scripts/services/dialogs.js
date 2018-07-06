@@ -172,6 +172,19 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     }
                 }).result;
             },
+            merge:function(system){
+                var title = L.system.mergeSystemTitle;
+
+                return openDialog({
+                    title: title,
+                    template: Config.viewsDir + 'dialogs/merge.html',
+                    hasFooter: false,
+                    cancellable:true,
+                    params:{
+                        system: system
+                    }
+                }).result;
+            },
             noClientDetected:function(){
                 // message, title, actionLabel, actionType
                 return this.confirm(null /*L.downloads.noClientDetectedMessage*/,

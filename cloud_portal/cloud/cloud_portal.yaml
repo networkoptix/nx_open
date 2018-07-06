@@ -1,0 +1,35 @@
+customization: '$CUSTOMIZATION'
+
+host: '$CLOUD_PORTAL_HOST'
+
+cloud_database:
+    host: '$DB_HOST'
+    port: '$DB_PORT'
+    username: '$DB_USER'
+    password: '$DB_PASSWORD'
+    database: '$DB_NAME'
+
+cloud_db:
+    url: 'http://$CLOUD_DB_HOST:$CLOUD_DB_PORT/cdb'
+
+cloud_portal:
+    url: 'https://$CLOUD_PORTAL_HOST'
+
+cloud_gateway:
+    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT/gateway'
+
+smtp:
+    host: 'email-smtp.us-east-1.amazonaws.com'
+    user: 'AKIAJ6MLW7ZT7WXXXOIA'
+    password: 'AlYDnddPk8mWorQFVogh8sqkQX6Nv01JwxxfMoYJAFeC'
+    port: 587
+    tls: on
+
+admins:
+    -
+        - 'Admins'
+        - 'cloud-portal-admins@networkoptix.com'
+
+queue_name: '$INSTANCE_NAME'
+
+max_retries: 10

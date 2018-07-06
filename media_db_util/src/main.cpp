@@ -2,15 +2,17 @@
 
 #include <memory>
 #include <QtCore>
-#include "recorder/storage_db.h"
-#include "recorder/storage_db_pool.h"
-#include "plugins/storage/file_storage/file_storage_resource.h"
+#include <nx/utils/literal.h>
+#include <common/common_module.h>
+#include <recorder/storage_db.h>
+#include <recorder/storage_db_pool.h>
+#include <recorder/storage_manager.cpp>
+#include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/status_dictionary.h>
 
 #include <common/static_common_module.h>
-#include <common/common_module.h>
 #include <media_server/media_server_module.h>
 
 #include <core/resource_management/resource_properties.h>
@@ -174,4 +176,7 @@ int main(int argc, char** argv)
         aux::printAllData(fileCatalogs);
     else if (!cfg.cameraNames.isEmpty())
         aux::printCamerasData(fileCatalogs, cfg.cameraNames);
+
+    qnNormalStorageMan->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 }

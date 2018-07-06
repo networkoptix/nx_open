@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
@@ -25,12 +27,14 @@ protected:
     virtual void onClientToRelayConnectionDestroyed(
         nx::cloud::relay::api::test::ClientImpl*) {}
 
+    void resetClientFactoryToDefault();
+
 private:
-    nx::cloud::relay::api::ClientFactory::CustomFactoryFunc
+    boost::optional<nx::cloud::relay::api::ClientFactory::CustomFactoryFunc>
         m_clientFactoryBak;
 
-    std::unique_ptr<nx::cloud::relay::api::Client> 
-        clientFactoryFunc(const QUrl& /*relayUrl*/);
+    std::unique_ptr<nx::cloud::relay::api::Client>
+        clientFactoryFunc(const utils::Url & /*relayUrl*/);
 };
 
 } // namespace test

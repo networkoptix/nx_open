@@ -1,19 +1,19 @@
 {
   "language_name": "Nederlands",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Oké",
     "cancelButton": "Annuleren",
-    "loginTitle": "Log in op {{PRODUCT_NAME}}",
+    "loginTitle": "Log in op %PRODUCT_NAME%",
     "loginButton": "Log in",
     "logoutAuthorisedTitle": "U bent reeds ingelogd",
     "logoutAuthorisedContinueButton": "Doorgaan",
     "logoutAuthorisedLogoutButton": "Uitloggen"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Welkom bij",
     "register": "Maak een account aan in",
     "changePassword": "Wachtwoord wijzigen -",
@@ -31,8 +31,8 @@
     "view": "Bekijk camera's - ",
     "debug": "Debug",
     "login": "Log in -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} voor ",
+    "download": "Download %VMS_NAME%",
+    "downloadPlatform": "Download %VMS_NAME% voor ",
     "pageNotFound": "Pagina niet gevonden"
   },
   "systemStatuses": {
@@ -52,15 +52,15 @@
       "description": "Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "Viewer": {
-      "label": "Kijker",
+      "label": "Gebruiker 'Basis'",
       "description": "Kan live video bekijken en zoeken in het archief"
     },
     "Live Viewer": {
-      "label": "Live kijker",
+      "label": "Gebruiker 'Live'",
       "description": "Kan alleen live video bekijken"
     },
     "Advanced Viewer": {
-      "label": "Geavanceerde Kijker",
+      "label": "Gebruiker 'Geavanceerd'",
       "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
     },
     "Administrator": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Aangepast",
-      "description": "Gebruik de {{PRODUCT_NAME}} client-applicatie om aangepaste rechten in te stellen"
+      "description": "Gebruik de %PRODUCT_NAME% client-applicatie om aangepaste rechten in te stellen"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -84,20 +84,20 @@
       "description": "Onbeperkt toegang, inclusief de mogelijkheid om systeem te delen en te verbinden / te verbreken vanuit de cloud"
     },
     "viewer": {
-      "label": "Kijker",
+      "label": "Gebruiker 'Basis'",
       "description": "Kan live video bekijken en zoeken in het archief"
     },
     "liveViewer": {
-      "label": "Live kijker",
+      "label": "Gebruiker 'Live'",
       "description": "Kan alleen live video bekijken"
     },
     "advancedViewer": {
-      "label": "Geavanceerde Kijker",
+      "label": "Gebruiker 'Geavanceerd'",
       "description": "Kan live video bekijken, bladeren in het archief, camera configureren, PTZ, enz. bedienen"
     },
     "custom": {
       "label": "Aangepast",
-      "description": "Gebruik de {{PRODUCT_NAME}} client-applicatie om aangepaste rechten in te stellen"
+      "description": "Gebruik de %VMS_NAME% client-applicatie om aangepaste rechten in te stellen"
     }
   },
   "errorCodes": {
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "Kan geen bevestigingsmail versturen",
     "cloudInvalidResponse": "Cloud DB heeft een onverwacht antwoord teruggezonden",
     "notAuthorized": "Wachtwoord onjuist",
-    "wrongParameters": "Sommige parameters op het formulier zijn onjuist",
     "brokenAccount": "Onverwacht probleem met account. <a href=\"/restore_password\">Account herstellen</a>",
+    "wrongParameters": "Sommige parameters op het formulier zijn onjuist",
     "wrongCode": "Account is al geactiveerd of de bevestigingscode is onjuist",
     "wrongCodeRestore": "Bevestigingscode is al gebruikt of niet correct",
     "forbidden": "U hebt geen rechten om deze actie uit te voeren",
@@ -133,9 +133,10 @@
     "passwordMismatch": "Wachtwoord onjuist",
     "cantEditYourself": "Het wijzigen van eigen machtigingen is niet toegestaan",
     "cantEditAdmin": "Deze gebruiker heeft beheerdersrechten",
-    "cantOpenClient": "{{VMS_NAME}} applicatie is niet gedetecteerd. <a href=\"/download\">Download</a>",
+    "cantOpenClient": "%VMS_NAME% applicatie is niet gedetecteerd. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbinding met {{systemName}} verloren",
-    "thisSystem": "het systeem"
+    "thisSystem": "het systeem",
+    "oldSafariNotSupported": "Versies van Safari ouder dan versie 10 worden niet ondersteund"
   },
   "passwordRequirements": {
     "minLengthMessage": "Het wachtwoord moet minstens 8 karakters bevatten",
@@ -158,12 +159,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Systeem is onbereikbaar",
     "offline": "Systeem is offline",
-    "openClient": "Open in {{VMS_NAME}}",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
+    "openClient": "Open in %VMS_NAME%",
+    "openClientNoSystem": "Open %VMS_NAME%",
+    "confirmMergeAction": "Samenvoegen",
+    "mergeSystemTitle": "Samenvoegen",
     "confirmRenameTitle": "Systeemnaam",
     "confirmRenameAction": "Opslaan",
     "successRename": "Systeemnaam opgeslagen",
-    "confirmDisconnectTitle": "Verbinding verbreken met systeem {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Verbinding verbreken met systeem %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Verbinding verbreken",
     "confirmUnshareFromMe": "U staat op het punt om dit systeem uit uw account te verbreken. U kunt dit systeem niet meer gebruiken. Weet u het zeker?",
     "confirmUnshareFromMeTitle": "Systeem loskoppelen?",
@@ -171,7 +174,7 @@
     "confirmUnshare": "Deze gebruiker heeft geen toegang tot het systeem. Weet je het zeker?",
     "confirmUnshareTitle": "Gebruiker verwijderen?",
     "confirmUnshareAction": "Verwijder",
-    "successDisconnected": "Systeem is succesvol afgesloten van {{PRODUCT_NAME}}",
+    "successDisconnected": "Systeem is succesvol afgesloten van %PRODUCT_NAME%",
     "successDeleted": "Systeem {{systemName}} is succesvol verwijderd van uw account",
     "permissionsRemoved": "Toestemmingen zijn verwijderd voor {{email}}"
   },
@@ -184,14 +187,14 @@
     "saveChanges": "Opslaan"
   },
   "downloads": {
-    "noClientDetectedTitle": "Installeer {{VMS_NAME}} om uw systeem te bekijken",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Installeer %VMS_NAME% om uw systeem te bekijken",
+    "action": "Download %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

@@ -5,10 +5,12 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/common/recording_status_helper.h>
+#include <nx/client/desktop/ui/common/recording_status_helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <core/resource/resource_display_info.h>
+
+using namespace nx::client::desktop;
 
 QnCameraListModel::QnCameraListModel(QObject *parent):
     base_type(parent),
@@ -61,7 +63,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
     case Qt::DecorationRole:
         switch(index.column()) {
         case RecordingColumn:
-            return QnRecordingStatusHelper::icon(QnRecordingStatusHelper::currentRecordingMode(camera));
+            return RecordingStatusHelper::icon(RecordingStatusHelper::currentRecordingMode(camera));
         case NameColumn:
             return qnResIconCache->icon(camera);
         case ServerColumn:
@@ -73,7 +75,7 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
     case Qt::DisplayRole:
         switch (index.column()) {
         case RecordingColumn:
-            return QnRecordingStatusHelper::shortTooltip(QnRecordingStatusHelper::currentRecordingMode(camera));
+            return RecordingStatusHelper::shortTooltip(RecordingStatusHelper::currentRecordingMode(camera));
         case NameColumn:
             return camera->getName();
         case VendorColumn:
@@ -86,6 +88,8 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
             return camera->getHostAddress();
         case MacColumn:
             return camera->getMAC().toString();
+        case LogicalIdColumn:
+            return camera->getLogicalId();
         case ServerColumn:
             return server ? QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl) : QVariant();
         default:
@@ -126,7 +130,8 @@ QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation,
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
     case IpColumn:        return tr("IP/Name");
-    case MacColumn:     return tr("MAC address");
+    case MacColumn:       return tr("MAC address");
+    case LogicalIdColumn: return tr("ID");
     case ServerColumn:    return tr("Server");
     default:
         break;

@@ -75,8 +75,11 @@ public:
 
     GIE_Context();
 
-    void buildGieContext(const string& deployfile,
-            const string& modelfile, bool bUseCPUBuf = false);
+    void buildGieContext(
+        const string& deployfile,
+        const string& modelfile,
+        const string& cachefile,
+        bool bUseCPUBuf = false);
 
     void doInference(
         queue< vector<cv::Rect> >& rectList_queue,
@@ -96,6 +99,7 @@ private:
     float *output_bbox_buf;
     float helnet_scale[4];
     int hel_net;
+    int ped_net;
     IRuntime *runtime;
     ICudaEngine *engine;
     IExecutionContext *context;
@@ -131,9 +135,11 @@ private:
     size_t outputSize;
     size_t outputSizeBBOX;
 
-
     int parseNet(const string& deployfile);
+
     void parseBbox(vector<cv::Rect>& rectList, int batch_th);
+    void parsePed100Bbox(vector<cv::Rect>& rectList, int batch_th);
+
     void parseHelBbox(vector<cv::Rect>& rectList, int class_num, int batch_th);
     void allocateMemory(bool bUseCPUBuf);
     void releaseMemory(bool bUseCPUBuf);

@@ -1,1 +1,3 @@
+INCLUDEPATH += ${root.dir}/vms_libs/nx_vms_api/src
+
 CONFIG += console

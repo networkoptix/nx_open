@@ -11,28 +11,23 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/busy_indicator_button.h>
+#include <nx/client/desktop/common/widgets/busy_indicator_button.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <ui/common/scoped_cursor_rollback.h>
+#include <nx/client/desktop/common/utils/scoped_cursor_rollback.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop;
 
 QnStorageUrlDialog::QnStorageUrlDialog(
-        const QnMediaServerResourcePtr& server,
-        QWidget* parent,
-        Qt::WindowFlags windowFlags) :
-
+    const QnMediaServerResourcePtr& server,
+    QWidget* parent,
+    Qt::WindowFlags windowFlags)
+    :
     base_type(parent, windowFlags),
     ui(new Ui::StorageUrlDialog()),
     m_server(server),
-    m_protocols(),
-    m_descriptions(),
-    m_urlByProtocol(),
-    m_lastProtocol(),
-    m_storage(),
-    m_currentServerStorages(),
-    m_okButton(new QnBusyIndicatorButton(this))
+    m_okButton(new BusyIndicatorButton(this))
 {
     ui->setupUi(this);
     ui->urlEdit->setFocus();
@@ -49,6 +44,8 @@ QnStorageUrlDialog::QnStorageUrlDialog(
 
     /* Override cursor to stay arrow when entire dialog has wait cursor: */
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setCursor(Qt::ArrowCursor);
+
+    setResizeToContentsMode(Qt::Vertical | Qt::Horizontal);
 }
 
 QnStorageUrlDialog::~QnStorageUrlDialog()
@@ -185,13 +182,13 @@ void QnStorageUrlDialog::accept()
 
     // Scoped event loop:
     {
-        QnScopedCursorRollback cursorRollback(this, Qt::WaitCursor);
+        ScopedCursorRollback cursorRollback(this, Qt::WaitCursor);
         QnScopedTypedPropertyRollback<bool, QWidget> inputsEnabledRollback(ui->inputsWidget,
             &QWidget::setEnabled, &QWidget::isEnabled, false);
         QnScopedTypedPropertyRollback<bool, QWidget> buttonEnabledRollback(m_okButton,
             &QWidget::setEnabled, &QWidget::isEnabled, false);
-        QnScopedTypedPropertyRollback<bool, QnBusyIndicatorButton> buttonIndicatorRollback(m_okButton,
-            &QnBusyIndicatorButton::showIndicator, &QnBusyIndicatorButton::isIndicatorVisible, true);
+        QnScopedTypedPropertyRollback<bool, BusyIndicatorButton> buttonIndicatorRollback(m_okButton,
+            &BusyIndicatorButton::showIndicator, &BusyIndicatorButton::isIndicatorVisible, true);
 
         if (loop.exec() == kCancelled)
             return;
@@ -223,7 +220,7 @@ void QnStorageUrlDialog::accept()
 
         QnMessageBox messageBox(QnMessageBoxIcon::Warning,
             tr("Storage path used by another server"),
-            extras, QDialogButtonBox::Cancel);
+            extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
         messageBox.addButton(tr("Add Storage"),
             QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
 

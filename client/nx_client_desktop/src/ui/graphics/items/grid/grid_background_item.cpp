@@ -6,9 +6,10 @@
 
 #include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
-#include <utils/threaded_image_loader.h>
+#include <nx/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <client/client_settings.h>
 
@@ -36,10 +37,9 @@
 #endif
 
 using namespace nx::client::desktop;
+using nx::client::core::Geometry;
 
 namespace {
-
-static const auto loaderFilenamePropertyName = "_qn_loaderFilename";
 
 enum class ImageStatus
 {
@@ -183,7 +183,7 @@ public:
 
 QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchContext* context):
     base_type(parent),
-    QnWorkbenchContextAware(nullptr, context),
+    QnWorkbenchContextAware(context),
     d_ptr(new QnGridBackgroundItemPrivate()),
     m_panelColor(Qt::black)
 {
@@ -411,11 +411,7 @@ void QnGridBackgroundItem::updateGeometry()
     if(mapper() == NULL)
         return;
 
-    const int left = d->imageData.size.width() / 2;
-    const int top =  d->imageData.size.height() / 2;
-    d->sceneBoundingRect = QRect(-left, -top,
-        d->imageData.size.width(), d->imageData.size.height());
-
+    d->sceneBoundingRect = QnLayoutResource::backgroundRect(d->imageData.size);
     const QRectF targetRect = mapper()->mapFromGrid(d->sceneBoundingRect);
     setViewportRect(targetRect);
 }
@@ -444,16 +440,15 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok)
         return;
     }
 
-    const auto loader = new QnThreadedImageLoader(this);
+    const auto loader = new ThreadedImageLoader(this);
     loader->setInput(cache()->getFullPath(filename));
     loader->setSize(cache()->getMaxImageSize());
-    loader->setProperty(loaderFilenamePropertyName, d->imageData.fileName);
-
-    #define QnThreadedImageLoaderFinished \
-        static_cast<void (QnThreadedImageLoader::*)(const QImage& )> \
-        (&QnThreadedImageLoader::finished)
-
-    connect(loader, QnThreadedImageLoaderFinished, this, &QnGridBackgroundItem::setImage);
+    connect(loader, &ThreadedImageLoader::imageLoaded, this,
+        [this, filename = d->imageData.fileName](const QImage& image)
+        {
+            setImage(image, filename);
+        });
+    connect(loader, &ThreadedImageLoader::imageLoaded, loader, &QObject::deleteLater);
     loader->start();
 }
 
@@ -466,13 +461,9 @@ ServerImageCache* QnGridBackgroundItem::cache()
         : context()->instance<ServerImageCache>();
 }
 
-void QnGridBackgroundItem::setImage(const QImage& image)
+void QnGridBackgroundItem::setImage(const QImage& image, const QString& filename)
 {
     Q_D(QnGridBackgroundItem);
-
-    const auto filename = sender()
-        ? sender()->property(loaderFilenamePropertyName).toString()
-        : QString();
 
     if (!filename.isEmpty() && filename != d->imageData.fileName)
         return; // race condition
@@ -483,7 +474,7 @@ void QnGridBackgroundItem::setImage(const QImage& image)
     if (!d->imagesMemCache.contains(d->imageData.fileName))
         d->imagesMemCache.insert(d->imageData.fileName, image);
 
-    d->imageAspectRatio = QnGeometry::aspectRatio(image.size());
+    d->imageAspectRatio = Geometry::aspectRatio(image.size(), 0.0);
 
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
@@ -573,11 +564,11 @@ void QnGridBackgroundItem::paint(
         switch (d->imageData.mode)
         {
             case Qn::ImageBehaviour::Fit:
-                targetRect = QnGeometry::expanded(d->imageAspectRatio,
+                targetRect = Geometry::expanded(d->imageAspectRatio,
                     display()->viewportGeometry(), Qt::KeepAspectRatio, Qt::AlignCenter);
                 break;
             case Qn::ImageBehaviour::Crop:
-                targetRect = QnGeometry::expanded(d->imageAspectRatio,
+                targetRect = Geometry::expanded(d->imageAspectRatio,
                     display()->viewportGeometry(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
                 break;
             default:

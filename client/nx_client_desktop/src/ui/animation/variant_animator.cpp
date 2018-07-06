@@ -45,7 +45,7 @@ void VariantAnimator::setSpeed(qreal speed) {
         start();
 }
 
-void VariantAnimator::setAccessor(AbstractAccessor *accessor) {
+void VariantAnimator::setAccessor(nx::client::desktop::AbstractAccessor *accessor) {
     if(isRunning()) {
         qnWarning("Cannot change accessor of a running animator.");
         return;

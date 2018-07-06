@@ -21,12 +21,20 @@ BasicFixture::BasicFixture()
 
 BasicFixture::~BasicFixture()
 {
-    api::ClientFactory::setCustomFactoryFunc(
-        std::move(m_clientFactoryBak));
+    resetClientFactoryToDefault();
 }
 
-std::unique_ptr<api::Client> 
-    BasicFixture::clientFactoryFunc(const QUrl& /*relayUrl*/)
+void BasicFixture::resetClientFactoryToDefault()
+{
+    if (m_clientFactoryBak)
+    {
+        api::ClientFactory::setCustomFactoryFunc(std::move(*m_clientFactoryBak));
+        m_clientFactoryBak = boost::none;
+    }
+}
+
+std::unique_ptr<api::Client>
+    BasicFixture::clientFactoryFunc(const nx::utils::Url& /*relayUrl*/)
 {
     auto result = std::make_unique<nx::cloud::relay::api::test::ClientImpl>();
     result->setOnBeforeDestruction(

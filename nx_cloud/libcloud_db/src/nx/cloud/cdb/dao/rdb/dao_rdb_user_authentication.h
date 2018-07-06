@@ -30,6 +30,10 @@ public:
         const std::string& systemId,
         const std::string& accountId) override;
 
+    virtual std::vector<std::string> fetchSystemsWithExpiredAuthRecords(
+        nx::utils::db::QueryContext* const queryContext,
+        int systemCountLimit) override;
+
     virtual void insertUserAuthRecords(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId,
@@ -43,6 +47,10 @@ public:
     virtual void deleteAccountAuthRecords(
         nx::utils::db::QueryContext* const queryContext,
         const std::string& accountId) override;
+
+    virtual void deleteSystemAuthRecords(
+        nx::utils::db::QueryContext* const queryContext,
+        const std::string& systemId) override;
 };
 
 } // namespace rdb

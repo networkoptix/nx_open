@@ -1,61 +1,64 @@
-#ifndef __GET_IMAGE_HELPER_H__
-#define __GET_IMAGE_HELPER_H__
+#pragma once
+
+#include <memory>
 
 #include <QByteArray>
 
-#include <api/helpers/thumbnail_request_data.h>
-
 #include <core/resource/resource_fwd.h>
-#include <camera/video_camera.h>
+
+#include <nx/api/mediaserver/image_request.h>
+
+#include <nx/streaming/data_packet_queue.h>
 
 #include <transcoding/filters/abstract_image_filter.h>
 
+#include "camera_fwd.h"
+#include "nx/streaming/media_data_packet.h"
+
 class CLVideoDecoderOutput;
-typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
-class QnServerArchiveDelegate;
+typedef CLVideoDecoderOutputPtr CLVideoDecoderOutputPtr;
+class QnAbstractArchiveDelegate;
 
 class QnGetImageHelper
 {
 public:
     QnGetImageHelper() {}
 
-    static QSharedPointer<CLVideoDecoderOutput> getImage(
-          const QnSecurityCamResourcePtr &camera
-        , qint64 timeUsec
-        , const QSize& size
-        , QnThumbnailRequestData::RoundMethod roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod
-        , int rotation = QnThumbnailRequestData::kDefaultRotation);
+    static CLVideoDecoderOutputPtr getImage(const nx::api::CameraImageRequest& request);
 
-    static QByteArray encodeImage(const QSharedPointer<CLVideoDecoderOutput>& outFrame, const QByteArray& format);
+    static QByteArray encodeImage(
+        const CLVideoDecoderOutputPtr& outFrame, const QByteArray& format);
 
 private:
-    static QSharedPointer<CLVideoDecoderOutput> readFrame(
-          qint64 timeUsec
-        , bool useHQ
-        , QnThumbnailRequestData::RoundMethod roundMethod
-        , const QnSecurityCamResourcePtr &camera
-        , QnServerArchiveDelegate &serverDelegate
-        , int prefferedChannel);
+    static CLVideoDecoderOutputPtr readFrame(
+        const nx::api::CameraImageRequest& request,
+        bool usePrimaryStream,
+        QnAbstractArchiveDelegate* archiveDelegate,
+        int prefferedChannel,
+        bool& isOpened);
 
-    static QSize updateDstSize(const QSharedPointer<QnSecurityCamResource>& res, const QSize& dstSize, QSharedPointer<CLVideoDecoderOutput> outFrame);
+    static QSize updateDstSize(
+        const QnVirtualCameraResourcePtr& camera,
+        const QSize& dstSize,
+        CLVideoDecoderOutputPtr outFrame,
+        nx::api::ImageRequest::AspectRatio aspectRatio);
 
-    static QSharedPointer<CLVideoDecoderOutput> getImageWithCertainQuality(
-          bool useHQ
-        , const QnSecurityCamResourcePtr &camera
-        , qint64 timeUsec
-        , const QSize& size
-        , QnThumbnailRequestData::RoundMethod roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod
-        , int rotation = -1 );
+    static CLVideoDecoderOutputPtr getImageWithCertainQuality(
+        bool usePrimaryStream, const nx::api::CameraImageRequest& request);
 
-    static QSharedPointer<CLVideoDecoderOutput> getMostPreciseImageFromLive(
-        QnVideoCameraPtr& camera,
-        bool useHq,
-        quint64 time,
-        int channel);
+    static CLVideoDecoderOutputPtr decodeFrameFromCaches(
+        QnVideoCameraPtr camera,
+        bool usePrimaryStream,
+        qint64 timestampUs,
+        int preferredChannel,
+        nx::api::ImageRequest::RoundMethod roundMethod);
 
     static CLVideoDecoderOutputPtr decodeFrameSequence(
-        std::unique_ptr<QnConstDataPacketQueue>& sequence,
-        quint64 time);
-};
+        std::unique_ptr<QnConstDataPacketQueue>& sequence, quint64 timestampUs);
 
-#endif // __GET_IMAGE_HELPER_H__
+    static CLVideoDecoderOutputPtr decodeFrameFromLiveCache(
+        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera);
+
+    static std::unique_ptr<QnConstDataPacketQueue> getLiveCacheGopTillTime(
+        bool usePrimaryStream, qint64 timestampUs, QnVideoCameraPtr camera);
+};

@@ -6,7 +6,7 @@
     "emailSubject": "사용자 암호 초기화"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} 님이 당신을 {{PRODUCT_NAME}}에 초대했습니다."
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} 께서 당신을 %PRODUCT_NAME%{{/message.sharer_name}}에 초대합니다{{^message.sharer_name}}께서 {{message.system_name}}시스템을 {{/message.sharer_name}}에게 공유 하였습니다"
   },
   "system_shared": {
     "emailSubject": "비디오 시스템 {{message.system_name}} 공유 되었습니다."

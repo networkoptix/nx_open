@@ -25,7 +25,7 @@ enum class SerializerState
     needMoreBufferSpace = 1,
     done = 2,
 };
-    
+
 /**
  * Demonstrates API of message parser.
  */
@@ -50,10 +50,10 @@ public:
     virtual ParserState parse(const nx::Buffer& /*buf*/, size_t* /*bytesProcessed*/) = 0;
 
     /**
-     * If parser supports streaming message body 
+     * If parser supports streaming message body
      *   (AbstractMessageParser::parse implementation can return ParserState::readingBody),
      *   then it should be returned here.
-     * If parser does not support it (never reports ParserState::readingBody) state, 
+     * If parser does not support it (never reports ParserState::readingBody) state,
      *   then it should leave dummy implementation.
      */
     virtual nx::Buffer fetchMessageBody() { return nx::Buffer(); };

@@ -13,6 +13,8 @@ ROOT_DIR = $$clean_path("${root.dir}")
 
 CONFIG += unversioned_soname unversioned_libname
 
+CONFIG += object_parallel_to_source
+
 ## GLOBAL CONFIGURATIONS
 !ios|equals(TEMPLATE, app) {
     CONFIG += precompile_header
@@ -41,6 +43,8 @@ if (android | ios) {
 
 include( optional_functionality.pri )
 
+#Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
+#DEFINES += USE_OWN_MUTEX ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
 
 CONFIG(debug, debug|release) {
   CONFIGURATION=debug
@@ -53,8 +57,6 @@ CONFIG(debug, debug|release) {
   !linux-clang {
     # Temporary fix for linux clang 3.6-3.7 that crashes with our mutex.
     DEFINES += USE_OWN_MUTEX
-    #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
-    #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
   }
   CONFIG += qml_debug
 }
@@ -119,29 +121,43 @@ INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 $$ROOT_DIR/common_libs/nx_utils/src \
                 $$ROOT_DIR/common_libs/nx_media/src \
                 $$ROOT_DIR/common_libs/nx_audio/src \
+                $$ROOT_DIR/vms_libs/nx_vms_api/src \
                 ${packages.dir}/any/nx_kit/src \
                 $$clean_path("${libdir}")/include \
                 $$ADDITIONAL_QT_INCLUDES
+
+INCLUDEPATH += $$ROOT_DIR/common_libs/nx_plugin_utils/src/
+INCLUDEPATH += $$ROOT_DIR/common_libs/nx_sdk/src/
 
 win* {
     DEFINES += \
         NX_KIT_API=__declspec(dllimport) \
         NX_NETWORK_API=__declspec(dllimport) \
+        NX_UPDATE_API=__declspec(dllimport) \
         NX_CASSANDRA_API=__declspec(dllimport) \
         NX_UTILS_API=__declspec(dllimport) \
         NX_FUSION_API=__declspec(dllimport) \
         NX_VMS_UTILS_API=__declspec(dllimport) \
         UDT_API=__declspec(dllimport) \
+        NX_RELAYING_API=__declspec(dllimport) \
+        NX_VMS_GATEWAY_API=__declspec(dllimport) \
+        NX_DATA_SYNC_ENGINE_API=__declspec(dllimport) \
+        NX_VMS_API=__declspec(dllimport) \
 
 } else {
     DEFINES += \
         NX_KIT_API= \
         NX_NETWORK_API= \
+        NX_UPDATE_API= \
         NX_CASSANDRA_API= \
         NX_UTILS_API= \
         NX_FUSION_API= \
         NX_VMS_UTILS_API= \
         UDT_API= \
+        NX_RELAYING_API= \
+        NX_VMS_GATEWAY_API= \
+        NX_DATA_SYNC_ENGINE_API= \
+        NX_VMS_API= \
 
 }
 
@@ -209,23 +225,17 @@ win* {
     QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
   }
 
-  !staticlib {
-    DEFINES += QN_EXPORT=Q_DECL_EXPORT
-  }
-  else {
-    DEFINES += QN_EXPORT=
-  }
-
   QMAKE_MOC_OPTIONS += -DQ_OS_WIN
 }
 
 ## BOTH LINUX AND MAC
 unix: {
-  DEFINES += QN_EXPORT=
+  QMAKE_CXXFLAGS -= -std=c++11
+  QMAKE_CXXFLAGS -= -std=c++1y
+  QMAKE_CXXFLAGS -= -std=gnu++1y
+
   clang {
     QMAKE_CXXFLAGS += -Wno-c++14-extensions -Wno-inconsistent-missing-override
-  } else {
-    #QMAKE_CXXFLAGS += -std=c++1y
   }
   QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 
@@ -254,11 +264,12 @@ linux*:!android {
         QMAKE_CXXFLAGS += -msse4.1
     }
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
+    QMAKE_CXXFLAGS += -fstack-protector-all
   } else {
     LIBS -= -lssl
     LIBS += ${linux.arm.oslibs}
     QMAKE_CXXFLAGS += -fno-omit-frame-pointer
-    CONFIG(release, debug|release)|!equals(BOX, tx1): QMAKE_CXXFLAGS += -ggdb1
+    CONFIG(release, debug|release): QMAKE_CXXFLAGS += -ggdb1
   }
   QMAKE_LFLAGS += -rdynamic -Wl,--no-undefined
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
@@ -313,3 +324,7 @@ CONFIG(debug, debug|release) {
   include(dependencies.pri)
 }
 
+unix: {
+  QMAKE_CXXFLAGS_CXX14 = -std=c++17
+  QMAKE_CXXFLAGS_GNUCXX14 = -std=c++17
+}

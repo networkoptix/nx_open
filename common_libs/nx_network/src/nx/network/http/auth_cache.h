@@ -10,169 +10,114 @@
 #include <QtCore/QUrl>
 
 #include <nx/network/socket_common.h>
+#include <nx/utils/url.h>
 
+#include "auth_tools.h"
 #include "http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 struct AuthInfo
 {
-    QString username;
-    QString password;
-    QString proxyUsername;
-    QString proxyPassword;
+    Credentials user;
+    Credentials proxyUser;
+    // TODO: #ak Remove proxyEndpoint from here.
     SocketAddress proxyEndpoint;
 };
 
-//!This cache is to help http clients to authenticate on server without receiving HTTP Unauthorized error first
+/**
+ * This cache is to help http clients to authenticate on server without receiving HTTP Unauthorized error first.
+ */
 class NX_NETWORK_API AuthInfoCache
 {
 public:
     class AuthorizationCacheItem
     {
     public:
-        QUrl url;
+        nx::utils::Url url;
         StringType method;
-        StringType userName;
-        boost::optional<StringType> password;
-        boost::optional<BufferType> ha1;
+        Credentials userCredentials;
         std::shared_ptr<header::WWWAuthenticate> wwwAuthenticateHeader;
         std::shared_ptr<header::Authorization> authorizationHeader;
 
-        AuthorizationCacheItem() {}
-        template<
-            typename WWWAuthenticateRef,
-            typename AuthorizationRef
-        >
+        AuthorizationCacheItem() = default;
+
         AuthorizationCacheItem(
-            const QUrl& url,
+            const nx::utils::Url& url,
             const StringType& method,
-            const StringType& userName,
-            boost::optional<StringType> password,
-            boost::optional<BufferType> ha1,
-            WWWAuthenticateRef&& wwwAuthenticateHeader,
-            AuthorizationRef&& authorization )
-        :
-            url( url ),
-            method( method ),
-            userName( userName ),
-            password( std::move(password) ),
-            ha1( std::move(ha1) ),
+            const Credentials& userCredentials,
+            header::WWWAuthenticate wwwAuthenticateHeader,
+            header::Authorization authorization)
+            :
+            url(url),
+            method(method),
+            userCredentials(userCredentials),
             wwwAuthenticateHeader(
                 std::make_shared<header::WWWAuthenticate>(
-                    std::forward<WWWAuthenticateRef>(wwwAuthenticateHeader) ) ),
+                    std::move(wwwAuthenticateHeader))),
             authorizationHeader(
                 std::make_shared<header::Authorization>(
-                    std::forward<AuthorizationRef>(authorization) ) )
+                    std::move(authorization)))
         {
         }
 
-        //AuthorizationCacheItem( AuthorizationCacheItem&& right ) = default;
-        AuthorizationCacheItem( AuthorizationCacheItem&& right )
-        :
-            url( std::move(right.url) ),
-            method( std::move(right.method) ),
-            userName( std::move(right.userName) ),
-            password( std::move(right.password ) ),
-            ha1( std::move(right.ha1 ) ),
-            wwwAuthenticateHeader( std::move(right.wwwAuthenticateHeader ) ),
-            authorizationHeader( std::move(right.authorizationHeader ) )
-        {
-        }
-
-        //AuthorizationCacheItem( const AuthorizationCacheItem& right ) = default;
-        AuthorizationCacheItem( const AuthorizationCacheItem& right )
-        :
-            url( right.url ),
-            method( right.method ),
-            userName( right.userName ),
-            password( right.password ),
-            ha1( right.ha1 ),
-            wwwAuthenticateHeader( right.wwwAuthenticateHeader ),
-            authorizationHeader( right.authorizationHeader )
-        {
-        }
-
-        //AuthorizationCacheItem& operator=( const AuthorizationCacheItem& ) = default;
-        AuthorizationCacheItem& operator=( const AuthorizationCacheItem& right )
-        {
-            if( &right == this )
-                return *this;
-
-            url = right.url;
-            method = right.method;
-            userName = right.userName;
-            password = right.password;
-            ha1 = right.ha1;
-            wwwAuthenticateHeader = right.wwwAuthenticateHeader;
-            authorizationHeader = right.authorizationHeader;
-
-            return *this;
-        }
-
-        //AuthorizationCacheItem& operator=( AuthorizationCacheItem&& ) = default;
-        AuthorizationCacheItem& operator=( AuthorizationCacheItem&& right )
-        {
-            if( &right == this )
-                return *this;
-
-            url = std::move(right.url);
-            method = std::move(right.method);
-            userName = std::move(right.userName);
-            password = std::move(right.password);
-            ha1 = std::move(right.ha1);
-            wwwAuthenticateHeader = std::move(right.wwwAuthenticateHeader);
-            authorizationHeader = std::move(right.authorizationHeader);
-
-            return *this;
-        }
+        AuthorizationCacheItem(AuthorizationCacheItem&& /*right*/) = default;
+        AuthorizationCacheItem(const AuthorizationCacheItem& /*right*/) = default;
+        AuthorizationCacheItem& operator=(const AuthorizationCacheItem& /*right*/) = default;
+        AuthorizationCacheItem& operator=(AuthorizationCacheItem&& /*right*/) = default;
     };
 
+    AuthInfoCache() = default;
 
-    AuthInfoCache();
-
-    //!Save successful authorization information in cache for later use
+    /**
+     * Save successful authorization information in cache for later use.
+     */
     template<typename AuthorizationCacheItemRef>
-    void cacheAuthorization( AuthorizationCacheItemRef&& item )
+    void cacheAuthorization(AuthorizationCacheItemRef&& item)
     {
-        std::lock_guard<std::mutex> lk( m_mutex );
+        std::lock_guard<std::mutex> lk(m_mutex);
 
-        m_cachedAuthorization.reset( new AuthorizationCacheItem(
-            std::forward<AuthorizationCacheItemRef>(item) ) );
+        m_cachedAuthorization.reset(new AuthorizationCacheItem(
+            std::forward<AuthorizationCacheItemRef>(item)));
     }
 
-    //!Adds Authorization header to \a request, if corresponding data can be found in cache
-    /*!
-        \return \a true if necessary information has been found in cache and added to \a request. \a false otherwise
-    */
+    /**
+     * Adds Authorization header to request, if corresponding data can be found in cache.
+     * @return True if necessary information has been found in cache and added to request.
+     *   False otherwise.
+     */
     bool addAuthorizationHeader(
-        const QUrl& url,
+        const nx::utils::Url& url,
         Request* const request,
-        AuthInfoCache::AuthorizationCacheItem* const authzData );
+        AuthInfoCache::AuthorizationCacheItem* const authzData);
 
-    /*!
-        \param url This argument is required since \a request->requestLine.url can contain only path
-    */
+    /**
+     * @param url Required since request->requestLine.url can contain only path.
+     */
     static bool addAuthorizationHeader(
-        const QUrl& url,
+        const nx::utils::Url& url,
         Request* const request,
-        AuthInfoCache::AuthorizationCacheItem authzData );
+        AuthInfoCache::AuthorizationCacheItem authzData);
     static AuthInfoCache* instance();
 
 private:
-    //!Authorization header, successfully used with \a m_url
-    /*!
-        //TODO #ak (2.4) this information should stored globally depending on server endpoint, server path, user credentials
-    */
+    // TODO: #ak (2.4) This information should stored globally depending on server endpoint, server path, user credentials.
+    /**
+     * Authorization header, successfully used with m_url.
+     */
     std::unique_ptr<AuthorizationCacheItem> m_cachedAuthorization;
     mutable std::mutex m_mutex;
 
     AuthorizationCacheItem getCachedAuthentication(
-        const QUrl& url,
-        const StringType& method ) const;
+        const nx::utils::Url& url,
+        const StringType& method) const;
 
-    AuthInfoCache( const AuthInfoCache& );
-    AuthInfoCache& operator=( const AuthInfoCache& );
+    AuthInfoCache(const AuthInfoCache&);
+    AuthInfoCache& operator=(const AuthInfoCache&);
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

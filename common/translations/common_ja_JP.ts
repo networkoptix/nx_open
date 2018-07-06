@@ -53,11 +53,6 @@
       <translation>検出されたシステム %1 は互換性のないバージョン %2 です</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>現在のシステムは既に %1 に接続されているために他のシステムに接続できません</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>検出されたシステム %1 はセーフモードです</translation>
@@ -68,19 +63,33 @@
       <translation>リモート システム %1 を構成できませんでした</translation>
     </message>
     <message>
+      <source>New System</source>
+      <translation>新規システム</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>検出されたシステム%1は、現在のシステムと互換性がありません</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>現在のシステムは既に %1 に接続されているために他のシステムに接続できません</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます</translation>
+    </message>
+    <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>両方のシステムは %1 に接続しています　統合は許可されていません</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>これらのシステムは異なる %1 の URL で構築されています　統合は許可されていません</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>クラウド システムへの統合はクラウドに接続されていないシステムとのみ結合できます　システム名とパスワードはクラウド システムから取得されます。</translation>
     </message>
   </context>
   <context>
@@ -246,18 +255,6 @@
       <translation>ポートt %1 にアクセス可能か確認してください.</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>まず、録画をOnにしてデバイス設定で fps を減少します</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>まず、録画をOnにしてカメラ設定で fps を減少します</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>まず、録画をOnにしてI/Oモジュール設定で fps を減少します</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>解決しない場合はデバイスの web ページで工場出荷時に戻します</translation>
     </message>
@@ -304,6 +301,22 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>カメラはアーカイブから復元されました　カメラを削除して再度登録すると、ライブビデオが表示されます</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>まず、録画をOnにしてデバイス設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>まず、録画をOnにしてカメラ設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>まず、録画をOnにしてI/Oモジュール設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>ファームウェアを更新してください。最小サポートバージョンは %1です。現在のバージョンは %2です</translation>
     </message>
   </context>
   <context>
@@ -477,6 +490,14 @@
       <source>Time Licenses</source>
       <translation>タイムライセンス</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>ブリッジ</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>ブリッジライセンス</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -536,7 +557,7 @@
       <translation>不明なエラー</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>サーバーのハードウェアIDが見つかりません</translation>
     </message>
   </context>
@@ -653,12 +674,12 @@
       <translation>透かし: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ハードウェア Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>タイムライセンス</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ハードウェア ID: %1</translation>
     </message>
   </context>
   <context>
@@ -755,6 +776,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>データ エクスポートに無効なリソースタイプ</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>データはエクスポートされませんでした</translation>
     </message>
   </context>
   <context>
@@ -1174,7 +1199,7 @@
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>IOモジュール %1 切断</translation>
+      <translation>I/Oモジュール %1 切断</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -1279,13 +1304,13 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n 時, 開始: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n, %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1465,6 +1490,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>承認</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>解析イベント</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%2 の %1</translation>
     </message>
   </context>
   <context>

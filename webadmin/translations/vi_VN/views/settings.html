@@ -15,14 +15,14 @@
             </alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Cổng</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Cổng" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -40,10 +40,10 @@
                             Tách máy chủ ra khỏi hệ thống hiện tại. Lưu trữ video sẽ vẫn còn nguyên vẹn.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Khôi phục mặc định của nha sản xuât</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Tách máy chủ khỏi hệ thống</h3>
                         <p>Hành động này sẽ tách máy chủ khỏi hệ thống giữ cơ sở dữ liệu, người dùng cục bộ và cấu hình.
-                            Lưu trữ video sẽ vẫn còn nguyên vẹn. Tất cả các tài khoản đám mây sẽ bị xóa</p>
+                            Lưu trữ video sẽ vẫn còn nguyên vẹn. <b>Tất cả các tài khoản đám mây sẽ bị xóa</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Tách máy chủ khỏi hệ thống</button></p>
                     </div>
                     <div>
@@ -64,9 +64,9 @@
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>tên</h3>
                         <div class="row">
@@ -111,9 +111,9 @@
                                    target="_blank"> Tạo {{Config.cloud.productName}} Tài khoản </a></p>
                         </div>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
                         <h3>Cài đặt Mạng Thiết bị</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
@@ -142,7 +142,7 @@
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -155,7 +155,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -172,8 +172,8 @@
                         <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()"> Chạy máy trạm </button> <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()"> Ngừng máy trạm </button></p>
                         <p>Sử dụng bàn phím / chuột hoặc ứng dụng di động để kiểm soát nó.</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

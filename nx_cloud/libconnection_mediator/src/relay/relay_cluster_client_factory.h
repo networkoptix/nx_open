@@ -8,7 +8,7 @@
 namespace nx {
 namespace hpm {
 
-using RelayClusterClientFactoryFunction = 
+using RelayClusterClientFactoryFunction =
     std::unique_ptr<AbstractRelayClusterClient>(const conf::Settings&);
 
 class RelayClusterClientFactory:
@@ -22,7 +22,7 @@ public:
     static RelayClusterClientFactory& instance();
 
 private:
-    std::unique_ptr<AbstractRelayClusterClient> 
+    std::unique_ptr<AbstractRelayClusterClient>
         defaultFactoryFunction(const conf::Settings& settings);
 };
 

@@ -3,6 +3,7 @@
 #include <nx/utils/system_error.h>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/connection_server/server_statistics.h>
 
 #include "message.h"
 #include "message_parser.h"
@@ -10,16 +11,18 @@
 #include "unreliable_message_pipeline.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 class MessageDispatcher;
 
 /**
  * Receives STUN message over udp, forwards them to dispatcher, sends response message.
- * @note Class methods are not thread-safe.
+ * NOTE: Class methods are not thread-safe.
  */
 class NX_NETWORK_API UdpServer:
     public network::aio::BasicPollable,
+    public network::server::AbstractStatisticsProvider,
     private nx::network::UnreliableMessagePipelineEventHandler<Message>
 {
     typedef nx::network::UnreliableMessagePipeline<
@@ -54,6 +57,8 @@ public:
         utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler);
     const std::unique_ptr<network::UDPSocket>& socket();
 
+    virtual nx::network::server::Statistics statistics() const override;
+
 private:
     PipelineType m_messagePipeline;
     bool m_boundToLocalAddress;
@@ -66,4 +71,5 @@ private:
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

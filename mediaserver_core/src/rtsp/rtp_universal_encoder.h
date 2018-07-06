@@ -22,7 +22,7 @@ public:
         QnConstAbstractMediaDataPtr media,
         AVCodecID transcodeToCodec,
         const QSize& videoSize,
-        const QnImageFilterHelper& extraTranscodeParams);
+        const QnLegacyTranscodingSettings& extraTranscodeParams);
 
     virtual QByteArray getAdditionSDP( const std::map<QString, QString>& streamParams ) override;
 

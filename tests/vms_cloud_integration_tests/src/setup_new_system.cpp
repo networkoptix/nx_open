@@ -1,17 +1,24 @@
+#include <memory>
+
 #include <gtest/gtest.h>
+
+#include <nx/network/url/url_builder.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
 class FtConfiguringNewSystem:
     public MediaServerCloudIntegrationTest
 {
-public:
-    FtConfiguringNewSystem()
-    {
-        init();
-    }
+    using base_type = MediaServerCloudIntegrationTest;
 
 protected:
+    void SetUp() override
+    {
+        base_type::SetUp();
+
+        ASSERT_TRUE(registerRandomCloudAccount());
+    }
+
     void givenSystemCredentialsRegisteredInCloud()
     {
         ASSERT_TRUE(registerCloudSystem());
@@ -28,15 +35,19 @@ protected:
 
         ASSERT_EQ(
             QnJsonRestResult::NoError,
-            client.setupCloudSystem(std::move(request)).error);
+            client->setupCloudSystem(std::move(request)).error);
     }
 
     void thenSystemMustBeAccessibleWithCloudOwnerCredentials()
     {
-        MediaServerClient client(mediaServerEndpoint());
-        client.setUserName(QString::fromStdString(accountEmail()));
-        client.setPassword(QString::fromStdString(accountPassword()));
-        ec2::ApiResourceParamDataList vmsSettings;
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
+
+        client.setUserCredentials(nx::network::http::Credentials(
+            accountEmail().c_str(),
+            nx::network::http::PasswordAuthToken(accountPassword().c_str())));
+        nx::vms::api::ResourceParamDataList vmsSettings;
         ASSERT_EQ(ec2::ErrorCode::ok, client.ec2GetSettings(&vmsSettings));
     }
 
@@ -49,9 +60,12 @@ protected:
 
     void detachSystemFromCloud()
     {
-        MediaServerClient client(mediaServerEndpoint());
-        client.setUserName(QString::fromStdString(accountEmail()));
-        client.setPassword(QString::fromStdString(accountPassword()));
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
+        client.setUserCredentials(nx::network::http::Credentials(
+            accountEmail().c_str(),
+            nx::network::http::PasswordAuthToken(accountPassword().c_str())));
 
         ASSERT_EQ(
             QnJsonRestResult::NoError,
@@ -60,11 +74,14 @@ protected:
 
     void assertSystemAcceptsDefaultCredentials()
     {
-        MediaServerClient client(mediaServerEndpoint());
-        client.setUserName("admin");
-        client.setPassword("admin");
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
+        client.setUserCredentials(nx::network::http::Credentials(
+            "admin",
+            nx::network::http::PasswordAuthToken("admin")));
 
-        ec2::ApiResourceParamDataList vmsSettings;
+        nx::vms::api::ResourceParamDataList vmsSettings;
         ASSERT_EQ(
             ec2::ErrorCode::ok,
             client.ec2GetSettings(&vmsSettings));
@@ -72,9 +89,12 @@ protected:
 
     void assertIfSystemHasNotBecameNew()
     {
-        MediaServerClient client(mediaServerEndpoint());
-        client.setUserName("admin");
-        client.setPassword("admin");
+        MediaServerClient client(
+            nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+                .setEndpoint(mediaServerEndpoint()));
+        client.setUserCredentials(nx::network::http::Credentials(
+            "admin",
+            nx::network::http::PasswordAuthToken("admin")));
 
         for (;;)
         {
@@ -85,12 +105,6 @@ protected:
             if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
                 break;
         }
-    }
-
-private:
-    void init()
-    {
-        ASSERT_TRUE(registerRandomCloudAccount());
     }
 };
 

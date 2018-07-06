@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
   <context>
+    <name>AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>KEINE DATEN</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -47,6 +54,10 @@ to view more bookmarks</source>
     <message>
       <source>Delete bookmark</source>
       <translation>Lesezeichen löschen</translation>
+    </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation>Lesezeichen exportieren</translation>
     </message>
   </context>
   <context>
@@ -127,7 +138,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Serververbindung getrennt</translation>
+      <translation>Serververbindung trennen</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -361,18 +372,6 @@ to view more bookmarks</source>
       <translation>Entferne Lesezeichen...</translation>
     </message>
     <message>
-      <source>Export Selected Area...</source>
-      <translation>Ausgewählten Bereich exportieren...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>Multi-Video exportieren...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>Rapid Review exportieren...</translation>
-    </message>
-    <message>
       <source>Preview Search...</source>
       <translation>Vorschau-Suche...</translation>
     </message>
@@ -475,22 +474,6 @@ to view more bookmarks</source>
     <message>
       <source>Hide Info</source>
       <translation>Info ausblenden</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>Auflösung ändern...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Niedrig</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Hoch</translation>
     </message>
     <message>
       <source>PTZ...</source>
@@ -705,14 +688,6 @@ to view more bookmarks</source>
       <translation>Mit dem aktuellen System verschmelzen...</translation>
     </message>
     <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>Seitenverhältnis der Zelle ändern...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>Zellenabstand ändern...</translation>
-    </message>
-    <message>
       <source>None</source>
       <translation>Keine</translation>
     </message>
@@ -872,6 +847,50 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>Demoband erstellen</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation>Tragbare Kamera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation>Neue tragbare Kamera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>Datei hochladen...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>Ordner hochladen...</translation>
+    </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation>Analytik starten...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>Einige Kameras erfordern das Setzen von Passwörtern</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation>Video exportieren...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>Lesezeichen exportieren...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation>Auflösung...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation>Zelle Seitenverhältnis...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation>Zellabstand...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -959,8 +978,66 @@ to view more bookmarks</source>
       <translation>Anzahl der Deaktivierungen für diese Lizenz überschritten.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>Hardware-ID vom Server mit dieser Lizenz stimmt nicht mit der Hardware-ID überein auf der die Lizenz aktiviert wurde.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>Ausgewählte Einstellungen erfordern eine Umkodierung. Es erhöht die CPU-Auslastung und kann viel Zeit in Anspruch nehmen.</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>Das AVI-Format wird nicht empfohlen, um eine nicht fortlaufende Aufzeichnung mit Audiospur zu exportieren.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>Wir empfehlen, Videos von dieser Kamera als &quot;Multi Video&quot; zu exportieren, um ein Herunterskalieren zu vermeiden.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>Sie sind im Begriff, ein langes Video zu exportieren. Es kann mehr als ein Gigabyte an Festplattenplatz benötigen und mehrere Minuten dauern.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>Exportierte .EXE-Datei hat eine Größe von mehr als 4 GB und kann nicht durch Doppelklicken in Windows geöffnet werden. Es kann nur im %1-Client abgespielt werden.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>Lokale Dateien, Servermonitor-Widgets und Webseiten werden nicht exportiert.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation>Einstellungen sind für .NOV und .EXE-Dateien nicht verfügbar.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation>Audio Video Interleave</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation>Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation>MPEG-4 Part 14</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation>%1 Mediendatei</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation>Ausführbare %1 Mediendatei (x64)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation>Ausführbare %1 Mediendatei (x86)</translation>
     </message>
   </context>
   <context>
@@ -1036,8 +1113,24 @@ to view more bookmarks</source>
       <translation>Datei &quot;%1&quot; ist bereits vorhanden. Bitte versuchen Sie einen anderen Namen.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>Datei &quot;%1&quot; wird von einem anderen Prozess verwendet. Bitte versuchen Sie einen anderen Namen.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation>Die Datei &quot;%1&quot; wird von einem anderen Prozess verwendet.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation>Die Datei &quot;%1&quot; kann nicht beschrieben werden. Bitte versuchen Sie einen anderen Namen.</translation>
+    </message>
+    <message>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation>Der Dateiname &quot;%1&quot; ist vom Betriebssystem reserviert. Bitte versuchen Sie einen anderen Namen.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation>
+        <numerusform>Der Dateiname darf das folgende Zeichen nicht enthalten:</numerusform>
+        <numerusform>Der Dateiname darf die folgenden Zeichen nicht enthalten:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1063,10 +1156,6 @@ to view more bookmarks</source>
       <translation>Kurz</translation>
     </message>
     <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>Das Passwort muss mindestens 8 Zeichen lang sein.</translation>
-    </message>
-    <message>
       <source>Common</source>
       <translation>Gewöhnlich</translation>
     </message>
@@ -1081,6 +1170,49 @@ to view more bookmarks</source>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>Es sind nur lateinische Buchstaben, Ziffern und Tastatursymbole erlaubt.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation>
+        <numerusform>Das Passwort sollte %n verschiedene Kombinationen von Zeichen, Symbolen oder Ziffern enthalten</numerusform>
+        <numerusform>Das Passwort sollte %n verschiedene Kombinationen von Zeichen, Symbolen oder Ziffern enthalten</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation>
+        <numerusform>Das Passwort muss mindestens %n Zeichen lang sein.</numerusform>
+        <numerusform>Das Passwort muss mindestens %n Zeichen lang sein.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>Lang</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation>
+        <numerusform>Das Passwort darf nicht länger als %n Zeichen sein.</numerusform>
+        <numerusform>Das Passwort darf nicht länger als %n Zeichen sein.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation>
+        <numerusform>Das Passwort sollte nicht %n oder mehr aufeinanderfolgende Zeichen zusammen enthalten.</numerusform>
+        <numerusform>Das Passwort sollte nicht %n oder mehr aufeinanderfolgende Zeichen zusammen enthalten.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation>
+        <numerusform>Passwort darf keine %n oder mehr wiederholte Zeichen enthalten.</numerusform>
+        <numerusform>Passwort darf keine %n oder mehr wiederholte Zeichen enthalten.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>Es sind nur lateinische Buchstaben, Ziffern und Tastatursymbole %1 erlaubt.</translation>
     </message>
   </context>
   <context>
@@ -1218,13 +1350,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>Nur Lesen</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
@@ -1276,6 +1401,17 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>Ordner nicht gefunden</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>Hoher Minimumwert kann die Archivlänge von anderen Geräten beeinflussen.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>Hoher Minimumwert kann die Archivlänge von anderen Kameras beeinflussen.</translation>
     </message>
   </context>
   <context>
@@ -1666,10 +1802,6 @@ to view more bookmarks</source>
       <translation>Versionsnummer</translation>
     </message>
     <message>
-      <source>Invalid build number</source>
-      <translation>Ungültige Versionsnummer</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>Passwort</translation>
     </message>
@@ -1687,7 +1819,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 of %n devices</source>
       <translation>
-        <numerusform>%1 von %n Geräten</numerusform>
+        <numerusform>%1 von %n Gerät</numerusform>
         <numerusform>%1 von %n Geräten</numerusform>
       </translation>
     </message>
@@ -2096,12 +2228,31 @@ to view more bookmarks</source>
       <translation>I/O-Modul hat keinen Audiostream</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
+      <source>Settings</source>
+      <translation>Einstellungen</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation>Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>Keine Einstellung</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
       <translation>I/O-Modul-ID</translation>
     </message>
     <message>
-      <source>Camera Id</source>
+      <source>Camera ID</source>
       <translation>Kamera-ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation>Analytik ist nicht verfügbar für %1</translation>
     </message>
   </context>
   <context>
@@ -2202,6 +2353,17 @@ to view more bookmarks</source>
     <message>
       <source>Secondary</source>
       <translation>Sekundär</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Kante</translation>
+    </message>
+    <message numerus="yes">
+      <source>This ID is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>Diese ID wird bereits für die folgende %n Kamera verwendet: %1</numerusform>
+        <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2321,6 +2483,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>Server</translation>
     </message>
+    <message>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2355,12 +2521,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>Aufnahme oder Bewegungserkennung deaktiviert für %1</numerusform>
-        <numerusform>Aufnahme oder Bewegungserkennung deaktiviert für %1</numerusform>
-      </translation>
+      <translation>Aufnahme oder Bewegungserkennung deaktiviert für %1</translation>
     </message>
   </context>
   <context>
@@ -2381,13 +2544,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>New Password</source>
+      <translation>Neues Passwort</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation>Passwort wiederholen</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>Passwörter stimmen nicht überein.</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation>Das Passwort sollte mindestens 8 Zeichen lang sein und verschiedene Arten von Zeichen enthalten.</translation>
+    </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>Das Passwort sollte nicht identisch mit dem Kamerabenutzernamen sein</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>Aufnahme deaktiviert für %1</numerusform>
-        <numerusform>Aufnahmen deaktiviert für %1</numerusform>
-      </translation>
+      <translation>Aufnahmen deaktiviert für %1</translation>
     </message>
   </context>
   <context>
@@ -2407,14 +2590,6 @@ to view more bookmarks</source>
     <message>
       <source>based on server time</source>
       <translation>basierend auf Serverzeit</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Hoher Minimumwert kann die Archivlänge von anderen Geräten beeinflussen.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Hoher Minimumwert kann die Archivlänge von anderen Kameras beeinflussen.</translation>
     </message>
     <message>
       <source>Not enough licenses to enable recording</source>
@@ -2459,6 +2634,18 @@ to view more bookmarks</source>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>Um es zu aktivieren/anzupassen, wechseln Sie zur Registerkarte &quot;Motion&quot; in den Kameraeinstellungen.</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>Weniger Einstellungen</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>Weitere Einstellungen</translation>
     </message>
   </context>
   <context>
@@ -2555,6 +2742,14 @@ to view more bookmarks</source>
       <source>No device selected.</source>
       <translation>Keine Geräte markiert.</translation>
     </message>
+    <message>
+      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+      <translation>Eigenschaften für mehrere tragbare und nicht-tragbare Kameras können nicht bearbeitet werden.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable cameras.</source>
+      <translation>Eigenschaften für mehrere tragbare Kameras können nicht bearbeitet werden.</translation>
+    </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
@@ -2603,50 +2798,61 @@ devices</source>
       <translation>Verbinden Sie sich mit jedem Gerät von überall mit Ihren Systemen</translation>
     </message>
     <message>
-      <source>Known limitations</source>
-      <translation>Bekannte Einschränkungen</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>System getrennt von %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Öffne %1-Portal</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1-Account erstellen</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Verbinde System mit %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1-Account erstellen</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Verbinde System mit %1</translation>
     </message>
     <message>
-      <source>%1 is in Beta.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 ist in der Beta.</translation>
+      <source>Learn more about %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Erfahren Sie mehr über %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Account not found</source>
+      <translation>Account nicht gefunden</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Erfahren Sie mehr über %1</translation>
+      <source>Account is not activated.</source>
+      <translation>Account ist nicht aktiviert.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation>Bitte loggen Sie sich in %1 ein und folgen Sie den Anweisungen.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>Ungültiges Passwort</translation>
     </message>
   </context>
   <context>
@@ -2661,7 +2867,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kann keine Verbindung zu %1 herstellen</translation>
     </message>
   </context>
@@ -2692,12 +2898,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Verbinde mit %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1-Account eingeben</translation>
     </message>
   </context>
@@ -2709,12 +2915,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>System mit %1 verbunden</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Fehler beim Verbinden mit %1</translation>
     </message>
   </context>
@@ -2866,17 +3072,17 @@ to %1</source>
       <translation>Dieses Vorhaben ist momentan nicht erlaubt. Es könnte passieren, dass der Server jetzt neu startet. Versuchen Sie es später erneut.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Verbindung zu %1 ist noch nicht bereit. Überprüfen Sie die Internetverbindung vom Server oder versuchen Sie es später erneut.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>Verbindung zum Server konnte nicht hergestellt werden.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>Dieser Benutzer wurde vom Systemadministrator deaktiviert.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Verbindung zu %1 ist noch nicht bereit. Überprüfen Sie die Internetverbindung vom Server oder versuchen Sie es später erneut.</translation>
     </message>
   </context>
   <context>
@@ -2983,6 +3189,29 @@ to %1</source>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>Sie können eine Sicherung für Systemkonfigurationen erstellen, die bei einem Ausfall wiederhergestellt werden können.</translation>
     </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation>Datenbanksicherungsdateien</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>Für diese Kamera muss ein Passwort eingerichtet werden.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation>Bei einigen ausgewählten Kameras muss ein Passwort eingerichtet werden.</translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>Bitten Sie Ihren Systemadministrator, dies zu tun.</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation>Passwort festlegen</translation>
+    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
@@ -3081,26 +3310,27 @@ to %1</source>
       <translation>Trennen</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Alle Cloud-Nutzer werden gelöscht.</translation>
-    </message>
-    <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Fehler beim Trennen des Systems von %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>System von %1 trennen?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>Sie werden von diesem System getrennt. Sie können sich dann über das lokale Netzwerk mit dem lokalen Account neu einloggen</translation>
     </message>
     <message>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Fehler beim Trennen des Systems von %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>System von %1 trennen?</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Alle %1benutzer werden gelöscht.</translation>
+    </message>
+    <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Sie werden nicht in der Lage sein, dieses System mit Ihrem %1-Account zu verbinden, nachdem Sie dieses System von %1 getrennt haben.</translation>
     </message>
   </context>
@@ -3230,6 +3460,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation>Basic</translation>
     </message>
   </context>
   <context>
@@ -3495,8 +3729,8 @@ to %1</source>
       <translation>Impuls</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>ID</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3523,38 +3757,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>Fehler beim Anschalten von I/O-Port %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Exportieren nach &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>Konnte Gerät %1 nicht exportieren.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>Konnte Kamera %1 nicht exportieren.</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>Unbekannter Fehler aufgetreten.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>Konnte I/O-Modul %1 nicht exportieren.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>Ausgabedatei %1 konnte nicht erstellt werden...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>Datei &quot;%1&quot; wird von einem anderen Prozess verwendet. Bitte versuchen Sie einen anderen Namen.</translation>
     </message>
   </context>
   <context>
@@ -3680,6 +3882,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3710,7 +3927,7 @@ to %1</source>
       <translation>Funktionen:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>Gebunden an Hardware-ID</translation>
     </message>
   </context>
@@ -3986,16 +4203,16 @@ to %1</source>
       <translation>Kontaktieren Sie bitte den Kundensupport, um einen gültigen Lizenzschlüssel zu erhalten.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
+      <source>If the problem persists please contact Customer Support.</source>
+      <translation>Wenn das Problem weiterhin besteht, kontaktieren Sie den Kundensupport.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
       <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 verbunden</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
       <translation>Diese Lizenz ist bereits aktiviert und mit Hardware-ID %1 auf %2 verbunden</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>Wenn das Problem weiterhin besteht, kontaktieren Sie den Kundensupport.</translation>
     </message>
   </context>
   <context>
@@ -4013,31 +4230,24 @@ to %1</source>
       <translation>Lizenzdatei offnen</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Alle Dateien (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Datei konnte nicht geöffnet</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>All files</source>
+      <translation>Alle Dateien</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>Senden Sie eine Email mit dem Lizenzschlüssel und der Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>Senden Sie den Lizenzschlüssel und die Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
-    <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>Benutze entsprechende Lizenzen, um diese %n Kamera anzusehen</numerusform>
-        <numerusform>Benutze entsprechende Lizenzen, um diese %n Kameras anzusehen</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
@@ -4059,12 +4269,19 @@ to %1</source>
         <numerusform>Verwende Lizenzen für %n I/O-Module</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation>
+        <numerusform>Verwenden Sie Lizenzen zum Anzeigen dieser %n Kamera</numerusform>
+        <numerusform>Verwenden Sie Lizenzen zum Anzeigen dieser %n Kameras</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Fehler beim Anmelden bei %1</translation>
     </message>
   </context>
@@ -4182,12 +4399,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Anmelden bei %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Willkommen bei %1!</translation>
     </message>
   </context>
@@ -4297,6 +4514,17 @@ to %1</source>
       <comment>Soft Trigger</comment>
       <translation>drücken und halten</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Nach Zeitplan deaktiviert</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for all %n Cameras</source>
+      <translation>
+        <numerusform>Für %n Kamera festlegen</numerusform>
+        <numerusform>Für alle %n Kameras festlegen</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4379,6 +4607,14 @@ to %1</source>
       <source>Skip</source>
       <translation>Überspringen</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>Schließen</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Anhalten</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4437,6 +4673,10 @@ to %1</source>
       <source>Previous Chunk</source>
       <translation>Vorheriger Block</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation>NVR-Kameras unterstützen keine nicht-synchronisierte Wiedergabe</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
@@ -4451,6 +4691,25 @@ to %1</source>
     <message>
       <source>KB/s</source>
       <translation>KB/s</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation>Tragbare Kamera</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation>Tragbare Kamera %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Name</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>Name darf nicht leer sein</translation>
     </message>
   </context>
   <context>
@@ -4531,13 +4790,13 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Bestätigen</translation>
     </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>Passwörter festlegen</translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
-    <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Nutzen Sie für den vollen Funktionsumfang bitte einen anderen Computer</translation>
-    </message>
     <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 kann nur im Konfigurationsmodus arbeiten</translation>
@@ -4545,6 +4804,10 @@ to %1</source>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>Die Leistungsfähigkeit dieses Computers erlaubt das Ausführen von %1 lediglich im Konfigurationsmodus.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>Nutzen Sie für den vollen Funktionsumfang bitte einen anderen Computer</translation>
     </message>
   </context>
   <context>
@@ -4595,6 +4858,10 @@ to %1</source>
     <message>
       <source>Manage Bookmarks</source>
       <translation>Lesezeichen verwalten</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation>Die Benachrichtigung wird angezeigt, bis einer der Benutzer ein Lesezeichen mit Ereignisbeschreibung erstellt</translation>
     </message>
   </context>
   <context>
@@ -4798,22 +5065,6 @@ to %1</source>
       <source>Quarter Native</source>
       <translation>1/4 Nativ</translation>
     </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920x1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280x720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640x480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320x240</translation>
-    </message>
   </context>
   <context>
     <name>QnRecordingStatsModel</name>
@@ -5008,13 +5259,6 @@ to %1</source>
     <message>
       <source>Health Monitor</source>
       <translation>Statusüberwachung</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnResourcePreviewWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>KEINE DATEN</translation>
     </message>
   </context>
   <context>
@@ -5413,10 +5657,6 @@ to %1</source>
       <translation>Updatedatei auswählen...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Updatedateien (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Release Notes</translation>
     </message>
@@ -5600,6 +5840,10 @@ to %1</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Inkompatible %1-Instanz. Um zu updaten, bitte den Server von %1 trennen.</translation>
     </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Update-Dateien</translation>
+    </message>
   </context>
   <context>
     <name>QnSessionAwareTabbedDialog</name>
@@ -5699,6 +5943,10 @@ to %1</source>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>Aufnahmeoption &quot;Bewegung + Low - Res&quot; kann nicht festgelegt werden.</translation>
+    </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Hochgeladenes Archiv kann automatisch gelöscht werden, wenn auf einem Serverspeicher kein freier Speicherplatz vorhanden ist. Das älteste Material aller Kameras auf dem Server wird zuerst gelöscht.</translation>
     </message>
   </context>
   <context>
@@ -5851,10 +6099,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>NICHT GENÜGEND LIZENZEN</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>KEINE DATEN</translation>
     </message>
@@ -5905,6 +6149,30 @@ to %1</source>
     <message>
       <source>Please check authentication information</source>
       <translation>Bitte überprüfen Sie die Authentifizierungsinformationen</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation>KEIN LIVESTREAM</translation>
+    </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>ZU VIELE VERBINDUNGEN</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>PASSWORT ERFORDERLICH</translation>
+    </message>
+    <message>
+      <source>Set for this Camera</source>
+      <translation>Für diese Kamera setzen</translation>
+    </message>
+    <message>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation>NICHT UNTERSTÜTZTE FIRMWARE-VERSION</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>NICHT GENÜGEND LIZENZEN</translation>
     </message>
   </context>
   <context>
@@ -6048,6 +6316,14 @@ to %1</source>
     <message>
       <source>Backup completed</source>
       <translation>Sicherung abgeschlossen</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Aufnahme auf deaktivierten Speicher wird angehalten. Veraltete Aufnahmen werden weiterhin gelöscht.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>Die Aufnahme wurde auf dem USB-Speicher aktiviert</translation>
     </message>
   </context>
   <context>
@@ -6201,10 +6477,6 @@ to %1</source>
       <translation>System ist im abgesicherten Modus</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Speicher ist voll</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Speicher ist nicht konfiguriert</translation>
     </message>
@@ -6249,10 +6521,6 @@ to %1</source>
       <translation>Wiederherstellung des Archivindex wurde vom Benutzer auf folgendem Server abgebrochen:</translation>
     </message>
     <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Speicher ist auf folgendem Server voll:</translation>
-    </message>
-    <message>
       <source>Storage is not configured on the following Server:</source>
       <translation>Speicher ist auf folgendem Server nicht konfiguriert:</translation>
     </message>
@@ -6267,16 +6535,6 @@ to %1</source>
     <message>
       <source>Connect</source>
       <translation>Verbinden</translation>
-    </message>
-    <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Verbinden Sie Ihr System mit %1 &amp;mdash; um es von überall zugänglich zu machen!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Schauen Sie sich %1 &amp;mdash; an, um von überall auf Ihre Server zuzugreifen!</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6321,6 +6579,24 @@ to %1</source>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>Die Remote-Archivsynchronisation wurde für folgendes Gerät abgeschlossen:</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation>Remote-Archivsynchronisation</translation>
+    </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation>Archivintegritätsproblem erkannt</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Verbinden Sie Ihr System mit %1 &amp;mdash; um es von überall zugänglich zu machen!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Schauen Sie sich %1 &amp;mdash; an, um von überall auf Ihre Server zuzugreifen!</translation>
     </message>
   </context>
   <context>
@@ -6383,16 +6659,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>Die Systemzeit wird mit dem Internet synchronisiert und ist unabhängig von Server Ortszeiten.</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>Die Systemzeit wird mit der ausgewählten lokalen Zeit des Servers synchronisiert und ist unabhängig von anderen Servern.</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>Kein Server hat Internetzugang. Die Zeit wird nicht synchronisiert.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation>Die Systemzeit wird mit dem Internet synchronisiert und ist unabhängig von der lokalen Zeit auf den Servern.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation>Die Systemzeit wird mit der lokalen Uhrzeit auf dem ausgewählten Server synchronisiert und ist unabhängig von der Ortszeit auf anderen Servern.</translation>
     </message>
   </context>
   <context>
@@ -6598,16 +6874,17 @@ to %1</source>
       <translation>Lokaler Benutzer</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Cloudbenutzer</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Login</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Rolle</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1benutzer</translation>
     </message>
   </context>
   <context>
@@ -6791,7 +7068,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Dieser Benutzer hat sich noch nicht für %1 angemeldet</translation>
     </message>
   </context>
@@ -6800,10 +7077,6 @@ to %1</source>
     <message>
       <source>Local</source>
       <translation>Lokal</translation>
-    </message>
-    <message>
-      <source>Cloud</source>
-      <translation>Cloud</translation>
     </message>
     <message>
       <source>Login</source>
@@ -6846,8 +7119,9 @@ to %1</source>
       <translation>Passwörter stimmen nicht überein.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>Ein Cloudbenutzer mit angegebener Email existiert bereits.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1benutzer mit angegebener Email existiert bereits.</translation>
     </message>
   </context>
   <context>
@@ -6916,6 +7190,40 @@ to %1</source>
     <message>
       <source>Muted</source>
       <translation>Stumm</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>Hochladen stoppen?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation>Bereits hochgeladene Dateien werden beibehalten.</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation>(%1 von %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Hochladen %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Fertigstellen %1...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>Benutzer &quot;%1&quot; lädt derzeit Aufnahmen auf diese Kamera hoch.</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation>Ein anderer Benutzer lädt derzeit Material auf diese Kamera hoch.</translation>
     </message>
   </context>
   <context>
@@ -7008,188 +7316,13 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Die Verbindung zum Server konnte nicht hergestellt werden. Videowand wird geschlossen.</translation>
     </message>
-  </context>
-  <context>
-    <name>QnWorkbenchExportHandler</name>
     <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Ausführbare %1 Mediendatei (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Ausführbare %1 Mediendatei (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>Layout exportieren</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>Exportiere Video als...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>Zeitmarken:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>Video exportieren</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Exportieren nach &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>Exportiere Layout als...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 Mediendatei (*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>Anwendung von Filtern: Rotation, Dewarping, Bildverbesserung, benutzerdefiniertes Seitenverhältnis (erfordert Transkodierung)</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>exportiert</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>Keine Zeitmarke</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>Obere linke Ecke (Umkodierung erforderlich)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>Obere rechte Ecke (Umkodierung erforderlich)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>Untere linke Ecke (Umkodierung erforderlich)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>Untere rechte Ecke (Umkodierung erforderlich)</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>Lokales Layout speichern als...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>Schreibschutz der Datei aktivieren.</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>Datei bereits in Verwendung für Aufnahme</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>Bitte wählen Sie einen anderen Namen oder warten Sie bis die Aufnahme beendet ist.</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>Sie sind dabei ein langes Video zu exportieren</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>Es kann über 1GB Speicherplatz auf der Festplatte benötigen und mehrere Minuten in Anspruch nehmen.</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>Trotzdem exportieren?</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>Als AVI exportieren?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>Gewähltes Format wird nicht empfohlen</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>Um eine Videoverkleinerung zu vermeiden, wird das NOV- oder EXE-Format für diese Kamera empfohlen.</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>Exportieren mit Umkodierung?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>Es erhöht die CPU-Auslastung und kann eine erhebliche Zeit dauern.</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>EXE-Format wird nicht empfohlen</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>Als EXE exportieren?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>Fehler beim Exportieren des Multi-Videos</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>Lokale Dateien sind nicht zulässig für den Multi-Video-Export</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>Entfernen Sie bitte alle lokalen Dateien aus dem Layout und versuchen Sie es erneut.</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>Export</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>Sie sind dabei eine große Menge an Videos zu exportieren</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>Zu kurzen Zeitraum ausgewählt</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>Für den Rapid-Review-Export sollte die Videolänge mindestens 10 Sekunden betragen.</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>Export abgeschlossen</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>Fehler beim Exportieren des Videos</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>AVI-Format wird nicht empfohlen</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>Für den Export einer nicht-kontinuierlichen Aufnahme wird MKV oder ein anderes Format empfohlen.</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>EXE-Dateien über 4GB können aufgrund einer Beschränkung in Windows nicht geöffnet werden.</translation>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>Die Videowand wird auf dem Server entfernt und geschlossen.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
-    <message>
-      <source>Enter Password...</source>
-      <translation>Passwort eingeben...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Administratorpasswort</translation>
-    </message>
     <message>
       <source>Systems will be merged shortly</source>
       <translation>Systeme werden bald zusammengefasst</translation>
@@ -7211,14 +7344,6 @@ to %1</source>
       <translation>Die Gesamtanzahl der Lizenzen wird verringert</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>Das Passwort darf nicht leer sein.</translation>
-    </message>
-    <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Cloudsysteme können nicht zusammengeführt werden</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Mit dem aktuellem System verbinden...</translation>
     </message>
@@ -7229,6 +7354,19 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>Der Server wird in Kürze mit dem System verbunden werden</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Passwort eingeben...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Administratorpasswort</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1systeme können nicht zusammengeführt werden</translation>
     </message>
   </context>
   <context>
@@ -7473,6 +7611,163 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>Alle Dateien (*.*)</translation>
+    </message>
+    <message>
+      <source>Video (%1)</source>
+      <translation>Video (%1)</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recordings...</source>
+      <translation>Öffnen der tragbaren Kameraaufnahmen...</translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation>Nur Videodateien mit dem richtigen Zeitstempel werden unterstützt.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>Der Upload konnte nicht gestartet werden, da der Nutzer &quot;%1&quot; gerade Material auf diese Kamera hochlädt.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation>Der Upload konnte nicht gestartet werden, da ein anderer Nutzer gerade Material auf diese Kamera hochlädt.</translation>
+    </message>
+    <message>
+      <source>Failed to add wearable camera</source>
+      <translation>Fehler beim Hinzufügen der tragbaren Kamera</translation>
+    </message>
+    <message>
+      <source>No video files found in selected folder</source>
+      <translation>Keine Videodateien im ausgewählten Ordner gefunden</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation>
+        <numerusform>Ausgewähltes Dateiformat wird nicht unterstützt</numerusform>
+        <numerusform>Ausgewählte Dateiformate werden nicht unterstützt</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation>Verwenden Sie .MKV, .AVI, .MP4 oder andere Videodateien.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation>
+        <numerusform>Ausgewähltes Dateiformat hat keinen Zeitstempel</numerusform>
+        <numerusform>Ausgewählte Dateiformate haben keinen Zeitstempel</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation>
+        <numerusform>Ausgewählte Datei umfasst Zeiträume, für die bereits Videos hochgeladen werden</numerusform>
+        <numerusform>Ausgewählte Dateien umfassen Zeiträume, für die bereits Videos hochgeladen werden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation>
+        <numerusform>Sie können diese Datei auf eine andere Instanz einer tragbaren Kamera hochladen.</numerusform>
+        <numerusform>Sie können diese Dateien auf eine andere Instanz einer tragbaren Kamera hochladen.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation>
+        <numerusform>Ausgewählte Datei umfasst Zeiträume, für die bereits Videos hochgeladen wurden</numerusform>
+        <numerusform>Ausgewählte Dateien umfassen Zeiträume, für die bereits Videos hochgeladen wurden</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Selected files will not be uploaded</source>
+      <translation>Ausgewählte Dateien werden nicht hochgeladen</translation>
+    </message>
+    <message>
+      <source>Some files will not be uploaded</source>
+      <translation>Einige Dateien werden nicht hochgeladen</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation>Keine neuen Dateien im ausgewählten Ordner hochladen</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>Ausgewählte Datei ist zu alt</numerusform>
+        <numerusform>Ausgewählte Dateien sind zu alt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Die ausgewählte Datei wurde am %1 aufgezeichnet. Es können jedoch nur Dateien hochgeladen werden, die in den letzten %n Tagen aufgezeichnet wurden. Sie können dies in den Kameraarchiveinstellungen ändern.</numerusform>
+        <numerusform>Die ausgewählten Dateien wurde am %1 aufgezeichnet. Es können jedoch nur Dateien hochgeladen werden, die in den letzten %n Tagen aufgezeichnet wurden. Sie können dies in den Kameraarchiveinstellungen ändern.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Ausgewählte Datei wurde zwischen %1 und %2 aufgezeichnet. Es können jedoch nur Dateien hochgeladen werden, die in den letzten %n Tagen aufgezeichnet wurden. Sie können dies in den Kameraarchiveinstellungen ändern.</numerusform>
+        <numerusform>Ausgewählte Dateien wurden zwischen %1 und %2 aufgezeichnet. Es können jedoch nur Dateien hochgeladen werden, die in den letzten %n Tagen aufgezeichnet wurden. Sie können dies in den Kameraarchiveinstellungen ändern.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Das Material kann nach dem Hochladen gelöscht werden</numerusform>
+        <numerusform>Das Material kann nach dem Hochladen gelöscht werden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Auf dem Serverspeicher ist nicht genügend freier Speicherplatz vorhanden. Einige alte Aufnahmen können gelöscht werden, um Speicherplatz freizugeben. Beachten Sie, dass ausgewählte Dateien, die auf dem Server am ältesten sind, unmittelbar nach dem Hochladen gelöscht werden.</numerusform>
+        <numerusform>Auf dem Serverspeicher ist nicht genügend freier Speicherplatz vorhanden. Einige alte Aufnahmen können gelöscht werden, um Speicherplatz freizugeben. Beachten Sie, dass ausgewählte Dateien, die auf dem Server am ältesten sind, unmittelbar nach dem Hochladen gelöscht werden.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Um dies zu verhindern, können Sie zusätzlichen Speicher hinzufügen. Sie können auch steuern, welches Material zuerst gelöscht wird, indem Sie die Archivierungszeit in den Kameraeinstellungen ändern.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>Trotzdem hochladen?</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>Der Upload auf %1 konnte nicht abgeschlossen werden</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Stellen Sie sicher, dass auf dem Server genügend Speicherplatz vorhanden ist.</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 hat ein nicht unterstütztes Format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 hat keinen Zeitstempel.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 ist älter als in den Kameraarchiveinstellungen erlaubt.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1 umfasst den Zeitraum, für den das Video bereits hochgeladen wurde.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1 deckt den Zeitraum ab, für den das Video hochgeladen wird.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
@@ -7660,6 +7955,21 @@ to %1</source>
         <numerusform>%n Items vom Demoband entfernen?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>Hochladen stoppen?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Anhalten</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
+      <translation>
+        <numerusform>Eine Videodatei wird noch auf %n tragbaren Kamera hochgeladen:</numerusform>
+        <numerusform>Einige Videodateien werden noch auf %n tragbare Kameras hochgeladen:</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
@@ -7699,6 +8009,393 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation>Dynamisch</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>Nicht unterstützte Medien für den Datenexport.</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>Das ausgewählte Format wird von der FFMPEG-Library nicht unterstützt.</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>FFMPEG-Library Fehler.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>Video- oder Audiocodec ist mit dem gewählten Format nicht kompatibel.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>Fehler beim Schreiben der Datei.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Keine Daten wurden exportiert.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Interner Fehler</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>exportiert</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Export</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>Rapid-Review</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>Einstellungen exportieren</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>Zeitstempel hinzufügen</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>Zeitstempel löschen</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>Zeitstempel</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>Bild hinzufügen</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>Bild löschen</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>Bild</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>Text hinzufügen</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>Text löschen</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>Text</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>Geschwindigkeit zurücksetzen</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>Lesezeicheninfo hinzufügen</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>Lesezeicheninfo löschen</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>Lesezeicheninfo</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>Ordner</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Name</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>Name darf nicht leer sein.</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Ordner wählen...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>Datei wählen...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation>Bilder (%1)</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Fehler</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>Bild kann nicht geladen werden.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>KEINE DATEN</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>KEINE KAMERA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Niedrig</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Hoch</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Benutzerdefiniert</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>Setzen Sie die Layoutauflösung auf &quot;Auto&quot;, um die Leistung zu erhöhen.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation>
+        <numerusform>Für den Rapid-Review-Export sollte die Videolänge mindestens %n Sekunde betragen.</numerusform>
+        <numerusform>Für den Rapid-Review-Export sollte die Videolänge mindestens %n Sekunden betragen.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation>Lang</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>Kurz</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation>Datei &quot;%1&quot; konnte nicht geöffnet werden</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation>Md5 konnte für die Datei &quot;%1&quot; nicht berechnet werden</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation>Upload konnte auf der Serverseite nicht erstellt werden</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation>Der Dateiblock konnte nicht auf den Server hochgeladen werden</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation>Die hochgeladene Datei auf dem Server konnte nicht überprüft werden</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation>Die Datei wurde beschädigt, während sie auf den Server hochgeladen wurde</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>Failed to send request to the server.</source>
+      <translation>Fehler beim Senden der Anfrage an den Server.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation>%1 Analytik</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation>Export beenden</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Export abgeschlossen</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>Export fehlgeschlagen</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Datei kann nicht geschrieben werden</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 wird von einem anderen Export verwendet.</translation>
+    </message>
+    <message>
+      <source>Selected period cannot be exported for the current camera.</source>
+      <translation>Ausgewählter Zeitraum kann für die aktuelle Kamera nicht exportiert werden.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>Datei &quot;%1&quot; wird von einem anderen Prozess verwendet. Bitte versuchen Sie einen anderen Namen.</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>Ausgabedatei %1 konnte nicht erstellt werden...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>Unbekannter Fehler aufgetreten.</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>Exportieren nach &quot;%1&quot;...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>Konnte Gerät %1 nicht exportieren.</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>Konnte Kamera %1 nicht exportieren.</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>Konnte I/O-Modul %1 nicht exportieren.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>Ausführbare %1 Mediendatei (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>Ausführbare %1 Mediendatei (x86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>Datei bereits in Verwendung für Aufnahme</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>Bitte wählen Sie einen anderen Namen oder warten Sie bis die Aufnahme beendet ist.</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>Layout exportieren</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>EXE-Format wird nicht empfohlen</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>EXE-Dateien über 4GB können aufgrund einer Beschränkung in Windows nicht geöffnet werden.</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>Als EXE exportieren?</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>Fehler beim Exportieren des Multi-Videos</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>Lokale Dateien sind nicht zulässig für den Multi-Video-Export</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>Entfernen Sie bitte alle lokalen Dateien aus dem Layout und versuchen Sie es erneut.</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>Lokales Layout speichern als...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>exportiert</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 Mediendatei (*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>Schreibschutz der Datei aktivieren.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Export</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation>Keine Ereignistypen unterstützt</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation>Das Ereignis wird nur dann ausgelöst, wenn alle oben gennanten Bedingungen erfüllt sind. Wenn das Passwortfeld leer ist, ist die Bedingung immer erfüllt. Wenn das nicht der Fall ist, dann ist die Bedingung erst erfüllt, wenn das entsprechende Feld des Ereignisses ein Passwort enthält.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
       <source>Copy</source>
@@ -7727,13 +8424,6 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Eingefügt</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>KEINE DATEN</translation>
     </message>
   </context>
   <context>
@@ -7772,20 +8462,20 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
-      <source>Stop Layout Tour</source>
-      <translation type="unfinished">Stop Layout Tour</translation>
-    </message>
-    <message>
       <source>Stop Showreel</source>
       <translation>Demoband stoppen</translation>
     </message>
     <message>
-      <source>Start Layout Tour</source>
-      <translation type="unfinished">Start Layout Tour</translation>
-    </message>
-    <message>
       <source>Start Showreel</source>
       <translation>Demoband starten</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>Tour stoppen</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Tour starten</translation>
     </message>
   </context>
   <context>
@@ -8042,6 +8732,18 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>Fehler beim Öffnen der Serverwebseite</translation>
     </message>
+    <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation>Tragbare Kameras können nicht zwischen Servern verschoben werden</translation>
+    </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation>Fehler beim Ändern des Passworts</translation>
+    </message>
+    <message>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation>Passwörter auf %1 von %2 Kameras konnten nicht geändert werden</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -8050,8 +8752,8 @@ to %1</source>
       <translation>Verwenden Sie Pfeiltasten, um Layouts zu wechseln. Das Demoband kann durch drücken von ESC beendet werden.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Anhalten der Tour durch Drücken einer beliebigen Taste.</translation>
     </message>
   </context>
   <context>
@@ -8072,16 +8774,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>Layout-Tour %1 löschen?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Demoband</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>Demoband %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Demoband %1 löschen?</translation>
     </message>
   </context>
   <context>

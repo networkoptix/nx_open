@@ -30,6 +30,7 @@ public:
     /** Get parameters list for the given resource. */
     QnCameraAdvancedParams params(const QnResourcePtr &resource) const;
     void setParams(const QnResourcePtr &resource, const QnCameraAdvancedParams &params) const;
+    void clearResourceParams(const QnResourcePtr& resource);
 private:
     /* Per-camera parameters cache. */
     mutable QHash<QnUuid, QnCameraAdvancedParams> m_paramsByCameraId;

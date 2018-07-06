@@ -16,6 +16,10 @@
 
 using namespace std::chrono;
 
+static_assert(
+    std::chrono::system_clock::period::den / std::chrono::system_clock::period::num >= 1000,
+    "Insufficient std::chrono::system_clock resolution.");
+
 namespace nx {
 namespace utils {
 
@@ -40,7 +44,7 @@ static QString getTimeZoneFile(const QString& timeZoneId)
             return QString();
         return timeZoneFile;
     #else
-        QN_UNUSED(timeZoneId);
+        nx::utils::unused(timeZoneId);
         return lit("");
     #endif
 }
@@ -55,6 +59,11 @@ system_clock::time_point utcTime()
 seconds timeSinceEpoch()
 {
     return seconds(system_clock::to_time_t(utcTime()));
+}
+
+std::chrono::milliseconds millisSinceEpoch()
+{
+    return duration_cast<milliseconds>(utcTime().time_since_epoch());
 }
 
 steady_clock::time_point monotonicTime()
@@ -98,7 +107,7 @@ bool setTimeZone(const QString& timeZoneId)
         return true;
     #else
         NX_LOG(lit("setTimeZone(): Unsupported platform"), cl_logERROR);
-        QN_UNUSED(timeZoneId);
+        nx::utils::unused(timeZoneId);
         return false;
     #endif
 }
@@ -185,11 +194,17 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
 
         return true;
     #else
-        QN_UNUSED(millisecondsSinceEpoch);
+        nx::utils::unused(millisecondsSinceEpoch);
         NX_LOG(lit("setDateTime(): unsupported platform"), cl_logERROR);
     #endif
 
     return true;
+}
+
+NX_UTILS_API QDateTime fromOffsetSinceEpoch(const nanoseconds& offset)
+{
+    return QDateTime::fromMSecsSinceEpoch(
+        duration_cast<milliseconds>(offset).count());
 }
 
 namespace test {

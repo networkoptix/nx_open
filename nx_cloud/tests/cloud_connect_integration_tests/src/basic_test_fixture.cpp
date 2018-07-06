@@ -1,17 +1,17 @@
 #include "basic_test_fixture.h"
 
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 
-#include <libconnection_mediator/src/http/http_api_path.h>
 #include <libconnection_mediator/src/listening_peer_pool.h>
 #include <libconnection_mediator/src/mediator_service.h>
-#include <nx/cloud/relay/controller/connect_session_manager.h>
+#include <nx/cloud/relay/model/remote_relay_peer_pool.h>
 #include <nx/cloud/relay/controller/relay_public_ip_discovery.h>
-#include <nx/cloud/relay/model/listening_peer_pool.h>
-#include <nx/cloud/relay/model/model.h>
+#include <nx/cloud/relaying/listening_peer_pool.h>
 
 namespace nx {
 namespace network {
@@ -36,11 +36,9 @@ boost::optional<hpm::api::SystemCredentials>
 
 //-------------------------------------------------------------------------------------------------
 
-cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(
-    const std::string& domainName,
-    const std::string& relayHost)
+cf::future<bool> MemoryRemoteRelayPeerPool::addPeer(const std::string& domainName)
 {
-    m_relayTest->peerAdded(domainName, relayHost);
+    m_relayTest->peerAdded(domainName);
     return cf::make_ready_future(true);
 }
 
@@ -62,6 +60,8 @@ cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
     return cf::make_ready_future<std::string>(std::move(redirectToEndpoint));
 }
 
+//-------------------------------------------------------------------------------------------------
+
 BasicTestFixture::BasicTestFixture(
     int relayCount,
     boost::optional<std::chrono::seconds> disconnectedPeerTimeout)
@@ -78,7 +78,7 @@ BasicTestFixture::BasicTestFixture(
 
 void BasicTestFixture::setUpPublicIpFactoryFunc()
 {
-    auto discoverFunc = []() {return HostAddress("127.0.0.1"); };
+    auto discoverFunc = []() {return network::HostAddress("127.0.0.1"); };
     controller::PublicIpDiscoveryService::setDiscoverFunc(discoverFunc);
 }
 
@@ -95,7 +95,7 @@ void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
 
 BasicTestFixture::~BasicTestFixture()
 {
-    std::list<std::unique_ptr<nx_http::AsyncClient>> httpClients;
+    std::list<std::unique_ptr<nx::network::http::AsyncClient>> httpClients;
     {
         QnMutexLocker lock(&m_mutex);
         httpClients.swap(m_httpClients);
@@ -112,7 +112,7 @@ void BasicTestFixture::setInitFlags(int flags)
     m_initFlags = flags;
 }
 
-SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
+network::SocketAddress BasicTestFixture::relayInstanceEndpoint(RelayPtrList::size_type index) const
 {
     return m_relays[index]->moduleInstance()->httpEndpoints()[0];
 }
@@ -154,6 +154,8 @@ void BasicTestFixture::SetUp()
 
     m_mediator.addArg("-trafficRelay/url");
     m_mediator.addArg(relayUrl().toString().toStdString().c_str());
+    m_mediator.addArg("-stun/addrToListenList", "127.0.0.1:0");
+    m_mediator.addArg("-http/addrToListenList", "127.0.0.1:0");
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
     ASSERT_TRUE(m_cloudModulesXmlProvider.bindAndListen());
@@ -171,11 +173,11 @@ void BasicTestFixture::SetUp()
 
     if ((m_initFlags & doNotInitializeMediatorConnection) == 0)
     {
-        SocketGlobals::mediatorConnector().mockupCloudModulesXmlUrl(
+        SocketGlobals::cloud().mediatorConnector().mockupCloudModulesXmlUrl(
             nx::network::url::Builder().setScheme("http")
                 .setEndpoint(m_cloudModulesXmlProvider.serverAddress())
                 .setPath(kCloudModulesXmlPath));
-        SocketGlobals::mediatorConnector().enable(true);
+        SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 }
 
@@ -187,7 +189,7 @@ void BasicTestFixture::startServer()
     m_cloudSystemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
     m_cloudSystemCredentials.key = cloudSystemCredentials.authKey;
 
-    SocketGlobals::mediatorConnector().setSystemCredentials(m_cloudSystemCredentials);
+    SocketGlobals::cloud().mediatorConnector().setSystemCredentials(m_cloudSystemCredentials);
 
     startHttpServer();
 }
@@ -197,14 +199,14 @@ void BasicTestFixture::stopServer()
     m_httpServer.reset();
 }
 
-QUrl BasicTestFixture::relayUrl(int relayNum) const
+nx::utils::Url BasicTestFixture::relayUrl(int relayNum) const
 {
     NX_ASSERT(relayNum < (int) m_relays.size());
 
     auto relayUrlString = lm("http://%1/")
         .arg(m_relays[relayNum]->moduleInstance()->httpEndpoints()[0].toStdString()).toQString();
 
-    return QUrl(relayUrlString);
+    return nx::utils::Url(relayUrlString);
 }
 
 void BasicTestFixture::restartMediator()
@@ -238,7 +240,7 @@ void BasicTestFixture::startExchangingFixedData()
 {
     QnMutexLocker lock(&m_mutex);
 
-    m_httpClients.push_back(std::make_unique<nx_http::AsyncClient>());
+    m_httpClients.push_back(std::make_unique<nx::network::http::AsyncClient>());
     m_httpClients.back()->setSendTimeout(std::chrono::seconds::zero());
     m_httpClients.back()->setResponseReadTimeout(std::chrono::seconds::zero());
 
@@ -255,7 +257,7 @@ void BasicTestFixture::assertDataHasBeenExchangedCorrectly()
     while (m_unfinishedRequestsLeft > 0)
     {
         const auto result = m_httpRequestResults.pop();
-        ASSERT_EQ(nx_http::StatusCode::ok, result.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, result.statusCode);
         ASSERT_EQ(m_expectedMsgBody, result.msgBody);
         --m_unfinishedRequestsLeft;
     }
@@ -333,7 +335,7 @@ void BasicTestFixture::setMediatorApiProtocol(MediatorApiProtocol mediatorApiPro
     m_mediatorApiProtocol = mediatorApiProtocol;
 }
 
-const std::unique_ptr<AbstractStreamSocket>& BasicTestFixture::clientSocket()
+const std::unique_ptr<network::AbstractStreamSocket>& BasicTestFixture::clientSocket()
 {
     return m_clientSocket;
 }
@@ -366,7 +368,7 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
     m_cloudModulesXmlProvider.registerStaticProcessor(
         kCloudModulesXmlPath,
         lm(kCloudModulesXmlTemplate)
-            .arg(m_mediator.httpEndpoint()).arg(nx::hpm::http::kStunOverHttpTunnelPath)
+            .arg(m_mediator.httpEndpoint()).arg(nx::hpm::api::kMediatorApiPrefix)
             .arg(m_mediator.stunEndpoint()).toUtf8(),
         "application/xml");
 }
@@ -374,11 +376,11 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
 void BasicTestFixture::startHttpServer()
 {
     auto cloudServerSocket = std::make_unique<CloudServerSocket>(
-        &SocketGlobals::mediatorConnector());
+        &SocketGlobals::cloud().mediatorConnector());
 
-    m_httpServer = std::make_unique<TestHttpServer>(std::move(cloudServerSocket));
+    m_httpServer = std::make_unique<nx::network::http::TestHttpServer>(std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");
-    m_staticUrl = QUrl(lm("http://%1/static").arg(serverSocketCloudAddress()));
+    m_staticUrl = nx::utils::Url(lm("http://%1/static").arg(serverSocketCloudAddress()));
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
 
@@ -386,7 +388,7 @@ void BasicTestFixture::startHttpServer()
 }
 
 void BasicTestFixture::onHttpRequestDone(
-    std::list<std::unique_ptr<nx_http::AsyncClient>>::iterator clientIter)
+    std::list<std::unique_ptr<nx::network::http::AsyncClient>>::iterator clientIter)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -400,7 +402,7 @@ void BasicTestFixture::onHttpRequestDone(
     if (httpClient->response())
     {
         result.statusCode =
-            (nx_http::StatusCode::Value)httpClient->response()->statusLine.statusCode;
+            (nx::network::http::StatusCode::Value)httpClient->response()->statusLine.statusCode;
         result.msgBody = httpClient->fetchMessageBodyBuffer();
     }
 

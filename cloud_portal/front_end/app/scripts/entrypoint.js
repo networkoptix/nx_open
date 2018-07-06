@@ -63,6 +63,7 @@ require('./controllers/disconnect.js');
 require('./controllers/download.js');
 require('./controllers/downloadHistory.js');
 require('./controllers/login.js');
+require('./controllers/merge.js');
 require('./controllers/register.js');
 require('./controllers/rename.js');
 require('./controllers/share.js');

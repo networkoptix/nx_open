@@ -8,28 +8,25 @@
 #include <nx/utils/counter.h>
 #include <nx/utils/db/db_instance_controller.h>
 
+#include <nx/data_sync_engine/serialization/transaction_serializer.h>
+#include <nx/data_sync_engine/transaction_log.h>
+
 #include "../data/statistics_data.h"
 #include "../data/system_data.h"
-#include "../ec2/serialization/transaction_serializer.h"
-#include "../ec2/transaction_log.h"
+
+namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
 namespace nx {
 namespace cdb {
 
 class AuthorizationInfo;
 
-namespace ec2 {
-
-class SyncronizationEngine;
-
-} // namespace ec2
-
 class MaintenanceManager
 {
 public:
     MaintenanceManager(
         const QnUuid& moduleGuid,
-        ec2::SyncronizationEngine* const syncronizationEngine,
+        data_sync_engine::SyncronizationEngine* const syncronizationEngine,
         const nx::utils::db::InstanceController& dbInstanceController);
     ~MaintenanceManager();
 
@@ -54,7 +51,7 @@ public:
 
 private:
     const QnUuid m_moduleGuid;
-    ec2::SyncronizationEngine* const m_syncronizationEngine;
+    data_sync_engine::SyncronizationEngine* const m_syncronizationEngine;
     const nx::utils::db::InstanceController& m_dbInstanceController;
     nx::network::aio::Timer m_timer;
     nx::utils::Counter m_startedAsyncCallsCounter;
@@ -62,8 +59,8 @@ private:
     void onTransactionLogRead(
         nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
         const std::string& systemId,
-        api::ResultCode resultCode,
-        std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,
+        data_sync_engine::ResultCode resultCode,
+        std::vector<data_sync_engine::dao::TransactionLogRecord> serializedTransactions,
         ::ec2::QnTranState readedUpTo,
         std::function<void(
             api::ResultCode,

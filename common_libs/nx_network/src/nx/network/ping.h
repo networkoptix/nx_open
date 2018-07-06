@@ -7,7 +7,7 @@
 /**
   * Max ICMP packet size
   */
-#define CL_MAX_PING_PACKET 1024 
+#define CL_MAX_PING_PACKET 1024
 
 class NX_NETWORK_API CLPing
 {

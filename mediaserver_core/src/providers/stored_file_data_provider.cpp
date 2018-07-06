@@ -3,8 +3,11 @@
 #include <api/app_server_connection.h>
 #include <core/resource/local_audio_file_resource.h>
 #include <core/resource/resource.h>
+
+#include <nx_ec/ec_api.h>
+
 #include <nx/utils/random.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <utils/common/sleep.h>
 
 namespace {
@@ -30,9 +33,8 @@ QnStoredFileDataProvider::QnStoredFileDataProvider(
     connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
         m_filePath,
         this,
-        [this](int handle, ec2::ErrorCode errorCode, const QByteArray& fileData)
+        [this](int /*handle*/, ec2::ErrorCode errorCode, const QByteArray& fileData)
         {
-            Q_UNUSED(handle);
             emit fileLoaded(fileData, errorCode == ec2::ErrorCode::ok);
         });
 }
@@ -65,7 +67,7 @@ void QnStoredFileDataProvider::at_fileLoaded(const QByteArray& fileData, bool st
     QnAviArchiveDelegatePtr mediaFileReader(new QnAviArchiveDelegate());
     mediaFileReader->setStorage(m_storage);
 
-    if (!mediaFileReader->open(m_resource))
+    if (!mediaFileReader->open(m_resource, /*archiveIntegrityWatcher*/ nullptr))
         return;
 
     m_provider = mediaFileReader;

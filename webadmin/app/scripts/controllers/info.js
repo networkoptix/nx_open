@@ -2,7 +2,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('InfoCtrl', function ($scope, mediaserver, nativeClient) {
+    .controller('InfoCtrl', ['$scope', 'mediaserver', 'nativeClient', function ($scope, mediaserver, nativeClient) {
 
         $scope.logUrl = mediaserver.logUrl();
         $scope.L = L;
@@ -49,4 +49,4 @@ angular.module('webadminApp')
         nativeClient.init().then(function(result){
             $scope.mode={liteClient: result.lite};
         });
-    });
+    }]);

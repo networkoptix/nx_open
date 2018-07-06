@@ -5,20 +5,22 @@
 
 #include "../http_types.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 template<typename Mapped>
 class ExactPathMatcher
 {
 public:
-    bool add(const nx_http::StringType& path, Mapped mapped)
+    bool add(const nx::network::http::StringType& path, Mapped mapped)
     {
         return m_pathToMapped.emplace(path, std::move(mapped)).second;
     }
 
     boost::optional<const Mapped&> match(
-        const nx_http::StringType& path,
-        std::vector<nx_http::StringType>* /*pathParams*/) const
+        const nx::network::http::StringType& path,
+        std::vector<nx::network::http::StringType>* /*pathParams*/) const
     {
         auto it = m_pathToMapped.find(path);
         if (it == m_pathToMapped.end())
@@ -28,7 +30,9 @@ public:
     }
 
 private:
-    std::map<nx_http::StringType, Mapped> m_pathToMapped;
+    std::map<nx::network::http::StringType, Mapped> m_pathToMapped;
 };
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

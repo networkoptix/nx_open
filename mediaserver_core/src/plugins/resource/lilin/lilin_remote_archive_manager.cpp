@@ -32,33 +32,36 @@ static const QString kDeleteOkResponse("del OK");
 static const QString kDateTimeFormat("yyyyMMddhhmmss");
 static const QString kDateTimeFormat2("yyyy/MM/dd hh:mm:ss");
 
-} // namespace 
+static const std::chrono::minutes kMaxChunkDuration(1);
+
+static const std::chrono::milliseconds kWaitBeforeSync(30000);
+static const int kNumberOfSyncCycles = 2;
+static const int kDefaultOverlappedId = 0;
+static const int kTriesPerChunk = 2;
+
+} // namespace
 
 using namespace nx::core::resource;
 
 LilinRemoteArchiveManager::LilinRemoteArchiveManager(LilinResource* resource):
     m_resource(resource)
 {
-
-}
-
-LilinRemoteArchiveManager::~LilinRemoteArchiveManager()
-{
-
 }
 
 bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
-    std::vector<RemoteArchiveEntry>* outArchiveEntries, 
+    OverlappedRemoteChunks* outArchiveEntries,
     int64_t startTimeMs,
     int64_t endTimeMs)
 {
+    using namespace std::chrono;
+
     auto dirs = getDirectoryList();
 
     std::vector<QString> files;
     for (const auto& dir : dirs)
         fetchFileList(dir, &files);
 
-    auto driftSeconds = m_resource->getTimeDrift();
+    auto driftMs = m_resource->getTimeDrift();
     auto fileCount = files.size();
     for (auto i = 0; i < files.size(); ++i)
     {
@@ -76,16 +79,15 @@ bool LilinRemoteArchiveManager::listAvailableArchiveEntries(
                 continue;
         }
 
-        const int64_t kMillisecondsInMinute = 60000;
-
-        auto duration = nextChunkStartMs
+        auto durationMs = nextChunkStartMs
             ? nextChunkStartMs.get() - currentChunkStartMs.get()
-            : kMillisecondsInMinute;
+            : duration_cast<milliseconds>(kMaxChunkDuration).count();
 
-        outArchiveEntries->emplace_back(
+        (*outArchiveEntries)[kDefaultOverlappedId].emplace_back(
             files[i],
-            currentChunkStartMs.get() - driftSeconds,
-            duration);
+            currentChunkStartMs.get() - driftMs,
+            durationMs,
+            kDefaultOverlappedId);
     }
 
     return true;
@@ -115,14 +117,14 @@ bool LilinRemoteArchiveManager::removeArchiveEntries(const std::vector<QString>&
     return response && response.get() == kDeleteOkResponse;
 }
 
-std::unique_ptr<nx_http::HttpClient> LilinRemoteArchiveManager::initHttpClient() const
+std::unique_ptr<nx::network::http::HttpClient> LilinRemoteArchiveManager::initHttpClient() const
 {
-    auto httpClient = std::make_unique<nx_http::HttpClient>();
+    auto httpClient = std::make_unique<nx::network::http::HttpClient>();
     auto auth = m_resource->getAuth();
 
     httpClient->setUserName(auth.user());
     httpClient->setUserPassword(auth.password());
-    httpClient->setAuthType(nx_http::AuthType::authBasic);
+    httpClient->setAuthType(nx::network::http::AuthType::authBasic);
     httpClient->setResponseReadTimeoutMs(kHttpTimeout.count());
     httpClient->setSendTimeoutMs(kHttpTimeout.count());
     httpClient->setMessageBodyReadTimeoutMs(kHttpTimeout.count());
@@ -130,27 +132,26 @@ std::unique_ptr<nx_http::HttpClient> LilinRemoteArchiveManager::initHttpClient()
     return httpClient;
 }
 
-boost::optional<nx_http::BufferType> LilinRemoteArchiveManager::doRequest(const QString& requestPath, bool expectOnlyBody /*= false*/)
+boost::optional<nx::network::http::BufferType> LilinRemoteArchiveManager::doRequest(
+    const QString& requestPath,
+    bool expectOnlyBody /*= false*/)
 {
     auto httpClient = initHttpClient();
 
     httpClient->setExpectOnlyMessageBodyWithoutHeaders(expectOnlyBody);
 
-    auto deviceUrl = QUrl(m_resource->getUrl());
-    auto requestUrl = QUrl(
+    auto deviceUrl = nx::utils::Url(m_resource->getUrl());
+    auto requestUrl = nx::utils::Url(
         lit("http://%1:%2%3")
             .arg(deviceUrl.host())
-            .arg(deviceUrl.port(nx_http::DEFAULT_HTTP_PORT))
+            .arg(deviceUrl.port(nx::network::http::DEFAULT_HTTP_PORT))
             .arg(requestPath));
 
     bool success = httpClient->doGet(requestUrl);
-
-    auto httpResponse = httpClient->response();
-
     if (!success)
         return boost::none;
 
-    nx_http::BufferType response;
+    nx::network::http::BufferType response;
     while (!httpClient->eof())
         response.append(httpClient->fetchMessageBodyBuffer());
 
@@ -191,7 +192,7 @@ std::vector<QString> LilinRemoteArchiveManager::getDirectoryList()
 
 
     auto dirStr = QString::fromLatin1(response.get()).trimmed();
-    for (const auto& dir : dirStr.split(QRegExp(lit("\,|\:"))))
+    for (const auto& dir : dirStr.split(QRegExp(lit(",|:"))))
         result.push_back(dir.trimmed());
 
     return result;
@@ -212,7 +213,7 @@ bool LilinRemoteArchiveManager::fetchFileList(const QString& directory, std::vec
 
         // Filter files that are being recorded at the moment
         auto entryExtension = QString::fromLatin1(split[1]);
-        if (entryExtension.endsWith("_ing")) 
+        if (entryExtension.endsWith("_ing"))
             continue;
 
         outFileLists->push_back(QString::fromLatin1(split[0]));
@@ -229,6 +230,37 @@ boost::optional<int64_t> LilinRemoteArchiveManager::parseDate(const QString& dat
         return boost::none;
 
     return dateTime.toMSecsSinceEpoch();
+}
+
+RemoteArchiveCapabilities LilinRemoteArchiveManager::capabilities() const
+{
+    return RemoteArchiveCapability::RemoveChunkCapability;
+}
+
+std::unique_ptr<QnAbstractArchiveDelegate> LilinRemoteArchiveManager::archiveDelegate(
+    const RemoteArchiveChunk& /*chunk*/)
+{
+    return nullptr;
+}
+
+void LilinRemoteArchiveManager::beforeSynchronization()
+{
+    // Do nothing.
+}
+
+void LilinRemoteArchiveManager::afterSynchronization(bool /*isSynchronizationSuccessful*/)
+{
+    // Do nothing.
+}
+
+RemoteArchiveSynchronizationSettings LilinRemoteArchiveManager::settings() const
+{
+    return {
+        kWaitBeforeSync,
+        std::chrono::milliseconds::zero(),
+        kNumberOfSyncCycles,
+        kTriesPerChunk
+    };
 }
 
 } // namespace plugins

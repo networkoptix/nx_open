@@ -3,6 +3,7 @@
 #include <nx/client/desktop/utils/server_file_cache.h>
 
 #include <QtGui/QImage>
+#include <utils/common/aspect_ratio.h>
 
 namespace nx {
 namespace client {
@@ -21,7 +22,7 @@ public:
 
     static QString cachedImageFilename(const QString &sourcePath);
 
-    void storeImage(const QString &filePath, const qreal targetAspectRatio = 0.0);
+    void storeImage(const QString &filePath, const QnAspectRatio& aspectRatio = QnAspectRatio());
 
 private slots:
     void at_imageConverted(const QString &filePath);

@@ -4,7 +4,7 @@
 
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <nx/network/http/http_client.h>
-#include <core/dataprovider/stream_mixer.h>
+#include <providers/stream_mixer.h>
 
 class QnOpteraResource : public QnPlOnvifResource
 {
@@ -26,7 +26,9 @@ public:
         const QnAbstractStreamDataProvider* dataProvider) const override;
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
 private:

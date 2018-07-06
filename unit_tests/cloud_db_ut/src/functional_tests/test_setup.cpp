@@ -14,6 +14,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 CdbFunctionalTest::CdbFunctionalTest()
 {
@@ -28,5 +29,6 @@ CdbFunctionalTest::~CdbFunctionalTest()
     stop();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

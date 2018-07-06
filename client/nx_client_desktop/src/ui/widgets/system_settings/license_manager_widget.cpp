@@ -32,12 +32,11 @@
 
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
-
-#include <llutil/hardware_id.h>
+#include <licensing/hardware_id_version.h>
 
 #include <nx/fusion/serialization/json_functions.h>
 
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -53,18 +52,57 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/license/util.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
-#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/common/widgets/clipboard_button.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 namespace {
 
 static const auto kHtmlDelimiter = lit("<br>");
 static const auto kEmptyLine = lit("%1%1").arg(kHtmlDelimiter);
+
+QString licenseReplyLogString(
+    QNetworkReply* reply,
+    const QByteArray& replyBody,
+    const QByteArray& licenseKey)
+{
+    if (!reply)
+        return QString();
+
+    static const auto kReplyLogTemplate =
+        lit("\nReceived response from license server (license key is %1):\n"
+            "Response: %2 (%3)\n"
+            "Headers:\n%4\n"
+            "Body:\n%5\n");
+
+    QStringList headers;
+    for (const auto header: reply->rawHeaderPairs())
+    {
+        headers.push_back(lit("%1: %2").arg(
+            QString::fromLatin1(header.first),
+            QString::fromLatin1(header.second)));
+    }
+
+    return kReplyLogTemplate.arg(
+        QString::fromLatin1(licenseKey),
+        QString::number(reply->error()), reply->errorString(),
+        headers.join(lit("\n")),
+        QString::fromLatin1(replyBody));
+}
+
+QString licenseRequestLogString(const QByteArray& body, const QByteArray& licenseKey)
+{
+    static const auto kRequestLogTemplate =
+        lit("\nSending request to license server (license key is %1).\nBody:\n%2\n");
+    return kRequestLogTemplate.arg(
+        QString::fromLatin1(licenseKey), QString::fromUtf8(body));
+}
 
 using DeactivationErrors =
     nx::client::desktop::license::Deactivator::Deactivator::LicenseErrorHash;
@@ -164,7 +202,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->alertBar->setVisible(false);
 
     m_exportLicensesButton = new QPushButton(ui->licensesGroupBox);
-    auto anchor = new QnWidgetAnchor(m_exportLicensesButton);
+    auto anchor = new WidgetAnchor(m_exportLicensesButton);
     anchor->setEdges(Qt::TopEdge | Qt::RightEdge);
     static const int kButtonTopAdjustment = -4;
     anchor->setMargins(0, kButtonTopAdjustment, 0, 0);
@@ -184,6 +222,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->gridLicenses->header()->setSectionsMovable(false);
     ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::ServerColumn, QHeaderView::Stretch);
+    ui->gridLicenses->header()->setSectionResizeMode(QnLicenseListModel::LicenseKeyColumn, QHeaderView::ResizeMode::ResizeToContents);
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
     /* By [Delete] key remove licenses. */
@@ -423,7 +462,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     for (const QString& hwid: hardwareIds)
     {
-        int version = LLUtil::hardwareIdVersion(hwid);
+        int version = nx::utils::license::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)
@@ -456,7 +495,9 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
         params.addQueryItem(lit("serial"), runtimeData.nx1serial);
     }
 
-    QNetworkReply *reply = m_httpClient->post(request, params.query(QUrl::FullyEncoded).toUtf8());
+    const auto messageBody = params.query(QUrl::FullyEncoded).toUtf8();
+    NX_LOGX(licenseRequestLogString(messageBody, licenseKey), cl_logINFO);
+    QNetworkReply *reply = m_httpClient->post(request, messageBody);
 
     connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_downloadError()));
     connect(reply, &QNetworkReply::finished, this, [this, licenseKey, infoMode, url, reply]
@@ -615,12 +656,16 @@ QString QnLicenseManagerWidget::getLicenseDescription(const QnLicensePtr& licens
     return lit("%1%2%3, %4").arg(key, kHtmlDelimiter, license->displayName(), channelsCountString);
 }
 
-bool QnLicenseManagerWidget::confirmDeactivation(const QStringList& extras)
+bool QnLicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
 {
+    QStringList extras;
+    for (const auto& license: licenses)
+        extras.push_back(getLicenseDescription(license));
+
     QnMessageBox confirmationDialog(QnMessageBoxIcon::Question,
-        tr("Deactivate licenses?", "", extras.size()),
+        tr("Deactivate licenses?", "", licenses.size()),
         QString(),
-        QDialogButtonBox::Cancel);
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
     confirmationDialog.setInformativeText(extras.join(kEmptyLine), false);
     confirmationDialog.setInformativeTextFormat(Qt::RichText);
     confirmationDialog.addButton(lit("Deactivate"),
@@ -694,7 +739,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     const bool totalFail = licenses.size() == errorsCount;
     const auto standardButton = totalFail ? QDialogButtonBox::Ok : QDialogButtonBox::Cancel;
     QnMessageBox dialog(icon, text, QString(),
-        standardButton, QDialogButtonBox::NoButton);
+        standardButton, QDialogButtonBox::NoButton, this);
 
     auto copyButton = new ClipboardButton(ClipboardButton::StandardType::copyLong, this);
     dialog.addButton(copyButton, QDialogButtonBox::HelpRole);
@@ -798,15 +843,15 @@ void QnLicenseManagerWidget::takeAwaySelectedLicenses()
     }
     else
     {
-        QStringList extras;
+        QnLicenseList deactivatableLicences;
         for (const auto& license: licenses)
         {
             if (canDeactivateLicense(license))
-                extras.append(getLicenseDescription(license));
+                deactivatableLicences.push_back(license);
         }
 
-        if (!extras.isEmpty() && confirmDeactivation(extras))
-            deactivateLicenses(licenses);
+        if (!deactivatableLicences.isEmpty() && confirmDeactivation(deactivatableLicences))
+            deactivateLicenses(deactivatableLicences);
     }
 }
 
@@ -883,6 +928,8 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
 
     QByteArray replyData = reply->readAll();
 
+    NX_LOGX(licenseReplyLogString(reply, replyData, licenseKey), cl_logINFO);
+
     // TODO: #Elric use JSON mapping here.
     // If we can deserialize JSON it means there is an error.
     QJsonObject errorMessage;
@@ -907,7 +954,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
         if (infoMode)
         {
             QnLicenseErrorCode errCode = m_validator->validate(license,
-                QnLicenseValidator::VM_CheckInfo);
+                QnLicenseValidator::VM_CanActivate);
 
             if (errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::Expired)
             {
@@ -1079,8 +1126,8 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
     const QString& time)
 {
     auto extras = (time.isEmpty()
-        ? tr("This license is already activated and linked to Hardware Id %1").arg(hwid)
-        : tr("This license is already activated and linked to Hardware Id %1 on %2")
+        ? tr("This license is already activated and linked to Hardware ID %1").arg(hwid)
+        : tr("This license is already activated and linked to Hardware ID %1 on %2")
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();

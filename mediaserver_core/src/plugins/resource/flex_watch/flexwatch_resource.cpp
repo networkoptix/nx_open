@@ -16,9 +16,9 @@ QnFlexWatchResource::~QnFlexWatchResource()
     delete m_tmpH264Conf;
 }
 
-CameraDiagnostics::Result QnFlexWatchResource::initInternal()
+CameraDiagnostics::Result QnFlexWatchResource::initializeCameraDriver()
 {
-    CameraDiagnostics::Result rez = QnPlOnvifResource::initInternal();
+    CameraDiagnostics::Result rez = QnPlOnvifResource::initializeCameraDriver();
     if (rez.errorCode == CameraDiagnostics::ErrorCode::noError && getChannel() == 0)
         rez = fetchUpdateVideoEncoder();
     return rez;
@@ -34,7 +34,7 @@ CameraDiagnostics::Result QnFlexWatchResource::fetchUpdateVideoEncoder()
 
     int soapRes = soapWrapper.getVideoEncoderConfigurations(request, response);
     if (soapRes != SOAP_OK) {
-        qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera (" 
+        qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera ("
             << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
             << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << getUniqueId();
         return CameraDiagnostics::UnknownErrorResult();
@@ -46,16 +46,16 @@ CameraDiagnostics::Result QnFlexWatchResource::fetchUpdateVideoEncoder()
         if (response.Configurations[i]->Encoding != onvifXsd__VideoEncoding__H264)
         {
             needReboot = true;
- 
+
             response.Configurations[i]->Encoding = onvifXsd__VideoEncoding__H264;
             VideoEncoder* encoder = response.Configurations[i];
             if (encoder->H264 == 0)
                 encoder->H264 = m_tmpH264Conf;
 
             encoder->H264->GovLength = 10;
-            int profile = getPrimaryH264Profile();
-            if (profile != -1)
-                encoder->H264->H264Profile = onvifXsd__H264Profile(profile);
+            auto h264Profile = getH264StreamProfile(primaryVideoCapabilities());
+            if (h264Profile.is_initialized())
+                encoder->H264->H264Profile = *h264Profile;
             if (encoder->RateControl)
                 encoder->RateControl->EncodingInterval = 1;
             sendVideoEncoderToCamera(*encoder);

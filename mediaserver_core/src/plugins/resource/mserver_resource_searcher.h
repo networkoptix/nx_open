@@ -33,12 +33,12 @@ private:
     void updateSocketList();
     void deleteSocketList();
     void readDataFromSocket();
-    void readSocketInternal(AbstractDatagramSocket* socket, QnCameraConflictList& conflictList);
+    void readSocketInternal(nx::network::AbstractDatagramSocket* socket, QnCameraConflictList& conflictList);
 private:
     QStringList m_localAddressList;
-    QList<AbstractDatagramSocket*> m_socketList;
+    QList<nx::network::AbstractDatagramSocket*> m_socketList;
     QTime m_socketLifeTime;
-    std::unique_ptr<AbstractDatagramSocket> m_receiveSocket;
+    std::unique_ptr<nx::network::AbstractDatagramSocket> m_receiveSocket;
 };
 
 #endif // __MSERVER_RESOURCE_SEARCHER_H__

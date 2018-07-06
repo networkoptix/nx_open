@@ -11,7 +11,7 @@
 
 #if 0
 namespace {
-    QUrl trimmedUrl(const QUrl &url) {
+    QUrl trimmedUrl(const QUrl& url) {
         QUrl newUrl;
         newUrl.setScheme(lit("http"));
         newUrl.setHost(url.host());
@@ -25,6 +25,14 @@ QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
     QObject(),
     QnCommonModuleAware(commonModule)
 {
+    connect(commonModule, &QnCommonModule::standAloneModeChanged, this,
+        [this](bool value)
+        {
+            if (value)
+                stop();
+            else
+                start();
+        }, Qt::DirectConnection);
 }
 
 static QString makeModuleUrl(const nx::vms::discovery::ModuleEndpoint& module)

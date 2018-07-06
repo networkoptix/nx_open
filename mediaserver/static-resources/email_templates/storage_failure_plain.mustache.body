@@ -1,4 +1,6 @@
 {{&event}}{{#source}} at {{&source}}{{/source}}
 
+{{#aggregated}}
 Reason: {{&reason}}
 Time: {{&timestampDate}} {{&timestampTime}}
+{{/aggregated}}

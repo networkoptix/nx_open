@@ -8,4 +8,4 @@ Hallo, {{message.fullName}}
 Ihnen wurde Zugriff auf das Videoverwaltungssystem "{{message.system_name}}" gewährt.
 {{/message.sharer_name}}
 
-Ansicht im {{PRODUCT_NAME}}-Portal: {{config.portal_url}}/systems/{{message.system_id}}
+Ansicht im %PRODUCT_NAME%-Portal: {{config.portal_url}}/systems/{{message.system_id}}

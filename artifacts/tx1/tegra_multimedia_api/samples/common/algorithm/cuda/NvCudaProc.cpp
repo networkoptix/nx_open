@@ -39,6 +39,8 @@
 #include "cudaEGL.h"
 #include "NvAnalysis.h"
 
+#include <iostream>
+
 #include "NvCudaProc.h"
 
 static void
@@ -161,3 +163,82 @@ void mapEGLImage2Float(void* pEGLImage, int width, int height, void* cuda_buf)
         printf("cuGraphicsEGLUnRegisterResource failed: %d\n", status);
     }
 }
+
+void mapEGLImage2Float2(void* pEGLImage, int width, int height, void* cuda_buf)
+{
+    CUresult status;
+    CUeglFrame eglFrame;
+    CUgraphicsResource pResource = NULL;
+    EGLImageKHR *pImage = (EGLImageKHR *)pEGLImage;
+
+    cudaFree(0);
+    status = cuGraphicsEGLRegisterImage(&pResource, *pImage,
+                CU_GRAPHICS_MAP_RESOURCE_FLAGS_NONE);
+    if (status != CUDA_SUCCESS)
+    {
+        printf("cuGraphicsEGLRegisterImage failed: %d, cuda process stop\n",
+                        status);
+        return;
+    }
+
+    status = cuGraphicsResourceGetMappedEglFrame(&eglFrame, pResource, 0, 0);
+    if (status != CUDA_SUCCESS)
+    {
+        printf("cuGraphicsSubResourceGetMappedArray failed\n");
+    }
+
+    status = cuCtxSynchronize();
+    if (status != CUDA_SUCCESS)
+    {
+        printf("cuCtxSynchronize failed\n");
+    }
+
+    if (eglFrame.frameType == CU_EGL_FRAME_TYPE_PITCH)
+    {
+        //using GPU to convert int buffer into float buffer.
+        convertIntToFloatWithMean(
+            (int*) eglFrame.frame.pPitch[0],
+            width,
+            height,
+            cuda_buf,
+            eglFrame.pitch,
+            make_float3(104.0069879317889f, 116.66876761696767f, 122.6789143406786f));
+    }
+
+    status = cuCtxSynchronize();
+    if (status != CUDA_SUCCESS)
+    {
+        printf("cuCtxSynchronize failed after memcpy\n");
+    }
+
+    status = cuGraphicsUnregisterResource(pResource);
+    if (status != CUDA_SUCCESS)
+    {
+        printf("cuGraphicsEGLUnRegisterResource failed: %d\n", status);
+    }
+}
+
+void mapIntRgbaToFloatBgr(int* rgba, int rgbaSize, void* cudaBuf)
+{
+    std::cout << "MAPPING INT RGBA TO FLOAT BGR WITH CUDA" << std::endl;
+
+    void* devicePtr;
+    cudaMalloc(&devicePtr, rgbaSize * sizeof(int));
+    cudaMemcpy(
+        devicePtr,
+        (void*)rgba,
+        rgbaSize * sizeof(int),
+        cudaMemcpyHostToDevice);
+
+    convertIntToFloatWithMean(
+        rgba,
+        1024,
+        512,
+        cudaBuf,
+        1024,
+        make_float3(104.0069879317889f, 116.66876761696767f, 122.6789143406786f));
+
+    cudaFree(devicePtr);
+
+}
+

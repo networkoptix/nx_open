@@ -69,12 +69,12 @@ int QnStorageStatusRestHandler::executeGet(
     QString storageUrl;
 
     if(!requireParameter(params, lit("path"), result, &storageUrl))
-        return nx_http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::invalidParameter;
 
     auto storage = aux::getOrCreateStorage(owner->commonModule(), storageUrl);
     if (!storage)
-        return nx_http::StatusCode::invalidParameter;
+        return nx::network::http::StatusCode::invalidParameter;
 
     result.setReply(aux::createReply(storage));
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

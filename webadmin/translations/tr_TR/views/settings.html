@@ -17,8 +17,8 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
             </alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
@@ -42,7 +42,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                             Sunucu geçerli sistemden ayrılacaktır. Video arşivi bozulmadan kalacaktır.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrika ayarlarına geri yükle</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Sunucuyu mevcut sistemden ayır</h3>
                         <p>Bu aksiyon sunucuyu, tutulan veritabanından, yerel kullanıcılardan ve ayarlardan ayırır.
                             Video arşivi bozulmadan kalacaktır. <b>Tüm bulut kullanıcıları silindi.</b></p>
@@ -68,9 +68,9 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>Ad</h3>
                         <div class="row">
@@ -117,9 +117,9 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                                    target="_blank">Hesap {{Config.cloud.productName}} Yarat</a></p>
                         </div>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
                         <h3>Cihaz Ağ Ayarları</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
@@ -148,7 +148,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -161,7 +161,7 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -180,8 +180,8 @@ Lütfen ağa bağlanın veya doğru IP Adresini yazın.
                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">İstemciyi durdur</button></p>
                         <p>Kontrol etmek için bir klavye/mouse veya mobil uygulama kullan.</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

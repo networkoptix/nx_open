@@ -5,6 +5,7 @@
 #include <deque>
 #include <functional>
 #include <memory>
+#include <set>
 
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/singleton.h>
@@ -14,12 +15,13 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/system_error.h>
 
-#include "resolve/predefined_host_resolver.h"
-#include "resolve/system_resolver.h"
+#include "resolve/abstract_resolver.h"
 #include "socket_common.h"
 
 namespace nx {
 namespace network {
+
+class PredefinedHostResolver;
 
 class NX_NETWORK_API DnsResolver:
     public QnLongRunnable
@@ -40,7 +42,7 @@ public:
      * @param handler MUST not block
      * @param requestId Used to cancel request. Multiple requests can be started using same request id.
      * @return false if failed to start asynchronous resolve operation
-     * @note It is garanteed that reqID is set before completionHandler is called.
+     * NOTE: It is garanteed that reqID is set before completionHandler is called.
      */
     void resolveAsync(const QString& hostName, Handler handler, int ipVersion, RequestId requestId);
     SystemError::ErrorCode resolveSync(
@@ -49,7 +51,7 @@ public:
         std::deque<HostAddress>* resolvedAddresses);
 
     /**
-     * @param waitForRunningHandlerCompletion if true, this method blocks until 
+     * @param waitForRunningHandlerCompletion if true, this method blocks until
      * running completion handler (if any) returns.
      */
     void cancel(RequestId requestId, bool waitForRunningHandlerCompletion);
@@ -60,6 +62,12 @@ public:
     /** Has even greater priority than /etc/hosts. */
     void addEtcHost(const QString& name, std::vector<HostAddress> addresses);
     void removeEtcHost(const QString& name);
+
+    /**
+     * Every attempt to resolve hostName will fails with SystemError::hostNotFound.
+     */
+    void blockHost(const QString& hostName);
+    void unblockHost(const QString& hostName);
 
     /**
      * @param priority Greater value increases priority.
@@ -96,6 +104,7 @@ private:
     std::chrono::milliseconds m_resolveTimeout;
     PredefinedHostResolver* m_predefinedHostResolver;
     std::multimap<int, std::unique_ptr<AbstractResolver>, std::greater<int>> m_resolversByPriority;
+    std::set<QString> m_blockedHosts;
 
     bool isExpired(const ResolveTask& task) const;
 };

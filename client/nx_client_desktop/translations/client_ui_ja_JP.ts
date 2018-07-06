@@ -147,6 +147,52 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation>キーワードをスペースで区切る</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>キャプションに含まれる:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>説明に含まれる:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation>イベントタイプ:</translation>
+    </message>
+  </context>
+  <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Fixed Archive Length</source>
+      <translation>アーカイブ保持期間</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>最低(日)</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>自動</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>最大(日)</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -334,6 +380,34 @@
     </message>
   </context>
   <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation>ブックマーク情報</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>エリア幅</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>フォントサイズ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation>説明を含める</translation>
+    </message>
+  </context>
+  <context>
     <name>BookmarkWidget</name>
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
@@ -369,7 +443,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>リフレッシュ</translation>
     </message>
@@ -567,72 +641,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>アドバンス設定は利用できません</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation>エキスパート設定を有効にする</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation>カメラ設定コントロール</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>注： 画質とフレーム数のみで、録画スケジュールには影響しません.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation>2番目のストリームコントロール</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation>ストリーム設定</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation>使用しない</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation>低画質</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation>標準画質</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation>高画質</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>注：高画質を選択するとCPUおよびネットワーク負荷に影響を及ぼします.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation>アーカイブコントロール</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>プライマリーストリームのアーカイブを行わない</translation>
     </message>
@@ -640,11 +651,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation>セカンダリーストリームのアーカイブを行わない</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation>メディアストリームコントロール</translation>
     </message>
     <message>
       <location/>
@@ -673,43 +679,8 @@
     </message>
     <message>
       <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>注意　低画質は低解像度が適応されます.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion detection control</source>
-      <translation>モーション検出コントロール</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
       <translation>ストリームのモーション検出を強制:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation>ビットレート/秒ではなく GOP でビットレートを計算する (カメラのビットレートが増加します)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation>カメラのストリームおよびプロファイルの設定を保持する</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation>&quot;カメラの設定の最適化有効&quot;はシステムアドミニストレーションで無効になっています</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation>注：システムパフォーマンスに対する影響を理解せずに変更は行わないでください</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation>PTZコントロール</translation>
     </message>
     <message>
       <location/>
@@ -721,12 +692,87 @@
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>警告！カメラのプリセットは使用できません</translation>
     </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation>システムパフォーマンスに対する影響を理解せずに変更は行わないでください</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation>カメラ設定</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation>カメラのストリームおよびプロファイル設定を保持する</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation>録画スケジュールの品質とフレームレート (FPS) 設定は無関係になります</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation>毎秒のビットレートの代わりにGOPあたりのビットレートを計算する</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation>それはカメラのビットレートを増加させます</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>セカンダリストリーム</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation>セカンダリ ストリームを無効にする</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>モーション検知</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation>アーカイブ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation>メディア ストリーム</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>生成</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>リセット</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>論理ID</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>入力ID</translation>
     </message>
   </context>
@@ -752,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>出力ID：</translation>
     </message>
   </context>
@@ -787,26 +833,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation>録画しない</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation>アーカイブ保持期間</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>自動</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>最低(日)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>最大(日)</translation>
     </message>
     <message>
       <location/>
@@ -868,6 +894,11 @@
       <source>Motion + Lo-Res</source>
       <translation>常時低 ＋ モーション高解像度</translation>
     </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>ビットレート</translation>
+    </message>
   </context>
   <context>
     <name>ChangeUserPasswordDialog</name>
@@ -883,11 +914,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>ログインを維持</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Emailまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>
@@ -942,6 +968,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>説明に含まれる:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>カテゴリー</translation>
     </message>
   </context>
   <context>
@@ -1022,6 +1056,16 @@
       <source>HTTP URL</source>
       <translation>HTTP URL</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>認証タイプ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>要求のタイプ</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -1032,31 +1076,70 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
+    <name>ExportLayoutSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>ラピッドレビューのエクスポート</translation>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>エクスポート設定</translation>
     </message>
     <message>
       <location/>
-      <source>Initial Video Length</source>
-      <translation>イニシャルビデオ長</translation>
+      <source>Make read-only</source>
+      <translation>読取り専用</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>エクスポート設定</translation>
     </message>
     <message>
       <location/>
-      <source>Exported Video Length</source>
-      <translation>エクスポートビデオ長</translation>
+      <source>Apply Filters</source>
+      <translation>フィルタの適用</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>フレームインターバル</translation>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation>回転、歪補正、イメージ拡張など</translation>
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>ラピッドレビュースピード</translation>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation>フィルタを適用してオーバーレイを追加するにはトランスコードが必要となり、CPU使用率が高くなり、時間がかかることがあります</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation>ビデオエクスポート</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation>単一のカメラ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation>エクスポート設定</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation>複数ビデオ</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation>参照...</translation>
     </message>
   </context>
   <context>
@@ -1207,6 +1290,39 @@
     </message>
   </context>
   <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation>イメージ:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation>サイズ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>透過度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>デフォルト</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>参照...</translation>
+    </message>
+  </context>
+  <context>
     <name>ImagePreviewDialog</name>
     <message>
       <location filename="../src/ui/dialogs/image_preview_dialog.ui"/>
@@ -1317,7 +1433,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>サーバーの URL</translation>
+      <translation>サーバー URL</translation>
     </message>
     <message>
       <location/>
@@ -1397,7 +1513,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>ハードウェアID:</translation>
     </message>
   </context>
@@ -1496,8 +1612,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>ハードウェア Id</translation>
+      <source>Hardware ID</source>
+      <translation>ハードウェア ID</translation>
     </message>
   </context>
   <context>
@@ -1623,8 +1739,8 @@
     </message>
     <message>
       <location/>
-      <source>Showreel cycle</source>
-      <translation>シーケンス表示サイクル</translation>
+      <source>Tour cycle</source>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1671,6 +1787,24 @@
       <location/>
       <source>Expert</source>
       <translation>エキスパート</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation>新しいウェアラブルカメラ...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation>サーバー</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;ウェアラブル カメラ&quot; はシステム上の任意のサーバーにビデオをアップロードして、すべてのユーザーがアクセスできるビデオ ファイルの仮想ストレージです</translation>
     </message>
   </context>
   <context>
@@ -1882,11 +2016,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>ログインを維持</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>Emailまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>
@@ -2135,6 +2264,39 @@
     </message>
   </context>
   <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation>ラピッドレビュー</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation>イニシャルビデオ長</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation>エクスポートビデオ長</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation>スピード</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation>フレームインターバル</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation>スピードリセット</translation>
+    </message>
+  </context>
+  <context>
     <name>ReconnectInfoDialog</name>
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
@@ -2225,7 +2387,7 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>解像度:</translation>
+      <translation>解像度</translation>
     </message>
     <message>
       <location/>
@@ -2521,11 +2683,6 @@
       <source>Reset</source>
       <translation>リセット</translation>
     </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation>テキストラベル</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2699,11 +2856,6 @@
       <source>Backup Settings...</source>
       <translation>バックアップ設定...</translation>
     </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>無効になっているストレージへの記録は停止しますが古い記録の削除は実行されます</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2788,6 +2940,34 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation>テキスト</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>削除</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>フォントサイズ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation>プレーンテキストまたはHTMLを入力</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>エリア幅</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
@@ -2798,6 +2978,29 @@
       <location/>
       <source>Sync time with the Internet</source>
       <translation>インターネットで時刻同期</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation>タイムスタンプ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>フォントサイズ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation>フォーマット</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>削除</translation>
     </message>
   </context>
   <context>
@@ -2835,14 +3038,18 @@
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>カスタムユーザーの役割はまだありません　 &quot;新しい役割&quot;ボタンをクリックして作成してください</translation>
+      <source>New role</source>
+      <translation>新しい役割</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>新しい役割</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>カスタムユーザーの役割はまだありません</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>&quot;新しい役割&quot; ボタンをクリックして作成します</translation>
     </message>
   </context>
   <context>
@@ -2861,6 +3068,50 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>役割を編集...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Motion Detection</source>
+      <translation>モーション検知</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation>アップロード動画のモーション検出</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>感度:</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Upload Video</source>
+      <translation>ビデオをアップロード</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation>ファイルをアップロード...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation>フォルダをアップロード...</translation>
     </message>
   </context>
   <context>

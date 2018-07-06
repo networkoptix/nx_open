@@ -46,7 +46,7 @@ public:
     virtual void connect(
         nx::hpm::api::ConnectRequest connectData,
         utils::MoveOnlyFunc<void(
-            stun::TransportHeader /*stunTransportHeader*/,
+            network::stun::TransportHeader /*stunTransportHeader*/,
             nx::hpm::api::ResultCode,
             nx::hpm::api::ConnectResponse)> completionHandler) = 0;
 
@@ -58,9 +58,9 @@ public:
 };
 
 class NX_NETWORK_API AbstractMediatorClientTcpConnection:
-    public AbstractMediatorClientConnection<stun::AsyncClientUser>
+    public AbstractMediatorClientConnection<network::stun::AsyncClientUser>
 {
-    using base_type = AbstractMediatorClientConnection<stun::AsyncClientUser>;
+    using base_type = AbstractMediatorClientConnection<network::stun::AsyncClientUser>;
 
 public:
     template<typename ... Args>
@@ -71,9 +71,9 @@ public:
 };
 
 class NX_NETWORK_API AbstractMediatorClientUdpConnection:
-    public AbstractMediatorClientConnection<stun::UdpClient>
+    public AbstractMediatorClientConnection<network::stun::UdpClient>
 {
-    using base_type = AbstractMediatorClientConnection<stun::UdpClient>;
+    using base_type = AbstractMediatorClientConnection<network::stun::UdpClient>;
 
 public:
     template<typename ... Args>
@@ -131,7 +131,7 @@ public:
     virtual void connect(
         nx::hpm::api::ConnectRequest connectData,
         utils::MoveOnlyFunc<void(
-            stun::TransportHeader /*stunTransportHeader*/,
+            network::stun::TransportHeader /*stunTransportHeader*/,
             nx::hpm::api::ResultCode,
             nx::hpm::api::ConnectResponse)> completionHandler) override
     {

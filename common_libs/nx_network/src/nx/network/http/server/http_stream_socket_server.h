@@ -6,7 +6,9 @@
 #include "http_message_dispatcher.h"
 #include "http_server_connection.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 class NX_NETWORK_API HttpStreamSocketServer:
     public nx::network::server::StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
@@ -19,8 +21,8 @@ public:
 
     template<typename ... StreamServerArgs>
     HttpStreamSocketServer(
-        nx_http::server::AbstractAuthenticationManager* const authenticationManager,
-        nx_http::AbstractMessageDispatcher* const httpMessageDispatcher,
+        nx::network::http::server::AbstractAuthenticationManager* const authenticationManager,
+        nx::network::http::AbstractMessageDispatcher* const httpMessageDispatcher,
         StreamServerArgs... streamServerArgs)
         :
         base_type(std::move(streamServerArgs)...),
@@ -37,9 +39,16 @@ protected:
         std::unique_ptr<AbstractStreamSocket> _socket) override;
 
 private:
-    nx_http::server::AbstractAuthenticationManager* const m_authenticationManager;
-    nx_http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
+    nx::network::http::server::AbstractAuthenticationManager* const m_authenticationManager;
+    nx::network::http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
     bool m_persistentConnectionEnabled;
 };
 
-} // namespace nx_http
+class NX_NETWORK_API StreamConnectionHolder:
+    public nx::network::server::StreamConnectionHolder<nx::network::http::AsyncMessagePipeline>
+{
+};
+
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>Português (PT)</translation>
+      <translation>Português (Brazil)</translation>
     </message>
   </context>
   <context>
@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Erro desconhecido.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -53,11 +53,6 @@
       <translation type="unfinished">The discovered System %1 has an incompatible version %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to the other System because current System is already connected to %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation type="unfinished">The discovered System %1 is in safe mode.</translation>
@@ -68,19 +63,33 @@
       <translation type="unfinished">Could not configure the remote System %1.</translation>
     </message>
     <message>
+      <source>New System</source>
+      <translation>New System</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>The discovered System %1 is incompatible with the current System.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Cannot connect to the other System because current System is already connected to %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">Both Systems are connected to %1. Merge is not allowed.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">These Systems are built with different %1 URL. Merge is not allowed.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
     </message>
   </context>
   <context>
@@ -95,7 +104,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -131,7 +140,7 @@
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation>Não é possível ligar ao porto HTTP %1.</translation>
+      <translation>Não é possível ligar ao porto http %1.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
@@ -246,18 +255,6 @@
       <translation>Verifique que a porta %1 está acessível (ex: reencaminhada).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation type="unfinished">If it does not help, restore factory defaults on the device web-page.</translation>
     </message>
@@ -305,6 +302,22 @@
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
     </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation type="unfinished">Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -318,7 +331,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Não foi possível inicializar o encoder do audio.</translation>
+      <translation>Não foi possível inicializar o encoder de áudio.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
@@ -361,7 +374,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Não foi possível alocar o stream para gravação.</translation>
+      <translation>Não foi possível alocar o stream de saída para gravação.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
@@ -384,7 +397,7 @@
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Não foi possível inicializar o encoder do video.</translation>
+      <translation>Não foi possível inicializar o encoder de vídeo.</translation>
     </message>
   </context>
   <context>
@@ -407,7 +420,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -415,7 +428,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Start</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -477,20 +490,28 @@
       <source>Time Licenses</source>
       <translation type="unfinished">Time Licenses</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation type="unfinished">Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation type="unfinished">Bridge Licenses</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>É usada %n %2 de um total de %1.</numerusform>
+        <numerusform>São usadas %n %2 de um total de %1.</numerusform>
         <numerusform>São usadas %n %2 de um total de %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>Será usada %n %2 de um total de %1.</numerusform>
+        <numerusform>Serão usadas %n %2 de um total de %1.</numerusform>
         <numerusform>Serão usadas %n %2 de um total de %1.</numerusform>
       </translation>
     </message>
@@ -521,7 +542,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>License is expired</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -540,15 +561,15 @@
       <translation>Erro desconhecido</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation type="unfinished">Server with matching Hardware ID not found</translation>
     </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>New Server</translation>
     </message>
   </context>
   <context>
@@ -633,7 +654,7 @@
     </message>
     <message>
       <source>I/O modules</source>
-      <translation>módulos I/O</translation>
+      <translation>Módulos I/O</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -641,7 +662,7 @@
     </message>
     <message>
       <source>I/O module</source>
-      <translation>módulo I/O</translation>
+      <translation>Módulo I/O</translation>
     </message>
   </context>
   <context>
@@ -663,31 +684,31 @@
       <translation type="unfinished">Watermark: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation type="unfinished">Time License</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation type="unfinished">Hardware ID: %1</translation>
     </message>
   </context>
   <context>
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>O Mais Baixo</translation>
+      <translation>Menor</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Baixo</translation>
+      <translation>Baixa</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Médio</translation>
+      <translation>Média</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Alto</translation>
+      <translation>Alta</translation>
     </message>
     <message>
       <source>Best</source>
@@ -744,7 +765,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Não foi possível alocar o stream de saída para gravação.</translation>
+      <translation>Não foi possível alocar o stream para gravação.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -766,6 +787,10 @@
       <source>Invalid resource type for data export.</source>
       <translation type="unfinished">Invalid resource type for data export.</translation>
     </message>
+    <message>
+      <source>No data exported.</source>
+      <translation type="unfinished">No data exported.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -778,7 +803,7 @@
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Not Found</source>
@@ -811,7 +836,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
@@ -902,9 +927,9 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>minutos</numerusform>
+        <numerusform>minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1030,7 +1055,7 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bookmark</translation>
     </message>
     <message>
       <source>Panic recording</source>
@@ -1101,7 +1126,7 @@
     </message>
     <message>
       <source>Storage Failure</source>
-      <translation>Falha de Armazenamento </translation>
+      <translation>Falha de Armazenamento</translation>
     </message>
     <message>
       <source>Network Issue</source>
@@ -1195,7 +1220,7 @@
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>A CÂmara %1 foi desligada</translation>
+      <translation>A câmara %1 foi desligada</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
@@ -1286,12 +1311,12 @@
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2  {1:?} {2?}</translation>
+      <translation>MAC #%1: %2</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>Servidor %1 em conflito : %2</translation>
+      <translation>Servidor %1 em conflito: %2</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
@@ -1448,11 +1473,11 @@
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Role</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Users</numerusform>
         <numerusform>%n Users</numerusform>
       </translation>
@@ -1470,7 +1495,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>All Users</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1494,7 +1519,16 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Acknowledge</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation type="unfinished">Analytics Event</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 em %2</translation>
     </message>
   </context>
   <context>

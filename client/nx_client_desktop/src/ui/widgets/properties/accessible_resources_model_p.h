@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/client/desktop/ui/common/column_remap_proxy_model.h>
+#include <nx/client/desktop/common/models/column_remap_proxy_model.h>
 
 #include <client_core/connection_context_aware.h>
 
@@ -12,11 +12,11 @@
 *  which a user gains implicit access to the resource of corresponding row.
 */
 class QnAccessibleResourcesModel:
-    public nx::client::desktop::ui::ColumnRemapProxyModel,
+    public nx::client::desktop::ColumnRemapProxyModel,
     public QnConnectionContextAware
 {
     Q_OBJECT
-    using base_type = nx::client::desktop::ui::ColumnRemapProxyModel;
+    using base_type = nx::client::desktop::ColumnRemapProxyModel;
 
 public:
     enum Column

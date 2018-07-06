@@ -17,9 +17,9 @@ namespace ec2 {
     public:
         virtual const ec2::ApiPeerData& localPeer() const = 0;
         virtual const ec2::ApiPeerData& remotePeer() const = 0;
-        virtual QUrl remoteAddr() const = 0;
+        virtual nx::utils::Url remoteAddr() const = 0;
         virtual bool isIncoming() const = 0;
-        virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const = 0;
+        virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const = 0;
 
         bool shouldTransactionBeSentToPeer(const QnAbstractTransaction& transaction);
     };

@@ -6,12 +6,13 @@
 #include "api_globals.h"
 #include "api_resource_data.h"
 #include "api_media_server_data.h"
-#include "api_camera_data_ex.h"
-#include "api_client_info_data.h"
+#include <nx/vms/api/data/camera_data_ex.h>
+#include <nx/vms/api/data/client_info_data.h>
 #include "api_license_data.h"
-#include "api_business_rule_data.h"
-#include "api_layout_data.h"
+#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include "api_user_data.h"
+#include <nx/vms/api/data/videowall_data.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -33,17 +34,17 @@ namespace std
 namespace ec2 {
 
     struct ApiCameraDataStatistics
-		: ApiCameraDataEx
+		: nx::vms::api::CameraDataEx
     {
         ApiCameraDataStatistics();
-        ApiCameraDataStatistics(ApiCameraDataEx&& data);
+        ApiCameraDataStatistics(nx::vms::api::CameraDataEx&& data);
 
 		const static std::set<QString> EXCEPT_PARAMS;
         const static std::set<QString> RESOURCE_PARAMS;
     };
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
-    (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
+    (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(disableDualStreaming) \
         (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferredServerId)(backupType)
 
     struct ApiStorageDataStatistics
@@ -79,10 +80,10 @@ namespace ec2 {
 #define ApiLicenseStatistics_Fields (name)(key)(cameraCount)(licenseType)(version)(brand)(expiration)(validation)
 
 	struct ApiBusinessRuleStatistics
-		: ApiBusinessRuleData
+		: nx::vms::api::EventRuleData
 	{
         ApiBusinessRuleStatistics();
-        ApiBusinessRuleStatistics(ApiBusinessRuleData&& data);
+        ApiBusinessRuleStatistics(nx::vms::api::EventRuleData&& data);
 	};
 #define ApiBusinessRuleStatistics_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState) \
 	(actionType)(actionResourceIds)(actionParams)(aggregationPeriod)(disabled)(schedule)(system)
@@ -113,11 +114,12 @@ namespace ec2 {
         std::vector<ApiCameraDataStatistics> cameras;
         std::vector<ApiLicenseStatistics> licenses;
         std::vector<ApiMediaServerDataStatistics> mediaservers;
-        std::vector<ApiLayoutData> layouts;
+        nx::vms::api::LayoutDataList layouts;
         std::vector<ApiUserDataStatistics> users;
+        nx::vms::api::VideowallDataList videowalls;
     };
 #define ApiSystemStatistics_Fields (systemId) \
-    (mediaservers)(cameras)(licenses)(businessRules)(layouts)(users) \
+    (mediaservers)(cameras)(licenses)(businessRules)(layouts)(users)(videowalls) \
     (reportInfo)
 
     struct ApiStatisticsServerInfo

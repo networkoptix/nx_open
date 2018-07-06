@@ -1,12 +1,14 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QRect>
+#include <QtCore/QSize>
 #include <QtCore/QUrl>
 #include <QtMultimedia/QMediaPlayer>
-#include <QtCore/QSize>
-#include <QtCore/QRect>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/media/abstract_metadata_consumer.h>
+#include <nx/media/media_fwd.h>
 
 class QAbstractVideoSurface;
 
@@ -42,10 +44,6 @@ class PlayerPrivate;
 class Player: public QObject
 {
     Q_OBJECT
-
-    Q_ENUMS(State)
-    Q_ENUMS(MediaStatus)
-    Q_ENUMS(VideoQuality)
 
     /**
      * Source url to open. In order to support multiserver archive, media player supports
@@ -113,6 +111,7 @@ public:
         Paused,
         Previewing,
     };
+    Q_ENUM(State)
 
     enum class MediaStatus
     {
@@ -128,6 +127,7 @@ public:
         EndOfMedia,
         InvalidMedia,
     };
+    Q_ENUM(MediaStatus)
 
     enum VideoQuality
     {
@@ -137,6 +137,17 @@ public:
         LowIframesOnlyVideoQuality = 2, //< Native stream, low quality, I-frames only.
         CustomVideoQuality //< A number greater or equal to this is treated as a number of lines.
     };
+    Q_ENUM(VideoQuality)
+
+    enum TranscodingSupportStatus
+    {
+        TranscodingDisabled,
+        TranscodingSupported,
+        TranscodingNotSupported,
+        TranscodingNotSupportedForServersOlder30,
+        TranscodingNotSupportedForArmServers,
+    };
+    Q_ENUM(TranscodingSupportStatus)
 
 public:
     Player(QObject *parent = nullptr);
@@ -202,6 +213,8 @@ public:
 
     QSize currentResolution() const;
 
+    Q_INVOKABLE TranscodingSupportStatus transcodingStatus() const;
+
     QRect videoGeometry() const;
     void setVideoGeometry(const QRect& rect);
 
@@ -210,6 +223,21 @@ public:
 
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
+
+    RenderContextSynchronizerPtr renderContextSynchronizer() const;
+    void setRenderContextSynchronizer(RenderContextSynchronizerPtr value);
+
+    /**
+     * Add new metadata consumer.
+     * @return True if success, false if specified consumer already exists.
+     */
+    bool addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
+
+    /**
+     * Remove metadata consumer.
+     * @return True if success, false if specified consumer is not found.
+     */
+    bool removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
 
 public slots:
     void play();

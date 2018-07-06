@@ -17,7 +17,6 @@ namespace Qn
     static const QString IS_AUDIO_SUPPORTED_PARAM_NAME = lit("isAudioSupported");
     static const QString STREAM_FPS_SHARING_PARAM_NAME = lit("streamFpsSharing");
     static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
-    static const QString FORCED_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
     static const QString MOTION_WINDOW_CNT_PARAM_NAME = lit("motionWindowCnt");
     static const QString MOTION_MASK_WINDOW_CNT_PARAM_NAME = lit("motionMaskWindowCnt");
     static const QString MOTION_SENS_WINDOW_CNT_PARAM_NAME = lit("motionSensWindowCnt");
@@ -61,34 +60,47 @@ namespace Qn
     static const QString kUnauthrizedTimeoutParamName = lit("unauthorizedTimeoutSec");
     static const QString TWO_WAY_AUDIO_PARAM_NAME = lit("2WayAudio");
     static const QString kCombinedSensorsDescriptionParamName = lit("combinedSensorsDescription");
+    static const QString kAnalyticsDriversParamName = lit("analyticsDrivers");
+    static const QString kGroupPlayParamName = lit("groupplay");
+    static const QString kCanShareLicenseGroup = lit("canShareLicenseGroup");
+    static const QString kMediaTraits = lit("mediaTraits");
+    static const QString kDeviceType = lit("deviceType");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 
     static const QString PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME = lit("preStreamConfigureRequests");
 
     static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
+    static const QString IGNORE_CAMERA_TIME_IF_BIG_JITTER_PARAM_NAME = lit("ignoreCameraTimeIfBigJitter");
     //!Contains QnCameraAdvancedParams in ubjson-serialized state
     static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
     static const QString IS_AUDIO_FORCED_PARAM_NAME = lit("forcedAudioStream");
-	static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
+    static const QString VIDEO_DISABLED_PARAM_NAME = lit("noVideoSupport");
     static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
     static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
     static const QString IO_OVERLAY_STYLE_PARAM_NAME = lit("ioOverlayStyle");
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
+    static const QString MAC_FROM_MULTICAST_PARAM_NAME = lit("macFromMulticast");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
+    static const QString PTZ_CAPABILITIES_TO_ADD_PARAM_NAME = lit("ptzCapabilitiesToAdd");
+    static const QString PTZ_CAPABILITIES_TO_REMOVE_PARAM_NAME = lit("ptzCapabilitiesToRemove");
     static const QString DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME = lit("disableNativePtzPresets");
-	static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
+    static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
     static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
     static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");
     static const QString VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME = lit("multiresourceVideoChannelMapping");
     static const QString NO_RECORDING_PARAMS_PARAM_NAME = lit("noRecordingParams");
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
     static const QString DISABLE_HEVC_PARAMETER_NAME = lit("disableHevc");
+    static const QString kCanConfigureRemoteRecording = lit("canConfigureRemoteRecording");
+
+    // Mediaserver common info
+    static const QString kTimezoneUtcOffset = lit("timezoneUtcOffset");
 
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");

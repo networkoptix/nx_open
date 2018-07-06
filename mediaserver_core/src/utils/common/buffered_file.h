@@ -17,7 +17,7 @@
 
 class QBufferedFile;
 
-class QN_EXPORT QueueFileWriter: public QnLongRunnable
+class QueueFileWriter: public QnLongRunnable
 {
 public:
     QueueFileWriter();
@@ -67,7 +67,7 @@ private:
     FileBlockInfo* popData();
 };
 
-class QN_EXPORT QBufferedFile: public QIODevice
+class QBufferedFile: public QIODevice
 {
     Q_OBJECT
 public:

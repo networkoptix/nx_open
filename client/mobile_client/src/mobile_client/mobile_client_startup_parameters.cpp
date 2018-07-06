@@ -11,11 +11,11 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
 {
     QCommandLineParser parser;
 
-    const auto basePathOption = QCommandLineOption(
-        lit("base-path"),
+    const auto qmlRootOption = QCommandLineOption(
+        lit("qml-root"),
         lit("The directory which contains runtime ui resources: 'qml' and 'images'."),
-        lit("basePath"));
-    parser.addOption(basePathOption);
+        lit("qmlRoot"));
+    parser.addOption(qmlRootOption);
 
     const auto liteModeOption = QCommandLineOption(
         lit("lite-mode"),
@@ -63,8 +63,8 @@ QnMobileClientStartupParameters::QnMobileClientStartupParameters(
 
     parser.parse(application.arguments());
 
-    if (parser.isSet(basePathOption))
-        basePath = parser.value(basePathOption);
+    if (parser.isSet(qmlRootOption))
+        qmlRoot = parser.value(qmlRootOption);
 
     liteMode = parser.isSet(liteModeOption);
 

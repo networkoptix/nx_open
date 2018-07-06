@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation>הדלק/כבה</translation>
+      <translation>מתג</translation>
     </message>
     <message>
       <source>Scroll Left</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Setup</source>
-      <translation>תצורה</translation>
+      <translation>הגדרות</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation>&amp;HTML:</translation>
+      <translation type="unfinished">&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
@@ -565,7 +565,7 @@ Please verify the correct file name was given.</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
@@ -658,11 +658,11 @@ Do you want to delete it anyway?</source>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation>%1 ט"ב</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 ג"ב</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>
@@ -735,7 +735,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation>&amp;סגור</translation>
+      <translation>&amp;סגירה</translation>
     </message>
     <message>
       <source>Close without Saving</source>
@@ -835,7 +835,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation>%1, ...</translation>
+      <translation type="unfinished">%1, ...</translation>
     </message>
   </context>
   <context>
@@ -862,7 +862,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -936,7 +936,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>סגור</translation>
+      <translation>סגירה</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -944,7 +944,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Discard</source>
-      <translation>שכח</translation>
+      <translation>בטל</translation>
     </message>
     <message>
       <source>Help</source>
@@ -1168,7 +1168,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <source>Select All</source>

@@ -9,6 +9,8 @@
 
 #include <recording/time_period_list.h>
 
+#include <nx/utils/log/log.h>
+
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
@@ -86,20 +88,29 @@ void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodContent type, const Qn
     update();
 }
 
-void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) {
-    m_selectedPeriod = QnTimePeriod(windowStart, windowEnd - windowStart);
+void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd)
+{
+    QnTimePeriod period = QnTimePeriod(windowStart + m_localOffset, windowEnd - windowStart);
 
-    if(m_selectedPeriod.startTimeMs >= m_selectedDaysPeriod.startTimeMs && m_selectedPeriod.startTimeMs < m_selectedDaysPeriod.startTimeMs + DAY &&
-        m_selectedPeriod.endTimeMs() <= m_selectedDaysPeriod.endTimeMs() && m_selectedPeriod.endTimeMs() > m_selectedDaysPeriod.endTimeMs() - DAY)
-        return; /* Ok, no update needed. */
+    // Calculate the first day of the window.
+    QDateTime dayStart = QDateTime::fromMSecsSinceEpoch(period.startTimeMs);
+    qint64 dayWindowStartMs = QDateTime(dayStart.date(), QTime()).toMSecsSinceEpoch();
+    // Calculate the last day of the window.
 
-    qint64 dayWindowStart = QDateTime(QDateTime::fromMSecsSinceEpoch(windowStart).date(), QTime()).toMSecsSinceEpoch();
-    qint64 dayWindowEnd = QDateTime(QDateTime::fromMSecsSinceEpoch(windowEnd + DAY - 1).date(), QTime()).toMSecsSinceEpoch();
-    QnTimePeriod dayWindow = QnTimePeriod(dayWindowStart - m_localOffset, dayWindowEnd - dayWindowStart);
-    if(m_selectedDaysPeriod == dayWindow)
+    QDateTime dayEnd = QDateTime::fromMSecsSinceEpoch(period.endTimeMs() + DAY - 1);
+    qint64 dayWindowEndMs = QDateTime(dayEnd.date(), QTime()).toMSecsSinceEpoch();
+
+    QnTimePeriod dayWindow(dayWindowStartMs, dayWindowEndMs - dayWindowStartMs - 1);
+
+    if (m_selectedPeriod == dayWindow)
         return;
 
-    m_selectedDaysPeriod = dayWindow;
+    m_selectedPeriod = dayWindow;
+
+    NX_VERBOSE(this) << "QnCalendarWidget::setSelectedWindow selectedPeriod = " << m_selectedPeriod << " from period = " << period;
+    NX_VERBOSE(this) << "QnCalendarWidget::setSelectedWindow local time ="
+        << QDateTime::fromMSecsSinceEpoch(this->m_currentTime)
+        << " server time =" << QDateTime::fromMSecsSinceEpoch(this->m_currentTime - m_localOffset);
     update();
 }
 
@@ -121,15 +132,16 @@ bool QnCalendarWidget::isEmpty() {
 
 void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const
 {
-    QnTimePeriod period(QDateTime(date).toMSecsSinceEpoch(), DAY);
-    if (period.startTimeMs > m_currentTime)
-        period = QnTimePeriod();
+    QnTimePeriod localPeriod(QDateTime(date).toMSecsSinceEpoch() - m_localOffset, DAY);
+    if (localPeriod.startTimeMs > m_currentTime)
+        localPeriod.startTimeMs = QnTimePeriod().startTimeMs;
 
-    const QnTimePeriod localPeriod(period.startTimeMs - m_localOffset, period.durationMs);
     const bool isEnabled = m_enabledPeriod.intersects(localPeriod);
     const bool isSelected = m_selectedPeriod.intersects(localPeriod);
 
-    const int dayOfWeek = date.dayOfWeek();
+    QDateTime day(QDateTime::fromMSecsSinceEpoch(localPeriod.startTimeMs).date(), QTime());
+
+    const int dayOfWeek = day.date().dayOfWeek();
     const auto foregroundRole = (dayOfWeek == Qt::Saturday || dayOfWeek == Qt::Sunday) && isEnabled
         ? QPalette::BrightText
         : QPalette::Text;
@@ -160,11 +172,14 @@ void QnCalendarWidget::updateEmpty() {
     emit emptyChanged();
 }
 
-void QnCalendarWidget::updateEnabledPeriod() {
-    qint64 startMSecs = QDateTime(minimumDate()).toMSecsSinceEpoch();
-    qint64 endMSecs = QDateTime(maximumDate()).addDays(1).toMSecsSinceEpoch();
+void QnCalendarWidget::updateEnabledPeriod()
+{
+    qint64 enabledStartMs = QDateTime(minimumDate()).toMSecsSinceEpoch();
+    qint64 enabledEndMs = QDateTime(maximumDate()).addDays(1).toMSecsSinceEpoch();
 
-    m_enabledPeriod = QnTimePeriod(startMSecs, endMSecs - startMSecs);
+    m_enabledPeriod = QnTimePeriod(enabledStartMs + m_localOffset, enabledEndMs - enabledStartMs);
+    NX_VERBOSE(this) << "QnCalendarWidget::updateEnabledPeriod() enabledPeriod = " << m_enabledPeriod;
+    return;
 }
 
 void QnCalendarWidget::updateCurrentTime() {
@@ -187,12 +202,14 @@ qint64 QnCalendarWidget::localOffset() const {
     return m_localOffset;
 }
 
-void QnCalendarWidget::setLocalOffset(qint64 localOffset) {
+void QnCalendarWidget::setLocalOffset(qint64 localOffset)
+{
     if(m_localOffset == localOffset)
         return;
 
     m_localOffset = localOffset;
 
+    updateEnabledPeriod();
     update();
 }
 

@@ -35,12 +35,12 @@ const model::ClientSessionPool& Model::clientSessionPool() const
     return m_clientSessionPool;
 }
 
-model::ListeningPeerPool& Model::listeningPeerPool()
+relaying::ListeningPeerPool& Model::listeningPeerPool()
 {
     return m_listeningPeerPool;
 }
 
-const model::ListeningPeerPool& Model::listeningPeerPool() const
+const relaying::ListeningPeerPool& Model::listeningPeerPool() const
 {
     return m_listeningPeerPool;
 }
@@ -54,26 +54,6 @@ const model::AbstractRemoteRelayPeerPool& Model::remoteRelayPeerPool() const
 {
     return *m_remoteRelayPeerPool;
 }
-
-namespace model {
-
-static RemoteRelayPeerPoolFactory::FactoryFunc remoteRelayPeerPoolFactoryFunc;
-
-std::unique_ptr<model::AbstractRemoteRelayPeerPool> RemoteRelayPeerPoolFactory::create(
-    const conf::Settings& settings)
-{
-    if (remoteRelayPeerPoolFactoryFunc)
-        return remoteRelayPeerPoolFactoryFunc(settings);
-
-    return std::make_unique<model::RemoteRelayPeerPool>(settings);
-}
-
-void RemoteRelayPeerPoolFactory::setFactoryFunc(FactoryFunc func)
-{
-    remoteRelayPeerPoolFactoryFunc.swap(func);
-}
-
-} // namespace model
 
 } // namespace relay
 } // namespace cloud

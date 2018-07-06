@@ -70,7 +70,7 @@ std::string ConnectionFactory::toString(api::ResultCode resultCode) const
 
 void ConnectionFactory::setCloudUrl(const std::string& url)
 {
-    m_endPointFetcher.setUrl(QUrl(QString::fromStdString(url)));
+    m_endPointFetcher.setUrl(nx::utils::Url(QString::fromStdString(url)));
 }
 
 }   //client

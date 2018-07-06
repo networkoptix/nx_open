@@ -18,6 +18,9 @@ function instantiate_config()
 {
     export CUSTOMIZATION=$1
     export CLOUD_PORTAL_CONF_DIR=$CLOUD_PORTAL_BASE_CONF_DIR/$customization
+    mkdir --parents $CLOUD_PORTAL_CONF_DIR
+
+    local CLOUD_PORTAL_CONF_TEMPLATE=$CLOUD_PORTAL_BASE_CONF_DIR/_source/cloud_portal.yaml
     local CLOUD_PORTAL_CONF=$CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
     local CLOUD_PORTAL_LOCK=${CLOUD_PORTAL_CONF}.lock
 
@@ -26,9 +29,9 @@ function instantiate_config()
 
     (
         flock -n 9 || exit 1
-
         tmp=$(tempfile)
-        envsubst < $CLOUD_PORTAL_CONF > $tmp
+
+        envsubst < $CLOUD_PORTAL_CONF_TEMPLATE > $tmp
         mv $tmp $CLOUD_PORTAL_CONF
 
         if [ -n "$MODULE_CONFIGURATION" ]
@@ -38,6 +41,7 @@ function instantiate_config()
 
         rm $CLOUD_PORTAL_LOCK
     ) 9> $CLOUD_PORTAL_LOCK
+
 }
 
 function write_my_cnf()
@@ -72,11 +76,7 @@ do
             echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
             yes "yes" | python manage.py migrate
-            yes "yes" | python manage.py createcachetable
-
-            python manage.py initdb
             python manage.py readstructure
-            python manage.py initbranding
             ;;
         config)
             instantiate_configs
@@ -96,17 +96,13 @@ do
             write_my_cnf
             rm -f /tmp/*.pid
 
-            python manage.py filldata all
-
             exec celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         broadcast_notifications)
             write_my_cnf
             rm -f /tmp/*.pid
 
-            python manage.py filldata all
-
-            exec celery worker -Q broadcast-notifications -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
+            exec celery worker -Q broadcast-notifications -A notifications -l info -B --concurrency=1 --pidfile=/tmp/celery-w1.pid
             ;;
         *)
             echo Usage: cloud_portal '[web|broadcast_notifications|celery|config|copystatic|migratedb]'

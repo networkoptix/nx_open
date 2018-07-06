@@ -226,7 +226,6 @@ void QnVoiceSpectrumAnalyzer::fillSpectrumData()
         currentStep -= stepsPerBand;
         result.data.push_back(qBound(0.0, value / maxFreqSum, 1.0));
     }
-    //Q_ASSERT_X(result.data.size() == kBands, Q_FUNC_INFO, "Invalid bands count");
 
     // convert result data to Db
     for (auto& data: result.data)
@@ -242,7 +241,6 @@ void QnVoiceSpectrumAnalyzer::fillSpectrumData()
 QnSpectrumData QnVoiceSpectrumAnalyzer::getSpectrumData() const
 {
     QnMutexLocker lock(&m_mutex);
-    //Q_ASSERT_X(m_spectrumData.data.isEmpty() || m_spectrumData.data.size() == kBands, Q_FUNC_INFO, "Invalid result size");
     return m_spectrumData;
 }
 

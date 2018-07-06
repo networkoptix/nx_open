@@ -7,12 +7,13 @@
 #include <network/tcp_connection_priv.h>
 #include <utils/common/util.h>
 #include "nx_ec/data/api_runtime_data.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "common/common_module.h"
 #include "licensing/license.h"
 #include "api/runtime_info_manager.h"
 #include "utils/license_usage_helper.h"
 #include "api/app_server_connection.h"
+#include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include <nx/fusion/serialization/json_functions.h>
@@ -20,6 +21,8 @@
 #include "rest/server/rest_connection_processor.h"
 #include <llutil/hardware_id.h>
 #include <licensing/license_validator.h>
+#include <licensing/hardware_id_version.h>
+#include <nx/utils/license/util.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
@@ -125,7 +128,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
     const QVector<QString> hardwareIds = commonModule->licensePool()->hardwareIds();
     for (const QString& hwid: hardwareIds)
     {
-        int version = LLUtil::hardwareIdVersion(hwid);
+        int version = nx::utils::license::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)
@@ -190,7 +193,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
 
         license = QnLicense::readFromStream(is);
         QnLicenseValidator validator(owner->commonModule());
-        auto licenseErrCode = validator.validate(license, QnLicenseValidator::VM_CheckInfo);
+        auto licenseErrCode = validator.validate(license, QnLicenseValidator::VM_CanActivate);
         if (licenseErrCode != QnLicenseErrorCode::NoError)
         {
             result.setError(

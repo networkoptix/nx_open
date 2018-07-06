@@ -97,6 +97,8 @@ private:
 
     QVariant rowCheckState(const QModelIndex& index) const;
 
+    void paintExtraStatus(QPainter* painter, const QRect& iconRect, const QModelIndex& index) const;
+
 private:
     QPointer<QnWorkbench> m_workbench;
     QIcon m_recordingIcon;

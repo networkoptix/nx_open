@@ -3,9 +3,10 @@
 #include <functional>
 
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 #include <api/server_rest_connection_fwd.h>
 
-#include "../file_information.h"
+#include <nx/vms/common/p2p/downloader/file_information.h>
 
 namespace nx {
 namespace vms {
@@ -24,6 +25,7 @@ public:
     /** @return Human readable peer name. This is mostly used in logs. */
     virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const = 0;
+    virtual QList<QnUuid> peers() const = 0;
     virtual int distanceTo(const QnUuid& peerId) const = 0;
     virtual bool hasInternetConnection(const QnUuid& peerId) const = 0;
 
@@ -52,10 +54,16 @@ public:
     virtual rest::Handle downloadChunkFromInternet(
         const QnUuid& peerId,
         const QString& fileName,
-        const QUrl& url,
+        const nx::utils::Url& url,
         int chunkIndex,
         int chunkSize,
         ChunkCallback callback) = 0;
+
+    using ValidateCallback = std::function<void(bool, rest::Handle)>;
+    virtual rest::Handle validateFileInformation(
+        const QnUuid& peerId,
+        const FileInformation& fileInformation,
+        ValidateCallback callback) = 0;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) = 0;
 };
@@ -64,7 +72,7 @@ class AbstractPeerManagerFactory
 {
 public:
     virtual ~AbstractPeerManagerFactory();
-    virtual AbstractPeerManager* createPeerManager() = 0;
+    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerSelectionPolicy peerPolicy) = 0;
 };
 
 } // namespace downloader

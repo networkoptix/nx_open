@@ -53,12 +53,14 @@ class SeamlessVideoDecoderPrivate: public QObject
     SeamlessVideoDecoder *q_ptr;
 
 public:
-    SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent);
+    SeamlessVideoDecoderPrivate(
+        SeamlessVideoDecoder* parent, RenderContextSynchronizerPtr renderContextSynchronizer);
 
     void addMetadata(const QnConstCompressedVideoDataPtr& frame);
     const FrameMetadata findMetadata(int frameNum);
     void clearMetadata();
     int decoderFrameNumToLocalNum(int value) const;
+
 public:
     std::deque<QVideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
     VideoDecoderPtr videoDecoder;
@@ -73,15 +75,20 @@ public:
 
     bool allowOverlay;
     SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
+
+    RenderContextSynchronizerPtr renderContextSynchronizer;
 };
 
-SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent)
-:
+SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(
+    SeamlessVideoDecoder* parent,
+    RenderContextSynchronizerPtr renderContextSynchronizer)
+    :
     QObject(parent),
     q_ptr(parent),
     videoDecoder(nullptr, nullptr),
     frameNumber(0),
-    decoderFrameOffset(0)
+    decoderFrameOffset(0),
+    renderContextSynchronizer(renderContextSynchronizer)
 {
 }
 
@@ -119,9 +126,9 @@ int SeamlessVideoDecoderPrivate::decoderFrameNumToLocalNum(int value) const
 //-------------------------------------------------------------------------------------------------
 // SeamlessVideoDecoder
 
-SeamlessVideoDecoder::SeamlessVideoDecoder():
+SeamlessVideoDecoder::SeamlessVideoDecoder(RenderContextSynchronizerPtr renderContextSynchronizer):
     QObject(),
-    d_ptr(new SeamlessVideoDecoderPrivate(this))
+    d_ptr(new SeamlessVideoDecoderPrivate(this, renderContextSynchronizer))
 {
 }
 
@@ -188,7 +195,7 @@ bool SeamlessVideoDecoder::decode(
         d->videoDecoder.reset();
 
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
-            frame->compressionType, frameInfo.size, d->allowOverlay);
+            frame->compressionType, frameInfo.size, d->allowOverlay, d->renderContextSynchronizer);
         if (d->videoDecoder)
             d->videoDecoder->setVideoGeometryAccessor(d->videoGeometryAccessor);
         d->decoderFrameOffset = d->frameNumber;

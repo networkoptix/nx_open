@@ -22,7 +22,7 @@ class QnAdjustVideoDialog : public QnSessionAwareButtonBoxDialog {
     typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
-    explicit QnAdjustVideoDialog(QWidget *parent = NULL);
+    explicit QnAdjustVideoDialog(QWidget *parent);
     virtual ~QnAdjustVideoDialog();
 
     ImageCorrectionParams params() const;

@@ -5,7 +5,7 @@
 #include <update/updates_common.h>
 
 #include <utils/common/system_information.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 class QnAsyncHttpClientReply;
 
@@ -58,11 +58,11 @@ private slots:
 
 private:
     struct UpdateServerInfo {
-        QUrl url;
+        nx::utils::Url url;
     };
 
-    QUrl m_mainUpdateUrl;
-    QUrl m_currentUpdateUrl;
+    nx::utils::Url m_mainUpdateUrl;
+    nx::utils::Url m_currentUpdateUrl;
     QList<UpdateServerInfo> m_updateServers;
 
     QnUpdateTarget m_target;
@@ -75,7 +75,7 @@ private:
     QnUpdateFileInformationPtr m_clientUpdateFile;
     bool m_clientRequiresInstaller;
 
-    QUrl m_releaseNotesUrl;
+    nx::utils::Url m_releaseNotesUrl;
     QString m_description;
     QString m_cloudHost;
 

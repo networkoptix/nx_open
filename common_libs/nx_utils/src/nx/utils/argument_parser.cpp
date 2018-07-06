@@ -24,7 +24,7 @@ void ArgumentParser::parse(const QStringList& args)
     std::vector<const char*> argv;
     for (const auto& arg: latin1Args)
         argv.push_back(arg.data());
-    parse(latin1Args.size(), &argv[0]);
+    parse((int) latin1Args.size(), &argv[0]);
 }
 
 void ArgumentParser::parse(int argc, const char* argv[])

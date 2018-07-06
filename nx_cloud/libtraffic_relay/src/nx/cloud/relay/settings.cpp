@@ -25,36 +25,8 @@ static const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3349");
 static const QLatin1String kHttpTcpBacklogSize("http/tcpBacklogSize");
 static constexpr int kDefaultHttpTcpBacklogSize = 4096;
 
-//-------------------------------------------------------------------------------------------------
-// ListeningPeer
-
-static const QLatin1String kRecommendedPreemptiveConnectionCount(
-    "listeningPeer/recommendedPreemptiveConnectionCount");
-constexpr int kDefaultRecommendedPreemptiveConnectionCount = 7;
-
-static const QLatin1String kMaxPreemptiveConnectionCount(
-    "listeningPeer/maxPreemptiveConnectionCount");
-constexpr int kDefaultMaxPreemptiveConnectionCount =
-    kDefaultRecommendedPreemptiveConnectionCount * 2;
-
-static const QLatin1String kDisconnectedPeerTimeout("listeningPeer/disconnectedPeerTimeout");
-static std::chrono::milliseconds kDefaultDisconnectedPeerTimeout = std::chrono::seconds(15);
-
-static const QLatin1String kTakeIdleConnectionTimeout("listeningPeer/takeIdleConnectionTimeout");
-static std::chrono::milliseconds kDefaultTakeIdleConnectionTimeout = std::chrono::seconds(5);
-
-static const QLatin1String kInternalTimerPeriod("listeningPeer/internalTimerPeriod");
-static std::chrono::milliseconds kDefaultInternalTimerPeriod = std::chrono::seconds(1);
-
-static const QLatin1String kInactivityPeriodBeforeFirstProbe(
-    "listeningPeer/tcpInactivityPeriodBeforeFirstProbe");
-static const std::chrono::seconds kDefaultInactivityPeriodBeforeFirstProbe(60);
-
-static const QLatin1String kProbeSendPeriod("listeningPeer/tcpProbeSendPeriod");
-static const std::chrono::seconds kDefaultProbeSendPeriod(60);
-
-static const QLatin1String kProbeCount("listeningPeer/tcpProbeCount");
-static const int kDefaultProbeCount(3);
+const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityTimeout");
+const std::chrono::minutes kDefaultHttpInactivityTimeout(1);
 
 //-------------------------------------------------------------------------------------------------
 // ConnectingPeer
@@ -82,19 +54,10 @@ static constexpr std::chrono::seconds kDefaultDelayBeforeRetryingInitialConnect 
 static const QString kModuleName = lit("traffic_relay");
 
 Http::Http():
-    tcpBacklogSize(kDefaultHttpTcpBacklogSize)
+    tcpBacklogSize(kDefaultHttpTcpBacklogSize),
+    connectionInactivityTimeout(kDefaultHttpInactivityTimeout)
 {
-    endpoints.push_back(SocketAddress(kDefaultHttpEndpointsToListen));
-}
-
-ListeningPeer::ListeningPeer():
-    recommendedPreemptiveConnectionCount(kDefaultRecommendedPreemptiveConnectionCount),
-    maxPreemptiveConnectionCount(kDefaultMaxPreemptiveConnectionCount),
-    disconnectedPeerTimeout(kDefaultDisconnectedPeerTimeout),
-    takeIdleConnectionTimeout(kDefaultTakeIdleConnectionTimeout),
-    internalTimerPeriod(kDefaultInternalTimerPeriod),
-    tcpKeepAlive()
-{
+    endpoints.push_back(network::SocketAddress(kDefaultHttpEndpointsToListen));
 }
 
 ConnectingPeer::ConnectingPeer():
@@ -141,7 +104,7 @@ utils::log::Settings Settings::logging() const
     return m_logging;
 }
 
-const ListeningPeer& Settings::listeningPeer() const
+const relaying::Settings& Settings::listeningPeer() const
 {
     return m_listeningPeer;
 }
@@ -165,7 +128,7 @@ void Settings::loadSettings()
 {
     m_logging.load(settings(), QLatin1String("log"));
     loadHttp();
-    loadListeningPeer();
+    m_listeningPeer.load(settings());
     loadConnectingPeer();
     loadCassandraHost();
 }
@@ -182,53 +145,15 @@ void Settings::loadHttp()
             httpAddrToListenStrList.begin(),
             httpAddrToListenStrList.end(),
             std::back_inserter(m_http.endpoints),
-            [](const QString& str) { return SocketAddress(str); });
+            [](const QString& str) { return network::SocketAddress(str); });
     }
 
     m_http.tcpBacklogSize = settings().value(
         kHttpTcpBacklogSize, kDefaultHttpTcpBacklogSize).toInt();
-}
 
-void Settings::loadListeningPeer()
-{
-    using namespace std::chrono;
-
-    m_listeningPeer.recommendedPreemptiveConnectionCount = settings().value(
-        kRecommendedPreemptiveConnectionCount,
-        kDefaultRecommendedPreemptiveConnectionCount).toInt();
-
-    m_listeningPeer.maxPreemptiveConnectionCount = settings().value(
-        kMaxPreemptiveConnectionCount,
-        m_listeningPeer.recommendedPreemptiveConnectionCount*2).toInt();
-
-    m_listeningPeer.disconnectedPeerTimeout =
-        nx::utils::parseTimerDuration(
-            settings().value(kDisconnectedPeerTimeout).toString(),
-            kDefaultDisconnectedPeerTimeout);
-
-    m_listeningPeer.takeIdleConnectionTimeout =
-        nx::utils::parseTimerDuration(
-            settings().value(kTakeIdleConnectionTimeout).toString(),
-            kDefaultTakeIdleConnectionTimeout);
-
-    m_listeningPeer.internalTimerPeriod =
-        nx::utils::parseTimerDuration(
-            settings().value(kInternalTimerPeriod).toString(),
-            kDefaultInternalTimerPeriod);
-
-    m_listeningPeer.tcpKeepAlive.inactivityPeriodBeforeFirstProbe = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings().value(kInactivityPeriodBeforeFirstProbe).toString(),
-            kDefaultInactivityPeriodBeforeFirstProbe));
-
-    m_listeningPeer.tcpKeepAlive.probeSendPeriod = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings().value(kProbeSendPeriod).toString(),
-            kDefaultProbeSendPeriod));
-
-    m_listeningPeer.tcpKeepAlive.probeCount = settings().value(
-        kProbeCount,
-        kDefaultProbeCount).toInt();
+    m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
+        settings().value(kHttpConnectionInactivityTimeout).toString(),
+        kDefaultHttpInactivityTimeout);
 }
 
 void Settings::loadConnectingPeer()

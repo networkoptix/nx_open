@@ -1,39 +1,50 @@
 #include "scene_transformations.h"
 
-#include <cassert>
+#include <nx/client/core/utils/geometry.h>
+#include <nx/utils/log/assert.h>
 
-#include <QtCore/QDebug>
-
-#include "geometry.h"
-
+using nx::client::core::Geometry;
 
 namespace {
-#ifdef QN_SCENE_TRANSFORMATIONS_DEBUG
-    void debugViewportRect(QGraphicsView *view) {
-        QRectF rect = QnGeometry::mapRectToScene(view, view->viewport()->rect());
-        qDebug() << "SCENE VIEWPORT RECT:" << rect;
-    }
+
+#if defined(QN_SCENE_TRANSFORMATIONS_DEBUG)
+
+void debugViewportRect(QGraphicsView* view)
+{
+    QRectF rect = Geometry::mapRectToScene(view, view->viewport()->rect());
+    qDebug() << "SCENE VIEWPORT RECT:" << rect;
+}
+
 #else
-#   define debugViewportRect(...)
+
+#define debugViewportRect(...)
+
 #endif
 
-} // anonymous namespace
+} // namespace
 
-void QnSceneTransformations::moveViewport(QGraphicsView *view, const QPoint &viewportPositionDelta) {
-    NX_ASSERT(view != NULL);
+void QnSceneTransformations::moveViewport(QGraphicsView* view, const QPoint& viewportPositionDelta)
+{
+    NX_ASSERT(view);
 
-    moveViewportScene(view, view->mapToScene(viewportPositionDelta) - view->mapToScene(QPoint(0, 0)));
+    moveViewportScene(
+        view, view->mapToScene(viewportPositionDelta) - view->mapToScene(QPoint(0, 0)));
 }
 
-void QnSceneTransformations::moveViewport(QGraphicsView *view, const QPointF &viewportPositionDelta) {
-    NX_ASSERT(view != NULL);
+void QnSceneTransformations::moveViewport(
+    QGraphicsView* view, const QPointF& viewportPositionDelta)
+{
+    NX_ASSERT(view);
 
     QTransform viewportToScene = view->viewportTransform().inverted();
-    moveViewportScene(view, viewportToScene.map(viewportPositionDelta) - viewportToScene.map(QPointF(0.0, 0.0)));
+    moveViewportScene(
+        view, viewportToScene.map(viewportPositionDelta) - viewportToScene.map(QPointF(0.0, 0.0)));
 }
 
-void QnSceneTransformations::moveViewportScene(QGraphicsView *view, const QPointF &scenePositionDelta) {
-    NX_ASSERT(view != NULL);
+void QnSceneTransformations::moveViewportScene(
+    QGraphicsView* view, const QPointF& scenePositionDelta)
+{
+    NX_ASSERT(view);
 
     QGraphicsView::ViewportAnchor oldAnchor = view->transformationAnchor();
     bool oldInteractive = view->isInteractive();
@@ -48,8 +59,9 @@ void QnSceneTransformations::moveViewportScene(QGraphicsView *view, const QPoint
     debugViewportRect(view);
 }
 
-void QnSceneTransformations::moveViewportSceneTo(QGraphicsView *view, const QPointF &sceneCenter) {
-    NX_ASSERT(view != NULL);
+void QnSceneTransformations::moveViewportSceneTo(QGraphicsView* view, const QPointF& sceneCenter)
+{
+    NX_ASSERT(view);
 
     QTransform viewportToScene = view->viewportTransform().inverted();
     QPointF currentSceneCenter = viewportToScene.map(QRectF(view->viewport()->rect()).center());
@@ -58,20 +70,21 @@ void QnSceneTransformations::moveViewportSceneTo(QGraphicsView *view, const QPoi
 }
 
 namespace {
-    QPoint anchorViewportPosition(QGraphicsView *view, QGraphicsView::ViewportAnchor anchor) {
-        switch(anchor) {
-        case QGraphicsView::AnchorViewCenter:
-            return view->viewport()->rect().center();
-        case QGraphicsView::AnchorUnderMouse:
-            return view->mapFromGlobal(QCursor::pos());
-        default:
-            return QPoint(0, 0);
-        }
+QPoint anchorViewportPosition(QGraphicsView* view, QGraphicsView::ViewportAnchor anchor)
+{
+    switch (anchor)
+    {
+        case QGraphicsView::AnchorViewCenter: return view->viewport()->rect().center();
+        case QGraphicsView::AnchorUnderMouse: return view->mapFromGlobal(QCursor::pos());
+        default: return QPoint(0, 0);
     }
 }
+} // namespace
 
-void QnSceneTransformations::scaleViewport(QGraphicsView *view, qreal factor, const QPoint &viewportAnchor) {
-    NX_ASSERT(view != NULL);
+void QnSceneTransformations::scaleViewport(
+    QGraphicsView* view, qreal factor, const QPoint& viewportAnchor)
+{
+    NX_ASSERT(view);
 
     qreal sceneFactor = 1 / factor;
 
@@ -92,29 +105,36 @@ void QnSceneTransformations::scaleViewport(QGraphicsView *view, qreal factor, co
     debugViewportRect(view);
 }
 
-void QnSceneTransformations::scaleViewport(QGraphicsView *view, qreal factor, QGraphicsView::ViewportAnchor anchor) {
+void QnSceneTransformations::scaleViewport(
+    QGraphicsView* view, qreal factor, QGraphicsView::ViewportAnchor anchor)
+{
     return scaleViewport(view, factor, anchorViewportPosition(view, anchor));
 }
 
-void QnSceneTransformations::scaleViewportTo(QGraphicsView *view, const QSizeF &size, Qt::AspectRatioMode mode, QGraphicsView::ViewportAnchor anchor) {
-    NX_ASSERT(view != NULL);
+void QnSceneTransformations::scaleViewportTo(QGraphicsView* view,
+    const QSizeF& size,
+    Qt::AspectRatioMode mode,
+    QGraphicsView::ViewportAnchor anchor)
+{
+    NX_ASSERT(view);
 
-    qreal factor = QnGeometry::scaleFactor(mapRectToScene(view, view->viewport()->rect()).size(), size, mode);
+    qreal factor =
+        Geometry::scaleFactor(mapRectToScene(view, view->viewport()->rect()).size(), size, mode);
 
     scaleViewport(view, factor, anchor);
 }
 
-QRectF QnSceneTransformations::mapRectToScene(const QGraphicsView *view, const QRect &rect) {
+QRectF QnSceneTransformations::mapRectToScene(const QGraphicsView* view, const QRect& rect)
+{
     return mapRectToScene(view, QRectF(rect));
 }
 
-QRectF QnSceneTransformations::mapRectToScene(const QGraphicsView *view, const QRectF &rect) {
+QRectF QnSceneTransformations::mapRectToScene(const QGraphicsView* view, const QRectF& rect)
+{
     return view->viewportTransform().inverted().mapRect(rect);
 }
 
-QRect QnSceneTransformations::mapRectFromScene(const QGraphicsView *view, const QRectF &rect) {
+QRect QnSceneTransformations::mapRectFromScene(const QGraphicsView* view, const QRectF& rect)
+{
     return view->viewportTransform().mapRect(rect).toRect();
 }
-
-
-

@@ -53,11 +53,6 @@
       <translation>Le système %1 découvert a une version %2 incompatible.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Impossible de se connecter à l’autre système, parce que le système actuel est déjà connecté à %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Système découvert %1 est en mode sans échec.</translation>
@@ -68,19 +63,33 @@
       <translation>Ne peut pas configurer le système distant %1.</translation>
     </message>
     <message>
+      <source>New System</source>
+      <translation>Nouveau Système</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>Le système découvert %1 est incompatible avec le système actuel.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Impossible de se connecter à l’autre système, parce que le système actuel est déjà connecté à %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Les deux systèmes sont connectés au %1. Fusion non autorisée.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ces systèmes sont construits avec différents %1 URL. Fusion non autorisée.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Système Nuage peut seulement être fusionné avec un non-nuage. Nom Système et mot de passe sont pris du Système Nuage.</translation>
     </message>
   </context>
   <context>
@@ -246,18 +255,6 @@
       <translation>Assurez-vous que le port %1 est accessible.(redirigé).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer IPS dans les paramètres périphérique.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer IPS dans les paramètres caméra.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer IPS dans les paramètres module I/O.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Si cela n’aide pas, rétablir par défaut sur la page web périphérique.</translation>
     </message>
@@ -304,6 +301,22 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Caméra restaurée à partir des archives. Supprimez la caméra et ajoutez-la à nouveau pour voir la vidéo en direct.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer ips dans les paramètres périphérique (erreur &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer ips dans les paramètres caméra (erreur &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer ips dans les paramètres module I/O (erreur &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Veuillez mettre à jour le firmware. La version minimale prise en charge est %1. La version actuelle est %2</translation>
     </message>
   </context>
   <context>
@@ -477,6 +490,14 @@
       <source>Time Licenses</source>
       <translation>Licences Temps</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Pont</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Pont de Licenses</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -540,8 +561,8 @@
       <translation>Erreur inconnue</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Aucun Serveur avec ID matériel correspondant trouvé</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Aucun Serveur avec ID Matériel correspondant trouvé</translation>
     </message>
   </context>
   <context>
@@ -663,12 +684,12 @@
       <translation>Filigrane: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ID Matériel: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licence Temps</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID Matériel: %1</translation>
     </message>
   </context>
   <context>
@@ -765,6 +786,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Type de ressource invalide pour l’exportation de données.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Aucune donnée exportée.</translation>
     </message>
   </context>
   <context>
@@ -1304,7 +1329,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1495,6 +1520,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Reconnaître</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Événement Analytique</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 à %2</translation>
     </message>
   </context>
   <context>

@@ -34,6 +34,7 @@ static const QString kVideoCodecTypeTag = lit("videoCodecType");
 static const QString kVideoResolutionWidthTag = lit("videoResolutionWidth");
 static const QString kVideoResolutionHeightTag = lit("videoResolutionHeight");
 static const QString kFixedQualityTag = lit("fixedQuality");
+static const QString kFixedBitrateTag = lit("constantBitRate");
 static const QString kMaxFrameRateTag = lit("maxFrameRate");
 
 static const QString kRtspPortNumberTag = lit("rtspPortNo");
@@ -42,16 +43,20 @@ static const QString kPrimaryStreamNumber = lit("01");
 static const QString kSecondaryStreamNumber = lit("02");
 
 static const QString kCapabilitiesRequestPathTemplate =
-lit("/ISAPI/Streaming/channels/%1/capabilities");
+    lit("/ISAPI/Streaming/channels/%1/capabilities");
 
+// TODO: Find out if we have to try both paths.
 static const QString kChannelStreamingPathTemplate = lit("/Streaming/Channels/%1");
+static const QString kChannelStreamingPathForNvrTemplate = lit("/ISAPI/Streaming/channels/%1");
 
-static const std::array<QString, 5> kVideoChannelProperties = {
+static const std::array<QString, 6> kVideoChannelProperties = {
     kVideoCodecTypeTag,
     kVideoResolutionWidthTag,
     kVideoResolutionHeightTag,
     kFixedQualityTag,
-    kMaxFrameRateTag};
+    kMaxFrameRateTag,
+    kFixedBitrateTag
+};
 
 static const std::map<QString, AVCodecID> kCodecMap = {
     {lit("MJPEG"), AVCodecID::AV_CODEC_ID_MJPEG},
@@ -66,13 +71,15 @@ struct ChannelCapabilities
     std::vector<QSize> resolutions;
     std::vector<int> fps;
     std::vector<int> quality;
+    std::pair<int, int> bitrateRange;
 };
 
 // Intentionally use struct here just in case we need
 // some additional channel properties in the future.
 struct ChannelProperties
 {
-    int rtspPortNumber = 554;
+    int rtspPort = 0;
+    nx::utils::Url httpUrl;
 };
 
 struct ChannelStatusResponse final
@@ -101,16 +108,16 @@ struct CommonResponse final
 QnAudioFormat toAudioFormat(const QString& codecName, int sampleRateKHz);
 
 std::vector<ChannelStatusResponse> parseAvailableChannelsResponse(
-    nx_http::StringType message);
+    nx::network::http::StringType message);
 
 boost::optional<ChannelStatusResponse> parseChannelStatusResponse(
-    nx_http::StringType message);
+    nx::network::http::StringType message);
 
 boost::optional<OpenChannelResponse> parseOpenChannelResponse(
-    nx_http::StringType message);
+    nx::network::http::StringType message);
 
 boost::optional<CommonResponse> parseCommonResponse(
-    nx_http::StringType message);
+    nx::network::http::StringType message);
 
 bool parseChannelCapabilitiesResponse(
     const nx::Buffer& response,
@@ -136,27 +143,27 @@ bool parseTransportElement(
     ChannelProperties* outChannelProperties);
 
 bool doGetRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     nx::Buffer* outBuffer,
-    nx_http::StatusCode::Value* outStatusCode = nullptr);
+    nx::network::http::StatusCode::Value* outStatusCode = nullptr);
 
 bool doPutRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     const nx::Buffer& buffer,
-    nx_http::StatusCode::Value* outStatusCode = nullptr);
+    nx::network::http::StatusCode::Value* outStatusCode = nullptr);
 
 bool doRequest(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
-    const nx_http::Method::ValueType& method,
+    const nx::network::http::Method::ValueType& method,
     const nx::Buffer* bufferToSend = nullptr,
     nx::Buffer* outResponseBuffer = nullptr,
-    nx_http::StatusCode::Value* outStatusCode = nullptr
+    nx::network::http::StatusCode::Value* outStatusCode = nullptr
 );
 
-bool tuneHttpClient(nx_http::HttpClient* outHttpClient, const QAuthenticator& auth);
+bool tuneHttpClient(nx::network::http::HttpClient* outHttpClient, const QAuthenticator& auth);
 
 QString buildChannelNumber(Qn::ConnectionRole role, int channelNumber);
 

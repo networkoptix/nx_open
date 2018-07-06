@@ -11,11 +11,15 @@
 class QnMServerAuditManager: public QnAuditManager
 {
 public:
-    QnMServerAuditManager(QObject* parent);
+    QnMServerAuditManager(std::chrono::milliseconds lastRunningTime, QObject* parent);
     ~QnMServerAuditManager();
+
+    void flushRecords();
+    void stop();
 protected:
     virtual int addAuditRecordInternal(const QnAuditRecord& record) override;
     virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) override;
+
 private:
     QTimer m_timer;
     mutable QnMutex m_mutex;

@@ -14,7 +14,9 @@ public:
     virtual ~QnVMax480ArchiveDelegate();
 
 
-    virtual bool open(const QnResourcePtr &resource)override;
+    virtual bool open(
+        const QnResourcePtr &resource,
+        AbstractArchiveIntegrityWatcher* /*archiveIntegrityWatcher*/)override;
     virtual void close()override;
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
@@ -25,11 +27,12 @@ public:
 
     virtual void beforeClose() override;
 
-    virtual void onReverseMode(qint64 displayTime, bool value);
+    virtual void setSpeed(qint64 displayTime, double value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
     virtual int getChannel() const override;
 
+    virtual void setPlaybackMode(PlaybackMode mode) override;
     virtual void setGroupId(const QByteArray& data) override;
     virtual QnTimePeriodList chunks() override;
     virtual void beforeSeek(qint64 time) override;
@@ -53,6 +56,7 @@ private:
     bool m_ignoreNextSeek;
     qint64 m_lastMediaTime;
     int m_noDataCounter;
+    PlaybackMode m_playbackMode = PlaybackMode::Archive;
 };
 
 #endif // #ifdef ENABLE_VMAX

@@ -16,11 +16,13 @@ namespace cdb {
 AuthorizationManager::AuthorizationManager(
     const StreeManager& stree,
     const AbstractAccountManager& accountManager,
+    const AbstractSystemManager& systemManager,
     const AbstractSystemSharingManager& systemSharingManager,
     const AbstractTemporaryAccountPasswordManager& temporaryAccountPasswordManager)
 :
     m_stree(stree),
     m_accountManager(accountManager),
+    m_systemManager(systemManager),
     m_systemSharingManager(systemSharingManager),
     m_temporaryAccountPasswordManager(temporaryAccountPasswordManager)
 {
@@ -114,13 +116,55 @@ nx::utils::stree::ResourceContainer AuthorizationManager::addHelperAttributes(
 }
 
 bool AuthorizationManager::checkStaticRules(
-    EntityType /*requestedEntity*/,
-    DataActionType /*requestedAction*/,
+    EntityType requestedEntity,
+    DataActionType requestedAction,
     const nx::utils::stree::AbstractResourceReader& inputData,
-    nx::utils::stree::AbstractResourceWriter* /*outAuthzInfo*/) const
+    nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const
 {
+    NX_VERBOSE(this, "Checking static authorization rules");
+
+    // TODO: #ak Introduce some generic code for adding such rules.
+    // NOTE: Such rules should be added from outside, by corresponding managers.
+
+    if (!authorizeRequestToSystemBeingMerged(
+            requestedEntity,
+            requestedAction,
+            inputData,
+            outAuthzInfo))
+    {
+        return false;
+    }
+
     if (!authorizeTemporaryCredentials(inputData))
         return false;
+
+    return true;
+}
+
+bool AuthorizationManager::authorizeRequestToSystemBeingMerged(
+    EntityType requestedEntity,
+    DataActionType requestedAction,
+    const nx::utils::stree::AbstractResourceReader& inputData,
+    nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const
+{
+    if (requestedEntity == EntityType::system &&
+        (requestedAction == DataActionType::update || requestedAction == DataActionType::delete_))
+    {
+        // Checking system state.
+        const auto systemId = inputData.get<std::string>(attr::systemId);
+        if (!systemId)
+            return false;
+        const auto system = m_systemManager.findSystemById(*systemId);
+        if (!system)
+            return false;
+        if (system->status == api::SystemStatus::beingMerged)
+        {
+            outAuthzInfo->put(
+                attr::resultCode,
+                QnLexical::serialized(api::ResultCode::notAllowedInCurrentState));
+            return false;
+        }
+    }
 
     return true;
 }

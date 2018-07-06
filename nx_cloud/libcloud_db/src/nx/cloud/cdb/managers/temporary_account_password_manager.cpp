@@ -1,11 +1,5 @@
 #include "temporary_account_password_manager.h"
 
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-#include <zlib.h>
-#else
-#include <QtZlib/zlib.h>
-#endif
-
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -36,11 +30,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
-    const conf::Settings& settings,
     const nx::utils::stree::ResourceNameSet& attrNameset,
     nx::utils::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false)
 :
-    m_settings(settings),
     m_attrNameset(attrNameset),
     m_dbManager(dbManager)
 {
@@ -55,7 +47,7 @@ TemporaryAccountPasswordManager::~TemporaryAccountPasswordManager()
 }
 
 void TemporaryAccountPasswordManager::authenticateByName(
-    const nx_http::StringType& username,
+    const nx::network::http::StringType& username,
     std::function<bool(const nx::Buffer&)> checkPasswordHash,
     const nx::utils::stree::AbstractResourceReader& /*authSearchInputData*/,
     nx::utils::stree::ResourceContainer* const authProperties,
@@ -63,11 +55,12 @@ void TemporaryAccountPasswordManager::authenticateByName(
 {
     QnMutexLocker lk(&m_mutex);
 
+    auto authResultCode = api::ResultCode::notAuthorized;
     boost::optional<const TemporaryAccountCredentialsEx&> credentials =
-        findMatchingCredentials(lk, username.toStdString(), checkPasswordHash);
+        findMatchingCredentials(lk, username.toStdString(), checkPasswordHash, &authResultCode);
 
     if (!credentials)
-        return completionHandler(api::ResultCode::notAuthorized);
+        return completionHandler(authResultCode);
 
     authProperties->put(cdb::attr::credentialsId, QString::fromStdString(credentials->id));
 
@@ -123,7 +116,7 @@ void TemporaryAccountPasswordManager::addRandomCredentials(
     }
 
     data->password = generateRandomPassword();
-    data->passwordHa1 = nx_http::calcHa1(
+    data->passwordHa1 = nx::network::http::calcHa1(
         data->login.c_str(),
         data->realm.c_str(),
         data->password.c_str()).constData();
@@ -238,7 +231,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::updateCredentialsAttrib
         ":accessRights",
         QnSql::serialized_field(tempPasswordData.accessRights.toString(m_attrNameset)));
 
-    const auto passwordHa1 = nx_http::calcHa1(
+    const auto passwordHa1 = nx::network::http::calcHa1(
         credentials.login.c_str(),
         tempPasswordData.realm.c_str(),
         credentials.password.c_str()).toStdString();
@@ -470,8 +463,11 @@ boost::optional<const TemporaryAccountCredentialsEx&>
     TemporaryAccountPasswordManager::findMatchingCredentials(
         const QnMutexLockerBase& /*lk*/,
         const std::string& username,
-        std::function<bool(const nx::Buffer&)> checkPasswordHash)
+        std::function<bool(const nx::Buffer&)> checkPasswordHash,
+        api::ResultCode* authResultCode)
 {
+    *authResultCode = api::ResultCode::badUsername;
+
     auto& temporaryCredentialsByLogin = m_temporaryCredentials.get<kIndexByLogin>();
     auto tmpPasswordsRange = temporaryCredentialsByLogin.equal_range(username);
     if (tmpPasswordsRange.first == temporaryCredentialsByLogin.end())
@@ -488,9 +484,12 @@ boost::optional<const TemporaryAccountCredentialsEx&>
             continue;
         }
 
+        *authResultCode = api::ResultCode::notAuthorized;
+
         if (!checkPasswordHash(curIt->passwordHa1.c_str()))
             continue;
 
+        *authResultCode = api::ResultCode::ok;
         return *curIt;
     }
 

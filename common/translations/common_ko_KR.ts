@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>알수없는 오류</translation>
+      <translation>알 수 없는 오류.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -53,11 +53,6 @@
       <translation>검색 된 시스템 %1는 호환 되지 않는 버전 %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>현재 시스템 %1에 이미 연결 되어 있기 때문에 다른 시스템에 연결할 수 없습니다.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>검색 된 시스템 %1 안전 모드입니다.</translation>
@@ -68,19 +63,33 @@
       <translation>원격 시스템 %1를 구성할 수 없습니다.</translation>
     </message>
     <message>
+      <source>New System</source>
+      <translation>새로운 시스템</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>발견 된 시스템 %1이 (가) 현재 시스템과 호환되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>현재 시스템 %1에 이미 연결 되어 있기 때문에 다른 시스템에 연결할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1시스템은 %1이외의 항목과 만 병합 할 수 있습니다. 시스템 이름과 암호는 %1 시스템에서 가져옵니다.</translation>
+    </message>
+    <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>두 시스템은 %1에 연결 됩니다. 병합 허용 되지 않습니다.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>이러한 시스템은 다른 %1 URL로 연결됩니다. 병합할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
     </message>
   </context>
   <context>
@@ -88,7 +97,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation type="unfinished">System Event</translation>
+      <translation>시스템 이벤트</translation>
     </message>
   </context>
   <context>
@@ -123,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>서버 %1: &quot;%2&quot; 에서 잘못된 응답을 받았습니다.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -147,7 +156,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>입, 출력 오류가 발생하였습니다. OS 메세지: "%1".</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -171,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>기기 요청 &quot;%1&quot; 이 &quot;%2&quot; 오류로 실패했습니다.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>카메라 요청 &quot;%1&quot; 이 &quot;%2&quot; 오류로 실패했습니다.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -215,7 +224,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>I / O 모듈 요청 &quot;%1&quot; 이 &quot;%2&quot; 오류로 실패했습니다.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -244,18 +253,6 @@
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
       <translation>%1포트가 접속가능한지 확인하세요.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
@@ -303,7 +300,23 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>카메라 아카이브에서 복원 되었습니다. 라이브 비디오를 보려면 카메라를 삭제 한후 다시 추가하십시요.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>우선, 장치 설정에서 녹화모드를 켜고 FPS를 줄이세요 (오류 &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>펌웨어를 업데이트하십시오. 최소 지원 버전은 %1입니다. 현재 버전은 %2입니다</translation>
     </message>
   </context>
   <context>
@@ -399,15 +412,15 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>비디오 월</translation>
+      <translation>Video Wall</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -415,7 +428,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation>시작:</translation>
+      <translation>시작</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -475,7 +488,15 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Time Licenses</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>브릿지</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>브릿지 라이센스</translation>
     </message>
   </context>
   <context>
@@ -533,11 +554,11 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>알수없는 오류</translation>
+      <translation>알 수 없는 오류</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation type="unfinished">Server with matching Hardware Id not found</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>HWID와 일치하는 서버를 찾지 못했습니다</translation>
     </message>
   </context>
   <context>
@@ -638,11 +659,11 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>알수 없음</translation>
+      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>무료 인증키</translation>
+      <translation>무료 라이센스</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -653,12 +674,12 @@
       <translation>워터 마크: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation type="unfinished">Hardware Id: %1</translation>
+      <source>Time License</source>
+      <translation>Time Licenses</translation>
     </message>
     <message>
-      <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <source>Hardware ID: %1</source>
+      <translation>하드웨어 ID: %1</translation>
     </message>
   </context>
   <context>
@@ -681,7 +702,7 @@
     </message>
     <message>
       <source>Best</source>
-      <translation>최적</translation>
+      <translation>최고</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -756,6 +777,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>데이터 내보내기에 대 한 잘못 된 리소스 형식입니다.</translation>
     </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>내 보낼 데이타가 없습니다.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -826,7 +851,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>월</translation>
+      <translation>분</translation>
     </message>
     <message>
       <source>y</source>
@@ -977,7 +1002,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>사용자 지정.</translation>
+      <translation>사용자 정의</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1194,7 +1219,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>서버 &quot;%1&quot; 오류</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
@@ -1208,19 +1233,19 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>서버 &quot;%1&quot; 충돌</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>서버 &quot;%1&quot; 시작됨</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>서버 &quot;%1&quot; 에 라이센스 문제가 있습니다.</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>서버 &quot;%1&quot; 가 아카이브 백업을 완료했습니다.</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1232,7 +1257,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>여러 개의 %1 이벤트가 발생했습니다.</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1274,7 +1299,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>Trigger: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1284,8 +1309,8 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n 번, 첫 번째: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1348,11 +1373,11 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>HDD/SSD 디스크 "%1" 꽉 찼습니다. 디스크에 VM에 의해 관리 되지 않는 너무 많은 데이터를 포함 합니다.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>시스템 디스크 &quot;%1&quot; 가 거의 찼습니다.</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
@@ -1416,7 +1441,7 @@
     </message>
     <message>
       <source>Trigger Name</source>
-      <translation type="unfinished">Trigger Name</translation>
+      <translation>트리거 이름</translation>
     </message>
     <message>
       <source>Role</source>
@@ -1436,7 +1461,7 @@
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>모든 관리자</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -1448,23 +1473,32 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Soft Trigger</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Soft Trigger %1 at %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Soft trigger %1이 (가) 여러 번 활성화되었습니다.</translation>
     </message>
     <message>
       <source>Send email</source>
-      <translation type="unfinished">Send email</translation>
+      <translation>이메일 보내기</translation>
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>확인함</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>분석 이벤트</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%2 에서 %1</translation>
     </message>
   </context>
   <context>

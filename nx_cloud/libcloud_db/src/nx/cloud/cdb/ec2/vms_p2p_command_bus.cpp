@@ -1,12 +1,14 @@
 #include "vms_p2p_command_bus.h"
 
-#include "synchronization_engine.h"
+#include <nx/data_sync_engine/synchronization_engine.h>
 
 namespace nx {
 namespace cdb {
 namespace ec2 {
 
-VmsP2pCommandBus::VmsP2pCommandBus(SyncronizationEngine* syncronizationEngine):
+VmsP2pCommandBus::VmsP2pCommandBus(
+    data_sync_engine::SyncronizationEngine* syncronizationEngine)
+    :
     m_syncronizationEngine(syncronizationEngine)
 {
 }
@@ -14,7 +16,7 @@ VmsP2pCommandBus::VmsP2pCommandBus(SyncronizationEngine* syncronizationEngine):
 nx::utils::db::DBResult VmsP2pCommandBus::saveResourceAttribute(
     nx::utils::db::QueryContext* queryContext,
     const std::string& systemId,
-    ::ec2::ApiResourceParamWithRefData data)
+    nx::vms::api::ResourceParamWithRefData data)
 {
     return m_syncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
         queryContext,

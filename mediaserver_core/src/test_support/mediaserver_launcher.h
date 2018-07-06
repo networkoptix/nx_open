@@ -32,7 +32,7 @@ public:
         DisabledFeatures disabledFeatures = DisabledFeature::all);
     ~MediaServerLauncher();
 
-    SocketAddress endpoint() const;
+    nx::network::SocketAddress endpoint() const;
     int port() const;
     QnCommonModule* commonModule() const;
 
@@ -63,7 +63,7 @@ public:
     /**
      * Return media server API url
      */
-    QUrl apiUrl() const;
+    nx::utils::Url apiUrl() const;
 signals:
     void started();
 private:
@@ -71,7 +71,7 @@ private:
 
     std::ofstream m_configFile;
     nx::ut::utils::WorkDirResource m_workDirResource;
-    SocketAddress m_serverEndpoint;
+    nx::network::SocketAddress m_serverEndpoint;
     QString m_configFilePath;
     //nx::utils::thread m_mediaServerProcessThread;
     std::unique_ptr<MediaServerProcess> m_mediaServerProcess;

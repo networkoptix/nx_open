@@ -1,16 +1,11 @@
-/**********************************************************
-* 3 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef cloud_db_data_event_h
-#define cloud_db_data_event_h
-
+#pragma once
 
 namespace nx {
 namespace cdb {
 
-//!In case of \a type == \a etInsert or \a etUpdate object can be cast to corresponding \a DataInsertUpdateEvent
+/**
+ * In case of type == etInsert or etUpdate object can be cast to corresponding DataInsertUpdateEvent.
+ */
 template<typename DataType>
 class DataChangeEvent
 {
@@ -22,14 +17,12 @@ public:
         etUpdate,
         etDelete
     };
-    
+
     DataChangeEvent() : type(etNone) {}
-    
+
     EventType type;
     DataType data;
 };
 
-}   //cdb
-}   //nx
-
-#endif
+} // namespace cdb
+} // namespace nx

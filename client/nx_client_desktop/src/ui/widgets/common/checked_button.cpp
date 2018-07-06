@@ -6,7 +6,9 @@
 
 #include "utils/math/color_transformations.h"
 #include "utils/math/linear_combination.h"
-#include "ui/common/geometry.h"
+#include <nx/client/core/utils/geometry.h>
+
+using nx::client::core::Geometry;
 
 namespace {
     int lineWidth = 4;
@@ -24,14 +26,14 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     {
         QColor penColor = palette().color(isEnabled() ? QPalette::Active : QPalette::Inactive, QPalette::Highlight);
         painter.setPen(QPen(penColor, lineWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-        painter.drawRect(QnGeometry::eroded(QRectF(result.rect()), lineWidth / 2.0));
+        painter.drawRect(Geometry::eroded(QRectF(result.rect()), lineWidth / 2.0));
     }
 
     QColor brushColor(color);
     if (!enabled)
         brushColor = toGrayscale(linearCombine(0.5, brushColor, 0.5, palette().color(QPalette::Disabled, QPalette::Background)));
 
-    QRect rect = QnGeometry::eroded(result.rect(), lineWidth * 3 / 2);
+    QRect rect = Geometry::eroded(result.rect(), lineWidth * 3 / 2);
     painter.fillRect(rect, brushColor);
 
     if (insideColor.toRgb() != color.toRgb())

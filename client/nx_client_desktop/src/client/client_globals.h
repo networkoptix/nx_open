@@ -8,57 +8,6 @@
 namespace Qn
 {
     /**
-     * Type of a node in resource tree displayed to the user. Ordered as it should be displayed on the screen.
-     */
-    enum NodeType
-    {
-        // Single-occurrence nodes
-        RootNode,               /**< Root node for the tree (current system node). */
-        CurrentSystemNode,      /**< Root node, displaying current system name. */
-        CurrentUserNode,        /**< Root node, displaying current user. */
-        SeparatorNode,          /**< Root node for spacing between header and main part of the tree. */
-        ServersNode,            /**< Root node for servers for admin user. */
-        UserResourcesNode,      /**< Root node for cameras, i/o modules and statistics for non-admin user. */
-        LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
-        LayoutToursNode,        /**< Root node for the layout tours. */
-        WebPagesNode,           /**< Root node for web pages. */
-        UsersNode,              /**< Root node for user resources. */
-        OtherSystemsNode,       /**< Root node for remote systems. */
-        LocalResourcesNode,     /**< Root node for local resources. */
-        LocalSeparatorNode,     /**< Root node for spacing between local resources header and resources. */
-
-        BastardNode,            /**< Root node for hidden resources. */
-
-        // Per-user placeholder nodes
-        RoleUsersNode,          /**< Node that represents 'Users' node, displayed under roles. */
-        AllCamerasAccessNode,   /**< Node that represents 'All Cameras' placeholder, displayed under users and roles with full access. */
-        AllLayoutsAccessNode,   /**< Node that represents 'All Shared Layouts' placeholder, displayed under admins. */
-        SharedResourcesNode,    /**< Node that represents 'Cameras & Resources' node, displayed under users and roles with custom access. */
-        SharedLayoutsNode,      /**< Node that represents 'Layouts' node, displayed under users and roles with custom access. */
-
-        // Repeating nodes
-        RoleNode,               /**< Node that represents custom role. */
-        SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
-        RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
-        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
-        ResourceNode,           /**< Node that represents a resource. Has only resource. */
-        LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
-        EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
-
-        LayoutTourNode,         /**< Node that represents a layout tour. Has a guid. */
-
-        VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
-        VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
-
-        CloudSystemNode,        /**< Node that represents available cloud system. */
-        SystemNode,             /**< Node that represents systems but the current. */
-
-        NodeTypeCount
-    };
-
-    bool isSeparatorNode(NodeType t);
-
-    /**
      * Role of an item on the scene.
      *
      * Note that at any time there may exist no more than one item for each role.
@@ -90,29 +39,6 @@ namespace Qn
     Q_DECLARE_OPERATORS_FOR_FLAGS(ItemFlags)
 
     /**
-     * Layer of a graphics item on the scene.
-     *
-     * Workbench display presents convenience functions for moving items between layers
-     * and guarantees that items from the layers with higher numbers are always
-     * displayed on top of those from the layers with lower numbers.
-     */
-    enum ItemLayer
-    {
-        EMappingLayer,              /**< Layer for E-Mapping background. */
-        BackLayer,                  /**< Back layer. */
-        PinnedLayer,                /**< Layer for pinned items. */
-        PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
-        UnpinnedLayer,              /**< Layer for unpinned items. */
-        UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
-        ZoomedLayer,                /**< Layer for zoomed items. */
-        FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
-        EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
-        MessageBoxLayer,            /**< Layer for graphics text messages. */
-        LayerCount
-    };
-
-    /**
     * Generic enumeration holding different data roles used in Qn classes.
     */
     enum ItemDataRole
@@ -120,7 +46,8 @@ namespace Qn
         FirstItemDataRole = Qt::UserRole,
 
         /* Tree-based. */
-        NodeTypeRole,                               /**< Role for node type, see <tt>Qn::NodeType</tt>. */
+        NodeTypeRole,  /**< Role for node type, see <tt>ResourceTreeNodeType</tt>. */
+        ResourceTreeScopeRole, //< Role for ResourceTreeScope.
 
         /* Resource-based. */
         ResourceRole,                               /**< Role for QnResourcePtr. */
@@ -134,6 +61,8 @@ namespace Qn
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
         ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type QString. */
+
+        CameraExtraStatusRole,                      /**< Custom camera status (recording, buggy, etc). Value of CameraExtraStatus. */
 
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */
@@ -164,6 +93,7 @@ namespace Qn
         ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
         ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
         ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
+        ItemZoomWindowRectangleVisibleRole,         /**< Role for item's flag which controls if zoom window rectangle should be visible for the corresponding zoom window. */
         ItemImageEnhancementRole,                   /**< Role for item's image enhancement params. Value of type ImageCorrectionParams. */
         ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type QnItemDewarpingParams. */
         ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
@@ -172,6 +102,7 @@ namespace Qn
         ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
         ItemDisplayInfoRole,                        /**< Role for item's info state. Value of type bool. */
+        ItemPlaceholderRole,                        /**< Role for item's placeholder pixmap. Value of type QPixmap. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
@@ -183,6 +114,9 @@ namespace Qn
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
 
         ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
+
+        ItemAnalyticsModeSourceRegionRole,          /**< Role for original region in the analytics mode. */
+        ItemAnalyticsModeRegionIdRole,              /**< Role for source region id in the analytics mode. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
@@ -220,9 +154,13 @@ namespace Qn
         MergedTimePeriodsRole,
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TextRole,                                   /**< Role for generic text. Used in several places. */
+        IntRole,                                    /**< Role for generic integer. Used in several places. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and action::ConnectAction. */
         AutoLoginRole,                              /**< Role for flag that shows if client should connect with last credentials
                                                          (or to the last system) automatically next time */
+
+        LayoutTemplateRole,                         /**< Role for layout template. Used in StartAnalyticsAction. */
+
         StoreSessionRole,                          /**< Role for flag that shows if session on successful connection should be stored.
                                                          Used in action::ConnectAction. */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
@@ -252,12 +190,13 @@ namespace Qn
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
         PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
-        EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::event::EventType. */
+        EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::api::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<QnUuid>. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::event::ActionType. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::api::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
         ActionDataRole,                             /**< Role for business action. Value of type vms::event::AbstractActionPtr. */
         RuleModelRole, /* #deprecate #3.2 */        /**< Role for business rule caching model. Value of type QnBusinessRuleViewModelPtr. */
+        EventParametersRole,                            /**< Role for business event parameters. Value of type nx::vms::event::EventParameters. */
 
         StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
 
@@ -284,6 +223,30 @@ namespace Qn
 
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
+
+        ForceShowCamerasList,                       /**< Used for default password dialog. */
+        ParentWidgetRole,                           /** Used for dialg's parent widget*/
+
+        TimestampRole,                              /**< Role for timestamp in microseconds since epoch (qint64). */
+        TimestampTextRole,                          /**< Role for timestamp text (QString). */
+        DescriptionTextRole,                        /**< Role for generic description text (QString). */
+        AdditionalTextRole,                         /**< Role for additional description text (QString). */
+        RemovableRole,                              /**< An item is removable (bool). */
+        CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
+        ResourceListRole,                           /**< Resource list (QnResourceList). */
+        PreviewTimeRole,                            /**< Role for camera preview time in microseconds since epoch (qint64). */
+        TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (int). */
+        BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
+        ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
+        AnimatedRole,                               /**< Role for specifying whether item animation is allowed (bool). */
+        DurationRole,                               /**< Role for duration in milliseconds (qint64). */
+        NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
+        ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
+
+        // Model notification roles. Do not necessarily pass any data but implement
+        // item-related view-to-model notifications via setData which can be proxied.
+        DefaultNotificationRole,                    /**< Role to perform default item action (no data). */
+        ActivateLinkRole,                           /**< Role to parse and follow hyperlink (QString). */
 
         RoleCount
     };
@@ -357,6 +320,10 @@ namespace Qn
         ServerOfflineOverlay,
         ServerUnauthorizedOverlay,
         IoModuleDisabledOverlay,
+        TooManyOpenedConnectionsOverlay,
+        PasswordRequiredOverlay,
+        NoLiveStreamOverlay,
+        OldFirmwareOverlay,
 
         OverlayCount
     };
@@ -365,9 +332,10 @@ namespace Qn
     {
         Empty,
         Diagnostics,
-        IoEnable,
+        EnableLicense,
         MoreLicenses,
         Settings,
+        SetPassword
     };
 
     /**
@@ -384,15 +352,6 @@ namespace Qn
         NewFrameRendered    /**< New frame was rendered. */
     };
 
-    /**
-     * Modes of layout export.
-     */
-    enum LayoutExportMode
-    {
-        LayoutLocalSave,
-        LayoutLocalSaveAs,
-        LayoutExport
-    };
 
     /**
      * Flags describing the client light mode.
@@ -477,7 +436,7 @@ namespace Qn
 Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType)(Qn::ThumbnailStatus),
+    (Qn::ItemRole)(Qn::TimeMode)(Qn::ThumbnailStatus),
     (metatype)
     )
 

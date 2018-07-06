@@ -23,20 +23,29 @@ public:
 
     boost::optional<hikvision::ChannelCapabilities>
     channelCapabilities(Qn::ConnectionRole role);
+    bool findDefaultPtzProfileToken();
+
+    static bool tryToEnableIntegrationProtocols(const nx::utils::Url& url, const QAuthenticator& authenticator);
 
 protected:
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual CameraDiagnostics::Result initializeMedia(
         const CapabilitiesResp& onvifCapabilities) override;
+
+    virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true) override;
 private:
     CameraDiagnostics::Result fetchChannelCapabilities(
         Qn::ConnectionRole role,
         hikvision::ChannelCapabilities* outCapabilities);
 
-    CameraDiagnostics::Result initialize2WayAudio();
-    std::unique_ptr<nx_http::HttpClient> getHttpClient();
-
+    virtual QnAudioTransmitterPtr initializeTwoWayAudio() override;
+    std::unique_ptr<nx::network::http::HttpClient> getHttpClient();
+    void setResolutionList(
+        const hikvision::ChannelCapabilities& channelCapabilities,
+        Qn::ConnectionRole role);
 private:
     std::map<Qn::ConnectionRole, hikvision::ChannelCapabilities> m_channelCapabilitiesByRole;
     bool m_hevcSupported = false;

@@ -40,7 +40,7 @@ AVLastPacketSize ExtractSize(const unsigned char* arr)
 
 // =========================================================
 
-AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader(const QnResourcePtr& res):
+AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader(const QnPlAreconVisionResourcePtr& res):
     QnPlAVClinetPullStreamReader(res),
     m_black_white(false),
     m_prevDataReadResult(CameraDiagnostics::ErrorCode::noError)
@@ -53,9 +53,7 @@ AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader(const QnResourceP
     m_last_cam_width = 0;
     m_last_cam_height = 0;
 
-    QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
-
-    m_model = avRes->getModel();
+    m_model = m_camera->getModel();
     m_tftp_client = 0;
 }
 
@@ -75,9 +73,9 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
     updateCameraParams();
 
-    if (needMetaData())
+    if (needMetadata())
     {
-        const QnAbstractMediaDataPtr& metadata = getMetaData();
+        const QnAbstractMediaDataPtr& metadata = getMetadata();
         if (metadata)
             return metadata;
     }

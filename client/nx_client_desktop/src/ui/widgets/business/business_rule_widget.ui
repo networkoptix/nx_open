@@ -285,7 +285,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QnAggregationWidget" name="aggregationWidget" native="true"/>
+         <widget class="nx::client::desktop::AggregationWidget" name="aggregationWidget" native="true"/>
         </item>
         <item>
          <widget class="QWidget" name="actionParamsWidget" native="true">
@@ -356,7 +356,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnAggregationWidget</class>
+   <class>nx::client::desktop::AggregationWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/business/aggregation_widget.h</header>
    <container>1</container>

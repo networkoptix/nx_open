@@ -2,10 +2,10 @@
 
 #include "dlink_resource.h"
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include "dlink_stream_reader.h"
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+#include <streaming/mjpeg_stream_reader.h>
 
 #include <motion/motion_detection.h>
 
@@ -49,7 +49,6 @@ namespace
     }
 }
 
-
 QnDlink_cam_info::QnDlink_cam_info()
 {
 }
@@ -75,7 +74,6 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width) const
     }
 
     QSize result = resolutions.at(0);
-
 
     for(const QSize& size: resolutions)
     {
@@ -142,7 +140,6 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
     return resolutionCloseTo(480);
 }
 
-
 // =======================================================================================
 
 QnPlDlinkResource::QnPlDlinkResource()
@@ -154,31 +151,32 @@ void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completion
 {
     QAuthenticator auth = getAuth();
 
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
-    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setPort( QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT) );
     apiUrl.setUserName( auth.user() );
     apiUrl.setPassword( auth.password() );
     apiUrl.setPath( lit("/common/info.cgi") );
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
+        nx::network::http::HttpHeaders /*httpResponseHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
-            statusCode != nx_http::StatusCode::ok )
+            statusCode != nx::network::http::StatusCode::ok )
         {
             return completionHandler( false );
         }
 
         //msgBody contains parameters "param1=value1" each on its line
 
-        nx_http::LineSplitter lineSplitter;
+        nx::network::http::LineSplitter lineSplitter;
         QnByteArrayConstRef line;
         size_t bytesRead = 0;
         size_t dataOffset = 0;
-        while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(msgBody, dataOffset), &line, &bytesRead) )
+        while( lineSplitter.parseByLines( nx::network::http::ConstBufferRefType(msgBody, dataOffset), &line, &bytesRead) )
         {
             dataOffset += bytesRead;
             const int sepIndex = line.indexOf('=');
@@ -195,7 +193,7 @@ void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completion
         completionHandler( false );
     };
 
-    nx_http::downloadFileAsync(
+    nx::network::http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }
@@ -215,7 +213,7 @@ QnAbstractStreamDataProvider* QnPlDlinkResource::createLiveDataProvider()
     //return new MJPEGStreamReader(toSharedPointer(), "ipcam/stream.cgi?nowprofileid=2&audiostream=0");
     //return new MJPEGStreamReader(toSharedPointer(), "video/mjpg.cgi");
     //return new MJPEGStreamReader(toSharedPointer(), "video/mjpg.cgi?profileid=2");
-    return new PlDlinkStreamReader(toSharedPointer());
+    return new PlDlinkStreamReader(toSharedPointer(this));
 }
 
 void QnPlDlinkResource::setCroppingPhysical(QRect /*cropping*/)
@@ -229,10 +227,15 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
     return m_camInfo;
 }
 
-CameraDiagnostics::Result QnPlDlinkResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlDlinkResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
 {
-    QnPhysicalCameraResource::initInternal();
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
 
+CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
+{
     updateDefaultAuthIfEmpty(QLatin1String("admin"), QLatin1String(""));
 
     CLHttpStatus status;
@@ -244,10 +247,8 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-
     if (cam_info_file.size()==0)
         return CameraDiagnostics::UnknownErrorResult();
-
 
     QList<QByteArray> lines = cam_info_file.split('\n');
 
@@ -318,7 +319,6 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         }
     }
 
-
     std::sort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), std::greater<int>());
     std::sort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
 
@@ -331,7 +331,6 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
     // =======remove elements with diff aspect ratio
     if (m_camInfo.resolutions.size() < 2)
         return CameraDiagnostics::UnknownErrorResult();
-
 
     int w_0 = m_camInfo.resolutions.at(0).width();
     int h_0 = m_camInfo.resolutions.at(0).height();
@@ -375,11 +374,8 @@ static void setBitAt(int x, int y, unsigned char* data)
     data[offset] |= 0x01 << (x&7);
 }
 
-
 void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 {
-    Q_UNUSED(channel);
-
     if (channel != 0)
         return; // motion info used always once even for multisensor cameras
 
@@ -412,12 +408,10 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     unsigned char maskBit[Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8];
     QnMetaDataV1::createMask(getMotionMask(0),  (char*)maskBit);
 
-
     QImage img(Qn::kMotionGridWidth, Qn::kMotionGridHeight, QImage::Format_Mono);
     memset(img.bits(), 0, img.byteCount());
     img.setColor(0, qRgb(0, 0, 0));
     img.setColor(1, qRgb(255, 255, 255));
-
 
     for (int x = 0; x  < Qn::kMotionGridWidth; ++x)
     {
@@ -427,8 +421,6 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
                 img.setPixel(x,y,1);
         }
     }
-
-
 
     QImage imgOut = img.scaled(32, 16);//, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
@@ -446,8 +438,6 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
         }
     }
 
-
-
     QString str;
     QTextStream stream(&str);
     stream << "config/motion.cgi?enable=yes&motioncvalue=" << sensitivity << "&mbmask=";
@@ -461,7 +451,6 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     }
 
     stream.flush();
-
 
     CLHttpStatus status;
     QByteArray result = downloadFile(status, str,  getHostAddress(), 80, 1000, getAuth());

@@ -3,7 +3,7 @@
 #include <client/client_app_info.h>
 
 #include "utils/common/util.h"
-#include "plugins/storage/file_storage/layout_storage_resource.h"
+#include "core/storage/file_storage/layout_storage_resource.h"
 
 namespace {
 
@@ -76,7 +76,7 @@ void populateFileListRecursive(QSet<QString>& result, const QDir& dir,
 /* Returns set of absolute file paths. */
 QSet<QString> calculateFileList(const QDir& sourceRoot)
 {
-    static const QStringList kNameFilters{lit("*.exe"), lit("*.dll")};
+    static const QStringList kNameFilters{lit("*.exe"), lit("*.dll"), lit("*.conf")};
     static const QStringList kExtraDirs{
         lit("vox"), 
         lit("fonts"), 

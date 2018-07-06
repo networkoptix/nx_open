@@ -5,13 +5,13 @@
 
 namespace ec2 {
 
-    struct ApiConnectionData : ApiData 
+    struct ApiConnectionData : nx::vms::api::Data 
     {
         ApiConnectionData(): port(0) {}
 
         QnUuid peerId;
         QString host;
-        int port;
+        int port = 0;
 
         bool operator ==(const ApiConnectionData &other) const {
             return  peerId == other.peerId &&

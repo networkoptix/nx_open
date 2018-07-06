@@ -53,11 +53,6 @@
       <translation>%1 sistemi %2 sistemi ile uyumsuzdur.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Sistem zaten %1 e bağlı olduğundan başka sisteme bağlanılamıyor.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>%1 güvenli modda çalışıyor.</translation>
@@ -68,19 +63,33 @@
       <translation>%1 sistemi yapılandırılamadı.</translation>
     </message>
     <message>
+      <source>New System</source>
+      <translation>Yeni sistem</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>Bulunan %1 Sistemi geçerli sistemi ile uyuşmuyor.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Sistem zaten %1 e bağlı olduğundan başka sisteme bağlanılamıyor.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Iki sistem birden %1 e bağlı. Birleştirme mümkün değil.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 sisteminin URL i bu sistemlerden farklı. Birleştirme mümkün değil.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Bukut tabanlı sistemler ancak bulut olmatan bir sistem ile birleştirebilir. Sistem ismi ve şifre bulut sistemden alınacaktır.</translation>
     </message>
   </context>
   <context>
@@ -246,18 +255,6 @@
       <translation>Port %1 in erişilebilir olduğuna emin olun (e.g. forwarded).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve cihazın Fps değerlerini düşürün.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve kameranın Fps değerlerini düşürün.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve I/O modülünün Fps değerlerini düşürün.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Eğer sorun çözülmez ise, Cihaz web sayfasından fabrika ayarlarına dönün.</translation>
     </message>
@@ -304,6 +301,22 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Kamera arşivden geri yüklendi. Canlı video izlemek için kamerayı silin ve tekrar ekleyin.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve cihazın Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve kameranın Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve I/O modülünün Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Lütfen firmware güncelleyiniz. Desteklenen minimum versiyon %1'dir. Şu anki versiyon %2</translation>
     </message>
   </context>
   <context>
@@ -477,6 +490,14 @@
       <source>Time Licenses</source>
       <translation>Deneme Lisansları</translation>
     </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Köprü</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Köprü Lisansları</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -540,8 +561,8 @@
       <translation>Bilinmeyen Hata</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Sunucu İle Eşleşen Donanım Id'si Bulunamadı</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Sunucu İle Eşleşen Donanım ID'si Bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -663,12 +684,12 @@
       <translation>Watermark: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Donanım Kimliği: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Deneme Lisansı</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Donanım Kimliği: %1</translation>
     </message>
   </context>
   <context>
@@ -765,6 +786,10 @@
     <message>
       <source>Invalid resource type for data export.</source>
       <translation>Data aktarma için geçersiz kaynak tipi.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Dışa aktarılan veri yok.</translation>
     </message>
   </context>
   <context>
@@ -1495,6 +1520,15 @@
     <message>
       <source>Acknowledge</source>
       <translation>Kabul edilen</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Analiz Etkinliği</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%2 de %1</translation>
     </message>
   </context>
   <context>

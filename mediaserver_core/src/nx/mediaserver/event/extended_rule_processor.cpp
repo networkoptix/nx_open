@@ -26,7 +26,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_history.h>
 
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <database/server_db.h>
 
@@ -50,6 +50,7 @@
 #include <nx/email/mustache/mustache_helper.h>
 
 #include <common/common_module.h>
+#include <common/common_globals.h>
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
@@ -61,7 +62,7 @@
 
 #include <providers/stored_file_data_provider.h>
 #include <streaming/audio_streamer_pool.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
@@ -76,14 +77,16 @@
 #include <utils/common/util.h>
 #include <nx/utils/concurrent.h>
 #include <utils/camera/bookmark_helpers.h>
+#include "nx/mediaserver/resource/camera.h"
+#include <media_server/media_server_module.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 namespace {
 
-static const QString tpProductLogoFilename(lit("productLogoFilename"));
-static const QString tpEventLogoFilename(lit("eventLogoFilename"));
 static const QString tpProductLogo(lit("logo"));
 static const QString tpSystemIcon(lit("systemIcon"));
 static const QString tpOwnerIcon(lit("ownerIcon"));
+static const QString tpSourceIcon(lit("sourceIcon"));
 static const QString tpCloudOwner(lit("cloudOwner"));
 static const QString tpCloudOwnerEmail(lit("cloudOwnerEmail"));
 static const QString tpCompanyName(lit("companyName"));
@@ -117,6 +120,7 @@ static const QString tpReasonContext(lit("reasonContext"));
 static const QString tpAggregated(lit("aggregated"));
 static const QString tpInputPort(lit("inputPort"));
 static const QString tpTriggerName(lit("triggerName"));
+static const QString tpAnalyticsSdkEventType(lit("analyticsSdkEventType"));
 static const QString tpHasCameras(lit("hasCameras"));
 static const QString tpCameras(lit("cameras"));
 static const QString tpUser(lit("user"));
@@ -135,65 +139,72 @@ static const QChar kNewEmailDelimiter(L' ');
 
 } // namespace
 
+using nx::vms::api::EventType;
+using nx::vms::api::ActionType;
+
 namespace nx {
 namespace mediaserver {
 namespace event {
 
 struct EmailAttachmentData
 {
-    EmailAttachmentData(vms::event::EventType eventType)
+    EmailAttachmentData(EventType eventType)
     {
         switch (eventType)
         {
-            case vms::event::cameraMotionEvent:
+            case EventType::cameraMotionEvent:
                 templatePath = lit(":/email_templates/camera_motion.mustache");
                 imageName = lit("camera.png");
                 break;
-            case vms::event::cameraInputEvent:
+            case EventType::cameraInputEvent:
                 templatePath = lit(":/email_templates/camera_input.mustache");
                 imageName = lit("camera.png");
                 break;
-            case vms::event::cameraDisconnectEvent:
+            case EventType::cameraDisconnectEvent:
                 templatePath = lit(":/email_templates/camera_disconnect.mustache");
                 imageName = lit("camera.png");
                 break;
-            case vms::event::storageFailureEvent:
+            case EventType::storageFailureEvent:
                 templatePath = lit(":/email_templates/storage_failure.mustache");
                 imageName = lit("storage.png");
                 break;
-            case vms::event::networkIssueEvent:
+            case EventType::networkIssueEvent:
                 templatePath = lit(":/email_templates/network_issue.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::cameraIpConflictEvent:
+            case EventType::cameraIpConflictEvent:
                 templatePath = lit(":/email_templates/camera_ip_conflict.mustache");
                 imageName = lit("camera.png");
                 break;
-            case vms::event::serverFailureEvent:
+            case EventType::serverFailureEvent:
                 templatePath = lit(":/email_templates/mediaserver_failure.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::serverConflictEvent:
+            case EventType::serverConflictEvent:
                 templatePath = lit(":/email_templates/mediaserver_conflict.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::serverStartEvent:
+            case EventType::serverStartEvent:
                 templatePath = lit(":/email_templates/mediaserver_started.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::licenseIssueEvent:
+            case EventType::licenseIssueEvent:
                 templatePath = lit(":/email_templates/license_issue.mustache");
                 imageName = lit("license.png");
                 break;
-            case vms::event::backupFinishedEvent:
+            case EventType::backupFinishedEvent:
                 templatePath = lit(":/email_templates/backup_finished.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::userDefinedEvent:
+            case EventType::analyticsSdkEvent:
+                templatePath = lit(":/email_templates/analytics_event.mustache");
+                imageName = lit("camera.png");
+                break;
+            case EventType::userDefinedEvent:
                 templatePath = lit(":/email_templates/generic_event.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::softwareTriggerEvent:
+            case EventType::softwareTriggerEvent:
                 templatePath = lit(":/email_templates/software_trigger.mustache");
                 break;
             default:
@@ -243,7 +254,7 @@ void ExtendedRuleProcessor::prepareAdditionActionParams(const vms::event::Abstra
 {
     switch (action->actionType())
     {
-        case vms::event::sendMailAction:
+        case ActionType::sendMailAction:
             // Add user's email addresses to action emailAddress field and filter invalid addresses
             if (auto emailAction = action.dynamicCast<class vms::event::SendMailAction>())
                 updateRecipientsList(emailAction);
@@ -261,32 +272,32 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
     {
         switch (action->actionType())
         {
-            case vms::event::sendMailAction:
+            case ActionType::sendMailAction:
                 result = sendMail(action.dynamicCast<class vms::event::SendMailAction>());
                 break;
-            case vms::event::bookmarkAction:
+            case ActionType::bookmarkAction:
                 result = executeBookmarkAction(action);
                 break;
-            case vms::event::cameraOutputAction:
+            case ActionType::cameraOutputAction:
                 result = triggerCameraOutput(action.dynamicCast<class vms::event::CameraOutputAction>());
                 break;
-            case vms::event::cameraRecordingAction:
+            case ActionType::cameraRecordingAction:
                 result = executeRecordingAction(action.dynamicCast<class vms::event::RecordingAction>());
                 break;
-            case vms::event::panicRecordingAction:
+            case ActionType::panicRecordingAction:
                 result = executePanicAction(action.dynamicCast<class vms::event::PanicAction>());
                 break;
-            case vms::event::executePtzPresetAction:
+            case ActionType::executePtzPresetAction:
                 result = executePtzAction(action);
                 break;
-            case vms::event::execHttpRequestAction:
+            case ActionType::execHttpRequestAction:
                 result = executeHttpRequestAction(action);
                 break;
-            case vms::event::sayTextAction:
+            case ActionType::sayTextAction:
                 result = executeSayTextAction(action);
                 break;
-            case vms::event::playSoundAction:
-            case vms::event::playSoundOnceAction:
+            case ActionType::playSoundAction:
+            case ActionType::playSoundOnceAction:
                 result = executePlaySoundAction(action);
             default:
                 break;
@@ -294,7 +305,16 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
     }
 
     if (result)
-        qnServerDb->saveActionToDB(action);
+    {
+        if (actionRequiresLogging(action))
+        {
+            qnServerDb->saveActionToDB(action);
+        }
+        else
+        {
+            NX_DEBUG(this, "Omitted event logging at executeActionInternal");
+        }
+    }
 
     return result;
 }
@@ -303,7 +323,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
     const vms::event::AbstractActionPtr& action)
 {
     const auto params = action->getParams();
-    const auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(
+    const auto resource = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(
         params.actionResourceId);
 
     if (!resource)
@@ -317,7 +337,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         return false;
 
 
-    if (action->actionType() == vms::event::playSoundOnceAction)
+    if (action->actionType() == ActionType::playSoundOnceAction)
     {
         auto url = lit("dbfile://notifications/") + params.url;
 
@@ -325,7 +345,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         resource->setCommonModule(commonModule());
         resource->setStatus(Qn::Online);
         QnAbstractStreamDataProviderPtr provider(
-            resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+            qnServerModule->dataProviderFactory()->createDataProvider(resource));
 
         provider.dynamicCast<QnAbstractArchiveStreamReader>()->setCycleMode(false);
 
@@ -337,13 +357,13 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
     {
 
         QnAbstractStreamDataProviderPtr provider;
-        if (action->getToggleState() == vms::event::EventState::active)
+        if (action->getToggleState() == vms::api::EventState::active)
         {
             provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
             transmitter->subscribe(provider, QnAbstractAudioTransmitter::kContinuousNotificationPriority);
             provider->startIfNotRunning();
         }
-        else if (action->getToggleState() == vms::event::EventState::inactive)
+        else if (action->getToggleState() == vms::api::EventState::inactive)
         {
             provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
             transmitter->unsubscribe(provider.data());
@@ -358,10 +378,10 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
 
 bool ExtendedRuleProcessor::executeSayTextAction(const vms::event::AbstractActionPtr& action)
 {
-#if !defined(EDGE_SERVER)
+#if !defined(EDGE_SERVER) && !defined(__aarch64__)
     const auto params = action->getParams();
     const auto text = params.sayText;
-    const auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(
+    const auto resource = resourcePool()->getResourceById<nx::mediaserver::resource::Camera>(
         params.actionResourceId);
     if (!resource)
         return false;
@@ -392,7 +412,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
         return true; // ignore panic business action if panic mode turn on by user
 
     Qn::PanicMode val = Qn::PM_None;
-    if (action->getToggleState() == vms::event::EventState::active)
+    if (action->getToggleState() == vms::api::EventState::active)
         val =  Qn::PM_BusinessEvents;
     mediaServer->setPanicMode(val);
     commonModule()->propertyDictionary()->saveParams(mediaServer->getId());
@@ -401,26 +421,38 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
 
 bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractActionPtr& action)
 {
-    QUrl url(action->getParams().url);
+    const nx::vms::event::ActionParameters& actionParameters=action->getParams();
 
-    if (action->getParams().text.isEmpty())
+    nx::utils::Url url(action->getParams().url);
+    if ((actionParameters.requestType == nx::network::http::Method::get) ||
+        (actionParameters.requestType == nx::network::http::Method::delete_) ||
+        (actionParameters.requestType.isEmpty() && actionParameters.text.isEmpty()))
     {
-        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
-        {
-            if (osErrorCode != SystemError::noError ||
-                statusCode != nx_http::StatusCode::ok)
+        auto callback = [action](
+            SystemError::ErrorCode osErrorCode,
+            int statusCode,
+            nx::network::http::StringType, /*content type*/
+            nx::network::http::BufferType messageBody,
+            nx::network::http::HttpHeaders /*httpResponseHeaders*/)
             {
-                qWarning() << "Failed to execute HTTP action for url "
-                    << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
-                    << "osErrorCode:" << osErrorCode
-                    << "HTTP result:" << statusCode
-                    << "message:" << messageBody;
-            }
-        };
+                if (osErrorCode != SystemError::noError ||
+                    statusCode != nx::network::http::StatusCode::ok)
+                {
+                    qWarning() << "Failed to execute HTTP action for url "
+                        << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                        << "osErrorCode:" << osErrorCode
+                        << "HTTP result:" << statusCode
+                        << "message:" << messageBody;
+                }
+            };
 
-        nx_http::downloadFileAsync(
+        nx::network::http::downloadFileAsyncEx(
             url,
-            callback);
+            callback,
+            nx::network::http::HttpHeaders(),
+            actionParameters.authType,
+            nx::network::http::AsyncHttpClient::Timeouts(),
+            actionParameters.requestType);
         return true;
     }
     else
@@ -428,7 +460,7 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
         auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode)
         {
             if (osErrorCode != SystemError::noError ||
-                statusCode != nx_http::StatusCode::ok)
+                statusCode != nx::network::http::StatusCode::ok)
             {
                 qWarning() << "Failed to execute HTTP action for url "
                            << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
@@ -437,15 +469,18 @@ bool ExtendedRuleProcessor::executeHttpRequestAction(const vms::event::AbstractA
             }
         };
 
-        QByteArray contentType = action->getParams().contentType.toUtf8();
+        QByteArray contentType = actionParameters.contentType.toUtf8();
         if (contentType.isEmpty())
-            contentType = autoDetectHttpContentType(action->getParams().text.toUtf8());
+            contentType = autoDetectHttpContentType(actionParameters.text.toUtf8());
 
-        nx_http::uploadDataAsync(url,
+        nx::network::http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
             contentType,
-            nx_http::HttpHeaders(),
-            callback);
+            nx::network::http::HttpHeaders(),
+            callback,
+            actionParameters.authType,
+            QString(), QString(), //< login/password.
+            actionParameters.requestType);
         return true;
     }
 }
@@ -474,14 +509,14 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
     {
         auto toggleState = action->getToggleState();
         // todo: if camera is offline function return false. Need some tries on timer event
-        if (toggleState == vms::event::EventState::active || //< Prolonged actions starts
+        if (toggleState == vms::api::EventState::active || //< Prolonged actions starts
             action->getDurationSec() > 0) //< Instant action
         {
             rez = qnRecordingManager->startForcedRecording(
                 camera,
                 action->getStreamQuality(),
                 action->getFps(),
-                0, /* Record-before setup is forbidden */
+                action->getRecordBeforeSec(),
                 action->getRecordAfterSec(),
                 action->getDurationSec());
         }
@@ -529,7 +564,7 @@ bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputAc
     }
     QString relayOutputId = action->getRelayOutputId();
     int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
-    bool on = action->getToggleState() != vms::event::EventState::inactive;
+    bool on = action->getToggleState() != vms::api::EventState::inactive;
 
     return securityCam->setRelayOutputState(
                 relayOutputId,
@@ -537,30 +572,33 @@ bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputAc
                 autoResetTimeout);
 }
 
-QByteArray ExtendedRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const
+ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreenshotEncoded(
+    const QnUuid& id,
+    qint64 timestampUsec,
+    QSize dstSize) const
 {
-    QnVirtualCameraResourcePtr cameraRes = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
-    const QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
-    if (!cameraRes || !server)
-        return QByteArray();
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        commonModule()->moduleGUID());
 
-    QnThumbnailRequestData request;
-    request.camera = cameraRes;
-    request.msecSinceEpoch = timestampUsec / 1000;
+    if (!camera || !server)
+        return TimespampedFrame();
+
+    api::CameraImageRequest request;
+    request.camera = camera;
+    request.usecSinceEpoch = timestampUsec;
     request.size = dstSize;
-    request.imageFormat = QnThumbnailRequestData::JpgFormat;
-    request.roundMethod = QnThumbnailRequestData::PreciseMethod;
+    request.roundMethod = api::CameraImageRequest::RoundMethod::precise;
 
     QnMultiserverThumbnailRestHandler handler;
-    QByteArray frame;
+    TimespampedFrame timestemedFrame;
+    //qint64 frameTimestampUsec = 0;
     QByteArray contentType;
-    auto result = handler.getScreenshot(commonModule(), request, frame, contentType, server->getPort());
-    if (result != nx_http::StatusCode::ok)
-        return QByteArray();
-    return frame;
-
-    //QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize, QnThumbnailRequestData::KeyFrameAfterMethod);
-    //return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
+    auto result = handler.getScreenshot(commonModule(), request, timestemedFrame.frame, contentType,
+        server->getPort(), &timestemedFrame.timestampUsec);
+    if (result != nx::network::http::StatusCode::ok)
+        return TimespampedFrame();
+    return timestemedFrame;
 }
 
 bool ExtendedRuleProcessor::sendMailInternal(const vms::event::SendMailActionPtr& action, int aggregatedResCount)
@@ -603,22 +641,41 @@ void ExtendedRuleProcessor::sendEmailAsync(
     QnEmailSettings emailSettings = commonModule()->globalSettings()->emailSettings();
     QString cloudOwnerAccount = commonModule()->globalSettings()->cloudAccountName();
 
+    auto addIcon =
+        [&attachments, &contextMap](const QString& name, const QString& source)
+        {
+            attachments << QnEmailAttachmentPtr(
+                new QnEmailAttachment(
+                    name,
+                    source,
+                    tpImageMimeType));
+            contextMap[name] = lit("cid:") + name;
+        };
+
+
     if (isHtml)
     {
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
+        addIcon(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"));
+        addIcon(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"));
 
-        contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-        contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+        const auto eventType = action->getRuntimeParams().eventType;
+        switch (eventType)
+        {
+            case EventType::cameraDisconnectEvent:
+            case EventType::licenseIssueEvent:
+            case EventType::networkIssueEvent:
+            case EventType::softwareTriggerEvent:
+                addIcon(tpSourceIcon, lit(":/skin/email_attachments/cameraIcon.png"));
+                break;
+            default:
+                break;
+        }
     }
 
     if (!cloudOwnerAccount.isEmpty())
     {
         if (isHtml)
-        {
-            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
-            contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
-        }
+            addIcon(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"));
 
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 
@@ -662,7 +719,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
 
     // TODO: #vkutin #gdm Need to refactor aggregation entirely.
     // I can't figure a proper abstraction for it at this point.
-    const int aggregatedCount = action->getRuntimeParams().eventType == vms::event::softwareTriggerEvent
+    const int aggregatedCount = action->getRuntimeParams().eventType == EventType::softwareTriggerEvent
         ? action->aggregationInfo().toList().count()
         : aggregatedResCount;
 
@@ -690,8 +747,8 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
 {
     // QnMutexLocker lk(&m_mutex); <- m_mutex is already locked down the stack.
 
-    if( action->getRuntimeParams().eventType != vms::event::cameraDisconnectEvent &&
-        action->getRuntimeParams().eventType != vms::event::networkIssueEvent )
+    if( action->getRuntimeParams().eventType != EventType::cameraDisconnectEvent &&
+        action->getRuntimeParams().eventType != EventType::networkIssueEvent )
     {
         return sendMailInternal(action, 1);
     }
@@ -746,7 +803,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     QnEmailAttachmentList& attachments) const
 {
     vms::event::EventParameters params = action->getRuntimeParams();
-    vms::event::EventType eventType = params.eventType;
+    EventType eventType = params.eventType;
 
     QVariantMap contextMap;
     vms::event::StringsHelper helper(commonModule());
@@ -754,43 +811,61 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     const int deviceCount = aggregationInfo.toList().size();
     contextMap[tpEvent] = helper.eventName(eventType, qMax(1, deviceCount));
-    contextMap[tpSource] = helper.getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
+    contextMap[tpSource] = helper.getResoureNameFromParams(
+        params, Qn::ResourceInfoLevel::RI_NameOnly);
     contextMap[tpSourceIP] = helper.getResoureIPFromParams(params);
+
+    const auto aggregationCount = action->getAggregationCount();
+    if (aggregationCount > 1)
+        contextMap[tpCount] = QString::number(aggregationCount);
 
     switch (eventType)
     {
-        case vms::event::cameraMotionEvent:
-        case vms::event::cameraInputEvent:
+        case EventType::cameraMotionEvent:
+        case EventType::cameraInputEvent:
         {
-            auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId);
+            auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(
+                action->getRuntimeParams().eventResourceId);
             cameraHistoryPool()->updateCameraHistorySync(camRes);
             if (camRes->hasVideo(nullptr))
             {
-                QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
-                if (!screenshotData.isNull())
-                {
-                    contextMap[tpUrlInt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
-                    contextMap[tpUrlExt] = helper.urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
+                const qint64 eventTimeUs = action->getRuntimeParams().eventTimestampUsec;
+                const qint64 currentTimeBeforeGetUs = qnSyncTime->currentUSecsSinceEpoch();
 
-                    QBuffer screenshotStream(&screenshotData);
-                    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
-                    contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                TimespampedFrame timestempedFrame = getEventScreenshotEncoded(
+                    action->getRuntimeParams().eventResourceId, eventTimeUs, SCREENSHOT_SIZE);
+
+                if (!timestempedFrame.frame.isNull())
+                {
+                    static const qint64 kIntervalUs = 5'000'000;
+                    const qint64 currentTimeUs = qnSyncTime->currentUSecsSinceEpoch();
+
+                    if (camRes->getStatus() == Qn::Recording)
+                    {
+                        contextMap[tpUrlInt] = helper.urlForCamera(
+                            params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ false);
+                        contextMap[tpUrlExt] = helper.urlForCamera(
+                            params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ true);
+                    }
+
+                    if (std::abs(currentTimeUs - timestempedFrame.timestampUsec) < kIntervalUs)
+                    {
+                        // Only fresh screenshots are sent.
+                        QBuffer screenshotStream(&timestempedFrame.frame);
+                        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(
+                            tpScreenshot, screenshotStream, lit("image/jpeg"))));
+                        contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                    }
                 }
             }
-
             break;
         }
 
-        case vms::event::softwareTriggerEvent:
+        case EventType::softwareTriggerEvent:
         {
             contextMap[tpTriggerName] = params.caption.trimmed().isEmpty()
                 ? helper.defaultSoftwareTriggerName()
                 : params.caption;
-
-            const auto aggregationCount = action->getAggregationCount();
-
-            if (aggregationCount > 1)
-                contextMap[tpCount] = QString::number(aggregationCount);
 
             contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
             contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
@@ -808,7 +883,39 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             break;
         }
 
-        case vms::event::userDefinedEvent:
+        case EventType::analyticsSdkEvent:
+        {
+            contextMap[tpAnalyticsSdkEventType] = helper.getAnalyticsSdkEventName(params);
+            contextMap[tpTimestamp] = helper.eventTimestampShort(params, aggregationCount);
+            contextMap[tpTimestampDate] = helper.eventTimestampDate(params);
+            contextMap[tpTimestampTime] = helper.eventTimestampTime(params);
+
+            auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(
+                params.eventResourceId);
+
+            cameraHistoryPool()->updateCameraHistorySync(camera);
+            if (camera->hasVideo(nullptr))
+            {
+                QByteArray screenshotData = getEventScreenshotEncoded(params.eventResourceId,
+                    params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
+                if (!screenshotData.isNull())
+                {
+                    contextMap[tpUrlInt] = helper.urlForCamera(
+                        params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ false);
+                    contextMap[tpUrlExt] = helper.urlForCamera(
+                        params.eventResourceId, params.eventTimestampUsec, /*isPublic*/ true);
+
+                    QBuffer screenshotStream(&screenshotData);
+                    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot,
+                        screenshotStream, lit("image/jpeg"))));
+                    contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                }
+            }
+
+            break;
+        }
+
+        case EventType::userDefinedEvent:
         {
             auto metadata = action->getRuntimeParams().metadata;
             if (!metadata.cameraRefs.empty())
@@ -817,7 +924,8 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                 int screenshotNum = 1;
                 for (const QnUuid& cameraId: metadata.cameraRefs)
                 {
-                    if (QnVirtualCameraResourcePtr camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
+                    if (QnVirtualCameraResourcePtr camRes =
+                        resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
                     {
                         QVariantMap camera;
 
@@ -826,14 +934,22 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
                         camera[tpCameraIP] = camInfo.host();
 
                         cameraHistoryPool()->updateCameraHistorySync(camRes);
-                        camera[tpUrlInt] = helper.urlForCamera(cameraId, params.eventTimestampUsec, false);
-                        camera[tpUrlExt] = helper.urlForCamera(cameraId, params.eventTimestampUsec, true);
+                        camera[tpUrlInt] = helper.urlForCamera(
+                            cameraId, params.eventTimestampUsec, /*isPublic*/ false);
+                        camera[tpUrlExt] = helper.urlForCamera(
+                            cameraId, params.eventTimestampUsec, /*isPublic*/ true);
 
-                        QByteArray screenshotData = getEventScreenshotEncoded(cameraId, params.eventTimestampUsec, SCREENSHOT_SIZE);
-                        if (!screenshotData.isNull()) {
+                        QByteArray screenshotData = getEventScreenshotEncoded(
+                            cameraId, params.eventTimestampUsec, SCREENSHOT_SIZE).frame;
+                        if (!screenshotData.isNull())
+                        {
                             QBuffer screenshotStream(&screenshotData);
-                            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshotNum.arg(screenshotNum), screenshotStream, lit("image/jpeg"))));
-                            camera[QLatin1String("screenshot")] = lit("cid:") + tpScreenshotNum.arg(screenshotNum++);
+                            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(
+                                tpScreenshotNum.arg(screenshotNum),
+                                screenshotStream,
+                                lit("image/jpeg"))));
+                            camera[QLatin1String("screenshot")] =
+                                lit("cid:") + tpScreenshotNum.arg(screenshotNum++);
                         }
 
                         cameras << camera;
@@ -923,21 +1039,21 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
 
     switch (params.eventType)
     {
-        case vms::event::cameraDisconnectEvent:
-        case vms::event::softwareTriggerEvent:
+        case EventType::cameraDisconnectEvent:
+        case EventType::softwareTriggerEvent:
         {
             detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
             detailsMap[tpSourceIP] = helper.getResoureIPFromParams(params);
             break;
         }
 
-        case vms::event::cameraInputEvent:
+        case EventType::cameraInputEvent:
         {
             detailsMap[tpInputPort] = params.inputPortId;
             break;
         }
 
-        case vms::event::networkIssueEvent:
+        case EventType::networkIssueEvent:
         {
             detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
             detailsMap[tpSourceIP] = helper.getResoureIPFromParams(params);
@@ -945,17 +1061,17 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
             break;
         }
 
-        case vms::event::storageFailureEvent:
-        case vms::event::serverFailureEvent:
-        case vms::event::licenseIssueEvent:
-        case vms::event::backupFinishedEvent:
+        case EventType::storageFailureEvent:
+        case EventType::serverFailureEvent:
+        case EventType::licenseIssueEvent:
+        case EventType::backupFinishedEvent:
         {
             detailsMap[tpReason] = helper.eventReason(params);
 
             // Fill event-specific reason context here
             QVariantMap reasonContext;
 
-            if (params.reasonCode == vms::event::EventReason::licenseRemoved)
+            if (params.reasonCode == vms::api::EventReason::licenseRemoved)
             {
                 QVariantList disabledCameras;
 
@@ -972,7 +1088,7 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
             break;
         }
 
-        case vms::event::cameraIpConflictEvent:
+        case EventType::cameraIpConflictEvent:
         {
             detailsMap[lit("cameraConflictAddress")] = params.caption;
             QVariantList conflicts;
@@ -989,7 +1105,7 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
             break;
         }
 
-        case vms::event::serverConflictEvent:
+        case EventType::serverConflictEvent:
         {
             QnCameraConflictList conflicts;
             conflicts.sourceServer = params.caption;

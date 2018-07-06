@@ -82,9 +82,7 @@ void AIOThread::startMonitoring(
 
 void AIOThread::stopMonitoring(
     Pollable* const sock,
-    aio::EventType eventType,
-    bool waitForRunningHandlerCompletion,
-    nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
+    aio::EventType eventType)
 {
     QnMutexLocker lock(&m_taskQueue->mutex);
 
@@ -94,14 +92,7 @@ void AIOThread::stopMonitoring(
         stopMonitoringInternal(
             &lock,
             sock,
-            eventType,
-            waitForRunningHandlerCompletion,
-            std::move(pollingStoppedHandler));
-    }
-    else
-    {
-        if (pollingStoppedHandler)
-            post(lock, nullptr, std::move(pollingStoppedHandler));
+            eventType);
     }
 }
 
@@ -122,7 +113,7 @@ void AIOThread::dispatch(Pollable* const sock, nx::utils::MoveOnlyFunc<void()> f
     post(sock, std::move(functor));
 }
 
-void AIOThread::cancelPostedCalls(Pollable* const sock, bool waitForRunningHandlerCompletion)
+void AIOThread::cancelPostedCalls(Pollable* const sock)
 {
     QnMutexLocker lock(&m_taskQueue->mutex);
 
@@ -138,44 +129,34 @@ void AIOThread::cancelPostedCalls(Pollable* const sock, bool waitForRunningHandl
         return;
     }
 
-    if (waitForRunningHandlerCompletion)
-    {
-        // Posting cancellation task
-        m_taskQueue->addTask(
-            detail::CancelPostedCallsTask(
-                sock->impl()->socketSequence,   //not passing socket here since it is allowed to be removed
-                                                //before posted call is actually cancelled
-                nullptr));
-        m_taskQueue->pollSet->interrupt();
+    // Posting cancellation task
+    m_taskQueue->addTask(
+        detail::CancelPostedCallsTask(
+            sock->impl()->socketSequence,   //not passing socket here since it is allowed to be removed
+                                            //before posted call is actually cancelled
+            nullptr));
+    m_taskQueue->pollSet->interrupt();
 
-        //we can be sure that socket will be removed before next poll
+    //we can be sure that socket will be removed before next poll
 
-        lock.unlock();
+    lock.unlock();
 
-        //waiting for posted calls processing to finish
-        while (m_taskQueue->processingPostedCalls == 1)
-            msleep(0);    //yield. TODO #ak Better replace it with conditional_variable
-                          //TODO #ak must wait for target call only, not for any call!
+    //waiting for posted calls processing to finish
+    while (m_taskQueue->processingPostedCalls == 1)
+        msleep(0);    //yield. TODO #ak Better replace it with conditional_variable
+                        //TODO #ak must wait for target call only, not for any call!
 
-                          //here we can be sure that posted call for socket will never be triggered.
-                          //  Although, it may still be in the queue.
-                          //  But, socket can be safely removed, since we use socketSequence
+                        //here we can be sure that posted call for socket will never be triggered.
+                        //  Although, it may still be in the queue.
+                        //  But, socket can be safely removed, since we use socketSequence
 
-        lock.relock();
-    }
-    else
-    {
-        m_taskQueue->addTask(
-            detail::CancelPostedCallsTask(
-                sock->impl()->socketSequence));
-        m_taskQueue->pollSet->interrupt();
-    }
+    lock.relock();
 }
 
 size_t AIOThread::socketsHandled() const
 {
     QnMutexLocker lock(&m_taskQueue->mutex);
-    return m_taskQueue->pollSet->size() 
+    return m_taskQueue->pollSet->size()
         + m_taskQueue->newReadMonitorTaskCount
         + m_taskQueue->newWriteMonitorTaskCount;
 }
@@ -200,7 +181,7 @@ void AIOThread::run()
 
     while (!needToStop())
     {
-        //setting processingPostedCalls flag before processPollSetModificationQueue 
+        //setting processingPostedCalls flag before processPollSetModificationQueue
         //  to be able to atomically add "cancel posted call" task and check for tasks to complete
         m_taskQueue->processingPostedCalls = 1;
 
@@ -211,7 +192,7 @@ void AIOThread::run()
 
         m_taskQueue->processingPostedCalls = 0;
 
-        //processing tasks that have been added from within \a processPostedCalls() call
+        //processing tasks that have been added from within processPostedCalls() call
         m_taskQueue->processPollSetModificationQueue(detail::TaskType::tAll);
 
         qint64 curClock = m_taskQueue->getSystemTimerVal();
@@ -254,10 +235,11 @@ void AIOThread::run()
 
         m_taskQueue->processScheduledRemoveSocketTasks();
 
-        if (m_taskQueue->processPeriodicTasks(curClock))
-            continue;   //periodic task handler is allowed to delete socket what can cause undefined behavour while iterating pollset
         if (triggeredSocketCount > 0)
             m_taskQueue->processSocketEvents(curClock);
+
+        if (m_taskQueue->processPeriodicTasks(curClock))
+            continue;
     }
 
     NX_LOG(QLatin1String("AIO thread stopped"), cl_logDEBUG1);
@@ -323,9 +305,7 @@ void AIOThread::startMonitoringInternal(
 void AIOThread::stopMonitoringInternal(
     QnMutexLockerBase* lock,
     Pollable* const sock,
-    aio::EventType eventType,
-    bool waitForRunningHandlerCompletion,
-    nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler)
+    aio::EventType eventType)
 {
     // Checking queue for reverse task for sock.
     if (m_taskQueue->removeReverseTask(sock, eventType, detail::TaskType::tRemoving, NULL, 0))
@@ -352,53 +332,38 @@ void AIOThread::stopMonitoringInternal(
         return;
     }
 
-    if (waitForRunningHandlerCompletion)
+    std::atomic<int> taskCompletedCondition(0);
+    // We MUST remove socket from pollset before returning from here.
+    m_taskQueue->addTask(detail::SocketAddRemoveTask(
+        detail::TaskType::tRemoving,
+        sock,
+        eventType,
+        nullptr,
+        0,
+        &taskCompletedCondition));
+
+    m_taskQueue->pollSet->interrupt();
+
+    // We can be sure that socket will be removed before next poll.
+
+    lock->unlock();
+
+    // TODO #ak maybe we just have to wait for remove completion, but not for running handler completion?
+    // I.e., is it possible that handler was launched (or still running) after removal task completion?
+
+    // Waiting for event handler completion (if it running).
+    while (handlingData->beingProcessed.load() > 0)
     {
-        std::atomic<int> taskCompletedCondition(0);
-        // We MUST remove socket from pollset before returning from here.
-        m_taskQueue->addTask(detail::SocketAddRemoveTask(
-            detail::TaskType::tRemoving,
-            sock,
-            eventType,
-            nullptr,
-            0,
-            &taskCompletedCondition));
-
-        m_taskQueue->pollSet->interrupt();
-
-        // We can be sure that socket will be removed before next poll.
-
-        lock->unlock();
-
-        // TODO #ak maybe we just have to wait for remove completion, but not for running handler completion?
-        // I.e., is it possible that handler was launched (or still running) after removal task completion?
-
-        // Waiting for event handler completion (if it running).
-        while (handlingData->beingProcessed.load() > 0)
-        {
-            m_taskQueue->socketEventProcessingMutex.lock();
-            m_taskQueue->socketEventProcessingMutex.unlock();
-        }
-
-        // Waiting for socket to be removed from pollset.
-        while (taskCompletedCondition.load(std::memory_order_relaxed) == 0)
-            msleep(0);    // Yield. TODO #ak Better replace it with conditional_variable.
-                          // TODO #ak if remove task completed, doesn't it mean handler is not running and never be launched?
-
-        lock->relock();
+        m_taskQueue->socketEventProcessingMutex.lock();
+        m_taskQueue->socketEventProcessingMutex.unlock();
     }
-    else
-    {
-        m_taskQueue->addTask(detail::SocketAddRemoveTask(
-            detail::TaskType::tRemoving,
-            sock,
-            eventType,
-            nullptr,
-            0,
-            nullptr,
-            std::move(pollingStoppedHandler)));
-        m_taskQueue->pollSet->interrupt();
-    }
+
+    // Waiting for socket to be removed from pollset.
+    while (taskCompletedCondition.load(std::memory_order_relaxed) == 0)
+        msleep(0);    // Yield. TODO #ak Better replace it with conditional_variable.
+                        // TODO #ak if remove task completed, doesn't it mean handler is not running and never be launched?
+
+    lock->relock();
 }
 
 void AIOThread::changeSocketTimeout(

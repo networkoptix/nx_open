@@ -27,7 +27,7 @@ int QnPermissionsHelper::safeModeError(QnRestResult &result)
     auto errorMessage = lit("Can't process rest request because server is running in safe mode.");
     NX_LOG(errorMessage, cl_logDEBUG1);
     result.setError(QnJsonRestResult::CantProcessRequest, errorMessage);
-    return nx_http::StatusCode::forbidden;
+    return nx::network::http::StatusCode::forbidden;
 }
 
 bool QnPermissionsHelper::hasOwnerPermissions(
@@ -46,7 +46,7 @@ int QnPermissionsHelper::notOwnerError(QnRestResult &result)
     auto errorMessage = lit("Can't process rest request because authenticated user is not a system owner.");
     NX_LOG(errorMessage, cl_logDEBUG1);
     result.setError(QnJsonRestResult::CantProcessRequest, errorMessage);
-    return nx_http::StatusCode::forbidden;
+    return nx::network::http::StatusCode::forbidden;
 }
 
 int QnPermissionsHelper::safeModeError(QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format /*= Qn::UnsupportedFormat*/, bool extraFormatting /*= false*/)
@@ -62,7 +62,7 @@ int QnPermissionsHelper::permissionsError(QnRestResult& result)
     auto errorMessage = lit("Can't process rest request because user has not enough access rights.");
     NX_LOG(errorMessage, cl_logDEBUG1);
     result.setError(QnJsonRestResult::CantProcessRequest, errorMessage);
-    return nx_http::StatusCode::forbidden;
+    return nx::network::http::StatusCode::forbidden;
 }
 
 int QnPermissionsHelper::permissionsError(QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format /*= Qn::UnsupportedFormat*/, bool extraFormatting /*= false*/)

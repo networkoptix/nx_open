@@ -67,6 +67,17 @@ const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chr
 const QLatin1String kOfflineUserHashValidityPeriod("auth/offlineUserHashValidityPeriod");
 const std::chrono::minutes kDefaultOfflineUserHashValidityPeriod = 14 * std::chrono::hours(24);
 
+const QLatin1String kCheckForExpiredAuthPeriod("auth/checkForExpiredAuthPeriod");
+constexpr std::chrono::milliseconds kDefaultCheckForExpiredAuthPeriod =
+    std::chrono::minutes(10);
+
+const QLatin1String kContinueUpdatingExpiredAuthPeriod("auth/continueUpdatingExpiredAuthPeriod");
+constexpr std::chrono::milliseconds kDefaultContinueUpdatingExpiredAuthPeriod =
+    std::chrono::minutes(1);
+
+const QLatin1String kMaxSystemsToUpdateAtATime("auth/maxSystemsToUpdateAtATime");
+constexpr int kDefaultMaxSystemsToUpdateAtATime = 11;
+
 //-------------------------------------------------------------------------------------------------
 // Event manager settings
 const QLatin1String kMediaServerConnectionIdlePeriod("eventManager/mediaServerConnectionIdlePeriod");
@@ -88,6 +99,13 @@ const int kDefaultTcpBacklogSize = 1024;
 const QLatin1String kConnectionInactivityPeriod("http/connectionInactivityPeriod");
 const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
 
+//-------------------------------------------------------------------------------------------------
+// VmsGateway
+const QLatin1String kVmsGatewayUrl("vmsGateway/url");
+
+const QLatin1String kVmsGatewayRequestTimeout("vmsGateway/requestTimeout");
+const std::chrono::milliseconds kDefaultVmsGatewayRequestTimeout(std::chrono::seconds(21));
+
 } // namespace
 
 
@@ -99,7 +117,10 @@ Auth::Auth():
     rulesXmlPath(kDefaultAuthXmlPath),
     nonceValidityPeriod(kDefaultNonceValidityPeriod),
     intermediateResponseValidityPeriod(kDefaultIntermediateResponseValidityPeriod),
-    offlineUserHashValidityPeriod(kDefaultOfflineUserHashValidityPeriod)
+    offlineUserHashValidityPeriod(kDefaultOfflineUserHashValidityPeriod),
+    checkForExpiredAuthPeriod(),
+    continueUpdatingExpiredAuthPeriod(),
+    maxSystemsToUpdateAtATime()
 {
 }
 
@@ -124,9 +145,20 @@ EventManager::EventManager():
 {
 }
 
+ModuleFinder::ModuleFinder():
+    cloudModulesXmlTemplatePath(kDefaultCloudModuleXmlTemplatePath),
+    newCloudModulesXmlTemplatePath(kDefaultNewCloudModuleXmlTemplatePath)
+{
+}
+
 Http::Http():
     tcpBacklogSize(kDefaultTcpBacklogSize),
     connectionInactivityPeriod(kDefaultConnectionInactivityPeriod)
+{
+}
+
+VmsGateway::VmsGateway():
+    requestTimeout(kDefaultVmsGatewayRequestTimeout)
 {
 }
 
@@ -206,7 +238,7 @@ const EventManager& Settings::eventManager() const
     return m_eventManager;
 }
 
-const ec2::Settings& Settings::p2pDb() const
+const data_sync_engine::Settings& Settings::p2pDb() const
 {
     return m_p2pDb;
 }
@@ -226,23 +258,28 @@ const Http& Settings::http() const
     return m_http;
 }
 
+const VmsGateway& Settings::vmsGateway() const
+{
+    return m_vmsGateway;
+}
+
 void Settings::setDbConnectionOptions(
     const nx::utils::db::ConnectionOptions& options)
 {
     m_dbConnectionOptions = options;
 }
 
-std::list<SocketAddress> Settings::endpointsToListen() const
+std::list<network::SocketAddress> Settings::endpointsToListen() const
 {
     const QStringList& httpAddrToListenStrList = settings().value(
         kEndpointsToListen,
         kDefaultEndpointsToListen ).toString().split( ',' );
-    std::list<SocketAddress> httpAddrToListenList;
+    std::list<network::SocketAddress> httpAddrToListenList;
     std::transform(
         httpAddrToListenStrList.begin(),
         httpAddrToListenStrList.end(),
         std::back_inserter( httpAddrToListenList ),
-        []( const QString& str ) { return SocketAddress( str ); } );
+        []( const QString& str ) { return network::SocketAddress( str ); } );
 
     return httpAddrToListenList;
 }
@@ -299,20 +336,7 @@ void Settings::loadSettings()
             kControlSystemStatusByDb,
             kDefaultControlSystemStatusByDb ? "true" : "false").toString() == "true";
 
-    //auth
-    m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
-    m_auth.nonceValidityPeriod = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings().value(kNonceValidityPeriod).toString(),
-            kDefaultNonceValidityPeriod));
-    m_auth.intermediateResponseValidityPeriod = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings().value(kIntermediateResponseValidityPeriod).toString(),
-            kDefaultIntermediateResponseValidityPeriod));
-    m_auth.offlineUserHashValidityPeriod = duration_cast<minutes>(
-        nx::utils::parseTimerDuration(
-            settings().value(kOfflineUserHashValidityPeriod).toString(),
-            kDefaultOfflineUserHashValidityPeriod));
+    loadAuth();
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
@@ -335,6 +359,47 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kConnectionInactivityPeriod).toString(),
             kDefaultConnectionInactivityPeriod));
+
+    //vmsGateway
+    m_vmsGateway.url = settings().value(kVmsGatewayUrl).toString().toStdString();
+
+    m_vmsGateway.requestTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kVmsGatewayRequestTimeout).toString(),
+            kDefaultVmsGatewayRequestTimeout);
+}
+
+void Settings::loadAuth()
+{
+    using namespace std::chrono;
+
+    m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
+
+    m_auth.nonceValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kNonceValidityPeriod).toString(),
+            kDefaultNonceValidityPeriod));
+
+    m_auth.intermediateResponseValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kIntermediateResponseValidityPeriod).toString(),
+            kDefaultIntermediateResponseValidityPeriod));
+
+    m_auth.offlineUserHashValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kOfflineUserHashValidityPeriod).toString(),
+            kDefaultOfflineUserHashValidityPeriod));
+
+    m_auth.checkForExpiredAuthPeriod = nx::utils::parseTimerDuration(
+        settings().value(kCheckForExpiredAuthPeriod).toString(),
+        kDefaultCheckForExpiredAuthPeriod);
+
+    m_auth.continueUpdatingExpiredAuthPeriod = nx::utils::parseTimerDuration(
+        settings().value(kContinueUpdatingExpiredAuthPeriod).toString(),
+        kDefaultContinueUpdatingExpiredAuthPeriod);
+
+    m_auth.maxSystemsToUpdateAtATime = settings().value(
+        kMaxSystemsToUpdateAtATime, kDefaultMaxSystemsToUpdateAtATime).toInt();
 }
 
 } // namespace conf

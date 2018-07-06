@@ -13,10 +13,13 @@
 **.js = native
 
 **.bat = CRLF
+**.cmd = CRLF
+**.ps1 = CRLF
 **.vcproj = CRLF
 **.wixproj = CRLF
 **.def = CRLF
 **.wxs = CRLF
+**/Autounattend.xml = CRLF
 
 **.jpg = BIN
 **.bmp = BIN

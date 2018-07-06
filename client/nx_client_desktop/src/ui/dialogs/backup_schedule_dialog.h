@@ -22,7 +22,7 @@ class QnBackupScheduleDialog: public QnSessionAwareButtonBoxDialog
     typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
-    QnBackupScheduleDialog(QWidget *parent = NULL);
+    QnBackupScheduleDialog(QWidget *parent);
     virtual ~QnBackupScheduleDialog();
 
     void updateFromSettings(const QnServerBackupSchedule& value);

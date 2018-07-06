@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 22, 2015
-* akolesnikov
-***********************************************************/
-
 #include "stun_message_data.h"
-
 
 namespace nx {
 namespace hpm {
@@ -29,21 +23,20 @@ StunMessageAttributesData::~StunMessageAttributesData()
 
 /** StunRequestData */
 
-StunRequestData::StunRequestData(int method)
-:
+StunRequestData::StunRequestData(int method):
     m_method(method)
 {
 }
 
-void StunRequestData::serialize(nx::stun::Message* const message)
+void StunRequestData::serialize(nx::network::stun::Message* const message)
 {
-    message->header = stun::Header(stun::MessageClass::request, m_method);
+    message->header = network::stun::Header(network::stun::MessageClass::request, m_method);
     serializeAttributes(message);
 }
 
-bool StunRequestData::parse(const nx::stun::Message& message)
+bool StunRequestData::parse(const nx::network::stun::Message& message)
 {
-    if (message.header.messageClass != stun::MessageClass::request ||
+    if (message.header.messageClass != network::stun::MessageClass::request ||
         message.header.method != m_method)
     {
         return false;
@@ -54,20 +47,19 @@ bool StunRequestData::parse(const nx::stun::Message& message)
 
 /** StunResponseData */
 
-StunResponseData::StunResponseData(int method)
-:
+StunResponseData::StunResponseData(int method):
     m_method(method)
 {
 }
 
-void StunResponseData::serialize(nx::stun::Message* const message)
+void StunResponseData::serialize(nx::network::stun::Message* const message)
 {
-    message->header.messageClass = stun::MessageClass::successResponse;
+    message->header.messageClass = network::stun::MessageClass::successResponse;
     message->header.method = m_method;
     serializeAttributes(message);
 }
 
-bool StunResponseData::parse(const nx::stun::Message& message)
+bool StunResponseData::parse(const nx::network::stun::Message& message)
 {
     //NOTE: not checking messageClass since response may have different values
     if (message.header.method != m_method)
@@ -78,21 +70,20 @@ bool StunResponseData::parse(const nx::stun::Message& message)
 
 /** StunIndicationData */
 
-StunIndicationData::StunIndicationData(int method)
-:
+StunIndicationData::StunIndicationData(int method):
     m_method(method)
 {
 }
 
-void StunIndicationData::serialize(nx::stun::Message* const message)
+void StunIndicationData::serialize(nx::network::stun::Message* const message)
 {
-    message->header = stun::Header(stun::MessageClass::indication, m_method);
+    message->header = network::stun::Header(network::stun::MessageClass::indication, m_method);
     serializeAttributes(message);
 }
 
-bool StunIndicationData::parse(const nx::stun::Message& message)
+bool StunIndicationData::parse(const nx::network::stun::Message& message)
 {
-    if (message.header.messageClass != stun::MessageClass::indication ||
+    if (message.header.messageClass != network::stun::MessageClass::indication ||
         message.header.method != m_method)
     {
         return false;

@@ -12,8 +12,9 @@
 #include <ws2tcpip.h>
 #endif
 
-#include <nx/utils/log/assert.h>
 #include <nx/network/nettools.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/scope_guard.h>
 
 namespace QnMulticast
 {
@@ -175,8 +176,12 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
     result.offset      = fields[7].toInt();
     result.payloadData = fields[8];
 
-    if (result.offset + result.payloadData.size() > result.messageSize)
-        return result; // error
+    if (result.offset < 0)
+        return result; //< Error: negative offset.
+
+    const auto payloadEndPosition = result.offset + result.payloadData.size();
+    if (payloadEndPosition < 0 || payloadEndPosition > result.messageSize)
+        return result; // Error: position overflow.
 
     *ok = true;
     return result;
@@ -191,7 +196,7 @@ Transport::Transport(const QUuid& localGuid):
     m_mutex(QnMutex::Recursive),
     m_nextSendQueued(false)
 {
-    initSockets(getLocalIpV4AddressList());
+    initSockets(nx::network::getLocalIpV4AddressList());
 
     m_timer.reset(new QTimer());
     connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
@@ -265,7 +270,7 @@ void Transport::at_timer()
     // 2. check if interface list changed
     if (m_checkInterfacesTimer.hasExpired(INTERFACE_LIST_CHECK_INTERVAL))
     {
-        QSet<QString> addrList = getLocalIpV4AddressList();
+        QSet<QString> addrList = nx::network::getLocalIpV4AddressList();
         if (addrList != m_localAddressList)
             initSockets(addrList);
         m_checkInterfacesTimer.restart();
@@ -450,6 +455,8 @@ void Transport::eraseRequest(const QUuid& id)
 
 void Transport::at_socketReadyRead()
 {
+    std::vector<Guard> callbackGuards;
+
     QnMutexLocker lock(&m_mutex);
     while (m_recvSocket->hasPendingDatagrams())
     {
@@ -504,7 +511,14 @@ void Transport::at_socketReadyRead()
             {
                 Request request = parseRequest(transportData, &ok);
                 if (ok && m_requestCallback)
-                    m_requestCallback(transportData.requestId, packet.clientId, request);
+                {
+                    callbackGuards.emplace_back(
+                        [callback = m_requestCallback, requestId = transportData.requestId,
+                            packetId = packet.clientId, request = std::move(request)]()
+                        {
+                            callback(requestId, packetId, request);
+                        });
+                }
             }
             eraseRequest(packet.requestId);
         }

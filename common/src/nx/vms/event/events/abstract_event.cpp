@@ -2,6 +2,11 @@
 
 #include "utils/common/synctime.h"
 #include "core/resource/resource.h"
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/vms/event/analytics_helper.h>
 
 namespace nx {
 namespace vms {
@@ -11,11 +16,9 @@ bool hasChild(EventType eventType)
 {
     switch (eventType)
     {
-        case anyCameraEvent:
-            return true;
-        case anyServerEvent:
-            return true;
-        case anyEvent:
+        case EventType::anyCameraEvent:
+        case EventType::anyServerEvent:
+        case EventType::anyEvent:
             return true;
         default:
             return false;
@@ -26,24 +29,24 @@ EventType parentEvent(EventType eventType)
 {
     switch (eventType)
     {
-        case cameraDisconnectEvent:
-        case networkIssueEvent:
-        case cameraIpConflictEvent:
-            return anyCameraEvent;
+        case EventType::cameraDisconnectEvent:
+        case EventType::networkIssueEvent:
+        case EventType::cameraIpConflictEvent:
+            return EventType::anyCameraEvent;
 
-        case storageFailureEvent:
-        case serverFailureEvent:
-        case serverConflictEvent:
-        case serverStartEvent:
-        case licenseIssueEvent:
-        case backupFinishedEvent:
-            return anyServerEvent;
+        case EventType::storageFailureEvent:
+        case EventType::serverFailureEvent:
+        case EventType::serverConflictEvent:
+        case EventType::serverStartEvent:
+        case EventType::licenseIssueEvent:
+        case EventType::backupFinishedEvent:
+            return EventType::anyServerEvent;
 
-        case anyEvent:
-            return undefinedEvent;
+        case EventType::anyEvent:
+            return EventType::undefinedEvent;
 
         default:
-            return anyEvent;
+            return EventType::anyEvent;
     }
 }
 
@@ -51,30 +54,36 @@ QList<EventType> childEvents(EventType eventType)
 {
     switch (eventType)
     {
-        case anyCameraEvent:
+        // Some critical issue occurred on the camera.
+        case EventType::anyCameraEvent:
             return {
-                cameraDisconnectEvent,
-                networkIssueEvent,
-                cameraIpConflictEvent,
-                softwareTriggerEvent };
+                EventType::cameraDisconnectEvent,
+                EventType::networkIssueEvent,
+                EventType::cameraIpConflictEvent,
+            };
 
-        case anyServerEvent:
+        // Some critical issue occurred on the server.
+        case EventType::anyServerEvent:
             return {
-                storageFailureEvent,
-                serverFailureEvent,
-                serverConflictEvent,
-                serverStartEvent,
-                licenseIssueEvent,
-                backupFinishedEvent };
+                EventType::storageFailureEvent,
+                EventType::serverFailureEvent,
+                EventType::serverConflictEvent,
+                EventType::serverStartEvent,
+                EventType::licenseIssueEvent,
+                EventType::backupFinishedEvent
+            };
 
-        case anyEvent:
+        // All events except already mentioned.
+        case EventType::anyEvent:
             return {
-                cameraMotionEvent,
-                cameraInputEvent,
-                anyCameraEvent,
-                anyServerEvent,
-                userDefinedEvent,
-                softwareTriggerEvent };
+                EventType::cameraMotionEvent,
+                EventType::cameraInputEvent,
+                EventType::softwareTriggerEvent,
+                EventType::anyCameraEvent,
+                EventType::anyServerEvent,
+                EventType::analyticsSdkEvent,
+                EventType::userDefinedEvent
+            };
 
         default:
             return {};
@@ -84,19 +93,21 @@ QList<EventType> childEvents(EventType eventType)
 QList<EventType> allEvents()
 {
     static const QList<EventType> result {
-        cameraMotionEvent,
-        cameraInputEvent,
-        cameraDisconnectEvent,
-        storageFailureEvent,
-        networkIssueEvent,
-        cameraIpConflictEvent,
-        serverFailureEvent,
-        serverConflictEvent,
-        serverStartEvent,
-        licenseIssueEvent,
-        backupFinishedEvent,
-        softwareTriggerEvent,
-        userDefinedEvent };
+        EventType::cameraMotionEvent,
+        EventType::cameraInputEvent,
+        EventType::cameraDisconnectEvent,
+        EventType::storageFailureEvent,
+        EventType::networkIssueEvent,
+        EventType::cameraIpConflictEvent,
+        EventType::serverFailureEvent,
+        EventType::serverConflictEvent,
+        EventType::serverStartEvent,
+        EventType::licenseIssueEvent,
+        EventType::backupFinishedEvent,
+        EventType::softwareTriggerEvent,
+        EventType::analyticsSdkEvent,
+        EventType::userDefinedEvent
+    };
 
     return result;
 }
@@ -107,40 +118,59 @@ bool isResourceRequired(EventType eventType)
         || requiresServerResource(eventType);
 }
 
-bool hasToggleState(EventType eventType)
+bool hasToggleState(
+    EventType eventType,
+    const EventParameters& runtimeParams,
+    QnCommonModule* commonModule)
 {
     switch (eventType)
     {
-        case anyEvent:
-        case cameraMotionEvent:
-        case cameraInputEvent:
-        case userDefinedEvent:
-        case softwareTriggerEvent:
+    case EventType::anyEvent:
+    case EventType::cameraMotionEvent:
+    case EventType::cameraInputEvent:
+    case EventType::userDefinedEvent:
+    case EventType::softwareTriggerEvent:
+        return true;
+    case EventType::analyticsSdkEvent:
+    {
+        if (runtimeParams.analyticsEventId().isNull())
             return true;
-
-        default:
-            return false;
+        AnalyticsHelper helper(commonModule);
+        auto descriptor = helper.eventDescriptor(runtimeParams.analyticsEventId());
+        return descriptor.flags.testFlag(nx::api::Analytics::stateDependent);
+    }
+    default:
+        return false;
     }
 }
 
-QList<EventState> allowedEventStates(EventType eventType)
+QList<EventState> allowedEventStates(
+    EventType eventType,
+    const EventParameters& runtimeParams,
+    QnCommonModule* commonModule)
 {
     QList<EventState> result;
-    if (!hasToggleState(eventType) || eventType == userDefinedEvent || eventType == softwareTriggerEvent)
+    const bool hasTooggleStateResult = hasToggleState(eventType, runtimeParams, commonModule);
+    if (!hasTooggleStateResult
+        || eventType == EventType::userDefinedEvent
+        || eventType == EventType::softwareTriggerEvent)
         result << EventState::undefined;
-    if (hasToggleState(eventType))
+
+    if (hasTooggleStateResult)
         result << EventState::active << EventState::inactive;
     return result;
 }
 
+// Check if camera required for this event to setup a rule. Camera selector will be displayed.
 bool requiresCameraResource(EventType eventType)
 {
     switch (eventType)
     {
-        case cameraMotionEvent:
-        case cameraInputEvent:
-        case cameraDisconnectEvent:
-        case softwareTriggerEvent:
+        case EventType::cameraMotionEvent:
+        case EventType::cameraInputEvent:
+        case EventType::cameraDisconnectEvent: //< Think about moving out disconnect event.
+        case EventType::softwareTriggerEvent:
+        case EventType::analyticsSdkEvent:
             return true;
 
         default:
@@ -148,47 +178,40 @@ bool requiresCameraResource(EventType eventType)
     }
 }
 
+// Check if server required for this event to setup a rule. Server selector will be displayed.
 bool requiresServerResource(EventType eventType)
 {
-    switch (eventType)
-    {
-        case storageFailureEvent:
-            return false; // TODO: #GDM #Business restore when will work fine
-        default:
-            return false;
-    }
+    // TODO: #GDM #Business possibly will never be required.
     return false;
 }
 
+// Check if camera required for this event to OCCUR.
 bool isSourceCameraRequired(EventType eventType)
 {
     switch (eventType)
     {
-        case cameraMotionEvent:
-        case cameraInputEvent:
-        case cameraDisconnectEvent:
-        case networkIssueEvent:
-        case softwareTriggerEvent:
+        case EventType::networkIssueEvent:
             return true;
 
         default:
-            return false;
+            return requiresCameraResource(eventType);
     }
 }
 
+// Check if server required for this event to OCCUR.
 bool isSourceServerRequired(EventType eventType)
 {
     switch (eventType)
     {
-        case storageFailureEvent:
-        case backupFinishedEvent:
-        case serverFailureEvent:
-        case serverConflictEvent:
-        case serverStartEvent:
+        case EventType::storageFailureEvent:
+        case EventType::backupFinishedEvent:
+        case EventType::serverFailureEvent:
+        case EventType::serverConflictEvent:
+        case EventType::serverStartEvent:
             return true;
 
         default:
-            return false;
+            return requiresServerResource(eventType);
     }
 }
 

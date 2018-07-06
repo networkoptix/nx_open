@@ -11,7 +11,7 @@ QnResourcePropertyDictionary::QnResourcePropertyDictionary(QObject *parent):
 
 bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
 {
-    ec2::ApiResourceParamWithRefDataList params;
+    nx::vms::api::ResourceParamWithRefDataList params;
     {
         QnMutexLocker lock( &m_mutex );
         auto itr = m_modifiedItems.find(resourceId);
@@ -19,7 +19,7 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
             return true;
         QnResourcePropertyList& properties = itr.value();
         for (auto itrParams = properties.begin(); itrParams != properties.end(); ++itrParams)
-            params.push_back(ec2::ApiResourceParamWithRefData(resourceId, itrParams.key(), itrParams.value()));
+            params.emplace_back(resourceId, itrParams.key(), itrParams.value());
         m_modifiedItems.erase(itr);
     }
 
@@ -40,36 +40,42 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
     return true;
 }
 
-void QnResourcePropertyDictionary::fromModifiedDataToSavedData(const QnUuid& resourceId, ec2::ApiResourceParamWithRefDataList& outData)
+void QnResourcePropertyDictionary::fromModifiedDataToSavedData(
+    const QnUuid& resourceId,
+    nx::vms::api::ResourceParamWithRefDataList& outData)
 {
     auto itr = m_modifiedItems.find(resourceId);
-    if (itr != m_modifiedItems.end()) {
+    if (itr != m_modifiedItems.end())
+    {
         QnResourcePropertyList& properties = itr.value();
         for (auto itrParams = properties.begin(); itrParams != properties.end(); ++itrParams)
-            outData.push_back(ec2::ApiResourceParamWithRefData(resourceId, itrParams.key(), itrParams.value()));
+            outData.emplace_back(resourceId, itrParams.key(), itrParams.value());
         m_modifiedItems.erase(itr);
     }
 }
 
-int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDataList&& data)
+int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWithRefDataList&& data)
 {
     if (data.empty())
         return -1; // nothing to save
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     if (!conn)
         return -1; // not connected to ec2
-    QnMutexLocker lock( &m_requestMutex );
+    QnMutexLocker lock(&m_requestMutex);
     //TODO #ak m_requestInProgress is redundant here, data can be saved to
-        //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone
+    //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone
     // TODO: #GDM SafeMode
-    int requestId = conn->getResourceManager(Qn::kSystemAccess)->save(data, this, &QnResourcePropertyDictionary::onRequestDone);
+    int requestId = conn->getResourceManager(Qn::kSystemAccess)->save(
+        data,
+        this,
+        &QnResourcePropertyDictionary::onRequestDone);
     m_requestInProgress.insert(requestId, std::move(data));
     return requestId;
 }
 
 int QnResourcePropertyDictionary::saveParamsAsync(const QnUuid& resourceId)
 {
-    ec2::ApiResourceParamWithRefDataList data;
+    nx::vms::api::ResourceParamWithRefDataList data;
     {
         QnMutexLocker lock( &m_mutex );
         //TODO #vasilenko is it correct to mark property as saved before it has been actually saved to ec?
@@ -80,7 +86,7 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QnUuid& resourceId)
 
 int QnResourcePropertyDictionary::saveParamsAsync(const QList<QnUuid>& idList)
 {
-    ec2::ApiResourceParamWithRefDataList data;
+    nx::vms::api::ResourceParamWithRefDataList data;
     {
         QnMutexLocker lock( &m_mutex );
         //TODO #vasilenko is it correct to mark property as saved before it has been actually saved to ec?
@@ -92,7 +98,7 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QList<QnUuid>& idList)
 
 void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode errorCode )
 {
-    ec2::ApiResourceParamWithRefDataList unsavedData;
+    nx::vms::api::ResourceParamWithRefDataList unsavedData;
     {
         QnMutexLocker lock( &m_requestMutex );
         auto itr = m_requestInProgress.find(reqID);
@@ -107,10 +113,11 @@ void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode erro
     emit asyncSaveDone(reqID, errorCode);
 }
 
-void QnResourcePropertyDictionary::addToUnsavedParams(const ec2::ApiResourceParamWithRefDataList& params)
+void QnResourcePropertyDictionary::addToUnsavedParams(
+    const nx::vms::api::ResourceParamWithRefDataList& params)
 {
-    QnMutexLocker lock( &m_mutex );
-    for(const ec2::ApiResourceParamWithRefData& param: params)
+    QnMutexLocker lock(&m_mutex);
+    for (const auto& param: params)
     {
         auto itr = m_modifiedItems.find(param.resourceId);
         if (itr == m_modifiedItems.end())
@@ -139,16 +146,18 @@ void QnResourcePropertyDictionary::clear()
 
 void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
 {
-    QnMutexLocker lock( &m_mutex );
-    for(const QnUuid& id: idList) {
+    QnMutexLocker lock(&m_mutex);
+    for (const QnUuid& id: idList)
+    {
         m_items.remove(id);
         m_modifiedItems.remove(id);
     }
     //removing from m_requestInProgress
     cancelOngoingRequest(
-        [&idList]( const ec2::ApiResourceParamWithRefData& param ) -> bool {
-            return idList.contains( param.resourceId );
-        } );
+        [&idList](const auto& param) -> bool
+        {
+            return idList.contains(param.resourceId);
+        });
 }
 
 void QnResourcePropertyDictionary::markAllParamsDirty(const QnUuid& resourceId)
@@ -223,27 +232,30 @@ namespace
     }
 }
 
-bool QnResourcePropertyDictionary::removeProperty(const QnUuid& resourceId, const QString& key)
+bool QnResourcePropertyDictionary::on_resourceParamRemoved(
+    const QnUuid& resourceId,
+    const QString& key)
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
-    if( !removePropertyFromDictionary(&m_items, resourceId, key) &&
-        !removePropertyFromDictionary(&m_modifiedItems, resourceId, key) )
+    if (!removePropertyFromDictionary(&m_items, resourceId, key) &&
+        !removePropertyFromDictionary(&m_modifiedItems, resourceId, key))
     {
         return false;
     }
 
     //removing from m_requestInProgress
     cancelOngoingRequest(
-        [&resourceId, &key]( const ec2::ApiResourceParamWithRefData& param ) -> bool {
+        [&resourceId, &key](const auto& param) -> bool
+        {
             return param.resourceId == resourceId && param.name == key;
-        } );
+        });
     return true;
 }
 
-ec2::ApiResourceParamDataList QnResourcePropertyDictionary::allProperties(const QnUuid& resourceId) const
+nx::vms::api::ResourceParamDataList QnResourcePropertyDictionary::allProperties(const QnUuid& resourceId) const
 {
-    ec2::ApiResourceParamDataList result;
+    nx::vms::api::ResourceParamDataList result;
 
     QnMutexLocker lock( &m_mutex );
     auto itr = m_items.find(resourceId);
@@ -251,7 +263,7 @@ ec2::ApiResourceParamDataList QnResourcePropertyDictionary::allProperties(const 
         return result;
     const QnResourcePropertyList& properties = itr.value();
     for (auto itr = properties.begin(); itr != properties.end(); ++itr)
-        result.push_back(ec2::ApiResourceParamData(itr.key(), itr.value()));
+        result.emplace_back(itr.key(), itr.value());
 
     return result;
 }

@@ -7,7 +7,9 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/cpp14.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 HttpStreamReader::HttpStreamReader():
     m_state(waitingMessageStart),
@@ -316,8 +318,8 @@ bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
                 }
 
                 // Parsing header.
-                nx_http::StringType headerName;
-                nx_http::StringType headerValue;
+                nx::network::http::StringType headerName;
+                nx::network::http::StringType headerValue;
                 if (!parseHeader(&headerName, &headerValue, data))
                     return false;
                 m_httpMessage.headers().insert(std::make_pair(headerName, headerValue));
@@ -337,8 +339,8 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     if (m_httpMessage.type == MessageType::request)
     {
-        if (m_httpMessage.request->requestLine.method != nx_http::Method::post &&
-            m_httpMessage.request->requestLine.method != nx_http::Method::put)
+        if (m_httpMessage.request->requestLine.method != nx::network::http::Method::post &&
+            m_httpMessage.request->requestLine.method != nx::network::http::Method::put)
         {
             // Only POST and PUT are allowed to have message body.
             m_contentLength = 0;
@@ -355,8 +357,8 @@ bool HttpStreamReader::prepareToReadMessageBody()
     }
 
     m_contentDecoder.reset();
-    HttpHeaders::const_iterator contentEncodingIter = 
-        m_httpMessage.headers().find(nx_http::StringType("Content-Encoding"));
+    HttpHeaders::const_iterator contentEncodingIter =
+        m_httpMessage.headers().find(nx::network::http::StringType("Content-Encoding"));
     if (contentEncodingIter != m_httpMessage.headers().end() &&
         contentEncodingIter->second != "identity")
     {
@@ -376,8 +378,8 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     // Analyzing message headers to find out if there should be message body
     //   and filling in m_contentLength.
-    HttpHeaders::const_iterator transferEncodingIter = 
-        m_httpMessage.headers().find(nx_http::StringType("Transfer-Encoding"));
+    HttpHeaders::const_iterator transferEncodingIter =
+        m_httpMessage.headers().find(nx::network::http::StringType("Transfer-Encoding"));
     if (transferEncodingIter != m_httpMessage.headers().end())
     {
         // Parsing Transfer-Encoding.
@@ -392,8 +394,8 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     m_isChunkedTransfer = false;
 
-    HttpHeaders::const_iterator contentLengthIter = 
-        m_httpMessage.headers().find(nx_http::StringType("Content-Length"));
+    HttpHeaders::const_iterator contentLengthIter =
+        m_httpMessage.headers().find(nx::network::http::StringType("Content-Length"));
     if (contentLengthIter != m_httpMessage.headers().end())
         m_contentLength = contentLengthIter->second.toULongLong();
 
@@ -401,7 +403,7 @@ bool HttpStreamReader::prepareToReadMessageBody()
     auto connectionHeaderIter = m_httpMessage.headers().find("Connection");
     auto contentTypeHeaderIter = m_httpMessage.headers().find("Content-Type");
 
-    if (!m_contentLength && 
+    if (!m_contentLength &&
         contentTypeHeaderIter == m_httpMessage.headers().end() &&
         connectionHeaderIter != m_httpMessage.headers().end() &&
         connectionHeaderIter->second.toLower() == "upgrade")
@@ -582,9 +584,9 @@ unsigned int HttpStreamReader::hexCharToInt(BufferType::value_type ch)
     return 0;
 }
 
-std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter> 
+std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter>
     HttpStreamReader::createContentDecoder(
-        const nx_http::StringType& encodingName)
+        const nx::network::http::StringType& encodingName)
 {
     if (encodingName == "gzip")
         return std::make_unique<nx::utils::bstream::gzip::Uncompressor>();
@@ -610,4 +612,6 @@ void HttpStreamReader::resetStateInternal()
     m_prevChar = 0;
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

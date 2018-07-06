@@ -4,6 +4,7 @@
 
 #include <QtCore/QVarLengthArray>
 
+#include <utils/common/aspect_ratio.h>
 #include <utils/common/warnings.h>
 
 #include <nx/utils/math/fuzzy.h>
@@ -94,15 +95,25 @@ void gaussianBlur(const QImage &src, qreal sigma, QImage *dst) {
     gaussianBlurInternal(src.convertToFormat(QImage::Format_ARGB32), sigma, *dst);
 }
 
-QImage cropToAspectRatio(const QImage &source, const qreal targetAspectRatio) {
+QImage cropToAspectRatio(const QImage& source, const QnAspectRatio& targetAspectRatio)
+{
+    return cropToAspectRatio(source, targetAspectRatio.toFloat());
+}
+
+QImage cropToAspectRatio(const QImage &source, const qreal targetAspectRatio)
+{
     QImage result = source;
     qreal aspectRatio = (qreal)source.width() / (qreal)source.height();
-    if (!qFuzzyEquals(aspectRatio, targetAspectRatio)) {
-        if (targetAspectRatio > aspectRatio) {
+    if (!qFuzzyEquals(aspectRatio, targetAspectRatio))
+    {
+        if (targetAspectRatio > aspectRatio)
+        {
             int targetHeight = qRound((qreal)source.width() / targetAspectRatio);
             int offset = (source.height() - targetHeight) / 2;
             result = source.copy(0, offset, source.width(), targetHeight);
-        } else {
+        }
+        else
+        {
             int targetWidth = qRound((qreal)source.height() * targetAspectRatio);
             int offset = (source.width() - targetWidth / 2);
             result = source.copy(offset, 0, targetWidth, source.height());

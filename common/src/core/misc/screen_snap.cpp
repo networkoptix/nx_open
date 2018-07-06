@@ -1,14 +1,14 @@
 #include "screen_snap.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace {
 
 const int snapsPerScreenValue = 2;
 
 } // namespace
 
-QnScreenSnap::QnScreenSnap():
-    screenIndex(-1),
-    snapIndex(0)
+QnScreenSnap::QnScreenSnap()
 {
 }
 
@@ -30,7 +30,7 @@ int QnScreenSnap::encode() const
 
 QnScreenSnap QnScreenSnap::decode(int encoded)
 {
-    return QnScreenSnap(encoded >> 8, encoded & 0xFF);
+    return {encoded >> 8, encoded & 0xFF};
 }
 
 int QnScreenSnap::snapsPerScreen()
@@ -43,45 +43,41 @@ bool QnScreenSnaps::isValid() const
     return std::all_of(values.cbegin(), values.cend(), [](const QnScreenSnap &snap) { return snap.isValid(); });
 }
 
-QSet<int> QnScreenSnaps::screens() const
-{
-    QSet<int> screens;
-    for (const QnScreenSnap &snap : values)
-        screens << snap.screenIndex;
-    return screens;
-}
-
-QRect QnScreenSnaps::geometry(const QList<QRect>& screens) const
+QRect QnScreenSnaps::geometry(const QList<QRect>& screenGeometries) const
 {
     if (!isValid())
-        return QRect();
+        return {};
 
     QRect geometry;
-    int maxIndex = screens.size() - 1;
+    int maxIndex = screenGeometries.size() - 1;
 
-    auto leftCoord = [&screens, maxIndex](const QnScreenSnap& snap)
-    {
-        QRect screenRect = screens.at(qMin(snap.screenIndex, maxIndex));
-        return screenRect.left() + (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-    };
+    auto leftCoord =
+        [&screenGeometries, maxIndex](const QnScreenSnap& snap)
+        {
+            QRect screenRect = screenGeometries.at(qMin(snap.screenIndex, maxIndex));
+            return screenRect.left() + (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+        };
 
-    auto topCoord = [&screens, maxIndex](const QnScreenSnap& snap)
-    {
-        QRect screenRect = screens.at(qMin(snap.screenIndex, maxIndex));
-        return screenRect.top() + (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-    };
+    auto topCoord =
+        [&screenGeometries, maxIndex](const QnScreenSnap& snap)
+        {
+            QRect screenRect = screenGeometries.at(qMin(snap.screenIndex, maxIndex));
+            return screenRect.top() + (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+        };
 
-    auto rightCoord = [&screens, maxIndex](const QnScreenSnap& snap)
-    {
-        QRect screenRect = screens.at(qMin(snap.screenIndex, maxIndex));
-        return screenRect.right() - (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-    };
+    auto rightCoord =
+        [&screenGeometries, maxIndex](const QnScreenSnap& snap)
+        {
+            QRect screenRect = screenGeometries.at(qMin(snap.screenIndex, maxIndex));
+            return screenRect.right() - (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+        };
 
-    auto bottomCoord = [&screens, maxIndex](const QnScreenSnap& snap)
-    {
-        QRect screenRect = screens.at(qMin(snap.screenIndex, maxIndex));
-        return screenRect.bottom() - (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-    };
+    auto bottomCoord =
+        [&screenGeometries, maxIndex](const QnScreenSnap& snap)
+        {
+            QRect screenRect = screenGeometries.at(qMin(snap.screenIndex, maxIndex));
+            return screenRect.bottom() - (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+        };
 
     return QRect(
         QPoint(leftCoord(left()), topCoord(top())),

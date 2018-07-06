@@ -6,12 +6,10 @@
 
 namespace ec2
 {
-    struct ApiLicenseOverflowData : ApiData
+    struct ApiLicenseOverflowData: nx::vms::api::Data
     {
-        ApiLicenseOverflowData(): value(false), time(0) {}
-
-        bool   value;
-        qint64 time;
+        bool   value = false;
+        qint64 time = 0;
     };
 #define ApiLicenseOverflowData_Fields (value)(time)
 }

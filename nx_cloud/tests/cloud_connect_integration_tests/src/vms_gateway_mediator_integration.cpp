@@ -3,7 +3,10 @@
 
 #include <gtest/gtest.h>
 
-#include <libvms_gateway/src/test_support/vms_gateway_functional_test.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
+
+#include <libvms_gateway_core/src/test_support/vms_gateway_functional_test.h>
 
 #include <controller.h>
 #include <mediator_service.h>
@@ -24,7 +27,7 @@ class VmsGatewayMediatorIntegration:
 public:
     VmsGatewayMediatorIntegration():
         m_vmsGateway(nx::cloud::gateway::VmsGatewayFunctionalTest::doNotReinitialiseSocketGlobals),
-        m_vmsGatewayPeerId(SocketGlobals::outgoingTunnelPool().ownPeerId().toStdString())
+        m_vmsGatewayPeerId(SocketGlobals::cloud().outgoingTunnelPool().ownPeerId().toStdString())
     {
         setInitFlags(BasicTestFixture::doNotInitializeMediatorConnection);
     }
@@ -33,6 +36,10 @@ protected:
     void givenGatewayThatFailedToConnectToMediator()
     {
         mediator().stop();
+
+        // TODO: #ak We cannot rely on that mediator will be able to start on the same port.
+        // Must hold port busy somehow.
+        // E.g., could introduce simple tcp forwarder based on AsyncChannelBridge class.
 
         whenStartGateway();
 
@@ -57,7 +64,7 @@ protected:
 
     void thenGatewayReconnectedToMediator()
     {
-        // TODO: #ak Probably, it is better to check that gateway 
+        // TODO: #ak Probably, it is better to check that gateway
         // endpoint is in mediator connection_requested event.
 
         for (;;)

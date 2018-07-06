@@ -31,7 +31,7 @@ void AsyncCall::removeAioObjectDelayed()
     aioObjectPtr->post(
         [aioObject = std::move(aioObject)]() mutable
         {
-            NX_ASSERT(aioObject.unique());
+            NX_ASSERT(aioObject.use_count() == 1);
             aioObject.reset();
         });
 }

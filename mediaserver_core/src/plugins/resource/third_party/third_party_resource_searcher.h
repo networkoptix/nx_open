@@ -15,12 +15,12 @@
 
 #include <nx/network/upnp/upnp_search_handler.h>
 
-#include "third_party_resource.h"
-#include "../mdns/mdns_resource_searcher.h"
-#include "plugins/resource/upnp/upnp_resource_searcher.h"
-#include "plugins/camera_plugin.h"
-#include "plugins/camera_plugin_qt_wrapper.h"
+#include <camera/camera_plugin.h>
 
+#include <plugins/resource/third_party/third_party_resource.h>
+#include <plugins/resource/mdns/mdns_resource_searcher.h>
+#include <plugins/resource/upnp/upnp_resource_searcher.h>
+#include <plugins/camera_plugin_qt_wrapper.h>
 
 /*!
     \note One object is created for all loaded plugin
@@ -46,7 +46,7 @@ public:
     virtual QString manufacture() const override;
     //!Implementation of QnAbstractNetworkResourceSearcher::checkHostAddr
     virtual QList<QnResourcePtr> checkHostAddr(
-        const QUrl& url,
+        const nx::utils::Url& url,
         const QAuthenticator& auth,
         bool doMultichannelCheck ) override;
 
@@ -63,8 +63,8 @@ protected:
     //!Implementation of QnUpnpResourceSearcherAsync::processPacket
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& host,
-        const nx_upnp::DeviceInfo& devInfo,
+        const nx::network::SocketAddress& host,
+        const nx::network::upnp::DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo,
         QnResourceList& result ) override;
     //!Implementation of QnAbstractResourceSearcher::findResources

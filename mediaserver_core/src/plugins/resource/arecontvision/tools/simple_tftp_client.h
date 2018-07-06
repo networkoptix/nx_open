@@ -60,7 +60,7 @@ private:
     int m_wish_blk_size;
     int m_curr_blk_size;
 
-    std::unique_ptr<AbstractDatagramSocket> m_sock;
+    std::unique_ptr<nx::network::AbstractDatagramSocket> m_sock;
     CameraDiagnostics::Result m_prevResult;
     QString m_resolvedAddress;
 };

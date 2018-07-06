@@ -26,6 +26,7 @@ class P2pMessageBusTestBase: public testing::Test
 public:
 protected:
     static void connectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
+    static void disconnectServers(const Appserver2Ptr& srcServer, const Appserver2Ptr& dstServer);
 
     static void sequenceConnect(std::vector<Appserver2Ptr>& servers);
     static void circleConnect(std::vector<Appserver2Ptr>& servers);
@@ -43,8 +44,12 @@ protected:
         int camerasCount,
         int propertiesPerCamera,
         int userCount = 0);
+
+    bool waitForCondition(std::function<bool()> condition, std::chrono::milliseconds timeout);
+    bool waitForConditionOnAllServers(
+        std::function<bool(const Appserver2Ptr&)> condition,
+        std::chrono::milliseconds timeout);
 protected:
-    QnStaticCommonModule staticCommon;
     std::vector<Appserver2Ptr> m_servers;
     static int m_instanceCounter;
 };

@@ -1,10 +1,12 @@
 #pragma once
 
 #include <memory>
+
 #include <nx/utils/move_only_func.h>
-#include "client_session_pool.h"
-#include "listening_peer_pool.h"
+#include <nx/cloud/relaying/listening_peer_pool.h>
+
 #include "abstract_remote_relay_peer_pool.h"
+#include "client_session_pool.h"
 
 namespace nx {
 namespace cloud {
@@ -22,8 +24,8 @@ public:
     model::ClientSessionPool& clientSessionPool();
     const model::ClientSessionPool& clientSessionPool() const;
 
-    model::ListeningPeerPool& listeningPeerPool();
-    const model::ListeningPeerPool& listeningPeerPool() const;
+    relaying::ListeningPeerPool& listeningPeerPool();
+    const relaying::ListeningPeerPool& listeningPeerPool() const;
 
     model::AbstractRemoteRelayPeerPool& remoteRelayPeerPool();
     const model::AbstractRemoteRelayPeerPool& remoteRelayPeerPool() const;
@@ -31,23 +33,9 @@ public:
 private:
     const conf::Settings& m_settings;
     model::ClientSessionPool m_clientSessionPool;
-    model::ListeningPeerPool m_listeningPeerPool;
+    relaying::ListeningPeerPool m_listeningPeerPool;
     std::unique_ptr<model::AbstractRemoteRelayPeerPool> m_remoteRelayPeerPool;
 };
-
-namespace model {
-
-class RemoteRelayPeerPoolFactory
-{
-public:
-    using FactoryFunc = nx::utils::MoveOnlyFunc<
-        std::unique_ptr<model::AbstractRemoteRelayPeerPool>(const conf::Settings&)>;
-    static std::unique_ptr<model::AbstractRemoteRelayPeerPool> create(
-        const conf::Settings& settings);
-    static void setFactoryFunc(FactoryFunc func);
-};
-
-} // namespace model
 
 } // namespace relay
 } // namespace cloud

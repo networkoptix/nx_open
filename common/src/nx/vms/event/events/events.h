@@ -17,3 +17,4 @@
 #include "server_started_event.h"
 #include "software_trigger_event.h"
 #include "storage_failure_event.h"
+#include "analytics_sdk_event.h"

@@ -64,7 +64,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\[Manufacturer]\$(var.clientName)"
+                            Key="Software\[Manufacturer]\$(var.clientInternalName)"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="yes"/>
@@ -79,9 +79,11 @@
                             Win64="no"/>
         </Property>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="$(var.SourceDir)\wix_custom_actions.dll" />
 
         <CustomAction Id="CleanAutorunRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="CleanAutorunRegistryKeys" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="CleanClientRegistryKeys_Cmd" Property="CleanClientRegistryKeys" Value="$(var.clientRegPath)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="CleanClientRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="CleanClientRegistryKeys" Execute="deferred" Impersonate="yes"/>
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
@@ -91,7 +93,7 @@
 
         <!-- Trying to kill old applauncher nicely. Notice: new applauncher may be left running during update. -->
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[$(var.clientDirId)]$(var.minilauncherBinaryName)&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[ClientRootDir]$(var.minilauncherBinaryName)&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
@@ -117,6 +119,8 @@
             <AppSearch Before="LaunchConditions" />
 
             <Custom Action="CleanAutorunRegistryKeys" Before="InstallFinalize">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="CleanClientRegistryKeys_Cmd" After="CleanAutorunRegistryKeys">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="CleanClientRegistryKeys" After="CleanClientRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
             <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
@@ -147,7 +151,7 @@
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">
-                <Directory Id="NetworkOptix" Name="$(var.companyName)">
+                <Directory Id="NetworkOptix" Name="$(var.companyInstallPath)">
                     <Directory Id="INSTALLDIR" Name="$(var.productName)">
                     </Directory>
                 </Directory>

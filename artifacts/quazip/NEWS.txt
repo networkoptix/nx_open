@@ -1,8 +1,19 @@
 QuaZIP changes
 
-* 2014-01-07 0.7.1
+* 2017-02-05 0.7.3
+        * Symlink handling
+        * Static linking exception for LGPL
+        * Minor bug fixes
+
+* 2016-03-29 0.7.2
+        * New JlCompress methods (QIODevice*-based API by Lukasz Kwiecinski)
+        * Implemented QuaZioDevice::atEnd() and bytesAvailable()--these might
+          break ABI, but pretty unlikely.
+
+* 2015-01-07 0.7.1
         * Fixed licensing issues (bug #45).
         * Added the convenience method QuaZipFileInfo::isEncrypted().
+
 * 2014-07-24 0.7
         * It is now possible to write ZIP files to sequential devices
           like sockets (only in mdCreate mode, so no self-extract, sorry).

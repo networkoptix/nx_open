@@ -302,11 +302,9 @@ angular.module('nxCommon')
         /* Formatting urls */
         ServerConnection.prototype.previewUrl = function(cameraId, time, width, height){
             var data = {
-                    cameraId:cleanId(cameraId)
+                    cameraId:cleanId(cameraId),
+                    time: time || 'LATEST'
                 };
-            if(time){
-                data.time = time;
-            }
             if(width){
                 data.width = width;
             }

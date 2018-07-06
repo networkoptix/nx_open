@@ -10,7 +10,7 @@ QnHTTPRawResponse::QnHTTPRawResponse():
 
 QnHTTPRawResponse::QnHTTPRawResponse(
     SystemError::ErrorCode sysErrorCode,
-    const nx_http::StatusLine&  statusLine,
+    const nx::network::http::StatusLine&  statusLine,
     const QByteArray& contentType,
     const QByteArray& msgBody)
     :
@@ -27,7 +27,7 @@ QnHTTPRawResponse::QnHTTPRawResponse(
     else
     {
         status = httpStatusCodeToNetworkError(
-            static_cast<nx_http::StatusCode::Value>(statusLine.statusCode));
+            static_cast<nx::network::http::StatusCode::Value>(statusLine.statusCode));
         errorString = QString::fromUtf8(statusLine.reasonPhrase);
     }
 }
@@ -53,30 +53,30 @@ QNetworkReply::NetworkError QnHTTPRawResponse::sysErrorCodeToNetworkError(
 }
 
 QNetworkReply::NetworkError QnHTTPRawResponse::httpStatusCodeToNetworkError(
-    nx_http::StatusCode::Value statusCode)
+    nx::network::http::StatusCode::Value statusCode)
 {
-    if ((statusCode / 100) == (nx_http::StatusCode::ok / 100))
+    if ((statusCode / 100) == (nx::network::http::StatusCode::ok / 100))
         return QNetworkReply::NoError;
 
     switch (statusCode)
     {
-        case nx_http::StatusCode::unauthorized:
+        case nx::network::http::StatusCode::unauthorized:
             return QNetworkReply::ContentAccessDenied;
-        case nx_http::StatusCode::notFound:
+        case nx::network::http::StatusCode::notFound:
             return QNetworkReply::ContentNotFoundError;
-        case nx_http::StatusCode::internalServerError:
+        case nx::network::http::StatusCode::internalServerError:
             return QNetworkReply::InternalServerError;
-        case nx_http::StatusCode::serviceUnavailable:
+        case nx::network::http::StatusCode::serviceUnavailable:
             return QNetworkReply::ServiceUnavailableError;
         default:
             return QNetworkReply::UnknownServerError;
     }
 }
 
-QnRequestParams requestParamsFromUrl(const QUrl& url)
+QnRequestParams requestParamsFromUrl(const nx::utils::Url& url)
 {
     QnRequestParams params;
-    const QUrlQuery query(url);
+    const QUrlQuery query(url.toQUrl());
     for (const auto& item: query.queryItems())
     {
         if (!params.contains(item.first))

@@ -12,5 +12,5 @@ INSTANTIATE_TYPED_TEST_CASE_P(
     TimeProtocolClient);
 
 } // namespace test
-} // namespace nx
 } // namespace network
+} // namespace nx

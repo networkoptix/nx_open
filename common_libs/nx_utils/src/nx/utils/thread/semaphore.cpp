@@ -19,7 +19,7 @@ public:
 
 /*!
     Creates a new semaphore and initializes the number of resources
-    it guards to \a n (by default, 0).
+    it guards to n (by default, 0).
 
     \sa release(), available()
 */
@@ -40,7 +40,7 @@ QnSemaphore::~QnSemaphore()
 { delete d; }
 
 /*!
-    Tries to acquire \c n resources guarded by the semaphore. If \a n
+    Tries to acquire \c n resources guarded by the semaphore. If n
     > available(), this call will block until enough resources are
     available.
 
@@ -56,7 +56,7 @@ void QnSemaphore::acquire(int n)
 }
 
 /*!
-    Releases \a n resources guarded by the semaphore.
+    Releases n resources guarded by the semaphore.
 
     This function can be used to "create" resources as well. For
     example:
@@ -87,7 +87,7 @@ int QnSemaphore::available() const
 
 /*!
     Tries to acquire \c n resources guarded by the semaphore and
-    returns true on success. If available() < \a n, this call
+    returns true on success. If available() < n, this call
     immediately returns false without acquiring any resources.
 
     Example:
@@ -108,13 +108,13 @@ bool QnSemaphore::tryAcquire(int n)
 
 /*!
     Tries to acquire \c n resources guarded by the semaphore and
-    returns true on success. If available() < \a n, this call will
-    wait for at most \a timeout milliseconds for resources to become
+    returns true on success. If available() < n, this call will
+    wait for at most timeout milliseconds for resources to become
     available.
 
-    Note: Passing a negative number as the \a timeout is equivalent to
+    Note: Passing a negative number as the timeout is equivalent to
     calling acquire(), i.e. this function will wait forever for
-    resources to become available if \a timeout is negative.
+    resources to become available if timeout is negative.
 
     Example:
 

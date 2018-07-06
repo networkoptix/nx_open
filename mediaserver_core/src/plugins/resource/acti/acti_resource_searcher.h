@@ -9,11 +9,10 @@
 #include <nx/network/mac_address.h>
 
 class QnActiResourceSearcher:
-    public QObject,
-    public QnUpnpResourceSearcherAsync
+    public QnAbstractNetworkResourceSearcher,
+    public nx::network::upnp::SearchAutoHandler
 {
-    Q_OBJECT;
-    using base_type = QnUpnpResourceSearcherAsync;
+    using base_type = nx::network::upnp::SearchAutoHandler;
 public:
     QnActiResourceSearcher(QnCommonModule* commonModule);
     virtual ~QnActiResourceSearcher();
@@ -22,18 +21,18 @@ public:
 
     virtual QString manufacture() const;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
-
-    virtual QnResourceList findResources(void) override;
+    virtual QnResourceList findResources() override;
+    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
     static const QString kSystemInfoProductionIdParamName;
+    virtual bool isEnabled() const override;
 protected:
-    virtual void processPacket(
+    virtual bool processPacket(
         const QHostAddress& discoveryAddr,
-        const SocketAddress& deviceEndpoint,
-        const nx_upnp::DeviceInfo& devInfo,
-        const QByteArray& xmlDevInfo,
-        QnResourceList& result) override;
+        const nx::network::SocketAddress& deviceEndpoint,
+        const nx::network::upnp::DeviceInfo& devInfo,
+        const QByteArray& xmlDevInfo) override;
+
 
 private:
     struct CacheInfo
@@ -45,21 +44,20 @@ private:
     struct CachedDevInfo
     {
         QElapsedTimer timer;
-        nx_upnp::DeviceInfo info;
-        QnMacAddress mac;
+        nx::network::upnp::DeviceInfo info;
+        nx::network::QnMacAddress mac;
     };
 
     QMap<QString, CacheInfo> m_cachedXml;
     QMap<QString, CachedDevInfo> m_cachedDevInfo;
 
-    QMap<QString, nx_http::AsyncHttpClientPtr > m_httpInProgress;
+    QMap<QString, nx::network::http::AsyncHttpClientPtr > m_httpInProgress;
     QnMutex m_mutex;
 
-    nx_upnp::DeviceInfo parseDeviceXml(const QByteArray& rawData, bool* outStatus) const;
-    QByteArray getDeviceXmlAsync(const QUrl& url);
-    nx_upnp::DeviceInfo getDeviceInfoSync(const QUrl& url, bool* outStatus) const;
+    nx::network::upnp::DeviceInfo parseDeviceXml(const QByteArray& rawData, bool* outStatus) const;
+    nx::network::upnp::DeviceInfo getDeviceInfoSync(const nx::utils::Url& url, bool* outStatus) const;
 
-    bool isNxDevice(const nx_upnp::DeviceInfo& devInfo) const;
+    bool isNxDevice(const nx::network::upnp::DeviceInfo& devInfo) const;
 
     QString chooseProperPhysicalId(
         const QString& hostAddress,
@@ -71,15 +69,9 @@ private:
         const QString& macAddress);
 
     void createResource(
-        const nx_upnp::DeviceInfo& devInfo,
-        const QnMacAddress& mac,
+        const nx::network::upnp::DeviceInfo& devInfo,
+        const nx::network::QnMacAddress& mac,
         const QAuthenticator &auth,
-        QnResourceList& result );
-
-    void processDeviceXml(
-        const QByteArray& foundDeviceDescription,
-        const HostAddress& host,
-        const HostAddress& sender,
         QnResourceList& result );
 
     boost::optional<QnActiResource::ActiSystemInfo> getActiSystemInfo(
@@ -87,12 +79,11 @@ private:
 
     QString retreiveModel(const QString& model, const QString& serialNumber) const;
 
-private slots:
-    void at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply);
-
 private:
     QnUuid m_resTypeId;
     QMap<QString, std::shared_ptr<QnActiSystemInfoChecker>> m_systemInfoCheckers;
+    QnResourceList m_foundUpnpResources;
+    QSet<QString> m_alreadyFoundMacAddresses;
 };
 
 #endif // #ifdef ENABLE_ACTI

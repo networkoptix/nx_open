@@ -10,5 +10,5 @@ int QnP2pStatsRestHandler::executeGet(
     const QnRestConnectionProcessor* owner)
 {
     result.setReply(rest::helper::P2pStatistics::data(owner->commonModule()));
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

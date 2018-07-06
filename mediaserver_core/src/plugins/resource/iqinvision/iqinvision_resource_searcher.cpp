@@ -1,6 +1,8 @@
 #include "iqinvision_resource_searcher.h"
-#if defined(ENABLE_IQE)
+#include "iqinvision_request_helper.h"
+#include "iqinvision_common.h"
 
+#include <nx/network/nettools.h>
 #include "core/resource/camera_resource.h"
 #include "iqinvision_resource.h"
 #include "utils/common/sleep.h"
@@ -79,12 +81,64 @@ bool QnPlIqResourceSearcher::isIqeModel(const QString& model)
 }
 
 QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
-    const QUrl& url, const QAuthenticator& /*auth*/, bool isSearchAction)
+    const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>(); //< Search if only host is present, not specific protocol.
 
-    return QList<QnResourcePtr>();
+    using namespace nx::mediaserver_core;
+
+    nx::utils::Url iqEyeUrl(url);
+    iqEyeUrl.setScheme(QString::fromLatin1(nx::network::http::kUrlSchemeName));
+
+    QnPlIqResourcePtr resource(new QnPlIqResource);
+    resource->setUrl(iqEyeUrl.toString());
+    resource->setAuth(auth);
+
+    auto helper = plugins::IqInvisionRequestHelper(resource);
+
+    const auto manufacturerResponse = helper.oid(plugins::kIqInvisionOidManufacturer);
+    if (!manufacturerResponse.isSuccessful())
+        return QList<QnResourcePtr>();
+
+    const auto vendor = manufacturerResponse.toString().trimmed();
+    if (vendor != plugins::kIqInvisionManufacturer)
+        return QList<QnResourcePtr>();
+
+    resource->setVendor(manufacture());
+
+    const auto macAddressResponse = helper.oid(plugins::kIqInvisionOidMacAddress);
+    if (!macAddressResponse.isSuccessful())
+        return QList<QnResourcePtr>();
+
+    const nx::network::QnMacAddress macAddress(macAddressResponse.toString().trimmed());
+    if (macAddress.isNull())
+        return QList<QnResourcePtr>();
+
+    resource->setMAC(macAddress);
+
+    auto modelResponse = helper.oid(plugins::kIqInvisionOidModel);
+    if (!modelResponse.isSuccessful())
+        return QList<QnResourcePtr>();
+
+    const auto model = modelResponse.toString().trimmed();
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), model);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return QList<QnResourcePtr>();
+
+    const auto resourceTypeId = resourceType(model);
+    if (resourceTypeId.isNull())
+        return QList<QnResourcePtr>();
+
+    resource->setModel(model);
+    resource->setName(model);
+    resource->setTypeId(resourceTypeId);
+
+    const auto firmwareResponse = helper.oid(plugins::kIqInvisionOidFirmware);
+    if (firmwareResponse.isSuccessful())
+        resource->setFirmware(firmwareResponse.toString().trimmed());
+
+    return {resource};
 }
 
 QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
@@ -135,7 +189,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     //response.fromDatagram(responseData);
 
     smac = smac.toUpper();
-    QnMacAddress macAddress(smac);
+    nx::network::QnMacAddress macAddress(smac);
     if (macAddress.isNull())
         return localResults;
 
@@ -152,14 +206,9 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name, false);
+    const auto rt = resourceType(name);
     if (rt.isNull())
-    {
-        // Try with default camera name.
-        rt = qnResTypePool->getResourceTypeId(manufacture(), kDefaultResourceType);
-        if (rt.isNull())
-            return localResults;
-    }
+        return localResults;
 
     resource->setTypeId(rt);
     resource->setName(name);
@@ -174,19 +223,13 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 void QnPlIqResourceSearcher::processNativePacket(
     QnResourceList& result, const QByteArray& responseData)
 {
-#if 0 // debug
-    QFile gggFile("c:/123");
-    gggFile.open(QFile::ReadOnly);
-    responseData = gggFile.readAll();
-#endif // 0
-
     if (responseData.at(0) != 0x01 || responseData.at(1) != 0x04 || responseData.at(2) != 0x00 ||
         responseData.at(3) != 0x00 || responseData.at(4) != 0x00 || responseData.at(5) != 0x00)
     {
         return;
     }
 
-    QnMacAddress macAddr;
+    nx::network::QnMacAddress macAddr;
     for (int i = 0; i < 6; ++i)
         macAddr.setByte(i, responseData.at(i+6));
 
@@ -206,13 +249,9 @@ void QnPlIqResourceSearcher::processNativePacket(
     }
 
     const QString nameStr = QString::fromLatin1(name);
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr, /*showWarning*/ false);
+    const auto rt = resourceType(nameStr);
     if (rt.isNull())
-    {
-        rt = qnResTypePool->getResourceTypeId(manufacture(), kDefaultResourceType);
-        if (rt.isNull())
-            return;
-    }
+        return;
 
     QnPlIqResourcePtr resource (new QnPlIqResource());
     in_addr* peerAddr = (in_addr*) (responseData.data() + 32);
@@ -226,17 +265,27 @@ void QnPlIqResourceSearcher::processNativePacket(
     result.push_back(resource);
 }
 
+QnUuid QnPlIqResourceSearcher::resourceType(const QString& model) const
+{
+    QnUuid resourceType = qnResTypePool->getResourceTypeId(manufacture(), model, false);
+    if (!resourceType.isNull())
+        return resourceType;
+
+    // Try with default camera name.
+    return qnResTypePool->getResourceTypeId(manufacture(), kDefaultResourceType);
+}
+
 QnResourceList QnPlIqResourceSearcher::findResources()
 {
     QnResourceList result = QnMdnsResourceSearcher::findResources();
 
-    std::unique_ptr<AbstractDatagramSocket> receiveSock(SocketFactory::createDatagramSocket());
-    if (!receiveSock->bind(SocketAddress( HostAddress::anyHost, kNativeDiscoveryResponsePort)))
+    std::unique_ptr<nx::network::AbstractDatagramSocket> receiveSock(nx::network::SocketFactory::createDatagramSocket());
+    if (!receiveSock->bind(nx::network::SocketAddress( nx::network::HostAddress::anyHost, kNativeDiscoveryResponsePort)))
         return result;
 
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
+    for (const nx::network::QnInterfaceAndAddr& iface: nx::network::getAllIPv4Interfaces())
     {
-        std::unique_ptr<AbstractDatagramSocket> sendSock(SocketFactory::createDatagramSocket());
+        std::unique_ptr<nx::network::AbstractDatagramSocket> sendSock(nx::network::SocketFactory::createDatagramSocket());
         if (!sendSock->bind(iface.address.toString(), kNativeDiscoveryRequestPort))
             continue;
 
@@ -245,7 +294,7 @@ QnResourceList QnPlIqResourceSearcher::findResources()
             // Sending broadcast.
             QByteArray datagram(requests[i], kRequestSize);
             sendSock->sendTo(
-                datagram.data(), datagram.size(), BROADCAST_ADDRESS, kNativeDiscoveryRequestPort);
+                datagram.data(), datagram.size(), nx::network::BROADCAST_ADDRESS, kNativeDiscoveryRequestPort);
         }
     }
 
@@ -254,9 +303,9 @@ QnResourceList QnPlIqResourceSearcher::findResources()
     while (receiveSock->hasData())
     {
         QByteArray datagram;
-        datagram.resize(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
+        datagram.resize(nx::network::AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
 
-        SocketAddress senderEndpoint;
+        nx::network::SocketAddress senderEndpoint;
         int bytesRead = receiveSock->recvFrom(datagram.data(), datagram.size(), &senderEndpoint);
 
         static constexpr int kMinResponseSize = 128;
@@ -266,5 +315,3 @@ QnResourceList QnPlIqResourceSearcher::findResources()
 
     return result;
 }
-
-#endif // defined(ENABLE_IQE)

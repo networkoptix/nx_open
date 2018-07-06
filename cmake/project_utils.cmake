@@ -1,3 +1,6 @@
+set(nx_enable_werror OFF)
+set(nx_werror_condition CMAKE_COMPILER_IS_GNUCXX)
+
 # build_source_groups(<source root path> <list of source files with absolute paths> <name of root group>)
 function(build_source_groups _src_root_path _source_list _root_group_name)
     foreach(_source IN ITEMS ${_source_list})
@@ -9,20 +12,32 @@ function(build_source_groups _src_root_path _source_list _root_group_name)
     endforeach()
 endfunction()
 
+function(nx_target_enable_werror target werror_condition)
+    if(werror_condition STREQUAL "")
+        set(werror_condition ${nx_werror_condition})
+    endif()
+
+    if(${werror_condition})
+        target_compile_options(${target} PRIVATE -Werror -Wall -Wextra)
+    endif()
+endfunction()
+
 function(nx_add_target name type)
-    set(options NO_MOC NO_PCH)
+    set(options NO_MOC WERROR NO_WERROR SIGNED)
     set(oneValueArgs LIBRARY_TYPE)
     set(multiValueArgs
         ADDITIONAL_SOURCES ADDITIONAL_RESOURCES
+        SOURCE_EXCLUSIONS
         OTHER_SOURCES
-        PUBLIC_LIBS PRIVATE_LIBS)
+        PUBLIC_LIBS PRIVATE_LIBS
+        WERROR_IF
+    )
 
     cmake_parse_arguments(NX "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files)
-    if(NOT NX_NO_MOC)
-        qt5_wrap_cpp(moc_files ${hpp_files} OPTIONS --no-notes)
-    endif()
+    nx_find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files
+        EXCLUDE ${NX_SOURCE_EXCLUSIONS}
+    )
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
@@ -38,19 +53,40 @@ function(nx_add_target name type)
 
         qt5_add_translation(qm_files ${ts_files})
 
-        list(APPEND resources ${qm_files})
-        set_source_files_properties(${qm_files}
+        set(needed_qm_files)
+        foreach(qm_file ${qm_files})
+            foreach(lang ${defaultTranslation} ${additionalTranslations})
+                if(qm_file MATCHES "${lang}\\.qm$")
+                    list(APPEND needed_qm_files ${qm_file})
+                    break()
+                endif()
+            endforeach()
+        endforeach()
+
+        list(APPEND resources ${needed_qm_files})
+        set_source_files_properties(${needed_qm_files}
             PROPERTIES RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/qm")
     endif()
 
     if(resources)
-        nx_generate_qrc("${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc" ${resources})
-        qt5_add_resources(rcc_files "${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc")
+        nx_generate_qrc(
+            ${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc
+            ${resources}
+            USED_FILES_VARIABLE qrc_dependencies
+        )
+        nx_add_qrc(
+            ${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc
+            rcc_files
+            DEPENDS ${qrc_dependencies}
+        )
     endif()
 
-    set(sources ${cpp_files} ${moc_files} ${rcc_files} ${qm_files})
-    if(NOT NX_NO_PCH)
-        set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
+    set(sources ${cpp_files} ${hpp_files} ${rcc_files} ${qm_files})
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
+        set(has_pch TRUE)
+        list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
+    else()
+        set(has_pch FALSE)
     endif()
 
     set(sources ${sources} ${NX_ADDITIONAL_SOURCES} ${NX_OTHER_RESOURCES} ${NX_OTHER_SOURCES})
@@ -83,6 +119,11 @@ function(nx_add_target name type)
                 nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${name}.vcxproj.user
                     ${CMAKE_CURRENT_BINARY_DIR})
             endif()
+
+            if(codeSigning AND NX_SIGNED)
+                nx_sign_windows_executable(${name})
+            endif()
+
             project(${name})
             set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${name})
         endif()
@@ -94,8 +135,22 @@ function(nx_add_target name type)
         nx_strip_target(${name} COPY_DEBUG_INFO)
     endif()
 
-    if(NOT NX_NO_PCH)
-        add_precompiled_header(${name} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h" ${pch_flags})
+    if(NOT NX_NO_WERROR AND (nx_enable_werror OR NX_WERROR OR NOT "${NX_WERROR_IF}" STREQUAL ""))
+        nx_target_enable_werror(${name} "${NX_WERROR_IF}")
+    endif()
+
+    if(NOT NX_NO_MOC)
+        nx_add_qt_mocables(${name} ${hpp_files}
+            INCLUDE_DIRS
+                ${CMAKE_CURRENT_SOURCE_DIR}/src
+                # TODO: #dklychkov Remove hardcoded nx_fusion after updating to a newer Qt which
+                # has Q_NAMESPACE macro which can avoid QN_DECLARE_METAOBJECT_HEADER.
+                ${CMAKE_SOURCE_DIR}/common_libs/nx_fusion/src
+        )
+    endif()
+
+    if(has_pch)
+        add_precompiled_header(${name} ${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h)
     endif()
 
     target_include_directories(${name} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -107,4 +162,17 @@ function(nx_add_target name type)
     if(NX_PRIVATE_LIBS)
         target_link_libraries(${name} PRIVATE ${NX_PRIVATE_LIBS})
     endif()
+endfunction()
+
+function(nx_exclude_sources_from_target target pattern)
+    get_property(sources TARGET ${target} PROPERTY SOURCES)
+
+    set(result)
+    foreach(src ${sources})
+        if(NOT src MATCHES "${pattern}")
+            list(APPEND result ${src})
+        endif()
+    endforeach()
+
+    set_PROPERTY(TARGET ${target} PROPERTY SOURCES ${result})
 endfunction()

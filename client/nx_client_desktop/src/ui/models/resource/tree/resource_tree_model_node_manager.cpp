@@ -42,7 +42,14 @@ void QnResourceTreeModelNodeManager::primaryNodeAdded(QnResourceTreeModelNode* n
         [node]() { chainCall(node, &QnResourceTreeModelNode::updateResourceStatus); });
 
     if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-        connect(camera, &QnVirtualCameraResource::statusFlagsChanged, node, chainUpdate);
+    {
+        connect(camera, &QnVirtualCameraResource::statusFlagsChanged, node,
+            [node]() { chainCall(node, &QnResourceTreeModelNode::updateCameraExtraStatus); });
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged, node,
+            [node]() { chainCall(node, &QnResourceTreeModelNode::updateCameraExtraStatus); });
+        connect(camera, &QnVirtualCameraResource::capabilitiesChanged, node,
+            [node]() { chainCall(node, &QnResourceTreeModelNode::updateResourceStatus); });
+    }
 }
 
 void QnResourceTreeModelNodeManager::primaryNodeRemoved(QnResourceTreeModelNode* node)

@@ -5,20 +5,22 @@
 
 #include "test_data.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 namespace test {
 
 class TestHandler:
-    public nx_http::AbstractFusionRequestHandler<void, Serializable>
+    public nx::network::http::AbstractFusionRequestHandler<void, Serializable>
 {
 public:
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
-        const nx_http::Request& /*request*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        const nx::network::http::Request& /*request*/,
         nx::utils::stree::ResourceContainer /*authInfo*/) override
     {
-        nx_http::FusionRequestResult result;
+        nx::network::http::FusionRequestResult result;
         result.setHttpStatusCode(m_httpStatusCode);
 
         Serializable output;
@@ -26,13 +28,13 @@ public:
         requestCompleted(result, output);
     }
 
-    void setHttpStatusCode(nx_http::StatusCode::Value httpStatusCode)
+    void setHttpStatusCode(nx::network::http::StatusCode::Value httpStatusCode)
     {
         m_httpStatusCode = httpStatusCode;
     }
 
 private:
-    nx_http::StatusCode::Value m_httpStatusCode = nx_http::StatusCode::ok;
+    nx::network::http::StatusCode::Value m_httpStatusCode = nx::network::http::StatusCode::ok;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -43,12 +45,12 @@ class HttpServerAbstractFusionRequestHandler:
 protected:
     void whenRequestCompletedSuccessfully()
     {
-        invokeProcessRequest(nx_http::StatusCode::ok);
+        invokeProcessRequest(nx::network::http::StatusCode::ok);
     }
 
     void whenRequestProducedStatusCodeForbiddingMessageBody()
     {
-        invokeProcessRequest(nx_http::StatusCode::switchingProtocols);
+        invokeProcessRequest(nx::network::http::StatusCode::switchingProtocols);
     }
 
     void thenOutputIsSerializedToMessageBody()
@@ -70,36 +72,36 @@ protected:
 private:
     struct Result
     {
-        nx_http::Message responseMessage;
-        std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+        nx::network::http::Message responseMessage;
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
     };
 
     TestHandler m_handler;
-    nx_http::Response m_response;
+    nx::network::http::Response m_response;
     nx::utils::SyncQueue<Result> m_requestResults;
 
-    void invokeProcessRequest(nx_http::StatusCode::Value statusCode)
+    void invokeProcessRequest(nx::network::http::StatusCode::Value statusCode)
     {
         using namespace std::placeholders;
 
         m_handler.setHttpStatusCode(statusCode);
 
-        nx_http::Message message(nx_http::MessageType::request);
-        message.request->requestLine.method = nx_http::Method::get;
+        nx::network::http::Message message(nx::network::http::MessageType::request);
+        message.request->requestLine.method = nx::network::http::Method::get;
         message.request->requestLine.url = "/some/url";
-        message.request->requestLine.version = nx_http::http_1_1;
+        message.request->requestLine.version = nx::network::http::http_1_1;
 
         m_handler.AbstractHttpRequestHandler::processRequest(
             nullptr,
             std::move(message),
             nx::utils::stree::ResourceContainer(),
-            std::bind(&HttpServerAbstractFusionRequestHandler::onRequestProcessed, this, 
+            std::bind(&HttpServerAbstractFusionRequestHandler::onRequestProcessed, this,
                 _1, _2, _3));
     }
 
     void onRequestProcessed(
-        nx_http::Message responseMessage,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody,
+        nx::network::http::Message responseMessage,
+        std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody,
         ConnectionEvents /*connectionEvents*/)
     {
         Result result;
@@ -125,4 +127,6 @@ TEST_F(
 
 } // namespace test
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

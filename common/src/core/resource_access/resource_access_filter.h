@@ -33,6 +33,11 @@ public:
     }
 
     /**
+     * Check if resource can be shared via videowall.
+     */
+    static bool isShareableViaVideowall(const QnResourcePtr& resource);
+
+    /**
      * Check if resource can be opened in a common layout...
      * ... OR is a layout itself
      * ... OR is a videowall.

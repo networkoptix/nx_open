@@ -1,19 +1,19 @@
 {
   "language_name": "Italiano",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Annulla",
-    "loginTitle": "Accedi a {{PRODUCT_NAME}}",
+    "loginTitle": "Accedi a %PRODUCT_NAME%",
     "loginButton": "Accesso",
     "logoutAuthorisedTitle": "Ha già effettuato l'accesso",
     "logoutAuthorisedContinueButton": "Continua",
     "logoutAuthorisedLogoutButton": "Scollegati"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Benvenuto in",
     "register": "Creare un account",
     "changePassword": "Cambia Password -",
@@ -31,8 +31,8 @@
     "view": "Visualizzazione delle telecamere - ",
     "debug": "Debug",
     "login": "Accesso -",
-    "download": "Scarica {{VMS_NAME}}",
-    "downloadPlatform": "Scarica {{VMS_NAME}} ",
+    "download": "Scarica %VMS_NAME%",
+    "downloadPlatform": "Scarica %VMS_NAME% ",
     "pageNotFound": "Pagina non trovata"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Personalizzato",
-      "description": "Utilizzare l'applicazione client {{PRODUCT_NAME}} per impostare le autorizzazioni personalizzate"
+      "description": "Utilizzare l'applicazione client %PRODUCT_NAME% per impostare le autorizzazioni personalizzate"
     },
     "cloudAdmin": {
       "label": "Amministratore",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Personalizzato",
-      "description": "Utilizzare l'applicazione client {{PRODUCT_NAME}} per impostare le autorizzazioni personalizzate"
+      "description": "Utilizzare l'applicazione client %VMS_NAME% per impostare le autorizzazioni personalizzate"
     }
   },
   "errorCodes": {
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "Non è possibile inviare e-mail di conferma",
     "cloudInvalidResponse": "Cloud DB ha restituito una risposta inaspettata",
     "notAuthorized": "Password errata",
-    "wrongParameters": "Alcuni parametri nel modulo non sono corretti",
     "brokenAccount": "Problema inaspettato con l'account. <a href=\"/restore_password\">Ripristina account</a>",
+    "wrongParameters": "Alcuni parametri nel modulo non sono corretti",
     "wrongCode": "L'account è già attivato o il codice di conferma non è corretto",
     "wrongCodeRestore": "Il codice di conferma è già utilizzato o errato",
     "forbidden": "Non ha il permesso per effettuare questa azione",
@@ -133,9 +133,10 @@
     "passwordMismatch": "Password errata",
     "cantEditYourself": "La modifica delle proprie autorizzazioni non è consentita",
     "cantEditAdmin": "Questo utente ha le autorizzazioni di amministratore",
-    "cantOpenClient": "{{VMS_NAME}} applicazione non rilevata. <a href=\"/download\">Scarica</a>",
+    "cantOpenClient": "%VMS_NAME% applicazione non rilevata. <a href=\"/download\">Scarica</a>",
     "lostConnection": "Connessione a {{systemName}} persa",
-    "thisSystem": "il sistema"
+    "thisSystem": "il sistema",
+    "oldSafariNotSupported": "Le versioni di Safari precedenti alla 10 non sono supportate"
   },
   "passwordRequirements": {
     "minLengthMessage": "La password deve contenere almeno 8 caratteri",
@@ -158,12 +159,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Il server è irraggiungibile",
     "offline": "Il sistema è offline",
-    "openClient": "Apri in {{VMS_NAME}}",
-    "openClientNoSystem": "Apri in {{VMS_NAME}}",
+    "openClient": "Apri in %VMS_NAME%",
+    "openClientNoSystem": "Apri in %VMS_NAME%",
+    "confirmMergeAction": "Unisci",
+    "mergeSystemTitle": "Unione dei sistemi",
     "confirmRenameTitle": "Nome del sistema",
     "confirmRenameAction": "Salvare",
     "successRename": "Nome del sistema salvato",
-    "confirmDisconnectTitle": "Scollegare il sistema da {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Scollegare il sistema da %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Scollegamento",
     "confirmUnshareFromMe": "Sta per disconnettere questo Sistema dal suo account. Non sara' in più in grado di accedere a questo Sistema. E' sicuro?",
     "confirmUnshareFromMeTitle": "Scollegare il sistema da?",
@@ -171,7 +174,7 @@
     "confirmUnshare": "Questo utente non sarà in grado di accedere al sistema. E' sicuro?",
     "confirmUnshareTitle": "Cancella utente?",
     "confirmUnshareAction": "Elimina",
-    "successDisconnected": "Il sistema è stato scollegato correttamente da {{PRODUCT_NAME}}",
+    "successDisconnected": "Il sistema è stato scollegato correttamente da %PRODUCT_NAME%",
     "successDeleted": "Il sistema {{systemName}} è stato eliminato correttamente dal suo account",
     "permissionsRemoved": "Le autorizzazioni sono state rimosse da {{email}}"
   },
@@ -184,14 +187,14 @@
     "saveChanges": "Salvare"
   },
   "downloads": {
-    "noClientDetectedTitle": "Installa {{VMS_NAME}} per visualizzare il suo sistema",
-    "action": "Scarica {{VMS_NAME}}",
+    "noClientDetectedTitle": "Installa %VMS_NAME% per visualizzare il suo sistema",
+    "action": "Scarica %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -251,7 +254,7 @@
   },
   "activeActions": {
     "sendConfirm": "Rinvia il link di attivazione",
-    "resetPassword": "Reimpostare la Password",
+    "resetPassword": "Reimpostare la password",
     "setNewPassword": "Salva password",
     "setNewPasswordLabel": "Nuova password"
   },

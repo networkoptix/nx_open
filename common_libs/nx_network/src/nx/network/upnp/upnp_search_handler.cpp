@@ -2,7 +2,9 @@
 
 #include "upnp_device_searcher.h"
 
-namespace nx_upnp {
+namespace nx {
+namespace network {
+namespace upnp {
 
 SearchAutoHandler::SearchAutoHandler(const QString& devType)
 {
@@ -15,4 +17,6 @@ SearchAutoHandler::~SearchAutoHandler()
         searcher->unregisterHandler(this);
 }
 
-} // namespace nx_upnp
+} // namespace nx
+} // namespace network
+} // namespace upnp

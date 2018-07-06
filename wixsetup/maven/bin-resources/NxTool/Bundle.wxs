@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <?include ../BuildVars.wxi ?>
+
+    <Bundle
+            Name="$(var.productName) Server Tool"
+            Manufacturer="$(var.companyName)"
+            Version="$(var.releaseVersionFull)"
+            IconSourceFile="$(var.CustomizationDir)/icons/windows/nxtool.ico"
+            UpgradeCode="$(var.nxtoolBundleUpgradeCode)"
+            DisableModify="yes">
+        <util:RegistrySearchRef Id='ArchRegistrySearch' />
+
+        <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="$(var.CustomizationDir)/wixsetup/License.html" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/installer_bg.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="$(var.CustomizationDir)/icons/windows/logo-64x64.png" />
+
+            <bal:WixExtendedBootstrapperApplication
+                SuppressOptionsUI="yes"
+                SuppressRepair="yes"
+                LicenseUrl="License.html"
+                ShowFilesInUse="yes"
+                LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"/>
+        </BootstrapperApplicationRef>
+
+        <Variable Name="InstallerTitle" Value="Server tool" />
+
+        <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
+
+        <Chain DisableSystemRestore="no">
+            <PackageGroupRef Id="NxtoolPackageGroup"/>
+        </Chain>
+    </Bundle>
+</Wix>

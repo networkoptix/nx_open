@@ -5,7 +5,10 @@
 <table class="description">
     <thead>
         <tr>
-	    <th>#</th>
+	        <th>#</th>
+            {{#sourceIcon}}
+                <th/>
+            {{/sourceIcon}}
             <th>Source</th>
             <th>User</th>
             <th>Time</th>
@@ -15,6 +18,11 @@
     {{#aggregated}}
         <tr>
             <td>{{index}}</td>
+            {{#sourceIcon}}
+            <td>
+                <img src="{{sourceIcon}}">
+            </td>
+            {{/sourceIcon}}
             <td><b>{{source}}</b> ({{sourceIp}})</td>
             <td>{{user}}</td>
             <td>{{timestampDate}} <b>{{timestampTime}}</b></td>
@@ -35,6 +43,9 @@
 <table class="description">
     <thead>
         <tr>
+            {{#sourceIcon}}
+                <th/>
+            {{/sourceIcon}}
             <th>Source</th>
             <th>User</th>
             <th>Time</th>
@@ -43,6 +54,11 @@
     <tbody>
     {{#aggregated}}
         <tr>
+            {{#sourceIcon}}
+            <td>
+                <img src="{{sourceIcon}}">
+            </td>
+            {{/sourceIcon}}
             <td><b>{{source}}</b> ({{sourceIp}})</td>
             <td>{{user}}</td>
             <td>{{timestampDate}} <b>{{timestampTime}}</b></td>

@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he" sourcelanguage="en">
   <context>
+    <name>AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>אין נתונים</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -47,6 +54,10 @@ to view more bookmarks</source>
     <message>
       <source>Delete bookmark</source>
       <translation>מחק סימניה</translation>
+    </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation>ייצוא סימנייה</translation>
     </message>
   </context>
   <context>
@@ -306,7 +317,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>חוקי אירוע...</translation>
+      <translation>חוקים...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -359,18 +370,6 @@ to view more bookmarks</source>
     <message>
       <source>Remove Bookmarks...</source>
       <translation>הסר סימניות...</translation>
-    </message>
-    <message>
-      <source>Export Selected Area...</source>
-      <translation>יצא את האיזור שנבחר...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>יצא מולטי-וידאו...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>יצוא סקירה מהירה...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
@@ -475,22 +474,6 @@ to view more bookmarks</source>
     <message>
       <source>Hide Info</source>
       <translation>הסתר מידע</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>שנה רזולוציה...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>אוטומטית</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>נמוכה</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>גבוהה</translation>
     </message>
     <message>
       <source>PTZ...</source>
@@ -705,14 +688,6 @@ to view more bookmarks</source>
       <translation>מזג למערכת המחוברת כעת...</translation>
     </message>
     <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>שנה את יחס הגובה-רוחב של התאים...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>שנה את המרווח בין התאים...</translation>
-    </message>
-    <message>
       <source>None</source>
       <translation>ללא</translation>
     </message>
@@ -858,19 +833,63 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation>סרטון...</translation>
+      <translation>סיור פריסות...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation>סרטון חדש...</translation>
+      <translation>סיור פריסות חדש...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation>הסר מהסרטון</translation>
+      <translation>הסר סיור פריסות</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation>צור סרטון</translation>
+      <translation>צור סיור פריסות</translation>
+    </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation>מצלמה לבישה...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation>מצלמה לבישה חדשה...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>העלה קובץ...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>תיקיה להעלאה...</translation>
+    </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation>התחל אנליטיקה...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>נדרשת סיסמא עבור מצלמות מסוימות</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation>יצא וידאו...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>ייצוא סימנייה...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation>רזולוציה...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation>שנה את יחס הגובה-רוחב של התאים...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation>מרווח בין תאים...</translation>
     </message>
   </context>
   <context>
@@ -959,8 +978,66 @@ to view more bookmarks</source>
       <translation>חריגה ממספר ההשבתות של רשיון זה.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>מזהה החומרה של שרת עם רשיון זה אינו תואם מזהה החומרה שבו הופעל רשיון.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>ההגדרות שנבחרו יקודדו. השימוש במעבד יוגדל ועשוי להימשך זמן רב.</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>פורמט AVI אינו מומלץ לייצוא הקלטה לא רציפה עם שמע.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>מומלץ לייצא וידאו מהמצלמה הזאת בתור&quot; "מולטי וידאו"&quot; כדי להימנע downscaling.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>. את/ה עומד לייצא וידאו ארוך... הוא עשוי לדרוש מעל ג'יגה של שטח דיסק קשיח, ולקחת כמה דקות.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>קובץ EXE המיוצא יהיה בגודל מעל 4 GB ולא ניתן לפתוח אותו על ידי לחיצה כפולה ב- Windows. ניתן להפעיל אותו רק בתחנת קליינט בתוכנה %1.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>קבצים מקומיים, רכיבי יישומי שרת ודפי אינטרנט לא ייוצאו.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation>ההגדרות אינן זמינות עבור קובצי .NOV ו- .EXE.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation>Audio Video Interleave</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation>Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation>MPEG-4 חלק 14</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation>%1 קובץ מדיה</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation>קובץ הפעלה %1 קובץ מדיה (x64)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation>(Executable %1 Media File (x86</translation>
     </message>
   </context>
   <context>
@@ -1022,7 +1099,7 @@ to view more bookmarks</source>
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation>התחל סרטון</translation>
+      <translation>התחל סיור</translation>
     </message>
   </context>
   <context>
@@ -1036,8 +1113,26 @@ to view more bookmarks</source>
       <translation>קובץ &quot;%1&quot; כבר קיים. נסה שם אחר.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>קובץ &quot;%1&quot; נמצא בשימוש בתהליך אחר. נסה שם אחר.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation>קובץ &quot;%1&quot; נמצא בשימוש על ידי תהליך אחר.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation>לא ניתן לכתוב את הקובץ &quot;%1&quot;. נסה שם אחר.</translation>
+    </message>
+    <message>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1056,15 +1151,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation>הסיסמה צריכה להכיל סוגים שונים של סמלים.</translation>
+      <translation>הסיסמא צריכה להכיל סוגים שונים של סמלים.</translation>
     </message>
     <message>
       <source>Short</source>
       <translation>קצר</translation>
-    </message>
-    <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>סיסמא חייבת להכיל לפחות 8 תווים.</translation>
     </message>
     <message>
       <source>Common</source>
@@ -1072,7 +1163,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
-      <translation>סיסמה זו נמצאת ברשימת הסיסמאות הפופולרי ביותר.</translation>
+      <translation>סיסמה זו נמצאת ברשימת הסיסמהות הפופולרי ביותר.</translation>
     </message>
     <message>
       <source>Incorrect</source>
@@ -1081,6 +1172,59 @@ to view more bookmarks</source>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>רק אותיות לטינית, מספרים וסימני מקלדת מותרים.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation>
+        <numerusform>הסיסמה צריכה להכיל %n שילובים שונים של תווים, סמלים או ספרות</numerusform>
+        <numerusform>הסיסמה צריכה להכיל %n שילובים שונים של תווים, סמלים או ספרות</numerusform>
+        <numerusform>הסיסמה צריכה להכיל %n שילובים שונים של תווים, סמלים או ספרות</numerusform>
+        <numerusform>הסיסמה צריכה להכיל %n שילובים שונים של תווים, סמלים או ספרות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation>
+        <numerusform>סיסמה חייבת להכיל לפחות %n תווים.</numerusform>
+        <numerusform>סיסמה חייבת להכיל לפחות %n תווים.</numerusform>
+        <numerusform>סיסמה חייבת להכיל לפחות %n תווים.</numerusform>
+        <numerusform>סיסמה חייבת להכיל לפחות %n תווים.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>ארוך</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation type="unfinished">
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
+        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation type="unfinished">
+        <numerusform>הסיסמה לא תכיל %n תווים או יותר רצופים ביחד.</numerusform>
+        <numerusform>הסיסמה לא צריכה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
+        <numerusform>הסיסמה לאי כולה להכיל %n תווים או יותר רצופים ביחד.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים או יותר רצופים ביחד.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation type="unfinished">
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
+        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>רק אותיות לטינית, מספרים וסימני מקלדת %1 מותרים.</translation>
     </message>
   </context>
   <context>
@@ -1218,13 +1362,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>לקריאה בלבד</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
@@ -1255,11 +1392,11 @@ to view more bookmarks</source>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>כאשר אתה נותן גישה לפריסות מסוימות אתה נותן גישה לכל המצלמות שבהם. המשתמש יקבל גישה אל כל המצלמות החדשות בפריסות אלה.</translation>
+      <translation>כאשר אתה נותן גישה לפריסות מסוימות אתה נותן גישה לכל המצלמות שבהן. המשתמש יקבל גישה אל כל המצלמות החדשות בפריסות אלה.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>כל מצלמות &amp; משאבים</translation>
+      <translation>כל המצלמות והמשאבים</translation>
     </message>
   </context>
   <context>
@@ -1278,6 +1415,17 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>התיקיה לא נמצאת</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>ערך מינימום גבוה יכול להוביל לירידה בשמירה של התקנים אחרים.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>ערך מינימום גבוה יכול להוביל לירידה בשמירה של מצלמות אחרות.</translation>
     </message>
   </context>
   <context>
@@ -1483,7 +1631,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>פעולה %n</numerusform>
         <numerusform>%n פעולות</numerusform>
         <numerusform>%n פעולות</numerusform>
@@ -1682,16 +1830,12 @@ to view more bookmarks</source>
       <translation>מספר Build</translation>
     </message>
     <message>
-      <source>Invalid build number</source>
-      <translation>מספר Build לא חוקי</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>סיסמה</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>הסיסמא אינה נכונה.</translation>
+      <translation>הסיסמה אינה נכונה.</translation>
     </message>
     <message>
       <source>Select Build</source>
@@ -1755,7 +1899,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>שרת %n</numerusform>
         <numerusform>%n שרתים</numerusform>
         <numerusform>%n שרתים</numerusform>
@@ -1772,11 +1916,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Stops</source>
-      <translation>עצירות</translation>
+      <translation>מסתיים</translation>
     </message>
     <message>
       <source>Starts</source>
-      <translation>התחלות</translation>
+      <translation>מתחיל</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -1788,7 +1932,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Occurs</source>
-      <translation>התרחשות</translation>
+      <translation>מתרחש</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -1885,7 +2029,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>אין חוקי אירוע</translation>
+      <translation>אין חוקים</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -2128,12 +2272,31 @@ to view more bookmarks</source>
       <translation>למודול קלט/פלט אין תזרים אודיו</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
+      <source>Settings</source>
+      <translation>הגדרות</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation type="unfinished">Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>אין הגדרות</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
       <translation>מזהה מודול קלט/פלט</translation>
     </message>
     <message>
-      <source>Camera Id</source>
+      <source>Camera ID</source>
       <translation>מזהה מצלמה</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation>Analytics אינו זמין עבור %1</translation>
     </message>
   </context>
   <context>
@@ -2237,6 +2400,19 @@ to view more bookmarks</source>
       <source>Secondary</source>
       <translation>משני</translation>
     </message>
+    <message>
+      <source>Edge</source>
+      <translation>קצה</translation>
+    </message>
+    <message numerus="yes">
+      <source>This ID is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>קוד זיהוי זה כבר בשימוש במצלמות %n אחרות: %1</numerusform>
+        <numerusform>קוד זיהוי זה כבר בשימוש במצלמות %n אחרות: %1</numerusform>
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2333,7 +2509,7 @@ to view more bookmarks</source>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation>מקליט</translation>
+      <translation>הקלטה</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2341,7 +2517,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Vendor</source>
-      <translation>ספק</translation>
+      <translation>ספק:</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2349,7 +2525,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>קושחה</translation>
+      <translation>קושחה:</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -2362,6 +2538,10 @@ to view more bookmarks</source>
     <message>
       <source>Server</source>
       <translation>שרת</translation>
+    </message>
+    <message>
+      <source>ID</source>
+      <translation>מזהה</translation>
     </message>
   </context>
   <context>
@@ -2397,14 +2577,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>ההקלטה או זיהוי התנועה כבויים עבור %1</numerusform>
-        <numerusform>ההקלטה או זיהוי התנועה כבויים עבור %1</numerusform>
-        <numerusform>ההקלטה או זיהוי התנועה כבויים עבור %1</numerusform>
-        <numerusform>ההקלטה או זיהוי התנועה כבויים עבור %1</numerusform>
-      </translation>
+      <translation>ההקלטה או זיהוי התנועה כבויים עבור %1</translation>
     </message>
   </context>
   <context>
@@ -2427,15 +2602,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>New Password</source>
+      <translation>סיסמה חדשה</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation>חזור על הסיסמא</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>הסיסמאות אינן תואמות.</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation>הסיסמה תכיל לפחות 8 סימני מקלדת ותכיל סוגים שונים של תווים.</translation>
+    </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>סיסמא לא יכולה להיות זהה לשם מצלמה&amp;;apos; או לשם משתמש</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>ההקלטה כבויה עבור %1</numerusform>
-        <numerusform>ההקלטות כבויות עבור %1</numerusform>
-        <numerusform>ההקלטות כבויות עבור %1</numerusform>
-        <numerusform>ההקלטות כבויות עבור %1</numerusform>
-      </translation>
+      <translation>ההקלטות כבויות עבור %1</translation>
     </message>
   </context>
   <context>
@@ -2455,14 +2648,6 @@ to view more bookmarks</source>
     <message>
       <source>based on server time</source>
       <translation>בהתבסס על זמן השרת</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>ערך מינימום גבוה יכול להוביל לירידה בשמירה של התקנים אחרים.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>ערך מינימום גבוה יכול להוביל לירידה בשמירה של מצלמות אחרות.</translation>
     </message>
     <message>
       <source>Not enough licenses to enable recording</source>
@@ -2507,6 +2692,18 @@ to view more bookmarks</source>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>כדי להפעיל או להתאים אותו, גש ללשונית &quot;תנועה&quot; בהגדרות המצלמה.</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>פחות הגדרות</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>הגדרות נוספות</translation>
     </message>
   </context>
   <context>
@@ -2609,6 +2806,14 @@ to view more bookmarks</source>
       <source>No device selected.</source>
       <translation>לא נבחרו התקנים.</translation>
     </message>
+    <message>
+      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+      <translation>לא ניתן לערוך מאפיינים עבור מספר מצלמות לבישות ומספר מצלמות לא לבישות.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable cameras.</source>
+      <translation>לא ניתן לערוך מאפיינים עבור מספר מצלמות לבישות.</translation>
+    </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
@@ -2618,7 +2823,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>אימות סיסמא</translation>
+      <translation>אימות סיסמה</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2626,11 +2831,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Current Password</source>
-      <translation>סיסמא נוכחית</translation>
+      <translation>סיסמה נוכחית</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation>כדי לשנות את הסיסמא שלך, יש להזין את הסיסמא הנוכחית.</translation>
+      <translation>כדי לשנות את הסיסמה שלך, יש להזין את הסיסמה הנוכחית.</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
@@ -2657,51 +2862,62 @@ devices</source>
       <translation>התחבר למערכות שלך מכל מקום עם כל מכשיר</translation>
     </message>
     <message>
-      <source>Known limitations</source>
-      <translation>מגבלות מוכרות</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>נתק את מערכת מ %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>פתח פורטל %1</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>צור חשבון %1</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>חבר מערכת אל %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>צור חשבון %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>חבר מערכת
 אל %1</translation>
     </message>
     <message>
-      <source>%1 is in Beta.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 הוא בגרסת ביתא.</translation>
+      <source>Learn more about %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>למד עוד אודות %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>למד עוד אודות %1</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -2716,7 +2932,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>אין אפשרות להתחבר אל %1</translation>
     </message>
   </context>
@@ -2743,16 +2959,16 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>שכחת סיסמא?</translation>
+      <translation>שכחת סיסמה?</translation>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>התחבר %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>הזן חשבון %1</translation>
     </message>
   </context>
@@ -2764,12 +2980,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>המערכת מחוברת אל %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>כשל חיבור המערכת אל %1</translation>
     </message>
   </context>
@@ -2816,7 +3032,7 @@ to %1</source>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation>שם המשתמש והסיסמה שהזנת שגויים, אנא נסה שנית.</translation>
+      <translation>שם המשתמש והסיסמא שהזנת שגויים, אנא נסה שנית.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
@@ -2832,7 +3048,7 @@ to %1</source>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation>שם משתמש או סיסמא שגויים</translation>
+      <translation>שם משתמש או סיסמה שגויים</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
@@ -2921,17 +3137,17 @@ to %1</source>
       <translation>הפעולה אינה מותרת עכשיו. זה יכול לקרות עקב כך שהשרת מופעל מחדש כרגע. נא נסה שוב מאוחר יותר.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>חיבור %1 לשרת אינו מוכן עדיין. בדוק את חיבור האינטרנט של השרת או נסה שוב מאוחר יותר.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>לא ניתן לבצע חיבור לשרת.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>משתמש זה מושבת על ידי מנהל המערכת.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>חיבור %1 לשרת אינו מוכן עדיין. בדוק את חיבור האינטרנט של השרת או נסה שוב מאוחר יותר.</translation>
     </message>
   </context>
   <context>
@@ -3038,6 +3254,29 @@ to %1</source>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>אתה יכול ליצור גיבוי להגדרות המערכת אותו תוכל לשחזר במקרה של כשלון.</translation>
     </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>נדרשת סיסמא להגדרת המצלמה.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation>לחלק מהמצלמות שנבחרו נדרשת סיסמא להגדרה.</translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>בקש ממנהל המערכת שלך לעשות זאת.</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation>הגדר סיסמא</translation>
+    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
@@ -3090,7 +3329,7 @@ to %1</source>
     </message>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>תבניות שמע 44.1khz ו- 48Khz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך.</translation>
+      <translation>תבניות שמע 44.1kHz ו- 48kHz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך.</translation>
     </message>
   </context>
   <context>
@@ -3101,7 +3340,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter password to continue.</source>
-      <translation>הזן סיסמא כדי להמשיך.</translation>
+      <translation>הזן סיסמה כדי להמשיך.</translation>
     </message>
     <message>
       <source>Set local owner password</source>
@@ -3121,11 +3360,11 @@ to %1</source>
     </message>
     <message>
       <source>Wrong Password</source>
-      <translation>סיסמה שגויה</translation>
+      <translation>סיסמא שגויה</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>אימות סיסמא</translation>
+      <translation>אימות סיסמה</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -3136,26 +3375,27 @@ to %1</source>
       <translation>התנתק</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>כל משתמשי הענן יימחקו.</translation>
-    </message>
-    <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>נכשל ניתוק המערכת מ- %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>נתק את מערכת מ %1?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>אתה תנותק ממערכת זו ותוכל להתחבר שוב דרך הרשת המקומית עם חשבון מקומי</translation>
     </message>
     <message>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>נכשל ניתוק המערכת מ- %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>נתק את מערכת מ %1?</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>לא תוכל להתחבר למערכת זו באמצעות חשבון %1 לאחר שתנתק את המערכת מ- %1.</translation>
     </message>
   </context>
@@ -3183,7 +3423,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - אירוע %n נמצא</numerusform>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - %n אירועים נמצאו</numerusform>
         <numerusform>רשימת תיעוד אירועים לתקופה מ%1 עד %2 - %n אירועים נמצאו</numerusform>
@@ -3192,7 +3432,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>רשימת תיעוד אירועים ל %1 - אירוע %n נמצא</numerusform>
         <numerusform>רשימת תיעוד אירועים ל %1 - %n אירועים נמצאה</numerusform>
         <numerusform>רשימת תיעוד אירועים ל %1 - %n אירועים נמצאה</numerusform>
@@ -3249,7 +3489,7 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (פעם אחת)</numerusform>
         <numerusform>%1 (%n פעמים)</numerusform>
         <numerusform>%1 (%n פעמים)</numerusform>
@@ -3297,6 +3537,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>אוטומטי</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation>בסיסי</translation>
     </message>
   </context>
   <context>
@@ -3424,7 +3668,7 @@ to %1</source>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>חוקי אירוע</translation>
+      <translation>חוקים</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -3562,7 +3806,7 @@ to %1</source>
       <translation>דחף</translation>
     </message>
     <message>
-      <source>Id</source>
+      <source>ID</source>
       <translation>מזהה</translation>
     </message>
   </context>
@@ -3590,38 +3834,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>לא ניתן לפתוח את יציאת קלט/פלט %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>מייצא אל &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>התקן %1 לא ניתן לייצוא.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>מצלמה %1 לא ניתנת לייצוא.</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>שגיאה לא ידועה התרחשה.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>ייצוא מודול קלט/פלט %1 נכשל.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>לא ניתן ליצור קובץ פלט %1...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>קובץ &quot;%1&quot; נמצא בשימוש בתהליך אחר. נסה שם אחר.</translation>
     </message>
   </context>
   <context>
@@ -3702,7 +3914,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3749,6 +3961,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3772,14 +3999,14 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>מפתח רשיון</translation>
+      <translation>מפתח רשיון:</translation>
     </message>
     <message>
       <source>Features:</source>
       <translation>תכונות:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>נעול למזהה-חומרה</translation>
     </message>
   </context>
@@ -3819,7 +4046,7 @@ to %1</source>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;השרת לא נמצא></translation>
+      <translation>השרת לא נמצא</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -4075,16 +4302,16 @@ to %1</source>
       <translation>אנא צרו קשר עם שירות לקוחות כדי להשיג מפתח רשיון תקף.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
+      <source>If the problem persists please contact Customer Support.</source>
+      <translation>אם הבעיה נמשכת, פנה אל שירות הלקוחות.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
       <translation>רישיון זה כבר פעיל ומקושר אל מזהה החומרה %1</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
       <translation>רישיון זה כבר הופעל ומקושר אל מזהה החומרה %1 ב- %2</translation>
-    </message>
-    <message>
-      <source>If the problem persists please contact Customer Support.</source>
-      <translation>אם הבעיה נמשכת, פנה אל שירות הלקוחות.</translation>
     </message>
   </context>
   <context>
@@ -4102,36 +4329,27 @@ to %1</source>
       <translation>פתח קובץ רשיון</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>כל הקבצים (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>פתיחת קובץ נכשלה</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>אנא שלח דוא"ל עם מפתח רישיון ומזהה חומרה שסופקו ל- %1 כדי לקבל קובץ הפעלה של מפתח.</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>אנא שלח את מפתח הרישיון ואת מזהה החומרה שסופקו ל- %1 כדי לקבל קובץ הפעלה של מפתח.</translation>
     </message>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>השתמש ברשיונות אנלוגיים על מנת לצפות במצלמה %n זו</numerusform>
-        <numerusform>השתמש ברשיונות אנלוגיים על מנת לצפות ב%n מצלמות אלו</numerusform>
-        <numerusform>השתמש ברשיונות אנלוגיים על מנת לצפות ב%n מצלמות אלו</numerusform>
-        <numerusform>השתמש ברשיונות אנלוגיים על מנת לצפות ב%n מצלמות אלו</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>השתמש ברישיון עבור %n ההתקן שנבחר</numerusform>
         <numerusform>השתמש ברישיונות עבור %n ההתקנים שנבחרו</numerusform>
         <numerusform>השתמש ברישיונות עבור %n ההתקנים שנבחרו</numerusform>
@@ -4140,7 +4358,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>השתמש ברישיון עבור %n המצלמה שנבחרה</numerusform>
         <numerusform>השתמש ברישיונות עבור %n המצלמות שנבחרו</numerusform>
         <numerusform>השתמש ברישיונות עבור %n המצלמות שנבחרו</numerusform>
@@ -4149,11 +4367,20 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>השתמש ברישיון עבור מודול הקלט/פלט שנבחר</numerusform>
         <numerusform>השתמש ברישיונות עבור %n התקני הקלט/פלט שנבחרו</numerusform>
         <numerusform>השתמש ברישיונות עבור %n התקני הקלט/פלט שנבחרו</numerusform>
         <numerusform>השתמש ברישיונות עבור %n התקני הקלט/פלט שנבחרו</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation type="unfinished">
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
+        <numerusform>השתמש ברישיונות עבור צפיה %n במצלמות שנבחרו</numerusform>
       </translation>
     </message>
   </context>
@@ -4161,7 +4388,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>נכשלה ההתחברות ל- %1</translation>
     </message>
   </context>
@@ -4271,7 +4498,7 @@ to %1</source>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>שכחת סיסמא?</translation>
+      <translation>שכחת סיסמה?</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -4279,12 +4506,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>היכנס ל- %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>ברוכים הבאים ל %1!</translation>
     </message>
   </context>
@@ -4394,6 +4621,19 @@ to %1</source>
       <comment>Soft Trigger</comment>
       <translation>לחץ והחזק</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>מושבת לפי לוח זמנים</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for all %n Cameras</source>
+      <translation type="unfinished">
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
+        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4476,6 +4716,14 @@ to %1</source>
       <source>Skip</source>
       <translation>דלג</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>סגירה</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>עצירה</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4497,7 +4745,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>לא ניתן להגדיר אפשרות הקלטה של &quot;תנועה + תזרים משני&quot;.</translation>
+      <translation>לא ניתן להגדיר אפשרות הקלטה של "תנועה + תזרים משני".</translation>
     </message>
   </context>
   <context>
@@ -4534,6 +4782,10 @@ to %1</source>
       <source>Previous Chunk</source>
       <translation>למקטע הקודם</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation>המצלמות לא תומכות בשחזור וידאו לא מסונכרן</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
@@ -4548,6 +4800,25 @@ to %1</source>
     <message>
       <source>KB/s</source>
       <translation>KB/s</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation>מצלמה לבישה</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation>מצלמה לבישה %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>שם</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>השם אינו יכול להשאר ריק</translation>
     </message>
   </context>
   <context>
@@ -4630,13 +4901,13 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>אשר</translation>
     </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>הגדר סיסמאות</translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
-    <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>עבור עבודה במצב מלא, יש להשתמש במחשב אחר</translation>
-    </message>
     <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 יכול לעבוד במצב הגדרה בלבד</translation>
@@ -4644,6 +4915,10 @@ to %1</source>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>הביצועים של מחשב זה מאפשרים הפעלת %1 במצב תצורה בלבד.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>עבור עבודה במצב מלא, יש להשתמש במחשב אחר</translation>
     </message>
   </context>
   <context>
@@ -4654,7 +4929,7 @@ to %1</source>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>זה נדרש גם ליצור / לערוך פריסטים וסיורים.</translation>
+      <translation>נדרש גם ליצור / לערוך פריסטים וסיורים.</translation>
     </message>
     <message>
       <source>Control video walls</source>
@@ -4694,6 +4969,10 @@ to %1</source>
     <message>
       <source>Manage Bookmarks</source>
       <translation>נהל סימניות</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation>ההודעה תוצג עד שאחד המשתמשים שיראה אותה ייצור סימניה עם תיאור האירוע</translation>
     </message>
   </context>
   <context>
@@ -4764,7 +5043,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>בערך דקה %n</numerusform>
         <numerusform>בערך %n דקות</numerusform>
         <numerusform>בערך %n דקות</numerusform>
@@ -4903,22 +5182,6 @@ to %1</source>
       <source>Quarter Native</source>
       <translation>רבע מקורי</translation>
     </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920x1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280x720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640x480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320x240</translation>
-    </message>
   </context>
   <context>
     <name>QnRecordingStatsModel</name>
@@ -4976,15 +5239,15 @@ to %1</source>
     </message>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>&lt;מצלמות משרתים אחרים ומצלמות שהוסרו></translation>
+      <translation>מצלמות משרתים אחרים ומצלמות שהוסרו</translation>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5126,13 +5389,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnResourcePreviewWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>אין נתונים</translation>
-    </message>
-  </context>
-  <context>
     <name>QnResourceSelectionDialog</name>
     <message>
       <source>Select Devices...</source>
@@ -5175,7 +5431,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>כל מצלמות ומשאבים</translation>
+      <translation>כל המצלמות והמשאבים</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -5191,11 +5447,11 @@ to %1</source>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>סרטונים</translation>
+      <translation>סיורי פריסות</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation>סרטון</translation>
+      <translation>סיור פריסות</translation>
     </message>
   </context>
   <context>
@@ -5538,10 +5794,6 @@ to %1</source>
       <translation>בחר קובץ עדכון...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>קבצי עדכון (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>הערות מוצר</translation>
     </message>
@@ -5727,6 +5979,10 @@ to %1</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>מופע לא תואם %1. כדי לעדכן נתק את המערכת מ- %1 תחילה.</translation>
     </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
+    </message>
   </context>
   <context>
     <name>QnSessionAwareTabbedDialog</name>
@@ -5825,7 +6081,11 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>לא ניתן להגדיר אפשרות הקלטה של &quot;תנועה + תזרים משני&quot;.</translation>
+      <translation>לא ניתן להגדיר אפשרות הקלטה של "תנועה + תזרים משני".</translation>
+    </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>הארכיון שהועלה יכול להימחק באופן אוטומטי, אם אין שטח פנוי באחסון שרת. הסרטון הישן ביותר מבין כל המצלמות בשרת יימחק תחילה.</translation>
     </message>
   </context>
   <context>
@@ -5895,7 +6155,7 @@ to %1</source>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation>לא נמצא פריסט. השתמש באפשרות &quot;מתקדם&quot;.</translation>
+      <translation>לא נמצא פריסט. השתמש באפשרות "מתקדם".</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -5978,10 +6238,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>אין מספיק רישיונות</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>אין נתונים</translation>
     </message>
@@ -6032,6 +6288,30 @@ to %1</source>
     <message>
       <source>Please check authentication information</source>
       <translation>בדוק את פרטי האימות</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation>אין צפייה בזרם ישיר</translation>
+    </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>חיבורים רבים מדי</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>דרושה סיסמה</translation>
+    </message>
+    <message>
+      <source>Set for this Camera</source>
+      <translation>הגדר למצלמה הזאת</translation>
+    </message>
+    <message>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation>גירסת הקושחה לא נתמכת</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>אין מספיק רישיונות</translation>
     </message>
   </context>
   <context>
@@ -6178,6 +6458,14 @@ to %1</source>
       <source>Backup completed</source>
       <translation>הגיבוי הושלם</translation>
     </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>ההקלטה לאחסון המושבת תיפסק. עם זאת, מחיקת צילומים מיושנים ממנו תמשיך.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>ההקלטה אופשרה באחסון ה- USB</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6219,7 +6507,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -6330,10 +6618,6 @@ to %1</source>
       <translation>המערכת במצב בטוח</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>האיחסון מלא</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>האיחסון אינו מוגדר</translation>
     </message>
@@ -6378,10 +6662,6 @@ to %1</source>
       <translation>בניית אינדקס הארכיון בוטלה על ידי משתמש בשרתים הבאים:</translation>
     </message>
     <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>האיחסון מלא בשרת הבא:</translation>
-    </message>
-    <message>
       <source>Storage is not configured on the following Server:</source>
       <translation>האיחסון אינו מוגדר בשרת הבא:</translation>
     </message>
@@ -6396,16 +6676,6 @@ to %1</source>
     <message>
       <source>Connect</source>
       <translation>חיבור</translation>
-    </message>
-    <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>חבר את המערכת שלך ל %1 &amp;mdash; כדי להפוך אותה לזמינה מכל מקום!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>נסה את %1 &amp;mdash; התחבר למערכת שלך מכל מקום!</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6450,6 +6720,24 @@ to %1</source>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>סינכרון הארכיון מרחוק הסתיים עבור ההתקן הבא:</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation>Remote archive synchronization</translation>
+    </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation>זוהתה בעיית שלמות בארכיון</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>חבר את המערכת שלך ל %1 &amp;mdash; כדי להפוך אותה לזמינה מכל מקום!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>נסה את %1 &amp;mdash; התחבר למערכת שלך מכל מקום!</translation>
     </message>
   </context>
   <context>
@@ -6512,16 +6800,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>זמן המערכת מסונכרן עם האינטרנט, והוא לא תלוי בשרת המקומי.</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>זמן המערכת מסונכרן עם השעה בשרת שנבחר, והוא עצמאי משרתים אחרים.</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>אין אף שרת עם גישה לאינטרנט. הזמן אינו מסונכרן.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation>זמן המערכת מסונכרן עם הזמן המקומי בשרת שנבחר ואינו תלוי בזמן המקומי בשרתים אחרים.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation>זמן המערכת מסונכרן עם הזמן המקומי בשרת שנבחר ואינו תלוי בזמן המקומי בשרתים אחרים.</translation>
     </message>
   </context>
   <context>
@@ -6698,7 +6986,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>אימות נכשל עבור %n שרת:</numerusform>
         <numerusform>אימות נכשל עבור %n שרתים:</numerusform>
         <numerusform>אימות נכשל עבור %n שרתים:</numerusform>
@@ -6737,16 +7025,17 @@ to %1</source>
       <translation>משתמש מקומי</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>משתמש ענן</translation>
-    </message>
-    <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>תפקיד</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -6799,7 +7088,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6932,7 +7221,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>משתמש זה עדיין לא נרשם ל- %1</translation>
     </message>
   </context>
@@ -6943,12 +7232,8 @@ to %1</source>
       <translation>מקומי</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>ענן</translation>
-    </message>
-    <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6980,15 +7265,16 @@ to %1</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>אימות סיסמא</translation>
+      <translation>אימות סיסמה</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
       <translation>הסיסמאות אינן תואמות.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>משתמש ענן עם דוא"ל שצוין כבר קיים.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -7059,6 +7345,40 @@ to %1</source>
     <message>
       <source>Muted</source>
       <translation>מושתק</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>להפסיק את העלאה?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation>הקבצים שכבר הועלו יישמרו.</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation>(%1 מתוך %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>מעלה %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>מסתיים %1...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>משתמש אחר מעלה כעת צילומים למצלמה זו.</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation>משתמש אחר מעלה כעת צילומים למצלמה זו.</translation>
     </message>
   </context>
   <context>
@@ -7153,188 +7473,13 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>ההתחברות לשרת נכשלה. קיר הווידאו ייסגר.</translation>
     </message>
-  </context>
-  <context>
-    <name>QnWorkbenchExportHandler</name>
     <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Executable %1 Media File (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Executable %1 Media File (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>מייצא פריסה</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>ייצא וידאו כ...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>חותמי זמן:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>מייצא וידאו</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>מייצא אל &quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>יצא פריסה כ...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 קובץ מדיה (*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>החל פילטרים: סיבוב, ביטול פיתול (Dewarping), שיפור תמונה, יחס גובה-רוחב מותאם אישית (דורש המרה)</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>יוצא</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>ללא חותמת זמן</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>פינה שמאלית עליונה (דורש המרה)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>פינה ימנית עליונה (דורש המרה)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>פינה שמאלית תחתונה (דורש המרה)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>פינה ימנית תחתונה (דורש המרה)</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>שמור פריסה מקומית כ...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>הפוך לקובץ לקריאה בלבד.</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>הקובץ כבר משמש עבור הקלטה</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>בחר שם אחר או המתן עד לסיום ההקלטה.</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>אתה עומד לייצא סרטון ארוך</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>זה עשוי לדרוש מעל ג'יגה של שטח אחסון ולהימשך כמה דקות עד להשלמה.</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>האם לייצא בכל מקרה?</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>ייצא ל- AVI בכל מקרה?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>פורמט נבחר לא מומלץ</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>כדי למנוע פגיעה באיכות, מומלץ להשתמש בפןרמט NOV או EXE עבור מצלמה זו.</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>ייצוא עם ההמרה?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>זה יגדיל את השימוש במעבד ויכול לקחת זמן משמעותי.</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>פורמט EXE לא מומלץ</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>ייצא ל- EXE בכל זאת?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>לא ניתן לייצא וידאו מרובה</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>קבצים מקומיים אינם מותרים לייצוא מרובה-וידאו</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>הסר את כל הקבצים המקומיים מהפריסה ונסה שוב.</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>ייצא</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>אתה עומד לייצא סרטון ארוך</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>נבחרה תקופה קצרה מדי</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>עבור ייצוא כסקירה מהירה, אורך וידאו צריך להיות לפחות 10 שניות.</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>הייצוא הושלם</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>ייצוא הסרטון נכשל</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>פורמט AVI אינו מומלץ</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>לייצוא הקלטה לא רציפה מומלץ להשתמש ב MKV או פורמט אחר.</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>לא ניתן לפתוח קבצי EXE מעל 4 GB בלחיצה כפולה עקב מגבלה של Windows.</translation>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>קיר וידאו יוסר בשרת וייסגר.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
-    <message>
-      <source>Enter Password...</source>
-      <translation>הכנס סיסמה...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>סיסמת מנהל</translation>
-    </message>
     <message>
       <source>Systems will be merged shortly</source>
       <translation>המערכות ימוזגו בקרוב</translation>
@@ -7356,14 +7501,6 @@ to %1</source>
       <translation>סך כל הרשיונות יקטן</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>הסיסמא לא יכולה להיות ריקה.</translation>
-    </message>
-    <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>אין אפשרות למזג מערכות ענן</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>מתחבר למערכת הנוכחית...</translation>
     </message>
@@ -7374,6 +7511,19 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>השרת יחובר למערכת בקרוב</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>הכנס סיסמא...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>סיסמת מנהל</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7628,6 +7778,183 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>כל הקבצים (*.*)</translation>
+    </message>
+    <message>
+      <source>Video (%1)</source>
+      <translation>סרטון (%1)</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recordings...</source>
+      <translation>פתח את הקלטות המצלמה הלבישה...</translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation>רק קבצי וידאו עם חתימת זמן נכונה נתמכים.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>לא ניתן להתחיל בהעלאה כאשר משתמש &amp;; quot;%1&amp;; quot; מעלה כעת צילומים למצלמה זו.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation>לא ניתן להתחיל בהעלאה כשמשתמש אחר מעלה כעת את הסרטון למצלמה הזו.</translation>
+    </message>
+    <message>
+      <source>Failed to add wearable camera</source>
+      <translation>הוספת המצלמה לבישה נכשלה</translation>
+    </message>
+    <message>
+      <source>No video files found in selected folder</source>
+      <translation>לא נמצאו קובצי וידאו בתיקייה שנבחרה</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation type="unfinished">
+        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation>השתמש .MKV, .AVI, .MP4 או קבצי וידאו אחרים.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation type="unfinished">
+        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation type="unfinished">
+        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation type="unfinished">
+        <numerusform>תוכל לטעון קבצים אלה למיקום שונה אחר של מצלמה לבישה.</numerusform>
+        <numerusform>תוכל לטעון קבצים אלה למיקום שונה של מצלמה לבישה.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation type="unfinished">
+        <numerusform>מכסה את הזמן שבו הסרטון כבר הועלה</numerusform>
+        <numerusform>%1 נמצא באותו זמן שבו הסרטון כבר הועלה</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Selected files will not be uploaded</source>
+      <translation>קבצים מסוימים לא יועלו</translation>
+    </message>
+    <message>
+      <source>Some files will not be uploaded</source>
+      <translation>קבצים מסוימים לא יועלו</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation>אין קבצים חדשים להעלאה בתיקיה שנבחרה</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation type="unfinished">
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
+        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>הקבצים שנבחרו נרשמו ב- %1, אך ניתן להעלות רק קבצים שנרשמו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של מצלמה.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>קבצים שנבחריו נרשמו בין %1 ו- %2, אך רק קבצים שנרשמו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של מצלמה.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation type="unfinished">
+        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation type="unfinished">
+        <numerusform>אין הרבה מקום פנוי על אחסון השרתים. כמה הקלטות ישנות עשויות להימחק כדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>כדי למנוע זאת ניתן להוסיף שטח אחסון נוסף. אתה יכול גם לקבוע איזה מידע יימחק הראשון על ידי שינוי שמירת זמן ארכיון בהגדרות המצלמה.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>להעלות בכל מקרה?</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>לא ניתן היה לסיים את ההעלאה אל %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>ודא שיש מספיק שטח אחסון בשרת.</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 כולל פורמט לא נתמך.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation>ל- %1 אין חותמת זמן.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 - ישן יותר מהזמן המורשה בהגדרות ארכיון של מצלמה.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1 מכסה את הזמן שבה הסרטון כבר הועלה.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1 מכסה את הזמן שבה הסרטון מועלה.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
@@ -7834,19 +8161,36 @@ to %1</source>
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation>האם להחליף סרטון קיים?</translation>
+      <translation>האם להחליף סיור פריסות קיים?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation>קיים סרטון אחר עם אותו שם.</translation>
+      <translation>קיים סיור פריסות אחר עם אותו שם.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
       <translation>
-        <numerusform>האם להסיר %n פריטים מהסרטון?</numerusform>
-        <numerusform>האם להסיר %n פריטים מהסרטון?</numerusform>
-        <numerusform>האם להסיר %n פריטים מהסרטון?</numerusform>
-        <numerusform>האם להסיר %n פריטים מהסרטון?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
+        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>להפסיק את ההעלאה?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>עצירה</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
+      <translation type="unfinished">
+        <numerusform>חלק מקובצי הסרטונים עדיין מועלים למצלמות %n לבישות:</numerusform>
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
       </translation>
     </message>
   </context>
@@ -7890,6 +8234,395 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation>דינמי</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>מדיה לא נתמכת לייצוא נתונים.</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>הפורמט הנבחר אינו נתמך על-ידי ספריית FFMPEG.</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>שגיאת ספריית FFMPEG.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>Codec וידאו או אודיו אינו תואם לתבנית שנבחרה.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>שגיאת כתיבה בקובץ.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>אין נתונים לייצוא.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>שגיאה פנימית</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>יוצא</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>יצא</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>סקירה מהירה</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>הגדרות ייצוא</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>הוספת חותמת זמן</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>מחק חותמת זמן</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>חותמת זמן</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>הוסף תמונה</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>מחיקת תמונה</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>תמונה</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>הוספת טקסט</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>מחק טקסט</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>טקסט</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>איפוס מהירות</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>מחק את פרטי הסימניה</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>מחק את פרטי הסימניה</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>פרטי הסימניה</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>תיקייה</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>שם</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>השם אינו יכול להשאר ריק.</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>בחר תיקיה...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>בחר קובץ...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation>תמונות (%1)</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>שגיאה</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>לא ניתן לטעון את התמונה.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>אין נתונים</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>לא מצלמה</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>אוטומטית</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>נמוכה</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>גבוהה</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>התאמה אישית</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>הגדר את רזולוציית הפריסה ל- &quot;Auto&quot; כדי לשפר את הביצועים.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation type="unfinished">
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
+        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation>אורך</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>קצר</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation>לא ניתן לפתוח את הקובץ &amp;; quot;%1&amp;; quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation>לא ניתן לחשב md5 עבור הקובץ &amp;; quot;%1&amp;; quot;</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation>לא ניתן ליצור העלאה בצד השרת</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation>לא ניתן להעלות נתחי קבצים לשרת</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation>בדיקת קובץ שהועלה לשרת נכשלה</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation>הקובץ נפגם בעת העלאה לשרת</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>Failed to send request to the server.</source>
+      <translation>שליחת הבקשה לשרת נכשלה.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation>%1 Analytics</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation>לעצור את הייצוא</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>הייצוא הושלם</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>ייצוא נכשל</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation>אין אפשרות לכתוב את הקובץ</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 נמצא בשימוש על-ידי ייצוא אחר.</translation>
+    </message>
+    <message>
+      <source>Selected period cannot be exported for the current camera.</source>
+      <translation>לא ניתן לייצא את הזמן שנבחר.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>קובץ &quot;%1&quot; נמצא בשימוש בתהליך אחר. נסה שם אחר.</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>לא ניתן ליצור קובץ פלט %1...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>שגיאה לא ידועה התרחשה.</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>מייצא אל &quot;%1&quot;...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>התקן %1 לא ניתן לייצוא.</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>מצלמה %1 לא ניתנת לייצוא.</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>ייצוא מודול קלט/פלט %1 נכשל.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>Executable %1 Media File (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>Executable %1 Media File (x86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>הקובץ כבר משמש עבור הקלטה</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>בחר שם אחר או המתן עד לסיום ההקלטה.</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>מייצא פריסה</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>פורמט EXE לא מומלץ</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>לא ניתן לפתוח קבצי EXE מעל 4 GB בלחיצה כפולה עקב מגבלה של Windows.</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>ייצא ל- EXE בכל זאת?</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>לא ניתן לייצא וידאו מרובה</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>קבצים מקומיים אינם מותרים לייצוא מרובה-וידאו</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>הסר את כל הקבצים המקומיים מהפריסה ונסה שוב.</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>שמור פריסה מקומית כ...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>יוצא</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 קובץ מדיה (*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>הפוך לקובץ לקריאה בלבד.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>יצא</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation>סוגי אירועים לא נתמך</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation>האירוע יופעל רק אם אירוע Analytics יעמוד בכל התנאים שלמעלה. אם השדה 'מילת מפתח' ריק, המצב תמיד מתקיים. אם לא, התנאי מתקיים אם השדה המתאים של אירוע Analytics מכיל מילת מפתח כלשהי.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
       <source>Copy</source>
@@ -7921,17 +8654,10 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>אין נתונים</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>גרור פריסה או מצלמה לכאן כדי להוסיף אותה לסרטון</translation>
+      <translation>גרור פריסה או מצלמה לכאן כדי להוסיף אותה לסיור פריסות</translation>
     </message>
   </context>
   <context>
@@ -7963,20 +8689,20 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
-      <source>Stop Layout Tour</source>
-      <translation type="unfinished">Stop Layout Tour</translation>
-    </message>
-    <message>
       <source>Stop Showreel</source>
-      <translation>עצור סרטון</translation>
-    </message>
-    <message>
-      <source>Start Layout Tour</source>
-      <translation type="unfinished">Start Layout Tour</translation>
+      <translation>עצור סיור</translation>
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation>התחל סרטון</translation>
+      <translation>התחל סיור</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>עצור סיור</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>התחל סיור</translation>
     </message>
   </context>
   <context>
@@ -8160,7 +8886,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>האם אתה בטוח שברצונך למחוק %n קובץ זה?</numerusform>
         <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
         <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
@@ -8247,16 +8973,28 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>פתיחת דף האינטרנט של השרת נכשלה</translation>
     </message>
+    <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation>מצלמות לבישות אינן ניתנות להעברה בין שרתים</translation>
+    </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation>שינוי הסיסמה נכשל</translation>
+    </message>
+    <message>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation>כישלון בשינוי סיסמה במצלמות %1 ו- %2</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>השתמש במקשי החצים כדי להחליף פריסות. כדי לצאת מהסרטון לחץ על Esc.</translation>
+      <translation>השתמש במקשי החצים כדי להחליף פריסות. כדי לצאת מהסיור לחץ על Esc.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>לחץ על כל מקש על מנת להפסיק את הסיור.</translation>
     </message>
   </context>
   <context>
@@ -8277,16 +9015,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>מחק את סיור פריסה %1?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
-      <translation>סרטון</translation>
+      <translation>סיור פריסות</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation>סרטון %1</translation>
+      <translation>סיור פריסות %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

@@ -4,7 +4,9 @@
 
 #include <nx/network/buffer.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 
 struct PasswordLookupResult
@@ -45,4 +47,6 @@ public:
 };
 
 } // namespace server
-} // namespace nx_http
+} // namespace nx {
+} // namespace network {
+} // namespace http {

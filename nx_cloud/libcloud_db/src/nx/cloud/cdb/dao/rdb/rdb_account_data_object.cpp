@@ -18,7 +18,7 @@ nx::utils::db::DBResult AccountDataObject::insert(
 {
     QSqlQuery insertAccountQuery(*queryContext->connection());
     insertAccountQuery.prepare(R"sql(
-        INSERT INTO account (id, email, password_ha1, password_ha1_sha256, 
+        INSERT INTO account (id, email, password_ha1, password_ha1_sha256,
             full_name, customization, status_code, registration_time_utc)
         VALUES  (:id, :email, :passwordHa1, :passwordHa1Sha256,
             :fullName, :customization, :statusCode, :registrationTime)
@@ -42,8 +42,8 @@ nx::utils::db::DBResult AccountDataObject::update(
 {
     QSqlQuery updateAccountQuery(*queryContext->connection());
     updateAccountQuery.prepare(R"sql(
-        UPDATE account 
-        SET password_ha1=:passwordHa1, password_ha1_sha256=:passwordHa1Sha256, 
+        UPDATE account
+        SET password_ha1=:passwordHa1, password_ha1_sha256=:passwordHa1Sha256,
             full_name=:fullName, customization=:customization, status_code=:statusCode
         WHERE id=:id AND email=:email
         )sql");
@@ -60,12 +60,11 @@ nx::utils::db::DBResult AccountDataObject::update(
     return nx::utils::db::DBResult::ok;
 }
 
-nx::utils::db::DBResult AccountDataObject::fetchAccountByEmail(
+std::optional<api::AccountData> AccountDataObject::fetchAccountByEmail(
     nx::utils::db::QueryContext* queryContext,
-    const std::string& accountEmail,
-    data::AccountData* const accountData)
+    const std::string& accountEmail)
 {
-    QSqlQuery fetchAccountQuery(*queryContext->connection());
+    nx::utils::db::SqlQuery fetchAccountQuery(*queryContext->connection());
     fetchAccountQuery.setForwardOnly(true);
     fetchAccountQuery.prepare(
         R"sql(
@@ -75,35 +74,39 @@ nx::utils::db::DBResult AccountDataObject::fetchAccountByEmail(
         WHERE email=:email
         )sql");
     fetchAccountQuery.bindValue(":email", QnSql::serialized_field(accountEmail));
-    if (!fetchAccountQuery.exec())
+
+    try
     {
-        NX_LOGX(lm("Error fetching account %1 from DB. %2")
-            .arg(accountEmail).arg(fetchAccountQuery.lastError().text()),
-            cl_logDEBUG1);
-        return nx::utils::db::DBResult::ioError;
+        fetchAccountQuery.exec();
+        if (!fetchAccountQuery.next())
+            return std::nullopt;
+    }
+    catch (nx::utils::db::Exception e)
+    {
+        NX_DEBUG(this, lm("Error fetching account %1 from DB. %2")
+            .args(accountEmail, e.what()));
+        throw;
     }
 
-    if (!fetchAccountQuery.next())
-        return nx::utils::db::DBResult::notFound;
-
+    api::AccountData account;
     // Account exists.
     QnSql::fetch(
-        QnSql::mapping<data::AccountData>(fetchAccountQuery),
+        QnSql::mapping<api::AccountData>(fetchAccountQuery.impl()),
         fetchAccountQuery.record(),
-        accountData);
-    return nx::utils::db::DBResult::ok;
+        &account);
+    return account;
 }
 
 nx::utils::db::DBResult AccountDataObject::fetchAccounts(
     nx::utils::db::QueryContext* queryContext,
-    std::vector<data::AccountData>* accounts)
+    std::vector<api::AccountData>* accounts)
 {
     QSqlQuery readAccountsQuery(*queryContext->connection());
     readAccountsQuery.setForwardOnly(true);
     readAccountsQuery.prepare(R"sql(
-        SELECT id, email, password_ha1 as passwordHa1, password_ha1_sha256 as passwordHa1Sha256, 
-            full_name as fullName, customization, status_code as statusCode, 
-            registration_time_utc as registrationTime, activation_time_utc as activationTime 
+        SELECT id, email, password_ha1 as passwordHa1, password_ha1_sha256 as passwordHa1Sha256,
+            full_name as fullName, customization, status_code as statusCode,
+            registration_time_utc as registrationTime, activation_time_utc as activationTime
         FROM account
         )sql");
     if (!readAccountsQuery.exec())
@@ -149,15 +152,15 @@ void AccountDataObject::insertEmailVerificationCode(
     }
 }
 
-boost::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmail(
+std::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmail(
     nx::utils::db::QueryContext* queryContext,
     const std::string& accountEmail)
 {
     nx::utils::db::SqlQuery fetchActivationCodesQuery(*queryContext->connection());
     fetchActivationCodesQuery.setForwardOnly(true);
     fetchActivationCodesQuery.prepare(R"sql(
-        SELECT verification_code 
-        FROM email_verification 
+        SELECT verification_code
+        FROM email_verification
         WHERE account_id=(SELECT id FROM account WHERE email=?)
         )sql");
     fetchActivationCodesQuery.bindValue(
@@ -175,7 +178,7 @@ boost::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmai
     }
 
     if (!fetchActivationCodesQuery.next())
-        return boost::none;
+        return std::nullopt;
 
     return fetchActivationCodesQuery.value(lit("verification_code")).toString().toStdString();
 }
@@ -188,8 +191,8 @@ nx::utils::db::DBResult AccountDataObject::getAccountEmailByVerificationCode(
     QSqlQuery getAccountByVerificationCode(*queryContext->connection());
     getAccountByVerificationCode.setForwardOnly(true);
     getAccountByVerificationCode.prepare(R"sql(
-        SELECT a.email 
-        FROM email_verification ev, account a 
+        SELECT a.email
+        FROM email_verification ev, account a
         WHERE ev.account_id = a.id AND ev.verification_code LIKE :code
         )sql");
     QnSql::bind(verificationCode, &getAccountByVerificationCode);
@@ -254,11 +257,10 @@ nx::utils::db::DBResult AccountDataObject::updateAccountToActiveStatus(
 void AccountDataObject::updateAccount(
     nx::utils::db::QueryContext* queryContext,
     const std::string& accountEmail,
-    const api::AccountUpdateData& accountUpdateData,
-    bool activateAccountIfNotActive)
+    const api::AccountUpdateData& accountUpdateData)
 {
     std::vector<nx::utils::db::SqlFilterField> fieldsToSet =
-        prepareAccountFieldsToUpdate(accountUpdateData, activateAccountIfNotActive);
+        prepareAccountFieldsToUpdate(accountUpdateData);
 
     NX_ASSERT(!fieldsToSet.empty());
 
@@ -269,44 +271,38 @@ void AccountDataObject::updateAccount(
 }
 
 std::vector<nx::utils::db::SqlFilterField> AccountDataObject::prepareAccountFieldsToUpdate(
-    const api::AccountUpdateData& accountData,
-    bool activateAccountIfNotActive)
+    const api::AccountUpdateData& accountData)
 {
-    std::vector<nx::utils::db::SqlFilterField> fieldsToSet;
+    using namespace nx::utils::db;
+
+    std::vector<SqlFilterField> fieldsToSet;
 
     if (accountData.passwordHa1)
     {
-        fieldsToSet.push_back({
+        fieldsToSet.push_back(SqlFilterFieldEqual(
             "password_ha1", ":passwordHa1",
-            QnSql::serialized_field(accountData.passwordHa1.get()) });
+            QnSql::serialized_field(accountData.passwordHa1.get())));
     }
 
     if (accountData.passwordHa1Sha256)
     {
-        fieldsToSet.push_back({
+        fieldsToSet.push_back(SqlFilterFieldEqual(
             "password_ha1_sha256", ":passwordHa1Sha256",
-            QnSql::serialized_field(accountData.passwordHa1Sha256.get()) });
+            QnSql::serialized_field(accountData.passwordHa1Sha256.get())));
     }
 
     if (accountData.fullName)
     {
-        fieldsToSet.push_back({
+        fieldsToSet.push_back(SqlFilterFieldEqual(
             "full_name", ":fullName",
-            QnSql::serialized_field(accountData.fullName.get()) });
+            QnSql::serialized_field(accountData.fullName.get())));
     }
 
     if (accountData.customization)
     {
-        fieldsToSet.push_back({
+        fieldsToSet.push_back(SqlFilterFieldEqual(
             "customization", ":customization",
-            QnSql::serialized_field(accountData.customization.get()) });
-    }
-
-    if (activateAccountIfNotActive)
-    {
-        fieldsToSet.push_back({
-            "status_code", ":status_code",
-            QnSql::serialized_field(static_cast<int>(api::AccountStatus::activated)) });
+            QnSql::serialized_field(accountData.customization.get())));
     }
 
     return fieldsToSet;

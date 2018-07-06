@@ -13,7 +13,7 @@
 struct Win32FuncResolverImpl;
 
 /*!
-    \note Caches all functions it had resolved
+    NOTE: Caches all functions it had resolved
 */
 class NX_UTILS_API Win32FuncResolver
 {
@@ -22,7 +22,7 @@ public:
     ~Win32FuncResolver();
 
     /*!
-        \note thread-safe
+        NOTE: thread-safe
     */
     template<class FuncPointerType>
         FuncPointerType resolveFunction(

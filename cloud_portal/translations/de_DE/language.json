@@ -1,19 +1,19 @@
 {
   "language_name": "Deutsch",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Abbrechen",
-    "loginTitle": "Anmelden bei {{PRODUCT_NAME}}",
+    "loginTitle": "Anmelden bei %PRODUCT_NAME%",
     "loginButton": "Anmelden",
     "logoutAuthorisedTitle": "Sie sind bereits eingeloggt",
     "logoutAuthorisedContinueButton": "Fortfahren",
     "logoutAuthorisedLogoutButton": "Abmelden"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Willkommen bei",
     "register": "Account erstellen bei",
     "changePassword": "Passwort ändern -",
@@ -31,8 +31,8 @@
     "view": "Kameras ansehen - ",
     "debug": "Debug",
     "login": "Anmelden -",
-    "download": "Download {{VMS_NAME}}",
-    "downloadPlatform": "Download {{VMS_NAME}} für ",
+    "download": "Download %VMS_NAME%",
+    "downloadPlatform": "Download %VMS_NAME% für ",
     "pageNotFound": "Seite nicht gefunden"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Benutzerdefiniert",
-      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
+      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %PRODUCT_NAME% Clientanwendung"
     },
     "cloudAdmin": {
       "label": "Administrator",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Benutzerdefiniert",
-      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die {{PRODUCT_NAME}} Clientanwendung"
+      "description": "Um benutzerdefinierte Berechtigungen zu erstellen, verwenden Sie die %VMS_NAME%-Clientanwendung"
     }
   },
   "errorCodes": {
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "Bestätigungsmail konnte nicht gesendet werden",
     "cloudInvalidResponse": "Cloud-DB hat eine unerwartete Antwort zurückgegeben",
     "notAuthorized": "Falsches Passwort",
-    "wrongParameters": "Einige Parameter in dem Formular sind falsch",
     "brokenAccount": "Unerwartetes Problem mit dem Konto. <a href=\"/restore_password\">Konto wiederherstellen</a>",
+    "wrongParameters": "Einige Parameter in dem Formular sind falsch",
     "wrongCode": "Account ist bereits aktiviert oder der Bestätigungscode ist falsch",
     "wrongCodeRestore": "Bestätigungscode wurde bereits verwendet oder ist falsch",
     "forbidden": "Sie haben keine Berechtigung diese Aktion auszuführen",
@@ -133,9 +133,10 @@
     "passwordMismatch": "Falsches Passwort",
     "cantEditYourself": "Eigene Berechtigungen zu ändern ist nicht erlaubt",
     "cantEditAdmin": "Dieser Benutzer hat Administratorberechtigungen",
-    "cantOpenClient": "Die Anwendung {{VMS_NAME}} wurde nicht gefunden. <a href=\"/download\">Download</a>",
+    "cantOpenClient": "Die Anwendung %VMS_NAME% wurde nicht gefunden. <a href=\"/download\">Download</a>",
     "lostConnection": "Verbindung zu {{systemName}} verloren",
-    "thisSystem": "das System"
+    "thisSystem": "das System",
+    "oldSafariNotSupported": "Versionen von Safari älter als 10 werden nicht unterstützt"
   },
   "passwordRequirements": {
     "minLengthMessage": "Passwort muss mindestens 8 Zeichen enthalten",
@@ -158,12 +159,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "System ist nicht erreichbar",
     "offline": "System ist offline",
-    "openClient": "In {{VMS_NAME}} öffnen",
-    "openClientNoSystem": "Öffnen Sie {{VMS_NAME}}",
+    "openClient": "In %VMS_NAME% öffnen",
+    "openClientNoSystem": "Öffnen Sie %VMS_NAME%",
+    "confirmMergeAction": "Zusammenführen",
+    "mergeSystemTitle": "Systeme zusammenführen",
     "confirmRenameTitle": "Systemname",
     "confirmRenameAction": "Speichern",
     "successRename": "Systemname wurde gespeichert",
-    "confirmDisconnectTitle": "System von {{PRODUCT_NAME}} trennen?",
+    "confirmDisconnectTitle": "System von %PRODUCT_NAME% trennen?",
     "confirmDisconnectAction": "Trennen",
     "confirmUnshareFromMe": "Sie sind dabei dieses System von Ihrem Account zu trennen. Sie werden nicht mehr auf dieses System zugreifen können. Sind Sie sich sicher?",
     "confirmUnshareFromMeTitle": "System trennen?",
@@ -171,7 +174,7 @@
     "confirmUnshare": "Dieser Benutzer wird nicht in der Lage sein auf das System zuzugreifen. Sind Sie sich sicher?",
     "confirmUnshareTitle": "Benutzer löschen?",
     "confirmUnshareAction": "Löschen",
-    "successDisconnected": "Das System wurde erfoglreich von {{PRODUCT_NAME}} getrennt",
+    "successDisconnected": "Das System wurde erfoglreich von %PRODUCT_NAME% getrennt",
     "successDeleted": "Das System {{systemName}} wurde erfolgreich von Ihrem Account gelöscht",
     "permissionsRemoved": "Berechtigungen wurden von {{email}} entfernt"
   },
@@ -184,14 +187,14 @@
     "saveChanges": "Speichern"
   },
   "downloads": {
-    "noClientDetectedTitle": "Installieren Sie {{VMS_NAME}}, um Ihr System anzusehen",
-    "action": "Download {{VMS_NAME}}",
+    "noClientDetectedTitle": "Installieren Sie %VMS_NAME%, um Ihr System anzusehen",
+    "action": "Download %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

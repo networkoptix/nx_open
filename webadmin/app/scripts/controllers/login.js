@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('LoginCtrl', function ($scope, mediaserver, $sessionStorage, dialogs, nativeClient) {
+    .controller('LoginCtrl', ['$scope', 'mediaserver', '$sessionStorage', 'dialogs', 'nativeClient',
+    function ($scope, mediaserver, $sessionStorage, dialogs, nativeClient) {
 
 
         // Login digest: http://en.wikipedia.org/wiki/Digest_access_authentication
@@ -39,4 +40,4 @@ angular.module('webadminApp')
                 });
             }
         };
-    });
+    }]);

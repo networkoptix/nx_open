@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>495</width>
+    <width>519</width>
     <height>347</height>
    </rect>
   </property>
@@ -49,10 +49,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QnPromoBar" name="promoBar" native="true"/>
-       </item>
-       <item>
-        <widget class="QnPanel" name="introWidget" native="true">
+        <widget class="nx::client::desktop::Panel" name="introWidget" native="true">
          <layout class="QGridLayout" name="introLayout" columnstretch="1,0,1,0,1">
           <property name="leftMargin">
            <number>20</number>
@@ -277,7 +274,7 @@ Cloud Account&gt;</string>
         <number>0</number>
        </property>
        <item>
-        <widget class="QnPanel" name="linkedAccountInfoWidget" native="true">
+        <widget class="nx::client::desktop::Panel" name="linkedAccountInfoWidget" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <property name="spacing">
            <number>8</number>
@@ -388,15 +385,10 @@ Cloud Account&gt;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnPromoBar</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/alert_bar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

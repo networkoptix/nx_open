@@ -1,0 +1,1 @@
+url = "http://cloud-test.hdw.mx/api/ping"

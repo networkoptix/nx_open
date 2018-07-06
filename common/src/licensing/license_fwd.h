@@ -10,3 +10,5 @@ using QnLicenseDict = QMap<QByteArray, QnLicensePtr>;
 class QnLicenseValidator;
 
 enum class QnLicenseErrorCode;
+
+enum class QnLicenseUsageStatus;

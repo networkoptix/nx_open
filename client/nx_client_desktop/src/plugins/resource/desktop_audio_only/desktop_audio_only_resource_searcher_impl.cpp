@@ -8,9 +8,8 @@
 
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
 
-QnDesktopResourceSearcherImpl::QnDesktopResourceSearcherImpl(QGLWidget* mainWindow)
+QnDesktopResourceSearcherImpl::QnDesktopResourceSearcherImpl(QGLWidget* /*mainWindow*/)
 {
-    QN_UNUSED(mainWindow);
 }
 
 QnDesktopResourceSearcherImpl::~QnDesktopResourceSearcherImpl()

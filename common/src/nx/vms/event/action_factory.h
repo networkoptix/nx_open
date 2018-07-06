@@ -12,12 +12,14 @@ class ActionFactory
 {
 public:
     static AbstractActionPtr instantiateAction(
+        QnCommonModule* commonModule,
         const RulePtr& rule,
         const AbstractEventPtr& event,
         const QnUuid& moduleGuid,
         EventState state = EventState::undefined);
 
     static AbstractActionPtr instantiateAction(
+        QnCommonModule* commonModule,
         const RulePtr& rule,
         const AbstractEventPtr& event,
         const QnUuid& moduleGuid,

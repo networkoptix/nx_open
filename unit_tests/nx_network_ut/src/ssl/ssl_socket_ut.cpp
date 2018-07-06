@@ -5,13 +5,97 @@
 #include <nx/network/ssl/ssl_stream_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
-#include <nx/utils/std/cpp14.h>
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "sync_ssl_socket.h"
 
 namespace nx {
 namespace network {
+
+namespace test {
+
+namespace {
+
+class EnforcedSslOverTcpServerSocket:
+    public ssl::StreamServerSocket
+{
+    using base_type = ssl::StreamServerSocket;
+
+public:
+    EnforcedSslOverTcpServerSocket(int ipVersion = AF_INET):
+        base_type(
+            std::make_unique<TCPServerSocket>(ipVersion),
+            ssl::EncryptionUse::always)
+    {
+    }
+};
+
+class AutoDetectedSslOverTcpServerSocket:
+    public ssl::StreamServerSocket
+{
+    using base_type = ssl::StreamServerSocket;
+
+public:
+    AutoDetectedSslOverTcpServerSocket(int ipVersion = AF_INET):
+        base_type(
+            std::make_unique<TCPServerSocket>(ipVersion),
+            ssl::EncryptionUse::autoDetectByReceivedData)
+    {
+    }
+};
+
+class SslOverTcpStreamSocket:
+    public ssl::StreamSocket
+{
+    using base_type = ssl::StreamSocket;
+
+public:
+    SslOverTcpStreamSocket(int ipVersion = AF_INET):
+        base_type(std::make_unique<TCPSocket>(ipVersion), false)
+    {
+    }
+};
+
+struct SslSocketBothEndsEncryptedTypeSet
+{
+    using ClientSocket = SslOverTcpStreamSocket;
+    using ServerSocket = EnforcedSslOverTcpServerSocket;
+};
+
+struct SslSocketBothEndsEncryptedAutoDetectingServerTypeSet
+{
+    using ClientSocket = SslOverTcpStreamSocket;
+    using ServerSocket = AutoDetectedSslOverTcpServerSocket;
+};
+
+struct SslSocketClientNotEncryptedTypeSet
+{
+    using ClientSocket = TCPSocket;
+    using ServerSocket = AutoDetectedSslOverTcpServerSocket;
+};
+
+} // namespace
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    SslSocketBothEndsEncrypted,
+    StreamSocketAcceptance,
+    SslSocketBothEndsEncryptedTypeSet);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    SslSocketBothEndsEncryptedAutoDetectingServer,
+    StreamSocketAcceptance,
+    SslSocketBothEndsEncryptedAutoDetectingServerTypeSet);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    SslSocketClientNotEncrypted,
+    StreamSocketAcceptance,
+    SslSocketClientNotEncryptedTypeSet);
+
+} // namespace test
+
+//-------------------------------------------------------------------------------------------------
+
 namespace ssl {
 namespace test {
 
@@ -101,6 +185,8 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class SynchronousReflectorPool:
     public AbstractReflectorPool
 {
@@ -134,6 +220,8 @@ public:
 private:
     std::deque<std::unique_ptr<SynchronousReflector>> m_reflectors;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 using AbstractStreamSocketAsyncReflector = aio::AsyncChannelReflector<AbstractStreamSocket>;
 
@@ -242,7 +330,7 @@ public:
 protected:
     void givenEstablishedConnection()
     {
-        ASSERT_TRUE(m_clientSocket.connect(m_acceptor->getLocalAddress()));
+        ASSERT_TRUE(m_clientSocket.connect(m_acceptor->getLocalAddress(), nx::network::kNoTimeout));
     }
 
     void whenSentRandomData()
@@ -328,41 +416,21 @@ private:
     }
 };
 
-//-------------------------------------------------------------------------------------------------
-// Asynchronous I/O
+// Verifies by using ClientSyncSslSocket class on one side.
 
-class SslSocketVerifySslIsActuallyUsedByAsyncIo:
-    public SslSocketVerifySslIsActuallyUsed
+TEST_F(SslSocketVerifySslIsActuallyUsed, ssl_used_by_async_io)
 {
-public:
-    SslSocketVerifySslIsActuallyUsedByAsyncIo()
-    {
-        switchToAsynchronousMode();
-    }
-};
+    switchToAsynchronousMode();
 
-TEST_F(SslSocketVerifySslIsActuallyUsedByAsyncIo, read_write)
-{
     givenEstablishedConnection();
     whenSentRandomData();
     thenSameDataHasBeenReceivedInResponse();
 }
 
-//-------------------------------------------------------------------------------------------------
-// Synchronous I/O
-
-class SslSocketVerifySslIsActuallyUsedBySyncIo:
-    public SslSocketVerifySslIsActuallyUsed
+TEST_F(SslSocketVerifySslIsActuallyUsed, ssl_used_by_sync_io)
 {
-public:
-    SslSocketVerifySslIsActuallyUsedBySyncIo()
-    {
-        switchToSynchronousMode();
-    }
-};
+    switchToSynchronousMode();
 
-TEST_F(SslSocketVerifySslIsActuallyUsedBySyncIo, read_write)
-{
     givenEstablishedConnection();
     whenSentRandomData();
     thenSameDataHasBeenReceivedInResponse();
@@ -409,7 +477,7 @@ TEST_F(SslSocketSwitchIoMode, from_async_to_sync)
 TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
 {
     givenEstablishedConnection();
-    
+
     exchangeDataInSyncMode();
     changeSocketIoMode();
     exchangeDataInAsyncMode();
@@ -419,9 +487,8 @@ TEST_F(SslSocketSwitchIoMode, from_sync_to_async)
 // Common socket tests. These are not enough since they do not even check ssl is actually used.
 
 #if 0
-
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
-    TEST, SslSocketNotEncryptedConnection,
+    TEST, SslSocketNotEncryptedConnectionAutoDetected,
     []()
     {
         return std::make_unique<ssl::StreamServerSocket>(
@@ -429,6 +496,7 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
             EncryptionUse::autoDetectByReceivedData);
     },
     []() { return std::make_unique<TCPSocket>(AF_INET); });
+#endif
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslSocketEncryptedConnection,
@@ -438,19 +506,25 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
             std::make_unique<TCPServerSocket>(AF_INET),
             EncryptionUse::always);
     },
-    []() { return std::make_unique<ssl::StreamSocket>(std::make_unique<TCPSocket>(AF_INET), false); });
+    []()
+    {
+        return std::make_unique<ssl::StreamSocket>(
+            std::make_unique<TCPSocket>(AF_INET), false);
+    });
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
-    TEST, SslSocketNotEncryptedConnection2,
+    TEST, SslSocketEncryptedConnectionAutoDetected,
     []()
     {
         return std::make_unique<ssl::StreamServerSocket>(
             std::make_unique<TCPServerSocket>(AF_INET),
             EncryptionUse::autoDetectByReceivedData);
     },
-    []() { return std::make_unique<ssl::StreamSocket>(std::make_unique<TCPSocket>(AF_INET), false); });
-
-#endif
+    []()
+    {
+        return std::make_unique<ssl::StreamSocket>(
+            std::make_unique<TCPSocket>(AF_INET), false);
+    });
 
 } // namespace test
 } // namespace ssl

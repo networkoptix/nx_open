@@ -2,11 +2,15 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <ui/style/resource_icon_cache.h>
+
+using namespace nx::client::desktop;
+
 QnResourceTreeModelRecorderNode::QnResourceTreeModelRecorderNode(
     QnResourceTreeModel* model,
     const QnVirtualCameraResourcePtr& camera)
     :
-    base_type(model, Qn::RecorderNode, QString())
+    base_type(model, NodeType::recorder, QString())
 {
     updateName(camera);
 }
@@ -17,14 +21,36 @@ QnResourceTreeModelRecorderNode::~QnResourceTreeModelRecorderNode()
 
 void QnResourceTreeModelRecorderNode::addChildInternal(const QnResourceTreeModelNodePtr& child)
 {
+    const bool addingFirstChild = children().empty();
     base_type::addChildInternal(child);
-    auto camera = child->resource().dynamicCast<QnVirtualCameraResource>();
-    NX_ASSERT(camera);
-    connect(camera, &QnVirtualCameraResource::groupNameChanged, this,
-        [this, camera]()
-        {
-            updateName(camera);
-        });
+
+    if (addingFirstChild)
+    {
+        auto camera = child->resource().dynamicCast<QnVirtualCameraResource>();
+        NX_ASSERT(camera);
+        if (!camera)
+            return;
+
+        connect(camera, &QnVirtualCameraResource::groupNameChanged, this,
+            [this, camera]()
+            {
+                updateName(camera);
+            });
+
+        connect(camera, &QnVirtualCameraResource::propertyChanged, this,
+            [this, camera](const QnResourcePtr& /*resource*/, const QString& name)
+            {
+                const bool hasDeviceTypeBeenChanged = name == Qn::DTS_PARAM_NAME
+                    || name == Qn::ANALOG_PARAM_NAME
+                    || name == Qn::kDeviceType;
+
+                if (hasDeviceTypeBeenChanged)
+                    updateIcon();
+            });
+
+        updateIcon();
+    }
+    updateCameraExtraStatus();
 }
 
 void QnResourceTreeModelRecorderNode::removeChildInternal(const QnResourceTreeModelNodePtr& child)
@@ -37,6 +63,27 @@ void QnResourceTreeModelRecorderNode::removeChildInternal(const QnResourceTreeMo
         NX_ASSERT(camera);
         disconnect(camera, nullptr, this, nullptr);
     }
+}
+
+QIcon QnResourceTreeModelRecorderNode::calculateIcon() const
+{
+    if (!children().empty())
+    {
+        const auto camera = child(0)->resource().dynamicCast<QnVirtualCameraResource>();
+        NX_ASSERT(camera);
+        if (camera && camera->isMultiSensorCamera())
+            return qnResIconCache->icon(QnResourceIconCache::MultisensorCamera);
+    }
+
+    return qnResIconCache->icon(QnResourceIconCache::Recorder);
+}
+
+CameraExtraStatus QnResourceTreeModelRecorderNode::calculateCameraExtraStatus() const
+{
+    CameraExtraStatus result;
+    for (auto child: children())
+        result |= child->data(Qn::CameraExtraStatusRole, 0).value<CameraExtraStatus>();
+    return result;
 }
 
 void QnResourceTreeModelRecorderNode::updateName(const QnVirtualCameraResourcePtr& camera)

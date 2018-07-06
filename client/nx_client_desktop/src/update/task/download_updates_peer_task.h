@@ -4,6 +4,7 @@
 #include <QtCore/QDir>
 
 #include <update/task/network_peer_task.h>
+#include <nx/utils/url.h>
 
 class QNetworkAccessManager;
 
@@ -20,11 +21,11 @@ public:
 
     explicit QnDownloadUpdatesPeerTask(QObject *parent = 0);
 
-    void setTargets(const QHash<QUrl, QString> &resultingFiles);
-    void setHashes(const QHash<QUrl, QString> &hashByUrl);
-    void setFileSizes(const QHash<QUrl, qint64> &fileSizeByUrl);
-    QHash<QUrl, QString> resultingFiles() const;
-    void setPeerAssociations(const QMultiHash<QUrl, QnUuid> &peersByUrl);
+    void setTargets(const QHash<nx::utils::Url, QString> &resultingFiles);
+    void setHashes(const QHash<nx::utils::Url, QString> &hashByUrl);
+    void setFileSizes(const QHash<nx::utils::Url, qint64> &fileSizeByUrl);
+    QHash<nx::utils::Url, QString> resultingFiles() const;
+    void setPeerAssociations(const QMultiHash<nx::utils::Url, QnUuid> &peersByUrl);
 
 protected:
     virtual void doStart() override;
@@ -42,13 +43,13 @@ private slots:
     void at_downloadReply_readyRead();
 
 private:
-    QHash<QUrl, QString> m_targets;
-    QHash<QUrl, QString> m_hashByUrl;
-    QMultiHash<QUrl, QnUuid> m_peersByUrl;
-    QHash<QUrl, QString> m_resultingFiles;
-    QHash<QUrl, qint64> m_fileSizeByUrl;
+    QHash<nx::utils::Url, QString> m_targets;
+    QHash<nx::utils::Url, QString> m_hashByUrl;
+    QMultiHash<nx::utils::Url, QnUuid> m_peersByUrl;
+    QHash<nx::utils::Url, QString> m_resultingFiles;
+    QHash<nx::utils::Url, qint64> m_fileSizeByUrl;
 
-    QList<QUrl> m_pendingDownloads;
+    QList<nx::utils::Url> m_pendingDownloads;
     QSet<QnUuid> m_currentPeers;
     int m_triesCount;
 

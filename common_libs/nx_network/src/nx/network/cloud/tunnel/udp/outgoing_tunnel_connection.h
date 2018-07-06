@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 12, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <atomic>
@@ -47,19 +42,19 @@ public:
 /**
  * Creates connections (UDT) after UDP hole punching has been successfully done.
  * Also, makes some efforts to keep UDP hole opened.
- * @note OutgoingTunnelConnection instance 
+ * NOTE: OutgoingTunnelConnection instance
  *     can be safely freed while in aio thread (e.g., in any handler).
  */
 class NX_NETWORK_API OutgoingTunnelConnection:
     public AbstractOutgoingTunnelConnection,
     public nx::network::server::StreamConnectionHolder<
 		nx::network::server::BaseStreamProtocolConnectionEmbeddable<
-			nx::stun::Message,
-            nx::stun::MessageParser,
-            nx::stun::MessageSerializer>>
+			nx::network::stun::Message,
+            nx::network::stun::MessageParser,
+            nx::network::stun::MessageSerializer>>
 {
 public:
-    /** 
+    /**
      * @param connectionId unique id of connection established.
      * @param udtConnection already established connection to the target host.
      */
@@ -85,12 +80,13 @@ public:
         OnNewConnectionHandler handler) override;
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
+    virtual std::string toString() const override;
 
 private:
     typedef nx::network::server::BaseStreamProtocolConnectionEmbeddable<
-        nx::stun::Message,
-        nx::stun::MessageParser,
-        nx::stun::MessageSerializer
+        nx::network::stun::Message,
+        nx::network::stun::MessageParser,
+        nx::network::stun::MessageSerializer
     > ConnectionType;
 
     struct ConnectionContext
@@ -125,7 +121,7 @@ private:
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
         ConnectionType* connection) override;
-    void onStunMessageReceived(nx::stun::Message message);
+    void onStunMessageReceived(nx::network::stun::Message message);
 };
 
 } // namespace udp

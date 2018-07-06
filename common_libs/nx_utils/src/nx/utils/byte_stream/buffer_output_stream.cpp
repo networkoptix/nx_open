@@ -1,5 +1,3 @@
-#pragma
-
 #include "buffer_output_stream.h"
 
 namespace nx {

@@ -54,9 +54,71 @@
 
 namespace ec2 {
 
-class Ec2DirectConnection;
-class Settings;
 class AbstractTransactionMessageBus;
+class Settings;
+
+// TODO: #ak This class should be removed when we can use m_miscManager to save parameters.
+class AbstractWorkAroundMiscDataSaver
+{
+public:
+    virtual ~AbstractWorkAroundMiscDataSaver() = default;
+
+    virtual ErrorCode saveSync(const ApiMiscData& data) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class AbstractSystemClock
+{
+public:
+    virtual ~AbstractSystemClock() = default;
+
+    virtual std::chrono::milliseconds millisSinceEpoch() = 0;
+};
+
+class AbstractSteadyClock
+{
+public:
+    virtual ~AbstractSteadyClock() = default;
+
+    /**
+     * @return Time from some unspecified epoch.
+     */
+    virtual std::chrono::milliseconds now() = 0;
+};
+
+class SteadyClock:
+    public AbstractSteadyClock
+{
+public:
+    virtual std::chrono::milliseconds now() override;
+};
+
+class ElapsedTimer
+{
+public:
+    ElapsedTimer(AbstractSteadyClock* steadyClock):
+        m_steadyClock(steadyClock)
+    {
+        restart();
+    }
+
+    void restart()
+    {
+        m_startTime = m_steadyClock->now();
+    }
+
+    std::chrono::milliseconds elapsed() const
+    {
+        return m_steadyClock->now() - m_startTime;
+    }
+
+private:
+    AbstractSteadyClock* m_steadyClock = nullptr;
+    std::chrono::milliseconds m_startTime;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
@@ -65,11 +127,11 @@ class AbstractTransactionMessageBus;
 class TimePriorityKey
 {
 public:
-        //!sequence number. Incremented with each peer selection by user
+    //!sequence number. Incremented with each peer selection by user
     quint16 sequence;
-        //!bitset of flags from \a TimeSynchronizationManager class
+    //!bitset of flags from \a TimeSynchronizationManager class
     quint16 flags;
-        //!some random number
+    //!some random number
     quint32 seed;
 
     TimePriorityKey();
@@ -101,10 +163,10 @@ public:
     TimeSyncInfo(
         qint64 _monotonicClockValue = 0,
         qint64 _syncTime = 0,
-        const TimePriorityKey& _timePriorityKey = TimePriorityKey() );
+        const TimePriorityKey& _timePriorityKey = TimePriorityKey());
 
     QByteArray toString() const;
-    bool fromString( const QByteArray& str );
+    bool fromString(const QByteArray& str);
 };
 
 /**
@@ -113,6 +175,7 @@ public:
  */
 class TimeSynchronizationManager:
     public QObject,
+    public QnCommonModuleAware,
     public QnStoppable,
     public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
     public Qn::EnableSafeDirectConnection
@@ -120,17 +183,24 @@ class TimeSynchronizationManager:
     Q_OBJECT
 
 public:
+
+    static const QString kTimeSyncUrlPath;
+    static const QByteArray TIME_SYNC_HEADER_NAME;
+
     /**
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
     TimeSynchronizationManager(
-        Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager,
-        AbstractTransactionMessageBus* messageBus,
-        Settings* settings);
+		QnCommonModule* commonModule,
+		Qn::PeerType peerType,
+        nx::utils::StandaloneTimerManager* const timerManager,
+        Settings* settings,
+        std::shared_ptr<AbstractWorkAroundMiscDataSaver> workAroundMiscDataSaver = nullptr,
+        const std::shared_ptr<AbstractSystemClock>& systemClock = nullptr,
+        const std::shared_ptr<AbstractSteadyClock>& steadyClock = nullptr);
     virtual ~TimeSynchronizationManager();
 
-    /** Implemenattion of QnStoppable::pleaseStop. */
+    /** Implementation of QnStoppable::pleaseStop. */
     virtual void pleaseStop() override;
 
     /**
@@ -138,14 +208,16 @@ public:
      * @note Cannot do it in constructor to keep valid object destruction order.
      * TODO #ak look like incapsulation failure. Better remove this method.
      */
-    void start(const std::shared_ptr<Ec2DirectConnection>& connection);
+    void start(
+        AbstractTransactionMessageBus* messageBus,
+        const std::shared_ptr<AbstractMiscManager>& miscManager);
 
     /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
     ApiTimeData getTimeInfo() const;
     /** Called when primary time server has been changed by user. */
-    void onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran);
-    void primaryTimeServerChanged(const ApiIdData& serverId);
+    void onGotPrimariTimeServerTran(const QnTransaction<nx::vms::api::IdData>& tran);
+    void primaryTimeServerChanged(const nx::vms::api::IdData& serverId);
     /** Returns synchronized time with time priority key (not local, but the one used). */
     TimeSyncInfo getTimeSyncInfo() const;
     /** Returns value of internal monotonic clock. */
@@ -156,13 +228,13 @@ public:
     void forceTimeResync();
     void processTimeSyncInfoHeader(
         const QnUuid& peerID,
-        const nx_http::StringType& serializedTimeSync,
+        const nx::network::http::StringType& serializedTimeSync,
         boost::optional<qint64> requestRttMillis);
     void resyncTimeWithPeer(const QnUuid& peerId);
 
 signals:
     /** Emitted when synchronized time has been changed. */
-    void timeChanged( qint64 syncTime );
+    void timeChanged(qint64 syncTime);
 
 private:
     struct RemotePeerTimeInfo
@@ -175,43 +247,45 @@ private:
         RemotePeerTimeInfo(
             const QnUuid& _peerID = QnUuid(),
             qint64 _localMonotonicClock = 0,
-            qint64 _remotePeerSyncTime = 0 )
-        :
-            peerID( _peerID ),
-            localMonotonicClock( _localMonotonicClock ),
-            remotePeerSyncTime( _remotePeerSyncTime )
+            qint64 _remotePeerSyncTime = 0)
+            :
+            peerID(_peerID),
+            localMonotonicClock(_localMonotonicClock),
+            remotePeerSyncTime(_remotePeerSyncTime)
         {
         }
     };
 
     struct PeerContext
     {
-        SocketAddress peerAddress;
-        nx_http::AuthInfoCache::AuthorizationCacheItem authData;
-        nx::utils::TimerManager::TimerGuard syncTimerID;
-        nx_http::AsyncHttpClientPtr httpClient;
+        nx::network::SocketAddress peerAddress;
+        nx::network::http::AuthInfoCache::AuthorizationCacheItem authData;
+        nx::utils::StandaloneTimerManager::TimerGuard syncTimerID;
+        nx::network::http::AsyncHttpClientPtr httpClient;
         /** Request round-trip time. */
         boost::optional<qint64> rttMillis;
 
         PeerContext(
-            SocketAddress _peerAddress,
-            nx_http::AuthInfoCache::AuthorizationCacheItem _authData )
-        :
-            peerAddress( std::move( _peerAddress ) ),
-            authData( std::move(_authData) )
-        {}
+            nx::network::SocketAddress _peerAddress,
+            nx::network::http::AuthInfoCache::AuthorizationCacheItem _authData)
+            :
+            peerAddress(std::move(_peerAddress)),
+            authData(std::move(_authData))
+        {
+        }
 
-            //PeerContext( PeerContext&& right ) = default;
-        PeerContext( PeerContext&& right )
-        :
-            peerAddress( std::move(right.peerAddress) ),
-            authData( std::move(right.authData) ),
-            syncTimerID( std::move(right.syncTimerID) ),
-            httpClient( std::move(right.httpClient) )
-        {}
+        //PeerContext( PeerContext&& right ) = default;
+        PeerContext(PeerContext&& right)
+            :
+            peerAddress(std::move(right.peerAddress)),
+            authData(std::move(right.authData)),
+            syncTimerID(std::move(right.syncTimerID)),
+            httpClient(std::move(right.httpClient))
+        {
+        }
 
-            //PeerContext& operator=( PeerContext&& right ) = default;
-        PeerContext& operator=( PeerContext&& right )
+        //PeerContext& operator=( PeerContext&& right ) = default;
+        PeerContext& operator=(PeerContext&& right)
         {
             peerAddress = std::move(right.peerAddress);
             syncTimerID = std::move(right.syncTimerID);
@@ -222,8 +296,6 @@ private:
 
     /** Delta (millis) from m_monotonicClock to local time, synchronized with internet. */
     qint64 m_localSystemTimeDelta;
-    /** Using monotonic clock to be proof to local system time change. */
-    QElapsedTimer m_monotonicClock;
     //!priority key of current server
     TimePriorityKey m_localTimePriorityKey;
     mutable QnMutex m_mutex;
@@ -234,10 +306,9 @@ private:
     boost::optional<qint64> m_prevSysTime;
     boost::optional<qint64> m_prevMonotonicClock;
     bool m_terminated;
-    std::shared_ptr<Ec2DirectConnection> m_connection;
-    AbstractTransactionMessageBus* m_messageBus;
+    std::shared_ptr<AbstractMiscManager> m_miscManager;
     const Qn::PeerType m_peerType;
-    nx::utils::TimerManager* const m_timerManager;
+    nx::utils::StandaloneTimerManager* const m_timerManager;
     std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
     size_t m_internetTimeSynchronizationPeriod;
     bool m_timeSynchronized;
@@ -246,10 +317,16 @@ private:
     Settings* m_settings;
     std::atomic<size_t> m_asyncOperationsInProgress;
     QnWaitCondition m_asyncOperationsWaitCondition;
+    std::shared_ptr<AbstractSystemClock> m_systemClock;
+    std::shared_ptr<AbstractSteadyClock> m_steadyClock;
+    /** Using monotonic clock to be proof to local system time change. */
+    ElapsedTimer m_monotonicClock;
 
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lock,
         quint16 newTimePriorityKeySequence);
+    void setLocalTimeAsSynchronized(QnMutexLockerBase* const lock);
+
     /**
      * @param lock Locked m_mutex. This method will unlock it to emit TimeSynchronizationManager::timeChanged signal.
      * @param remotePeerID
@@ -265,11 +342,11 @@ private:
         qint64 localMonotonicClock,
         qint64 remotePeerSyncTime,
         const TimePriorityKey& remotePeerTimePriorityKey,
-        qint64 timeErrorEstimation );
-    void checkIfManualTimeServerSelectionIsRequired( quint64 taskID );
+        qint64 timeErrorEstimation);
+    void checkIfManualTimeServerSelectionIsRequired(quint64 taskID);
     /** Periodically synchronizing time with internet (if possible). */
-    void syncTimeWithInternet( quint64 taskID );
-    void onTimeFetchingDone( qint64 millisFromEpoch, SystemError::ErrorCode errorCode );
+    void syncTimeWithInternet(quint64 taskID);
+    void onTimeFetchingDone(qint64 millisFromEpoch, SystemError::ErrorCode errorCode);
     void initializeTimeFetcher();
     void addInternetTimeSynchronizationTask();
     /** Returns time received from the internet or current local system time. */
@@ -279,22 +356,22 @@ private:
     qint64 getSyncTimeNonSafe() const;
     void startSynchronizingTimeWithPeer(
         const QnUuid& peerID,
-        SocketAddress peerAddress,
-        nx_http::AuthInfoCache::AuthorizationCacheItem authData );
-    void stopSynchronizingTimeWithPeer( const QnUuid& peerID );
-    void synchronizeWithPeer( const QnUuid& peerID );
+        nx::network::SocketAddress peerAddress,
+        nx::network::http::AuthInfoCache::AuthorizationCacheItem authData);
+    void stopSynchronizingTimeWithPeer(const QnUuid& peerID);
+    void synchronizeWithPeer(const QnUuid& peerID);
     void timeSyncRequestDone(
         const QnUuid& peerID,
-        nx_http::AsyncHttpClientPtr clientPtr,
+        nx::network::http::AsyncHttpClientPtr clientPtr,
         qint64 requestRttMillis);
     TimeSyncInfo getTimeSyncInfoNonSafe() const;
     void syncTimeWithAllKnownServers(const QnMutexLockerBase& /*lock*/);
     void onBeforeSendingTransaction(
         QnTransactionTransportBase* transport,
-        nx_http::HttpHeaders* const headers);
+        nx::network::http::HttpHeaders* const headers);
     void onTransactionReceived(
         QnTransactionTransportBase* transport,
-        const nx_http::HttpHeaders& headers);
+        const nx::network::http::HttpHeaders& headers);
     void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
     void switchBackToLocalTime(QnMutexLockerBase* const /*lock*/);
     void checkSystemTimeForChange();
@@ -313,7 +390,7 @@ private:
         const TimePriorityKey& syncTimeKey);
 
 private slots:
-    void onNewConnectionEstablished(QnAbstractTransactionTransport* transport );
+    void onNewConnectionEstablished(QnAbstractTransactionTransport* transport);
     void onPeerLost(QnUuid peer, Qn::PeerType peerType);
     void onDbManagerInitialized();
     void onTimeSynchronizationSettingsChanged();

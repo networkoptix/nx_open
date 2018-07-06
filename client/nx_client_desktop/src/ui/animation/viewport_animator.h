@@ -1,8 +1,8 @@
-#ifndef QN_VIEWPORT_ANIMATOR_H
-#define QN_VIEWPORT_ANIMATOR_H
+#pragma once
 
 #include <QtCore/QObject>
-#include <ui/common/geometry.h>
+#include <QtCore/QMargins>
+#include <QtCore/QRect>
 #include <client/client_globals.h>
 #include "rect_animator.h"
 #include "viewport_geometry_accessor.h"
@@ -11,7 +11,7 @@ class QGraphicsView;
 class QMargins;
 
 class ViewportAnimator: public RectAnimator {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef RectAnimator base_type;
 
@@ -22,9 +22,9 @@ public:
      * \param view                      View that this viewport animator will be assigned to.
      * \param parent                    Parent object.
      */
-    ViewportAnimator(QObject *parent = NULL);
+    ViewportAnimator(QObject* parent = nullptr);
 
-    virtual ~ViewportAnimator();
+    virtual ~ViewportAnimator() override;
 
     /**
      * \returns                         View that this viewport animator is assigned to.
@@ -83,5 +83,3 @@ private:
     QRectF m_adjustedTargetRect;
     bool m_adjustedTargetRectValid;
 };
-
-#endif // QN_VIEWPORT_ANIMATOR_H

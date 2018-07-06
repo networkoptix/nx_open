@@ -4,6 +4,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/vms/utils/system_uri.h>
+#include <nx/utils/url.h>
 
 class QnCloudUrlHelper: public QObject
 {
@@ -15,15 +16,15 @@ public:
         nx::vms::utils::SystemUri::ReferralContext context,
         QObject* parent = nullptr);
 
-    Q_INVOKABLE QUrl mainUrl() const;
-    Q_INVOKABLE QUrl aboutUrl() const;
-    Q_INVOKABLE QUrl accountManagementUrl() const;
-    Q_INVOKABLE QUrl createAccountUrl() const;
-    Q_INVOKABLE QUrl restorePasswordUrl() const;
-    Q_INVOKABLE QUrl faqUrl() const;
-    Q_INVOKABLE QUrl viewSystemUrl() const;
+    Q_INVOKABLE nx::utils::Url mainUrl() const;
+    Q_INVOKABLE nx::utils::Url aboutUrl() const;
+    Q_INVOKABLE nx::utils::Url accountManagementUrl() const;
+    Q_INVOKABLE nx::utils::Url createAccountUrl() const;
+    Q_INVOKABLE nx::utils::Url restorePasswordUrl() const;
+    Q_INVOKABLE nx::utils::Url faqUrl() const;
+    Q_INVOKABLE nx::utils::Url viewSystemUrl() const;
 
-    Q_INVOKABLE QUrl makeUrl(const QString& path = QString(), bool auth = true) const;
+    Q_INVOKABLE nx::utils::Url makeUrl(const QString& path = QString(), bool auth = true) const;
 
 public:
     nx::vms::utils::SystemUri::ReferralSource m_source;

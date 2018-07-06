@@ -5,8 +5,8 @@
 
 #include "ui_search_bookmarks_dialog.h"
 
+#include <ini.h>
 #include <client/client_settings.h>
-
 #include <common/common_module.h>
 
 #include <core/resource/camera_bookmark_fwd.h>
@@ -37,6 +37,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &filterText
@@ -62,8 +63,8 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , utcRangeEndMs(utcFinishTimeMs)
 {
     m_ui->setupUi(m_owner);
-    m_ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
-    m_ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
+    m_ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
+    m_ui->clearFilterButton->setIcon(qnSkin->icon("text_buttons/clear.png"));
 
     m_ui->gridBookmarks->setModel(m_model);
 
@@ -82,10 +83,10 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     enum { kUpdateFilterDelayMs = 200 };
     m_ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
 
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilterText);
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::textChanged, this, updateFilterText);
+    connect(m_ui->filterLineEdit, &SearchLineEdit::enterKeyPressed, this, updateFilterText);
+    connect(m_ui->filterLineEdit, &SearchLineEdit::textChanged, this, updateFilterText);
 
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::escKeyPressed, this, [this]()
+    connect(m_ui->filterLineEdit, &SearchLineEdit::escKeyPressed, this, [this]()
     {
         m_ui->filterLineEdit->lineEdit()->setText(QString());
         m_model->setFilterText(QString());
@@ -365,7 +366,7 @@ void QnSearchBookmarksDialogPrivate::chooseCamera()
 
     if (dialog.exec() == QDialog::Accepted)
     {
-        auto selectedCameras = resourcePool()->getResources<QnVirtualCameraResource>(
+        auto selectedCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
             dialog.selectedResources());
         setCameras(selectedCameras);
         m_model->applyFilter();
@@ -389,37 +390,44 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     auto newMenu = new QMenu();
 
     /* Add suitable actions: */
-    const auto addActionToMenu = [this, newMenu, params](action::IDType id, QAction *action)
-    {
-        if (menu()->canTrigger(id, params))
-            newMenu->addAction(action);
-    };
+    const auto addActionToMenu =
+        [this, newMenu, params](action::IDType id, QAction *action)
+        {
+            if (menu()->canTrigger(id, params))
+                newMenu->addAction(action);
+        };
 
     addActionToMenu(action::OpenInNewTabAction, m_openInNewTabAction);
     addActionToMenu(action::EditCameraBookmarkAction, m_editBookmarkAction);
-    addActionToMenu(action::ExportTimeSelectionAction, m_exportBookmarkAction);
+    addActionToMenu(action::ExportVideoAction, m_exportBookmarkAction);
     addActionToMenu(action::RemoveBookmarksAction, m_removeBookmarksAction);
 
     /* Connect action signal handlers: */
-    connect(m_openInNewTabAction, &QAction::triggered, this, [this, params, window]
-    {
-        openInNewLayout(params, window);
-    });
+    connect(m_openInNewTabAction, &QAction::triggered, this,
+        [this, params, window]
+        {
+            openInNewLayout(params, window);
+        });
 
-    connect(m_editBookmarkAction, &QAction::triggered, this, [this, params]
-    {
-        menu()->triggerIfPossible(action::EditCameraBookmarkAction, params);
-    });
+    connect(m_editBookmarkAction, &QAction::triggered, this,
+        [this, params]
+        {
+            menu()->triggerIfPossible(action::EditCameraBookmarkAction, params);
+        });
 
-    connect(m_removeBookmarksAction, &QAction::triggered, this, [this, params]
-    {
-        menu()->triggerIfPossible(action::RemoveBookmarksAction, params);
-    });
+    connect(m_removeBookmarksAction, &QAction::triggered, this,
+        [this, params]
+        {
+            const auto parentWidget = QPointer<QWidget>(m_owner);
+            menu()->triggerIfPossible(action::RemoveBookmarksAction,
+                action::Parameters(params).withArgument(Qn::ParentWidgetRole, parentWidget));
+        });
 
-    connect(m_exportBookmarkAction, &QAction::triggered, this, [this, params]
-    {
-        menu()->triggerIfPossible(action::ExportTimeSelectionAction, params);
-    });
+    connect(m_exportBookmarkAction, &QAction::triggered, this,
+        [this, params]
+        {
+            menu()->triggerIfPossible(action::ExportVideoAction, params);
+        });
 
     /* Execute popup menu: */
     newMenu->exec(QCursor::pos());

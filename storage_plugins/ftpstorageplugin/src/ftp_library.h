@@ -43,7 +43,6 @@
 
     \section build_how_to Build how-to
     Use provided CMakeLists.txt project file to generate solution for your favorite build tool or IDE.
-    There is also ready to use project for visual studio users in vs2012 folder.
     There are no external dependencies used in this example. All you need to build the library is a relatively modern C++ compiler.
 
     \section usage Usage

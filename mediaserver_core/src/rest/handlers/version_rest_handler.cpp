@@ -9,12 +9,8 @@
 #include <utils/common/app_info.h>
 #include <common/static_common_module.h>
 
-int QnAppInfoRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnAppInfoRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& result, QByteArray& /*contentType*/, const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
-    Q_UNUSED(contentType)
-
     result.append(QString("<root><engineVersion>%1</engineVersion><revision>%2</revision></root>\n").arg(qnStaticCommon->engineVersion().toString()).arg(QCoreApplication::applicationVersion()).toUtf8());
     return CODE_OK;
 }

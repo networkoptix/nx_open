@@ -26,7 +26,7 @@ TEST(UnusedLayoutsWatcherTest, main)
 
     auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
 
-    ec2::ApiLayoutData apiLayout;
+    nx::vms::api::LayoutData apiLayout;
     apiLayout.id = QnUuid::createUuid();
     apiLayout.backgroundImageFilename = lit("file1.jpg");
 

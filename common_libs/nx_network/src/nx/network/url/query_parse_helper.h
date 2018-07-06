@@ -25,7 +25,7 @@ bool convertTo(const QString& src, boost::optional<T>* const dst)
 } // namespace detail
 
 /**
- * @return \a false if requested field was not found in \a urlQuery. \a true otherwise.
+ * @return false if requested field was not found in urlQuery. true otherwise.
  */
 template<typename T>
 bool deserializeField(

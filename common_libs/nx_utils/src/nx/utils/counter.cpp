@@ -26,6 +26,17 @@ Counter::ScopedIncrement::ScopedIncrement(const ScopedIncrement& right):
         m_counter->increment();
 }
 
+Counter::ScopedIncrement& Counter::ScopedIncrement::operator=(ScopedIncrement&& right)
+{
+    if (m_counter)
+        m_counter->decrement();
+
+    m_counter = right.m_counter;
+    right.m_counter = nullptr;
+
+    return *this;
+}
+
 Counter::ScopedIncrement::~ScopedIncrement()
 {
     if (m_counter)

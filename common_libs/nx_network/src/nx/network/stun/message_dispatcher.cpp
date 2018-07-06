@@ -1,6 +1,7 @@
 #include "message_dispatcher.h"
 
 namespace nx {
+namespace network {
 namespace stun {
 
 bool MessageDispatcher::registerRequestProcessor(
@@ -32,4 +33,5 @@ bool MessageDispatcher::dispatchRequest(
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

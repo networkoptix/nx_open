@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hu" sourcelanguage="en">
   <context>
+    <name>AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>NINCS ADAT</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -48,6 +55,10 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Delete bookmark</source>
       <translation>Könyvjelző törlése</translation>
+    </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation>Könyvjelző exportlása</translation>
     </message>
   </context>
   <context>
@@ -362,18 +373,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Könyvejlzők eltávolítása...</translation>
     </message>
     <message>
-      <source>Export Selected Area...</source>
-      <translation>Kijelölt terület exportálása...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>Multi-videó exportálása...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>Gyors áttekintés exportálása...</translation>
-    </message>
-    <message>
       <source>Preview Search...</source>
       <translation>Keresés előnézet...</translation>
     </message>
@@ -476,22 +475,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Hide Info</source>
       <translation>Info elrejtése</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>Felbontás változtatása...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Alacsony</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Magas</translation>
     </message>
     <message>
       <source>PTZ...</source>
@@ -706,14 +689,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Összevonás a ejelenleg csatlakoztatott rendszerrel...</translation>
     </message>
     <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>Cella képarány megváltoztatása...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>Cellaközök megváltoztatása...</translation>
-    </message>
-    <message>
       <source>None</source>
       <translation>Semmi</translation>
     </message>
@@ -873,6 +848,50 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Make Showreel</source>
       <translation>Showreel készítése</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation type="unfinished">Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation type="unfinished">New Wearable Camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>Fájl feltöltése...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>Mappa feltöltése...</translation>
+    </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation>Analitika indítása...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>Néhány kamera beállításához jelszó szükséges</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation>Video exportálása...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>Könyvjelzők exportálása...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation>Felbontás...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation>Cella képarány...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation>Cellatávolság...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -960,8 +979,66 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>A deaktiválások száma túllépte a licenc korlátokat.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>A licenchez adott média szerver hardver ID nem egyezik meg az eszköz hardver ID-vel melyhez a licencet aktiválták.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>A licenchez adott média szerver Hardver ID nem egyezik meg az eszköz Hardver ID-vel melyhez a licencet aktiválták.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>A kiválasztott beállítások átkódolást igényelnek. Ez növeli a CPU használatát, a művelet hosszabb időt vehet igénybe.</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>Az AVI formátum nem ajánlott nem folyamatos felvétel készítésére hangsávval.</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>Ennek a kamerának a felvételeit &quot;Multi Video&quot; formátumban javasoljuk kimenteni a minőség megőrzése érdekében.</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>Hosszabb videó exportálására készül. Ez több gigabájtnyi merevlemez-területet igényelhet, és több percet vesz igénybe.</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>Az exportált .EXE fájl mérete több mint 4 GB, és nem nyitható meg dupla kattintással a Windows rendszerben. Csak %1 kliensben játszható le.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>A helyi fájlok, a szervermonitor widgetek és a weboldalak nem lesznek exportálva.</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation>A beállítások nem állnak rendelkezésre .NOV és .EXE fájlokhoz.</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation>Audio video interleave</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation>Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation>MPEG-4 Part 14</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation>%1 média-fájl</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation>%1 futtatható media-fájl (x64)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation>%1 futtatható media-fájl (x86)</translation>
     </message>
   </context>
   <context>
@@ -1037,8 +1114,24 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>&quot;%1&quot; fájlt már létezik. Próbáljon más nevet.</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>&quot;%1&quot; fájlt más alkalmazás használja. Próbáljon más nevet.</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation>A &quot;%1&quot; fájlt egy másik folyamat használja.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation>&quot;%1&quot; nem írható. Próbáljon más nevet.</translation>
+    </message>
+    <message>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation type="unfinished">
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1064,10 +1157,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Túl rövid</translation>
     </message>
     <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>A jelszónak legalább 8 karakterből kell állnia.</translation>
-    </message>
-    <message>
       <source>Common</source>
       <translation>Általános</translation>
     </message>
@@ -1082,6 +1171,49 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>A jelszó csak latin betűkből, számokból és szimbólumokból állhat.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation>
+        <numerusform>A jelszónak %n különböző karaktert, szimbólumot vagy számjegyet kell tartalmaznia</numerusform>
+        <numerusform>A jelszónak %n különböző karaktert, szimbólumot vagy számjegyet kell tartalmaznia</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation>
+        <numerusform>A jelszónak legalább %n karakterből kell állnia.</numerusform>
+        <numerusform>A jelszónak legalább %n karakterből kell állnia.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>Hosszú</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation>
+        <numerusform>A jelszó nem lehet hosszabb %n karakternél.</numerusform>
+        <numerusform>A jelszó nem lehet hosszabb %n karakternél.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation>
+        <numerusform>A jelszó nem tartalmazhat %n vagy több egymást követő karaktert.</numerusform>
+        <numerusform>A jelszó nem tartalmazhat %n vagy több egymást követő karaktert.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation>
+        <numerusform>A jelszó nem tartalmazhat %n vagy több ismétlődő karaktert.</numerusform>
+        <numerusform>A jelszó nem tartalmazhat %n vagy több ismétlődő karaktert.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>A jelszó csak latin betűkből, számokból és szimbólumokból %1 állhat.</translation>
     </message>
   </context>
   <context>
@@ -1219,13 +1351,6 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>Csak-olvasható</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
@@ -1277,6 +1402,17 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Folder not found</source>
       <translation>A mappa nem található</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>Túl magasra állított minimális érték archív hossz csökkenéshez vezethet más eszközökön.</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>Túl magasra állított minimális érték archív hossz csökkenéshez vezethet más kamerákon.</translation>
     </message>
   </context>
   <context>
@@ -1665,10 +1801,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Build Number</source>
       <translation>Verziószám</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>Érvénytelen verziószám</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2097,12 +2229,31 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>I/O modulhoz nincs audio steam</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
+      <source>Settings</source>
+      <translation>Beállítások</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation type="unfinished">Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation type="unfinished">No settings</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
       <translation>I/O modul ID</translation>
     </message>
     <message>
-      <source>Camera Id</source>
+      <source>Camera ID</source>
       <translation>Kamera ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation>%1 esetében nem használható analitika</translation>
     </message>
   </context>
   <context>
@@ -2203,6 +2354,17 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Secondary</source>
       <translation>Másodlagos</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This ID is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2322,6 +2484,10 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Server</source>
       <translation>Szerver</translation>
     </message>
+    <message>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2356,12 +2522,9 @@ több könyvjelző megjelenítéséhez</translation>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>Rögzítés vagy mozgásérzékelés kikapcsolva %1</numerusform>
-        <numerusform>Rögzítés vagy mozgásérzékelés kikapcsolva %1</numerusform>
-      </translation>
+      <translation>Rögzítés vagy mozgásérzékelés kikapcsolva %1</translation>
     </message>
   </context>
   <context>
@@ -2382,13 +2545,33 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>New Password</source>
+      <translation>Új Jelszó</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation>Jelszó újra</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>A jelszavak nem egyeznek.</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation>A jelszónak legalább 8 szimbólumból kell állnia, és különböző karaktereket kell tartalmaznia.</translation>
+    </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>%1 rögzítése letiltva</numerusform>
-        <numerusform>%1 rögzítése letiltva</numerusform>
-      </translation>
+      <translation>%1 rögzítése letiltva</translation>
     </message>
   </context>
   <context>
@@ -2408,14 +2591,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>based on server time</source>
       <translation>szerveridő alapján</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>Túl magasra állított minimális érték archív hossz csökkenéshez vezethet más eszközökön.</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>Túl magasra állított minimális érték archív hossz csökkenéshez vezethet más kamerákon.</translation>
     </message>
     <message>
       <source>Not enough licenses to enable recording</source>
@@ -2460,6 +2635,18 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>Bekapcsoláshoz és paraméterezéshez kattintson a &quot;Mozgás&quot; fülre a kamerabeállítások lapon.</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>Kevesebb beállítási lehetőség</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>Több beállítási lehetőség</translation>
     </message>
   </context>
   <context>
@@ -2556,6 +2743,14 @@ több könyvjelző megjelenítéséhez</translation>
       <source>No device selected.</source>
       <translation>Nincs eszköz kiválasztva.</translation>
     </message>
+    <message>
+      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable cameras.</source>
+      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
+    </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
@@ -2606,50 +2801,61 @@ bárhonnan, bármilyen
 eszközzel</translation>
     </message>
     <message>
-      <source>Known limitations</source>
-      <translation>Ismert korlátok</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Szüntesse meg a kapcsolatot %1 felhővel</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Nyissa meg a %1 portált</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Hozzon létre %1 fiókot</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Csatlakozzon %1 felhőhöz...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Hozzon létre %1 fiókot</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Csatlakozzon %1 felhőhöz</translation>
     </message>
     <message>
-      <source>%1 is in Beta.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 Beta verzió.</translation>
+      <source>Learn more about %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Tudjon meg többet erről: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Tudjon meg többet erről: %1</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -2664,7 +2870,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Nem lehet kapcsolódni ehhez: %1</translation>
     </message>
   </context>
@@ -2695,12 +2901,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Csatlakozás %1 felhőhöz</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Csatlakozás %1 fiókhoz</translation>
     </message>
   </context>
@@ -2712,12 +2918,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>A rendszer %1 felhőhöz csatlakoztatva</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kapcsolódás %1 felhőhöz sikertelen</translation>
     </message>
   </context>
@@ -2780,7 +2986,7 @@ to %1</source>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation>Hibás Email cím vagy jelszó</translation>
+      <translation>Hibás felhasználónév cím vagy jelszó</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
@@ -2869,17 +3075,17 @@ to %1</source>
       <translation>A művelet nem engedélyezett most. Lehet, hogy a szerver éppen újraindul. Kérjük, próbálkozzon később.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>A kapcsolat %1 felhővel nem jött létre. Ellenőrizze a szerver Internetkapcsolatát vagy próbálkozzon később.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>Nem lehet kapcsolatot létesíteni a szerverrel.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>Ezt a felhasználót az adminisztrátor letiltotta.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>A kapcsolat %1 felhővel nem jött létre. Ellenőrizze a szerver Internetkapcsolatát vagy próbálkozzon később.</translation>
     </message>
   </context>
   <context>
@@ -2986,6 +3192,29 @@ to %1</source>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>Készíthet biztonsági mentést a rendszerkonfigurációkról egy esetleges későbbi hibát követő helyreállításhoz.</translation>
     </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>Ennek a kamerának a beállításához jelszó szükséges.</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation>A kiválasztott kamerák közül néhány beállításához jelszó szükséges.</translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>Kérje a rendszergazda segítségét.</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation>Jelszó beállítása</translation>
+    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
@@ -3084,26 +3313,27 @@ to %1</source>
       <translation>Szétkapcsolás</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Minden felhő felhasználó törlésre kerül.</translation>
-    </message>
-    <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Kijelentkezés a %1 felhőről sikertelen</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Megszünteti a kapcsolatot %1 felhővel?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>Erről a rendszerről le lesz választva. A helyi hálózaton keresztül helyi fiókkal újracsatlakozhat</translation>
     </message>
     <message>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kijelentkezés a %1 felhőről sikertelen</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Megszünteti a kapcsolatot %1 felhővel?</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ehhez a rendszerhez nem lehet %1 fiókkal csatlakozni miután kijelentkezett %1 rendszerből.</translation>
     </message>
   </context>
@@ -3233,6 +3463,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation>Alap</translation>
     </message>
   </context>
   <context>
@@ -3498,8 +3732,8 @@ to %1</source>
       <translation>Impulzus</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>ID</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3526,38 +3760,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>%1 I/O port bekapcsolása sikertelen</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Exportálás &quot;%1&quot; fájlba...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>%1 eszközt nem lehet exportálni.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>%1 kamerát nem lehet exportálni.</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>Ismeretlen hiba történt.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>%1 I/O modult nem lehet exportálni.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>%1 kimeneti fájl létrehozása sikertelen...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>&quot;%1&quot; fájlt más alkalmazás használja. Próbáljon más nevet.</translation>
     </message>
   </context>
   <context>
@@ -3683,6 +3885,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3713,7 +3930,7 @@ to %1</source>
       <translation>Jellemzők:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>Hardver ID-hez rendelve</translation>
     </message>
   </context>
@@ -3989,16 +4206,16 @@ to %1</source>
       <translation>Kérjük, forduljon az ügyfélszolgálathoz egy érvényes licenckulcs beszerzéséért.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz (%2)</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Ha a probléma továbbra is fennáll, kérjük, forduljon az ügyfélszolgálathoz.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Ez a licenc már aktiválva van %1 Hardver ID-hoz</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Ez a licenc már aktiválva van %1 Hardver ID-hoz (%2)</translation>
     </message>
   </context>
   <context>
@@ -4016,31 +4233,24 @@ to %1</source>
       <translation>Licencfájl megnyitása</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Minden fájl (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>A fájl megnyitása sikertelen</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a Hardver ID-t %1 címre.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Az aktivációs kulcs megküldéséhez, kérjük küldje el a licenc kulcsot és a Hardver ID-t %1 címre.</translation>
     </message>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
-    <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>Használjon analóg licenceket a %n kamera megtekintéséhez</numerusform>
-        <numerusform>Használjon analóg licenceket a %n kamera megtekintéséhez</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
@@ -4062,12 +4272,19 @@ to %1</source>
         <numerusform>Licencek használata a kiválasztott %n I/O modulhoz</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation>
+        <numerusform>Használjon licenceket a %n kamera megtekintéséhez</numerusform>
+        <numerusform>Használjon licenceket a %n kamera megtekintéséhez</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Bejelentkezés %1 felhőbe sikertelen</translation>
     </message>
   </context>
@@ -4185,12 +4402,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Bejelentkezés ide: %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Üdvözlet a %1 felhőben!</translation>
     </message>
   </context>
@@ -4300,6 +4517,17 @@ to %1</source>
       <comment>Soft Trigger</comment>
       <translation>tartsa lenyomva</translation>
     </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Ütemezés alapján letiltva</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for all %n Cameras</source>
+      <translation>
+        <numerusform>Beállítás %n kamerához</numerusform>
+        <numerusform>Beállítás %n kamerához</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4382,6 +4610,14 @@ to %1</source>
       <source>Skip</source>
       <translation>Kihagy</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>Bezár</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Állj</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4440,6 +4676,10 @@ to %1</source>
       <source>Previous Chunk</source>
       <translation>Előző szelet</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation>Az NVR kamerák nem támogatják a nem szinkronizált lejátszást</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
@@ -4454,6 +4694,25 @@ to %1</source>
     <message>
       <source>KB/s</source>
       <translation>KB/s</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation type="unfinished">Wearable Camera</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation type="unfinished">Wearable Camera %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Név</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>A név nem lehet üres</translation>
     </message>
   </context>
   <context>
@@ -4534,13 +4793,13 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>Nyugtázás</translation>
     </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>Jelszó beállítása</translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
-    <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>A teljes - kiemelt mód eléréséhez használjon másik számítógépet</translation>
-    </message>
     <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 csak a konfigurációs módban dolgozhat</translation>
@@ -4548,6 +4807,10 @@ to %1</source>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>A számítógép teljesítménye csak csak konfigurációs módban teszi lehetővé %1 futtatását.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation type="unfinished">For full-featured mode please use another computer</translation>
     </message>
   </context>
   <context>
@@ -4598,6 +4861,10 @@ to %1</source>
     <message>
       <source>Manage Bookmarks</source>
       <translation>Könyvjelzők kezelése</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation>Az értesítés addig látható lesz amíg valamelyik felhasználó, aki látja, létre nem hoz egy könyvjelzőt az eseményleírásával</translation>
     </message>
   </context>
   <context>
@@ -4801,22 +5068,6 @@ to %1</source>
       <source>Quarter Native</source>
       <translation>Natív negyede</translation>
     </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920 x 1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280 x 720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640 x 480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320 x 240</translation>
-    </message>
   </context>
   <context>
     <name>QnRecordingStatsModel</name>
@@ -5011,13 +5262,6 @@ to %1</source>
     <message>
       <source>Health Monitor</source>
       <translation>Állapotfigyelés</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnResourcePreviewWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>NINCS ADAT</translation>
     </message>
   </context>
   <context>
@@ -5416,10 +5660,6 @@ to %1</source>
       <translation>Válasszon frissítő fájlt...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Frissítő fájlok (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>Megjegyzések</translation>
     </message>
@@ -5603,6 +5843,10 @@ to %1</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>%1 inkompatibilis elem. A frissítéshez szakítsa meg a kapcsolatot %1 felhővel.</translation>
     </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
+    </message>
   </context>
   <context>
     <name>QnSessionAwareTabbedDialog</name>
@@ -5702,6 +5946,10 @@ to %1</source>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Mozgás + Alacsony felbontás&quot; opció nem állítható be.</translation>
+    </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -5854,10 +6102,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>NINCS ELÉG LICENC</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>NINCS ADAT</translation>
     </message>
@@ -5908,6 +6152,30 @@ to %1</source>
     <message>
       <source>Please check authentication information</source>
       <translation>Ellenőrizze a hitelesítési adatokat</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation>NINCS ÉLŐ KÖZVETÍTÉS</translation>
+    </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>TÚL SOK KAPCSOLAT</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>JELSZÓ SZÜKSÉGES</translation>
+    </message>
+    <message>
+      <source>Set for this Camera</source>
+      <translation>Beállítás ehhez kamerához</translation>
+    </message>
+    <message>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
     </message>
   </context>
   <context>
@@ -6002,7 +6270,7 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>Archív biztonsági mentés befejeződött &lt;/b&gt;%1&lt;/b&gt;-ig</translation>
+      <translation>Archív biztonsági mentés befejeződött &lt;b&gt;%1&lt;/b&gt;-ig</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
@@ -6051,6 +6319,14 @@ to %1</source>
     <message>
       <source>Backup completed</source>
       <translation>Biztonsági mentés kész</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Rögzítés a lekapcsolt tárolóra leáll. A lejáró felvételek továbbra is törlésre kerülnek.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>A felvétel engedélyezve volt az USB-táron</translation>
     </message>
   </context>
   <context>
@@ -6204,10 +6480,6 @@ to %1</source>
       <translation>A rendszer biztonsági módban fut</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>Tároló megtelt</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>Nincs tároló beállítva</translation>
     </message>
@@ -6252,10 +6524,6 @@ to %1</source>
       <translation>Az archív indexek újraépítését a felhasználó megszakította a következő szerveren:</translation>
     </message>
     <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>Tároló megtelt a következő szerveren:</translation>
-    </message>
-    <message>
       <source>Storage is not configured on the following Server:</source>
       <translation>Nincs tároló bállítva a következő szerveren:</translation>
     </message>
@@ -6270,16 +6538,6 @@ to %1</source>
     <message>
       <source>Connect</source>
       <translation>Kapcsolódás</translation>
-    </message>
-    <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Csatlakoztassa rendeszét %1 &amp;mdash; felhőre, hogy elérhető legen bárhonnan!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Próbálja ki %1 &amp;mdash; felhőt. Csatlakozzon rendszeréhez bárhonnan!</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6324,6 +6582,24 @@ to %1</source>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>A rögzített videók távoli szinkronizálása befejeződött a következő eszközön:</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation>Remote archive synchronization</translation>
+    </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation>Integritási hiba az archív állományban</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Csatlakoztassa rendeszét %1 &amp;mdash; felhőre, hogy elérhető legen bárhonnan!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Próbálja ki %1 &amp;mdash; felhőt. Csatlakozzon rendszeréhez bárhonnan!</translation>
     </message>
   </context>
   <context>
@@ -6386,16 +6662,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>A rendszeridő szinkronizálva van az interneten, így független a szerver helyi idejétől.</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>A rendszeridő szinkronizálva van a kiválasztott szerver helyi idejével, így független a többi szerver idejétől.</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>A szerver nem rendelkezik Internet-hozzáféréssel. Az idő nincs szinkronizálva.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation>A rendszeridő az Internettel szinkronizálva, és nem függ a helyi szerveridőtől.</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation>A rendszeridő a kiválasztott szerver idejével szinkronizálva, és nem függ a többi szerver idejétől.</translation>
     </message>
   </context>
   <context>
@@ -6411,22 +6687,22 @@ to %1</source>
     <message>
       <source>hh:mm</source>
       <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>óó:pp</translation>
+      <translation>hh:mm</translation>
     </message>
     <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>ó ap</translation>
+      <translation>h ap</translation>
     </message>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation>nn</translation>
+      <translation>dd</translation>
     </message>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation>HHHH</translation>
+      <translation>MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6466,7 +6742,7 @@ to %1</source>
     <message>
       <source>h:mm ap</source>
       <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>ó:pp ap</translation>
+      <translation>h:mm ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -6601,16 +6877,17 @@ to %1</source>
       <translation>Helyi felhasználó</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Felhő felhasználó</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>Bejelentkezés</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Szerepkör</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 user</translation>
     </message>
   </context>
   <context>
@@ -6794,7 +7071,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ez a felhasználó még nem jelentkezett be %1 felhőre</translation>
     </message>
   </context>
@@ -6803,10 +7080,6 @@ to %1</source>
     <message>
       <source>Local</source>
       <translation>Helyi</translation>
-    </message>
-    <message>
-      <source>Cloud</source>
-      <translation>Felhő</translation>
     </message>
     <message>
       <source>Login</source>
@@ -6834,7 +7107,7 @@ to %1</source>
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Az Email mező nem lehet üres.</translation>
+      <translation>Az email mező nem lehet üres.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -6849,19 +7122,20 @@ to %1</source>
       <translation>A jelszavak nem egyeznek.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>A felhő felhasználó a megadott e-mail címmel már létezik.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>A %1 felhasználó a megadott email címmel már létezik.</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Az e-mail mező nem lehet üres.</translation>
+      <translation>Az email mező nem lehet üres.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Nem érvényes Email.</translation>
+      <translation>Nem érvényes email.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -6919,6 +7193,40 @@ to %1</source>
     <message>
       <source>Muted</source>
       <translation>Némítva</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>Leállítja a feltöltés?</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation type="unfinished">Already uploaded files will be kept.</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation type="unfinished">(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Feltöltés %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation type="unfinished">Finalizing %1...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
     </message>
   </context>
   <context>
@@ -7011,188 +7319,13 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Nem sikerült csatlakozni a szerverhez. A videofal be lesz zárva.</translation>
     </message>
-  </context>
-  <context>
-    <name>QnWorkbenchExportHandler</name>
     <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>%1 futtatható media fájl (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>%1 futtatható media fájl (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>Elrendezés exportálása</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>Video exportálása mint...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>Időbélyegek:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>Video exportálása</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>Exportálás &quot;%1&quot; fájlba...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>Elrendezés mentése mint...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 media fájl (*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>Szűrők alkalmazása: Elforgatás, Kiterítés, Kép javítás, Egyedi képarány (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>exportálva</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>Nincs időbélyeg</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>Bal felső sarok (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>Jobb felső sarok (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>Bal alsó sarok (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>Jobb alsó sarok (átkódolás szükséges)</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>Helyi elrendezés mentése mint...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>Csak olvasható fájl készítése.</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>A fájl már rögzítésre használatban</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>Kérjük, válasszon egy másik nevet, vagy várjon, amíg a rögzítés befejeződik.</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>Hosszú videó exportálására készül</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>Több mint egy GB tárhelyet is igényelhet és több percig is eltarthat.</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>Mindenképpen exportálja?</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>Mindenképpen exportálja AVI-ba?</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>A kiválasztott formátum nem ajánlott</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>A minőség megőrzése érdekében NOV vagy EXE formátum használata ajánlott.</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>Exportálás transzkódolással?</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>Megnöveli a CPU használatot és hosszú ideig tarthat.</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>EXE formátum nem ajánlott</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>Mindenképpen exportálja EXE-be?</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>Multi-videó exportálása nem sikerült</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>Helyi videók multi videós exportálása nem támogatott</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>Távolítson el minden helyi fájlt az elrendezésből.</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>Exportálás</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>Sok videó exportálására készül</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>Túl rövid időtartam van kiválasztva</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>Gyors áttekintés exportálásához a videó hossza legalább 10 másodperc kell, hogy legyen.</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>Exportálás elkészült</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>Exportálás sikertelen</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>AVI formátum nem ajánlott</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>Nem-folyamatos videó exportálásához MKV, vagy valami más formátum ajánlott.</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>4 GB-nál nagyobb EXE Windows korlátok miatt nem lesz megnyitható két kattintással.</translation>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
-    <message>
-      <source>Enter Password...</source>
-      <translation>Jelszó megadása...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>Adminisztrátor jelszó</translation>
-    </message>
     <message>
       <source>Systems will be merged shortly</source>
       <translation>A rendszer hamarosan összevonásra kerül</translation>
@@ -7214,14 +7347,6 @@ to %1</source>
       <translation>A licencek száma csökkenni fog</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>A jelszó mező nem lehet üres.</translation>
-    </message>
-    <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Felhő rendszerek nem vonhatók össze</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Csatlakozás a jelenlegi rendszerhez...</translation>
     </message>
@@ -7232,6 +7357,19 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>A szerver rövidesen csatlakozik a rendszerhez</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>Jelszó megadása...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>Adminisztrátor jelszó</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7476,6 +7614,163 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>Minden fájl (*.*)</translation>
+    </message>
+    <message>
+      <source>Video (%1)</source>
+      <translation type="unfinished">Video (%1)</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recordings...</source>
+      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+    </message>
+    <message>
+      <source>Failed to add wearable camera</source>
+      <translation type="unfinished">Failed to add wearable camera</translation>
+    </message>
+    <message>
+      <source>No video files found in selected folder</source>
+      <translation type="unfinished">No video files found in selected folder</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation type="unfinished">
+        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>Selected file formats are not supported</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation type="unfinished">
+        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>Selected files do not have timestamps</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation type="unfinished">
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation type="unfinished">
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Selected files will not be uploaded</source>
+      <translation type="unfinished">Selected files will not be uploaded</translation>
+    </message>
+    <message>
+      <source>Some files will not be uploaded</source>
+      <translation type="unfinished">Some files will not be uploaded</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation type="unfinished">No new files to upload in selected folder</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation type="unfinished">
+        <numerusform>Selected files are too old</numerusform>
+        <numerusform>Selected files are too old</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation type="unfinished">
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation type="unfinished">
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation type="unfinished">
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation type="unfinished">Upload anyway?</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation type="unfinished">Could not finish upload to %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <translation type="unfinished">%1 has unsupported format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation type="unfinished">%1 does not have timestamp.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
@@ -7663,6 +7958,21 @@ to %1</source>
         <numerusform>Eltávolít %n elemet a showreelből?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>Leállítja a feltöltés?</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Állj</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
+      <translation type="unfinished">
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
@@ -7702,6 +8012,393 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation>Dinamikus</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>Nem támogatott média az adat exportáláshoz.</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>A kiválasztott formátumot nem támogatja az FFMPEG könyvtár.</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>FFMPEG könyvtár hiba.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>Video vagy audio kodek nem kompatibilis a választott formátummal.</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>Fájlírási hiba történt.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Nincs exportált adat.</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>Belső hiba</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>exportálva</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exportálás</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>Gyors áttekintés</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>Beállítások exportálása</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>Időbélyeg hozzáadása</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>Időbélyeg törlése</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>Időbélyeg</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>Kép hozzáadása</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>Kép törlése</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>Kép</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>Szöveg hozzáadása</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>Szöveg törlése</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>Szöveg</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>Sebesség visszaállítása</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>Könyvjelző info hozzáadása</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>Könyvjelző info törlése</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>Könyvjelző info</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>Mappa</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Név</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>A név nem lehet üres.</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Mappa választása...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>Fájl kiválasztása...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation>(%1) kép</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>Hiba</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>Nem tölthető be a kép.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>NINCS ADAT</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>NEM KAMERA</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Alacsony</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Magas</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Egyéni</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>A teljesítmény javításához állítsa be az elrendezés felbontását &quot;Auto&quot; értékre.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation>
+        <numerusform>Gyors áttekintés exportálásához a videó hossza legalább %n másodperc kell, hogy legyen.</numerusform>
+        <numerusform>Gyors áttekintés exportálásához a videó hossza legalább %n másodperc kell, hogy legyen.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation>Hosszú</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>Túl rövid</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation type="unfinished">Could not create upload on the server side</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation type="unfinished">Could not upload file chunk to the server</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation type="unfinished">Could not check uploaded file on the server</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>Failed to send request to the server.</source>
+      <translation type="unfinished">Failed to send request to the server.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation>%1 analitika</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation>Export leállítása</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>Exportálás elkészült</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>Sikertelen exportálás</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation>Nem lehet írni a fájlt</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>A %1 más export által használva.</translation>
+    </message>
+    <message>
+      <source>Selected period cannot be exported for the current camera.</source>
+      <translation>A kiválasztott időszak nem exportálható az aktuális kamera számára.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>&quot;%1&quot; fájlt más alkalmazás használja. Próbáljon más nevet.</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>%1 kimeneti fájl létrehozása sikertelen...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>Ismeretlen hiba történt.</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>Exportálás &quot;%1&quot; fájlba...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>%1 eszközt nem lehet exportálni.</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>%1 kamerát nem lehet exportálni.</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>%1 I/O modult nem lehet exportálni.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>%1 futtatható media fájl (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>%1 futtatható media fájl (x86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>A fájl már rögzítésre használatban</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>Kérjük, válasszon egy másik nevet, vagy várjon, amíg a rögzítés befejeződik.</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>Elrendezés exportálása</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>EXE formátum nem ajánlott</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>4 GB-nál nagyobb EXE Windows korlátok miatt nem lesz megnyitható két kattintással.</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>Mindenképpen exportálja EXE-be?</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>Multi-videó exportálása nem sikerült</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>Helyi videók multi videós exportálása nem támogatott</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>Távolítson el minden helyi fájlt az elrendezésből.</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>Helyi elrendezés mentése mint...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>exportálva</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 media fájl (*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>Csak olvasható fájl készítése.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>Exportálás</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation>Nincsenek támogatott eseménytípusok</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation>Ez az esemény akkor aktiválódik, ha az Analitikai Esemény minden feltételnek megfelel. Ha a kulcsszó mező üres, minden esetben megfelel. Ha nem, akkor felel meg ha a vonatkozó mező tartalmazza valamelyik kulcsszót.</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
       <source>Copy</source>
@@ -7730,13 +8427,6 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Beillesztve</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>NINCS ADAT</translation>
     </message>
   </context>
   <context>
@@ -7775,20 +8465,20 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
-      <source>Stop Layout Tour</source>
-      <translation type="unfinished">Stop Layout Tour</translation>
-    </message>
-    <message>
       <source>Stop Showreel</source>
       <translation>Showreel leállítása</translation>
     </message>
     <message>
-      <source>Start Layout Tour</source>
-      <translation type="unfinished">Start Layout Tour</translation>
-    </message>
-    <message>
       <source>Start Showreel</source>
       <translation>Showreel indítása</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>Túra leállítása</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Túra indítása</translation>
     </message>
   </context>
   <context>
@@ -8045,6 +8735,18 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>Nem sikerült megnyitni a szerver weboldalt</translation>
     </message>
+    <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
+    </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation>A jelszó módosítása sikertelen</translation>
+    </message>
+    <message>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation>A jelszó megváltoztatása sikertelen %2/%1 kamerán</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -8053,8 +8755,8 @@ to %1</source>
       <translation>Elrendezések váltásához használja a nyilakat. Kilépés a showreelből az Esc billentyűvel.</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>Nyomjon meg egy gombot a túra megállításához.</translation>
     </message>
   </context>
   <context>
@@ -8075,16 +8777,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>%1 elrendezés túra törlése?</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>%1 showreel</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

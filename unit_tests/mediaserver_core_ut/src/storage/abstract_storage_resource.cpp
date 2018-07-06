@@ -36,41 +36,46 @@
 
 #include <core/resource_management/resource_properties.h>
 #include <test_support/utils.h>
-#include <media_server/media_server_module.h>
 
-namespace
-{
+#include "media_server_module_fixture.h"
 
-class AbstractStorageResourceTest: public ::testing::Test, public QnMediaServerModule
+namespace {
+
+class AbstractStorageResourceTest:
+    public MediaServerModuleFixture
 {
-public:
-    AbstractStorageResourceTest():
-        QnMediaServerModule()
-    {
-    }
+    using base_type = MediaServerModuleFixture;
+
 protected:
+    virtual void TearDown() override
+    {
+        qnNormalStorageMan->stopAsyncTasks();
+        qnBackupStorageMan->stopAsyncTasks();
+    }
 
     virtual void SetUp() override
     {
+        base_type::SetUp();
+
         prepare();
 
         ASSERT_TRUE((bool)workDirResource.getDirName());
 
         QString fileStorageUrl = *workDirResource.getDirName();
-        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), fileStorageUrl));
+        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), fileStorageUrl));
         fileStorage->setUrl(fileStorageUrl);
         ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate() == Qn::StorageInit_Ok);
         qnNormalStorageMan->addStorage(fileStorage);
 
         if (!nx::ut::cfg::configInstance().ftpUrl.isEmpty())
         {
-            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), nx::ut::cfg::configInstance().ftpUrl, false));
+            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), nx::ut::cfg::configInstance().ftpUrl, false));
             EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate() == Qn::StorageInit_Ok) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
         }
 
         if (!nx::ut::cfg::configInstance().smbUrl.isEmpty())
         {
-            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), nx::ut::cfg::configInstance().smbUrl));
+            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(serverModule().commonModule(), nx::ut::cfg::configInstance().smbUrl));
             EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate() == Qn::StorageInit_Ok);
             smbStorage->setUrl(smbStorageUrl);
             qnNormalStorageMan->addStorage(smbStorage);
@@ -82,16 +87,14 @@ protected:
         this->ftpStorageUrl = nx::ut::cfg::configInstance().ftpUrl;
         this->smbStorageUrl = nx::ut::cfg::configInstance().smbUrl;
 
-        commonModule()->setModuleGUID(QnUuid("6F789D28-B675-49D9-AEC0-CEFFC99D674E"));
-
-        pluginManager = std::unique_ptr<PluginManager>( new PluginManager);
+        pluginManager = std::unique_ptr<PluginManager>( new PluginManager(nullptr));
 
         platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
-        PluginManager::instance()->loadPlugins(roSettings());
+        pluginManager->loadPlugins(serverModule().roSettings());
 
-        for (const auto storagePlugin : PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+        for (const auto storagePlugin : pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         {
             QnStoragePluginFactory::instance()->registerStoragePlugin(
                 storagePlugin->storageType(),
@@ -367,7 +370,7 @@ StorageDistributionMap getStorageDistribution(
 
     StorageDistributionMap result;
     for (const auto& p: selectionsData)
-        result.emplace(p.first, p.second / (double)iterations);
+        result.emplace(p.first, p.second / (double) iterations);
 
     return result;
 }
@@ -387,8 +390,8 @@ protected:
 
 TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceNotKnown)
 {
-    spaceInfo.storageRebuilded(0, 50, 20, 10);
-    spaceInfo.storageRebuilded(1, 30, 20, 10);
+    spaceInfo.storageChanged(0, 50, 20, 10);
+    spaceInfo.storageChanged(1, 30, 20, 10);
 
     /* no storage rebulded call for the third storage. getOptimalStorageIndex() should be
     *  equally distributed
@@ -401,9 +404,9 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceNotKnown)
 
 TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown)
 {
-    spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
-    spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
-    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40
+    spaceInfo.storageChanged(0, 50, 20, 10); // Es = 70
+    spaceInfo.storageChanged(1, 30, 20, 10); // Es = 50
+    spaceInfo.storageChanged(2, 10, 30, 10); // Es = 40
 
     /* Total Es = 160 => 0 - 0.4375, 1 - 0.3125, 2 - 0.25 */
 
@@ -415,9 +418,9 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown)
 
 TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_OneRemoved)
 {
-    spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
-    spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
-    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40, This will be removed
+    spaceInfo.storageChanged(0, 50, 20, 10); // Es = 70
+    spaceInfo.storageChanged(1, 30, 20, 10); // Es = 50
+    spaceInfo.storageChanged(2, 10, 30, 10); // Es = 40, This will be removed
 
     /* Total Es = 120 => 0 - 0.5833, 1 - 0.4166 */
 
@@ -432,13 +435,35 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_OneRemoved)
 
 TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_NotAllAllowed)
 {
-    spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
-    spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
-    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40. This won't be allowed
+    spaceInfo.storageChanged(0, 50, 20, 10); // Es = 70
+    spaceInfo.storageChanged(1, 30, 20, 10); // Es = 50
+    spaceInfo.storageChanged(2, 10, 30, 10); // Es = 40. This won't be allowed
     /* Total Es = 120 => 0 - 0.5833, 1 - 0.4166 */
 
     auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1});
     ASSERT_EQ(storageDistribution.find(2), storageDistribution.cend());
     ASSERT_LT(storageDistribution[0] - 0.5833, 0.05);
     ASSERT_LT(storageDistribution[1] - 0.4166, 0.05);
+}
+
+TEST_F(StorageBalancingAlgorithmTest, NegativeEffectiveSpace_oneStorage_notCountedAsValid)
+{
+    spaceInfo.storageChanged(0, 10, 0, 30); // fs + nxs < sc => should not be ever selected
+    spaceInfo.storageChanged(1, 50, 10, 30);
+    spaceInfo.storageChanged(2, 50, 10, 30);
+
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
+    ASSERT_EQ(storageDistribution.find(0), storageDistribution.cend());
+}
+
+TEST_F(StorageBalancingAlgorithmTest, NegativeEffectiveSpace_everyStorage)
+{
+    spaceInfo.storageChanged(0, 10, 0, 30);
+    spaceInfo.storageChanged(1, 10, 0, 30);
+    spaceInfo.storageChanged(2, 10, 0, 30);
+
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
+    ASSERT_EQ(storageDistribution.find(2), storageDistribution.cend());
+    ASSERT_EQ(storageDistribution.find(1), storageDistribution.cend());
+    ASSERT_EQ(storageDistribution.find(0), storageDistribution.cend());
 }

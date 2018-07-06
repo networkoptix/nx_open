@@ -231,7 +231,7 @@ void QnSystemDescription::setName(const QString& value)
     emit systemNameChanged();
 }
 
-void QnSystemDescription::setServerHost(const QnUuid& serverId, const QUrl& host)
+void QnSystemDescription::setServerHost(const QnUuid& serverId, const nx::utils::Url& host)
 {
     const bool containsServer = m_servers.contains(serverId);
 
@@ -252,7 +252,7 @@ void QnSystemDescription::setServerHost(const QnUuid& serverId, const QUrl& host
     emit serverChanged(serverId, QnServerField::Host);
 }
 
-QUrl QnSystemDescription::getServerHost(const QnUuid& serverId) const
+nx::utils::Url QnSystemDescription::getServerHost(const QnUuid& serverId) const
 {
     NX_ASSERT(m_servers.contains(serverId), Q_FUNC_INFO,
         "System does not contain specified server");

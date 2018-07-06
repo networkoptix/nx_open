@@ -39,15 +39,20 @@ QString QnAdamResource::getDriverName() const
     return kManufacture;
 }
 
-CameraDiagnostics::Result QnAdamResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnAdamResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex streamIndex)
 {
-    QnSecurityCamResource::initInternal();
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
 
+CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
+{
     QUrl url(getUrl());
     auto host  = url.host();
     auto port = url.port(nx::modbus::kDefaultModbusPort);
 
-    SocketAddress endpoint(host, port);
+    nx::network::SocketAddress endpoint(host, port);
 
     nx::modbus::QnModbusClient testClient(endpoint);
 
@@ -75,6 +80,10 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
     QnIOPortDataList outputPorts = getRelayOutputList();
     allPorts.insert(allPorts.begin(), outputPorts.begin(), outputPorts.end());
 
+    m_portTypes.clear();
+    for (const auto& port: allPorts)
+        m_portTypes[port.id] = port.portType;
+
     setPortDefaultStates();
     setIOPorts(allPorts);
     setCameraCapabilities(caps);
@@ -90,7 +99,6 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 
 bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
 {
-    QN_UNUSED(completionHandler);
     if (!m_ioManager)
         return false;
 
@@ -102,11 +110,24 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
 
         bool isActive = nx_io_managment::isActiveIOPortState(inputState);
 
-        emit cameraInput(
-            toSharedPointer(),
-            portId,
-            isActive != isDefaultPortStateActive,
-            qnSyncTime->currentUSecsSinceEpoch());
+        const auto ioPortType = portType(portId);
+
+        if (ioPortType == Qn::PT_Input)
+        {
+            emit cameraInput(
+                toSharedPointer(),
+                portId,
+                isActive != isDefaultPortStateActive,
+                qnSyncTime->currentUSecsSinceEpoch());
+        }
+        else if (ioPortType == Qn::PT_Output)
+        {
+            emit cameraOutput(
+                toSharedPointer(),
+                portId,
+                isActive != isDefaultPortStateActive,
+                qnSyncTime->currentUSecsSinceEpoch());
+        }
     };
 
     auto networkIssueHandler = [this](QString reason, bool isFatal)
@@ -114,7 +135,7 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
         emit networkIssue(
             toSharedPointer(this),
             qnSyncTime->currentUSecsSinceEpoch(),
-            nx::vms::event::EventReason::networkNoResponseFromDevice,
+            nx::vms::api::EventReason::networkNoResponseFromDevice,
             QString());
 
         if (isFatal)
@@ -283,7 +304,7 @@ bool QnAdamResource::setRelayOutputState(
     return m_ioManager->setOutputPortState(outputId, isActive);
 }
 
-void QnAdamResource::at_propertyChanged(const QnResourcePtr &res, const QString &key)
+void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString& key)
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {
@@ -296,6 +317,15 @@ void QnAdamResource::at_propertyChanged(const QnResourcePtr &res, const QString 
 
 void QnAdamResource::setIframeDistance(int /*frames*/, int /*timeMs*/)
 {
+}
+
+Qn::IOPortType QnAdamResource::portType(const QString& portId) const
+{
+    const auto itr = m_portTypes.find(portId);
+    if (itr == m_portTypes.cend())
+        return Qn::PT_Unknown;
+
+    return itr->second;
 }
 
 #endif //< ENABLE_ADVANTECH

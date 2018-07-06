@@ -5,6 +5,8 @@
 
 #include <ui/animation/variant_animator.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 /* There should be no horizontal clipping therefore this margin

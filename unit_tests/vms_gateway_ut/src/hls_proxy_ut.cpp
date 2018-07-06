@@ -1,6 +1,6 @@
 #include "test_setup.h"
 
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/hls/hls_types.h>
 #include <nx/network/http/http_client.h>
@@ -61,7 +61,8 @@ public:
 
     ~HlsProxy()
     {
-        SocketFactory::setCreateStreamSocketFunc(std::move(m_socketFactoryBak));
+        nx::network::SocketFactory::setCreateStreamSocketFunc(
+            std::move(m_socketFactoryBak));
     }
 
 protected:
@@ -72,20 +73,20 @@ protected:
 
     void whenReceivedHlsPlaylistViaProxy()
     {
-        nx_http::BufferType msgBody;
-        nx_http::StringType contentType;
-        ASSERT_TRUE(nx_http::HttpClient::fetchResource(
-            playlistProxyUrl(), &msgBody, &contentType));
+        nx::network::http::BufferType msgBody;
+        nx::network::http::StringType contentType;
+        ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
+            playlistProxyUrl(), &msgBody, &contentType, nx::network::kNoTimeout));
         ASSERT_TRUE(m_receivedPlaylist.parse(msgBody));
     }
 
     void thenPlaylistItemIsAvailableThroughProxy()
     {
-        QUrl chunkUrl;
+        nx::utils::Url chunkUrl;
         for (const auto& entry: m_receivedPlaylist.entries)
         {
             if (entry.type == network::m3u::EntryType::location)
-                chunkUrl = QUrl(entry.value);
+                chunkUrl = nx::utils::Url(entry.value);
         }
 
         if (chunkUrl.host().isEmpty())
@@ -95,10 +96,10 @@ protected:
             chunkUrl.setScheme("http");
         }
 
-        nx_http::BufferType msgBody;
-        nx_http::StringType contentType;
-        ASSERT_TRUE(nx_http::HttpClient::fetchResource(
-            chunkUrl, &msgBody, &contentType));
+        nx::network::http::BufferType msgBody;
+        nx::network::http::StringType contentType;
+        ASSERT_TRUE(nx::network::http::HttpClient::fetchResource(
+            chunkUrl, &msgBody, &contentType, nx::network::kNoTimeout));
 
         ASSERT_EQ(kHlsChunkContents, msgBody);
         ASSERT_EQ(kHlsChunkContentType, contentType);
@@ -110,7 +111,7 @@ protected:
         {
             if (entry.type != network::m3u::EntryType::location)
                 continue;
-            QString chunkProxyPath = QUrl(entry.value).path();
+            QString chunkProxyPath = nx::utils::Url(entry.value).path();
             const auto pathParts = chunkProxyPath.split('/', QString::SkipEmptyParts);
             const auto targetHostName = pathParts[1];
             ASSERT_EQ(m_hlsServerFullCloudName, targetHostName);
@@ -118,12 +119,12 @@ protected:
     }
 
 private:
-    TestHttpServer m_hlsServer;
+    nx::network::http::TestHttpServer m_hlsServer;
     nx::network::m3u::Playlist m_receivedPlaylist;
     QString m_hlsServerFullCloudName;
     QString m_cloudSystemId;
     QString m_cloudServerId;
-    SocketFactory::CreateStreamSocketFuncType m_socketFactoryBak;
+    nx::network::SocketFactory::CreateStreamSocketFuncType m_socketFactoryBak;
     bool m_sslEnabled = false;
 
     virtual void SetUp() override
@@ -149,7 +150,7 @@ private:
             m_cloudSystemId,
             m_hlsServer.serverAddress());
 
-        m_socketFactoryBak = SocketFactory::setCreateStreamSocketFunc(
+        m_socketFactoryBak = nx::network::SocketFactory::setCreateStreamSocketFunc(
             std::bind(&HlsProxy::createStreamSocket, this, _1, _2));
 
         m_hlsServer.registerStaticProcessor(
@@ -157,28 +158,28 @@ private:
             kHlsChunkContents,
             kHlsChunkContentType);
 
-        nx_hls::Chunk hlsChunk;
+        mediaserver::hls::Chunk hlsChunk;
         hlsChunk.duration = 10;
         hlsChunk.url = lm("%1").arg(kHlsChunkPath);
 
-        nx_hls::Playlist playlist;
+        mediaserver::hls::Playlist playlist;
         playlist.closed = true;
         playlist.chunks.push_back(hlsChunk);
 
         m_hlsServer.registerStaticProcessor(
             kHlsPlaylistPath,
             playlist.toString(),
-            nx_http::kAudioMpegUrlMimeType);
+            nx::network::http::kAudioMpegUrlMimeType);
     }
 
-    QUrl playlistProxyUrl() const
+    nx::utils::Url playlistProxyUrl() const
     {
-        return QUrl(lm("http://%1/%2%3")
+        return nx::utils::Url(lm("http://%1/%2%3")
             .arg(moduleInstance()->impl()->httpEndpoints()[0])
             .arg(m_cloudSystemId).arg(kHlsPlaylistPath));
     }
 
-    std::unique_ptr<AbstractStreamSocket> createStreamSocket(
+    std::unique_ptr<nx::network::AbstractStreamSocket> createStreamSocket(
         bool sslRequired,
         nx::network::NatTraversalSupport /*natTraversalRequired*/)
     {

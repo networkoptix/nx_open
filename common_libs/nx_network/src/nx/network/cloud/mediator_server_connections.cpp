@@ -5,10 +5,10 @@ namespace hpm {
 namespace api {
 
 MediatorServerTcpConnection::MediatorServerTcpConnection(
-    std::shared_ptr<nx::stun::AbstractAsyncClient> stunClient,
+    std::shared_ptr<nx::network::stun::AbstractAsyncClient> stunClient,
     AbstractCloudSystemCredentialsProvider* connector)
 :
-    MediatorServerConnection<stun::AsyncClientUser>(
+    MediatorServerConnection<network::stun::AsyncClientUser>(
         std::move(stunClient), connector)
 {
 }
@@ -23,8 +23,8 @@ void MediatorServerTcpConnection::setOnConnectionRequestedHandler(
     std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler)
 {
     setIndicationHandler(
-        nx::stun::extension::indications::connectionRequested,
-        [handler = std::move(handler)](nx::stun::Message msg)
+        nx::network::stun::extension::indications::connectionRequested,
+        [handler = std::move(handler)](nx::network::stun::Message msg)
         {
             ConnectionRequestedEvent indicationData;
             indicationData.parse(msg);

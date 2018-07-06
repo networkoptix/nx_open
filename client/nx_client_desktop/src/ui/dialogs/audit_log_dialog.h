@@ -15,20 +15,16 @@
 class QnAuditLogMasterModel;
 class QnAuditLogDetailModel;
 class QnAuditItemDelegate;
-class QnTableView;
 class QnAuditLogModel;
 class QLabel;
 
-namespace Ui
-{
-    class AuditLogDialog;
-}
+namespace Ui { class AuditLogDialog; }
+namespace nx { namespace client { namespace desktop { class TableView; }}}
 
 class QnAuditLogDialog: public QnSessionAwareDialog
 {
     Q_OBJECT
-
-    typedef QnSessionAwareDialog base_type;
+    using base_type = QnSessionAwareDialog;
 
 public:
     explicit QnAuditLogDialog(QWidget* parent);
@@ -74,7 +70,7 @@ private:
     void setupCamerasGrid();
     void setupDetailsGrid();
 
-    void setupGridCommon(QnTableView* grid, bool master);
+    void setupGridCommon(nx::client::desktop::TableView* grid, bool master);
 
     QnAuditRecordRefList filterChildDataBySessions(const QnAuditRecordRefList& checkedRows);
     QnAuditRecordRefList filterChildDataByCameras(const QnAuditRecordRefList& checkedRows);
@@ -84,8 +80,8 @@ private:
     QnAuditRecordRefList applyFilter();
     void makeSessionData();
     void makeCameraData();
-    void setupContextMenu(QnTableView* gridMaster);
-    QnTableView* currentGridView() const;
+    void setupContextMenu(nx::client::desktop::TableView* gridMaster);
+    nx::client::desktop::TableView* currentGridView() const;
 
     void retranslateUi();
 

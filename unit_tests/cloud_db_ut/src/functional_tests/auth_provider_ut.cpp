@@ -1,15 +1,10 @@
-/**********************************************************
-* Oct 19, 2015
-* akolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include "test_setup.h"
 
-
 namespace nx {
 namespace cdb {
+namespace test {
 
 class AuthProvider: public CdbFunctionalTest {};
 
@@ -49,5 +44,6 @@ TEST_F(AuthProvider, nonce)
         getCdbNonce(account2.email, account2Password, system1.id, &nonceData));
 }
 
-}   //cdb
-}   //nx
+} // namespace test
+} // namespace cdb
+} // namespace nx

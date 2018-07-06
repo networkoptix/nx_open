@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('cloudAPI', function ($http, $q) {
+    .factory('cloudAPI', ['$http', '$q', function ($http, $q) {
         return {
             login:function(email, password){
                 return $http.post(Config.cloud.portalUrl + Config.cloud.apiUrl + '/account/login',{
@@ -41,4 +41,4 @@ angular.module('webadminApp')
                 return deferred.promise;
             }
         };
-    });
+    }]);

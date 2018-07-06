@@ -9,10 +9,10 @@ namespace settings {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LastConnectionData, (json), LastConnectionData_Fields)
 
-QUrl LastConnectionData::urlWithCredentials() const
+nx::utils::Url LastConnectionData::urlWithCredentials() const
 {
     if (!url.isValid())
-        return QUrl();
+        return nx::utils::Url();
 
     auto result = url;
     result.setUserName(credentials.user);

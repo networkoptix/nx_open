@@ -32,12 +32,13 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <nx/client/desktop/utils/server_notification_cache.h>
-#include <utils/common/qtimespan.h>
-#include <utils/email/email.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <utils/media/audio_player.h>
 
 using namespace nx;
+
+using nx::vms::api::EventType;
+using nx::vms::api::ActionType;
 
 namespace {
 
@@ -77,15 +78,15 @@ QSet<QnUuid> toIds(const QnResourceList& resources)
     return result;
 }
 
-QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::event::EventType eventType)
+QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::api::EventType eventType)
 {
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
     if (vms::event::requiresCameraResource(eventType))
-        return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));
 
     if (vms::event::requiresServerResource(eventType))
-        return toIds(resourcePool->getResources<QnMediaServerResource>(ids));
+        return toIds(resourcePool->getResourcesByIds<QnMediaServerResource>(ids));
 
     return QSet<QnUuid>();
 }
@@ -99,14 +100,14 @@ QSet<QnUuid> filterSubjectIds(const IDList& ids)
     return toIds(users).unite(roles.toSet());
 }
 
-QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, vms::event::ActionType actionType)
+QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, vms::api::ActionType actionType)
 {
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
     if (vms::event::requiresCameraResource(actionType))
-        return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids));
 
-    if (requiresUserResource(actionType))
+    if (vms::event::requiresUserResource(actionType))
         return filterSubjectIds(ids);
 
     return QSet<QnUuid>();
@@ -116,7 +117,7 @@ QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, vms::event::ActionTy
 *  This method must cleanup all action parameters that are not required for the given action.
 *  // TODO: #GDM implement correct filtering
 */
-vms::event::ActionParameters filterActionParams(vms::event::ActionType actionType, const vms::event::ActionParameters &params)
+vms::event::ActionParameters filterActionParams(vms::api::ActionType actionType, const vms::event::ActionParameters &params)
 {
     Q_UNUSED(actionType);
     return params;
@@ -146,9 +147,9 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     QnWorkbenchContextAware(parent),
     m_id(QnUuid::createUuid()),
     m_modified(false),
-    m_eventType(vms::event::cameraDisconnectEvent),
-    m_eventState(vms::event::EventState::undefined),
-    m_actionType(vms::event::showPopupAction),
+    m_eventType(EventType::cameraDisconnectEvent),
+    m_eventState(vms::api::EventState::undefined),
+    m_actionType(ActionType::showPopupAction),
     m_aggregationPeriodSec(defaultAggregationPeriodSec),
     m_disabled(false),
     m_eventTypesModel(new QStandardItemModel(this)),
@@ -156,18 +157,35 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     m_actionTypesModel(new QStandardItemModel(this)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
+    auto addEventItem =
+        [this](vms::api::EventType eventType)
+        {
+            auto item = new QStandardItem(m_helper->eventName(eventType));
+            item->setData(eventType);
+            m_eventTypesModel->appendRow(item);
+        };
+
+    auto addSeparator =
+        [](QStandardItemModel* model)
+        {
+            auto item = new QStandardItem(lit("-"));
+            item->setData(lit("separator"), Qt::AccessibleDescriptionRole);
+            model->appendRow(item);
+        };
+
+    using EventSubType = QnBusinessTypesComparator::EventSubType;
+
     QnBusinessTypesComparator lexComparator(true);
-    for (vms::event::EventType eventType : lexComparator.lexSortedEvents())
-    {
-        QStandardItem *item = new QStandardItem(m_helper->eventName(eventType));
-        item->setData(eventType);
+    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::user))
+        addEventItem(eventType);
+    addSeparator(m_eventTypesModel);
+    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::failure))
+        addEventItem(eventType);
+    addSeparator(m_eventTypesModel);
+    for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::success))
+        addEventItem(eventType);
 
-        QList<QStandardItem *> row;
-        row << item;
-        m_eventTypesModel->appendRow(row);
-    }
-
-    for (vms::event::ActionType actionType : lexComparator.lexSortedActions())
+    for (vms::api::ActionType actionType : lexComparator.lexSortedActions())
     {
         QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
         item->setData(actionType);
@@ -231,7 +249,7 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
                 case Column::action:
                     return m_actionType;
                 case Column::target:
-                    if (m_actionType == vms::event::sendMailAction)
+                    if (m_actionType == ActionType::sendMailAction)
                         return m_actionParams.emailAddress;
                     break;
                 case Column::aggregation:
@@ -255,13 +273,15 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
 
         case Qn::EventTypeRole:
             return qVariantFromValue(m_eventType);
+        case Qn::EventParametersRole:
+            return qVariantFromValue(m_eventParams);
         case Qn::EventResourcesRole:
             return qVariantFromValue(filterEventResources(m_eventResources, m_eventType));
         case Qn::ActionTypeRole:
             return qVariantFromValue(m_actionType);
         case Qn::ActionResourcesRole:
         {
-            auto ids = m_actionType != vms::event::showPopupAction
+            auto ids = m_actionType != ActionType::showPopupAction
                 ? filterActionResources(m_actionResources, m_actionType)
                 : filterSubjectIds(m_actionParams.additionalResources);
 
@@ -292,11 +312,11 @@ bool QnBusinessRuleViewModel::setData(Column column, const QVariant& value, int 
     switch (column)
     {
         case Column::event:
-            setEventType((vms::event::EventType)value.toInt());
+            setEventType((vms::api::EventType)value.toInt());
             return true;
 
         case Column::action:
-            setActionType((vms::event::ActionType)value.toInt());
+            setActionType((vms::api::ActionType)value.toInt());
             return true;
 
         case Column::source:
@@ -319,7 +339,7 @@ bool QnBusinessRuleViewModel::setData(Column column, const QVariant& value, int 
 
             switch (m_actionType)
             {
-                case vms::event::showPopupAction:
+                case ActionType::showPopupAction:
                 {
                     auto params = m_actionParams;
                     params.additionalResources = decltype(params.additionalResources)(
@@ -421,12 +441,12 @@ void QnBusinessRuleViewModel::setModified(bool value)
     emit dataChanged(Field::modified);
 }
 
-vms::event::EventType QnBusinessRuleViewModel::eventType() const
+vms::api::EventType QnBusinessRuleViewModel::eventType() const
 {
     return m_eventType;
 }
 
-void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
+void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
 {
     if (m_eventType == value)
         return;
@@ -437,6 +457,22 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
     m_eventType = value;
     m_modified = true;
 
+    switch (m_eventType)
+    {
+    case EventType::cameraInputEvent:
+        m_eventParams.inputPortId = QString();
+        break;
+
+    case EventType::softwareTriggerEvent:
+        m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
+        m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
+        m_eventParams.caption = QString();
+        break;
+
+    default:
+        m_eventParams.caption = m_eventParams.description = QString();
+    }
+
     Fields fields = Field::eventType | Field::modified;
 
     if (vms::event::requiresCameraResource(m_eventType) != cameraRequired ||
@@ -445,11 +481,20 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
         fields |= Field::eventResources;
     }
 
-    if (vms::event::hasToggleState(m_eventType))
+    fields |= updateEventClassRelatedParams();
+
+    emit dataChanged(fields);
+    // TODO: #GDM #Business check others, params and resources should be merged
+}
+
+QnBusinessRuleViewModel::Fields QnBusinessRuleViewModel::updateEventClassRelatedParams()
+{
+    Fields fields = Field::modified;
+    if (vms::event::hasToggleState(m_eventType, m_eventParams, commonModule()))
     {
         if (!isActionProlonged())
         {
-            const auto allowedStates = allowedEventStates(m_eventType);
+            const auto allowedStates = allowedEventStates(m_eventType, m_eventParams, commonModule());
             if (!allowedStates.contains(m_eventState))
             {
                 m_eventState = allowedStates.first();
@@ -459,15 +504,15 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
     }
     else
     {
-        if (m_eventState != vms::event::EventState::undefined)
+        if (m_eventState != vms::api::EventState::undefined)
         {
-            m_eventState = vms::event::EventState::undefined;
+            m_eventState = vms::api::EventState::undefined;
             fields |= Field::eventState;
         }
 
         if (!vms::event::canBeInstant(m_actionType))
         {
-            m_actionType = vms::event::showPopupAction;
+            m_actionType = ActionType::showPopupAction;
             fields |= Field::actionType | Field::actionResources | Field::actionParams;
         }
         else if (isActionProlonged() && vms::event::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0)
@@ -477,27 +522,10 @@ void QnBusinessRuleViewModel::setEventType(const vms::event::EventType value)
         }
     }
 
-    switch (m_eventType)
-    {
-        case vms::event::cameraInputEvent:
-            m_eventParams.inputPortId = QString();
-            break;
-
-        case vms::event::softwareTriggerEvent:
-            m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
-            m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
-            m_eventParams.caption = QString();
-            break;
-
-        default:
-            m_eventParams.caption = m_eventParams.description = QString();
-    }
-
     updateActionTypesModel();
     updateEventStateModel();
 
-    emit dataChanged(fields);
-    // TODO: #GDM #Business check others, params and resources should be merged
+    return fields;
 }
 
 
@@ -532,18 +560,24 @@ void QnBusinessRuleViewModel::setEventParams(const vms::event::EventParameters &
     if (!hasChanges)
         return;
 
+    bool hasAnalyticsChanges = m_eventParams.analyticsEventId() != params.analyticsEventId();
     m_eventParams = params;
     m_modified = true;
-
-    emit dataChanged(Field::eventParams | Field::modified);
+    auto fields = Field::eventParams | Field::modified;
+    if (hasAnalyticsChanges)
+    {
+        updateEventClassRelatedParams();
+        fields |= Field::eventType;
+    }
+    emit dataChanged(fields);
 }
 
-vms::event::EventState QnBusinessRuleViewModel::eventState() const
+vms::api::EventState QnBusinessRuleViewModel::eventState() const
 {
     return m_eventState;
 }
 
-void QnBusinessRuleViewModel::setEventState(vms::event::EventState state)
+void QnBusinessRuleViewModel::setEventState(vms::api::EventState state)
 {
     if (m_eventState == state)
         return;
@@ -554,12 +588,12 @@ void QnBusinessRuleViewModel::setEventState(vms::event::EventState state)
     emit dataChanged(Field::eventState | Field::modified);
 }
 
-vms::event::ActionType QnBusinessRuleViewModel::actionType() const
+vms::api::ActionType QnBusinessRuleViewModel::actionType() const
 {
     return m_actionType;
 }
 
-void QnBusinessRuleViewModel::setActionType(const vms::event::ActionType value)
+void QnBusinessRuleViewModel::setActionType(const vms::api::ActionType value)
 {
     if (m_actionType == value)
         return;
@@ -568,7 +602,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::event::ActionType value)
     const bool userWasRequired = vms::event::requiresUserResource(m_actionType);
     const bool additionalUserWasRequired = vms::event::requiresAdditionalUserResource(m_actionType);
 
-    const bool wasEmailAction = m_actionType == vms::event::sendMailAction;
+    const bool wasEmailAction = m_actionType == ActionType::sendMailAction;
     const bool aggregationWasDisabled = !vms::event::allowsAggregation(m_actionType);
 
     m_actionType = value;
@@ -605,7 +639,7 @@ void QnBusinessRuleViewModel::setActionType(const vms::event::ActionType value)
          *  If action is "send email" default units for aggregation period should be hours, not minutes.
          *  Works only if aggregation period was not changed from default value.
          */
-        if (value == vms::event::sendMailAction && m_aggregationPeriodSec == defaultAggregationPeriodSec)
+        if (value == ActionType::sendMailAction && m_aggregationPeriodSec == defaultAggregationPeriodSec)
         {
             m_aggregationPeriodSec = defaultAggregationPeriodSec * 60;
             fields |= Field::aggregation;
@@ -622,12 +656,14 @@ void QnBusinessRuleViewModel::setActionType(const vms::event::ActionType value)
         }
     }
 
-    if (vms::event::hasToggleState(m_eventType) && !isActionProlonged() && m_eventState == vms::event::EventState::undefined)
+    if (vms::event::hasToggleState(m_eventType, m_eventParams, commonModule()) &&
+        !isActionProlonged() && m_eventState == vms::api::EventState::undefined)
     {
-        m_eventState = allowedEventStates(m_eventType).first();
+        m_eventState = allowedEventStates(m_eventType, m_eventParams, commonModule()).first();
         fields |= Field::eventState;
     }
-    else if (!vms::event::hasToggleState(m_eventType) && vms::event::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0)
+    else if (!vms::event::hasToggleState(m_eventType, m_eventParams, commonModule()) &&
+        vms::event::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0)
     {
         m_actionParams.durationMs = defaultActionDurationMs;
         fields |= Field::actionParams;
@@ -681,12 +717,12 @@ int QnBusinessRuleViewModel::aggregationPeriod() const
     return m_aggregationPeriodSec;
 }
 
-void QnBusinessRuleViewModel::setAggregationPeriod(int msecs)
+void QnBusinessRuleViewModel::setAggregationPeriod(int seconds)
 {
-    if (m_aggregationPeriodSec == msecs)
+    if (m_aggregationPeriodSec == seconds)
         return;
 
-    m_aggregationPeriodSec = msecs;
+    m_aggregationPeriodSec = seconds;
     m_modified = true;
 
     emit dataChanged(Field::aggregation | Field::modified);
@@ -812,7 +848,7 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
         case Column::source:
         {
             // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            auto resources = resourcePool()->getResources(eventResources());
+            auto resources = resourcePool()->getResourcesByIds(eventResources());
             if (!vms::event::isResourceRequired(m_eventType))
             {
                 return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
@@ -835,14 +871,14 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
         {
             switch (m_actionType)
             {
-                case vms::event::sendMailAction:
+                case ActionType::sendMailAction:
                 {
                     if (!isValid(Column::target))
                         return qnSkin->icon("tree/user_alert.png");
                     return qnResIconCache->icon(QnResourceIconCache::Users);
                 }
 
-                case vms::event::showPopupAction:
+                case ActionType::showPopupAction:
                 {
                     if (m_actionParams.allUsers)
                         return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -858,10 +894,12 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
                         : qnResIconCache->icon(QnResourceIconCache::User);
                 }
 
-                case vms::event::showTextOverlayAction:
-                case vms::event::showOnAlarmLayoutAction:
+                case ActionType::showTextOverlayAction:
+                case ActionType::showOnAlarmLayoutAction:
                 {
-                    bool canUseSource = (m_actionParams.useSource && (m_eventType >= vms::event::userDefinedEvent || requiresCameraResource(m_eventType)));
+                    bool canUseSource = (m_actionParams.useSource
+                        && (m_eventType >= EventType::userDefinedEvent
+                            || vms::event::requiresCameraResource(m_eventType)));
                     if (canUseSource)
                         return qnResIconCache->icon(QnResourceIconCache::Camera);
                     break;
@@ -871,7 +909,7 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
             }
 
             // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            QnResourceList resources = resourcePool()->getResources(actionResources());
+            QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
             if (!vms::event::requiresCameraResource(m_actionType))
             {
                 return qnResIconCache->icon(QnResourceIconCache::Servers);
@@ -920,15 +958,19 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
             auto filtered = filterEventResources(m_eventResources, m_eventType);
             switch (m_eventType)
             {
-                case vms::event::cameraMotionEvent:
+                case EventType::cameraMotionEvent:
                     return isResourcesListValid<QnCameraMotionPolicy>(
-                        resourcePool()->getResources<QnCameraMotionPolicy::resource_type>(filtered));
+                        resourcePool()->getResourcesByIds<QnCameraMotionPolicy::resource_type>(filtered));
 
-                case vms::event::cameraInputEvent:
+                case EventType::cameraInputEvent:
                     return isResourcesListValid<QnCameraInputPolicy>(
-                        resourcePool()->getResources<QnCameraInputPolicy::resource_type>(filtered));
+                        resourcePool()->getResourcesByIds<QnCameraInputPolicy::resource_type>(filtered));
 
-                case vms::event::softwareTriggerEvent:
+                case EventType::analyticsSdkEvent:
+                    return isResourcesListValid<QnCameraAnalyticsPolicy>(
+                        resourcePool()->getResourcesByIds<QnCameraAnalyticsPolicy::resource_type>(filtered));
+
+                case EventType::softwareTriggerEvent:
                 {
                     if (m_eventParams.metadata.allUsers)
                         return true;
@@ -986,26 +1028,26 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
             auto filtered = filterActionResources(m_actionResources, m_actionType);
             switch (m_actionType)
             {
-                case vms::event::sendMailAction:
+                case ActionType::sendMailAction:
                     return QnSendEmailActionDelegate::isValidList(filtered, m_actionParams.emailAddress);
-                case vms::event::cameraRecordingAction:
+                case ActionType::cameraRecordingAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
-                        resourcePool()->getResources<QnCameraRecordingPolicy::resource_type>(filtered));
-                case vms::event::bookmarkAction:
+                        resourcePool()->getResourcesByIds<QnCameraRecordingPolicy::resource_type>(filtered));
+                case ActionType::bookmarkAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
-                        resourcePool()->getResources<QnBookmarkActionPolicy::resource_type>(filtered));
-                case vms::event::cameraOutputAction:
+                        resourcePool()->getResourcesByIds<QnBookmarkActionPolicy::resource_type>(filtered));
+                case ActionType::cameraOutputAction:
                     return isResourcesListValid<QnCameraOutputPolicy>(
-                        resourcePool()->getResources<QnCameraOutputPolicy::resource_type>(filtered));
-                case vms::event::playSoundAction:
-                case vms::event::playSoundOnceAction:
+                        resourcePool()->getResourcesByIds<QnCameraOutputPolicy::resource_type>(filtered));
+                case ActionType::playSoundAction:
+                case ActionType::playSoundOnceAction:
                     return !m_actionParams.url.isEmpty()
                         && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-                            resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+                            resourcePool()->getResourcesByIds<QnCameraAudioTransmitPolicy::resource_type>(filtered))
                             || m_actionParams.playToClient
                         );
 
-                case vms::event::showPopupAction:
+                case ActionType::showPopupAction:
                 {
                     static const QnDefaultSubjectValidationPolicy defaultPolicy;
                     static const QnRequiredPermissionSubjectPolicy acknowledgePolicy(
@@ -1019,29 +1061,29 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                     return validationState != QValidator::Invalid;
                 }
 
-                case vms::event::sayTextAction:
+                case ActionType::sayTextAction:
                     return !m_actionParams.sayText.isEmpty()
                         && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-                            resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+                            resourcePool()->getResourcesByIds<QnCameraAudioTransmitPolicy::resource_type>(filtered))
                             || m_actionParams.playToClient
                         );
 
-                case vms::event::executePtzPresetAction:
+                case ActionType::executePtzPresetAction:
                     return isResourcesListValid<QnExecPtzPresetPolicy>(
-                        resourcePool()->getResources<QnExecPtzPresetPolicy::resource_type>(filtered))
+                        resourcePool()->getResourcesByIds<QnExecPtzPresetPolicy::resource_type>(filtered))
                         && m_actionResources.size() == 1
                         && !m_actionParams.presetId.isEmpty();
-                case vms::event::showTextOverlayAction:
-                case vms::event::showOnAlarmLayoutAction:
+                case ActionType::showTextOverlayAction:
+                case ActionType::showOnAlarmLayoutAction:
                 {
                     bool canUseSource = (m_actionParams.useSource
-                        && (m_eventType >= vms::event::userDefinedEvent
-                            || requiresCameraResource(m_eventType)));
+                        && (m_eventType >= EventType::userDefinedEvent
+                            || vms::event::requiresCameraResource(m_eventType)));
                     if (canUseSource)
                         return true;
                     break;
                 }
-                case vms::event::execHttpRequestAction:
+                case ActionType::execHttpRequestAction:
                 {
                     QUrl url(m_actionParams.url);
                     return url.isValid()
@@ -1054,7 +1096,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
             }
 
             // TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            auto resources = resourcePool()->getResources(filtered);
+            auto resources = resourcePool()->getResourcesByIds(filtered);
             if (vms::event::requiresCameraResource(m_actionType) && resources.isEmpty())
             {
                 return false;
@@ -1069,7 +1111,7 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
 void QnBusinessRuleViewModel::updateEventStateModel()
 {
     m_eventStatesModel->clear();
-    foreach(vms::event::EventState val, vms::event::allowedEventStates(m_eventType))
+    foreach(vms::api::EventState val, vms::event::allowedEventStates(m_eventType, m_eventParams, commonModule()))
     {
         QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
         item->setData(int(val));
@@ -1086,7 +1128,7 @@ void QnBusinessRuleViewModel::updateActionTypesModel()
         ProlongedActionRole, true, -1, Qt::MatchExactly);
 
     // what type of actions to show: prolonged or instant
-    bool enableProlongedActions = vms::event::hasToggleState(m_eventType);
+    bool enableProlongedActions = vms::event::hasToggleState(m_eventType, m_eventParams, commonModule());
     foreach(QModelIndex idx, prolongedActions)
     {
         m_actionTypesModel->item(idx.row())->setEnabled(enableProlongedActions);
@@ -1096,12 +1138,15 @@ void QnBusinessRuleViewModel::updateActionTypesModel()
 
 QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 {
-    QnResourceList resources = resourcePool()->getResources(eventResources());
-    if (m_eventType == vms::event::cameraMotionEvent)
+    QnResourceList resources = resourcePool()->getResourcesByIds(eventResources());
+    if (m_eventType == EventType::cameraMotionEvent)
         return QnCameraMotionPolicy::getText(resources, detailed);
 
-    if (m_eventType == vms::event::cameraInputEvent)
+    if (m_eventType == EventType::cameraInputEvent)
         return QnCameraInputPolicy::getText(resources, detailed);
+
+    if (m_eventType == EventType::analyticsSdkEvent)
+        return QnCameraAnalyticsPolicy::getText(resources, detailed);
 
     if (!vms::event::isResourceRequired(m_eventType))
         return braced(tr("System"));
@@ -1133,16 +1178,16 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 {
-    QnResourceList resources = resourcePool()->getResources(actionResources());
+    QnResourceList resources = resourcePool()->getResourcesByIds(actionResources());
     switch (m_actionType)
     {
-        case vms::event::sendMailAction:
+        case ActionType::sendMailAction:
         {
             return QnSendEmailActionDelegate::getText(actionResources(),
                 detailed,
                 m_actionParams.emailAddress);
         }
-        case vms::event::showPopupAction:
+        case ActionType::showPopupAction:
         {
             if (m_actionParams.allUsers)
                 return nx::vms::event::StringsHelper::allUsersText();
@@ -1152,32 +1197,34 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
             users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
             return m_helper->actionSubjects(users, roles);
         }
-        case vms::event::bookmarkAction:
-        case vms::event::cameraRecordingAction:
+        case ActionType::bookmarkAction:
+        case ActionType::cameraRecordingAction:
         {
             return QnCameraRecordingPolicy::getText(resources, detailed);
         }
-        case vms::event::cameraOutputAction:
+        case ActionType::cameraOutputAction:
         {
             return QnCameraOutputPolicy::getText(resources, detailed);
         }
 
-        case vms::event::playSoundAction:
-        case vms::event::playSoundOnceAction:
-        case vms::event::sayTextAction:
+        case ActionType::playSoundAction:
+        case ActionType::playSoundOnceAction:
+        case ActionType::sayTextAction:
             return QnCameraAudioTransmitPolicy::getText(resources, detailed);
 
-        case vms::event::executePtzPresetAction:
+        case ActionType::executePtzPresetAction:
             return QnExecPtzPresetPolicy::getText(resources, detailed);
 
-        case vms::event::showTextOverlayAction:
-        case vms::event::showOnAlarmLayoutAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::showOnAlarmLayoutAction:
         {
-            bool canUseSource = (m_actionParams.useSource && (m_eventType >= vms::event::userDefinedEvent || requiresCameraResource(m_eventType)));
+            bool canUseSource = (m_actionParams.useSource
+                && (m_eventType >= EventType::userDefinedEvent
+                    || vms::event::requiresCameraResource(m_eventType)));
 
             if (canUseSource)
             {
-                QnVirtualCameraResourceList targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(m_actionResources);
+                QnVirtualCameraResourceList targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(m_actionResources);
 
                 if (targetCameras.isEmpty())
                     return tr("Source camera");
@@ -1186,7 +1233,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
             }
             break;
         }
-        case vms::event::execHttpRequestAction:
+        case ActionType::execHttpRequestAction:
             return QUrl(m_actionParams.url).toString(QUrl::RemoveUserInfo);
         default:
             break;
@@ -1218,27 +1265,26 @@ QString QnBusinessRuleViewModel::getAggregationText() const
     if (m_aggregationPeriodSec <= 0)
         return tr("Instant");
 
-    const qint64 kMsecPerSec = 1000;
-    static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours | Qt::Days;
+    const auto duration = std::chrono::seconds(m_aggregationPeriodSec);
     static const QString kSeparator(L' ');
 
-    const qint64 aggregationPeriodMs = m_aggregationPeriodSec * kMsecPerSec;
-    const QString timespan = QTimeSpan(aggregationPeriodMs).toApproximateString(
-        QTimeSpan::kDoNotSuppressSecondUnit,
-        kFormat,
-        QTimeSpan::SuffixFormat::Full,
-        kSeparator);
+    using HumanReadable = client::core::HumanReadable;
+    const auto timespan = HumanReadable::timeSpan(duration,
+        HumanReadable::DaysAndTime,
+        HumanReadable::SuffixFormat::Full,
+        kSeparator,
+        HumanReadable::kNoSuppressSecondUnit);
 
     return tr("Every %1").arg(timespan);
 }
 
-QString QnBusinessRuleViewModel::toggleStateToModelString(vms::event::EventState value)
+QString QnBusinessRuleViewModel::toggleStateToModelString(vms::api::EventState value)
 {
     switch (value)
     {
-        case vms::event::EventState::inactive:  return tr("Stops");
-        case vms::event::EventState::active:    return tr("Starts");
-        case vms::event::EventState::undefined: return tr("Occurs");
+        case vms::api::EventState::inactive:  return tr("Stops");
+        case vms::api::EventState::active:    return tr("Starts");
+        case vms::api::EventState::undefined: return tr("Occurs");
 
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Unknown EventState enumeration value.");

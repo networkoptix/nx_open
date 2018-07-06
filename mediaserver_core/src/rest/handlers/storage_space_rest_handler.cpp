@@ -22,6 +22,8 @@
 #include <utils/common/util.h>
 #include <nx/network/http/http_types.h>
 #include <rest/server/rest_connection_processor.h>
+#include <media_server/media_server_module.h>
+#include <nx/utils/log/log.h>
 
 namespace
 {
@@ -32,13 +34,11 @@ QnStorageSpaceRestHandler::QnStorageSpaceRestHandler()
 {}
 
 int QnStorageSpaceRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    QN_UNUSED(path, owner);
-
     /* Some api calls can take a lot of time, so client can make a fast request for the first time. */
     const bool fastRequest = QnLexical::deserialized(params[kFastRequestKey], false);
 
@@ -74,14 +74,22 @@ int QnStorageSpaceRestHandler::executeGet(
     reply.storageProtocols = getStorageProtocols();
 
     result.setReply(reply);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }
 
 QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const
 {
     QList<QString> result;
-    for (const auto storagePlugin : PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+    auto pluginManager = qnServerModule->pluginManager();
+    NX_ASSERT(pluginManager, "There should be common module.");
+    if (!pluginManager)
+        return result;
+    for (nx_spl::StorageFactory* const storagePlugin:
+        pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+    {
         result.push_back(storagePlugin->storageType());
+        storagePlugin->releaseRef();
+    }
     result.push_back(lit("smb"));
     return result;
 }
@@ -113,8 +121,9 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
     QnPlatformMonitor* monitor = qnPlatform->monitor();
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         monitor->totalPartitionSpaceInfo(
-        QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition
-        );
+            QnPlatformMonitor::LocalDiskPartition
+            | QnPlatformMonitor::NetworkPartition
+            | QnPlatformMonitor::RemovableDiskPartition);
 
     for(int i = 0; i < partitions.size(); i++)
         partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
@@ -153,15 +162,39 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonMo
 
         if (storage)
         {
-            storage->setUrl(data.url); /* createStorage does not fill url. */
+            storage->setUrl(data.url);
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
 
-            data.isWritable = storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable();
-            data.isOnline = true;
+            data.isOnline = storage->initOrUpdate() == Qn::StorageInit_Ok;
+            if (data.isOnline)
+            {
+                if (storage->getId().isNull())
+                    storage->setId(QnUuid::createUuid());
+                storage->setStatus(Qn::Online);
+                if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+                    storage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
+            }
+
+            QnStorageResourceList additionalStorages;
+            additionalStorages.append(storage);
+            auto writableStoragesIfCurrentWasAdded = qnNormalStorageMan->getAllWritableStorages(
+                &additionalStorages);
+
+            bool wouldBeWritableIfAmongstServerStorages =
+                writableStoragesIfCurrentWasAdded.contains(storage);
+            data.isWritable = data.isOnline
+                && storage->isWritable()
+                && wouldBeWritableIfAmongstServerStorages;
+
+            NX_VERBOSE(
+                this,
+                lm("[ApiStorageSpace] Optional storage %1, online: %2, isWritable: %3, wouldBeWritableIfAmongstServerStorages: %4")
+                    .args(storage->getUrl(), data.isOnline, data.isWritable,
+                        wouldBeWritableIfAmongstServerStorages));
 
             auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            if (fileStorage)
+            if (fileStorage && data.isOnline)
                 data.reservedSpace = fileStorage->calcInitialSpaceLimit();
         }
 

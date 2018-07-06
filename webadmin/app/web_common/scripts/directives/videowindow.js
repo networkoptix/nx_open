@@ -77,7 +77,6 @@ angular.module('nxCommon')
                             ieNoWebm: false,
                             ieWin10: false,
                             ubuntuNX: false,
-                            errorCode: '',
                             errorDescription: ''
                         };
 
@@ -372,22 +371,20 @@ angular.module('nxCommon')
 
                         scope
                             .playerHandler(error)
-                            .then(function (response) {
-                                scope.videoFlags.errorLoading = response;
+                            .then(function (showError) {
+                                scope.videoFlags.errorLoading = showError;
 
+                                // Trying to get error description requesting media stream url as ajax request
                                 if (scope.videoFlags.errorLoading) {
                                     $http.get(err.url)
                                         .then(function (response) {
-                                            scope.videoFlags.errorCode = response.data.error || 'SNAFU3.14';
-                                            scope.videoFlags.errorDescription = response.data.errorString || 'Unexpected error';
+                                            scope.videoFlags.errorDescription = response.data.errorString;
+                                        }, function(failResponse){
+                                            // What is here?
+                                            console.error("failResponse", failResponse);
                                         });
                                 }
-
-                            }, function (error) {
-                                scope.videoFlags.errorLoading = error;
                             });
-
-                        // console.error(error);
                     }
 
                     function initNewPlayer() {
@@ -431,6 +428,7 @@ angular.module('nxCommon')
                     function srcChanged() {
                         scope.loading = true; // source changed - start loading
                         scope.videoFlags.errorLoading = false;
+                        scope.preview = "";
                         if (scope.vgSrc) {
                             scope.preview = getFormatSrc('jpeg');
                             scope.player = detectBestFormat();

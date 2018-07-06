@@ -25,8 +25,12 @@
 #include <nx/utils/db/async_sql_query_executor.h>
 #include <nx/utils/db/filter.h>
 
+#include <nx/data_sync_engine/transaction_log.h>
+
+#include "account_manager.h"
 #include "cache.h"
 #include "data_view.h"
+#include "extension_pool.h"
 #include "managers_types.h"
 #include "system_sharing_manager.h"
 #include "../access_control/auth_types.h"
@@ -36,28 +40,57 @@
 #include "../data/account_data.h"
 #include "../data/data_filter.h"
 #include "../data/system_data.h"
-#include "../ec2/transaction_log.h"
+
+namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
 namespace nx {
 namespace cdb {
 
-namespace conf {
-
-class Settings;
-
-} // namespace conf
+namespace conf { class Settings; } // namespace conf
 
 class AbstractEmailManager;
-class AccountManager;
-class SystemHealthInfoProvider;
-
-namespace ec2 {
-
-class SyncronizationEngine;
-
-} // namespace ec2
-
+class AbstractAccountManager;
+class AbstractSystemHealthInfoProvider;
 class InviteUserNotification;
+
+//-------------------------------------------------------------------------------------------------
+
+class AbstractSystemExtension
+{
+public:
+    virtual ~AbstractSystemExtension() = default;
+
+    virtual void modifySystemBeforeProviding(api::SystemDataEx* system) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class AbstractSystemManager
+{
+public:
+    virtual ~AbstractSystemManager() = default;
+
+    virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const = 0;
+
+    virtual nx::utils::db::DBResult fetchSystemById(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        data::SystemData* const system) = 0;
+
+    virtual nx::utils::db::DBResult updateSystemStatus(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        api::SystemStatus systemStatus) = 0;
+
+    virtual nx::utils::db::DBResult markSystemForDeletion(
+        nx::utils::db::QueryContext* const queryContext,
+        const std::string& systemId) = 0;
+
+    virtual void addExtension(AbstractSystemExtension*) = 0;
+    virtual void removeExtension(AbstractSystemExtension*) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Provides methods for manipulating system data on persisent storage.
@@ -65,8 +98,10 @@ class InviteUserNotification;
  * @note All data can be cached.
  */
 class SystemManager:
+    public AbstractSystemManager,
     public AbstractSystemSharingManager,
-    public AbstractAuthenticationDataProvider
+    public AbstractAuthenticationDataProvider,
+    public AbstractAccountManagerExtension
 {
 public:
     enum class NotificationCommand
@@ -82,15 +117,15 @@ public:
     SystemManager(
         const conf::Settings& settings,
         nx::utils::StandaloneTimerManager* const timerManager,
-        AccountManager* const accountManager,
-        const SystemHealthInfoProvider& systemHealthInfoProvider,
+        AbstractAccountManager* const accountManager,
+        const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
-        ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
+        data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
-        const nx_http::StringType& username,
+        const nx::network::http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const nx::utils::stree::AbstractResourceReader& authSearchInputData,
         nx::utils::stree::ResourceContainer* const authProperties,
@@ -141,17 +176,36 @@ public:
         data::UserSessionDescriptor userSessionDescriptor,
         std::function<void(api::ResultCode)> completionHandler);
 
-    /**
-     * @return api::SystemAccessRole::none is returned if
-     * - accountEmail has no rights for systemId
-     * - accountEmail or systemId is unknown
-     */
+    virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const override;
+
+    virtual nx::utils::db::DBResult fetchSystemById(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        data::SystemData* const system) override;
+
+    virtual nx::utils::db::DBResult updateSystemStatus(
+        nx::utils::db::QueryContext* queryContext,
+        const std::string& systemId,
+        api::SystemStatus systemStatus) override;
+
+    virtual nx::utils::db::DBResult markSystemForDeletion(
+        nx::utils::db::QueryContext* const queryContext,
+        const std::string& systemId) override;
+
+    //---------------------------------------------------------------------------------------------
+    // AbstractSystemSharingManager overrides.
+
     virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemId) const override;
+
     virtual boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
         const std::string& systemId) const override;
+
+    virtual std::vector<api::SystemSharingEx> fetchSystemUsers(
+        utils::db::QueryContext* queryContext,
+        const std::string& systemId) override;
 
     std::vector<api::SystemSharingEx> fetchAllSharings() const;
 
@@ -162,6 +216,9 @@ public:
 
     virtual void addSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
     virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
+
+    virtual void addExtension(AbstractSystemExtension*) override;
+    virtual void removeExtension(AbstractSystemExtension*) override;
 
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
@@ -230,11 +287,11 @@ private:
 
     const conf::Settings& m_settings;
     nx::utils::StandaloneTimerManager* const m_timerManager;
-    AccountManager* const m_accountManager;
-    const SystemHealthInfoProvider& m_systemHealthInfoProvider;
+    AbstractAccountManager* const m_accountManager;
+    const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
-    ec2::SyncronizationEngine* const m_ec2SyncronizationEngine;
+    data_sync_engine::SyncronizationEngine* const m_ec2SyncronizationEngine;
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
@@ -245,6 +302,11 @@ private:
     std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
     std::set<AbstractSystemSharingExtension*> m_systemSharingExtensions;
+    ExtensionPool<AbstractSystemExtension> m_extensions;
+
+    virtual void afterUpdatingAccount(
+        nx::utils::db::QueryContext*,
+        const data::AccountUpdateDataWithEmail&) override;
 
     nx::utils::db::DBResult insertSystemToDB(
         nx::utils::db::QueryContext* const queryContext,
@@ -267,16 +329,7 @@ private:
         InsertNewSystemToDbResult systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
-    nx::utils::db::DBResult markSystemAsDeleted(
-        nx::utils::db::QueryContext* const queryContext,
-        const std::string& systemId);
-    void systemMarkedAsDeleted(
-        nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
-        std::string systemId,
-        std::function<void(api::ResultCode)> completionHandler);
-    void markSystemAsDeletedInCache(const std::string& systemId);
+    void markSystemForDeletionInCache(const std::string& systemId);
 
     nx::utils::db::DBResult deleteSystemFromDB(
         nx::utils::db::QueryContext* const queryContext,
@@ -326,6 +379,16 @@ private:
         const std::string& grantorEmail,
         const data::AccountData& inviteeAccount,
         const api::SystemSharing& sharing);
+
+    /**
+     * TODO: #ak Having both requestResources and filter looks overabundant.
+     * @return boost::none is returned in case if distinct filter has been specified
+     *   and system was not found with this filter.
+     */
+    boost::optional<std::vector<api::SystemDataEx>> selectSystemsFromCacheByFilter(
+        const nx::utils::stree::AbstractResourceReader& requestResources,
+        const data::DataFilter& filter);
+    void addUserAccessInfo(const std::string& accountEmail, api::SystemDataEx& systemDataEx);
 
     /**
      * Fetch existing account or create a new one sending corresponding notification.
@@ -401,11 +464,9 @@ private:
         const QnMutexLockerBase& lock,
         SystemDictionary& systemByIdIndex,
         typename SystemDictionary::iterator systemIter);
-    void systemActivated(
-        nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
-        std::string systemId);
+    template<typename Handler>
+    void updateSystemInCache(std::string systemId, Handler handler);
+    void updateSystemStatusInCache(std::string systemId, api::SystemStatus systemStatus);
 
     nx::utils::db::DBResult saveUserSessionStart(
         nx::utils::db::QueryContext* queryContext,
@@ -423,10 +484,6 @@ private:
 
     nx::utils::db::DBResult fillCache();
     template<typename Func> nx::utils::db::DBResult doBlockingDbQuery(Func func);
-    nx::utils::db::DBResult fetchSystemById(
-        nx::utils::db::QueryContext* queryContext,
-        const std::string& systemId,
-        data::SystemData* const system);
     nx::utils::db::DBResult fetchSystemToAccountBinder(
         nx::utils::db::QueryContext* queryContext);
 
@@ -440,7 +497,7 @@ private:
     nx::utils::db::DBResult processEc2SaveUser(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiUserData> data,
+        data_sync_engine::Command<::ec2::ApiUserData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2SaveUserDone(
         nx::utils::db::QueryContext* /*queryContext*/,
@@ -450,7 +507,7 @@ private:
     nx::utils::db::DBResult processEc2RemoveUser(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiIdData> data,
+        data_sync_engine::Command<nx::vms::api::IdData> data,
         data::SystemSharing* const systemSharingData);
     void onEc2RemoveUserDone(
         nx::utils::db::QueryContext* /*queryContext*/,
@@ -460,7 +517,7 @@ private:
     nx::utils::db::DBResult processSetResourceParam(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
+        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data,
         data::SystemAttributesUpdate* const systemNameUpdate);
     void onEc2SetResourceParamDone(
         nx::utils::db::QueryContext* /*queryContext*/,
@@ -470,7 +527,7 @@ private:
     nx::utils::db::DBResult processRemoveResourceParam(
         nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data);
+        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
     void onEc2RemoveResourceParamDone(
         nx::utils::db::QueryContext* /*queryContext*/,
         nx::utils::db::DBResult dbResult);

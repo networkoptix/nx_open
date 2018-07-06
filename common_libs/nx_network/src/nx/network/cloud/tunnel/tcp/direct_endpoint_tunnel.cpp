@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-static const KeepAliveOptions kControlConnectionKeepAlive(
+static const nx::network::KeepAliveOptions kControlConnectionKeepAlive(
     std::chrono::minutes(1), std::chrono::seconds(10), 3);
 
 namespace nx {
@@ -35,7 +35,7 @@ DirectTcpEndpointTunnel::~DirectTcpEndpointTunnel()
 void DirectTcpEndpointTunnel::stopWhileInAioThread()
 {
     m_controlConnection.reset();
-    
+
     auto connectionClosedHandler = std::move(m_connectionClosedHandler);
     m_connectionClosedHandler = nullptr;
 
@@ -99,11 +99,16 @@ void DirectTcpEndpointTunnel::setControlConnectionClosedHandler(
     m_connectionClosedHandler = std::move(handler);
 }
 
+std::string DirectTcpEndpointTunnel::toString() const
+{
+    return lm("Direct tcp connect to %1").args(m_targetEndpoint).toStdString();
+}
+
 void DirectTcpEndpointTunnel::startConnection(
     std::list<ConnectionContext>::iterator connectionContextIter,
     std::chrono::milliseconds timeout)
 {
-    connectionContextIter->tcpSocket = 
+    connectionContextIter->tcpSocket =
         std::make_unique<TCPSocket>(SocketFactory::tcpClientIpVersion());
     connectionContextIter->tcpSocket->bindToAioThread(getAioThread());
     if (!connectionContextIter->tcpSocket->setNonBlockingMode(true) ||
@@ -152,7 +157,7 @@ void DirectTcpEndpointTunnel::reportConnectResult(
         QnMutexLocker lk(&m_mutex);
         m_connections.erase(connectionContextIter);
     }
-    
+
     if (tcpSocket && !context.socketAttributes.applyTo(tcpSocket.get()))
     {
         sysErrorCode = SystemError::getLastOSErrorCode();

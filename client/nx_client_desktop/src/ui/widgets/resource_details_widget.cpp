@@ -5,13 +5,15 @@
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QStyle>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <core/resource/camera_resource.h>
 
 #include <ui/style/helper.h>
-#include <ui/widgets/common/text_edit_label.h>
-#include <ui/widgets/resource_preview_widget.h>
+#include <nx/client/desktop/common/widgets/text_edit_label.h>
+#include <nx/client/desktop/common/widgets/async_image_widget.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -23,12 +25,11 @@ static const QSize kCameraPreviewSize(160, 240);
 
 } // namespace
 
-
 QnResourceDetailsWidget::QnResourceDetailsWidget(QWidget* parent) :
     base_type(parent),
-    m_thumbnailManager(new QnCameraThumbnailManager()),
-    m_preview(new QnResourcePreviewWidget(this)),
-    m_nameTextEdit(new QnTextEditLabel(this)),
+    m_thumbnailManager(new CameraThumbnailManager()),
+    m_preview(new nx::client::desktop::AsyncImageWidget(this)),
+    m_nameTextEdit(new TextEditLabel(this)),
     m_descriptionLabel(new QLabel(this))
 {
     // We cannot pass height to thumbnail manager as it will lose AR.

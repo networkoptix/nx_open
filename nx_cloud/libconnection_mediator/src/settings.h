@@ -6,8 +6,6 @@
 
 #include <boost/optional.hpp>
 
-#include <QtCore/QUrl>
-
 #include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
@@ -33,7 +31,7 @@ struct General
 struct CloudDb
 {
     bool runWithCloud = true;
-    boost::optional<QUrl> url;
+    boost::optional<nx::utils::Url> url;
     QString user;
     QString password;
     std::chrono::seconds updateInterval{0};
@@ -42,15 +40,15 @@ struct CloudDb
 
 struct Stun
 {
-    std::list<SocketAddress> addrToListenList;
-    boost::optional<KeepAliveOptions> keepAliveOptions;
+    std::list<network::SocketAddress> addrToListenList;
+    boost::optional<network::KeepAliveOptions> keepAliveOptions;
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 struct Http
 {
-    std::list<SocketAddress> addrToListenList;
-    boost::optional<KeepAliveOptions> keepAliveOptions;
+    std::list<network::SocketAddress> addrToListenList;
+    boost::optional<network::KeepAliveOptions> keepAliveOptions;
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
@@ -125,7 +123,7 @@ private:
     void initializeWithDefaultValues();
     void readEndpointList(
         const QString& str,
-        std::list<SocketAddress>* const addrToListenList);
+        std::list<network::SocketAddress>* const addrToListenList);
     void loadConnectionParameters();
     void loadTrafficRelay();
     void loadListeningPeer();

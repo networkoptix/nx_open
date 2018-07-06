@@ -7,6 +7,7 @@
 #include <utils/common/software_version.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 #include "compatibility_item.h"
 
 /*
@@ -20,7 +21,7 @@ struct QnConnectionInfo
     */
     QnConnectionInfo();
 
-    QUrl ecUrl;
+    nx::utils::Url ecUrl;
     QnSoftwareVersion version;
     QList<QnCompatibilityItem> compatibilityItems;
     QString ecsGuid;    //< Id of remote server. Contains valid QnUuid.
@@ -44,7 +45,7 @@ struct QnConnectionInfo
     QnUuid serverId() const;
 
     /* Check if https protocol can be used. */
-    QUrl effectiveUrl() const;
+    nx::utils::Url effectiveUrl() const;
 };
 
 #define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(systemName)(brand)\

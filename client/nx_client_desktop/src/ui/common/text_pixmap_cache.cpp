@@ -10,7 +10,7 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QGuiApplication>
 
-#include <utils/common/hashed_font.h>
+#include "hashed_font.h"
 #include <utils/common/hash.h>
 
 namespace {

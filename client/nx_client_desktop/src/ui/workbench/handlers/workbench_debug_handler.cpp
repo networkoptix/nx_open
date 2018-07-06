@@ -15,6 +15,10 @@
 #include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+
+#include <nx/api/analytics/driver_manifest.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/widgets/palette_widget.h>
@@ -22,9 +26,12 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/common/web_page.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/widgets/main_window.h>
 
 #include <nx/client/desktop/ui/dialogs/debug/animations_control_dialog.h>
 #include <nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.h>
+#include <nx/client/desktop/custom_settings/dialogs/custom_settings_test_dialog.h>
+
 #include <finders/test_systems_finder.h>
 #include <finders/system_tiles_test_case.h>
 #include <finders/systems_finder.h>
@@ -32,13 +39,18 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
+#include <nx/api/analytics/driver_manifest.h>
+#include <nx/api/analytics/supported_events.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/random.h>
 
 //#ifdef _DEBUG
 #define DEBUG_ACTIONS
 //#endif
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -87,7 +99,7 @@ class QnDebugControlDialog: public QnDialog, public QnWorkbenchContextAware
     typedef QnDialog base_type;
 
 public:
-    QnDebugControlDialog(QWidget *parent = NULL):
+    QnDebugControlDialog(QWidget *parent):
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {
@@ -109,6 +121,9 @@ public:
 
         addButton(lit("Animations control"), [this] { (new AnimationsControlDialog(this))->show(); });
 
+        addButton(lit("Custom Settings Test"), [this]
+            { (new CustomSettingsTestDialog(this))->show(); });
+
         addButton(lit("Web View"), [this]
             {
                 auto dialog(new QnWebViewDialog(this));
@@ -116,20 +131,68 @@ public:
                 dialog->show();
             });
 
+        addButton(lit("Toggle default password"),
+            [this]
+            {
+                const auto cameras = resourcePool()->getAllCameras(QnResourcePtr(), true);
+                if (cameras.empty())
+                    return;
+
+                const auto caps = Qn::SetUserPasswordCapability | Qn::isDefaultPasswordCapability;
+
+                const bool isDefaultPassword = cameras.first()->needsToChangeDefaultPassword();
+
+                for (const auto& camera: cameras)
+                {
+                    // Toggle current option.
+                    if (isDefaultPassword)
+                        camera->setCameraCapabilities(camera->getCameraCapabilities() & ~caps);
+                    else
+                        camera->setCameraCapabilities(camera->getCameraCapabilities() | caps);
+                    camera->saveParamsAsync();
+                }
+
+            });
+
         addButton(lit("Palette"), [this]
             {
                 QnPaletteWidget *w = new QnPaletteWidget(this);
                 w->setPalette(qApp->palette());
-                auto messageBox = new QnMessageBox(mainWindow());
+                auto messageBox = new QnMessageBox(mainWindowWidget());
                 messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(w);
                 messageBox->addButton(QDialogButtonBox::Ok);
                 messageBox->show();
             });
 
+        addButton(lit("RandomizePtz"), [this]
+            {
+                QList<Ptz::Capabilities> presets;
+                presets.push_back(Ptz::NoPtzCapabilities);
+                presets.push_back(Ptz::ContinuousZoomCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability);
+                presets.push_back(Ptz::ContinuousZoomCapability | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability);
+                presets.push_back(Ptz::ContinuousPanTiltCapabilities);
+                presets.push_back(Ptz::ContinuousPtzCapabilities | Ptz::ContinuousFocusCapability
+                    | Ptz::AuxilaryPtzCapability | Ptz::PresetsPtzCapability);
+
+                for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
+                {
+                    int idx = presets.indexOf(camera->getPtzCapabilities());
+                    if (idx < 0)
+                        idx = 0;
+                    else
+                        idx = (idx + 1) % presets.size();
+
+                    camera->setPtzCapabilities(presets[idx]);
+                }
+
+            });
+
         addButton(lit("Resource Pool"), [this]
             {
-                auto messageBox = new QnMessageBox(mainWindow());
+                auto messageBox = new QnMessageBox(mainWindowWidget());
                 messageBox->setWindowFlags(Qt::Window);
 
                 messageBox->addCustomWidget(new QnResourceListView(resourcePool()->getResources(),
@@ -145,6 +208,86 @@ public:
                 runTilesTest();
                 close();
             });
+
+        addButton(lit("Generate analytics manifests"),
+            [this]()
+            {
+                auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
+                if (servers.empty())
+                    return;
+
+                int serverIndex = 0;
+
+                for (int i = 0; i < 5; ++i)
+                {
+                    nx::api::AnalyticsDriverManifest manifest;
+                    manifest.driverId = QnUuid::createUuid();
+                    manifest.driverName.value = lit("Driver %1").arg(i);
+                    manifest.driverName.localization[lit("ru_RU")] = lit("Russian %1").arg(i);
+                    for (int j = 0; j < 3; ++j)
+                    {
+                        nx::api::Analytics::EventType eventType;
+                        eventType.typeId = QnUuid::createUuid();
+                        eventType.name.value = lit("Event %1").arg(j);
+                        eventType.name.localization[lit("ru_RU")] = lit("Russion %1").arg(j);
+                        manifest.outputEventTypes.push_back(eventType);
+                    }
+
+                    auto server = servers[serverIndex];
+                    auto manifests = server->analyticsDrivers();
+                    manifests.push_back(manifest);
+                    server->setAnalyticsDrivers(manifests);
+                    server->saveParamsAsync();
+
+                    serverIndex = (serverIndex + 1) % servers.size();
+                }
+
+                for (auto server: servers)
+                {
+                    auto drivers = server->analyticsDrivers();
+                    drivers.push_back(nx::api::AnalyticsDriverManifest()); //< Some cameras will not have driver.
+
+                    for (auto camera: resourcePool()->getAllCameras(server, true))
+                    {
+                        const auto randomDriver = nx::utils::random::choice(drivers);
+                        if (randomDriver.driverId.isNull()) //< dummy driver
+                        {
+                            camera->setAnalyticsSupportedEvents({});
+                        }
+                        else
+                        {
+                            nx::api::AnalyticsSupportedEvents supported;
+                            std::transform(randomDriver.outputEventTypes.cbegin(),
+                                randomDriver.outputEventTypes.cend(),
+                                std::back_inserter(supported),
+                                [](const nx::api::Analytics::EventType& eventType)
+                                {
+                                    return eventType.typeId;
+                                });
+                            camera->setAnalyticsSupportedEvents(supported);
+                        }
+
+                        camera->saveParamsAsync();
+                    }
+                }
+            });
+
+        addButton(lit("Clear analytics manifests"),
+            [this]()
+            {
+                for (auto camera: resourcePool()->getAllCameras({}))
+                {
+                    camera->setAnalyticsSupportedEvents({});
+                    camera->saveParamsAsync();
+                }
+
+                for (auto server: resourcePool()->getAllServers(Qn::AnyStatus))
+                {
+                    server->setAnalyticsDrivers({});
+                    server->saveParamsAsync();
+                }
+            });
+
 
     }
 
@@ -172,7 +315,7 @@ private:
 
             m_tilesTests = new QnSystemTilesTestCase(testSystemsFinder, this);
 
-            const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+            const auto welcomeScreen = mainWindow()->welcomeScreen();
 
             connect(m_tilesTests, &QnSystemTilesTestCase::openTile,
                 welcomeScreen, &QnWorkbenchWelcomeScreen::openTile);
@@ -245,11 +388,12 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     supressLog(nx::utils::log::Tag(lit("__workbenchState")));
     supressLog(nx::utils::log::Tag(lit("__itemMap")));
     supressLog(QnLog::PERMISSIONS_LOG);
+    //consoleLog(lit("nx::client::desktop::RadassController::Private"));
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()
 {
-    QnDebugControlDialog* dialog(new QnDebugControlDialog(mainWindow()));
+    QnDebugControlDialog* dialog(new QnDebugControlDialog(mainWindowWidget()));
     dialog->show();
 }
 

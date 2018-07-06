@@ -9,7 +9,7 @@ window.NativePlayer = function(){
         this.readyHandler = readyHandler;
         this.readyHandler(this);
     };
-};
+}
 
 NativePlayer.prototype.play = function(){
     var playPromise = this.video.play();

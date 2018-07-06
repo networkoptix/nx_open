@@ -14,6 +14,7 @@
 
 namespace nx {
 
+// TODO: #GDM Remove together with maven.
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif

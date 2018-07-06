@@ -18,7 +18,7 @@ CloudModuleUrlFetcher::CloudModuleUrlFetcher(const QString& moduleName):
         lit("Given bad cloud module name %1").arg(moduleName));
 }
 
-void CloudModuleUrlFetcher::setUrl(QUrl url)
+void CloudModuleUrlFetcher::setUrl(nx::utils::Url url)
 {
     QnMutexLocker lk(&m_mutex);
     m_url = std::move(url);
@@ -26,10 +26,10 @@ void CloudModuleUrlFetcher::setUrl(QUrl url)
 
 void CloudModuleUrlFetcher::get(Handler handler)
 {
-    get(nx_http::AuthInfo(), std::move(handler));
+    get(nx::network::http::AuthInfo(), std::move(handler));
 }
 
-void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
+void CloudModuleUrlFetcher::get(nx::network::http::AuthInfo auth, Handler handler)
 {
     using namespace std::chrono;
     using namespace std::placeholders;
@@ -40,7 +40,7 @@ void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
     {
         auto result = m_url.get();
         lk.unlock();
-        handler(nx_http::StatusCode::ok, std::move(result));
+        handler(nx::network::http::StatusCode::ok, std::move(result));
         return;
     }
 
@@ -60,10 +60,10 @@ bool CloudModuleUrlFetcher::analyzeXmlSearchResult(
 
 void CloudModuleUrlFetcher::invokeHandler(
     const Handler& handler,
-    nx_http::StatusCode::Value statusCode)
+    nx::network::http::StatusCode::Value statusCode)
 {
-    NX_ASSERT(statusCode != nx_http::StatusCode::ok || static_cast<bool>(m_url));
-    handler(statusCode, m_url ? *m_url : QUrl());
+    NX_ASSERT(statusCode != nx::network::http::StatusCode::ok || static_cast<bool>(m_url));
+    handler(statusCode, m_url ? *m_url : nx::utils::Url());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -81,19 +81,19 @@ CloudModuleUrlFetcher::ScopedOperation::~ScopedOperation()
 
 void CloudModuleUrlFetcher::ScopedOperation::get(Handler handler)
 {
-    get(nx_http::AuthInfo(), std::move(handler));
+    get(nx::network::http::AuthInfo(), std::move(handler));
 }
 
 void CloudModuleUrlFetcher::ScopedOperation::get(
-    nx_http::AuthInfo auth,
+    nx::network::http::AuthInfo auth,
     Handler handler)
 {
     auto sharedGuard = m_guard.sharedGuard();
     m_fetcher->get(
         auth,
         [sharedGuard = std::move(sharedGuard), handler = std::move(handler)](
-            nx_http::StatusCode::Value statusCode,
-            QUrl result) mutable
+            nx::network::http::StatusCode::Value statusCode,
+            nx::utils::Url result) mutable
         {
             if (auto lock = sharedGuard->lock())
                 handler(statusCode, result);

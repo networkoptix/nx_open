@@ -1,19 +1,19 @@
 {
   "language_name": "Tiếng Việt",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Hủy bỏ",
-    "loginTitle": "Đăng nhập vào {{PRODUCT_NAME}}",
+    "loginTitle": "Đăng nhập vào %PRODUCT_NAME%",
     "loginButton": "Đăng nhập",
     "logoutAuthorisedTitle": "Bạn đã đăng nhập",
     "logoutAuthorisedContinueButton": "Tiếp tục",
     "logoutAuthorisedLogoutButton": "Đăng xuất"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Chào mừng bạn đến",
     "register": "Tạo tài khoản tại",
     "changePassword": "Đổi mật khẩu -",
@@ -31,8 +31,8 @@
     "view": "Xem camera ",
     "debug": "Gỡ rối",
     "login": "Đăng nhập -",
-    "download": "Tải xuống {{VMS_NAME}}",
-    "downloadPlatform": "Tải xuống {{VMS_NAME}} cho ",
+    "download": "Tải xuống %VMS_NAME%",
+    "downloadPlatform": "Tải xuống %VMS_NAME% cho ",
     "pageNotFound": "Không tìm thấy trang"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Tùy chỉnh",
-      "description": "Sử dụng ứng dụng Khách hàng {{PRODUCT_NAME}} để thiết lập quyền tùy chỉnh"
+      "description": "Sử dụng ứng dụng Khách hàng %PRODUCT_NAME% để thiết lập quyền tùy chỉnh"
     },
     "cloudAdmin": {
       "label": "Giám sát viên",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Tùy chỉnh",
-      "description": "Sử dụng ứng dụng Khách hàng {{PRODUCT_NAME}} để thiết lập quyền tùy chỉnh"
+      "description": "Sử dụng ứng dụng Khách hàng %VMS_NAME% để thiết lập quyền tùy chỉnh"
     }
   },
   "errorCodes": {
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "Không thể gửi Email xác nhận",
     "cloudInvalidResponse": "Có thể DB đã trả một phản hồi bất ngờ",
     "notAuthorized": "Sai mật khẩu",
-    "wrongParameters": "Một số thông số trên biểu mẫu không chính xác",
     "brokenAccount": "Vấn đề không mong muốn với tài khoản. <a href=\"/restore_password\">Khôi phục tài khoản</a>",
+    "wrongParameters": "Một số thông số trên biểu mẫu không chính xác",
     "wrongCode": "Tài khoản đã được kích hoạt hoặc mã xác nhận không chính xác",
     "wrongCodeRestore": "Mã xác nhận đã được sử dụng hoặc không chính xác",
     "forbidden": "Bạn không có quyền thực hiện công việc này",
@@ -133,9 +133,10 @@
     "passwordMismatch": "Sai mật khẩu",
     "cantEditYourself": "Không cho phép thay đổi quyền riêng tư",
     "cantEditAdmin": "Người dùng này có quyền quản trị viên",
-    "cantOpenClient": "Ứng dụng {{VMS_NAME}} ứng dụng không tìm thấy. <a href=\"/download\">Tải xuống</a>",
+    "cantOpenClient": "Ứng dụng %VMS_NAME% ứng dụng không tìm thấy. <a href=\"/download\">Tải xuống</a>",
     "lostConnection": "Kết nối với {{systemName}} bị mất",
-    "thisSystem": "hệ thống"
+    "thisSystem": "hệ thống",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "Mật khẩu phải chứa ít nhất 8 ký tự",
@@ -158,12 +159,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Hệ thống không thể truy cập được",
     "offline": "Hệ thống offline",
-    "openClient": "Mở trong {{VMS_NAME}}",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
+    "openClient": "Mở trong %VMS_NAME%",
+    "openClientNoSystem": "Mở %VMS_NAME%",
+    "confirmMergeAction": "Gộp lại",
+    "mergeSystemTitle": "Hợp nhất hệ thống",
     "confirmRenameTitle": "Tên hệ thống",
     "confirmRenameAction": "Tiết kiệm",
     "successRename": "Đã lưu tên hệ thống",
-    "confirmDisconnectTitle": "Ngắt kết nối Hệ thống từ {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Ngắt kết nối Hệ thống từ %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Ngắt kết nối",
     "confirmUnshareFromMe": "Bạn sẽ ngắt kết nối Hệ thống này khỏi tài khoản của bạn. Bạn sẽ không thể truy cập Hệ thống này nữa. Bạn có chắc không?",
     "confirmUnshareFromMeTitle": "Ngắt kết nối hệ thống?",
@@ -171,7 +174,7 @@
     "confirmUnshare": "Người dùng này sẽ không thể truy cập vào Hệ thống. Bạn có chắc không?",
     "confirmUnshareTitle": "Xóa người dùng?",
     "confirmUnshareAction": "Xóa bỏ",
-    "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ {{PRODUCT_NAME}}",
+    "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
     "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}"
   },
@@ -184,14 +187,14 @@
     "saveChanges": "Tiết kiệm"
   },
   "downloads": {
-    "noClientDetectedTitle": "Cài đặt {{VMS_NAME}} để xem Hệ thống của bạn",
-    "action": "Tải xuống {{VMS_NAME}}",
+    "noClientDetectedTitle": "Cài đặt %VMS_NAME% để xem Hệ thống của bạn",
+    "action": "Tải xuống %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

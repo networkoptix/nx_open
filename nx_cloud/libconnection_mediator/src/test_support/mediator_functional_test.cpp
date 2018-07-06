@@ -9,10 +9,14 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/mediator/api/mediator_api_client.h>
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket.h>
+#include <nx/network/stun/stun_types.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
@@ -29,12 +33,12 @@ namespace hpm {
 
 static constexpr size_t kMaxBindRetryCount = 10;
 
-static SocketAddress findFreeTcpAndUdpLocalAddress()
+static network::SocketAddress findFreeTcpAndUdpLocalAddress()
 {
     for (size_t attempt = 0; attempt < kMaxBindRetryCount; ++attempt)
     {
-        const SocketAddress address(
-            HostAddress::localhost,
+        const network::SocketAddress address(
+            network::HostAddress::localhost,
             nx::utils::random::number<uint16_t>(5000, 50000));
 
         network::TCPServerSocket tcpSocket(AF_INET);
@@ -45,23 +49,20 @@ static SocketAddress findFreeTcpAndUdpLocalAddress()
         if (!udpSocket.bind(address))
             continue;
 
-        return address;
+        return tcpSocket.getLocalAddress();
     }
 
-    return SocketAddress::anyPrivateAddress;
+    return network::SocketAddress::anyPrivateAddress;
 }
 
 MediatorFunctionalTest::MediatorFunctionalTest(int flags):
+    utils::test::TestWithTemporaryDirectory("hpm", QString()),
     m_testFlags(flags),
     m_stunPort(0),
     m_httpPort(0)
 {
     if (m_testFlags & initializeSocketGlobals)
-        nx::network::SocketGlobalsHolder::instance()->reinitialize();
-
-    m_tmpDir = QDir::homePath() + "/hpm_ut.data";
-    QDir(m_tmpDir).removeRecursively();
-    QDir().mkpath(m_tmpDir);
+        nx::network::SocketGlobals::cloud().reinitialize();
 
     m_stunAddress = findFreeTcpAndUdpLocalAddress();
     NX_LOGX(lm("STUN TCP & UDP endpoint: %1").arg(m_stunAddress), cl_logINFO);
@@ -69,9 +70,9 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-stun/addrToListenList", m_stunAddress.toStdString().c_str());
-    addArg("-http/addrToListenList", SocketAddress::anyPrivateAddress.toStdString().c_str());
+    addArg("-http/addrToListenList", network::SocketAddress::anyPrivateAddressV4.toStdString().c_str());
     addArg("-log/logLevel", "DEBUG2");
-    addArg("-general/dataDir", m_tmpDir.toLatin1().constData());
+    addArg("-general/dataDir", testDataDir().toLatin1().constData());
 
     if (m_testFlags & MediatorTestFlags::useTestCloudDataProvider)
         registerCloudDataProvider(&m_cloudDataProvider);
@@ -80,8 +81,6 @@ MediatorFunctionalTest::MediatorFunctionalTest(int flags):
 MediatorFunctionalTest::~MediatorFunctionalTest()
 {
     stop();
-
-    QDir(m_tmpDir).removeRecursively();
 
     if (m_factoryFuncToRestore)
     {
@@ -107,44 +106,44 @@ bool MediatorFunctionalTest::waitUntilStarted()
 
     if (m_testFlags & MediatorTestFlags::initializeConnectivity)
     {
-        network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+        network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder()
-                .setScheme(nx::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
-        network::SocketGlobals::mediatorConnector().enable(true);
+                .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
+        network::SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     return true;
 }
 
-SocketAddress MediatorFunctionalTest::stunEndpoint() const
+network::SocketAddress MediatorFunctionalTest::stunEndpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_stunPort);
+    return network::SocketAddress(network::HostAddress::localhost, m_stunPort);
 }
 
-SocketAddress MediatorFunctionalTest::httpEndpoint() const
+network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
 {
-    return SocketAddress(HostAddress::localhost, m_httpPort);
+    return network::SocketAddress(network::HostAddress::localhost, m_httpPort);
 }
 
 std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorFunctionalTest::clientConnection()
 {
-    return network::SocketGlobals::mediatorConnector().clientConnection();
+    return network::SocketGlobals::cloud().mediatorConnector().clientConnection();
 }
 
 std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
     MediatorFunctionalTest::systemConnection()
 {
-    return network::SocketGlobals::mediatorConnector().systemConnection();
+    return network::SocketGlobals::cloud().mediatorConnector().systemConnection();
 }
 
 void MediatorFunctionalTest::registerCloudDataProvider(
     AbstractCloudDataProvider* cloudDataProvider)
 {
-    m_factoryFuncToRestore = 
+    m_factoryFuncToRestore =
         AbstractCloudDataProviderFactory::setFactoryFunc(
             [cloudDataProvider](
-                const boost::optional<QUrl>& /*cdbUrl*/,
+                const boost::optional<nx::utils::Url>& /*cdbUrl*/,
                 const std::string& /*user*/,
                 const std::string& /*password*/,
                 std::chrono::milliseconds /*updateInterval*/,
@@ -225,30 +224,13 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
     return systemServers;
 }
 
-std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
+std::tuple<nx::network::http::StatusCode::Value, api::ListeningPeers>
     MediatorFunctionalTest::getListeningPeers() const
 {
-    nx_http::HttpClient httpClient;
-    const auto urlStr =
-        lm("http://%1%2").arg(httpEndpoint().toString())
-        .arg(nx::hpm::http::GetListeningPeerListHandler::kHandlerPath);
-    if (!httpClient.doGet(QUrl(urlStr)))
-        return std::make_tuple(
-            nx_http::StatusCode::serviceUnavailable,
-            data::ListeningPeers());
-    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
-        return std::make_tuple(
-            static_cast<nx_http::StatusCode::Value>(
-                httpClient.response()->statusLine.statusCode),
-            data::ListeningPeers());
-
-    QByteArray responseBody;
-    while (!httpClient.eof())
-        responseBody += httpClient.fetchMessageBodyBuffer();
-
-    return std::make_tuple(
-        nx_http::StatusCode::ok,
-        QJson::deserialized<data::ListeningPeers>(responseBody));
+    api::Client mediatorClient(
+        nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+            .setEndpoint(httpEndpoint()).setPath(api::kMediatorApiPrefix).toUrl());
+    return mediatorClient.getListeningPeers();
 }
 
 void MediatorFunctionalTest::beforeModuleCreation()
@@ -269,7 +251,7 @@ void MediatorFunctionalTest::beforeModuleCreation()
         }
     }
 
-    SocketAddress httpEndpoint = SocketAddress::anyPrivateAddress;
+    network::SocketAddress httpEndpoint = network::SocketAddress::anyPrivateAddressV4;
     if (m_httpPort != 0)
         httpEndpoint.port = m_httpPort;
 

@@ -4,12 +4,12 @@
 
 #include <boost/preprocessor/tuple/enum.hpp>
 
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr& resource):
-    base_type(resource),
-    m_resource(resource),
+QnRemotePtzController::QnRemotePtzController(const QnVirtualCameraResourcePtr& camera):
+    base_type(camera),
+    m_camera(camera),
     m_sequenceId(QnUuid::createUuid()),
     m_sequenceNumber(1)
 {
@@ -21,7 +21,7 @@ QnRemotePtzController::~QnRemotePtzController()
 
 Ptz::Capabilities QnRemotePtzController::getCapabilities() const
 {
-    Ptz::Capabilities result = m_resource->getPtzCapabilities();
+    Ptz::Capabilities result = m_camera->getPtzCapabilities();
     if (!result)
         return Ptz::NoPtzCapabilities;
 
@@ -35,7 +35,7 @@ Ptz::Capabilities QnRemotePtzController::getCapabilities() const
 
 QnMediaServerResourcePtr QnRemotePtzController::getMediaServer() const
 {
-    return m_resource->getParentResource().dynamicCast<QnMediaServerResource>();
+    return m_camera->getParentServer();
 }
 
 bool QnRemotePtzController::isPointless(Qn::PtzCommand command)
@@ -43,7 +43,7 @@ bool QnRemotePtzController::isPointless(Qn::PtzCommand command)
     if (!getMediaServer())
         return true;
 
-    const Qn::ResourceStatus status = m_resource->getStatus();
+    const Qn::ResourceStatus status = m_camera->getStatus();
     if (status == Qn::Unauthorized || status == Qn::Offline)
         return true;
 
@@ -68,7 +68,7 @@ int QnRemotePtzController::nextSequenceNumber()
             return false;                                                       \
                                                                                 \
         int handle = server->apiConnection()->FUNCTION(                         \
-            m_resource, ##__VA_ARGS__, nonConstThis,                            \
+            m_camera, ##__VA_ARGS__, nonConstThis,                            \
                 SLOT(at_replyReceived(int, const QVariant &, int)));            \
                                                                                 \
         const QnMutexLocker locker(&m_mutex);                                   \

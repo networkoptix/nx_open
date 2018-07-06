@@ -4,73 +4,80 @@
 
 using namespace nx;
 
+using nx::vms::api::EventType;
+using nx::vms::api::ActionType;
+
 // TODO: #vkutin Think of a proper namespace
 namespace QnBusiness {
 
-int eventHelpId(vms::event::EventType type)
+int eventHelpId(EventType type)
 {
     switch (type)
     {
-        case vms::event::cameraMotionEvent:
+        case EventType::cameraMotionEvent:
             return Qn::EventsActions_CameraMotion_Help;
-        case vms::event::cameraInputEvent:
+        case EventType::cameraInputEvent:
             return Qn::EventsActions_CameraInput_Help;
-        case vms::event::cameraDisconnectEvent:
+        case EventType::cameraDisconnectEvent:
             return Qn::EventsActions_CameraDisconnected_Help;
-        case vms::event::storageFailureEvent:
+        case EventType::storageFailureEvent:
             return Qn::EventsActions_StorageFailure_Help;
-        case vms::event::networkIssueEvent:
+        case EventType::networkIssueEvent:
             return Qn::EventsActions_NetworkIssue_Help;
-        case vms::event::cameraIpConflictEvent:
+        case EventType::cameraIpConflictEvent:
             return Qn::EventsActions_CameraIpConflict_Help;
-        case vms::event::serverFailureEvent:
+        case EventType::serverFailureEvent:
             return Qn::EventsActions_MediaServerFailure_Help;
-        case vms::event::serverConflictEvent:
+        case EventType::serverConflictEvent:
             return Qn::EventsActions_MediaServerConflict_Help;
-        case vms::event::serverStartEvent:
+        case EventType::serverStartEvent:
             return Qn::EventsActions_MediaServerStarted_Help;
-        case vms::event::licenseIssueEvent:
+        case EventType::licenseIssueEvent:
             return Qn::EventsActions_LicenseIssue_Help;
-        case vms::event::backupFinishedEvent:
+        case EventType::backupFinishedEvent:
             return Qn::EventsActions_BackupFinished_Help;
+        case EventType::analyticsSdkEvent:
+            return Qn::EventsActions_VideoAnalytics_Help;
+        case EventType::softwareTriggerEvent:
+            return Qn::EventActions_SoftTrigger_Help;
         default:
-            return type >= vms::event::userDefinedEvent
+            return type >= EventType::userDefinedEvent
                 ? Qn::EventsActions_Generic_Help
                 : -1;
     }
 }
 
-int actionHelpId(vms::event::ActionType type)
+int actionHelpId(ActionType type)
 {
     switch (type)
     {
-        case vms::event::cameraOutputAction:
+        case ActionType::cameraOutputAction:
             return Qn::EventsActions_CameraOutput_Help;
-        case vms::event::cameraRecordingAction:
+        case ActionType::cameraRecordingAction:
             return Qn::EventsActions_StartRecording_Help;
-        case vms::event::panicRecordingAction:
+        case ActionType::panicRecordingAction:
             return Qn::EventsActions_StartPanicRecording_Help;
-        case vms::event::sendMailAction:
+        case ActionType::sendMailAction:
             return Qn::EventsActions_SendMail_Help;
-        case vms::event::showPopupAction:
+        case ActionType::showPopupAction:
             return Qn::EventsActions_ShowNotification_Help;
-        case vms::event::playSoundOnceAction:
+        case ActionType::playSoundOnceAction:
             return Qn::EventsActions_PlaySound_Help;
-        case vms::event::playSoundAction:
+        case ActionType::playSoundAction:
             return Qn::EventsActions_PlaySoundRepeated_Help;
-        case vms::event::sayTextAction:
+        case ActionType::sayTextAction:
             return Qn::EventsActions_Speech_Help;
-        case vms::event::diagnosticsAction:
+        case ActionType::diagnosticsAction:
             return Qn::EventsActions_Diagnostics_Help;
-        case vms::event::showOnAlarmLayoutAction:
+        case ActionType::showOnAlarmLayoutAction:
             return Qn::EventsActions_ShowOnAlarmLayout_Help;
-        case vms::event::bookmarkAction:
+        case ActionType::bookmarkAction:
             return Qn::EventsActions_Bookmark_Help;
-        case vms::event::executePtzPresetAction:
+        case ActionType::executePtzPresetAction:
             return Qn::EventsActions_ExecutePtzPreset_Help;
-        case vms::event::showTextOverlayAction:
+        case ActionType::showTextOverlayAction:
             return Qn::EventsActions_ShowTextOverlay_Help;
-        case vms::event::execHttpRequestAction:
+        case ActionType::execHttpRequestAction:
             return Qn::EventsActions_ExecHttpRequest_Help;
         default:
             return -1;
@@ -92,8 +99,6 @@ int healthHelpId(QnSystemHealth::MessageType type)
             return Qn::EventsActions_SendMailError_Help;
         case QnSystemHealth::StoragesNotConfigured:
             return Qn::EventsActions_StoragesMisconfigured_Help;
-        case QnSystemHealth::StoragesAreFull:
-            return Qn::EventsActions_StorageFull_Help;
         default:
             return -1;
     }

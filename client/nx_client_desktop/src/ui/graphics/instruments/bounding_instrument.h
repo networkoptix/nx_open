@@ -5,11 +5,12 @@
 #include <QtCore/QSet>
 #include <QtGui/QTransform>
 #include <ui/animation/animation_timer.h>
-#include <ui/common/margins.h>
 #include "instrument.h"
 
-class BoundingInstrument: public Instrument {
-    Q_OBJECT;
+class BoundingInstrument: public Instrument
+{
+    Q_OBJECT
+
 public:
     /**
      * Constructor.
@@ -39,13 +40,13 @@ public:
      * \param view                      Graphics view to use.
      * \param extension                 Extension of the area to which viewport movement is restricted, in viewports.
      */
-    void setPositionBoundsExtension(QGraphicsView *view, const MarginsF &extension);
+    void setPositionBoundsExtension(QGraphicsView *view, const QMarginsF &extension);
 
     /**
      * \param view                      Graphics view to use.
      * \returns                         Extension of the area to which viewport movement is restricted, in viewports.
      */
-    MarginsF positionBoundsExtension(QGraphicsView *view) const;
+    QMarginsF positionBoundsExtension(QGraphicsView *view) const;
 
     /**
      * \param view                      Graphics view to use.

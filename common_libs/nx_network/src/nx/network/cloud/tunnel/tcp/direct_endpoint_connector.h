@@ -3,7 +3,7 @@
 #include <list>
 
 #include <nx/network/aio/basic_pollable.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/move_only_func.h>
 
@@ -50,7 +50,7 @@ private:
     struct ConnectionContext
     {
         SocketAddress endpoint;
-        nx_http::AsyncHttpClientPtr httpClient;
+        nx::network::http::AsyncHttpClientPtr httpClient;
     };
 
     using Verificators = std::list<std::unique_ptr<AbstractEndpointVerificator>>;

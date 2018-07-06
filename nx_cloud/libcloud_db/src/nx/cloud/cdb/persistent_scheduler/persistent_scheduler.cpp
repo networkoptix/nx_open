@@ -1,7 +1,8 @@
-#include <nx/utils/std/future.h>
+#include "persistent_scheduler.h"
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
-#include "persistent_scheduler.h"
+#include <nx/utils/std/future.h>
 
 namespace nx {
 namespace cdb {
@@ -168,32 +169,29 @@ void PersistentScheduler::addTimer(
     const ScheduleTaskInfo& taskInfo)
 {
     nx::utils::TimerId timerId;
+    QnMutexLocker lock(&m_timerManagerMutex);
+    NX_ASSERT(m_timerManager);
+    if (!m_timerManager)
     {
-        QnMutexLocker lock(&m_timerManagerMutex);
-        NX_ASSERT(m_timerManager);
-        if (!m_timerManager)
-        {
-            NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
-            return;
-        }
-
-        auto delayInfo = calcDelay(taskInfo);
-        if (delayInfo.fullPeriodsPassed != 0 && delayInfo.delay > std::chrono::milliseconds(10))
-        {
-            m_timerManager->addTimer(
-                [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
-                { timerFunction(functorId, taskId, params); },
-                std::chrono::milliseconds(1));
-        }
-
-        timerId = m_timerManager->addNonStopTimer(
-            [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
-            { timerFunction(functorId, taskId, params); },
-            taskInfo.period,
-            delayInfo.delay);
+        NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
+        return;
     }
 
-    QnMutexLocker lock2(&m_mutex);
+    auto delayInfo = calcDelay(taskInfo);
+    if (delayInfo.fullPeriodsPassed != 0 && delayInfo.delay > std::chrono::milliseconds(10))
+    {
+        m_timerManager->addTimer(
+            [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
+            { timerFunction(functorId, taskId, params); },
+            std::chrono::milliseconds(1));
+    }
+
+    timerId = m_timerManager->addNonStopTimer(
+        [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
+        { timerFunction(functorId, taskId, params); },
+        taskInfo.period,
+        delayInfo.delay);
+
     auto taskToTimerIt = m_taskToTimer.find(taskId);
     NX_ASSERT(taskToTimerIt == m_taskToTimer.cend());
     if (taskToTimerIt != m_taskToTimer.cend())

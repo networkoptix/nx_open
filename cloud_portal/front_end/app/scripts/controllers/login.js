@@ -36,7 +36,8 @@ angular.module('cloudApp')
             }
         }).then(function(){
             if(dialogSettings.params.redirect){
-                $location.path(Config.redirectAuthorised);
+                $location.path($routeParams.next ? $routeParams.next : Config.redirectAuthorised);
+                $location.search('next', null);
             }
             setTimeout(function(){
                 document.location.reload();

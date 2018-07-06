@@ -16,16 +16,16 @@ class HttpServer
 {
 public:
     HttpServer(
-        nx_http::server::rest::MessageDispatcher* httpMessageDispatcher,
+        nx::network::http::server::rest::MessageDispatcher* httpMessageDispatcher,
         RegisteredPeerPool* registeredPeerPool);
 
 private:
-    nx_http::server::rest::MessageDispatcher* m_httpMessageDispatcher;
+    nx::network::http::server::rest::MessageDispatcher* m_httpMessageDispatcher;
     RegisteredPeerPool* m_registeredPeerPool;
 
     void onKeepAliveConnectionAccepted(
         std::unique_ptr<nx::network::WebSocket> connection,
-        std::vector<nx_http::StringType> restParams);
+        std::vector<nx::network::http::StringType> restParams);
 };
 
 } // namespace discovery

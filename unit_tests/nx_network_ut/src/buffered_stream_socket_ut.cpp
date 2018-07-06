@@ -14,7 +14,8 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
     []()
     {
         return std::make_unique<BufferedStreamSocket>(
-            std::make_unique<TCPSocket>(AF_INET));
+            std::make_unique<TCPSocket>(AF_INET),
+            nx::Buffer());
     })
 
 class BufferedStreamSocketTest:
@@ -40,12 +41,14 @@ protected:
 
         client = std::make_unique<TCPSocket>(AF_INET);
         ASSERT_TRUE(client->setSendTimeout(500));
-        ASSERT_TRUE(client->connect(serverAddress, 500));
+        ASSERT_TRUE(client->connect(serverAddress, nx::network::kNoTimeout));
 
-        std::unique_ptr<AbstractStreamSocket> acceptedRaw(server->accept());
+        auto acceptedRaw = server->accept();
         ASSERT_NE(acceptedRaw, nullptr) << SystemError::getLastOSErrorText().toStdString();
 
-        accepted = std::make_unique<BufferedStreamSocket>(std::move(acceptedRaw));
+        accepted = std::make_unique<BufferedStreamSocket>(
+            std::move(acceptedRaw),
+            nx::Buffer());
         ASSERT_TRUE(accepted->setRecvTimeout(500));
     }
 };
@@ -92,25 +95,6 @@ TEST_F(BufferedStreamSocketTest, catchRecvEvent)
     client.reset();
     ASSERT_EQ(acceptedResults.pop(), SystemError::connectionReset);
     ASSERT_TRUE(acceptedResults.isEmpty());
-}
-
-TEST_F(BufferedStreamSocketTest, injectRecvData)
-{
-    accepted->injectRecvData(kTestMessage);
-    ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
-
-    buffer = Buffer(kTestMessage.size() * 2, '\0');
-    ASSERT_EQ(accepted->recv(buffer.data(), buffer.size(), MSG_WAITALL), buffer.size());
-    ASSERT_TRUE(buffer.startsWith(kTestMessage));
-    ASSERT_TRUE(buffer.endsWith(kTestMessage));
-
-    accepted->injectRecvData(kTestMessage);
-    accepted->injectRecvData(kTestMessage, BufferedStreamSocket::Inject::replace);
-    accepted->injectRecvData(kTestMessage, BufferedStreamSocket::Inject::begin);
-    client.reset();
-
-    buffer = Buffer(kTestMessage.size() * 3, '\0');
-    ASSERT_EQ(accepted->recv(buffer.data(), buffer.size(), MSG_WAITALL), kTestMessage.size() * 2);
 }
 
 } // namespace test

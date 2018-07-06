@@ -21,7 +21,7 @@ CONFIG(release, debug|release) {
 
 win32 {
   QT += axserver
-  DEFINES += AxHDWitness=Ax${ax.className}
+  DEFINES += AxHDWitness=Ax${paxton.className}
   CONFIG += dll qaxserver_no_postlink
   CONFIG -= console
 }

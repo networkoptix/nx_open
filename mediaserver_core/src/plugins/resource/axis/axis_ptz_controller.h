@@ -8,6 +8,7 @@
 
 #include <core/ptz/basic_ptz_controller.h>
 #include <utils/math/functors.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 class CLSimpleHTTPClient;
 class QnAxisParameterMap;

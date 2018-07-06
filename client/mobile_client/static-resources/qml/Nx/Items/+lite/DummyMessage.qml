@@ -16,9 +16,14 @@ Pane
 
     contentItem: Item
     {
-        anchors.fill: parent
-        anchors.leftMargin: 8
-        anchors.rightMargin: 8
+        id: contentItem
+
+        readonly property real maximumHeight: 400
+        readonly property real scaleFactor: height / maximumHeight
+
+        anchors.centerIn: parent
+        width: Math.min(availableWidth, height * 2)
+        height: Math.min(availableHeight / 2, maximumHeight)
 
         Column
         {
@@ -28,19 +33,28 @@ Pane
             Image
             {
                 id: image
-                anchors.horizontalCenter: parent.horizontalCenter
+
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: Qt.AlignVCenter
+
+                width: parent.width
+                height: implicitHeight * contentItem.scaleFactor
+                fillMode: Image.PreserveAspectFit
             }
 
             Text
             {
                 id: title
+
                 width: parent.width
-                height: 160
+                height: contentItem.height - image.height
+
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 88
+                font.pixelSize: 88 * contentItem.scaleFactor
                 font.weight: Font.Light
                 font.capitalization: Font.AllUppercase
+                fontSizeMode: Text.Fit
                 wrapMode: Text.WordWrap
                 color: ColorTheme.red_main
             }

@@ -6,8 +6,8 @@
 #include <nx/streaming/audio_data_packet.h>
 #include <core/resource/resource.h>
 #include <ui/screen_recording/video_recorder_settings.h>
-#include <core/dataprovider/live_stream_provider.h>
 #include <utils/media/voice_spectrum_analyzer.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 
 class QnAbstractDataConsumer;
 

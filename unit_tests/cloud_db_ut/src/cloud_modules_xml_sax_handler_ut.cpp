@@ -17,7 +17,7 @@ namespace client {
 
 TEST(CloudModulesXmlHandler, common)
 {
-    //< ? xml version = \"1.0\" encoding=\"utf-8\"?>  
+    //< ? xml version = \"1.0\" encoding=\"utf-8\"?>
     QByteArray testData( "                          \
         <modules>                                   \
         <cdb>                                       \
@@ -43,13 +43,13 @@ TEST(CloudModulesXmlHandler, common)
 
     const auto cdbEndpoints = xmlHandler.moduleUrls("cdb");
     ASSERT_EQ(cdbEndpoints.size(), 2U);
-    ASSERT_EQ(cdbEndpoints.front(), SocketAddress("10.0.2.95:3346"));
-    ASSERT_EQ(*std::next(cdbEndpoints.begin(), 1), SocketAddress("10.0.2.101:3346"));
+    ASSERT_EQ(cdbEndpoints.front(), nx::network::SocketAddress("10.0.2.95:3346"));
+    ASSERT_EQ(*std::next(cdbEndpoints.begin(), 1), nx::network::SocketAddress("10.0.2.101:3346"));
 
     const auto hpmEndpoints = xmlHandler.moduleUrls("hpm");
     ASSERT_EQ(hpmEndpoints.size(), 2U);
-    ASSERT_EQ(hpmEndpoints.front(), SocketAddress("10.0.2.102:123"));
-    ASSERT_EQ(*std::next(hpmEndpoints.begin(), 1), SocketAddress("10.0.2.103:456"));
+    ASSERT_EQ(hpmEndpoints.front(), nx::network::SocketAddress("10.0.2.102:123"));
+    ASSERT_EQ(*std::next(hpmEndpoints.begin(), 1), nx::network::SocketAddress("10.0.2.103:456"));
 }
 
 }   //client

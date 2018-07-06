@@ -8,12 +8,11 @@
 #include "core/resource_management/resource_pool.h"
 
 #include <QtCore/QUrlQuery>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "vmax480_resource_searcher.h"
 
 QnMutex QnPlVmax480Resource::m_chunkReaderMutex;
 QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
-
 
 const QString QnPlVmax480Resource::MANUFACTURE(lit("VMAX"));
 
@@ -39,18 +38,16 @@ int QnPlVmax480Resource::getMaxFps() const
     return 30;
 }
 
-QString QnPlVmax480Resource::getDriverName() const 
+QString QnPlVmax480Resource::getDriverName() const
 {
     return MANUFACTURE;
 }
 
-void QnPlVmax480Resource::setIframeDistance(int frames, int timems) 
+void QnPlVmax480Resource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
-    Q_UNUSED(frames)
-    Q_UNUSED(timems)
 }
 
-void QnPlVmax480Resource::setHostAddress(const QString &ip) 
+void QnPlVmax480Resource::setHostAddress(const QString &ip)
 {
     QString oldHostAddr = getHostAddress();
 
@@ -106,12 +103,12 @@ int QnPlVmax480Resource::eventPort() const
         return 0;
 
     return lst[3].toInt();
-    
+
 }
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
 {
-    return new QnVMax480LiveProvider(toSharedPointer());
+    return new QnVMax480LiveProvider(toSharedPointer(this));
 }
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()
@@ -122,12 +119,19 @@ QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()
     return archiveReader;
 }
 
-QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate() 
-{ 
+QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
+{
     return new QnVMax480ArchiveDelegate(toSharedPointer());
 }
 
-CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap QnPlVmax480Resource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result QnPlVmax480Resource::initializeCameraDriver()
 {
     QUrl url = getUrl();
     int httpPort = url.port(80);
@@ -139,7 +143,6 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     if (!QnPlVmax480ResourceSearcher::vmaxAuthenticate(client, getAuth()))
         return CameraDiagnostics::CannotEstablishConnectionResult(httpPort);
 
-    QnPhysicalCameraResource::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
 
@@ -189,18 +192,18 @@ void QnPlVmax480Resource::setArchiveRange(qint64 startTimeUsec, qint64 endTimeUs
         m_endTime = endTimeUsec;
     }
 
-    if (recursive) 
+    if (recursive)
     {
         for (int i = 0; i < VMAX_MAX_CH; ++i)
         {
-            QnPhysicalCameraResourcePtr otherRes = getOtherResource(i);
+            QnSecurityCamResourcePtr otherRes = getOtherResource(i);
             if (otherRes && otherRes.data() != this)
                 otherRes.dynamicCast<QnPlVmax480Resource>()->setArchiveRange(startTimeUsec, endTimeUsec, false);
         }
     }
 }
 
-QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
+QnSecurityCamResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
 {
     QUrl url(getUrl());
     QUrlQuery urlQuery(url.query());
@@ -213,7 +216,7 @@ QnPhysicalCameraResourcePtr QnPlVmax480Resource::getOtherResource(int channel)
     urlQuery.setQueryItems(items);
     url.setQuery(urlQuery);
     QString urlStr = url.toString();
-    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<QnPhysicalCameraResource>();
+    return resourcePool()->getResourceByUrl(urlStr).dynamicCast<nx::mediaserver::resource::Camera>();
 }
 
 void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
@@ -221,7 +224,7 @@ void QnPlVmax480Resource::at_gotChunks(int channel, QnTimePeriodList chunks)
     if (channel == getChannel())
         setChunks(chunks);
     else {
-        QnPhysicalCameraResourcePtr otherRes = getOtherResource(channel);
+        QnSecurityCamResourcePtr otherRes = getOtherResource(channel);
         if (otherRes)
             otherRes.dynamicCast<QnPlVmax480Resource>()->setChunks(chunks);
     }
@@ -241,9 +244,8 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
     //m_chunksCond.wakeAll();
 }
 
-QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) 
+QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)
 {
-    Q_UNUSED(detailLevel)
     QnMutexLocker lock( &m_mutexChunks );
     if (!m_chunks.empty())
         startTimeMs = qMin(startTimeMs, m_chunks.last().startTimeMs);
@@ -256,11 +258,9 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
     return m_chunks.intersected(period);
 }
 
-Qn::LicenseType QnPlVmax480Resource::licenseType() const
+Qn::LicenseType QnPlVmax480Resource::calculateLicenseType() const
 {
     return Qn::LC_VMAX;
 }
 
-
 #endif // #ifdef ENABLE_VMAX
-

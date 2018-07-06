@@ -65,10 +65,10 @@ QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const Parameters& /*par
     QObject* parent)
 {
     /* Multi-videos and shared layouts will go here. */
-    auto layouts = resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>();
+    auto layouts = resourcePool()->getResourcesByParentId(QnUuid()).filtered<QnLayoutResource>();
     if (context()->user())
     {
-        layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId())
+        layouts.append(resourcePool()->getResourcesByParentId(context()->user()->getId())
             .filtered<QnLayoutResource>());
     }
 

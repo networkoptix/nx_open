@@ -123,9 +123,9 @@ protected:
 
         T reply;
         if(status == 0) {
-            QnUbjsonRestResult result;
             bool deserialized = false;
-            result = QnUbjson::deserialized<QnUbjsonRestResult>(response.msgBody, QnUbjsonRestResult(), &deserialized);
+            QnUbjsonRestResult result = QnUbjson::deserialized<QnUbjsonRestResult>(
+                response.msgBody, QnUbjsonRestResult(), &deserialized);
 
             if (deserialized && !result.reply.isNull())
                 reply = QnUbjson::deserialized<T>(result.reply, T(), &deserialized);

@@ -6,31 +6,31 @@
         <?include BuildVars.wxi ?>
 
         <DirectoryRef Id="INSTALLDIR">
-             <Directory Id="${customization}TrayToolDir" Name="TrayTool">
+             <Directory Id="TrayToolRootDir" Name="TrayTool">
                  <Directory Id="TraytoolPlatforms" Name="platforms"/>
                  <Component Id="traytool.exe">
                      <File Id="traytool.exe" Name="traytool.exe" Source="$(var.SourceDir)/traytool.exe" KeyPath="yes">
                          <fire:FirewallException Id="FirewallException${customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
 
                          <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${traytool.name}"
-                                   WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe">
+                                   WorkingDirectory='TrayToolRootDir' Advertise="yes" Icon="icon_menu.exe">
                          </Shortcut>
 
                          <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${traytool.name}"
-                                   WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe">
+                                   WorkingDirectory='TrayToolRootDir' Advertise="yes" Icon="icon_menu.exe">
                          </Shortcut>
                      </File>
                  </Component>
              </Directory>
         </DirectoryRef>
 
-        <ComponentGroup Id="TrayToolLibs" Directory="${customization}TrayToolDir">
+        <ComponentGroup Id="TrayToolLibs" Directory="TrayToolRootDir">
             <Component>
                 <File Id="TrayToolUtilsLib" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="TrayToolQTLibraries" Directory="${customization}TrayToolDir">
+        <ComponentGroup Id="TrayToolQTLibraries" Directory="TrayToolRootDir">
             <Component>
                 <File Id="TrayToolicudt58.dll" Name="icudt58.dll" Source="$(var.QtDir)\icudt58.dll" DiskId="5" />
             </Component>
@@ -61,7 +61,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="TrayToolOpenSSL" Directory="${customization}TrayToolDir">
+        <ComponentGroup Id="TrayToolOpenSSL" Directory="TrayToolRootDir">
             <Component>
                 <File Id="TrayToolSsl_libeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll" DiskId="6"/>
             </Component>

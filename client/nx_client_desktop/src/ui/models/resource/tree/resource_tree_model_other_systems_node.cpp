@@ -19,7 +19,7 @@
 #include <ui/workbench/workbench_context.h>
 
 QnResourceTreeModelOtherSystemsNode::QnResourceTreeModelOtherSystemsNode(QnResourceTreeModel* model):
-    base_type(model, Qn::OtherSystemsNode)
+    base_type(model, NodeType::otherSystems)
 {
 }
 
@@ -149,7 +149,7 @@ void QnResourceTreeModelOtherSystemsNode::updateFakeServerNode(
     const bool isCurrentSystemServer = helpers::serverBelongsToCurrentSystem(server);
 
     const auto parent = isCurrentSystemServer
-        ? model()->rootNode(Qn::ServersNode)
+        ? model()->rootNode(NodeType::servers)
         : ensureLocalSystemNode(systemName);
 
     auto node = ensureFakeServerNode(server);
@@ -247,20 +247,20 @@ void QnResourceTreeModelOtherSystemsNode::rebuild()
     }
 }
 
-void QnResourceTreeModelOtherSystemsNode::removeNode(const QnResourceTreeModelNodePtr& node)
+void QnResourceTreeModelOtherSystemsNode::removeNode(QnResourceTreeModelNodePtr node)
 {
     if (!node)
         return;
 
     switch(node->type())
     {
-        case Qn::SystemNode:
+        case NodeType::localSystem:
             m_localNodes.remove(m_localNodes.key(node));
             break;
-        case Qn::CloudSystemNode:
+        case NodeType::cloudSystem:
             m_cloudNodes.remove(m_cloudNodes.key(node));
             break;
-        case Qn::ResourceNode:
+        case NodeType::resource:
             m_fakeServers.remove(node->resource());
             break;
         default:

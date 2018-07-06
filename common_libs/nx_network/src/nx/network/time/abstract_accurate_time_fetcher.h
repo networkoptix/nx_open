@@ -23,7 +23,7 @@ public:
 
     /**
      * Initiates asynchronous time request operation.
-     * @note Implementation is NOT REQUIRED to support performing multiple simultaneous operations.
+     * NOTE: Implementation is NOT REQUIRED to support performing multiple simultaneous operations.
      * @return true if request issued successfully, otherwise false.
      */
     virtual void getTimeAsync(CompletionHandler handlerFunc) = 0;

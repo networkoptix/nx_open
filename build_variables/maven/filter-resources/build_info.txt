@@ -1,0 +1,11 @@
+version=@parsedVersion.majorVersion@.@parsedVersion.minorVersion@.@parsedVersion.incrementalVersion@.@buildNumber@
+customization=@customization@
+cloudHost=@cloudHost@
+cloudGroup=@cloudGroup@
+arch=@arch@
+platform=@platform@
+platformModification=@modification@
+changeSet=@changeSet@
+beta=@beta_bool@
+brand=@product.name.short@
+protoVersion=@nxec.ec2ProtoVersion@

@@ -30,7 +30,5 @@ private:
 
 private:
     QUrl m_url;
-    std::unique_ptr<AbstractDatagramSocket> m_socket;
-    QByteArray m_buffer;
-    bool m_cutRtpHeaderOff;
+    std::unique_ptr<nx::network::AbstractDatagramSocket> m_socket;
 };

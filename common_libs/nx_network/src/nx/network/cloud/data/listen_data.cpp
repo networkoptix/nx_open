@@ -10,15 +10,19 @@ ListenRequest::ListenRequest():
 {
 }
 
-void ListenRequest::serializeAttributes(nx::stun::Message* const message)
+void ListenRequest::serializeAttributes(nx::network::stun::Message* const message)
 {
+    using namespace nx::network;
+
     message->newAttribute<stun::extension::attrs::SystemId>(systemId);
     message->newAttribute<stun::extension::attrs::ServerId>(serverId);
     message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
-bool ListenRequest::parseAttributes(const nx::stun::Message& message)
+bool ListenRequest::parseAttributes(const nx::network::stun::Message& message)
 {
+    using namespace nx::network;
+
     if (!readEnumAttributeValue(
             message,
             stun::extension::attrs::cloudConnectVersion,
@@ -40,12 +44,12 @@ ListenResponse::ListenResponse():
 {
 }
 
-using TcpKeepAlive = 
-    stun::extension::attrs::StringAttribute<stun::extension::attrs::tcpConnectionKeepAlive>;
+using TcpKeepAlive =
+    network::stun::extension::attrs::StringAttribute<network::stun::extension::attrs::tcpConnectionKeepAlive>;
 
-void ListenResponse::serializeAttributes(nx::stun::Message* const message)
+void ListenResponse::serializeAttributes(nx::network::stun::Message* const message)
 {
-    using namespace stun::extension;
+    using namespace nx::network::stun::extension;
 
     if (tcpConnectionKeepAlive)
         message->newAttribute<TcpKeepAlive>(tcpConnectionKeepAlive->toString().toUtf8());
@@ -54,19 +58,19 @@ void ListenResponse::serializeAttributes(nx::stun::Message* const message)
     if (trafficRelayUrl)
         message->newAttribute<attrs::TrafficRelayUrl>(std::move(*trafficRelayUrl));
     message->newAttribute<attrs::StringList>(
-        nx::stun::extension::attrs::trafficRelayUrlList,
+        nx::network::stun::extension::attrs::trafficRelayUrlList,
         std::move(trafficRelayUrls));
 }
 
-bool ListenResponse::parseAttributes(const nx::stun::Message& message)
+bool ListenResponse::parseAttributes(const nx::network::stun::Message& message)
 {
-    using namespace stun::extension;
+    using namespace nx::network::stun::extension;
 
     tcpConnectionKeepAlive = boost::none;
     nx::String keepAliveOptions;
     if (readStringAttributeValue<TcpKeepAlive>(message, &keepAliveOptions))
     {
-        tcpConnectionKeepAlive = KeepAliveOptions::fromString(QString::fromUtf8(keepAliveOptions));
+        tcpConnectionKeepAlive = network::KeepAliveOptions::fromString(QString::fromUtf8(keepAliveOptions));
         if (!tcpConnectionKeepAlive)
             return false; //< Empty means parsing has failed.
     }

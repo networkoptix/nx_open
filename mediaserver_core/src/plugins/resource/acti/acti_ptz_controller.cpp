@@ -6,7 +6,6 @@
 
 #include "acti_resource.h"
 
-
 // -------------------------------------------------------------------------- //
 // Utility
 // -------------------------------------------------------------------------- //
@@ -99,7 +98,6 @@ namespace {
 
 } // anonymous namespace
 
-
 // -------------------------------------------------------------------------- //
 // QnActiPtzControllerPrivate
 // -------------------------------------------------------------------------- //
@@ -120,7 +118,7 @@ public:
 
     void init();
 
-    bool query(const QString &request, QByteArray *body = NULL, bool keepAllData = false) const;
+    bool query(const QString& request, QByteArray* body = NULL, bool keepAllData = false) const;
     bool continuousZoomQuery(int zoomSpeed);
     bool continuousPanTiltQuery(int panSpeed, int tiltSpeed);
     bool absoluteZoomQuery(int zoom);
@@ -129,9 +127,9 @@ public:
     bool processQueries();
     bool processQueriesLocked();
 
-    bool continuousMove(const ActiPtzVector &speed);
-    bool absoluteMove(const ActiPtzVector &position, int panTiltSpeed);
-    bool getPosition(ActiPtzVector *position);
+    bool continuousMove(const ActiPtzVector& speed);
+    bool absoluteMove(const ActiPtzVector& position, int panTiltSpeed);
+    bool getPosition(ActiPtzVector* position);
 
 public:
     QnMutex mutex;
@@ -183,7 +181,9 @@ void QnActiPtzControllerPrivate::init() {
 #endif
 }
 
-bool QnActiPtzControllerPrivate::query(const QString &request, QByteArray *body, bool keepAllData) const {
+bool QnActiPtzControllerPrivate::query(
+    const QString& request, QByteArray* body, bool keepAllData) const
+{
     CLHttpStatus status;
     QByteArray data = resource->makeActiRequest(lit("encoder"), request, status, keepAllData);
     if(body) {
@@ -194,7 +194,8 @@ bool QnActiPtzControllerPrivate::query(const QString &request, QByteArray *body,
     return status == CL_HTTP_SUCCESS;
 }
 
-bool QnActiPtzControllerPrivate::continuousZoomQuery(int zoomSpeed) {
+bool QnActiPtzControllerPrivate::continuousZoomQuery(int zoomSpeed)
+{
     QString request = lit("ZOOM=%1").arg(actiZoomDirection(zoomSpeed));
     if(zoomSpeed != 0)
         request += lit(",%1").arg(qAbs(zoomSpeed));
@@ -202,7 +203,8 @@ bool QnActiPtzControllerPrivate::continuousZoomQuery(int zoomSpeed) {
     return query(request);
 }
 
-bool QnActiPtzControllerPrivate::continuousPanTiltQuery(int panSpeed, int tiltSpeed) {
+bool QnActiPtzControllerPrivate::continuousPanTiltQuery(int panSpeed, int tiltSpeed)
+{
     QString request = lit("MOVE=%1").arg(actiPanTiltDirection(panSpeed, tiltSpeed));
     if (panSpeed != 0)
         request += lit(",%1").arg(qAbs(panSpeed));
@@ -212,19 +214,23 @@ bool QnActiPtzControllerPrivate::continuousPanTiltQuery(int panSpeed, int tiltSp
     return query(request);
 }
 
-bool QnActiPtzControllerPrivate::absoluteZoomQuery(int zoom) {
+bool QnActiPtzControllerPrivate::absoluteZoomQuery(int zoom)
+{
     return query(lit("ZOOM=DIRECT,%1").arg(zoom));
 }
 
-bool QnActiPtzControllerPrivate::absolutePanTiltQuery(int pan, int tilt, int panTiltSpeed) {
+bool QnActiPtzControllerPrivate::absolutePanTiltQuery(int pan, int tilt, int panTiltSpeed)
+{
     return query(lit("POSITION=ABSOLUTE,%1,%2,%3,%3").arg(pan).arg(tilt).arg(panTiltSpeed));
 }
 
-bool QnActiPtzControllerPrivate::processQueriesLocked() {
+bool QnActiPtzControllerPrivate::processQueriesLocked()
+{
     bool result = true;
     bool first = true;
 
-    while(true) {
+    while(true)
+    {
         Qn::PtzCommand command;
         ActiPtzVector speed;
         ActiPtzVector position;
@@ -239,8 +245,10 @@ bool QnActiPtzControllerPrivate::processQueriesLocked() {
             pendingCommand = Qn::InvalidPtzCommand;
         }
 
-        switch(command) {
-        case Qn::ContinuousMovePtzCommand: {
+        switch(command)
+        {
+        case Qn::ContinuousMovePtzCommand:
+        {
             if(currentSpeed == speed)
                 break;
 
@@ -268,7 +276,8 @@ bool QnActiPtzControllerPrivate::processQueriesLocked() {
 
             break;
         }
-        case Qn::AbsoluteDeviceMovePtzCommand: {
+        case Qn::AbsoluteDeviceMovePtzCommand:
+        {
             /* Stop first.
              * If we don't do that, absolute movement will not work. */
             if(currentSpeed.zoom != 0)
@@ -281,10 +290,12 @@ bool QnActiPtzControllerPrivate::processQueriesLocked() {
             status = status & absolutePanTiltQuery(position.pan, position.tilt, speed.pan);
             status = status & absoluteZoomQuery(position.zoom);
 
-            if(status) {
+            if(status)
+            {
                 currentPosition = position;
                 currentSpeed = ActiPtzVector(0, 0, 0);
-            } else {
+            } else
+            {
                 currentSpeed = currentPosition = ActiPtzVector(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue);
             }
 
@@ -294,15 +305,17 @@ bool QnActiPtzControllerPrivate::processQueriesLocked() {
             return result;
         }
 
-        if(first) {
+        if (first)
+        {
             first = false;
             result = status;
         }
     }
 }
 
-bool QnActiPtzControllerPrivate::processQueries() {
-    if(!queryMutex.tryLock())
+bool QnActiPtzControllerPrivate::processQueries()
+{
+    if (!queryMutex.tryLock())
         return true; /* Just assume that it will work. */
 
     bool result = processQueriesLocked();
@@ -312,7 +325,8 @@ bool QnActiPtzControllerPrivate::processQueries() {
     return result;
 }
 
-bool QnActiPtzControllerPrivate::continuousMove(const ActiPtzVector &speed) {
+bool QnActiPtzControllerPrivate::continuousMove(const ActiPtzVector& speed)
+{
     {
         QnMutexLocker locker( &mutex );
         pendingSpeed = speed;
@@ -323,7 +337,8 @@ bool QnActiPtzControllerPrivate::continuousMove(const ActiPtzVector &speed) {
     return true;
 }
 
-bool QnActiPtzControllerPrivate::absoluteMove(const ActiPtzVector &position, int panTiltSpeed) {
+bool QnActiPtzControllerPrivate::absoluteMove(const ActiPtzVector& position, int panTiltSpeed)
+{
     {
         QnMutexLocker locker( &mutex );
         pendingPosition = position;
@@ -335,7 +350,8 @@ bool QnActiPtzControllerPrivate::absoluteMove(const ActiPtzVector &position, int
     return true;
 }
 
-bool QnActiPtzControllerPrivate::getPosition(ActiPtzVector *position) {
+bool QnActiPtzControllerPrivate::getPosition(ActiPtzVector* position)
+{
     /* Always send the requests, don't use cached values. This is safer. */
 
     QByteArray positionData;
@@ -356,18 +372,18 @@ bool QnActiPtzControllerPrivate::getPosition(ActiPtzVector *position) {
     return true;
 }
 
-
 // -------------------------------------------------------------------------- //
 // QnActiPtzController
 // -------------------------------------------------------------------------- //
-QnActiPtzController::QnActiPtzController(const QnActiResourcePtr &resource):
+QnActiPtzController::QnActiPtzController(const QnActiResourcePtr& resource):
     base_type(resource),
     d(new QnActiPtzControllerPrivate(resource))
 {
     d->init();
 }
 
-QnActiPtzController::~QnActiPtzController() {
+QnActiPtzController::~QnActiPtzController()
+{
     return;
 }
 
@@ -376,18 +392,23 @@ Ptz::Capabilities QnActiPtzController::getCapabilities() const
     return d->capabilities;
 }
 
-bool QnActiPtzController::continuousMove(const QVector3D &speed) {
+bool QnActiPtzController::continuousMove(const QVector3D& speed)
+{
     return d->continuousMove(toActiPtzSpeed(speed));
 }
 
-bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D& position,
+    qreal speed)
+{
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
-    return d->absoluteMove(ActiPtzVector(position.x(), position.y(), position.z()), toActiPanTiltSpeed(qBound(0.01, speed, 1.0))); /* We don't want to get zero speed, hence 0.01 bound. */
+    /* We don't want to get zero speed, hence 0.01 bound. */
+    return d->absoluteMove(ActiPtzVector(position.x(), position.y(), position.z()),
+        toActiPanTiltSpeed(qBound(0.01, speed, 1.0)));
 }
 
-bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const
+bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
 {
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;

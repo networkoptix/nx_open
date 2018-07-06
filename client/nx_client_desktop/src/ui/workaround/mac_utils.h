@@ -30,4 +30,6 @@ QString mac_getSaveFileName(const QString &caption,
                             const QString &dir,
                             const QStringList &extensions);
 
+void setHidesOnDeactivate(WId windowId, bool value);
+
 #endif // _HDWITNESS_MAC_UTILS_H_

@@ -24,10 +24,12 @@ void printHelp()
     std::cout <<
         std::endl <<
         "Common options:" << std::endl <<
-        "  --enforce-mediator={endpoint}    Enforces custom mediator address" << std::endl <<
         "  --log-level={level}              Log level to console" << std::endl <<
-        "  --rw-timeout={time}              Socket send/recv timeouts" << std::endl <<
-        "  --disable-udp                    Disable UDP hole punching" << std::endl <<
+        "  --rw-timeout={time}              Socket send/recv timeouts" << std::endl;
+
+    nx::network::SocketGlobals::printArgumentsHelp(&std::cout);
+
+    std::cout <<
         std::endl <<
         std::endl;
 }
@@ -48,13 +50,6 @@ int main(int argc, const char* argv[])
     // common options
     nx::utils::log::initializeGlobally(args);
     SocketGlobals::applyArguments(args);
-
-    if (args.get("disable-udp"))
-    {
-        cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            cloud::ConnectorFactory::getEnabledCloudConnectMask() &
-            ~((int)cloud::CloudConnectType::udpHp));
-    }
 
     // reading mode
     if (args.get("listen"))

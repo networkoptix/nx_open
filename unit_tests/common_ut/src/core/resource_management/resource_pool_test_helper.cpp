@@ -7,7 +7,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <test_support/resource/storage_resource_stub.h>
-#include <test_support/resource/camera_resource_stub.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
@@ -60,14 +59,14 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
     return layout;
 }
 
-QnVirtualCameraResourcePtr QnResourcePoolTestHelper::createCamera(Qn::LicenseType licenseType)
+nx::CameraResourceStubPtr QnResourcePoolTestHelper::createCamera(Qn::LicenseType licenseType)
 {
-    QnVirtualCameraResourcePtr camera(new nx::CameraResourceStub(licenseType));
+    nx::CameraResourceStubPtr camera(new nx::CameraResourceStub(licenseType));
     camera->setName(QStringLiteral("camera"));
     return camera;
 }
 
-QnVirtualCameraResourcePtr QnResourcePoolTestHelper::addCamera(Qn::LicenseType licenseType)
+nx::CameraResourceStubPtr QnResourcePoolTestHelper::addCamera(Qn::LicenseType licenseType)
 {
     auto camera = createCamera(licenseType);
     resourcePool()->addResource(camera);

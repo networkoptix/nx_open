@@ -13,7 +13,7 @@
 #include <QtCore/QStringList>
 #include <nx/utils/thread/mutex.h>
 
-#include "camera_plugin.h"
+#include <camera/camera_plugin.h>
 
 
 //!Contains wrappers for convenient use of \a nxcip classes

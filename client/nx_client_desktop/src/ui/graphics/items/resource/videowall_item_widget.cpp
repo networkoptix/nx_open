@@ -11,7 +11,7 @@
 
 #include <common/common_globals.h>
 
-#include <camera/camera_thumbnail_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
 
 #include <core/resource_access/resource_access_filter.h>
 
@@ -25,6 +25,11 @@
 #include <core/resource/videowall_resource.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/utils/mime_data.h>
+#include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
+
+#include <nx/utils/log/log.h>
+
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -46,10 +51,11 @@
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/linear_combination.h>
-#include <nx/client/desktop/utils/mime_data.h>
+#include <nx/client/core/utils/geometry.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
+using nx::client::core::Geometry;
 
 namespace {
 
@@ -57,6 +63,8 @@ namespace {
 const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #Elric #customization
 const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
 
+// We request this size for thumbnails.
+static const QSize kPreviewSize(640, 480);
 }
 
 class QnVideowallItemWidgetHoverProgressAccessor: public AbstractAccessor
@@ -216,77 +224,20 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     paintRect.adjust(offset * 2, offset * 2, -offset * 2, -offset * 2);
     painter->fillRect(paintRect, palette().color(QPalette::Window));
 
-    if (!m_layout)
+    m_statusOverlayController->setStatusOverlay(m_resourceStatus, true);
+
+    if (m_layout && !m_layoutThumbnail.isNull())
     {
-        m_statusOverlayController->setStatusOverlay(Qn::NoDataOverlay, true);
-    }
-    else
-    {
-        // TODO: #GDM #VW paint layout background and calculate its size in bounding geometry
-        QRectF bounding;
-        foreach(const QnLayoutItemData &data, m_layout->getItems())
-        {
-            QRectF itemRect = data.combinedGeometry;
-            if (!itemRect.isValid())
-                continue; // TODO: #GDM #VW some items can be not placed yet, wtf
-            bounding = bounding.united(itemRect);
-        }
+        QSizeF paintSize = m_layoutThumbnail.size() / m_layoutThumbnail.devicePixelRatio();
+        // Fitting thumbnail exactly to widget's rect.
+        paintSize = Geometry::bounded(paintSize, paintRect.size(), Qt::KeepAspectRatio);
+        paintSize = Geometry::expanded(paintSize, paintRect.size(), Qt::KeepAspectRatio);
 
-        if (bounding.isNull())
-        {
-            m_statusOverlayController->setStatusOverlay(Qn::NoDataOverlay, true);
-            paintFrame(painter, paintRect);
-            return;
-        }
+        QRect dstRect = QStyle::alignedRect(layoutDirection(), Qt::AlignCenter,
+            paintSize.toSize(), paintRect.toRect());
 
-        qreal space = m_layout->cellSpacing() * 0.5;
-
-        qreal cellAspectRatio = m_layout->hasCellAspectRatio()
-            ? m_layout->cellAspectRatio()
-            : qnGlobals->defaultLayoutCellAspectRatio();
-
-        qreal xscale, yscale, xoffset, yoffset;
-        qreal sourceAr = cellAspectRatio * bounding.width() / bounding.height();
-
-        qreal targetAr = paintRect.width() / paintRect.height();
-        if (sourceAr > targetAr)
-        {
-            xscale = paintRect.width() / bounding.width();
-            yscale = xscale / cellAspectRatio;
-            xoffset = paintRect.left();
-
-            qreal h = bounding.height() * yscale;
-            yoffset = (paintRect.height() - h) * 0.5 + paintRect.top();
-        }
-        else
-        {
-            yscale = paintRect.height() / bounding.height();
-            xscale = yscale * cellAspectRatio;
-            yoffset = paintRect.top();
-
-            qreal w = bounding.width() * xscale;
-            xoffset = (paintRect.width() - w) * 0.5 + paintRect.left();
-        }
-
-        bool allItemsAreLoaded = true;
-        foreach(const QnLayoutItemData &data, m_layout->getItems())
-        {
-            QRectF itemRect = data.combinedGeometry;
-            if (!itemRect.isValid())
-                continue;
-
-            // cell bounds
-            qreal x1 = (itemRect.left() - bounding.left() + space) * xscale + xoffset;
-            qreal y1 = (itemRect.top() - bounding.top() + space) * yscale + yoffset;
-            qreal w1 = (itemRect.width() - space * 2) * xscale;
-            qreal h1 = (itemRect.height() - space * 2) * yscale;
-
-            if (!paintItem(painter, QRectF(x1, y1, w1, h1), data))
-                allItemsAreLoaded = false;
-        }
-
-        const auto overlay = allItemsAreLoaded ? Qn::EmptyOverlay : Qn::LoadingOverlay;
-        m_statusOverlayController->setStatusOverlay(overlay, true);
+        painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+        painter->drawPixmap(dstRect, m_layoutThumbnail);
     }
 
     paintFrame(painter, paintRect);
@@ -449,12 +400,28 @@ void QnVideowallItemWidget::updateLayout()
         return;
 
     if (m_layout)
+    {
+        // Disconnect from previous layout
         m_layout->disconnect(this);
+        m_layoutThumbnailProvider.reset();
+        m_resourceStatus = Qn::NoDataOverlay;
+    }
 
     m_layout = layout;
 
     if (m_layout)
     {
+        // Right now this widget does not have any sort of proper size to calculate aspect ratio
+        const QSize previewSize = kPreviewSize;
+        m_layoutThumbnailProvider.reset(
+            new LayoutThumbnailLoader(m_layout, previewSize, nx::api::ImageRequest::kLatestThumbnail));
+
+        connect(m_layoutThumbnailProvider.get(), &ImageProvider::statusChanged,
+            this, &QnVideowallItemWidget::at_updateThumbnailStatus);
+
+        m_layoutThumbnailProvider->setResourcePool(resourcePool());
+        m_layoutThumbnailProvider->loadAsync();
+
         connect(m_layout, &QnLayoutResource::itemAdded, this,
             &QnVideowallItemWidget::updateView);
         connect(m_layout, &QnLayoutResource::itemChanged, this,
@@ -500,84 +467,28 @@ void QnVideowallItemWidget::updateHud(bool animate)
     update();
 }
 
-bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data)
-{
-    QnResourcePtr resource = resourcePool()->getResourceByDescriptor(data.resource);
-    if (!resource)
-        return true; // Absent resources must not display "Loading..." overlay
-
-    auto drawFixedThumbnail = [painter, &paintRect](const QPixmap& thumb)
-        {
-            auto ar = QnGeometry::aspectRatio(thumb.size());
-            auto rect = QnGeometry::expanded(ar, paintRect, Qt::KeepAspectRatio).toRect();
-            painter->drawPixmap(rect, thumb);
-        };
-
-    if (resource->hasFlags(Qn::server))
-    {
-        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/videowall_server_placeholder.png"));
-    }
-    else if (resource->hasFlags(Qn::web_page))
-    {
-        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/videowall_webpage_placeholder.png"));
-    }
-    else if (resource->hasFlags(Qn::local_media))
-    {
-        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/videowall_local_placeholder.png"));
-    }
-    else if (m_widget->m_thumbs.contains(resource->getId()))
-    {
-        QPixmap pixmap = m_widget->m_thumbs[resource->getId()];
-
-        QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-        QSize mediaLayout = mediaResource ? mediaResource->getVideoLayout()->size() : QSize(1, 1);
-        // ensure width and height are not zero
-        mediaLayout.setWidth(qMax(mediaLayout.width(), 1));
-        mediaLayout.setHeight(qMax(mediaLayout.height(), 1));
-
-        QRectF sourceRect(0, 0, pixmap.width() * mediaLayout.width(),
-            pixmap.height() * mediaLayout.height());
-
-        auto drawPixmap =
-            [painter, &pixmap, &mediaLayout](const QRectF &targetRect)
-            {
-                int width = targetRect.width() / mediaLayout.width();
-                int height = targetRect.height() / mediaLayout.height();
-                for (int i = 0; i < mediaLayout.width(); ++i)
-                {
-                    for (int j = 0; j < mediaLayout.height(); ++j)
-                    {
-                        painter->drawPixmap(QRectF(targetRect.left() + width * i,
-                            targetRect.top() + height * j, width, height).toRect(), pixmap);
-                    }
-                }
-            };
-
-        if (!qFuzzyIsNull(data.rotation))
-        {
-            QnScopedPainterTransformRollback guard(painter); Q_UNUSED(guard);
-            painter->translate(paintRect.center());
-            painter->rotate(data.rotation);
-            painter->translate(-paintRect.center());
-            drawPixmap(QnGeometry::encloseRotatedGeometry(paintRect, QnGeometry::aspectRatio(sourceRect), data.rotation));
-        }
-        else
-        {
-            drawPixmap(paintRect);
-        }
-        return true;
-    }
-
-    if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-    {
-        m_widget->m_thumbnailManager->selectCamera(camera);
-        return false;
-    }
-
-    return true;
-}
-
 bool QnVideowallItemWidget::isDragValid() const
 {
     return !m_mimeData->isEmpty();
+}
+
+void QnVideowallItemWidget::at_updateThumbnailStatus(Qn::ThumbnailStatus status)
+{
+    switch (status)
+    {
+        case Qn::ThumbnailStatus::Loaded:
+            m_resourceStatus = Qn::EmptyOverlay;
+            m_layoutThumbnail = QPixmap::fromImage(m_layoutThumbnailProvider->image());
+            NX_VERBOSE(this) << "QnVideowallItemWidget got thumbs of size " << m_layoutThumbnail.size();
+            update();
+            break;
+
+        case Qn::ThumbnailStatus::Loading:
+            m_resourceStatus = Qn::LoadingOverlay;
+            break;
+
+        default:
+            m_resourceStatus = Qn::NoDataOverlay;
+            break;
+    }
 }

@@ -39,11 +39,13 @@
 #include <utils/intent_listener_android.h>
 #include <handlers/lite_client_handler.h>
 
-#include <nx/media/decoder_registrar.h>
-#include <resource_allocator.h>
+#include <gl_context_synchronizer.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/std/cpp14.h>
 
+#include <nx/media/media_fwd.h>
+#include <nx/media/decoder_registrar.h>
+#include <nx/media/video_decoder_registry.h>
 #include <nx/mobile_client/webchannel/web_channel_server.h>
 #include <nx/mobile_client/controllers/web_admin_controller.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
@@ -111,23 +113,15 @@ int runUi(QtSingleGuiApplication* application)
     QFileSelector fileSelector;
     fileSelector.setExtraSelectors(selectors);
 
-    QQmlEngine engine;
-    auto basePath = qnSettings->basePath();
-    if (!basePath.startsWith(lit("qrc:")))
-        basePath = lit("file://") + QDir(basePath).absolutePath() + lit("/");
-    engine.setBaseUrl(QUrl(basePath + lit("qml/")));
-    engine.addImportPath(basePath + lit("qml"));
-    QQmlFileSelector qmlFileSelector(&engine);
+    const auto engine = qnClientCoreModule->mainQmlEngine();
+    QQmlFileSelector qmlFileSelector(engine);
     qmlFileSelector.setSelector(&fileSelector);
 
-    if (QnAppInfo::applicationPlatform() == lit("ios"))
-        engine.addImportPath(lit("qt_qml"));
+    engine->addImageProvider(lit("thumbnail"), thumbnailProvider);
+    engine->addImageProvider(lit("active"), activeCameraThumbnailProvider);
+    engine->rootContext()->setContextObject(&context);
 
-    engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
-    engine.addImageProvider(lit("active"), activeCameraThumbnailProvider);
-    engine.rootContext()->setContextObject(&context);
-
-    QQmlComponent mainComponent(&engine, QUrl(lit("main.qml")));
+    QQmlComponent mainComponent(engine, QUrl(lit("main.qml")));
     QPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(
@@ -160,31 +154,19 @@ int runUi(QtSingleGuiApplication* application)
         return 1;
     }
 
-    QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
+    QObject::connect(engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
-    std::shared_ptr<nx::media::AbstractResourceAllocator> allocator(new ResourceAllocator(
-        mainWindow));
 
     QSize maxFfmpegResolution = qnSettings->maxFfmpegResolution();
     if (maxFfmpegResolution.isEmpty())
-    {
-        // Use platform-dependent defaults.
-
-        if (QnAppInfo::isArm())
-        {
-            if (QnAppInfo::isBpi())
-                maxFfmpegResolution = QSize(1280, 720);
-            else
-                maxFfmpegResolution = QSize(1920, 1080);
-
-            if (QnAppInfo::isMobile())
-                maxFfmpegResolution = QSize(1920, 1080);
-        }
-    }
+        maxFfmpegResolution = nx::media::VideoDecoderRegistry::platformMaxFfmpegResolution();
 
     nx::media::DecoderRegistrar::registerDecoders(
-        allocator, maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
+        maxFfmpegResolution, /*isTranscodingEnabled*/ !context.liteMode());
+
+    nx::media::VideoDecoderRegistry::instance()->setDefaultRenderContextSynchronizer(
+        nx::media::RenderContextSynchronizerPtr(new GlContextSynchronizer(mainWindow)));
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();
@@ -214,9 +196,9 @@ int runUi(QtSingleGuiApplication* application)
                     break;
                 case InterClientMessage::Command::updateUrl:
                 {
-                    QUrl url(message.parameters);
+                    nx::utils::Url url(message.parameters);
                     if (url.isValid())
-                        qnSettings->startupParameters().url = QUrl(message.parameters);
+                        qnSettings->startupParameters().url = nx::utils::Url(message.parameters);
                     break;
                 }
             }
@@ -256,7 +238,8 @@ void initLog(const QString& logLevel)
                 ? QString::fromUtf8(ini().logFile)
                 : QnAppInfo::isAndroid()
                     ? lit("-")
-                    : (QString::fromUtf8(ini().iniFilesDir()) + lit("mobile_client")));
+                    : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir())
+                        + lit("mobile_client")));
     }
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
@@ -269,22 +252,13 @@ void initLog(const QString& logLevel)
             /*baseName*/
                 QnAppInfo::isAndroid()
                 ? lit("-")
-                : (QString::fromUtf8(ini().iniFilesDir()) + lit("ec2_tran")),
+                : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran")),
             ec2logger);
     }
 }
 
 void processStartupParams(const QnMobileClientStartupParameters& startupParameters)
 {
-    if (!startupParameters.basePath.isEmpty())
-    {
-        const auto path = QDir(startupParameters.basePath).absoluteFilePath(lit("qml/main.qml"));
-        if (QFile::exists(path))
-            qnSettings->setBasePath(startupParameters.basePath);
-        else
-            qWarning() << lit("File %1 doesn't exist. Loading from qrc...").arg(path);
-    }
-
     if (ini().forceNonLiteMode)
         qnSettings->setLiteMode(static_cast<int>(LiteModeType::LiteModeDisabled));
     else if (startupParameters.liteMode || ini().forceLiteMode)

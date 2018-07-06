@@ -44,47 +44,47 @@ public:
 protected:
     cloud::CloudDbUrlFetcher m_fetcher;
 
-    QUrl fetchModuleUrl(const char* moduleName)
+    nx::utils::Url fetchModuleUrl(const char* moduleName)
     {
         auto fetcher = std::make_unique<cloud::CloudModuleUrlFetcher>(moduleName);
         auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher->pleaseStopSync(); });
         fetcher->setModulesXmlUrl(m_modulesUrl);
 
-        nx::utils::promise<QUrl> urlFoundPromise;
+        nx::utils::promise<nx::utils::Url> urlFoundPromise;
         fetcher->get(
-            [&urlFoundPromise](nx_http::StatusCode::Value statusCode, QUrl url)
+            [&urlFoundPromise](nx::network::http::StatusCode::Value statusCode, nx::utils::Url url)
             {
-                if (statusCode != nx_http::StatusCode::ok)
+                if (statusCode != nx::network::http::StatusCode::ok)
                 {
                     urlFoundPromise.set_exception(
                         std::make_exception_ptr(std::logic_error(
-                            nx_http::StatusCode::toString(statusCode).toStdString())));
+                            nx::network::http::StatusCode::toString(statusCode).toStdString())));
                 }
                 else
                 {
                     urlFoundPromise.set_value(url);
                 }
             });
-     
+
         return urlFoundPromise.get_future().get();
     }
 
 protected:
-    TestHttpServer& httpServer()
+    nx::network::http::TestHttpServer& httpServer()
     {
         return m_server;
     }
 
-    void setModulesUrl(QUrl modulesUrl)
+    void setModulesUrl(nx::utils::Url modulesUrl)
     {
         m_modulesUrl = modulesUrl;
         m_fetcher.setModulesXmlUrl(m_modulesUrl);
     }
 
 private:
-    TestHttpServer m_server;
+    nx::network::http::TestHttpServer m_server;
     const QByteArray m_modulesXmlBody;
-    QUrl m_modulesUrl;
+    nx::utils::Url m_modulesUrl;
 
     void init()
     {
@@ -96,15 +96,15 @@ private:
         ASSERT_TRUE(m_server.bindAndListen()) << SystemError::getLastOSErrorText().toStdString();
 
         setModulesUrl(
-            QUrl(lit("http://%1%2").arg(m_server.serverAddress().toString()).arg(testPath)));
+            nx::utils::Url(lit("http://%1%2").arg(m_server.serverAddress().toString()).arg(testPath)));
     }
 };
 
 TEST_F(CloudModuleUrlFetcher, common)
 {
-    ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
-    ASSERT_EQ(QUrl("stuns://52.55.171.51:3345"), fetchModuleUrl("hpm"));
-    ASSERT_EQ(QUrl("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
+    ASSERT_EQ(nx::utils::Url("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
+    ASSERT_EQ(nx::utils::Url("stuns://52.55.171.51:3345"), fetchModuleUrl("hpm"));
+    ASSERT_EQ(nx::utils::Url("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -129,9 +129,9 @@ public:
 
 TEST_F(CloudModuleUrlFetcherCompatibility, correctly_parses_endpoints)
 {
-    ASSERT_EQ(QUrl("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("cdb"));
-    ASSERT_EQ(QUrl("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
-    ASSERT_EQ(QUrl("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
+    ASSERT_EQ(nx::utils::Url("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("cdb"));
+    ASSERT_EQ(nx::utils::Url("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
+    ASSERT_EQ(nx::utils::Url("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -156,9 +156,9 @@ public:
 
 TEST_F(CloudModuleUrlFetcherCompatibilityAutoSchemeSelection, https)
 {
-    ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
-    ASSERT_EQ(QUrl("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
-    ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("notification_module"));
+    ASSERT_EQ(nx::utils::Url("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
+    ASSERT_EQ(nx::utils::Url("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
+    ASSERT_EQ(nx::utils::Url("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("notification_module"));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -166,10 +166,10 @@ TEST_F(CloudModuleUrlFetcherCompatibilityAutoSchemeSelection, https)
 namespace {
 
 class HanglingMsgBodySource:
-    public nx_http::AbstractMsgBodySource
+    public nx::network::http::AbstractMsgBodySource
 {
 public:
-    virtual nx_http::StringType mimeType() const override
+    virtual nx::network::http::StringType mimeType() const override
     {
         return "text/plain";
     }
@@ -181,7 +181,7 @@ public:
 
     virtual void readAsync(
         nx::utils::MoveOnlyFunc<
-            void(SystemError::ErrorCode, nx_http::BufferType)
+            void(SystemError::ErrorCode, nx::network::http::BufferType)
         > /*completionHandler*/) override
     {
     }
@@ -189,7 +189,7 @@ public:
 
 template<typename MessageBody>
 class CustomMessageBodyProvider:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
     CustomMessageBodyProvider()
@@ -197,13 +197,13 @@ public:
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx::network::http::HttpServerConnection* const /*connection*/,
         nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler) override
+        nx::network::http::Request /*request*/,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler) override
     {
-        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
+        nx::network::http::RequestResult requestResult(nx::network::http::StatusCode::ok);
         requestResult.dataSource = std::make_unique<MessageBody>();
         completionHandler(std::move(requestResult));
     }
@@ -222,9 +222,9 @@ protected:
         httpServer().registerRequestProcessor<
             CustomMessageBodyProvider<HanglingMsgBodySource>>("/cloud_modules.xml");
         setModulesUrl(
-            QUrl(lit("http://%1/cloud_modules.xml").arg(httpServer().serverAddress().toString())));
+            nx::utils::Url(lit("http://%1/cloud_modules.xml").arg(httpServer().serverAddress().toString())));
     }
-    
+
     void assertUrlFetcherReportsError()
     {
         try
@@ -255,8 +255,8 @@ TEST_F(FtCloudModuleUrlFetcher, cancellation)
             std::string s;
             operation.get(
                 [&s](
-                    nx_http::StatusCode::Value /*resCode*/,
-                    QUrl endpoint)
+                    nx::network::http::StatusCode::Value /*resCode*/,
+                    nx::utils::Url endpoint)
                 {
                     //if called after destruction, will get segfault here
                     s = endpoint.toString().toStdString();
@@ -299,6 +299,12 @@ static const char* kConnectionMediatorXmlPath = "/mediator_test_modules.xml";
 class MediatorUrlFetcher:
     public CloudModuleUrlFetcher
 {
+public:
+    ~MediatorUrlFetcher()
+    {
+        m_urlFetcher.pleaseStopSync();
+    }
+
 protected:
     void givenXmlWithSingleMediatorUrl()
     {
@@ -306,7 +312,7 @@ protected:
             kConnectionMediatorXmlPath,
             kSingleMediatorUrlXml,
             "application/xml");
-        m_expectedResult.statusCode = nx_http::StatusCode::ok;
+        m_expectedResult.statusCode = nx::network::http::StatusCode::ok;
         m_expectedResult.tcpUrl = "stun://cloud-test.hdw.mx:3345";
         m_expectedResult.udpUrl = "stun://cloud-test.hdw.mx:3345";
     }
@@ -317,7 +323,7 @@ protected:
             kConnectionMediatorXmlPath,
             kMediatorHasDifferentAddressForTcpAndUdpXml,
             "application/xml");
-        m_expectedResult.statusCode = nx_http::StatusCode::ok;
+        m_expectedResult.statusCode = nx::network::http::StatusCode::ok;
         m_expectedResult.tcpUrl = "http://cloud-test.hdw.mx:3345";
         m_expectedResult.udpUrl = "stun://cloud-test.hdw.mx:3346";
     }
@@ -330,7 +336,7 @@ protected:
         nx::utils::promise<void> done;
         m_urlFetcher.get(
             [this, &done](
-                nx_http::StatusCode::Value statusCode, QUrl tcpUrl, QUrl udpUrl)
+                nx::network::http::StatusCode::Value statusCode, nx::utils::Url tcpUrl, nx::utils::Url udpUrl)
             {
                 m_actualResult.statusCode = statusCode;
                 m_actualResult.tcpUrl = tcpUrl;
@@ -350,9 +356,9 @@ protected:
 private:
     struct Result
     {
-        nx_http::StatusCode::Value statusCode;
-        QUrl tcpUrl;
-        QUrl udpUrl;
+        nx::network::http::StatusCode::Value statusCode;
+        nx::utils::Url tcpUrl;
+        nx::utils::Url udpUrl;
     };
 
     Result m_expectedResult;

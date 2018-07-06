@@ -26,17 +26,15 @@ namespace aio {
  * NOTE: Suggested use of this class: few add/remove, many notifications.
  * NOTE: A specific socket always receives all events within the same thread.
  * NOTE: All methods are thread-safe.
- * NOTE: All methods are non-blocking except AIOService::stopMonitoring
- *   (when called with waitForRunningHandlerCompletion set to true).
  */
 class NX_NETWORK_API AIOService
 {
 public:
     /**
-     * After object instantiation one must call AIOService::isInitialized to check 
+     * After object instantiation one must call AIOService::isInitialized to check
      * whether instantiation was a success.
      */
-    AIOService(unsigned int aioThreadPollSize = 0);
+    AIOService() = default;
     virtual ~AIOService();
 
     AIOService(const AIOService&) = delete;
@@ -47,7 +45,7 @@ public:
     /**
      * @return true, if object has been successfully initialized.
      */
-    bool isInitialized() const;
+    bool initialize(unsigned int aioThreadPollSize = 0);
 
     /**
      * Monitor sock for event eventToWatch and trigger eventHandler on event.
@@ -65,30 +63,23 @@ public:
 
     /**
      * Cancel monitoring sock for event eventType.
-     * @param waitForRunningHandlerCompletion true garantees that no aio::AIOEventHandler::eventTriggered will be called after return of this method.
-     *   and all running handlers have returned. But this MAKES METHOD BLOCKING and, as a result, this MUST NOT be called from aio thread.
-     *   It is strongly recommended to set this parameter to false.
-     * NOTE: If waitForRunningHandlerCompletion is false events that are already posted to the queue can be called after return of this method.
-     * NOTE: If this method is called from asio thread, sock is processed in (e.g., from event handler associated with sock).
-     *   this method does not block and always works like waitForRunningHandlerCompletion has been set to true.
+     * NOTE: If this method is called from socket's aio thread,
+     *   then it is executed without blocking.
+     *   Otherwise, it blocks until already running handler has returned.
      */
-    void stopMonitoring(
-        Pollable* const sock,
-        aio::EventType eventType,
-        bool waitForRunningHandlerCompletion = true,
-        nx::utils::MoveOnlyFunc<void()> pollingStoppedHandler = nx::utils::MoveOnlyFunc<void()>());
+    void stopMonitoring(Pollable* const socket, aio::EventType eventType);
 
     /**
      * Register timeout, associated with socket sock.
-     * eventHandler->eventTriggered(sock, aio::etTimedOut) will be called every 
-     * timeoutMillis milliseconds until cancelled with 
+     * eventHandler->eventTriggered(sock, aio::etTimedOut) will be called every
+     * timeoutMillis milliseconds until cancelled with
      * aio::AIOService::stopMonitoring(sock, aio::etTimedOut ).
      */
     void registerTimer(
         Pollable* const sock,
         std::chrono::milliseconds timeoutMillis,
         AIOEventHandler* const eventHandler );
-    
+
     /**
      * @returns true, if socket is still listened for state changes.
      */
@@ -96,9 +87,9 @@ public:
 
     /**
      * Call handler from within aio thread sock is bound to.
-     * NOTE: Call will always be queued. I.e., if called from handler 
+     * NOTE: Call will always be queued. I.e., if called from handler
      *   running in aio thread, it will be called after handler has returned.
-     * WARNING: Currently, there is no way to find out whether call 
+     * WARNING: Currently, there is no way to find out whether call
      *   has been posted or being executed currently.
      */
     void post(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);
@@ -108,7 +99,7 @@ public:
     void post(nx::utils::MoveOnlyFunc<void()> handler);
     /**
      * Call handler from within aio thread sock is bound to.
-     * NOTE: If called in aio thread, handler will be called from within this method, 
+     * NOTE: If called in aio thread, handler will be called from within this method,
      *   otherwise - queued like aio::AIOService::post does.
      */
     void dispatch(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);
@@ -120,9 +111,11 @@ public:
     void bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread);
     aio::AIOThread* bindSocketToAioThread(Pollable* const sock);
 
-    void cancelPostedCalls(
-        Pollable* const sock,
-        bool waitForRunningHandlerCompletion = true);
+    /**
+     * NOTE: If called within sock's aio thread then is non-blocking.
+     * Otherwise, blocks until all calls are cancelled.
+     */
+    void cancelPostedCalls(Pollable* const sock);
 
 private:
     std::vector<std::unique_ptr<AIOThread>> m_aioThreadPool;

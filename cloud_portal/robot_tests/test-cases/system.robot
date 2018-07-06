@@ -31,11 +31,14 @@ Check System Text
 
 Reset DB and Open New Browser On Failure
     Close Browser
+    Reset System Names
     Make sure notowner is in the system
     Open Browser and go to URL    ${url}
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
     Go To    ${url}
 
@@ -214,6 +217,7 @@ should display same user data as user provided during registration (stress to cy
     Remove User Permissions    ${email}
 
 should display same user data as showed in user account (stress to cyrillic)
+    [tags]    email
 #create user
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register

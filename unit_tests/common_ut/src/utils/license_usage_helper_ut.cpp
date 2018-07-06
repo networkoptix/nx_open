@@ -509,6 +509,30 @@ TEST_F(QnLicenseUsageHelperTest, checkIoLicensesArmActivating)
     ASSERT_TRUE(m_helper->isValid());
 }
 
+TEST_F(QnLicenseUsageHelperTest, checkVmaxInitLicense)
+{
+    addLicenses(Qn::LC_VMAX, 1);
+    auto vmax = addCamera();
+
+    vmax->setLicenseUsed(true);
+    ASSERT_FALSE(m_helper->isValid());
+
+    vmax->markCameraAsVMax();
+    ASSERT_TRUE(m_helper->isValid());
+}
+
+TEST_F(QnLicenseUsageHelperTest, checkNvrInitLicense)
+{
+    addLicenses(Qn::LC_Bridge, 1);
+    auto nvr = addCamera();
+
+    nvr->setLicenseUsed(true);
+    ASSERT_FALSE(m_helper->isValid());
+
+    nvr->markCameraAsNvr();
+    ASSERT_TRUE(m_helper->isValid());
+}
+
 /** Check if license info is filled for every license type. */
 TEST_F(QnLicenseUsageHelperTest, validateLicenseInfo)
 {
@@ -550,4 +574,77 @@ TEST_F(QnLicenseUsageHelperTest, validateFutureLicenses)
     addFutureLicenses(1);
     addRecordingCameras(Qn::LC_Professional, 1, true);
     ASSERT_FALSE(m_helper->isValid());
+}
+
+/** Check if can enable recoding if everything is good. */
+TEST_F(QnLicenseUsageHelperTest, canEnableRecordingTrivial)
+{
+    addLicense(Qn::LC_Professional);
+    auto camera = addRecordingCamera(Qn::LC_Professional, false);
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
+}
+
+/** Check if can enable recoding if recording is already enabled (even if no licenses). */
+TEST_F(QnLicenseUsageHelperTest, canEnableRecordingIfAlreadyEnabled)
+{
+    auto camera = addRecordingCamera(Qn::LC_Professional);
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
+}
+
+/** Check if cannot enable recoding if everything is bad. */
+TEST_F(QnLicenseUsageHelperTest, canEnableRecordingTrivialNegative)
+{
+    auto camera = addRecordingCamera(Qn::LC_Professional, false);
+    ASSERT_FALSE(m_helper->canEnableRecording(camera));
+}
+
+/** Check if can enable recoding with license borrowing. */
+TEST_F(QnLicenseUsageHelperTest, canEnableRecordingBorrowing)
+{
+    addLicense(Qn::LC_Professional);
+    auto camera = addRecordingCamera(Qn::LC_Analog, false);
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
+}
+
+/** Check if can enable recoding if everything is good on the current camera type. */
+TEST_F(QnLicenseUsageHelperTest, canEnableRecordingAlreadyInvalid)
+{
+    auto camera = addRecordingCamera(Qn::LC_Professional);
+    addLicense(Qn::LC_Analog);
+
+    auto analogCamera = addRecordingCamera(Qn::LC_Analog, false);
+    ASSERT_TRUE(m_helper->canEnableRecording(analogCamera));
+}
+
+/** Check if cannot enable recoding if something is bad on one of the camera types. */
+TEST_F(QnLicenseUsageHelperTest, cannotExtendRecordingAlreadyInvalid)
+{
+    auto camera = addRecordingCamera(Qn::LC_Professional);
+    addLicense(Qn::LC_Analog);
+
+    auto analogCamera = addRecordingCamera(Qn::LC_Analog, false);
+    auto secondCamera = addRecordingCamera(Qn::LC_Professional, false);
+    ASSERT_FALSE(m_helper->canEnableRecording(QnVirtualCameraResourceList()
+        << analogCamera << secondCamera));
+}
+
+/** Check if cannot enable recoding if license is used as borrowed. */
+TEST_F(QnLicenseUsageHelperTest, cannotSwitchUsedLicense)
+{
+    auto camera = addRecordingCamera(Qn::LC_Analog);
+    addLicense(Qn::LC_Professional);
+
+    auto secondCamera = addRecordingCamera(Qn::LC_Professional, false);
+    ASSERT_FALSE(m_helper->canEnableRecording(secondCamera));
+}
+
+/** Check if call does not modify inner state. */
+TEST_F(QnLicenseUsageHelperTest, canEnableRecordingSavesState)
+{
+    auto camera = addRecordingCamera(Qn::LC_Analog);
+    auto secondCamera = addRecordingCamera(Qn::LC_Professional);
+    addLicense(Qn::LC_Professional);
+
+    ASSERT_TRUE(m_helper->canEnableRecording(camera));
+    ASSERT_TRUE(m_helper->canEnableRecording(secondCamera));
 }

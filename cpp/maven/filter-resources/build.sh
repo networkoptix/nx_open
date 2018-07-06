@@ -4,8 +4,6 @@ CONFIG=${build.configuration}
 ARTIFACT=${project.artifactId}
 PLATFORM=`uname -s`
 
-DEBUG=
-
 if [ $PLATFORM == 'Linux' ] && [ "${arch}" != "arm"  ]; then
     QTCHECK=`ldd ${qt.dir}/lib/libQt5Core.so | grep libglib-2.0.so.0`
     if [ -z "$QTCHECK" ]; then
@@ -42,16 +40,10 @@ case `uname -s` in
         NPROCESSORS=`sysctl hw.ncpu | awk '{print $2}'`
         ;;
 esac
-if [ '${box}' == 'edge1' ]; then
-    if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'mediaserver_core' ]  || [ '${project.artifactId}' == 'appserver2' ]; then
-    #if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'appserver2' ]; then
-        DEBUG=ext_debug
-    fi
-fi
 
 if [ '${box}' == 'ios' ]; then
     echo "Unlocking Keychain..."
     security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
 fi
 
-make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] $DEBUG || exit 1
+make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] || exit 1

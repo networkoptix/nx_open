@@ -35,7 +35,7 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    void setHttpTimeouts(nx_http::AsyncClient::Timeouts timeouts);
+    void setHttpTimeouts(nx::network::http::AsyncClient::Timeouts timeouts);
 
     void connect(const SocketAddress& endpoint, ConnectHandler handler);
 
@@ -45,12 +45,12 @@ public:
 
 private:
     const String m_targetHostName;
-    nx_http::AsyncClient m_httpClient;
+    nx::network::http::AsyncClient m_httpClient;
     ConnectHandler m_handler;
 
     virtual void stopWhileInAioThread() override;
 
-    SystemError::ErrorCode processHeaders(const nx_http::HttpHeaders& headers);
+    SystemError::ErrorCode processHeaders(const nx::network::http::HttpHeaders& headers);
 };
 
 } // namespace tcp

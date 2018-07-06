@@ -14,39 +14,6 @@
    <string/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="2">
-    <widget class="QLineEdit" name="passwordLineEdit">
-     <property name="inputMask">
-      <string/>
-     </property>
-     <property name="echoMode">
-      <enum>QLineEdit::Password</enum>
-     </property>
-     <property name="placeholderText">
-      <string>Password to authenticate (optional)</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QLineEdit" name="loginLineEdit">
-     <property name="placeholderText">
-      <string>Login to authenticate (optional)</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="contentLabel">
-     <property name="text">
-      <string>HTTP content</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLineEdit" name="httpUrlLineEdit"/>
-   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="httpUrlLabel">
      <property name="text">
@@ -57,17 +24,20 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="2" colspan="5">
+    <widget class="QLineEdit" name="httpUrlLineEdit"/>
+   </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="labelLogin">
+    <widget class="QLabel" name="contentLabel">
      <property name="text">
-      <string>Login</string>
+      <string>HTTP content</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
+   <item row="1" column="2" colspan="5">
     <widget class="QPlainTextEdit" name="contentTextEdit">
      <property name="maximumSize">
       <size>
@@ -77,7 +47,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="contentTypeLabel">
      <property name="maximumSize">
       <size>
@@ -93,15 +63,45 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="2">
-    <widget class="QComboBox" name="comboBoxContentType">
+   <item row="2" column="2" colspan="5">
+    <widget class="QComboBox" name="contentTypeComboBox">
      <property name="editable">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="labelPassword">
+   <item row="3" column="0">
+    <widget class="QLabel" name="loginLabel">
+     <property name="text">
+      <string>Login</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QLineEdit" name="loginLineEdit">
+     <property name="placeholderText">
+      <string>Login to authenticate (optional)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="4">
+    <widget class="QLabel" name="authTypeLabel">
+     <property name="text">
+      <string>Authentication type</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="6">
+    <widget class="QComboBox" name="authTypeComboBox"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="passwordLabel">
      <property name="text">
       <string>Password</string>
      </property>
@@ -109,6 +109,32 @@
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QLineEdit" name="passwordLineEdit">
+     <property name="inputMask">
+      <string/>
+     </property>
+     <property name="echoMode">
+      <enum>QLineEdit::Password</enum>
+     </property>
+     <property name="placeholderText">
+      <string>Password to authenticate (optional)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="4">
+    <widget class="QLabel" name="requestTypeLabel">
+     <property name="text">
+      <string>Request type</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="6">
+    <widget class="QComboBox" name="requestTypeComboBox"/>
    </item>
   </layout>
  </widget>

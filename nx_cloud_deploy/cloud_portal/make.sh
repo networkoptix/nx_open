@@ -15,13 +15,24 @@ function build()
     ./build.sh
 }
 
-
 function stage()
 {
     rm -rf stage
 
-	mkdir -p stage/cloud/static/common/static
-	rsync -a $NX_PORTAL_DIR/cloud stage
+    mkdir -p stage/cloud/static/common/static
+    rsync -a $NX_PORTAL_DIR/cloud stage
+    rm -rf stage/cloud/.idea
+}
+
+function stage_cmake()
+{
+    local cmakeBuildDirectory=$1
+    #local moduleName=$2
+
+    rm -rf stage
+
+    mkdir -p stage/cloud/static/common/static
+    rsync -a $cmakeBuildDirectory/cloud_portal/cloud_portal/cloud stage
     rm -rf stage/cloud/.idea
 }
 

@@ -3,12 +3,24 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client):
     m_client(std::move(client))
 {
     NX_LOGX("AsyncClientUser()", cl_logDEBUG2);
+
+    m_client->addOnReconnectedHandler(
+        [this, guard = m_asyncGuard.sharedGuard()]()
+        {
+            if (auto lock = guard->lock())
+                return post(std::bind(&AsyncClientUser::reportReconnect, this));
+
+            NX_LOG(lm("AsyncClientUser(%1). Ignoring reconnect handler")
+                .arg((void*)this), cl_logDEBUG1);
+        },
+        m_asyncGuard.sharedGuard().get());
 }
 
 AsyncClientUser::~AsyncClientUser()
@@ -38,7 +50,7 @@ void AsyncClientUser::sendRequest(
             if (auto lock = guard->lock())
             {
                 return post(
-                    [this, handler = std::move(handler), code, 
+                    [handler = std::move(handler), code,
                         message = std::move(message)]() mutable
                     {
                         handler(code, std::move(message));
@@ -71,16 +83,7 @@ bool AsyncClientUser::setIndicationHandler(
 void AsyncClientUser::setOnReconnectedHandler(
     AbstractAsyncClient::ReconnectHandler handler)
 {
-    m_client->addOnReconnectedHandler(
-        [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)]()
-        {
-            if (auto lock = guard->lock())
-                return post(std::move(handler));
-
-            NX_LOG(lm("AsyncClientUser(%1). Ignoring reconnect handler")
-                .arg((void*)this), cl_logDEBUG1);
-        },
-        m_asyncGuard.sharedGuard().get());
+    m_reconnectHandler.swap(handler);
 }
 
 bool AsyncClientUser::setConnectionTimer(
@@ -133,5 +136,12 @@ void AsyncClientUser::disconnectFromClient()
     m_asyncGuard.reset();
 }
 
+void AsyncClientUser::reportReconnect()
+{
+    if (m_reconnectHandler)
+        m_reconnectHandler();
+}
+
 } // namespace stun
+} // namespace network
 } // namespace nx

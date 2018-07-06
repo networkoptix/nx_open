@@ -185,7 +185,7 @@ bool QnUserResource::checkLocalUserPassword(const QString &password)
     QnMutexLocker locker(&m_mutex);
 
     if (!m_digest.isEmpty())
-        return nx_http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
+        return nx::network::http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
 
     //hash is obsolete. Cannot remove it to maintain update from version < 2.3
     //hash becomes empty after changing user's realm
@@ -343,19 +343,17 @@ QString QnUserResource::fullName() const
     return result.isNull() ? m_fullName : result;
 }
 
-ec2::ApiResourceParamWithRefDataList QnUserResource::params() const
+nx::vms::api::ResourceParamWithRefDataList QnUserResource::params() const
 {
-    ec2::ApiResourceParamWithRefDataList result;
+    nx::vms::api::ResourceParamWithRefDataList result;
     QString value;
     if (commonModule())
         value = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
     if (value.isEmpty() && !fullName().isEmpty() && isCloud())
         value = fullName(); //< move fullName to property dictionary to sync data with cloud correctly
     if (!value.isEmpty())
-    {
-        ec2::ApiResourceParamWithRefData param(getId(), Qn::USER_FULL_NAME, value);
-        result.push_back(param);
-    }
+        result.emplace_back(getId(), Qn::USER_FULL_NAME, value);
+
     return result;
 }
 

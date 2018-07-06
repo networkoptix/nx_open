@@ -19,7 +19,7 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
-#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <core/resource/avi/avi_archive_delegate.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <nx/utils/thread/long_runnable.h>
 
@@ -76,7 +76,7 @@ public:
     bool setVideoCodec(
         AVCodecID codec,
         QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_FfmpegTranscode,
-        Qn::StreamQuality quality = Qn::QualityHighest,
+        Qn::StreamQuality quality = Qn::StreamQuality::highest,
         const QSize& resolution = QSize(0,0),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value() );

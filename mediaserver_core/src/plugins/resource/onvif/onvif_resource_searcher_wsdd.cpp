@@ -10,10 +10,13 @@
 
 #include "core/resource/camera_resource.h"
 
-#include "onvif/wsaapi.h"
+#include <gsoap/wsaapi.h>
 #include "onvif_resource_searcher_wsdd.h"
 #include "onvif_resource.h"
 #include "onvif_helper.h"
+#include <common/static_common_module.h>
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
 
 
 //static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds
@@ -37,7 +40,7 @@ const char OnvifResourceSearcherWsdd::WSDD_GSOAP_MULTICAST_ADDRESS[] = "soap.udp
 
 static const int WSDD_MULTICAST_PORT = 3702;
 static const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
-static const SocketAddress WSDD_MULTICAST_ENDPOINT( WSDD_MULTICAST_ADDRESS, WSDD_MULTICAST_PORT );
+static const nx::network::SocketAddress WSDD_MULTICAST_ENDPOINT( WSDD_MULTICAST_ADDRESS, WSDD_MULTICAST_PORT );
 
 
 namespace
@@ -56,7 +59,7 @@ namespace
     //Socket send through UdpSocket
     int gsoapFsend(struct soap *soap, const char *s, size_t n)
     {
-        AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+        nx::network::AbstractDatagramSocket* qSocket = reinterpret_cast<nx::network::AbstractDatagramSocket*>(soap->user);
         qSocket->sendTo(s, static_cast<unsigned int>(n), WSDD_MULTICAST_ENDPOINT);
         return SOAP_OK;
     }
@@ -86,7 +89,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
     // avoid SOAP select call
     size_t gsoapFrecv(struct soap* soap, char* data, size_t maxSize)
     {
-        AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+        nx::network::AbstractDatagramSocket* qSocket = reinterpret_cast<nx::network::AbstractDatagramSocket*>(soap->user);
         int readed = qSocket->recv(data, static_cast<unsigned int>(maxSize), 0);
         return (size_t) qMax(0, readed);
     }
@@ -101,7 +104,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
         }
 
         QString msgId;
-        AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+        nx::network::AbstractDatagramSocket* qSocket = reinterpret_cast<nx::network::AbstractDatagramSocket*>(soap->user);
 
         QString guid = QnUuid::createUuid().toString();
         guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
@@ -119,7 +122,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
         }
 
         QString msgId;
-        AbstractDatagramSocket* socket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+        nx::network::AbstractDatagramSocket* socket = reinterpret_cast<nx::network::AbstractDatagramSocket*>(soap->user);
 
         QString guid = QnUuid::createUuid().toString();
         guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
@@ -127,7 +130,7 @@ http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
 
         //socket.connectToHost(QHostAddress(QString::fromLatin1(soap->host)), WSDD_MULTICAST_PORT);
         //socket.write(data);
-        socket->sendTo(data.data(), data.size(), SocketAddress( soap->host, WSDD_MULTICAST_PORT ) );
+        socket->sendTo(data.data(), data.size(), nx::network::SocketAddress( soap->host, WSDD_MULTICAST_PORT ) );
         return SOAP_OK;
     }
 #endif
@@ -194,13 +197,13 @@ void OnvifResourceSearcherWsdd::pleaseStop()
 {
     QnMutexLocker lock( &m_mutex );
 
-    QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
+    QList<nx::network::QnInterfaceAndAddr> interfaces = nx::network::getAllIPv4Interfaces();
 
     //Remove outdated
     QHash<QString, QUdpSocketPtr>::iterator it = m_recvSocketList.begin();
     while (it != m_recvSocketList.end()) {
         bool found = false;
-        for(const QnInterfaceAndAddr& iface: interfaces)
+        for(const nx::network::QnInterfaceAndAddr& iface: interfaces)
         {
             if (m_recvSocketList.contains(iface.address.toString())) {
                 found = true;
@@ -217,7 +220,7 @@ void OnvifResourceSearcherWsdd::pleaseStop()
     }
 
     //Add new
-    for(const QnInterfaceAndAddr& iface: interfaces)
+    for(const nx::network::QnInterfaceAndAddr& iface: interfaces)
     {
         QString key = iface.address.toString();
 
@@ -312,11 +315,11 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
 
 void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 {
-    const QList<QnInterfaceAndAddr>& intfList = getAllIPv4Interfaces();
+    const QList<nx::network::QnInterfaceAndAddr>& intfList = nx::network::getAllIPv4Interfaces();
 
     if( !m_isFirstSearch )
     {
-        for(const QnInterfaceAndAddr& iface: intfList)
+        for(const nx::network::QnInterfaceAndAddr& iface: intfList)
         {
             if (m_shouldStop)
                 return;
@@ -326,7 +329,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 
     bool intfListChanged = (unsigned int)intfList.size() != m_ifaceToSock.size();
     if( !intfListChanged )
-        for( const QnInterfaceAndAddr& intf: intfList )
+        for( const nx::network::QnInterfaceAndAddr& intf: intfList )
         {
             if( m_ifaceToSock.find( intf.address.toString() ) == m_ifaceToSock.end() )
                 intfListChanged = true;
@@ -342,7 +345,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         m_ifaceToSock.clear();
     }
 
-    for(const QnInterfaceAndAddr& iface: intfList)
+    for(const nx::network::QnInterfaceAndAddr& iface: intfList)
     {
         if (m_shouldStop)
             return;
@@ -358,10 +361,10 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         ::sleep( 1 );
 #endif
 
-        for(const QnInterfaceAndAddr& iface: intfList)
+        for(const nx::network::QnInterfaceAndAddr& iface: intfList)
             readProbeMatches( iface, result );
 
-        for(const QnInterfaceAndAddr& iface: intfList)
+        for(const nx::network::QnInterfaceAndAddr& iface: intfList)
         {
             if (m_shouldStop)
                 return;
@@ -461,16 +464,28 @@ QString OnvifResourceSearcherWsdd::getMac(const T* source, const SOAP_ENV__Heade
     }
     QString macFromMessageId = messageId.right(messageId.size() - pos - 1).trimmed();
 
-    if (macFromEndpoint.size() == 12 && macFromEndpoint == macFromMessageId) {
-        QString result;
-        for (int i = 1; i < 12; i += 2) {
-            int ind = i + i / 2;
-            if (i < 11) result[ind + 1] = QLatin1Char('-');
-            result[ind] = macFromEndpoint[i];
-            result[ind - 1] = macFromEndpoint[i - 1];
-        }
+    static const int kMacAddressLength = 12;
+    if (macFromEndpoint.size() == kMacAddressLength)
+    {
+        QString name = extractScope(source, QLatin1String(SCOPES_NAME_PREFIX));
+        QString manufacturer = getManufacturer(source, name);
 
-        return result.toUpper();
+        const QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
+
+        if (macFromEndpoint == macFromMessageId
+            || resourceData.value<bool>(Qn::MAC_FROM_MULTICAST_PARAM_NAME))
+        {
+            QString result;
+            for (int i = 1; i < kMacAddressLength; i += 2)
+            {
+                int ind = i + i / 2;
+                if (i < 11) result[ind + 1] = QLatin1Char('-');
+                result[ind] = macFromEndpoint[i];
+                result[ind - 1] = macFromEndpoint[i - 1];
+            }
+
+            return result.toUpper();
+        }
     }
 
     return QString();
@@ -655,7 +670,7 @@ void OnvifResourceSearcherWsdd::printProbeMatches(const T* source, const SOAP_EN
 }
 
 #if 0
-void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, const QnInterfaceAndAddr& iface ) const
+void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, const nx::network::QnInterfaceAndAddr& iface ) const
 {
     if( m_shouldStop )
         return;
@@ -770,14 +785,14 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, con
 }
 #endif
 
-bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
+bool OnvifResourceSearcherWsdd::sendProbe( const nx::network::QnInterfaceAndAddr& iface )
 {
     std::pair<std::map<QString, ProbeContext*>::iterator, bool> p = m_ifaceToSock.insert( std::make_pair( iface.address.toString(), (ProbeContext*)NULL ) );
     ProbeContext*& ctx = p.first->second;
     if( p.second )
     {
         ctx = new ProbeContext();
-        ctx->sock = SocketFactory::createDatagramSocket();
+        ctx->sock = nx::network::SocketFactory::createDatagramSocket();
         //if( !ctx->sock->bindToInterface(iface) || !ctx->sock->setNonBlockingMode( true ) )
         if( !ctx->sock->bind(iface.address.toString(), 0) || !ctx->sock->setNonBlockingMode( true ) )
         {
@@ -822,7 +837,7 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
     return false;
 }
 
-bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& iface, EndpointInfoHash& result )
+bool OnvifResourceSearcherWsdd::readProbeMatches( const nx::network::QnInterfaceAndAddr& iface, EndpointInfoHash& result )
 {
     std::map<QString, ProbeContext*>::iterator it = m_ifaceToSock.find( iface.address.toString() );
     if( it == m_ifaceToSock.end() )

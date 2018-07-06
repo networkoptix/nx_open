@@ -79,6 +79,7 @@ Control
 
         Item
         {
+            id: spacer
             width: 16
             height: 1
         }
@@ -94,10 +95,10 @@ Control
         {
             id: label
             leftPadding: 6
-            width: parent.width - statusIndicator.width - 2 * anchors.margins
+            width: parent.width - statusIndicator.width - spacer.width - thumbnailContainer.width
             height: 48
             verticalAlignment: Text.AlignVCenter
-            maximumLineCount: 2
+            maximumLineCount: 1
             wrapMode: Text.WordWrap
             font.pixelSize: 16
             font.weight: d.offline ? Font.DemiBold : Font.Normal

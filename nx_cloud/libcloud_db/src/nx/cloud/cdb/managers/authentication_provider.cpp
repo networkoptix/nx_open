@@ -12,13 +12,13 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
+#include <nx/data_sync_engine/transaction_log.h>
 
 #include "temporary_account_password_manager.h"
 #include "../dao/user_authentication_data_object_factory.h"
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
 #include "../access_control/authentication_manager.h"
-#include "../ec2/transaction_log.h"
 #include "../ec2/vms_p2p_command_bus.h"
 
 namespace nx {
@@ -42,10 +42,21 @@ AuthenticationProvider::AuthenticationProvider(
 {
     m_accountManager->addExtension(this);
     m_systemSharingManager->addSystemSharingExtension(this);
+
+    m_updateExpiredAuthTimer.post(
+        std::bind(&AuthenticationProvider::checkForExpiredAuthRecordsAsync, this));
 }
 
 AuthenticationProvider::~AuthenticationProvider()
 {
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_terminated = true;
+    }
+
+    m_ongoingOperationCounter.wait();
+    m_updateExpiredAuthTimer.pleaseStopSync();
+
     m_systemSharingManager->removeSystemSharingExtension(this);
     m_accountManager->removeExtension(this);
 }
@@ -259,7 +270,7 @@ api::AuthResponse AuthenticationProvider::prepareResponse(
     response.nonce = std::move(nonce);
     response.authenticatedAccountData = std::move(systemSharing);
     response.accessRole = response.authenticatedAccountData.accessRole;
-    const auto intermediateResponse = nx_http::calcIntermediateResponse(
+    const auto intermediateResponse = nx::network::http::calcIntermediateResponse(
         passwordHa1.c_str(),
         response.nonce.c_str());
     response.intermediateResponse.assign(
@@ -313,17 +324,11 @@ api::AuthInfoRecord AuthenticationProvider::generateAuthRecord(
 {
     api::AuthInfoRecord authInfo;
     authInfo.nonce = nonce;
-    authInfo.intermediateResponse = nx_http::calcIntermediateResponse(
+    authInfo.intermediateResponse = nx::network::http::calcIntermediateResponse(
         account.passwordHa1.c_str(), nonce.c_str()).toStdString();
     authInfo.expirationTime =
         nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod;
     return authInfo;
-}
-
-void AuthenticationProvider::removeExpiredRecords(
-    api::AuthInfo* /*userAuthenticationRecords*/)
-{
-    // TODO
 }
 
 void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
@@ -332,7 +337,7 @@ void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
     const std::string& vmsUserId,
     const api::AuthInfo& userAuthenticationRecords)
 {
-    ::ec2::ApiResourceParamWithRefData userAuthenticationInfoAttribute;
+    nx::vms::api::ResourceParamWithRefData userAuthenticationInfoAttribute;
     userAuthenticationInfoAttribute.name = api::kVmsUserAuthInfoAttributeName;
     userAuthenticationInfoAttribute.resourceId =
         QnUuid::fromStringSafe(vmsUserId.c_str());
@@ -344,6 +349,124 @@ void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
         std::move(userAuthenticationInfoAttribute));
     if (dbResult != nx::utils::db::DBResult::ok)
         throw nx::utils::db::Exception(dbResult);
+}
+
+void AuthenticationProvider::checkForExpiredAuthRecordsAsync()
+{
+    using namespace std::placeholders;
+
+    QnMutexLocker lock(&m_mutex);
+
+    if (m_terminated)
+        return;
+
+    m_sqlQueryExecutor->executeUpdate(
+        std::bind(&AuthenticationProvider::checkForExpiredAuthRecords, this, _1),
+        [this, currentRequestIncrement = m_ongoingOperationCounter.getScopedIncrement()](
+            nx::utils::db::QueryContext* queryContext,
+            utils::db::DBResult result)
+        {
+            startCheckForExpiredAuthRecordsTimer(queryContext, result);
+        });
+}
+
+utils::db::DBResult AuthenticationProvider::checkForExpiredAuthRecords(
+    utils::db::QueryContext* queryContext)
+{
+    const auto systemsWithExpiredAuthRecords =
+        m_authenticationDataObject->fetchSystemsWithExpiredAuthRecords(
+            queryContext, m_settings.auth().maxSystemsToUpdateAtATime);
+    if (systemsWithExpiredAuthRecords.empty())
+    {
+        NX_VERBOSE(this, lm("No systems with expired user authentication records"));
+        return utils::db::DBResult::notFound;
+    }
+
+    NX_DEBUG(this, lm("Found %1 systems with expired user authentication records")
+        .args(systemsWithExpiredAuthRecords.size()));
+
+    for (const auto& systemId: systemsWithExpiredAuthRecords)
+        updateSystemAuth(queryContext, systemId);
+
+    return utils::db::DBResult::ok;
+}
+
+void AuthenticationProvider::updateSystemAuth(
+    utils::db::QueryContext* queryContext,
+    const std::string& systemId)
+{
+    NX_VERBOSE(this, lm("Updating system %1 user authentication records").args(systemId));
+
+    try
+    {
+        const auto nonce = api::generateCloudNonceBase(systemId);
+        m_authenticationDataObject->insertOrReplaceSystemNonce(
+            queryContext, systemId, nonce);
+
+        m_authenticationDataObject->deleteSystemAuthRecords(
+            queryContext, systemId);
+
+        std::vector<api::SystemSharingEx> users =
+            m_systemSharingManager->fetchSystemUsers(queryContext, systemId);
+        for (const auto& user: users)
+            updateUserAuthInSystem(queryContext, systemId, nonce, user);
+
+        NX_DEBUG(this, lm("Updated system %1 user authentication records").args(systemId));
+    }
+    catch (const std::exception& e)
+    {
+        NX_DEBUG(this, lm("Error updating system %1 user authentication records. %2")
+            .args(systemId, e.what()));
+        throw;
+    }
+}
+
+void AuthenticationProvider::updateUserAuthInSystem(
+    nx::utils::db::QueryContext* queryContext,
+    const std::string& systemId,
+    const std::string& nonce,
+    const api::SystemSharingEx& userSharing)
+{
+    NX_VERBOSE(this, lm("Updating user %1 authentication records for system %2 using nonce %3")
+        .args(userSharing.accountEmail, systemId, nonce));
+
+    data::AccountData account;
+    const auto dbResult = m_accountManager->fetchAccountByEmail(
+        queryContext, userSharing.accountEmail, &account);
+    if (dbResult != utils::db::DBResult::ok)
+        throw utils::db::Exception(dbResult);
+    if (account.passwordHa1.empty() && account.passwordHa1Sha256.empty())
+    {
+        NX_VERBOSE(this, lm("Skipping user %1, system %2. User does not have password")
+            .args(userSharing.accountEmail, systemId));
+        return;
+    }
+
+    addUserAuthRecord(
+        queryContext,
+        systemId,
+        userSharing.vmsUserId,
+        account,
+        nonce);
+
+    NX_DEBUG(this, lm("Updated user %1 authentication records for system %2 using nonce %3")
+        .args(userSharing.accountEmail, systemId, nonce));
+}
+
+void AuthenticationProvider::startCheckForExpiredAuthRecordsTimer(
+    nx::utils::db::QueryContext* /*queryContext*/,
+    utils::db::DBResult result)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    if (m_terminated)
+        return;
+
+    m_updateExpiredAuthTimer.start(
+        result == utils::db::DBResult::ok //< Updated some records?
+            ? m_settings.auth().continueUpdatingExpiredAuthPeriod
+            : m_settings.auth().checkForExpiredAuthPeriod,
+        std::bind(&AuthenticationProvider::checkForExpiredAuthRecordsAsync, this));
 }
 
 } // namespace cdb

@@ -190,7 +190,7 @@ void QnUserRolesDialog::applyChanges()
             qnResourcesChangesManager->saveUserRole(userRole);
 
         auto resources = m_model->accessibleResources(userRole);
-        QnLayoutResourceList layoutsToShare = resourcePool()->getResources(resources)
+        QnLayoutResourceList layoutsToShare = resourcePool()->getResourcesByIds(resources)
             .filtered<QnLayoutResource>(
                 [](const QnLayoutResourcePtr& layout)
                 {

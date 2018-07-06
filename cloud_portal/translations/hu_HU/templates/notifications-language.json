@@ -6,7 +6,7 @@
     "emailSubject": "A jelszó alaphelyzetbe állítása"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} meghívott {{PRODUCT_NAME}} használatára"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} meghívja Önt %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Hozzáférést kapott {{message.system_name}} videó rendszerhez{{/message.sharer_name}}"
   },
   "system_shared": {
     "emailSubject": "Hozzáférést kapott {{message.system_name}} videó rendszerhez"

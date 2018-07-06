@@ -13,7 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <onvif/stdsoap2.h>
+#include <gsoap/stdsoap2.h>
 
 #include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/stoppable.h>
@@ -102,7 +102,7 @@ public:
     */
     virtual void join() override
     {
-        std::unique_ptr<AbstractStreamSocket> socket;
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket;
         {
             QnMutexLocker lk( &m_mutex );
             socket = std::move(m_socket);
@@ -148,7 +148,7 @@ public:
 
         //NOTE not locking mutex because all public method calls are synchronized
             //by caller and no request interleaving is allowed
-        m_socket = SocketFactory::createStreamSocket(
+        m_socket = nx::network::SocketFactory::createStreamSocket(
             false,
             nx::network::NatTraversalSupport::disabled);
 
@@ -183,7 +183,7 @@ public:
         }
 
         m_socket->connectAsync(
-            SocketAddress(endpoint.host(), endpoint.port(nx_http::DEFAULT_HTTP_PORT)),
+            nx::network::SocketAddress(endpoint.host(), endpoint.port(nx::network::http::DEFAULT_HTTP_PORT)),
             std::bind(&GSoapAsyncCallWrapper::onConnectCompleted, this, _1));
     }
 
@@ -302,7 +302,7 @@ private:
         bool parseResult = m_httpStreamReader.parseBytes(
             QnByteArrayConstRef(m_responseBuffer, m_totalBytesRead, bytesRead));
 
-        bool stateIsOk = m_httpStreamReader.state() != nx_http::HttpStreamReader::parseError;
+        bool stateIsOk = m_httpStreamReader.state() != nx::network::http::HttpStreamReader::parseError;
         m_totalBytesRead += bytesRead;
 
         if (!parseResult || !stateIsOk)
@@ -312,10 +312,10 @@ private:
             return;
         }
 
-        if (m_httpStreamReader.state() == nx_http::HttpStreamReader::messageDone)
+        if (m_httpStreamReader.state() == nx::network::http::HttpStreamReader::messageDone)
         {
             m_state = done;
-            if (m_httpStreamReader.message().type != nx_http::MessageType::response)
+            if (m_httpStreamReader.message().type != nx::network::http::MessageType::response)
                 m_resultHandler(SOAP_FAULT);
 
             auto resultCode = deserializeResponse();
@@ -393,12 +393,12 @@ private:
     QByteArray m_serializedRequest;
     QByteArray m_responseBuffer;
     int m_responseDataPos;
-    std::unique_ptr<AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     std::function<void(int)> m_extCompletionHandler;
     std::function<void(int)> m_resultHandler;
     bool* m_terminatedFlagPtr;
     mutable QnMutex m_mutex;
-    nx_http::HttpStreamReader m_httpStreamReader;
+    nx::network::http::HttpStreamReader m_httpStreamReader;
     std::size_t m_totalBytesRead;
     bool m_useHttpReader;
 

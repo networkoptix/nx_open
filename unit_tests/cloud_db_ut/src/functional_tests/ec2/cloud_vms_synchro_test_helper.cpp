@@ -9,8 +9,6 @@
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
 
-#include <transaction/transaction.h>
-
 #include <api/global_settings.h>
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 #include <utils/common/app_info.h>
@@ -124,12 +122,12 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
     if (!findAdminUserId(&adminUserId))
         return api::ResultCode::unknownError;
 
-    ::ec2::ApiResourceParamWithRefDataList params;
-    params.emplace_back(::ec2::ApiResourceParamWithRefData(
+    nx::vms::api::ResourceParamWithRefDataList params;
+    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
         adminUserId,
         "cloudSystemID",
         QString()));
-    params.emplace_back(::ec2::ApiResourceParamWithRefData(
+    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
         adminUserId,
         "cloudAuthKey",
         QString()));
@@ -172,12 +170,12 @@ api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
     if (!findAdminUserId(&adminUserId))
         return api::ResultCode::unknownError;
 
-    ::ec2::ApiResourceParamWithRefDataList params;
-    params.emplace_back(::ec2::ApiResourceParamWithRefData(
+    nx::vms::api::ResourceParamWithRefDataList params;
+    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
         adminUserId,
         "cloudSystemID",
         QString::fromStdString(m_system.id)));
-    params.emplace_back(::ec2::ApiResourceParamWithRefData(
+    params.emplace_back(nx::vms::api::ResourceParamWithRefData(
         adminUserId,
         "cloudAuthKey",
         QString::fromStdString(m_system.authKey)));
@@ -200,9 +198,9 @@ const api::SystemData& Ec2MserverCloudSynchronization::registeredSystemData() co
     return m_system;
 }
 
-QUrl Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
+nx::utils::Url Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
 {
-    QUrl url(lit("http://%1/").arg(cdb()->endpoint().toString()));
+    nx::utils::Url url(lit("http://%1/").arg(cdb()->endpoint().toString()));
     url.setUserName(QString::fromStdString(m_system.id));
     url.setPassword(QString::fromStdString(m_system.authKey));
     return url;
@@ -488,7 +486,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
     }
 
     // Verifying user full name.
-    ::ec2::ApiResourceParamWithRefDataList kvPairs;
+    nx::vms::api::ResourceParamWithRefDataList kvPairs;
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
@@ -496,7 +494,7 @@ void Ec2MserverCloudSynchronization::verifyCloudUserPresenceInLocalDb(
 
     const auto fullNameIter = std::find_if(
         kvPairs.cbegin(), kvPairs.cend(),
-        [](const ::ec2::ApiResourceParamWithRefData& element)
+        [](const nx::vms::api::ResourceParamWithRefData& element)
         {
             return element.name == Qn::USER_FULL_NAME;
         });
@@ -610,7 +608,7 @@ void Ec2MserverCloudSynchronization::verifyThatSystemDataMatchInCloudAndVms(
     QnUuid adminUserId;
     ASSERT_TRUE(findAdminUserId(&adminUserId));
 
-    ::ec2::ApiResourceParamWithRefDataList systemSettings;
+    nx::vms::api::ResourceParamWithRefDataList systemSettings;
     ASSERT_EQ(
         ::ec2::ErrorCode::ok,
         appserver2()->moduleInstance()->ecConnection()
@@ -710,7 +708,7 @@ void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncSystemData(
 api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    const QUrl url(lm("http://%1%2?systemId=%3")
+    const nx::utils::Url url(lm("http://%1%2?systemId=%3")
         .arg(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
         .arg(registeredSystemData().id));
     return fetchTransactionLog(url, transactionList);
@@ -719,7 +717,7 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
 api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLogFromMediaserver(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    QUrl url(lm("http://%1/%2?cloud_only=true")
+    nx::utils::Url url(lm("http://%1/%2?cloud_only=true")
         .arg(appserver2()->moduleInstance()->endpoint()).arg("ec2/getTransactionLog"));
     url.setUserName("admin");
     url.setPassword("admin");
@@ -749,15 +747,15 @@ bool Ec2MserverCloudSynchronization::findAdminUserId(QnUuid* const id)
 }
 
 api::ResultCode Ec2MserverCloudSynchronization::fetchTransactionLog(
-    const QUrl& url,
+    const nx::utils::Url& url,
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     httpClient.setResponseReadTimeoutMs(0);
     httpClient.setMessageBodyReadTimeoutMs(0);
     if (!httpClient.doGet(url))
         return api::ResultCode::networkError;
-    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
         return api::ResultCode::notAuthorized;
 
     nx::Buffer msgBody;

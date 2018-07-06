@@ -6,7 +6,7 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 
 #include "isd_resource.h"
 
@@ -15,11 +15,11 @@ const int QnISDStreamReader::ISD_HTTP_REQUEST_TIMEOUT_MS = 5000;
 
 extern QString getValueFromString(const QString& line);
 
-QnISDStreamReader::QnISDStreamReader(const QnResourcePtr& res):
+QnISDStreamReader::QnISDStreamReader(const QnPlIsdResourcePtr& res):
     CLServerPushStreamReader(res),
-    m_rtpStreamParser(res)
+    m_rtpStreamParser(res),
+    m_isdCam(res)
 {
-    //m_axisRes = getResource().dynamicCast<QnPlAxisResource>();
 }
 
 QnISDStreamReader::~QnISDStreamReader()
@@ -29,19 +29,16 @@ QnISDStreamReader::~QnISDStreamReader()
 
 QString QnISDStreamReader::serializeStreamParams(
     const QnLiveStreamParams& params,
-    const QSize& resolution,
     int profileIndex) const
 {
-    QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
-
     QString result;
     QTextStream t(&result);
 
     static const int kMinBitrate = 256; //< kbps
-    const int desiredBitrateKbps = std::max(kMinBitrate, res->suggestBitrateKbps(params.quality, resolution, params.fps));
+    const int desiredBitrateKbps = std::max(kMinBitrate, m_isdCam->suggestBitrateKbps(params, getRole()));
 
-    t << "VideoInput.1.h264." << profileIndex << ".Resolution=" << resolution.width()
-      << "x" << resolution.height() << "\r\n";
+    t << "VideoInput.1.h264." << profileIndex << ".Resolution=" << params.resolution.width()
+      << "x" << params.resolution.height() << "\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".FrameRate=" << params.fps << "\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".BitrateControl=vbr\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".BitrateVariableMin=" << desiredBitrateKbps / 5 << "\r\n";
@@ -50,35 +47,41 @@ QString QnISDStreamReader::serializeStreamParams(
     return result;
 }
 
-CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& liveStreamParams)
 {
+    QnLiveStreamParams params = liveStreamParams;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
     Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
-    QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
     CLHttpStatus status;
 
-    int port = QUrl(res->getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
-    CLSimpleHTTPClient http (res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
+    int port = QUrl(m_isdCam->getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT);
+    CLSimpleHTTPClient http(
+        m_isdCam->getHostAddress(),
+        port,
+        ISD_HTTP_REQUEST_TIMEOUT_MS,
+        m_isdCam->getAuth());
 
     QSize resolution;
     int profileIndex;
     if (role == Qn::CR_SecondaryLiveVideo)
     {
-        resolution = res->getSecondaryResolution();
+        resolution = m_isdCam->getSecondaryResolution();
         profileIndex = 2;
     }
     else
     {
-        resolution = res->getPrimaryResolution();
+        resolution = m_isdCam->getPrimaryResolution();
         profileIndex = 1;
     }
 
+    params.resolution = resolution;
+
     if (isCameraControlRequired)
     {
-        QString streamProfileStr = serializeStreamParams(params, resolution, profileIndex);
+        QString streamProfileStr = serializeStreamParams(params, profileIndex);
         status = http.doPOST(QByteArray("/api/param.cgi"), streamProfileStr);
         QnSleep::msleep(100);
     }
@@ -86,12 +89,18 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     QString urlrequest =
         lit("api/param.cgi?req=VideoInput.1.h264.%1.Rtsp.AbsolutePath").arg(profileIndex);
 
-    QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
+    QByteArray reslst = downloadFile(
+        status,
+        urlrequest,
+        m_isdCam->getHostAddress(),
+        port,
+        ISD_HTTP_REQUEST_TIMEOUT_MS,
+        m_isdCam->getAuth());
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
-        res->setStatus(Qn::Unauthorized);
+        m_isdCam->setStatus(Qn::Unauthorized);
         QUrl requestedUrl;
-        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setHost( m_isdCam->getHostAddress() );
         requestedUrl.setPort( port );
         requestedUrl.setScheme( QLatin1String("http") );
         requestedUrl.setPath( urlrequest );
@@ -104,7 +113,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     if(urlLst.size() < 1)
     {
         QUrl requestedUrl;
-        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setHost( m_isdCam->getHostAddress() );
         requestedUrl.setPort( port );
         requestedUrl.setScheme( QLatin1String("http") );
         requestedUrl.setPath( urlrequest );
@@ -117,20 +126,20 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     if (url.isEmpty())
     {
         QUrl requestedUrl;
-        requestedUrl.setHost( res->getHostAddress() );
+        requestedUrl.setHost( m_isdCam->getHostAddress() );
         requestedUrl.setPort( port );
         requestedUrl.setScheme( QLatin1String("http") );
         requestedUrl.setPath( urlrequest );
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
 
-    res->updateSourceUrl(url, getRole());
+    m_isdCam->updateSourceUrl(url, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
     //m_resource.dynamicCast<QnNetworkResource>()->setMediaPort(8554);
 
     m_rtpStreamParser.setRequest(url);
-	res->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
+	m_isdCam->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }
 
@@ -162,8 +171,8 @@ QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     QnAbstractMediaDataPtr rez;
     int errorCount = 0;

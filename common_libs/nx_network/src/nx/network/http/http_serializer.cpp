@@ -1,12 +1,14 @@
 #include "http_serializer.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 void MessageSerializer::setMessage(const Message* message)
 {
     m_message = message;
 }
-        
+
 nx::network::server::SerializerState MessageSerializer::serialize(
     nx::Buffer* const buffer,
     size_t* bytesWritten)
@@ -17,4 +19,6 @@ nx::network::server::SerializerState MessageSerializer::serialize(
     return nx::network::server::SerializerState::done;
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

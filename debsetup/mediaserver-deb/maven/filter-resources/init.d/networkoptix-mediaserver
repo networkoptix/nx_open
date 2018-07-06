@@ -2,7 +2,7 @@
 #
 # Backwards compartability for appstart
 
-SERVICE=${deb.customization.company.name}-mediaserver
+SERVICE=@deb.customization.company.name@-mediaserver
 COMMAND=$1
 
 echo "Rather than invoking init scripts through /etc/init.d, use the service(8)" >&2

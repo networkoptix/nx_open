@@ -1,7 +1,11 @@
 #include "controller.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
+#include <nx/cloud/cdb/client/cdb_request_path.h>
+
+#include "http_handlers/ping.h"
 #include "settings.h"
 
 namespace nx {
@@ -14,7 +18,6 @@ Controller::Controller(const conf::Settings& settings):
     m_emailManager(EMailManagerFactory::create(settings)),
     m_streeManager(settings.auth().rulesXmlPath),
     m_tempPasswordManager(
-        settings,
         m_streeManager.resourceNameSet(),
         &m_dbInstanceController.queryExecutor()),
     m_accountManager(
@@ -30,16 +33,26 @@ Controller::Controller(const conf::Settings& settings):
         &m_dbInstanceController.queryExecutor()),
     m_vmsP2pCommandBus(&m_ec2SyncronizationEngine),
     m_systemHealthInfoProvider(
-        &m_ec2SyncronizationEngine.connectionManager(),
-        &m_dbInstanceController.queryExecutor()),
+        SystemHealthInfoProviderFactory::instance().create(
+            &m_ec2SyncronizationEngine.connectionManager(),
+            &m_dbInstanceController.queryExecutor())),
     m_systemManager(
         settings,
         &m_timerManager,
         &m_accountManager,
-        m_systemHealthInfoProvider,
+        *m_systemHealthInfoProvider,
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
         &m_ec2SyncronizationEngine),
+    m_systemCapabilitiesProvider(
+        &m_systemManager,
+        &m_ec2SyncronizationEngine.connectionManager()),
+    m_vmsGateway(settings, m_accountManager),
+    m_systemMergeManager(
+        &m_systemManager,
+        *m_systemHealthInfoProvider,
+        &m_vmsGateway,
+        &m_dbInstanceController.queryExecutor()),
     m_authProvider(
         settings,
         &m_dbInstanceController.queryExecutor(),
@@ -50,17 +63,26 @@ Controller::Controller(const conf::Settings& settings):
     m_maintenanceManager(
         kCdbGuid,
         &m_ec2SyncronizationEngine,
-        m_dbInstanceController)
+        m_dbInstanceController),
+    m_cloudModuleUrlProviderDeprecated(
+        settings.moduleFinder().cloudModulesXmlTemplatePath),
+    m_cloudModuleUrlProvider(
+        settings.moduleFinder().newCloudModulesXmlTemplatePath)
 {
     performDataMigrations();
 
-    m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
-        m_systemManager.systemMarkedAsDeletedSubscription());
+    initializeDataSynchronizationEngine();
+
     m_timerManager.start();
+
+    initializeSecurity();
 }
 
 Controller::~Controller()
 {
+    m_ec2SyncronizationEngine.incomingTransactionDispatcher().removeHandler(
+        ::ec2::ApiCommand::saveSystemMergeHistoryRecord);
+
     m_ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
 }
@@ -85,19 +107,24 @@ EventManager& Controller::eventManager()
     return m_eventManager;
 }
 
-ec2::SyncronizationEngine& Controller::ec2SyncronizationEngine()
+data_sync_engine::SyncronizationEngine& Controller::ec2SyncronizationEngine()
 {
     return m_ec2SyncronizationEngine;
 }
 
-SystemHealthInfoProvider& Controller::systemHealthInfoProvider()
+AbstractSystemHealthInfoProvider& Controller::systemHealthInfoProvider()
 {
-    return m_systemHealthInfoProvider;
+    return *m_systemHealthInfoProvider;
 }
 
 SystemManager& Controller::systemManager()
 {
     return m_systemManager;
+}
+
+AbstractSystemMergeManager& Controller::systemMergeManager()
+{
+    return m_systemMergeManager;
 }
 
 AuthenticationProvider& Controller::authProvider()
@@ -108,6 +135,26 @@ AuthenticationProvider& Controller::authProvider()
 MaintenanceManager& Controller::maintenanceManager()
 {
     return m_maintenanceManager;
+}
+
+CloudModuleUrlProvider& Controller::cloudModuleUrlProviderDeprecated()
+{
+    return m_cloudModuleUrlProviderDeprecated;
+}
+
+CloudModuleUrlProvider& Controller::cloudModuleUrlProvider()
+{
+    return m_cloudModuleUrlProvider;
+}
+
+AuthenticationManager& Controller::authenticationManager()
+{
+    return *m_authenticationManager;
+}
+
+AuthorizationManager& Controller::authorizationManager()
+{
+    return *m_authorizationManager;
 }
 
 void Controller::performDataMigrations()
@@ -140,6 +187,53 @@ void Controller::generateUserAuthRecords(nx::utils::db::QueryContext* queryConte
             sharing,
             nx::cdb::SharingType::sharingWithExistingAccount);
     }
+}
+
+void Controller::initializeSecurity()
+{
+    // TODO: #ak Move following to stree xml.
+    m_authRestrictionList = std::make_unique<nx::network::http::AuthMethodRestrictionList>();
+    m_authRestrictionList->allow(kAnotherDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountRegisterPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountActivatePath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
+
+    std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
+    authDataProviders.push_back(&m_accountManager);
+    authDataProviders.push_back(&m_systemManager);
+    m_authenticationManager = std::make_unique<AuthenticationManager>(
+        std::move(authDataProviders),
+        *m_authRestrictionList,
+        m_streeManager);
+
+    m_authorizationManager = std::make_unique<AuthorizationManager>(
+        m_streeManager,
+        m_accountManager,
+        m_systemManager,
+        m_systemManager,
+        m_tempPasswordManager);
+}
+
+void Controller::initializeDataSynchronizationEngine()
+{
+    m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
+        m_systemManager.systemMarkedAsDeletedSubscription());
+
+    m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
+        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, ::ec2::ApiSystemMergeHistoryRecord, int>(
+            [this](
+                nx::utils::db::QueryContext* queryContext,
+                const nx::String& /*systemId*/,
+                data_sync_engine::Command<::ec2::ApiSystemMergeHistoryRecord> data,
+                int*)
+            {
+                m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
+                return nx::utils::db::DBResult::ok;
+            },
+            [](nx::utils::db::QueryContext*, nx::utils::db::DBResult, int) {});
 }
 
 } // namespace cdb

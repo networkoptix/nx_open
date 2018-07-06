@@ -24,6 +24,7 @@ private:
     void handleItemModeChanged(const QnLayoutItemIndex& item, RadassMode mode);
     void handleCurrentLayoutChanged();
     void handleLocalSystemIdChanged();
+    void notifyAboutPerformanceLoss();
 
 private:
     struct Private;

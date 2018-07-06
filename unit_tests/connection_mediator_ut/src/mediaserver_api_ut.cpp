@@ -11,10 +11,9 @@ namespace test {
 
 TEST( MediaserverEndpointTester, DISABLED_Hardcode )
 {
-    nx::stun::MessageDispatcher dispatcher;
     CloudDataProviderMock cloud;
-    MediaserverEndpointTester api( &cloud, &dispatcher );
-    nx::utils::TestSyncMultiQueue< SocketAddress, bool > results;
+    MediaserverEndpointTester api(&cloud);
+    nx::utils::TestSyncMultiQueue< nx::network::SocketAddress, bool > results;
 
     // 1. success
     api.pingServer( lit("localhost:7001"),
@@ -22,7 +21,7 @@ TEST( MediaserverEndpointTester, DISABLED_Hardcode )
                     results.pusher() );
 
     const auto r1 = results.pop();
-    EXPECT_EQ( r1.first, SocketAddress( lit("localhost:7001") ) );
+    EXPECT_EQ( r1.first, nx::network::SocketAddress( lit("localhost:7001") ) );
     EXPECT_EQ( r1.second, true );
 
     // 2. wrong port
@@ -31,7 +30,7 @@ TEST( MediaserverEndpointTester, DISABLED_Hardcode )
                     results.pusher() );
 
     const auto r2 = results.pop();
-    EXPECT_EQ( r2.first, SocketAddress( lit("localhost:7002") ) );
+    EXPECT_EQ( r2.first, nx::network::SocketAddress( lit("localhost:7002") ) );
     EXPECT_EQ( r2.second, false );
 
     // 3. wrong uuid
@@ -40,7 +39,7 @@ TEST( MediaserverEndpointTester, DISABLED_Hardcode )
                     results.pusher() );
 
     const auto r3 = results.pop();
-    EXPECT_EQ( r3.first, SocketAddress( lit("localhost:7001") ) );
+    EXPECT_EQ( r3.first, nx::network::SocketAddress( lit("localhost:7001") ) );
     EXPECT_EQ( r3.second, false );
 }
 

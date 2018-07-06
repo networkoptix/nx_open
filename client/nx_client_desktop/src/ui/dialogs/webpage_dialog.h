@@ -12,7 +12,7 @@ class QnWebpageDialog: public QnButtonBoxDialog
     using base_type = QnButtonBoxDialog;
 
 public:
-    explicit QnWebpageDialog(QWidget* parent = nullptr);
+    explicit QnWebpageDialog(QWidget* parent);
     virtual ~QnWebpageDialog();
 
     QString name() const;

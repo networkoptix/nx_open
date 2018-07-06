@@ -116,8 +116,8 @@ public:
         QString         m_fpath;
         QString         m_basename;
         QString         m_fname;
-        qint64          m_size;
-        bool            m_isDir;
+        qint64          m_size = 0;
+        bool            m_isDir = false;
         QFileInfoPtr    m_qfi;
         QDateTime       m_created;
     };

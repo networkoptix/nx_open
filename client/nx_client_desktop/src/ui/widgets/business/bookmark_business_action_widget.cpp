@@ -35,8 +35,8 @@ QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) 
     {
         // Prolonged type of event has changed. In case of instant
         // action event state should be updated
-        if (checked && (model()->eventType() == vms::event::userDefinedEvent))
-            model()->setEventState(vms::event::EventState::undefined);
+        if (checked && (model()->eventType() == vms::api::EventType::userDefinedEvent))
+            model()->setEventState(vms::api::EventState::undefined);
 
         ui->recordAfterWidget->setEnabled(!checked);
     });
@@ -64,7 +64,7 @@ void QnBookmarkBusinessActionWidget::at_model_dataChanged(Fields fields)
 
     if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = vms::event::hasToggleState(model()->eventType());
+        bool hasToggleState = vms::event::hasToggleState(model()->eventType(), model()->eventParams(), commonModule());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);

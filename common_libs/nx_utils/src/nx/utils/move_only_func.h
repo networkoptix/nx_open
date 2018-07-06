@@ -111,13 +111,12 @@ public:
         return !(*this == nullptr);
     }
 
-    //using std::function<F>::operator();
-    using std::function<F>::operator bool;
-
     void swap(MoveOnlyFunc& other)
     {
         base_type::swap(static_cast<base_type&>(other));
     }
+
+    using std::function<F>::operator bool;
 };
 
 template<typename Function, typename ... Args>

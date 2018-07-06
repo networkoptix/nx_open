@@ -7,9 +7,9 @@
 #include <QtMultimedia/QVideoFrame>
 #include <QtGui/QOpenGLContext>
 
-#include <nx/utils/log/log.h>
+#include <nx/media/media_fwd.h>
 #include <nx/streaming/video_data_packet.h>
-#include "abstract_resource_allocator.h"
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace media {
@@ -30,8 +30,8 @@ public:
      * @return Optimal video decoder (in case of any) compatible with such frame. Return null
      * pointer if no compatible decoder is found.
      */
-    VideoDecoderPtr createCompatibleDecoder(
-        const AVCodecID codec, const QSize& resolution, bool allowOverlay);
+    VideoDecoderPtr createCompatibleDecoder(const AVCodecID codec, const QSize& resolution,
+        bool allowOverlay, RenderContextSynchronizerPtr renderContextSynchronizer);
 
     /**
      * @return Whether a compatible video decoder is found.
@@ -61,25 +61,27 @@ public:
      * Register video decoder plugin.
      */
     template<class Decoder>
-    void addPlugin(
-        ResourceAllocatorPtr allocator = ResourceAllocatorPtr(),
-        int maxUseCount = std::numeric_limits<int>::max())
+    void addPlugin(int maxUseCount = std::numeric_limits<int>::max())
     {
-        m_plugins.push_back(MetadataImpl<Decoder>(allocator, maxUseCount));
+        m_plugins.push_back(MetadataImpl<Decoder>(maxUseCount));
     }
 
     /** For tests. */
     void reinitialize();
 
+    RenderContextSynchronizerPtr defaultRenderContextSynchronizer() const;
+    void setDefaultRenderContextSynchronizer(RenderContextSynchronizerPtr value);
+
+    static QSize platformMaxFfmpegResolution();
+
 private:
     struct Metadata
     {
-        std::function<AbstractVideoDecoder*(
-            const ResourceAllocatorPtr& allocator, const QSize& resolution)> createVideoDecoder;
+        std::function<AbstractVideoDecoder*(const RenderContextSynchronizerPtr& synchronizer,
+            const QSize& resolution)> createVideoDecoder;
         std::function<bool(
             const AVCodecID codec, const QSize& resolution, bool allowOverlay)> isCompatible;
         std::function<QSize(const AVCodecID codec)> maxResolution;
-        ResourceAllocatorPtr allocator;
         int useCount = 0;
         int maxUseCount = std::numeric_limits<int>::max();
         QString name;
@@ -89,16 +91,15 @@ private:
     template<class Decoder>
     struct MetadataImpl: public Metadata
     {
-        MetadataImpl(ResourceAllocatorPtr allocator, int maxUseCount)
+        MetadataImpl(int maxUseCount)
         {
             createVideoDecoder =
-                [](const ResourceAllocatorPtr& allocator, const QSize& resolution)
+                [](const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution)
                 {
-                    return new Decoder(allocator, resolution);
+                    return new Decoder(synchronizer, resolution);
                 };
             isCompatible = &Decoder::isCompatible;
             maxResolution = &Decoder::maxResolution;
-            this->allocator = std::move(allocator);
             this->maxUseCount = maxUseCount;
             typeIndex = std::type_index(typeid(Decoder));
             name = ::toString(typeid(Decoder));
@@ -108,6 +109,8 @@ private:
     std::vector<Metadata> m_plugins;
 
     bool m_isTranscodingEnabled;
+
+    RenderContextSynchronizerPtr m_defaultRenderContextSynchronizer;
 };
 
 } // namespace media

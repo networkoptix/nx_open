@@ -20,12 +20,18 @@ QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE), m_eof(false)
 
 }
 
-QnFile::QnFile(const QString& fName): m_fileName(fName), 
+QnFile::QnFile(const QString& fName): m_fileName(fName),
                                       m_impl(INVALID_HANDLE_VALUE),
                                       m_eof(false)
 {
 
 }
+
+QnFile::QnFile(int /*fd*/): m_eof(false)
+{
+    NX_ASSERT(false, "Windows is not supported");
+}
+
 
 QnFile::~QnFile()
 {
@@ -67,7 +73,7 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
     if (m_impl == INVALID_HANDLE_VALUE && (openMode & QIODevice::WriteOnly) && GetLastError() == ERROR_PATH_NOT_FOUND)
     {
         QDir dir;
-        if (dir.mkpath(QnFile::absolutePath(m_fileName))) 
+        if (dir.mkpath(QnFile::absolutePath(m_fileName)))
         {
             m_impl = CreateFile((const wchar_t*)m_fileName.constData(),
                 accessRights,
@@ -92,7 +98,7 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
     return true;
 }
 
-bool QnFile::eof() const 
+bool QnFile::eof() const
 {
     return m_eof;
 }
@@ -168,7 +174,7 @@ bool QnFile::truncate( qint64 newFileSize)
 {
     LONG distanceToMoveLow = (quint32)(newFileSize & 0xffffffff);
     LONG distanceToMoveHigh = (quint32)(newFileSize >> 32);
-    DWORD newPointerLow = SetFilePointer( 
+    DWORD newPointerLow = SetFilePointer(
         m_impl,
         distanceToMoveLow,
         &distanceToMoveHigh,

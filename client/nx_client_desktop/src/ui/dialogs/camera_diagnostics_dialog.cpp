@@ -1,5 +1,5 @@
-#include "ui_camera_diagnostics_dialog.h"
 #include "camera_diagnostics_dialog.h"
+#include "ui_camera_diagnostics_dialog.h"
 
 #include <QtGui/QClipboard>
 #include <QtWidgets/QApplication>
@@ -19,9 +19,9 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/common/widgets/clipboard_button.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 QnCameraDiagnosticsDialog::QnCameraDiagnosticsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),

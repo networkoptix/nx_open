@@ -1,6 +1,9 @@
 #pragma once
 
 #include "api_data.h"
+
+#include <nx/vms/api/types/resource_types.h>
+
 #include <network/module_information.h>
 
 namespace nx { namespace vms { namespace discovery { class Manager; } } }
@@ -8,7 +11,7 @@ namespace nx { namespace vms { namespace discovery { struct ModuleEndpoint; } } 
 
 namespace ec2 {
 
-    struct ApiDiscoveryData : ApiIdData
+    struct ApiDiscoveryData : nx::vms::api::IdData
     {
         ApiDiscoveryData(): ignore(false) {}
 
@@ -16,9 +19,9 @@ namespace ec2 {
         bool ignore;
     };
 
-#define ApiDiscoveryData_Fields ApiIdData_Fields(url)(ignore)(id)
+#define ApiDiscoveryData_Fields IdData_Fields(url)(ignore)(id)
 
-    struct ApiDiscoverPeerData : ApiData
+    struct ApiDiscoverPeerData: nx::vms::api::Data
     {
         QString url;
         QnUuid id;
@@ -27,13 +30,12 @@ namespace ec2 {
 
     struct ApiDiscoveredServerData : QnModuleInformationWithAddresses
     {
-        ApiDiscoveredServerData() : status(Qn::Online) {}
+        ApiDiscoveredServerData() = default;
         ApiDiscoveredServerData(const QnModuleInformation &other) :
-            QnModuleInformationWithAddresses(other),
-            status(Qn::Online)
+            QnModuleInformationWithAddresses(other)
         {}
         // Should be only Online, Incompatible or Unauthorized
-        Qn::ResourceStatus status;
+        nx::vms::api::ResourceStatus status = nx::vms::api::ResourceStatus::online;
     };
 #define ApiDiscoveredServerData_Fields QnModuleInformationWithAddresses_Fields(status)
 

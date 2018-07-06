@@ -1,15 +1,21 @@
 #include "entropix_image_enhancer.h"
 
+#include <chrono>
+
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QHttpMultiPart>
 
 #include <nx/utils/log/log.h>
 #include <core/resource/camera_resource.h>
-#include <camera/single_thumbnail_loader.h>
-#include <ui/common/geometry.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_provider.h>
+#include <nx/client/core/utils/geometry.h>
 
 #include <ini.h>
+
+using nx::client::core::Geometry;
 
 namespace nx {
 namespace client {
@@ -41,7 +47,7 @@ public:
     QnVirtualCameraResourcePtr camera;
     qint64 timestamp;
     QRectF zoomRect;
-    QScopedPointer<QnSingleThumbnailLoader> thumbnailLoader;
+    QScopedPointer<CameraThumbnailProvider> thumbnailLoader;
 
     enum class Step
     {
@@ -61,7 +67,7 @@ public:
 
     void enhanceScreenshot(const QImage& colorImage, const QImage& blackAndWhiteImage);
 
-    void at_imageLoaded(const QByteArray& imageData);
+    void at_imageLoaded(const QImage& image);
 
     void at_replyReadyRead();
     void at_replyFinished();
@@ -126,7 +132,7 @@ void EntropixImageEnhancer::Private::enhanceScreenshot(
 
     const auto& colorImageData = imageToByteArray(colorImage);
     const auto& blackAndWhiteImageData = imageToByteArray(blackAndWhiteImage);
-    const auto& rect = QnGeometry::subRect(colorImage.rect(), zoomRect).toRect();
+    const auto& rect = Geometry::subRect(colorImage.rect(), zoomRect).toRect();
 
     auto makePart =
         [](const QByteArray& name, const QByteArray& body)
@@ -174,9 +180,8 @@ void EntropixImageEnhancer::Private::enhanceScreenshot(
     connect(m_reply.data(), &QNetworkReply::finished, this, &Private::at_replyFinished);
 }
 
-void EntropixImageEnhancer::Private::at_imageLoaded(const QByteArray& imageData)
+void EntropixImageEnhancer::Private::at_imageLoaded(const QImage& image)
 {
-    const auto& image = QImage::fromData(imageData);
     NX_DEBUG(q, lm("Got screenshot with size %1x%2").arg(image.width()).arg(image.height()));
 
     const auto& sensors = camera->combinedSensorsDescription();
@@ -252,21 +257,27 @@ EntropixImageEnhancer::~EntropixImageEnhancer()
 {
 }
 
-void EntropixImageEnhancer::requestScreenshot(qint64 timestamp, const QRectF& zoomRect)
+void EntropixImageEnhancer::requestScreenshot(qint64 timestampMs, const QRectF& zoomRect)
 {
     d->setProgress(Private::Step::gettingScreenshot);
 
     d->zoomRect = zoomRect;
 
     if (!d->thumbnailLoader)
-        d->thumbnailLoader.reset(new QnSingleThumbnailLoader(d->camera, timestamp));
+    {
+        using namespace std::chrono;
+        api::CameraImageRequest request;
+        request.camera = d->camera;
+        request.usecSinceEpoch = microseconds(milliseconds(timestampMs)).count();
+        d->thumbnailLoader.reset(new CameraThumbnailProvider(request));
+    }
 
-    connect(d->thumbnailLoader.data(), &QnSingleThumbnailLoader::imageLoaded,
+    connect(d->thumbnailLoader.data(), &CameraThumbnailProvider::imageChanged,
         d.data(), &Private::at_imageLoaded);
 
     NX_DEBUG(this,
         lm("Requesting screenshot from server for camera %2 at %1")
-            .arg(timestamp).arg(d->camera->getName()));
+            .arg(timestampMs).arg(d->camera->getName()));
     d->thumbnailLoader->loadAsync();
 }
 

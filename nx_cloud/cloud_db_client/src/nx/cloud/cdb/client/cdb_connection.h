@@ -28,6 +28,8 @@ public:
     //!Implemetation of api::Connection::maintenanceManager
     virtual api::MaintenanceManager* maintenanceManager() override;
 
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     //!Implemetation of api::Connection::setCredentials
     virtual void setCredentials(
         const std::string& login,

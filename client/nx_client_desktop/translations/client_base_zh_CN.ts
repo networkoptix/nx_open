@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh-CN" sourcelanguage="en">
   <context>
+    <name>AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>没有数据</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -48,6 +55,10 @@ to view more bookmarks</source>
     <message>
       <source>Delete bookmark</source>
       <translation>删除书签</translation>
+    </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation>导出书签</translation>
     </message>
   </context>
   <context>
@@ -280,7 +291,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation>研判...</translation>
+      <translation>使用者行为记录...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
@@ -360,18 +371,6 @@ to view more bookmarks</source>
     <message>
       <source>Remove Bookmarks...</source>
       <translation>删除书签...</translation>
-    </message>
-    <message>
-      <source>Export Selected Area...</source>
-      <translation>导出所选录像区域...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>导出多个录像...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>导出快速回放</translation>
     </message>
     <message>
       <source>Preview Search...</source>
@@ -476,22 +475,6 @@ to view more bookmarks</source>
     <message>
       <source>Hide Info</source>
       <translation>隐藏信息</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>修改分辨率...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>自动</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>低</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>高</translation>
     </message>
     <message>
       <source>PTZ...</source>
@@ -706,14 +689,6 @@ to view more bookmarks</source>
       <translation>联网到当前系统...</translation>
     </message>
     <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>改变宽高比...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>改变间距...</translation>
-    </message>
-    <message>
       <source>None</source>
       <translation>无</translation>
     </message>
@@ -873,6 +848,50 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>制作幻灯片</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation>穿戴式相机...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation>新的穿戴式相机...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>上传文件</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>上传文件夹...</translation>
+    </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation>启动分析...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>某些相机需要设置密码</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation>导出视频...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>导出书签...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation>分辨率</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation>改变宽高比...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation>网格间距：</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -960,8 +979,66 @@ to view more bookmarks</source>
       <translation>此授权的重置次数超出了限制.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>此服务器的硬件ID与原启动本授权的硬件ID不匹配.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>所选过滤器需要转码，这将增加CPU使用率，可能需要很长时间。</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>不建议使用AVI格式导出带有音轨的非连续录制。</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>我们建议将视频从该相机中导出为 &quot;多视频&quot; 以避免降级。</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>您即将导出长视频。它可能需要超过千兆字节的硬盘空间，需要几分钟才能完成。</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>导出的.EXE文件的大小超过4 GB，无法在Windows中双击打开。它只能在 %1 Client中播放。</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>本地文件，服务器监视器小部件和网页将不会被导出。</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation>设置不适用于.NOV和.EXE文件。</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation>音频视频交错</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation>Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation>MPEG-4第14部分</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation>%1 個媒體檔案</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation>可执行文件%1媒体文件（x64）</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation>可执行文件%1媒体文件（x86）</translation>
     </message>
   </context>
   <context>
@@ -1037,8 +1114,23 @@ to view more bookmarks</source>
       <translation>文件 &quot;%1&quot; 已存在，请尝试另一个名称。</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>文件 &quot;%1&quot; 正在被另一个程序使用，请尝试另一个名称。</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation>另一个进程正使用文件&quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation>文件 &quot;%1&quot; 无法覆写，请尝试另一个名称。</translation>
+    </message>
+    <message>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation>文件名&quot;%1&quot; 由作业系统保留。请尝试另一个名字。</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation>
+        <numerusform>文件名不应包含下列字符：</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1064,10 +1156,6 @@ to view more bookmarks</source>
       <translation>短</translation>
     </message>
     <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>密码必须至少 8 个字符长。</translation>
-    </message>
-    <message>
       <source>Common</source>
       <translation>公共</translation>
     </message>
@@ -1082,6 +1170,44 @@ to view more bookmarks</source>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>允许只拉丁文字母、 数字和符号键盘。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation>
+        <numerusform>密码应包含%n字符，符号或数字的不同组合</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation>
+        <numerusform>密码必须至少 %n 个字符长。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>长</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation>
+        <numerusform>密码不得超过 %n 个字符</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation>
+        <numerusform>密码不得包含%n或更多连续的字符。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation>
+        <numerusform>密码不应当包含%n重复字符</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>允许只拉丁文字母、 数字和符号键盘%1。</translation>
     </message>
   </context>
   <context>
@@ -1219,13 +1345,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>只读</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
@@ -1276,6 +1395,17 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>找不到文件夹</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>最小值可能会导致其他摄像机上的录像长度减小。</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>最小值可能会导致其他摄像机上的录像长度减小。</translation>
     </message>
   </context>
   <context>
@@ -1391,7 +1521,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>研判日志回放</translation>
+      <translation>使用者行为记录回放</translation>
     </message>
   </context>
   <context>
@@ -1659,10 +1789,6 @@ to view more bookmarks</source>
       <translation>版本号</translation>
     </message>
     <message>
-      <source>Invalid build number</source>
-      <translation>无效的内部版本号</translation>
-    </message>
-    <message>
       <source>Password</source>
       <translation>密码</translation>
     </message>
@@ -1700,7 +1826,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
       <translation>
-        <numerusform> %n 的 %1 I/O模块</numerusform>
+        <numerusform>%n 的 %1 I/O模块</numerusform>
       </translation>
     </message>
     <message>
@@ -2081,12 +2207,31 @@ to view more bookmarks</source>
       <translation>I/O 模块有没有音频流</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O 模块 Id</translation>
+      <source>Settings</source>
+      <translation>设置</translation>
     </message>
     <message>
-      <source>Camera Id</source>
-      <translation>摄像机 Id</translation>
+      <source>Web</source>
+      <translation type="unfinished">Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>无设置</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O 模块 ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>摄像机 ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation>分析不可用于%1</translation>
     </message>
   </context>
   <context>
@@ -2186,6 +2331,16 @@ to view more bookmarks</source>
     <message>
       <source>Secondary</source>
       <translation>次要</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This ID is already used on the following %n cameras: %1</source>
+      <translation type="unfinished">
+        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2301,6 +2456,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>服务器</translation>
     </message>
+    <message>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2335,11 +2494,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform> %1 录像或移动侦测功能已禁用</numerusform>
-      </translation>
+      <translation>%1 录像或移动侦测功能已禁用</translation>
     </message>
   </context>
   <context>
@@ -2359,12 +2516,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>New Password</source>
+      <translation>新密码</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation>重复输入密码</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>密码不匹配。</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation>密码长度应至少为8个符号，并包含不同类型的字符。</translation>
+    </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>密码不得与摄像机的用户名称相同</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>%1 的录像功能关闭</numerusform>
-      </translation>
+      <translation>%1 的录像功能关闭</translation>
     </message>
   </context>
   <context>
@@ -2384,14 +2562,6 @@ to view more bookmarks</source>
     <message>
       <source>based on server time</source>
       <translation>基于服务器时间</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>最小值可能会导致其他摄像机上的录像长度减小。</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>最小值可能会导致其他摄像机上的录像长度减小。</translation>
     </message>
     <message>
       <source>Not enough licenses to enable recording</source>
@@ -2436,6 +2606,18 @@ to view more bookmarks</source>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>到摄像机设置中的&quot;移动侦测&quot;启用或設置移动侦测.</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mb/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>较少设置</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>更多设置</translation>
     </message>
   </context>
   <context>
@@ -2529,6 +2711,14 @@ to view more bookmarks</source>
       <source>No device selected.</source>
       <translation>未选择设备.</translation>
     </message>
+    <message>
+      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+      <translation>无法编辑某些穿戴式和非穿戴式相机的属性。</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable cameras.</source>
+      <translation>无法编辑某些穿戴式相机的属性。</translation>
+    </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
@@ -2577,50 +2767,61 @@ devices</source>
       <translation>从任何地方连接到您的系统与任何设备</translation>
     </message>
     <message>
-      <source>Known limitations</source>
-      <translation>已知的限制</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>系统断开 %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>打开 %1 门户...</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>创建 %1 帐户</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>将系统连接到 %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>创建 %1 帐户</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>将系统连接到 %1</translation>
     </message>
     <message>
-      <source>%1 is in Beta.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 是 beta 版。</translation>
+      <source>Learn more about %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>了解更多关于 %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Account not found</source>
+      <translation type="unfinished">Account not found</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>了解更多关于 %1</translation>
+      <source>Account is not activated.</source>
+      <translation type="unfinished">Account is not activated.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation type="unfinished">Invalid password</translation>
     </message>
   </context>
   <context>
@@ -2635,7 +2836,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>无法连接到 %1</translation>
     </message>
   </context>
@@ -2666,12 +2867,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>正在连接到 %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>输入 %1 帐户</translation>
     </message>
   </context>
@@ -2683,12 +2884,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>系统连接到 %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>无法连接到 %1</translation>
     </message>
   </context>
@@ -2840,17 +3041,17 @@ to %1</source>
       <translation>不允许操作, 服务器现可能正在重新启动。请稍后再试。</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>连接错误%1。请检查您的互联网连接或稍后再试。</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>无法与服务器建立连接.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>该用户被系统管理员禁用。</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>连接错误%1。请检查您的互联网连接或稍后再试。</translation>
     </message>
   </context>
   <context>
@@ -2957,6 +3158,29 @@ to %1</source>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>请创建系统配置备份，以便在系统出错时可还原。</translation>
     </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation type="unfinished">Database Backup Files</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>本相机需要设置密码。</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation>某些选定的相机需要设置密码。</translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>要求您的系统管理员执行此操作。</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation>设置密码</translation>
+    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
@@ -3055,26 +3279,27 @@ to %1</source>
       <translation>断开连接</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>所有云用户将被删除。</translation>
-    </message>
-    <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>无法连接到 %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>系统从 %1断开 吗？</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>您将从当前系统断开，但可通过本地网络的本地帐户再次登录。</translation>
     </message>
     <message>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>无法连接到 %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>系统从 %1断开 吗？</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>你将不能连接到此系统与您的 %1 帐户后该系统断开 %1。</translation>
     </message>
   </context>
@@ -3103,7 +3328,7 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>搜索到 %1 从 %2时间段的事件日志 - %n </numerusform>
+        <numerusform>搜索到 %1 从 %2时间段的事件日志 - %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3198,6 +3423,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>自动</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation>基本</translation>
     </message>
   </context>
   <context>
@@ -3357,7 +3586,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation>打开审查跟踪日志</translation>
+      <translation>打开使用者行为记录日志</translation>
     </message>
     <message>
       <source>Monitor All Servers on a Single Layout</source>
@@ -3463,8 +3692,8 @@ to %1</source>
       <translation>脉冲</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3491,38 +3720,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>打开IO端口 '%1'失败</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>导出到&quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>无法导出设备%1.</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>无法导出摄像机%1.</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>未知错误发生.</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>无法输出I/O模块 %1.</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>不能创建输出文件 %1...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>文件 &quot;%1&quot; 正在被另一个程序使用，请尝试另一个名称。</translation>
     </message>
   </context>
   <context>
@@ -3647,6 +3844,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3677,7 +3889,7 @@ to %1</source>
       <translation>功能:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>已关联硬件ID</translation>
     </message>
   </context>
@@ -3943,16 +4155,16 @@ to %1</source>
       <translation>请联系客服以获取有效的授权。</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>本授权已经激活并链接到硬件 Id %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>本授权已经激活并链接到硬件 Id %1 於 %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>如果问题仍然存在，请与客户支持联系。</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>本授权已经激活并链接到硬件 ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>本授权已经激活并链接到硬件 ID %1 於 %2</translation>
     </message>
   </context>
   <context>
@@ -3970,30 +4182,24 @@ to %1</source>
       <translation>打开授权许可文件</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>所有文件(*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>打开文件失败</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>All files</source>
+      <translation type="unfinished">All files</translation>
+    </message>
+    <message>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>请以电子邮件将硬件ID及授权发送給 %1 来获取离线激活档。</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
       <translation>请以将硬件ID及授权发送給 %1 来获取离线激活档。</translation>
     </message>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
-    <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>使用模拟授权预览 %n 摄像机</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
@@ -4012,12 +4218,18 @@ to %1</source>
         <numerusform>所选 %nI/O模块使用授权</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation>
+        <numerusform>使用授权预览 %n 摄像机</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>无法连接到 %1</translation>
     </message>
   </context>
@@ -4135,12 +4347,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>登录到 %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>欢迎来到 %1</translation>
     </message>
   </context>
@@ -4227,7 +4439,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1（轮播&quot;%2&quot; 已启用）</translation>
+      <translation>%1 (轮播&quot;%2&quot; 已启用)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4243,12 +4455,22 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation>无法调用触发器 %1（%2）</translation>
+      <translation>无法调用触发器 %1 (%2)</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>按住</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>已按计划禁用</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for all %n Cameras</source>
+      <translation>
+        <numerusform>为所有%n相机设置</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4332,6 +4554,14 @@ to %1</source>
       <source>Skip</source>
       <translation>跳过</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>关闭</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>停止</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4390,6 +4620,10 @@ to %1</source>
       <source>Previous Chunk</source>
       <translation>上一个</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation>NVR摄像机不支持不同步的播放</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
@@ -4404,6 +4638,25 @@ to %1</source>
     <message>
       <source>KB/s</source>
       <translation>KB/s</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation>穿戴式相机</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation>穿戴式相机 %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名称</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>名称不能为空。</translation>
     </message>
   </context>
   <context>
@@ -4483,13 +4736,13 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>接受</translation>
     </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>设置密码</translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
-    <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>若需启用全功能模式, 请使用另外的服务器.</translation>
-    </message>
     <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 只工作在配置模式下</translation>
@@ -4497,6 +4750,10 @@ to %1</source>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>当前服务器性能在配置模式下仅允许运行 %1.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>若需启用全功能模式,请使用另外的服务器</translation>
     </message>
   </context>
   <context>
@@ -4547,6 +4804,10 @@ to %1</source>
     <message>
       <source>Manage Bookmarks</source>
       <translation>管理书签</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation>当任何一个用户看到事件书签, 通知将被显示</translation>
     </message>
   </context>
   <context>
@@ -4747,22 +5008,6 @@ to %1</source>
       <source>Quarter Native</source>
       <translation>1/4 原生</translation>
     </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920 x 1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280 x 720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640 x 480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320 x 240</translation>
-    </message>
   </context>
   <context>
     <name>QnRecordingStatsModel</name>
@@ -4772,7 +5017,7 @@ to %1</source>
     </message>
     <message>
       <source>Space</source>
-      <translation>空格</translation>
+      <translation>空间</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -4952,13 +5197,6 @@ to %1</source>
     <message>
       <source>Health Monitor</source>
       <translation>健康状况监控器</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnResourcePreviewWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>没有数据</translation>
     </message>
   </context>
   <context>
@@ -5352,10 +5590,6 @@ to %1</source>
       <translation>请选择升级文件...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>升级文件（*.zip）</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>版本说明</translation>
     </message>
@@ -5538,6 +5772,10 @@ to %1</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>不兼容 %1 实例。先从 %1 更新断开系统。</translation>
     </message>
+    <message>
+      <source>Update Files</source>
+      <translation type="unfinished">Update Files</translation>
+    </message>
   </context>
   <context>
     <name>QnSessionAwareTabbedDialog</name>
@@ -5637,6 +5875,10 @@ to %1</source>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;移动主码流 + 连续子码流&quot;录像选项不能设置。</translation>
+    </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>如果服务器存储上没有可用空间，则上传的存档会自动删除。服务器上所有摄像机中最老的文件将首先被删除。</translation>
     </message>
   </context>
   <context>
@@ -5789,10 +6031,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>没有足够的授权</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>没有数据</translation>
     </message>
@@ -5843,6 +6081,30 @@ to %1</source>
     <message>
       <source>Please check authentication information</source>
       <translation>请检查身份验证信息</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation>没有实时流</translation>
+    </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>连接太多</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>需要密码</translation>
+    </message>
+    <message>
+      <source>Set for this Camera</source>
+      <translation>为此相机设置</translation>
+    </message>
+    <message>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation>无支持的固件版本</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>没有足够的授权</translation>
     </message>
   </context>
   <context>
@@ -5985,6 +6247,14 @@ to %1</source>
     <message>
       <source>Backup completed</source>
       <translation>备份已完成。</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>录像到禁用存储将停止。然而，从它删除过时的画面将继续。</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>在USB存储器上启用了录制</translation>
     </message>
   </context>
   <context>
@@ -6138,10 +6408,6 @@ to %1</source>
       <translation>系统处于安全模式</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>存储满</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>存储未设置</translation>
     </message>
@@ -6186,10 +6452,6 @@ to %1</source>
       <translation>以下服务器已取消录像索引重建:</translation>
     </message>
     <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>以下服务器录像已满:</translation>
-    </message>
-    <message>
       <source>Storage is not configured on the following Server:</source>
       <translation>以下服务器录像未进行配置:</translation>
     </message>
@@ -6204,16 +6466,6 @@ to %1</source>
     <message>
       <source>Connect</source>
       <translation>连接</translation>
-    </message>
-    <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>将您的系统连接到 %1 &amp;mdash; 使其可从任何地方访问！</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>查阅 %1 &amp;mdash; 从任何地方连接到您的服务器</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6258,6 +6510,24 @@ to %1</source>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>以下设备的远程归档同步已完成：</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation>Remote archive synchronization</translation>
+    </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation>刪除存档完整性问题</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>将您的系统连接到 %1 &amp;mdash; 使其可从任何地方访问！</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>查阅 %1 &amp;mdash; 从任何地方连接到您的服务器</translation>
     </message>
   </context>
   <context>
@@ -6320,16 +6590,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>系统时间与互联网同步，独立于服务器的本地时间。</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>系统时间与选定的服务器本地时间同步，与其他服务器无关。</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>没有服务器具有互联网访问权限。时间不会被同步。</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation>系统时间与Internet同步，不依赖于服务器上的本地时间。</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation>系统时间与所选服务器上的本地时间同步，并且不取决于其他服务器上的本地时间。</translation>
     </message>
   </context>
   <context>
@@ -6350,7 +6620,7 @@ to %1</source>
     <message>
       <source>h ap</source>
       <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>h ap</translation>
+      <translation>h时 ap</translation>
     </message>
     <message>
       <source>dd</source>
@@ -6380,7 +6650,7 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd日 MMMM yyyy h ap</translation>
+      <translation>dd日 MMMM yyyy h时 ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
@@ -6530,16 +6800,17 @@ to %1</source>
       <translation>本地用户</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>云用户</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>登录</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>角色</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 用户</translation>
     </message>
   </context>
   <context>
@@ -6722,7 +6993,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>该用户尚未注册%1</translation>
     </message>
   </context>
@@ -6731,10 +7002,6 @@ to %1</source>
     <message>
       <source>Local</source>
       <translation>本地</translation>
-    </message>
-    <message>
-      <source>Cloud</source>
-      <translation>云</translation>
     </message>
     <message>
       <source>Login</source>
@@ -6777,8 +7044,9 @@ to %1</source>
       <translation>密码不匹配。</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>拥有指定的电子邮件的云用户已存在。</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 user with specified email already exists.</translation>
     </message>
   </context>
   <context>
@@ -6846,6 +7114,40 @@ to %1</source>
     <message>
       <source>Muted</source>
       <translation>静音</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>停止上传？</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation>已经上传的文件将被保留。</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation>(%1 of %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>上传 %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>正在完成 %1...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>用户 &quot;%1&quot; 当前正在将档案上传到本相机。</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation>另一位用户正在将档案上传到此相机。</translation>
     </message>
   </context>
   <context>
@@ -6937,188 +7239,13 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>无法连接到服务器。视频墙将会関闭。</translation>
     </message>
-  </context>
-  <context>
-    <name>QnWorkbenchExportHandler</name>
     <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>可执行 %1 媒体文件 (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>可执行 %1 媒体文件 (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>导出视窗</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>导出视频为...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>时间戳:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>导出视频</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>导出到&quot;%1&quot;...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>导出视窗为...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 媒体文件(*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>应用过滤器:旋转、图像矫正、图像增强、自定义宽高比(需转码)</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>导出</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>无时间戳</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>左上角((需转码)</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>右上角((需转码)</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>左下角((需转码)</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>右下角((需转码)</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>保存本地视窗为...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>设置文件为只读.</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>文件已用于录制</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>请选择另一个名称或等待，直到完成录像。</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>您将要导出长视频</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>它可能需要高於 1GB 的硬盘空间，需要几分钟才能完成。</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>仍要导出吗？</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>仍要导出 AVI 吗？</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>不推荐所选择的格式</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>为避免降级，这台相机建议用 NOV 或 EXE 格式。</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>导出与转码？</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>它会增加 CPU 使用率和可能会占用大量的时间。</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>不推荐的 EXE 格式</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>仍导出到 EXE？</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>未能导出多视频</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>本地文件不允许做多视频导出</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>请从布局中删除所有本地文件，然后重试。</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>导出</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>您将要导出大量的视频</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>太短的时间选择</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>要导出快速审查，视频长度应至少 10 秒。</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>导出完成</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>未能导出视频</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>不建议AVI格式</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>导出非连续的录像，建议 MKV 或其他格式。</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>由于 Windows 的限制，双击 EXE 无法打开超过 4 GB的文件。</translation>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
-    <message>
-      <source>Enter Password...</source>
-      <translation>输入密码...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>管理员密码</translation>
-    </message>
     <message>
       <source>Systems will be merged shortly</source>
       <translation>系统将于短期内合并</translation>
@@ -7140,14 +7267,6 @@ to %1</source>
       <translation>授权的总量将减少</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>密码不能为空。</translation>
-    </message>
-    <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>云系统不能合并</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>正在连接到当前系统...</translation>
     </message>
@@ -7158,6 +7277,19 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>服务器将很快连接到系统</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>输入密码...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>管理员密码</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">%1 Systems cannot be merged</translation>
     </message>
   </context>
   <context>
@@ -7397,6 +7529,153 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>所有文件(*.*)</translation>
+    </message>
+    <message>
+      <source>Video (%1)</source>
+      <translation>视频 (%1)</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recordings...</source>
+      <translation>打开穿戴式相机录像..。</translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation>仅支持具有正确时间戳的视频文件。</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>用户 &quot;%1&quot; 正在将档案上传到本相机因此无法开始上传.</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation>其它用户正在将档案上传到本相机因此无法开始上传.</translation>
+    </message>
+    <message>
+      <source>Failed to add wearable camera</source>
+      <translation>无法添加穿戴式相机</translation>
+    </message>
+    <message>
+      <source>No video files found in selected folder</source>
+      <translation>在选定文件夹中找不到视频文件</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation>
+        <numerusform>所选文件格式不受支持</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation>使用.MKV，.AVI，.MP4或其他视频文件。</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation>
+        <numerusform>所选文件没有时间戳</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation>
+        <numerusform>选定的文件覆盖已经上传视频的时段</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation>
+        <numerusform>您可以将这些文件上传到穿戴式相机的其它区。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation>
+        <numerusform>选定的文件覆盖已经上传视频的时段</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Selected files will not be uploaded</source>
+      <translation>所选文件不会被上传</translation>
+    </message>
+    <message>
+      <source>Some files will not be uploaded</source>
+      <translation>有些文件不会被上传</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation>未在选定文件夹中上载新文件</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>所选文件太旧</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>所选文件记录在 %1上，但只能上载最近 %n 天内记录的文件。您可以在相机存档设置中更改此设置。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>所选文件记录在 %1 和 %2之间，但只能上载最近 %n 天内记录的文件。您可以在相机存档设置中更改此设置。</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>上传这些文件后可能会删除一些文件</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>服务器存储上没有太多可用空间。一些旧镜头可能会被删除以释放空间。请注意，如果选定的文件碰巧是服务器上最旧的文件，它们将在上传后立即删除。</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>为了防止这种情况，您可以添加额外的存储。您还可以通过更改相机设置中的存档保留时间来控制首先删除哪些素材。</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>无论如何上传？</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>无法完成上传到 %1</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>确保服务器存储空间足够。</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 格式不受支持。</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 没有时间戳。</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 比相机存档设置中允许的时间早。</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1 涵盖已上传视频的时间段。</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1 涵盖已上传视频的时间段。</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
@@ -7567,6 +7846,20 @@ to %1</source>
         <numerusform>从幻灯片中删除 %n 项目吗？</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>停止上传？</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>停止</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
+      <translation>
+        <numerusform>某些视频文件仍在上传至 %n 穿戴式相机：</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
@@ -7605,6 +7898,392 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation>动态</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>不支持的数据导出媒体。</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>所选格式不被FFMPEG库支持。</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>FFMPEG库错误。</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>视频或音频编解码器与选定格式不兼容。</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>文件写入错误</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>没有数据导出。</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>内部错误</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>导出</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>导出</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>快速审查</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>导出设置</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>添加时间戳</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>删除时间戳</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>时间戳</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>添加图像</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>删除图像</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>图片:</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>添加文字</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>删除文字</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>文字</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>重置速度</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>添加书签信息</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>刪除书签信息</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>书签信息</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>目录</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名称</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>名称不能为空。</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>选择文件夹...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>选择文件...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation>图像（%1）</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>错误</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>无法载入图像。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>没有数据</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>不是相机</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>自动</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>低</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>高</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>自定义</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>将布局分辨率设置为&quot;自动&quot;以提高性能。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation>
+        <numerusform>要导出快速审查，视频长度应至少 %n 秒。</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation>长</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>短</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation>无法打开文件 &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation>无法计算文件 &quot;%1&quot; 的 md5</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation>无法在服务器端创建上载</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation>无法将文件块上载到服务器</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation>无法检查服务器上的上传文件</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation>文件在上传到服务器时被损坏</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>Failed to send request to the server.</source>
+      <translation>无法将请求发送到服务器。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation>%1 分析</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation>停止导出</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>导出完成</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>导出失败</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation>无法写入文件。</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1 正在被另一个导出使用。</translation>
+    </message>
+    <message>
+      <source>Selected period cannot be exported for the current camera.</source>
+      <translation>当前相机所选的时间段不能导出。</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>文件 &quot;%1&quot; 正在被另一个程序使用，请尝试另一个名称。</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>不能创建输出文件 %1...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>未知错误发生.</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>导出到&quot;%1&quot;...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>无法导出设备%1.</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>无法导出摄像机%1.</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>无法输出I/O模块 %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>可执行 %1 媒体文件 (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>可执行 %1 媒体文件 (x86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>文件已用于录制</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>请选择另一个名称或等待，直到完成录像。</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>导出视窗</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>不推荐的 EXE 格式</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>由于 Windows 的限制，双击 EXE 无法打开超过 4 GB的文件。</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>仍导出到 EXE？</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>未能导出多视频</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>本地文件不允许做多视频导出</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>请从布局中删除所有本地文件，然后重试。</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>保存本地视窗为...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>导出</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 媒体文件(*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>设置文件为只读.</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>导出</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation>没有支持的事件类型</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation>仅当分析事件符合上述所有条件时，才会触发事件。如果关键字字段为空，则始终满足条件。如果不是，则在分析事件的相应字段包含任何关键字的情况下满足条件。</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
       <source>Copy</source>
@@ -7633,13 +8312,6 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>粘贴</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>没有数据</translation>
     </message>
   </context>
   <context>
@@ -7678,20 +8350,20 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
-      <source>Stop Layout Tour</source>
-      <translation type="unfinished">Stop Layout Tour</translation>
-    </message>
-    <message>
       <source>Stop Showreel</source>
       <translation>停止幻灯片</translation>
     </message>
     <message>
-      <source>Start Layout Tour</source>
-      <translation type="unfinished">Start Layout Tour</translation>
-    </message>
-    <message>
       <source>Start Showreel</source>
       <translation>启动幻灯片</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>停止轮巡</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>开始轮巡</translation>
     </message>
   </context>
   <context>
@@ -7941,6 +8613,18 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>无法打开服务器 web 页</translation>
     </message>
+    <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation>穿戴式摄像机不能在服务器之间移动</translation>
+    </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation>变更密码失败</translation>
+    </message>
+    <message>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation>无法更改%2个摄像机中%1个摄像机上的密码</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -7949,8 +8633,8 @@ to %1</source>
       <translation>使用键盘方向键切换布局。退出幻灯片按Esc键。</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>按任意键停止轮巡.</translation>
     </message>
   </context>
   <context>
@@ -7971,16 +8655,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>删除布局轮播 %1？</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>幻灯片</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>幻灯片 %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

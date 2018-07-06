@@ -6,6 +6,7 @@
 
 #include <QtOpenGL/QGLWidget>
 
+#include <client/client_module.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -17,6 +18,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/widgets/main_window.h>
 
 #include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
@@ -25,6 +27,7 @@
 #include <recording/stream_recorder.h>
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <utils/common/delayed.h>
 
@@ -85,11 +88,8 @@ void QnWorkbenchScreenRecordingHandler::timerEvent(QTimerEvent* event)
     const int seconds = std::max((millisecondsLeft + 500) / 1000, 0);
     const auto message = recordingCountdownText(seconds);
 
-    if (qnRuntime->isDesktopMode())
-    {
-        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+    if (const auto welcomeScreen = mainWindow()->welcomeScreen())
         welcomeScreen->setMessage(seconds > 0 ? message : QString());
-    }
 
     if (m_messageBox)
     {
@@ -163,11 +163,8 @@ void QnWorkbenchScreenRecordingHandler::stopRecordingCountdown()
     if (m_messageBox)
         m_messageBox->hideImmideately();
 
-    if (qnRuntime->isDesktopMode())
-    {
-        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-        welcomeScreen->setMessage(QString());
-    }
+    if (mainWindow() && mainWindow()->welcomeScreen())
+        mainWindow()->welcomeScreen()->setMessage(QString());
 }
 
 bool QnWorkbenchScreenRecordingHandler::isRecordingCountdown() const
@@ -223,7 +220,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     }
 
     m_dataProvider.reset(dynamic_cast<QnDesktopDataProviderWrapper*>(
-        res->createDataProvider(Qn::CR_Default)));
+        qnClientModule->dataProviderFactory()->createDataProvider(res)));
     m_recorder.reset(new QnStreamRecorder(res->toResourcePtr()));
     m_dataProvider->addDataProcessor(m_recorder.data());
     m_recorder->addRecordingContext(filePath);
@@ -304,7 +301,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
     while (true)
     {
         QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
-            mainWindow(),
+            mainWindowWidget(),
             tr("Save Recording As..."),
             qnSettings->lastRecordingDir() + QLatin1Char('/') + suggetion,
             tr("AVI (Audio/Video Interleaved) (*.avi)")));
@@ -322,7 +319,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
             QFile::remove(filePath);
             if (!QFile::rename(fileName, filePath))
             {
-                QnFileMessages::overwriteFailed(mainWindow(), filePath);
+                QnFileMessages::overwriteFailed(mainWindowWidget(), filePath);
                 continue;
             }
 
@@ -341,5 +338,5 @@ void QnWorkbenchScreenRecordingHandler::onError(const QString& reason)
 {
     stopRecording();
 
-    QnMessageBox::critical(mainWindow(), tr("Failed to start recording"), reason);
+    QnMessageBox::critical(mainWindowWidget(), tr("Failed to start recording"), reason);
 }

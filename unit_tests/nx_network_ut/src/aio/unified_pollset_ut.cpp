@@ -12,6 +12,7 @@
 #include <nx/utils/test_support/utils.h>
 
 #include "pollset_test_common.h"
+#include "pollset_performance_tests.h"
 
 namespace nx {
 namespace network {
@@ -20,32 +21,30 @@ namespace test {
 
 constexpr std::size_t kBytesToSend = 128;
 
-class UnifiedPollSet:
-    public CommonPollSetTest
+class UnifiedPollSetHelper
 {
 public:
-    UnifiedPollSet()
+    using PollSet = aio::PollSetWrapper<aio::UnifiedPollSet>;
+
+    UnifiedPollSetHelper()
     {
         init();
-
-        setPollset(&m_pollset);
     }
 
-    ~UnifiedPollSet()
+    ~UnifiedPollSetHelper()
     {
         m_udtServerSocket.pleaseStopSync();
         for (auto& socket: m_acceptedConnections)
             socket->pleaseStopSync();
     }
 
-protected:
-    virtual bool simulateSocketEvent(Pollable* socket, int /*eventMask*/) override
+    bool simulateSocketEvent(Pollable* socket, int /*eventMask*/)
     {
         const auto udtSocket = dynamic_cast<UdtStreamSocket*>(socket);
         if (udtSocket)
         {
             // Connect sometimes fails for unknown reason. It is some UDT problem.
-            if (!udtSocket->connect(m_udtServerSocket.getLocalAddress()))
+            if (!udtSocket->connect(m_udtServerSocket.getLocalAddress(), nx::network::kNoTimeout))
                 return false;
             char buf[kBytesToSend / 2];
             //const auto localAddress = udtSocket->getLocalAddress();
@@ -62,8 +61,30 @@ protected:
         return true;
     }
 
+    std::unique_ptr<Pollable> createRegularSocket()
+    {
+        auto udpSocket = std::make_unique<UDPSocket>(AF_INET);
+        NX_GTEST_ASSERT_TRUE(udpSocket->bind(SocketAddress(HostAddress::localhost, 0)));
+        return std::move(udpSocket);
+    }
+
+    std::unique_ptr<Pollable> createSocketOfRandomType()
+    {
+        if (nx::utils::random::number<int>(0, 1) > 0)
+            return std::make_unique<UdtStreamSocket>(AF_INET);
+        else
+            return createRegularSocket();
+    }
+
+    std::vector<std::unique_ptr<Pollable>> createSocketOfAllSupportedTypes()
+    {
+        std::vector<std::unique_ptr<Pollable>> sockets;
+        sockets.push_back(createRegularSocket());
+        sockets.push_back(std::make_unique<UdtStreamSocket>(AF_INET));
+        return sockets;
+    }
+
 private:
-    aio::PollSetWrapper<aio::UnifiedPollSet> m_pollset;
     UdtStreamServerSocket m_udtServerSocket;
     std::list<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
     nx::Buffer m_dataToSend;
@@ -78,7 +99,7 @@ private:
         ASSERT_TRUE(m_udtServerSocket.bind(SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(m_udtServerSocket.listen());
         m_udtServerSocket.acceptAsync(
-            std::bind(&UnifiedPollSet::onConnectionAccepted, this, _1, _2));
+            std::bind(&UnifiedPollSetHelper::onConnectionAccepted, this, _1, _2));
     }
 
     void onConnectionAccepted(
@@ -91,11 +112,11 @@ private:
         ASSERT_TRUE(streamSocket->setNonBlockingMode(true));
         streamSocket->sendAsync(
             m_dataToSend,
-            std::bind(&UnifiedPollSet::onBytesSent, this, streamSocket.get(), _1, _2));
+            std::bind(&UnifiedPollSetHelper::onBytesSent, this, streamSocket.get(), _1, _2));
         m_acceptedConnections.push_back(std::move(streamSocket));
 
         m_udtServerSocket.acceptAsync(
-            std::bind(&UnifiedPollSet::onConnectionAccepted, this, _1, _2));
+            std::bind(&UnifiedPollSetHelper::onConnectionAccepted, this, _1, _2));
     }
 
     void onBytesSent(
@@ -110,14 +131,13 @@ private:
 
         streamSocket->sendAsync(
             m_dataToSend,
-            std::bind(&UnifiedPollSet::onBytesSent, this, streamSocket, _1, _2));
+            std::bind(&UnifiedPollSetHelper::onBytesSent, this, streamSocket, _1, _2));
     }
 };
 
-TEST(UnifiedPollSet, all_tests)
-{
-    UnifiedPollSet::runTests<UnifiedPollSet>();
-}
+INSTANTIATE_TYPED_TEST_CASE_P(UnifiedPollSet, PollSetAcceptance, UnifiedPollSetHelper);
+
+//-------------------------------------------------------------------------------------------------
 
 INSTANTIATE_TYPED_TEST_CASE_P(UnifiedPollSet, PollSetPerformance, aio::UnifiedPollSet);
 

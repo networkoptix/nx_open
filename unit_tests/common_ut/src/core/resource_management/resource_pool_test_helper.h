@@ -7,6 +7,7 @@
 #include <nx_ec/data/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h> //not so good but we can allow it for test module
+#include <test_support/resource/camera_resource_stub.h>
 
 class QnStaticCommonModule;
 
@@ -30,8 +31,8 @@ public:
     QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();
 
-    QnVirtualCameraResourcePtr createCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
-    QnVirtualCameraResourcePtr addCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
+    nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
+    nx::CameraResourceStubPtr addCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
 
     QnWebPageResourcePtr addWebPage();
 

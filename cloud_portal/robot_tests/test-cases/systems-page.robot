@@ -27,7 +27,9 @@ Reset DB and Open New Browser On Failure
     Open Browser and go to URL    ${url}
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
     Go To    ${url}
 
@@ -93,4 +95,4 @@ should update owner name in systems list, if it's changed
     Go To    ${url}/systems
     Wait Until Elements Are Visible    ${AUTO TESTS TITLE}    ${AUTO TESTS USER}    ${AUTO TESTS OPEN NX}
     Element Text Should Be    ${AUTO TESTS USER}    newFirstName newLastName
-    Clean up owner first/last name
+    Reset user owner first/last name

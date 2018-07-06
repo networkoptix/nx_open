@@ -22,7 +22,7 @@ public:
     virtual SystemError::ErrorCode resolve(
         const QString& hostName,
         int ipVersion,
-        std::deque<HostAddress>* resolvedAddresses) override
+        std::deque<AddressEntry>* resolvedAddresses) override
     {
         return m_func(hostName, ipVersion, resolvedAddresses);
     }

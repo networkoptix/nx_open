@@ -61,16 +61,16 @@
                                 <a href="{{config.portal_url}}"><img class="logo" src="cid:logo"></a>
                             </td>
                             <td class="left-border right-border">
-                                <b>Sito Web</b> <br><a href="{{companyUrl}}">{{companyUrl}}</a>
+                                <b>Sito Web</b> <br><a href="%COMPANY_LINK%">%COMPANY_LINK%</a>
                             </td>
                         {{/system}}
                         {{^system}}
                             <td class="right-border">
-                                <b>Sito Web</b> <br><a href="{{companyUrl}}">{{companyUrl}}</a>
+                                <b>Sito Web</b> <br><a href="%COMPANY_LINK%">%COMPANY_LINK%</a>
                             </td>
                         {{/system}}
                         <td class="left-border">
-                            <b> Supporto </b> <br> <a href="{{supportLink}}">{{supportLinkText}}</a>
+                            <b> Supporto </b> <br> <a href="%SUPPORT_LINK%">%SUPPORT_LINK_TEXT%</a>
                         </td>
                     </tr>
                     </tbody>

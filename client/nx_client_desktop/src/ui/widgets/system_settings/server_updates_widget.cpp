@@ -131,7 +131,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionsClickable(false);
 
-    ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
+    ui->refreshButton->setIcon(qnSkin->icon("text_buttons/refresh.png"));
     ui->updateButton->setEnabled(false);
 
     connect(ui->cancelButton, &QPushButton::clicked, this,
@@ -154,7 +154,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     connect(ui->releaseNotesLabel, &QLabel::linkActivated, this, [this]()
     {
         if (!m_releaseNotesUrl.isEmpty())
-            QDesktopServices::openUrl(m_releaseNotesUrl);
+            QDesktopServices::openUrl(m_releaseNotesUrl.toQUrl());
     });
 
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
@@ -198,12 +198,12 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     connect(m_longUpdateWarningTimer, &QTimer::timeout, ui->longUpdateWarning, &QLabel::show);
 
     connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged,
-        this, &QnAbstractPreferencesWidget::loadDataToUi);
+        this, &QnServerUpdatesWidget::loadDataToUi);
 
     at_tool_stageChanged(QnFullUpdateStage::Init);
 
     ui->downloadButton->hide();
-    ui->downloadButton->setIcon(qnSkin->icon(lit("buttons/download.png")));
+    ui->downloadButton->setIcon(qnSkin->icon(lit("text_buttons/download.png")));
     ui->downloadButton->setForegroundRole(QPalette::WindowText);
 
     initDownloadActions();
@@ -258,6 +258,7 @@ void QnServerUpdatesWidget::initDropdownActions()
         {
             setMode(Mode::LatestVersion);
             m_targetVersion = QnSoftwareVersion();
+            m_targetChangeset = QString();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_latestVersion);
 
@@ -279,6 +280,7 @@ void QnServerUpdatesWidget::initDropdownActions()
             setMode(Mode::SpecificBuild);
             QnSoftwareVersion version = qnStaticCommon->engineVersion();
             m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
+            m_targetChangeset = dialog.changeset();
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_targetVersion);
 
@@ -293,8 +295,9 @@ void QnServerUpdatesWidget::initDropdownActions()
         {
             m_localFileName = QnFileDialog::getOpenFileName(this,
                 tr("Select Update File..."),
-                QString(), tr("Update Files (*.zip)"),
-                0,
+                QString(),
+                tr("Update Files") + lit(" (*.zip)"),
+                nullptr,
                 QnCustomFileDialog::fileDialogOptions());
 
             if (m_localFileName.isEmpty())
@@ -322,14 +325,14 @@ void QnServerUpdatesWidget::initDownloadActions()
         [this]()
         {
             QDesktopServices::openUrl(
-                m_updateTool->generateUpdatePackageUrl(m_targetVersion));
+                m_updateTool->generateUpdatePackageUrl(m_targetVersion, m_targetChangeset));
         });
 
     downloadLinkMenu->addAction(tr("Copy Link to Clipboard"),
         [this]()
         {
             qApp->clipboard()->setText(
-                m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
+                m_updateTool->generateUpdatePackageUrl(m_targetVersion, m_targetChangeset).toString());
 
             ui->linkCopiedWidget->show();
             fadeWidget(ui->linkCopiedWidget, 1.0, 0.0, kLinkCopiedMessageTimeoutMs, 1.0,
@@ -802,7 +805,7 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
 void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning)
 {
     const auto failedServers =
-        resourcePool()->getResources<QnMediaServerResource>(lowFreeSpaceWarning.failedPeers);
+        resourcePool()->getResourcesByIds<QnMediaServerResource>(lowFreeSpaceWarning.failedPeers);
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Not enough free space at %n Servers:", "", failedServers.size()),
         tr("Attempt to update may fail or cause Server malfunction."),

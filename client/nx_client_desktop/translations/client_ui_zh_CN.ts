@@ -115,12 +115,12 @@
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>如果启用了模糊功能，Intel HD Graphics显示屏可能会面临问题。我们强烈建议您不开启。</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>禁用模糊功能</translation>
     </message>
   </context>
   <context>
@@ -144,6 +144,52 @@
       <location/>
       <source>Instant</source>
       <translation>立即作用</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation>关键字隔开的空间</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>标题中包含:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>描述包含:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation>事件类型：</translation>
+    </message>
+  </context>
+  <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Fixed Archive Length</source>
+      <translation>固定的录像范围</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>最小天数</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>自动</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>最大天数</translation>
     </message>
   </context>
   <context>
@@ -211,7 +257,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>研判</translation>
+      <translation>使用者行为记录</translation>
     </message>
     <message>
       <location/>
@@ -334,6 +380,34 @@
     </message>
   </context>
   <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation>书签信息</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>删除</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>区域宽度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>字体大小</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation>包含描述</translation>
+    </message>
+  </context>
+  <context>
     <name>BookmarkWidget</name>
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
@@ -369,7 +443,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>刷新</translation>
     </message>
@@ -567,72 +641,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>高级的设置都不可用</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation>我已阅读使用手册，并了解风险</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation>摄像机设置控制</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>注意！当前视频质量和帧率将无法与录像计划中的录像设置同步.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation>次码流控制</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation>次码流画质</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation>不使用</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation>低画质</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation>中画质</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation>高画质</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>注意！选择高画质将会影响CPU和网络性能，可能会导致系统稳定性.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation>存储控制</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>不使用主码流存储</translation>
     </message>
@@ -640,11 +651,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation>不使用次码流存储</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation>视频流控制</translation>
     </message>
     <message>
       <location/>
@@ -673,43 +679,8 @@
     </message>
     <message>
       <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>注意！低码流将导致低分辨率图片生成。</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion detection control</source>
-      <translation>移动侦测控制</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
       <translation>视频流中进行移动侦测</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation>通过计算GOP代替码流(将增加摄像机的码流)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation>保持相机溪流和配置文件设置</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation>系统管理中之 &quot;允许系统优化摄像机设置&quot; 已停用.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation>注意！请不要改变以下参数，可能会影响系统稳定性.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation>PTZ 控制</translation>
     </message>
     <message>
       <location/>
@@ -721,12 +692,87 @@
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>警告！摄像机预置点将无法使用。</translation>
     </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation>请不要改变以下参数，可能会影响系统稳定性.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation>摄像机设置</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation>保持相机码流和配置文件设置</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation>录制时间表中的质量和帧率（FPS）设置将变得不相关。</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation>计算每个GOP的比特率，而不是每秒的比特率</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation>它会增加相机的比特率。</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>副码流</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation>禁用次码流</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>移动侦测</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation>存档</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation>视频流</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>生成</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>重置</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>逻辑 ID</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>输入ID:</translation>
     </message>
   </context>
@@ -752,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>输出ID:</translation>
     </message>
   </context>
@@ -787,26 +833,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation>不录像</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation>固定的录像范围</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>自动</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>最小天数</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>最大天数</translation>
     </message>
     <message>
       <location/>
@@ -868,6 +894,11 @@
       <source>Motion + Lo-Res</source>
       <translation>移动+低分辨率</translation>
     </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>比特率</translation>
+    </message>
   </context>
   <context>
     <name>ChangeUserPasswordDialog</name>
@@ -883,11 +914,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>保持登录状态</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>不正确的邮箱或密码</translation>
     </message>
   </context>
   <context>
@@ -942,6 +968,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>描述包含:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>分类</translation>
     </message>
   </context>
   <context>
@@ -1022,6 +1056,16 @@
       <source>HTTP URL</source>
       <translation>HTTPS URL 地址</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>身份验证类型</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>请求类型</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -1032,31 +1076,70 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
+    <name>ExportLayoutSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>导出快速回放</translation>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>导出设置</translation>
     </message>
     <message>
       <location/>
-      <source>Initial Video Length</source>
-      <translation>起始视频长度</translation>
+      <source>Make read-only</source>
+      <translation>设置文件为唯读</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>导出设置</translation>
     </message>
     <message>
       <location/>
-      <source>Exported Video Length</source>
-      <translation>导出视频长度</translation>
+      <source>Apply Filters</source>
+      <translation>应用过滤</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>帧间隔</translation>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation>旋转，Dewarping，图像增强等</translation>
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>快速回放速度</translation>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation>应用过滤器和添加叠加层需要转码，这将增加CPU使用率，可能需要很长时间。</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation>导出视频</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation>单相机</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation>导出设置</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation>复合视频流</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation>浏览...</translation>
     </message>
   </context>
   <context>
@@ -1204,6 +1287,39 @@
       <location/>
       <source>Rotation</source>
       <translation>旋转</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation>图片:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>删除</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation>大小</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>不透明度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>默认</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>浏览...</translation>
     </message>
   </context>
   <context>
@@ -1397,7 +1513,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>已关联硬件ID</translation>
     </message>
   </context>
@@ -1496,7 +1612,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>硬件ID:</translation>
     </message>
   </context>
@@ -1623,8 +1739,8 @@
     </message>
     <message>
       <location/>
-      <source>Showreel cycle</source>
-      <translation>幻灯片周期</translation>
+      <source>Tour cycle</source>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1671,6 +1787,24 @@
       <location/>
       <source>Expert</source>
       <translation>专家</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation>新的穿戴式相机...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation>到服务器</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;可穿戴相机&quot; 是视频文件的虚拟存储空间，可以上传到系统中的任何服务器并由任何用户访问。</translation>
     </message>
   </context>
   <context>
@@ -1882,11 +2016,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>保持登录状态</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>不正确的邮箱或密码</translation>
     </message>
   </context>
   <context>
@@ -2132,6 +2261,39 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>桌面显示快捷方式.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation>快速审查</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation>起始视频长度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation>导出视频长度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation>速度</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation>帧间隔</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation>重置速度</translation>
     </message>
   </context>
   <context>
@@ -2521,11 +2683,6 @@
       <source>Reset</source>
       <translation>重置</translation>
     </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation>文字标签</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2699,11 +2856,6 @@
       <source>Backup Settings...</source>
       <translation>备份设置</translation>
     </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>录像到禁用存储将停止。然而，从它删除过时的画面将继续。</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2774,7 +2926,7 @@
     <message>
       <location/>
       <source>Enable audit trail</source>
-      <translation>允许研判启用</translation>
+      <translation>启用使用者行为记录</translation>
     </message>
     <message>
       <location/>
@@ -2788,6 +2940,34 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation>文字</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>删除</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>字体大小</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation>输入纯文本或HTML</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>区域宽度</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
@@ -2798,6 +2978,29 @@
       <location/>
       <source>Sync time with the Internet</source>
       <translation>与互联网同步时间</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation>时间戳</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>字体大小</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation>格式</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>删除</translation>
     </message>
   </context>
   <context>
@@ -2835,14 +3038,18 @@
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>目前还没有自定义用户角色。单击 &quot;新角色&quot; 按钮来创建一个。</translation>
+      <source>New role</source>
+      <translation>新建角色</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>新建角色</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>
@@ -2861,6 +3068,50 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>编辑角色</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Motion Detection</source>
+      <translation>移动侦测</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation>检测上传的视频中的运动</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>敏感度:</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Cancel</source>
+      <translation>撤消</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Upload Video</source>
+      <translation>上传视频</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation>上传文件</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation>上传文件夹...</translation>
     </message>
   </context>
   <context>

@@ -5,13 +5,11 @@
 #include <utils/media/frame_info.h>
 #include <utils/math/math.h>
 
-QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params, bool doDeepCopy):
+QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params):
     m_params(params),
     m_lastGamma(-1.0)
 {
     memset(m_gammaCorrection, 0, sizeof(m_gammaCorrection));
-    if (doDeepCopy)
-        m_deepCopyFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
 }
 
 bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
@@ -29,9 +27,7 @@ static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0
 
 CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame)
 {
-    if (m_deepCopyFrame)
-        CLVideoDecoderOutput::copy(srcFrame.data(), m_deepCopyFrame.data());
-    const CLVideoDecoderOutputPtr& frame = m_deepCopyFrame ? m_deepCopyFrame : srcFrame;
+    const CLVideoDecoderOutputPtr& frame = srcFrame;
 
     static const float GAMMA_EPS = 0.01f;
 
@@ -54,7 +50,7 @@ CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderO
     int right = frame->width;
     int top = 0;
     int bottom = frame->height;
-    
+
     int xSteps = (right - left) / 16;
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
@@ -88,22 +84,22 @@ CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderO
 
                 tmp.v = _mm_packus_epi16(_mm_mulhi_epu16(y0, aFactorIntr), _mm_mulhi_epu16(y1, aFactorIntr));
 
-                tmp.a[0] = m_gammaCorrection[(quint8)tmp.a[0]] + 
+                tmp.a[0] = m_gammaCorrection[(quint8)tmp.a[0]] +
                                  (m_gammaCorrection[(quint8)(tmp.a[0]>>8)] << 8)+
                                  (m_gammaCorrection[(quint8)(tmp.a[0]>>16)] << 16)+
                                  (m_gammaCorrection[(quint8)(tmp.a[0]>>24)] << 24);
 
-                tmp.a[1] = (quint32) m_gammaCorrection[tmp.b[4]] + 
+                tmp.a[1] = (quint32) m_gammaCorrection[tmp.b[4]] +
                     (m_gammaCorrection[tmp.b[5]] << 8) +
                     (m_gammaCorrection[tmp.b[6]] << 16) +
                     (m_gammaCorrection[tmp.b[7]] << 24);
 
-                tmp.a[2] = (quint32) m_gammaCorrection[tmp.b[8]] + 
+                tmp.a[2] = (quint32) m_gammaCorrection[tmp.b[8]] +
                     (m_gammaCorrection[tmp.b[9]] << 8) +
                     (m_gammaCorrection[tmp.b[10]] << 16) +
                     (m_gammaCorrection[tmp.b[11]] << 24);
 
-                tmp.a[3] = (quint32) m_gammaCorrection[tmp.b[12]] + 
+                tmp.a[3] = (quint32) m_gammaCorrection[tmp.b[12]] +
                     (m_gammaCorrection[tmp.b[13]] << 8) +
                     (m_gammaCorrection[tmp.b[14]] << 16) +
                     (m_gammaCorrection[tmp.b[15]] << 24);

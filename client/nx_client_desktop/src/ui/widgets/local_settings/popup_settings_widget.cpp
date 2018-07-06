@@ -39,7 +39,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 
     setHelpTopic(this, Qn::SystemSettings_Notifications_Help);
 
-    for (vms::event::EventType eventType : vms::event::allEvents())
+    for (vms::api::EventType eventType : vms::event::allEvents())
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(m_helper->eventName(eventType));
@@ -52,12 +52,8 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 
     static_assert(QnSystemHealth::Count < 64, "We are packing messages to single quint64");
 
-    for (int i = 0; i < QnSystemHealth::Count; i++)
+    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
     {
-        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
-            continue;
-
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(QnSystemHealthStringsHelper::messageTitle(messageType));
         ui->systemHealthLayout->addWidget(checkbox);
@@ -98,18 +94,12 @@ void QnPopupSettingsWidget::loadDataToUi()
 
     bool all = true;
 
-    quint64 healthShown = qnSettings->popupSystemHealth();
-    quint64 healthFlag = 1;
+    QSet<QnSystemHealth::MessageType> messageTypes = qnSettings->popupSystemHealth();
 
-    for (int i = 0; i < QnSystemHealth::Count; i++)
+    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
     {
-        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
-            continue;
-
-        bool checked = ((healthShown & healthFlag) == healthFlag);
+        const bool checked = messageTypes.contains(messageType);
         m_systemHealthCheckBoxes[messageType]->setChecked(checked);
-        healthFlag = healthFlag << 1;
 
         all &= checked;
     }
@@ -117,11 +107,11 @@ void QnPopupSettingsWidget::loadDataToUi()
     if (context()->user())
         m_adaptor->setResource(context()->user());
 
-    QList<vms::event::EventType> watchedEvents = context()->user()
+    QList<vms::api::EventType> watchedEvents = context()->user()
         ? m_adaptor->watchedEvents()
         : vms::event::allEvents();
 
-    for (vms::event::EventType eventType : m_businessRulesCheckBoxes.keys())
+    for (vms::api::EventType eventType : m_businessRulesCheckBoxes.keys())
     {
         bool checked = watchedEvents.contains(eventType);
         m_businessRulesCheckBoxes[eventType]->setChecked(checked);
@@ -154,37 +144,26 @@ bool QnPopupSettingsWidget::hasChanges() const
         || (context()->user() && m_adaptor->watchedEvents() != watchedEvents());
 }
 
-QList<vms::event::EventType> QnPopupSettingsWidget::watchedEvents() const
+QList<vms::api::EventType> QnPopupSettingsWidget::watchedEvents() const
 {
     if (ui->showAllCheckBox->isChecked())
         return vms::event::allEvents();
 
-    QList<vms::event::EventType> result;
-    for (vms::event::EventType eventType : m_businessRulesCheckBoxes.keys())
+    QList<vms::api::EventType> result;
+    for (vms::api::EventType eventType : m_businessRulesCheckBoxes.keys())
         if (m_businessRulesCheckBoxes[eventType]->isChecked())
             result << eventType;
     return result;
 }
 
-quint64 QnPopupSettingsWidget::watchedSystemHealth() const
+QSet<QnSystemHealth::MessageType> QnPopupSettingsWidget::watchedSystemHealth() const
 {
-    quint64 result = qnSettings->popupSystemHealth();
-    quint64 healthFlag = 1;
-    for (int i = 0; i < QnSystemHealth::Count; i++)
-    {
-        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageOptional(messageType))
-            continue;
+    QSet<QnSystemHealth::MessageType> result;
 
+    for (auto messageType: QnSystemHealth::allVisibleMessageTypes())
+    {
         if (m_systemHealthCheckBoxes[messageType]->isChecked() || ui->showAllCheckBox->isChecked())
-        {
-            result |= healthFlag;
-        }
-        else
-        {
-            result &= ~healthFlag;
-        }
-        healthFlag = healthFlag << 1;
+            result.insert(messageType);
     }
 
     return result;

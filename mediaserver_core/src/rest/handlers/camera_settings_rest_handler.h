@@ -29,15 +29,13 @@
 
 #include <set>
 
+#include <core/resource/resource_fwd.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-
-#include <core/resource/resource_fwd.h>
-
 #include <rest/server/json_rest_handler.h>
 #include <utils/common/connective.h>
 
-struct AwaitedParameters;
 class QnCachingCameraAdvancedParamsReader;
 
 class QnCameraSettingsRestHandler: public Connective<QnJsonRestHandler>
@@ -46,45 +44,13 @@ class QnCameraSettingsRestHandler: public Connective<QnJsonRestHandler>
 	typedef Connective<QnJsonRestHandler> base_type;
 
 public:
-	QnCameraSettingsRestHandler();
-	virtual ~QnCameraSettingsRestHandler();
+    QnCameraSettingsRestHandler();
+    virtual ~QnCameraSettingsRestHandler() override;
 
-    /**
-     * Implementation of QnJsonRestHandler::executeGet().
-     */
     virtual int executeGet(
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
         const QnRestConnectionProcessor* /*owner*/) override;
 
 private:
-    enum class Operation
-    {
-        GetParam,
-        GetParamsBatch,
-        SetParam,
-        SetParamsBatch,
-    };
-
-    void connectToResource(const QnResourcePtr& resource, Operation operation);
-    void disconnectFromResource(const QnResourcePtr& resource, Operation operation);
-    void processOperation(
-        const QnResourcePtr& resource,
-        Operation operation,
-        const QnCameraAdvancedParamValueList& values);
-
-private slots:
-    void asyncParamGetComplete(
-        const QnResourcePtr& resource, const QString& id, const QString& value, bool success);
-    void asyncParamSetComplete(
-        const QnResourcePtr& resource, const QString& id, const QString& value, bool success);
-    void asyncParamsGetComplete(
-        const QnResourcePtr& resource, const QnCameraAdvancedParamValueList& values);
-    void asyncParamsSetComplete(
-        const QnResourcePtr& resource, const QnCameraAdvancedParamValueList& values);
-
-private:
-    QnMutex m_mutex;
-    QnWaitCondition m_cond;
-    std::set<AwaitedParameters*> m_awaitedParamsSets;
     QScopedPointer<QnCachingCameraAdvancedParamsReader> m_paramsReader;
 };

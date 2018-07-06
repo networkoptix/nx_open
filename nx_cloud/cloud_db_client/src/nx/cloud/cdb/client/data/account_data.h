@@ -1,10 +1,4 @@
-/**********************************************************
-* Sep 4, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_CL_ACCOUNT_DATA_H
-#define NX_CDB_CL_ACCOUNT_DATA_H
+#pragma once
 
 #include <QtCore/QUrlQuery>
 
@@ -17,14 +11,12 @@
 
 #include <nx/cloud/cdb/api/account_data.h>
 
-
 namespace nx {
 namespace cdb {
 namespace api {
 
-////////////////////////////////////////////////////////////
-//// class AccountRegistrationData
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AccountRegistrationData
 
 //TODO #ak add corresponding parser/serializer to fusion and remove this function
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountRegistrationData* const accountData);
@@ -35,9 +27,8 @@ void serializeToUrlQuery(const AccountRegistrationData&, QUrlQuery* const urlQue
     (fullName)(customization)
 
 
-////////////////////////////////////////////////////////////
-//// class AccountData
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AccountData
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AccountStatus)
 
@@ -46,9 +37,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AccountStatus)
     (fullName)(customization)(statusCode)(registrationTime)(activationTime)
 
 
-////////////////////////////////////////////////////////////
-//// class AccountConfirmationCode
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AccountConfirmationCode
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountConfirmationCode* const data);
 void serializeToUrlQuery(const AccountConfirmationCode&, QUrlQuery* const urlQuery);
@@ -60,9 +50,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json)(sql_record) )
 
 
-////////////////////////////////////////////////////////////
-//// class AccountUpdateData
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AccountUpdateData
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data);
 void serializeToUrlQuery(const AccountUpdateData&, QUrlQuery* const urlQuery);
@@ -71,9 +60,8 @@ void serialize(QnJsonContext*, const AccountUpdateData&, QJsonValue*);
 bool deserialize(QnJsonContext*, const QJsonValue&, AccountUpdateData*);
 
 
-////////////////////////////////////////////////////////////
-//// class AccountEmail
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AccountEmail
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountEmail* const data);
 void serializeToUrlQuery(const AccountEmail&, QUrlQuery* const urlQuery);
@@ -85,9 +73,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json))
 
 
-////////////////////////////////////////////////////////////
-//// class TemporaryCredentials
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class TemporaryCredentials
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, TemporaryCredentialsTimeouts* const data);
 void serializeToUrlQuery(const TemporaryCredentialsTimeouts&, QUrlQuery* const urlQuery);
@@ -106,10 +93,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json))
 
 
-}   //api
-}   //cdb
-}   //nx
+} // namespace api
+} // namespace cdb
+} // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::AccountStatus), (lexical))
-
-#endif  //NX_CDB_CL_ACCOUNT_DATA_H

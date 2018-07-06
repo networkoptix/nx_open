@@ -28,6 +28,11 @@ QWindow *getMainWindow()
         return 0;
     }
 
+    bool isLeftSideNavigationBar()
+    {
+        return false;
+    }
+
     bool isPhone() {
         return false;
     }

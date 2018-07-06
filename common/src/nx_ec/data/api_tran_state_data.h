@@ -42,7 +42,5 @@ struct ApiSyncRequestData {
 
 }
 
-inline void serialize_field(const ec2::QnTranState &, QVariant *) { return; }
-inline void deserialize_field(const QVariant &, ec2::QnTranState *) { return; }
 
 #endif // __TRAN_STATE_DATA_H_

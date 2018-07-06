@@ -90,6 +90,17 @@ public:
     static bool multiChoiceListIsValid() { return true; }
 };
 
+class QnCameraAnalyticsPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnCameraAnalyticsPolicy)
+public:
+    using resource_type = QnVirtualCameraResource;
+    static bool isResourceValid(const QnVirtualCameraResourcePtr& camera);
+    static QString getText(const QnResourceList& resources, const bool detailed = true);
+    static inline bool emptyListIsValid() { return false; }
+    static bool multiChoiceListIsValid() { return true; }
+};
+
 typedef QnCameraRecordingPolicy QnBookmarkActionPolicy;
 
 template<typename CheckingPolicy>

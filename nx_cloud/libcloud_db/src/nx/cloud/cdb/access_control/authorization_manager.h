@@ -10,6 +10,7 @@ namespace cdb {
 
 class AbstractAccountManager;
 class StreeManager;
+class AbstractSystemManager;
 class AbstractSystemSharingManager;
 class AbstractTemporaryAccountPasswordManager;
 
@@ -28,6 +29,7 @@ public:
     AuthorizationManager(
         const StreeManager& stree,
         const AbstractAccountManager& accountManager,
+        const AbstractSystemManager& systemManager,
         const AbstractSystemSharingManager& systemSharingManager,
         const AbstractTemporaryAccountPasswordManager& temporaryAccountPasswordManager);
 
@@ -47,6 +49,7 @@ public:
 private:
     const StreeManager& m_stree;
     const AbstractAccountManager& m_accountManager;
+    const AbstractSystemManager& m_systemManager;
     const AbstractSystemSharingManager& m_systemSharingManager;
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountPasswordManager;
 
@@ -55,6 +58,12 @@ private:
         const nx::utils::stree::AbstractResourceReader& dataToAuthorize) const;
 
     bool checkStaticRules(
+        EntityType requestedEntity,
+        DataActionType requestedAction,
+        const nx::utils::stree::AbstractResourceReader& inputData,
+        nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const;
+
+    bool authorizeRequestToSystemBeingMerged(
         EntityType requestedEntity,
         DataActionType requestedAction,
         const nx::utils::stree::AbstractResourceReader& inputData,

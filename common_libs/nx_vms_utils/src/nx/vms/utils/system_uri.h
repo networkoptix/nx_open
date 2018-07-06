@@ -6,6 +6,8 @@
 #include <QtCore/QHash>
 #include <QtCore/QString>
 
+#include <nx/utils/url.h>
+
 namespace nx {
 namespace vms {
 namespace utils {
@@ -74,7 +76,7 @@ public:
     };
 
     SystemUri();
-    SystemUri(const QUrl& url);
+    SystemUri(const nx::utils::Url& url);
     SystemUri(const QString& uri);
     SystemUri(const SystemUri& other);
     virtual ~SystemUri();
@@ -129,10 +131,10 @@ public:
     bool isValid() const;
 
     QString toString() const;
-    QUrl toUrl() const;
+    nx::utils::Url toUrl() const;
 
     //! QUrl for connection to a given system.
-    QUrl connectionUrl() const;
+    nx::utils::Url connectionUrl() const;
 
     // TODO: #GDM when fusion will be moved out to separate library, change to QnLexical
     static QString toString(SystemUri::Scope value);

@@ -1,38 +1,92 @@
 #include "predefined_host_resolver.h"
 
+#include <boost/algorithm/string.hpp>
+
+#include <nx/utils/std/algorithm.h>
+
 namespace nx {
 namespace network {
 
 SystemError::ErrorCode PredefinedHostResolver::resolve(
     const QString& name,
     int ipVersion,
-    std::deque<HostAddress>* resolvedAddresses)
+    std::deque<AddressEntry>* resolvedAddresses)
 {
+    const auto reversedName = nx::utils::reverseWords(name.toStdString(), ".");
+
     QnMutexLocker lock(&m_mutex);
 
-    const auto it = m_etcHosts.find(name);
-    if (it == m_etcHosts.end())
+    // Searching for a smallest string that has reversedName as a prefix.
+    const auto it = m_etcHosts.lower_bound(reversedName);
+    if (it == m_etcHosts.end() || !boost::starts_with(it->first, reversedName))
         return SystemError::hostNotFound;
 
-    for (const auto address : it->second)
+    if (reversedName != it->first &&
+        !(reversedName.size() < it->first.size() && it->first[reversedName.size()] == '.'))
     {
-        if (ipVersion != AF_INET || address.ipV4())
-            resolvedAddresses->push_back(address);
+        // Suitable name must start with "originalName."
+        return SystemError::hostNotFound;
     }
 
-    return SystemError::noError;
+    for (const auto entry: it->second)
+    {
+        if (ipVersion == AF_INET && !entry.host.ipV4())
+            continue; //< Only ipv4 hosts are requested.
+        resolvedAddresses->push_back(entry);
+    }
+
+    return resolvedAddresses->empty()
+        ? SystemError::hostNotFound
+        : SystemError::noError;
 }
 
-void PredefinedHostResolver::addEtcHost(const QString& name, std::vector<HostAddress> addresses)
+void PredefinedHostResolver::addMapping(
+    const std::string& name,
+    std::deque<AddressEntry> entries)
 {
+    const auto reversedName = nx::utils::reverseWords(name, ".");
+
     QnMutexLocker lock(&m_mutex);
-    m_etcHosts[name] = std::move(addresses);
+    auto& existingEntries = m_etcHosts[reversedName];
+    for (auto& entry: entries)
+    {
+        if (!nx::utils::contains(existingEntries.begin(), existingEntries.end(), entry))
+            existingEntries.push_back(std::move(entry));
+    }
 }
 
-void PredefinedHostResolver::removeEtcHost(const QString& name)
+void PredefinedHostResolver::replaceMapping(
+    const std::string& name,
+    std::deque<AddressEntry> entries)
 {
+    const auto reversedName = nx::utils::reverseWords(name, ".");
+
     QnMutexLocker lock(&m_mutex);
-    m_etcHosts.erase(name);
+    m_etcHosts[reversedName] = std::move(entries);
+}
+
+void PredefinedHostResolver::removeMapping(const std::string& name)
+{
+    const auto reversedName = nx::utils::reverseWords(name, ".");
+
+    QnMutexLocker lock(&m_mutex);
+    m_etcHosts.erase(reversedName);
+}
+
+void PredefinedHostResolver::removeMapping(
+    const std::string& name,
+    const AddressEntry& entryToRemove)
+{
+    const auto reversedName = nx::utils::reverseWords(name, ".");
+
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_etcHosts.find(reversedName);
+    if (it == m_etcHosts.end())
+        return;
+
+    it->second.erase(
+        std::remove(it->second.begin(), it->second.end(), entryToRemove),
+        it->second.end());
 }
 
 } // namespace network

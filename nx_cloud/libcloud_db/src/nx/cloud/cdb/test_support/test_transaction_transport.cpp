@@ -34,7 +34,7 @@ int TransactionTransport::connectionId() const
 }
 
 void TransactionTransport::fillAuthInfo(
-    const nx_http::AsyncHttpClientPtr& httpClient,
+    const nx::network::http::AsyncHttpClientPtr& httpClient,
     bool /*authByKey*/)
 {
     httpClient->setUserName(QString::fromStdString(m_systemId));

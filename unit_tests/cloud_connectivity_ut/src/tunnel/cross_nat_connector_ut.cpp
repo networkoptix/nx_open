@@ -96,19 +96,16 @@ private:
 
 TEST_F(CrossNatConnector, timeout)
 {
-    const std::chrono::milliseconds connectTimeout(nx::utils::random::number(1000, 4000));
+    const std::chrono::milliseconds connectTimeout(nx::utils::random::number(100, 400));
 
     // Timing out mediator response by providing incorrect mediator address to connector.
     const auto connectResult = doSimpleConnectTest(
         connectTimeout,
         nx::hpm::MediaServerEmulator::ActionToTake::ignoreIndication,
-        SocketAddress(HostAddress::localhost, 10345));
+        nx::network::SocketAddress(nx::network::HostAddress::localhost, 10345));
 
     ASSERT_EQ(SystemError::timedOut, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);
-    //ASSERT_TRUE(
-    //    connectResult.executionTime > connectTimeout*0.8 &&
-    //    connectResult.executionTime < connectTimeout*1.2);
 }
 
 TEST_F(CrossNatConnector, target_host_not_found)
@@ -200,7 +197,7 @@ protected:
         using namespace std::placeholders;
 
         m_redirector.server = std::make_unique<stun::UdpServer>(&m_redirector.messageDispatcher);
-        ASSERT_TRUE(m_redirector.server->bind(SocketAddress(HostAddress::localhost, 0)));
+        ASSERT_TRUE(m_redirector.server->bind(nx::network::SocketAddress(nx::network::HostAddress::localhost, 0)));
         ASSERT_TRUE(m_redirector.server->listen());
 
         m_redirector.messageDispatcher.registerRequestProcessor(
@@ -240,12 +237,12 @@ private:
     void redirectHandler(
         std::shared_ptr<stun::AbstractServerConnection> connection,
         stun::Message message,
-        SocketAddress targetAddress)
+        nx::network::SocketAddress targetAddress)
     {
         ++m_requestsRedirected;
 
         stun::Message response(stun::Header(
-            stun::MessageClass::errorResponse, 
+            stun::MessageClass::errorResponse,
             message.header.method,
             message.header.transactionId));
         response.newAttribute<stun::attrs::ErrorCode>(stun::error::tryAlternate);

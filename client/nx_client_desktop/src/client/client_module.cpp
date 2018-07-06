@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
+#include <QtQml/QQmlEngine>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -13,6 +14,8 @@
 
 #include <common/common_module.h>
 #include <common/static_common_module.h>
+
+#include <camera/camera_data_manager.h>
 
 #include <nx/utils/crash_dump/systemexcept.h>
 
@@ -35,23 +38,29 @@
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
 
+#include <camera/video_decoder_factory.h>
+
 #include <cloud/cloud_connection.h>
 
+#include <core/resource/client_camera.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource/client_camera_factory.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource_management/layout_tour_manager.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <decoders/video/abstract_video_decoder.h>
 
 #include <finders/systems_finder.h>
 #include <nx/vms/discovery/manager.h>
-#include <network/router.h>
 
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <vms_gateway_embeddable.h>
@@ -62,9 +71,15 @@
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
-#include <plugins/storage/file_storage/qtfile_storage_resource.h>
-#include <plugins/storage/file_storage/layout_storage_resource.h>
+#include <plugins/resource/desktop_audio_only/desktop_audio_only_resource.h>
+#if defined(Q_OS_WIN)
+    #include <plugins/resource/desktop_win/desktop_resource.h>
+#endif
 
+#include <core/storage/file_storage/qtfile_storage_resource.h>
+#include <core/storage/file_storage/layout_storage_resource.h>
+
+#include <nx/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/client/desktop/radass/radass_controller.h>
 
 #include <server/server_storage_manager.h>
@@ -73,13 +88,18 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/common/synctime.h>
 
 #include <utils/media/voice_spectrum_analyzer.h>
-#include <utils/performance_test.h>
-#include <utils/server_interface_watcher.h>
+#include <nx/client/desktop/utils/performance_test.h>
+#include <watchers/server_interface_watcher.h>
 #include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
+#include <nx/client/desktop/utils/resource_widget_pixmap_cache.h>
+#include <nx/client/desktop/layout_templates/layout_template_manager.h>
+#include <nx/client/desktop/analytics/analytics_metadata_provider_factory.h>
+#include <nx/client/desktop/utils/upload_manager.h>
+#include <nx/client/desktop/utils/wearable_manager.h>
+#include <nx/client/desktop/analytics/object_display_settings.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -104,9 +124,11 @@
 
 #include <ini.h>
 
+
 using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
+static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
 static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg)
 {
@@ -127,43 +149,77 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
+namespace {
 
-namespace
+typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
+
+QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
 {
-    typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
+    QnTranslationManagerPtr translationManager(new QnTranslationManager());
+    translationManager->addPrefix(lit("client_base"));
+    translationManager->addPrefix(lit("client_ui"));
+    translationManager->addPrefix(lit("client_core"));
+    translationManager->addPrefix(lit("client_qml"));
 
-    QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
-    {
-        QnTranslationManagerPtr translationManager(new QnTranslationManager());
-        translationManager->addPrefix(lit("client_base"));
-        translationManager->addPrefix(lit("client_ui"));
-        translationManager->addPrefix(lit("client_core"));
-        translationManager->addPrefix(lit("client_qml"));
+    QnTranslation translation;
+    if (translation.isEmpty()) /* By path. */
+        translation = translationManager->loadTranslation(settings->locale());
 
-        QnTranslation translation;
-        if (translation.isEmpty()) /* By path. */
-            translation = translationManager->loadTranslation(settings->locale());
+    /* Check if qnSettings value is invalid. */
+    if (translation.isEmpty())
+        translation = translationManager->defaultTranslation();
 
-        /* Check if qnSettings value is invalid. */
-        if (translation.isEmpty())
-            translation = translationManager->defaultTranslation();
-
-        translationManager->installTranslation(translation);
-        return translationManager;
-    }
-
-    void initializeStatisticsManager(QnCommonModule *commonModule)
-    {
-        const auto statManager = commonModule->instance<QnStatisticsManager>();
-
-        statManager->setClientId(qnSettings->pcUuid());
-        statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
-        statManager->setSettings(QnStatisticsLoaderPtr(new QnStatisticsSettingsWatcher()));
-    }
+    translationManager->installTranslation(translation);
+    return translationManager;
 }
 
+void initializeStatisticsManager(QnCommonModule* commonModule)
+{
+    const auto statManager = commonModule->instance<QnStatisticsManager>();
+
+    statManager->setClientId(qnSettings->pcUuid());
+    statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
+    statManager->setSettings(QnStatisticsLoaderPtr(new QnStatisticsSettingsWatcher()));
+}
+
+QString calculateLogNameSuffix(const QnStartupParameters& startupParams)
+{
+    if (!startupParams.videoWallGuid.isNull())
+    {
+        QString result = startupParams.videoWallItemGuid.isNull()
+            ? startupParams.videoWallGuid.toString()
+            : startupParams.videoWallItemGuid.toString();
+        result.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
+        return result;
+    }
+
+    if (startupParams.selfUpdateMode)
+    {
+        // we hope self-updater will run only once per time and will not overflow log-file
+        // qnClientInstanceManager is not initialized in self-update mode
+        return lit("self_update");
+    }
+
+    if (qnRuntime->isActiveXMode())
+    {
+        return lit("ax");
+    }
+
+    if (qnClientInstanceManager && qnClientInstanceManager->isValid())
+    {
+        int idx = qnClientInstanceManager->instanceIndex();
+        if (idx > 0)
+            return L'_' + QString::number(idx);
+    }
+
+    return QString();
+}
+
+} // namespace
+
 QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
-    QObject(parent)
+    QObject(parent),
+    m_startupParameters(startupParams)
 {
     ini().reload();
 
@@ -171,7 +227,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initMetaInfo();
     initApplication();
     initSingletons(startupParams);
-    initRuntimeParams(startupParams);
     initLog(startupParams);
 
     /* Do not initialize anything else because we must exit immediately if run in self-update mode. */
@@ -186,8 +241,13 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     static bool isWebKitInitialized = false;
     if (!isWebKitInitialized)
     {
-        QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-        QWebSettings::globalSettings()->enablePersistentStorage();
+        const auto settings = QWebSettings::globalSettings();
+        settings->setAttribute(QWebSettings::PluginsEnabled, true);
+        settings->enablePersistentStorage();
+
+        if (ini().enableWebKitDeveloperExtras)
+            settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+
         isWebKitInitialized = true;
     }
 }
@@ -276,7 +336,11 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
     const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
 
-    m_staticCommon.reset(new QnStaticCommonModule(clientPeerType, brand, customization));
+    m_staticCommon.reset(new QnStaticCommonModule(
+        clientPeerType,
+        brand,
+        customization,
+        QLatin1String(ini().cloudHost)));
 
     m_clientCoreModule.reset(new QnClientCoreModule());
 
@@ -301,6 +365,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnClientRuntimeSettings());
     commonModule->store(clientSettingsPtr.take()); /* Now common owns the link. */
 
+    initRuntimeParams(startupParams);
+
     /* Shorted initialization if run in self-update mode. */
     if (startupParams.selfUpdateMode)
         return;
@@ -320,12 +386,13 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnClientAutoRunWatcher());
 
     commonModule->setModuleGUID(clientInstanceManager->instanceGuid());
-    nx::network::SocketGlobals::outgoingTunnelPool()
+    nx::network::SocketGlobals::cloud().outgoingTunnelPool()
         .assignOwnPeerId("dc", commonModule->moduleGUID());
 
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
+    commonModule->store(new nx::client::desktop::MetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 
@@ -337,6 +404,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->instance<QnLayoutTourManager>();
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
+
+    commonModule->store(new ResourceWidgetPixmapCache());
 
     // Must be called before QnCloudStatusWatcher but after setModuleGUID() call.
     initLocalInfo(startupParams);
@@ -354,14 +423,33 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
     QNetworkProxyFactory::setApplicationProxyFactory(m_networkProxyFactory);
 
+    m_uploadManager = new nx::client::desktop::UploadManager(commonModule);
+    m_wearableManager = new nx::client::desktop::WearableManager(commonModule);
+
+    commonModule->store(m_uploadManager);
+    commonModule->store(m_wearableManager);
+
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
 #endif
 
     commonModule->store(new QnQtbugWorkaround());
-    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
+
+    const QString vmsGatewayLogFile = lit("vms_gateway") + calculateLogNameSuffix(startupParams);
+    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true, {}, vmsGatewayLogFile));
+
+    m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
+
+    commonModule->store(new LayoutTemplateManager());
+    commonModule->store(new ObjectDisplaySettings());
 
     commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
+
+    m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
+    m_analyticsMetadataProviderFactory->registerMetadataProviders();
+
+    m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
+    registerResourceDataProviders();
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
@@ -372,6 +460,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
     qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
+    qnRuntime->setProfilerMode(startupParams.profilerMode);
 
     if (!startupParams.engineVersion.isEmpty())
     {
@@ -402,58 +491,40 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
     }
 
-    // TODO: #GDM fix it
     /* Here the value from LightModeOverride will be copied to LightMode */
-#ifndef __arm__
-    QnPerformanceTest::detectLightMode();
-#else
-    // TODO: On NVidia TX1 this call leads to segfault in next QGLWidget
-    //       constructor call. Need to find the way to work it around.
-#endif
-
+    PerformanceTest::detectLightMode();
 
 #ifdef Q_OS_MACX
     if (mac_isSandboxed())
         qnSettings->setLightMode(qnSettings->lightMode() | Qn::LightModeNoNewWindow);
 #endif
+
+    auto qmlRoot = startupParams.qmlRoot.isEmpty() ? kQmlRoot : startupParams.qmlRoot;
+    if (!qmlRoot.endsWith(L'/'))
+        qmlRoot.append(L'/');
+    NX_INFO(this, lm("Setting QML root to %1").arg(qmlRoot));
+
+    m_clientCoreModule->mainQmlEngine()->setBaseUrl(
+        qmlRoot.startsWith(lit("qrc:"))
+            ? QUrl(qmlRoot)
+            : QUrl::fromLocalFile(qmlRoot));
+    m_clientCoreModule->mainQmlEngine()->addImportPath(qmlRoot);
 }
 
 void QnClientModule::initLog(const QnStartupParameters& startupParams)
 {
     auto logLevel = startupParams.logLevel;
+    auto logFile = startupParams.logFile;
     auto ec2TranLogLevel = startupParams.ec2TranLogLevel;
 
-    QString logFileNameSuffix;
-    if (!startupParams.videoWallGuid.isNull())
-    {
-        logFileNameSuffix = startupParams.videoWallItemGuid.isNull()
-            ? startupParams.videoWallGuid.toString()
-            : startupParams.videoWallItemGuid.toString();
-        logFileNameSuffix.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
-    }
-    else if (startupParams.selfUpdateMode)
-    {
-        // we hope self-updater will run only once per time and will not overflow log-file
-        // qnClientInstanceManager is not initialized in self-update mode
-        logFileNameSuffix = lit("self_update");
-    }
-    else if (qnRuntime->isActiveXMode())
-    {
-        logFileNameSuffix = lit("ax");
-    }
-    else if (qnClientInstanceManager && qnClientInstanceManager->isValid())
-    {
-        int idx = qnClientInstanceManager->instanceIndex();
-        if (idx > 0)
-            logFileNameSuffix = L'_' + QString::number(idx);
-    }
+    const QString logFileNameSuffix = calculateLogNameSuffix(startupParams);
 
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
 
     nx::utils::log::Settings logSettings;
-    logSettings.maxFileSize = 10 * 1024 * 1024;
-    logSettings.maxBackupCount = 5;
+    logSettings.maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
+    logSettings.maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
     logSettings.level.parse(logLevel);
@@ -461,7 +532,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         logSettings,
         qApp->applicationName(),
         qApp->applicationFilePath(),
-        lit("log_file") + logFileNameSuffix);
+        !logFile.isEmpty() ? logFile : (lit("client_log") + logFileNameSuffix));
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
@@ -491,16 +562,18 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 
     //TODO #ak get rid of this class!
     commonModule->store(new ec2::DummyHandler());
-    commonModule->store(new nx_http::HttpModManager());
+    commonModule->store(new nx::network::http::HttpModManager());
     if (!startupParams.enforceSocketType.isEmpty())
-        SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
+        nx::network::SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::mediatorConnector().mockupMediatorUrl(
+    {
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             startupParams.enforceMediatorEndpoint);
+    }
 
     // TODO: #mu ON/OFF switch in settings?
-    nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     if (!startupParams.videoWallGuid.isNull())
     {
@@ -549,9 +622,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     if (qApp)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
-
-        // Window icon is taken from 'icons' customization project. Suppress check.
-        QApplication::setWindowIcon(qnSkin->icon(":/logo.png")); // _IGNORE_VALIDATION_
+        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 
@@ -563,13 +634,15 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
 {
     auto commonModule = m_clientCoreModule->commonModule();
-    commonModule->store(new PluginManager());
     // client uses ordinary QT file to access file system
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
+    auto pluginManager = commonModule->store(new PluginManager(nullptr));
+
     QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
+    QnVideoDecoderFactory::setPluginManager(pluginManager);
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 
@@ -598,9 +671,34 @@ QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
     return m_cloudStatusWatcher;
 }
 
+QnCameraDataManager* QnClientModule::cameraDataManager() const
+{
+    return m_cameraDataManager;
+}
+
+QnDataProviderFactory* QnClientModule::dataProviderFactory() const
+{
+    return m_resourceDataProviderFactory.data();
+}
+
 nx::client::desktop::RadassController* QnClientModule::radassController() const
 {
     return m_radassController;
+}
+
+QnStartupParameters QnClientModule::startupParameters() const
+{
+    return m_startupParameters;
+}
+
+nx::client::desktop::UploadManager* QnClientModule::uploadManager() const
+{
+    return m_uploadManager;
+}
+
+nx::client::desktop::WearableManager* QnClientModule::wearableManager() const
+{
+    return m_wearableManager;
 }
 
 void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
@@ -619,4 +717,14 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
     runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
+}
+
+void QnClientModule::registerResourceDataProviders()
+{
+    m_resourceDataProviderFactory->registerResourceType<QnAviResource>();
+    m_resourceDataProviderFactory->registerResourceType<QnClientCameraResource>();
+    m_resourceDataProviderFactory->registerResourceType<QnDesktopAudioOnlyResource>();
+    #if defined(Q_OS_WIN)
+        m_resourceDataProviderFactory->registerResourceType<QnWinDesktopResource>();
+    #endif
 }

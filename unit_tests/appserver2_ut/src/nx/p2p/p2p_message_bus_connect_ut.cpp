@@ -2,7 +2,7 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <core/resource_access/user_access_data.h>
 
 #include <nx/p2p/p2p_message_bus.h>
@@ -37,7 +37,7 @@ static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 
 int getIntParam(const nx::utils::ArgumentParser& args, const QString& name, int defaultValue = 0)
 {
-    auto result = args.get(name);
+    auto result = args.get<QString>(name);
     return result ? result->toInt() : defaultValue;
 }
 
@@ -119,7 +119,7 @@ protected:
     {
         ec2::Ec2DirectConnection* connection =
             dynamic_cast<ec2::Ec2DirectConnection*> (m_servers[0]->moduleInstance()->ecConnection());
-        ec2::detail::QnDbManager* db = connection->messageBus()->getDb();
+        ec2::detail::QnDbManager* db = connection->queryProcessor()->getDb();
         ec2::ApiTransactionDataList tranList;
         db->doQuery(ec2::ApiTranLogFilter(), tranList);
         qint64 totalDbData = 0;
@@ -269,10 +269,10 @@ protected:
             auto flags = serverRes->getServerFlags();
             flags |= Qn::SF_P2pSyncDone;
             serverRes->setServerFlags(flags);
-            commonModule->bindModuleinformation(serverRes);
+            commonModule->bindModuleInformation(serverRes);
         }
 
-        while (args.get(kStandaloneModeParamName))
+        while (args.get<QString>(kStandaloneModeParamName))
             std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 };

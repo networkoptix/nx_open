@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #ifdef ENABLE_FLIR
 
@@ -7,7 +7,7 @@
 #include "flir_fc_private.h"
 #include "flir_web_socket_io_manager.h"
 
-#include <core/resource/camera_resource.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/network/http/http_client.h>
 
 namespace nx {
@@ -17,7 +17,7 @@ namespace flir {
 /**
  * Flir FC-series resource.
  */
-class FcResource: public QnPhysicalCameraResource
+class FcResource: public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
 
@@ -31,7 +31,9 @@ public:
     FcResource();
     virtual ~FcResource();
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
     virtual void stopInputPortMonitoringAsync() override;
@@ -47,12 +49,12 @@ public:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int, int) override;
-    virtual bool  hasDualStreaming() const override;
+    virtual bool  hasDualStreamingInternal() const override;
 
 private:
-    bool doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, const QUrl& url);
-    boost::optional<fc_private::ServerStatus> getNexusServerStatus(nx_http::HttpClient& httpClient);
-    bool tryToEnableNexusServer(nx_http::HttpClient& httpClient);
+    bool doGetRequestAndCheckResponse(nx::network::http::HttpClient& httpClient, const nx::utils::Url& url);
+    boost::optional<fc_private::ServerStatus> getNexusServerStatus(nx::network::http::HttpClient& httpClient);
+    bool tryToEnableNexusServer(nx::network::http::HttpClient& httpClient);
 
 private:
     nexus::WebSocketIoManager* m_ioManager;

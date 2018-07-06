@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <map>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -125,7 +126,7 @@ typename std::pair<
 }
 
 /**
- * E.g., given inbox.google.com returns com.google.inbox
+ * E.g., reverseWords("test.example.com", '.') returns "com.example.test".
  */
 template<typename RandomAccessContainer, typename Separator>
 RandomAccessContainer reverseWords(
@@ -138,6 +139,36 @@ RandomAccessContainer reverseWords(
     return boost::join(
         boost::make_iterator_range(splitVec.rbegin(), splitVec.rend()),
         separator);
+}
+
+template<typename InputIt, typename T>
+bool contains(InputIt first, InputIt last, const T& value)
+{
+    using RangeElement = decltype(*first);
+    return std::any_of(
+        first, last,
+        [&value](const RangeElement& elementValue)
+        {
+            return elementValue == value;
+        });
+}
+
+template<typename Container, typename T>
+bool contains(const Container& container, const T& value)
+{
+    return contains(container.begin(), container.end(), value);
+}
+
+template<typename InputIt, typename UnaryPredicate>
+bool contains_if(InputIt first, InputIt last, UnaryPredicate p)
+{
+    return std::any_of(first, last, p);
+}
+
+template<typename Container, typename UnaryPredicate>
+bool contains_if(const Container& container, UnaryPredicate p)
+{
+    return contains_if(container.begin(), container.end(), p);
 }
 
 } // namespace utils

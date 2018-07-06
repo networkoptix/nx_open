@@ -12,14 +12,6 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/unused.h>
 
-#if !defined(SSL_OP_NO_TLSv1_1)
-    #define SSL_OP_NO_TLSv1_1 0
-#endif
-
-#if !defined(SSL_OP_NO_TLSv1_2)
-    #define SSL_OP_NO_TLSv1_2 0
-#endif
-
 namespace nx {
 namespace network {
 namespace ssl {
@@ -75,7 +67,7 @@ private:
             #if defined(USE_OWN_MUTEX)
                 mutex->lock(file, line);
             #else
-                QN_UNUSED(file, line);
+                nx::utils::unused(file, line);
                 mutex->lock();
             #endif
         }
@@ -158,10 +150,10 @@ static const int kDisableAllSslVerions =
 
 void SslStaticData::setAllowedServerVersions(const String& versions)
 {
-    NX_LOG(lm("Set server SSL versions: %1").container(versions), cl_logALWAYS);
-
     int disabledVersions = kDisableAllSslVerions;
     const auto versionList = versions.split('|');
+    NX_LOG(lm("Set server SSL versions: %1").container(versionList), cl_logALWAYS);
+
     for (const auto& version: versionList)
     {
         const auto s = version.trimmed().toLower();
@@ -199,7 +191,7 @@ void SslStaticData::setAllowedServerCiphers(const String& ciphers)
 }
 
 std::atomic<bool> SslStaticData::s_isInitialized(false);
-int SslStaticData::s_disabledServerVersions(SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
+int SslStaticData::s_disabledServerVersions(SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1);
 String SslStaticData::s_allowedServerCiphers("HIGH:!RC4:!3DES");
 
 } // namespace ssl

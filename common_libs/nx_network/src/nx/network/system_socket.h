@@ -81,6 +81,8 @@ public:
     virtual bool isClosed() const override;
     virtual bool setReuseAddrFlag(bool reuseAddr) override;
     virtual bool getReuseAddrFlag(bool* val) const override;
+    virtual bool setReusePortFlag(bool value) override;
+    virtual bool getReusePortFlag(bool* value) const override;
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool getMtu(unsigned int* mtuValue) const override;
@@ -90,6 +92,7 @@ public:
     virtual bool getRecvBufferSize(unsigned int* buffSize) const override;
     virtual bool setRecvTimeout(unsigned int ms) override;
     virtual bool setSendTimeout(unsigned int ms) override;
+    virtual bool setIpv6Only(bool val) override;
 
     virtual Pollable* pollable() override;
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -133,7 +136,7 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
@@ -144,23 +147,23 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     virtual bool close() override;
     virtual bool shutdown() override;
 
 protected:
-    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
+
+    bool connectToIp(
+        const SocketAddress& remoteAddress,
+        std::chrono::milliseconds timeout);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
     bool m_connected;
@@ -186,13 +189,14 @@ public:
     TCPSocket(TCPSocket&&) = delete;
     TCPSocket& operator=(TCPSocket&&) = delete;
 
-    virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
     virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
+
+    bool reopen();
 
 private:
     friend class TCPServerSocketPrivate;
@@ -225,16 +229,17 @@ public:
      */
     static int accept(int sockDesc);
 
-    virtual bool listen(int queueLen = 128) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual bool listen(int queueLen = AbstractStreamServerSocket::kDefaultBacklogSize) override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
 
-    AbstractStreamSocket* systemAccept();
+    std::unique_ptr<AbstractStreamSocket> systemAccept();
+
+protected:
+    virtual void cancelIoInAioThread() override;
 
 private:
     bool setListen(int queueLen);
@@ -295,7 +300,7 @@ public:
     virtual void sendToAsync(
         const nx::Buffer& buf,
         const SocketAddress& foreignAddress,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
     /**
      * Actually calls UDPSocket::recvFrom and makes datagram source address/port
      *   available through UDPSocket::lastDatagramSourceAddress.
@@ -307,7 +312,7 @@ public:
         SocketAddress* const sourceAddress ) override;
     virtual void recvFromAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
     virtual SocketAddress lastDatagramSourceAddress() const override;
     virtual bool hasData() const override;
     /**

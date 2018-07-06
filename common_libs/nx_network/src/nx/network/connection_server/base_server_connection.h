@@ -57,11 +57,11 @@ struct BaseServerConnectionAccess
  *     closeConnection( SystemError::ErrorCode reasonCode, CustomConnectionType* )
  * @endcode
  *
- * @note This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to.
+ * NOTE: This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to.
  *     In other case, it is caller's responsibility to syunchronize access to the connection object.
- * @note Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
- * @note This class instance can be safely freed in any event handler (i.e., in internal socket's aio thread)
- * @note It is allowed to free instance within event handler
+ * NOTE: Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
+ * NOTE: This class instance can be safely freed in any event handler (i.e., in internal socket's aio thread)
+ * NOTE: It is allowed to free instance within event handler
  */
 template<
     class CustomConnectionType
@@ -174,7 +174,7 @@ public:
 
     /**
      * Register handler to be executed when connection just about to be destroyed.
-     * @note It is unspecified which thread handler will be invoked in
+     * NOTE: It is unspecified which thread handler will be invoked in
      * (usually, it is aio thread corresponding to the socket).
      */
     void registerCloseHandler(nx::utils::MoveOnlyFunc<void()> handler)
@@ -210,7 +210,7 @@ public:
     }
 
     /**
-     * @note Can be called only from connection's AIO thread.
+     * NOTE: Can be called only from connection's AIO thread.
      */
     void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
     {

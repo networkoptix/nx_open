@@ -30,6 +30,10 @@ const char* toString(DBResult result)
             return "uniqueConstraintViolation";
         case DBResult::connectionError:
             return "connectionError";
+        case DBResult::logicError:
+            return "logicError";
+        case DBResult::endOfData:
+            return "endOfData";
         default:
             return "unknown";
     }
@@ -156,7 +160,7 @@ void ConnectionOptions::loadFromSettings(const QnSettings& settings)
 
 bool ConnectionOptions::operator==(const ConnectionOptions& rhs) const
 {
-    return 
+    return
         driverType == rhs.driverType &&
         hostName == rhs.hostName &&
         port == rhs.port &&

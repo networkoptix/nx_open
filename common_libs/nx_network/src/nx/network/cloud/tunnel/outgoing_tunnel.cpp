@@ -42,7 +42,7 @@ void OutgoingTunnel::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 void OutgoingTunnel::stopWhileInAioThread()
 {
-    //do not need to lock mutex since it is unexpected if 
+    //do not need to lock mutex since it is unexpected if
     //  someone calls public methods while stopping object
 
     m_terminated = true;
@@ -200,7 +200,7 @@ void OutgoingTunnel::onTimer()
     {
         using namespace std::chrono;
         //resolution of timer is millisecond and zero timeout is not supported
-        if ((it->first > curTime) && 
+        if ((it->first > curTime) &&
             (duration_cast<milliseconds>(it->first - curTime) > milliseconds(0)))
         {
             break;
@@ -328,7 +328,7 @@ void OutgoingTunnel::setTunnelConnection(
 //-------------------------------------------------------------------------------------------------
 
 OutgoingTunnelFactory::OutgoingTunnelFactory():
-    base_type(std::bind(&OutgoingTunnelFactory::defaultFactoryFunction, 
+    base_type(std::bind(&OutgoingTunnelFactory::defaultFactoryFunction,
         this, std::placeholders::_1))
 {
 }

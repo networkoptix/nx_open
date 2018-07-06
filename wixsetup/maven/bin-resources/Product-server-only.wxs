@@ -103,7 +103,7 @@
         <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/>
         <?endif?>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="$(var.SourceDir)\wix_custom_actions.dll" />
 
         <!-- Custom actions -->
         <CustomAction Id="SetPreviousServerInstalled" BinaryKey="CustomActions.dll" DllEntry="SetPreviousServerInstalled" Execute="immediate" Return="check"/>
@@ -145,7 +145,7 @@
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT1]"/>
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
-                      Value="&quot;[$(var.customization)TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[TrayToolRootDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
@@ -160,7 +160,7 @@
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate"
                       Value="#LocalAppDataFolder#\$(var.companyName)\$(var.mediaserverName)"/>
 
-        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="$(var.customization)TrayToolDir" ExeCommand="[$(var.customization)TrayToolDir]traytool.exe"/>
+        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="TrayToolRootDir" ExeCommand="[TrayToolRootDir]traytool.exe"/>
 
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
 
@@ -250,7 +250,7 @@
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">
-                <Directory Id="NetworkOptix" Name="$(var.companyName)">
+                <Directory Id="NetworkOptix" Name="$(var.companyInstallPath)">
                     <Directory Id="INSTALLDIR" Name="$(var.ProductName)"/>
                 </Directory>
             </Directory>

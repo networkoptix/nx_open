@@ -20,9 +20,7 @@ public:
     static void setTemporaryDirectoryPath(const QString& path);
     static QString temporaryDirectoryPath();
 
-    enum class LoadMode { light, normal, stress };
     static void setLoadMode(const QString& mode);
-    static LoadMode getLoadMode();
 
     template<typename Count>
     static Count applyLoadMode(Count count);
@@ -32,7 +30,7 @@ public:
 private:
     static std::atomic<size_t> s_timeoutMultiplier;
     static std::atomic<bool> s_disableTimeAsserts;
-    static std::atomic<LoadMode> s_loadMode;
+    static std::atomic<size_t> s_loadMode;
 
     static QnMutex s_mutex;
     static QString s_temporaryDirectoryPath;
@@ -41,14 +39,8 @@ private:
 template<typename Count>
 Count TestOptions::applyLoadMode(Count count)
 {
-    switch (s_loadMode.load())
-    {
-        case LoadMode::light: return 1;
-        case LoadMode::normal: return count;
-        case LoadMode::stress: return count * 100;
-    }
-
-    return count;
+    count *= (Count) s_loadMode;
+    return (count < 1) ? 1 : count;
 }
 
 } // namespace utils

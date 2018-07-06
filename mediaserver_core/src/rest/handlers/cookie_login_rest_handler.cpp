@@ -12,6 +12,9 @@
 #include <network/client_authenticate_helper.h>
 #include "current_user_rest_handler.h"
 #include <api/model/cookie_login_data.h>
+#include "cookie_logout_rest_handler.h"
+#include <nx/utils/scope_guard.h>
+#include <audit/audit_manager.h>
 
 int QnCookieLoginRestHandler::executePost(
     const QString &/*path*/,
@@ -22,10 +25,19 @@ int QnCookieLoginRestHandler::executePost(
 {
     bool success = false;
     QnCookieData cookieData = QJson::deserialized<QnCookieData>(body, QnCookieData(), &success);
+
+    auto logoutGuard = makeScopeGuard(
+        [owner]
+        {
+            auto headers = &owner->response()->headers;
+            if (headers->find("Set-Cookie") == headers->end())
+                QnCookieHelper::addLogoutHeaders(headers);
+        });
+
     if (!success)
     {
         result.setError(QnRestResult::InvalidParameter, "Invalid json object. All fields are mandatory");
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     Qn::UserAccessData accessRights;
@@ -34,33 +46,49 @@ int QnCookieLoginRestHandler::executePost(
         QByteArray("GET"),
         *owner->response(),
         &accessRights);
+
     const_cast<QnRestConnectionProcessor*>(owner)->setAccessRights(accessRights);
     if (authResult == Qn::Auth_CloudConnectError)
     {
-        result.setError(QnRestResult::CantProcessRequest, nx::network::AppInfo::cloudName() + " is not accessible yet. Please try again later.");
-        return nx_http::StatusCode::ok;
+        result.setError(QnRestResult::CantProcessRequest,
+            nx::network::AppInfo::cloudName() + " is not accessible yet. Please try again later.");
+        return nx::network::http::StatusCode::ok;
     }
     else if (authResult == Qn::Auth_LDAPConnectError)
     {
-        result.setError(QnRestResult::CantProcessRequest, "LDAP server is not accessible yet. Please try again later.");
-        return nx_http::StatusCode::ok;
+        result.setError(QnRestResult::CantProcessRequest,
+            "LDAP server is not accessible yet. Please try again later.");
+        return nx::network::http::StatusCode::ok;
     }
     else if (authResult != Qn::Auth_OK)
     {
+        auto session = owner->authSession();
+        session.id = QnUuid::createUuid();
+        qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(session, Qn::AR_UnauthorizedLogin));
+
         result.setError(QnRestResult::InvalidParameter, "Invalid login or password");
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
-    QString cookiePostfix(lit("Path=/; HttpOnly"));
-    QString authData = lit("auth=%1;%2")
-        .arg(QLatin1String(cookieData.auth))
-        .arg(cookiePostfix);
-    nx_http::insertHeader(&owner->response()->headers, nx_http::HttpHeader("Set-Cookie", authData.toUtf8()));
+    const auto setCookie =
+        [&](const QByteArray& name, const QByteArray& value, const QByteArray& options)
+    {
+        QByteArray data = name;
+        data += "=";
+        data += value;
+        data += "; Path=/";
+        if (!options.isEmpty())
+            data += "; " + options;
+        nx::network::http::insertHeader(
+            &owner->response()->headers,
+            nx::network::http::HttpHeader("Set-Cookie", data));
+    };
 
-    QString clientGuid = lit("%1=%2;")
-        .arg(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME))
-        .arg(QnUuid::createUuid().toString()) + cookiePostfix;
-    nx_http::insertHeader(&owner->response()->headers, nx_http::HttpHeader("Set-Cookie", clientGuid.toUtf8()));
+    // TODO: Save ganegated UUID and CSRF tocken for verification in
+    // QnAuthHelper::doCookieAuthorization.
+    setCookie(Qn::URL_QUERY_AUTH_KEY_NAME, cookieData.auth, "HttpOnly");
+    setCookie(Qn::EC2_RUNTIME_GUID_HEADER_NAME, QnUuid::createUuid().toByteArray(), "HttpOnly");
+    setCookie(Qn::CSRF_TOKEN_COOKIE_NAME, QnUuid::createUuid().toSimpleByteArray(), "");
 
     QnCurrentUserRestHandler currentUser;
     return currentUser.executeGet(QString(), QnRequestParams(), result, owner);

@@ -13,3 +13,8 @@ endif()
 if(ANDROID)
     target_link_libraries(nx_media PRIVATE Qt5::AndroidExtras)
 endif()
+
+if(targetDevice STREQUAL "bpi")
+    add_definitions(-DENABLE_PROXY_DECODER)
+    target_link_libraries(nx_media PRIVATE proxy_decoder)
+endif()

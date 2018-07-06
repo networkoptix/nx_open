@@ -8,6 +8,7 @@
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <nx/utils/url.h>
 
 namespace Ui {
     class QnMergeSystemsDialog;
@@ -21,10 +22,10 @@ class QnMergeSystemsDialog : public QnButtonBoxDialog, public QnWorkbenchContext
 
     typedef QnButtonBoxDialog base_type;
 public:
-    explicit QnMergeSystemsDialog(QWidget *parent = 0);
+    explicit QnMergeSystemsDialog(QWidget *parent);
     ~QnMergeSystemsDialog();
 
-    QUrl url() const;
+    nx::utils::Url url() const;
     QString password() const;
 
 private slots:
@@ -53,6 +54,6 @@ private:
     QnMergeSystemsTool *m_mergeTool;
 
     QnMediaServerResourcePtr m_discoverer;
-    QUrl m_url;
+    nx::utils::Url m_url;
     QAuthenticator m_remoteOwnerCredentials;
 };

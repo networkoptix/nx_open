@@ -1,277 +1,264 @@
-\section{QuaZip Class Reference}
-\label{classQuaZip}\index{QuaZip@{QuaZip}}
+\section{Qua\-Zip Class Reference}
+\label{classQuaZip}\index{Qua\-Zip@{Qua\-Zip}}
 
 
-ZIP archive.  
-
-
-
-
-{\ttfamily \#include $<$quazip/quazip.h$>$}
+Z\-I\-P archive.  
 
 
 
-Collaboration diagram for QuaZip:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=120pt]{classQuaZip__coll__graph}
-\end{center}
-\end{figure}
+
+{\ttfamily \#include $<$quazip/quazip.\-h$>$}
+
 \subsection*{Public Types}
 \begin{DoxyCompactItemize}
 \item 
-enum {\bf Constants} \{ {\bf MAX\_\-FILE\_\-NAME\_\-LENGTH} = 256
+enum {\bf Constants} \{ {\bf M\-A\-X\-\_\-\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E\-\_\-\-L\-E\-N\-G\-T\-H} =256
  \}
 \begin{DoxyCompactList}\small\item\em Useful constants. \end{DoxyCompactList}\item 
-enum {\bf Mode} \{ \par
-{\bf mdNotOpen}, 
-{\bf mdUnzip}, 
-{\bf mdCreate}, 
-{\bf mdAppend}, 
-\par
-{\bf mdAdd}
+enum {\bf Mode} \{ \\*
+{\bf md\-Not\-Open}, 
+{\bf md\-Unzip}, 
+{\bf md\-Create}, 
+{\bf md\-Append}, 
+\\*
+{\bf md\-Add}
  \}
-\begin{DoxyCompactList}\small\item\em Open mode of the ZIP file. \end{DoxyCompactList}\item 
-enum {\bf CaseSensitivity} \{ {\bf csDefault} = 0, 
-{\bf csSensitive} = 1, 
-{\bf csInsensitive} = 2
+\begin{DoxyCompactList}\small\item\em Open mode of the Z\-I\-P file. \end{DoxyCompactList}\item 
+enum {\bf Case\-Sensitivity} \{ {\bf cs\-Default} =0, 
+{\bf cs\-Sensitive} =1, 
+{\bf cs\-Insensitive} =2
  \}
 \begin{DoxyCompactList}\small\item\em Case sensitivity for the file names. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-{\bf QuaZip} ()
-\begin{DoxyCompactList}\small\item\em Constructs \doxyref{QuaZip}{p.}{classQuaZip} object. \end{DoxyCompactList}\item 
-{\bf QuaZip} (const QString \&zipName)\label{classQuaZip_aaea7294b02abd22379cc3a9fccb754b7}
+{\bf Qua\-Zip} ()
+\begin{DoxyCompactList}\small\item\em Constructs \doxyref{Qua\-Zip}{p.}{classQuaZip} object. \end{DoxyCompactList}\item 
+{\bf Qua\-Zip} (const Q\-String \&zip\-Name)\label{classQuaZip_aaea7294b02abd22379cc3a9fccb754b7}
 
-\begin{DoxyCompactList}\small\item\em Constructs \doxyref{QuaZip}{p.}{classQuaZip} object associated with ZIP file {\itshape zipName\/}. \end{DoxyCompactList}\item 
-{\bf QuaZip} (QIODevice $\ast$ioDevice)
-\begin{DoxyCompactList}\small\item\em Constructs \doxyref{QuaZip}{p.}{classQuaZip} object associated with ZIP file represented by {\itshape ioDevice\/}. \end{DoxyCompactList}\item 
-{\bf $\sim$QuaZip} ()
-\begin{DoxyCompactList}\small\item\em Destroys \doxyref{QuaZip}{p.}{classQuaZip} object. \end{DoxyCompactList}\item 
-bool {\bf open} ({\bf Mode} mode, zlib\_\-filefunc\_\-def $\ast$ioApi=NULL)
-\begin{DoxyCompactList}\small\item\em Opens ZIP file. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Constructs \doxyref{Qua\-Zip}{p.}{classQuaZip} object associated with Z\-I\-P file {\itshape zip\-Name}. \end{DoxyCompactList}\item 
+{\bf Qua\-Zip} (Q\-I\-O\-Device $\ast$io\-Device)
+\begin{DoxyCompactList}\small\item\em Constructs \doxyref{Qua\-Zip}{p.}{classQuaZip} object associated with Z\-I\-P file represented by {\itshape io\-Device}. \end{DoxyCompactList}\item 
+{\bf $\sim$\-Qua\-Zip} ()
+\begin{DoxyCompactList}\small\item\em Destroys \doxyref{Qua\-Zip}{p.}{classQuaZip} object. \end{DoxyCompactList}\item 
+bool {\bf open} ({\bf Mode} mode, zlib\-\_\-filefunc\-\_\-def $\ast$io\-Api=N\-U\-L\-L)
+\begin{DoxyCompactList}\small\item\em Opens Z\-I\-P file. \end{DoxyCompactList}\item 
 void {\bf close} ()
-\begin{DoxyCompactList}\small\item\em Closes ZIP file. \end{DoxyCompactList}\item 
-void {\bf setFileNameCodec} (QTextCodec $\ast$fileNameCodec)
+\begin{DoxyCompactList}\small\item\em Closes Z\-I\-P file. \end{DoxyCompactList}\item 
+void {\bf set\-File\-Name\-Codec} (Q\-Text\-Codec $\ast$file\-Name\-Codec)
 \begin{DoxyCompactList}\small\item\em Sets the codec used to encode/decode file names inside archive. \end{DoxyCompactList}\item 
-void {\bf setFileNameCodec} (const char $\ast$fileNameCodecName)
+void {\bf set\-File\-Name\-Codec} (const char $\ast$file\-Name\-Codec\-Name)
 \begin{DoxyCompactList}\small\item\em Sets the codec used to encode/decode file names inside archive. \end{DoxyCompactList}\item 
-QTextCodec $\ast$ {\bf getFileNameCodec} () const \label{classQuaZip_a27b866aa2c75ea6f9c438cbb6e32b43c}
+Q\-Text\-Codec $\ast$ {\bf get\-File\-Name\-Codec} () const \label{classQuaZip_a27b866aa2c75ea6f9c438cbb6e32b43c}
 
 \begin{DoxyCompactList}\small\item\em Returns the codec used to encode/decode comments inside archive. \end{DoxyCompactList}\item 
-void {\bf setCommentCodec} (QTextCodec $\ast$commentCodec)
+void {\bf set\-Comment\-Codec} (Q\-Text\-Codec $\ast$comment\-Codec)
 \begin{DoxyCompactList}\small\item\em Sets the codec used to encode/decode comments inside archive. \end{DoxyCompactList}\item 
-void {\bf setCommentCodec} (const char $\ast$commentCodecName)
+void {\bf set\-Comment\-Codec} (const char $\ast$comment\-Codec\-Name)
 \begin{DoxyCompactList}\small\item\em Sets the codec used to encode/decode comments inside archive. \end{DoxyCompactList}\item 
-QTextCodec $\ast$ {\bf getCommentCodec} () const \label{classQuaZip_a008260161781d8b5d2a0a28493fddaf4}
+Q\-Text\-Codec $\ast$ {\bf get\-Comment\-Codec} () const \label{classQuaZip_a008260161781d8b5d2a0a28493fddaf4}
 
 \begin{DoxyCompactList}\small\item\em Returns the codec used to encode/decode comments inside archive. \end{DoxyCompactList}\item 
-QString {\bf getZipName} () const 
-\begin{DoxyCompactList}\small\item\em Returns the name of the ZIP file. \end{DoxyCompactList}\item 
-void {\bf setZipName} (const QString \&zipName)
-\begin{DoxyCompactList}\small\item\em Sets the name of the ZIP file. \end{DoxyCompactList}\item 
-QIODevice $\ast$ {\bf getIoDevice} () const 
-\begin{DoxyCompactList}\small\item\em Returns the device representing this ZIP file. \end{DoxyCompactList}\item 
-void {\bf setIoDevice} (QIODevice $\ast$ioDevice)
-\begin{DoxyCompactList}\small\item\em Sets the device representing the ZIP file. \end{DoxyCompactList}\item 
-{\bf Mode} {\bf getMode} () const \label{classQuaZip_a129ceff04d28fb00531f7bf7f9329664}
+Q\-String {\bf get\-Zip\-Name} () const 
+\begin{DoxyCompactList}\small\item\em Returns the name of the Z\-I\-P file. \end{DoxyCompactList}\item 
+void {\bf set\-Zip\-Name} (const Q\-String \&zip\-Name)
+\begin{DoxyCompactList}\small\item\em Sets the name of the Z\-I\-P file. \end{DoxyCompactList}\item 
+Q\-I\-O\-Device $\ast$ {\bf get\-Io\-Device} () const 
+\begin{DoxyCompactList}\small\item\em Returns the device representing this Z\-I\-P file. \end{DoxyCompactList}\item 
+void {\bf set\-Io\-Device} (Q\-I\-O\-Device $\ast$io\-Device)
+\begin{DoxyCompactList}\small\item\em Sets the device representing the Z\-I\-P file. \end{DoxyCompactList}\item 
+{\bf Mode} {\bf get\-Mode} () const \label{classQuaZip_a129ceff04d28fb00531f7bf7f9329664}
 
-\begin{DoxyCompactList}\small\item\em Returns the mode in which ZIP file was opened. \end{DoxyCompactList}\item 
-bool {\bf isOpen} () const \label{classQuaZip_a5b869a9c0d4f49955b759592fec08888}
+\begin{DoxyCompactList}\small\item\em Returns the mode in which Z\-I\-P file was opened. \end{DoxyCompactList}\item 
+bool {\bf is\-Open} () const \label{classQuaZip_a5b869a9c0d4f49955b759592fec08888}
 
-\begin{DoxyCompactList}\small\item\em Returns {\ttfamily true} if ZIP file is open, {\ttfamily false} otherwise. \end{DoxyCompactList}\item 
-int {\bf getZipError} () const 
+\begin{DoxyCompactList}\small\item\em Returns {\ttfamily true} if Z\-I\-P file is open, {\ttfamily false} otherwise. \end{DoxyCompactList}\item 
+int {\bf get\-Zip\-Error} () const 
 \begin{DoxyCompactList}\small\item\em Returns the error code of the last operation. \end{DoxyCompactList}\item 
-int {\bf getEntriesCount} () const 
-\begin{DoxyCompactList}\small\item\em Returns number of the entries in the ZIP central directory. \end{DoxyCompactList}\item 
-QString {\bf getComment} () const \label{classQuaZip_ae55cfbf2296132df808c557b62433051}
+int {\bf get\-Entries\-Count} () const 
+\begin{DoxyCompactList}\small\item\em Returns number of the entries in the Z\-I\-P central directory. \end{DoxyCompactList}\item 
+Q\-String {\bf get\-Comment} () const \label{classQuaZip_ae55cfbf2296132df808c557b62433051}
 
-\begin{DoxyCompactList}\small\item\em Returns global comment in the ZIP file. \end{DoxyCompactList}\item 
-void {\bf setComment} (const QString \&comment)
-\begin{DoxyCompactList}\small\item\em Sets the global comment in the ZIP file. \end{DoxyCompactList}\item 
-bool {\bf goToFirstFile} ()
+\begin{DoxyCompactList}\small\item\em Returns global comment in the Z\-I\-P file. \end{DoxyCompactList}\item 
+void {\bf set\-Comment} (const Q\-String \&comment)
+\begin{DoxyCompactList}\small\item\em Sets the global comment in the Z\-I\-P file. \end{DoxyCompactList}\item 
+bool {\bf go\-To\-First\-File} ()
 \begin{DoxyCompactList}\small\item\em Sets the current file to the first file in the archive. \end{DoxyCompactList}\item 
-bool {\bf goToNextFile} ()
+bool {\bf go\-To\-Next\-File} ()
 \begin{DoxyCompactList}\small\item\em Sets the current file to the next file in the archive. \end{DoxyCompactList}\item 
-bool {\bf setCurrentFile} (const QString \&fileName, {\bf CaseSensitivity} cs=csDefault)
+bool {\bf set\-Current\-File} (const Q\-String \&file\-Name, {\bf Case\-Sensitivity} cs={\bf cs\-Default})
 \begin{DoxyCompactList}\small\item\em Sets current file by its name. \end{DoxyCompactList}\item 
-bool {\bf hasCurrentFile} () const \label{classQuaZip_a00b237d926648f45da86db25e7cfb697}
+bool {\bf has\-Current\-File} () const \label{classQuaZip_a00b237d926648f45da86db25e7cfb697}
 
 \begin{DoxyCompactList}\small\item\em Returns {\ttfamily true} if the current file has been set. \end{DoxyCompactList}\item 
-bool {\bf getCurrentFileInfo} ({\bf QuaZipFileInfo} $\ast$info) const 
+bool {\bf get\-Current\-File\-Info} ({\bf Qua\-Zip\-File\-Info} $\ast$info) const 
 \begin{DoxyCompactList}\small\item\em Retrieves information about the current file. \end{DoxyCompactList}\item 
-bool {\bf getCurrentFileInfo} ({\bf QuaZipFileInfo64} $\ast$info) const 
+bool {\bf get\-Current\-File\-Info} ({\bf Qua\-Zip\-File\-Info64} $\ast$info) const 
 \begin{DoxyCompactList}\small\item\em Retrieves information about the current file. \end{DoxyCompactList}\item 
-QString {\bf getCurrentFileName} () const 
+Q\-String {\bf get\-Current\-File\-Name} () const 
 \begin{DoxyCompactList}\small\item\em Returns the current file name. \end{DoxyCompactList}\item 
-unzFile {\bf getUnzFile} ()
-\begin{DoxyCompactList}\small\item\em Returns {\ttfamily unzFile} handle. \end{DoxyCompactList}\item 
-zipFile {\bf getZipFile} ()
-\begin{DoxyCompactList}\small\item\em Returns {\ttfamily zipFile} handle. \end{DoxyCompactList}\item 
-void {\bf setDataDescriptorWritingEnabled} (bool enabled)
+unz\-File {\bf get\-Unz\-File} ()
+\begin{DoxyCompactList}\small\item\em Returns {\ttfamily unz\-File} handle. \end{DoxyCompactList}\item 
+zip\-File {\bf get\-Zip\-File} ()
+\begin{DoxyCompactList}\small\item\em Returns {\ttfamily zip\-File} handle. \end{DoxyCompactList}\item 
+void {\bf set\-Data\-Descriptor\-Writing\-Enabled} (bool enabled)
 \begin{DoxyCompactList}\small\item\em Changes the data descriptor writing mode. \end{DoxyCompactList}\item 
-bool {\bf isDataDescriptorWritingEnabled} () const 
+bool {\bf is\-Data\-Descriptor\-Writing\-Enabled} () const 
 \begin{DoxyCompactList}\small\item\em Returns the data descriptor default writing mode. \end{DoxyCompactList}\item 
-QStringList {\bf getFileNameList} () const 
+Q\-String\-List {\bf get\-File\-Name\-List} () const 
 \begin{DoxyCompactList}\small\item\em Returns a list of files inside the archive. \end{DoxyCompactList}\item 
-QList$<$ {\bf QuaZipFileInfo} $>$ {\bf getFileInfoList} () const 
+Q\-List$<$ {\bf Qua\-Zip\-File\-Info} $>$ {\bf get\-File\-Info\-List} () const 
 \begin{DoxyCompactList}\small\item\em Returns information list about all files inside the archive. \end{DoxyCompactList}\item 
-QList$<$ {\bf QuaZipFileInfo64} $>$ {\bf getFileInfoList64} () const 
+Q\-List$<$ {\bf Qua\-Zip\-File\-Info64} $>$ {\bf get\-File\-Info\-List64} () const 
 \begin{DoxyCompactList}\small\item\em Returns information list about all files inside the archive. \end{DoxyCompactList}\item 
-void {\bf setZip64Enabled} (bool zip64)
+void {\bf set\-Zip64\-Enabled} (bool zip64)
 \begin{DoxyCompactList}\small\item\em Enables the zip64 mode. \end{DoxyCompactList}\item 
-bool {\bf isZip64Enabled} () const 
+bool {\bf is\-Zip64\-Enabled} () const 
 \begin{DoxyCompactList}\small\item\em Returns whether the zip64 mode is enabled. \end{DoxyCompactList}\item 
-bool {\bf isAutoClose} () const 
+bool {\bf is\-Auto\-Close} () const 
 \begin{DoxyCompactList}\small\item\em Returns the auto-\/close flag. \end{DoxyCompactList}\item 
-void {\bf setAutoClose} (bool autoClose) const 
+void {\bf set\-Auto\-Close} (bool auto\-Close) const 
 \begin{DoxyCompactList}\small\item\em Sets or unsets the auto-\/close flag. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-static Qt::CaseSensitivity {\bf convertCaseSensitivity} ({\bf CaseSensitivity} cs)
-\begin{DoxyCompactList}\small\item\em Returns the actual case sensitivity for the specified QuaZIP one. \end{DoxyCompactList}\item 
-static void {\bf setDefaultFileNameCodec} (QTextCodec $\ast$codec)
+static Qt\-::\-Case\-Sensitivity {\bf convert\-Case\-Sensitivity} ({\bf Case\-Sensitivity} cs)
+\begin{DoxyCompactList}\small\item\em Returns the actual case sensitivity for the specified Qua\-Z\-I\-P one. \end{DoxyCompactList}\item 
+static void {\bf set\-Default\-File\-Name\-Codec} (Q\-Text\-Codec $\ast$codec)
 \begin{DoxyCompactList}\small\item\em Sets the default file name codec to use. \end{DoxyCompactList}\item 
-static void {\bf setDefaultFileNameCodec} (const char $\ast$codecName)
+static void {\bf set\-Default\-File\-Name\-Codec} (const char $\ast$codec\-Name)
 \end{DoxyCompactItemize}
 \subsection*{Friends}
 \begin{DoxyCompactItemize}
 \item 
-class {\bf QuaZipPrivate}\label{classQuaZip_a5d400b33a69412e9d419a484aaf476cd}
+class {\bfseries Qua\-Zip\-Private}\label{classQuaZip_a5d400b33a69412e9d419a484aaf476cd}
 
 \end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
-ZIP archive. 
+Z\-I\-P archive. 
 
-This class implements basic interface to the ZIP archive. It can be used to read table contents of the ZIP archive and retreiving information about the files inside it.
+This class implements basic interface to the Z\-I\-P archive. It can be used to read table contents of the Z\-I\-P archive and retreiving information about the files inside it.
 
-You can also use this class to open files inside archive by passing pointer to the instance of this class to the constructor of the \doxyref{QuaZipFile}{p.}{classQuaZipFile} class. But see \doxyref{QuaZipFile::QuaZipFile(QuaZip$\ast$, QObject$\ast$)}{p.}{classQuaZipFile_a54e944a6b3d27030f64c8f30d2cc33bb} for the possible pitfalls.
+You can also use this class to open files inside archive by passing pointer to the instance of this class to the constructor of the \doxyref{Qua\-Zip\-File}{p.}{classQuaZipFile} class. But see \doxyref{Qua\-Zip\-File\-::\-Qua\-Zip\-File(\-Qua\-Zip$\ast$, Q\-Object$\ast$)}{p.}{classQuaZipFile_a54e944a6b3d27030f64c8f30d2cc33bb} for the possible pitfalls.
 
-This class is indended to provide interface to the ZIP subpackage of the ZIP/UNZIP package as well as to the UNZIP subpackage. But currently it supports only UNZIP.
+This class is indended to provide interface to the Z\-I\-P subpackage of the Z\-I\-P/\-U\-N\-Z\-I\-P package as well as to the U\-N\-Z\-I\-P subpackage. But currently it supports only U\-N\-Z\-I\-P.
 
-The use of this class is simple -\/ just create instance using constructor, then set ZIP archive file name using setFile() function (if you did not passed the name to the constructor), then \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} and then use different functions to work with it! Well, if you are paranoid, you may also wish to call close before destructing the instance, to check for errors on close.
+The use of this class is simple -\/ just create instance using constructor, then set Z\-I\-P archive file name using set\-File() function (if you did not passed the name to the constructor), then \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} and then use different functions to work with it! Well, if you are paranoid, you may also wish to call close before destructing the instance, to check for errors on close.
 
-You may also use \doxyref{getUnzFile()}{p.}{classQuaZip_a3b78a652f296ff4a678a791e8294e642} and \doxyref{getZipFile()}{p.}{classQuaZip_a425043a4d7cc31e2fe2bba73d954f15c} functions to get the ZIP archive handle and use it with ZIP/UNZIP package API directly.
+You may also use \doxyref{get\-Unz\-File()}{p.}{classQuaZip_a3b78a652f296ff4a678a791e8294e642} and \doxyref{get\-Zip\-File()}{p.}{classQuaZip_a425043a4d7cc31e2fe2bba73d954f15c} functions to get the Z\-I\-P archive handle and use it with Z\-I\-P/\-U\-N\-Z\-I\-P package A\-P\-I directly.
 
-This class supports localized file names inside ZIP archive, but you have to set up proper codec with setCodec() function. By default, locale codec will be used, which is probably ok for UNIX systems, but will almost certainly fail with ZIP archives created in Windows. This is because Windows ZIP programs have strange habit of using DOS encoding for file names in ZIP archives. For example, ZIP archive with cyrillic names created in Windows will have file names in {\ttfamily IBM866} encoding instead of {\ttfamily WINDOWS-\/1251}. I think that calling one function is not much trouble, but for true platform independency it would be nice to have some mechanism for file name encoding auto detection using locale information. Does anyone know a good way to do it? 
+This class supports localized file names inside Z\-I\-P archive, but you have to set up proper codec with set\-Codec() function. By default, locale codec will be used, which is probably ok for U\-N\-I\-X systems, but will almost certainly fail with Z\-I\-P archives created in Windows. This is because Windows Z\-I\-P programs have strange habit of using D\-O\-S encoding for file names in Z\-I\-P archives. For example, Z\-I\-P archive with cyrillic names created in Windows will have file names in {\ttfamily I\-B\-M866} encoding instead of {\ttfamily W\-I\-N\-D\-O\-W\-S-\/1251}. I think that calling one function is not much trouble, but for true platform independency it would be nice to have some mechanism for file name encoding auto detection using locale information. Does anyone know a good way to do it? 
 
 \subsection{Member Enumeration Documentation}
-\index{QuaZip@{QuaZip}!Constants@{Constants}}
-\index{Constants@{Constants}!QuaZip@{QuaZip}}
-\subsubsection[{Constants}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf QuaZip::Constants}}\label{classQuaZip_adce46b942c341dbb5c851eadead65459}
+\index{Qua\-Zip@{Qua\-Zip}!Constants@{Constants}}
+\index{Constants@{Constants}!QuaZip@{Qua\-Zip}}
+\subsubsection[{Constants}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Qua\-Zip\-::\-Constants}}\label{classQuaZip_adce46b942c341dbb5c851eadead65459}
 
 
 Useful constants. 
 
 \begin{Desc}
-\item[Enumerator: ]\par
+\item[Enumerator]\par
 \begin{description}
-\index{MAX\_\-FILE\_\-NAME\_\-LENGTH@{MAX\_\-FILE\_\-NAME\_\-LENGTH}!QuaZip@{QuaZip}}\index{QuaZip@{QuaZip}!MAX\_\-FILE\_\-NAME\_\-LENGTH@{MAX\_\-FILE\_\-NAME\_\-LENGTH}}\item[{\em 
-MAX\_\-FILE\_\-NAME\_\-LENGTH\label{classQuaZip_adce46b942c341dbb5c851eadead65459ab26ce1a9c9e94f901dc2cf90fa5baa4b}
-}]Maximum file name length. Taken from {\ttfamily UNZ\_\-MAXFILENAMEINZIP} constant in unzip.c. \end{description}
+\index{M\-A\-X\-\_\-\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E\-\_\-\-L\-E\-N\-G\-T\-H@{M\-A\-X\-\_\-\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E\-\_\-\-L\-E\-N\-G\-T\-H}!Qua\-Zip@{Qua\-Zip}}\index{Qua\-Zip@{Qua\-Zip}!M\-A\-X\-\_\-\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E\-\_\-\-L\-E\-N\-G\-T\-H@{M\-A\-X\-\_\-\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E\-\_\-\-L\-E\-N\-G\-T\-H}}\item[{\em 
+M\-A\-X\-\_\-\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E\-\_\-\-L\-E\-N\-G\-T\-H\label{classQuaZip_adce46b942c341dbb5c851eadead65459ab26ce1a9c9e94f901dc2cf90fa5baa4b}
+}]Maximum file name length. Taken from {\ttfamily U\-N\-Z\-\_\-\-M\-A\-X\-F\-I\-L\-E\-N\-A\-M\-E\-I\-N\-Z\-I\-P} constant in unzip.\-c. \end{description}
 \end{Desc}
+\index{Qua\-Zip@{Qua\-Zip}!Mode@{Mode}}
+\index{Mode@{Mode}!QuaZip@{Qua\-Zip}}
+\subsubsection[{Mode}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Qua\-Zip\-::\-Mode}}\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4}
 
-\index{QuaZip@{QuaZip}!Mode@{Mode}}
-\index{Mode@{Mode}!QuaZip@{QuaZip}}
-\subsubsection[{Mode}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf QuaZip::Mode}}\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4}
 
-
-Open mode of the ZIP file. 
+Open mode of the Z\-I\-P file. 
 
 \begin{Desc}
-\item[Enumerator: ]\par
+\item[Enumerator]\par
 \begin{description}
-\index{mdNotOpen@{mdNotOpen}!QuaZip@{QuaZip}}\index{QuaZip@{QuaZip}!mdNotOpen@{mdNotOpen}}\item[{\em 
-mdNotOpen\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4ac87ddb1e901e1ec700c16ee0d4d398ce}
-}]ZIP file is not open. This is the initial mode. \index{mdUnzip@{mdUnzip}!QuaZip@{QuaZip}}\index{QuaZip@{QuaZip}!mdUnzip@{mdUnzip}}\item[{\em 
-mdUnzip\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897}
-}]ZIP file is open for reading files inside it. \index{mdCreate@{mdCreate}!QuaZip@{QuaZip}}\index{QuaZip@{QuaZip}!mdCreate@{mdCreate}}\item[{\em 
-mdCreate\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a25ae05b12590540af8c66ae8298b928e}
-}]ZIP file was created with \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} call. \index{mdAppend@{mdAppend}!QuaZip@{QuaZip}}\index{QuaZip@{QuaZip}!mdAppend@{mdAppend}}\item[{\em 
-mdAppend\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4ab807f0c65653a16d77b365801fd25582}
-}]ZIP file was opened in append mode. This refers to {\ttfamily APPEND\_\-STATUS\_\-CREATEAFTER} mode in ZIP/UNZIP package and means that zip is appended to some existing file what is useful when that file contains self-\/extractor code. This is obviously {\itshape not\/} what you whant to use to add files to the existing ZIP archive. \index{mdAdd@{mdAdd}!QuaZip@{QuaZip}}\index{QuaZip@{QuaZip}!mdAdd@{mdAdd}}\item[{\em 
-mdAdd\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a22c745f349f06add449af523254fdaec}
-}]ZIP file was opened for adding files in the archive. \end{description}
+\index{md\-Not\-Open@{md\-Not\-Open}!Qua\-Zip@{Qua\-Zip}}\index{Qua\-Zip@{Qua\-Zip}!md\-Not\-Open@{md\-Not\-Open}}\item[{\em 
+md\-Not\-Open\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4ac87ddb1e901e1ec700c16ee0d4d398ce}
+}]Z\-I\-P file is not open. This is the initial mode. \index{md\-Unzip@{md\-Unzip}!Qua\-Zip@{Qua\-Zip}}\index{Qua\-Zip@{Qua\-Zip}!md\-Unzip@{md\-Unzip}}\item[{\em 
+md\-Unzip\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897}
+}]Z\-I\-P file is open for reading files inside it. \index{md\-Create@{md\-Create}!Qua\-Zip@{Qua\-Zip}}\index{Qua\-Zip@{Qua\-Zip}!md\-Create@{md\-Create}}\item[{\em 
+md\-Create\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a25ae05b12590540af8c66ae8298b928e}
+}]Z\-I\-P file was created with \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} call. \index{md\-Append@{md\-Append}!Qua\-Zip@{Qua\-Zip}}\index{Qua\-Zip@{Qua\-Zip}!md\-Append@{md\-Append}}\item[{\em 
+md\-Append\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4ab807f0c65653a16d77b365801fd25582}
+}]Z\-I\-P file was opened in append mode. This refers to {\ttfamily A\-P\-P\-E\-N\-D\-\_\-\-S\-T\-A\-T\-U\-S\-\_\-\-C\-R\-E\-A\-T\-E\-A\-F\-T\-E\-R} mode in Z\-I\-P/\-U\-N\-Z\-I\-P package and means that zip is appended to some existing file what is useful when that file contains self-\/extractor code. This is obviously {\itshape not} what you whant to use to add files to the existing Z\-I\-P archive. \index{md\-Add@{md\-Add}!Qua\-Zip@{Qua\-Zip}}\index{Qua\-Zip@{Qua\-Zip}!md\-Add@{md\-Add}}\item[{\em 
+md\-Add\label{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a22c745f349f06add449af523254fdaec}
+}]Z\-I\-P file was opened for adding files in the archive. \end{description}
 \end{Desc}
-
-\index{QuaZip@{QuaZip}!CaseSensitivity@{CaseSensitivity}}
-\index{CaseSensitivity@{CaseSensitivity}!QuaZip@{QuaZip}}
-\subsubsection[{CaseSensitivity}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf QuaZip::CaseSensitivity}}\label{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbe}
+\index{Qua\-Zip@{Qua\-Zip}!Case\-Sensitivity@{Case\-Sensitivity}}
+\index{Case\-Sensitivity@{Case\-Sensitivity}!QuaZip@{Qua\-Zip}}
+\subsubsection[{Case\-Sensitivity}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Qua\-Zip\-::\-Case\-Sensitivity}}\label{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbe}
 
 
 Case sensitivity for the file names. 
 
-This is what you specify when accessing files in the archive. Works perfectly fine with any characters thanks to Qt's great unicode support. This is different from ZIP/UNZIP API, where only US-\/ASCII characters was supported. \begin{Desc}
-\item[Enumerator: ]\par
+This is what you specify when accessing files in the archive. Works perfectly fine with any characters thanks to Qt's great unicode support. This is different from Z\-I\-P/\-U\-N\-Z\-I\-P A\-P\-I, where only U\-S-\/\-A\-S\-C\-I\-I characters was supported. \begin{Desc}
+\item[Enumerator]\par
 \begin{description}
-\index{csDefault@{csDefault}!QuaZip@{QuaZip}}\index{QuaZip@{QuaZip}!csDefault@{csDefault}}\item[{\em 
-csDefault\label{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbeac3cca8c0b976cf6397a28a5c84e75253}
-}]Default for platform. Case sensitive for UNIX, not for Windows. \index{csSensitive@{csSensitive}!QuaZip@{QuaZip}}\index{QuaZip@{QuaZip}!csSensitive@{csSensitive}}\item[{\em 
-csSensitive\label{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbead8d86b0c34203336cad09348cfa5356e}
-}]Case sensitive. \index{csInsensitive@{csInsensitive}!QuaZip@{QuaZip}}\index{QuaZip@{QuaZip}!csInsensitive@{csInsensitive}}\item[{\em 
-csInsensitive\label{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbea3e492bcc3f64f41a74906cecc45fb366}
+\index{cs\-Default@{cs\-Default}!Qua\-Zip@{Qua\-Zip}}\index{Qua\-Zip@{Qua\-Zip}!cs\-Default@{cs\-Default}}\item[{\em 
+cs\-Default\label{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbeac3cca8c0b976cf6397a28a5c84e75253}
+}]Default for platform. Case sensitive for U\-N\-I\-X, not for Windows. \index{cs\-Sensitive@{cs\-Sensitive}!Qua\-Zip@{Qua\-Zip}}\index{Qua\-Zip@{Qua\-Zip}!cs\-Sensitive@{cs\-Sensitive}}\item[{\em 
+cs\-Sensitive\label{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbead8d86b0c34203336cad09348cfa5356e}
+}]Case sensitive. \index{cs\-Insensitive@{cs\-Insensitive}!Qua\-Zip@{Qua\-Zip}}\index{Qua\-Zip@{Qua\-Zip}!cs\-Insensitive@{cs\-Insensitive}}\item[{\em 
+cs\-Insensitive\label{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbea3e492bcc3f64f41a74906cecc45fb366}
 }]Case insensitive. \end{description}
 \end{Desc}
 
 
-
 \subsection{Constructor \& Destructor Documentation}
-\index{QuaZip@{QuaZip}!QuaZip@{QuaZip}}
-\index{QuaZip@{QuaZip}!QuaZip@{QuaZip}}
-\subsubsection[{QuaZip}]{\setlength{\rightskip}{0pt plus 5cm}QuaZip::QuaZip (
+\index{Qua\-Zip@{Qua\-Zip}!Qua\-Zip@{Qua\-Zip}}
+\index{Qua\-Zip@{Qua\-Zip}!QuaZip@{Qua\-Zip}}
+\subsubsection[{Qua\-Zip}]{\setlength{\rightskip}{0pt plus 5cm}Qua\-Zip\-::\-Qua\-Zip (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a970e0f401c7cfd7a78e78572f758eec4}
 
 
-Constructs \doxyref{QuaZip}{p.}{classQuaZip} object. 
+Constructs \doxyref{Qua\-Zip}{p.}{classQuaZip} object. 
 
-Call setName() before opening constructed object. \index{QuaZip@{QuaZip}!QuaZip@{QuaZip}}
-\index{QuaZip@{QuaZip}!QuaZip@{QuaZip}}
-\subsubsection[{QuaZip}]{\setlength{\rightskip}{0pt plus 5cm}QuaZip::QuaZip (
+Call set\-Name() before opening constructed object. \index{Qua\-Zip@{Qua\-Zip}!Qua\-Zip@{Qua\-Zip}}
+\index{Qua\-Zip@{Qua\-Zip}!QuaZip@{Qua\-Zip}}
+\subsubsection[{Qua\-Zip}]{\setlength{\rightskip}{0pt plus 5cm}Qua\-Zip\-::\-Qua\-Zip (
 \begin{DoxyParamCaption}
-\item[{QIODevice $\ast$}]{ioDevice}
+\item[{Q\-I\-O\-Device $\ast$}]{io\-Device}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_ae52ebadd5ce64cdb49d7e198904b0b8c}
 
 
-Constructs \doxyref{QuaZip}{p.}{classQuaZip} object associated with ZIP file represented by {\itshape ioDevice\/}. 
+Constructs \doxyref{Qua\-Zip}{p.}{classQuaZip} object associated with Z\-I\-P file represented by {\itshape io\-Device}. 
 
-The IO device must be seekable, otherwise an error will occur when opening. \index{QuaZip@{QuaZip}!$\sim$QuaZip@{$\sim$QuaZip}}
-\index{$\sim$QuaZip@{$\sim$QuaZip}!QuaZip@{QuaZip}}
-\subsubsection[{$\sim$QuaZip}]{\setlength{\rightskip}{0pt plus 5cm}QuaZip::$\sim$QuaZip (
+The I\-O device must be seekable, otherwise an error will occur when opening. \index{Qua\-Zip@{Qua\-Zip}!$\sim$\-Qua\-Zip@{$\sim$\-Qua\-Zip}}
+\index{$\sim$\-Qua\-Zip@{$\sim$\-Qua\-Zip}!QuaZip@{Qua\-Zip}}
+\subsubsection[{$\sim$\-Qua\-Zip}]{\setlength{\rightskip}{0pt plus 5cm}Qua\-Zip\-::$\sim$\-Qua\-Zip (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_af60a2d3930b90f3b25a3148baecad81e}
 
 
-Destroys \doxyref{QuaZip}{p.}{classQuaZip} object. 
+Destroys \doxyref{Qua\-Zip}{p.}{classQuaZip} object. 
 
 Calls \doxyref{close()}{p.}{classQuaZip_a7a4323b73e12f3b4470109f200728f9f} if necessary. 
 
-References close(), and isOpen().
+References close(), and is\-Open().
 
 
 
 \subsection{Member Function Documentation}
-\index{QuaZip@{QuaZip}!convertCaseSensitivity@{convertCaseSensitivity}}
-\index{convertCaseSensitivity@{convertCaseSensitivity}!QuaZip@{QuaZip}}
-\subsubsection[{convertCaseSensitivity}]{\setlength{\rightskip}{0pt plus 5cm}Qt::CaseSensitivity QuaZip::convertCaseSensitivity (
+\index{Qua\-Zip@{Qua\-Zip}!convert\-Case\-Sensitivity@{convert\-Case\-Sensitivity}}
+\index{convert\-Case\-Sensitivity@{convert\-Case\-Sensitivity}!QuaZip@{Qua\-Zip}}
+\subsubsection[{convert\-Case\-Sensitivity}]{\setlength{\rightskip}{0pt plus 5cm}Qt\-::\-Case\-Sensitivity Qua\-Zip\-::convert\-Case\-Sensitivity (
 \begin{DoxyParamCaption}
-\item[{{\bf QuaZip::CaseSensitivity}}]{cs}
+\item[{{\bf Qua\-Zip\-::\-Case\-Sensitivity}}]{cs}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily  [static]}}\label{classQuaZip_a1d3fbd445a8e9d3449ded7371931c6b3}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classQuaZip_a1d3fbd445a8e9d3449ded7371931c6b3}
 
 
-Returns the actual case sensitivity for the specified QuaZIP one. 
+Returns the actual case sensitivity for the specified Qua\-Z\-I\-P one. 
 
 
 \begin{DoxyParams}{Parameters}
@@ -279,197 +266,197 @@ Returns the actual case sensitivity for the specified QuaZIP one.
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-If CaseSensitivity::csDefault, then returns the default file name case sensitivity for the platform. Otherwise, just returns the appropriate value from the Qt::CaseSensitivity enum. 
+If Case\-Sensitivity\-::cs\-Default, then returns the default file name case sensitivity for the platform. Otherwise, just returns the appropriate value from the Qt\-::\-Case\-Sensitivity enum. 
 \end{DoxyReturn}
 
 
-References csDefault, and csSensitive.
+References cs\-Default, and cs\-Sensitive.
 
 
 
-Referenced by QuaZipDir::exists(), and setCurrentFile().
+Referenced by Qua\-Zip\-Dir\-::exists(), and set\-Current\-File().
 
-\index{QuaZip@{QuaZip}!open@{open}}
-\index{open@{open}!QuaZip@{QuaZip}}
-\subsubsection[{open}]{\setlength{\rightskip}{0pt plus 5cm}bool QuaZip::open (
+\index{Qua\-Zip@{Qua\-Zip}!open@{open}}
+\index{open@{open}!QuaZip@{Qua\-Zip}}
+\subsubsection[{open}]{\setlength{\rightskip}{0pt plus 5cm}bool Qua\-Zip\-::open (
 \begin{DoxyParamCaption}
 \item[{{\bf Mode}}]{mode, }
-\item[{zlib\_\-filefunc\_\-def $\ast$}]{ioApi = {\ttfamily NULL}}
+\item[{zlib\-\_\-filefunc\-\_\-def $\ast$}]{io\-Api = {\ttfamily NULL}}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962}
 
 
-Opens ZIP file. 
+Opens Z\-I\-P file. 
 
-Argument {\itshape mode\/} specifies open mode of the ZIP archive. See Mode for details. Note that there is zipOpen2() function in the ZIP/UNZIP API which accepts {\itshape globalcomment\/} argument, but it does not use it anywhere, so this \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} function does not have this argument. See \doxyref{setComment()}{p.}{classQuaZip_a1b5d936a203859340574d5908ffa2222} if you need to set global comment.
+Argument {\itshape mode} specifies open mode of the Z\-I\-P archive. See Mode for details. Note that there is zip\-Open2() function in the Z\-I\-P/\-U\-N\-Z\-I\-P A\-P\-I which accepts {\itshape globalcomment} argument, but it does not use it anywhere, so this \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} function does not have this argument. See \doxyref{set\-Comment()}{p.}{classQuaZip_a1b5d936a203859340574d5908ffa2222} if you need to set global comment.
 
-If the ZIP file is accessed via explicitly set QIODevice, then this device is opened in the necessary mode. If the device was already opened by some other means, then QuaZIP checks if the open mode is compatible to the mode needed for the requested operation. If necessary, seeking is performed to position the device properly.
+If the Z\-I\-P file is accessed via explicitly set Q\-I\-O\-Device, then this device is opened in the necessary mode. If the device was already opened by some other means, then Qua\-Z\-I\-P checks if the open mode is compatible to the mode needed for the requested operation. If necessary, seeking is performed to position the device properly.
 
 \begin{DoxyReturn}{Returns}
 {\ttfamily true} if successful, {\ttfamily false} otherwise.
 \end{DoxyReturn}
 \begin{DoxyNote}{Note}
-ZIP/UNZIP API open calls do not return error code -\/ they just return {\ttfamily NULL} indicating an error. But to make things easier, \doxyref{quazip.h}{p.}{quazip_8h_source} header defines additional error code {\ttfamily UNZ\_\-ERROROPEN} and \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} will return it if the open call of the ZIP/UNZIP API returns {\ttfamily NULL}.
+Z\-I\-P/\-U\-N\-Z\-I\-P A\-P\-I open calls do not return error code -\/ they just return {\ttfamily N\-U\-L\-L} indicating an error. But to make things easier, \doxyref{quazip.\-h}{p.}{quazip_8h_source} header defines additional error code {\ttfamily U\-N\-Z\-\_\-\-E\-R\-R\-O\-R\-O\-P\-E\-N} and \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} will return it if the open call of the Z\-I\-P/\-U\-N\-Z\-I\-P A\-P\-I returns {\ttfamily N\-U\-L\-L}.
 \end{DoxyNote}
-Argument {\itshape ioApi\/} specifies IO function set for ZIP/UNZIP package to use. See unzip.h, zip.h and ioapi.h for details. Note that IO API for \doxyref{QuaZip}{p.}{classQuaZip} is different from the original package. The file path argument was changed to be of type {\ttfamily voidpf}, and \doxyref{QuaZip}{p.}{classQuaZip} passes a QIODevice pointer there. This QIODevice is either set explicitly via \doxyref{setIoDevice()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6} or the \doxyref{QuaZip(QIODevice$\ast$)}{p.}{classQuaZip_ae52ebadd5ce64cdb49d7e198904b0b8c} constructor, or it is created internally when opening the archive by its file name. The default API (qioapi.cpp) just delegates everything to the QIODevice API. Not only this allows to use a QIODevice instead of file name, but also has a nice side effect of raising the file size limit from 2G to 4G (in non-\/zip64 archives).
+Argument {\itshape io\-Api} specifies I\-O function set for Z\-I\-P/\-U\-N\-Z\-I\-P package to use. See unzip.\-h, zip.\-h and ioapi.\-h for details. Note that I\-O A\-P\-I for \doxyref{Qua\-Zip}{p.}{classQuaZip} is different from the original package. The file path argument was changed to be of type {\ttfamily voidpf}, and \doxyref{Qua\-Zip}{p.}{classQuaZip} passes a Q\-I\-O\-Device pointer there. This Q\-I\-O\-Device is either set explicitly via \doxyref{set\-Io\-Device()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6} or the \doxyref{Qua\-Zip(\-Q\-I\-O\-Device$\ast$)}{p.}{classQuaZip_ae52ebadd5ce64cdb49d7e198904b0b8c} constructor, or it is created internally when opening the archive by its file name. The default A\-P\-I (qioapi.\-cpp) just delegates everything to the Q\-I\-O\-Device A\-P\-I. Not only this allows to use a Q\-I\-O\-Device instead of file name, but also has a nice side effect of raising the file size limit from 2\-G to 4\-G (in non-\/zip64 archives).
 
 \begin{DoxyNote}{Note}
-If the zip64 support is needed, the ioApi argument {\itshape must\/} be NULL because due to the backwards compatibility issues it can be used to provide a 32-\/bit API only.
+If the zip64 support is needed, the io\-Api argument {\itshape must} be N\-U\-L\-L because due to the backwards compatibility issues it can be used to provide a 32-\/bit A\-P\-I only.
 
-If the \doxyref{no-\/auto-\/close}{p.}{classQuaZip_a54bfc924762774ccf9f99be075ba7b0e} feature is used, then the {\itshape ioApi\/} argument {\itshape should\/} be NULL because the old API doesn't support the 'fake close' operation, causing slight memory leaks and other possible troubles (like closing the output device in case when an error occurs during opening).
+If the \doxyref{no-\/auto-\/close}{p.}{classQuaZip_a54bfc924762774ccf9f99be075ba7b0e} feature is used, then the {\itshape io\-Api} argument {\itshape should} be N\-U\-L\-L because the old A\-P\-I doesn't support the 'fake close' operation, causing slight memory leaks and other possible troubles (like closing the output device in case when an error occurs during opening).
 \end{DoxyNote}
-In short: just forget about the {\itshape ioApi\/} argument and you'll be fine. 
+In short\-: just forget about the {\itshape io\-Api} argument and you'll be fine. 
 
-References isOpen(), mdAdd, mdAppend, mdCreate, mdUnzip, QuaZipPrivate::unzFile\_\-f, and QuaZipPrivate::zipFile\_\-f.
+References is\-Open(), md\-Add, md\-Append, md\-Create, md\-Unzip, Qua\-Zip\-Private\-::unz\-File\-\_\-f, and Qua\-Zip\-Private\-::zip\-File\-\_\-f.
 
 
 
-Referenced by JlCompress::compressDir(), JlCompress::compressFile(), JlCompress::compressFiles(), JlCompress::extractDir(), JlCompress::extractFile(), JlCompress::extractFiles(), JlCompress::getFileList(), and QuaZipFile::open().
+Referenced by Jl\-Compress\-::compress\-Dir(), Jl\-Compress\-::compress\-File(), Jl\-Compress\-::compress\-Files(), and Qua\-Zip\-File\-::open().
 
-\index{QuaZip@{QuaZip}!close@{close}}
-\index{close@{close}!QuaZip@{QuaZip}}
-\subsubsection[{close}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::close (
+\index{Qua\-Zip@{Qua\-Zip}!close@{close}}
+\index{close@{close}!QuaZip@{Qua\-Zip}}
+\subsubsection[{close}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::close (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a7a4323b73e12f3b4470109f200728f9f}
 
 
-Closes ZIP file. 
+Closes Z\-I\-P file. 
 
-Call \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to determine if the close was successful.
+Call \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to determine if the close was successful.
 
-If the file was opened by name, then the underlying QIODevice is closed and deleted.
+If the file was opened by name, then the underlying Q\-I\-O\-Device is closed and deleted.
 
-If the underlying QIODevice was set explicitly using \doxyref{setIoDevice()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6} or the appropriate constructor, then it is closed if the auto-\/close flag is set (which it is by default). Call \doxyref{setAutoClose()}{p.}{classQuaZip_a54bfc924762774ccf9f99be075ba7b0e} to clear the auto-\/close flag if this behavior is undesirable.
+If the underlying Q\-I\-O\-Device was set explicitly using \doxyref{set\-Io\-Device()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6} or the appropriate constructor, then it is closed if the auto-\/close flag is set (which it is by default). Call \doxyref{set\-Auto\-Close()}{p.}{classQuaZip_a54bfc924762774ccf9f99be075ba7b0e} to clear the auto-\/close flag if this behavior is undesirable.
 
-Since Qt 5.1, the QSaveFile was introduced. It breaks the QIODevice API by making \doxyref{close()}{p.}{classQuaZip_a7a4323b73e12f3b4470109f200728f9f} private and crashing the application if it is called from the base class where it is public. It is an excellent example of poor design that illustrates why you should never ever break an is-\/a relationship between the base class and a subclass. QuaZIP works around this bug by checking if the QIODevice is an instance of QSaveFile, using qobject\_\-cast$<$$>$, and if it is, calls QSaveFile::commit() instead of \doxyref{close()}{p.}{classQuaZip_a7a4323b73e12f3b4470109f200728f9f}. It is a really ugly hack, but at least it makes your programs work instead of crashing. Note that if the auto-\/close flag is cleared, then this is a non-\/issue, and commit() isn't called. 
+Since Qt 5.\-1, the Q\-Save\-File was introduced. It breaks the Q\-I\-O\-Device A\-P\-I by making \doxyref{close()}{p.}{classQuaZip_a7a4323b73e12f3b4470109f200728f9f} private and crashing the application if it is called from the base class where it is public. It is an excellent example of poor design that illustrates why you should never ever break an is-\/a relationship between the base class and a subclass. Qua\-Z\-I\-P works around this bug by checking if the Q\-I\-O\-Device is an instance of Q\-Save\-File, using qobject\-\_\-cast$<$$>$, and if it is, calls Q\-Save\-File\-::commit() instead of \doxyref{close()}{p.}{classQuaZip_a7a4323b73e12f3b4470109f200728f9f}. It is a really ugly hack, but at least it makes your programs work instead of crashing. Note that if the auto-\/close flag is cleared, then this is a non-\/issue, and commit() isn't called. 
 
-References mdAdd, mdAppend, mdCreate, mdNotOpen, mdUnzip, QuaZipPrivate::unzFile\_\-f, and QuaZipPrivate::zipFile\_\-f.
+References md\-Add, md\-Append, md\-Create, md\-Not\-Open, md\-Unzip, Qua\-Zip\-Private\-::unz\-File\-\_\-f, and Qua\-Zip\-Private\-::zip\-File\-\_\-f.
 
 
 
-Referenced by QuaZipFile::close(), JlCompress::compressDir(), JlCompress::compressFile(), JlCompress::compressFiles(), JlCompress::extractDir(), JlCompress::extractFile(), JlCompress::extractFiles(), JlCompress::getFileList(), QuaZipFile::open(), and $\sim$QuaZip().
+Referenced by Qua\-Zip\-File\-::close(), Jl\-Compress\-::compress\-Dir(), Jl\-Compress\-::compress\-File(), Jl\-Compress\-::compress\-Files(), Qua\-Zip\-File\-::open(), and $\sim$\-Qua\-Zip().
 
-\index{QuaZip@{QuaZip}!setFileNameCodec@{setFileNameCodec}}
-\index{setFileNameCodec@{setFileNameCodec}!QuaZip@{QuaZip}}
-\subsubsection[{setFileNameCodec}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setFileNameCodec (
+\index{Qua\-Zip@{Qua\-Zip}!set\-File\-Name\-Codec@{set\-File\-Name\-Codec}}
+\index{set\-File\-Name\-Codec@{set\-File\-Name\-Codec}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-File\-Name\-Codec}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-File\-Name\-Codec (
 \begin{DoxyParamCaption}
-\item[{QTextCodec $\ast$}]{fileNameCodec}
+\item[{Q\-Text\-Codec $\ast$}]{file\-Name\-Codec}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a339010b5566704ba3c9cafbfe848d8fb}
 
 
 Sets the codec used to encode/decode file names inside archive. 
 
-This is necessary to access files in the ZIP archive created under Windows with non-\/latin characters in file names. For example, file names with cyrillic letters will be in {\ttfamily IBM866} encoding. \index{QuaZip@{QuaZip}!setFileNameCodec@{setFileNameCodec}}
-\index{setFileNameCodec@{setFileNameCodec}!QuaZip@{QuaZip}}
-\subsubsection[{setFileNameCodec}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setFileNameCodec (
+This is necessary to access files in the Z\-I\-P archive created under Windows with non-\/latin characters in file names. For example, file names with cyrillic letters will be in {\ttfamily I\-B\-M866} encoding. \index{Qua\-Zip@{Qua\-Zip}!set\-File\-Name\-Codec@{set\-File\-Name\-Codec}}
+\index{set\-File\-Name\-Codec@{set\-File\-Name\-Codec}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-File\-Name\-Codec}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-File\-Name\-Codec (
 \begin{DoxyParamCaption}
-\item[{const char $\ast$}]{fileNameCodecName}
+\item[{const char $\ast$}]{file\-Name\-Codec\-Name}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a8f283519a195aa1d9076bbbb01ea0497}
 
 
 Sets the codec used to encode/decode file names inside archive. 
 
-This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Equivalent to calling setFileNameCodec(QTextCodec::codecForName(codecName)); \index{QuaZip@{QuaZip}!setCommentCodec@{setCommentCodec}}
-\index{setCommentCodec@{setCommentCodec}!QuaZip@{QuaZip}}
-\subsubsection[{setCommentCodec}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setCommentCodec (
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Equivalent to calling set\-File\-Name\-Codec(\-Q\-Text\-Codec\-::codec\-For\-Name(codec\-Name)); \index{Qua\-Zip@{Qua\-Zip}!set\-Comment\-Codec@{set\-Comment\-Codec}}
+\index{set\-Comment\-Codec@{set\-Comment\-Codec}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Comment\-Codec}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Comment\-Codec (
 \begin{DoxyParamCaption}
-\item[{QTextCodec $\ast$}]{commentCodec}
+\item[{Q\-Text\-Codec $\ast$}]{comment\-Codec}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a1c81fca7215a4374f6f03872ade4885b}
 
 
 Sets the codec used to encode/decode comments inside archive. 
 
-This codec defaults to locale codec, which is probably ok. \index{QuaZip@{QuaZip}!setCommentCodec@{setCommentCodec}}
-\index{setCommentCodec@{setCommentCodec}!QuaZip@{QuaZip}}
-\subsubsection[{setCommentCodec}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setCommentCodec (
+This codec defaults to locale codec, which is probably ok. \index{Qua\-Zip@{Qua\-Zip}!set\-Comment\-Codec@{set\-Comment\-Codec}}
+\index{set\-Comment\-Codec@{set\-Comment\-Codec}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Comment\-Codec}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Comment\-Codec (
 \begin{DoxyParamCaption}
-\item[{const char $\ast$}]{commentCodecName}
+\item[{const char $\ast$}]{comment\-Codec\-Name}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a413f3c56b54a9a47258d53802cb606e7}
 
 
 Sets the codec used to encode/decode comments inside archive. 
 
-This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Equivalent to calling setCommentCodec(QTextCodec::codecForName(codecName)); \index{QuaZip@{QuaZip}!getZipName@{getZipName}}
-\index{getZipName@{getZipName}!QuaZip@{QuaZip}}
-\subsubsection[{getZipName}]{\setlength{\rightskip}{0pt plus 5cm}QString QuaZip::getZipName (
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Equivalent to calling set\-Comment\-Codec(\-Q\-Text\-Codec\-::codec\-For\-Name(codec\-Name)); \index{Qua\-Zip@{Qua\-Zip}!get\-Zip\-Name@{get\-Zip\-Name}}
+\index{get\-Zip\-Name@{get\-Zip\-Name}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-Zip\-Name}]{\setlength{\rightskip}{0pt plus 5cm}Q\-String Qua\-Zip\-::get\-Zip\-Name (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 ) const}\label{classQuaZip_a4f7deef08ff40aeb1a7a04bcd7f228c2}
 
 
-Returns the name of the ZIP file. 
+Returns the name of the Z\-I\-P file. 
 
-Returns null string if no ZIP file name has been set, for example when the \doxyref{QuaZip}{p.}{classQuaZip} instance is set up to use a QIODevice instead. \begin{DoxySeeAlso}{See also}
-\doxyref{setZipName()}{p.}{classQuaZip_aa80b661de1262af905d1677dbcb008cc}, \doxyref{setIoDevice()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6}, \doxyref{getIoDevice()}{p.}{classQuaZip_afd3ba12fe68748acbf8b7cc14a5a1c29} 
+Returns null string if no Z\-I\-P file name has been set, for example when the \doxyref{Qua\-Zip}{p.}{classQuaZip} instance is set up to use a Q\-I\-O\-Device instead. \begin{DoxySeeAlso}{See Also}
+\doxyref{set\-Zip\-Name()}{p.}{classQuaZip_aa80b661de1262af905d1677dbcb008cc}, \doxyref{set\-Io\-Device()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6}, \doxyref{get\-Io\-Device()}{p.}{classQuaZip_afd3ba12fe68748acbf8b7cc14a5a1c29} 
 \end{DoxySeeAlso}
 
 
-Referenced by QuaZipFile::getZipName().
+Referenced by Qua\-Zip\-File\-::get\-Zip\-Name().
 
-\index{QuaZip@{QuaZip}!setZipName@{setZipName}}
-\index{setZipName@{setZipName}!QuaZip@{QuaZip}}
-\subsubsection[{setZipName}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setZipName (
+\index{Qua\-Zip@{Qua\-Zip}!set\-Zip\-Name@{set\-Zip\-Name}}
+\index{set\-Zip\-Name@{set\-Zip\-Name}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Zip\-Name}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Zip\-Name (
 \begin{DoxyParamCaption}
-\item[{const QString \&}]{zipName}
+\item[{const Q\-String \&}]{zip\-Name}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_aa80b661de1262af905d1677dbcb008cc}
 
 
-Sets the name of the ZIP file. 
+Sets the name of the Z\-I\-P file. 
 
-Does nothing if the ZIP file is open.
+Does nothing if the Z\-I\-P file is open.
 
-Does not reset error code returned by \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4}. \begin{DoxySeeAlso}{See also}
-\doxyref{setIoDevice()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6}, \doxyref{getIoDevice()}{p.}{classQuaZip_afd3ba12fe68748acbf8b7cc14a5a1c29}, \doxyref{getZipName()}{p.}{classQuaZip_a4f7deef08ff40aeb1a7a04bcd7f228c2} 
+Does not reset error code returned by \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4}. \begin{DoxySeeAlso}{See Also}
+\doxyref{set\-Io\-Device()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6}, \doxyref{get\-Io\-Device()}{p.}{classQuaZip_afd3ba12fe68748acbf8b7cc14a5a1c29}, \doxyref{get\-Zip\-Name()}{p.}{classQuaZip_a4f7deef08ff40aeb1a7a04bcd7f228c2} 
 \end{DoxySeeAlso}
 
 
-References isOpen().
+References is\-Open().
 
-\index{QuaZip@{QuaZip}!getIoDevice@{getIoDevice}}
-\index{getIoDevice@{getIoDevice}!QuaZip@{QuaZip}}
-\subsubsection[{getIoDevice}]{\setlength{\rightskip}{0pt plus 5cm}QIODevice $\ast$ QuaZip::getIoDevice (
+\index{Qua\-Zip@{Qua\-Zip}!get\-Io\-Device@{get\-Io\-Device}}
+\index{get\-Io\-Device@{get\-Io\-Device}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-Io\-Device}]{\setlength{\rightskip}{0pt plus 5cm}Q\-I\-O\-Device $\ast$ Qua\-Zip\-::get\-Io\-Device (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 ) const}\label{classQuaZip_afd3ba12fe68748acbf8b7cc14a5a1c29}
 
 
-Returns the device representing this ZIP file. 
+Returns the device representing this Z\-I\-P file. 
 
-Returns null string if no device has been set explicitly, for example when opening a ZIP file by name. \begin{DoxySeeAlso}{See also}
-\doxyref{setIoDevice()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6}, \doxyref{getZipName()}{p.}{classQuaZip_a4f7deef08ff40aeb1a7a04bcd7f228c2}, \doxyref{setZipName()}{p.}{classQuaZip_aa80b661de1262af905d1677dbcb008cc} 
+Returns null string if no device has been set explicitly, for example when opening a Z\-I\-P file by name. \begin{DoxySeeAlso}{See Also}
+\doxyref{set\-Io\-Device()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6}, \doxyref{get\-Zip\-Name()}{p.}{classQuaZip_a4f7deef08ff40aeb1a7a04bcd7f228c2}, \doxyref{set\-Zip\-Name()}{p.}{classQuaZip_aa80b661de1262af905d1677dbcb008cc} 
 \end{DoxySeeAlso}
-\index{QuaZip@{QuaZip}!setIoDevice@{setIoDevice}}
-\index{setIoDevice@{setIoDevice}!QuaZip@{QuaZip}}
-\subsubsection[{setIoDevice}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setIoDevice (
+\index{Qua\-Zip@{Qua\-Zip}!set\-Io\-Device@{set\-Io\-Device}}
+\index{set\-Io\-Device@{set\-Io\-Device}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Io\-Device}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Io\-Device (
 \begin{DoxyParamCaption}
-\item[{QIODevice $\ast$}]{ioDevice}
+\item[{Q\-I\-O\-Device $\ast$}]{io\-Device}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a64642948b6531ee54f5522f29e388cc6}
 
 
-Sets the device representing the ZIP file. 
+Sets the device representing the Z\-I\-P file. 
 
-Does nothing if the ZIP file is open.
+Does nothing if the Z\-I\-P file is open.
 
-Does not reset error code returned by \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4}. \begin{DoxySeeAlso}{See also}
-\doxyref{getIoDevice()}{p.}{classQuaZip_afd3ba12fe68748acbf8b7cc14a5a1c29}, \doxyref{getZipName()}{p.}{classQuaZip_a4f7deef08ff40aeb1a7a04bcd7f228c2}, \doxyref{setZipName()}{p.}{classQuaZip_aa80b661de1262af905d1677dbcb008cc} 
+Does not reset error code returned by \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4}. \begin{DoxySeeAlso}{See Also}
+\doxyref{get\-Io\-Device()}{p.}{classQuaZip_afd3ba12fe68748acbf8b7cc14a5a1c29}, \doxyref{get\-Zip\-Name()}{p.}{classQuaZip_a4f7deef08ff40aeb1a7a04bcd7f228c2}, \doxyref{set\-Zip\-Name()}{p.}{classQuaZip_aa80b661de1262af905d1677dbcb008cc} 
 \end{DoxySeeAlso}
 
 
-References isOpen().
+References is\-Open().
 
-\index{QuaZip@{QuaZip}!getZipError@{getZipError}}
-\index{getZipError@{getZipError}!QuaZip@{QuaZip}}
-\subsubsection[{getZipError}]{\setlength{\rightskip}{0pt plus 5cm}int QuaZip::getZipError (
+\index{Qua\-Zip@{Qua\-Zip}!get\-Zip\-Error@{get\-Zip\-Error}}
+\index{get\-Zip\-Error@{get\-Zip\-Error}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-Zip\-Error}]{\setlength{\rightskip}{0pt plus 5cm}int Qua\-Zip\-::get\-Zip\-Error (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -478,46 +465,46 @@ References isOpen().
 
 Returns the error code of the last operation. 
 
-Returns {\ttfamily UNZ\_\-OK} if the last operation was successful.
+Returns {\ttfamily U\-N\-Z\-\_\-\-O\-K} if the last operation was successful.
 
-Error code resets to {\ttfamily UNZ\_\-OK} every time you call any function that accesses something inside ZIP archive, even if it is {\ttfamily const} (like \doxyref{getEntriesCount()}{p.}{classQuaZip_a2ea4bd1fca948637c35c2d2752bb5a80}). \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} and \doxyref{close()}{p.}{classQuaZip_a7a4323b73e12f3b4470109f200728f9f} calls reset error code too. See documentation for the specific functions for details on error detection. 
+Error code resets to {\ttfamily U\-N\-Z\-\_\-\-O\-K} every time you call any function that accesses something inside Z\-I\-P archive, even if it is {\ttfamily const} (like \doxyref{get\-Entries\-Count()}{p.}{classQuaZip_a2ea4bd1fca948637c35c2d2752bb5a80}). \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} and \doxyref{close()}{p.}{classQuaZip_a7a4323b73e12f3b4470109f200728f9f} calls reset error code too. See documentation for the specific functions for details on error detection. 
 
-Referenced by QuaZipFile::close(), JlCompress::compressDir(), JlCompress::compressFile(), JlCompress::compressFiles(), JlCompress::extractDir(), JlCompress::extractFile(), JlCompress::extractFiles(), QuaZipFile::getActualFileName(), QuaZipFile::getFileInfo(), JlCompress::getFileList(), and QuaZipFile::open().
+Referenced by Qua\-Zip\-File\-::close(), Jl\-Compress\-::compress\-Dir(), Jl\-Compress\-::compress\-File(), Jl\-Compress\-::compress\-Files(), Qua\-Zip\-File\-::get\-Actual\-File\-Name(), Qua\-Zip\-File\-::get\-File\-Info(), and Qua\-Zip\-File\-::open().
 
-\index{QuaZip@{QuaZip}!getEntriesCount@{getEntriesCount}}
-\index{getEntriesCount@{getEntriesCount}!QuaZip@{QuaZip}}
-\subsubsection[{getEntriesCount}]{\setlength{\rightskip}{0pt plus 5cm}int QuaZip::getEntriesCount (
+\index{Qua\-Zip@{Qua\-Zip}!get\-Entries\-Count@{get\-Entries\-Count}}
+\index{get\-Entries\-Count@{get\-Entries\-Count}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-Entries\-Count}]{\setlength{\rightskip}{0pt plus 5cm}int Qua\-Zip\-::get\-Entries\-Count (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 ) const}\label{classQuaZip_a2ea4bd1fca948637c35c2d2752bb5a80}
 
 
-Returns number of the entries in the ZIP central directory. 
+Returns number of the entries in the Z\-I\-P central directory. 
 
-Returns negative error code in the case of error. The same error code will be returned by subsequent \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} call. 
+Returns negative error code in the case of error. The same error code will be returned by subsequent \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} call. 
 
-References mdUnzip, and QuaZipPrivate::unzFile\_\-f.
+References md\-Unzip, and Qua\-Zip\-Private\-::unz\-File\-\_\-f.
 
-\index{QuaZip@{QuaZip}!setComment@{setComment}}
-\index{setComment@{setComment}!QuaZip@{QuaZip}}
-\subsubsection[{setComment}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setComment (
+\index{Qua\-Zip@{Qua\-Zip}!set\-Comment@{set\-Comment}}
+\index{set\-Comment@{set\-Comment}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Comment}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Comment (
 \begin{DoxyParamCaption}
-\item[{const QString \&}]{comment}
+\item[{const Q\-String \&}]{comment}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a1b5d936a203859340574d5908ffa2222}
 
 
-Sets the global comment in the ZIP file. 
+Sets the global comment in the Z\-I\-P file. 
 
-The comment will be written to the archive on close operation. \doxyref{QuaZip}{p.}{classQuaZip} makes a distinction between a null QByteArray() comment and an empty "" comment in the \doxyref{QuaZip::mdAdd}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a22c745f349f06add449af523254fdaec} mode. A null comment is the default and it means "don't change the comment". An empty comment removes the original comment.
+The comment will be written to the archive on close operation. \doxyref{Qua\-Zip}{p.}{classQuaZip} makes a distinction between a null Q\-Byte\-Array() comment and an empty "" comment in the \doxyref{Qua\-Zip\-::md\-Add}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a22c745f349f06add449af523254fdaec} mode. A null comment is the default and it means "don't change the comment". An empty comment removes the original comment.
 
-\begin{DoxySeeAlso}{See also}
+\begin{DoxySeeAlso}{See Also}
 \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} 
 \end{DoxySeeAlso}
-\index{QuaZip@{QuaZip}!goToFirstFile@{goToFirstFile}}
-\index{goToFirstFile@{goToFirstFile}!QuaZip@{QuaZip}}
-\subsubsection[{goToFirstFile}]{\setlength{\rightskip}{0pt plus 5cm}bool QuaZip::goToFirstFile (
+\index{Qua\-Zip@{Qua\-Zip}!go\-To\-First\-File@{go\-To\-First\-File}}
+\index{go\-To\-First\-File@{go\-To\-First\-File}!QuaZip@{Qua\-Zip}}
+\subsubsection[{go\-To\-First\-File}]{\setlength{\rightskip}{0pt plus 5cm}bool Qua\-Zip\-::go\-To\-First\-File (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -526,17 +513,13 @@ The comment will be written to the archive on close operation. \doxyref{QuaZip}{
 
 Sets the current file to the first file in the archive. 
 
-Returns {\ttfamily true} on success, {\ttfamily false} otherwise. Call \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to get the error code. 
+Returns {\ttfamily true} on success, {\ttfamily false} otherwise. Call \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to get the error code. 
 
-References mdUnzip, and QuaZipPrivate::unzFile\_\-f.
+References md\-Unzip, and Qua\-Zip\-Private\-::unz\-File\-\_\-f.
 
-
-
-Referenced by JlCompress::extractDir(), and JlCompress::getFileList().
-
-\index{QuaZip@{QuaZip}!goToNextFile@{goToNextFile}}
-\index{goToNextFile@{goToNextFile}!QuaZip@{QuaZip}}
-\subsubsection[{goToNextFile}]{\setlength{\rightskip}{0pt plus 5cm}bool QuaZip::goToNextFile (
+\index{Qua\-Zip@{Qua\-Zip}!go\-To\-Next\-File@{go\-To\-Next\-File}}
+\index{go\-To\-Next\-File@{go\-To\-Next\-File}!QuaZip@{Qua\-Zip}}
+\subsubsection[{go\-To\-Next\-File}]{\setlength{\rightskip}{0pt plus 5cm}bool Qua\-Zip\-::go\-To\-Next\-File (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -545,130 +528,132 @@ Referenced by JlCompress::extractDir(), and JlCompress::getFileList().
 
 Sets the current file to the next file in the archive. 
 
-Returns {\ttfamily true} on success, {\ttfamily false} otherwise. Call \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to determine if there was an error.
+Returns {\ttfamily true} on success, {\ttfamily false} otherwise. Call \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to determine if there was an error.
 
-Should be used only in \doxyref{QuaZip::mdUnzip}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897} mode.
+Should be used only in \doxyref{Qua\-Zip\-::md\-Unzip}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897} mode.
 
 \begin{DoxyNote}{Note}
-If the end of file was reached, \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} will return {\ttfamily UNZ\_\-OK} instead of {\ttfamily UNZ\_\-END\_\-OF\_\-LIST\_\-OF\_\-FILE}. This is to make things like this easier: 
+If the end of file was reached, \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} will return {\ttfamily U\-N\-Z\-\_\-\-O\-K} instead of {\ttfamily U\-N\-Z\-\_\-\-E\-N\-D\-\_\-\-O\-F\-\_\-\-L\-I\-S\-T\-\_\-\-O\-F\-\_\-\-F\-I\-L\-E}. This is to make things like this easier\-: 
 \begin{DoxyCode}
- for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile()) {
-   // do something
- }
- if(zip.getZipError()==UNZ_OK) {
-   // ok, there was no error
- }
+\textcolor{keywordflow}{for}(\textcolor{keywordtype}{bool} more=zip.goToFirstFile(); more; more=zip.goToNextFile()) \{
+  \textcolor{comment}{// do something}
+\}
+\textcolor{keywordflow}{if}(zip.getZipError()==UNZ\_OK) \{
+  \textcolor{comment}{// ok, there was no error}
+\}
 \end{DoxyCode}
  
 \end{DoxyNote}
 
 
-References mdUnzip, and QuaZipPrivate::unzFile\_\-f.
+References md\-Unzip, and Qua\-Zip\-Private\-::unz\-File\-\_\-f.
 
 
 
-Referenced by JlCompress::extractDir(), JlCompress::getFileList(), and setCurrentFile().
+Referenced by set\-Current\-File().
 
-\index{QuaZip@{QuaZip}!setCurrentFile@{setCurrentFile}}
-\index{setCurrentFile@{setCurrentFile}!QuaZip@{QuaZip}}
-\subsubsection[{setCurrentFile}]{\setlength{\rightskip}{0pt plus 5cm}bool QuaZip::setCurrentFile (
+\index{Qua\-Zip@{Qua\-Zip}!set\-Current\-File@{set\-Current\-File}}
+\index{set\-Current\-File@{set\-Current\-File}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Current\-File}]{\setlength{\rightskip}{0pt plus 5cm}bool Qua\-Zip\-::set\-Current\-File (
 \begin{DoxyParamCaption}
-\item[{const QString \&}]{fileName, }
-\item[{{\bf CaseSensitivity}}]{cs = {\ttfamily csDefault}}
+\item[{const Q\-String \&}]{file\-Name, }
+\item[{{\bf Case\-Sensitivity}}]{cs = {\ttfamily {\bf cs\-Default}}}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a6c657bfcfccb59d728e0da24c677d899}
 
 
 Sets current file by its name. 
 
-Returns {\ttfamily true} if successful, {\ttfamily false} otherwise. Argument {\itshape cs\/} specifies case sensitivity of the file name. Call \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} in the case of a failure to get error code.
+Returns {\ttfamily true} if successful, {\ttfamily false} otherwise. Argument {\itshape cs} specifies case sensitivity of the file name. Call \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} in the case of a failure to get error code.
 
-This is not a wrapper to unzLocateFile() function. That is because I had to implement locale-\/specific case-\/insensitive comparison.
+This is not a wrapper to unz\-Locate\-File() function. That is because I had to implement locale-\/specific case-\/insensitive comparison.
 
-Here are the differences from the original implementation:
+Here are the differences from the original implementation\-:
 
 
 \begin{DoxyItemize}
-\item If the file was not found, error code is {\ttfamily UNZ\_\-OK}, not {\ttfamily UNZ\_\-END\_\-OF\_\-LIST\_\-OF\_\-FILE} (see also \doxyref{goToNextFile()}{p.}{classQuaZip_aee6779b6cd338420c2e8c5655fa8ba97}).
+\item If the file was not found, error code is {\ttfamily U\-N\-Z\-\_\-\-O\-K}, not {\ttfamily U\-N\-Z\-\_\-\-E\-N\-D\-\_\-\-O\-F\-\_\-\-L\-I\-S\-T\-\_\-\-O\-F\-\_\-\-F\-I\-L\-E} (see also \doxyref{go\-To\-Next\-File()}{p.}{classQuaZip_aee6779b6cd338420c2e8c5655fa8ba97}).
 \item If this function fails, it unsets the current file rather than resetting it back to what it was before the call.
 \end{DoxyItemize}
 
-If {\itshape fileName\/} is null string then this function unsets the current file and return {\ttfamily true}. Note that you should close the file first if it is open! See \doxyref{QuaZipFile::QuaZipFile(QuaZip$\ast$,QObject$\ast$)}{p.}{classQuaZipFile_a54e944a6b3d27030f64c8f30d2cc33bb} for the details.
+If {\itshape file\-Name} is null string then this function unsets the current file and return {\ttfamily true}. Note that you should close the file first if it is open! See \doxyref{Qua\-Zip\-File\-::\-Qua\-Zip\-File(\-Qua\-Zip$\ast$,\-Q\-Object$\ast$)}{p.}{classQuaZipFile_a54e944a6b3d27030f64c8f30d2cc33bb} for the details.
 
-Should be used only in \doxyref{QuaZip::mdUnzip}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897} mode.
+Should be used only in \doxyref{Qua\-Zip\-::md\-Unzip}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897} mode.
 
-\begin{DoxySeeAlso}{See also}
-\doxyref{setFileNameCodec()}{p.}{classQuaZip_a339010b5566704ba3c9cafbfe848d8fb}, \doxyref{CaseSensitivity}{p.}{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbe} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{set\-File\-Name\-Codec()}{p.}{classQuaZip_a339010b5566704ba3c9cafbfe848d8fb}, \doxyref{Case\-Sensitivity}{p.}{classQuaZip_a6053a1d249ed210a85c9d5eb7cf9cdbe} 
 \end{DoxySeeAlso}
 
 
-References convertCaseSensitivity(), getCurrentFileName(), goToNextFile(), MAX\_\-FILE\_\-NAME\_\-LENGTH, mdUnzip, and QuaZipPrivate::unzFile\_\-f.
+References convert\-Case\-Sensitivity(), get\-Current\-File\-Name(), go\-To\-Next\-File(), M\-A\-X\-\_\-\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E\-\_\-\-L\-E\-N\-G\-T\-H, md\-Unzip, and Qua\-Zip\-Private\-::unz\-File\-\_\-f.
 
 
 
-Referenced by QuaZipFile::open().
+Referenced by Qua\-Zip\-File\-::open().
 
-\index{QuaZip@{QuaZip}!getCurrentFileInfo@{getCurrentFileInfo}}
-\index{getCurrentFileInfo@{getCurrentFileInfo}!QuaZip@{QuaZip}}
-\subsubsection[{getCurrentFileInfo}]{\setlength{\rightskip}{0pt plus 5cm}bool QuaZip::getCurrentFileInfo (
+\index{Qua\-Zip@{Qua\-Zip}!get\-Current\-File\-Info@{get\-Current\-File\-Info}}
+\index{get\-Current\-File\-Info@{get\-Current\-File\-Info}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-Current\-File\-Info}]{\setlength{\rightskip}{0pt plus 5cm}bool Qua\-Zip\-::get\-Current\-File\-Info (
 \begin{DoxyParamCaption}
-\item[{{\bf QuaZipFileInfo} $\ast$}]{info}
+\item[{{\bf Qua\-Zip\-File\-Info} $\ast$}]{info}
 \end{DoxyParamCaption}
 ) const}\label{classQuaZip_a9c91a53ed4c2038e153c64bdc097ebe8}
 
 
 Retrieves information about the current file. 
 
-Fills the structure pointed by {\itshape info\/}. Returns {\ttfamily true} on success, {\ttfamily false} otherwise. In the latter case structure pointed by {\itshape info\/} remains untouched. If there was an error, \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} returns error code.
+Fills the structure pointed by {\itshape info}. Returns {\ttfamily true} on success, {\ttfamily false} otherwise. In the latter case structure pointed by {\itshape info} remains untouched. If there was an error, \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} returns error code.
 
-Should be used only in \doxyref{QuaZip::mdUnzip}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897} mode.
+Should be used only in \doxyref{Qua\-Zip\-::md\-Unzip}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897} mode.
 
 Does nothing and returns {\ttfamily false} in any of the following cases.
 \begin{DoxyItemize}
-\item ZIP is not open;
-\item ZIP does not have current file.
+\item Z\-I\-P is not open;
+\item Z\-I\-P does not have current file.
 \end{DoxyItemize}
 
-In both cases \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} returns {\ttfamily UNZ\_\-OK} since there is no ZIP/UNZIP API call.
+In both cases \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} returns {\ttfamily U\-N\-Z\-\_\-\-O\-K} since there is no Z\-I\-P/\-U\-N\-Z\-I\-P A\-P\-I call.
 
-This overload doesn't support zip64, but will work OK on zip64 archives except that if one of the sizes (compressed or uncompressed) is greater than 0xFFFFFFFFu, it will be set to exactly 0xFFFFFFFFu.
+This overload doesn't support zip64, but will work O\-K on zip64 archives except that if one of the sizes (compressed or uncompressed) is greater than 0x\-F\-F\-F\-F\-F\-F\-F\-Fu, it will be set to exactly 0x\-F\-F\-F\-F\-F\-F\-F\-Fu.
 
-\begin{DoxySeeAlso}{See also}
-\doxyref{getCurrentFileInfo(QuaZipFileInfo64$\ast$ info)const}{p.}{classQuaZip_a7ba6daf39263c308c683e7f72f74e0ae} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{get\-Current\-File\-Info(\-Qua\-Zip\-File\-Info64$\ast$ info)const}{p.}{classQuaZip_a7ba6daf39263c308c683e7f72f74e0ae} 
 
-\doxyref{QuaZipFileInfo64::toQuaZipFileInfo(QuaZipFileInfo\&)const}{p.}{structQuaZipFileInfo64_ada29945c7ee4c9df6fbe95864793aade} 
+\doxyref{Qua\-Zip\-File\-Info64\-::to\-Qua\-Zip\-File\-Info(\-Qua\-Zip\-File\-Info\&)const}{p.}{structQuaZipFileInfo64_ada29945c7ee4c9df6fbe95864793aade} 
 \end{DoxySeeAlso}
 
 
-References QuaZipFileInfo64::toQuaZipFileInfo().
+References Qua\-Zip\-File\-Info64\-::to\-Qua\-Zip\-File\-Info().
 
 
 
-Referenced by QuaZipFile::getFileInfo(), and JlCompress::getFileList().
+Referenced by Qua\-Zip\-File\-::get\-File\-Info().
 
-\index{QuaZip@{QuaZip}!getCurrentFileInfo@{getCurrentFileInfo}}
-\index{getCurrentFileInfo@{getCurrentFileInfo}!QuaZip@{QuaZip}}
-\subsubsection[{getCurrentFileInfo}]{\setlength{\rightskip}{0pt plus 5cm}bool QuaZip::getCurrentFileInfo (
+\index{Qua\-Zip@{Qua\-Zip}!get\-Current\-File\-Info@{get\-Current\-File\-Info}}
+\index{get\-Current\-File\-Info@{get\-Current\-File\-Info}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-Current\-File\-Info}]{\setlength{\rightskip}{0pt plus 5cm}bool Qua\-Zip\-::get\-Current\-File\-Info (
 \begin{DoxyParamCaption}
-\item[{{\bf QuaZipFileInfo64} $\ast$}]{info}
+\item[{{\bf Qua\-Zip\-File\-Info64} $\ast$}]{info}
 \end{DoxyParamCaption}
 ) const}\label{classQuaZip_a7ba6daf39263c308c683e7f72f74e0ae}
 
 
 Retrieves information about the current file. 
 
-This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. This function supports zip64. If the archive doesn't use zip64, it is completely equivalent to getCurrentFileInfo(QuaZipFileInfo$\ast$ info) except for the argument type.
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
 
-\begin{DoxySeeAlso}{See also}
+This function supports zip64. If the archive doesn't use zip64, it is completely equivalent to get\-Current\-File\-Info(\-Qua\-Zip\-File\-Info$\ast$ info) except for the argument type.
+
+\begin{DoxySeeAlso}{See Also}
 
 \end{DoxySeeAlso}
 
 
-References QuaZipFileInfo64::comment, QuaZipFileInfo64::compressedSize, QuaZipFileInfo64::crc, QuaZipFileInfo64::dateTime, QuaZipFileInfo64::diskNumberStart, QuaZipFileInfo64::externalAttr, QuaZipFileInfo64::extra, QuaZipFileInfo64::flags, hasCurrentFile(), QuaZipFileInfo64::internalAttr, isOpen(), mdUnzip, QuaZipFileInfo64::method, QuaZipFileInfo64::name, QuaZipFileInfo64::uncompressedSize, QuaZipPrivate::unzFile\_\-f, QuaZipFileInfo64::versionCreated, and QuaZipFileInfo64::versionNeeded.
+References Qua\-Zip\-File\-Info64\-::comment, Qua\-Zip\-File\-Info64\-::compressed\-Size, Qua\-Zip\-File\-Info64\-::crc, Qua\-Zip\-File\-Info64\-::date\-Time, Qua\-Zip\-File\-Info64\-::disk\-Number\-Start, Qua\-Zip\-File\-Info64\-::external\-Attr, Qua\-Zip\-File\-Info64\-::extra, Qua\-Zip\-File\-Info64\-::flags, has\-Current\-File(), Qua\-Zip\-File\-Info64\-::internal\-Attr, is\-Open(), md\-Unzip, Qua\-Zip\-File\-Info64\-::method, Qua\-Zip\-File\-Info64\-::name, Qua\-Zip\-File\-Info64\-::uncompressed\-Size, Qua\-Zip\-Private\-::unz\-File\-\_\-f, Qua\-Zip\-File\-Info64\-::version\-Created, and Qua\-Zip\-File\-Info64\-::version\-Needed.
 
-\index{QuaZip@{QuaZip}!getCurrentFileName@{getCurrentFileName}}
-\index{getCurrentFileName@{getCurrentFileName}!QuaZip@{QuaZip}}
-\subsubsection[{getCurrentFileName}]{\setlength{\rightskip}{0pt plus 5cm}QString QuaZip::getCurrentFileName (
+\index{Qua\-Zip@{Qua\-Zip}!get\-Current\-File\-Name@{get\-Current\-File\-Name}}
+\index{get\-Current\-File\-Name@{get\-Current\-File\-Name}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-Current\-File\-Name}]{\setlength{\rightskip}{0pt plus 5cm}Q\-String Qua\-Zip\-::get\-Current\-File\-Name (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -677,62 +662,62 @@ References QuaZipFileInfo64::comment, QuaZipFileInfo64::compressedSize, QuaZipFi
 
 Returns the current file name. 
 
-Equivalent to calling \doxyref{getCurrentFileInfo()}{p.}{classQuaZip_a9c91a53ed4c2038e153c64bdc097ebe8} and then getting {\ttfamily name} field of the \doxyref{QuaZipFileInfo}{p.}{structQuaZipFileInfo} structure, but faster and more convenient.
+Equivalent to calling \doxyref{get\-Current\-File\-Info()}{p.}{classQuaZip_a9c91a53ed4c2038e153c64bdc097ebe8} and then getting {\ttfamily name} field of the \doxyref{Qua\-Zip\-File\-Info}{p.}{structQuaZipFileInfo} structure, but faster and more convenient.
 
-Should be used only in \doxyref{QuaZip::mdUnzip}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897} mode. 
+Should be used only in \doxyref{Qua\-Zip\-::md\-Unzip}{p.}{classQuaZip_a47e28d4116ee716fdd6b431b821d0be4a803a371910c2dc830d111e9ce5b58897} mode. 
 
-References hasCurrentFile(), isOpen(), MAX\_\-FILE\_\-NAME\_\-LENGTH, mdUnzip, and QuaZipPrivate::unzFile\_\-f.
+References has\-Current\-File(), is\-Open(), M\-A\-X\-\_\-\-F\-I\-L\-E\-\_\-\-N\-A\-M\-E\-\_\-\-L\-E\-N\-G\-T\-H, md\-Unzip, and Qua\-Zip\-Private\-::unz\-File\-\_\-f.
 
 
 
-Referenced by JlCompress::extractDir(), QuaZipFile::getActualFileName(), and setCurrentFile().
+Referenced by Qua\-Zip\-File\-::get\-Actual\-File\-Name(), and set\-Current\-File().
 
-\index{QuaZip@{QuaZip}!getUnzFile@{getUnzFile}}
-\index{getUnzFile@{getUnzFile}!QuaZip@{QuaZip}}
-\subsubsection[{getUnzFile}]{\setlength{\rightskip}{0pt plus 5cm}unzFile QuaZip::getUnzFile (
+\index{Qua\-Zip@{Qua\-Zip}!get\-Unz\-File@{get\-Unz\-File}}
+\index{get\-Unz\-File@{get\-Unz\-File}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-Unz\-File}]{\setlength{\rightskip}{0pt plus 5cm}unz\-File Qua\-Zip\-::get\-Unz\-File (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a3b78a652f296ff4a678a791e8294e642}
 
 
-Returns {\ttfamily unzFile} handle. 
+Returns {\ttfamily unz\-File} handle. 
 
-You can use this handle to directly call UNZIP part of the ZIP/UNZIP package functions (see unzip.h).
+You can use this handle to directly call U\-N\-Z\-I\-P part of the Z\-I\-P/\-U\-N\-Z\-I\-P package functions (see unzip.\-h).
 
 \begin{DoxyWarning}{Warning}
-When using the handle returned by this function, please keep in mind that \doxyref{QuaZip}{p.}{classQuaZip} class is unable to detect any changes you make in the ZIP file state (e. g. changing current file, or closing the handle). So please do not do anything with this handle that is possible to do with the functions of this class. Or at least return the handle in the original state before calling some another function of this class (including implicit destructor calls and calls from the \doxyref{QuaZipFile}{p.}{classQuaZipFile} objects that refer to this \doxyref{QuaZip}{p.}{classQuaZip} instance!). So if you have changed the current file in the ZIP archive -\/ then change it back or you may experience some strange behavior or even crashes. 
+When using the handle returned by this function, please keep in mind that \doxyref{Qua\-Zip}{p.}{classQuaZip} class is unable to detect any changes you make in the Z\-I\-P file state (e. g. changing current file, or closing the handle). So please do not do anything with this handle that is possible to do with the functions of this class. Or at least return the handle in the original state before calling some another function of this class (including implicit destructor calls and calls from the \doxyref{Qua\-Zip\-File}{p.}{classQuaZipFile} objects that refer to this \doxyref{Qua\-Zip}{p.}{classQuaZip} instance!). So if you have changed the current file in the Z\-I\-P archive -\/ then change it back or you may experience some strange behavior or even crashes. 
 \end{DoxyWarning}
 
 
-References QuaZipPrivate::unzFile\_\-f.
+References Qua\-Zip\-Private\-::unz\-File\-\_\-f.
 
 
 
-Referenced by QuaZipFile::atEnd(), QuaZipFile::close(), QuaZipFile::csize(), QuaZipFile::open(), QuaZipFile::pos(), QuaZipFile::readData(), and QuaZipFile::usize().
+Referenced by Qua\-Zip\-File\-::at\-End(), Qua\-Zip\-File\-::close(), Qua\-Zip\-File\-::csize(), Qua\-Zip\-File\-::open(), Qua\-Zip\-File\-::pos(), Qua\-Zip\-File\-::read\-Data(), and Qua\-Zip\-File\-::usize().
 
-\index{QuaZip@{QuaZip}!getZipFile@{getZipFile}}
-\index{getZipFile@{getZipFile}!QuaZip@{QuaZip}}
-\subsubsection[{getZipFile}]{\setlength{\rightskip}{0pt plus 5cm}zipFile QuaZip::getZipFile (
+\index{Qua\-Zip@{Qua\-Zip}!get\-Zip\-File@{get\-Zip\-File}}
+\index{get\-Zip\-File@{get\-Zip\-File}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-Zip\-File}]{\setlength{\rightskip}{0pt plus 5cm}zip\-File Qua\-Zip\-::get\-Zip\-File (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
 )}\label{classQuaZip_a425043a4d7cc31e2fe2bba73d954f15c}
 
 
-Returns {\ttfamily zipFile} handle. 
+Returns {\ttfamily zip\-File} handle. 
 
-You can use this handle to directly call ZIP part of the ZIP/UNZIP package functions (see zip.h). Warnings about the \doxyref{getUnzFile()}{p.}{classQuaZip_a3b78a652f296ff4a678a791e8294e642} function also apply to this function. 
+You can use this handle to directly call Z\-I\-P part of the Z\-I\-P/\-U\-N\-Z\-I\-P package functions (see zip.\-h). Warnings about the \doxyref{get\-Unz\-File()}{p.}{classQuaZip_a3b78a652f296ff4a678a791e8294e642} function also apply to this function. 
 
-References QuaZipPrivate::zipFile\_\-f.
+References Qua\-Zip\-Private\-::zip\-File\-\_\-f.
 
 
 
-Referenced by QuaZipFile::close(), QuaZipFile::open(), and QuaZipFile::writeData().
+Referenced by Qua\-Zip\-File\-::close(), Qua\-Zip\-File\-::open(), and Qua\-Zip\-File\-::write\-Data().
 
-\index{QuaZip@{QuaZip}!setDataDescriptorWritingEnabled@{setDataDescriptorWritingEnabled}}
-\index{setDataDescriptorWritingEnabled@{setDataDescriptorWritingEnabled}!QuaZip@{QuaZip}}
-\subsubsection[{setDataDescriptorWritingEnabled}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setDataDescriptorWritingEnabled (
+\index{Qua\-Zip@{Qua\-Zip}!set\-Data\-Descriptor\-Writing\-Enabled@{set\-Data\-Descriptor\-Writing\-Enabled}}
+\index{set\-Data\-Descriptor\-Writing\-Enabled@{set\-Data\-Descriptor\-Writing\-Enabled}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Data\-Descriptor\-Writing\-Enabled}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Data\-Descriptor\-Writing\-Enabled (
 \begin{DoxyParamCaption}
 \item[{bool}]{enabled}
 \end{DoxyParamCaption}
@@ -741,27 +726,27 @@ Referenced by QuaZipFile::close(), QuaZipFile::open(), and QuaZipFile::writeData
 
 Changes the data descriptor writing mode. 
 
-According to the ZIP format specification, a file inside archive may have a data descriptor immediately following the file data. This is reflected by a special flag in the local file header and in the central directory. By default, QuaZIP sets this flag and writes the data descriptor unless both method and level were set to 0, in which case it operates in 1.0-\/compatible mode and never writes data descriptors.
+According to the Z\-I\-P format specification, a file inside archive may have a data descriptor immediately following the file data. This is reflected by a special flag in the local file header and in the central directory. By default, Qua\-Z\-I\-P sets this flag and writes the data descriptor unless both method and level were set to 0, in which case it operates in 1.\-0-\/compatible mode and never writes data descriptors.
 
-By setting this flag to false, it is possible to disable data descriptor writing, thus increasing compatibility with archive readers that don't understand this feature of the ZIP file format.
+By setting this flag to false, it is possible to disable data descriptor writing, thus increasing compatibility with archive readers that don't understand this feature of the Z\-I\-P file format.
 
-Setting this flag affects all the \doxyref{QuaZipFile}{p.}{classQuaZipFile} instances that are opened after this flag is set.
+Setting this flag affects all the \doxyref{Qua\-Zip\-File}{p.}{classQuaZipFile} instances that are opened after this flag is set.
 
 The data descriptor writing mode is enabled by default.
 
-Note that if the ZIP archive is written into a QIODevice for which QIODevice::isSequential() returns {\ttfamily true}, then the data descriptor is mandatory and will be written even if this flag is set to false.
+Note that if the Z\-I\-P archive is written into a Q\-I\-O\-Device for which Q\-I\-O\-Device\-::is\-Sequential() returns {\ttfamily true}, then the data descriptor is mandatory and will be written even if this flag is set to false.
 
 
 \begin{DoxyParams}{Parameters}
 {\em enabled} & If {\ttfamily true}, enable local descriptor writing, disable it otherwise.\\
 \hline
 \end{DoxyParams}
-\begin{DoxySeeAlso}{See also}
-QuaZipFile::isDataDescriptorWritingEnabled() 
+\begin{DoxySeeAlso}{See Also}
+Qua\-Zip\-File\-::is\-Data\-Descriptor\-Writing\-Enabled() 
 \end{DoxySeeAlso}
-\index{QuaZip@{QuaZip}!isDataDescriptorWritingEnabled@{isDataDescriptorWritingEnabled}}
-\index{isDataDescriptorWritingEnabled@{isDataDescriptorWritingEnabled}!QuaZip@{QuaZip}}
-\subsubsection[{isDataDescriptorWritingEnabled}]{\setlength{\rightskip}{0pt plus 5cm}bool QuaZip::isDataDescriptorWritingEnabled (
+\index{Qua\-Zip@{Qua\-Zip}!is\-Data\-Descriptor\-Writing\-Enabled@{is\-Data\-Descriptor\-Writing\-Enabled}}
+\index{is\-Data\-Descriptor\-Writing\-Enabled@{is\-Data\-Descriptor\-Writing\-Enabled}!QuaZip@{Qua\-Zip}}
+\subsubsection[{is\-Data\-Descriptor\-Writing\-Enabled}]{\setlength{\rightskip}{0pt plus 5cm}bool Qua\-Zip\-::is\-Data\-Descriptor\-Writing\-Enabled (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -770,16 +755,16 @@ QuaZipFile::isDataDescriptorWritingEnabled()
 
 Returns the data descriptor default writing mode. 
 
-\begin{DoxySeeAlso}{See also}
-\doxyref{setDataDescriptorWritingEnabled()}{p.}{classQuaZip_a6c23a12af88f7ea5edd4f9c0a24b9453} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{set\-Data\-Descriptor\-Writing\-Enabled()}{p.}{classQuaZip_a6c23a12af88f7ea5edd4f9c0a24b9453} 
 \end{DoxySeeAlso}
 
 
-Referenced by QuaZipFile::open().
+Referenced by Qua\-Zip\-File\-::open().
 
-\index{QuaZip@{QuaZip}!getFileNameList@{getFileNameList}}
-\index{getFileNameList@{getFileNameList}!QuaZip@{QuaZip}}
-\subsubsection[{getFileNameList}]{\setlength{\rightskip}{0pt plus 5cm}QStringList QuaZip::getFileNameList (
+\index{Qua\-Zip@{Qua\-Zip}!get\-File\-Name\-List@{get\-File\-Name\-List}}
+\index{get\-File\-Name\-List@{get\-File\-Name\-List}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-File\-Name\-List}]{\setlength{\rightskip}{0pt plus 5cm}Q\-String\-List Qua\-Zip\-::get\-File\-Name\-List (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -789,14 +774,14 @@ Referenced by QuaZipFile::open().
 Returns a list of files inside the archive. 
 
 \begin{DoxyReturn}{Returns}
-A list of file names or an empty list if there was an error or if the archive is empty (call \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to figure out which). 
+A list of file names or an empty list if there was an error or if the archive is empty (call \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to figure out which). 
 \end{DoxyReturn}
-\begin{DoxySeeAlso}{See also}
-\doxyref{getFileInfoList()}{p.}{classQuaZip_a7486af66bede8e131db0cd2e81881387} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{get\-File\-Info\-List()}{p.}{classQuaZip_a7486af66bede8e131db0cd2e81881387} 
 \end{DoxySeeAlso}
-\index{QuaZip@{QuaZip}!getFileInfoList@{getFileInfoList}}
-\index{getFileInfoList@{getFileInfoList}!QuaZip@{QuaZip}}
-\subsubsection[{getFileInfoList}]{\setlength{\rightskip}{0pt plus 5cm}QList$<$ {\bf QuaZipFileInfo} $>$ QuaZip::getFileInfoList (
+\index{Qua\-Zip@{Qua\-Zip}!get\-File\-Info\-List@{get\-File\-Info\-List}}
+\index{get\-File\-Info\-List@{get\-File\-Info\-List}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-File\-Info\-List}]{\setlength{\rightskip}{0pt plus 5cm}Q\-List$<$ {\bf Qua\-Zip\-File\-Info} $>$ Qua\-Zip\-::get\-File\-Info\-List (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -806,18 +791,18 @@ A list of file names or an empty list if there was an error or if the archive is
 Returns information list about all files inside the archive. 
 
 \begin{DoxyReturn}{Returns}
-A list of \doxyref{QuaZipFileInfo}{p.}{structQuaZipFileInfo} objects or an empty list if there was an error or if the archive is empty (call \doxyref{getZipError()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to figure out which).
+A list of \doxyref{Qua\-Zip\-File\-Info}{p.}{structQuaZipFileInfo} objects or an empty list if there was an error or if the archive is empty (call \doxyref{get\-Zip\-Error()}{p.}{classQuaZip_a28b91a6282ddd9382c96a069572c6fb4} to figure out which).
 \end{DoxyReturn}
-This function doesn't support zip64, but will still work with zip64 archives, converting results using \doxyref{QuaZipFileInfo64::toQuaZipFileInfo()}{p.}{structQuaZipFileInfo64_ada29945c7ee4c9df6fbe95864793aade}. If all file sizes are below 4 GB, it will work just fine.
+This function doesn't support zip64, but will still work with zip64 archives, converting results using \doxyref{Qua\-Zip\-File\-Info64\-::to\-Qua\-Zip\-File\-Info()}{p.}{structQuaZipFileInfo64_ada29945c7ee4c9df6fbe95864793aade}. If all file sizes are below 4 G\-B, it will work just fine.
 
-\begin{DoxySeeAlso}{See also}
-\doxyref{getFileNameList()}{p.}{classQuaZip_abb38d8b4c9c4ae0728b48caae9dd82de} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{get\-File\-Name\-List()}{p.}{classQuaZip_abb38d8b4c9c4ae0728b48caae9dd82de} 
 
-\doxyref{getFileInfoList64()}{p.}{classQuaZip_a474e66b1b696a9e00edcc067484c36ad} 
+\doxyref{get\-File\-Info\-List64()}{p.}{classQuaZip_a474e66b1b696a9e00edcc067484c36ad} 
 \end{DoxySeeAlso}
-\index{QuaZip@{QuaZip}!getFileInfoList64@{getFileInfoList64}}
-\index{getFileInfoList64@{getFileInfoList64}!QuaZip@{QuaZip}}
-\subsubsection[{getFileInfoList64}]{\setlength{\rightskip}{0pt plus 5cm}QList$<$ {\bf QuaZipFileInfo64} $>$ QuaZip::getFileInfoList64 (
+\index{Qua\-Zip@{Qua\-Zip}!get\-File\-Info\-List64@{get\-File\-Info\-List64}}
+\index{get\-File\-Info\-List64@{get\-File\-Info\-List64}!QuaZip@{Qua\-Zip}}
+\subsubsection[{get\-File\-Info\-List64}]{\setlength{\rightskip}{0pt plus 5cm}Q\-List$<$ {\bf Qua\-Zip\-File\-Info64} $>$ Qua\-Zip\-::get\-File\-Info\-List64 (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -826,16 +811,18 @@ This function doesn't support zip64, but will still work with zip64 archives, co
 
 Returns information list about all files inside the archive. 
 
-This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. This function supports zip64.
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts.
 
-\begin{DoxySeeAlso}{See also}
-\doxyref{getFileNameList()}{p.}{classQuaZip_abb38d8b4c9c4ae0728b48caae9dd82de} 
+This function supports zip64.
 
-\doxyref{getFileInfoList()}{p.}{classQuaZip_a7486af66bede8e131db0cd2e81881387} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{get\-File\-Name\-List()}{p.}{classQuaZip_abb38d8b4c9c4ae0728b48caae9dd82de} 
+
+\doxyref{get\-File\-Info\-List()}{p.}{classQuaZip_a7486af66bede8e131db0cd2e81881387} 
 \end{DoxySeeAlso}
-\index{QuaZip@{QuaZip}!setZip64Enabled@{setZip64Enabled}}
-\index{setZip64Enabled@{setZip64Enabled}!QuaZip@{QuaZip}}
-\subsubsection[{setZip64Enabled}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setZip64Enabled (
+\index{Qua\-Zip@{Qua\-Zip}!set\-Zip64\-Enabled@{set\-Zip64\-Enabled}}
+\index{set\-Zip64\-Enabled@{set\-Zip64\-Enabled}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Zip64\-Enabled}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Zip64\-Enabled (
 \begin{DoxyParamCaption}
 \item[{bool}]{zip64}
 \end{DoxyParamCaption}
@@ -849,16 +836,16 @@ Enables the zip64 mode.
 {\em zip64} & If {\ttfamily true}, the zip64 mode is enabled, disabled otherwise.\\
 \hline
 \end{DoxyParams}
-Once this is enabled, all new files (until the mode is disabled again) will be created in the zip64 mode, thus enabling the ability to write files larger than 4 GB. By default, the zip64 mode is off due to compatibility reasons.
+Once this is enabled, all new files (until the mode is disabled again) will be created in the zip64 mode, thus enabling the ability to write files larger than 4 G\-B. By default, the zip64 mode is off due to compatibility reasons.
 
 Note that this does not affect the ability to read zip64 archives in any way.
 
-\begin{DoxySeeAlso}{See also}
-\doxyref{isZip64Enabled()}{p.}{classQuaZip_a1b638566390d7599ba5982e844b151f4} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{is\-Zip64\-Enabled()}{p.}{classQuaZip_a1b638566390d7599ba5982e844b151f4} 
 \end{DoxySeeAlso}
-\index{QuaZip@{QuaZip}!isZip64Enabled@{isZip64Enabled}}
-\index{isZip64Enabled@{isZip64Enabled}!QuaZip@{QuaZip}}
-\subsubsection[{isZip64Enabled}]{\setlength{\rightskip}{0pt plus 5cm}bool QuaZip::isZip64Enabled (
+\index{Qua\-Zip@{Qua\-Zip}!is\-Zip64\-Enabled@{is\-Zip64\-Enabled}}
+\index{is\-Zip64\-Enabled@{is\-Zip64\-Enabled}!QuaZip@{Qua\-Zip}}
+\subsubsection[{is\-Zip64\-Enabled}]{\setlength{\rightskip}{0pt plus 5cm}bool Qua\-Zip\-::is\-Zip64\-Enabled (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -870,16 +857,16 @@ Returns whether the zip64 mode is enabled.
 \begin{DoxyReturn}{Returns}
 {\ttfamily true} if and only if the zip64 mode is enabled.
 \end{DoxyReturn}
-\begin{DoxySeeAlso}{See also}
-\doxyref{setZip64Enabled()}{p.}{classQuaZip_ab99a22efae02ebb4b5c9cd8eedc1c0b0} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{set\-Zip64\-Enabled()}{p.}{classQuaZip_ab99a22efae02ebb4b5c9cd8eedc1c0b0} 
 \end{DoxySeeAlso}
 
 
-Referenced by QuaZipFile::open().
+Referenced by Qua\-Zip\-File\-::open().
 
-\index{QuaZip@{QuaZip}!isAutoClose@{isAutoClose}}
-\index{isAutoClose@{isAutoClose}!QuaZip@{QuaZip}}
-\subsubsection[{isAutoClose}]{\setlength{\rightskip}{0pt plus 5cm}bool QuaZip::isAutoClose (
+\index{Qua\-Zip@{Qua\-Zip}!is\-Auto\-Close@{is\-Auto\-Close}}
+\index{is\-Auto\-Close@{is\-Auto\-Close}!QuaZip@{Qua\-Zip}}
+\subsubsection[{is\-Auto\-Close}]{\setlength{\rightskip}{0pt plus 5cm}bool Qua\-Zip\-::is\-Auto\-Close (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -888,73 +875,73 @@ Referenced by QuaZipFile::open().
 
 Returns the auto-\/close flag. 
 
-\begin{DoxySeeAlso}{See also}
-\doxyref{setAutoClose()}{p.}{classQuaZip_a54bfc924762774ccf9f99be075ba7b0e} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{set\-Auto\-Close()}{p.}{classQuaZip_a54bfc924762774ccf9f99be075ba7b0e} 
 \end{DoxySeeAlso}
-\index{QuaZip@{QuaZip}!setAutoClose@{setAutoClose}}
-\index{setAutoClose@{setAutoClose}!QuaZip@{QuaZip}}
-\subsubsection[{setAutoClose}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setAutoClose (
+\index{Qua\-Zip@{Qua\-Zip}!set\-Auto\-Close@{set\-Auto\-Close}}
+\index{set\-Auto\-Close@{set\-Auto\-Close}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Auto\-Close}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Auto\-Close (
 \begin{DoxyParamCaption}
-\item[{bool}]{autoClose}
+\item[{bool}]{auto\-Close}
 \end{DoxyParamCaption}
 ) const}\label{classQuaZip_a54bfc924762774ccf9f99be075ba7b0e}
 
 
 Sets or unsets the auto-\/close flag. 
 
-By default, QuaZIP opens the underlying QIODevice when \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} is called, and closes it when \doxyref{close()}{p.}{classQuaZip_a7a4323b73e12f3b4470109f200728f9f} is called. In some cases, when the device is set explicitly using \doxyref{setIoDevice()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6}, it may be desirable to leave the device open. If the auto-\/close flag is unset using this method, then the device isn't closed automatically if it was set explicitly.
+By default, Qua\-Z\-I\-P opens the underlying Q\-I\-O\-Device when \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} is called, and closes it when \doxyref{close()}{p.}{classQuaZip_a7a4323b73e12f3b4470109f200728f9f} is called. In some cases, when the device is set explicitly using \doxyref{set\-Io\-Device()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6}, it may be desirable to leave the device open. If the auto-\/close flag is unset using this method, then the device isn't closed automatically if it was set explicitly.
 
-If it is needed to clear this flag, it is recommended to do so before opening the archive because otherwise QuaZIP may close the device during the \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} call if an error is encountered after the device is opened.
+If it is needed to clear this flag, it is recommended to do so before opening the archive because otherwise Qua\-Z\-I\-P may close the device during the \doxyref{open()}{p.}{classQuaZip_abfa4e6018b2964a3d10a4c54e5ab3962} call if an error is encountered after the device is opened.
 
-If the device was not set explicitly, but rather the \doxyref{setZipName()}{p.}{classQuaZip_aa80b661de1262af905d1677dbcb008cc} or the appropriate constructor was used to set the ZIP file name instead, then the auto-\/close flag has no effect, and the internal device is closed nevertheless because there is no other way to close it.
+If the device was not set explicitly, but rather the \doxyref{set\-Zip\-Name()}{p.}{classQuaZip_aa80b661de1262af905d1677dbcb008cc} or the appropriate constructor was used to set the Z\-I\-P file name instead, then the auto-\/close flag has no effect, and the internal device is closed nevertheless because there is no other way to close it.
 
-\begin{DoxySeeAlso}{See also}
-\doxyref{isAutoClose()}{p.}{classQuaZip_adc2cc762ab5744720ae4d33290b5f5bf} 
+\begin{DoxySeeAlso}{See Also}
+\doxyref{is\-Auto\-Close()}{p.}{classQuaZip_adc2cc762ab5744720ae4d33290b5f5bf} 
 
-\doxyref{setIoDevice()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6} 
+\doxyref{set\-Io\-Device()}{p.}{classQuaZip_a64642948b6531ee54f5522f29e388cc6} 
 \end{DoxySeeAlso}
-\index{QuaZip@{QuaZip}!setDefaultFileNameCodec@{setDefaultFileNameCodec}}
-\index{setDefaultFileNameCodec@{setDefaultFileNameCodec}!QuaZip@{QuaZip}}
-\subsubsection[{setDefaultFileNameCodec}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setDefaultFileNameCodec (
+\index{Qua\-Zip@{Qua\-Zip}!set\-Default\-File\-Name\-Codec@{set\-Default\-File\-Name\-Codec}}
+\index{set\-Default\-File\-Name\-Codec@{set\-Default\-File\-Name\-Codec}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Default\-File\-Name\-Codec}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Default\-File\-Name\-Codec (
 \begin{DoxyParamCaption}
-\item[{QTextCodec $\ast$}]{codec}
+\item[{Q\-Text\-Codec $\ast$}]{codec}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily  [static]}}\label{classQuaZip_a317f5db89d84a80417338a3ab89770da}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classQuaZip_a317f5db89d84a80417338a3ab89770da}
 
 
 Sets the default file name codec to use. 
 
-The default codec is used by the constructors, so calling this function won't affect the \doxyref{QuaZip}{p.}{classQuaZip} instances already created at that moment.
+The default codec is used by the constructors, so calling this function won't affect the \doxyref{Qua\-Zip}{p.}{classQuaZip} instances already created at that moment.
 
-The codec specified here can be overriden by calling \doxyref{setFileNameCodec()}{p.}{classQuaZip_a339010b5566704ba3c9cafbfe848d8fb}. If neither function is called, QTextCodec::codecForLocale() will be used to decode or encode file names. Use this function with caution if the application uses other libraries that depend on QuaZIP. Those libraries can either call this function by themselves, thus overriding your setting or can rely on the default encoding, thus failing mysteriously if you change it. For these reasons, it isn't recommended to use this function if you are developing a library, not an application. Instead, ask your library users to call it in case they need specific encoding.
+The codec specified here can be overriden by calling \doxyref{set\-File\-Name\-Codec()}{p.}{classQuaZip_a339010b5566704ba3c9cafbfe848d8fb}. If neither function is called, Q\-Text\-Codec\-::codec\-For\-Locale() will be used to decode or encode file names. Use this function with caution if the application uses other libraries that depend on Qua\-Z\-I\-P. Those libraries can either call this function by themselves, thus overriding your setting or can rely on the default encoding, thus failing mysteriously if you change it. For these reasons, it isn't recommended to use this function if you are developing a library, not an application. Instead, ask your library users to call it in case they need specific encoding.
 
-In most cases, using \doxyref{setFileNameCodec()}{p.}{classQuaZip_a339010b5566704ba3c9cafbfe848d8fb} instead is the right choice. However, if you depend on third-\/party code that uses QuaZIP, then the reasons stated above can actually become a reason to use this function in case the third-\/party code in question fails because it doesn't understand the encoding you need and doesn't provide a way to specify it. This applies to the \doxyref{JlCompress}{p.}{classJlCompress} class as well, as it was contributed and doesn't support explicit encoding parameters.
+In most cases, using \doxyref{set\-File\-Name\-Codec()}{p.}{classQuaZip_a339010b5566704ba3c9cafbfe848d8fb} instead is the right choice. However, if you depend on third-\/party code that uses Qua\-Z\-I\-P, then the reasons stated above can actually become a reason to use this function in case the third-\/party code in question fails because it doesn't understand the encoding you need and doesn't provide a way to specify it. This applies to the \doxyref{Jl\-Compress}{p.}{classJlCompress} class as well, as it was contributed and doesn't support explicit encoding parameters.
 
-In short: use \doxyref{setFileNameCodec()}{p.}{classQuaZip_a339010b5566704ba3c9cafbfe848d8fb} when you can, resort to \doxyref{setDefaultFileNameCodec()}{p.}{classQuaZip_a317f5db89d84a80417338a3ab89770da} when you don't have access to the \doxyref{QuaZip}{p.}{classQuaZip} instance.
+In short\-: use \doxyref{set\-File\-Name\-Codec()}{p.}{classQuaZip_a339010b5566704ba3c9cafbfe848d8fb} when you can, resort to \doxyref{set\-Default\-File\-Name\-Codec()}{p.}{classQuaZip_a317f5db89d84a80417338a3ab89770da} when you don't have access to the \doxyref{Qua\-Zip}{p.}{classQuaZip} instance.
 
 
 \begin{DoxyParams}{Parameters}
-{\em codec} & The codec to use by default. If NULL, resets to default. \\
+{\em codec} & The codec to use by default. If N\-U\-L\-L, resets to default. \\
 \hline
 \end{DoxyParams}
 
 
-Referenced by setDefaultFileNameCodec().
+Referenced by set\-Default\-File\-Name\-Codec().
 
-\index{QuaZip@{QuaZip}!setDefaultFileNameCodec@{setDefaultFileNameCodec}}
-\index{setDefaultFileNameCodec@{setDefaultFileNameCodec}!QuaZip@{QuaZip}}
-\subsubsection[{setDefaultFileNameCodec}]{\setlength{\rightskip}{0pt plus 5cm}void QuaZip::setDefaultFileNameCodec (
+\index{Qua\-Zip@{Qua\-Zip}!set\-Default\-File\-Name\-Codec@{set\-Default\-File\-Name\-Codec}}
+\index{set\-Default\-File\-Name\-Codec@{set\-Default\-File\-Name\-Codec}!QuaZip@{Qua\-Zip}}
+\subsubsection[{set\-Default\-File\-Name\-Codec}]{\setlength{\rightskip}{0pt plus 5cm}void Qua\-Zip\-::set\-Default\-File\-Name\-Codec (
 \begin{DoxyParamCaption}
-\item[{const char $\ast$}]{codecName}
+\item[{const char $\ast$}]{codec\-Name}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily  [static]}}\label{classQuaZip_a694af3c0ab076fab7bf619952f6fbfea}
-This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Equivalent to calling setDefltFileNameCodec(QTextCodec::codecForName(codecName)). 
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classQuaZip_a694af3c0ab076fab7bf619952f6fbfea}
+This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Equivalent to calling set\-Deflt\-File\-Name\-Codec(\-Q\-Text\-Codec\-::codec\-For\-Name(codec\-Name)). 
 
-References setDefaultFileNameCodec().
+References set\-Default\-File\-Name\-Codec().
 
 
 
-The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 
-quazip/quazip.h\item 
-quazip/quazip.cpp\end{DoxyCompactItemize}
+quazip/quazip.\-h\item 
+quazip/quazip.\-cpp\end{DoxyCompactItemize}

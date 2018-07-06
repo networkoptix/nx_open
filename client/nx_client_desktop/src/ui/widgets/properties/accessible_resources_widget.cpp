@@ -20,7 +20,7 @@
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/common/item_view_utils.h>
+#include <nx/client/desktop/common/utils/item_view_utils.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/delegates/customizable_item_delegate.h>
@@ -38,7 +38,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/app_info.h>
 
-using namespace  nx::client::desktop::ui;
+using namespace  nx::client::desktop;
 
 namespace {
 
@@ -117,7 +117,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     itemDelegate->setCheckBoxColumn(QnAccessibleResourcesModel::CheckColumn);
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
-    auto setupTreeView = [itemDelegate](QnTreeView* treeView)
+    auto setupTreeView = [itemDelegate](TreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->setItemDelegateForColumn(QnAccessibleResourcesModel::NameColumn,
@@ -310,7 +310,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
     m_controlsModel->setHasCheckboxes(true);
     m_controlsModel->setUserCheckable(false);
 
-    m_controlsModel->setOptions(QnResourceListModel::HideStatusOption | 
+    m_controlsModel->setOptions(QnResourceListModel::HideStatusOption |
         QnResourceListModel::ServerAsHealthMonitorOption);
 
     auto modelUpdated = [this](const QModelIndex& index = QModelIndex())

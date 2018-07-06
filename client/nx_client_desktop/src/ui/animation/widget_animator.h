@@ -4,7 +4,6 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QEasingCurve>
 
-#include <ui/common/geometry.h>
 #include "animator_group.h"
 
 class QGraphicsWidget;

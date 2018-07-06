@@ -144,7 +144,7 @@ bool QnDesktopAudioOnlyDataProvider::initSpeex()
 
 bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
 {
-    Q_ASSERT(!m_audioSourcesInfo.empty());
+    NX_ASSERT(!m_audioSourcesInfo.empty());
 
     m_encoderBuffer = (uint8_t*) av_malloc(FF_MIN_BUFFER_SIZE);
 

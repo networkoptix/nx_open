@@ -104,7 +104,7 @@ private:
         ASSERT_TRUE(m_timeServer->bind(
             m_serverAddress ? (*m_serverAddress) : SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(m_timeServer->listen());
-    
+
         m_serverAddress = m_timeServer->address();
     }
 };
@@ -146,5 +146,5 @@ REGISTER_TYPED_TEST_CASE_P(BasicTimeProtocolClient,
     reusing_same_instance_after_error);
 
 } // namespace test
-} // namespace nx
 } // namespace network
+} // namespace nx

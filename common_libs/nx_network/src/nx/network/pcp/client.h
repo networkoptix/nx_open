@@ -1,11 +1,12 @@
-#ifndef PCP_CLIENT_H
-#define PCP_CLIENT_H
+#pragma once
 
 #include <nx/network/socket_factory.h>
 #include <nx/utils/subscription.h>
 
 #include <QtCore/QMutex>
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 /** PCP Mapping information */
@@ -36,5 +37,5 @@ private:
 };
 
 } // namespace pcp
-
-#endif // PCP_CLIENT_H
+} // namespace network
+} // namespace nx

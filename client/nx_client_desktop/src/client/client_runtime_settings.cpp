@@ -19,8 +19,11 @@ bool QnClientRuntimeSettings::isDesktopMode() const
     return !isVideoWallMode() && !isActiveXMode();
 }
 
-int QnClientRuntimeSettings::maxSceneItems()
+int QnClientRuntimeSettings::maxSceneItems() const
 {
+    if (maxSceneItemsOverride() > 0)
+        return maxSceneItemsOverride();
+
     return qnSettings->lightMode().testFlag(Qn::LightModeSingleItem)
         ? 1
         : qnSettings->maxSceneVideoItems();

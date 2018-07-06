@@ -8,7 +8,8 @@ namespace websocket {
 
 namespace test {
 
-class WebsocketMultibuffer : public ::testing::Test
+class WebsocketMultibuffer:
+    public ::testing::Test
 {
 protected:
     enum class Locked

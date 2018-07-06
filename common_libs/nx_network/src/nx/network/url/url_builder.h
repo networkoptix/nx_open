@@ -12,10 +12,10 @@ namespace url {
 class Builder
 {
 public:
-    Builder(const QUrl& url = QUrl()): m_url(url) {}
+    Builder(const nx::utils::Url& url = nx::utils::Url()): m_url(url) {}
 
-    QUrl toUrl() const { return m_url; }
-    operator QUrl() const { return toUrl(); }
+    nx::utils::Url toUrl() const { return m_url; }
+    operator nx::utils::Url() const { return toUrl(); }
 
     QString toString(QUrl::FormattingOptions options =
         QUrl::FormattingOptions(QUrl::PrettyDecoded)) const
@@ -70,7 +70,7 @@ public:
         m_url.setPath(path, mode);
         return *this;
     }
-    Builder& addPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
+    Builder& appendPath(const QString& path, QUrl::ParsingMode mode = QUrl::DecodedMode)
     {
         m_url.setPath(normalizePath(m_url.path() + path), mode);
         return *this;
@@ -92,7 +92,7 @@ public:
     }
 
 private:
-    QUrl m_url;
+    nx::utils::Url m_url;
 };
 
 } // namespace url

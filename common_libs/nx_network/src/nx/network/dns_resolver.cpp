@@ -17,8 +17,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/time.h>
-
 #include <nx/utils/scope_guard.h>
+
+#include "resolve/predefined_host_resolver.h"
+#include "resolve/system_resolver.h"
 
 namespace nx {
 namespace network {
@@ -67,7 +69,7 @@ DnsResolver::~DnsResolver()
 void DnsResolver::pleaseStop()
 {
     NX_LOGX(lm("DnsResolver::pleaseStop"), cl_logDEBUG2);
-    
+
     QnMutexLocker lock(&m_mutex);
     m_terminated = true;
     m_cond.wakeAll();
@@ -98,12 +100,19 @@ SystemError::ErrorCode DnsResolver::resolveSync(
     int ipVersion,
     std::deque<HostAddress>* resolvedAddresses)
 {
+    if (m_blockedHosts.count(hostName) > 0)
+        return SystemError::hostNotFound;
+
     for (const auto& resolver: m_resolversByPriority)
     {
-        const auto resultCode = resolver.second->resolve(hostName, ipVersion, resolvedAddresses);
+        std::deque<AddressEntry> resolvedAddressesEntries;
+        const auto resultCode = resolver.second->resolve(
+            hostName, ipVersion, &resolvedAddressesEntries);
         if (resultCode == SystemError::noError)
         {
-            NX_ASSERT(!resolvedAddresses->empty());
+            NX_ASSERT(!resolvedAddressesEntries.empty());
+            for (auto& entry: resolvedAddressesEntries)
+                resolvedAddresses->push_back(std::move(entry.host));
             return resultCode;
         }
     }
@@ -136,12 +145,28 @@ bool DnsResolver::isRequestIdKnown(RequestId requestId) const
 
 void DnsResolver::addEtcHost(const QString& name, std::vector<HostAddress> addresses)
 {
-    m_predefinedHostResolver->addEtcHost(name, std::move(addresses));
+    std::deque<AddressEntry> entries;
+    for (auto& address: addresses)
+        entries.push_back({ AddressType::direct, address });
+
+    m_predefinedHostResolver->replaceMapping(name.toStdString(), std::move(entries));
 }
 
 void DnsResolver::removeEtcHost(const QString& name)
 {
-    m_predefinedHostResolver->removeEtcHost(name);
+    m_predefinedHostResolver->removeMapping(name.toStdString());
+}
+
+void DnsResolver::blockHost(const QString& hostName)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_blockedHosts.insert(hostName);
+}
+
+void DnsResolver::unblockHost(const QString& hostName)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_blockedHosts.erase(hostName);
 }
 
 void DnsResolver::registerResolver(std::unique_ptr<AbstractResolver> resolver, int priority)

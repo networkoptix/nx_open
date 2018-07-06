@@ -10,7 +10,7 @@ QnEncodedCredentials::QnEncodedCredentials(const QString& user, const QString& p
 {
 }
 
-QnEncodedCredentials::QnEncodedCredentials(const QUrl& url):
+QnEncodedCredentials::QnEncodedCredentials(const nx::utils::Url& url):
     user(url.userName()),
     password(url.password())
 {

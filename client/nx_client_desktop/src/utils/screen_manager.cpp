@@ -1,10 +1,13 @@
 #include "screen_manager.h"
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
+#include <QtCore/QCoreApplication>
+
+#include <QtWidgets/QWidget>
 
 #include "utils/common/app_info.h"
 #include "utils/common/process.h"
+
+#include <utils/screen_utils.h>
 
 namespace {
 
@@ -150,7 +153,7 @@ int QnScreenManager::nextFreeScreen() const
     QSet<int> current = instanceUsedScreens();
     int currentScreen = current.isEmpty() ? 0 : *std::min_element(current.begin(), current.end());
 
-    int screenCount = qApp->desktop()->screenCount();
+    int screenCount = nx::gui::Screens::count();
     int nextScreen = (currentScreen + 1) % screenCount;
 
     QSet<int> used = usedScreens();
@@ -192,21 +195,6 @@ void QnScreenManager::at_timer_timeout()
 
 void QnScreenManager::at_refreshTimer_timeout()
 {
-    QSet<int> used;
-
-    QDesktopWidget *desktop = qApp->desktop();
-
-    int screenCount = desktop->screenCount();
-    used.insert(desktop->screenNumber(m_geometry.center()));
-
-    for (int i = 0; i < screenCount; i++)
-    {
-        QRect screenGeometry = desktop->screenGeometry(i);
-        QRect intersected = screenGeometry.intersected(m_geometry);
-        if (intersected.width() > screenGeometry.width() / 2 && intersected.height() > screenGeometry.height() / 2)
-            used.insert(i);
-    }
-
-    setCurrentScreens(used);
+    setCurrentScreens(nx::gui::Screens::coveredBy(m_geometry));
 }
 

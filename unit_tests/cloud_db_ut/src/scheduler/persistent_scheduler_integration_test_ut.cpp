@@ -97,8 +97,8 @@ protected:
 
     void andWhenFirstUsersUnsubscribesAllTasks()
     {
-        nx::utils::promise<int> u1t1p;
-        nx::utils::promise<int> u1t2p;
+        nx::utils::promise<QnUuid> u1t1p;
+        nx::utils::promise<QnUuid> u1t2p;
 
         auto u1t1f = u1t1p.get_future();
         auto u1t2f = u1t2p.get_future();
@@ -108,20 +108,20 @@ protected:
 
         user1->unsubscribe(
             user1Task1Id,
-            [u1t1p = std::move(u1t1p)](const QnUuid&, const SchedulerUser::Task& task) mutable
+            [u1t1p = std::move(u1t1p)](const QnUuid& taskId, const SchedulerUser::Task& /*task*/) mutable
             {
-                u1t1p.set_value(task.fired);
+                u1t1p.set_value(taskId);
             });
 
         user1->unsubscribe(
             user1Task2Id,
-            [u1t2p = std::move(u1t2p)](const QnUuid&, const SchedulerUser::Task& task) mutable
+            [u1t2p = std::move(u1t2p)](const QnUuid& taskId, const SchedulerUser::Task& /*task*/) mutable
             {
-                u1t2p.set_value(task.fired);
+                u1t2p.set_value(taskId);
             });
 
-        user1Task1FiredWhileUnsubscribe = u1t1f.get();
-        user1Task2FiredWhileUnsubscribe = u1t2f.get();
+        user1Task1FiredWhileUnsubscribe = user1->tasks()[u1t1f.get()].fired;
+        user1Task2FiredWhileUnsubscribe = user1->tasks()[u1t2f.get()].fired;
     }
 
     void andWhenFirstUsersUnsubscribesFirstTask()
@@ -199,6 +199,7 @@ protected:
             user1Task1Id,
             [this](const QnUuid& taskId, const SchedulerUser::Task& task)
             {
+                QnMutexLocker lock(&m_mutex);
                 unsubsribeCalledIds.emplace(taskId);
                 user1Task1FiredWhileUnsubscribe = task.fired;
             });
@@ -347,40 +348,71 @@ protected:
         ASSERT_EQ(1U, user1Tasks.size());
 
         for (const auto& task: user1Tasks)
-            ASSERT_EQ(task.second.fired, 0);
+            ASSERT_EQ(0, task.second.fired);
     }
 
     void thenLongTaskShouldAtLastFire()
     {
+        waitForPredicateBecomeTrue(
+            [this]()
+            {
+                if (user1->tasks().empty() || user1->tasks().cbegin()->second.fired < 1)
+                    return false;
+                return true;
+            },
+            "thenLongTaskShouldAtLastFire");
+
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(1U, user1Tasks.size());
 
         for (const auto& task: user1Tasks)
-            ASSERT_EQ(task.second.fired, 1);
+            ASSERT_GE(task.second.fired, 1);
     }
 
     void thenTaskShouldFireAsIfServerWasNotOffline()
     {
+        waitForPredicateBecomeTrue(
+            [this]()
+            {
+                if (user1->tasks().empty() || user1->tasks().cbegin()->second.fired < 2)
+                    return false;
+                return true;
+            },
+            "thenTaskShouldFireAsIfServerWasNotOffline");
+
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(1U, user1Tasks.size());
 
-        for (const auto& task: user1Tasks)
+        for (const auto& task : user1Tasks)
             ASSERT_EQ(task.second.fired, 2);
     }
 
     void thenFistTaskShouldFire()
     {
+        auto dataIsReady = [this]()
+        {
+            auto tasks = user1->tasks();
+            return
+                user1->tasks().size () == 2
+                && std::any_of(
+                        tasks.cbegin(),
+                        tasks.cend(),
+                        [](const std::pair<QnUuid, SchedulerUser::Task> p)
+                        {
+                            return p.second.fired == 2;
+                        });
+        };
+
+        waitForPredicateBecomeTrue(
+            [this, dataIsReady]()
+            {
+                return dataIsReady();
+            },
+            "thenFistTaskShouldFire");
+
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(2U, user1Tasks.size());
-
-        bool someTaskFiredExactlyTwice = std::any_of(
-            user1Tasks.cbegin(),
-            user1Tasks.cend(),
-            [](const std::pair<QnUuid, SchedulerUser::Task> p)
-            {
-                return p.second.fired == 2;
-            });
-        ASSERT_TRUE(someTaskFiredExactlyTwice);
+        ASSERT_TRUE(dataIsReady());
     }
 
     void thenSecondTaskShouldFireMultipleTimes()
@@ -400,14 +432,23 @@ protected:
 
     void thenFirstTaskShouldFireAndSecondTaskShouldBeSubscribed()
     {
-        auto user1Tasks = user1->tasks();
-        ASSERT_EQ(2U, user1Tasks.size());
+        waitForPredicateBecomeTrue(
+            [this]()
+            {
+                return 2U == user1->tasks().size();
+            },
+            "2 tasks should've been subscribed");
     }
 
     void thenTaskShouldHaveAlreadyUnsubscribed()
     {
-        auto user1Tasks = user1->tasks();
-        ASSERT_NE(unsubsribeCalledIds.find(user1Task1Id), unsubsribeCalledIds.cend());
+        waitForPredicateBecomeTrue(
+            [this]()
+            {
+                QnMutexLocker lock(&m_mutex);
+                return unsubsribeCalledIds.find(user1Task1Id) != unsubsribeCalledIds.cend();
+            },
+            "task should has been unsubscribed");
     }
 
     void thenNoNewFires()
@@ -434,6 +475,7 @@ protected:
     int user1Task2FiredWhileUnsubscribe = 0;
 
     std::unordered_set<QnUuid> unsubsribeCalledIds;
+    QnMutex m_mutex;
 };
 
 TEST_F(SchedulerIntegrationTest, TwoUsersScheduleTasks)

@@ -1,5 +1,4 @@
 #include "connection_guard.h"
-#include <common/common_module.h>
 
 namespace ec2
 {

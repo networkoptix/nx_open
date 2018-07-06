@@ -9,9 +9,8 @@
 #include "udp_message_response_sender.h"
 
 namespace nx {
+namespace network {
 namespace stun {
-
-static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
 
 UdpServer::UdpServer(const MessageDispatcher* dispatcher):
     m_messagePipeline(this),
@@ -81,6 +80,12 @@ const std::unique_ptr<network::UDPSocket>& UdpServer::socket()
     return m_messagePipeline.socket();
 }
 
+nx::network::server::Statistics UdpServer::statistics() const
+{
+    // TODO: #ak
+    return nx::network::server::Statistics();
+}
+
 void UdpServer::stopWhileInAioThread()
 {
     m_messagePipeline.pleaseStopSync();
@@ -99,4 +104,5 @@ void UdpServer::ioFailure(SystemError::ErrorCode)
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

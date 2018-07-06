@@ -291,3 +291,56 @@ TEST_F(QnJsonTextFixture, serializeEmptyQListBrief)
     ASSERT_EQ(jsonStr, QJson::serialized(data));
     ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithQList>(jsonStr));
 }
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+struct TestDataWithOptionalField
+{
+    boost::optional<BriefMockData> optionalField;
+};
+
+#define TestDataWithOptionalField_Fields (optionalField)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (TestDataWithOptionalField), (json), _Fields)
+
+} // namespace
+
+class QnJsonBoostOptionalField:
+    public QnJsonTextFixture
+{
+};
+
+TEST_F(QnJsonBoostOptionalField, serialize_optional_field_present)
+{
+    TestDataWithOptionalField test;
+    test.optionalField = BriefMockData{QnUuid(), "test"};
+
+    ASSERT_EQ(
+        "{\"optionalField\":{\"str\":\"test\"}}",
+        QJson::serialized(test));
+}
+
+TEST_F(QnJsonBoostOptionalField, serialize_optional_field_not_present)
+{
+    ASSERT_EQ("{}", QJson::serialized(TestDataWithOptionalField()));
+}
+
+TEST_F(QnJsonBoostOptionalField, deserialize_optional_field_present)
+{
+    const auto json = "{\"optionalField\":{\"str\":\"test\"}}";
+    const auto deserializedValue = QJson::deserialized<TestDataWithOptionalField>(json);
+
+    ASSERT_TRUE(static_cast<bool>(deserializedValue.optionalField));
+    ASSERT_EQ("test", deserializedValue.optionalField->str);
+}
+
+TEST_F(QnJsonBoostOptionalField, deserialize_optional_field_not_present)
+{
+    const auto json = "{}";
+    const auto deserializedValue = QJson::deserialized<TestDataWithOptionalField>(json);
+
+    ASSERT_FALSE(static_cast<bool>(deserializedValue.optionalField));
+}

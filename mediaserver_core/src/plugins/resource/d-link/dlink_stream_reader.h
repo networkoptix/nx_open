@@ -3,15 +3,15 @@
 
 #ifdef ENABLE_DLINK
 
-#include "core/dataprovider/spush_media_stream_provider.h"
-#include <nx/network/simple_http_client.h>
+#include <providers/spush_media_stream_provider.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include "network/multicodec_rtp_reader.h"
 #include "dlink_resource.h"
 
 class PlDlinkStreamReader: public CLServerPushStreamReader
 {
 public:
-    PlDlinkStreamReader(const QnResourcePtr& res);
+    PlDlinkStreamReader(const QnPlDlinkResourcePtr& res);
     virtual ~PlDlinkStreamReader();
 
 protected:
@@ -37,6 +37,7 @@ private:
     std::unique_ptr<CLSimpleHTTPClient> m_HttpClient;
     QSize m_resolution;
     QnDlink_ProfileInfo m_profile;
+    QnPlDlinkResourcePtr m_dlinkRes;
 };
 
 #endif // ENABLE_DLINK

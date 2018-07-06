@@ -1,7 +1,4 @@
-#ifndef QN_INSTRUMENT_H
-#define QN_INSTRUMENT_H
-
-#include <functional> /* For std::unary_function. */
+#pragma once
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QObject>
@@ -11,7 +8,6 @@
 
 #include <utils/common/connective.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 #include <ui/customization/customized.h>
 
@@ -57,22 +53,25 @@ class InstrumentEventDispatcher;
 class InstrumentItemCondition;
 
 namespace detail {
-    struct AlwaysTrue: public std::unary_function<QGraphicsItem *, bool> {
-        bool operator()(QGraphicsItem *) const {
-            return true;
-        }
-    };
 
-    template<class GraphicsItem, class Condition>
-    struct CompoundCondition: public std::unary_function<QGraphicsItem *, bool> {
-        CompoundCondition(const Condition &condition): condition(condition) {}
+struct AlwaysTrue{
+    bool operator()(QGraphicsItem *) const
+    {
+        return true;
+    }
+};
 
-        bool operator()(QGraphicsItem *item) const {
-            return condition(item) && dynamic_cast<GraphicsItem *>(item) != NULL;
-        }
+template<class GraphicsItem, class Condition>
+struct CompoundCondition
+{
+    CompoundCondition(const Condition &condition): condition(condition) {}
 
-        const Condition &condition;
-    };
+    bool operator()(QGraphicsItem *item) const {
+        return condition(item) && dynamic_cast<GraphicsItem *>(item) != NULL;
+    }
+
+    const Condition &condition;
+};
 
 } // namespace detail
 
@@ -126,10 +125,11 @@ namespace detail {
  * inside derived class's destructor if it reimplements either
  * <tt>aboutToBeDisabledNotify()</tt> or <tt>aboutToBeUninstalledNotify()</tt>.
  */
-class Instrument: public Customized<Connective<QObject> >, protected QnGeometry, protected QnSceneTransformations {
-    Q_OBJECT;
+class Instrument: public Customized<Connective<QObject>>, protected QnSceneTransformations
+{
+    Q_OBJECT
 
-    typedef Customized<Connective<QObject> > base_type;
+    using base_type = Customized<Connective<QObject>>;
 
 public:
     /**
@@ -827,5 +827,3 @@ QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QWidget,        Viewport);
 QN_DEFINE_INSTRUMENT_WATCHED_TYPE(QGraphicsItem,  Item);
 
 #undef QN_DEFINE_INSTRUMENT_WATCHED_TYPE
-
-#endif // QN_INSTRUMENT_H

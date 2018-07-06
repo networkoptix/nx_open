@@ -11,6 +11,7 @@
 #include <QtCore/QUrl>
 
 #include <nx/utils/thread/stoppable.h>
+#include <nx/utils/url.h>
 
 
 namespace detail
@@ -64,13 +65,13 @@ namespace detail
     public:
         const RSyncOperationType type;
         const int id;
-        const QUrl baseUrl;
+        const nx::utils::Url baseUrl;
         const QString entryPath;
 
         RDirSynchronizationOperation(
             RSyncOperationType _type,
             int _id,
-            const QUrl& _baseUrl,
+            const nx::utils::Url& _baseUrl,
             const QString& _entryPath,
             AbstractRDirSynchronizationEventHandler* handler )
         :

@@ -12,7 +12,7 @@
 
 class QTimer;
 
-namespace nx_http { class AsyncHttpClientPtr; }
+namespace nx { namespace network { namespace http { class AsyncHttpClientPtr; } } }
 
 class QnCloudSystemsFinder : public Connective<QnAbstractSystemsFinder>
 {
@@ -51,5 +51,5 @@ private:
     mutable QnMutex m_mutex;
 
     SystemsHash m_systems;
-    QList<nx_http::AsyncHttpClientPtr> m_runningRequests;
+    QList<nx::network::http::AsyncHttpClientPtr> m_runningRequests;
 };

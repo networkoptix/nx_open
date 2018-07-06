@@ -99,6 +99,9 @@ angular.module('cloudApp')
 
                 self.isOnline = self.info.stateOfHealth == Config.systemStatuses.onlineStatus;
                 self.isMine = self.info.ownerAccountEmail == self.currentUserEmail;
+                self.canMerge = self.isMine && (self.capabilities && self.capabilities.indexOf(Config.systemCapabilities.cloudMerge) > -1
+                                                                  || Config.allowDebugMode
+                                                                  || Config.allowBetaMode);
 
                 self.checkPermissions();
 

@@ -1,7 +1,9 @@
 #pragma once
 
-#include <nx/utils/test_support/run_test.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/test_support/run_test.h>
 #include <nx/utils/std/thread.h>
 
 namespace nx {
@@ -12,20 +14,22 @@ namespace test {
  * Sets up environment and runs Google Tests. Should be used for all unit tests which use network.
  */
 inline int runTest(
-    int& argc, const char* argv[],
+    int argc, const char* argv[],
     utils::test::InitFunction extraInit = nullptr,
-    int socketGlobalsFlags = 0)
+    int socketGlobalsFlags = 0,
+    int gtestRunFlags = 0)
 {
     return utils::test::runTest(
         argc, argv,
-        [extraInit = std::move(extraInit), socketGlobalsFlags](const utils::ArgumentParser& args)
+        [extraInit = std::move(extraInit), socketGlobalsFlags](
+            const utils::ArgumentParser& args)
         {
             nx::utils::DetachedThreads detachedThreadsGuard;
 
             auto sgGuard = std::make_unique<SocketGlobalsHolder>(socketGlobalsFlags);
             SocketGlobals::applyArguments(args);
-            SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
-            cloud::OutgoingTunnelPool::allowOwnPeerIdChange();
+            SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
+            cloud::OutgoingTunnelPool::ignoreOwnPeerIdChange();
 
             utils::test::DeinitFunctions deinitFunctions;
             if (extraInit)
@@ -38,15 +42,21 @@ inline int runTest(
                 });
 
             return deinitFunctions;
-        });
+        },
+        gtestRunFlags);
 }
 
 inline int runTest(
-    int& argc, char* argv[],
+    int argc, char* argv[],
     utils::test::InitFunction extraInit = nullptr,
-    int socketGlobalsFlags = 0)
+    int socketGlobalsFlags = 0,
+    int gtestRunFlags = 0)
 {
-    return runTest(argc, (const char**)argv, std::move(extraInit), socketGlobalsFlags);
+    return runTest(
+        argc, (const char**)argv,
+        std::move(extraInit),
+        socketGlobalsFlags,
+        gtestRunFlags);
 }
 
 } // namespace test

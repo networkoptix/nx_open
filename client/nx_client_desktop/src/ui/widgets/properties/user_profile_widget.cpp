@@ -13,8 +13,10 @@
 #include <common/common_module.h>
 #include <helpers/system_helpers.h>
 
+#include <nx_ec/ec_api.h>
+
 #include <ui/common/read_only.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/resource_properties/change_user_password_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -26,9 +28,27 @@
 
 #include <utils/email/email.h>
 
-#include <utils/common/url.h>
-
 #include <api/global_settings.h>
+
+using namespace nx::client::desktop;
+
+namespace {
+
+bool isUrlEqual(const nx::utils::Url &l, const nx::utils::Url &r, QUrl::FormattingOptions ignored = QUrl::RemovePassword | QUrl::RemoveScheme)
+{
+    nx::utils::Url lc(l), rc(r);
+    if (ignored & QUrl::RemovePassword) {
+        lc.setPassword(QString());
+        rc.setPassword(QString());
+    }
+
+    if (ignored & QUrl::RemoveScheme)
+        lc.setScheme(rc.scheme());
+
+    return lc == rc;
+}
+
+} // namespace
 
 QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/):
     base_type(parent),
@@ -36,7 +56,7 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     ui(new Ui::UserProfileWidget()),
     m_model(model),
     m_newPassword(),
-    m_aligner(new QnAligner(this))
+    m_aligner(new Aligner(this))
 {
     ui->setupUi(this);
 
@@ -48,11 +68,11 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
     ui->groupInputField->setTitle(tr("Role"));
 
     ui->emailInputField->setTitle(tr("Email"));
-    ui->emailInputField->setValidator(Qn::defaultEmailValidator());
+    ui->emailInputField->setValidator(defaultEmailValidator());
 
-    connect(ui->nameInputField, &QnInputField::textChanged, this,
+    connect(ui->nameInputField, &InputField::textChanged, this,
         &QnUserProfileWidget::hasChangesChanged);
-    connect(ui->emailInputField, &QnInputField::textChanged, this,
+    connect(ui->emailInputField, &InputField::textChanged, this,
         &QnUserProfileWidget::hasChangesChanged);
 
     connect(ui->changePasswordButton, &QPushButton::clicked, this, [this]()
@@ -64,15 +84,14 @@ QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* pa
         if (!permissions.testFlag(Qn::WritePasswordPermission))
             return;
 
-        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog());
-        dialog->initializeContext(this);
+        QScopedPointer<QnChangeUserPasswordDialog> dialog(new QnChangeUserPasswordDialog(this));
         dialog->setWindowModality(Qt::ApplicationModal);
         if (dialog->exec() != QDialog::Accepted)
             return;
         m_newPassword = dialog->newPassword();
     });
 
-    m_aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    m_aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     m_aligner->registerTypeAccessor<QnCloudUserPanelWidget>(
         QnCloudUserPanelWidget::createIconWidthAccessor());
     m_aligner->setSkipInvisible(true);
@@ -173,11 +192,8 @@ void QnUserProfileWidget::applyChanges()
 
         if (isOwnProfile)
         {
-            QUrl url = commonModule()->currentUrl();
+            nx::utils::Url url = commonModule()->currentUrl();
             url.setPassword(m_newPassword);
-
-            if (auto connection = QnAppServerConnectionFactory::ec2Connection())
-                connection->updateConnectionUrl(url);
 
             using namespace nx::client::core::helpers;
             const auto localSystemId = commonModule()->globalSettings()->localSystemId();
@@ -186,7 +202,7 @@ void QnUserProfileWidget::applyChanges()
             qnClientCoreSettings->save();
 
             auto lastUsed = qnSettings->lastUsedConnection();
-            if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url))
+            if (!lastUsed.url.password().isEmpty() && isUrlEqual(lastUsed.url, url))
             {
                 lastUsed.url = url;
                 qnSettings->setLastUsedConnection(lastUsed);

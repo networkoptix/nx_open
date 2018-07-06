@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <nx/network/app_info.h>
+
 #include <client_core/connection_context_aware.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -425,7 +427,7 @@ void QnUserSettingsDialog::loadDataToUi()
         if (auth.isEmpty())
         {
             ui->alertBar->setText(tr("This user has not yet signed up for %1",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+                "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
             return;
         }
     }
@@ -450,17 +452,10 @@ QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
     if (!canApplyChanges())
         return QDialogButtonBox::Cancel;
 
-    const auto result = QnMessageBox::question(this,
+    return QnMessageBox::question(this,
         tr("Apply changes before switching to another user?"), QString(),
         QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
         QDialogButtonBox::Apply);
-
-    if (result == QDialogButtonBox::Apply)
-        return QDialogButtonBox::Yes;
-    if (result == QDialogButtonBox::Discard)
-        return QDialogButtonBox::No;
-
-    return QDialogButtonBox::Cancel;
 }
 
 void QnUserSettingsDialog::retranslateUi()
@@ -522,7 +517,7 @@ void QnUserSettingsDialog::applyChanges()
     {
         auto accessibleResources = m_model->accessibleResources();
 
-        QnLayoutResourceList layoutsToShare = resourcePool()->getResources(accessibleResources)
+        QnLayoutResourceList layoutsToShare = resourcePool()->getResourcesByIds(accessibleResources)
             .filtered<QnLayoutResource>(
                 [](const QnLayoutResourcePtr& layout)
             {
@@ -536,6 +531,10 @@ void QnUserSettingsDialog::applyChanges()
         }
 
         qnResourcesChangesManager->saveAccessibleResources(m_user, accessibleResources);
+    }
+    else
+    {
+        qnResourcesChangesManager->cleanAccessibleResources(m_user->getId());
     }
 
     /* We may fill password field to change current user password. */

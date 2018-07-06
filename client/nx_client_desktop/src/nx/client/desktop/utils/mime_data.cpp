@@ -208,7 +208,7 @@ void MimeData::load(const QMimeData* data, QnResourcePool* resourcePool)
 
     // Intentionally leave duplicates here to keep Ctrl+Drag behavior consistent.
     if (resourcePool)
-        m_resources = resourcePool->getResources(ids);
+        m_resources = resourcePool->getResourcesByIds(ids);
 
     if (data->hasUrls())
     {

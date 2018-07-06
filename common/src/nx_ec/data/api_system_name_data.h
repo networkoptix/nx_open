@@ -7,13 +7,13 @@
 
 namespace ec2 {
 
-    struct ApiSystemIdData: ApiData
+    struct ApiSystemIdData: nx::vms::api::Data
     {
-        ApiSystemIdData(): sysIdTime(0) {}
-        ApiSystemIdData(const QString &systemId): systemId(systemId), sysIdTime(0) {}
+        ApiSystemIdData() = default;
+        ApiSystemIdData(const QString &systemId): systemId(systemId) {}
 
         QnUuid systemId;
-        qint64 sysIdTime;
+        qint64 sysIdTime = 0;
         Timestamp tranLogTime;
     };
     #define ApiSystemIdData_Fields (systemId)(sysIdTime)(tranLogTime)

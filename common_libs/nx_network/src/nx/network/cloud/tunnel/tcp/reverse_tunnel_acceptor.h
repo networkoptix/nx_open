@@ -27,6 +27,7 @@ public:
 
     void accept(AcceptHandler handler) override;
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual std::string toString() const override;
 
 private:
     void callAcceptHandler(

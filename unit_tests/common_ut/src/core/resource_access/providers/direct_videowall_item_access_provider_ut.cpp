@@ -108,6 +108,21 @@ TEST_F(QnDirectVideoWallItemAccessProviderTest, checkCameraOnVideoWall)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkPushMyScreen)
+{
+    auto target = addCamera();
+    target->addFlags(Qn::desktop_camera);
+    auto videoWall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videoWall);
+    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = target->getId();
+    layout->addItem(layoutItem);
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
 TEST_F(QnDirectVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoWall)
 {
     auto target = addCamera();

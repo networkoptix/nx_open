@@ -21,11 +21,11 @@
 
 #include <nx/streaming/abstract_archive_resource.h>
 
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_user_data.h>
-#include <nx_ec/data/api_videowall_data.h>
-#include <nx_ec/data/api_webpage_data.h>
+#include <nx/vms/api/data/videowall_data.h>
+#include <nx/vms/api/data/webpage_data.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
@@ -240,7 +240,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiLayoutData& data) const
+    const nx::vms::api::LayoutData& data) const
 {
     NX_EXPECT(!isUpdating());
     return canCreateLayout(subject, data.parentId);
@@ -257,14 +257,14 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiVideowallData& /*data*/) const
+    const nx::vms::api::VideowallData& /*data*/) const
 {
     NX_EXPECT(!isUpdating());
     return canCreateVideoWall(subject);
 }
 
 bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& subject,
-    const ec2::ApiWebPageData& /*data*/) const
+    const nx::vms::api::WebPageData& /*data*/) const
 {
     NX_EXPECT(!isUpdating());
     return canCreateWebPage(subject);
@@ -333,13 +333,25 @@ void QnResourceAccessManager::updatePermissionsBySubject(const QnResourceAccessS
 
 void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 {
-    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    if (const auto& layout = resource.dynamicCast<QnLayoutResource>())
     {
         /* If layout become shared AND user is admin - he will not receive access notification
          * (because he already had access) but permissions must be recalculated. */
          connect(layout, &QnResource::parentIdChanged, this,
              &QnResourceAccessManager::updatePermissionsToResource);
         connect(layout, &QnLayoutResource::lockedChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
+    }
+
+    if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        connect(camera, &QnVirtualCameraResource::licenseTypeChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
+
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
+            &QnResourceAccessManager::updatePermissionsToResource);
+
+        connect(camera, &QnVirtualCameraResource::capabilitiesChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
     }
 
@@ -353,7 +365,7 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
 
 void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    disconnect(resource, nullptr, this, nullptr);
+    resource->disconnect(this);
 
     if (isUpdating())
         return;
@@ -466,8 +478,46 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return result;
 
     result |= Qn::ReadPermission | Qn::ViewContentPermission;
-    if (hasGlobalPermission(subject, Qn::GlobalExportPermission))
+
+    bool isLiveAllowed = !camera->needsToChangeDefaultPassword();
+    bool isFootageAllowed = hasGlobalPermission(subject, Qn::GlobalViewArchivePermission);
+    bool isExportAllowed = isFootageAllowed
+        && hasGlobalPermission(subject, Qn::GlobalExportPermission);
+
+    if (!camera->isLicenseUsed())
+    {
+        switch (camera->licenseType())
+        {
+            case Qn::LC_Bridge:
+            {
+                isFootageAllowed = false;
+                isExportAllowed = false;
+                break;
+            }
+
+            // TODO: Forbid all for VMAX when discussed with management
+            case Qn::LC_VMAX:
+            {
+                //isLiveAllowed = false;
+                //footageAllowed = false;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    if (isLiveAllowed)
+        result |= Qn::ViewLivePermission;
+
+    if (isFootageAllowed)
+        result |= Qn::ViewFootagePermission;
+
+    if (isExportAllowed)
+    {
+        NX_EXPECT(isFootageAllowed, "Server API cannot allow export without footage access.");
         result |= Qn::ExportPermission;
+    }
 
     if (hasGlobalPermission(subject, Qn::GlobalUserInputPermission))
         result |= Qn::WritePtzPermission;
@@ -861,7 +911,7 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& target, const ec2::ApiLayoutData& update) const
+    const QnResourcePtr& target, const nx::vms::api::LayoutData& update) const
 {
     NX_ASSERT(target.dynamicCast<QnLayoutResource>());
 
@@ -915,7 +965,7 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
 }
 
 bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& target, const ec2::ApiVideowallData& update) const
+    const QnResourcePtr& target, const nx::vms::api::VideowallData& update) const
 {
     if (!subject.isValid() || commonModule()->isReadOnly())
         return false;

@@ -209,17 +209,26 @@ QnCommonModule::~QnCommonModule()
     clear();
 }
 
-void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &server)
+void QnCommonModule::bindModuleInformation(const QnMediaServerResourcePtr &server)
 {
     /* Can't use resourceChanged signal because it's not emited when we are saving server locally. */
-    connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::resetCachedValue);
-    connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::resetCachedValue);
-    connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::resetCachedValue);
-    connect(server.data(),  &QnMediaServerResource::primaryAddressChanged,  this,   &QnCommonModule::resetCachedValue);
+    connect(server.data(), &QnMediaServerResource::nameChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(server.data(), &QnMediaServerResource::apiUrlChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(server.data(), &QnMediaServerResource::serverFlagsChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(server.data(), &QnMediaServerResource::primaryAddressChanged, this,
+        &QnCommonModule::resetCachedValue);
 
-    connect(m_globalSettings, &QnGlobalSettings::systemNameChanged, this, &QnCommonModule::resetCachedValue);
-    connect(m_globalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnCommonModule::resetCachedValue);
-    connect(m_globalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::systemNameChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::localSystemIdChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::cloudSettingsChanged, this,
+        &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::initialized, this,
+        &QnCommonModule::resetCachedValue);
 
     resetCachedValue();
 }
@@ -240,11 +249,11 @@ QnUuid QnCommonModule::remoteGUID() const {
     return m_remoteUuid;
 }
 
-QUrl QnCommonModule::currentUrl() const
+nx::utils::Url QnCommonModule::currentUrl() const
 {
     if (auto connection = ec2Connection())
         return connection->connectionInfo().ecUrl;
-    return QUrl();
+    return nx::utils::Url();
 }
 
 QnMediaServerResourcePtr QnCommonModule::currentServer() const
@@ -324,18 +333,17 @@ void QnCommonModule::updateModuleInformationUnsafe()
     m_moduleInformation.id = m_uuid;
     m_moduleInformation.runtimeId = m_runUuid;
 
+    m_moduleInformation.systemName = m_globalSettings->systemName();
+    m_moduleInformation.localSystemId = m_globalSettings->localSystemId();
+    m_moduleInformation.cloudSystemId = m_globalSettings->cloudSystemId();
+
     QnMediaServerResourcePtr server = m_resourcePool->getResourceById<QnMediaServerResource>(moduleGUID());
-    //NX_ASSERT(server);
     if (!server)
         return;
     if (server->getPort())
         m_moduleInformation.port = server->getPort();
     m_moduleInformation.name = server->getName();
     m_moduleInformation.serverFlags = server->getServerFlags();
-
-    m_moduleInformation.systemName = m_globalSettings->systemName();
-    m_moduleInformation.localSystemId = m_globalSettings->localSystemId();
-    m_moduleInformation.cloudSystemId = m_globalSettings->cloudSystemId();
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
@@ -472,4 +480,20 @@ void QnCommonModule::setResourceDiscoveryManager(QnResourceDiscoveryManager* dis
     if (m_resourceDiscoveryManager)
         delete m_resourceDiscoveryManager;
     m_resourceDiscoveryManager = discoveryManager;
+}
+
+void QnCommonModule::setStandAloneMode(bool value)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_standaloneMode != value)
+    {
+        m_standaloneMode = value;
+        lock.unlock();
+        emit standAloneModeChanged(value);
+    }
+}
+
+bool QnCommonModule::isStandAloneMode() const
+{
+    return m_standaloneMode;
 }

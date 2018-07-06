@@ -4,12 +4,14 @@
   <String Id="Caption">[WixBundleName] telepítő - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/ install | / repair | / uninstall | /layout [directory] - telepíti, javítja, eltávolítja, vagy teljes helyi másolatot készít a könyvtárban. Telepítés az alapértelmezett. 
+  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
+   creates a complete local copy of the bundle in directory. Install is the default.
 
-/ passive | / quiet - minimális UI megjelenítése súgók nélkül, vagy UI és súgók sem. Alapértelmezés szerint UI és súgók is megjelennek. 
+/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
+   no prompts. By default UI and all prompts are displayed.
 
-/ norestart – megakadályoz minden újraindításti kísérletet. Alapértelmezés szerint UI rákérdez újraindítás előtt.
-/ log log.txt - egy meghatározott fájlba logol. Alapértelmezés szerint a naplófájl helye: %TEMP%.</String>
+/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
+/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Biztosan megszakítja a folyamatot?</String>
   <String Id="ClientAndServer">Kliens és szerver</String>
   <String Id="ClientOnly">Csak kliens</String>

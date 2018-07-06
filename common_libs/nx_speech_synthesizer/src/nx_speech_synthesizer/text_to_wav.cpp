@@ -1,13 +1,4 @@
-#if !defined(EDGE_SERVER) && !defined(DISABLE_FESTIVAL)
 #include "text_to_wav.h"
-
-#include <QtCore/QFile>
-
-#include <mutex>
-#include <memory>
-
-#include <festival/festival.h>
-#include <EST_wave_aux.h>
 
 #ifdef QN_USE_VLD
 #include <vld.h>
@@ -15,9 +6,9 @@
 
 static char festivalVoxPath[256];
 
-#if (_XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L) && 0
-#include <stdio.h>
-#else
+#include <festival/festival.h>
+#include <EST_wave_aux.h>
+
 namespace
 {
     //TODO/IMPL: #ak use ffmpeg instead of following code (stolen from speech_tools)
@@ -28,26 +19,6 @@ namespace
     #define WAVE_FORMAT_ADPCM  0x0002
     #define WAVE_FORMAT_ALAW   0x0006
     #define WAVE_FORMAT_MULAW  0x0007
-
-    void short_to_schar(const short *data,unsigned char *chars,int length)
-    {
-        /* Convert shorts to 8 bit SIGNED CHAR */
-        int i;
-
-        for (i=0; i<length; i++)
-        chars[i] = (data[i]/256);
-
-    }
-
-    void short_to_uchar(const short *data,unsigned char *chars,int length)
-    {
-        /* Convert shorts to 8 bit UNSIGNED CHAR */
-        int i;
-
-        for (i=0; i<length; i++)
-        chars[i] = (data[i]/256)+128;
-
-    }
 
     int get_word_size(enum EST_sample_type_t sample_type)
     {
@@ -159,12 +130,12 @@ namespace
                 n = fp->write( (const char*)&data[offset], sizeof(short) * num_channels * num_samples ) / sizeof(short);
             }
             if (n != (num_channels * num_samples))
-                return misc_write_error;
+                return write_error;
         }
         else
         {
             fprintf(stderr,"save data file: unsupported sample type\n");
-            return misc_write_error;
+            return write_error;
         }
         return write_ok;
     }
@@ -211,7 +182,7 @@ namespace
             default:
               fprintf(stderr,"RIFF format: unsupported data format %d\n",
                   sample_type);
-              return misc_write_error;
+              return write_error;
         }
         if (EST_BIG_ENDIAN) data_short = SWAPSHORT(data_short);
         //fwrite(&data_short,1,2,fp); /* sample type */
@@ -248,7 +219,7 @@ namespace
                  sample_type,bo_little);
     }
 }
-#endif
+
 
 static void initFestival(const QString binaryPath)
 {
@@ -442,4 +413,3 @@ QSharedPointer<TextToWaveServer::SynthetiseSpeechTask> TextToWaveServer::addTask
     task->dest = dest;
     return m_textQueue.push( task ) ? task : QSharedPointer<SynthetiseSpeechTask>();
 }
-#endif

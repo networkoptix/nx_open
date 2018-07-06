@@ -1,11 +1,16 @@
 #include "frame_info.h"
 
+#include <nx/utils/log/log.h>
+
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <cstring>
 #include <cstdio>
 
 #include <utils/math/math.h>
+
+#include <nx/utils/app_info.h>
+#include <utils/color_space/yuvconvert.h>
 
 extern "C" {
 #ifdef WIN32
@@ -18,6 +23,29 @@ extern "C" {
 #endif
 };
 
+
+namespace {
+
+void convertImageFormat(
+    int width,
+    int height,
+    uint8_t* const sourceSlice[],
+    const int sourceStride[],
+    AVPixelFormat sourceFormat,
+    uint8_t* const targetSlice[],
+    const int targetStride[],
+    AVPixelFormat targetFormat)
+{
+    const auto context = sws_getContext(
+        width, height, sourceFormat,
+        width, height, targetFormat,
+        SWS_BILINEAR, nullptr, nullptr, nullptr);
+
+    sws_scale(context, sourceSlice, sourceStride, 0, height, targetSlice, targetStride);
+    sws_freeContext(context);
+}
+
+} // namespace
 
 /////////////////////////////////////////////////////
 //  class QnSysMemPictureData
@@ -56,7 +84,12 @@ unsigned int QnOpenGLPictureData::glTexture() const
 /////////////////////////////////////////////////////
 CLVideoDecoderOutput::CLVideoDecoderOutput()
 {
-    memset( this, 0, sizeof(*this) );
+    memset( this, 0, sizeof(AVFrame) );
+}
+CLVideoDecoderOutput::CLVideoDecoderOutput(int targetWidth, int targetHeight, int targetFormat):
+    CLVideoDecoderOutput()
+{
+    reallocate(targetWidth, targetHeight, targetFormat);
 }
 
 CLVideoDecoderOutput::~CLVideoDecoderOutput()
@@ -332,7 +365,7 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 
 CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 {
-    memset( this, 0, sizeof(*this) );
+    memset( this, 0, sizeof(AVFrame) );
 
     reallocate(image.width(), image.height(), AV_PIX_FMT_YUV420P);
     CLVideoDecoderOutput src;
@@ -341,29 +374,90 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
     for (int y = 0; y < height; ++y)
         memcpy(src.data[0] + src.linesize[0]*y, image.scanLine(y), width * 4);
 
-    SwsContext* scaleContext = sws_getContext(width, height, AV_PIX_FMT_BGRA,
-                                              width, height, AV_PIX_FMT_YUV420P,
-                                              SWS_BICUBIC, NULL, NULL, NULL);
-    sws_scale(scaleContext, src.data, src.linesize, 0, height, data, linesize);
-    sws_freeContext(scaleContext);
+    convertImageFormat(width, height,
+        src.data, src.linesize, AV_PIX_FMT_BGRA,
+        data, linesize, AV_PIX_FMT_YUV420P);
 }
 
 QImage CLVideoDecoderOutput::toImage() const
 {
-    CLVideoDecoderOutput dst;
-    dst.reallocate(width, height, AV_PIX_FMT_BGRA);
+    // In some cases direct conversion to AV_PIX_FMT_BGRA causes crash in sws_scale
+    // function. As workaround we can temporary convert to AV_PIX_FMT_ARGB format and then convert
+    // to target AV_PIX_FMT_BGRA
+    const AVPixelFormat intermediateFormat = AV_PIX_FMT_ARGB;
+    const AVPixelFormat targetFormat = AV_PIX_FMT_BGRA;
 
-    SwsContext* scaleContext = sws_getContext(width, height, (AVPixelFormat) format,
-                                              width, height, AV_PIX_FMT_BGRA,
-                                              SWS_BICUBIC, NULL, NULL, NULL);
-    sws_scale(scaleContext, data, linesize, 0, height, dst.data, dst.linesize);
-    sws_freeContext(scaleContext);
+    CLVideoDecoderOutputPtr target(new CLVideoDecoderOutput(width, height, intermediateFormat));
+
+    convertImageFormat(width, height,
+        data, linesize, (AVPixelFormat)format,
+        target->data, target->linesize, intermediateFormat);
+
+    const CLVideoDecoderOutputPtr converted(new CLVideoDecoderOutput(width, height, targetFormat));
+    convertImageFormat(width, height,
+        target->data, target->linesize, intermediateFormat,
+        converted->data, converted->linesize, targetFormat);
+    target = converted;
 
     QImage img(width, height, QImage::Format_ARGB32);
     for (int y = 0; y < height; ++y)
-        memcpy(img.scanLine(y), dst.data[0] + dst.linesize[0]*y, width * 4);
+        memcpy(img.scanLine(y), target->data[0] + target->linesize[0] * y, width * 4);
 
     return img;
+}
+
+std::vector<char> CLVideoDecoderOutput::toRgb(int* outLineSize, AVPixelFormat pixelFormat) const
+{
+    NX_ASSERT(outLineSize);
+
+    int bytesPerPixel = 0;
+    switch (pixelFormat)
+    {
+        case AV_PIX_FMT_ARGB:
+        case AV_PIX_FMT_ABGR:
+        case AV_PIX_FMT_RGBA:
+        case AV_PIX_FMT_BGRA:
+            bytesPerPixel = 4;
+            break;
+
+        case AV_PIX_FMT_RGB24:
+        case AV_PIX_FMT_BGR24:
+            bytesPerPixel = 3;
+            break;
+
+        default:
+            NX_ERROR(this) << __func__ << "(): Unsupported AVPixelFormat " << pixelFormat;
+            return std::vector<char>{};
+    }
+
+    int targetLineSize[4];
+    memset(targetLineSize, 0, sizeof(targetLineSize));
+    targetLineSize[0] = qPower2Ceil((unsigned int) (width * bytesPerPixel), 16U);
+    *outLineSize = targetLineSize[0];
+
+    std::vector<char> result(*outLineSize * height);
+
+    uint8_t* targetData[4];
+    memset(targetData, 0, sizeof(targetData));
+    targetData[0] = (uint8_t*) &result.at(0);
+
+    #if defined(__i386) || defined(__amd64) || defined(_WIN32)
+        if (pixelFormat == AV_PIX_FMT_BGRA)
+        {
+            // ATTENTION: Despite its name, this function actually converts to BGRA.
+            yuv420_argb32_simd_intr(
+                (uint8_t*) &result[0],
+                data[0], data[1], data[2],
+                width, height, *outLineSize,
+                linesize[0], linesize[1], /*alpha*/ 255);
+            return result;
+        }
+    #endif
+
+    convertImageFormat(width, height,
+        data, linesize, (AVPixelFormat) format,
+        targetData, targetLineSize, pixelFormat);
+    return result;
 }
 
 void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
@@ -381,7 +475,7 @@ bool CLVideoDecoderOutput::invalidScaleParameters(const QSize& size) const
     return size.width() == 0 || size.height() == 0 || height == 0 || width == 0;
 }
 
-CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat)
+CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat) const
 {
     if (invalidScaleParameters(newSize))
         return nullptr;

@@ -43,7 +43,7 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
 
     if (mode() == Mode::direct)
     {
-        auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
+        auto sharedLayouts = commonModule()->resourcePool()->getResourcesByIds<QnLayoutResource>(
             sharedResourcesManager()->sharedResources(subject));
 
         auto resourceId = resource->getId();
@@ -90,7 +90,7 @@ void QnSharedLayoutItemAccessProvider::fillProviders(
     if (!isMediaResource(resource))
         return;
 
-    auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
+    auto sharedLayouts = commonModule()->resourcePool()->getResourcesByIds<QnLayoutResource>(
         sharedResourcesManager()->sharedResources(subject));
 
     auto resourceId = resource->getId();
@@ -161,7 +161,7 @@ void QnSharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccess
 
     auto aggregator = ensureAggregatorForSubject(subject);
 
-    auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
+    auto sharedLayouts = commonModule()->resourcePool()->getResourcesByIds<QnLayoutResource>(
         sharedResourcesManager()->sharedResources(subject));
     for (auto layout: sharedLayouts)
         aggregator->addWatchedLayout(layout);
@@ -198,13 +198,13 @@ void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     auto added = (newValues - oldValues);
     auto removed = (oldValues - newValues);
 
-    for (const auto& layout: commonModule()->resourcePool()->getResources<QnLayoutResource>(added))
+    for (const auto& layout: commonModule()->resourcePool()->getResourcesByIds<QnLayoutResource>(added))
     {
         if (layout->isShared())
            aggregator->addWatchedLayout(layout);
     }
 
-    for (const auto& layout: commonModule()->resourcePool()->getResources<QnLayoutResource>(removed))
+    for (const auto& layout: commonModule()->resourcePool()->getResourcesByIds<QnLayoutResource>(removed))
     {
         if (layout->isShared())
             aggregator->removeWatchedLayout(layout);

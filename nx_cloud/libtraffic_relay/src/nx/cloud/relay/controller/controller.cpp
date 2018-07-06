@@ -13,15 +13,16 @@ Controller::Controller(
     const conf::Settings& settings,
     Model* model)
     :
+    m_trafficRelay(controller::TrafficRelayFactory::instance().create()),
     m_connectSessionManager(
         controller::ConnectSessionManagerFactory::create(
             settings,
             &model->clientSessionPool(),
             &model->listeningPeerPool(),
             &model->remoteRelayPeerPool(),
-            &m_trafficRelay)),
+            m_trafficRelay.get())),
     m_listeningPeerManager(
-        controller::ListeningPeerManagerFactory::instance().create(
+        relaying::ListeningPeerManagerFactory::instance().create(
             settings.listeningPeer(), &model->listeningPeerPool())),
     m_model(model),
     m_settings(&settings)
@@ -34,12 +35,17 @@ Controller::~Controller()
         m_model->listeningPeerPool().peerConnectedSubscription().removeSubscription(subscriptionId);
 }
 
+controller::AbstractTrafficRelay& Controller::trafficRelay()
+{
+    return *m_trafficRelay;
+}
+
 controller::AbstractConnectSessionManager& Controller::connectSessionManager()
 {
     return *m_connectSessionManager;
 }
 
-controller::AbstractListeningPeerManager& Controller::listeningPeerManager()
+relaying::AbstractListeningPeerManager& Controller::listeningPeerManager()
 {
     return *m_listeningPeerManager;
 }
@@ -47,13 +53,14 @@ controller::AbstractListeningPeerManager& Controller::listeningPeerManager()
 bool Controller::discoverPublicAddress()
 {
     auto publicHostAddress = controller::PublicIpDiscoveryService::get();
-    if (!(bool) publicHostAddress)
+    if (!(bool)publicHostAddress)
         return false;
 
-    SocketAddress publicSocketAddress(*publicHostAddress, m_settings->http().endpoints.front().port);
+    network::SocketAddress publicSocketAddress(*publicHostAddress, m_settings->http().endpoints.front().port);
+    m_model->remoteRelayPeerPool().setNodeId(publicSocketAddress.toStdString());
 
     nx::utils::SubscriptionId subscriptionId;
-    subscribeForPeerConnected(&subscriptionId, publicSocketAddress.toStdString());
+    subscribeForPeerConnected(&subscriptionId);
     m_listeningPeerPoolSubscriptions.push_back(subscriptionId);
 
     subscribeForPeerDisconnected(&subscriptionId);
@@ -62,25 +69,23 @@ bool Controller::discoverPublicAddress()
     return true;
 }
 
-void Controller::subscribeForPeerConnected(
-    nx::utils::SubscriptionId* subscriptionId,
-    std::string publicAddress)
+void Controller::subscribeForPeerConnected(nx::utils::SubscriptionId* subscriptionId)
 {
     m_model->listeningPeerPool().peerConnectedSubscription().subscribe(
-        [this, publicAddress = std::move(publicAddress)](std::string peer)
+        [this](std::string peer)
         {
-            m_model->remoteRelayPeerPool().addPeer(peer, publicAddress)
+            m_model->remoteRelayPeerPool().addPeer(peer)
                 .then(
                     [this, peer](cf::future<bool> addPeerFuture)
                     {
                         if (addPeerFuture.get())
                         {
-                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
                                 .arg(peer));
                         }
                         else
                         {
-                            NX_VERBOSE(this, lm("Successfully added peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Failed to add peer %1 to RemoteRelayPool")
                                 .arg(peer));
                         }
 
@@ -101,12 +106,12 @@ void Controller::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscri
                     {
                         if (removePeerFuture.get())
                         {
-                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
                                 .arg(peer));
                         }
                         else
                         {
-                            NX_VERBOSE(this, lm("Successfully removed peer %1 to RemoteRelayPool")
+                            NX_VERBOSE(this, lm("Failed to remove peer %1 to RemoteRelayPool")
                                 .arg(peer));
                         }
 
@@ -115,8 +120,6 @@ void Controller::subscribeForPeerDisconnected(nx::utils::SubscriptionId* subscri
         },
         subscriptionId);
 }
-
-
 
 } // namespace relay
 } // namespace cloud

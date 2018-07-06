@@ -340,9 +340,6 @@ void QnStatisticsManager::saveCurrentStatistics()
     const auto cloudSystemId = qnGlobalSettings->cloudSystemId();
     metrics.insert(kSessionIdMetricTag, sessionId.toString());
     metrics.insert(kClientMachineIdMetricTag, m_clientId.toString());
-    metrics.insert(kSystemNameMetricTag, systemName);
-    if (!cloudSystemId.isEmpty())
-        metrics.insert(kCloudSystemIdMetricTag, cloudSystemId);
 
     m_storage->storeMetrics(metrics);
 }

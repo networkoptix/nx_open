@@ -12,7 +12,7 @@
 #include <nx/utils/string.h>
 
 #include <utils/common/synctime.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 
 namespace {
 
@@ -220,16 +220,8 @@ QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) c
             if (index.column() != CameraNameColumn)
                 break;
 
-            // Makes always-selected cameras icon
-            const auto source = qnResIconCache->icon(QnResourceIconCache::Cameras);
-            QIcon result;
-            for (const auto& size: source.availableSizes(QIcon::Selected))
-            {
-                const auto selectedPixmap = source.pixmap(size, QIcon::Selected);
-                result.addPixmap(selectedPixmap, QIcon::Normal);
-                result.addPixmap(selectedPixmap, QIcon::Selected);
-            }
-            return result;
+            return qnResIconCache->icon(
+                QnResourceIconCache::Cameras | QnResourceIconCache::AlwaysSelected);
         }
         case Qn::RecordingStatsDataRole:
             return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
@@ -392,13 +384,13 @@ QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsDat
     if (data.archiveDurationSecs < kSecondsPerHour)
         return tr("less than an hour");
 
-    static const int kMsecPerSec = 1000;
+    const auto duration = std::chrono::seconds(data.archiveDurationSecs);
     static const QString kSeparator(L' ');
-    static const Qt::TimeSpanFormat kFormat = Qt::Years | Qt::Months | Qt::Days | Qt::Hours;
 
-    qint64 durationMs = data.archiveDurationSecs * kMsecPerSec;
-    qint64 referenceMs = qnSyncTime->currentMSecsSinceEpoch();
-
-    return QTimeSpan(QDateTime::fromMSecsSinceEpoch(referenceMs), durationMs)
-        .toApproximateString(QTimeSpan::kDoNotSuppressSecondUnit, kFormat, QTimeSpan::SuffixFormat::Full, kSeparator);
+    using HumanReadable = nx::client::core::HumanReadable;
+    return HumanReadable::timeSpan(duration,
+        HumanReadable::Years | HumanReadable::Months | HumanReadable::Days | HumanReadable::Hours,
+        HumanReadable::SuffixFormat::Full,
+        kSeparator,
+        HumanReadable::kNoSuppressSecondUnit);
 }

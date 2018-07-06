@@ -26,7 +26,7 @@ namespace ec2
     public:
         FixedUrlClientQueryProcessor &getAccess(const Qn::UserAccessData &) { return *this; }
 
-        FixedUrlClientQueryProcessor( ClientQueryProcessor* clientProcessor, const QUrl& ecURL )
+        FixedUrlClientQueryProcessor( ClientQueryProcessor* clientProcessor, const nx::utils::Url& ecURL )
         :
             m_clientProcessor( clientProcessor ),
             m_ecURL( ecURL )
@@ -36,7 +36,7 @@ namespace ec2
         template<class InputData, class HandlerType>
             void processUpdateAsync(ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
-            QUrl ecUrl;
+            nx::utils::Url ecUrl;
             {
                 QnMutexLocker lk( &m_mutex );
                 ecUrl = m_ecURL;
@@ -47,7 +47,7 @@ namespace ec2
         template<class InputData, class OutputData, class HandlerType>
             void processQueryAsync( ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
-            QUrl ecUrl;
+            nx::utils::Url ecUrl;
             {
                 QnMutexLocker lk( &m_mutex );
                 ecUrl = m_ecURL;
@@ -55,10 +55,16 @@ namespace ec2
             m_clientProcessor->processQueryAsync<InputData, OutputData, HandlerType>( ecUrl, cmdCode, input, handler );
         }
 
-        QUrl getUrl() const
+        nx::utils::Url getUrl() const
         {
             QnMutexLocker lk( &m_mutex );
             return m_ecURL;
+        }
+
+        void setUrl(const nx::utils::Url& url)
+        {
+            QnMutexLocker lk( &m_mutex );
+            m_ecURL = url;
         }
 
         QnUuid getId() const
@@ -81,12 +87,13 @@ namespace ec2
 
     private:
         ClientQueryProcessor* m_clientProcessor;
-        QUrl m_ecURL;
+        nx::utils::Url m_ecURL;
         QnUuid m_peerId;
         mutable QnMutex m_mutex;
     };
 
     typedef std::shared_ptr<FixedUrlClientQueryProcessor> FixedUrlClientQueryProcessorPtr;
 }
+
 
 #endif  //FIXED_URL_CLIENT_QUERY_PROCESSOR_H

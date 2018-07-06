@@ -479,7 +479,7 @@ table.webclient-window>tbody>tr>td{
     margin: 40px 0 0 10px;
     position: absolute;
     padding: 10px;
-    z-index: 3; /* Keeps camera details panel above video and preloader */
+    z-index: 2; /* Keeps camera details panel above video and preloader */
 
     & table{
       font-size: 12px;

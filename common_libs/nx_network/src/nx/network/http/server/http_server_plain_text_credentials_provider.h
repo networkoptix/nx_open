@@ -6,7 +6,9 @@
 
 #include "http_server_base_authentication_manager.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 
 class NX_NETWORK_API PlainTextCredentialsProvider:
@@ -26,4 +28,6 @@ private:
 };
 
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

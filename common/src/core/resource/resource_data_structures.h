@@ -22,6 +22,7 @@ typedef std::vector<quint64> QnBitrateList;
 
 struct TwoWayAudioParams
 {
+    QString engine;
     QString codec;
     int bitrateKbps = 0;
     int channels = 1;
@@ -29,9 +30,10 @@ struct TwoWayAudioParams
     QString urlPath;
     QString contentType;
     bool noAuth = false;
+    bool useBasicAuth = false;
 };
 Q_DECLARE_METATYPE(TwoWayAudioParams);
-#define TwoWayAudioParams_Fields (codec)(bitrateKbps)(channels)(sampleRate)(urlPath)(contentType)(noAuth)
+#define TwoWayAudioParams_Fields (engine)(codec)(bitrateKbps)(channels)(sampleRate)(urlPath)(contentType)(noAuth)(useBasicAuth)
 
 struct QnBounds
 {

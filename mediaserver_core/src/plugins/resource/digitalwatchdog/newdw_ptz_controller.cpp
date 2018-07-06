@@ -141,9 +141,8 @@ QString QnNewDWPtzController::fromExtarnalID(const QString& externalId)
     return result.isEmpty() ? externalId : result;
 }
 
-bool QnNewDWPtzController::activatePreset(const QString &presetId, qreal speed)
+bool QnNewDWPtzController::activatePreset(const QString &presetId, qreal /*speed*/)
 {
-    Q_UNUSED(speed)
     return doQuery(lit("/cgi-bin/ptz.cgi?gotopreset=%1").arg(fromExtarnalID(presetId)));
 }
 
@@ -173,6 +172,5 @@ bool QnNewDWPtzController::removePreset(const QString &presetId)
     }
     return rez;
 }
-
 
 #endif // ENABLE_ONVIF

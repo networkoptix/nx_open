@@ -61,7 +61,6 @@ QString QnRestResult::ErrorDescriptor::text() const
     }
 }
 
-
 QnRestResult::QnRestResult():
     error(NoError)
 {}
@@ -92,17 +91,14 @@ QnUbjsonRestResult::QnUbjsonRestResult(const QnRestResult& base) :
     QnRestResult(base)
 {}
 
-
 /* Dummy methods to make fusion macro compile for json and ubjson at once.  */
-void serialize(const QJsonValue &value, QnUbjsonWriter<QByteArray> *stream) {
+void serialize(const QJsonValue& /*value*/, QnUbjsonWriter<QByteArray>* /*stream*/)
+{
     NX_ASSERT(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
-    QN_UNUSED(value, stream);
-    return;
 }
 
-bool deserialize(QnUbjsonReader<QByteArray> *stream, QJsonValue *target) {
+bool deserialize(QnUbjsonReader<QByteArray>* /*stream*/, QJsonValue* /*target*/)
+{
     NX_ASSERT(false, Q_FUNC_INFO, "We should not serialize QJsonValue to UBJson.");
-    QN_UNUSED(stream, target);
     return true;
 }
-

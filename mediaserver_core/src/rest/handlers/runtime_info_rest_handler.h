@@ -5,6 +5,9 @@
 class QnRuntimeInfoRestHandler: public QnJsonRestHandler
 {
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
-private:
+    virtual int executeGet(
+        const QString& path,
+        const QnRequestParams& params,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner) override;
 };

@@ -1,11 +1,11 @@
-Witamy w {{PRODUCT_NAME}}
+Witamy w %PRODUCT_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) zaprasza do {{PRODUCT_NAME}} i udostępnia Ci swój system {{message.system_name}}.
+{{message.sharer_name}} ({{message.sharer_email}}) zaprasza do %PRODUCT_NAME% i udostępnia Ci swój system {{message.system_name}}.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Zapraszamy Cię do {{PRODUCT_NAME}}.
+Zapraszamy Cię do %PRODUCT_NAME%.
 Masz dostęp do {{message.system_name}}.
 {{/message.sharer_name}}
 

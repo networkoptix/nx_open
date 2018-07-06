@@ -73,11 +73,10 @@ public:
 
     /**
      * \param other
-     * \returns                         True if and only if storage allocated from \a this can be deallocated from \a other.
-     *                                  Always returns true for stateless allocators.
+     * \returns True if and only if storage allocated from \a this can be deallocated from \a other.
+     *          Always returns true for stateless allocators.
      */
-    inline bool operator==(const QnAlignedAllocator<T,N> &other) const {
-        Q_UNUSED(other)
+    inline bool operator==(const QnAlignedAllocator<T,N>& /*other*/) const {
         return true;
     }
 };

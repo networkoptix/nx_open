@@ -8,7 +8,7 @@
 
 #include <ui/style/globals.h>
 
-#include <nx/utils/collection.h>
+#include <nx/utils/algorithm/index_of.h>
 
 namespace {
     static const qreal speedLowest  = 0.15;
@@ -163,7 +163,8 @@ bool QnPtzTourSpotsModel::insertRows(int row, int count, const QModelIndex &pare
         int index = -1;
         if (!m_spots.isEmpty()) {
             QString lastId = m_spots.last().presetId;
-            index = qnIndexOf(m_presets, [&](const QnPtzPreset &preset) { return lastId == preset.id; });
+            index = nx::utils::algorithm::index_of(m_presets,
+                [&](const QnPtzPreset &preset) { return lastId == preset.id; });
         }
         index++;
 

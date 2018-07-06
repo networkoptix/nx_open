@@ -287,25 +287,23 @@ bool QnTimePeriodList::decode(QByteArray &stream)
     return decode((const quint8 *)stream.constData(), stream.size());
 }
 
-QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &periods, int detailLevelMs)
+QnTimePeriodList QnTimePeriodList::aggregateTimePeriodsUnconstrained(
+    const QnTimePeriodList& periods,
+    std::chrono::milliseconds detailLevel)
 {
-    /* Do not aggregate periods by 1 ms */
-    if (detailLevelMs <= 1)
-        return periods;
-
     QnTimePeriodList result;
     if (periods.isEmpty())
         return result;
 
     result.push_back(*periods.begin());
 
-    for (const QnTimePeriod &p : periods)
+    for (const QnTimePeriod& p: periods)
     {
         QnTimePeriod &last = result.last();
         if (last.isInfinite())
             break;
 
-        if (last.startTimeMs + last.durationMs + detailLevelMs > p.startTimeMs)
+        if (last.startTimeMs + last.durationMs + detailLevel.count() > p.startTimeMs)
         {
             if (p.isInfinite())
             {
@@ -323,6 +321,24 @@ QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(const QnTimePeriodList &
     }
 
     return result;
+}
+
+QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(
+    const QnTimePeriodList& periods,
+    int detailLevelMs)
+{
+    return aggregateTimePeriods(periods, std::chrono::milliseconds(detailLevelMs));
+}
+
+QnTimePeriodList QnTimePeriodList::aggregateTimePeriods(
+    const QnTimePeriodList& periods,
+    std::chrono::milliseconds detailLevel)
+{
+    // Do not aggregate periods by 1 ms.
+    if (detailLevel <= std::chrono::milliseconds(1))
+        return periods;
+
+    return aggregateTimePeriodsUnconstrained(periods, detailLevel);
 }
 
 void QnTimePeriodList::includeTimePeriod(const QnTimePeriod &period)
@@ -404,6 +420,82 @@ void QnTimePeriodList::excludeTimePeriod(const QnTimePeriod &period)
     }
 }
 
+void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
+{
+    auto srcItr = cbegin();
+    auto subtrahendItr = periodList.cbegin();
+    QnTimePeriodList result;
+
+    while (srcItr != end())
+    {
+        if (subtrahendItr == periodList.cend())
+        {
+            result << *srcItr;
+            ++srcItr;
+            continue;
+        }
+
+        if (srcItr->isContainedIn(*subtrahendItr))
+        {
+            ++srcItr;
+            continue;
+        }
+
+        if (subtrahendItr->endTimeMs() <= srcItr->startTimeMs)
+        {
+            ++subtrahendItr;
+            continue;
+        }
+
+        auto current = *srcItr;
+        while (subtrahendItr != periodList.cend())
+        {
+            if (current.isLeftIntersection(*subtrahendItr))
+            {
+                current = current.truncatedFront(subtrahendItr->endTimeMs());
+                ++subtrahendItr;
+
+                if (subtrahendItr == periodList.cend())
+                    result << current;
+
+                continue;
+            }
+
+            if (current.isRightIntersection(*subtrahendItr))
+            {
+                result << current.truncated(subtrahendItr->startTimeMs);
+                break;
+            }
+
+            if (current.contains(*subtrahendItr))
+            {
+                result << QnTimePeriod::fromInterval(
+                    current.startTimeMs,
+                    subtrahendItr->startTimeMs);
+
+                current = QnTimePeriod::fromInterval(
+                    subtrahendItr->endTimeMs(),
+                    current.endTimeMs());
+
+                ++subtrahendItr;
+
+                if (subtrahendItr == periodList.cend())
+                    result << current;
+
+                continue;
+            }
+
+            result << current;
+            break;
+        }
+
+        // We should be here only if current source chunk is fully processed.
+        ++srcItr;
+    }
+
+    *this = result;
+}
+
 void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeriodList& tail, qint64 dividerPoint)
 {
     qint64 erasePoint = dividerPoint;
@@ -440,7 +532,7 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     }
 
 
-    NX_ASSERT(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
+    //NX_ASSERT(!periods.isEmpty(), Q_FUNC_INFO, "Empty list should be worked out earlier");
     if (periods.isEmpty())
     {
         periods = tail;

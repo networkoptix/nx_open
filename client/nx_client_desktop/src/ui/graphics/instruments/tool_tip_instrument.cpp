@@ -8,51 +8,42 @@
 #include <ui/graphics/items/standard/graphics_tool_tip.h>
 #include <ui/common/tool_tip_queryable.h>
 
-namespace {
-    QString widgetToolTip(QWidget *widget, const QPoint &pos) { // TODO: #Elric implement like in help topic accessor, with bubbleUp.
-        QWidget *childWidget = widget->childAt(pos);
-        if(!childWidget)
-            childWidget = widget;
-
-        while(true) {
-            if(ToolTipQueryable *queryable = dynamic_cast<ToolTipQueryable *>(childWidget))
-                return queryable->toolTipAt(childWidget->mapFrom(widget, pos));
-
-            if(QAbstractItemView *view = dynamic_cast<QAbstractItemView *>(childWidget)) {
-                if(/*QAbstractItemModel *model = */view->model()) {
-                    QVariant toolTip = view->indexAt(childWidget->mapFrom(widget, pos)).data(Qt::ToolTipRole);
-                    if (toolTip.convert(QVariant::String))
-                        return toolTip.toString();
-                }
-            }
-
-            if(!childWidget->toolTip().isEmpty() || childWidget == widget)
-                return childWidget->toolTip();
-
-            childWidget = childWidget->parentWidget();
-        }
-    }
-
-    QString itemToolTip(QGraphicsItem *item, const QPointF &pos) {
-        if(ToolTipQueryable *queryable = dynamic_cast<ToolTipQueryable *>(item))
-            return queryable->toolTipAt(pos);
-
-        if(QGraphicsProxyWidget *proxyWidget = dynamic_cast<QGraphicsProxyWidget *>(item))
-            if(QWidget *widget = proxyWidget->widget())
-                return widgetToolTip(widget, pos.toPoint());
-        
-        return item->toolTip();
-    }
-
-} // anonymous namespace
-
-
 ToolTipInstrument::ToolTipInstrument(QObject *parent):
     Instrument(Viewport, makeSet(QEvent::ToolTip), parent)
 {}
 
 ToolTipInstrument::~ToolTipInstrument() {
     return;
+}
+
+void ToolTipInstrument::addIgnoredItem(QGraphicsItem* item)
+{
+    m_ignoredItems.insert(item);
+}
+
+bool ToolTipInstrument::removeIgnoredItem(QGraphicsItem* item)
+{
+    return m_ignoredItems.remove(item);
+}
+
+void ToolTipInstrument::addIgnoredWidget(QWidget* widget)
+{
+    m_ignoredWidgets.insert(widget);
+    connect(widget, &QWidget::destroyed, this, &ToolTipInstrument::at_ignoredWidgetDestroyed);
+}
+
+bool ToolTipInstrument::removeIgnoredWidget(QWidget* widget)
+{
+    if (!m_ignoredWidgets.remove(widget))
+        return false;
+
+    disconnect(widget, &QWidget::destroyed, this, &ToolTipInstrument::at_ignoredWidgetDestroyed);
+    return true;
+}
+
+void ToolTipInstrument::at_ignoredWidgetDestroyed()
+{
+    m_ignoredWidgets.remove(static_cast<QWidget*>(sender()));
 }
 
 bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
@@ -69,6 +60,8 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     ToolTipQueryable* targetAsToolTipQueryable = NULL;
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
         if(!item->toolTip().isEmpty() || dynamic_cast<ToolTipQueryable *>(item) || dynamic_cast<QGraphicsProxyWidget *>(item) ) {
+            if (!satisfiesItemConditions(item) || m_ignoredItems.contains(item))
+                continue;
             targetItem = item;
             targetAsToolTipQueryable = dynamic_cast<ToolTipQueryable *>(item);
             QGraphicsProxyWidget* targetAsGraphicsProxy = dynamic_cast<QGraphicsProxyWidget *>(item);
@@ -98,4 +91,58 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     return true;
 }
 
+// TODO: #Elric implement like in help topic accessor, with bubbleUp.
+QString ToolTipInstrument::widgetToolTip(QWidget* widget, const QPoint& pos) const
+{
+    if (m_ignoredWidgets.contains(widget))
+        return QString();
 
+    auto childWidget = widget->childAt(pos);
+    if (!childWidget)
+        childWidget = widget;
+
+    if (!m_ignoredWidgets.empty())
+    {
+        for (auto child = childWidget; child && child != widget; child = child->parentWidget())
+            if (m_ignoredWidgets.contains(child))
+                return QString();
+    }
+
+    while (true)
+    {
+        if (auto queryable = dynamic_cast<ToolTipQueryable*>(childWidget))
+            return queryable->toolTipAt(childWidget->mapFrom(widget, pos));
+
+        if (auto view = dynamic_cast<QAbstractItemView*>(childWidget))
+        {
+            if (view->model())
+            {
+                QVariant toolTip = view->indexAt(childWidget->mapFrom(widget, pos)).
+                    data(Qt::ToolTipRole);
+
+                if (toolTip.convert(QVariant::String))
+                    return toolTip.toString();
+            }
+        }
+
+        if (!childWidget->toolTip().isEmpty() || childWidget == widget)
+            return childWidget->toolTip();
+
+        childWidget = childWidget->parentWidget();
+    }
+}
+
+QString ToolTipInstrument::itemToolTip(QGraphicsItem* item, const QPointF& pos) const
+{
+    if (m_ignoredItems.contains(item))
+        return QString();
+
+    if (auto queryable = dynamic_cast<ToolTipQueryable*>(item))
+        return queryable->toolTipAt(pos);
+
+    if (auto proxyWidget = dynamic_cast<QGraphicsProxyWidget*>(item))
+        if (auto widget = proxyWidget->widget())
+            return widgetToolTip(widget, pos.toPoint());
+
+    return item->toolTip();
+}

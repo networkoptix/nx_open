@@ -1,13 +1,13 @@
-Welkom bij {{PRODUCT_NAME}}
+Welkom bij %PRODUCT_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) nodigt u uit om deel te nemen {{PRODUCT_NAME}} en heeft zijn {{message.system_name}} systeem met u gedeeld.
+{{message.sharer_name}} ({{message.sharer_email}}) nodigt u uit om gebruik te maken van %PRODUCT_NAME% en heeft zijn {{message.system_name}} systeem met u gedeeld.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-U wordt uitgenodigd om deel te nemen aan {{PRODUCT_NAME}}.
+U wordt uitgenodigd om gebruik te maken van %PRODUCT_NAME%.
 U heeft toegang gekregen tot "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Registreer en bekijk het systeem: {{config.portal_url}} / register / {{message.code}}
+Registreer en bekijk het systeem: {{config.portal_url}}/register/{{message.code}}
 

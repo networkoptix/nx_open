@@ -16,7 +16,7 @@ class QnTwoWayAudioWidget : public Customized<GraphicsWidget>
     typedef Customized<GraphicsWidget> base_type;
 
 public:
-    QnTwoWayAudioWidget(QGraphicsWidget* parent = nullptr);
+    QnTwoWayAudioWidget(const QString& sourceId, QGraphicsWidget* parent = nullptr);
     ~QnTwoWayAudioWidget();
 
     void setCamera(const QnVirtualCameraResourcePtr &camera);

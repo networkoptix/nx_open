@@ -54,11 +54,9 @@ namespace {
 
 struct FffmpegLog
 {
-    static void av_log_default_callback_impl(void* ptr, int level, const char* fmt, va_list vl)
+    static void av_log_default_callback_impl(void* /*ptr*/, int /*level*/, const char* fmt, va_list vl)
     {
-        Q_UNUSED(level)
-            Q_UNUSED(ptr)
-            NX_ASSERT(fmt && "NULL Pointer");
+        NX_ASSERT(fmt && "NULL Pointer");
 
         if (!fmt) {
             return;
@@ -70,7 +68,6 @@ struct FffmpegLog
         qDebug() << "ffmpeg library: " << strText;
     }
 };
-
 
 QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
@@ -128,9 +125,8 @@ void QnFfmpegVideoDecoder::flush()
     //avcodec_flush_buffers(c); // does not flushing output frames
     int got_picture = 0;
     QnFfmpegAvPacket avpkt;
-    while (avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt) > 0);
+    while (decodeVideo(m_context, m_frame, &got_picture, &avpkt) > 0);
 }
-
 
 AVCodec* QnFfmpegVideoDecoder::findCodec(AVCodecID codecId)
 {
@@ -150,13 +146,10 @@ void QnFfmpegVideoDecoder::closeDecoder()
     m_decoderContext.close();
 #endif
 
-    av_free(m_frame);
-    m_frame = 0;
-    if (m_deinterlaceBuffer)
-        av_free(m_deinterlaceBuffer);
-    av_free(m_deinterlacedFrame);
+    av_frame_free(&m_frame);
+    av_freep(&m_deinterlaceBuffer);
+    av_frame_free(&m_deinterlacedFrame);
     delete m_frameTypeExtractor;
-    m_motionMap.clear();
 }
 
 void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
@@ -182,8 +175,8 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
                 quint8 nalType = *curNal & 0x1f;
                 if (nalType >= nuSliceNonIDR && nalType <= nuSliceIDR) {
                     BitStreamReader bitReader;
-                    bitReader.setBuffer(curNal+1, end);
                     try {
+                        bitReader.setBuffer(curNal + 1, end);
                         int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
                         if (first_mb_in_slice > 0) {
                             nextSliceCnt++;
@@ -244,7 +237,6 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == AV_CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
-
     NX_LOG(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
     // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
@@ -270,13 +262,13 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
         return; // can't reset right now
     }
 
-    //closeDecoder();
-    //openDecoder();
-    //return;
+    QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
+    m_passedContext = nullptr;
 
-    if (m_passedContext && data->context)
+    if (data->context)
 	{
         m_codec = findCodec(data->context->getCodecId());
+        m_passedContext = avcodec_alloc_context3(nullptr);
         QnFfmpegHelper::mediaContextToAvCodecContext(m_passedContext, data->context);
     }
     if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
@@ -303,9 +295,9 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
 
     //m_context->debug |= FF_DEBUG_THREADS;
     //m_context->flags2 |= CODEC_FLAG2_FAST;
-    m_motionMap.clear();
     m_frame->data[0] = 0;
     m_spsFound = false;
+    m_dtsQueue.clear();
 }
 
 void QnFfmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
@@ -318,19 +310,9 @@ unsigned int QnFfmpegVideoDecoder::getDecoderCaps() const
     return QnAbstractVideoDecoder::multiThreadedMode;
 }
 
-void QnFfmpegVideoDecoder::setSpeed( float newValue )
+void QnFfmpegVideoDecoder::setSpeed( float /*newValue*/ )
 {
-    Q_UNUSED(newValue)
-    //ffmpeg-based decoder has nothing to do here
-}
-
-int QnFfmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
-{
-    for (int i = 0; i < m_motionMap.size(); ++i) {
-        if (m_motionMap[i].first == pkt_dts)
-            return i;
-    }
-    return -1;
+    // ffmpeg-based decoder has nothing to do here
 }
 
 void QnFfmpegVideoDecoder::reallocateDeinterlacedFrame()
@@ -374,6 +356,25 @@ void QnFfmpegVideoDecoder::forceMtDecoding(bool value)
     }
 }
 
+int QnFfmpegVideoDecoder::decodeVideo(
+    AVCodecContext *avctx,
+    AVFrame *picture,
+    int *got_picture_ptr,
+    const AVPacket *avpkt)
+{
+    int result = avcodec_decode_video2(avctx, picture, got_picture_ptr, avpkt);
+
+    if (result > 0 && avpkt && avpkt->dts != AV_NOPTS_VALUE)
+        m_dtsQueue.push_back(avpkt->dts);
+
+    if (*got_picture_ptr && !m_dtsQueue.empty())
+    {
+        picture->pkt_dts = m_dtsQueue.front();
+        m_dtsQueue.pop_front();
+    }
+    return result;
+}
+
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
@@ -387,7 +388,11 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
     if (data && m_codecId!= data->compressionType) {
         if (m_codecId != AV_CODEC_ID_NONE && data->context)
+        {
+            if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+                return false; //< Can't switch decoder to new codec right now.
             resetDecoder(data);
+        }
         m_codecId = data->compressionType;
     }
 
@@ -473,7 +478,6 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         if (m_context->pix_fmt == -1)
             m_context->pix_fmt = AVPixelFormat(0);
 
-
         bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
         // workaround ffmpeg crash
         if (m_checkH264ResolutionChange && avpkt.size > 4 && dataWithNalPrefixes)
@@ -510,18 +514,12 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 processNewResolutionIfChanged(data, data->context->getWidth(), data->context->getHeight());
         }
 
-        if (data->motion) {
-            while (m_motionMap.size() > MAX_DECODE_THREAD+1)
-                m_motionMap.remove(0);
-            m_motionMap << QPair<qint64, QnMetaDataV1Ptr>(data->timestamp, data->motion);
-        }
-
         // -------------------------
         if(m_context->codec)
         {
-            avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+            decodeVideo(m_context, m_frame, &got_picture, &avpkt);
             for(int i = 0; i < 2 && !got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice); ++i)
-                avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+                decodeVideo(m_context, m_frame, &got_picture, &avpkt);
         }
 
         if (got_picture)
@@ -565,19 +563,11 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
     else {
         QnFfmpegAvPacket avpkt;
         avpkt.pts = avpkt.dts = m_prevTimestamp;
-        avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt); // flush
+        decodeVideo(m_context, m_frame, &got_picture, &avpkt); // flush
     }
 
     if (got_picture)
     {
-        int motionIndex = findMotionInfo(m_frame->pkt_dts);
-        if (motionIndex >= 0) {
-            outFrame->metadata = m_motionMap[motionIndex].second;
-            m_motionMap.remove(motionIndex);
-        }
-        else
-            outFrame->metadata.reset();
-
         AVPixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height ||

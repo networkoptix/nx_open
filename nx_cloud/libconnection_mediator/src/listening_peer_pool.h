@@ -6,11 +6,12 @@
 
 #include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/cloud/data/connection_method.h>
+#include <nx/network/cloud/mediator/api/listening_peer.h>
 #include <nx/network/stun/abstract_server_connection.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "data/listening_peer.h"
 #include "request_processor.h"
 #include "server/stun_request_processing_helper.h"
 #include "settings.h"
@@ -25,8 +26,8 @@ struct ListeningPeerData
     bool isListening;
     nx::String hostName;
     /** Valid for locally-registered peer only. */
-    std::shared_ptr<nx::stun::ServerConnection> peerConnection;
-    std::list<SocketAddress> endpoints;
+    std::shared_ptr<nx::network::stun::ServerConnection> peerConnection;
+    std::list<network::SocketAddress> endpoints;
     api::CloudConnectVersion cloudConnectVersion;
 
     ListeningPeerData():
@@ -96,7 +97,7 @@ public:
     };
 
     ListeningPeerPool(const conf::ListeningPeer& settings);
-    ~ListeningPeerPool();
+    virtual ~ListeningPeerPool();
 
     /**
      * Inserts new or returns existing element with key peerData.
@@ -104,7 +105,7 @@ public:
      *     DataLocker instance is still alive.
      */
     DataLocker insertAndLockPeerData(
-        const std::shared_ptr<nx::stun::ServerConnection>& connection,
+        const std::shared_ptr<nx::network::stun::ServerConnection>& connection,
         const MediaserverData& peerData);
 
     boost::optional<ConstDataLocker> findAndLockPeerDataByHostName(
@@ -114,16 +115,20 @@ public:
         const nx::String& systemId) const;
 
     // TODO: rename to getListeningPeersBySystem
-    data::ListeningPeersBySystem getListeningPeers() const;
+    api::ListeningPeersBySystem getListeningPeers() const;
     std::vector<ConnectionWeakRef> getAllConnections() const;
 
 private:
     mutable QnMutex m_mutex;
     PeerContainer m_peers;
     const conf::ListeningPeer m_settings;
+    nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     nx::utils::Counter m_counter;
 
-    void closeConnectionAsync(std::shared_ptr<nx::stun::ServerConnection> peerConnection);
+    void onListeningPeerConnectionClosed(
+        const MediaserverData& peerData,
+        nx::network::stun::AbstractServerConnection* connection);
+    void closeConnectionAsync(std::shared_ptr<nx::network::stun::ServerConnection> peerConnection);
 };
 
 } // namespace hpm

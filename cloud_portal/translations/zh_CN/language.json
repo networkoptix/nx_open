@@ -1,19 +1,19 @@
 {
   "language_name": "简体中文",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%",
   "dialogs": {
     "okButton": "确定",
     "cancelButton": "取消",
-    "loginTitle": "登录到 {{PRODUCT_NAME}}",
+    "loginTitle": "登录到 %PRODUCT_NAME%",
     "loginButton": "登录",
     "logoutAuthorisedTitle": "您已经登录",
     "logoutAuthorisedContinueButton": "继续",
     "logoutAuthorisedLogoutButton": "退出登录"
   },
   "pageTitles": {
-    "template": "{{title}}{{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}}%PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "欢迎来到",
     "register": "创建帐户中",
     "changePassword": "更改密码-",
@@ -31,8 +31,8 @@
     "view": "查看相机 - ",
     "debug": "调试",
     "login": "登录-",
-    "download": "下载 {{VMS_NAME}}",
-    "downloadPlatform": "下载的 {{VMS_NAME}} ",
+    "download": "下载 %VMS_NAME%",
+    "downloadPlatform": "下载的 %VMS_NAME% ",
     "pageNotFound": "找不到页面"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "自定义",
-      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限"
+      "description": "使用 %PRODUCT_NAME% 客户端应用程序可以设置自定义权限"
     },
     "cloudAdmin": {
       "label": "管理员",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "自定义",
-      "description": "使用 {{PRODUCT_NAME}} 客户端应用程序可以设置自定义权限"
+      "description": "请使用 %VMS_NAME% 客户端应用程序以配置自订权限"
     }
   },
   "errorCodes": {
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "不能发送确认电子邮件",
     "cloudInvalidResponse": "云 DB 返回了意外的响应",
     "notAuthorized": "错误的密码。",
-    "wrongParameters": "窗体上的一些参数不正确",
     "brokenAccount": "帐户出现意外问题。 <a href=\"/restore_password\">恢复帐户</a>",
+    "wrongParameters": "窗体上的一些参数不正确",
     "wrongCode": "已经激活帐户或确认码不正确",
     "wrongCodeRestore": "确认代码已使用或不正确",
     "forbidden": "您没有权限执行此操作",
@@ -133,9 +133,10 @@
     "passwordMismatch": "错误的密码。",
     "cantEditYourself": "不允许更改自己的权限",
     "cantEditAdmin": "此用户具有管理员权限",
-    "cantOpenClient": "{{VMS_NAME}} 应用程序未检测到。<a href=\"/download\"> 下载</a>",
+    "cantOpenClient": "%VMS_NAME% 应用程序未检测到。<a href=\"/download\"> 下载</a>",
     "lostConnection": "连接到 {{systemName}} 失去了",
-    "thisSystem": "系统"
+    "thisSystem": "系统",
+    "oldSafariNotSupported": "不支持10岁以上的Safari版本"
   },
   "passwordRequirements": {
     "minLengthMessage": "密码必须包含至少 8 个字符",
@@ -158,12 +159,14 @@
     "mySystemSearch": "我的",
     "unavailable": "系统无法访问",
     "offline": "系统处于离线状态",
-    "openClient": "在 {{VMS_NAME}} 中打开",
-    "openClientNoSystem": "打开 {{VMS_NAME}}",
+    "openClient": "在 %VMS_NAME% 中打开",
+    "openClientNoSystem": "打开 %VMS_NAME%",
+    "confirmMergeAction": "联网",
+    "mergeSystemTitle": "合并系统",
     "confirmRenameTitle": "系统名称",
     "confirmRenameAction": "保存",
     "successRename": "保存的系统名称",
-    "confirmDisconnectTitle": "系统断开 {{PRODUCT_NAME}} 吗？",
+    "confirmDisconnectTitle": "系统断开 %PRODUCT_NAME% 吗？",
     "confirmDisconnectAction": "断开连接",
     "confirmUnshareFromMe": "您将要断开此系统从您的帐户。你将无法再访问该系统。是否确定？",
     "confirmUnshareFromMeTitle": "断开系统吗？",
@@ -171,7 +174,7 @@
     "confirmUnshare": "此用户不能访问系统。是否确定？",
     "confirmUnshareTitle": "删除用户？",
     "confirmUnshareAction": "删除",
-    "successDisconnected": "系统成功地断开 {{PRODUCT_NAME}}",
+    "successDisconnected": "系统成功地断开 %PRODUCT_NAME%",
     "successDeleted": "从您的帐户成功删除系统 {{systemName}}",
     "permissionsRemoved": "权限从 {{email}} 被刪除"
   },
@@ -184,14 +187,14 @@
     "saveChanges": "保存"
   },
   "downloads": {
-    "noClientDetectedTitle": "安装 {{VMS_NAME}} 来查看您的系统",
-    "action": "下载 {{VMS_NAME}}",
+    "noClientDetectedTitle": "安装 %VMS_NAME% 来查看您的系统",
+    "action": "下载 %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

@@ -1,4 +1,5 @@
 #pragma once
+#include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
@@ -24,7 +25,7 @@ namespace ec2 {
 }
 
 QString getDataDirectory();
-void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
+void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
 bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection);
 
 namespace nx
@@ -67,27 +68,21 @@ namespace nx
     };
 }
 
-
-void resetTransactionTransportConnections();
-
 bool updateUserCredentials(
     std::shared_ptr<ec2::AbstractECConnection> connection,
     PasswordData data,
     QnOptionalBool isEnabled,
     const QnUserResourcePtr& userRes,
     QString* errString = nullptr);
-bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 
-
-bool isLocalAppServer(const QString &host);
-
+bool isLocalAppServer(const QString& host);
 
 /*
 * @param localSystemId - new local system id
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeLocalSystemId(
+bool configureLocalSystem(
     const ConfigureSystemData& data,
     ec2::AbstractTransactionMessageBus* messageBus);
 
@@ -97,6 +92,11 @@ bool changeLocalSystemId(
 QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
 
 /**
- * @return false if failed to save some data.
+ * Drop message bus connections to other servers in the system.
  */
-bool resetSystemToStateNew(QnCommonModule* commonModule);
+void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus);
+
+/**
+ * Resume connection listening
+ */
+void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus);

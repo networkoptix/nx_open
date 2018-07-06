@@ -1,25 +1,28 @@
-cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
+set(CMAKE_SUPPRESS_REGENERATION true)
+include(cmake/option.cmake)
+include(cmake/default_target.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
-option(beta "Is this build is beta build" ON)
+nx_option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
-option(analyzeMutexLocksForDeadlock
-    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
-    OFF)
-
-option(rdepSync
-    "Whether rdep should sync packages or use only existing copies"
+nx_option(developerBuild
+    "Disable this option for production builds (Jenkins)"
     ON)
 
-option(addQtPdb
-    "Whether add Qt PDB files to debug libs"
-    OFF)
+if(developerBuild)
+    set(default_cmake_build_type "Debug")
+else()
+    set(default_cmake_build_type "Release")
+endif()
 
-set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+set(CMAKE_BUILD_TYPE ${default_cmake_build_type} CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
+set(CMAKE_VS_PLATFORM_TOOLSET_HOST_ARCHITECTURE "x64" CACHE INTERNAL "")
 
-set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
+set(targetDevice ${default_target_device} CACHE STRING
+    "Target device. For the list see cmake/toolchains.")
 set(box "none")
 
 if(targetDevice STREQUAL "none")
@@ -27,8 +30,8 @@ if(targetDevice STREQUAL "none")
 endif()
 
 # Early loading rdep to download a toolchain if needed.
-include(build_utils/cmake/find_python.cmake)
-include(build_utils/cmake/rdep.cmake)
+include(cmake/find_python.cmake)
+include(cmake/rdep.cmake)
 nx_rdep_configure()
 
 if(targetDevice AND NOT targetDevice STREQUAL "ios")
@@ -36,7 +39,7 @@ if(targetDevice AND NOT targetDevice STREQUAL "ios")
     include(cmake/sync_toolchain.cmake)
 endif()
 
-project(vms VERSION 3.1.0)
+project(vms VERSION 4.0.0)
 
 if(targetDevice STREQUAL "ios")
     include(cmake/ios.cmake)
@@ -51,22 +54,23 @@ set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(CMAKE_DEBUG_POSTFIX "" CACHE INTERNAL "" FORCE)
+
 list(APPEND CMAKE_MODULE_PATH
-    ${PROJECT_SOURCE_DIR}/build_utils/cmake
-    ${PROJECT_SOURCE_DIR}/cmake)
+    ${PROJECT_SOURCE_DIR}/cmake
+)
 
 include(CMakeParseArguments)
+include(CMakeDependentOption)
 include(ExternalProject)
 include(target_detection)
 include(utils)
 include(find_sources)
+include(moc_utils)
 include(qrc_utils)
 include(precompiled_header)
 include(strip_target)
 include(mercurial)
-include(project_utils)
-include(test_utils)
-
 include(ec_protocol)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
@@ -80,19 +84,35 @@ include(compiler_options)
 include(output_directories)
 include(distribution_names)
 
-if(NOT (WINDOWS OR ANDROID OR IOS))
-    set(BUILD_SHARED_LIBS ON)
+if(MACOSX OR IOS)
+    include(macosx_keychain)
+endif()
+
+if(WINDOWS)
+    include(windows_signing)
+endif()
+
+include(parameters_validation)
+
+if(WINDOWS OR ANDROID OR IOS)
+    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+else()
+    set(BUILD_SHARED_LIBS ON CACHE INTERNAL "")
 endif()
 
 include(dependencies)
 include(maven_compatibility)
 include(generate_current_config)
+include(project_utils)
+include(test_utils)
 
-if(CMAKE_CROSSCOMPILING)
-    set(QT_PREFIX "..")
-else()
-    set(QT_PREFIX "${QT_DIR}")
-endif()
+nx_create_dev_qt_conf()
+
+cmake_dependent_option(codeSigning "Enable code signing"
+    ON "NOT developerBuild"
+    OFF
+)
+
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
@@ -128,16 +148,30 @@ find_package(Qt5
         Concurrent
         Multimedia)
 
-if(withDesktopClient OR withMobileClient)
+if(targetDevice STREQUAL "bpi")
+    set_property(TARGET Qt5::Gui APPEND PROPERTY
+        INTERFACE_LINK_LIBRARIES EGL GLESv2 UMP)
+endif()
+
+if(withDesktopClient OR withMobileClient OR withNxTool)
     find_package(Qt5
         COMPONENTS
             Qml
             Quick)
 endif()
 
+if(withDesktopClient OR withNxTool)
+    find_package(Qt5
+        COMPONENTS
+            Widgets
+    )
+endif()
+
 set(QML_IMPORT_PATH
     "${QT_DIR}/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/client/nx_client_desktop/static-resources/qml"
     "${CMAKE_CURRENT_LIST_DIR}/client/mobile_client/static-resources/qml"
+    "${CMAKE_CURRENT_LIST_DIR}/nxtool/static-resources/src/qml"
     CACHE STRING "Extra QML import paths")
 
 if(ANDROID)
@@ -147,25 +181,46 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        add_subdirectory(wixsetup)
-    endif()
 endif()
 
-# Required for QN_DECLARE_METAOBJECT_HEADER
-include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
+add_subdirectory(dependencies)
 
-add_subdirectory(common_libs)
-add_subdirectory(common)
-add_subdirectory(appserver2)
-add_subdirectory(nx_cloud)
+if (withMediaServer OR withTestCamera OR withTrayTool OR withDesktopClient OR withMobileClient OR withClouds)
+    add_subdirectory(common_libs)
+    add_subdirectory(vms_libs)
+    add_subdirectory(common)
+    add_subdirectory(appserver2)
+    add_subdirectory(nx_cloud)
+endif()
+
+if(withMediaServer OR withClouds)
+    add_subdirectory(mediaserver_db)
+endif()
 
 if(withMediaServer)
     add_subdirectory(mediaserver_core)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
+    add_subdirectory(nx_system_commands)
+
+    if(withDistributions)
+        # TODO: Combine all SDKs (nx_storage_sdk, nx_sdk, nx_metadata_sdk) into one like this.
+        add_subdirectory(nx_metadata_sdk)
+    endif()
+
+    if(withMediaDbUtil)
+        add_subdirectory(media_db_util)
+    endif()
+
+    if(LINUX AND box MATCHES "none|tx1")
+        add_subdirectory(root_tool)
+    endif()
 endif()
+
+#add_subdirectory(_axis_controller)
+#add_subdirectory(_dw_vca_controller)
+#add_subdirectory(_dw_mtt_controller)
 
 if(withTestCamera)
     add_subdirectory(testcamera)
@@ -179,13 +234,55 @@ if(withDesktopClient OR withMobileClient)
     add_subdirectory(client)
 endif()
 
+if(withNxTool)
+    add_subdirectory(nxtool)
+endif()
+
 if(withTests)
     add_subdirectory(unit_tests)
     add_subdirectory(tests)
 endif()
 
-if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
-    add_subdirectory(edge_firmware)
+if(withDistributions)
+    if(WINDOWS)
+        add_subdirectory(wixsetup)
+    endif()
+
+    if(LINUX AND box STREQUAL "none") #< Desktop Linux.
+        add_subdirectory(debsetup)
+    endif()
+
+    if(box STREQUAL "tx1")
+        add_subdirectory(tx1setup)
+    endif()
+
+    if(MACOSX)
+        add_subdirectory(macsetup)
+    endif()
+
+    if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
+        add_subdirectory(edge_firmware)
+    endif()
 endif()
 
 include(fix_qt_vars)
+
+if(beta)
+    set(beta_bool "true")
+else()
+    set(beta_bool "false")
+endif()
+nx_configure_file(
+    build_variables/maven/filter-resources/build_info.txt
+    ${CMAKE_CURRENT_BINARY_DIR})
+
+nx_save_known_files()
+
+if(withClouds)
+    add_subdirectory(cloud_portal)
+    add_custom_target(cloud-frontend DEPENDS cloud_portal)
+    if(LINUX)
+        add_subdirectory(nx_cloud_deploy)
+    endif()
+    add_custom_target(cloud DEPENDS cloud-backend cloud-frontend)
+endif()

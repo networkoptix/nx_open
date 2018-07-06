@@ -11,6 +11,8 @@ import requests
 from cloud import settings
 from django.shortcuts import redirect
 
+from cms.models import Customization, UserGroupsToCustomizationPermissions
+
 logger = logging.getLogger(__name__)
 
 
@@ -37,44 +39,11 @@ def visited_key(request):
     return Response({'visited': value})
 
 
-def detect_language_by_request(request):
-    lang = None
-
-    # 1. Try account value - top priority
-    if request.user.is_authenticated():
-        lang = request.user.language
-
-    # 2. try session valie
-    if not lang:
-        lang = request.session.get('language', False)
-
-    # 3. Try cookie value (saved in browser some time ago)
-    if not lang:
-        if 'language' in request.COOKIES:
-            lang = request.COOKIES['language']
-
-    # 4. Try ACCEPT_LANGUAGE header
-    if not lang and 'HTTP_ACCEPT_LANGUAGE' in request.META:
-        languages = request.META['HTTP_ACCEPT_LANGUAGE']
-        languages = languages.split(';')[0]
-        languages = languages.split(',')
-        for l in languages:
-            if l in settings.LANGUAGES:
-                lang = l
-                break
-            if l.split('-')[0] in settings.LANGUAGES:
-                lang = l.split('-')[0]
-                break
-
-    if not lang or lang not in settings.LANGUAGES:  # not supported language
-        lang = settings.DEFAULT_LANGUAGE  # return default
-    return lang
-
-
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 def language(request):
     if request.method == 'GET':  # Get language for current user
+        from util.helpers import detect_language_by_request
         lang = detect_language_by_request(request)
         language_file = '/static/lang_' + lang + '/language.json'
         # Return: redirect to language.json file for selected language
@@ -106,12 +75,13 @@ def language(request):
 @handle_exceptions
 def downloads_history(request):
     # TODO: later we can check specific permissions
-    customization = settings.CUSTOMIZATION
-    if not request.user.is_superuser and (request.user.customization != customization \
-                                     or not request.user.has_perm('api.can_view_release')):
-        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
+    customization = Customization.objects.get(name=settings.CUSTOMIZATION)
+    can_view_releases = UserGroupsToCustomizationPermissions.check_permission(request.user, customization.name,
+                                                                              'api.can_view_release')
+    if not customization.public_release_history and not can_view_releases:
+        raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
-    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization)
+    downloads_url = settings.DOWNLOADS_JSON.replace('{{customization}}', customization.name)
     downloads_json = requests.get(downloads_url)
     downloads_json.raise_for_status()
     downloads_json = downloads_json.json()
@@ -125,9 +95,8 @@ def downloads_history(request):
 def download_build(request, build):
     # TODO: later we can check specific permissions
     customization = settings.CUSTOMIZATION
-    if not request.user.is_superuser and (request.user.customization != customization \
-                                     or not request.user.has_perm('api.can_view_release')):
-        raise APIForbiddenException("Not authorized!!!", ErrorCodes.forbidden)
+    if not UserGroupsToCustomizationPermissions.check_permission(request.user, customization, 'api.can_view_release'):
+        raise APIForbiddenException("Not authorized", ErrorCodes.forbidden)
 
     if re.search(r'\D+', build):
         raise APINotFoundException("Invalid build number", ErrorCodes.bad_request)
@@ -137,10 +106,11 @@ def download_build(request, build):
 
     if downloads_json.status_code == 403:
         raise APINotFoundException("Build number does not exist", ErrorCodes.not_found, error_data=request.query_params)
+
     downloads_json = downloads_json.json()
 
     if 'releaseNotes' not in downloads_json:
-        raise APINotFoundException("No downloads.json for this build!!!", ErrorCodes.not_found, error_data=request.query_params)
+        raise APINotFoundException("No downloads.json for this build", ErrorCodes.not_found, error_data=request.query_params)
 
     updates_json = requests.get(settings.UPDATE_JSON)
     updates_json.raise_for_status()
@@ -158,7 +128,7 @@ def download_build(request, build):
 
 
 @api_view(['GET', 'POST'])
-@permission_classes((AllowAny, ))
+@permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def downloads(request):
     customization = settings.CUSTOMIZATION

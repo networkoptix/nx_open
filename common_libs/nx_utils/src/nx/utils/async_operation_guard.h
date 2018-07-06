@@ -41,7 +41,7 @@ public:
     public:
         /**
          * This lock is supposed to be held as long as operation is in progress
-         * @note the lock must be verified right after obtaining to find
+         * NOTE: the lock must be verified right after obtaining to find
          * out if operation has been canceled.
          */
         class NX_UTILS_API Lock

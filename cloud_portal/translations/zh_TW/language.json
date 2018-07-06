@@ -1,19 +1,19 @@
 {
   "language_name": "繁体中文",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "確定",
     "cancelButton": "取消",
-    "loginTitle": "登入到 {{PRODUCT_NAME}}",
+    "loginTitle": "登入到 %PRODUCT_NAME%",
     "loginButton": "登入",
     "logoutAuthorisedTitle": "您已經登入",
     "logoutAuthorisedContinueButton": "繼續",
     "logoutAuthorisedLogoutButton": "登出"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "歡迎來到",
     "register": "新建帳號",
     "changePassword": "更改密碼 -",
@@ -31,8 +31,8 @@
     "view": "查看攝影機 - ",
     "debug": "除錯",
     "login": "登入 -",
-    "download": "下載 {{VMS_NAME}}",
-    "downloadPlatform": "下載 {{VMS_NAME}} ",
+    "download": "下載 %VMS_NAME%",
+    "downloadPlatform": "下載 %VMS_NAME% ",
     "pageNotFound": "找不到頁面"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "自訂",
-      "description": "使用 {{PRODUCT_NAME}} 用戶端應用程式可以設置自訂權限"
+      "description": "使用 %PRODUCT_NAME% 用戶端應用程式可以設置自訂權限"
     },
     "cloudAdmin": {
       "label": "管理者",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "自訂",
-      "description": "使用 {{PRODUCT_NAME}} 用戶端應用程式可以設置自訂權限"
+      "description": "請使用 %VMS_NAME% 客戶端應用程式以設定自訂權限"
     }
   },
   "errorCodes": {
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "無法發送確認郵件",
     "cloudInvalidResponse": "雲端 DB 回覆預期外的回應",
     "notAuthorized": "密碼不正確",
-    "wrongParameters": "表單上的一些參數不正確",
     "brokenAccount": "帳號出現意外問題. <a href=\"/restore_password\">還原帳號</a>",
+    "wrongParameters": "表單上的一些參數不正確",
     "wrongCode": "帳號已經啟動或確認碼不正確",
     "wrongCodeRestore": "確認代碼已使用或不正確",
     "forbidden": "您沒有權限執行此操作",
@@ -133,9 +133,10 @@
     "passwordMismatch": "密碼不正確",
     "cantEditYourself": "不允許變更自己的權限",
     "cantEditAdmin": "此使用者具有管理員權限",
-    "cantOpenClient": "{{VMS_NAME}} 應用程式未檢測到.<a href=\"/download\"> 下載</a>",
+    "cantOpenClient": "%VMS_NAME% 應用程式未檢測到.<a href=\"/download\"> 下載</a>",
     "lostConnection": "與 {{systemName}} 的連線斷開了",
-    "thisSystem": "系統"
+    "thisSystem": "系統",
+    "oldSafariNotSupported": "不支持10歲以上的Safari版本"
   },
   "passwordRequirements": {
     "minLengthMessage": "密碼必須包含至少 8 個字元",
@@ -158,12 +159,14 @@
     "mySystemSearch": "我的",
     "unavailable": "無法連接至系統",
     "offline": "系統處於離線狀態",
-    "openClient": "在 {{VMS_NAME}} 中打開",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
+    "openClient": "在 %VMS_NAME% 中打開",
+    "openClientNoSystem": "開啟 %VMS_NAME%",
+    "confirmMergeAction": "合併",
+    "mergeSystemTitle": "合併系統",
     "confirmRenameTitle": "系統名稱",
     "confirmRenameAction": "儲存",
     "successRename": "系統名稱已儲存",
-    "confirmDisconnectTitle": "從 {{PRODUCT_NAME}} 斷開系統嗎?",
+    "confirmDisconnectTitle": "從 %PRODUCT_NAME% 斷開系統嗎?",
     "confirmDisconnectAction": "斷線",
     "confirmUnshareFromMe": "您正要從您的帳號斷開此系統. 您將再也無法存取此系統. 確定?",
     "confirmUnshareFromMeTitle": "斷開系統?",
@@ -171,7 +174,7 @@
     "confirmUnshare": "此使用者將無法存取系統. 確定?",
     "confirmUnshareTitle": "刪除使用者?",
     "confirmUnshareAction": "刪除",
-    "successDisconnected": "系統成功地斷開 {{PRODUCT_NAME}}",
+    "successDisconnected": "系統成功地斷開 %PRODUCT_NAME%",
     "successDeleted": "從您的帳號成功刪除系統 {{systemName}}",
     "permissionsRemoved": "權限從 {{email}} 被移除"
   },
@@ -184,14 +187,14 @@
     "saveChanges": "儲存"
   },
   "downloads": {
-    "noClientDetectedTitle": "安裝 {{VMS_NAME}} 來查看您的系統",
-    "action": "下載 {{VMS_NAME}}",
+    "noClientDetectedTitle": "安裝 %VMS_NAME% 來查看您的系統",
+    "action": "下載 %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

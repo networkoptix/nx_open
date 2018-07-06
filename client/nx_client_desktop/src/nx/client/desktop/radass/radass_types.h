@@ -7,10 +7,10 @@ namespace desktop {
 // Please note: enum is numeric-serialized, reordering is forbidden.
 enum class RadassMode
 {
-    Auto,
-    High,
-    Low,
-    Custom,
+    Auto = 0,
+    High = 1,
+    Low = 2,
+    Custom = 3,
 };
 
 } // namespace desktop

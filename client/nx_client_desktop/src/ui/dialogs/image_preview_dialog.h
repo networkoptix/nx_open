@@ -16,7 +16,7 @@ class QnImagePreviewDialog : public QnDialog
     typedef QnDialog base_type;
 
 public:
-    explicit QnImagePreviewDialog(QWidget *parent = 0);
+    explicit QnImagePreviewDialog(QWidget *parent);
     ~QnImagePreviewDialog();
     
     void openImage(const QString &filename);

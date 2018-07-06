@@ -25,12 +25,33 @@ Pipeline::Pipeline(SSL_CTX* sslContext):
 
 int Pipeline::write(const void* data, size_t size)
 {
-    return performSslIoOperation(&SSL_write, data, size);
+    bool eofBak = m_eof;
+    int result = performSslIoOperation(&SSL_write, data, size);
+    if (result == 0 && m_eof && !eofBak)
+        m_eof = false; //< TODO: #ak Remove this & fix handleSslIoResult().
+    return result;
 }
 
 int Pipeline::read(void* data, size_t size)
 {
     return performSslIoOperation(&SSL_read, data, size);
+}
+
+bool Pipeline::performHandshake()
+{
+    int ret = performHandshakeInternal();
+    if (ret <= 0)
+    {
+        handleSslIoResult(ret);
+        return false;
+    }
+
+    return true;
+}
+
+bool Pipeline::isHandshakeCompleted() const
+{
+    return m_state == State::handshakeDone;
 }
 
 bool Pipeline::isReadThirsty() const
@@ -105,7 +126,7 @@ int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t size)
 {
     if (m_state < State::handshakeDone)
     {
-        int ret = doHandshake();
+        int ret = performHandshakeInternal();
         if (ret <= 0)
             return handleSslIoResult(ret);
     }
@@ -116,7 +137,7 @@ int Pipeline::performSslIoOperation(Func sslFunc, Data* data, size_t size)
     return handleSslIoResult(ret);
 }
 
-int Pipeline::doHandshake()
+int Pipeline::performHandshakeInternal()
 {
     const int ret = SSL_do_handshake(m_ssl.get());
     if (ret == 1)
@@ -141,6 +162,13 @@ int Pipeline::bioWrite(const void* buffer, unsigned int bufferLen)
 
 int Pipeline::handleSslIoResult(int result)
 {
+    if (result >= 0)
+    {
+        if (result == 0)
+            m_eof = true;
+        return result;
+    }
+
     const auto sslErrorCode = SSL_get_error(m_ssl.get(), result);
     switch (sslErrorCode)
     {

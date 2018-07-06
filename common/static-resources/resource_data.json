@@ -19,6 +19,73 @@
     "data": [
         {
             "keys": [
+                "N8Fx-OLAH4|IP-Camera"
+            ],
+            "macFromMulticast": true
+        },
+        {
+            "keys": [
+                "Hanwha|PRN-4011"
+            ],
+            "minimalFirmwareVersion":  "v1.08_171018"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-3010"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-2011"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-2010"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-1610S"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-1610"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-810S"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|XRN-410S"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|QRN-810"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+        {
+            "keys": [
+                "Hanwha|QRN-410"
+            ],
+            "minimalFirmwareVersion":  "v1.06_171010"
+        },
+
+        {
+            "keys": [
                 "Sony|SNC-VM772R"
             ],
             "forcedOnvifParams":
@@ -47,16 +114,29 @@
         },
         {
             "keys": [
-                "Sony|SNC-CX600*"
+                "Sony|SNC-CX600*",
+                "Sony|SNC-VM600*",
+                "Sony|SNC-VM630",
+                "Sony|SNC-VM641",
+                "Sony|SNC-VB632D",
+                "Sony|SNC-VB642D",
+                "Sony|SNC-EB642R",
+                "Sony|SNC-EM642R",
+                "Sony|SNC-VM642R",
+                "Sony|SNC-WR632R",
+                "Sony|SNC-WR602C",
+                "Sony|SNC-WR630",
+                "Sony|SNC-EM641"
             ],
 
             "2WayAudio":
             {
-                "codec": "AAC",
+                "codec": "MULAW",
                 "bitrateKbps": 64,
-                "sampleRate": 16,
-                "urlPath": "/audio-out/aac16_64.cgi",
-                "contentType": ""
+                "sampleRate": 8,
+                "urlPath": "/audio-out/g711_64.cgi",
+                "contentType": "",
+                "useBasicAuth": true
             }
         },
         {
@@ -102,42 +182,42 @@
                 }
             ]
         },
-		{
-			"keys": [
-				"Advantech|ADAM-6050"
-			],
-			"adamStartInputCoil": 0,
-			"adamInputCount": 12,
-			"adamStartOutputCoil": 16,
-			"adamOutputCount": 6
-		},
-		{
-			"keys": [
-				"Advantech|ADAM-6051"
-			],
-			"adamStartInputCoil": 0,
-			"adamInputCount": 14,
-			"adamStartOutputCoil": 16,
-			"adamOutputCount": 2
-		},
-		{
-			"keys": [
-				"Advantech|ADAM-6052"
-			],
-			"adamStartInputCoil": 0,
-			"adamInputCount": 8,
-			"adamStartOutputCoil": 16,
-			"adamOutputCount": 8
-		},
-		{
-			"keys": [
-				"Advantech|ADAM-6060","Advantech|ADAM-6066"
-			],
-			"adamStartInputCoil": 0,
-			"adamInputCount": 6,
-			"adamStartOutputCoil": 16,
-			"adamOutputCount": 6
-		},
+        {
+            "keys": [
+                "Advantech|ADAM-6050"
+            ],
+            "adamStartInputCoil": 0,
+            "adamInputCount": 12,
+            "adamStartOutputCoil": 16,
+            "adamOutputCount": 6
+        },
+        {
+            "keys": [
+                "Advantech|ADAM-6051"
+            ],
+            "adamStartInputCoil": 0,
+            "adamInputCount": 14,
+            "adamStartOutputCoil": 16,
+            "adamOutputCount": 2
+        },
+        {
+            "keys": [
+                "Advantech|ADAM-6052"
+            ],
+            "adamStartInputCoil": 0,
+            "adamInputCount": 8,
+            "adamStartOutputCoil": 16,
+            "adamOutputCount": 8
+        },
+        {
+            "keys": [
+                "Advantech|ADAM-6060","Advantech|ADAM-6066"
+            ],
+            "adamStartInputCoil": 0,
+            "adamInputCount": 6,
+            "adamStartOutputCoil": 16,
+            "adamOutputCount": 6
+        },
         {
             "keys": ["FLIR|FC*"],
             "ioSettings": [
@@ -256,7 +336,7 @@
             "ignoreONVIF": true
         },
         {
-            "__comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
+            "_comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
             "keys":[
                 "FC-Series-R|*", "FC-Series-S|*"
             ],
@@ -265,6 +345,12 @@
         {
             "keys":[
                 "Axis|P7216*"
+            ],
+            "ignoreONVIF": true
+        },
+        {
+            "keys":[
+                "Axis|Axis F44 Dual Audio*"
             ],
             "ignoreONVIF": true
         },
@@ -450,6 +536,8 @@
                 "BOSCH|VJT-X40XF-E",
                 "CAP|NVN4100",
                 "DS-6701HWI|Embedded Net DVS",
+                "DS-6716HQHI-SATA|Embedded_Net_DVR", 
+                "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6716HQHI-SATA",
                 "GrandStream|GXV3504",
                 "Hikvision|DS-6701*",
                 "Hikvision|DS-6704*",
@@ -553,12 +641,12 @@
             ],
             "onvifPtzStopBroken": true
         },
-    	{
+        {
             "keys": [
                 "ArecontVision|??05", "ArecontVision|?155"
             ],
             "isRTSPSupported": false
-    	},
+        },
         {
             "keys": ["ArecontVision|20185DN"],
             "forceRtspSupport": true
@@ -566,6 +654,12 @@
         {
             "keys": ["ArecontVision|*"],
             "forceRtcpReports": true
+        },
+        {
+            "keys": [
+                "HANWHA|SNP*"
+            ],
+            "ptzCapabilitiesToAdd": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability"
         },
         {
             "keys": [
@@ -587,7 +681,7 @@
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
                 "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
-                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR"
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR", "DW|DWC-BVI2IR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -607,9 +701,7 @@
         {
             "keys": [
                 "ACTI|V32",
-                "ACTi Corporation|V32",
-                "AXIS|Q6000-E",
-                "AXIS|*Q6000-E"
+                "ACTi Corporation|V32"
             ],
             "forceONVIF": true
         },
@@ -652,7 +744,7 @@
                 "H264|N51820L",
                 "TRUEN Co., Ltd.|TN-P4230CSLXIR",
                 "TRUEN Co. Ltd.|*",
-				"Vista|VK2-3MPEFEDre",
+                "Vista|VK2-3MPEFEDre",
                 "eneo|IEP-63M2812M0A"
             ],
             "ptzTraits": "FourWayPtz"
@@ -690,7 +782,7 @@
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-ENCODER",
-		"Pelco|D5220",
+        "Pelco|D5220",
                 "Pelco|PelcoD5220"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
@@ -716,12 +808,6 @@
         },
         {
             "keys": [
-                "DW|DWC-BVI2IR"
-            ],
-            "dw-pravis-chipset": true
-        },
-        {
-            "keys": [
                 "AXIS|AXISM7016Group1", "AXIS|AXISM7016Group2", "AXIS|AXISM7016Group3", "AXIS|AXISM7016Group4"
             ],
             "axisMaxZoomSpeed": 70
@@ -743,7 +829,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-2CD6362F-I","Hikvision|HNCA12-FEA"
+                "Hikvision|DS-2CD6362F-I*|V5.0.*", "Hikvision|DS-2CD6362F-I*|V5.3.*", "Hikvision|DS-2CD6362F-I*|V5.1.*", "Hikvision|DS-2CD6362F-I*|V5.2.*", "Hikvision|HNCA12-FEA"
             ],
             "forcedOnvifParams":
             {
@@ -789,17 +875,52 @@
         },
         {
             "keys": [
+                "HIKVISION|DS-2CD2132F-IWS",
+                "HIKVISION|DS-2CD2655FWD-IZS",
+                "HIKVISION|DS-2CD2742FWD-IS",
+                "HIKVISION|DS-2CD2942F-IS",
+                "HIKVISION|DS-2CD4A26FWD-IZS",
+                "HIKVISION|DS-2CD63C2F-IS",
+                "HIKVISION|DS-2DE4A220IW-DE",
+                "Hikvision|DS-2CD2132F-IWS",
+                "Hikvision|DS-2CD2655FWD-IZS",
+                "Hikvision|DS-2CD2742FWD-IS",
+                "Hikvision|DS-2CD2942F-IS",
+                "Hikvision|DS-2CD4A26FWD-IZS",
                 "Hikvision|DS-2CD63C2F-IS",
-                "Hikvision|DS-2CD2132F-IWS"
+                "Hikvision|DS-2DE4A220IW-DE",
+                "HIKVISION|DS-2CD4032FWD*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
         {
             "keys": [
-                "Hikvision|DS-2CD2132F-IWS"
+                "HIKVISION|DS-2CD2132F-IWS",
+                "HIKVISION|DS-2CD2655FWD-IZS",
+                "HIKVISION|DS-2CD2742FWD-IS",
+                "HIKVISION|DS-2CD2942F-IS",
+                "HIKVISION|DS-2CD4A26FWD-IZS",
+                "HIKVISION|DS-2DE4A220IW-DE",
+                "Hikvision|DS-2CD2132F-IWS",
+                "Hikvision|DS-2CD2655FWD-IZS",
+                "Hikvision|DS-2CD2742FWD-IS",
+                "Hikvision|DS-2CD2942F-IS",
+                "Hikvision|DS-2CD4A26FWD-IZS",
+                "Hikvision|DS-2DE4A220IW-DE",
+                "Hikvision|DS-2CD2522FWD*",
+                "HIKVISION|DS-2CD2522FWD*",
+                "HIKVISION|DS-2CD4032FWD*",
+                "ONVIF|H47",
+                "ONVIF|IP-2CD4B26FWD-IZS",
+                "*|NC304-WDA"
             ],
-            "relayOutputInversed": true
+            "relayOutputInversed": true,
+            "portNamePrefixToIgnore": "AlarmOut"
         },
+		{
+            "keys": ["DW|DWC-PF5M1TIR"],
+			"fixWrongInputPortNumber": true
+		},
         {
             "keys": [
                 "DW|DWC-MPTZ20X",
@@ -1062,7 +1183,7 @@
         },
         {
             "keys": [
-                "VISTA|VK2-1080XVRDPTZF", "VISTA|VK2-HD20-SM"
+                "VISTA|VK2-1080XVRDPTZF", "VISTA|VK2-HD20-SM", "VISTA|VK2-HD30-PM"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -1570,11 +1691,11 @@
                     "ve7,ve15"
                 ]
             },
-	        "trustToVideoSourceSize": false,
-	        "useExistingOnvifProfies": true,
-		    "controlFpsViaEncodingInterval": true,
-		    "forcedSecondaryStreamResolution": "352x288",
-		    "fpsBase": 25
+            "trustToVideoSourceSize": false,
+            "useExistingOnvifProfies": true,
+            "controlFpsViaEncodingInterval": true,
+            "forcedSecondaryStreamResolution": "352x288",
+            "fpsBase": 25
         },
         {
             "keys": [
@@ -1588,11 +1709,11 @@
                     "ve3,ve7"
                 ]
             },
-			"trustToVideoSourceSize": false,
-			"useExistingOnvifProfies": true,
-			"controlFpsViaEncodingInterval": true,
-			"forcedSecondaryStreamResolution": "352x288",
-			"fpsBase": 25
+            "trustToVideoSourceSize": false,
+            "useExistingOnvifProfies": true,
+            "controlFpsViaEncodingInterval": true,
+            "forcedSecondaryStreamResolution": "352x288",
+            "fpsBase": 25
         },
         {
             "keys": [
@@ -1602,14 +1723,14 @@
             ],
             "onvifManufacturerReplacement": "PelcoOptera"
         },
-		{
-			"keys": [
-				"Pelco|IMM12018",
-				"Pelco|IMM12027",
-				"Pelco|IMM12036"
-			],
-			"onvifVendorSubtype": "PelcoOptera"
-		},
+        {
+            "keys": [
+                "Pelco|IMM12018",
+                "Pelco|IMM12027",
+                "Pelco|IMM12036"
+            ],
+            "onvifVendorSubtype": "PelcoOptera"
+        },
         {
             "keys": [
                 "PelcoOptera|IMM12018",
@@ -1619,147 +1740,147 @@
             "doNotConfigureCamera": false,
             "ignoreMultisensors": true
         },
-		{
-			"keys": [
-				"PelcoOptera|IMM12018","Pelco|IMM12018"
-			],
-			"multiresourceVideoChannelMapping": [
-				{
-					"resourceChannel": 2,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [2]
-						}
-					]
-				},
-				{
-					"resourceChannel": 3,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [1]
-						}
-					]
-				},
-				{
-					"resourceChannel": 4,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [0]
-						}
-					]
-				}
-			],
-			"shouldAppearAsSingleChannel": true,
-			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=1;sensors=0,1,2"
-		},
-		{
-			"keys": [
-				"PelcoOptera|IMM12027","Pelco|IMM12027"
-			],
-			"multiresourceVideoChannelMapping": [
-				{
-					"resourceChannel": 2,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [2]
-						}
-					]
-				},
-				{
-					"resourceChannel": 3,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [1]
-						}
-					]
-				},
-				{
-					"resourceChannel": 4,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [0]
-						}
-					]
-				},
-				{
-					"resourceChannel": 5,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [3]
-						}
-					]
-				}
-			],
-			"shouldAppearAsSingleChannel": true,
-			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=2;sensors=0,1,2,-1,3,-1",
-			"defaultAR":"4x3"
-		},
-		{
-			"keys": [
-				"PelcoOptera|IMM12036","Pelco|IMM12036"
-			],
-			"multiresourceVideoChannelMapping": [
-				{
-					"resourceChannel": 2,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [2]
-						}
-					]
-				},
-				{
-					"resourceChannel": 3,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [1]
-						}
-					]
-				},
-				{
-					"resourceChannel": 4,
-					"channelMap": [
-						{
-							"originalChannel": 0,
-							"mappedChannels": [0]
-						}
-					]
-				}
-			],
-			"shouldAppearAsSingleChannel": true,
-			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=1;sensors=0,1,2"
-		},
-		{
-			"keys": [
-				"ACTI|A41", "ACTI|A81"
-			],
-			"forceONVIF": true,
+        {
+            "keys": [
+                "PelcoOptera|IMM12018","Pelco|IMM12018"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                }
+            ],
+            "shouldAppearAsSingleChannel": true,
+            "doNotAddVendorToDeviceName": true,
+            "videoLayout": "width=3;height=1;sensors=0,1,2"
+        },
+        {
+            "keys": [
+                "PelcoOptera|IMM12027","Pelco|IMM12027"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 5,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [3]
+                        }
+                    ]
+                }
+            ],
+            "shouldAppearAsSingleChannel": true,
+            "doNotAddVendorToDeviceName": true,
+            "videoLayout": "width=3;height=2;sensors=0,1,2,-1,3,-1",
+            "defaultAR":"4x3"
+        },
+        {
+            "keys": [
+                "PelcoOptera|IMM12036","Pelco|IMM12036"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                }
+            ],
+            "shouldAppearAsSingleChannel": true,
+            "doNotAddVendorToDeviceName": true,
+            "videoLayout": "width=3;height=1;sensors=0,1,2"
+        },
+        {
+            "keys": [
+                "ACTI|A41", "ACTI|A81"
+            ],
+            "forceONVIF": true,
             "possibleDefaultCredentials": [
                 {
                     "user": "admin",
                     "password": "123456"
                 }
             ]
-		},
-		{
-			"keys": [
-				"DW|*|A*"
-			],
-			"showUrl": true,
-			"urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
+        },
+        {
+            "keys": [
+                "DW|*|A*", "CPRO|*|A*"
+            ],
+            "showUrl": true,
+            "urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
             "desiredH264Profile": "High"
-		},
+        },
         {
             "keys":[
                 "DW|DWC-MTT4W*",
@@ -1826,7 +1947,7 @@
 
         },
         {
-            "keys":["Digital_Watchdog|DWC-PB6M4T"],
+            "keys":["DW|DWC-PB6M4T"],
             "forcedOnvifParams":
             {
                 "videoEncoders":
@@ -1908,7 +2029,7 @@
             "keys": [
                 "Cellinx|STH795"
             ],
-			"_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
+            "_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -2005,8 +2126,9 @@
         },
         {
             "keys": [
-                "Dahua|IPC-K15P", "Dahua|DH-IPC-K15P",
-                "Dahua|IPC-K35A", "Dahua|DH-IPC-K35A"
+                "Dahua|IPC-K15*", "Dahua|DH-IPC-K15*",
+                "Dahua|IPC-K35A", "Dahua|DH-IPC-K35A",
+                "Dahua|IPC-K35A*", "Dahua|DH-IPC-K35A*"
             ],
             "2WayAudio":
             {
@@ -2064,6 +2186,379 @@
                 "DW|DW-CPUHD*"
             ],
             "isMacAddressMandatory": false
+        },
+        {
+            "keys": [
+                "Hikvision|DS-2DP1636Z-D"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderToken_101,VideoEncoderToken_102",
+                    "VideoEncoderToken_201,VideoEncoderToken_202",
+                    "VideoEncoderToken_301,VideoEncoderToken_302"
+                ]
+            }
+        },        
+        {
+            "keys": [
+                "IQA*|IQEYE*"
+            ],
+            "ignoreONVIF": true
+        },
+        {
+            "keys": [
+                "Surveillance Camera|DVB-4100-VS"
+            ],
+            "ignoreCameraTimeIfBigJitter": true
+        },
+        {
+            "keys": [
+                "DigitalWatchdog|DWC-MTT4Wi36"
+            ],
+            "forceOnvifAdvancedParameters": true
+        },
+        {
+            "keys": [
+                "UNIVIEW|IPC6253SR-X33*", "Securicorp|SCL-SDM03MVIR-WD3533X", "NONE|SCL-SDM03MVIR-WD3533X"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-0.1666667, 1],
+                        "logical": [15, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 1],
+                        "logical": [1, 7],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+     "keys": ["*|H.264+4MP+HD+IR+IP+Camera"],
+          "onvifManufacturerReplacement": "merit-lilin"
+        },
+        {
+            "keys":[
+            "DW|DWC-PVX16W4", "DW|DWC-PVX16W6", "DW|DWC-PVX16W28", "N8PC-OLAH4|IP-Camera", "DW|DWC-PVX16W"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [3]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=2;height=2;sensors=0,1,2,3"
+        },
+        {
+            "keys":[
+            "N9PC-SLAH5|IP-Camera", "DW|DWC-PZ21M69T", "N9PC-SLAH5|DWC-PZ21M69T"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [3]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=4;height=1;sensors=0,1,2,3"
+        },   
+        {
+            "keys":[
+            "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*"
+            ],
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 4,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [3]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=2;height=2;sensors=0,1,2,3"
+        },             
+        {
+            "keys": ["*|CMD-C244","COMMANDCO|*","ONVIF|NTH-IP4T"],
+            "onvifManufacturerReplacement": "Hikvision"
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DE4220IW*", "HIKVISION|DS-2DE4220W*", "Hikvision|DS-2DE4220IW*", "Hikvision|DS-2DE4220W*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-15, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DF8436IX*", "Hikvision|DS-2DF8436IX*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [20, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Hikvision|DS-7216*", "HIKVISION|DS-7216*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationToken001,VideoEncoderConfigurationToken019",
+                    "VideoEncoderConfigurationToken002,VideoEncoderConfigurationToken020",
+                    "VideoEncoderConfigurationToken003,VideoEncoderConfigurationToken021",
+                    "VideoEncoderConfigurationToken004,VideoEncoderConfigurationToken022",
+                    "VideoEncoderConfigurationToken005,VideoEncoderConfigurationToken023",
+                    "VideoEncoderConfigurationToken006,VideoEncoderConfigurationToken024",
+                    "VideoEncoderConfigurationToken007,VideoEncoderConfigurationToken025",
+                    "VideoEncoderConfigurationToken008,VideoEncoderConfigurationToken026",
+                    "VideoEncoderConfigurationToken009,VideoEncoderConfigurationToken027",
+                    "VideoEncoderConfigurationToken010,VideoEncoderConfigurationToken028",
+                    "VideoEncoderConfigurationToken011,VideoEncoderConfigurationToken029",
+                    "VideoEncoderConfigurationToken012,VideoEncoderConfigurationToken030",
+                    "VideoEncoderConfigurationToken013,VideoEncoderConfigurationToken031",
+                    "VideoEncoderConfigurationToken014,VideoEncoderConfigurationToken032",
+                    "VideoEncoderConfigurationToken015,VideoEncoderConfigurationToken033",
+                    "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken034"
+                ]
+            }
+        },        
+        {
+            "keys": [
+                "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [5, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "DS-6716HQHI-SATA|Embedded_Net_DVR", "Hangzhou Hikvision Digital Technology Co., Ltd|DS-6716HQHI-SATA"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationToken001,VideoEncoderConfigurationToken017",
+                    "VideoEncoderConfigurationToken002,VideoEncoderConfigurationToken018",
+                    "VideoEncoderConfigurationToken003,VideoEncoderConfigurationToken019",
+                    "VideoEncoderConfigurationToken004,VideoEncoderConfigurationToken020",
+                    "VideoEncoderConfigurationToken005,VideoEncoderConfigurationToken021",
+                    "VideoEncoderConfigurationToken006,VideoEncoderConfigurationToken022",
+                    "VideoEncoderConfigurationToken007,VideoEncoderConfigurationToken023",
+                    "VideoEncoderConfigurationToken008,VideoEncoderConfigurationToken024",
+                    "VideoEncoderConfigurationToken009,VideoEncoderConfigurationToken025",
+                    "VideoEncoderConfigurationToken010,VideoEncoderConfigurationToken026",
+                    "VideoEncoderConfigurationToken011,VideoEncoderConfigurationToken027",
+                    "VideoEncoderConfigurationToken012,VideoEncoderConfigurationToken028",
+                    "VideoEncoderConfigurationToken013,VideoEncoderConfigurationToken029",
+                    "VideoEncoderConfigurationToken014,VideoEncoderConfigurationToken030",
+                    "VideoEncoderConfigurationToken015,VideoEncoderConfigurationToken031",
+                    "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken032"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "HIKVISION|DS-2DP1636ZIX-D*", "Hikvision|DS-2DP1636ZIX-D*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-15, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.06, 0.1, 0.13, 0.15, 0.2, 0.3, 0.4, 0.5, 0.7, 1],
+                        "logical": [1, 2, 2.5, 3.0, 3.3, 3.7, 4.0, 5.5, 6.5, 7.5, 8],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        { 
+            "keys": ["DW|DWC-MPZ20XFM"],
+            "mediaTraits": {
+                "aspectRatioDependent": {
+                    "allowedAspectRatioDiff": "0.1"
+                }
+            }
         }
     ]
 }

@@ -11,10 +11,10 @@ class AuthorizationManager;
 namespace http_handler {
 
 class GetCloudModulesXml:
-    public nx_http::AbstractHttpRequestHandler
+    public nx::network::http::AbstractHttpRequestHandler
 {
 public:
-    using GenerateModulesXmlFunc = 
+    using GenerateModulesXmlFunc =
         nx::utils::MoveOnlyFunc<QByteArray(const nx::String& /*httpHostHeader*/)>;
 
     static const QString kHandlerPath;
@@ -23,11 +23,11 @@ public:
 
 protected:
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
+        nx::network::http::HttpServerConnection* const connection,
         nx::utils::stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler) override;
+        nx::network::http::Request request,
+        nx::network::http::Response* const response,
+        nx::network::http::RequestProcessedHandler completionHandler) override;
 
 private:
     GenerateModulesXmlFunc m_generateModulesXmlFunc;

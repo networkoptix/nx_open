@@ -51,6 +51,8 @@ void QnRestUpdatePeerTask::doStart()
             .dynamicCast<QnFakeMediaServerResource>();
         NX_ASSERT(server,
             Q_FUNC_INFO, "An incompatible server resource is expected here.");
+        if (!server)
+            continue;
 
         NX_LOG(lit("Update: QnRestUpdatePeerTask: Request [%1, %2, %3].")
            .arg(m_updateId, server->getName(), server->getApiUrl().toString()), cl_logDEBUG2);

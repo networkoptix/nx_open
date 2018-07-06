@@ -6,21 +6,20 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName)
-:
+ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName):
     StunRequestData(kMethod),
     hostName(std::move(_hostName))
 {
 }
 
-void ResolvePeerRequest::serializeAttributes(nx::stun::Message* const message)
+void ResolvePeerRequest::serializeAttributes(nx::network::stun::Message* const message)
 {
-    message->newAttribute<stun::extension::attrs::HostName>(hostName);
+    message->newAttribute<network::stun::extension::attrs::HostName>(hostName);
 }
 
-bool ResolvePeerRequest::parseAttributes(const nx::stun::Message& message)
+bool ResolvePeerRequest::parseAttributes(const nx::network::stun::Message& message)
 {
-    return readStringAttributeValue<stun::extension::attrs::HostName>(message, &hostName);
+    return readStringAttributeValue<network::stun::extension::attrs::HostName>(message, &hostName);
 }
 
 ResolvePeerResponse::ResolvePeerResponse():
@@ -29,19 +28,19 @@ ResolvePeerResponse::ResolvePeerResponse():
 {
 }
 
-void ResolvePeerResponse::serializeAttributes(nx::stun::Message* const message)
+void ResolvePeerResponse::serializeAttributes(nx::network::stun::Message* const message)
 {
-    message->newAttribute< stun::extension::attrs::PublicEndpointList >(std::move(endpoints));
-    message->newAttribute< stun::extension::attrs::ConnectionMethods >(
+    message->newAttribute<network::stun::extension::attrs::PublicEndpointList >(std::move(endpoints));
+    message->newAttribute<network::stun::extension::attrs::ConnectionMethods >(
         nx::String::number(static_cast<qulonglong>(connectionMethods)));
 }
 
-bool ResolvePeerResponse::parseAttributes(const nx::stun::Message& message)
+bool ResolvePeerResponse::parseAttributes(const nx::network::stun::Message& message)
 {
-    if (!readAttributeValue<stun::extension::attrs::PublicEndpointList>(message, &endpoints))
+    if (!readAttributeValue<network::stun::extension::attrs::PublicEndpointList>(message, &endpoints))
         return false;
     nx::String connectionMethodsStr;
-    if (!readStringAttributeValue<stun::extension::attrs::ConnectionMethods>(
+    if (!readStringAttributeValue<network::stun::extension::attrs::ConnectionMethods>(
             message, &connectionMethodsStr))
     {
         return false;

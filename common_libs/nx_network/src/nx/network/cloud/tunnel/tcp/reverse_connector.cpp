@@ -27,7 +27,7 @@ void ReverseConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_httpClient.bindToAioThread(aioThread);
 }
 
-void ReverseConnector::setHttpTimeouts(nx_http::AsyncClient::Timeouts timeouts)
+void ReverseConnector::setHttpTimeouts(nx::network::http::AsyncClient::Timeouts timeouts)
 {
     m_httpClient.setSendTimeout(timeouts.sendTimeout);
     m_httpClient.setResponseReadTimeout(timeouts.responseReadTimeout);
@@ -49,8 +49,8 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
             if (m_httpClient.failed() || !m_httpClient.response())
                 return handler(SystemError::connectionRefused);
 
-            if (m_httpClient.response()->statusLine.statusCode != 
-                    nx_http::StatusCode::switchingProtocols)
+            if (m_httpClient.response()->statusLine.statusCode !=
+                    nx::network::http::StatusCode::switchingProtocols)
             {
                 NX_LOG(lm("Unexpected status: (%1) %2")
                     .arg(m_httpClient.response()->statusLine.statusCode)
@@ -62,15 +62,13 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
             handler(processHeaders(m_httpClient.response()->headers));
         };
 
-    m_httpClient.doUpgrade(
-        url::Builder().setScheme(nx_http::kUrlSchemeName).setEndpoint(endpoint).toUrl(),
-        kNxRc,
-        std::move(onHttpDone));
+    auto url = url::Builder().setScheme(nx::network::http::kUrlSchemeName).setEndpoint(endpoint).toUrl();
+    m_httpClient.doUpgrade(url, kNxRc, std::move(onHttpDone));
 }
 
 std::unique_ptr<BufferedStreamSocket> ReverseConnector::takeSocket()
 {
-    auto socket = std::make_unique<BufferedStreamSocket>(m_httpClient.takeSocket());
+    auto socket = std::make_unique<BufferedStreamSocket>(m_httpClient.takeSocket(), nx::Buffer());
     if (socket->setSendTimeout(0) && socket->setRecvTimeout(0))
         return socket;
 
@@ -110,7 +108,7 @@ void ReverseConnector::stopWhileInAioThread()
 }
 
 SystemError::ErrorCode ReverseConnector::processHeaders(
-    const nx_http::HttpHeaders& headers)
+    const nx::network::http::HttpHeaders& headers)
 {
     const auto upgrade = headers.find(kUpgrade);
     if (upgrade == headers.end() || !upgrade->second.startsWith(kNxRc))

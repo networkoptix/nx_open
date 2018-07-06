@@ -8,9 +8,9 @@
 
 namespace ec2
 {
-    struct ApiMiscData: ApiData
+    struct ApiMiscData: nx::vms::api::Data
     {
-        ApiMiscData() {}
+        ApiMiscData() = default;
         ApiMiscData(const QByteArray &name, const QByteArray &value)
             : name(name),
               value(value)

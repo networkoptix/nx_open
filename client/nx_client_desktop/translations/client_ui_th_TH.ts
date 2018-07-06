@@ -31,7 +31,7 @@
     <message>
       <location/>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>ระบบเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -85,17 +85,17 @@
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation type="unfinished">Double Buffering</translation>
+      <translation>การบัฟเฟอร์คู่</translation>
     </message>
     <message>
       <location/>
       <source>Disable only if the client takes too much CPU</source>
-      <translation type="unfinished">Disable only if the client takes too much CPU</translation>
+      <translation>ปิดใช้งานเฉพาะเมื่อไคลเอ็นต์ใช้ CPU มากเกินไป</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation type="unfinished">Maximum Live Buffer Length</translation>
+      <translation>ความยาวบัฟเฟอร์สดสูงสุด</translation>
     </message>
     <message>
       <location/>
@@ -110,7 +110,7 @@
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>รีเซ็ตคำเตือนทั้งหมด</translation>
     </message>
     <message>
       <location/>
@@ -144,6 +144,52 @@
       <location/>
       <source>Instant</source>
       <translation>เร่งด่วน</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation>คำที่คั่นด้วยช่องว่าง</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>คำอธิบายประกอบด้วย:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>รายละเอียดประกอบด้วย:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation>ประเภทเหตุการณ์</translation>
+    </message>
+  </context>
+  <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Fixed Archive Length</source>
+      <translation>จำกัดความยาว</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>วันน้อยสุด</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>อัตโนมัติ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>วันมากสุด</translation>
     </message>
   </context>
   <context>
@@ -226,7 +272,7 @@
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
+      <translation>เซิร์ฟเวอร์ทั้งหมดอยู่ในสถานะออฟไลน์ ไม่มีข้อมูลการตรวจสอบ</translation>
     </message>
   </context>
   <context>
@@ -234,7 +280,7 @@
     <message>
       <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
       <source>Backup Schedule...</source>
-      <translation>การสำรองข้อมูลตามตารางเวลา ...</translation>
+      <translation>การสำรองข้อมูลตามตารางเวลา...</translation>
     </message>
     <message>
       <location/>
@@ -249,22 +295,22 @@
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit / s</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation type="unfinished">Bitrate limitation could lead to backup failure.</translation>
+      <translation>ข้อ จำกัด ของอัตราบิตอาจนำไปสู่ความล้มเหลวในการสำรองข้อมูล</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>เสร็จสิ้น</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>เริ่มต้น</translation>
     </message>
   </context>
   <context>
@@ -272,7 +318,7 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation type="unfinished">Backup Settings</translation>
+      <translation>การตั้งค่าการสำรองข้อมูล</translation>
     </message>
     <message>
       <location/>
@@ -282,12 +328,12 @@
     <message>
       <location/>
       <source>Set Schedule...</source>
-      <translation>กำหนดตารางเวลา ...</translation>
+      <translation>กำหนดตารางเวลา...</translation>
     </message>
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation type="unfinished">Only further recording will be backed up. Backup process will ignore existing footage.</translation>
+      <translation>จะมีการสำรองข้อมูลเพิ่มเติมเท่านั้น ขั้นตอนการสำรองข้อมูลจะไม่สนใจภาพวิดีโอที่มีอยู่</translation>
     </message>
     <message>
       <location/>
@@ -297,12 +343,12 @@
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation type="unfinished">Backup Archive From</translation>
+      <translation>สำรองข้อมูลจาก</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation type="unfinished">Backup Quality</translation>
+      <translation>คุณภาพการสำรองข้อมูล</translation>
     </message>
   </context>
   <context>
@@ -320,7 +366,7 @@
     <message>
       <location/>
       <source>Tags:</source>
-      <translation type="unfinished">Tags:</translation>
+      <translation>แท็ก:</translation>
     </message>
     <message>
       <location/>
@@ -330,7 +376,35 @@
     <message>
       <location/>
       <source>Post-recording:</source>
-      <translation>โพสต์การบันทึก :</translation>
+      <translation>โพสต์การบันทึก:</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation>ข้อมูลบุ๊กมาร์ก</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>ความกว้างของพื้นที่</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>ขนาดตัวอักษร</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation>รวมคำอธิบาย</translation>
     </message>
   </context>
   <context>
@@ -363,13 +437,13 @@
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation type="unfinished">List of tags divided by commas</translation>
+      <translation>รายการของแท็กที่แบ่ง ด้วยเครื่องหมายจุลภาค</translation>
     </message>
   </context>
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>รีเฟรช</translation>
     </message>
@@ -419,7 +493,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>ที่</translation>
     </message>
   </context>
   <context>
@@ -437,12 +511,12 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>กฎเหตุการณ์</translation>
     </message>
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>บันทึกเหตุการณ์ ...</translation>
+      <translation>บันทึกเหตุการณ์...</translation>
     </message>
     <message>
       <location/>
@@ -460,7 +534,7 @@
     <message>
       <location/>
       <source>IP, hostname, RTSP link...</source>
-      <translation type="unfinished">IP, hostname, RTSP link...</translation>
+      <translation>IP, ชื่อโฮสต์, ลิงก์ RTSP...</translation>
     </message>
     <message>
       <location/>
@@ -500,7 +574,7 @@
     <message>
       <location/>
       <source>Add device(s)...</source>
-      <translation>เพิ่มอุปกรณ์ (s) ...</translation>
+      <translation>เพิ่มอุปกรณ์ (s)...</translation>
     </message>
     <message>
       <location/>
@@ -515,17 +589,17 @@
     <message>
       <location/>
       <source>Start IP</source>
-      <translation type="unfinished">Start IP</translation>
+      <translation>เริ่มต้น IP</translation>
     </message>
     <message>
       <location/>
       <source>End IP</source>
-      <translation type="unfinished">End IP</translation>
+      <translation>IP ท้าย</translation>
     </message>
     <message>
       <location/>
       <source>Subnet Scan</source>
-      <translation>&amp;สแกน Subnet </translation>
+      <translation>สแกน Subnet</translation>
     </message>
     <message>
       <location/>
@@ -545,7 +619,7 @@
     <message>
       <location/>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>ค้นหา</translation>
     </message>
     <message>
       <location/>
@@ -567,72 +641,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation type="unfinished">Advanced settings are unavailable</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation>ฉันได้อ่านคู่มือและเข้าใจความเสี่ยงเรียบร้อยแล้ว</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation>การตั้งค่าของกล้อง</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>คำเตือน! สิ่งนี้จะทำให้คุณภาพและอัตราเฟรม (FPS) การตั้งค่าในตารางเวลาการบันทึกที่ไม่เกี่ยวข้อง.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation>การควบคุมสัญญาณภาพสำรอง</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation>การเขียนทับคุณภาพของสัญญาณภาพสำรอง</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation>ไม่ได้ใช้</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation>คุณภาพต่ำ</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation>คุณภาพปานกลาง</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation>คุณภาพสูง</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>คำเตือน! การเลือกคุณภาพที่สูงอาจส่งผลกระทบ CPU ของคุณและประสิทธิภาพการทำงานของเครือข่ายและอาจก่อให้เกิดปัญหาอื่น ๆ.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation>การควบคุมการส่งภาพ</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>ไ่ม่ต้องการเก็บภาพหลัก</translation>
     </message>
@@ -640,11 +651,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation>ไม่ต้องการเก็บภาพรอง</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation>การควบคุมสื่อสตรีมมิ่ง</translation>
     </message>
     <message>
       <location/>
@@ -659,12 +665,12 @@
     <message>
       <location/>
       <source>TCP</source>
-      <translation type="unfinished">TCP</translation>
+      <translation>TCP</translation>
     </message>
     <message>
       <location/>
       <source>UDP</source>
-      <translation type="unfinished">UDP</translation>
+      <translation>UDP</translation>
     </message>
     <message>
       <location/>
@@ -673,61 +679,101 @@
     </message>
     <message>
       <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>คำเตือน คุณภาพที่ตำ อาจจะทำให้ความละเอียดของภาพต่ำไปด้วย.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion detection control</source>
-      <translation type="unfinished">Motion detection control</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
-      <translation type="unfinished">Force motion detection for stream:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation type="unfinished">Keep camera streams and profiles settings</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation type="unfinished">Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation type="unfinished">PTZ Control</translation>
+      <translation>บังคับให้ตรวจจับการเคลื่อนไหวสำหรับสตรีม:</translation>
     </message>
     <message>
       <location/>
       <source>Disable native presets, use system presets instead</source>
-      <translation type="unfinished">Disable native presets, use system presets instead</translation>
+      <translation>ปิดใช้งานชุดค่าที่ตั้งล่วงหน้าโดยใช้ระบบที่ตั้งล่วงหน้าแทน</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>คำเตือน! กล้องที่ตั้งไว้ล่วงหน้าจะไม่สามารถใช้งานได้</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation>คำเตือน! อย่าเปลี่ยนการตั้งค่าเหล่านี้นอกจากคุณจะแน่ใจจริงๆ กับของผลกระทบที่อาจเกิดกับประสิทธิภาพของระบบ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation>การตั้งค่ากล้อง</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation>เก็บการตั้งค่าโปรไฟล์ของกล้องและโปรไฟล์ไว้</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation>คุณภาพและกรอบอัตรา (FPS) ค่าในตารางการบันทึกจะไม่เกี่ยวข้อง</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation>คำนวณบิตเรตต่อ GOP แทนบิตเรตต่อวินาที</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation>จะเพิ่มอัตราบิตสำหรับกล้อง</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>สตรีมรอง</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation>ปิดใช้สตรีมรอง</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>ตรวจจับการเคลื่อนไหว</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation>เก็บถาวร</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation>สตรีมมิ่งสื่อ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>ทั่วไป</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>รีเซ็ต</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>รหัสตรรกะ</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <source>Input ID</source>
+      <translation>หมายเลข ID:</translation>
     </message>
   </context>
   <context>
@@ -735,7 +781,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>เพิ่มอุปกรณ์...</translation>
     </message>
   </context>
   <context>
@@ -752,8 +798,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <source>Output ID:</source>
+      <translation>รหัสการแสดงผล:</translation>
     </message>
   </context>
   <context>
@@ -766,7 +812,7 @@
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
@@ -787,26 +833,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation>ไม่ทำการบันทึก</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation>จำกัดความยาว</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>อัตโนมัติ</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>วันน้อยสุด</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>วันมากสุด</translation>
     </message>
     <message>
       <location/>
@@ -836,12 +862,12 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>เปิดใช้งานใบอนุญาต...</translation>
     </message>
     <message>
       <location/>
       <source>Show Quality</source>
-      <translation type="unfinished">Show Quality</translation>
+      <translation>แสดงคุณภาพ</translation>
     </message>
     <message>
       <location/>
@@ -851,7 +877,7 @@
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation type="unfinished">Copying Schedule</translation>
+      <translation>กำลังคัดลอกตารางเวลา</translation>
     </message>
     <message>
       <location/>
@@ -861,12 +887,17 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation type="unfinished">Panic Mode:</translation>
+      <translation>โหมดตื่นตระหนก:</translation>
     </message>
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
       <translation>การเคลื่อนไหว + Lo-Res</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>บิตเรท</translation>
     </message>
   </context>
   <context>
@@ -874,7 +905,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>เปลี่ยนรหัสผ่าน</translation>
     </message>
   </context>
   <context>
@@ -882,12 +913,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>อีเมลหรือรหัสผ่านไม่ถูกต้อง</translation>
+      <translation>คงอยู่ในระบบ</translation>
     </message>
   </context>
   <context>
@@ -945,6 +971,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>ประเภท</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -982,7 +1016,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>กฎเหตุการณ์</translation>
     </message>
   </context>
   <context>
@@ -1015,12 +1049,22 @@
     <message>
       <location/>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>ชนิดของเนื้อหา</translation>
     </message>
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation type="unfinished">HTTP URL</translation>
+      <translation>HTTP URL</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>ประเภทการตรวจสอบสิทธิ์</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>ประเภทคำขอ</translation>
     </message>
   </context>
   <context>
@@ -1032,31 +1076,70 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
+    <name>ExportLayoutSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>ส่งออกทบทวนอย่างรวดเร็ว</translation>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>ตั้งค่าส่งออก</translation>
     </message>
     <message>
       <location/>
-      <source>Initial Video Length</source>
-      <translation>ความยาววิดีโอเริ่มต้น</translation>
+      <source>Make read-only</source>
+      <translation>ทำให้ไฟล์อ่านอย่างเดียว</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>ตั้งค่าส่งออก</translation>
     </message>
     <message>
       <location/>
-      <source>Exported Video Length</source>
-      <translation>ส่งออกความยาววิดีโอ</translation>
+      <source>Apply Filters</source>
+      <translation>ใช้ตัวกรอง</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>กรอบช่วงเวลา</translation>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation>หมุน Dewarping ฯลฯ การเพิ่มประสิทธิภาพของภาพ</translation>
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>ความเร็วในการทบทวนอย่างรวดเร็ว</translation>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation>การตั้งค่าที่เลือกจะต้องมีการแปลงรหัส จะเพิ่มการใช้ CPU และอาจใช้เวลามาก</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation>ส่งออกวิดีโอ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation>กล้องเดียว</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation>ตั้งค่าส่งออก</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation>วิดีโอหลายรายการ</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation>ค้นหา...</translation>
     </message>
   </context>
   <context>
@@ -1079,7 +1162,7 @@
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation type="unfinished">Fisheye Dewarping</translation>
+      <translation>Fisheye Dewarping</translation>
     </message>
     <message>
       <location/>
@@ -1089,17 +1172,17 @@
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation type="unfinished">Mount Angle Correction:</translation>
+      <translation>การแก้ไขมุมเมาท์:</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>ออฟเซ็ต Y</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>ออฟเซ็ต x</translation>
     </message>
     <message>
       <location/>
@@ -1109,7 +1192,7 @@
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>Ellipticity</translation>
     </message>
   </context>
   <context>
@@ -1147,17 +1230,17 @@
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>โฟลเดอร์สื่อท้องถิ่น</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>อินพุตเสียง</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>แหล่งแรก</translation>
     </message>
     <message>
       <location/>
@@ -1167,12 +1250,12 @@
     <message>
       <location/>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>แหล่งที่มาที่สอง</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>เรียกใช้โปรแกรมประยุกต์เมื่อบูทเครื่องคอมพิวเตอร์ขึ้น</translation>
     </message>
   </context>
   <context>
@@ -1185,7 +1268,7 @@
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>สำรองและเรียกคืน</translation>
     </message>
   </context>
   <context>
@@ -1198,12 +1281,45 @@
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation type="unfinished">Aspect Ratio</translation>
+      <translation>อัตราส่วนภาพ</translation>
     </message>
     <message>
       <location/>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>หมุนหน้าจอ</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation>ภาพ:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation>ขนาด</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>ความทึบ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>ค่าเริ่มต้น</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>ค้นหา...</translation>
     </message>
   </context>
   <context>
@@ -1297,7 +1413,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
       <source>ldap(s)://host:port</source>
-      <translation type="unfinished">ldap(s)://host:port</translation>
+      <translation>ldap(s)://โฮสต์:พอร์ต</translation>
     </message>
     <message>
       <location/>
@@ -1317,12 +1433,12 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation type="unfinished">Server URL</translation>
+      <translation>URL ของเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN</source>
-      <translation type="unfinished">Admin DN</translation>
+      <translation>Admin DN</translation>
     </message>
     <message>
       <location/>
@@ -1332,12 +1448,12 @@
     <message>
       <location/>
       <source>Search Base</source>
-      <translation type="unfinished">Search Base</translation>
+      <translation>ฐานค้นหา</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation type="unfinished">Search Filter</translation>
+      <translation>การค้นหาและกรองข้อมูล</translation>
     </message>
   </context>
   <context>
@@ -1345,12 +1461,12 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>ผู้ใช้สามารถดึงข้อมูลจาก LDAP ...</translation>
+      <translation>ผู้ใช้สามารถดึงข้อมูลจาก LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>Loading...</source>
-      <translation>กำลังโหลด ...</translation>
+      <translation>กำลังโหลด...</translation>
     </message>
     <message>
       <location/>
@@ -1360,12 +1476,12 @@
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation type="unfinished">Role to assign to imported users</translation>
+      <translation>บทบาทที่จะมอบหมายให้กับผู้ใช้ที่นำเข้า</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation type="unfinished">Disable imported users</translation>
+      <translation>ปิดการใช้งานผู้ใช้ที่นำเข้า</translation>
     </message>
   </context>
   <context>
@@ -1397,8 +1513,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>ล็อคไปยังรหัสฮาร์ดแวร์:</translation>
     </message>
   </context>
   <context>
@@ -1421,12 +1537,12 @@
     <message>
       <location/>
       <source>Details...</source>
-      <translation type="unfinished">Details...</translation>
+      <translation>รายละเอียด...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation type="unfinished">The software is licensed to</translation>
+      <translation>ซอฟต์แวร์ได้รับอนุญาตให้</translation>
     </message>
   </context>
   <context>
@@ -1439,7 +1555,7 @@
     <message>
       <location/>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>ปัญหาเกี่ยวกับใบอนุญาต:</translation>
     </message>
   </context>
   <context>
@@ -1477,7 +1593,7 @@
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>เปิดใช้งานอินเทอร์เน็ต</translation>
     </message>
     <message>
       <location/>
@@ -1487,7 +1603,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>คีย์สัญญาอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
       <location/>
@@ -1496,8 +1612,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <source>Hardware ID</source>
+      <translation>รหัสฮาร์ดแวร์</translation>
     </message>
   </context>
   <context>
@@ -1510,7 +1626,7 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>เปิดใช้งานใบอนุญาต...</translation>
     </message>
   </context>
   <context>
@@ -1541,12 +1657,12 @@
     <message>
       <location/>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>โฮสต์</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>พอร์ท</translation>
     </message>
     <message>
       <location/>
@@ -1604,7 +1720,7 @@
     <message>
       <location/>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>โหมด</translation>
     </message>
     <message>
       <location/>
@@ -1614,7 +1730,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation type="unfinished">Show additional info in tree</translation>
+      <translation>แสดงข้อมูลเพิ่มเติมในโครงสร้าง</translation>
     </message>
     <message>
       <location/>
@@ -1623,8 +1739,8 @@
     </message>
     <message>
       <location/>
-      <source>Showreel cycle</source>
-      <translation type="unfinished">Showreel cycle</translation>
+      <source>Tour cycle</source>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1632,7 +1748,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>อย่าแสดงข้อความนี้อีก</translation>
     </message>
   </context>
   <context>
@@ -1674,6 +1790,24 @@
     </message>
   </context>
   <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation>เพิ่มกล้องใหม่</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation>ไปยังเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Wearable Camera&quot; เป็นที่เก็บข้อมูลเสมือนจริงสำหรับไฟล์วิดีโอซึ่งสามารถอัพโหลดไปยังเซิร์ฟเวอร์ใดก็ได้ในระบบของคุณและเข้าถึงได้โดยผู้ใช้รายใด</translation>
+    </message>
+  </context>
+  <context>
     <name>PlaySoundBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
@@ -1693,7 +1827,7 @@
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>เล่นกับผู้ใช้</translation>
     </message>
   </context>
   <context>
@@ -1711,7 +1845,7 @@
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>บังคับรับทราบ</translation>
     </message>
   </context>
   <context>
@@ -1729,7 +1863,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>เหตุการณ์</translation>
     </message>
   </context>
   <context>
@@ -1821,7 +1955,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation type="unfinished">Choose a specific build</translation>
+      <translation>เลือกการสร้างที่เฉพาะเจาะจง</translation>
     </message>
   </context>
   <context>
@@ -1837,7 +1971,7 @@
     <message>
       <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation type="unfinished">Installing Compatibility Version...</translation>
+      <translation>กำลังติดตั้งเวอร์ชันความเข้ากันได้...</translation>
     </message>
   </context>
   <context>
@@ -1868,7 +2002,7 @@
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>เปิดใช้งานอินเตอร์เฟสกระเบื้อง</translation>
     </message>
   </context>
   <context>
@@ -1881,12 +2015,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>อีเมลหรือรหัสผ่านไม่ถูกต้อง</translation>
+      <translation>คงอยู่ในระบบ</translation>
     </message>
   </context>
   <context>
@@ -1902,7 +2031,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>ผสานระบบ ...</translation>
+      <translation>ผสานระบบ...</translation>
     </message>
     <message>
       <location/>
@@ -1927,7 +2056,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation type="unfinished">The new System will have password and name from System:</translation>
+      <translation>ระบบใหม่จะมีรหัสผ่านและชื่อจากระบบ:</translation>
     </message>
   </context>
   <context>
@@ -1986,7 +2115,7 @@
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
+      <translation>การลบตัวเลือกการเชื่อมต่อนี้อาจทำให้ระบบทำงานไม่ถูกต้อง</translation>
     </message>
   </context>
   <context>
@@ -2009,22 +2138,22 @@
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation type="unfinished">Updating to...</translation>
+      <translation>กำลังอัปเดตเป็น...</translation>
     </message>
     <message>
       <location/>
       <source>Link copied</source>
-      <translation type="unfinished">Link copied</translation>
+      <translation>คัดลอกลิ้งค์แล้ว</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation type="unfinished">You have the latest version installed</translation>
+      <translation>คุณได้ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
     </message>
     <message>
       <location/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
+      <translation>ไม่แนะนำให้ใช้การอัปเดตระบบในช่วงปลายสัปดาห์</translation>
     </message>
   </context>
   <context>
@@ -2065,7 +2194,7 @@
     <message>
       <location/>
       <source>Warning: file with the same name already exists!</source>
-      <translation type="unfinished">Warning: file with the same name already exists!</translation>
+      <translation>คำเตือน: ไฟล์ที่มีชื่อเดียวกันนี้มีอยู่แล้ว!</translation>
     </message>
   </context>
   <context>
@@ -2073,7 +2202,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
       <source>LDAP Settings...</source>
-      <translation>การตั้งค่า LDAP ...</translation>
+      <translation>การตั้งค่า LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2083,7 +2212,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>ผู้ใช้สามารถดึงข้อมูลจาก LDAP ...</translation>
+      <translation>ผู้ใช้สามารถดึงข้อมูลจาก LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2093,7 +2222,7 @@
     <message>
       <location/>
       <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
+      <translation>ค้นหาผู้ใช้</translation>
     </message>
     <message>
       <location/>
@@ -2103,7 +2232,7 @@
     <message>
       <location/>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>ปิดการใช้งาน</translation>
     </message>
     <message>
       <location/>
@@ -2113,7 +2242,7 @@
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>แก้ไขบทบาท...</translation>
     </message>
   </context>
   <context>
@@ -2135,6 +2264,39 @@
     </message>
   </context>
   <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation>รีวิวอย่างรวดเร็ว</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation>ความยาวเริ่มต้นของวิดีโอ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation>ส่งออกความยาววิดีโอ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation>ความเร็ว</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation>ช่วงเฟรม</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation>รีเซ็ตความเร็ว</translation>
+    </message>
+  </context>
+  <context>
     <name>ReconnectInfoDialog</name>
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
@@ -2144,7 +2306,7 @@
     <message>
       <location/>
       <source>Please wait while the connection is being restored...</source>
-      <translation>กรุณารอสักครู่ในขณะที่การเชื่อมต่อจะถูกเรียกคืน ...</translation>
+      <translation>กรุณารอสักครู่ในขณะที่การเชื่อมต่อจะถูกเรียกคืน...</translation>
     </message>
   </context>
   <context>
@@ -2157,12 +2319,12 @@
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
       <source>s</source>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2215,7 +2377,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>ขอแนะนำให้ใช้คอมพิวเตอร์ที่มีประสิทธิภาพเพื่อคุณภาพและความละเอียด &quot;Best&quot;</translation>
     </message>
     <message>
       <location/>
@@ -2281,7 +2443,7 @@
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>พูดคุยกับผู้ใช้</translation>
     </message>
   </context>
   <context>
@@ -2312,7 +2474,7 @@
     <message>
       <location/>
       <source>Failover Priority...</source>
-      <translation>ลำดับความสำคัญล้มเหลว ...</translation>
+      <translation>ลำดับความสำคัญล้มเหลว...</translation>
     </message>
     <message>
       <location/>
@@ -2327,7 +2489,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>พอร์ท</translation>
     </message>
   </context>
   <context>
@@ -2484,7 +2646,7 @@
     <message>
       <location/>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>เสียง</translation>
     </message>
     <message>
       <location/>
@@ -2520,11 +2682,6 @@
       <location/>
       <source>Reset</source>
       <translation>รีเซ็ต</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2621,7 +2778,7 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>พร้อมใช้</translation>
     </message>
     <message>
       <location/>
@@ -2631,7 +2788,7 @@
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>ไอคอน</translation>
     </message>
   </context>
   <context>
@@ -2639,12 +2796,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation type="unfinished">Current Statistics</translation>
+      <translation>สถิติปัจจุบัน</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation type="unfinished">Forecast for Full Storage Usage</translation>
+      <translation>พยากรณ์การใช้พื้นที่เก็บข้อมูลแบบเต็มรูปแบบ</translation>
     </message>
     <message>
       <location/>
@@ -2654,7 +2811,7 @@
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
+      <translation>เซิร์ฟเวอร์ออฟไลน์ ไม่สามารถใช้สถิติได้</translation>
     </message>
   </context>
   <context>
@@ -2677,32 +2834,27 @@
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>ที่จัดเก็บ</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>เก็บถาวรการจัดดัชนีใหม่</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation type="unfinished">Reindex Backup</translation>
+      <translation>สำรองข้อมูลการจัดดัชนีใหม่</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation type="unfinished">Backup Archive</translation>
+      <translation>ที่เก็บข้อมูลสำรอง</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation type="unfinished">Backup Settings...</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>การตั้งค่าสำรอง...</translation>
     </message>
   </context>
   <context>
@@ -2728,7 +2880,7 @@
     <message>
       <location/>
       <source>URL:</source>
-      <translation type="unfinished">URL:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <location/>
@@ -2746,22 +2898,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>บทบาท</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>แสดงผู้ใช้ทั้งหมด</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>เลือกผู้ใช้</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>ไม่มีรายการตรงกับการค้นหาของคุณ</translation>
     </message>
   </context>
   <context>
@@ -2788,16 +2940,67 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation>ข้อความ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>ลบ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>ขนาดตัวอักษร</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation>ป้อนข้อความล้วนหรือ HTML</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>ความกว้างของพื้นที่</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
       <source>System Time</source>
-      <translation type="unfinished">System Time</translation>
+      <translation>เวลาของระบบ</translation>
     </message>
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>เวลาการซิงค์กับอินเทอร์เน็ต</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation>ประทับเวลา</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>ขนาดตัวอักษร</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation>รูปแบบ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>ลบ</translation>
     </message>
   </context>
   <context>
@@ -2805,7 +3008,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>เปลี่ยนรหัสผ่าน...</translation>
     </message>
   </context>
   <context>
@@ -2823,7 +3026,7 @@
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation type="unfinished">Delete Role</translation>
+      <translation>ลบบทบาท</translation>
     </message>
   </context>
   <context>
@@ -2831,19 +3034,22 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation type="unfinished">User Roles</translation>
-    </message>
-    <message>
-      <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>บทบาทผู้ใช้</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation type="unfinished">New role</translation>
+      <translation>บทบาทใหม่</translation>
+    </message>
+    <message>
+      <location/>
+      <source>There are no custom user roles yet.</source>
+      <translation>ยังไม่มีบทบาทผู้ใช้ที่กำหนดเอง</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>คลิก &quot;ปุ่มบทบาทใหม่&quot; เพื่อสร้างใหม่</translation>
     </message>
   </context>
   <context>
@@ -2851,17 +3057,61 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
+      <translation>ชนิดของผู้ใช้</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>บทบาท</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>แก้ไขบทบาท...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Motion Detection</source>
+      <translation>ตรวจจับการเคลื่อนไหว</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation>ตรวจจับการเคลื่อนไหวในวิดีโอที่อัปโหลด</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>ความไว:</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Cancel</source>
+      <translation>ยกเลิก</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Upload Video</source>
+      <translation>อัปโหลดวิดีโอ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation>อัปโหลดไฟล์</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation>อัปโหลดโฟลเดอร์</translation>
     </message>
   </context>
   <context>

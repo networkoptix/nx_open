@@ -4,6 +4,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/utils/url.h>
 
 namespace nx {
 namespace client {
@@ -12,7 +13,7 @@ namespace core {
 struct LocalConnectionData
 {
     QString systemName;
-    QList<QUrl> urls;
+    QList<nx::utils::Url> urls;
 };
 #define LocalConnectionData_Fields (systemName)(urls)
 

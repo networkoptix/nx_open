@@ -22,6 +22,7 @@ QnStaticCommonModule::QnStaticCommonModule(
     Qn::PeerType localPeerType,
     const QString& brand,
     const QString& customization,
+    const QString& customCloudHost,
     QObject *parent)
     :
     QObject(parent),
@@ -34,12 +35,12 @@ QnStaticCommonModule::QnStaticCommonModule(
     Q_INIT_RESOURCE(common);
     QnCommonMetaTypes::initialize();
     instance<QnLongRunnablePool>();
-    nx::network::SocketGlobals::init();
+    nx::network::SocketGlobals::init(/*initializationFlags*/ 0, customCloudHost);
 
     // Providing mediaserver-specific way of validating peer id.
     m_private->endpointVerificatorFactoryBak =
         nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
-            [](const nx::String& connectSessionId) 
+            [](const nx::String& connectSessionId)
                 -> std::unique_ptr<nx::network::cloud::tcp::AbstractEndpointVerificator>
             {
                 return std::make_unique<CloudMediaServerEndpointVerificator>(
@@ -54,7 +55,7 @@ QnStaticCommonModule::QnStaticCommonModule(
     store(new nx::utils::TimerManager());
 
     instance<QnSyncTime>();
-    instance<nx_http::ClientPool>();
+    instance<nx::network::http::ClientPool>();
 }
 
 void QnStaticCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {

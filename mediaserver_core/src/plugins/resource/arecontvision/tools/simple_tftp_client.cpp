@@ -5,10 +5,12 @@
 #ifdef ENABLE_ARECONT
 
 #include <nx/network/socket.h>
-#include <nx/utils/log/log.h>
-#include <utils/common/byte_array.h>
-#include <nx/utils/system_error.h>
+#include <nx/network/nettools.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/system_error.h>
+
+#include <utils/common/byte_array.h>
 
 using namespace std;
 
@@ -16,9 +18,9 @@ CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout
     m_retry(retry),
     m_hostAddress(host),
     m_timeout(timeout),
-    m_resolvedAddress(resolveAddress(host).toString())
+    m_resolvedAddress(nx::network::resolveAddress(host).toString())
 {
-    m_sock.reset( SocketFactory::createDatagramSocket().release() );
+    m_sock.reset( nx::network::SocketFactory::createDatagramSocket().release() );
 
     //m_wish_blk_size = double_blk_size;
     m_wish_blk_size  = blk_size;
@@ -35,7 +37,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
     {
         m_last_packet_size = 0;
         char buff_send[1000]; int len_send;
-        unsigned char buff_recv[3100]; 
+        unsigned char buff_recv[3100];
         int len_recv;
         int i, len = 0;
 
@@ -59,12 +61,12 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
             while(1)
             {
                 m_prevResult = CameraDiagnostics::NoErrorResult();
-                SocketAddress datagrammSourceAddress;
+                nx::network::SocketAddress datagrammSourceAddress;
                 len_recv = m_sock->recvFrom(buff_recv, sizeof(buff_recv), &datagrammSourceAddress);
                 if (len_recv < 0)
                 {
                     m_prevResult = CameraDiagnostics::IOErrorResult( SystemError::getLastOSErrorText() );
-                    m_status = time_out; 
+                    m_status = time_out;
                     break;
                 }
                 m_sock->setDestAddr(m_resolvedAddress, datagrammSourceAddress.port);
@@ -250,9 +252,9 @@ int CLSimpleTFTPClient::form_read_request(const QString& fn, char* buff)
     buff[len] = 0;    len++;
 
     if (m_wish_blk_size == double_blk_size)
-        memcpy(buff+len, "2904", 4); 
+        memcpy(buff+len, "2904", 4);
     else
-        memcpy(buff+len, "1450", 4); 
+        memcpy(buff+len, "1450", 4);
 
     len+=4;
     buff[len] = 0;    len++;
@@ -263,7 +265,7 @@ int CLSimpleTFTPClient::form_read_request(const QString& fn, char* buff)
 
 int CLSimpleTFTPClient::form_ack(unsigned short blk, char* buff)
 {
-    buff[0] = 0; buff[1] = 0x04; 
+    buff[0] = 0; buff[1] = 0x04;
     buff[2] = blk>>8; buff[3] = blk&0xff;
 
     return 4;
@@ -280,10 +282,10 @@ int CLSimpleTFTPClient::parseBlockSize(const char* const responseBuffer, std::si
 
     const char* kBlockSizeOption = "blksize";
     const auto kOptionAckCodeLen = 1;
-    const auto kTerminatingBytes = 3; 
+    const auto kTerminatingBytes = 3;
     const auto optionNameLength = std::strlen(kBlockSizeOption);
-    const auto minimalLength = kTerminatingBytes 
-        + kOptionAckCodeLen 
+    const auto minimalLength = kTerminatingBytes
+        + kOptionAckCodeLen
         + optionNameLength
         + 1;
 
@@ -294,13 +296,13 @@ int CLSimpleTFTPClient::parseBlockSize(const char* const responseBuffer, std::si
     if (strncmp(responseBuffer + 2, kBlockSizeOption, optionNameLength) != 0)
         return 0;
 
-    const int blockSizeValueLength = responseLength 
+    const int blockSizeValueLength = responseLength
         - optionNameLength
         - kOptionAckCodeLen
         - kTerminatingBytes;
-    
-    const auto blockSizeValuePtr = responseBuffer 
-        + responseLength 
+
+    const auto blockSizeValuePtr = responseBuffer
+        + responseLength
         - (blockSizeValueLength + 1);
 
     const auto str = QString::fromLatin1(blockSizeValuePtr);

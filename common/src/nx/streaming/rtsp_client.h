@@ -1,5 +1,6 @@
-#ifndef RTSP_CLIENT_H
-#define RTSP_CLIENT_H
+#pragma once
+
+#include <QtCore/QElapsedTimer>
 
 #include <fstream>
 #include <memory>
@@ -24,6 +25,7 @@ extern "C"
 #include <utils/common/byte_array.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <network/client_authenticate_helper.h>
+#include <nx/utils/elapsed_timer.h>
 
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM
@@ -32,60 +34,85 @@ class QnRtspClient;
 
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
-static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
+static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadataType
 static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
+
+// Class name is quite misleading.
+// Actually it is RTCP statistics + NTP time from Onvif extension.
 class QnRtspStatistic
 {
 public:
-    QnRtspStatistic(): timestamp(0), nptTime(0), localtime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
-    bool isEmpty() const { return timestamp == 0 && nptTime == 0; }
+    QnRtspStatistic(): timestamp(0), ntpTime(0), localTime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
+    bool isEmpty() const
+    {
+        return timestamp == 0
+            && ntpTime == 0
+            && !ntpOnvifExtensionTime.is_initialized();
+    }
 
     quint32 timestamp;
-    double nptTime;
-    double localtime;
+    double ntpTime;
+    double localTime;
     qint64 receivedPackets;
     qint64 receivedOctets;
     quint32 ssrc;
+    boost::optional<std::chrono::microseconds> ntpOnvifExtensionTime;
+};
+
+enum class TimePolicy
+{
+    bindCameraTimeToLocalTime, //< Use camera NPT time, bind it to local time.
+    ignoreCameraTimeIfBigJitter, //< Same as previous, switch to ForceLocalTime if big jitter.
+    forceLocalTime, //< Use local time only.
+    forceCameraTime, //< Use camera NPT time only.
+    onvifExtension, //< Use timestamps from Onvif streaming spec extension.
 };
 
 class QnRtspTimeHelper
 {
 public:
+
     QnRtspTimeHelper(const QString& resId);
     ~QnRtspTimeHelper();
 
     /*!
         \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
     */
-    qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
-    QString getResID() const { return m_resId; }
+    qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursionAllowed = true);
+    QString getResID() const { return m_resourceId; }
+
+    void setTimePolicy(TimePolicy policy);
+
 private:
-    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
+    double cameraTimeToLocalTime(double cameraSecondsSinceEpoch, double currentSecondsSinceEpoch);
     bool isLocalTimeChanged();
-    bool isCameraTimeChanged(const QnRtspStatistic& statistics);
+    bool isCameraTimeChanged(const QnRtspStatistic& statistics, double* outCameraTimeDriftSeconds);
     void reset();
 private:
+    quint32 m_prevRtpTime = 0;
+    quint32 m_prevCurrentSeconds = 0;
     QElapsedTimer m_timer;
     qint64 m_localStartTime;
     //qint64 m_cameraTimeDrift;
-    double m_rtcpReportTimeDiff;
+    boost::optional<double> m_rtcpReportTimeDiff;
+    nx::utils::ElapsedTimer m_rtcpJitterTimer;
 
     struct CamSyncInfo {
-        CamSyncInfo(): timeDiff(INT_MAX), driftSum(0) {}
+        CamSyncInfo(): timeDiff(INT_MAX) {}
         QnMutex mutex;
         double timeDiff;
-        QnUnsafeQueue<qint64> driftStats;
-        qint64 driftSum;
     };
 
     QSharedPointer<CamSyncInfo> m_cameraClockToLocalDiff;
-    QString m_resId;
+    QString m_resourceId;
 
     static QnMutex m_camClockMutex;
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
+    TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
+    QnRtspStatistic m_statistics;
 
 #ifdef DEBUG_TIMINGS
     void printTime(double jitter);
@@ -105,8 +132,8 @@ public:
     virtual qint64 read(char * data, qint64 maxSize );
     const QnRtspStatistic& getStatistic() { return m_statistic; }
     void setStatistic(const QnRtspStatistic& value) { m_statistic = value; }
-    AbstractCommunicatingSocket* getMediaSocket();
-    AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    nx::network::AbstractCommunicatingSocket* getMediaSocket();
+    nx::network::AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
     void shutdown();
     void setTcpMode(bool value);
     void setSSRC(quint32 value) {ssrc = value; }
@@ -114,7 +141,7 @@ public:
 
     void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
     void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
-    void setHostAddress(const HostAddress& hostAddress) {m_hostAddress = hostAddress;};
+    void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
     quint8 getRtpTrackNum() const { return m_rtpTrackNum; }
     quint8 getRtcpTrackNum() const { return m_rtpTrackNum+1; }
@@ -124,11 +151,11 @@ private:
     QnRtspClient* m_owner;
     bool m_tcpMode;
     QnRtspStatistic m_statistic;
-    AbstractDatagramSocket* m_mediaSocket;
-    AbstractDatagramSocket* m_rtcpSocket;
+    nx::network::AbstractDatagramSocket* m_mediaSocket;
+    nx::network::AbstractDatagramSocket* m_rtcpSocket;
     quint16 m_mediaPort;
     quint16 m_remoteEndpointRtcpPort;
-    HostAddress m_hostAddress;
+    nx::network::HostAddress m_hostAddress;
     quint32 ssrc;
     quint8 m_rtpTrackNum;
     QElapsedTimer m_reportTimer;
@@ -144,6 +171,12 @@ public:
 
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
     enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
+
+    enum class DateTimeFormat
+    {
+        Numeric,
+        ISO
+    };
 
     struct SDPTrackInfo
     {
@@ -166,7 +199,7 @@ public:
 
             ioDevice = new QnRtspIoDevice(owner, useTCP);
             ioDevice->setRtpTrackNum(_trackNum * 2);
-            ioDevice->setHostAddress(HostAddress(owner->getUrl().host()));
+            ioDevice->setHostAddress(nx::network::HostAddress(owner->getUrl().host()));
             interleaved = QPair<int,int>(-1,-1);
         }
 
@@ -185,6 +218,9 @@ public:
         QPair<int,int> interleaved;
 
         QnRtspIoDevice* ioDevice;
+
+        bool isBackChannel = false;
+        int timeBase = 0;
     };
 
     static QString mediaTypeToStr(TrackType tt);
@@ -194,7 +230,7 @@ public:
 
     QnRtspClient(
         bool shouldGuessAuthDigest,
-        std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>());
+        std::unique_ptr<nx::network::AbstractStreamSocket> tcpSock = std::unique_ptr<nx::network::AbstractStreamSocket>());
 
     ~QnRtspClient();
 
@@ -228,6 +264,7 @@ public:
     void setTransport(TransportType transport);
     void setTransport(const QString& transport);
     TransportType getTransport() const { return m_transport; }
+    bool isTcpMode() const { return m_prefferedTransport != TRANSPORT_UDP; }
     QString getTrackFormatByRtpChannelNum(int channelNum);
     TrackType getTrackTypeByRtpChannelNum(int channelNum);
     int getChannelNum(int rtpChannelNum);
@@ -247,7 +284,8 @@ public:
     void setAdditionAttribute(const QByteArray& name, const QByteArray& value);
     void removeAdditionAttribute(const QByteArray& name);
 
-    void setTCPTimeout(int timeout);
+    void setTCPTimeout(std::chrono::milliseconds timeout);
+    std::chrono::milliseconds getTCPTimeout() const;
 
     void parseRangeHeader(const QString& rangeStr);
 
@@ -255,10 +293,10 @@ public:
     * Client will use any AuthScheme corresponding to server requirements (authenticate server request)
     * defaultAuthScheme is used for first client request only
     */
-    void setAuth(const QAuthenticator& auth, nx_http::header::AuthScheme::Value defaultAuthScheme);
+    void setAuth(const QAuthenticator& auth, nx::network::http::header::AuthScheme::Value defaultAuthScheme);
     QAuthenticator getAuth() const;
 
-    QUrl getUrl() const;
+    nx::utils::Url getUrl() const;
 
     void setProxyAddr(const QString& addr, int port);
 
@@ -288,9 +326,9 @@ public:
     int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
 
-    void sendBynaryResponse(quint8* buffer, int size);
+    void sendBynaryResponse(const quint8* buffer, int size);
 
-    QnRtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
+    QnRtspStatistic parseServerRTCPReport(const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
     int buildClientRTCPReport(quint8 *dstBuffer, int bufferLen);
 
     void setUsePredefinedTracks(int numOfVideoChannel);
@@ -302,27 +340,36 @@ public:
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
 
-    AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
+    void setTrackInfo(const TrackMap& tracks);
+
+    nx::network::AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
     void setUserAgent(const QString& value);
 
     /** @return "Server" http header value */
     QByteArray serverInfo() const;
 
+    void setDateTimeFormat(const DateTimeFormat& format);
+    void setScaleHeaderEnabled(bool value);
+    void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
+
+    bool processTcpRtcpData(const quint8* data, int size);
+
+    QElapsedTimer lastReceivedDataTimer() const;
 signals:
     void gotTextResponse(QByteArray text);
 private:
-    void addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos );
+    void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     QString getTrackFormat(int trackNum) const;
     TrackType getTrackType(int trackNum) const;
     //int readRAWData();
-    nx_http::Request createDescribeRequest();
+    nx::network::http::Request createDescribeRequest();
     bool sendDescribe();
     bool sendOptions();
     bool sendSetup();
     bool sendKeepAlive();
 
     bool readTextResponce(QByteArray &responce);
-    void addAuth( nx_http::Request* const request );
+    void addAuth( nx::network::http::Request* const request );
 
 
     QString extractRTSPParam(const QString &buffer, const QString &paramName);
@@ -330,7 +377,7 @@ private:
 
     void parseSDP();
     void updateTrackNum();
-    void addAdditionAttrs( nx_http::Request* const request );
+    void addAdditionAttrs( nx::network::http::Request* const request );
     void updateResponseStatus(const QByteArray& response);
 
     void usePredefinedTracks();
@@ -338,10 +385,13 @@ private:
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo);
     QByteArray calcDefaultNonce() const;
-    nx_http::Request createPlayRequest( qint64 startPos, qint64 endPos );
+    nx::network::http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
-    bool sendRequestInternal(nx_http::Request&& request);
-    void addCommonHeaders(nx_http::HttpHeaders& headers);
+    bool sendRequestInternal(nx::network::http::Request&& request);
+    void addCommonHeaders(nx::network::http::HttpHeaders& headers);
+    void addAdditionalHeaders(const QString& requestName, nx::network::http::HttpHeaders* outHeaders);
+
+    QByteArray nptPosToString(qint64 posUsec) const;
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
@@ -353,7 +403,7 @@ private:
     qint64 m_openedTime;
     qint64 m_endTime;
     float m_scale;
-    int m_tcpTimeout;
+    std::chrono::milliseconds m_tcpTimeout;
     int m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
@@ -365,10 +415,10 @@ private:
     int m_responseBufferLen;
     QByteArray m_sdp;
 
-    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
 
-    QUrl m_url;
+    nx::utils::Url m_url;
 
     QString m_SessionId;
     unsigned short m_ServerPort;
@@ -380,7 +430,7 @@ private:
     friend class QnRtspIoDevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
     QAuthenticator m_auth;
-    boost::optional<SocketAddress> m_proxyAddress;
+    boost::optional<nx::network::SocketAddress> m_proxyAddress;
     QString m_contentBase;
     TransportType m_prefferedTransport;
 
@@ -400,9 +450,14 @@ private:
     std::ofstream m_inStreamFile;
     std::ofstream m_outStreamFile;
 #endif
-    nx_http::header::AuthScheme::Value m_defaultAuthScheme;
+    nx::network::http::header::AuthScheme::Value m_defaultAuthScheme;
     mutable QnMutex m_socketMutex;
     QByteArray m_serverInfo;
+    DateTimeFormat m_dateTimeFormat = DateTimeFormat::Numeric;
+    bool m_scaleHeaderEnabled = true;
+    using RequestName = QString;
+    QMap<RequestName, nx::network::http::HttpHeaders> m_additionalHeaders;
+    QElapsedTimer m_lastReceivedDataTimer;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
@@ -414,7 +469,5 @@ private:
         Updates \a m_responseCode member.
         \return error description
     */
-    bool sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responce );
+    bool sendRequestAndReceiveResponse( nx::network::http::Request&& request, QByteArray& responce );
 };
-
-#endif // RTSP_CLIENT_H

@@ -40,7 +40,7 @@ void QnClientPtzControllerPool::registerResource(const QnResourcePtr &resource) 
         return;
 
     connect(camera, &QnVirtualCameraResource::ptzCapabilitiesChanged, this,
-        [this, camera]
+        [this](const QnVirtualCameraResourcePtr& camera)
         {
             updateController(camera);
             cacheCameraPresets(camera);

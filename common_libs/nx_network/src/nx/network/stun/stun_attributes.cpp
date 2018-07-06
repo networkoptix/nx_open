@@ -4,6 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace attrs {
 
@@ -36,7 +37,7 @@ MappedAddress::MappedAddress(SocketAddress endpoint):
     m_endpoint(std::move(endpoint))
 {
     NX_ASSERT(m_endpoint.address.isIpAddress());
-    NX_ASSERT(m_endpoint.address.ipV4() || m_endpoint.address.ipV6());
+    NX_ASSERT(m_endpoint.address.ipV4() || m_endpoint.address.ipV6().first);
 }
 
 int MappedAddress::getType() const
@@ -65,7 +66,7 @@ nx::network::server::SerializerState MappedAddress::serialize(
         if (buffer->WriteBytes(reinterpret_cast<const char*>(&ipv4Address->s_addr), 4) == nullptr)
             return nx::network::server::SerializerState::needMoreBufferSpace;
     }
-    else if (const auto ipv6Address = m_endpoint.address.ipV6())
+    else if (const auto ipv6Address = m_endpoint.address.ipV6().first)
     {
         if (buffer->WriteBytes(reinterpret_cast<const char*>(&ipv6Address->s6_addr), 16) == nullptr)
             return nx::network::server::SerializerState::needMoreBufferSpace;
@@ -267,4 +268,5 @@ int IntAttribute::value() const
 
 } // namespace attrs
 } // namespace stun
+} // namespace network
 } // namespace nx

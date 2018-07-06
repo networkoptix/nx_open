@@ -8,21 +8,23 @@ namespace nx {
 namespace utils {
 namespace stree {
 
-/*!
-    Associative dictionary. Element key interpreted as wildcard mask. \a find methods finds first element with mask, supplying searched string
-    \note Performs validation to mask by sequentially checking all elements. So do not use it when high performance is needed
-*/
+/**
+ * Associative dictionary. Element key interpreted as wildcard mask. 
+ * Find methods look up the first element that satisfies supplied string.
+ * NOTE: Performs validation to mask by sequentially checking all elements. 
+ * So do not use it when high performance is needed.
+ */
 template<class KeyType, class MappedType>
-    class WildcardMatchContainer
+class WildcardMatchContainer
 {
-    typedef std::map<KeyType, MappedType> InternalContainerType;
+    using InternalContainerType = std::map<KeyType, MappedType>;
 
 public:
-    typedef typename InternalContainerType::iterator iterator;
-    typedef typename InternalContainerType::const_iterator const_iterator;
-    typedef typename InternalContainerType::key_type key_type;
-    typedef typename InternalContainerType::mapped_type mapped_type;
-    typedef typename InternalContainerType::value_type value_type;
+    using iterator = typename InternalContainerType::iterator;
+    using const_iterator = typename InternalContainerType::const_iterator;
+    using key_type = typename InternalContainerType::key_type;
+    using mapped_type = typename InternalContainerType::mapped_type;
+    using value_type = typename InternalContainerType::value_type;
 
     iterator begin()
     {
@@ -44,42 +46,42 @@ public:
         return m_container.end();
     }
 
-    void erase( const iterator& pos )
+    void erase(const iterator& pos)
     {
-        m_container.erase( pos );
+        m_container.erase(pos);
     }
 
-    iterator find( const key_type& key )
+    iterator find(const key_type& key)
     {
-        for( typename InternalContainerType::iterator
+        for (typename InternalContainerType::iterator
             it = m_container.begin();
             it != m_container.end();
-            ++it )
+            ++it)
         {
-            if( wildcardMatch( it->first, key ) )
+            if (wildcardMatch(it->first, key))
                 return it;
         }
 
         return m_container.end();
     }
 
-    const_iterator find( const key_type& key ) const
+    const_iterator find(const key_type& key) const
     {
-        for( typename InternalContainerType::const_iterator
+        for (typename InternalContainerType::const_iterator
             it = m_container.begin();
             it != m_container.end();
-            ++it )
+            ++it)
         {
-            if( wildcardMatch( it->first, key ) )
+            if (wildcardMatch(it->first, key))
                 return it;
         }
 
         return m_container.end();
     }
 
-    std::pair<iterator, bool> insert( const value_type& val )
+    std::pair<iterator, bool> insert(const value_type& val)
     {
-        return m_container.insert( val );
+        return m_container.insert(val);
     }
 
     template<typename KeyTypeRef, typename MappedTypeRef>

@@ -19,6 +19,7 @@
 #include "common/common_module.h"
 #include "plugins/plugin_manager.h"
 #include <common/static_common_module.h>
+#include <media_server/media_server_module.h>
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 
@@ -28,7 +29,9 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonMod
     QnMdnsResourceSearcher(commonModule),
     QnUpnpResourceSearcherAsync(commonModule)
 {
-    QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
+    auto pluginManager = qnServerModule->pluginManager();
+    NX_ASSERT(pluginManager, lit("There is no plugin manager"));
+    QList<nxcip::CameraDiscoveryManager*> pluginList = pluginManager->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(
         pluginList.begin(),
         pluginList.end(),
@@ -58,7 +61,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
 
     if( resourceType.isNull() )
     {
-        NX_LOG( lit("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()), cl_logDEBUG1 );
+        NX_DEBUG(this, lm("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()));
         return result;
     }
 
@@ -91,9 +94,16 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
         //so just instanciating QnThirdPartyResource
     result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, nullptr, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
-    result->setPhysicalId(QString::fromUtf8(cameraInfo.uid).trimmed());
 
-    NX_LOG( lit("Created third party resource (manufacturer %1, res type id %2)").
+    // If third party driver returns MAC based physical ID then re-format MAC address string
+    // to ensure it has same string format as build-in drivers.
+    auto uuidStr = QString::fromUtf8(cameraInfo.uid).trimmed();
+    const auto uuidMac = nx::network::QnMacAddress(uuidStr);
+    if (!uuidMac.isNull())
+        uuidStr = uuidMac.toString();
+    result->setPhysicalId(uuidStr);
+
+    NX_LOG( lm("Created third party resource (manufacturer %1, res type id %2)").
         arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
 
     return result;
@@ -104,7 +114,7 @@ QString ThirdPartyResourceSearcher::manufacture() const
     return THIRD_PARTY_MANUFACTURER_NAME;
 }
 
-QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const QUrl& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
+QList<QnResourcePtr> ThirdPartyResourceSearcher::checkHostAddr( const nx::utils::Url& url, const QAuthenticator& auth, bool /*doMultichannelCheck*/ )
 {
     QVector<nxcip::CameraInfo> cameraInfoTempArray;
 
@@ -188,8 +198,8 @@ QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
 
 void ThirdPartyResourceSearcher::processPacket(
     const QHostAddress& /*discoveryAddr*/,
-    const SocketAddress& /*host*/,
-    const nx_upnp::DeviceInfo& /*devInfo*/,
+    const nx::network::SocketAddress& /*host*/,
+    const nx::network::upnp::DeviceInfo& /*devInfo*/,
     const QByteArray& xmlDevInfo,
     QnResourceList& result )
 {
@@ -216,6 +226,9 @@ QnResourceList ThirdPartyResourceSearcher::findResources()
     const QnResourceList& mdnsFoundResList = QnMdnsResourceSearcher::findResources();
     const QnResourceList& upnpFoundResList = QnUpnpResourceSearcherAsync::findResources();
     const QnResourceList& customFoundResList = doCustomSearch();
+
+    NX_DEBUG(this, lm("Found %1 mdns, %2 upnp and %3 customSearch resources")
+        .args(mdnsFoundResList.size(), upnpFoundResList.size(), customFoundResList.size()));
     return mdnsFoundResList + upnpFoundResList + customFoundResList;
 }
 
@@ -267,14 +280,14 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
 
     if( strlen(cameraInfo.uid) == 0 )
     {
-        NX_LOG( lit("THIRD_PARTY. Plugin %1 returned camera with empty uid. This is forbidden").
-            arg(vendor), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Plugin %1 returned camera with empty uid. This is forbidden").
+            arg(vendor));
         return QnThirdPartyResourcePtr();
     }
     if( strlen(cameraInfo.url) == 0 )
     {
-        NX_LOG( lit("THIRD_PARTY. Plugin %1 returned camera with empty url. This is forbidden").
-            arg(vendor), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Plugin %1 returned camera with empty url. This is forbidden").
+            arg(vendor));
         return QnThirdPartyResourcePtr();
     }
 
@@ -285,7 +298,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
     if( !camManager )
     {
-        NX_LOG( lit("THIRD_PARTY. Plugin %1 could not create BaseCameraManager").arg(vendor), cl_logDEBUG1 );
+        NX_DEBUG(this, lit("Plugin %1 could not create BaseCameraManager").arg(vendor));
         return QnThirdPartyResourcePtr();
     }
 
@@ -300,8 +313,11 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     else
         resource->setName( QString::fromUtf8("%1-%2").arg(vendor).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
-    resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
-    resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
+
+    const auto uuid = QString::fromUtf8(cameraInfo.uid).trimmed();
+    const auto uuidMac = nx::network::QnMacAddress(uuid);
+    resource->setPhysicalId(uuidMac.isNull() ? uuid : uuidMac.toString());
+    resource->setMAC(uuidMac);
     resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setVendor( vendor );
@@ -313,9 +329,10 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
 
     if( !resourcePool()->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
     {
-        //new resource
-        //TODO #ak reading MaxFPS here is a workaround of camera integration API defect:
-            //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
+        // new resource
+        // TODO #ak reading MaxFPS here is a workaround of camera integration API defect:
+        // it does not not allow plugin to return hard-coded max fps, it can only be read in during
+        // init.
         const QnResourceData& resourceData = qnStaticCommon->dataPool()->data(resource);
         const float maxFps = resourceData.value<float>( Qn::MAX_FPS_PARAM_NAME, 0.0 );
         if( maxFps > 0.0 )

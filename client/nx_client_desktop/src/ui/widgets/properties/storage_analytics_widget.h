@@ -16,11 +16,9 @@
 #include <utils/common/connective.h>
 
 class QnRecordingStatsModel;
-class QnTableView;
 
-namespace Ui {
-    class StorageAnalyticsWidget;
-}
+namespace Ui { class StorageAnalyticsWidget; }
+namespace nx { namespace client { namespace desktop { class TableView; }}}
 
 class QnStorageAnalyticsWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
@@ -40,8 +38,8 @@ public:
 
 private:
     void updateData();
-    void setupTableView(QnTableView* table, QAbstractItemModel* model);
-    QnTableView* currentTable() const;
+    void setupTableView(nx::client::desktop::TableView* table, QAbstractItemModel* model);
+    nx::client::desktop::TableView* currentTable() const;
 
 private slots:
     void at_gotStatiscits(int status, const QnRecordingStatsReply& data, int requestNum);

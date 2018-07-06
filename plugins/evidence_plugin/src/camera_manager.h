@@ -16,7 +16,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QString>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
 #include "ptz_manager.h"

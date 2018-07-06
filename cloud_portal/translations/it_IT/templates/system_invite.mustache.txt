@@ -1,13 +1,13 @@
-Benvenuto in {{PRODUCT_NAME}}
+Benvenuto in %PRODUCT_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) la invita ad unirsi a {{PRODUCT_NAME}} e ha condiviso con lei il suo sistema {{message.system_name}}.
+{{message.sharer_name}} ({{message.sharer_email}}) la invita ad unirsi a %PRODUCT_NAME% e ha condiviso con lei il suo sistema {{message.system_name}}.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-E' invitato ad iscriversi a {{PRODUCT_NAME}}.
+E' invitato ad iscriversi a %PRODUCT_NAME%.
 Le è stato concesso l'accesso a {{message.system_name}}.
 {{/message.sharer_name}}
 
-Registri e visualizzi il sistema: {{config.portal_url}}/ register /{{message.code}}
+Registri e visualizzi il sistema: {{config.portal_url}}/register/{{message.code}}
 

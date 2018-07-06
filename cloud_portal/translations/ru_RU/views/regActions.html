@@ -53,20 +53,19 @@
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Пожалуйста, введите действительный Email</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Этот Email уже зарегистрирован в {{PRODUCT_NAME}}</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Этот Email уже зарегистрирован в %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
         <div class="form-group" validate-field>
-            <div class="col-sm-offset-4 col-sm-8">
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
-                        I agree to the <a href="/content/eula" target="_blank">Terms and Conditions</a> and
-                        <a href="%PRIVACY_LINK%" target="_blank">Privacy policy</a>
+                        Я согласен с <a href="/content/eula" target="_blank">Условиями использования</a> и <a href="%PRIVACY_LINK%" target="_blank">Политикой конфиденциальности</a>
                     </label>
                     <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
-                        Please review and agree to the Terms and Conditions and Privacy policy in order to proceed
+                        Пожалуйста, просмотрите и согласитесь с условиями использования и политикой конфиденциальности для того, чтобы продолжить
                     </p>
                 </div>
             </div>

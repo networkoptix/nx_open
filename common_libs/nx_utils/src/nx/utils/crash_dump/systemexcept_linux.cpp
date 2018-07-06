@@ -245,11 +245,22 @@ void linux_exception::setSignalHandlingDisabled(bool isDisabled)
     pthread_mutex_unlock(&mutex);
 }
 
+static std::string g_crashDirectory =
+    []()
+    {
+        if (const auto pwd = getpwuid(getuid()))
+            return std::string(pwd->pw_dir);
+        return std::string(".");
+    }();
+
+void linux_exception::setCrashDirectory(std::string directory)
+{
+    g_crashDirectory = std::move(directory);
+}
+
 std::string linux_exception::getCrashDirectory()
 {
-    if (const auto pwd = getpwuid(getuid()))
-        return std::string(pwd->pw_dir);
-    return std::string(".");
+    return g_crashDirectory;
 }
 
 std::string linux_exception::getCrashPattern()

@@ -15,6 +15,7 @@
 static const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 
 namespace nx {
+namespace network {
 namespace stun {
 
 Header::Header()
@@ -39,7 +40,7 @@ Header::Header(Header&& right)
     transactionId(std::move(right.transactionId))
 {
 }
-         
+
 Header::Header( MessageClass messageClass_ , int method_)
     : messageClass( messageClass_ )
     , method( method_ )
@@ -89,7 +90,7 @@ static Buffer hmacSha1( const String& key, const String& baseString )
     HMAC_CTX_cleanup( &ctx );
 
     result.resize( len );
-    return std::move( result );
+    return result;
 }
 
 static Buffer hmacSha1( const String& key, const Message* message )
@@ -178,4 +179,5 @@ void Message::clear()
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

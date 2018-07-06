@@ -43,7 +43,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-ReverseConnection::ReverseConnection(const QUrl& relayUrl):
+ReverseConnection::ReverseConnection(const nx::utils::Url& relayUrl):
     m_relayClient(api::ClientFactory::create(relayUrl)),
     m_peerName(relayUrl.userName().toUtf8())
 {
@@ -88,9 +88,18 @@ api::BeginListeningResponse ReverseConnection::beginListeningResponse() const
 
 std::unique_ptr<AbstractStreamSocket> ReverseConnection::takeSocket()
 {
-    decltype(m_streamSocket) streamSocket;
-    m_streamSocket.swap(streamSocket);
-    return streamSocket;
+    if (m_streamSocket)
+    {
+        decltype(m_streamSocket) streamSocket;
+        m_streamSocket.swap(streamSocket);
+        return streamSocket;
+    }
+    else if (m_httpPipeline)
+    {
+        return m_httpPipeline->takeSocket();
+    }
+
+    return nullptr;
 }
 
 void ReverseConnection::stopWhileInAioThread()
@@ -101,7 +110,7 @@ void ReverseConnection::stopWhileInAioThread()
 
 void ReverseConnection::closeConnection(
     SystemError::ErrorCode closeReason,
-    nx_http::AsyncMessagePipeline* connection)
+    nx::network::http::AsyncMessagePipeline* connection)
 {
     NX_ASSERT(m_httpPipeline.get() == connection);
     m_httpPipeline.reset();
@@ -121,7 +130,17 @@ void ReverseConnection::onConnectDone(
     {
         streamSocket->setRecvTimeout(std::chrono::milliseconds::zero());
         streamSocket->setSendTimeout(std::chrono::milliseconds::zero());
-        m_httpPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
+        if (response.keepAliveOptions)
+        {
+            if (!streamSocket->setKeepAlive(response.keepAliveOptions))
+            {
+                const auto systemErrorCode = SystemError::getLastOSErrorCode();
+                NX_DEBUG(this, lm("Failed to enable keep alive. %1")
+                    .args(SystemError::toString(systemErrorCode)));
+            }
+        }
+
+        m_httpPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
             this, std::move(streamSocket));
         m_httpPipeline->setMessageHandler(
             std::bind(&ReverseConnection::relayNotificationReceived, this, _1));
@@ -132,7 +151,7 @@ void ReverseConnection::onConnectDone(
 }
 
 void ReverseConnection::relayNotificationReceived(
-    nx_http::Message message)
+    nx::network::http::Message message)
 {
     api::OpenTunnelNotification openTunnelNotification;
     if (!openTunnelNotification.parse(message))
@@ -155,7 +174,7 @@ void ReverseConnection::relayNotificationReceived(
 
 //-------------------------------------------------------------------------------------------------
 
-ConnectionAcceptor::ConnectionAcceptor(const QUrl& relayUrl):
+ConnectionAcceptor::ConnectionAcceptor(const nx::utils::Url& relayUrl):
     m_relayUrl(relayUrl),
     m_acceptor(std::bind(&ConnectionAcceptor::reverseConnectionFactoryFunc, this))
 {
@@ -183,7 +202,22 @@ void ConnectionAcceptor::acceptAsync(AcceptCompletionHandler handler)
             SystemError::ErrorCode sysErrorCode,
             std::unique_ptr<detail::ReverseConnection> connection) mutable
         {
-            handler(sysErrorCode, toStreamSocket(std::move(connection)));
+            std::unique_ptr<AbstractStreamSocket> acceptedSocket;
+            if (connection)
+                acceptedSocket = toStreamSocket(std::move(connection));
+
+            if (acceptedSocket)
+            {
+                NX_INFO(this, lm("Cloud connection from %1 has been accepted. Info: relay %2")
+                    .args(acceptedSocket->getForeignAddress(), m_relayUrl));
+            }
+            else
+            {
+                NX_INFO(this, lm("Cloud connection accept error (%1). Info: relay %2")
+                    .args(SystemError::toString(sysErrorCode), m_relayUrl));
+            }
+
+            handler(sysErrorCode, std::move(acceptedSocket));
         });
 }
 
@@ -202,7 +236,7 @@ void ConnectionAcceptor::stopWhileInAioThread()
     m_acceptor.pleaseStopSync();
 }
 
-std::unique_ptr<detail::ReverseConnection> 
+std::unique_ptr<detail::ReverseConnection>
     ConnectionAcceptor::reverseConnectionFactoryFunc()
 {
     return std::make_unique<detail::ReverseConnection>(m_relayUrl);
@@ -231,7 +265,7 @@ ConnectionAcceptorFactory& ConnectionAcceptorFactory::instance()
 }
 
 std::unique_ptr<AbstractConnectionAcceptor> ConnectionAcceptorFactory::defaultFactoryFunc(
-    const QUrl& relayUrl)
+    const nx::utils::Url& relayUrl)
 {
     return std::make_unique<ConnectionAcceptor>(relayUrl);
 }

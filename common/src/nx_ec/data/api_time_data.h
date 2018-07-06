@@ -10,24 +10,19 @@
 
 namespace ec2
 {
-    struct ApiTimeData: ApiData 
+    struct ApiTimeData: nx::vms::api::Data 
     {
-        ApiTimeData():
-            value(0),
-            isPrimaryTimeServer(false),
-            syncTimeFlags(Qn::TF_none)
-        {}
+        ApiTimeData() = default;
+
         ApiTimeData(qint64 value):
-            value(value),
-            isPrimaryTimeServer(false),
-            syncTimeFlags(Qn::TF_none)
+            value(value)
         {}
 
         /** MSec value. */ 
-        qint64 value;
-        bool isPrimaryTimeServer;
+        qint64 value = 0;
+        bool isPrimaryTimeServer = 0;
         QnUuid primaryTimeServerGuid;
-        Qn::TimeFlags syncTimeFlags;
+        Qn::TimeFlags syncTimeFlags = Qn::TF_none;
     };
 
 #define ApiTimeData_Fields (value)(isPrimaryTimeServer)(primaryTimeServerGuid)(syncTimeFlags)

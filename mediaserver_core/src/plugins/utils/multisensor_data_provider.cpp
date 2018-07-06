@@ -22,9 +22,9 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
-MultisensorDataProvider::MultisensorDataProvider(const QnResourcePtr& res) :
+MultisensorDataProvider::MultisensorDataProvider(const QnPlOnvifResourcePtr& res):
     CLServerPushStreamReader(res),
-    m_onvifRes(res.dynamicCast<QnPlOnvifResource>())
+    m_onvifRes(res)
 {
 
 }
@@ -38,8 +38,8 @@ MultisensorDataProvider::~MultisensorDataProvider()
 
 QnAbstractMediaDataPtr MultisensorDataProvider::getNextData()
 {
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     auto data = m_dataSource.retrieveData();
 
@@ -86,8 +86,8 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
         reader->setMustNotConfigureResource(doNotConfigureCamera);
 
         QnAbstractStreamDataProviderPtr source(reader);
-        if (!doNotConfigureCamera)
-            reader->setDesiredLiveParams(params);
+        if (!doNotConfigureCamera && getRole() != Qn::CR_SecondaryLiveVideo)
+            reader->setPrimaryStreamParams(params);
 
         reader->setRole(getRole());
 

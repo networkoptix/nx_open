@@ -56,6 +56,8 @@ class _onvifDeviceIO__SetRelayOutputSettings;
 class _onvifDeviceIO__SetRelayOutputSettingsResponse;
 class _onvifMedia__GetVideoSources;
 class _onvifMedia__GetVideoSourcesResponse;
+class _onvifMedia__GetAudioOutputs;
+class _onvifMedia__GetAudioOutputsResponse;
 
 typedef _onvifDevice__CreateUsers CreateUsersReq;
 typedef _onvifDevice__CreateUsersResponse CreateUsersResp;
@@ -366,6 +368,7 @@ public:
     int getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response);
     int getVideoEncoderConfiguration(VideoConfigReq& request, VideoConfigResp& response);
 
+    int getAudioOutputs( _onvifMedia__GetAudioOutputs& request, _onvifMedia__GetAudioOutputsResponse& response );
     int getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response);
     int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
     int getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response);

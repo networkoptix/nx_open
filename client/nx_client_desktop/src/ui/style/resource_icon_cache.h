@@ -35,9 +35,12 @@ public:
         LayoutTours,
 
         Camera,
+        WearableCamera,
         Cameras,
 
         Recorder,
+        MultisensorCamera,
+
         Image,
         Media,
         User,
@@ -62,7 +65,8 @@ public:
         StatusMask      = 0xFF00,
 
         /* Additional flags */
-        ReadOnly        = 0x10000
+        ReadOnly        = 0x10000,
+        AlwaysSelected  = 0x20000
     };
     Q_DECLARE_FLAGS(Key, KeyPart)
 
@@ -75,10 +79,9 @@ public:
     /**
      * @brief icon
      * @param key
-     * @param unchecked         Do not check against TypeMask
      * @return
      */
-    QIcon icon(Key key, bool unchecked = false);
+    QIcon icon(Key key);
 
     static Key key(const QnResourcePtr& resource);
 

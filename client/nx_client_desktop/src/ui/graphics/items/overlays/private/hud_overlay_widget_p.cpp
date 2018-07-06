@@ -6,7 +6,6 @@
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
-#include <ui/common/geometry.h>
 #include <ui/style/helper.h>
 
 QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):

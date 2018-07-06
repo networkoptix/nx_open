@@ -142,7 +142,7 @@ function NumberToDate(date){
 }
 
 // Additional mini-library for declaring and using settings for ruler levels
-window.Interval = function (ms,seconds,minutes,hours,days,months,years){
+window.Interval = function(ms,seconds,minutes,hours,days,months,years){
     this.seconds = seconds;
     this.minutes = minutes;
     this.hours = hours;

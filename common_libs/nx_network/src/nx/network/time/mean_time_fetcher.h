@@ -11,13 +11,12 @@ namespace network {
 /**
  * Fetches time from multiple time fetchers. If all succeeded than returns mean value.
  */
-class NX_NETWORK_API MeanTimeFetcher
-:
+class NX_NETWORK_API MeanTimeFetcher:
     public AbstractAccurateTimeFetcher
 {
 public:
     static const qint64 kDefaultMaxDeviationMillis = 60*1000;
-    
+
     /**
      * @param maxDeviationMillis Maximum allowed deviation between time values received via different time fetchers
      */

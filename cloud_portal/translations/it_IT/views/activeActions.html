@@ -4,7 +4,7 @@
             Il suo account è stato creato con successo
         </h1>
         <h1 class="process-success" ng-if="activate.success">
-            <a class="btn btn-default" href="/accesso">Log In</a>
+            <a class="btn btn-default" href="/login">Log In</a>
         </h1>
 
         <h1 class="process-success" ng-if="!activate.success">
@@ -17,13 +17,13 @@
             Il suo account è stato creato con successo
         </h1>
         <h1 class="process-success">
-            <a class="btn btn-default" href="/accesso">Log In</a>
+            <a class="btn btn-default" href="/login">Log In</a>
         </h1>
     </div>
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>Si è registrato nel {{PRODUCT_NAME}}</h1>
+            <h1>Si è registrato nel %PRODUCT_NAME%</h1>
             <p>Le abbiamo inviato una lettera con il link di attivazione a {{data.email}}. <br> Attivi il suo account visitando questo link.</p>
         </div>
         <h1 ng-if="!data.email">Attivi il suo Account</h1>
@@ -87,7 +87,7 @@
             Password salvata correttamente
         </h1>
         <h1 class="process-success" ng-if="change.success || changeSuccess">
-            <a class="btn btn-default" href="/accesso">Accedi</a>
+            <a class="btn btn-default" href="/login">Accedi</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>

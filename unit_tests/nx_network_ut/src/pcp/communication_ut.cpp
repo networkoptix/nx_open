@@ -5,7 +5,9 @@
 
 #include "data_stream_helpers.h"
 
-using namespace pcp;
+namespace nx {
+namespace network {
+namespace pcp {
 
 class TestEvents : public Listener::Events
 {
@@ -33,9 +35,13 @@ TEST(PcpCommunication, Simple)
     Sender sender("10.0.2.1");
 
     HostAddress host("10.0.2.64");
-    const RequestHeader head = { VERSION, Opcode::MAP, 60*60, dsh::rawBytes(*host.ipV6()) };
+    const RequestHeader head = { VERSION, Opcode::MAP, 60*60, dsh::rawBytes(*host.ipV6().first) };
     const MapMessage msg = { makeRandomNonce(), 0, 80, 8877, QByteArray(16, 0) };
 
     sender.send(head, msg);
     QThread::sleep(1);
 }
+
+} // namespace pcp
+} // namespace network
+} // namespace nx

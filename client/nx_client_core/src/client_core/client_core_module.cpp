@@ -1,5 +1,7 @@
 #include "client_core_module.h"
 
+#include <QtQml/QQmlEngine>
+
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
@@ -13,10 +15,10 @@
 
 #include <utils/media/ffmpeg_initializer.h>
 
-#include <nx_ec/ec2_lib.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/client/core/watchers/known_server_connections.h>
+#include <ec2/remote_connection_factory.h>
 
 using namespace nx::client::core;
 
@@ -31,14 +33,17 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
     m_commonModule->store(new QnFfmpegInitializer());
 
     NX_ASSERT(nx::utils::TimerManager::instance());
-    m_connectionFactory.reset(getConnectionFactory(qnStaticCommon->localPeerType(),
-        nx::utils::TimerManager::instance(), m_commonModule, false));
+    m_connectionFactory.reset(new ec2::RemoteConnectionFactory(
+        m_commonModule, qnStaticCommon->localPeerType(),
+        nx::utils::TimerManager::instance(), false));
 
     m_commonModule->instance<QnResourcesChangesManager>();
     m_commonModule->instance<QnClientPtzControllerPool>();
     m_commonModule->instance<QnLayoutTourStateManager>();
 
     m_commonModule->store(new watchers::KnownServerConnections(m_commonModule));
+
+    m_qmlEngine = new QQmlEngine(this);
 }
 
 QnClientCoreModule::~QnClientCoreModule()
@@ -64,4 +69,9 @@ QnPtzControllerPool* QnClientCoreModule::ptzControllerPool() const
 QnLayoutTourStateManager* QnClientCoreModule::layoutTourStateManager() const
 {
     return m_commonModule->instance<QnLayoutTourStateManager>();
+}
+
+QQmlEngine*QnClientCoreModule::mainQmlEngine()
+{
+    return m_qmlEngine;
 }

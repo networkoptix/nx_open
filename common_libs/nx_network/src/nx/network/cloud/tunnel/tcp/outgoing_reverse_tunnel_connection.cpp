@@ -51,7 +51,7 @@ void OutgoingReverseTunnelConnection::establishNewConnection(
     NX_LOGX(lm("Request for new socket with timeout: %1").arg(timeout), cl_logDEBUG1);
     m_connectionHolder->takeSocket(
         timeout,
-        [this, guard = m_asyncGuard.sharedGuard(), timeout = std::move(timeout),
+        [this, guard = m_asyncGuard.sharedGuard(),
             socketAttributes = std::move(socketAttributes), handler = std::move(handler)](
                 SystemError::ErrorCode code,
                 std::unique_ptr<AbstractStreamSocket> socket)
@@ -85,6 +85,11 @@ void OutgoingReverseTunnelConnection::setControlConnectionClosedHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     m_closedHandler = std::move(handler);
+}
+
+std::string OutgoingReverseTunnelConnection::toString() const
+{
+    return "Reverse connection";
 }
 
 } // namespace tcp

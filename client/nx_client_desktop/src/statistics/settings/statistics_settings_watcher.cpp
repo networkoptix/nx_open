@@ -1,7 +1,7 @@
 
 #include "statistics_settings_watcher.h"
 
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
@@ -48,26 +48,30 @@ void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
         return;
 
     const QPointer<QnStatisticsSettingsWatcher> guard(this);
-    const auto callback = [this, guard]
-        (bool success, rest::Handle handle, const QByteArray &data)
-    {
-        if (!guard)
-            return;
-
-        if (handle != m_handle)
-            return;
-
-        m_handle = rest::Handle();
-
-        QnStatisticsSettings settings;
-        if (!success || !QJson::deserialize(data, &settings))
+    const auto callback =
+        [this, guard](
+            bool success,
+            rest::Handle requestId,
+            QByteArray result,
+            const nx::network::http::HttpHeaders& /*headers*/)
         {
-            resetSettings();
-            return;
-        }
+            if (!guard)
+                return;
 
-        setSettings(settings);
-    };
+            if (requestId != m_handle)
+                return;
+
+            m_handle = rest::Handle();
+
+            QnStatisticsSettings settings;
+            if (!success || !QJson::deserialize(result, &settings))
+            {
+                resetSettings();
+                return;
+            }
+
+            setSettings(settings);
+        };
 
     if (delayMs != kImmediately)
     {

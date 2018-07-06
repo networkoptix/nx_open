@@ -1,0 +1,103 @@
+#header #branding h1{
+    text-indent: unset !important;
+    background: none !important;
+    width: unset !important;
+}
+
+#header, .breadcrumbs {
+    background: #212A2F !important;
+}
+
+#changelist #toolbar form #searchbar{
+    height: 26px;
+}
+
+.dashboard-module h2{
+    height: initial;
+    font-size: initial;
+    background: #35464F !important;
+    color: #FAFBFC !important;
+}
+
+.dashboard-module-content h3{
+    height: initial;
+    font-size: initial;
+}
+
+.dashboard-module h3{
+    background: #E1E7EA;
+}
+
+.jumbotron{
+    text-align: center;
+}
+
+.text-danger{
+    color: red !important;
+}
+
+.results tr {
+    height: 40px !important;
+}
+.results tr > td, tr > th{
+    vertical-align: middle;
+    padding: 8px !important;
+}
+
+td a.btn {
+    color:white !important;
+    text-decoration:none !important;
+    background-color: #35464F;
+}
+
+button.btn-danger > a{
+    color: #FAFBFC !important;
+}
+
+img.preview-image{
+    background-image: url('/static/cms_images/transparent_bg.png');
+}
+
+.context-preview{
+    max-height: 400px;
+    max-width: 400px;
+}
+
+.review-preview{
+    max-height: 200px;
+    max-width: 200px;
+}
+
+.optional-image{
+    opacity: 0.5;
+}
+
+.truncate-email{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 125px;
+}
+
+.truncate-name{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 95px;
+}
+
+.submit-row input[type=checkbox]{
+    margin-top: -1px !important;
+}
+
+.module h2{
+    background: #35464F;
+}
+
+.show-html{
+    word-wrap : break-word;
+    overflow-y: scroll;
+    max-height: 350px;
+    padding: 5px;
+    border: 1px solid silver;
+}

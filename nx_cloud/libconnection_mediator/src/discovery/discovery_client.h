@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <deque>
 #include <string>
 #include <type_traits>
@@ -54,7 +55,7 @@ struct BasicInstanceInformation
 {
     std::string type;
     std::string id;
-    QUrl apiUrl;
+    nx::utils::Url apiUrl;
 
     BasicInstanceInformation(std::string type):
         type(type)
@@ -73,7 +74,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 //-------------------------------------------------------------------------------------------------
 
 /**
- * @param InstanceInformation Must inherit BasicInstanceInformation 
+ * @param InstanceInformation Must inherit BasicInstanceInformation
  */
 template<typename InstanceInformation>
 class ModuleRegistrar:
@@ -90,7 +91,7 @@ class ModuleRegistrar:
 
 public:
     ModuleRegistrar(
-        const QUrl& baseUrl,
+        const nx::utils::Url& baseUrl,
         const std::string& moduleId)
         :
         m_baseUrl(baseUrl),
@@ -129,16 +130,16 @@ public:
 
         auto keepAliveConnectionUrl = m_baseUrl;
         keepAliveConnectionUrl.setPath(nx::network::url::normalizePath(
-            keepAliveConnectionUrl.path() + "/" + 
-            nx_http::rest::substituteParameters(
-                nx::cloud::discovery::http::kModuleKeepAliveConnectionPath, {m_moduleId.c_str()})));
+            keepAliveConnectionUrl.path() + "/" +
+            nx::network::http::rest::substituteParameters(
+                nx::cloud::discovery::http::kModuleKeepAliveConnectionPath, {m_moduleId}).c_str()));
 
-        m_webSocketConnector = std::make_unique<nx_http::AsyncClient>();
+        m_webSocketConnector = std::make_unique<nx::network::http::AsyncClient>();
         nx::network::websocket::addClientHeaders(m_webSocketConnector.get(), "NxDiscovery");
         m_webSocketConnector->bindToAioThread(getAioThread());
         m_webSocketConnector->doUpgrade(
             keepAliveConnectionUrl,
-            nx_http::Method::post,
+            nx::network::http::Method::post,
             nx::network::websocket::kWebsocketProtocolName,
             std::bind(&ModuleRegistrar::onWebSocketConnectFinished, this));
     }
@@ -152,8 +153,8 @@ protected:
     }
 
 private:
-    QUrl m_baseUrl;
-    std::unique_ptr<nx_http::AsyncClient> m_webSocketConnector;
+    nx::utils::Url m_baseUrl;
+    std::unique_ptr<nx::network::http::AsyncClient> m_webSocketConnector;
     std::unique_ptr<nx::network::WebSocket> m_webSocket;
     nx::Buffer m_sendBuffer;
     std::deque<InstanceInformation> m_sendQueue;
@@ -168,7 +169,7 @@ private:
                 .args(
                     m_baseUrl, m_webSocketConnector->lastSysErrorCode(),
                     m_webSocketConnector->response()
-                        ? nx_http::StatusCode::toString(
+                        ? nx::network::http::StatusCode::toString(
                             m_webSocketConnector->response()->statusLine.statusCode)
                         : nx::String("none")));
 
@@ -216,7 +217,7 @@ private:
             // TODO: #ak Reconnecting.
             return;
         }
-    
+
         // Retrying to send.
         sendNext();
     }
@@ -233,9 +234,12 @@ class ModuleFinder:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    ModuleFinder(const QUrl& baseUrl);
+    ModuleFinder(const nx::utils::Url& baseUrl);
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
+    void setResponseReadTimeout(std::chrono::milliseconds timeout);
+    std::chrono::milliseconds responseReadTimeout() const;
 
     template<typename InstanceInformation>
     void fetchModules(
@@ -243,20 +247,21 @@ public:
     {
         post(
             [this, handler = std::move(handler)]() mutable
-            {   
+            {
                 // TODO Include type.
                 auto url = m_baseUrl;
                 url.setPath(nx::network::url::normalizePath(
                     url.path() + nx::cloud::discovery::http::kDiscoveredModulesPath));
 
-                auto httpClient = 
-                    std::make_unique<nx_http::FusionDataHttpClient<void, std::vector<InstanceInformation>>>(
-                        url, nx_http::AuthInfo());
+                auto httpClient =
+                    std::make_unique<nx::network::http::FusionDataHttpClient<void, std::vector<InstanceInformation>>>(
+                        url, nx::network::http::AuthInfo());
+                httpClient->setRequestTimeout(m_responseReadTimeout);
                 httpClient->bindToAioThread(getAioThread());
                 httpClient->execute(
                     [this, handler = std::move(handler), httpClientPtr = httpClient.get()](
                         SystemError::ErrorCode systemErrorCode,
-                        const nx_http::Response* response,
+                        const nx::network::http::Response* response,
                         std::vector<InstanceInformation> instanceInformation) mutable
                     {
                         processRequestResult(
@@ -274,14 +279,15 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    const QUrl m_baseUrl;
+    const nx::utils::Url m_baseUrl;
     std::vector<std::unique_ptr<nx::network::aio::BasicPollable>> m_runningRequests;
+    std::chrono::milliseconds m_responseReadTimeout;
 
     template<typename InstanceInformation>
     void processRequestResult(
         nx::network::aio::BasicPollable* httpClientPtr,
         SystemError::ErrorCode systemErrorCode,
-        const nx_http::Response* response,
+        const nx::network::http::Response* response,
         std::vector<InstanceInformation> instanceInformation,
         nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<InstanceInformation>)> handler)
     {
@@ -298,7 +304,7 @@ private:
         if (systemErrorCode != SystemError::noError)
             return handler(ResultCode::networkError, std::move(instanceInformation));
 
-        if (!(response && nx_http::StatusCode::isSuccessCode(response->statusLine.statusCode)))
+        if (!(response && nx::network::http::StatusCode::isSuccessCode(response->statusLine.statusCode)))
         {
             // TODO Converting from HTTP status code.
             return handler(ResultCode::networkError, std::move(instanceInformation));

@@ -12,7 +12,6 @@ namespace ec2
         Q_OBJECT
     public:
         TransactionMessageBusBase(
-            detail::QnDbManager* db,
             Qn::PeerType peerType,
             QnCommonModule* commonModule,
             QnJsonTransactionSerializer* jsonTranSerializer,
@@ -39,16 +38,9 @@ namespace ec2
         virtual QnUbjsonTransactionSerializer* ubjsonTranSerializer() const override;
 
         virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
-        virtual detail::QnDbManager* getDb() const override { return m_db; }
         virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
 
     protected:
-        bool readApiFullInfoData(
-            const Qn::UserAccessData& userAccess,
-            const ec2::ApiPeerData& remotePeer,
-            ApiFullInfoData* outData);
-    protected:
-        detail::QnDbManager* m_db = nullptr;
         QThread* m_thread = nullptr;
         ECConnectionNotificationManager* m_handler = nullptr;
 

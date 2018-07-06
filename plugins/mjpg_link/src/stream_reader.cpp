@@ -110,12 +110,12 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
     bool httpClientHasBeenJustCreated = false;
-    std::shared_ptr<nx_http::HttpClient> localHttpClientPtr;
+    std::shared_ptr<nx::network::http::HttpClient> localHttpClientPtr;
     {
         QnMutexLocker lk( &m_mutex );
         if( !m_httpClient )
         {
-            m_httpClient = std::make_shared<nx_http::HttpClient>();
+            m_httpClient = std::make_shared<nx::network::http::HttpClient>();
             m_httpClient->setMessageBodyReadTimeoutMs( MAX_FRAME_DURATION_MS );
             httpClientHasBeenJustCreated = true;
         }
@@ -126,7 +126,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     {
         using namespace std::placeholders;
 
-        m_multipartContentParser = std::make_unique<nx_http::MultipartContentParser>();
+        m_multipartContentParser = std::make_unique<nx::network::http::MultipartContentParser>();
         auto jpgFrameHandleFunc = std::bind(&StreamReader::gotJpegFrame, this, _1);
         m_multipartContentParser->setNextFilter(
             std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(jpgFrameHandleFunc)>>(
@@ -136,7 +136,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         if( result != nxcip::NX_NO_ERROR )
             return result;
 
-        if( nx_http::strcasecmp(localHttpClientPtr->contentType(), "image/jpeg") == 0 )
+        if( nx::network::http::strcasecmp(localHttpClientPtr->contentType(), "image/jpeg") == 0 )
         {
             //single jpeg, have to get it by timer
             m_streamType = jpg;
@@ -166,10 +166,10 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
                     return result;
             }
 
-            nx_http::BufferType msgBody;
+            nx::network::http::BufferType msgBody;
             while( msgBody.size() < MAX_FRAME_SIZE )
             {
-                const nx_http::BufferType& msgBodyBuf = localHttpClientPtr->fetchMessageBodyBuffer();
+                const nx::network::http::BufferType& msgBodyBuf = localHttpClientPtr->fetchMessageBodyBuffer();
                 {
                     QnMutexLocker lk( &m_mutex );
                     if( m_terminated )
@@ -230,7 +230,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
-    std::shared_ptr<nx_http::HttpClient> client;
+    std::shared_ptr<nx::network::http::HttpClient> client;
     {
         QnMutexLocker lk(&m_mutex);
         m_terminated = true;
@@ -257,23 +257,23 @@ void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
     m_cameraInfo = info;
 }
 
-int StreamReader::doRequest( nx_http::HttpClient* const httpClient )
+int StreamReader::doRequest( nx::network::http::HttpClient* const httpClient )
 {
     httpClient->setUserName( QLatin1String(m_cameraInfo.defaultLogin) );
     httpClient->setUserPassword( QLatin1String(m_cameraInfo.defaultPassword) );
-    if( !httpClient->doGet( QUrl(QLatin1String(m_cameraInfo.url)) ) ||
+    if( !httpClient->doGet( nx::utils::Url(QLatin1String(m_cameraInfo.url)) ) ||
         !httpClient->response() )
     {
         NX_LOG( QString::fromLatin1("Failed to request %1").arg(QLatin1String(m_cameraInfo.url)), cl_logDEBUG1 );
         return nxcip::NX_NETWORK_ERROR;
     }
-    if( httpClient->response()->statusLine.statusCode == nx_http::StatusCode::unauthorized )
+    if( httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::unauthorized )
     {
         NX_LOG( QString::fromLatin1("Failed to request %1: %2").arg(QLatin1String(m_cameraInfo.url)).
             arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
         return nxcip::NX_NOT_AUTHORIZED;
     }
-    if( httpClient->response()->statusLine.statusCode / 100 * 100 != nx_http::StatusCode::ok )
+    if( httpClient->response()->statusLine.statusCode / 100 * 100 != nx::network::http::StatusCode::ok )
     {
         NX_LOG( QString::fromLatin1("Failed to request %1: %2").arg(QLatin1String(m_cameraInfo.url)).
             arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
@@ -282,7 +282,7 @@ int StreamReader::doRequest( nx_http::HttpClient* const httpClient )
     return nxcip::NX_NO_ERROR;
 }
 
-void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )
+void StreamReader::gotJpegFrame( const nx::network::http::ConstBufferRefType& jpgFrame )
 {
     //creating video packet
 

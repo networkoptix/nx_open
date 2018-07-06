@@ -38,6 +38,7 @@ extern "C"
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/basic_media_context.h>
 #include <nx/fusion/serialization/lexical_enum.h>
+#include <api/global_settings.h>
 
 static const int MAX_RTP_BUFFER_SIZE = 65536;
 static const int REOPEN_TIMEOUT = 1000;
@@ -63,7 +64,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
-    m_opened(false),
     m_lastMediaFlags(-1),
     m_closing(false),
     m_singleShotMode(false),
@@ -79,15 +79,31 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_isMultiserverAllowed(true),
     m_playNowModeAllowed(true),
     m_reader(reader),
-    m_frameCnt(0)
+    m_frameCnt(0),
+    m_maxSessionDurationMs(std::numeric_limits<qint64>::max())
 {
     m_footageUpToDate.test_and_set();
+    m_currentServerUpToDate.test_and_set();
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanSendMotion;
     m_flags |= Flag_CanSeekImmediatly;
+
+    // These signals are emitted from the same thread. It is safe to call close();
+    auto closeIfExpired =
+        [this]()
+	    {
+		    if (isConnectionExpired())
+			    close();
+        };
+    if (reader)
+    {
+        connect(reader, &QnLongRunnable::paused, this, closeIfExpired, Qt::DirectConnection);
+        connect(reader, &QnArchiveStreamReader::waitForDataCanBeAccepted,
+            this, closeIfExpired, Qt::DirectConnection);
+    }
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &camera)
@@ -107,6 +123,11 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
     m_server = camera->getParentServer();
 
     auto commonModule = camera->commonModule();
+    auto maxSessionDuration = commonModule->globalSettings()->maxRtspConnectDuration();
+    if (maxSessionDuration.count() > 0)
+        m_maxSessionDurationMs = maxSessionDuration;
+    else
+        m_maxSessionDurationMs = std::chrono::milliseconds::max();
 
     m_auth.username = commonModule->currentUrl().userName();
     m_auth.password = commonModule->currentUrl().password();
@@ -126,7 +147,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
             return;
 
         if (m_server != getServerOnTime(m_position))
-            reopen();
+            m_currentServerUpToDate.clear();
     });
 
     connect(commonModule->cameraHistoryPool(),
@@ -146,12 +167,14 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
     setupRtspSession(camera, m_server, m_rtspSession.get(), m_playNowModeAllowed);
 }
 
-void QnRtspClientArchiveDelegate::setFixedServer(const QnMediaServerResourcePtr &server){
+void QnRtspClientArchiveDelegate::setFixedServer(const QnMediaServerResourcePtr &server)
+{
     m_server = server;
     m_fixedServer = m_server;
 }
 
-QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate() {
+QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
+{
     close();
     delete [] m_rtpDataBuffer;
 }
@@ -261,7 +284,9 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
 
 }
 
-bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource) {
+bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource,
+    AbstractArchiveIntegrityWatcher * /*archiveIntegrityWatcher*/)
+{
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     NX_ASSERT(camera);
     if (!camera)
@@ -277,15 +302,22 @@ bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource) {
     return rez;
 }
 
-bool QnRtspClientArchiveDelegate::openInternal() {
-    if (m_opened)
+bool QnRtspClientArchiveDelegate::openInternal()
+{
+    if (m_rtspSession->isOpened())
         return true;
-    m_closing = false;
 
-    m_customVideoLayout.reset();
+    m_frameCnt = 0;
+    m_parsers.clear();
+    m_closing = false;
+    m_lastMediaFlags = -1;
+    m_sessionTimeout.invalidate();
+    setCustomVideoLayout(QnCustomResourceVideoLayoutPtr());
+
     m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
 
-    if (!m_fixedServer) {
+    if (!m_fixedServer)
+    {
         m_server = getServerOnTime(m_position); // try to update server
         if (m_server == 0 || m_server->getStatus() == Qn::Offline)
         {
@@ -319,33 +351,39 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     else {
         m_rtspSession->stop();
     }
-    m_opened = m_rtspSession->isOpened();
     m_sendedCSec = m_rtspSession->lastSendedCSeq();
 
-    if (m_opened) {
+    if (isOpened)
+    {
+        m_sessionTimeout.restart();
+
 
         QList<QByteArray> audioSDP = m_rtspSession->getSdpByType(QnRtspClient::TT_AUDIO);
         parseAudioSDP(audioSDP);
 
         QString vLayout = m_rtspSession->getVideoLayout();
-        if (!vLayout.isEmpty()) {
+        if (!vLayout.isEmpty())
+        {
             auto newValue = QnCustomResourceVideoLayout::fromString(vLayout);
             bool isChanged =  getVideoLayout()->toString() != newValue->toString();
-            m_customVideoLayout = newValue;
+            setCustomVideoLayout(newValue);
             if(isChanged)
                 emit m_reader->videoLayoutChanged();
         }
     }
-    return m_opened;
+    return isOpened;
 }
 
 void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSDP)
 {
+    QnMutexLocker lock(&m_mutex);
     for (int i = 0; i < audioSDP.size(); ++i)
     {
-        if (audioSDP[i].startsWith("a=fmtp")) {
+        if (audioSDP[i].startsWith("a=fmtp"))
+        {
             int configPos = audioSDP[i].indexOf("config=");
-            if (configPos > 0) {
+            if (configPos > 0)
+            {
                 m_audioLayout.reset( new QnResourceCustomAudioLayout() );
                 QnConstMediaContextPtr context(QnBasicMediaContext::deserialize(
                     QByteArray::fromBase64(audioSDP[i].mid(configPos + 7))));
@@ -361,7 +399,6 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
 
 void QnRtspClientArchiveDelegate::setRtpData(QnRtspIoDevice* value)
 {
-    QnMutexLocker lock(&m_rtpDataMutex);
     m_rtpData = value;
 }
 
@@ -369,22 +406,13 @@ void QnRtspClientArchiveDelegate::beforeClose()
 {
     //m_waitBOF = false;
     m_closing = true;
-    QnMutexLocker lock(&m_rtpDataMutex);
-    if (m_rtpData)
-        m_rtpData->shutdown();
     m_rtspSession->shutdown();
 }
 
 void QnRtspClientArchiveDelegate::close()
 {
-    QnMutexLocker lock( &m_mutex );
-    //m_waitBOF = false;
-    m_rtspSession->shutdown();
-    m_lastMediaFlags = -1;
-    m_opened = false;
-    m_audioLayout.reset();
-    m_frameCnt = 0;
-    m_parsers.clear();
+    QnMutexLocker lock(&m_mutex);
+    m_rtspSession->stop();
 }
 
 qint64 QnRtspClientArchiveDelegate::startTime() const
@@ -427,8 +455,16 @@ void QnRtspClientArchiveDelegate::reopen()
         openInternal();
 }
 
+bool QnRtspClientArchiveDelegate::isConnectionExpired() const
+{
+    return m_sessionTimeout.isValid() && m_sessionTimeout.hasExpired(m_maxSessionDurationMs.count());
+}
+
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
+    if (!m_currentServerUpToDate.test_and_set() || isConnectionExpired())
+        reopen();
+
     if (!m_footageUpToDate.test_and_set()) {
         if (m_isMultiserverAllowed)
             checkMinTimeFromOtherServer(m_camera);
@@ -488,7 +524,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     receiveTimer.restart();
     while(!result)
     {
-        if (!m_rtpData || (!m_opened && !m_closing)) {
+        if (!m_rtpData || (!m_rtspSession->isOpened() && !m_closing))
+        {
             //m_rtspSession->stop(); // reconnect
             reopen();
             return result;
@@ -627,7 +664,8 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     if (!findIFrame)
         m_rtspSession->setAdditionAttribute("x-no-find-iframe", "1");
 
-    if (!m_opened && m_camera) {
+    if (!m_rtspSession->isOpened() && m_camera)
+    {
         if (!openInternal() && m_isMultiserverAllowed)
         {
             // Try next server in the list immediately, It is improve seek time if current server is offline and next server is exists
@@ -684,8 +722,15 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
     */
 }
 
+void QnRtspClientArchiveDelegate::setCustomVideoLayout(const QnCustomResourceVideoLayoutPtr& value)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_customVideoLayout = value;
+}
+
 QnConstResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
 {
+    QnMutexLocker lock(&m_mutex);
     if (m_customVideoLayout)
         return m_customVideoLayout;
     else if (m_camera && m_camera->resourcePool())
@@ -696,7 +741,9 @@ QnConstResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
 
 QnConstResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
 {
-    if (!m_audioLayout) {
+    QnMutexLocker lock(&m_mutex);
+    if (!m_audioLayout)
+    {
         m_audioLayout.reset( new QnResourceCustomAudioLayout() );
         for (QMap<int, QnNxRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
         {
@@ -727,7 +774,7 @@ namespace {
 /**
  * @return Zero version if serverString is invalid.
  */
-nx::utils::SoftwareVersion extractServerVersion(const nx_http::StringType& serverString)
+nx::utils::SoftwareVersion extractServerVersion(const nx::network::http::StringType& serverString)
 {
     int versionStartPos = serverString.indexOf("/") + 1;
     int versionEndPos = serverString.indexOf(" ", versionStartPos);
@@ -747,8 +794,9 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     QMap<int, QnNxRtpParserPtr>::iterator itr = m_parsers.find(channelNum);
     if (itr == m_parsers.end())
     {
-        auto parser = new QnNxRtpParser();
-        // TODO: Use nx_http::header::Server here
+        auto parser = new QnNxRtpParser(
+            lm("%1-%2").args(m_camera->getUserDefinedName(), channelNum));
+        // TODO: Use nx::network::http::header::Server here
         // to get RFC2616-conformant Server header parsing function.
         auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());
         if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion(3, 0))
@@ -757,7 +805,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     }
     QnNxRtpParserPtr parser = itr.value();
     bool gotData = false;
-    parser->processData(data, 0, dataSize, QnRtspStatistic(), gotData);
+    if (!parser->processData(data, 0, dataSize, QnRtspStatistic(), gotData))
+        return QnAbstractDataPacketPtr(); //< Report error to reopen connection.
     *parserPosition = parser->position();
     if (gotData) {
         result = parser->nextData();
@@ -767,24 +816,25 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     return result;
 }
 
-void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
+    if (value == 0.0)
+        return;
+
+    m_position = displayTime;
+
+    bool oldReverseMode = m_rtspSession->getScale() < 0;
+    bool newReverseMode = value < 0;
+    m_rtspSession->setScale(value);
+
+    bool needSendRequest = !m_rtspSession->isOpened() || oldReverseMode != newReverseMode ||  m_camera->isDtsBased();
+    if (!needSendRequest)
+        return;
+
+    bool fromLive = newReverseMode && m_position == DATETIME_NOW;
     m_blockReopening = false;
-    int sign = value ? -1 : 1;
-    bool fromLive = value && m_position == DATETIME_NOW;
-    close();
 
-    if (!m_opened && m_camera) {
-        m_rtspSession->setScale(qAbs(m_rtspSession->getScale()) * sign);
-        m_position = displayTime;
-        openInternal();
-    }
-    else {
-        m_rtspSession->sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession->getScale()) * sign);
-    }
-    m_sendedCSec = m_rtspSession->lastSendedCSeq();
-    //m_waitBOF = true;
-
+    seek(displayTime, /* findIFrame */ true);
     if (fromLive)
         m_position = AV_NOPTS_VALUE;
 }
@@ -859,23 +909,26 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
-    if (m_camera && m_camera->hasParam(lit("groupplay")))
+    if (m_camera && m_camera->isGroupPlayOnly())
         return; // avoid close/open for VMAX
 
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
     bool longNoData = ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10;
     if (longNoData || m_quality == MEDIA_Quality_Low || m_quality == MEDIA_Quality_LowIframesOnly)
     {
-        m_blockReopening = true;
-        close();
+        beforeClose();
     }
 }
 
-void QnRtspClientArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
+void QnRtspClientArchiveDelegate::beforeChangeSpeed(double speed)
 {
+    bool oldReverseMode = m_rtspSession->getScale() < 0;
+    bool newReverseMode = speed < 0;
+
     // Reconnect If camera is offline and it is switch from live to archive
-    if (m_position == DATETIME_NOW) {
-        if (reverseMode)
+    if (oldReverseMode != newReverseMode && m_position == DATETIME_NOW)
+    {
+        if (newReverseMode)
             beforeSeek(AV_NOPTS_VALUE);
         else
             m_blockReopening = false;
@@ -909,7 +962,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);
-    session->setAuth(auth, nx_http::header::AuthScheme::digest);
+    session->setAuth(auth, nx::network::http::header::AuthScheme::digest);
 
     if (!m_auth.videowall.isNull())
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());

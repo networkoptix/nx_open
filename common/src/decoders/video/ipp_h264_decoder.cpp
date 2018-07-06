@@ -29,7 +29,6 @@ static inline bool resolveIPPDecoder()
     return ptr_createDecoder && ptr_destroyDecoder && ptr_decode;
 }
 
-
 IPPH264Decoder::IPPH264Decoder() : QnAbstractVideoDecoder()
 {
     m_decoder = resolveIPPDecoder() ? ptr_createDecoder(0) : 0;
@@ -67,9 +66,8 @@ unsigned int IPPH264Decoder::getDecoderCaps() const
     return 0;
 }
 
-void IPPH264Decoder::setSpeed( float newValue )
+void IPPH264Decoder::setSpeed( float /*newValue*/ )
 {
-    Q_UNUSED(newValue)
     //TODO/IMPL
 }
 

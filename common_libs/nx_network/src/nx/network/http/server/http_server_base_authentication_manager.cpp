@@ -8,7 +8,9 @@
 
 #include "../auth_tools.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 
 BaseAuthenticationManager::BaseAuthenticationManager(
@@ -24,8 +26,8 @@ BaseAuthenticationManager::~BaseAuthenticationManager()
 }
 
 void BaseAuthenticationManager::authenticate(
-    const nx_http::HttpServerConnection& /*connection*/,
-    const nx_http::Request& request,
+    const nx::network::http::HttpServerConnection& /*connection*/,
+    const nx::network::http::Request& request,
     AuthenticationCompletionHandler completionHandler)
 {
     using namespace std::placeholders;
@@ -71,11 +73,11 @@ void BaseAuthenticationManager::reportAuthenticationFailure(
     AuthenticationCompletionHandler completionHandler)
 {
     completionHandler(
-        nx_http::server::AuthenticationResult(
+        nx::network::http::server::AuthenticationResult(
             false,
             nx::utils::stree::ResourceContainer(),
             generateWwwAuthenticateHeader(),
-            nx_http::HttpHeaders(),
+            nx::network::http::HttpHeaders(),
             nullptr));
 }
 
@@ -114,7 +116,7 @@ void BaseAuthenticationManager::passwordLookupDone(
 void BaseAuthenticationManager::reportSuccess(
     AuthenticationCompletionHandler completionHandler)
 {
-    completionHandler(nx_http::server::SuccessfulAuthenticationResult());
+    completionHandler(nx::network::http::server::SuccessfulAuthenticationResult());
 }
 
 nx::String BaseAuthenticationManager::generateNonce()
@@ -139,4 +141,6 @@ bool BaseAuthenticationManager::validateNonce(const nx::String& /*nonce*/)
 }
 
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -23,9 +23,9 @@ Item
         video.clear()
     }
 
-    VideoOutput 
-    { 
-        id: video 
+    VideoOutput
+    {
+        id: video
     }
 
     FisheyeShaderEffect
@@ -43,7 +43,7 @@ Item
 
         fieldRadius: resourceHelper ? resourceHelper.fisheyeParams.radius : 0.0
 
-        fieldRotation: resourceHelper 
+        fieldRotation: resourceHelper
             ? (resourceHelper.fisheyeParams.fovRot + resourceHelper.customRotation)
             : 0.0
 
@@ -170,7 +170,7 @@ Item
         {
             interactor.scalePower = startScalePower
             interactor.scaleBy(Math.log(scale) / Math.LN2, false)
-        }                
+        }
 
         MouseArea
         {
@@ -190,6 +190,8 @@ Item
             KineticAnimation
             {
                 id: kinetics
+
+                deceleration: 0.005
 
                 property point startPosition
 

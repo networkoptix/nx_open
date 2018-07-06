@@ -4,10 +4,10 @@
 
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
 
-class QnImageProvider;
-class QnTextEditLabel;
-class QnResourcePreviewWidget;
 class QGraphicsProxyWidget;
+namespace nx { namespace client { namespace desktop { class AsyncImageWidget; }}}
+namespace nx { namespace client { namespace desktop { class TextEditLabel; }}}
+namespace nx { namespace client { namespace desktop { class ImageProvider; }}}
 
 class QnGraphicsToolTipWidget: public QnStyledTooltipWidget
 {
@@ -29,7 +29,9 @@ public:
 
     void setThumbnailVisible(bool visible);
 
-    void setImageProvider(QnImageProvider* provider);
+    void setImageProvider(nx::client::desktop::ImageProvider* provider);
+
+    void setHighlightRect(const QRectF& relativeRect);
 
     QSize maxThumbnailSize() const;
     void setMaxThumbnailSize(const QSize& value);
@@ -53,7 +55,7 @@ protected:
 private:
     QGraphicsProxyWidget* m_proxyWidget;
     QWidget* m_embeddedWidget;
-    QnTextEditLabel* m_textLabel;
-    QnResourcePreviewWidget* m_previewWidget;
+    nx::client::desktop::TextEditLabel* m_textLabel;
+    nx::client::desktop::AsyncImageWidget* m_previewWidget;
     QSize m_maxThumbnailSize;
 };

@@ -44,7 +44,7 @@ public:
     void checkStoragesStatus(const QnMediaServerResourcePtr &server);
 
     void saveStorages(const QnStorageResourceList &storages);
-    void deleteStorages(const ec2::ApiIdDataList &ids);
+    void deleteStorages(const nx::vms::api::IdDataList &ids);
 signals:
     void serverProtocolsChanged(const QnMediaServerResourcePtr &server, const QSet<QString> &protocols);
     void serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);

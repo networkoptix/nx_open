@@ -6,6 +6,7 @@
 #include <nx/utils/uuid.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 namespace extension {
 
@@ -287,4 +288,5 @@ struct NX_NETWORK_API HostNameList : StringList
 
 } // namespace extension
 } // namespace stun
+} // namespace network
 } // namespace nx

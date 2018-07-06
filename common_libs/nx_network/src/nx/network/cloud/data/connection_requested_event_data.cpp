@@ -1,17 +1,10 @@
-/**********************************************************
-* Jan 18, 2016
-* akolesnikov
-***********************************************************/
-
 #include "connection_requested_event_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-ConnectionRequestedEvent::ConnectionRequestedEvent()
-:
+ConnectionRequestedEvent::ConnectionRequestedEvent():
     StunIndicationData(kMethod),
     connectionMethods(0),
     cloudConnectVersion(kCurrentCloudConnectVersion),
@@ -19,8 +12,10 @@ ConnectionRequestedEvent::ConnectionRequestedEvent()
 {
 }
 
-void ConnectionRequestedEvent::serializeAttributes(nx::stun::Message* const message)
+void ConnectionRequestedEvent::serializeAttributes(nx::network::stun::Message* const message)
 {
+    using namespace nx::network;
+
     message->newAttribute<stun::extension::attrs::ConnectionId>(std::move(connectSessionId));
     message->newAttribute<stun::extension::attrs::PeerId>(std::move(originatingPeerID));
     message->newAttribute<stun::extension::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
@@ -31,8 +26,10 @@ void ConnectionRequestedEvent::serializeAttributes(nx::stun::Message* const mess
     message->addAttribute(stun::extension::attrs::isPersistent, isPersistent);
 }
 
-bool ConnectionRequestedEvent::parseAttributes(const nx::stun::Message& message)
+bool ConnectionRequestedEvent::parseAttributes(const nx::network::stun::Message& message)
 {
+    using namespace nx::network;
+
     if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
@@ -50,6 +47,6 @@ bool ConnectionRequestedEvent::parseAttributes(const nx::stun::Message& message)
     return ret;
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

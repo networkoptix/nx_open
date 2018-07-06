@@ -4,6 +4,7 @@
 #include <nx/utils/async_operation_guard.h>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 /**
@@ -47,10 +48,13 @@ public:
 
 protected:
     void disconnectFromClient();
+    void reportReconnect();
 
     utils::AsyncOperationGuard m_asyncGuard;
     std::shared_ptr<AbstractAsyncClient> m_client;
+    AbstractAsyncClient::ReconnectHandler m_reconnectHandler;
 };
 
 } // namespace stun
+} // namespace network
 } // namespace nx

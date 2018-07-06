@@ -12,9 +12,9 @@ namespace controller {
 class PublicIpDiscoveryService
 {
 public:
-    using DiscoverFunc = nx::utils::MoveOnlyFunc<boost::optional<HostAddress>()>;
+    using DiscoverFunc = nx::utils::MoveOnlyFunc<boost::optional<network::HostAddress>()>;
     static void setDiscoverFunc(DiscoverFunc func);
-    static boost::optional<HostAddress> get();
+    static boost::optional<network::HostAddress> get();
 };
 
 } // namespace controller

@@ -23,10 +23,6 @@ public:
 
     virtual QnUuid getGuid() const override;
 
-    /*
-    * How long to keep event log in usecs
-    */
-    void setEventLogPeriod(qint64 periodUsec);
     virtual void prepareAdditionActionParams(const vms::event::AbstractActionPtr& action) override;
 
 protected slots:
@@ -47,15 +43,15 @@ private:
     class SendEmailAggregationKey
     {
     public:
-        vms::event::EventType eventType;
+        vms::api::EventType eventType;
         QString recipients;
 
         SendEmailAggregationKey():
-            eventType(vms::event::undefinedEvent)
+            eventType(vms::api::EventType::undefinedEvent)
         {
         }
 
-        SendEmailAggregationKey(vms::event::EventType _eventType, QString _recipients):
+        SendEmailAggregationKey(vms::api::EventType _eventType, QString _recipients):
             eventType(_eventType),
             recipients(_recipients)
         {
@@ -85,6 +81,7 @@ private:
     QScopedPointer<EmailManagerImpl> m_emailManager;
     QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
     QThreadPool m_emailThreadPool;
+
 private:
     bool sendMail(const vms::event::SendMailActionPtr& action);
     void sendAggregationEmail(const SendEmailAggregationKey& aggregationKey);
@@ -97,7 +94,14 @@ private:
      */
     void updateRecipientsList(const vms::event::SendMailActionPtr& action) const;
 
-    QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const;
+    struct TimespampedFrame
+    {
+        qint64 timestampUsec = 0;
+        QByteArray frame;
+    };
+
+    TimespampedFrame getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec,
+        QSize dstSize) const;
 
     QVariantMap eventDescriptionMap(
         const vms::event::AbstractActionPtr& action,

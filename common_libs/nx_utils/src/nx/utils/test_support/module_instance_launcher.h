@@ -24,11 +24,14 @@ public:
     {
     }
 
-    ~ModuleLauncher()
+    virtual ~ModuleLauncher()
     {
         stop();
         clearArgs();
     }
+
+    ModuleLauncher(ModuleLauncher&&) = default;
+    ModuleLauncher& operator=(ModuleLauncher&&) = default;
 
     void start()
     {

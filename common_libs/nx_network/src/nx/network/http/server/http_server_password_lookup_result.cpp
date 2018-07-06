@@ -1,6 +1,8 @@
 #include "http_server_password_lookup_result.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 
 //-------------------------------------------------------------------------------------------------
@@ -54,4 +56,6 @@ PasswordLookupResult Ha1LookupResultBuilder::build(PasswordLookupResult::Code er
 }
 
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

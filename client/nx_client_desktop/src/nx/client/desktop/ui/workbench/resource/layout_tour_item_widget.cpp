@@ -8,8 +8,6 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
-#include <camera/camera_thumbnail_manager.h>
-
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
@@ -17,6 +15,8 @@
 #include <text/time_strings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/image_providers/camera_thumbnail_manager.h>
+
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -91,17 +91,20 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     QGraphicsItem* parent)
     :
     base_type(context, item, parent),
-    m_previewPainter(new LayoutPreviewPainter(context->instance<QnCameraThumbnailManager>()))
+    m_previewPainter(new LayoutPreviewPainter(context->resourcePool()))
 {
-    context->instance<QnCameraThumbnailManager>()->setAutoRotate(false); //< TODO: VMS-6759
+    context->instance<CameraThumbnailManager>()->setAutoRotate(false); //< TODO: VMS-6759
 
     setOption(QnResourceWidget::InfoOverlaysForbidden);
     setOption(QnResourceWidget::WindowRotationForbidden);
 
     QnLayoutResourcePtr layout = resource().dynamicCast<QnLayoutResource>();
+
     if (!layout)
     {
         layout = QnLayoutResource::createFromResource(resource());
+        QString name = lit("Tour@%1").arg(resource()->getName());
+        layout->setName(name);
         connect(resource(), &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& key)
             {
@@ -170,7 +173,7 @@ void LayoutTourItemWidget::initOverlay()
     connect(resource(), &QnResource::nameChanged, this, updateTitle);
 
     auto closeButton = new QnImageButtonWidget();
-    const auto closeButtonIcon = qnSkin->icon(lit("buttons/clear.png"));
+    const auto closeButtonIcon = qnSkin->icon(lit("text_buttons/clear.png"));
     const auto closeButtonSize = QnSkin::maximumSize(closeButtonIcon);
     closeButton->setIcon(closeButtonIcon);
     closeButton->setFixedSize(closeButtonSize);

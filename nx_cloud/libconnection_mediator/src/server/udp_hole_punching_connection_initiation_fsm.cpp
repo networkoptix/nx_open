@@ -13,6 +13,8 @@
 namespace nx {
 namespace hpm {
 
+using namespace nx::network;
+
 UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     nx::String connectionID,
     const ListeningPeerData& serverPeerData,
@@ -190,7 +192,7 @@ bool UDPHolePunchingConnectionInitiationFsm::notifyListeningPeerAboutConnectRequ
     return true;
 }
 
-nx::stun::Message UDPHolePunchingConnectionInitiationFsm::prepareConnectionRequestedIndication(
+nx::network::stun::Message UDPHolePunchingConnectionInitiationFsm::prepareConnectionRequestedIndication(
     const ConnectionStrongRef& originatingPeerConnection,
     const api::ConnectRequest& connectRequest)
 {
@@ -216,7 +218,7 @@ nx::stun::Message UDPHolePunchingConnectionInitiationFsm::prepareConnectionReque
     connectionRequestedEvent.connectionMethods =
         api::ConnectionMethod::udpHolePunching;
     connectionRequestedEvent.params = m_settings.connectionParameters();
-    nx::stun::Message indication(
+    nx::network::stun::Message indication(
         stun::Header(
             stun::MessageClass::indication,
             stun::extension::indications::connectionRequested));
@@ -246,7 +248,7 @@ void UDPHolePunchingConnectionInitiationFsm::noConnectionAckOnTime()
 
     api::ConnectResponse connectResponse = prepareConnectResponse(
         api::ConnectionAckRequest(),
-        std::list<SocketAddress>(),
+        std::list<network::SocketAddress>(),
         boost::none);
     sendConnectResponse(api::ResultCode::noReplyFromServer, std::move(connectResponse));
 
@@ -404,7 +406,7 @@ void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
 
 api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectResponse(
     const api::ConnectionAckRequest& connectionAckRequest,
-    std::list<SocketAddress> tcpEndpoints,
+    std::list<network::SocketAddress> tcpEndpoints,
     boost::optional<QUrl> relayInstanceUrl)
 {
     api::ConnectResponse connectResponse;

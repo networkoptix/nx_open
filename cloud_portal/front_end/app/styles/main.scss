@@ -182,7 +182,7 @@ a.disabled {
 }
 
 .warning-label{
-    color: $brand-danger;
+    color: $brand-danger !important;
 }
 
 .loading .auth-visible,
@@ -764,3 +764,15 @@ button .icon-caret{
   background-position: -32px 0;
 }
 
+.wide-button{
+  width: 102px;
+}
+
+.help-block-no-height{
+  min-height: 0px !important;
+}
+
+.light-label{
+  font-weight: initial;
+  padding-left: 4px;
+}

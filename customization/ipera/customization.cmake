@@ -1,11 +1,9 @@
 # Components Namings
-set(parent.customization "default")
 set(product.name "FlyView")
 set(display.product.name "FlyView")
 set(product.name.short "ipera_ru")
 set(product.appName "flyview")
 set(company.name "iPera")
-set(short.company.name "iPera")
 set(uri.protocol "fly-vms")
 set(cloudName "FlyView Cloud")
 set(installer.name "flyview")
@@ -42,11 +40,12 @@ set(customization.serverUpgradeCode "{8021cd6c-2cc7-4dda-b31e-327ed7e24167}")
 set(customization.clientBundleUpgradeCode "{61d97f69-4bb3-4908-9948-14af7f217800}")
 set(customization.serverBundleUpgradeCode "{77f83e92-8cba-4007-b328-eff68cc9ecc7}")
 set(customization.fullBundleUpgradeCode "{d68bde62-2804-4429-ac3f-d347ced6ddb6}")
-set(customization.nxtoolBundleUpgradeCode "{287ef256-27d5-4f28-86e8-e32ebf9b2ff8}")
+
+#set(nxtool.company.name "iPera")
+#set(nxtool.bundleUpgradeCode "{287ef256-27d5-4f28-86e8-e32ebf9b2ff8}")
 
 set(deb.customization.company.name "ipera")
 
-set(ios.bundle_identifier "ru.ipera.FlyView")
 set(ios.new_bundle_identifier "ru.ipera.FlyViewMobile")
 set(ios.sign.identity "iPhone Distribution: IPera (32NH529F85)")
 set(ios.group_identifier "group.ru.ipera.FlyView")
@@ -68,7 +67,6 @@ set(installer.language "ru_RU")
 set(installer.cultures "ru-ru")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation ru_RU)

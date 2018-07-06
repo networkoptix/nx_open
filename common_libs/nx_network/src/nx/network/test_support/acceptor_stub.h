@@ -30,7 +30,6 @@ public:
 
 private:
     utils::SyncQueue<AcceptorStub*>* m_removedAcceptorsQueue;
-    std::atomic<bool> m_asyncAcceptInProgress;
     std::deque<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
     AcceptCompletionHandler m_acceptHandler;
     mutable QnMutex m_mutex;

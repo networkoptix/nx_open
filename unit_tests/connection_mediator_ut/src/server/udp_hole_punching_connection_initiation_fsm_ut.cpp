@@ -136,7 +136,7 @@ protected:
 
         api::ConnectionAckRequest request;
         request.connectionMethods = api::ConnectionMethod::all;
-        request.udpEndpointList.push_back(SocketAddress(HostAddress::localhost, 12345)); //< Just any port.
+        request.udpEndpointList.push_back(nx::network::SocketAddress(nx::network::HostAddress::localhost, 12345)); //< Just any port.
         m_connectSessionFsm->onConnectionAckRequest(
             std::make_shared<TestServerConnection>(),
             std::move(request),

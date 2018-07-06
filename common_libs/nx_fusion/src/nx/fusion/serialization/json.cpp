@@ -6,6 +6,7 @@
 #include <QtCore/QtNumeric> //< for qIsFinite
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/url.h>
 
 #include "json_functions.h"
 
@@ -222,6 +223,7 @@ public:
         registerSerializer<QVector4D>();
         registerSerializer<QnUuid>();
         registerSerializer<QUrl>();
+        registerSerializer<nx::utils::Url>();
         registerSerializer<QFont>();
 
         registerSerializer<QnLatin1Array>();

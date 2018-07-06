@@ -74,7 +74,7 @@ private:
 // -------------------------------------------------------------------------- //
 // QnLongRunnablePool
 // -------------------------------------------------------------------------- //
-QnLongRunnablePool::QnLongRunnablePool(QObject *parent): 
+QnLongRunnablePool::QnLongRunnablePool(QObject *parent):
     QObject(parent),
     d(new QnLongRunnablePoolPrivate())
 {}
@@ -153,13 +153,18 @@ void QnLongRunnable::resume() {
     m_semaphore.release();
 }
 
-bool QnLongRunnable::isPaused() const { 
-    return m_onPause; 
+bool QnLongRunnable::isPaused() const 
+{
+    return m_onPause;
 }
 
-void QnLongRunnable::pauseDelay() {
+void QnLongRunnable::pauseDelay()
+{
     while(m_onPause && !needToStop())
+    {
+        emit paused();
         m_semaphore.tryAcquire(1, 50);
+    }
 }
 
 uintptr_t QnLongRunnable::systemThreadId() const {

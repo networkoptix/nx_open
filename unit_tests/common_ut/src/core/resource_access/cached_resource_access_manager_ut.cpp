@@ -78,6 +78,13 @@ protected:
         m_currentUser = user;
     }
 
+    bool hasPermission(const QnResourceAccessSubject& subject,
+        const QnResourcePtr& resource,
+        Qn::Permissions requiredPermissions) const
+    {
+        return resourceAccessManager()->hasPermission(subject, resource, requiredPermissions);
+    }
+
     void checkPermissions(const QnResourcePtr &resource, Qn::Permissions desired, Qn::Permissions forbidden) const
     {
         Qn::Permissions actual = resourceAccessManager()->permissions(m_currentUser, resource);
@@ -232,9 +239,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkLockedChanged)
     auto user = m_currentUser;
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
+    ASSERT_TRUE(hasPermission(user, layout, Qn::AddRemoveItemsPermission));
     layout->setLocked(true);
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, layout, Qn::AddRemoveItemsPermission));
+    ASSERT_FALSE(hasPermission(user, layout, Qn::AddRemoveItemsPermission));
 }
 
 /************************************************************************/
@@ -367,7 +374,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkParentChanged)
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
     layout->setParentId(QnUuid());
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, layout, Qn::ReadPermission));
+    ASSERT_FALSE(hasPermission(user, layout, Qn::ReadPermission));
 }
 
 /************************************************************************/
@@ -431,6 +438,36 @@ TEST_F(QnCachedResourceAccessManagerTest, checkVideowallLockedLayout)
     checkPermissions(layout, desired, forbidden);
 }
 
+TEST_F(QnCachedResourceAccessManagerTest, checkPushMyScreenAsViewer)
+{
+    loginAs(Qn::GlobalControlVideoWallPermission | Qn::GlobalViewerPermissionSet);
+
+    auto camera = createCamera();
+    camera->addFlags(Qn::desktop_camera);
+    resourcePool()->addResource(camera);
+
+    // User cannot see anybody's else screen.
+    ASSERT_FALSE(hasPermission(m_currentUser, camera, Qn::ViewLivePermission));
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, false, videowall->getId());
+
+    QnVideoWallItem vwitem;
+    vwitem.layout = layout->getId();
+    videowall->items()->addItem(vwitem);
+
+    QnLayoutItemData item;
+    item.resource.id = camera->getId();
+    item.resource.uniqueId = camera->getUniqueId();
+    layout->addItem(item);
+
+    resourcePool()->addResource(layout);
+
+    // Screen is available once it is added to videowall.
+    ASSERT_TRUE(hasPermission(m_currentUser, camera, Qn::ViewLivePermission));
+}
+
+
 /************************************************************************/
 /* Checking user access rights                                          */
 /************************************************************************/
@@ -454,7 +491,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkEditDisabledAdmin)
     auto otherAdmin = createUser(Qn::GlobalAdminPermission);
     otherAdmin->setEnabled(false);
     resourcePool()->addResource(otherAdmin);
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, otherAdmin, Qn::WriteAccessRightsPermission));
+    ASSERT_FALSE(hasPermission(user, otherAdmin, Qn::WriteAccessRightsPermission));
 }
 
 /************************************************************************/
@@ -482,7 +519,7 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRemoveCameraAsAdmin)
     auto user = addUser(Qn::GlobalAdminPermission);
     auto target = addCamera();
 
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::RemovePermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::RemovePermission));
 }
 
 // EditCameras is not enough to be able to remove cameras
@@ -491,9 +528,45 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRemoveCameraAsEditor)
     auto user = addUser(Qn::GlobalAccessAllMediaPermission | Qn::GlobalEditCamerasPermission);
     auto target = addCamera();
 
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::WritePermission));
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::SavePermission));
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, target, Qn::RemovePermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::WritePermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::SavePermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::RemovePermission));
+}
+
+TEST_F(QnCachedResourceAccessManagerTest, checkViewCameraPermission)
+{
+    auto admin = addUser(Qn::GlobalAdminPermission);
+    auto viewer = addUser(Qn::GlobalViewerPermissionSet);
+    auto live = addUser(Qn::GlobalLiveViewerPermissionSet);
+    auto target = addCamera();
+
+    auto viewLivePermission = Qn::ReadPermission
+        | Qn::ViewContentPermission
+        | Qn::ViewLivePermission;
+    auto viewPermission = viewLivePermission | Qn::ViewFootagePermission;
+
+    ASSERT_TRUE(hasPermission(admin, target, viewPermission));
+    ASSERT_TRUE(hasPermission(viewer, target, viewPermission));
+    ASSERT_TRUE(hasPermission(live, target, viewLivePermission));
+    ASSERT_FALSE(hasPermission(live, target, Qn::ViewFootagePermission));
+}
+
+
+TEST_F(QnCachedResourceAccessManagerTest, checkExportCameraPermission)
+{
+    auto admin = addUser(Qn::GlobalAdminPermission);
+    auto viewer = addUser(Qn::GlobalViewerPermissionSet);
+    auto live = addUser(Qn::GlobalLiveViewerPermissionSet);
+    auto target = addCamera();
+
+    auto exportPermission = Qn::ReadPermission
+        | Qn::ViewContentPermission
+        | Qn::ViewFootagePermission
+        | Qn::ExportPermission;
+
+    ASSERT_TRUE(hasPermission(admin, target, exportPermission));
+    ASSERT_TRUE(hasPermission(viewer, target, exportPermission));
+    ASSERT_FALSE(hasPermission(live, target, exportPermission));
 }
 
 TEST_F(QnCachedResourceAccessManagerTest, checkUserRemoved)
@@ -501,9 +574,9 @@ TEST_F(QnCachedResourceAccessManagerTest, checkUserRemoved)
     auto user = addUser(Qn::GlobalAdminPermission);
     auto camera = addCamera();
 
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, camera, Qn::RemovePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::RemovePermission));
     resourcePool()->removeResource(user);
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, camera, Qn::RemovePermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::RemovePermission));
 }
 
 TEST_F(QnCachedResourceAccessManagerTest, checkUserRoleChange)
@@ -515,8 +588,8 @@ TEST_F(QnCachedResourceAccessManagerTest, checkUserRoleChange)
     userRolesManager()->addOrUpdateUserRole(role);
 
     user->setUserRoleId(role.id);
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ReadPermission));
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnCachedResourceAccessManagerTest, checkUserEnabledChange)
@@ -524,12 +597,12 @@ TEST_F(QnCachedResourceAccessManagerTest, checkUserEnabledChange)
     auto target = addCamera();
 
     auto user = addUser(Qn::GlobalAccessAllMediaPermission);
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ReadPermission));
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 
     user->setEnabled(false);
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, target, Qn::ReadPermission));
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, target, Qn::ViewContentPermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnCachedResourceAccessManagerTest, checkRoleAccessChange)
@@ -541,14 +614,14 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRoleAccessChange)
     userRolesManager()->addOrUpdateUserRole(role);
 
     user->setUserRoleId(role.id);
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, target, Qn::ReadPermission));
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, target, Qn::ViewContentPermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 
     role.permissions = Qn::GlobalAccessAllMediaPermission;
     userRolesManager()->addOrUpdateUserRole(role);
 
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ReadPermission));
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnCachedResourceAccessManagerTest, checkEditAccessChange)
@@ -556,10 +629,10 @@ TEST_F(QnCachedResourceAccessManagerTest, checkEditAccessChange)
     auto target = addCamera();
 
     auto user = addUser(Qn::GlobalAccessAllMediaPermission);
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, target, Qn::SavePermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::SavePermission));
 
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission | Qn::GlobalEditCamerasPermission);
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::SavePermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::SavePermission));
 }
 
 TEST_F(QnCachedResourceAccessManagerTest, checkRoleRemoved)
@@ -571,12 +644,12 @@ TEST_F(QnCachedResourceAccessManagerTest, checkRoleRemoved)
     userRolesManager()->addOrUpdateUserRole(role);
 
     user->setUserRoleId(role.id);
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ReadPermission));
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 
     userRolesManager()->removeUserRole(role.id);
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, target, Qn::ReadPermission));
-    ASSERT_FALSE(resourceAccessManager()->hasPermission(user, target, Qn::ViewContentPermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_FALSE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnCachedResourceAccessManagerTest, checkCameraOnVideoWall)
@@ -595,8 +668,8 @@ TEST_F(QnCachedResourceAccessManagerTest, checkCameraOnVideoWall)
     item.resource.uniqueId = target->getUniqueId();
     layout->addItem(item);
     resourcePool()->addResource(layout);
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ReadPermission));
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ViewContentPermission));
 }
 
 TEST_F(QnCachedResourceAccessManagerTest, checkShareLayoutToRole)
@@ -628,7 +701,101 @@ TEST_F(QnCachedResourceAccessManagerTest, checkShareLayoutToRole)
     sharedResourcesManager()->setSharedResources(role, {layout->getId()});
 
     // Make sure user got permissions
-    ASSERT_TRUE(resourceAccessManager()->hasPermission(user, target, Qn::ReadPermission));
+    ASSERT_TRUE(hasPermission(user, target, Qn::ReadPermission));
+}
+
+/**
+* VMAXes without licences:
+* Viewing live: temporary allowed
+* Viewing footage: temporary allowed
+* Export video: temporary allowed
+*/
+TEST_F(QnCachedResourceAccessManagerTest, checkVMaxWithoutLicense)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = addCamera();
+
+    // Camera is detected as VMax
+    camera->markCameraAsVMax();
+    ASSERT_TRUE(camera->licenseType() == Qn::LC_VMAX);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+
+    // TODO: Forbid all for VMAX when discussed with management
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
+
+    // License enabled
+    camera->setLicenseUsed(true);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
+}
+
+/**
+* NVRs without licences:
+* Viewing live: allowed
+* Viewing footage: forbidden
+* Export video: forbidden
+*/
+TEST_F(QnCachedResourceAccessManagerTest, checkNvrWithoutLicense)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = addCamera();
+
+    // Camera is detected as NVR
+    camera->markCameraAsNvr();
+    ASSERT_TRUE(camera->licenseType() == Qn::LC_Bridge);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ExportPermission));
+
+    // License enabled
+    camera->setLicenseUsed(true);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
+}
+
+/**
+* Camera with default auth (if can be changed) must not be viewable.
+*/
+TEST_F(QnCachedResourceAccessManagerTest, checkDefaultAuthCamera)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = addCamera();
+
+    camera->setCameraCapabilities(Qn::SetUserPasswordCapability | Qn::isDefaultPasswordCapability);
+
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_FALSE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
+
+    // Password changed
+    camera->setCameraCapabilities(Qn::SetUserPasswordCapability);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
+}
+
+/**
+* Camera with default auth must be viewable if password cannot be changed.
+*/
+TEST_F(QnCachedResourceAccessManagerTest, checkDefaultAuthCameraNonChangeable)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto camera = addCamera();
+
+    camera->setCameraCapabilities(Qn::isDefaultPasswordCapability);
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewContentPermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewLivePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ViewFootagePermission));
+    ASSERT_TRUE(hasPermission(user, camera, Qn::ExportPermission));
 }
 
 /************************************************************************/

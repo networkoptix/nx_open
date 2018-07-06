@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>Options</source>
-      <translation>옵션</translation>
+      <translation>옵션:</translation>
     </message>
     <message>
       <source>Setting</source>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation>HTML:</translation>
+      <translation type="unfinished">&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
@@ -360,7 +360,7 @@ Press ESC to cancel</source>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>형식</translation>
+      <translation>유형</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -699,7 +699,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation>형식</translation>
+      <translation>유형</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -746,7 +746,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <translation>LTR</translation>
     </message>
   </context>
   <context>

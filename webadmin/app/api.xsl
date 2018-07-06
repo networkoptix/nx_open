@@ -22,24 +22,15 @@
                 <title/>
                 <meta name="description" content=""/>
                 <meta name="viewport" content="width=device-width"/>
-                <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-                <!-- build:css styles/vendor.css -->
-                <!-- bower:css -->
-                <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css" >
-                <!-- endbower -->
-                <!-- endbuild -->
-                </link> <!-- This is strange hack, I know -->
 
-                <!-- build:css({.tmp,app}) styles/main.css -->
-                <link rel="stylesheet" href="styles/main.css" >
-                <!-- endbuild -->
+                <% for (key in htmlWebpackPlugin.files.css) { %>
+                <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[key] %>" />
+                <% } %>
 
-                </link><!-- This is strange hack, I know -->
-
-                <link rel="stylesheet" href="customization/styles.css"/>
+                <link rel="stylesheet" href="skin/styles.css"/>
             </head>
             <body class="api-xml">
-                <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+                <header class="navbar navbar-static-top bs-docs-nav navbar-default" id="top" role="banner">
                     <div class="container">
                         <div class="navbar-header">
                             <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" href="index.html">
@@ -57,7 +48,7 @@
                     </div>
                 </header>
 
-                <div class="container-fluid scroll-wrapper">
+                <div class="scroll-wrapper">
                         <nav class="col-sm-3 bs-docs-sidebar hidden-xs scroll-container">
                             <ul class="nav nav-stacked fixed-lg" id="sidebar">
                                 <xsl:for-each select="/apidoc/groups/group">
@@ -168,34 +159,9 @@
             </body>
 
 
-            <!-- build:js({.tmp,app}) scripts/api_documentation.js -->
-            <script src="bower_components/jquery/jquery.js"/>
-            <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"/>
-            <!-- <script src="bower_components/jquery-scrollspy-thesmart/scrollspy.js"/> -->
-            <!-- endbuild -->
-
-            <script>
-                $(function () {
-                    //$("[data-toggle='tooltip']").tooltip();
-
-                    $(".nav .glyphicon").click(function(){
-                        var $container = $(this).parent().parent();
-
-                        // .active
-                        // .pinned
-                        // .pinned-hidden
-
-                        if($container.hasClass("active")){
-                            $container.removeClass("pinned")
-                                    .toggleClass("pinned-hidden");
-                        }else{
-                            $container.toggleClass("pinned")
-                                    .removeClass("pinned-hidden");
-                        }
-                        return false;
-                    });
-                });
-            </script>
+            <% for (key in htmlWebpackPlugin.files.chunks) { %>
+            <script type="text/javascript" src="<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
+            <% } %>
         </html>
     </xsl:template>
 

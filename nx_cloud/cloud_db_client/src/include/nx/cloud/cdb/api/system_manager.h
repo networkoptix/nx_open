@@ -99,6 +99,14 @@ public:
     virtual void getSystemHealthHistory(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) = 0;
+
+    /**
+     * Result of merge is system idOfSystemToMergeToId.
+     */
+    virtual void startMerge(
+        const std::string& idOfSystemToMergeTo,
+        const std::string& idOfSystemBeingMerged,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
 } // namespace api

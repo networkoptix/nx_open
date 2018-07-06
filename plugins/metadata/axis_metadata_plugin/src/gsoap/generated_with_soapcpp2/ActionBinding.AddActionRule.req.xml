@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+    xmlns:SOAP-ENV="http://www.w3.org/2003/05/soap-envelope"
+    xmlns:SOAP-ENC="http://www.w3.org/2003/05/soap-encoding"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns6="http://www.w3.org/2005/08/addressing"
+    xmlns:ns4="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:ns2="http://docs.oasis-open.org/wsn/t-1"
+    xmlns:ns3="http://docs.oasis-open.org/wsn/b-2"
+    xmlns:ns1="http://www.axis.com/vapix/ws/event1"
+    xmlns:ns5="http://www.axis.com/vapix/ws/action1">
+ <SOAP-ENV:Body>
+  <!-- __ns5__AddActionRule(..., _ns5__AddActionRule *ns5__AddActionRule, ...) -->
+   <!-- _ns5__AddActionRule *ns5__AddActionRule -->
+   <ns5:AddActionRule>
+    <!-- ns5__NewActionRule *NewActionRule -->
+    <ns5:NewActionRule>
+     <!-- std::string *Name -->
+     <ns5:Name></ns5:Name>
+     <!-- bool Enabled -->
+     <ns5:Enabled>false</ns5:Enabled>
+     <!-- ns3__FilterType *StartEvent -->
+     <ns5:StartEvent>
+      <!-- std::vector<struct soap_dom_element> __any -->
+
+     </ns5:StartEvent>
+     <!-- ns5__Conditions *Conditions -->
+     <ns5:Conditions>
+      <!-- std::vector<ns3__FilterType *> Condition -->
+      <ns5:Condition>
+       <!-- std::vector<struct soap_dom_element> __any -->
+
+      </ns5:Condition>
+      <ns5:Condition>
+       <!-- std::vector<struct soap_dom_element> __any -->
+
+      </ns5:Condition>
+     </ns5:Conditions>
+     <!-- std::string *ActivationTimeout -->
+     <ns5:ActivationTimeout>PT0S</ns5:ActivationTimeout>
+     <!-- std::string PrimaryAction -->
+     <ns5:PrimaryAction>0</ns5:PrimaryAction>
+     <!-- std::string *FailoverAction -->
+     <ns5:FailoverAction>0</ns5:FailoverAction>
+    </ns5:NewActionRule>
+   </ns5:AddActionRule>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

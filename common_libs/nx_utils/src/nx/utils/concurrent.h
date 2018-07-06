@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <cassert>
 #include <functional>
@@ -17,7 +17,7 @@ namespace nx {
 namespace utils {
 
 /**
- * Contains analogous functions for some of QtConcurrent namespace, 
+ * Contains analogous functions for some of QtConcurrent namespace,
  * but provides a way to run concurrent computations in custom thread pool with custom priority.
  */
 namespace concurrent {
@@ -307,7 +307,7 @@ class TaskExecuter
 {
 public:
     using ResultType = typename std::result_of<Function(typename Container::value_type)>::type;
-    using FutureImplType = 
+    using FutureImplType =
         QnFutureImpl<typename std::result_of<Function(typename Container::value_type)>::type>;
 
     TaskExecuter(
@@ -333,9 +333,9 @@ public:
         NX_ASSERT(futureImplStrongRef);
 
         // Launching next task.
-        const typename std::pair<typename Container::iterator, int>& nextElement = 
+        const typename std::pair<typename Container::iterator, int>& nextElement =
             m_safeIter->fetchAndMoveToNextPos();
-        if (nextElement.first != m_container.end() && 
+        if (nextElement.first != m_container.end() &&
             futureImplStrongRef->incStartedTaskCountIfAllowed())
         {
             auto functor = std::bind(
@@ -390,7 +390,7 @@ protected:
 /**
  * Result of concurrent task execution.
  * Provides methods to wait for concurrent computation completion, get computation progress and get results.
- * 
+ *
  * NOTE: Contains array of T elements.
  */
 template<class T>
@@ -457,7 +457,7 @@ Future<typename std::result_of<Function(typename Container::value_type)>::type> 
     Container& container,
     Function function)
 {
-    using FutureType = 
+    using FutureType =
         Future<typename std::result_of<Function(typename Container::value_type)>::type>;
 
     FutureType future;
@@ -472,7 +472,7 @@ Future<typename std::result_of<Function(typename Container::value_type)>::type> 
     futureImpl->setCleanupFunc(
         std::function<void()>([taskExecutor]() { delete taskExecutor; }));    //TODO #ak not good! Think over again
 
-    // Launching maximum threadPool->maxThreadCount() tasks, 
+    // Launching maximum threadPool->maxThreadCount() tasks,
     // other tasks added to threadPool's queue after completion of added tasks.
     const int maxTasksToLaunch = threadPool->maxThreadCount();
     for (int tasksLaunched = 0;

@@ -5,6 +5,8 @@
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+class QDialog;
+
 class QnSearchBookmarksModel;
 
 namespace Ui {

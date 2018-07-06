@@ -1,5 +1,7 @@
 #include "epoll_macosx.h"
 
+#include <iostream>
+
 #ifdef __APPLE__
 
 #include <sys/types.h>
@@ -113,7 +115,12 @@ int EpollMacosx::poll(
             continue;
         }
 
+        // EV_EOF means:
+        // When reading: EOF is already in the buffer, but there still may be some data to read.
+        // When writing: Connection is closed.
+
         const bool failure = (ev[i].flags & EV_ERROR) > 0;
+        const bool eof = (ev[i].flags & EV_EOF) > 0;
         if ((NULL != lrfds) && (ev[i].filter == EVFILT_READ))
         {
             lrfds->emplace(
@@ -124,7 +131,7 @@ int EpollMacosx::poll(
         {
             lwfds->emplace(
                 ev[i].ident,
-                UDT_EPOLL_OUT | (failure ? UDT_EPOLL_ERR : 0));
+                UDT_EPOLL_OUT | ((failure || eof) ? UDT_EPOLL_ERR : 0));
         }
     }
 

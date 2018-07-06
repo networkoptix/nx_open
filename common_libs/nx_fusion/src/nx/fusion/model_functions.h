@@ -1,5 +1,4 @@
-#ifndef QN_FUSION_AUTOMATION_H
-#define QN_FUSION_AUTOMATION_H
+#pragma once
 
 #include <nx/utils/uuid.h>
 #include <nx/fusion/fusion/fusion_adaptor.h>
@@ -12,6 +11,7 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/fusion/serialization/ubjson_functions.h>
 #include <nx/fusion/serialization/xml_functions.h>
+#include <nx/fusion/serialization_format.h>
 #include <nx/utils/math/fuzzy.h>
 
 namespace QnHashAutomation {
@@ -93,9 +93,39 @@ __VA_ARGS__ bool operator!=(const TYPE &l, const TYPE &r) {                     
     return !(l == r);                                                           \
 }
 
+namespace Qn {
 
+template<typename OutputData>
+QByteArray serialized(
+    const OutputData& outputData, Qn::SerializationFormat format, bool extraFormatting)
+{
+    switch(format)
+    {
+        case Qn::UbjsonFormat:
+            return QnUbjson::serialized(outputData);
 
-#endif // QN_FUSION_AUTOMATION_H
+        case Qn::JsonFormat:
+        case Qn::UnsupportedFormat:
+        {
+            QByteArray result = QJson::serialized(outputData);
+            if (extraFormatting)
+                result = nx::utils::formatJsonString(result);
+            return result;
+        }
 
+        case Qn::CsvFormat:
+            return QnCsv::serialized(outputData);
 
+        case Qn::XmlFormat:
+        {
+            QByteArray result = QnXml::serialized(outputData, lit("reply"));
+            return result;
+        }
 
+        default:
+            NX_ASSERT(false);
+            return QJson::serialized(outputData);
+    }
+}
+
+} // namespace Qn

@@ -11,26 +11,33 @@
 
 #include <translation/translation_manager.h>
 
+#include <nx/utils/crash_dump/systemexcept.h>
+
 QString translationPath30ToLocale(const QString& translationPath)
 {
     const QString oldLocale = QnTranslationManager::translationPathToLocaleCode(translationPath);
     return QnTranslationManager::localeCode30to31(oldLocale);
 }
 
-QString readLocaleFromSettings(QSettings* settings)
+QString readLocaleFromSettings(const QSettings& settings)
 {
     static const QString k30TranslationPath = lit("translationPath");
     static const QString kLocalePath = lit("locale");
 
-    QString compatibleValue = settings->value(k30TranslationPath).toString();
+    QString compatibleValue = settings.value(k30TranslationPath).toString();
     if (!compatibleValue.isEmpty())
         return translationPath30ToLocale(compatibleValue);
-    return settings->value(kLocalePath, QnAppInfo::defaultLanguage()).toString();
+    return settings.value(kLocalePath, QnAppInfo::defaultLanguage()).toString();
 }
 
-void initTranslations()
+bool readIsFullCrashDumpFromSettings(const QSettings& settings)
 {
-    static const QString clientName(QnTraytoolAppInfo::clientName());
+    static const QString kCreateFullCrashDumpPath = lit("createFullCrashDump");
+    return settings.value(kCreateFullCrashDumpPath).toBool();
+}
+
+void initTranslations(const QSettings& settings)
+{
 
     Q_INIT_RESOURCE(common);
     Q_INIT_RESOURCE(traytool);
@@ -38,14 +45,22 @@ void initTranslations()
     QScopedPointer<QnTranslationManager> translationManager(new QnTranslationManager());
     translationManager->addPrefix(lit("traytool"));
 
-    QSettings clientSettings(QSettings::UserScope, QnAppInfo::organizationName(), clientName);
-    QString locale = readLocaleFromSettings(&clientSettings);
+    QString locale = readLocaleFromSettings(settings);
     QnTranslation translation = translationManager->loadTranslation(locale);
     QnTranslationManager::installTranslation(translation);
 }
 
 int main(int argc, char *argv[])
 {
+    static const QString clientName(QnTraytoolAppInfo::clientName());
+    const QSettings clientSettings(QSettings::UserScope, QnAppInfo::organizationName(), clientName);
+
+    /* Init crash dumps as early as possible. */
+#ifdef Q_OS_WIN
+    win32_exception::installGlobalUnhandledExceptionHandler();
+    win32_exception::setCreateFullCrashDump(readIsFullCrashDumpFromSettings(clientSettings));
+#endif
+
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(QnTraytoolAppInfo::applicationName());
     QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
@@ -89,7 +104,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    initTranslations();
+    initTranslations(clientSettings);
 
     if (!QSystemTrayIcon::isSystemTrayAvailable())
     {

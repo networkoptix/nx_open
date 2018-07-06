@@ -20,7 +20,7 @@ PageBase
         Rectangle
         {
             width: parent.width
-            height: getStatusBarHeight()
+            height: deviceStatusBarHeight
             color: ColorTheme.windowBackground
         }
 

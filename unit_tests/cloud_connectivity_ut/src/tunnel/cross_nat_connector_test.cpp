@@ -26,7 +26,7 @@ TunnelConnector::~TunnelConnector()
 void TunnelConnector::setConnectorFactoryFunc(
     CrossNatConnectorFactory::Function newFactoryFunc)
 {
-    auto oldFunc = 
+    auto oldFunc =
         CrossNatConnectorFactory::instance().setCustomFunc(
             std::move(newFactoryFunc));
     if (!m_oldFactoryFunc)
@@ -46,7 +46,7 @@ hpm::MediatorFunctionalTest& TunnelConnector::mediator()
 TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
     std::chrono::milliseconds connectTimeout,
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
-    boost::optional<SocketAddress> mediatorAddressForConnector,
+    boost::optional<nx::network::SocketAddress> mediatorAddressForConnector,
     std::function<void(nx::hpm::MediaServerEmulator*)> serverConfig)
 {
     ConnectResult connectResult;
@@ -69,7 +69,7 @@ TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
     const nx::hpm::AbstractCloudDataProvider::System& system,
     const std::unique_ptr<MediaServerEmulator>& server,
-    boost::optional<SocketAddress> mediatorAddressForConnector)
+    boost::optional<nx::network::SocketAddress> mediatorAddressForConnector)
 {
     ConnectResult connectResult;
     doSimpleConnectTest(
@@ -112,7 +112,7 @@ void TunnelConnector::cancellationTest()
     while (std::chrono::steady_clock::now() - t1 < totalTestTime)
     {
         CrossNatConnector connector(
-            SocketAddress((server->serverId() + "." + system.id).constData()));
+            nx::network::SocketAddress((server->serverId() + "." + system.id).constData()));
 
         connector.connect(
             std::chrono::milliseconds::zero(),
@@ -133,7 +133,7 @@ void TunnelConnector::doSimpleConnectTest(
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
     const nx::hpm::AbstractCloudDataProvider::System& system,
     const std::unique_ptr<MediaServerEmulator>& server,
-    boost::optional<SocketAddress> mediatorAddressForConnector,
+    boost::optional<nx::network::SocketAddress> mediatorAddressForConnector,
     ConnectResult* const connectResult)
 {
     //starting mediaserver emulator with specified host name
@@ -147,7 +147,7 @@ void TunnelConnector::doSimpleConnectTest(
 
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(
-        SocketAddress((server->serverId() + "." + system.id).constData()),
+        nx::network::SocketAddress((server->serverId() + "." + system.id).constData()),
         mediatorAddressForConnector);
     auto connectorGuard = makeScopeGuard([&connector]() { connector.pleaseStopSync(); });
 
@@ -164,16 +164,7 @@ void TunnelConnector::doSimpleConnectTest(
             connectedPromise.set_value(std::move(result));
         });
 
-    auto connectedFuture = connectedPromise.get_future();
-    auto actualConnectTimeout =
-        connectTimeout == std::chrono::milliseconds::zero()
-            ? kDefaultTestTimeout : (connectTimeout * 2);
-
-    actualConnectTimeout *= utils::TestOptions::timeoutMultiplier();
-    ASSERT_EQ(std::future_status::ready, connectedFuture.wait_for(actualConnectTimeout))
-        << ::toString(actualConnectTimeout).toStdString();
-
-    *connectResult = connectedFuture.get();
+    *connectResult = connectedPromise.get_future().get();
     connectResult->executionTime =
         std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - t1);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
 #include <nx/vms/event/event_fwd.h>
@@ -13,8 +14,9 @@ namespace QnNotificationLevel {
 enum class Value
 {
     NoNotification,
-    OtherNotification,
     CommonNotification,
+    OtherNotification,
+    SuccessNotification,
     ImportantNotification,
     CriticalNotification,
     LevelCount
@@ -23,6 +25,9 @@ enum class Value
 Value valueOf(const nx::vms::event::AbstractActionPtr &businessAction);
 Value valueOf(QnSystemHealth::MessageType messageType);
 
+QColor notificationTextColor(Value level);
 QColor notificationColor(Value level);
 
 };
+
+Q_DECLARE_METATYPE(QnNotificationLevel::Value)

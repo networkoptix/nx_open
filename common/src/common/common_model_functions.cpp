@@ -7,26 +7,21 @@
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCommand)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCoordinateSpace)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzObjectType)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, MotionType)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, SecondStreamQuality)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatisticsDeviceType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PanicMode)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RebuildState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PeerType)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, BitratePerGopType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ServerFlags)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, Permissions)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, GlobalPermissions)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, TimeFlags)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraStatusFlags)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, TTHeaderFlag)
-//QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortTypes)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuditRecordType)
-//QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IODefaultState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuthResult)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamIndex)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortType,
 (Qn::PT_Unknown,  "Unknown")
@@ -40,12 +35,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, IODefaultState,
 (Qn::IO_GroundedCircuit, "Grounded circuit")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, FailoverPriority,
-(Qn::FP_Never,      "Never")
-(Qn::FP_Low,        "Low")
-(Qn::FP_Medium,     "Medium")
-(Qn::FP_High,       "High")
-)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupType,
     (Qn::Backup_Manual,            "BackupManual")
@@ -60,31 +49,12 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageInitResult,
     (Qn::StorageInit_WrongAuth,     "InitFailed_WrongAuth")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraBackupQualities,
-    (Qn::CameraBackup_Disabled,          "CameraBackupDisabled")
-    (Qn::CameraBackup_HighQuality,       "CameraBackupHighQuality")
-    (Qn::CameraBackup_LowQuality,        "CameraBackupLowQuality")
-    (Qn::CameraBackup_Both,              "CameraBackupBoth")
-    (Qn::CameraBackup_Default,           "CameraBackupDefault")
-)
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraBackupQuality,
-    (Qn::CameraBackup_Disabled,          "CameraBackupDisabled")
-    (Qn::CameraBackup_HighQuality,       "CameraBackupHighQuality")
-    (Qn::CameraBackup_LowQuality,        "CameraBackupLowQuality")
-    (Qn::CameraBackup_Both,              "CameraBackupBoth")
-    (Qn::CameraBackup_Default,           "CameraBackupDefault")
-)
-
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingType)
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamQuality,
-    (Qn::QualityLowest,     "lowest")
-    (Qn::QualityLow,        "low")
-    (Qn::QualityNormal,     "normal")
-    (Qn::QualityHigh,       "high")
-    (Qn::QualityHighest,    "highest")
-    (Qn::QualityPreSet,     "preset")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, MediaStreamEvent,
+    (Qn::NoEvent,                       "NoEvent")
+    (Qn::TooManyOpenedConnections,      "TooManyOpenedConnections")
+    (Qn::ForbiddenWithDefaultPassword,  "ForbiddenWithDefaultPassword")
+    (Qn::ForbiddenWithNoLicense,        "ForbiddenWithNoLicense")
+    (Qn::oldFirmware,                   "oldFirmare")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BookmarkSortField,
@@ -119,6 +89,25 @@ namespace Qn {
 QString toString(AuthResult value)
 {
     return QnLexical::serialized(value);
+}
+
+QString toString(MediaStreamEvent value)
+{
+    switch (value)
+    {
+        case NoEvent:
+            return QString();
+        case TooManyOpenedConnections:
+            return lit("Too many opened connections");
+        case ForbiddenWithDefaultPassword:
+            return lit("Please setup camera password");
+        case ForbiddenWithNoLicense:
+            return lit("No license");
+        case oldFirmware:
+            return lit("Cameras has too old firmware");
+        default:
+            return lit("Unknown error");
+    }
 }
 
 } // namespace Qn

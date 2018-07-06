@@ -7,7 +7,7 @@ namespace vms {
 namespace event {
 
 RecordingAction::RecordingAction(const EventParameters& runtimeParams):
-    base_type(cameraRecordingAction, runtimeParams)
+    base_type(ActionType::cameraRecordingAction, runtimeParams)
 {
 }
 
@@ -29,6 +29,11 @@ int RecordingAction::getDurationSec() const
 int RecordingAction::getRecordAfterSec() const
 {
     return m_params.recordAfter;
+}
+
+int RecordingAction::getRecordBeforeSec() const
+{
+    return m_params.recordBeforeMs / 1000;
 }
 
 } // namespace event

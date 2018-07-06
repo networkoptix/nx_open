@@ -26,5 +26,5 @@ Config.helpLinks.push({
 Config.allowDebugMode = false;
 Config.productName = 'SK_VMS';
 Config.cloud.productName = 'SK Cloud';
-
+Config.defaultLanguage = 'ja_JP';
 Config.supportedLanguages = ['ja_JP'];

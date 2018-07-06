@@ -16,8 +16,8 @@
             </alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>포트:</h3>
@@ -41,7 +41,7 @@
                             서버가 현재 시스템에서 분리됩니다. 저장된 비디오는 그대로 유지됩니다.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">공장 기본값 복원</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>시스템에서 서버 분리</h3>
                         <p>이 작업은 데이터베이스, 로컬 사용자 및 구성을 유지하면서 서버를 시스템에서 분리합니다.
                             저장된 비디오는 그대로 유지됩니다. <b>클라우드 사용자가 삭제됩니다.</b></p>
@@ -66,9 +66,9 @@
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>이름</h3>
                         <div class="row">
@@ -110,9 +110,9 @@
                             <p ng-if="canConnectToCloud"  ><button class="btn btn-default" ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer ||!hasInternetOnClient"> {{Config.cloud.productName}}에 연결</button>                                 <a ng-if="!mode.liteClient" class="btn btn-default" ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank"> {{Config.cloud.productName}} 계정 만들기</a></p>
                         </div>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
                         <h3>모바일 네트워크 설정</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
@@ -141,7 +141,7 @@
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -154,7 +154,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -171,8 +171,8 @@
                         <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()"> 클라이언트 실행</button>                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()"> 클라이언트 중지</button></p>
                         <p>키보드/마우스 또는 모바일 응용 프로그램을 이용하여 제어 합니다.</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

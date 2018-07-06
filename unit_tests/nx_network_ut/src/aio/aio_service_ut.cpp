@@ -17,7 +17,7 @@ namespace test {
 namespace {
 
 class TestTcpServer:
-    public network::test::SynchronousTcpServer
+    public network::test::SynchronousStreamSocketServer
 {
 protected:
     virtual void processConnection(AbstractStreamSocket* connection) override
@@ -37,15 +37,10 @@ class AIOService:
     public AIOEventHandler
 {
 public:
-    AIOService():
-        m_service(1)
-    {
-    }
-
     ~AIOService()
     {
-        m_service.stopMonitoring(m_socket.get(), aio::EventType::etRead, true);
-        m_service.stopMonitoring(m_socket.get(), aio::EventType::etTimedOut, true);
+        m_service.stopMonitoring(m_socket.get(), aio::EventType::etRead);
+        m_service.stopMonitoring(m_socket.get(), aio::EventType::etTimedOut);
 
         m_service.pleaseStopSync();
     }
@@ -60,7 +55,7 @@ protected:
     {
         givenSocket();
 
-        ASSERT_TRUE(m_socket->connect(m_tcpServer.endpoint())) <<
+        ASSERT_TRUE(m_socket->connect(m_tcpServer.endpoint(), nx::network::kNoTimeout)) <<
             SystemError::getLastOSErrorText().toStdString();
     }
 
@@ -98,15 +93,15 @@ protected:
             else if (action == 1)
             {
                 m_service.post(
-                    m_socket.get(), 
+                    m_socket.get(),
                     [this]()
                     {
-                        m_service.stopMonitoring(m_socket.get(), eventType, true);
+                        m_service.stopMonitoring(m_socket.get(), eventType);
                     });
             }
             else if (action == 2)
             {
-                m_service.stopMonitoring(m_socket.get(), eventType, rand() & 1);
+                m_service.stopMonitoring(m_socket.get(), eventType);
             }
         }
     }
@@ -154,11 +149,13 @@ private:
 
     virtual void SetUp() override
     {
+        ASSERT_TRUE(m_service.initialize(1));
+
         ASSERT_TRUE(m_tcpServer.bindAndListen(SocketAddress::anyPrivateAddress));
         m_tcpServer.start();
     }
 
-    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw()
+    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override
     {
         MonitoringEvent event;
         event.sock = sock;

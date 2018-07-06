@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QAction>
 
+#include <ini.h>
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 
@@ -42,6 +43,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
+#include <nx/client/desktop/utils/parameter_helper.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -88,9 +90,11 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
 
             const bool readonly = commonModule()->isReadOnly()
                 || !accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
-
             bookmarksViewer->setReadOnly(readonly);
+
         };
+
+    setupBookmarksExport();
 
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         updateBookmarkActionsAvailability);
@@ -113,6 +117,13 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
                 getActionParamsFunc(bookmark));
         });
 
+    connect(bookmarksViewer, &QnBookmarksViewer::exportBookmarkClicked, this,
+        [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+        {
+            context()->statisticsModule()->registerClick(lit("bookmark_tooltip_export"));
+            menu()->triggerIfPossible(action::ExportVideoAction, getActionParamsFunc(bookmark));
+        });
+
     connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this,
         [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
         {
@@ -130,6 +141,38 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
             menu()->triggerIfPossible(action::OpenBookmarksSearchAction,
                 {Qn::BookmarkTagRole, tag});
         });
+}
+
+void QnWorkbenchBookmarksHandler::setupBookmarksExport()
+{
+    const auto updateExportAbility =
+        [this]()
+        {
+            const auto currentWidget = navigator()->currentWidget();
+            if (!currentWidget)
+                return;
+
+            const auto resource = currentWidget->resource();
+            if (!resource)
+                return;
+
+            const bool allowExport = accessController()->hasPermissions(
+                currentWidget->resource(), Qn::ExportPermission);
+
+            navigator()->timeSlider()->bookmarksViewer()->setAllowExport(allowExport);
+        };
+
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
+        [this, updateExportAbility](const QnResourcePtr& resource)
+        {
+            const auto currentWidget = navigator()->currentWidget();
+            const auto currentResource = currentWidget ? currentWidget->resource() : QnResourcePtr();
+            if (resource == currentResource)
+                updateExportAbility();
+        });
+
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
+        this, updateExportAbility);
 }
 
 void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
@@ -152,7 +195,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
         QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, period.startTimeMs);
         if (!server || server->getStatus() != Qn::Online)
         {
-            QnMessageBox::warning(mainWindow(),
+            QnMessageBox::warning(mainWindowWidget(),
                 tr("Server offline"),
                 tr("Bookmarks can only be added to an online server."));
             return;
@@ -166,7 +209,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     bookmark.durationMs = period.durationMs;
     bookmark.cameraId = camera->getId();
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindow()));
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
     dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
@@ -197,13 +240,13 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
     QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online)
     {
-        QnMessageBox::warning(mainWindow(),
+        QnMessageBox::warning(mainWindowWidget(),
             tr("Server offline"),
             tr("Bookmarks can only be edited on an online Server."));
         return;
     }
 
-    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindow()));
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(false, mainWindowWidget()));
     dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
@@ -226,7 +269,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete bookmark?"), bookmark.name.trimmed(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
+        mainWindowWidget());
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
@@ -244,10 +287,11 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     if (bookmarks.isEmpty())
         return;
 
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete %n bookmarks?", "", bookmarks.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
+        parent);
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
@@ -280,13 +324,14 @@ void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
 
     if (!m_hintDisplayed && enabled && checked && !navigator()->bookmarksModeEnabled())
     {
+        const auto hotkey = action(action::OpenBookmarksSearchAction)->shortcut().toString(
+            QKeySequence::NativeText);
         QnGraphicsMessageBox::information(
-            tr("Press %1 to search bookmarks").arg(action(action::OpenBookmarksSearchAction)->shortcut().toString())
+            tr("Press %1 to search bookmarks").arg(hotkey)
             , kHintTimeoutMs
         );
         m_hintDisplayed = true;
     }
-
 
     navigator()->setBookmarksModeEnabled(checked);
 }

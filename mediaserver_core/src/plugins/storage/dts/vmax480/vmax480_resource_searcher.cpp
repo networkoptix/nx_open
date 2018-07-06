@@ -3,9 +3,9 @@
 #include "vmax480_resource_searcher.h"
 #include "vmax480_resource.h"
 #include "utils/common/sleep.h"
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/simple_http_client.h>
+#include <nx/network/deprecated/simple_http_client.h>
 #include <nx/utils/log/log.h>
 
 #include <QtXml/QXmlDefaultHandler>
@@ -13,7 +13,6 @@
 
 #include "core/resource_management/resource_pool.h"
 #include "../../vmaxproxy/src/vmax480_helper.h"
-
 
 static const int VMAX_API_PORT = 9010;
 static const int TCP_TIMEOUT = 3000;
@@ -32,15 +31,13 @@ QnPlVmax480ResourceSearcher::~QnPlVmax480ResourceSearcher()
 {
 }
 
-void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAddr,
-                                                const SocketAddress& deviceEndpoint,
-                                                const nx_upnp::DeviceInfo& devInfo,
+void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& /*discoveryAddr*/,
+                                                const nx::network::SocketAddress& deviceEndpoint,
+                                                const nx::network::upnp::DeviceInfo& devInfo,
                                                 const QByteArray& /*xmlDevInfo*/,
                                                 QnResourceList& result)
 {
-    Q_UNUSED(discoveryAddr)
-
-    QnMacAddress mac(devInfo.serialNumber);
+    nx::network::QnMacAddress mac(devInfo.serialNumber);
     const int channelCountEndIndex = devInfo.modelName.indexOf( QLatin1String("CH") );
     if( channelCountEndIndex == -1 )
         return;
@@ -56,14 +53,12 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     int apiPort = VMAX_API_PORT;
     int httpPort = QUrl(devInfo.presentationUrl).port(80);
 
-
     QAuthenticator auth;
     auth.setUser(QLatin1String("admin"));
 
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return;
-
 
     QMap<int, QByteArray> camNames;
     bool camNamesReaded = false;
@@ -123,9 +118,8 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     }
 }
 
-QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
-    Q_UNUSED(params)
     QnNetworkResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
@@ -266,13 +260,12 @@ int extractChannelCount(const QByteArray& model)
     return num.toInt();
 }
 
-QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     QList<QnResourcePtr> result;
-
 
     int channels = -1;
     int apiPort = VMAX_API_PORT;
@@ -294,7 +287,6 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         if (!httpPort)
             httpPort = 80;
     }
-
 
     if (!isSearchAction)
     {

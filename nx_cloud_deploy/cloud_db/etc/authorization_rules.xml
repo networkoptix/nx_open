@@ -77,8 +77,11 @@
                             <set value="none" resName="authorized" resValue="false"/>
                         </condition>
                     </condition>
-                    <condition value="/cdb/system/get_cloud_users" resName="systemID" matchType="presence">
+                    <condition value="/cdb/system/get_cloud_users" resName="auth.systemID" matchType="presence">
                         <sequence value="true">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </sequence>
+                        <condition value="false" resName="systemID" matchType="presence">
                             <!-- user list is allowed for account -->
                             <set resName="authorized" resValue="false"/>
                             <condition resName="auth.accountRightsOnSystem">
@@ -88,9 +91,6 @@
                                 <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
                                 <set value="maintenance" resName="authorized" resValue="true"/>
                             </condition>
-                        </sequence>
-                        <condition value="false" resName="auth.systemID" matchType="presence">
-                            <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </condition>
                     <condition value="/cdb/system/get_access_role_list" resName="systemID" matchType="presence">

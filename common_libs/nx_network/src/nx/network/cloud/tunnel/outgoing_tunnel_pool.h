@@ -7,7 +7,7 @@
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/async_stoppable.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -34,7 +34,7 @@ public:
      * Establish new connection for user needs.
      * @param timeout Zero means no timeout.
      * @param socketAttributes Attribute values to apply to a newly-created socket.
-     * @note This method can be called from different threads simultaneously.
+     * NOTE: This method can be called from different threads simultaneously.
      */
     void establishNewConnection(
         const AddressEntry& targetHostAddress,
@@ -51,15 +51,21 @@ public:
      * Should be called somewhere in every module exactly once, so this id is useful for debug.
      * @param name Short module name, useful for debug.
      * @param uuid Unique instance id, e.g. Hardware id.
+     * NOTE: This method generates peer id in internal format using supplied information (name & uuid).
      */
     void assignOwnPeerId(const String& name, const QnUuid& uuid);
-    void clearOwnPeerId();
+    /**
+     * NOTE: This method just sets already prepared peerId.
+     *   E.g., received from OutgoingTunnelPool::ownPeerId().
+     */
+    void setOwnPeerId(const String& peerId);
+    void clearOwnPeerIdIfEqual(const String& name, const QnUuid& uuid);
 
     OnTunnelClosedSubscription& onTunnelClosedSubscription();
 
     // TODO: Remove this function when SocketGlobals are not dependent on cloud any more.
     /** Unit test usage only! */
-    static void allowOwnPeerIdChange();
+    static void ignoreOwnPeerIdChange();
 
 private:
     struct TunnelContext
@@ -90,7 +96,7 @@ private:
     void onTunnelClosed(AbstractOutgoingTunnel* tunnelPtr);
     void tunnelsStopped(nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    static bool s_isOwnPeerIdChangeAllowed;
+    static bool s_isIgnoringOwnPeerIdChange;
 };
 
 } // namespace cloud

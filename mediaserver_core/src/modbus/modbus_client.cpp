@@ -3,16 +3,13 @@
 
 namespace
 {
-    const int kDefaultConnectionTimeoutMs = 4000;
-    const int kSendTimeout = 4000;
-    const int kReceiveTimeout = 4000;
+static const std::chrono::seconds kDefaultConnectionTimeout(4);
+const int kSendTimeout = 4000;
+const int kReceiveTimeout = 4000;
 }
 
-namespace nx
-{
-
-namespace modbus
-{
+namespace nx {
+namespace modbus {
 
 QnModbusClient::QnModbusClient():
     m_requestTransactionId(0),
@@ -20,7 +17,7 @@ QnModbusClient::QnModbusClient():
 {
 }
 
-QnModbusClient::QnModbusClient(const SocketAddress& sockaddr) :
+QnModbusClient::QnModbusClient(const nx::network::SocketAddress& sockaddr) :
     m_requestTransactionId(0),
     m_endpoint(sockaddr),
     m_connected(false)
@@ -41,7 +38,7 @@ bool QnModbusClient::initSocket()
     if (m_socket)
         m_socket->shutdown();
 
-    m_socket = SocketFactory::createStreamSocket(false);
+    m_socket = nx::network::SocketFactory::createStreamSocket(false);
 
     if (!m_socket->setRecvTimeout(kReceiveTimeout)
         || !m_socket->setSendTimeout(kSendTimeout))
@@ -52,7 +49,7 @@ bool QnModbusClient::initSocket()
     return true;
 }
 
-void QnModbusClient::setEndpoint(const SocketAddress& endpoint)
+void QnModbusClient::setEndpoint(const nx::network::SocketAddress& endpoint)
 {
     m_endpoint = endpoint;
     initSocket();
@@ -63,12 +60,12 @@ bool QnModbusClient::connect()
     if (!m_socket && !initSocket())
         return false;
 
-    m_connected = m_socket->connect(m_endpoint, kDefaultConnectionTimeoutMs);
+    m_connected = m_socket->connect(m_endpoint, kDefaultConnectionTimeout);
 
     return m_connected;
 }
 
-ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest &request, bool* outStatus)
+ModbusResponse QnModbusClient::doModbusRequest(const ModbusRequest& request, bool* outStatus)
 {
     ModbusResponse response;
 
@@ -180,7 +177,8 @@ ModbusResponse QnModbusClient::readHoldingRegisters(
     return doModbusRequest(request, outStatus);
 }
 
-ModbusResponse QnModbusClient::writeHoldingRegisters(quint16 startRegister, const QByteArray &data, bool* outStatus)
+ModbusResponse QnModbusClient::writeHoldingRegisters(quint16 startRegister, const QByteArray& data,
+    bool* outStatus)
 {
     ModbusRequest request;
 
@@ -202,7 +200,8 @@ ModbusResponse QnModbusClient::writeHoldingRegisters(quint16 startRegister, cons
     return doModbusRequest(request, outStatus);
 }
 
-ModbusResponse QnModbusClient::writeSingleCoil(quint16 coilAddress, bool coilState, bool* outStatus)
+ModbusResponse QnModbusClient::writeSingleCoil(quint16 coilAddress, bool coilState,
+    bool* outStatus)
 {
     ModbusRequest request;
 
@@ -258,7 +257,7 @@ ModbusResponse QnModbusClient::readDiscreteInputs(quint16 startAddress, quint16 
 {
     NX_ASSERT(false, "QnModbusClient::readDiscreteInputs not implemented.");
 
-    *outStatus = false; 
+    *outStatus = false;
     return ModbusResponse();
 }
 
@@ -298,6 +297,5 @@ ModbusResponse QnModbusClient::readInputRegisters(quint16 startRegister, quint16
     return ModbusResponse();
 }
 
-} //< Closing namespace modbus.
-
-} //< Closing namespace nx.
+} // namespace modbus
+} // namespace nx

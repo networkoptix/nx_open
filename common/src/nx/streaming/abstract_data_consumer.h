@@ -5,10 +5,10 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/streaming/data_packet_queue.h>
 
-class QN_EXPORT QnAbstractDataConsumer
+class QnAbstractDataConsumer
 :
     public QnLongRunnable,
-    public QnAbstractDataReceptor
+    public QnAbstractMediaDataReceptor
 {
     Q_OBJECT
 

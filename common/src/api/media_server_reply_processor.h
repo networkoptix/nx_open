@@ -49,12 +49,11 @@ signals:
     void finished(int status, const QnTimePeriodList &reply, int handle, const QString &errorString);
     void finished(int status, const QnStatisticsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QVector3D &reply, int handle, const QString &errorString);
-	void finished(int status, const QnCameraAdvancedParamValueList &reply, int handle, const QString &errorString);
+    void finished(int status, const QnCameraAdvancedParamValueList &reply, int handle, const QString &errorString);
     void finished(int status, const QnTimeReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnTestEmailSettingsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnManualCameraSearchReply &reply, int handle, const QString &errorString);
-    void finished(int status, const nx::vms::event::ActionDataListPtr &reply, int handle, const QString &errorString);
     void finished(int status, const QImage &reply, int handle, const QString &errorString);
     void finished(int status, const QString &reply, int handle, const QString &errorString);
     void finished(int status, const QnPtzPresetList &reply, int handle, const QString &errorString);
@@ -70,9 +69,8 @@ signals:
     void finished(int status, const QnUploadUpdateReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnModuleInformation &reply, int handle, const QString &errorString);
     void finished(int status, const QList<QnModuleInformation> &reply, int handle, const QString &errorString);
-    void finished(int status, const ec2::ApiCameraHistoryDataList &reply, int handle, const QString &errorString);
     void finished(int status, const MultiServerPeriodDataList &reply, int handle, const QString &errorString);
-	void finished(int status, const QnRecordingStatsReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnRecordingStatsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnAuditRecordList&reply, int handle, const QString &errorString);
     void finished(int status, const QnLdapUsers &reply, int handle, const QString &errorString);
 

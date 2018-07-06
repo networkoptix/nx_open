@@ -108,7 +108,7 @@ public:
         parameters(other.parameters)
     {}
 
-    void parse(const QUrl& url)
+    void parse(const nx::utils::Url& url)
     {
         // For now we support parsing of generic links only
         scope = SystemUri::Scope::Generic;
@@ -162,9 +162,9 @@ public:
         }
     }
 
-    QUrl toUrl() const
+    nx::utils::Url toUrl() const
     {
-        QUrl result;
+        nx::utils::Url result;
         result.setScheme(protocolToString[protocol]);
 
         LocalHostName hostname = parseLocalHostname(domain);
@@ -209,14 +209,14 @@ public:
         return result;
     }
 
-    QUrl connectionUrl() const
+    nx::utils::Url connectionUrl() const
     {
         if (systemId.isEmpty())
-            return QUrl();
+            return nx::utils::Url();
 
         const auto hostName = parseLocalHostname(systemId);
 
-        QUrl result;
+        nx::utils::Url result;
         result.setScheme(
             protocol == SystemUri::Protocol::Native ? lit("http") : protocolToString[protocol]);
         result.setHost(hostName.first);
@@ -365,7 +365,7 @@ private:
             || isLocalHostname(systemId);
     }
 
-    void parseParameters(const QUrl& url)
+    void parseParameters(const nx::utils::Url& url)
     {
         if (!url.hasQuery())
             return;
@@ -400,7 +400,7 @@ SystemUri::SystemUri() :
 
 }
 
-SystemUri::SystemUri(const QUrl& url) :
+SystemUri::SystemUri(const nx::utils::Url& url) :
     SystemUri()
 {
     Q_D(SystemUri);
@@ -412,7 +412,7 @@ SystemUri::SystemUri(const QString& uri) :
 {
     Q_D(SystemUri);
 
-    QUrl url(uri);
+    nx::utils::Url url(uri);
     if (url.isValid())
         d->parse(url);
 }
@@ -621,13 +621,13 @@ QString SystemUri::toString(SystemUri::ReferralContext value)
     return referralContextToString[value];
 }
 
-QUrl SystemUri::toUrl() const
+nx::utils::Url SystemUri::toUrl() const
 {
     Q_D(const SystemUri);
     return d->toUrl();
 }
 
-QUrl SystemUri::connectionUrl() const
+nx::utils::Url SystemUri::connectionUrl() const
 {
     Q_D(const SystemUri);
     return d->connectionUrl();

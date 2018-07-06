@@ -5,13 +5,12 @@
 #include <recorder/schedule_sync.h>
 #include "recorder/storage_manager.h"
 
-int QnBackupControlRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnBackupControlRestHandler::executeGet(const QString& /*path*/, const QnRequestParams& params,
+    QnJsonRestResult& result, const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(path);
-    
     QString method = params.value("action");
     QnBackupStatusData reply;
-    
+
     if (method == "start")
         qnBackupStorageMan->scheduleSync()->forceStart();
     else if (method == "stop")

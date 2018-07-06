@@ -9,12 +9,12 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/settings.h>
 #include <nx/utils/basic_service_settings.h>
+#include <nx/utils/db/types.h>
+
+#include <nx/data_sync_engine/p2p_sync_settings.h>
 
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/db/types.h>
 #include <utils/email/email.h>
-
-#include "ec2/p2p_sync_settings.h"
 
 namespace nx {
 namespace cdb {
@@ -26,7 +26,11 @@ public:
     QString rulesXmlPath;
     std::chrono::seconds nonceValidityPeriod;
     std::chrono::seconds intermediateResponseValidityPeriod;
-    std::chrono::minutes offlineUserHashValidityPeriod;
+    std::chrono::seconds offlineUserHashValidityPeriod;
+
+    std::chrono::milliseconds checkForExpiredAuthPeriod;
+    std::chrono::milliseconds continueUpdatingExpiredAuthPeriod;
+    int maxSystemsToUpdateAtATime;
 
     Auth();
 };
@@ -70,7 +74,7 @@ class EventManager
 {
 public:
     /**
-     * If haven't heard anything from mediaserver during this timeout 
+     * If haven't heard anything from mediaserver during this timeout
      * then closing event stream for mediaserver to send another request.
      */
     std::chrono::seconds mediaServerConnectionIdlePeriod;
@@ -83,6 +87,8 @@ class ModuleFinder
 public:
     QString cloudModulesXmlTemplatePath;
     QString newCloudModulesXmlTemplatePath;
+
+    ModuleFinder();
 };
 
 class Http
@@ -95,6 +101,15 @@ public:
     std::chrono::milliseconds connectionInactivityPeriod;
 
     Http();
+};
+
+class VmsGateway
+{
+public:
+    std::string url;
+    std::chrono::milliseconds requestTimeout;
+
+    VmsGateway();
 };
 
 /**
@@ -116,8 +131,8 @@ public:
     virtual nx::utils::log::Settings logging() const override;
 
     /** List of local endpoints to bind to. By default, 0.0.0.0:3346. */
-    std::list<SocketAddress> endpointsToListen() const;
-    
+    std::list<network::SocketAddress> endpointsToListen() const;
+
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
     const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
@@ -125,10 +140,11 @@ public:
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
     const EventManager& eventManager() const;
-    const ec2::Settings& p2pDb() const;
+    const data_sync_engine::Settings& p2pDb() const;
     const QString& changeUser() const;
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
+    const VmsGateway& vmsGateway() const;
 
     void setDbConnectionOptions(const nx::utils::db::ConnectionOptions& options);
 
@@ -141,12 +157,15 @@ private:
     AccountManager m_accountManager;
     SystemManager m_systemManager;
     EventManager m_eventManager;
-    ec2::Settings m_p2pDb;
+    data_sync_engine::Settings m_p2pDb;
     QString m_changeUser;
     ModuleFinder m_moduleFinder;
     Http m_http;
+    VmsGateway m_vmsGateway;
 
     virtual void loadSettings() override;
+
+    void loadAuth();
 };
 
 } // namespace conf

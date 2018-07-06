@@ -48,7 +48,7 @@ void EIPAsyncClient::terminate()
 
 bool EIPAsyncClient::initSocket()
 {
-    m_socket = SocketFactory::createStreamSocket();
+    m_socket = nx::network::SocketFactory::createStreamSocket();
     bool success = m_socket->setNonBlockingMode(true)
         && m_socket->setSendTimeout(kSendTimeout.count())
         && m_socket->setRecvTimeout(kReceiveTimeout.count());
@@ -280,7 +280,7 @@ bool EIPAsyncClient::doServiceRequestAsync(const MessageRouterRequest &request)
     {
         m_hasPendingRequest = true;
         m_socket->connectAsync(
-            SocketAddress(m_hostAddress, m_port),
+            nx::network::SocketAddress(m_hostAddress, m_port),
             [this](SystemError::ErrorCode c) { asyncConnectDone(c); });
 
         return true;

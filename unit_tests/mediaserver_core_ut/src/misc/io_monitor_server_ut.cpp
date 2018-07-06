@@ -87,7 +87,7 @@ static QnIOStateDataList genTestData()
 
 static void prepareDbTestData(const MediaServerLauncher* const launcher)
 {
-    ec2::ApiCameraData cameraData;
+    nx::vms::api::CameraData cameraData;
     auto resTypeId = qnResTypePool->getResourceTypeId(
         QnTestCameraResource::kManufacturer,
         QnTestCameraResource::kModel);
@@ -97,7 +97,7 @@ static void prepareDbTestData(const MediaServerLauncher* const launcher)
     cameraData.parentId = launcher->commonModule()->moduleGUID();
     cameraData.vendor = QnTestCameraResource::kManufacturer;
     cameraData.physicalId = kTestCamPhysicalId;
-    cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+    cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
     NX_TEST_API_POST(launcher, lit("/ec2/saveCamera"), cameraData);
 }
 
@@ -111,19 +111,19 @@ TEST(IoServerMonitorTest, main)
     prepareDbTestData(&launcher);
     auto testData = genTestData();
 
-    auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClient = nx::network::http::AsyncHttpClient::create();
     auto httpClientGuard = makeScopeGuard([&httpClient]() { httpClient->pleaseStopSync(); });
 
     httpClient->setUserName("admin");
     httpClient->setUserPassword("admin");
 
-    QUrl url = launcher.apiUrl();
+    nx::utils::Url url = launcher.apiUrl();
     url.setPath("/api/iomonitor");
     QUrlQuery query;
     query.addQueryItem(Qn::PHYSICAL_ID_URL_QUERY_ITEM, kTestCamPhysicalId);
     url.setQuery(query);
 
-    auto contentParser = std::make_shared<nx_http::MultipartContentParser>();
+    auto contentParser = std::make_shared<nx::network::http::MultipartContentParser>();
     auto ioParser = std::make_shared<IoMonitorParser>(testData);
     contentParser->setNextFilter(ioParser);
 
@@ -131,27 +131,27 @@ TEST(IoServerMonitorTest, main)
     std::promise<void> ioServerStarted;
 
     QObject::connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
-        [contentParser, &ioServerStarted](nx_http::AsyncHttpClientPtr httpClient)
+        httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
+        [contentParser, &ioServerStarted](nx::network::http::AsyncHttpClientPtr httpClient)
         {
-            ASSERT_EQ(nx_http::StatusCode::ok, httpClient->response()->statusLine.statusCode);
+            ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient->response()->statusLine.statusCode);
             ASSERT_TRUE(contentParser->setContentType(httpClient->contentType()));
             ioServerStarted.set_value();
         });
 
     QObject::connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
-        [contentParser, ioParser, &allDataProcessed](nx_http::AsyncHttpClientPtr httpClient)
+        httpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
+        [contentParser, ioParser, &allDataProcessed](nx::network::http::AsyncHttpClientPtr httpClient)
         {
-            const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
+            const nx::network::http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
             ASSERT_TRUE(contentParser->processData(msgBodyBuf));
             if (ioParser->isEof())
                 allDataProcessed.set_value();
         });
 
     QObject::connect(
-        httpClient.get(), &nx_http::AsyncHttpClient::done,
-        [&allDataProcessed](nx_http::AsyncHttpClientPtr /*httpClient*/)
+        httpClient.get(), &nx::network::http::AsyncHttpClient::done,
+        [&allDataProcessed](nx::network::http::AsyncHttpClientPtr /*httpClient*/)
         {
             allDataProcessed.set_value();
         });

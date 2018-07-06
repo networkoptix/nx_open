@@ -20,6 +20,7 @@ public:
     {
         NameColumn,
         CheckColumn,
+        StatusColumn,
         ColumnCount
     };
 
@@ -28,6 +29,7 @@ public:
     {
         HideStatusOption                = 0x01,
         ServerAsHealthMonitorOption     = 0x02,
+        AlwaysSelectedOption            = 0x04,
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -51,6 +53,11 @@ public:
     bool userCheckable() const;
     void setUserCheckable(bool value);
 
+    bool hasStatus() const;
+    void setHasStatus(bool value);
+
+    void setSinglePick(bool value);
+
     Options options() const;
     void setOptions(Options value);
 
@@ -63,6 +70,17 @@ public:
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     virtual QModelIndex parent(const QModelIndex& child) const override;
 
+    /**
+     * Custom column accessor
+     * Overrides a logic of QVariant data(const QModelIndex &index, int role) for specified column.
+     * Accessor gets a pointer to appropriate resource according to index.row().
+     */
+    using ColumnDataAccessor = std::function<QVariant(QnResourcePtr, int)>;
+    void setCustomColumnAccessor(int column, ColumnDataAccessor dataAccessor);
+
+signals:
+    void selectionChanged();
+
 private slots:
     void at_resource_resourceChanged(const QnResourcePtr& resource);
 
@@ -73,9 +91,14 @@ private:
     bool m_readOnly = false;
     bool m_hasCheckboxes = false;
     bool m_userCheckable = true;
+    bool m_hasStatus = false;
+
+    bool m_singlePick = false;
     Options m_options;
     QnResourceList m_resources;
     QSet<QnUuid> m_checkedResources;
+
+    QMap<int, ColumnDataAccessor> m_customAccessors;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceListModel::Options)

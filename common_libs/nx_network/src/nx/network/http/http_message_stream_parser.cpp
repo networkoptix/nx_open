@@ -1,6 +1,8 @@
 #include "http_message_stream_parser.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 
 bool HttpMessageStreamParser::processData(const QnByteArrayConstRef& data)
 {
@@ -36,9 +38,11 @@ size_t HttpMessageStreamParser::flush()
     return 0;
 }
 
-nx_http::Message HttpMessageStreamParser::currentMessage() const
+nx::network::http::Message HttpMessageStreamParser::currentMessage() const
 {
     return m_httpStreamReader.message();
 }
 
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

@@ -4,11 +4,15 @@
 
 #include <utils/common/warnings.h>
 #include <utils/math/math.h>
-#include <utils/common/time.h>
 #include <utils/common/date_time_formatter.h>
 
 namespace
 {
+    inline qint64 timeToMSecs(const QTime& time) 
+    {
+        return QTime(0, 0, 0, 0).msecsTo(time);
+    }
+
     QDateTime addHours(const QDateTime& dateTime, int hours)
     {
         int oldHours = dateTime.time().hour();

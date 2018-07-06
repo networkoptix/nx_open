@@ -66,13 +66,13 @@ public:
      * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, QVariant>>& params)</tt>.
      * Status is 0 in case of success, in other cases it holds error code.
      *
-	 * @param keys List of parameter ids that are requested.
+     * @param keys List of parameter ids that are requested.
      * @return Request handle.
      */
     int getParamsAsync(const QnNetworkResourcePtr& camera, const QStringList& keys,
         QObject* target, const char* slot);
 
-	/**
+    /**
      * Set camera params.
      *
      * Returns immediately. On request completion the specified slot of the specified target is
@@ -83,30 +83,6 @@ public:
      */
     int setParamsAsync(const QnNetworkResourcePtr& camera,
         const QnCameraAdvancedParamValueList& params, QObject* target, const char* slot);
-
-    /**
-     * Get event log.
-     *
-     * Returns immediately. On request completion the specified slot of the specified target is
-     * called with signature <tt>(int handle, int httpStatusCode, const QList<nx::vms::event::AbstractAction>& events)</tt>.
-     * Status is 0 in case of success, in other cases it holds error code.
-     *
-     * @param dateFrom Start timestamp in msec.
-     * @param dateTo End timestamp in msec. Can be <tt>DATETIME_NOW</tt>.
-     * @param cameras Filter events by camera. Optional.
-     * @param businessRuleId Filter events by specified business rule. Optional.
-     *
-     * @return Request handle.
-     */
-    int getEventLogAsync(
-        qint64 dateFrom,
-        qint64 dateTo,
-        QnResourceList cameras,
-        nx::vms::event::EventType eventType,
-        nx::vms::event::ActionType actionType,
-        QnUuid businessRuleId,
-        QObject* target,
-        const char* slot);
 
     /**
      * @return Request handle.
@@ -232,21 +208,18 @@ public:
         const QByteArray& passwordHash, const QByteArray& passwordDigest,
         const QByteArray& cryptSha512Hash, int port, QObject* target, const char* slot);
 
-    int pingSystemAsync(const QUrl& url, const QString& getKey, QObject* target, const char* slot);
-    int getNonceAsync(const QUrl& url, QObject* target, const char* slot);
+    int pingSystemAsync(const nx::utils::Url &url, const QString& getKey, QObject* target, const char* slot);
+    int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
     int getRecordingStatisticsAsync(
         qint64 bitrateAnalizePeriodMs, QObject* target, const char* slot);
     int getAuditLogAsync(qint64 startTimeMs, qint64 endTimeMs, QObject* target, const char* slot);
-    int mergeSystemAsync(
-        const QUrl& url, const QString& getKey, const QString& postKey, bool ownSettings,
+    int mergeSystemAsync(const nx::utils::Url &url, const QString& getKey, const QString& postKey, bool ownSettings,
         bool oneServer, bool ignoreIncompatible, QObject* target, const char* slot);
 
     int testEmailSettingsAsync(const QnEmailSettings& settings, QObject* target, const char* slot);
     int testLdapSettingsAsync(const QnLdapSettings& settings, QObject* target, const char* slot);
 
     int modulesInformation(QObject* target, const char* slot);
-
-    int cameraHistory(const QnChunksRequestData& request, QObject* target, const char* slot);
 
     int recordedTimePeriods(const QnChunksRequestData& request, QObject* target, const char* slot);
     int getBookmarksAsync(
@@ -267,7 +240,7 @@ protected:
 
     int sendAsyncPostRequestLogged(
         int object,
-        nx_http::HttpHeaders headers,
+        nx::network::http::HttpHeaders headers,
         const QnRequestParamList& params,
         const QByteArray& data,
         const char* replyTypeName,

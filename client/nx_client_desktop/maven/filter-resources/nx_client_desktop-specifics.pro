@@ -3,7 +3,7 @@ INCLUDEPATH +=  ${root.dir}/appserver2/src \
                 ${root.dir}/common_libs/nx_vms_utils/src \
                 ${root.dir}/common_libs/nx_speech_synthesizer/src \
                 ${root.dir}/nx_cloud/cloud_db_client/src/include \
-                ${root.dir}/nx_cloud/libvms_gateway/src
+                ${root.dir}/nx_cloud/libvms_gateway_core/src
 
 mac {
     INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers

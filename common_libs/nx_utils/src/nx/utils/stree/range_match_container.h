@@ -9,6 +9,7 @@ namespace utils {
 namespace stree {
 
 namespace detail {
+
 template<typename BoundaryType>
 class Range
 {
@@ -16,8 +17,7 @@ public:
     BoundaryType left;
     BoundaryType right;
 
-    Range()
-    :
+    Range():
         left(),
         right()
     {
@@ -26,7 +26,7 @@ public:
     Range(
         BoundaryType _left,
         BoundaryType _right)
-    :
+        :
         left(_left),
         right(_right)
     {
@@ -47,26 +47,27 @@ public:
         return QString::fromLatin1("%1-%2").arg(left).arg(right);
     }
 };
-}   // namespace detail
 
-/** Finds range that contains given value.
-    If multiple ranges contain given value, then any matching range is returned.
-    Both boundaries of a range are inclusive.
+} // namespace detail
 
-    \param KeyType Type of range boundary
-*/
+/**
+ * Finds range that contains given value.
+ * If multiple ranges contain given value, then any matching range is returned.
+ * Both boundaries of a range are inclusive.
+ * @param KeyType Type of range boundary.
+ */
 template<class KeyType, class MappedType>
 class RangeMatchContainer
 {
-    typedef typename detail::Range<KeyType> Range;
-    typedef std::multimap<Range, MappedType, std::greater<Range>> InternalContainerType;
+    using Range = typename detail::Range<KeyType>;
+    using InternalContainerType = std::multimap<Range, MappedType, std::greater<Range>>;
 
 public:
-    typedef typename InternalContainerType::iterator iterator;
-    typedef typename InternalContainerType::const_iterator const_iterator;
-    typedef typename InternalContainerType::key_type key_type;
-    typedef typename InternalContainerType::mapped_type mapped_type;
-    typedef typename InternalContainerType::value_type value_type;
+    using iterator = typename InternalContainerType::iterator;
+    using const_iterator = typename InternalContainerType::const_iterator;
+    using key_type = typename InternalContainerType::key_type;
+    using mapped_type = typename InternalContainerType::mapped_type;
+    using value_type = typename InternalContainerType::value_type;
 
     iterator begin()
     {

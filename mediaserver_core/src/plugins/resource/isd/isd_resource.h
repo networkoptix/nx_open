@@ -1,19 +1,15 @@
-#ifndef isd_resource_h_1934
-#define isd_resource_h_1934
+#pragma once
 
 #ifdef ENABLE_ISD
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include <nx/network/simple_http_client.h>
-#include "nx/streaming/media_data_packet.h"
+#include <nx/mediaserver/resource/camera.h>
+#include <nx/network/deprecated/simple_http_client.h>
+#include <nx/streaming/media_data_packet.h>
 
-class QnPlIsdResource : public QnPhysicalCameraResource
+class QnPlIsdResource: public nx::mediaserver::resource::Camera
 {
 public:
-
     static QString MAX_FPS_PARAM_NAME;
-
     static const QString MANUFACTURE;
 
     QnPlIsdResource();
@@ -28,23 +24,19 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    //bool hasDualStreaming() const {return false;}
-
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
-
 protected:
     QSize m_resolution1;
     QSize m_resolution2;
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
     virtual void setCroppingPhysical(QRect cropping);
 
 private:
     void setMaxFps(int f);
-    CameraDiagnostics::Result doISDApiRequest( const QUrl& apiRequestUrl, QByteArray* const msgBody );
+    CameraDiagnostics::Result doISDApiRequest( const nx::utils::Url& apiRequestUrl, QByteArray* const msgBody );
 };
 
 #endif // #ifdef ENABLE_ISD
-
-#endif //isd_resource_h_1934

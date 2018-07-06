@@ -9,11 +9,11 @@ TunnelConnectionChosenRequest::TunnelConnectionChosenRequest():
 {
 }
 
-void TunnelConnectionChosenRequest::serializeAttributes(nx::stun::Message* const /*message*/)
+void TunnelConnectionChosenRequest::serializeAttributes(nx::network::stun::Message* const /*message*/)
 {
 }
 
-bool TunnelConnectionChosenRequest::parseAttributes(const nx::stun::Message& /*message*/)
+bool TunnelConnectionChosenRequest::parseAttributes(const nx::network::stun::Message& /*message*/)
 {
     return true;
 }
@@ -23,11 +23,11 @@ TunnelConnectionChosenResponse::TunnelConnectionChosenResponse():
 {
 }
 
-void TunnelConnectionChosenResponse::serializeAttributes(nx::stun::Message* const /*message*/)
+void TunnelConnectionChosenResponse::serializeAttributes(nx::network::stun::Message* const /*message*/)
 {
 }
 
-bool TunnelConnectionChosenResponse::parseAttributes(const nx::stun::Message& /*message*/)
+bool TunnelConnectionChosenResponse::parseAttributes(const nx::network::stun::Message& /*message*/)
 {
     return true;
 }

@@ -30,6 +30,7 @@ extern "C"
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <nx/streaming/video_data_packet.h>
 
 namespace {
 
@@ -58,6 +59,7 @@ QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider*
     m_tmpAudioBuffer(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
     m_speexPreprocess(nullptr),
     m_owner(owner),
+    hWaveIn(0),
     m_terminated(false),
     m_waveInOpened(false)
 {
@@ -176,8 +178,9 @@ void QnDesktopDataProvider::EncodedAudioInfo::stop()
         m_terminated = true;
         if (!m_waveInOpened)
             return;
+        m_waveInOpened = false;
     }
-
+    waveInStop(hWaveIn);
     waveInReset(hWaveIn);
     waveInClose(hWaveIn);
     clearBuffers();
@@ -258,11 +261,11 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess()
     {
         m_speexPreprocess = speex_preprocess_state_init(m_owner->m_audioCodecCtx->frame_size * m_owner->m_audioCodecCtx->channels, m_owner->m_audioCodecCtx->sample_rate);
         int denoiseEnabled = 1;
-        int agcEnabled = 1;
-        float agcLevel = 16000;
         speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_DENOISE, &denoiseEnabled);
-        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC, &agcEnabled);
-        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC_LEVEL, &agcLevel);
+
+        int gainLevel = 16;
+        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC_INCREMENT, &gainLevel);
+        speex_preprocess_ctl(m_speexPreprocess, SPEEX_PREPROCESS_SET_AGC_MAX_GAIN, &gainLevel);
     }
     return true;
 }
@@ -669,6 +672,9 @@ void QnDesktopDataProvider::putAudioData()
             continue;
         if (got_packet)
         {
+            if (m_initTime == AV_NOPTS_VALUE)
+                m_initTime = qnSyncTime->currentUSecsSinceEpoch();
+
             AVRational timeBaseNative;
             timeBaseNative.num = 1;
             timeBaseNative.den = 1000000;

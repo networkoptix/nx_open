@@ -30,7 +30,9 @@ Check Log In
     Validate Log In
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
 
 Reset DB and Open New Browser On Failure
@@ -207,6 +209,8 @@ Delete user works
 
 Share with registered user - sends him notification
     [tags]    email
+    #log in as noperm to check language and change its language to the current testing language
+    #otherwise it may receive the notification in another language and fail the email subject comparison
     Log In    ${EMAIL NOPERM}    ${password}
     Validate Log In
     Log Out
@@ -223,7 +227,27 @@ Share with registered user - sends him notification
     Check For Alert    ${NEW PERMISSIONS SAVED}
     Check User Permissions    ${EMAIL NOPERM}    ${CUSTOM TEXT}
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
-    ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
+    ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.system_name}}    ${AUTO TESTS}
     ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
     Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Remove User Permissions    ${EMAIL NOPERM}
+
+Share with unregistered user - brings them to registration page with code with correct email locked
+    [tags]    email
+    Log in to Auto Tests System    ${email}
+    Verify In System    Auto Tests
+    Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    ${random email}    Get Random Email    ${BASE EMAIL}
+    Input Text    ${SHARE EMAIL}    ${random email}
+    Sleep    .5
+    Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${NEW PERMISSIONS SAVED}
+    Check User Permissions    ${random email}    ${CUSTOM TEXT}
+    Log Out
+    Validate Log Out
+    ${link}    Get Email Link    ${random email}    register
+    Go To    ${link}
+    Register    ${TEST FIRST NAME}    ${TEST LAST NAME}    ${random email}    ${password}
+    Validate Log In

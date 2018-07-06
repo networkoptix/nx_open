@@ -6,52 +6,54 @@ set -e
 # or from cloud_portal "./build_scripts/build.sh"
 #or like this from outside the repository "../nx_vms/cloud_portal/build_scripts/build.sh"
 
-NX_VMS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../.."
+VMS_REPOSITORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+[[ "$VMS_REPOSITORY" =~ (.*)\/cloud_portal.* ]]; VMS_REPOSITORY=${BASH_REMATCH[1]}
 
 #If we are not using the repository we should update necessary files
-if [[ "$PWD" != */cloud_portal/* && "$PWD" != */cloud_portal ]]
+if [[ ! $PWD =~ $VMS_REPOSITORY ]]
 then
-    echo "Updating Cloud Portal Content"
+    echo "Updating Cloud Portal sources"
     if [ -e "cloud_portal" ]
     then
         pushd cloud_portal
-            for entry in $(ls -A .)
+            for entry in $(ls -A $VMS_REPOSITORY/cloud_portal/)
             do
                 if [ "$entry" = "front_end" ]
                 then
                     pushd $entry
-                    for element in $(ls -A .)
+                    for element in $(ls -A $VMS_REPOSITORY/cloud_portal/$entry/)
                     do
-                        [ "$element" = "node_modules" ] && continue
+                        echo "copy $entry/$element"
                         [ -e "$element" ] && rm -rf "$element"
-                        cp -pr "$NX_VMS/cloud_portal/$entry/$element" "$element"
+                        cp -pr "$VMS_REPOSITORY/cloud_portal/$entry/$element" "$element"
                     done
                     popd
                 else
-                    [[ "$entry" = "env" ]] && continue
+                    echo "copy $entry"
                     [ -e "$entry" ] && rm -rf "$entry"
-                    cp -pr "$NX_VMS/cloud_portal/$entry" "$entry"
+                    cp -pr "$VMS_REPOSITORY/cloud_portal/$entry" "$entry"
                 fi
             done
         popd
     else
-        cp -pr $NX_VMS/cloud_portal cloud_portal
+        cp -pr $VMS_REPOSITORY/cloud_portal cloud_portal
     fi
 
     mkdir -p webadmin
     pushd webadmin
         [ -d 'app/web_common' ] && rm -rf app/web_common
-        mkdir -p app/web_common && cp -pr $NX_VMS/webadmin/app/web_common/* "$_"
+        mkdir -p app/web_common && cp -pr $VMS_REPOSITORY/webadmin/app/web_common/* "$_"
 
         [ -d 'app/styles' ] && rm -rf app/styles
-        mkdir -p app/styles && cp -pr $NX_VMS/webadmin/app/styles/* "$_"
+        mkdir -p app/styles && cp -pr $VMS_REPOSITORY/webadmin/app/styles/* "$_"
 
         [ -e 'package.json' ] && rm -rf 'package.json'
-        cp $NX_VMS/webadmin/package.json ./
+        cp $VMS_REPOSITORY/webadmin/package.json ./
     popd
     cd cloud_portal
 else
-    cd $NX_VMS/cloud_portal
+    echo "In repository skip copying sources"
+    cd $VMS_REPOSITORY/cloud_portal
 fi
 
 echo "pip install requirements"
@@ -78,13 +80,16 @@ echo "Create $TARGET_DIR"
 mkdir -p $TARGET_DIR
 
 
-echo "Iterate all customizations"
-for dir in ../customizations/*/
+echo "Iterate all skins"
+for dir in ../skins/*/
 do
     dir=${dir%*/}
-    CUSTOMIZATION=${dir/..\/customizations\//}
-    ./build_customization.sh $CUSTOMIZATION $NX_VMS
+    SKIN=${dir/..\/skins\//}
+    ./build_skin.sh $SKIN $VMS_REPOSITORY
 done
+
+cp ../cloud/cloud/cloud_portal.yaml $TARGET_DIR/_source
+
 
 echo "Cloud portal build is finished"
 # say "Cloud portal build is finished"

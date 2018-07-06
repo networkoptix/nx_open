@@ -14,9 +14,10 @@
 
 #include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
-#include <utils/common/qtimespan.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/collection.h>
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/algorithm/index_of.h>
 
 namespace
 {
@@ -161,7 +162,7 @@ QnSearchBookmarksModelPrivate::QnSearchBookmarksModelPrivate(QnSearchBookmarksMo
 
 int QnSearchBookmarksModelPrivate::getBookmarkIndex(const QnUuid& bookmarkId) const
 {
-    return qnIndexOf(m_bookmarks,
+    return nx::utils::algorithm::index_of(m_bookmarks,
         [bookmarkId](const QnCameraBookmark& item) { return bookmarkId == item.guid; });
 }
 
@@ -315,8 +316,15 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         case QnSearchBookmarksModel::kCreator:
             return helpers::getBookmarkCreatorName(bookmark, resourcePool());
         case QnSearchBookmarksModel::kLength:
-            return QTimeSpan(bookmark.durationMs).normalized().toApproximateString(
-                QTimeSpan::kDoNotSuppressSecondUnit);
+        {
+            const auto duration = std::chrono::milliseconds(std::abs(bookmark.durationMs));
+            using HumanReadable = nx::client::core::HumanReadable;
+            return HumanReadable::timeSpan(duration,
+                HumanReadable::DaysAndTime,
+                HumanReadable::SuffixFormat::Full,
+                lit(", "),
+                HumanReadable::kNoSuppressSecondUnit);
+        }
         case QnSearchBookmarksModel::kTags:
             return QnCameraBookmark::tagsToString(bookmark.tags);
         case QnSearchBookmarksModel::kCamera:

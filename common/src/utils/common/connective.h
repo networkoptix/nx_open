@@ -15,7 +15,7 @@
 
 #include "forward.h"
 
-/* Properly defined NULL is required for this class to work, so we just redefine 
+/* Properly defined NULL is required for this class to work, so we just redefine
  * it here. Defining it only in config.h doesn't work for some compilers. */
 #undef NULL
 #define NULL nullptr
@@ -48,6 +48,12 @@ inline const T* connector(const QPointer<T>& object)
 
 template <class T>
 inline const T* connector(const std::shared_ptr<T>& object)
+{
+    return connector(object.get());
+}
+
+template <class T>
+inline const T* connector(const std::unique_ptr<T>& object)
 {
     return connector(object.get());
 }
@@ -129,7 +135,7 @@ protected:
 
 /**
  * Convenience base class for objects that want to use extensible ADL-based connections.
- * 
+ *
  * It replaces <tt>QObject</tt>'s <tt>connect</tt> and <tt>disconnect</tt>
  * methods with drop-in replacements that call into ADL-based implementation.
  */

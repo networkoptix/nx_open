@@ -5,7 +5,7 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
-#include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
+#include <streaming/rtp_stream_reader.h>
 
 namespace {
 
@@ -43,10 +43,17 @@ FcResource::~FcResource()
         m_ioWaitCondition.wait(&m_ioMutex);
 }
 
-CameraDiagnostics::Result FcResource::initInternal()
+nx::mediaserver::resource::StreamCapabilityMap FcResource::getStreamCapabilityMapFromDrives(
+    Qn::StreamIndex /*streamIndex*/)
+{
+    // TODO: implement me
+    return nx::mediaserver::resource::StreamCapabilityMap();
+}
+
+CameraDiagnostics::Result FcResource::initializeCameraDriver()
 {
     quint16 port = nexus::kDefaultNexusPort;
-    nx_http::HttpClient httpClient;
+    nx::network::http::HttpClient httpClient;
     auto auth = getAuth();
 
     httpClient.setSendTimeoutMs(kServerStatusRequestTimeout.count());
@@ -128,7 +135,7 @@ bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& compl
         {
             QnMutexLocker lock(&m_ioMutex);
             m_callbackIsInProgress = true;
-            
+
             lock.unlock();
             emit cameraInput(
                 toSharedPointer(this),
@@ -210,12 +217,12 @@ void FcResource::setIframeDistance(int, int)
     // Do nothing.
 }
 
-bool FcResource::hasDualStreaming() const
+bool FcResource::hasDualStreamingInternal() const
 {
     return false;
 }
 
-bool FcResource::doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, const QUrl& url)
+bool FcResource::doGetRequestAndCheckResponse(nx::network::http::HttpClient& httpClient, const nx::utils::Url& url)
 {
     auto success = httpClient.doGet(url);
     if (!success)
@@ -223,36 +230,36 @@ bool FcResource::doGetRequestAndCheckResponse(nx_http::HttpClient& httpClient, c
 
     auto response = httpClient.response();
 
-    if (response->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (response->statusLine.statusCode != nx::network::http::StatusCode::ok)
         return false;
 
     return true;
 }
 
-boost::optional<fc_private::ServerStatus> FcResource::getNexusServerStatus(nx_http::HttpClient& httpClient)
+boost::optional<fc_private::ServerStatus> FcResource::getNexusServerStatus(nx::network::http::HttpClient& httpClient)
 {
-    QUrl url = getUrl();
+    nx::utils::Url url = getUrl();
     url.setPath(fc_private::kConfigurationFile);
 
     if (!doGetRequestAndCheckResponse(httpClient, url))
         return boost::none;
 
-    nx_http::BufferType messageBody;
+    nx::network::http::BufferType messageBody;
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 
     return parseNexusServerStatusResponse(QString::fromUtf8(messageBody));
 }
 
-bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
+bool FcResource::tryToEnableNexusServer(nx::network::http::HttpClient& httpClient)
 {
-    QUrl url = getUrl();
+    nx::utils::Url url = getUrl();
     url.setPath(fc_private::kStartNexusServerCommand);
 
     if (!doGetRequestAndCheckResponse(httpClient, url))
         return false;
 
-    nx_http::BufferType messageBody;
+    nx::network::http::BufferType messageBody;
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 

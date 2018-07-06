@@ -48,7 +48,7 @@ void executePost(
     const QString& urlStr,
     const RequestData& requestData,
     PreprocessRequestFunc preprocessRequestFunc = nullptr,
-    int httpStatus = nx_http::StatusCode::ok)
+    int httpStatus = nx::network::http::StatusCode::ok)
 {
     const QByteArray& request = QJson::serialized(requestData);
     ASSERT_NO_FATAL_FAILURE(doExecutePost(
@@ -58,7 +58,12 @@ void executePost(
 void doExecuteGet(
     const MediaServerLauncher* const launcher,
     const QString& urlStr,
-    nx_http::BufferType* outResponse,
+    nx::network::http::BufferType* outResponse,
+    int httpStatus);
+
+void doExecuteGet(
+    const nx::utils::Url& url,
+    nx::network::http::BufferType* outResponse,
     int httpStatus);
 
 /**
@@ -69,10 +74,22 @@ void executeGet(
     const MediaServerLauncher* const launcher,
     const QString& urlStr,
     ResponseData* responseData = nullptr,
-    int httpStatus = nx_http::StatusCode::ok)
+    int httpStatus = nx::network::http::StatusCode::ok)
 {
-    nx_http::BufferType response;
+    nx::network::http::BufferType response;
     ASSERT_NO_FATAL_FAILURE(doExecuteGet(launcher, urlStr, &response, httpStatus));
+    if (responseData)
+        ASSERT_TRUE(QJson::deserialize(response, responseData));
+}
+
+template<class ResponseData>
+void executeGet(
+    const nx::utils::Url& url,
+    ResponseData* responseData = nullptr,
+    int httpStatus = nx::network::http::StatusCode::ok)
+{
+    nx::network::http::BufferType response;
+    ASSERT_NO_FATAL_FAILURE(doExecuteGet(url, &response, httpStatus));
     if (responseData)
         ASSERT_TRUE(QJson::deserialize(response, responseData));
 }

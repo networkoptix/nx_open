@@ -13,7 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <core/dataprovider/abstract_ondemand_data_provider.h>
+#include <providers/abstract_ondemand_data_provider.h>
 
 #include "data_source_cache.h"
 #include "streaming_chunk.h"
@@ -67,7 +67,7 @@ private:
         StreamingChunkCacheKey transcodeParams;
         bool dataAvailable;
         qint64 prevReadTryTimestamp;
-        quint64 msTranscoded; 
+        quint64 msTranscoded;
         quint64 packetsTranscoded;
         //!-1, if no prev packet
         qint64 prevPacketTimestamp;

@@ -107,7 +107,7 @@ public:
                 m_waitForReadinessInvoked = true;
                 if (m_ready)
                     reportReadiness();
-                    
+
             });
     }
 
@@ -173,7 +173,7 @@ private:
 
     void reportReadiness()
     {
-        const auto result = 
+        const auto result =
             m_readinessWaitResult ? *m_readinessWaitResult : SystemError::noError;
         if (m_onReadinessWaitDone)
             m_onReadinessWaitDone(result);
@@ -247,7 +247,7 @@ protected:
         thenConnectionToTheTargetHasBeenOpened();
         m_reverseConnectionPool.front()->makeReady();
     }
-    
+
     void whenConnectFails()
     {
         m_connectionsFailedToConnect.pop();
@@ -265,7 +265,7 @@ protected:
 
     void whenConnectionCountHasReachedMaximum()
     {
-        const auto desiredConnectionCount = 
+        const auto desiredConnectionCount =
             m_acceptor.readyConnectionQueueSize() + m_acceptor.preemptiveConnectionCount();
         while (m_reverseConnectionPool.size() < desiredConnectionCount)
             std::this_thread::yield();
@@ -307,7 +307,7 @@ protected:
 
     void thenConnectionToTheTargetHasBeenOpened()
     {
-        while (m_reverseConnectionPool.empty() || 
+        while (m_reverseConnectionPool.empty() ||
             !m_reverseConnectionPool.front()->isConnected())
         {
             std::this_thread::yield();
@@ -391,7 +391,7 @@ protected:
     }
 
 private:
-    using AcceptResult = 
+    using AcceptResult =
         std::tuple<SystemError::ErrorCode, std::unique_ptr<ReverseConnection>>;
 
     const std::size_t m_preemptiveConnectionCount;

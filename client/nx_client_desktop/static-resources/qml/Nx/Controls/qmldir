@@ -1,0 +1,5 @@
+module Nx.Controls
+
+Button 1.0 Button.qml
+FlatButton 1.0 FlatButton.qml
+AutoScalableItem 1.0 AutoScalableItem.qml

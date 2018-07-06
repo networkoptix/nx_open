@@ -6,21 +6,22 @@
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/time.h>
+#include <nx/utils/test_support/settings_loader.h>
 
+#include <nx/data_sync_engine/synchronization_engine.h>
 #include <nx/cloud/cdb/api/cloud_nonce.h>
-
 #include <nx/cloud/cdb/client/data/auth_data.h>
 #include <nx/cloud/cdb/dao/user_authentication_data_object_factory.h>
 #include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
-#include <nx/cloud/cdb/ec2/synchronization_engine.h>
 #include <nx/cloud/cdb/managers/authentication_provider.h>
 #include <nx/cloud/cdb/settings.h>
 #include <nx/cloud/cdb/stree/cdb_ns.h>
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "account_manager_stub.h"
-#include "base_persistent_data_test.h"
 #include "system_sharing_manager_stub.h"
 #include "temporary_account_password_manager_stub.h"
 #include "vms_p2p_command_bus_stub.h"
@@ -41,16 +42,18 @@ public:
         m_factoryBak = dao::UserAuthenticationDataObjectFactory::instance().setCustomFunc(
             std::bind(&AuthenticationProvider::createUserAuthenticationDao, this));
 
-        std::array<const char*, 1U> args{"--auth/nonceValidityPeriod=1ms"};
-        m_settings.load(args.size(), args.data());
+        m_settingsLoader.addArg("--auth/nonceValidityPeriod=1ms");
+        m_settingsLoader.addArg("--auth/checkForExpiredAuthPeriod=10ms");
+        m_settingsLoader.addArg("--auth/continueUpdatingExpiredAuthPeriod=1ms");
+        m_settingsLoader.load();
 
         prepareTestData();
-        
+
         m_vmsP2pCommandBusStub.setOnSaveResourceAttribute(
             std::bind(&AuthenticationProvider::onSaveResourceAttribute, this, _1, _2));
 
         m_authenticationProvider = std::make_unique<cdb::AuthenticationProvider>(
-            m_settings,
+            m_settingsLoader.settings(),
             &queryExecutor(),
             &m_accountManager,
             &m_systemSharingManager,
@@ -60,6 +63,8 @@ public:
 
     ~AuthenticationProvider()
     {
+        m_authenticationProvider.reset();
+
         dao::UserAuthenticationDataObjectFactory::instance().setCustomFunc(
             std::move(m_factoryBak));
     }
@@ -84,6 +89,51 @@ protected:
     {
         // Nonce is created for sure while sharing.
         whenSharingSystem();
+    }
+
+    AccountWithPassword addUserWithoutPassword()
+    {
+        auto account = BusinessDataGenerator::generateRandomAccount();
+        account.statusCode = api::AccountStatus::invited;
+        account.passwordHa1.clear();
+        account.passwordHa1Sha256.clear();
+        account.password.clear();
+
+        m_accountManager.addAccount(account);
+
+        shareSystem(m_systems[0].id, account.email, api::SystemAccessRole::cloudAdmin);
+
+        return account;
+    }
+
+    AccountWithPassword addUserWithShortAuthInfoExpirationPeriod()
+    {
+        return addUserWithAuthInfoExpirationPeriod(std::chrono::seconds(1));
+    }
+
+    AccountWithPassword addUserWithLongAuthInfoExpirationPeriod()
+    {
+        return addUserWithAuthInfoExpirationPeriod(7 * std::chrono::hours(24));
+    }
+
+    AccountWithPassword addUserWithAuthInfoExpirationPeriod(
+        std::chrono::seconds expirationPeriod)
+    {
+        m_settingsLoader.addArg(
+            "-auth/offlineUserHashValidityPeriod",
+            std::to_string(expirationPeriod.count()));
+        m_settingsLoader.load();
+
+        auto account = BusinessDataGenerator::generateRandomAccount();
+        m_accountManager.addAccount(account);
+
+        shareSystem(m_systems[0].id, account.email, api::SystemAccessRole::cloudAdmin);
+
+        m_accountToUserAuthInfo[account.email] =
+            m_userAuthenticationDao->fetchUserAuthRecords(
+                nullptr, m_systems[0].id, account.id);
+
+        return account;
     }
 
     void whenSharingSystem()
@@ -121,7 +171,7 @@ protected:
     void whenChangingAccountPassword()
     {
         m_ownerAccount.password = nx::utils::generateRandomName(7).toStdString();
-        m_ownerAccount.passwordHa1 = nx_http::calcHa1(
+        m_ownerAccount.passwordHa1 = nx::network::http::calcHa1(
             m_ownerAccount.email.c_str(),
             nx::network::AppInfo::realm().toStdString().c_str(),
             m_ownerAccount.password.c_str()).toStdString();
@@ -134,7 +184,7 @@ protected:
     void whenGeneratedNonceTimeoutHasExpired()
     {
         std::this_thread::sleep_for(
-            m_settings.auth().nonceValidityPeriod + std::chrono::seconds(1));
+            m_settingsLoader.settings().auth().nonceValidityPeriod + std::chrono::seconds(1));
     }
 
     void whenRequestAuthenticationResponse()
@@ -165,7 +215,7 @@ protected:
 
     void thenEachUserAuthRecordContainsSystemNonce()
     {
-        boost::optional<std::string> nonce;
+        std::optional<std::string> nonce;
         for (const auto& account: m_additionalAccounts)
         {
             const auto authInfo = m_userAuthenticationDao->fetchUserAuthRecords(
@@ -214,8 +264,36 @@ protected:
         thenAuthenticationResponseIsProvided();
     }
 
+    void waitForUserAuthRecordToBeUpdated(const AccountWithPassword& userAccount)
+    {
+        const api::AuthInfo initialUserAuth = m_accountToUserAuthInfo[userAccount.email];
+
+        for (;;)
+        {
+            const auto userAuthInfo = m_userAuthenticationDao->fetchUserAuthRecords(
+                nullptr, m_systems[0].id, userAccount.id);
+            if (!userAuthInfo.records.empty() && userAuthInfo != initialUserAuth)
+            {
+                ASSERT_EQ(1U, userAuthInfo.records.size());
+                ASSERT_GT(
+                    userAuthInfo.records.front().expirationTime,
+                    initialUserAuth.records.front().expirationTime);
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+
+    void assertUserDoesNotHaveAuthRecord(const AccountWithPassword& userAccount)
+    {
+        const auto userAuthInfo = m_userAuthenticationDao->fetchUserAuthRecords(
+            nullptr, m_systems[0].id, userAccount.id);
+        ASSERT_TRUE(userAuthInfo.records.empty());
+    }
+
 private:
-    conf::Settings m_settings;
+    nx::utils::test::SettingsLoader<conf::Settings> m_settingsLoader;
     AccountManagerStub m_accountManager;
     SystemSharingManagerStub m_systemSharingManager;
     TemporaryAccountPasswordManagerStub m_temporaryAccountPasswordManager;
@@ -231,6 +309,7 @@ private:
         std::pair<std::string, QnUuid>,
         api::AuthInfo> m_updateUserAuthInfoTransactions;
     nx::utils::SyncQueue<std::tuple<api::ResultCode, api::AuthResponse>> m_authResponses;
+    std::map<std::string /*email*/, api::AuthInfo> m_accountToUserAuthInfo;
 
     std::unique_ptr<dao::AbstractUserAuthentication> createUserAuthenticationDao()
     {
@@ -282,7 +361,7 @@ private:
 
     nx::utils::db::DBResult onSaveResourceAttribute(
         const std::string& systemId,
-        const ::ec2::ApiResourceParamWithRefData& data)
+        const nx::vms::api::ResourceParamWithRefData& data)
     {
         if (data.name == api::kVmsUserAuthInfoAttributeName)
         {
@@ -305,14 +384,14 @@ private:
 
     void assertUserAuthenticationHashIsValid(const api::AuthInfoRecord& authInfo)
     {
-        const auto ha2 = nx_http::calcHa2("GET", "/getsome/");
+        const auto ha2 = nx::network::http::calcHa2("GET", "/getsome/");
         const auto nonce = api::generateNonce(authInfo.nonce);
-        const auto expectedResponse = nx_http::calcResponse(
+        const auto expectedResponse = nx::network::http::calcResponse(
             m_ownerAccount.passwordHa1.c_str(), nonce.c_str(), ha2);
 
         const auto nonceTrailer = nonce.substr(authInfo.nonce.size());
 
-        const auto actualResponse = nx_http::calcResponseFromIntermediate(
+        const auto actualResponse = nx::network::http::calcResponseFromIntermediate(
             authInfo.intermediateResponse.c_str(),
             authInfo.nonce.size(),
             nonceTrailer.c_str(),
@@ -331,7 +410,8 @@ private:
         ASSERT_LE(
             nx::utils::floor<milliseconds>(authInfo.expirationTime),
             nx::utils::floor<milliseconds>(
-                nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod));
+                nx::utils::utcTime() +
+                m_settingsLoader.settings().auth().offlineUserHashValidityPeriod));
     }
 
     void saveAuthenticationResponse(
@@ -388,6 +468,29 @@ TEST_F(AuthenticationProvider, system_nonce_is_always_valid)
     givenSystemWithNonce();
     whenGeneratedNonceTimeoutHasExpired();
     thenSystemNonceIsValidForAuthentication();
+}
+
+TEST_F(AuthenticationProvider, expired_auth_record_is_updated_eventually)
+{
+    givenSystemWithNonce();
+    const auto user1 = addUserWithShortAuthInfoExpirationPeriod();
+    const auto user2 = addUserWithLongAuthInfoExpirationPeriod();
+
+    waitForUserAuthRecordToBeUpdated(user1);
+    waitForUserAuthRecordToBeUpdated(user2);
+}
+
+// E.g., invited but not yet activated account does not have password.
+TEST_F(AuthenticationProvider, does_not_try_to_calculate_auth_record_for_user_without_password)
+{
+    givenSystemWithNonce();
+
+    const auto userWithoutPassword = addUserWithoutPassword();
+    const auto userWithShortAuthInfoExpirationPeriod =
+        addUserWithShortAuthInfoExpirationPeriod();
+
+    waitForUserAuthRecordToBeUpdated(userWithShortAuthInfoExpirationPeriod);
+    assertUserDoesNotHaveAuthRecord(userWithoutPassword);
 }
 
 } // namespace test

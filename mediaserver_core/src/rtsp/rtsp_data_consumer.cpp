@@ -64,7 +64,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_newLiveQuality(MEDIA_Quality_None),
     m_streamingSpeed(MAX_STREAMING_SPEED),
     m_multiChannelVideo(false),
-    m_adaptiveSleep(MAX_FRAME_DURATION*1000),
+    m_adaptiveSleep(MAX_FRAME_DURATION_MS*1000),
     m_useUTCTime(true),
     m_fastChannelZappingSize(0),
     m_firstLiveTime(AV_NOPTS_VALUE),
@@ -255,7 +255,6 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         bool clearHiQ = !needSecondaryStream(m_liveQuality); // remove LQ packets, keep HQ
 
         // try to reduce queue by removed packets in specified quality
-        bool somethingDeleted = false;
         for (quint32 ch = 0; ch < m_videoChannels; ++ch)
         {
             for (int i = unsafeQueue.size() - 1; i >=0; --i)
@@ -274,7 +273,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         }
 
         // try to reduce queue by removed video packets at any quality
-        if (!somethingDeleted)
+        if (!m_someDataIsDropped)
         {
             for (quint32 ch = 0; ch < m_videoChannels; ++ch)
             {
@@ -462,8 +461,8 @@ void QnRtspDataConsumer::doRealtimeDelay(QnConstAbstractMediaDataPtr media)
     }
     else {
         qint64 timeDiff = media->timestamp - m_lastRtTime;
-        if (timeDiff <= MAX_FRAME_DURATION*1000)
-            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
+        if (timeDiff <= MAX_FRAME_DURATION_MS*1000)
+            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION_MS*1000); // if diff too large, it is recording hole. do not calc delay for this case
     }
     m_lastRtTime = media->timestamp;
 }
@@ -702,12 +701,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         {
             RtpHeader* packet = (RtpHeader*) (rtpHeaderPtr);
             isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
-            if (isRtcp && m_owner->getTracksCount() == 1)
-            {
-                // skip RTCP packets is no audio. some clients have problem with it. I don't know why.
-                m_sendBuffer.resize(dataStartIndex);
-                continue;
-            }
         }
         else {
             const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
@@ -729,7 +722,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         else
         {
             NX_ASSERT(m_sendBuffer.size() < 16384);
-            AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
+            nx::network::AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
             mediaSocket->send(m_sendBuffer.data(), m_sendBuffer.size());
             m_sendBuffer.clear();
         }

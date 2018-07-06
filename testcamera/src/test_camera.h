@@ -15,7 +15,7 @@ class QnTestCamera
 {
 public:
 
-    QnTestCamera(quint32 num);
+    QnTestCamera(quint32 num, bool includePts);
 
     QByteArray getMac() const;
 
@@ -24,15 +24,16 @@ public:
 
     void setOfflineFreq(double offlineFreq);
 
-    void startStreaming(AbstractStreamSocket* socket, bool isSecondary, int fps);
+    void startStreaming(nx::network::AbstractStreamSocket* socket, bool isSecondary, int fps);
 
     bool isEnabled();
 private:
-    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, AbstractStreamSocket* socket, int fps);
+    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, nx::network::AbstractStreamSocket* socket, int fps);
     void makeOfflineFlood();
-    int sendAll(AbstractStreamSocket* socket, const void* data, int size);
+    int sendAll(nx::network::AbstractStreamSocket* socket, const void* data, int size);
 private:
     quint32 m_num;
+    const bool m_includePts;
     QByteArray m_mac;
     QStringList m_primaryFiles;
     QStringList m_secondaryFiles;

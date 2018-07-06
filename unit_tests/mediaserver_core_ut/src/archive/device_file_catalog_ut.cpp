@@ -6,7 +6,7 @@
 namespace nx {
 namespace test {
 
-TEST(DeviceFileCatalog, main)
+TEST(DeviceFileCatalog, catalogRange)
 {
     DeviceFileCatalog catalog(QString(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
 
@@ -61,6 +61,65 @@ TEST(DeviceFileCatalog, main)
         ASSERT_EQ(chunk2.startTimeMs, allPeriods.front().startTimeMs);
         ASSERT_EQ(chunk3.endTimeMs(), allPeriods.last().endTimeMs());
     }
+}
+
+TEST(DeviceFileCatalog, mergeData)
+{
+    DeviceFileCatalog catalog(QString(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
+    static const int kRecordsToTest = 1000;
+
+    std::deque<DeviceFileCatalog::Chunk> chunks1;
+    catalog.addChunks(chunks1);
+    ASSERT_EQ(0, catalog.size());
+
+    for (int i = 0; i < kRecordsToTest; ++i)
+    {
+        DeviceFileCatalog::Chunk chunk;
+        chunk.startTimeMs = i * 10;
+        chunk.durationMs = 10;
+        chunks1.push_back(chunk);
+    }
+    catalog.addChunks(chunks1);
+    ASSERT_EQ(kRecordsToTest, catalog.size());
+
+    std::deque<DeviceFileCatalog::Chunk> chunks2;
+    for (int i = 0; i < kRecordsToTest; ++i)
+    {
+        DeviceFileCatalog::Chunk chunk;
+        chunk.startTimeMs = i * 10 + 5;
+        chunk.durationMs = 10;
+        chunks2.push_back(chunk);
+    }
+
+    catalog.addChunks(chunks2);
+    ASSERT_EQ(kRecordsToTest * 2, catalog.size());
+
+    catalog.addChunks(std::deque<DeviceFileCatalog::Chunk>());
+    ASSERT_EQ(kRecordsToTest * 2, catalog.size());
+
+    catalog.addChunks(chunks2);
+    catalog.addChunks(chunks1);
+    ASSERT_EQ(kRecordsToTest * 2, catalog.size());
+
+    {
+        DeviceFileCatalog::Chunk chunk;
+        chunk.startTimeMs = kRecordsToTest/2 * 10 + 4;
+        chunk.durationMs = 10;
+        catalog.addRecord(chunk);
+    }
+    ASSERT_EQ(kRecordsToTest * 2 + 1, catalog.size());
+
+    for (int i = 0; i < kRecordsToTest; ++i)
+    {
+        DeviceFileCatalog::Chunk chunk;
+        chunk.startTimeMs = i * 10 + 3;
+        chunk.durationMs = 10;
+        chunks2.push_back(chunk);
+    }
+    std::sort(chunks2.begin(), chunks2.end());
+
+    catalog.addChunks(chunks2);
+    ASSERT_EQ(kRecordsToTest * 3 + 1, catalog.size());
 }
 
 } // test

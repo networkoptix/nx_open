@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation>Gevraagde bediening is niet toegestaan ​​met deze inloggegevens.</translation>
+      <translation>De gevraagde bediening is niet toegestaan ​​met deze inloggegevens.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>Requested feature is not implemented.</source>
-      <translation>Gevraagde functie is niet geïmplementeerd.</translation>
+      <translation>De gevraagde functie is niet geïmplementeerd.</translation>
     </message>
     <message>
       <source>Unknown realm.</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation>Inloggegevens zijn niet meer geldig.</translation>
+      <translation>Deze inloggegevens zijn niet langer geldig.</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation>Ongeldige gegevens ontvangen.</translation>
+      <translation>Er is ongeldige data ontvangen.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -65,21 +65,21 @@
     </message>
     <message>
       <source>Object already exists.</source>
-      <translation>Object bestaat al.</translation>
+      <translation>Dit object bestaat al.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Interne %1 fout. Neem contact op met support team.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Sorry, %1 de dienst is tijdelijk niet beschikbaar. We doen ons best om het te herstellen. Probeer het later nogmaals.</translation>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Sorry, de %1 dienst is tijdelijk niet beschikbaar. We doen ons best om het te herstellen. Probeer het later nogmaals.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Sorry, %1 service kan uw aanvraag niet verwerken. Probeer het over enkele ogenblikken nogmaals.</translation>
     </message>
   </context>

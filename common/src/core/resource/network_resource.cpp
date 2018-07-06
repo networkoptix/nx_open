@@ -7,6 +7,7 @@
 
 #include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/ping.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
@@ -17,15 +18,14 @@
 #include <utils/crypt/symmetrical.h>
 
 #include <recording/time_period_list.h>
-#include <nx_ec/data/api_camera_data.h>
-
+#include <nx/vms/api/data/camera_data.h>
 
 QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
     base_type(commonModule),
     m_authenticated(true),
     m_networkStatus(0),
     m_networkTimeout(1000 * 10),
-    m_httpPort(nx_http::DEFAULT_HTTP_PORT),
+    m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
     m_mediaPort(nx_rtsp::DEFAULT_RTSP_PORT),
     m_probablyNeedToUpdateStatus(false)
 {
@@ -41,7 +41,6 @@ QString QnNetworkResource::getUniqueId() const
 {
     return getPhysicalId();
 }
-
 
 QString QnNetworkResource::getHostAddress() const
 {
@@ -68,13 +67,13 @@ void QnNetworkResource::setHostAddress(const QString &ip)
     }
 }
 
-QnMacAddress QnNetworkResource::getMAC() const
+nx::network::QnMacAddress QnNetworkResource::getMAC() const
 {
     QnMutexLocker mutexLocker( &m_mutex );
     return m_macAddress;
 }
 
-void QnNetworkResource::setMAC(const QnMacAddress &mac)
+void QnNetworkResource::setMAC(const nx::network::QnMacAddress &mac)
 {
     QnMutexLocker mutexLocker( &m_mutex );
     m_macAddress = mac;
@@ -118,7 +117,6 @@ QAuthenticator QnNetworkResource::getResourceAuth(
     const QnUuid &resourceId,
     const QnUuid &resourceTypeId)
 {
-    // TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
     QString value = getResourceProperty(
         commonModule,
@@ -132,15 +130,7 @@ QAuthenticator QnNetworkResource::getResourceAuth(
             resourceId,
             resourceTypeId);
 
-    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
-
-    const QStringList& credentialsList = value.split(lit(":"));
-    QAuthenticator auth;
-    if (credentialsList.size() >= 1)
-        auth.setUser(credentialsList[0]);
-    if (credentialsList.size() >= 2)
-        auth.setPassword(credentialsList[1]);
-    return auth;
+    return getAuthInternal(value);
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
@@ -148,8 +138,18 @@ QAuthenticator QnNetworkResource::getAuth() const
     QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
     if (value.isNull())
         value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+    return getAuthInternal(value);
+}
 
-    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
+QAuthenticator QnNetworkResource::getDefaultAuth() const
+{
+    QString value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+    return getAuthInternal(value);
+}
+
+QAuthenticator QnNetworkResource::getAuthInternal(const QString& encodedAuth)
+{
+    QString value = nx::utils::decodeStringFromHexStringAES128CBC(encodedAuth);
 
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
@@ -190,13 +190,12 @@ void QnNetworkResource::setMediaPort( int newPort )
     m_mediaPort = newPort;
 }
 
-QString QnNetworkResource::toSearchString() const
+QStringList QnNetworkResource::searchFilters() const
 {
-    return base_type::toSearchString()
-        + L' ' + getMAC().toString()
-        + L' ' + getHostAddress()
-        + L' ' + lit("live")
-        ; // TODO: #Elric evil!
+    return base_type::searchFilters()
+        << getMAC().toString()
+        << getHostAddress()
+        << lit("live");
 }
 
 void QnNetworkResource::addNetworkStatus(NetworkStatus status)
@@ -223,6 +222,18 @@ void QnNetworkResource::setNetworkStatus(NetworkStatus status)
     m_networkStatus = status;
 }
 
+QDateTime QnNetworkResource::getLastDiscoveredTime() const
+{
+    QnMutexLocker mutexLocker(&m_mutex);
+    return m_lastDiscoveredTime;
+}
+
+void QnNetworkResource::setLastDiscoveredTime(const QDateTime& time)
+{
+    QnMutexLocker mutexLocker(&m_mutex);
+    m_lastDiscoveredTime = time;
+}
+
 void QnNetworkResource::setNetworkTimeout(unsigned int timeout)
 {
     QnMutexLocker mutexLocker( &m_mutex );
@@ -242,6 +253,7 @@ void QnNetworkResource::updateInternal(const QnResourcePtr &other, Qn::NotifierL
     if (other_casted)
     {
         m_macAddress = other_casted->m_macAddress;
+        m_lastDiscoveredTime = other_casted->m_lastDiscoveredTime;
     }
 }
 
@@ -262,7 +274,6 @@ bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     return mergedSomething;
 }
 
-
 int QnNetworkResource::getChannel() const
 {
     return 0;
@@ -270,8 +281,11 @@ int QnNetworkResource::getChannel() const
 
 bool QnNetworkResource::ping()
 {
-    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
-    return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    std::unique_ptr<nx::network::AbstractStreamSocket> sock( nx::network::SocketFactory::createStreamSocket() );
+    return sock->connect(
+        getHostAddress(),
+        QUrl(getUrl()).port(nx::network::http::DEFAULT_HTTP_PORT),
+        nx::network::deprecated::kDefaultConnectTimeout);
 }
 
 void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
@@ -280,10 +294,7 @@ void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completion
     nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
 
-QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
-    Q_UNUSED(startTimeMs)
-    Q_UNUSED(endTimeMs)
-    Q_UNUSED(detailLevel)
+QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 /*startTimeMs*/, qint64 /*endTimeMs*/, int /*detailLevel*/) {
     return QnTimePeriodList();
 }
 
@@ -296,7 +307,6 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
     QTime time;
     time.start();
 
-
     QList<QnResourcePtr> local_list;
     for (const QnResourcePtr& res: lst.values())
     {
@@ -304,7 +314,6 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
         if (netRes && !(netRes->checkNetworkStatus(QnNetworkResource::HasConflicts)))
             local_list << res.data();
     }
-
 
     QThreadPool* global = QThreadPool::globalInstance();
     for (int i = 0; i < threads; ++i ) global->releaseThread();
@@ -325,7 +334,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 QnUuid QnNetworkResource::physicalIdToId(const QString& physicalId)
 {
-    return ec2::ApiCameraData::physicalIdToId(physicalId);
+    return nx::vms::api::CameraData::physicalIdToId(physicalId);
 }
 
 void QnNetworkResource::initializationDone()

@@ -110,6 +110,8 @@ bool MultipleServerSocket::isClosed() const
 
 MultipleServerSocket_FORWARD_SET(setReuseAddrFlag, bool);
 MultipleServerSocket_FORWARD_GET(getReuseAddrFlag, bool);
+MultipleServerSocket_FORWARD_SET(setReusePortFlag, bool);
+MultipleServerSocket_FORWARD_GET(getReusePortFlag, bool);
 
 bool MultipleServerSocket::setNonBlockingMode(bool value)
 {
@@ -155,6 +157,13 @@ bool MultipleServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
     return true;
 }
 
+bool MultipleServerSocket::setIpv6Only(bool /*val*/)
+{
+    NX_ASSERT(false);
+    SystemError::setLastErrorCode(SystemError::notImplemented);
+    return false;
+}
+
 AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
 {
     NX_ASSERT(false);
@@ -179,7 +188,7 @@ bool MultipleServerSocket::isInSelfAioThread() const
 
 MultipleServerSocket_FORWARD_SET(listen, int);
 
-AbstractStreamSocket* MultipleServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> MultipleServerSocket::accept()
 {
     NX_VERBOSE(this, lm("accept()"));
     if (m_nonBlockingMode)
@@ -220,7 +229,7 @@ AbstractStreamSocket* MultipleServerSocket::accept()
         result.second->setNonBlockingMode(false);
     }
 
-    return result.second.release();
+    return std::move(result.second);
 }
 
 void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
@@ -263,31 +272,11 @@ void MultipleServerSocket::acceptAsync(AcceptCompletionHandler handler)
     m_aggregateAcceptor.acceptAsync(std::move(handler));
 }
 
-void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+void MultipleServerSocket::cancelIoInAioThread()
 {
-    NX_VERBOSE(this, lm("Canceling async IO asynchronously..."));
-    post(
-        [this, handler = std::move(handler)]() mutable
-        {
-            cancelIoFromAioThread();
-            NX_LOGX(lm("Async IO is canceled asynchronously"), cl_logDEBUG1);
-            handler();
-        });
-}
-
-void MultipleServerSocket::cancelIOSync()
-{
-    NX_VERBOSE(this, lm("Canceling async IO synchronously..."));
-    nx::utils::promise<void> ioCancelledPromise;
-    dispatch(
-        [this, &ioCancelledPromise]() mutable
-        {
-            cancelIoFromAioThread();
-            NX_LOGX(lm("Async IO is canceled synchronously"), cl_logDEBUG1);
-            ioCancelledPromise.set_value();
-        });
-
-    ioCancelledPromise.get_future().wait();
+    m_acceptHandler = nullptr;
+    m_timer.cancelSync();
+    m_aggregateAcceptor.cancelIOSync();
 }
 
 bool MultipleServerSocket::addSocket(
@@ -316,13 +305,6 @@ void MultipleServerSocket::removeSocket(size_t pos)
 size_t MultipleServerSocket::count() const
 {
     return m_serverSockets.size();
-}
-
-void MultipleServerSocket::cancelIoFromAioThread()
-{
-    m_acceptHandler = nullptr;
-    m_timer.cancelSync();
-    m_aggregateAcceptor.cancelIOSync();
 }
 
 void MultipleServerSocket::stopWhileInAioThread()

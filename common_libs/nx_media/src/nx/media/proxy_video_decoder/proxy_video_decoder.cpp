@@ -54,7 +54,7 @@ static ProxyVideoDecoderImpl* createProxyVideoDecoderImpl(
 } // namespace
 
 ProxyVideoDecoder::ProxyVideoDecoder(
-    const ResourceAllocatorPtr& allocator, const QSize& resolution)
+    const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution)
 {
     static_assert(QN_BYTE_ARRAY_PADDING >= ProxyDecoder::CompressedFrame::kPaddingSize,
         "ProxyVideoDecoder: Insufficient padding size");
@@ -66,7 +66,7 @@ ProxyVideoDecoder::ProxyVideoDecoder(
 
     ProxyVideoDecoderImpl::Params params;
     params.owner = this;
-    params.allocator = allocator;
+    params.synchronizer = synchronizer;
     params.resolution = resolution;
     d.reset(createProxyVideoDecoderImpl(params));
 }

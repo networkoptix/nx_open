@@ -4,7 +4,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <plugins/resource/avi/avi_resource.h>
+#include <core/resource/avi/avi_resource.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -36,6 +36,8 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &r
     NX_ASSERT(supportedResource(resource), Q_FUNC_INFO, "Loaders must not be created for unsupported resources");
     init();
     initLoaders();
+
+    m_analyticsFilter.deviceId = m_resource->toResource()->getId();
 
     QTimer* loadTimer = new QTimer(this);
     loadTimer->setInterval(requestIntervalMs / 10);  // time period will be loaded no often than once in 30 seconds, but timer should check it much more often
@@ -164,6 +166,33 @@ void QnCachingCameraDataLoader::setMotionRegions(const QList<QRegion> &motionReg
     updateTimePeriods(Qn::MotionContent, true);
 }
 
+const QnCachingCameraDataLoader::AnalyticsFilter& QnCachingCameraDataLoader::analyticsFilter() const
+{
+    return m_analyticsFilter;
+}
+
+void QnCachingCameraDataLoader::setAnalyticsFilter(const AnalyticsFilter& value)
+{
+    if (m_analyticsFilter == value)
+        return;
+
+    const auto deviceId = m_analyticsFilter.deviceId;
+    NX_ASSERT(value.deviceId == deviceId);
+
+    m_analyticsFilter = value;
+
+    if (m_analyticsFilter.deviceId != deviceId)
+        m_analyticsFilter.deviceId = deviceId; //< Just for safety.
+
+    if (!m_cameraChunks[Qn::AnalyticsContent].isEmpty())
+    {
+        m_cameraChunks[Qn::AnalyticsContent].clear();
+        emit periodsChanged(Qn::AnalyticsContent);
+    }
+
+    updateTimePeriods(Qn::AnalyticsContent, true);
+}
+
 bool QnCachingCameraDataLoader::isMotionRegionsEmpty() const {
     foreach(const QRegion &region, m_motionRegions)
         if(!region.isEmpty())
@@ -175,10 +204,12 @@ QnTimePeriodList QnCachingCameraDataLoader::periods(Qn::TimePeriodContent timePe
     return m_cameraChunks[timePeriodType];
 }
 
-bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
+bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
+{
     QnAbstractCameraDataLoaderPtr loader = m_loaders[periodType];
     NX_ASSERT(loader, Q_FUNC_INFO, "Loader must always exists");
-    if(!loader)
+
+    if (!loader)
     {
         qnWarning("No valid loader in scope.");
         emit loadingFailed();
@@ -189,24 +220,39 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType) {
     switch (periodType)
     {
         case Qn::RecordingContent:
+        {
             handle = loader->load();
             break;
+        }
+
         case Qn::MotionContent:
-            if(!isMotionRegionsEmpty())
+        {
+            if (!isMotionRegionsEmpty())
             {
-                QString filter = QString::fromUtf8(QJson::serialized(m_motionRegions));
+                const auto filter = QString::fromUtf8(QJson::serialized(m_motionRegions));
                 handle = loader->load(filter);
             }
-            else if(!m_cameraChunks[Qn::MotionContent].isEmpty())
+            else if (!m_cameraChunks[Qn::MotionContent].isEmpty())
             {
                 m_cameraChunks[Qn::MotionContent].clear();
                 emit periodsChanged(Qn::MotionContent);
                 return true;
             }
             break;
+        }
+
+        case Qn::AnalyticsContent:
+        {
+            const auto filter = QString::fromUtf8(QJson::serialized(m_analyticsFilter));
+            handle = loader->load(filter);
+            break;
+        }
+
         default:
+        {
             Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
             break;
+        }
     }
 
     if (handle <= 0)
@@ -229,7 +275,15 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
         .arg(dt(startTimeMs)),
         dataType);
     emit periodsChanged(timePeriodType, startTimeMs);
+}
 
+void QnCachingCameraDataLoader::invalidateCachedData()
+{
+    NX_VERBOSE(this, "Chunks: mark local cache as dirty");
+
+    for (int i = 0; i < Qn::TimePeriodContentCount; i++)
+        if (m_loaders[i])
+            m_loaders[i]->discardCachedData();
 }
 
 void QnCachingCameraDataLoader::discardCachedData()

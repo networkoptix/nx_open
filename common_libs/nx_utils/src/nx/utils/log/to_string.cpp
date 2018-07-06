@@ -3,6 +3,15 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/core/demangle.hpp>
 
+// Uncomment to try cache optimization.
+// #define NX_UTILS_TO_STRING_CACHE
+
+#if defined(NX_UTILS_TO_STRING_CACHE)
+    #include <QReadWriteLock>
+    #include <typeindex>
+    #include <unordered_map>
+#endif
+
 QString toString(char value)
 {
     return QChar::fromLatin1(value);
@@ -87,7 +96,26 @@ QString toString(const std::chrono::microseconds& value)
 
 QString toString(const std::type_info& value)
 {
-    return demangleTypeName(value.name());
+    #if defined NX_UTILS_TO_STRING_CACHE
+        static QReadWriteLock mutex;
+        static std::unordered_map<std::type_index, QString> cache;
+
+        {
+            QReadLocker lock(&mutex);
+            const auto it = cache.find(value);
+            if (it != cache.end())
+                return it->second;
+        }
+
+        QWriteLocker lock(&mutex);
+        auto& s = cache[value];
+        if (s.isEmpty())
+            s = demangleTypeName(value.name());
+
+        return s;
+    #else
+        return demangleTypeName(value.name());
+    #endif
 }
 
 QString demangleTypeName(const char* type)

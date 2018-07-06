@@ -8,15 +8,15 @@ namespace hpm {
 namespace api {
 
 ResultCode fromStunErrorToResultCode(
-    const nx::stun::attrs::ErrorCode& errorCode)
+    const nx::network::stun::attrs::ErrorCode& errorCode)
 {
     switch (errorCode.getCode())
     {
-        case nx::stun::error::badRequest:
+        case nx::network::stun::error::badRequest:
             return ResultCode::badRequest;
-        case nx::stun::error::unauthtorized:
+        case nx::network::stun::error::unauthtorized:
             return ResultCode::notAuthorized;
-        case nx::stun::extension::error::notFound:
+        case nx::network::stun::extension::error::notFound:
             return ResultCode::notFound;
         default:
             return ResultCode::otherLogicError;
@@ -28,13 +28,13 @@ int resultCodeToStunErrorCode(ResultCode resultCode)
     switch (resultCode)
     {
         case ResultCode::badRequest:
-            return nx::stun::error::badRequest;
+            return nx::network::stun::error::badRequest;
         case ResultCode::notAuthorized:
-            return nx::stun::error::unauthtorized;
+            return nx::network::stun::error::unauthtorized;
         case ResultCode::notFound:
-            return nx::stun::extension::error::notFound;
+            return nx::network::stun::extension::error::notFound;
         default:
-            return nx::stun::error::serverError;
+            return nx::network::stun::error::serverError;
     }
 }
 

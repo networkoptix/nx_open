@@ -24,7 +24,7 @@ namespace detail
 {
     GetFileOperation::GetFileOperation(
         int _id,
-        const QUrl& baseUrl,
+        const nx::utils::Url& baseUrl,
         const QString& filePath,
         const QString& localDirPath,
         const QString& hashTypeName,
@@ -157,7 +157,7 @@ namespace detail
             return;
         }
 
-        const nx_http::BufferType& partialMsgBody = m_httpClient->fetchMessageBodyBuffer();
+        const nx::network::http::BufferType& partialMsgBody = m_httpClient->fetchMessageBodyBuffer();
         if( !partialMsgBody.isEmpty() )
         {
             m_totalBytesDownloaded += partialMsgBody.size();
@@ -207,7 +207,7 @@ namespace detail
                 if( m_fileWritePending )
                     return; //not reading message body since previous message body buffer has not been written yet
 
-                const nx_http::BufferType& partialMsgBody = m_httpClient->fetchMessageBodyBuffer();
+                const nx::network::http::BufferType& partialMsgBody = m_httpClient->fetchMessageBodyBuffer();
                 if( partialMsgBody.isEmpty() )
                     return;
                 m_totalBytesDownloaded += partialMsgBody.size();
@@ -226,7 +226,7 @@ namespace detail
         }
     }
 
-    void GetFileOperation::onResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
+    void GetFileOperation::onResponseReceived( nx::network::http::AsyncHttpClientPtr httpClient )
     {
         NX_LOG( QString::fromLatin1("GetFileOperation::onResponseReceived. file %1").arg(entryPath), cl_logDEBUG2 );
 
@@ -238,8 +238,8 @@ namespace detail
         {
             case State::sCheckingLocalFile:
             {
-                const nx_http::StringType& contentLengthStr = nx_http::getHeaderValue( httpClient->response()->headers, "Content-Length" );
-                if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok ||
+                const nx::network::http::StringType& contentLengthStr = nx::network::http::getHeaderValue( httpClient->response()->headers, "Content-Length" );
+                if( httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok ||
                     contentLengthStr.isEmpty() )
                 {
                     //assuming file size is unknown and proceeding with download...
@@ -264,7 +264,7 @@ namespace detail
 
             case State::sDownloadingFile:
             {
-                if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+                if( httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok )
                 {
                     setResult( ResultCode::downloadFailure );
                     setErrorText( httpClient->response()->statusLine.reasonPhrase );
@@ -302,14 +302,14 @@ namespace detail
         }
     }
 
-    void GetFileOperation::onSomeMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
+    void GetFileOperation::onSomeMessageBodyAvailable( nx::network::http::AsyncHttpClientPtr httpClient )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
         NX_ASSERT( m_httpClient == httpClient );
         onSomeMessageBodyAvailableNonSafe();
     }
 
-    void GetFileOperation::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
+    void GetFileOperation::onHttpDone( nx::network::http::AsyncHttpClientPtr httpClient )
     {
         NX_LOG( QString::fromLatin1("GetFileOperation::onHttpDone. file %1, state %2. http result %3").
             arg(entryPath).arg((int)m_state).arg(!httpClient->failed()), cl_logDEBUG2 );
@@ -396,19 +396,19 @@ namespace detail
         }
 
         //starting async http request to get remote file size
-        QUrl downloadUrl = baseUrl;
+        nx::utils::Url downloadUrl = baseUrl;
         downloadUrl.setPath( downloadUrl.path() + "/" + entryPath );
-        m_httpClient = nx_http::AsyncHttpClient::create();
+        m_httpClient = nx::network::http::AsyncHttpClient::create();
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
             this, &GetFileOperation::onResponseReceived,
             Qt::DirectConnection );
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
             this, &GetFileOperation::onSomeMessageBodyAvailable,
             Qt::DirectConnection );
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
             this, &GetFileOperation::onHttpDone,
             Qt::DirectConnection );
         m_httpClient->setUseCompression( false );   //not using compression for server to report Content-Length
@@ -456,20 +456,20 @@ namespace detail
             m_state = State::sDownloadingFile;
         }
 
-        QUrl downloadUrl = baseUrl;
+        nx::utils::Url downloadUrl = baseUrl;
         downloadUrl.setPath( downloadUrl.path() + "/" + entryPath );
 
-        m_httpClient = nx_http::AsyncHttpClient::create();
+        m_httpClient = nx::network::http::AsyncHttpClient::create();
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::responseReceived,
             this, &GetFileOperation::onResponseReceived,
             Qt::DirectConnection );
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::someMessageBodyAvailable,
             this, &GetFileOperation::onSomeMessageBodyAvailable,
             Qt::DirectConnection );
         connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+            m_httpClient.get(), &nx::network::http::AsyncHttpClient::done,
             this, &GetFileOperation::onHttpDone,
             Qt::DirectConnection );
         m_httpClient->doGet( downloadUrl );

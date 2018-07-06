@@ -2,6 +2,7 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QClipboard>
+#include <QtGui/QScreen>
 
 #include <camera/camera_thumbnail_cache.h>
 #include <utils/mobile_app_info.h>
@@ -18,7 +19,6 @@
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
-#include <helpers/nx_globals_object.h>
 #include <helpers/system_helpers.h>
 #include <settings/last_connection.h>
 #include <settings/qml_settings_adaptor.h>
@@ -34,7 +34,6 @@ const auto kUserRightsRefactoredVersion = QnSoftwareVersion(3, 0);
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),
-    m_nxGlobals(new NxGlobalsObject(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_settings(new QmlSettingsAdaptor(this)),
     m_appInfo(new QnMobileAppInfo(this)),
@@ -45,6 +44,11 @@ QnContext::QnContext(QObject* parent) :
         this)),
     m_localPrefix(lit("qrc:///"))
 {
+    const auto screen = qApp->primaryScreen();
+    screen->setOrientationUpdateMask(Qt::PortraitOrientation | Qt::InvertedPortraitOrientation
+        | Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation);
+    connect(screen, &QScreen::orientationChanged, this, &QnContext::deviceStatusBarHeightChanged);
+
     connect(m_connectionManager, &QnConnectionManager::connectionStateChanged, this,
         [this]()
         {
@@ -121,8 +125,14 @@ void QnContext::enterFullscreen() {
     hideSystemUi();
 }
 
-int QnContext::getStatusBarHeight() const {
-    return statusBarHeight();
+int QnContext::deviceStatusBarHeight() const
+{
+    return ::statusBarHeight();
+}
+
+bool QnContext::getNavigationBarIsLeftSide() const
+{
+    return ::isLeftSideNavigationBar();
 }
 
 int QnContext::getNavigationBarHeight() const {
@@ -224,21 +234,21 @@ QString QnContext::getLastUsedSystemName() const
     return qnSettings->lastUsedConnection().systemName;
 }
 
-QUrl QnContext::getLastUsedUrl() const
+nx::utils::Url QnContext::getLastUsedUrl() const
 {
     return qnSettings->lastUsedConnection().urlWithCredentials();
 }
 
-QUrl QnContext::getInitialUrl() const
+nx::utils::Url QnContext::getInitialUrl() const
 {
     return qnSettings->startupParameters().url;
 }
 
-QUrl QnContext::getWebSocketUrl() const
+nx::utils::Url QnContext::getWebSocketUrl() const
 {
     const auto port = qnSettings->webSocketPort();
     if (port == 0)
-        return QUrl();
+        return nx::utils::Url();
 
     return nx::network::url::Builder()
         .setScheme(lit("ws"))

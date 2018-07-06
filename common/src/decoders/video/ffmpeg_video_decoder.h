@@ -7,6 +7,7 @@
 
 #include "abstract_video_decoder.h"
 #include "nx/streaming/video_data_packet.h"
+#include <deque>
 
 #ifdef _USE_DXVA
 #include "dxva/dxva.h"
@@ -70,9 +71,13 @@ private:
 
     void openDecoder(const QnConstCompressedVideoDataPtr& data);
     void closeDecoder();
-    int findMotionInfo(qint64 pkt_dts);
     void reallocateDeinterlacedFrame();
     void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height);
+    int decodeVideo(
+        AVCodecContext *avctx,
+        AVFrame *picture,
+        int *got_picture_ptr,
+        const AVPacket *avpkt);
 private:
     AVCodecContext *m_passedContext;
 
@@ -110,13 +115,14 @@ private:
     bool m_checkH264ResolutionChange;
 
     int m_forceSliceDecoding;
-    typedef QVector<QPair<qint64, QnMetaDataV1Ptr> > MotionMap; // I have used vector instead map because of 2-3 elements is tipical size
-    MotionMap m_motionMap;
+    // I have used vector instead map because of 2-3 elements is typical size
+    typedef QVector<QPair<qint64, FrameMetadata> > MotionMap;
     QAtomicInt* const m_swDecoderCount;
     mutable double m_prevSampleAspectRatio;
     bool m_forcedMtDecoding;
     qint64 m_prevTimestamp;
     bool m_spsFound;
+    std::deque<qint64> m_dtsQueue;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

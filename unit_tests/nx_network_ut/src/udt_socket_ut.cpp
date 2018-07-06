@@ -8,13 +8,13 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/test_support/stream_socket_acceptance_tests.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/test_options.h>
 
 #include "common_server_socket_ut.h"
-#include "stream_socket_ut.h"
 
 namespace nx {
 namespace network {
@@ -55,7 +55,7 @@ public:
     void setUdtSocketFunctions()
     {
         setCreateStreamSocketFunc(
-            [](bool /*sslRequired*/, NatTraversalSupport)
+            [](bool /*sslRequired*/, NatTraversalSupport, boost::optional<int> /*ipVersion*/)
                 -> std::unique_ptr<AbstractStreamSocket>
             {
                 return std::make_unique<UdtStreamSocket>(AF_INET);
@@ -115,27 +115,6 @@ TEST_F(SocketUdt, cancelConnect)
 
     serverSocket.pleaseStopSync();
 }
-
-#if 0
-TEST(SocketUdt_UdtPollSet, general)
-{
-    UdtPollSet pollset;
-    ASSERT_TRUE(pollset.isValid());
-
-    UdtStreamSocket sock;
-
-    ASSERT_TRUE(pollset.add(&sock, aio::etRead, (void*)1));
-    ASSERT_TRUE(pollset.add(&sock, aio::etWrite, (void*)2));
-
-    pollset.remove(&sock, aio::etRead);
-    pollset.remove(&sock, aio::etWrite);
-    ASSERT_TRUE(pollset.add(&sock, aio::etRead));
-    pollset.remove(&sock, aio::etRead);
-
-    auto result = pollset.poll(100);
-    ASSERT_EQ(0, result);
-}
-#endif
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST_F, SocketUdt,
@@ -295,7 +274,7 @@ protected:
                 m_serverSocketConnected.set_value(code);
             });
     }
-    
+
     void assertClientSocketHasConnected()
     {
         const auto connectResultCode = m_serverSocketConnected.get_future().get();
@@ -344,7 +323,7 @@ protected:
             {
                 break;
             }
-            
+
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
@@ -405,7 +384,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
             });
 
         UdtStreamSocket clientSock(AF_INET);
-        ASSERT_TRUE(clientSock.connect(serverAddress))
+        ASSERT_TRUE(clientSock.connect(serverAddress, nx::network::kNoTimeout))
             << serverAddress.toStdString() <<", "
             << SystemError::getLastOSErrorText().toStdString();
 
@@ -444,7 +423,7 @@ protected:
     void connectToUdtServer()
     {
         m_clientSock = std::make_unique<UdtStreamSocket>(AF_INET);
-        ASSERT_TRUE(m_clientSock->connect(m_serverAddress))
+        ASSERT_TRUE(m_clientSock->connect(m_serverAddress, nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
     }
 
@@ -469,7 +448,7 @@ private:
 
         m_udtSocketServerStarted.set_value();
 
-        std::unique_ptr<AbstractStreamSocket> acceptedSocket(m_serverSocket.accept());
+        auto acceptedSocket = m_serverSocket.accept();
         ASSERT_NE(nullptr, acceptedSocket);
 
         for (;;)
@@ -482,27 +461,6 @@ private:
         }
     }
 };
-
-TEST_F(SocketUdtNew, simpleTest)
-{
-    listenOnServerSocket();
-
-    for (int i = 0; i < 17; ++i)
-    {
-        connectToUdtServer();
-
-        std::unique_ptr<AbstractStreamSocket> acceptedSocket(m_serverSocket.accept());
-        ASSERT_NE(nullptr, acceptedSocket);
-
-        std::array<char, 128> testBuf;
-        ASSERT_EQ((int)testBuf.size(), m_clientSock->send(testBuf.data(), testBuf.size()));
-
-        std::array<char, testBuf.size()> readBuf;
-        ASSERT_EQ((int)readBuf.size(), acceptedSocket->recv(readBuf.data(), readBuf.size(), 0));
-
-        closeConnection();
-    }
-}
 
 TEST_F(SocketUdtNew, connectionProperlyClosed)
 {
@@ -547,7 +505,7 @@ TEST_F(SocketUdt, allDataReadAfterFin)
         ASSERT_TRUE(clientSock->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_NE(server.getLocalAddress(), clientSock->getLocalAddress());
 
-        ASSERT_TRUE(clientSock->connect(server.getLocalAddress()));
+        ASSERT_TRUE(clientSock->connect(server.getLocalAddress(), nx::network::kNoTimeout));
 
         auto connectionAcceptedFuture = connectionAcceptedPromise.get_future();
         ASSERT_EQ(
@@ -601,15 +559,7 @@ protected:
 
     static uint64_t selectTransferSize()
     {
-        switch (utils::TestOptions::getLoadMode())
-        {
-            case utils::TestOptions::LoadMode::light: return 100 * 1024 * 1024;
-            case utils::TestOptions::LoadMode::normal: return uint64_t(1) * 1024 * 1024 * 1024;
-            case utils::TestOptions::LoadMode::stress: return uint64_t(10) * 1024 * 1024 * 1024;
-        };
-
-        EXPECT_TRUE(false);
-        return 0;
+        return utils::TestOptions::applyLoadMode((uint64_t) 1024) * 1024 * 1024;
     }
 
     UdtSocketPerformance():
@@ -636,13 +586,13 @@ protected:
     {
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         socketConfig(socket.get());
-        EXPECT_TRUE((bool) socket->connect(address));
+        EXPECT_TRUE(socket->connect(address, nx::network::kNoTimeout));
         return socket;
     }
 
     std::unique_ptr<AbstractStreamSocket> accept() const
     {
-        std::unique_ptr<AbstractStreamSocket> socket(server->accept());
+        auto socket = server->accept();
         EXPECT_NE(nullptr, socket);
         socketConfig(socket.get());
         return socket;
@@ -773,7 +723,22 @@ struct UdtSocketTypeSet
     using ServerSocket = UdtStreamServerSocket;
 };
 
-INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocket, UdtSocketTypeSet);
+INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocketAcceptance, UdtSocketTypeSet);
+
+//-------------------------------------------------------------------------------------------------
+
+#if 0
+struct UdtStreamSocketFactory
+{
+    std::unique_ptr<nx::network::UdtStreamSocket> operator()() const
+    {
+        return std::make_unique<nx::network::UdtStreamSocket>(AF_INET);
+    }
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(UdtStreamSocket, SocketOptions, UdtStreamSocketFactory);
+INSTANTIATE_TYPED_TEST_CASE_P(UdtStreamSocket, SocketOptionsDefaultValue, UdtStreamSocketFactory);
+#endif
 
 } // namespace test
 } // namespace network

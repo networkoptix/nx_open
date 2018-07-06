@@ -1,11 +1,9 @@
 # Components Namings
-set(parent.customization "default")
 set(product.name "VMS Smart Client")
 set(display.product.name "VMS DTV")
 set(product.name.short "ust")
 set(product.appName "vmsdtv")
 set(company.name "UST")
-set(short.company.name "UST")
 
 set(uri.protocol "dtv-vms")
 set(cloudName "VMS Cloud")
@@ -35,7 +33,6 @@ set(customization.serverUpgradeCode "{48450207-3e31-4e2e-8416-95744aae0d5f}")
 set(customization.clientBundleUpgradeCode "{dbdab234-4b8e-493b-a408-fbec12461a3e}")
 set(customization.serverBundleUpgradeCode "{c83442b5-2dd4-4196-9af0-b87e96b41c3c}")
 set(customization.fullBundleUpgradeCode "{a6e3dab6-ee2b-4282-a57b-8bd8af95840b}")
-set(customization.nxtoolBundleUpgradeCode "{16572faf-8ff4-4e70-9885-493d783676d3}")
 
 set(deb.customization.company.name "ubiquity")
 
@@ -57,8 +54,24 @@ set(freeLicenseKey "0000-0000-0000-0023")
 # Installer Customizations
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(defaultTranslation en_US)
-set(additionalTranslations en_GB fr_FR de_DE ru_RU es_ES ja_JP ko_KR tr_TR zh_CN zh_TW he_IL hu_HU)
+set(additionalTranslations
+    en_GB
+    fr_FR
+    de_DE
+    ru_RU
+    es_ES
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+    nl_NL
+    pl_PL
+    vi_VN
+    th_TH
+)

@@ -1,15 +1,10 @@
-/**********************************************************
-* Apr 4, 2016
-* akolesnikov
-***********************************************************/
-
 #include <gtest/gtest.h>
 
 #include "functional_tests/test_setup.h"
 
-
 namespace nx {
 namespace cdb {
+namespace test {
 
 TEST_F(CdbFunctionalTest, client_cancellation)
 {
@@ -41,5 +36,6 @@ TEST_F(CdbFunctionalTest, client_cancellation)
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
-}   //cdb
-}   //nx
+} // namespace test
+} // namespace cdb
+} // namespace nx

@@ -12,7 +12,10 @@
          ng-if="!param.proprietary || allowProprietary"
          ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
-            {{param.name}} <small ng-if="param.optional=='false'">(requerido)</small> <small ng-if="param.proprietary">(propietario)</small>
+            {{param.name}}
+            <small>{{param.type}}</small>
+            <small ng-if="param.optional=='false'">(required)</small>
+            <small ng-if="param.proprietary">(proprietary)</small>
         </label>
         <div class="col-sm-10">
             <p class="form-control-static" ng-if="param.description.xml"
@@ -47,19 +50,21 @@
     <div class="form-group"
          ng-repeat="param in activeFunction.params | orderBy:['-proprietary','optional']"
          ng-if="!param.proprietary || allowProprietary"
-         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.type != 'info'}">
+         ng-class="{'has-warning':param.proprietary, 'has-error':param.optional=='false' && param.formType != 'info'}">
         <label class="col-sm-2 control-label" for="{{param.name}}">
-            {{param.name}} <small ng-if="param.optional=='false'"> (necesario) </small> <small ng-if="param.proprietary"> (propietario) </small>
+            {{param.name}}
+            <small>{{param.type}}</small>
+            <small ng-if="!param.optional">(required)</small>
+            <small ng-if="param.proprietary">(proprietary)</small>
         </label>
         <div class="col-sm-10">
-
-            <div ng-switch on="param.type">
+            <div ng-switch on="param.formType">
 
                 <select class="form-control input-sm"
                         ng-switch-when="enum"
                         ng-options="value.name as value.label for value in param.values"
                         id="{{param.name}}"
-                        ng-required="param.optional=='false'"
+                        ng-required="!param.optional"
                         ng-model="apiMethod.params[param.name]">
                 </select>
 
@@ -69,9 +74,9 @@
                            id="{{param.name}}"
                            class="form-control"
                            placeholder="AAAA-MM-DDTHH:mm:ss"
-                           datepicker-popup="{{Config.dateInternalFormat}}"
+                           uib-datepicker-popup="{{Config.dateInternalFormat}}"
                            ng-model="apiMethod.params[param.name]"
-                           ng-required="param.optional=='false'"
+                           ng-required="!param.optional"
                            is-open="openDate[param.name]"
                            close-text="Close" />
                     <span class="input-group-btn">
@@ -80,6 +85,13 @@
                                 class="glyphicon glyphicon-calendar"></i></button>
                     </span>
                 </div>
+
+                <input type="number" class="form-control input-sm"
+                       ng-switch-when="integer"
+                       id="{{param.name}}"
+                       ng-required="!param.optional"
+                       ng-model="apiMethod.params[param.name]">
+
                 <p class="help-block" ng-switch-when="timestamp">
                     <i>Marca de tiempo: {{apiMethod.params[param.name].getTime()}}</i>
                 </p>
@@ -88,26 +100,67 @@
                        ng-switch-when="camera"
                        id="{{param.name}}"
                        ng-model="apiMethod.params[param.name]"
-                       typeahead="camera.id as camera.id +': ' + camera.name for camera in cameras | filter:{searchLabel:$viewValue} | limitTo:10 "
-                       typeahead-focus-on-select="false"
-                       typeahead-min-length="0"
-                       typeahead-show-hint="true"
-                       typeahead-focus-first="false"
-                       typeahead-editable="false"
-                       typeahead-focus
+                       uib-typeahead="camera.id as camera.id +': ' + camera.name for camera in cameras | filter:{searchLabel:$viewValue} | limitTo:10 "
+                       uib-typeahead-focus-on-select="false"
+                       uib-typeahead-min-length="0"
+                       uib-typeahead-show-hint="true"
+                       uib-typeahead-focus-first="false"
+                       uib-typeahead-editable="false"
+                       uib-typeahead-focus
  class="form-control input-sm">
                 <p class="help-block" ng-switch-when="camera">
                     <i>Cámara seleccionada: {{cameraIds[apiMethod.params[param.name]].name}}</i>
                 </p>
+
+                <input ng-switch-when="option"
+                       type="checkbox"
+                       ng-true-value="'API_TOOL_OPTION_SET'"
+                       ng-false-value="null"
+                       ng-model="apiMethod.params[param.name]">
+
+                <input ng-switch-when="boolean" ng-if="!param.optional"
+                       type="checkbox"
+                       ng-model="apiMethod.params[param.name]">
+                <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
+                    <label>
+                        <input type="radio"
+                               ng-model="apiMethod.params[param.name]"
+                               name="{{param.name}}"
+                               id="{{param.name}}_empty"
+                               ng-value="null"
+                               ng-checked="true">
+                        dejar vacío
+                    </label>
+                </div>
+                <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
+                    <label>
+                        <input type="radio"
+                               ng-model="apiMethod.params[param.name]"
+                               name="{{param.name}}"
+                               id="{{param.name}}_verdadero"
+                               ng-value="verdadero">
+                        verdadero
+                    </label>
+                </div>
+                <div ng-switch-when="boolean" ng-if="param.optional" class="radio">
+                    <label>
+                        <input type="radio"
+                               ng-model="apiMethod.params[param.name]"
+                               name="{{param.name}}"
+                               id="{{param.name}}_falso"
+                               ng-value="falso">
+                        falso
+                    </label>
+                </div>
+
 
                 <span ng-switch-when="info"></span>
 
                 <input type="text" class="form-control input-sm"
                        ng-switch-default
  id="{{param.name}}"
-                       ng-required="param.optional=='false'"
-                       ng-model="apiMethod.params[param.name]"
-                       placeholder="{{}}">
+                       ng-required="!param.optional"
+                       ng-model="apiMethod.params[param.name]">
             </div>
 
             <p class="help-block" ng-if="param.description.xml"
@@ -161,7 +214,7 @@
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{getPostData()}}</textarea>
             <p class="help-block">
-                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+                <copy-button copy-data="result.result"></copy-button>
             </p>
         </div>
     </div>
@@ -196,7 +249,7 @@
         <div class="col-sm-10">
             <textarea class="form-control" rows="10" readonly>{{result.result}}</textarea>
             <p class="help-block">
-                <copy-button copy-data="activeCamera.id.replace('{','').replace('}','')"></copy-button>
+                <copy-button copy-data="result.result"></copy-button>
             </p>
         </div>
     </div>

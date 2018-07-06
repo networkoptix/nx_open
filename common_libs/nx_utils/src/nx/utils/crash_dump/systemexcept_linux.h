@@ -24,6 +24,7 @@ public:
     static void setSignalHandlingDisabled(bool isDisabled);
 
     //! How to find created dumps
+    static void setCrashDirectory(std::string directory);
     static std::string getCrashDirectory();
     static std::string getCrashPattern();
 };

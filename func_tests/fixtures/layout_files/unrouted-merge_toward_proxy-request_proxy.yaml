@@ -1,0 +1,12 @@
+mergers:
+  first:
+    proxy:
+  second:
+    proxy:
+networks:
+  10.254.0.0/28:
+    first:
+    proxy:
+  10.254.0.16/28:
+    proxy:
+    second:

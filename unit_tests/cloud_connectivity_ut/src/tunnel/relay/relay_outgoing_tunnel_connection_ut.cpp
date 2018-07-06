@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/cloud/tunnel/relay/relay_outgoing_tunnel_connection.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
@@ -27,7 +28,7 @@ class RelayOutgoingTunnelConnection:
     struct Result
     {
         SystemError::ErrorCode sysErrorCode;
-        std::unique_ptr<AbstractStreamSocket> connection;
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         bool stillValid;
 
         Result():
@@ -38,7 +39,7 @@ class RelayOutgoingTunnelConnection:
 
         Result(
             SystemError::ErrorCode sysErrorCode,
-            std::unique_ptr<AbstractStreamSocket> connection,
+            std::unique_ptr<nx::network::AbstractStreamSocket> connection,
             bool stillValid)
             :
             sysErrorCode(sysErrorCode),
@@ -56,9 +57,9 @@ public:
         m_connectTimeout(std::chrono::milliseconds::zero()),
         m_connectionsToCreateCount(1)
     {
-        m_resultingSocketAttributes.aioThread = 
+        m_resultingSocketAttributes.aioThread =
             SocketGlobals::aioService().getRandomAioThread();
-        m_resultingSocketAttributes.recvBufferSize = 
+        m_resultingSocketAttributes.recvBufferSize =
             nx::utils::random::number<unsigned int>(10000, 50000);
     }
 
@@ -83,7 +84,7 @@ protected:
     {
         m_relayType = RequestProcessingBehavior::fail;
     }
-    
+
     void givenSilentRelay()
     {
         m_relayType = RequestProcessingBehavior::ignore;
@@ -227,7 +228,7 @@ private:
     std::chrono::milliseconds m_connectTimeout;
     int m_connectionsToCreateCount;
     boost::optional<std::chrono::milliseconds> m_tunnelInactivityTimeout;
-    std::unique_ptr<AbstractStreamSocket> m_connection;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_connection;
     aio::BasicPollable m_aioThreadBinder;
     nx::network::SocketAttributes m_resultingSocketAttributes;
 
@@ -244,7 +245,7 @@ private:
         using namespace std::placeholders;
         using namespace nx::cloud::relay;
 
-        const auto relayUrl = QUrl("http://127.0.0.1:12345");
+        const auto relayUrl = nx::utils::Url("http://127.0.0.1:12345");
 
         auto clientToRelayConnection = api::ClientFactory::create(relayUrl);
 
@@ -269,7 +270,7 @@ private:
 
     void onConnectDone(
         SystemError::ErrorCode sysErrorCode,
-        std::unique_ptr<AbstractStreamSocket> connection,
+        std::unique_ptr<nx::network::AbstractStreamSocket> connection,
         bool stillValid)
     {
         ASSERT_TRUE(m_tunnelConnection->isInSelfAioThread());

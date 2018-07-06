@@ -21,6 +21,8 @@
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 
+using namespace nx::client::desktop;
+
 class QnUserRoleSettingsWidgetPrivate: public Connective<QObject>, public QnConnectionContextAware
 {
     using base_type = Connective<QObject>;
@@ -320,7 +322,7 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
         {
             auto name = text.trimmed().toLower();
             if (name.isEmpty())
-                return Qn::ValidationResult(tr("Role name cannot be empty."));
+                return ValidationResult(tr("Role name cannot be empty."));
 
             auto model = d_ptr->model;
             for (const auto& userRole: model->userRoles())
@@ -331,7 +333,7 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
                 if (userRole.name.trimmed().toLower() != name)
                     continue;
 
-                return Qn::ValidationResult(tr("Role with same name already exists."));
+                return ValidationResult(tr("Role with same name already exists."));
             }
 
             auto predefined = userRolesManager()->predefinedRoles();
@@ -341,13 +343,13 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
                 if (userRolesManager()->userRoleName(role).trimmed().toLower() != name)
                     continue;
 
-                return Qn::ValidationResult(tr("Role with same name already exists."));
+                return ValidationResult(tr("Role with same name already exists."));
             }
 
-            return Qn::kValidResult;
+            return ValidationResult::kValid;
         });
 
-    connect(ui->nameInputField, &QnInputField::textChanged, this,
+    connect(ui->nameInputField, &InputField::textChanged, this,
         [this]
         {
             ui->nameInputField->validate();

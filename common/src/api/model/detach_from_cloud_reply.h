@@ -13,6 +13,12 @@ struct DetachFromCloudReply
         cannotCleanUpCloudDataInLocalDb,
     };
 
+    DetachFromCloudReply():
+        resultCode(ResultCode::ok),
+        cloudServerResultCode(0)
+    {
+    }
+
     DetachFromCloudReply(
         ResultCode resultCode,
         int cloudServerResultCode = 0)

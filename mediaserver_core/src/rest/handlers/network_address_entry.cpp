@@ -24,12 +24,12 @@ static bool readExtraFields(QnNetworkAddressEntryList& entryList, bool addFromCo
     }
     const QByteArray data = netSettings.readAll();
 
-    nx_http::LineSplitter lineSplitter;
+    nx::network::http::LineSplitter lineSplitter;
     QnByteArrayConstRef line;
     size_t bytesRead = 0;
     size_t dataOffset = 0;
     QnNetworkAddressEntry* currentEntry = nullptr;
-    while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
+    while( lineSplitter.parseByLines( nx::network::http::ConstBufferRefType(data, dataOffset), &line, &bytesRead) )
     {
         dataOffset += bytesRead;
 
@@ -80,12 +80,13 @@ static bool readExtraFields(QnNetworkAddressEntryList& entryList, bool addFromCo
 QnNetworkAddressEntryList systemNetworkAddressEntryList(bool* isOk, bool addFromConfig)
 {
     QnNetworkAddressEntryList entryList;
-
-    const bool allInterfaces = (QnAppInfo::isBpi());
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces))
+    using namespace nx::network;
+    const auto policy = QnAppInfo::isBpi()
+        ? InterfaceListPolicy::allowInterfacesWithoutAddress : InterfaceListPolicy::oneAddressPerInterface;
+    for (const auto& iface: getAllIPv4Interfaces(policy))
     {
         static const QChar kColon = ':';
-        if (allInterfaces && iface.name.contains(kColon))
+        if (policy == InterfaceListPolicy::allowInterfacesWithoutAddress && iface.name.contains(kColon))
             continue;
 
         QnNetworkAddressEntry entry;

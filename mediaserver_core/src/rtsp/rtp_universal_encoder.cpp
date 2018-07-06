@@ -57,6 +57,7 @@ static const struct
   {34, "H263",       AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_H263, 90000, -1},
   {96, "H264",       AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_H264, 90000, -1},
   {96, "MPEG4-GENERIC",  AVMEDIA_TYPE_VIDEO,   AV_CODEC_ID_MPEG4, 90000, -1},
+  {96, "H265", AVMEDIA_TYPE_VIDEO, AV_CODEC_ID_HEVC, 90000, -1},
   {-1, "",           AVMEDIA_TYPE_UNKNOWN, AV_CODEC_ID_NONE, -1, -1}
 };
 
@@ -620,7 +621,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
     QnConstAbstractMediaDataPtr media,
     AVCodecID transcodeToCodec,
     const QSize& videoSize,
-    const QnImageFilterHelper& extraTranscodeParams)
+    const QnLegacyTranscodingSettings& extraTranscodeParams)
 :
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
     m_outputPos(0),
@@ -641,8 +642,8 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(
         method = media->compressionType == transcodeToCodec ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode;
 
     if (media->dataType == QnAbstractMediaData::VIDEO) {
-        m_transcoder.setExtraTranscodeParams(extraTranscodeParams);
-        m_transcoder.setVideoCodec(m_codec, method, Qn::QualityNormal, videoSize);
+        m_transcoder.setTranscodingSettings(extraTranscodeParams);
+        m_transcoder.setVideoCodec(m_codec, method, Qn::StreamQuality::normal, videoSize);
     }
     else {
         m_transcoder.setAudioCodec(m_codec, method);

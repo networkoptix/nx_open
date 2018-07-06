@@ -1,5 +1,4 @@
-#ifndef onvif_resource_h
-#define onvif_resource_h
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
@@ -19,12 +18,15 @@
 #include <QElapsedTimer>
 #include <QtCore/QTimeZone>
 
-#include <core/resource/security_cam_resource.h>
-#include <core/resource/camera_resource.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <core/resource/camera_advanced_param.h>
 
-#include <nx/network/simple_http_client.h>
-#include "nx/streaming/media_data_packet.h"
+#include <core/resource/resource_data_structures.h>
+#include <nx/mediaserver/resource/camera_advanced_parameters_providers.h>
+#include <nx/network/deprecated/simple_http_client.h>
+#include <nx/streaming/media_data_packet.h>
+#include <onvif/soapStub.h>
+
 #include "soap_wrapper.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;
@@ -40,8 +42,6 @@ typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
 typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 typedef onvifXsd__VideoSourceConfiguration VideoSource;
 
-class VideoOptionsLocal;
-
 //first = width, second = height
 
 class QDomElement;
@@ -51,9 +51,10 @@ class QnOnvifMaintenanceProxy;
 template<typename SyncWrapper, typename Request, typename Response>
 class GSoapAsyncCallWrapper;
 
-/*
-* This structure is used during discovery process. These data are read by getDeviceInformation request and may override data from multicast packet
-*/
+/**
+ * This structure is used during discovery process.
+ * These data are read by getDeviceInformation request and may override data from multicast packet.
+ */
 struct OnvifResExtInfo
 {
     QString name;
@@ -67,20 +68,22 @@ struct OnvifResExtInfo
 
 struct QnOnvifServiceUrls
 {
-	QString deviceServiceUrl;
-	QString mediaServiceUrl;
-	QString ptzServiceUrl;
-	QString imagingServiceUrl;
-	QString anlyticsServiceUrl;
-	QString eventsServiceUrl;
-	QString thermalServiceUrl;
+    QString deviceServiceUrl;
+    QString mediaServiceUrl;
+    QString ptzServiceUrl;
+    QString imagingServiceUrl;
+    QString anlyticsServiceUrl;
+    QString eventsServiceUrl;
+    QString thermalServiceUrl;
 
 };
 
-class QnPlOnvifResource: public QnPhysicalCameraResource
+class QnPlOnvifResource:
+    public nx::mediaserver::resource::Camera
 {
     Q_OBJECT
-    using base_type = QnPhysicalCameraResource;
+    using base_type = nx::mediaserver::resource::Camera;
+
 public:
 
     typedef GSoapAsyncCallWrapper <
@@ -130,6 +133,31 @@ public:
         SIZE_OF_AUDIO_CODECS // TODO: #Elric #enum
     };
 
+    class VideoOptionsLocal
+    {
+    public:
+        VideoOptionsLocal() = default;
+
+        VideoOptionsLocal(const QString& id, const VideoOptionsResp& resp,
+            QnBounds frameRateBounds = QnBounds());
+
+        QVector<onvifXsd__H264Profile> h264Profiles;
+        QString id;
+        QList<QSize> resolutions;
+        bool isH264 = false;
+        int minQ = -1;
+        int maxQ = 1;
+        int frameRateMin = -1;
+        int frameRateMax = -1;
+        int govMin = -1;
+        int govMax = -1;
+        bool usedInProfiles = false;
+        QString currentProfile;
+
+    private:
+        int restrictFrameRate(int frameRate, QnBounds frameRateBounds) const;
+    };
+
     static const QString MANUFACTURE;
     static QString MEDIA_URL_PARAM_NAME;
     static QString ONVIF_URL_PARAM_NAME;
@@ -137,9 +165,11 @@ public:
     static const float QUALITY_COEF;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;
-    static const int ADVANCED_SETTINGS_VALID_TIME; //Time, during which adv settings will not be obtained from camera (in milliseconds)
+    // Time, during which adv settings will not be obtained from camera (in milliseconds)
+    static const int ADVANCED_SETTINGS_VALID_TIME;
 
-    static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
+    static const QString fetchMacAddress(
+        const NetIfacesResp& response, const QString& senderIpAddress);
 
     QnPlOnvifResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnPlOnvifResource();
@@ -147,7 +177,6 @@ public:
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
     virtual void setHostAddress(const QString &ip) override;
-
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
@@ -173,30 +202,24 @@ public:
         bool activate,
         unsigned int autoResetTimeoutMS ) override;
 
-    int innerQualityToOnvif(Qn::StreamQuality quality) const;
-    const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress()); }
+    int innerQualityToOnvif(Qn::StreamQuality quality, int minQuality, int maxQuality) const;
+    const QString createOnvifEndpointUrl() const
+    {
+        return createOnvifEndpointUrl(getHostAddress());
+    }
 
-    int getGovLength() const;
     int getAudioBitrate() const;
     int getAudioSamplerate() const;
-    QSize getPrimaryResolution() const;
-    QSize getSecondaryResolution() const;
-    int getPrimaryH264Profile() const;
-    int getSecondaryH264Profile() const;
-    QSize getMaxResolution() const;
     int getTimeDrift() const; // return clock diff between camera and local clock at seconds
     void setTimeDrift(int value); // return clock diff between camera and local clock at seconds
     //bool isSoapAuthorized() const;
     const QSize getVideoSourceSize() const;
 
-    const QString getPrimaryVideoEncoderId() const;
-    const QString getSecondaryVideoEncoderId() const;
     const QString getAudioEncoderId() const;
     const QString getVideoSourceId() const;
     const QString getAudioSourceId() const;
 
     void updateOnvifUrls(const QnPlOnvifResourcePtr& other);
-
 
     QString getMediaUrl() const;
     void setMediaUrl(const QString& src);
@@ -219,7 +242,6 @@ public:
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
-    CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
     virtual void setOnvifRequestsRecieveTimeout(int timeout);
@@ -228,22 +250,19 @@ public:
     virtual int getOnvifRequestsRecieveTimeout() const;
     virtual int getOnvifRequestsSendTimeout() const;
 
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
+    /** calculate clock diff between camera and local clock at seconds. */
+    void calcTimeDrift(int* outSoapRes = nullptr) const;
+    static int calcTimeDrift(const QString& deviceUrl,
+        int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 
-    void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
-    static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
+    virtual QnCameraAdvancedParamValueMap getApiParameters(const QSet<QString>& ids);
+    virtual QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result);
-
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
-    static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
+    static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl,
+        const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
     CameraDiagnostics::Result readDeviceInformation();
     CameraDiagnostics::Result getFullUrlInfo();
-
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
@@ -263,11 +282,14 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
         const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    bool detectVideoSourceCount();
+    virtual CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
 
-    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
-    bool secondaryResolutionIsLarge() const;
-    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const override;
+    virtual CameraDiagnostics::Result sendVideoEncoderToCameraEx(
+        VideoEncoder& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& params);
+    virtual int suggestBitrateKbps(
+        const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const override;
 
     QnMutex* getStreamConfMutex();
     virtual void beforeConfigureStream(Qn::ConnectionRole role);
@@ -276,28 +298,39 @@ public:
 
     double getClosestAvailableFps(double desiredFps);
 
-    QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
+    QSize findSecondaryResolution(
+        const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
     static bool isCameraForcedToOnvif(const QString& manufacturer, const QString& model);
+
+    VideoOptionsLocal primaryVideoCapabilities() const;
+    VideoOptionsLocal secondaryVideoCapabilities() const;
+
+    void updateVideoEncoder(
+        VideoEncoder& encoder,
+        Qn::StreamIndex streamIndex,
+        const QnLiveStreamParams& streamParams);
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
+
 protected:
+    virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
-    void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
-    virtual CameraDiagnostics::Result initInternal() override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
+    virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
         CapabilitiesResp* outCapabilitiesResponse,
         DeviceSoapWrapper** outDeviceSoapWrapper);
     virtual CameraDiagnostics::Result initializeMedia(const CapabilitiesResp& onvifCapabilities);
     virtual CameraDiagnostics::Result initializePtz(const CapabilitiesResp& onvifCapabilities);
     virtual CameraDiagnostics::Result initializeIo(const CapabilitiesResp& onvifCapabilities);
-    virtual CameraDiagnostics::Result initializeAdvancedParameters(const CapabilitiesResp& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializeAdvancedParameters(
+        const CapabilitiesResp& onvifCapabilities);
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-
-    virtual void setCroppingPhysical(QRect cropping);
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
@@ -307,58 +340,63 @@ protected:
     virtual void fetchAndSetAdvancedParameters();
 
     virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values);
-    virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value);
-    virtual bool setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result);
+    virtual bool setAdvancedParameterUnderLock(
+        const QnCameraAdvancedParameter &parameter, const QString &value);
+    virtual bool setAdvancedParametersUnderLock(
+        const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result);
 
-    virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& /*capabilitiesResponse*/) {
+    virtual CameraDiagnostics::Result customInitialization(
+        const CapabilitiesResp& /*capabilitiesResponse*/)
+    {
         return CameraDiagnostics::NoErrorResult();
     }
 
     void setMaxFps(int f);
-    void setPrimaryResolution(const QSize& value);
+
+    void setPrimaryVideoCapabilities(const VideoOptionsLocal& capabilities)
+    {
+        m_primaryStreamCapabilities = capabilities;
+    }
+    void setSecondaryVideoCapabilities(const VideoOptionsLocal& capabilities)
+    {
+        m_secondaryStreamCapabilities = capabilities;
+    }
+    boost::optional<onvifXsd__H264Profile> getH264StreamProfile(
+        const VideoOptionsLocal& videoOptionsLocal);
+    CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
 private:
     CameraDiagnostics::Result fetchAndSetResourceOptions();
-    void fetchAndSetPrimarySecondaryResolution();
     CameraDiagnostics::Result fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
-    void updateSecondaryResolutionList(const VideoOptionsLocal& opts);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
 
-    CameraDiagnostics::Result fetchVideoSourceToken();
     CameraDiagnostics::Result fetchAndSetVideoSource();
     CameraDiagnostics::Result fetchAndSetAudioSource();
 
-    void setVideoEncoderOptions(const VideoOptionsLocal& opts);
-    void setVideoEncoderOptionsH264(const VideoOptionsLocal& opts);
-    void setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts);
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
-    void setMinMaxQuality(int min, int max);
 
     int round(float value);
-    QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
-    int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
-
 
     void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
     CameraDiagnostics::Result sendVideoSourceToCamera(VideoSource* source);
 
     QRect getVideoSourceMaxSize(const QString& configToken);
 
-    bool isH264Allowed() const; // block H264 if need for compatible with some onvif devices
     CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 
     bool checkResultAndSetStatus(const CameraDiagnostics::Result& result);
 
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
-    QList<QSize> m_resolutionList; //Sorted desc
-    QList<QSize> m_secondaryResolutionList;
+    VideoOptionsLocal m_primaryStreamCapabilities;
+    VideoOptionsLocal m_secondaryStreamCapabilities;
 
-    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
+    virtual bool startInputPortMonitoringAsync(
+        std::function<void(bool)>&& completionHandler) override;
     virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
 
@@ -367,10 +405,16 @@ protected:
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     void updateFirmware();
+    void scheduleRetrySubscriptionTimer();
     virtual bool subscribeToCameraNotifications();
 
     bool createPullPointSubscription();
-    bool loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
+    bool loadXmlParametersInternal(
+        QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
+    void setMaxChannels(int value);
+
+    virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
+
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 
@@ -384,45 +428,33 @@ private:
     };
 
     //!Parses <dom0:SubscriptionId xmlns:dom0=\"(null)\">1</dom0:SubscriptionId>
-    class SubscriptionReferenceParametersParseHandler
-    :
-        public QXmlDefaultHandler
+    class SubscriptionReferenceParametersParseHandler: public QXmlDefaultHandler
     {
     public:
         QString subscriptionID;
 
         SubscriptionReferenceParametersParseHandler();
 
-        virtual bool characters( const QString& ch ) override;
-        virtual bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts ) override;
-        virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
+        virtual bool characters(const QString& ch) override;
+        virtual bool startElement(const QString& namespaceURI, const QString& localName,
+            const QString& qName, const QXmlAttributes& atts) override;
+        virtual bool endElement(const QString& namespaceURI, const QString& localName,
+            const QString& qName) override;
 
     private:
         bool m_readingSubscriptionID;
     };
 
-    //!Parses tt:Message element (onvif-core-specification, 9.11.6)
-    class NotificationMessageParseHandler
-    :
-        public QXmlDefaultHandler
+    // !Parses tt:Message element (onvif-core-specification, 9.11.6).
+    class NotificationMessageParseHandler: public QXmlDefaultHandler
     {
     public:
-        class SimpleItem
+        struct SimpleItem
         {
-        public:
             QString name;
             QString value;
-
-            SimpleItem()
-            {
-            }
-
-            SimpleItem( const QString& _name, const QString& _value )
-            :
-                name( _name ),
-                value( _value )
-            {
-            }
+            SimpleItem() {}
+            SimpleItem(const QString& name, const QString& value): name(name), value(value) {}
         };
 
         const QTimeZone timeZone;
@@ -431,10 +463,13 @@ private:
         std::list<SimpleItem> source;
         SimpleItem data;
 
+    public:
         NotificationMessageParseHandler(QTimeZone timeZone);
 
-        virtual bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts ) override;
-        virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
+        virtual bool startElement(const QString& namespaceURI, const QString& localName,
+            const QString& qName, const QXmlAttributes& atts) override;
+        virtual bool endElement(const QString& namespaceURI, const QString& localName,
+            const QString& qName) override;
 
     private:
         // TODO: #Elric #enum
@@ -446,35 +481,24 @@ private:
             readingSourceItem,
             readingData,
             readingDataItem,
-            //skipping unknown element
-            skipping
+            skipping, //< Skipping unknown element.
         };
 
         std::stack<State> m_parseStateStack;
     };
 
-    class TriggerOutputTask
+    struct TriggerOutputTask
     {
-    public:
         QString outputID;
         bool active;
         unsigned int autoResetTimeoutMS;
 
-        TriggerOutputTask()
-        :
-            active( false ),
-            autoResetTimeoutMS( 0 )
-        {
-        }
+        TriggerOutputTask(): active(false), autoResetTimeoutMS(0) {}
 
         TriggerOutputTask(
-            const QString _outputID,
-            const bool _active,
-            const unsigned int _autoResetTimeoutMS )
-        :
-            outputID( _outputID ),
-            active( _active ),
-            autoResetTimeoutMS( _autoResetTimeoutMS )
+            const QString outputID, const bool active, const unsigned int autoResetTimeoutMS)
+            :
+            outputID(outputID), active(active), autoResetTimeoutMS(autoResetTimeoutMS)
         {
         }
     };
@@ -486,22 +510,11 @@ private:
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
 
-    int m_iframeDistance;
-    int m_minQuality;
-    int m_maxQuality;
-    CODECS m_primaryCodec;
-    CODECS m_secondaryCodec;
     AUDIO_CODECS m_audioCodec;
-    QSize m_primaryResolution;
-    QSize m_secondaryResolution;
-    int m_primaryH264Profile;
-    int m_secondaryH264Profile;
     int m_audioBitrate;
     int m_audioSamplerate;
     //QRect m_physicalWindowSize;
     QSize m_videoSourceSize;
-    QString m_primaryVideoEncoderId;
-    QString m_secondaryVideoEncoderId;
     QString m_audioEncoderId;
     QString m_videoSourceId;
     QString m_audioSourceId;
@@ -516,6 +529,7 @@ private:
     mutable QTimeZone m_cameraTimeZone;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     bool m_isRelayOutputInversed;
+    bool m_fixWrongInputPortNumber;
     std::map<QString, RelayInputState> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
@@ -540,6 +554,7 @@ private:
     QString m_portNamePrefixToIgnore;
     size_t m_inputPortCount;
     std::vector<QString> m_portAliases;
+    std::unique_ptr<onvifXsd__H264Configuration> m_tmpH264Conf;
 
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
@@ -566,7 +581,7 @@ private:
         bool active,
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
-    QnAbstractPtzController* createSpecialPtzController();
+    QnAbstractPtzController* createSpecialPtzController() const;
     bool trustMaxFPS();
     CameraDiagnostics::Result fetchOnvifCapabilities(
         DeviceSoapWrapper* const soapWrapper,
@@ -574,21 +589,21 @@ private:
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
-    bool initializeTwoWayAudio();
+    virtual QnAudioTransmitterPtr initializeTwoWayAudio();
+    QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();
 
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
-	mutable QnOnvifServiceUrls m_serviceUrls;
+    mutable QnOnvifServiceUrls m_serviceUrls;
     mutable QnResourceVideoLayoutPtr m_videoLayout;
+
 protected:
-    QnCameraAdvancedParams m_advancedParameters;
+    nx::mediaserver::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     int m_onvifRecieveTimeout;
     int m_onvifSendTimeout;
 };
 
 #endif //ENABLE_ONVIF
-
-#endif //onvif_resource_h

@@ -15,7 +15,7 @@ class QnCrossdomainConnectionProcessorPrivate;
 class QnCrossdomainConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnCrossdomainConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnCrossdomainConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnCrossdomainConnectionProcessor();
 protected:
     virtual void run() override;

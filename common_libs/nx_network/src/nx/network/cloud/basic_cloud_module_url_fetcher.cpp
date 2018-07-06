@@ -1,5 +1,8 @@
 #include "basic_cloud_module_url_fetcher.h"
 
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -28,6 +31,18 @@ CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
     registerResource(hpmUdpUrl, "hpm.udpUrl", QVariant::String);
 
     registerResource(notificationModuleUrl, kNotificationModuleName, QVariant::String);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+VeryBasicCloudModuleUrlFetcher::VeryBasicCloudModuleUrlFetcher():
+    m_modulesXmlUrl(AppInfo::defaultCloudModulesXmlUrl(nx::network::SocketGlobals::cloud().cloudHost()))
+{
+}
+
+void VeryBasicCloudModuleUrlFetcher::setModulesXmlUrl(nx::utils::Url url)
+{
+    m_modulesXmlUrl = std::move(url);
 }
 
 } // namespace cloud

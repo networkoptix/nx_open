@@ -32,6 +32,11 @@ public:
         const QString& applicationName,
         const QString& moduleName,
         QSettings::Scope scope = QSettings::SystemScope);
+    /**
+     * Initialize using existing QSettings object.
+     * Caller is responsible for existingSettings life time.
+     */
+    QnSettings(QSettings* existingSettings);
 
     void parseArgs(int argc, const char* argv[]);
     bool contains(const QString& key) const;
@@ -50,6 +55,7 @@ private:
     const QString m_moduleName;
     const QSettings::Scope m_scope;
 
-    std::unique_ptr<QSettings> m_systemSettings;
+    std::unique_ptr<QSettings> m_ownSettings;
+    QSettings* m_systemSettings = nullptr;
     nx::utils::ArgumentParser m_args;
 };

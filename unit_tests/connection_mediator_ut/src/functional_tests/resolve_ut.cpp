@@ -169,7 +169,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     ASSERT_TRUE(mserverEmulator.start());
     ASSERT_EQ(api::ResultCode::ok, mserverEmulator.bind());
 
-    //resolving 
+    //resolving
     api::ResolvePeerResponse resolveResponse;
     api::ResultCode resultCode = api::ResultCode::ok;
     std::tie(resultCode, resolveResponse) =

@@ -3,7 +3,9 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace header {
 namespace test {
 
@@ -13,7 +15,7 @@ class HttpHeaderStrictTransportSecurity:
 protected:
     void givenHeaderWithRandomValues()
     {
-        m_originalHeader.maxAge = 
+        m_originalHeader.maxAge =
             std::chrono::seconds(nx::utils::random::number<int>(1, 100000));
         m_originalHeader.includeSubDomains = nx::utils::random::number<bool>();
         m_originalHeader.preload = nx::utils::random::number<bool>();
@@ -76,4 +78,6 @@ TEST_F(HttpHeaderStrictTransportSecurity, parse_ignores_unknown_attributes)
 
 } // namespace test
 } // namespace header
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

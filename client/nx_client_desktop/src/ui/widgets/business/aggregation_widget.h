@@ -1,37 +1,41 @@
-#ifndef AGGREGATION_WIDGET_H
-#define AGGREGATION_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
-namespace Ui {
-    class AggregationWidget;
-}
+namespace Ui { class AggregationWidget; }
 
-class QnAggregationWidget : public QWidget
+namespace Ui { class TimeDurationWidget; }
+
+namespace nx {
+namespace client {
+namespace desktop {
+
+class AggregationWidget: public QWidget
 {
     Q_OBJECT
 
-public:
-    explicit QnAggregationWidget(QWidget *parent = 0);
-    ~QnAggregationWidget();
+    typedef QWidget base_type;
 
-    Q_SLOT void setValue(int secs);
+public:
+    explicit AggregationWidget(QWidget* parent);
+    virtual ~AggregationWidget() override;
+
+    void setValue(int secs);
     int value() const;
 
     void setShort(bool value);
 
     static int optimalWidth();
 
-    QWidget *lastTabItem();
+    QWidget* lastTabItem() const;
 
 signals:
     void valueChanged();
 
 private:
-    void updateMinimumValue();
-
-private:
     QScopedPointer<Ui::AggregationWidget> ui;
 };
 
-#endif // AGGREGATION_WIDGET_H
+} // namespace desktop
+} // namespace client
+} // namespace nx

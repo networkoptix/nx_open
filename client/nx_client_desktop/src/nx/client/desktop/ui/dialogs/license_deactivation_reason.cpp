@@ -4,16 +4,21 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QPushButton>
 
-#include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
+#include <ui/workbench/workbench_context.h>
 
-#include <nx/client/desktop/ui/common/text_edit_field.h>
-#include <nx/client/desktop/ui/common/combo_box_field.h>
+#include <nx/client/desktop/common/widgets/text_edit_field.h>
+#include <nx/client/desktop/common/widgets/combo_box_field.h>
+
+#include <core/resource/user_resource.h>
+#include <api/global_settings.h>
+#include <common/common_module.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
-using namespace nx::client::desktop::ui;
-
-Qn::TextValidateFunction reasonComboBoxValidator(
+TextValidateFunction reasonComboBoxValidator(
     const QStringList& reasons,
     const QString& errorText)
 {
@@ -22,8 +27,8 @@ Qn::TextValidateFunction reasonComboBoxValidator(
         {
             const auto reasonIndex = reasons.indexOf(text);
             return  reasonIndex > 0 //< First index is "Choose option"
-                ? Qn::kValidResult
-                : Qn::ValidationResult(errorText);
+                ? ValidationResult::kValid
+                : ValidationResult(errorText);
         };
 
     return validator;
@@ -34,15 +39,15 @@ bool isLastSelectedOption(ComboBoxField* field)
     return field && field->currentIndex() == (field->items().size() - 1);
 }
 
-Qn::TextValidateFunction reasonTextEditValidator(
+TextValidateFunction reasonTextEditValidator(
     TextEditField* field,
     const QString& errorText)
 {
-    const auto nonEmptyValidator = Qn::defaultNonEmptyValidator(errorText);
+    const auto nonEmptyValidator = defaultNonEmptyValidator(errorText);
     const auto validator =
         [nonEmptyValidator, field](const QString& text)
         {
-            return field->isVisible() ? nonEmptyValidator(text) : Qn::kValidResult;
+            return field->isVisible() ? nonEmptyValidator(text) : ValidationResult::kValid;
         };
 
     return validator;
@@ -56,17 +61,18 @@ namespace desktop {
 namespace ui {
 namespace dialogs {
 
-using namespace nx::client::desktop::ui;
-
 LicenseDeactivationReason::LicenseDeactivationReason(
     const license::RequestInfo& info,
     QWidget* parent)
     :
-    base_type(QnMessageBoxIcon::Information,
-        tr("Please fill up information about yourself and reason for license deactivation"),
-        QString(), QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent),
+    base_type(parent),
     m_info(info)
 {
+    setIcon(QnMessageBoxIcon::Information);
+    setText(tr("Please fill up information about yourself and reason for license deactivation"));
+    setStandardButtons(QDialogButtonBox::Cancel);
+    setDefaultButton(QDialogButtonBox::NoButton);
+
     const auto nextButton = addButton(tr("Next"),
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
 
@@ -110,16 +116,16 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
             layout->addWidget(field);
         };
 
-    const auto nameField = QnInputField::create(m_info.name,
-        Qn::defaultNonEmptyValidator(tr("Name is necessary")));
-    const auto emailField = QnInputField::create(m_info.email,
-        Qn::defaultEmailValidator(false));
+    const auto nameField = InputField::create(m_info.name,
+        defaultNonEmptyValidator(tr("Name is necessary")));
+    const auto emailField = InputField::create(m_info.email,
+        defaultEmailValidator(false));
 
     static const auto kReasonNecessaryText = tr("Reason is necessary");
     const auto reasonComboBox = ComboBoxField::create(reasons(), 0,
         reasonComboBoxValidator(reasons(), kReasonNecessaryText), this);
     reasonComboBox->setRowHidden(0);
-    const auto reasonField = TextEditField::create(QString(), Qn::TextValidateFunction());
+    const auto reasonField = TextEditField::create(QString(), TextValidateFunction());
     reasonField->setValidator(reasonTextEditValidator(reasonField, kReasonNecessaryText));
 
     const auto updateReasonFieldState =
@@ -136,6 +142,7 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
             handleFieldChanges(reasonField);
         };
 
+
     connect(reasonComboBox, &ComboBoxField::currentIndexChanged, this, updateReasonFieldState);
     updateReasonFieldState();
 
@@ -145,8 +152,11 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
             const auto reasonText = isLastSelectedOption(reasonComboBox)
                 ? reasonField->text().split(lit("\n"))
                 : QStringList(reasonComboBox->text());
+
+            const auto systemName = qnGlobalSettings->systemName();
+            const auto userName = context()->user()->getName();
             m_info = nx::client::desktop::license::RequestInfo({
-                nameField->text(), emailField->text(), reasonText});
+                nameField->text(), emailField->text(), reasonText, systemName, userName});
         });
 
     addLabel(tr("Name"));

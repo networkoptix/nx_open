@@ -45,7 +45,7 @@ public:
         const std::string& authKey);
     const AccountWithPassword& ownerAccount() const;
     const api::SystemData& registeredSystemData() const;
-    QUrl cdbEc2TransactionUrl() const;
+    nx::utils::Url cdbEc2TransactionUrl() const;
 
 protected:
     void establishConnectionBetweenVmsAndCloud();
@@ -94,8 +94,7 @@ private:
     AccountWithPassword m_account;
     api::SystemData m_system;
 
-    api::ResultCode fetchTransactionLog(
-        const QUrl& url,
+    api::ResultCode fetchTransactionLog(const utils::Url &url,
         ::ec2::ApiTransactionDataList* const transactionList);
     bool findAdminUserId(QnUuid* const id);
 };

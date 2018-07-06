@@ -22,11 +22,13 @@ int main(int argc, char** argv)
             }
             else
             {
-                nx::ut::cfg::configInstance().tmpDir = 
+                nx::ut::cfg::configInstance().tmpDir =
                     QDir(QDir::tempPath()).absoluteFilePath("vms_cloud_integration_tests");
             }
 
             nx::network::ssl::Engine::useRandomCertificate("vms_cloud_integration_tests");
             return nx::utils::test::DeinitFunctions();
-        });
+        },
+        nx::network::InitializationFlags::none,
+        nx::utils::test::GtestRunFlag::gtestThrowOnFailure);
 }

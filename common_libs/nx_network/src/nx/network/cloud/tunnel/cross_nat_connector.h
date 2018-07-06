@@ -7,7 +7,7 @@
 #include <type_traits>
 
 #include <nx/network/aio/timer.h>
-#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/cloud/mediator_client_connections.h>
 #include <nx/utils/move_only_func.h>

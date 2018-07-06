@@ -459,7 +459,7 @@ window.JsHlsAPI = function(){
             }
         }
     };
-};
+}
 
 JsHlsAPI.prototype.kill = function(){
     this.hls.destroy();

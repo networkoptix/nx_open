@@ -7,7 +7,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 
-#include "data/listening_peer.h"
 #include "listening_peer_pool.h"
 #include "relay/abstract_relay_cluster_client.h"
 
@@ -17,7 +16,6 @@ namespace hpm {
 PeerRegistrator::PeerRegistrator(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
-    nx::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* const listeningPeerPool,
     AbstractRelayClusterClient* const relayClusterClient)
 :
@@ -26,86 +24,23 @@ PeerRegistrator::PeerRegistrator(
     m_listeningPeerPool(listeningPeerPool),
     m_relayClusterClient(relayClusterClient)
 {
-    using namespace std::placeholders;
-    const auto result =
-        dispatcher->registerRequestProcessor(
-            stun::extension::methods::bind,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
-                { bind( std::move(connection), std::move( message ) ); } ) &&
-
-        dispatcher->registerRequestProcessor(
-            stun::extension::methods::listen,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::listen,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            } ) &&
-
-        dispatcher->registerRequestProcessor(
-            stun::extension::methods::getConnectionState,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::checkOwnState,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            } ) &&
-
-        dispatcher->registerRequestProcessor(
-            stun::extension::methods::resolveDomain,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::resolveDomain,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            }) &&
-
-        dispatcher->registerRequestProcessor(
-            stun::extension::methods::resolvePeer,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::resolvePeer,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            }) &&
-
-        dispatcher->registerRequestProcessor(
-            stun::extension::methods::clientBind,
-            [this](const ConnectionStrongRef& connection, stun::Message message)
-            {
-                processRequestWithOutput(
-                    &PeerRegistrator::clientBind,
-                    this,
-                    std::move(connection),
-                    std::move(message));
-            }) ;
-
-    // TODO: NX_LOG
-    NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
 PeerRegistrator::~PeerRegistrator()
 {
     m_counter.wait();
+    m_asyncOperationGuard->terminate();
 }
 
-data::ListeningPeers PeerRegistrator::getListeningPeers() const
+api::ListeningPeers PeerRegistrator::getListeningPeers() const
 {
-    data::ListeningPeers result;
+    api::ListeningPeers result;
     result.systems = m_listeningPeerPool->getListeningPeers();
 
     QnMutexLocker lk(&m_mutex);
     for (const auto& client: m_boundClients)
     {
-        data::BoundClient info;
+        api::BoundClient info;
         if (const auto connetion = client.second.connection.lock())
             info.connectionEndpoint = connetion->getSourceAddress().toString();
 
@@ -120,18 +55,18 @@ data::ListeningPeers PeerRegistrator::getListeningPeers() const
 
 void PeerRegistrator::bind(
     const ConnectionStrongRef& connection,
-    stun::Message requestMessage)
+    network::stun::Message requestMessage)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return sendErrorResponse(
             connection,
             requestMessage.header,
             api::ResultCode::badTransport,
-            stun::error::badRequest,
+            network::stun::error::badRequest,
             "Only tcp is allowed for bind request");
 
     auto serverConnection =
-        std::dynamic_pointer_cast<nx::stun::ServerConnection>(connection);
+        std::dynamic_pointer_cast<network::stun::ServerConnection>(connection);
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -153,7 +88,7 @@ void PeerRegistrator::bind(
         mediaserverData);
     //TODO #ak if peer has already been bound with another connection, overwriting it...
     //peerDataLocker.value().peerConnection = connection;
-    if (const auto attr = requestMessage.getAttribute< stun::extension::attrs::PublicEndpointList >())
+    if (const auto attr = requestMessage.getAttribute< network::stun::extension::attrs::PublicEndpointList >())
         peerDataLocker.value().endpoints = attr->get();
     else
         peerDataLocker.value().endpoints.clear();
@@ -169,14 +104,14 @@ void PeerRegistrator::bind(
 void PeerRegistrator::listen(
     const ConnectionStrongRef& connection,
     api::ListenRequest requestData,
-    stun::Message requestMessage,
+    network::stun::Message requestMessage,
     std::function<void(api::ResultCode, api::ListenResponse)> completionHandler)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return completionHandler(api::ResultCode::badTransport, {});    //Only tcp is allowed for listen request
 
     auto serverConnection =
-        std::dynamic_pointer_cast<nx::stun::ServerConnection>(connection);
+        std::dynamic_pointer_cast<network::stun::ServerConnection>(connection);
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -213,14 +148,14 @@ void PeerRegistrator::listen(
             completionHandler = std::move(completionHandler), mediaserverConnectionKey,
             asyncCallLocker = m_counter.getScopedIncrement()](
                 nx::cloud::relay::api::ResultCode resultCode,
-                QUrl relayInstanceUrl)
+                QUrl relayInstanceUrl) mutable
         {
             // Sending response from connection's aio thread.
             auto aioCaller = std::make_unique<nx::network::aio::BasicPollable>();
             aioCaller->bindToAioThread(serverConnectionAioThread);
             auto aioCallerPtr = aioCaller.get();
 
-            // TODO: #ak Code here looks like shit. Major refactoring is needed.
+            // TODO: #ak Code here is a mess. Major refactoring is needed.
             // Likely, it is needed to get rid of shared connections to simplify it.
 
             aioCallerPtr->post(
@@ -242,7 +177,7 @@ void PeerRegistrator::listen(
 void PeerRegistrator::checkOwnState(
     const ConnectionStrongRef& connection,
     api::GetConnectionStateRequest /*requestData*/,
-    stun::Message requestMessage,
+    network::stun::Message requestMessage,
     std::function<void(api::ResultCode, api::GetConnectionStateResponse)> completionHandler)
 {
     MediaserverData mediaserverData;
@@ -271,7 +206,7 @@ void PeerRegistrator::checkOwnState(
 void PeerRegistrator::resolveDomain(
     const ConnectionStrongRef& connection,
     api::ResolveDomainRequest requestData,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(
         api::ResultCode, api::ResolveDomainResponse)> completionHandler)
 {
@@ -302,7 +237,7 @@ void PeerRegistrator::resolveDomain(
 void PeerRegistrator::resolvePeer(
     const ConnectionStrongRef& connection,
     api::ResolvePeerRequest requestData,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(
         api::ResultCode, api::ResolvePeerResponse)> completionHandler)
 {
@@ -338,7 +273,7 @@ void PeerRegistrator::resolvePeer(
 void PeerRegistrator::clientBind(
     const ConnectionStrongRef& connection,
     api::ClientBindRequest requestData,
-    stun::Message /*requestMessage*/,
+    network::stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler)
 {
     const auto reject = [&](api::ResultCode code)
@@ -357,11 +292,12 @@ void PeerRegistrator::clientBind(
         return reject(api::ResultCode::badRequest);
 
     auto peerId = std::move(requestData.originatingPeerID);
-    nx::stun::Message indication;
+    network::stun::Message indication;
     std::vector<ConnectionWeakRef> listeningPeerConnections;
     {
         QnMutexLocker lk(&m_mutex);
         ClientBindInfo& info = m_boundClients[peerId];
+        connection->setInactivityTimeout(boost::none);
         info.connection = connection;
         info.tcpReverseEndpoints = std::move(requestData.tcpReverseEndpoints);
 
@@ -374,8 +310,15 @@ void PeerRegistrator::clientBind(
     }
 
     connection->addOnConnectionCloseHandler(
-        [this, peerId, connection]()
+        [this, peerId, connection, guard = m_asyncOperationGuard.sharedGuard()]()
         {
+            // TODO: #ak Logic here seems to duplicate ListeningPeerPool.
+            // The only difference is here we have client connection, there - server connection.
+
+            auto lock = guard->lock();
+            if (!lock)
+                return; //< ListeningPeerPool has been destroyed.
+
             QnMutexLocker lk(&m_mutex);
             const auto it = m_boundClients.find(peerId);
             if (it == m_boundClients.end() || it->second.connection.lock() != connection)
@@ -409,7 +352,7 @@ void PeerRegistrator::sendListenResponse(
 void PeerRegistrator::reportClientBind(
     const MediaserverData& mediaserverConnectionKey)
 {
-    std::shared_ptr<nx::stun::ServerConnection> peerConnection;
+    std::shared_ptr<nx::network::stun::ServerConnection> peerConnection;
 
     {
         auto peerLocker = m_listeningPeerPool->findAndLockPeerDataByHostName(
@@ -426,7 +369,7 @@ void PeerRegistrator::reportClientBind(
 void PeerRegistrator::sendClientBindIndications(
     const ConnectionStrongRef& connection)
 {
-    std::vector<nx::stun::Message> clientBindIndications;
+    std::vector<network::stun::Message> clientBindIndications;
     {
         QnMutexLocker lk(&m_mutex);
         for (const auto& client: m_boundClients)
@@ -437,7 +380,7 @@ void PeerRegistrator::sendClientBindIndications(
         connection->sendMessage(std::move(indication));
 }
 
-nx::stun::Message PeerRegistrator::makeIndication(
+network::stun::Message PeerRegistrator::makeIndication(
     const String& id,
     const ClientBindInfo& info) const
 {
@@ -448,7 +391,10 @@ nx::stun::Message PeerRegistrator::makeIndication(
     event.params = m_settings.connectionParameters();
     event.isPersistent = true;
 
-    nx::stun::Message indication(stun::Header(stun::MessageClass::indication, event.kMethod));
+    network::stun::Message indication(
+        network::stun::Header(
+            network::stun::MessageClass::indication,
+            event.kMethod));
     event.serialize(&indication);
     return indication;
 }

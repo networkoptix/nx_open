@@ -72,7 +72,7 @@ bool Videowall::checkLocalFiles(QWidget* parent,
         };
 
     if (displayDelayed)
-        executeDelayedParented(execMessage, kDefaultDelay, parent);
+        executeDelayedParented(execMessage, parent);
     else
         execMessage();
 

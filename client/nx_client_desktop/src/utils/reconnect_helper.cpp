@@ -60,11 +60,11 @@ QnMediaServerResourcePtr QnReconnectHelper::currentServer() const
     return m_servers[m_currentIndex];
 }
 
-QUrl QnReconnectHelper::currentUrl() const
+nx::utils::Url QnReconnectHelper::currentUrl() const
 {
     const auto server = currentServer();
     if (!server)
-        return QUrl();
+        return nx::utils::Url();
 
     const auto discoverManager = commonModule()->moduleDiscoveryManager();
     if (const auto endpoint = discoverManager->getEndpoint(server->getId()))
@@ -76,7 +76,7 @@ QUrl QnReconnectHelper::currentUrl() const
         return builder.toUrl();
     }
 
-    return QUrl();
+    return nx::utils::Url();
 }
 
 void QnReconnectHelper::next()

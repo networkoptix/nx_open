@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout, systemAPI) {
+    .controller('DebugCtrl', ['$scope', 'mediaserver', '$sessionStorage', '$location',
+                              'dialogs', '$timeout', 'systemAPI',
+    function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout, systemAPI) {
 
         mediaserver.getUser().then(function(user){
             if(!user.isOwner){
@@ -223,4 +225,4 @@ angular.module('webadminApp')
             return $scope.linkSettings.rtspLink;
         };
 
-    });
+    }]);

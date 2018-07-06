@@ -1,27 +1,33 @@
 #include "stun_server.h"
 
+#include <nx/network/cloud/mediator/api/mediator_api_http_paths.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "http/http_api_path.h"
 #include "http/http_server.h"
 #include "settings.h"
 
 namespace nx {
 namespace hpm {
 
-StunServer::StunServer(const conf::Settings& settings):
+StunServer::StunServer(
+    const conf::Settings& settings,
+    http::Server* httpServer)
+    :
     m_settings(settings),
     m_stunOverHttpServer(&m_stunMessageDispatcher),
-    m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::SocketServer>>(
+    m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::SocketServer>>(
         &m_stunMessageDispatcher,
         /* ssl required? */ false,
         nx::network::NatTraversalSupport::disabled)),
-    m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::UdpServer>>(
+    m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<network::stun::UdpServer>>(
         &m_stunMessageDispatcher))
 {
     if (!bind())
         throw std::runtime_error("Error binding to specified STUN address");
+
+    initializeHttpTunnelling(httpServer);
 }
 
 void StunServer::listen()
@@ -47,24 +53,29 @@ void StunServer::listen()
 void StunServer::stopAcceptingNewRequests()
 {
     m_tcpStunServer->pleaseStopSync();
-    m_udpStunServer->forEachListener(&stun::UdpServer::stopReceivingMessagesSync);
+    m_udpStunServer->forEachListener(&network::stun::UdpServer::stopReceivingMessagesSync);
 }
 
-const std::vector<SocketAddress>& StunServer::endpoints() const
+const std::vector<network::SocketAddress>& StunServer::endpoints() const
 {
     return m_endpoints;
 }
 
-nx::stun::MessageDispatcher& StunServer::dispatcher()
+network::stun::MessageDispatcher& StunServer::dispatcher()
 {
     return m_stunMessageDispatcher;
+}
+
+const StunServer::MultiAddressStunServer& StunServer::server() const
+{
+    return *m_tcpStunServer;
 }
 
 void StunServer::initializeHttpTunnelling(http::Server* httpServer)
 {
     m_stunOverHttpServer.setupHttpTunneling(
         &httpServer->messageDispatcher(),
-        http::kStunOverHttpTunnelPath);
+        network::url::joinPath(api::kMediatorApiPrefix, api::kStunOverHttpTunnelPath).c_str());
 }
 
 bool StunServer::bind()
@@ -75,18 +86,19 @@ bool StunServer::bind()
         return false;
     }
 
-    m_tcpStunServer->forEachListener(
-        [this](stun::SocketServer* server)
-        {
-            server->setConnectionInactivityTimeout(m_settings.stun().connectionInactivityTimeout);
-        });
-
     if (!m_tcpStunServer->bind(m_settings.stun().addrToListenList))
     {
         NX_LOGX(lit("Can not bind to TCP addresses: %1")
             .arg(containerString(m_settings.stun().addrToListenList)), cl_logERROR);
         return false;
     }
+
+    m_tcpStunServer->forEachListener(
+        [this](network::stun::SocketServer* server)
+        {
+            server->setConnectionInactivityTimeout(
+                m_settings.stun().connectionInactivityTimeout);
+        });
 
     m_endpoints = m_tcpStunServer->endpoints();
 

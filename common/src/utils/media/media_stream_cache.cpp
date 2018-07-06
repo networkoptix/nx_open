@@ -89,13 +89,13 @@ MediaStreamCache::~MediaStreamCache()
 {
 }
 
-//!Implementation of QnAbstractDataReceptor::canAcceptData
+//!Implementation of QnAbstractMediaDataReceptor::canAcceptData
 bool MediaStreamCache::canAcceptData() const
 {
     return m_sharedImpl->canAcceptData();
 }
 
-//!Implementation of QnAbstractDataReceptor::putData
+//!Implementation of QnAbstractMediaDataReceptor::putData
 void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 {
     m_sharedImpl->putData( data );

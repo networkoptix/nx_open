@@ -1,12 +1,4 @@
-/*
- * plugin_manager.h
- *
- *  Created on: Sep 11, 2012
- *      Author: a.kolesnikov
- */
-
-#ifndef PLUGIN_MANAGER_H
-#define PLUGIN_MANAGER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
@@ -18,8 +10,9 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
-#include "plugin_api.h"
-#include "plugin_container_api.h"
+#include <plugins/plugin_api.h>
+#include <plugins/plugin_container_api.h>
+#include <nx/sdk/metadata/plugin.h>
 
 
 //!Loads custom application plugins and provides plugin management methods
@@ -30,28 +23,28 @@
     - process current directory
     - process binary directory
 
-    \note This class implements single-tone
     \note Methods of class are thread-safe
 */
 class PluginManager
 :
-    public QObject,
-    public Singleton<PluginManager>
+    public QObject
 {
     Q_OBJECT
 
 public:
     enum PluginType
     {
-        QtPlugin = 1, //!< Qt-based plugins.
-        NxPlugin = 2, //!< Plugins, implementing plugin_api.h.
-        
+        QtPlugin = 1, //< Qt-based plugins.
+        NxPlugin = 2, //< Plugins, implementing plugin_api.h.
+
         AllPlugins = QtPlugin | NxPlugin
     };
 
     PluginManager(
+        QObject* parent,
         const QString& pluginDir = QString(),
-        nxpl::PluginInterface* const pluginContainer = nullptr);
+        nxpl::PluginInterface* pluginContainer = nullptr);
+
     virtual ~PluginManager();
 
     //!Searches for plugins of type \a T among loaded plugins
@@ -87,6 +80,12 @@ public:
         return foundPlugins;
     }
 
+    /** @return Null string if not found. */
+    QString pluginLibName(const nxpl::PluginInterface* plugin)
+    {
+        return m_libNameByNxPlugin.value(plugin);
+    }
+
     /*!
         \param settings This settings are reported to each plugin (if supported by plugin of course)
         This method must be called implicitly
@@ -104,6 +103,7 @@ private:
     nxpl::PluginInterface* const m_pluginContainer;
     QList<QSharedPointer<QPluginLoader> > m_qtPlugins;
     QList<nxpl::PluginInterface*> m_nxPlugins;
+    QHash<const nxpl::PluginInterface*, QString> m_libNameByNxPlugin;
     mutable QnMutex m_mutex;
 
     void loadPluginsFromDir(
@@ -114,7 +114,7 @@ private:
     //!Loads \a nxpl::PluginInterface based plugin
     bool loadNxPlugin(
         const std::vector<nxpl::Setting>& settingsForPlugin,
-        const QString& fullFilePath );
+        const QString& fileDir,
+        const QString& fileName,
+        const QStringList& disabledPluginLibNames);
 };
-
-#endif /* PLUGIN_MANAGER_H */

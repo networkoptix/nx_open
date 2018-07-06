@@ -6,6 +6,8 @@ static const int NONCE_SIZE = 12;
 static const int IP_SIZE = 16;
 static const quint8 RESPONSE_BIT = (1 << 7);
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 QDataStream& operator<<(QDataStream& stream, const RequestHeader& data)
@@ -131,3 +133,5 @@ QByteArray makeRandomNonce()
 }
 
 } // namespace pcp
+} // namespace network
+} // namespace nx

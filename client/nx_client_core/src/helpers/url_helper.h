@@ -1,15 +1,16 @@
 #pragma once
 
 #include <QtCore/QUrl>
+#include <nx/utils/url.h>
 
 class QnUrlHelper
 {
     Q_GADGET
 
 public:
-    QnUrlHelper(const QUrl& url = QUrl());
+    QnUrlHelper(const nx::utils::Url& url = nx::utils::Url());
 
-    Q_INVOKABLE QUrl url() const;
+    Q_INVOKABLE nx::utils::Url url() const;
 
     Q_INVOKABLE QString scheme() const;
     Q_INVOKABLE QString host() const;
@@ -20,10 +21,10 @@ public:
     Q_INVOKABLE QString password() const;
     Q_INVOKABLE QString path() const;
 
-    Q_INVOKABLE QUrl cleanUrl() const;
+    Q_INVOKABLE nx::utils::Url cleanUrl() const;
 
 private:
-    QUrl m_url;
+    nx::utils::Url m_url;
 };
 
 Q_DECLARE_METATYPE(QnUrlHelper)

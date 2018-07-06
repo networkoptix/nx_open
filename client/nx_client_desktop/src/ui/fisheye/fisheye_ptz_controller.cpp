@@ -51,7 +51,7 @@ QnFisheyePtzController::QnFisheyePtzController(const QnMediaResourcePtr& mediaRe
     updateLimits();
 }
 
-qreal QnFisheyePtzController::customAR() const
+QnAspectRatio QnFisheyePtzController::customAR() const
 {
     return m_widget->resource()->customAspectRatio();
 }
@@ -84,7 +84,7 @@ void QnFisheyePtzController::updateLimits()
     if (m_itemDewarpingParams.panoFactor > 1)
         imageAR = 1.0 / (qreal) m_itemDewarpingParams.panoFactor;
     qreal radiusY = m_mediaDewarpingParams.radius * imageAR / m_mediaDewarpingParams.hStretch;
-    
+
     qreal minY = m_mediaDewarpingParams.yCenter - radiusY;
     qreal maxY = m_mediaDewarpingParams.yCenter + radiusY;
 
@@ -99,7 +99,7 @@ void QnFisheyePtzController::updateLimits()
         m_unlimitedPan = false;
         m_limits.minPan = -90.0;
         m_limits.maxPan = 90.0;
-        
+
         m_limits.minTilt = -90.0;
         m_limits.maxTilt = 90.0;
 
@@ -108,7 +108,7 @@ void QnFisheyePtzController::updateLimits()
             m_limits.minTilt += (maxY - 1.0) * 180.0;
         if (minY < 0.0)
             m_limits.maxTilt += minY * 180.0;
-        
+
 #if 0
         // not tested yet. Also, I am not sure that it's needed for real cameras
         if (maxX > 1.0)
@@ -227,9 +227,9 @@ void QnFisheyePtzController::absoluteMoveInternal(const QVector3D& position)
     m_itemDewarpingParams.yAngle = qDegreesToRadians(position.y());
     m_itemDewarpingParams.fov = qDegreesToRadians(position.z());
 
-    /* We check for item as we can get here in a rare case when item is 
+    /* We check for item as we can get here in a rare case when item is
      * destroyed, but the widget is not (yet). */
-    if (m_widget && m_widget->item()) 
+    if (m_widget && m_widget->item())
         m_widget->item()->setDewarpingParams(m_itemDewarpingParams);
 }
 
@@ -321,7 +321,7 @@ bool QnFisheyePtzController::absoluteMove(
         {
             m_startPosition.setX(qMod(m_startPosition.x(), 360.0));
             m_endPosition.setX(qMod(m_endPosition.x(), 360.0));
-            
+
             if (m_endPosition.x() - 180.0 > m_startPosition.x())
                 m_endPosition.setX(m_endPosition.x() - 360.0);
             if (m_endPosition.x() + 180.0 < m_startPosition.x())
@@ -335,7 +335,7 @@ bool QnFisheyePtzController::absoluteMove(
             distance.x() / m_unitSpeed.x(), distance.y() / m_unitSpeed.y()).length();
         const qreal zoomTime = distance.z() / m_unitSpeed.z();
         m_relativeSpeed = qBound(0.0, speed, 1.0) / qMax(panTiltTime, zoomTime);
-        
+
         startListening();
     }
 
@@ -346,7 +346,7 @@ bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D
 {
     if (space != Qn::LogicalPtzCoordinateSpace)
         return false;
-    
+
     *position = getPositionInternal();
 
     return true;
@@ -356,7 +356,7 @@ QVector3D QnFisheyePtzController::positionFromRect(
     const QnMediaDewarpingParams &dewarpingParams,
     const QRectF& rect)
 {
-    // TODO: #PTZ 
+    // TODO: #PTZ
     // implement support for x/y displacement
 
     QPointF center = rect.center() - QPointF(0.5, 0.5);

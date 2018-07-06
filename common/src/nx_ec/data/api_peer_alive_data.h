@@ -8,15 +8,17 @@
 #include "api_fwd.h"
 #include "api_tran_state_data.h"
 
+#include <nx/vms/api/data/data.h>
+
 namespace ec2
 {
-    struct ApiPeerAliveData: ApiData
+    struct ApiPeerAliveData: nx::vms::api::Data
     {
-        ApiPeerAliveData(): isAlive(false) {}
+        ApiPeerAliveData() = default;
         ApiPeerAliveData(const ApiPeerData& peer, bool isAlive): peer(peer), isAlive(isAlive) {}
 
         ApiPeerData peer;
-        bool isAlive;
+        bool isAlive = false;
         QnTranState persistentState;
         QnTranState runtimeState;
     };

@@ -4,7 +4,7 @@
 
 #include <nx/streaming/video_data_packet.h>
 #include <nx/utils/random.h>
-#include <streaming/hls/hls_live_playlist_manager.h>
+#include <nx/mediaserver/hls/hls_live_playlist_manager.h>
 #include <utils/media/media_stream_cache.h>
 #include <media_server/settings.h>
 
@@ -22,7 +22,7 @@ TEST(hls_LivePlaylistManager, general)
     MediaStreamCache mediaCache(
         targetCacheSize.count(),
         maxCacheSize.count());
-    nx_hls::HLSLivePlaylistManager hlsPlaylistManager(
+    nx::mediaserver::hls::LivePlaylistManager hlsPlaylistManager(
         &mediaCache,
         targetDuration.count(),
         nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP);
@@ -51,7 +51,7 @@ TEST(hls_LivePlaylistManager, general)
         mediaCache.putData(std::move(packet));
 
         //checking that hlsPlaylistManager refers to existing data
-        std::vector<nx_hls::AbstractPlaylistManager::ChunkData> chunks;
+        std::vector<nx::mediaserver::hls::AbstractPlaylistManager::ChunkData> chunks;
         bool endOfStreamReached = false;
         hlsPlaylistManager.generateChunkList(&chunks, &endOfStreamReached);
         ASSERT_FALSE(endOfStreamReached);

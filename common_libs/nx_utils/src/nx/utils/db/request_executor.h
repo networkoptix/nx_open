@@ -7,6 +7,7 @@
 
 #include <QtSql/QSqlDatabase>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 
 #include "db_statistics_collector.h"
@@ -19,14 +20,22 @@ namespace db {
 
 class StatisticsCollector;
 
+enum class QueryType
+{
+    lookup,
+    modification,
+};
+
 class NX_UTILS_API AbstractExecutor
 {
 public:
-    virtual ~AbstractExecutor() {}
+    virtual ~AbstractExecutor() = default;
 
     /** Executed within DB connection thread. */
     virtual DBResult execute(QSqlDatabase* const connection) = 0;
     virtual void reportErrorWithoutExecution(DBResult errorCode) = 0;
+    virtual QueryType queryType() const = 0;
+    virtual void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -36,10 +45,12 @@ class NX_UTILS_API BaseExecutor:
     public AbstractExecutor
 {
 public:
-    BaseExecutor();
+    BaseExecutor(QueryType queryType);
     virtual ~BaseExecutor() override;
 
     virtual DBResult execute(QSqlDatabase* const connection) override;
+    virtual QueryType queryType() const override;
+    virtual void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     void setStatisticsCollector(StatisticsCollector* statisticsCollector);
 
@@ -64,6 +75,12 @@ protected:
         {
             dbResult = e.dbResult();
         }
+        catch (const std::exception& e)
+        {
+            // TODO: #ak Propagate exception further so that "execute query sync" function throws this exception.
+            NX_DEBUG(this, lm("Caught exception. %1").arg(e.what()));
+            dbResult = DBResult::logicError;
+        }
         return dbResult;
     }
 
@@ -72,6 +89,8 @@ private:
     std::chrono::steady_clock::time_point m_creationTime;
     QueryExecutionInfo m_queryStatistics;
     bool m_queryExecuted;
+    nx::utils::MoveOnlyFunc<void()> m_onBeforeDestructionHandler;
+    QueryType m_queryType;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -84,12 +103,15 @@ template<typename InputData>
 class UpdateExecutor:
     public BaseExecutor
 {
+    using base_type = BaseExecutor;
+
 public:
     UpdateExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&)> dbUpdateFunc,
         InputData&& input,
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData)> completionHandler)
     :
+        base_type(QueryType::modification),
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_input(std::move(input)),
         m_completionHandler(std::move(completionHandler))
@@ -153,12 +175,15 @@ template<typename InputData, typename OutputData>
 class UpdateWithOutputExecutor:
     public BaseExecutor
 {
+    using base_type = BaseExecutor;
+
 public:
     UpdateWithOutputExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&, OutputData* const)> dbUpdateFunc,
         InputData&& input,
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData, OutputData&&)> completionHandler)
     :
+        base_type(QueryType::modification),
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_input(std::move(input)),
         m_completionHandler(std::move(completionHandler))
@@ -219,6 +244,8 @@ private:
 class NX_UTILS_API UpdateWithoutAnyDataExecutor:
     public BaseExecutor
 {
+    using base_type = BaseExecutor;
+
 public:
     UpdateWithoutAnyDataExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
@@ -238,6 +265,8 @@ private:
 class NX_UTILS_API UpdateWithoutAnyDataExecutorNoTran:
     public BaseExecutor
 {
+    using base_type = BaseExecutor;
+
 public:
     UpdateWithoutAnyDataExecutorNoTran(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
@@ -257,6 +286,8 @@ private:
 class NX_UTILS_API SelectExecutor:
     public BaseExecutor
 {
+    using base_type = BaseExecutor;
+
 public:
     SelectExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "dummy_socket.h"
 
@@ -20,14 +20,14 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
     virtual bool isConnected() const override;
 
 private:
-    const std::string& m_data;
+    const std::string m_data;
     bool m_isOpened;
     size_t m_curPos;
 };

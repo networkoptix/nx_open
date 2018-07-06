@@ -24,18 +24,24 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
-#include <camera/resource_display.h> //< TODO: #Elric FWD!
+#include <nx/client/desktop/camera/camera_fwd.h>
+#include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
-#include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
+
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
+class RecordingStatusHelper;
 class EntropixImageEnhancer;
+class MediaResourceWidgetPrivate;
+class AreaHighlightOverlayWidget;
+class AreaSelectOverlayWidget;
 
 namespace ui {
 namespace graphics {
@@ -50,6 +56,7 @@ class SoftwareTriggerButton;
 
 // TODO: Remove this when QnMediaResourceWidget is refactored and put into proper namespace.
 using QnSoftwareTriggerButton = nx::client::desktop::ui::graphics::SoftwareTriggerButton;
+using QnMediaResourceWidgetPrivate = nx::client::desktop::MediaResourceWidgetPrivate;
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -156,9 +163,21 @@ public:
 
     void setZoomWindowCreationModeEnabled(bool enabled);
     void setMotionSearchModeEnabled(bool enabled);
+    bool isMotionSearchModeEnabled() const;
 
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();
+
+    bool isLicenseUsed() const;
+
+    bool isAnalyticsEnabled() const;
+    void setAnalyticsEnabled(bool analyticsEnabled);
+
+    void setAnalyticsSearchModeEnabled(bool enabled);
+    QRectF analyticsSearchRect() const;
+    void setAnalyticsSearchRect(const QRectF& value);
+
+    nx::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
 
 signals:
     void motionSelectionChanged();
@@ -169,6 +188,10 @@ signals:
     void positionChanged(qint64 positionUtcMs);
     void motionSearchModeEnabled(bool enabled);
     void zoomWindowCreationModeEnabled(bool enabled);
+    void zoomWindowRectangleVisibleChanged();
+    void licenseStatusChanged();
+    void analyticsSearchAreaSelected(const QRectF& relativeRect);
+    void ptzControllerChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -184,6 +207,8 @@ protected:
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
     virtual Qn::ResourceOverlayButton calculateOverlayButton(
+        Qn::ResourceStatusOverlay statusOverlay) const override;
+    virtual QString overlayCustomButtonText(
         Qn::ResourceStatusOverlay statusOverlay) const override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -222,7 +247,7 @@ protected:
 
     rest::Handle invokeTrigger(const QString& id,
         std::function<void(bool, rest::Handle)> resultHandler,
-        nx::vms::event::EventState toggleState = nx::vms::event::EventState::undefined);
+        nx::vms::api::EventState toggleState = nx::vms::api::EventState::undefined);
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -234,11 +259,12 @@ private slots:
     void at_camDisplay_liveChanged();
     void processSettingsRequest();
     void processDiagnosticsRequest();
-    void processIoEnableRequest();
+    void processEnableLicenseRequest();
     void processMoreLicensesRequest();
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
+    void at_analyticsButton_toggled(bool checked);
 
     void at_entropixEnhancementButton_clicked();
     void at_entropixImageLoaded(const QImage& image);
@@ -252,9 +278,13 @@ private slots:
     void clearEntropixEnhancedImage();
 
 private:
+    void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+    void handleDewarpingParamsChanged();
+
     void setDisplay(const QnResourceDisplayPtr &display);
     void createButtons();
-    void createPtzController();
+
+    void updatePtzController();
 
     qreal calculateVideoAspectRatio() const;
 
@@ -266,6 +296,7 @@ private:
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
+    Q_SLOT void updateAreaHighlightVisibility();
 
     void updateCompositeOverlayMode();
 
@@ -276,11 +307,6 @@ private:
     void updateCurrentUtcPosMs();
 
     void setupHud();
-
-    void initSoftwareTriggers();
-
-    void updateTriggersAvailability();
-    void updateTriggerAvailability(const nx::vms::event::RulePtr& rule);
 
     void setTextOverlayParameters(const QnUuid& id, bool visible,
         const QString& text, const QnHtmlTextItemOptions& options);
@@ -309,40 +335,42 @@ private:
 
     struct SoftwareTrigger
     {
+        QnUuid ruleId;
         SoftwareTriggerInfo info;
         QnUuid overlayItemId;
     };
 
-    SoftwareTrigger* createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
+    void initRenderer();
+    void initDisplay();
+    void initSoftwareTriggers();
+    void initIoModuleOverlay();
+    void initAreaSelectOverlay();
+    void initAreaHighlightOverlay();
+    void initStatusOverlayController();
+
+    void createTriggerIfRelevant(const nx::vms::event::RulePtr& rule);
     bool isRelevantTriggerRule(const nx::vms::event::RulePtr& rule) const;
     void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info,
         std::function<void()> clientSideHandler = std::function<void()>());
     void resetTriggers();
 
+    void updateTriggersAvailability();
+    void updateTriggerAvailability(const nx::vms::event::RulePtr& rule, bool force=false);
+    void updateTriggerButtonTooltip(
+        QnSoftwareTriggerButton* button,
+        const SoftwareTriggerInfo& info,
+        bool enabledBySchedule);
+
+    void getResourceStates();
+
+    using TriggerDataList = QList<SoftwareTrigger>;
+    TriggerDataList::iterator lowerBoundbyTriggerRuleId(const QnUuid& id);
+
 private:
-    struct ResourceStates
-    {
-        bool isRealTimeSource;  /// Shows if resource is real-time source
-        bool isOffline;         /// Shows if resource is offline. Not-real-time resource is alwasy online
-        bool isUnauthorized;    /// Shows if resource is unauthorized. Not-real-time resource is alwasy online
-        bool hasVideo;          /// Shows if resource has video
-    };
-
-    /// @brief Return resource states
-    ResourceStates getResourceStates() const;
-
-private:
-    /** Media resource. */
-    QnMediaResourcePtr m_resource;
-
-    /** Camera resource. */
-    QnVirtualCameraResourcePtr m_camera;
-
-    /** Display. */
-    QnResourceDisplayPtr m_display;
+    QScopedPointer<QnMediaResourceWidgetPrivate> d;
 
     /** Associated renderer. */
-    QnResourceWidgetRenderer *m_renderer;
+    QnResourceWidgetRenderer* m_renderer = nullptr;
 
     /** Selected region for search-by-motion, in parrots. */
     QList<QRegion> m_motionSelection;
@@ -356,36 +384,35 @@ private:
     mutable QList<QnMotionRegion> m_motionSensitivity;
 
     /** Whether the motion sensitivity is valid. */
-    mutable bool m_motionSensitivityValid;
+    mutable bool m_motionSensitivityValid = false;
 
     /** Binary mask for the current motion region. */
     mutable QList<simd128i *> m_binaryMotionMask;
 
     /** Whether motion mask binary data is valid. */
-    mutable bool m_binaryMotionMaskValid;
+    mutable bool m_binaryMotionMaskValid = false;
 
     /** Whether motion selection cached paths are valid. */
-    mutable bool m_motionSelectionCacheValid;
+    mutable bool m_motionSelectionCacheValid = false;
 
     /** Position for text labels for all motion sensitivity regions. */
     /*   m_motionLabelPositions[channel][sensitivity][polygonIndex]  */
     mutable QVector<std::array<QVector<QPoint>, QnMotionRegion::kSensitivityLevelCount>> m_motionLabelPositions;
 
     /** Whether motion label positions data is valid. */
-    mutable bool m_motionLabelPositionsValid;
+    mutable bool m_motionLabelPositionsValid = false;
 
     QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
 
+    nx::client::desktop::RecordingStatusHelper* m_recordingStatusHelper;
+
     QnPtzControllerPtr m_ptzController;
-    QnFisheyeHomePtzController *m_homePtzController;
+    QnFisheyeHomePtzController* m_homePtzController = nullptr;
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
-    bool m_ioCouldBeShown;
-
-    typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
-    QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
+    QnIoModuleOverlayWidget* m_ioModuleOverlayWidget = nullptr;
+    bool m_ioCouldBeShown = false;
 
     qint64 m_posUtcMs;
 
@@ -398,11 +425,15 @@ private:
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
-    QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
+    nx::client::desktop::AreaHighlightOverlayWidget* m_areaHighlightOverlayWidget = nullptr;
+    nx::client::desktop::AreaSelectOverlayWidget* m_areaSelectOverlayWidget = nullptr;
+
+    TriggerDataList m_triggers;
 
     QScopedPointer<nx::client::desktop::EntropixImageEnhancer> m_entropixEnhancer;
     QImage m_entropixEnhancedImage;
     int m_entropixProgress = -1;
+    QnUuid m_itemId;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

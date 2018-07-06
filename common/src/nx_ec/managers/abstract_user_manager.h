@@ -14,11 +14,15 @@ class AbstractUserNotificationManager: public QObject
     Q_OBJECT
 
 signals:
-    void addedOrUpdated(const ApiUserData& user, NotificationSource source);
-    void userRoleAddedOrUpdated(const ApiUserRoleData& userRole);
+    /**
+     * Notice: should keep ec2:: namespace for all signal declarations, or moc/qt signals
+     * will fail to pick correct metadata when you try to emit queued signal
+     */
+    void addedOrUpdated(const ec2::ApiUserData& user, ec2::NotificationSource source);
+    void userRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole);
     void removed(const QnUuid& id);
     void userRoleRemoved(const QnUuid& id);
-    void accessRightsChanged(const ApiAccessRightsData& access);
+    void accessRightsChanged(const ec2::ApiAccessRightsData& access);
 };
 
 typedef std::shared_ptr<AbstractUserNotificationManager> AbstractUserNotificationManagerPtr;

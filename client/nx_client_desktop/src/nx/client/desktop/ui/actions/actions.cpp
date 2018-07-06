@@ -2,11 +2,14 @@
 
 #include <core/resource/device_dependent_strings.h>
 
+#include <ini.h>
+
 #include <client/client_runtime_settings.h>
 
 #include <nx/client/desktop/ui/actions/menu_factory.h>
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action_factories.h>
+#include <nx/client/desktop/analytics/analytics_action_factory.h>
 #include <nx/client/desktop/radass/radass_action_factory.h>
 #include <nx/client/desktop/ui/actions/action_text_factories.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
@@ -20,8 +23,6 @@
 #include <nx/network/app_info.h>
 
 #include <nx/utils/app_info.h>
-
-#include <ini.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::ui::action, IDType)
 
@@ -121,7 +122,7 @@ void initialize(Manager* manager, Action* root)
     factory(ConnectToCloudSystemAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Connect to System"))
-        .condition(condition::treeNodeType(Qn::CloudSystemNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::cloudSystem));
 
     factory(ReconnectAction)
         .flags(NoTarget);
@@ -307,7 +308,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("User..."))
             .pulledText(ContextMenu::tr("New User..."))
             .condition(
-                condition::treeNodeType(Qn::UsersNode)
+                condition::treeNodeType(ResourceTreeNodeType::users)
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -326,7 +327,7 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Web Page..."))
             .pulledText(ContextMenu::tr("New Web Page..."))
             .condition(
-                condition::treeNodeType(Qn::WebPagesNode)
+                condition::treeNodeType(ResourceTreeNodeType::webPages)
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -336,11 +337,21 @@ void initialize(Manager* manager, Action* root)
             .text(ContextMenu::tr("Showreel..."))
             .pulledText(ContextMenu::tr("New Showreel..."))
             .condition(condition::isLoggedIn()
-                && condition::treeNodeType({Qn::LayoutToursNode})
+                && condition::treeNodeType({ResourceTreeNodeType::layoutTours})
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
 
+        factory(NewWearableCameraAction)
+            .flags(Main | NoTarget)
+            .requiredGlobalPermission(Qn::GlobalAdminPermission)
+            .text(ContextMenu::tr("Wearable Camera..."))
+            .pulledText(ContextMenu::tr("New Wearable Camera..."))
+            .condition(condition::isLoggedIn()
+                && !condition::isSafeMode()
+                && condition::isTrue(ini().enableWearableCameras)
+            )
+            .autoRepeat(false);
     }
     factory.endSubMenu();
 
@@ -357,6 +368,12 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Open Layout...")) //< To be displayed on button tooltip
         .childFactory(new OpenCurrentUserLayoutFactory(manager))
         .icon(qnSkin->icon("titlebar/dropdown.png"));
+
+    factory(StartAnalyticsAction)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Start Analytics..."))
+        .childFactory(new AnalyticsActionFactory(manager))
+        .condition(AnalyticsActionFactory::condition());
 
     factory()
         .flags(TitleBar)
@@ -394,7 +411,8 @@ void initialize(Manager* manager, Action* root)
             .pulledText(ContextMenu::tr("Open Web Client..."))
             .autoRepeat(false)
             .condition(condition::isLoggedIn()
-                && condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode}));
+                && condition::treeNodeType(
+                    {ResourceTreeNodeType::currentSystem, ResourceTreeNodeType::servers}));
 
     } factory.endSubMenu();
 
@@ -434,6 +452,13 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(!condition::isSafeMode());
 
+    factory(ShareCameraAction)
+        .mode(DesktopMode)
+        .flags(SingleTarget | ResourceTarget)
+        .autoRepeat(false)
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(!condition::isSafeMode());
+
     factory(SaveCurrentVideoWallReviewAction)
         .flags(Main | Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous)
         .mode(DesktopMode)
@@ -467,12 +492,24 @@ void initialize(Manager* manager, Action* root)
             .shortcut(lit("Alt+R"))
             .shortcut(Qt::Key_MediaRecord)
             .shortcutContext(Qt::ApplicationShortcut)
-            .autoRepeat(false);
+            .autoRepeat(false)
+            .condition(!condition::isLoggedIn()
+                || condition::hasGlobalPermission(Qn::GlobalExportPermission));
 
         factory()
             .flags(Main)
             .separator();
     }
+
+    factory(ExportStandaloneClientAction)
+        .flags(Main | DevMode)
+        .text(lit("Export Standalone Client"))
+        .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
+
+    factory()
+        .flags(Main | DevMode)
+        .separator()
+        .condition(condition::isTrue(nx::utils::AppInfo::isWindows()));
 
     factory(EscapeHotkeyAction)
         .flags(GlobalHotkey)
@@ -535,7 +572,9 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("System Administration..."))
         .shortcut(lit("Ctrl+Alt+A"))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .condition(condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode})
+        .condition(
+            condition::treeNodeType(
+                {ResourceTreeNodeType::currentSystem, ResourceTreeNodeType::servers})
             && !condition::tourIsRunning());
 
     factory(SystemUpdateAction)
@@ -547,7 +586,10 @@ void initialize(Manager* manager, Action* root)
         .flags(Main | Tree)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .text(ContextMenu::tr("User Management..."))
-        .condition(condition::treeNodeType(Qn::UsersNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::users));
+
+    factory(UpdateLocalFilesAction)
+        .flags(NoTarget);
 
     factory(PreferencesGeneralTabAction)
         .flags(Main)
@@ -592,6 +634,12 @@ void initialize(Manager* manager, Action* root)
     factory(HideCloudPromoAction)
         .flags(NoTarget);
 
+    factory(ChangeDefaultCameraPasswordAction)
+        .flags(SingleTarget | MultiTarget | ResourceTarget)
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .mode(DesktopMode)
+        .text(ContextMenu::tr("Some cameras require passwords to be set"));
+
     factory(OpenCloudRegisterUrl)
         .flags(NoTarget)
         .text(ContextMenu::tr("Create Account..."));
@@ -623,11 +671,21 @@ void initialize(Manager* manager, Action* root)
         .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
+    factory(MainMenuAddDeviceManuallyAction)
+        .flags(Main)
+        .text(ContextMenu::tr("Add Device..."))
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(condition::isLoggedIn()
+            && !condition::isSafeMode()
+            && !condition::tourIsRunning()
+            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
+
     factory(MergeSystems)
         .flags(Main | Tree)
         .text(ContextMenu::tr("Merge Systems..."))
         .condition(
-            condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode})
+            condition::treeNodeType(
+                {ResourceTreeNodeType::currentSystem, ResourceTreeNodeType::servers})
             && !condition::isSafeMode()
             && ConditionWrapper(new RequiresOwnerCondition())
         );
@@ -739,23 +797,12 @@ void initialize(Manager* manager, Action* root)
         .flags(Slider)
         .separator();
 
-    factory(ExportTimeSelectionAction)
-        .flags(Slider | SingleTarget | ResourceTarget)
-        .text(ContextMenu::tr("Export Selected Area..."))
-        .requiredTargetPermissions(Qn::ExportPermission)
-        .condition(new ExportCondition(true));
-
-    factory(ExportLayoutAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
-        .text(ContextMenu::tr("Export Multi-Video..."))
-        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(false));
-
-    factory(ExportRapidReviewAction)
-        .flags(Slider | SingleTarget | MultiTarget | NoTarget)
-        .text(ContextMenu::tr("Export Rapid Review..."))
-        .requiredTargetPermissions(Qn::CurrentLayoutMediaItemsRole, Qn::ExportPermission)
-        .condition(new ExportCondition(true));
+    factory(ExportVideoAction)
+        .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget | ResourceTarget)
+        .text(ContextMenu::tr("Export Video..."))
+        .conditionalText(ContextMenu::tr("Export Bookmark..."),
+            condition::hasArgument(Qn::CameraBookmarkRole))
+        .condition(ConditionWrapper(new ExportCondition()));
 
     factory(ThumbnailsSearchAction)
         .flags(Slider | Scene | SingleTarget)
@@ -767,7 +814,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | ResourceTarget)
         .childFactory(new EdgeNodeFactory(manager))
         .text(ContextMenu::tr("Server..."))
-        .condition(condition::treeNodeType(Qn::EdgeNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::edge));
 
     factory()
         .flags(Scene | Tree)
@@ -914,6 +961,16 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Save Layout"))
         .condition(ConditionWrapper(new SaveLayoutCondition(false)));
 
+    factory(SaveLocalLayoutAction)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::SavePermission)
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All));
+
+    factory(SaveLocalLayoutAsAction)
+        .flags(SingleTarget | ResourceTarget)
+        .requiredTargetPermissions(Qn::SavePermission)
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All));
+
     factory(SaveLayoutAsAction) // TODO: #GDM #access check canCreateResource permission
         .flags(SingleTarget | ResourceTarget)
         .requiredTargetPermissions(Qn::UserResourceRole, Qn::SavePermission)
@@ -929,6 +986,16 @@ void initialize(Manager* manager, Action* root)
             ConditionWrapper(new SaveLayoutAsCondition(false))
             && !condition::isLayoutTourReviewMode()
         );
+
+    factory()
+        .flags(Tree)
+        .separator();
+
+    factory(MakeLayoutTourAction)
+        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
+        .text(ContextMenu::tr("Make Showreel"))
+        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
+            && !condition::isSafeMode());
 
     factory()
         .flags(Scene | Tree)
@@ -982,14 +1049,6 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Alt+I"))
         .condition(ConditionWrapper(new DisplayInfoCondition())
             && !condition::isLayoutTourReviewMode());
-
-    factory(RadassAction)
-        .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Resolution..."))
-        .childFactory(new RadassActionFactory(manager))
-        .condition(ConditionWrapper(new ChangeResolutionCondition())
-            && !condition::isLayoutTourReviewMode()
-            && !condition::tourIsRunning());
 
     factory()
         .flags(Scene | SingleTarget)
@@ -1103,6 +1162,13 @@ void initialize(Manager* manager, Action* root)
             .condition(new RotateItemCondition());
     } factory.endSubMenu();
 
+    factory(RadassAction)
+        .flags(Scene | NoTarget | SingleTarget | MultiTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Resolution..."))
+        .childFactory(new RadassActionFactory(manager))
+        .condition(ConditionWrapper(new ChangeResolutionCondition())
+            && !condition::isLayoutTourReviewMode());
+
     factory()
         .flags(Scene | Tree)
         .separator();
@@ -1203,9 +1269,29 @@ void initialize(Manager* manager, Action* root)
     factory(UserRolesAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("User Roles..."))
-        .conditionalText(ContextMenu::tr("Role Settings..."), condition::treeNodeType(Qn::RoleNode))
+        .conditionalText(
+            ContextMenu::tr("Role Settings..."),
+            condition::treeNodeType(ResourceTreeNodeType::role))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .condition(condition::treeNodeType({Qn::UsersNode, Qn::RoleNode}));
+        .condition(
+            condition::treeNodeType(
+                {ResourceTreeNodeType::users, ResourceTreeNodeType::role}));
+
+    factory(UploadWearableCameraFileAction)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget)
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .text(ContextMenu::tr("Upload File..."))
+        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
+            && condition::isTrue(ini().enableWearableCameras));
+
+    factory(UploadWearableCameraFolderAction)
+        .mode(DesktopMode)
+        .flags(Scene | Tree | SingleTarget | ResourceTarget)
+        .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
+        .text(ContextMenu::tr("Upload Folder..."))
+        .condition(condition::hasFlags(Qn::wearable_camera, MatchMode::All)
+            && condition::isTrue(ini().enableWearableCameras));
 
     factory(CameraIssuesAction)
         .mode(DesktopMode)
@@ -1218,6 +1304,7 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
         .condition(condition::hasFlags(Qn::live_cam, MatchMode::Any)
+            && !condition::hasFlags(Qn::wearable_camera, MatchMode::All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1234,6 +1321,7 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::live_cam, MatchMode::ExactlyOne)
+            && !condition::hasFlags(Qn::wearable_camera, MatchMode::All)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
@@ -1288,7 +1376,7 @@ void initialize(Manager* manager, Action* root)
             lit("Convert to Normal Camera"),
             condition::isEntropixCamera())
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
-        .condition(condition::isTrue(ini().enableEntropixEnhancer)
+        .condition(condition::isTrue(nx::client::desktop::ini().enableEntropixEnhancer)
             && condition::hasFlags(Qn::live_cam, MatchMode::Any)
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope,
@@ -1305,6 +1393,18 @@ void initialize(Manager* manager, Action* root)
             && !condition::isSafeMode()
             && !condition::tourIsRunning()
             && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
+
+    factory(AddDeviceManuallyAction)
+        .flags(Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
+        .text(ContextMenu::tr("Add Device..."))   //intentionally hardcode devices here
+        .requiredGlobalPermission(Qn::GlobalAdminPermission)
+        .condition(condition::hasFlags(Qn::remote_server, MatchMode::ExactlyOne)
+            && ConditionWrapper(new EdgeServerCondition(false))
+            && !ConditionWrapper(new FakeServerCondition(true))
+            && !condition::isSafeMode()
+            && !condition::tourIsRunning()
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode())
+            && condition::isTrue(nx::client::desktop::ini().enableDeviceSearch));
 
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1364,7 +1464,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
         .text(ContextMenu::tr("Merge to Currently Connected System..."))
         .condition(
-            condition::treeNodeType(Qn::ResourceNode)
+            condition::treeNodeType(ResourceTreeNodeType::resource)
             && !condition::isSafeMode()
             && ConditionWrapper(new MergeToCurrentSystemCondition())
             && ConditionWrapper(new RequiresOwnerCondition())
@@ -1437,17 +1537,18 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open in New Tab"))
-        .condition(condition::treeNodeType(Qn::LayoutTourNode))
+        .condition(condition::treeNodeType(ResourceTreeNodeType::layoutTour))
         .autoRepeat(false);
 
     factory(ReviewLayoutTourInNewWindowAction)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
         .text(ContextMenu::tr("Open in New Window"))
-        .condition(condition::treeNodeType(Qn::LayoutTourNode))
+        .condition(condition::treeNodeType(ResourceTreeNodeType::layoutTour))
         .autoRepeat(false);
 
-    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+    factory().flags(Tree).separator().condition(
+        condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
     factory(ToggleLayoutTourModeAction)
         .flags(Scene | Tree | NoTarget | GlobalHotkey)
@@ -1456,8 +1557,10 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Alt+T"))
         .checkable()
         .autoRepeat(false)
-        .condition(condition::tourIsRunning()
-            || (condition::treeNodeType(Qn::LayoutTourNode) && condition::canStartTour()));
+        .condition(
+            condition::tourIsRunning()
+            || (condition::treeNodeType(ResourceTreeNodeType::layoutTour) && condition::
+                canStartTour()));
 
     factory(StartCurrentLayoutTourAction)
         .flags(NoTarget)
@@ -1471,7 +1574,8 @@ void initialize(Manager* manager, Action* root)
         )
         .autoRepeat(false);
 
-    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+    factory().flags(Tree).separator().condition(
+        condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
     factory(RemoveLayoutTourAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
@@ -1479,15 +1583,17 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Delete"))
         .shortcut(lit("Del"))
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .condition(condition::treeNodeType(Qn::LayoutTourNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
-    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+    factory().flags(Tree).separator().condition(
+        condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
     factory(RenameLayoutTourAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
         .text(ContextMenu::tr("Rename"))
         .shortcut(lit("F2"))
-        .condition(condition::treeNodeType(Qn::LayoutTourNode)
+        .condition(
+            condition::treeNodeType(ResourceTreeNodeType::layoutTour)
             && !condition::isSafeMode())
         .autoRepeat(false);
 
@@ -1501,18 +1607,14 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::isLayoutTourReviewMode())
         .autoRepeat(false);
 
-    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
-
-    factory(MakeLayoutTourAction)
-        .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
-        .text(ContextMenu::tr("Make Showreel"))
-        .condition(condition::hasFlags(Qn::layout, MatchMode::All)
-            && !condition::isSafeMode());
+    factory().flags(Tree).separator().condition(
+        condition::treeNodeType(ResourceTreeNodeType::layoutTour));
 
     factory(LayoutTourSettingsAction)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Settings"))
-        .condition(condition::treeNodeType(Qn::LayoutTourNode)
+        .condition(
+            condition::treeNodeType(ResourceTreeNodeType::layoutTour)
             && !condition::isSafeMode())
         .childFactory(new LayoutTourSettingsFactory(manager))
         .autoRepeat(false);
@@ -1648,7 +1750,8 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Synchronize Streams"))
         .toggledText(ContextMenu::tr("Disable Stream Synchronization"))
         .condition(ConditionWrapper(new ArchiveCondition())
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::syncIsForced());
 
     factory()
         .flags(Slider | TitleBar | Tree)
@@ -1678,7 +1781,7 @@ void initialize(Manager* manager, Action* root)
         .flags(Tree | NoTarget)
         .text(ContextMenu::tr("Pin Tree")) //< To be displayed on button tooltip
         .toggledText(ContextMenu::tr("Unpin Tree"))
-        .condition(condition::treeNodeType(Qn::RootNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::root));
 
     factory(PinCalendarAction)
         .flags(NoTarget)
@@ -1692,7 +1795,7 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .text(ContextMenu::tr("Show Tree")) //< To be displayed on button tooltip
         .toggledText(ContextMenu::tr("Hide Tree"))
-        .condition(condition::treeNodeType(Qn::RootNode));
+        .condition(condition::treeNodeType(ResourceTreeNodeType::root));
 
     factory(ToggleTimelineAction)
         .flags(NoTarget)
@@ -1723,6 +1826,11 @@ void initialize(Manager* manager, Action* root)
 
     factory(PtzActivatePresetByIndexAction)
         .flags(NoTarget);
+
+    factory(OpenNewSceneAction)
+        .flags(GlobalHotkey | DevMode)
+        .shortcut(lit("Ctrl+Shift+E"))
+        .autoRepeat(false);
 }
 
 } // namespace action

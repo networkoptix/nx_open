@@ -29,7 +29,7 @@ int QnDebugEventsRestHandler::executeGet(
     if (action == "disconnected")
         return testCameraDisconnected(params, result, owner);
 
-    return nx_http::StatusCode::notFound;
+    return nx::network::http::StatusCode::notFound;
 }
 
 int QnDebugEventsRestHandler::testNetworkIssue(
@@ -54,11 +54,11 @@ int QnDebugEventsRestHandler::testNetworkIssue(
         vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),
-            vms::event::EventReason::networkNoFrame,
+            vms::api::EventReason::networkNoFrame,
             param));
 
         qnEventRuleProcessor->processEvent(networkEvent);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     else if (id == "closed")
     {
@@ -68,11 +68,11 @@ int QnDebugEventsRestHandler::testNetworkIssue(
         vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),
-            vms::event::EventReason::networkConnectionClosed,
+            vms::api::EventReason::networkConnectionClosed,
             param));
 
         qnEventRuleProcessor->processEvent(networkEvent);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
     else if (id == "packetloss")
     {
@@ -82,15 +82,15 @@ int QnDebugEventsRestHandler::testNetworkIssue(
         vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),
-            vms::event::EventReason::networkRtpPacketLoss,
+            vms::api::EventReason::networkRtpPacketLoss,
             param));
 
         qnEventRuleProcessor->processEvent(networkEvent);
-        return nx_http::StatusCode::ok;
+        return nx::network::http::StatusCode::ok;
     }
 
     result.setError(QnRestResult::InvalidParameter, lit("Possible id values: noframe, closed, packetloss"));
-    return nx_http::StatusCode::notImplemented;
+    return nx::network::http::StatusCode::notImplemented;
 }
 
 int QnDebugEventsRestHandler::testCameraDisconnected(
@@ -108,5 +108,5 @@ int QnDebugEventsRestHandler::testCameraDisconnected(
         camera, qnSyncTime->currentUSecsSinceEpoch()));
 
     qnEventRuleProcessor->processEvent(event);
-    return nx_http::StatusCode::ok;
+    return nx::network::http::StatusCode::ok;
 }

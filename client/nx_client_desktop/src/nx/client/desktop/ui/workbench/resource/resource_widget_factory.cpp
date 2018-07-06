@@ -1,7 +1,9 @@
 #include "resource_widget_factory.h"
 
 #include <core/resource_access/resource_access_filter.h>
+
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>

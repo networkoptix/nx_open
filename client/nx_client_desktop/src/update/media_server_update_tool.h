@@ -43,7 +43,8 @@ public:
     QSet<QnUuid> actualTargetIds() const;
 
     /** Generate url for download update file, depending on actual targets list. */
-    QUrl generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion) const;
+    QUrl generateUpdatePackageUrl(const QnSoftwareVersion &targetVersion,
+        const QString& targetChangeset) const;
 
     void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion(), std::function<void(const QnCheckForUpdateResult &result)> func = NULL);
     void checkForUpdates(const QString &fileName, std::function<void(const QnCheckForUpdateResult &result)> func = NULL);

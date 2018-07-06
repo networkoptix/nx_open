@@ -2,7 +2,7 @@ FROM alpine:3.5
 
 RUN apk add --no-cache mysql-client
 
-COPY tests /tests
+COPY stage /tests
 WORKDIR /tests
 
 CMD ["/tests/runtests.sh"]

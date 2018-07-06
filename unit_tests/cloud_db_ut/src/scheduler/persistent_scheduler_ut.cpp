@@ -29,6 +29,12 @@ public:
 class SqlExecutorStub: public nx::utils::db::AbstractAsyncSqlQueryExecutor
 {
 public:
+    virtual ~SqlExecutorStub()
+    {
+        while (runningCount() > 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
     virtual const nx::utils::db::ConnectionOptions& connectionOptions() const override
     {
         return m_connectionOptions;
@@ -38,10 +44,12 @@ public:
         nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, nx::utils::db::DBResult)> completionHandler) override
     {
+        incRunningCount();
         std::thread(
-            [dbUpdateFunc = std::move(dbUpdateFunc), completionHandler= std::move(completionHandler)]()
+            [this, dbUpdateFunc = std::move(dbUpdateFunc), completionHandler= std::move(completionHandler)]()
             {
                 completionHandler(nullptr, dbUpdateFunc(nullptr));
+                decRunningCount();
             }).detach();
     }
 
@@ -55,10 +63,12 @@ public:
         nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, nx::utils::db::DBResult)> completionHandler) override
     {
+        incRunningCount();
         std::thread(
-            [dbSelectFunc = std::move(dbSelectFunc), completionHandler= std::move(completionHandler)]()
+            [this, dbSelectFunc = std::move(dbSelectFunc), completionHandler= std::move(completionHandler)]()
             {
                 completionHandler(nullptr, dbSelectFunc(nullptr));
+                decRunningCount();
             }).detach();
     }
 
@@ -69,7 +79,28 @@ public:
         return nx::utils::db::DBResult::ok;
     }
 
+private:
     nx::utils::db::ConnectionOptions m_connectionOptions;
+    QnMutex m_mutex;
+    int m_runningThreads = 0;
+
+    void incRunningCount()
+    {
+        QnMutexLocker lock(&m_mutex);
+        ++m_runningThreads;
+    }
+
+    void decRunningCount()
+    {
+        QnMutexLocker lock(&m_mutex);
+        --m_runningThreads;
+    }
+
+    int runningCount()
+    {
+        QnMutexLocker lock(&m_mutex);
+        return m_runningThreads;
+    }
 };
 
 static const QnUuid functorId = QnUuid::createUuid();
@@ -178,42 +209,31 @@ protected:
         user->setShouldUnsubscribe(taskId, std::move(unsubscribeCb));
     }
 
-    enum TasksIdState
+    void thenTaskCountShouldBe(size_t desiredTaskCount)
     {
-        filled,
-        notFilled
-    };
-
-    void thenTaskIdsAre(TasksIdState idState)
-    {
-        if (idState == notFilled)
-        {
-            ASSERT_TRUE(user->tasks().empty());
-            return;
-        }
-
-        for (const auto& task : user->tasks())
-            ASSERT_FALSE(task.first.isNull());
+        while (user->tasks().size() != desiredTaskCount)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 
-    void thenTimersFiredSeveralTimes(int taskCount = -1)
+    void thenTimersShouldHaveFiredSeveralTimes()
     {
-        if (taskCount >= 0)
+        bool allFired = false;
+        while (!allFired)
         {
-            ASSERT_EQ(user->tasks().size(), static_cast<std::size_t>(taskCount));
-        }
+            allFired = true;
+            for (const auto& task: user->tasks())
+                allFired &= task.second.fired > 0;
 
-        for (const auto& task : user->tasks())
-        {
-            ASSERT_GT(task.second.fired, 0);
+            if (!allFired)
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
         }
     }
 
-    SqlExecutorStub executor;
-    DbHelperStub dbHelper;
     std::unique_ptr<nx::cdb::PersistentScheduler> scheduler;
     std::unique_ptr<SchedulerUser> user;
     const std::chrono::milliseconds kSleepTimeout{ 100 };
+    DbHelperStub dbHelper;
+    SqlExecutorStub executor;
 };
 
 
@@ -230,8 +250,7 @@ TEST_F(PersistentScheduler, subscribe)
     whenSchedulerAndUserInitialized();
 
     user->subscribe(std::chrono::milliseconds(10));
-    std::this_thread::sleep_for(kSleepTimeout);
-    thenTaskIdsAre(filled);
+    thenTaskCountShouldBe(1);
 }
 
 TEST_F(PersistentScheduler, subscribe_dbError)
@@ -242,7 +261,7 @@ TEST_F(PersistentScheduler, subscribe_dbError)
 
     user->subscribe(std::chrono::milliseconds(10));
     std::this_thread::sleep_for(kSleepTimeout);
-    thenTaskIdsAre(notFilled);
+    thenTaskCountShouldBe(0);
 }
 
 TEST_F(PersistentScheduler, unsubscribe)
@@ -255,7 +274,7 @@ TEST_F(PersistentScheduler, unsubscribe)
 
     QnUuid taskId = whenSubscribedOnce();
 
-    int firedAlready;
+    std::atomic<int> firedAlready;
     user->unsubscribe(
         taskId,
         [&firedAlready](const QnUuid&, const nx::cdb::test::SchedulerUser::Task& task)
@@ -263,7 +282,13 @@ TEST_F(PersistentScheduler, unsubscribe)
             firedAlready = task.fired;
         });
 
-    std::this_thread::sleep_for(kSleepTimeout);
+    waitForPredicateBecomeTrue(
+        [&firedAlready, this, taskId]()
+        {
+            return firedAlready == user->tasks()[taskId].fired
+                && !user->tasks()[taskId].subscribed;
+        },
+        "PersistentScheduler.unsubscribe");
 
     ASSERT_EQ(firedAlready, user->tasks()[taskId].fired);
     ASSERT_FALSE(user->tasks()[taskId].subscribed);
@@ -305,11 +330,8 @@ TEST_F(PersistentScheduler, running2Tasks)
     user->subscribe(kFirstTaskTimeout);
     user->subscribe(kSecondTaskTimeout);
 
-    std::this_thread::sleep_for(kSleepTimeout);
-
-    ASSERT_EQ(2U, user->tasks().size());
-    thenTaskIdsAre(filled);
-    thenTimersFiredSeveralTimes();
+    thenTaskCountShouldBe(2);
+    thenTimersShouldHaveFiredSeveralTimes();
 }
 
 TEST_F(PersistentScheduler, subscribeFromHandler)
@@ -317,13 +339,12 @@ TEST_F(PersistentScheduler, subscribeFromHandler)
     expectingGetScheduledDataFromDbWithNoDataWillBeCalled();
     expectingDbHelperSubscribeWillBeCalledTwice();
     whenSchedulerAndUserInitialized();
-
-    user->subscribe(std::chrono::milliseconds(10));
     whenShouldSubscribeFromHandler();
 
-    std::this_thread::sleep_for(kSleepTimeout);
-    thenTaskIdsAre(filled);
-    thenTimersFiredSeveralTimes(2);
+    user->subscribe(std::chrono::milliseconds(10));
+
+    thenTaskCountShouldBe(2);
+    thenTimersShouldHaveFiredSeveralTimes();
 }
 
 TEST_F(PersistentScheduler, unsubscribeFromHandler)
@@ -355,9 +376,7 @@ TEST_F(PersistentScheduler, tasksLoadedFromDb)
 {
     expectingGetScheduledDataFromDbWithSomeDataWillBeCalled();
     whenSchedulerAndUserInitialized();
-
-    std::this_thread::sleep_for(kSleepTimeout);
-    thenTimersFiredSeveralTimes(1);
+    thenTimersShouldHaveFiredSeveralTimes();
 }
 
 } // namespace test

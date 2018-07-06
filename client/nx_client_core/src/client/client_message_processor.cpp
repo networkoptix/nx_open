@@ -13,6 +13,7 @@
 #include <core/resource/layout_resource.h>
 
 #include <nx_ec/ec_api.h>
+#include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 
 #include "utils/common/synctime.h"
@@ -113,6 +114,11 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
     }
 }
 
+Qt::ConnectionType QnClientMessageProcessor::handlerConnectionType() const
+{
+    return Qt::QueuedConnection;
+}
+
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
     base_type::connectToConnection(connection);
@@ -124,7 +130,7 @@ void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnClientMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+void QnClientMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
     if (qnClientCoreModule->layoutTourStateManager()->isChanged(tour.id))
         return;

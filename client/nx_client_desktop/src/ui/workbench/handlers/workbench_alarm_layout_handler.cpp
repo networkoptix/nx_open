@@ -81,7 +81,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const vms::event::AbstractActionPtr& action)
         {
-            if (action->actionType() != vms::event::showOnAlarmLayoutAction)
+            if (action->actionType() != vms::api::ActionType::showOnAlarmLayoutAction)
                 return;
 
             if (!context()->user())
@@ -93,9 +93,11 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
                 return;
 
-            auto targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(action->getResources());
+            auto targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                action->getResources());
             if (action->getParams().useSource)
-                targetCameras << resourcePool()->getResources<QnVirtualCameraResource>(action->getSourceResources());
+                targetCameras << resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+                    action->getSourceResources());
             targetCameras = accessController()->filtered(targetCameras, Qn::ViewContentPermission);
             targetCameras = targetCameras.toSet().toList();
 

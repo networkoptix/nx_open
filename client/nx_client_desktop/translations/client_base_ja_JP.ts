@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja" sourcelanguage="en">
   <context>
+    <name>AsyncImageWidget</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>データがありません</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -47,6 +54,10 @@ to view more bookmarks</source>
     <message>
       <source>Delete bookmark</source>
       <translation>ブックマークを削除</translation>
+    </message>
+    <message>
+      <source>Export bookmark</source>
+      <translation>ブックマークのエクスポート</translation>
     </message>
   </context>
   <context>
@@ -361,18 +372,6 @@ to view more bookmarks</source>
       <translation>ブックマーク削除...</translation>
     </message>
     <message>
-      <source>Export Selected Area...</source>
-      <translation>単一ビデオのエクスポート...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>複数ビデオのエクスポート...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>ラピッドレビューのエクスポート...</translation>
-    </message>
-    <message>
       <source>Preview Search...</source>
       <translation>検索表示...</translation>
     </message>
@@ -475,22 +474,6 @@ to view more bookmarks</source>
     <message>
       <source>Hide Info</source>
       <translation>情報を隠す</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>解像度変更...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>自動</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>低</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>高</translation>
     </message>
     <message>
       <source>PTZ...</source>
@@ -705,14 +688,6 @@ to view more bookmarks</source>
       <translation>接続しているシステムに統合...</translation>
     </message>
     <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>セルのアスペクトレシオ比を変更...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>セルスペースの変更...</translation>
-    </message>
-    <message>
       <source>None</source>
       <translation>なし</translation>
     </message>
@@ -872,6 +847,50 @@ to view more bookmarks</source>
       <source>Make Showreel</source>
       <translation>シーケンス表示作成</translation>
     </message>
+    <message>
+      <source>Wearable Camera...</source>
+      <translation>ウェアラブルカメラ...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation>新しいウェアラブルカメラ...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>ファイルをアップロード</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>フォルダをアップロード...</translation>
+    </message>
+    <message>
+      <source>Start Analytics...</source>
+      <translation>解析開始...</translation>
+    </message>
+    <message>
+      <source>Some cameras require passwords to be set</source>
+      <translation>幾つかのカメラでパスワードを設定する必要があります</translation>
+    </message>
+    <message>
+      <source>Export Video...</source>
+      <translation>ビデオエクスポート...</translation>
+    </message>
+    <message>
+      <source>Export Bookmark...</source>
+      <translation>ブックマークのエクスポート...</translation>
+    </message>
+    <message>
+      <source>Resolution...</source>
+      <translation>解像度...</translation>
+    </message>
+    <message>
+      <source>Cell Aspect Ratio...</source>
+      <translation>セルのアスペクト比...</translation>
+    </message>
+    <message>
+      <source>Cell Spacing...</source>
+      <translation>セルの間隔...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -959,8 +978,66 @@ to view more bookmarks</source>
       <translation>非アクティブの数がこのライセンスの上限を超えました</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
       <translation>このサーバーのハードウェアIDは、ライセンスがアクティブ化されたハードウェアIDと一致しません</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
+      <translation>選択した設定にはトランスコードが必要です　 CPU使用量が増加し、時間がかかることがあります</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
+      <translation>オーディオ トラックと非連続記録をエクスポートするのには、AVI 形式は推奨出来ません</translation>
+    </message>
+    <message>
+      <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
+      <translation>ダウンスケールを避けるため、&quot;マルチビデオ&quot;としてエクスポートする事を推奨します</translation>
+    </message>
+    <message>
+      <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
+      <translation>長いビデオをエクスポートしようとしています　ギガバイト以上の空き容量のを必要とし、数分かかることがあります</translation>
+    </message>
+    <message>
+      <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
+      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるのでWindowsで開くことはできません %1 Clientでのみ再生できます</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>ローカルファイル、サーバーモニターウィジェット、およびWebページはエクスポートされません</translation>
+    </message>
+    <message>
+      <source>Settings are not available for .NOV and .EXE files.</source>
+      <translation>.NOVと.EXEファイルでは設定を使用できません</translation>
+    </message>
+  </context>
+  <context>
+    <name>FileSystemStrings</name>
+    <message>
+      <source>Audio Video Interleave</source>
+      <translation>オーディオビデオインターリーブ</translation>
+    </message>
+    <message>
+      <source>Matroska</source>
+      <translation>Matroska</translation>
+    </message>
+    <message>
+      <source>MPEG-4 Part 14</source>
+      <translation>MPEG-4 Part 14</translation>
+    </message>
+    <message>
+      <source>%1 Media File</source>
+      <translation>%1メディアファイル</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x64)</source>
+      <translation>実行可能 %1 メディアファイル (x64)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86)</source>
+      <translation>実行可能 %1 メディアファイル (x86)</translation>
     </message>
   </context>
   <context>
@@ -1036,8 +1113,23 @@ to view more bookmarks</source>
       <translation>ファイル&quot;%1&quot; は既に存在します　別の名前をお試しください</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>ファイル&quot;%1&quot; は、別のプロセスで使用されています　別の名前をお試しください</translation>
+      <source>File &quot;%1&quot; is used by another process.</source>
+      <translation>ファイル&quot;%1&quot; は、別のプロセスで使用されています</translation>
+    </message>
+    <message>
+      <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
+      <translation>ファイル&quot;%1&quot; は書き込めません。別の名前をお試しください</translation>
+    </message>
+    <message>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <translation>ファイル名&quot;%1&quot; は、オペレーティングシステムによって予約されています。別の名前をお試しください</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation>
+        <numerusform>ファイル名には次の予約文字を含めることはできません：</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1063,10 +1155,6 @@ to view more bookmarks</source>
       <translation>短い</translation>
     </message>
     <message>
-      <source>Password must be at least 8 characters long.</source>
-      <translation>パスワードは8文字以上必要です</translation>
-    </message>
-    <message>
       <source>Common</source>
       <translation>共通</translation>
     </message>
@@ -1081,6 +1169,44 @@ to view more bookmarks</source>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>ラテン文字、数字、およびキーボードの記号のみが許可されます</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
+      <translation>
+        <numerusform>パスワードには %n の文字、記号、または数字の異なる組み合わせが含まれている必要があります</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be at least %n characters long.</source>
+      <translation>
+        <numerusform>パスワードは最低でも %n 文字以上にして下さい</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>文字数</translation>
+    </message>
+    <message numerus="yes">
+      <source>Password must be no longer than %n characters.</source>
+      <translation>
+        <numerusform>パスワードは %n 文字以内である必要があります</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more consecutive characters together.</source>
+      <translation>
+        <numerusform>パスワードに %n 以上の連続した文字を含めないでください</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Password should not contain %n or more repeating characters.</source>
+      <translation>
+        <numerusform>パスワードに %n 以上の繰り返し文字を使用しないでください</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>ラテン文字、数字、およびキーボードシンボル%1のみが許可されます</translation>
     </message>
   </context>
   <context>
@@ -1218,13 +1344,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnAbstractCameraAdvancedParamWidget</name>
-    <message>
-      <source>Read-Only</source>
-      <translation>読み取り専用</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
@@ -1275,6 +1394,17 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>フォルダーが見つかりません</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnArchiveLengthWidget</name>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other devices.</source>
+      <translation>高い最小値は、他のデバイスのアーカイブ期間を減少させる可能性があります</translation>
+    </message>
+    <message>
+      <source>High minimum value can lead to archive length decrease on other cameras.</source>
+      <translation>高い最小値は、他のカメラのアーカイブ期間を減少させる可能性があります</translation>
     </message>
   </context>
   <context>
@@ -1656,10 +1786,6 @@ to view more bookmarks</source>
     <message>
       <source>Build Number</source>
       <translation>ビルド番号</translation>
-    </message>
-    <message>
-      <source>Invalid build number</source>
-      <translation>無効なビルド番号</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2080,12 +2206,31 @@ to view more bookmarks</source>
       <translation>I/O モジュールにはオーディオ ストリームがありません</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O モジュール Id</translation>
+      <source>Settings</source>
+      <translation>設定</translation>
     </message>
     <message>
-      <source>Camera Id</source>
-      <translation>カメラ Id</translation>
+      <source>Web</source>
+      <translation>Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>設定がありません</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O モジュール ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>カメラ ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraAnalyticsPolicy</name>
+    <message>
+      <source>Analytics is not available for %1</source>
+      <translation>%1では解析を利用できません</translation>
     </message>
   </context>
   <context>
@@ -2185,6 +2330,16 @@ to view more bookmarks</source>
     <message>
       <source>Secondary</source>
       <translation>セカンダリ</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Edge</translation>
+    </message>
+    <message numerus="yes">
+      <source>This ID is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>このIDは次の %n カメラで既に使用されています： %1</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -2300,6 +2455,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>サーバー</translation>
     </message>
+    <message>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2334,11 +2493,9 @@ to view more bookmarks</source>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>
-        <numerusform>%1 の記録やモーション検知は無効になります</numerusform>
-      </translation>
+      <translation>%1 の記録やモーション検知は無効になります</translation>
     </message>
   </context>
   <context>
@@ -2358,12 +2515,33 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>QnCameraPasswordChangeDialog</name>
+    <message>
+      <source>New Password</source>
+      <translation>新規パスワード</translation>
+    </message>
+    <message>
+      <source>Repeat Password</source>
+      <translation>パスワード(確認用)</translation>
+    </message>
+    <message>
+      <source>Passwords do not match.</source>
+      <translation>パスワードが一致しません.</translation>
+    </message>
+    <message>
+      <source>Password should be at least 8 symbols long and contain different types of characters.</source>
+      <translation>パスワードは8文字以上で、異なる種類の文字を含む必要があります</translation>
+    </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>パスワードはカメラのユーザー名と同じにできません</translation>
+    </message>
+  </context>
+  <context>
     <name>QnCameraRecordingPolicy</name>
-    <message numerus="yes">
+    <message>
       <source>Recording is disabled for %1</source>
-      <translation>
-        <numerusform>%1 の記録を無効</numerusform>
-      </translation>
+      <translation>%1 の記録を無効</translation>
     </message>
   </context>
   <context>
@@ -2383,14 +2561,6 @@ to view more bookmarks</source>
     <message>
       <source>based on server time</source>
       <translation>サーバー時刻基準</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation>高い最小値は、他のデバイスのアーカイブ期間を減少させる可能性があります</translation>
-    </message>
-    <message>
-      <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation>高い最小値は、他のカメラのアーカイブ期間を減少させる可能性があります</translation>
     </message>
     <message>
       <source>Not enough licenses to enable recording</source>
@@ -2435,6 +2605,18 @@ to view more bookmarks</source>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
       <translation>有効または調整するには、カメラ設定の&quot;Motion&quot;タブに移動します</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit/s</translation>
+    </message>
+    <message>
+      <source>Less Settings</source>
+      <translation>簡易設定</translation>
+    </message>
+    <message>
+      <source>More Settings</source>
+      <translation>詳細設定</translation>
     </message>
   </context>
   <context>
@@ -2528,6 +2710,14 @@ to view more bookmarks</source>
       <source>No device selected.</source>
       <translation>デバイス選択なし.</translation>
     </message>
+    <message>
+      <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
+      <translation>複数のウェアラブルおよび非ウェアラブルカメラのプロパティを編集することはできません</translation>
+    </message>
+    <message>
+      <source>Cannot edit properties for several wearable cameras.</source>
+      <translation>複数のウェアラブルカメラのプロパティを編集することはできません</translation>
+    </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
@@ -2576,50 +2766,61 @@ devices</source>
       <translation>何処からでもどのデバイスでもシステムに接続できます</translation>
     </message>
     <message>
-      <source>Known limitations</source>
-      <translation>既知の制限事項</translation>
-    </message>
-    <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 からシステムを切断</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 ポータルを開く</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 アカウントを作成</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムを %1 に接続...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 アカウントを作成</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムを %1 に接続</translation>
     </message>
     <message>
-      <source>%1 is in Beta.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 はベータ版</translation>
+      <source>Learn more about %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 について</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCloudResultMessages</name>
+    <message>
+      <source>Account not found</source>
+      <translation>アカウントが見つかりません</translation>
     </message>
     <message>
-      <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 について</translation>
+      <source>Account is not activated.</source>
+      <translation>アカウントがアクティベートされていません</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation>%1 にログインし指示に従ってください</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>無効なパスワード</translation>
     </message>
   </context>
   <context>
@@ -2634,7 +2835,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 に接続できません</translation>
     </message>
   </context>
@@ -2665,12 +2866,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 へ接続</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 アカウントに接続します</translation>
     </message>
   </context>
@@ -2682,12 +2883,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 に接続されたシステム</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>システムを %1 に接続できませんでした</translation>
     </message>
   </context>
@@ -2839,17 +3040,17 @@ to %1</source>
       <translation>操作は現在許可されていません　再起動後にもう一度試してください</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 への接続がまだできていません　サーバーのインターネット接続を確認または後でもう一度試してください</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>サーバーへの接続を確立できませんでした</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
       <translation>このユーザーはシステム管理者によって無効になっています</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 への接続がまだできていません　サーバーのインターネット接続を確認または後でもう一度試してください</translation>
     </message>
   </context>
   <context>
@@ -2956,6 +3157,29 @@ to %1</source>
       <source>You can create a backup for System configurations that can be restored in case of failure.</source>
       <translation>障害発生時に復元可能なシステム構成のバックアップを作成できます</translation>
     </message>
+    <message>
+      <source>Database Backup Files</source>
+      <translation>データベースバックアップファイル</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnDefaultPasswordAlertBar</name>
+    <message>
+      <source>This camera requires password to be set up.</source>
+      <translation>このカメラはパスワードを設定する必要があります</translation>
+    </message>
+    <message>
+      <source>Some of selected cameras requires password to be set up.</source>
+      <translation>選択されたカメラの中には、パスワードの設定が必要なものがあります</translation>
+    </message>
+    <message>
+      <source>Ask your system administrator to do it.</source>
+      <translation>システム管理者に依頼してください</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation>パスワードの設定</translation>
+    </message>
   </context>
   <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
@@ -3054,26 +3278,27 @@ to %1</source>
       <translation>切断</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>クラウドのすべてのユーザーが削除されます</translation>
-    </message>
-    <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 からのシステム切断に失敗しました</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 からシステムを切断しますか？</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>このシステムから切断し、再びローカル アカウントでローカル ネットワークを介してログインすることができます</translation>
     </message>
     <message>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 からのシステム切断に失敗しました</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 からシステムを切断しますか？</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>すべての %1 ユーザーが削除されます</translation>
+    </message>
+    <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 からこのシステムを切断した後 %1 アカウントでシステムに接続することはできません</translation>
     </message>
   </context>
@@ -3197,6 +3422,10 @@ to %1</source>
     <message>
       <source>Auto</source>
       <translation>自動</translation>
+    </message>
+    <message>
+      <source>Basic</source>
+      <translation>ベーシック</translation>
     </message>
   </context>
   <context>
@@ -3462,8 +3691,8 @@ to %1</source>
       <translation>インパルス</translation>
     </message>
     <message>
-      <source>Id</source>
-      <translation>Id</translation>
+      <source>ID</source>
+      <translation type="unfinished">ID</translation>
     </message>
   </context>
   <context>
@@ -3490,38 +3719,6 @@ to %1</source>
     <message>
       <source>Failed to turn on I/O port %1</source>
       <translation>I/O ポート %1 のオンに失敗しました</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLayoutExportTool</name>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>&quot;%1&quot; にエクスポート中...</translation>
-    </message>
-    <message>
-      <source>Could not export device %1.</source>
-      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
-      <translation>%1. デバイスをエクスポートできません</translation>
-    </message>
-    <message>
-      <source>Could not export camera %1.</source>
-      <translation>%1. カメラをエクスポートできません</translation>
-    </message>
-    <message>
-      <source>Unknown error has occurred.</source>
-      <translation>不明なエラーが発生しました</translation>
-    </message>
-    <message>
-      <source>Could not export I/O module %1.</source>
-      <translation>Ioモジュール %1. をエクスポートできませんでした</translation>
-    </message>
-    <message>
-      <source>Could not create output file %1...</source>
-      <translation>ファイル %1 を作成できませんでした...</translation>
-    </message>
-    <message>
-      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
-      <translation>ファイル&quot;%1&quot; は、別のプロセスで使用されています　別の名前をお試しください</translation>
     </message>
   </context>
   <context>
@@ -3646,6 +3843,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation type="unfinished">Zoom</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation type="unfinished">Focus</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation type="unfinished">Rotation:</translation>
+    </message>
+  </context>
+  <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
@@ -3676,7 +3888,7 @@ to %1</source>
       <translation>機能:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
+      <source>Locked to Hardware ID</source>
       <translation>ハードウェアID</translation>
     </message>
   </context>
@@ -3716,7 +3928,7 @@ to %1</source>
     </message>
     <message>
       <source>Server not found</source>
-      <translation>&lt;サーバーが見つかりません></translation>
+      <translation>サーバーが見つかりません</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -3942,16 +4154,16 @@ to %1</source>
       <translation>有効なライセンス キーを取得するにはカスタマーサポートに問い合わせてください</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>このライセンスは既にアクティベートされハードウェア Id %1 にリンクされています</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>このライセンスは既にアクティベートされ %2 のハードウェア Id %1 にリンクされています</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>問題が解決しない場合は、カスタマー サポートに連絡してください</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>このライセンスは既にアクティベートされハードウェア ID %1 にリンクされています</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>このライセンスは既にアクティベートされ %2 のハードウェア ID %1 にリンクされています</translation>
     </message>
   </context>
   <context>
@@ -3969,30 +4181,24 @@ to %1</source>
       <translation>ライセンスファイルを開く</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>すべてのファイル (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>ファイルが開けませんでした</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア Id を送信してください</translation>
+      <source>All files</source>
+      <translation>すべてのファイル</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア Id を送信してください</translation>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア ID を送信してください</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア ID を送信してください</translation>
     </message>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
-    <message numerus="yes">
-      <source>Use analog licenses to view these %n cameras</source>
-      <translation>
-        <numerusform>%n カメラの表示にアナログライセンスを使用</numerusform>
-      </translation>
-    </message>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
@@ -4011,12 +4217,18 @@ to %1</source>
         <numerusform>%n I/Oデバイスにライセンスを使用</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>Use licenses to view these %n cameras</source>
+      <translation>
+        <numerusform>%n カメラの表示にライセンスを使用</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 へのログインに失敗しました</translation>
     </message>
   </context>
@@ -4134,12 +4346,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 にログイン</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1へようこそ</translation>
     </message>
   </context>
@@ -4226,7 +4438,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1（ツアー&quot;%2&quot; が有効）</translation>
+      <translation>%1(ツアー&quot;%2&quot; が有効)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -4242,12 +4454,22 @@ to %1</source>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
-      <translation>トリガ%1（%2）の呼び出しに失敗しました</translation>
+      <translation>トリガ%1(%2)の呼び出しに失敗しました</translation>
     </message>
     <message>
       <source>press and hold</source>
       <comment>Soft Trigger</comment>
       <translation>押したまま</translation>
+    </message>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>スケジュールで無効</translation>
+    </message>
+    <message numerus="yes">
+      <source>Set for all %n Cameras</source>
+      <translation>
+        <numerusform>全ての %n カメラに設定</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -4331,6 +4553,14 @@ to %1</source>
       <source>Skip</source>
       <translation>スキップ</translation>
     </message>
+    <message>
+      <source>Close</source>
+      <translation>閉じる</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>停止</translation>
+    </message>
   </context>
   <context>
     <name>QnMultipleCameraSettingsWidget</name>
@@ -4389,6 +4619,10 @@ to %1</source>
       <source>Previous Chunk</source>
       <translation>前のブロック</translation>
     </message>
+    <message>
+      <source>NVR cameras do not support not-synchronized playback</source>
+      <translation>NVRカメラは非同期再生をサポートしていません</translation>
+    </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
@@ -4403,6 +4637,25 @@ to %1</source>
     <message>
       <source>KB/s</source>
       <translation>KB/s</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnNewWearableCameraDialog</name>
+    <message>
+      <source>Wearable Camera</source>
+      <translation>ウェアラブルカメラ</translation>
+    </message>
+    <message>
+      <source>Wearable Camera %1</source>
+      <translation>ウェアラブルカメラ %1</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名前</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty</source>
+      <translation>名前を空にすることはできません</translation>
     </message>
   </context>
   <context>
@@ -4482,13 +4735,13 @@ to %1</source>
       <source>Acknowledge</source>
       <translation>承認</translation>
     </message>
+    <message>
+      <source>Set Passwords</source>
+      <translation>パスワードの設定</translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
-    <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>フル機能モードでは別のコンピューターを使用してください</translation>
-    </message>
     <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 構成モードでのみ動作することができます</translation>
@@ -4496,6 +4749,10 @@ to %1</source>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>このコンピューターのパフォーマンスは構成モードでのみ %1 を実行することができます</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>フル機能モードの場合は別のコンピューターを使用してください</translation>
     </message>
   </context>
   <context>
@@ -4546,6 +4803,10 @@ to %1</source>
     <message>
       <source>Manage Bookmarks</source>
       <translation>ブックマークの管理</translation>
+    </message>
+    <message>
+      <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
+      <translation>通知はユーザーがイベントの説明を記述するまで表示され続けます</translation>
     </message>
   </context>
   <context>
@@ -4746,22 +5007,6 @@ to %1</source>
       <source>Quarter Native</source>
       <translation>Quarter Native</translation>
     </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920 x 1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280 x 720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640 x 480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320 x 240</translation>
-    </message>
   </context>
   <context>
     <name>QnRecordingStatsModel</name>
@@ -4951,13 +5196,6 @@ to %1</source>
     <message>
       <source>Health Monitor</source>
       <translation>ヘルスモニタ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnResourcePreviewWidget</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>データがありません</translation>
     </message>
   </context>
   <context>
@@ -5351,10 +5589,6 @@ to %1</source>
       <translation>更新ファイル選択...</translation>
     </message>
     <message>
-      <source>Update Files (*.zip)</source>
-      <translation>更新ファイル (*.zip)</translation>
-    </message>
-    <message>
       <source>Release notes</source>
       <translation>リリースノート</translation>
     </message>
@@ -5537,6 +5771,10 @@ to %1</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>互換性のない %1 インスタンス　更新は最初に %1 からシステムを切断します</translation>
     </message>
+    <message>
+      <source>Update Files</source>
+      <translation>ファイルを更新</translation>
+    </message>
   </context>
   <context>
     <name>QnSessionAwareTabbedDialog</name>
@@ -5636,6 +5874,10 @@ to %1</source>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;モーション+低解像度&quot;録画オプションを設定できません</translation>
+    </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>アップロードされたアーカイブは、サーバーストレージに空き容量がない場合、自動的に削除されます　サーバー上のすべてのカメラの中で最も古い映像が最初に削除されます</translation>
     </message>
   </context>
   <context>
@@ -5788,10 +6030,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>ライセンスが不足しています</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>データがありません</translation>
     </message>
@@ -5842,6 +6080,30 @@ to %1</source>
     <message>
       <source>Please check authentication information</source>
       <translation>認証情報を確認してください</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation>ライブストリームなし</translation>
+    </message>
+    <message>
+      <source>TOO MANY CONNECTIONS</source>
+      <translation>接続が多すぎます</translation>
+    </message>
+    <message>
+      <source>PASSWORD REQUIRED</source>
+      <translation>パスワードが必要</translation>
+    </message>
+    <message>
+      <source>Set for this Camera</source>
+      <translation>このカメラに設定</translation>
+    </message>
+    <message>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation>サポートされていないファームウェアバージョン</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>ライセンスが不足しています</translation>
     </message>
   </context>
   <context>
@@ -5984,6 +6246,14 @@ to %1</source>
     <message>
       <source>Backup completed</source>
       <translation>バックアップ完了</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>無効になっているストレージへの記録は停止しますが古い記録の削除は実行されます</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>USBストレージで録画が有効になりました</translation>
     </message>
   </context>
   <context>
@@ -6137,10 +6407,6 @@ to %1</source>
       <translation>セーフモード</translation>
     </message>
     <message>
-      <source>Storage is full</source>
-      <translation>ストレージが一杯</translation>
-    </message>
-    <message>
       <source>Storage is not configured</source>
       <translation>ストレージが設定されていません</translation>
     </message>
@@ -6185,10 +6451,6 @@ to %1</source>
       <translation>アーカイブインデックスのリビルドキャンセル　サーバー:</translation>
     </message>
     <message>
-      <source>Storage is full on the following Server:</source>
-      <translation>ストレージが一杯のサーバー:</translation>
-    </message>
-    <message>
       <source>Storage is not configured on the following Server:</source>
       <translation>ストレージが設定されていないサーバー:</translation>
     </message>
@@ -6203,16 +6465,6 @@ to %1</source>
     <message>
       <source>Connect</source>
       <translation>接続</translation>
-    </message>
-    <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1にシステムを接続&amp;mdash; どこからでもアクセスできます！</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 をチェックしてください &amp;mdash; 何処からでもサーバーに接続可能!</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6257,6 +6509,24 @@ to %1</source>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
       <translation>次のデバイスのリモートアーカイブ同期が完了しました：</translation>
+    </message>
+    <message>
+      <source>Remote archive synchronization</source>
+      <translation>Remote archive synchronization</translation>
+    </message>
+    <message>
+      <source>Archive integrity problem detected</source>
+      <translation>アーカイブの整合性の問題が検出されました</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1にシステムを接続&amp;mdash; どこからでもアクセスできます！</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 をチェックしてください &amp;mdash; 何処からでもサーバーに接続可能!</translation>
     </message>
   </context>
   <context>
@@ -6319,16 +6589,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>System time is synchronized with the Internet and is independent from server local times.</source>
-      <translation>システム時間はインターネットと同期され、サーバーの現地時間とは関係ありません</translation>
-    </message>
-    <message>
-      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
-      <translation>システム時間は、選択されたサーバーの現地時間と同期され、他のサーバーから独立しています</translation>
-    </message>
-    <message>
       <source>No server has Internet access. Time is not being synchronized.</source>
       <translation>インターネットにアクセスできるサーバーはありません　時間は同期されていません</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
+      <translation>システム時刻はインターネットと同期され、サーバーのローカル時間に依存しません</translation>
+    </message>
+    <message>
+      <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
+      <translation>システム時間は、選択したサーバーのローカル時刻と同期され、他のサーバーのローカル時間に依存しません</translation>
     </message>
   </context>
   <context>
@@ -6529,16 +6799,17 @@ to %1</source>
       <translation>ローカル ユーザー</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>クラウド ユーザー</translation>
-    </message>
-    <message>
       <source>Login</source>
       <translation>ログイン</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>役割</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 ユーザー</translation>
     </message>
   </context>
   <context>
@@ -6721,7 +6992,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>このユーザーはまだ%1にサインアップしていません</translation>
     </message>
   </context>
@@ -6730,10 +7001,6 @@ to %1</source>
     <message>
       <source>Local</source>
       <translation>ローカル</translation>
-    </message>
-    <message>
-      <source>Cloud</source>
-      <translation>クラウド</translation>
     </message>
     <message>
       <source>Login</source>
@@ -6776,8 +7043,9 @@ to %1</source>
       <translation>パスワードが一致しません</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>そのEmailのクラウド ユーザーは既に存在します</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 ユーザーのemailは既に存在します</translation>
     </message>
   </context>
   <context>
@@ -6845,6 +7113,40 @@ to %1</source>
     <message>
       <source>Muted</source>
       <translation>ミュート</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableProgressWidget</name>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>アップロードを停止しますか？</translation>
+    </message>
+    <message>
+      <source>Already uploaded files will be kept.</source>
+      <translation>既にアップロードされたファイルは保管されます</translation>
+    </message>
+    <message>
+      <source>(%1 of %2)</source>
+      <translation>(%1 / %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>アップロード中 %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>ファイナライズ %1...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWearableUploadWidget</name>
+    <message>
+      <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>ユーザー &quot;%1&quot; は現在このカメラに映像をアップロードしています</translation>
+    </message>
+    <message>
+      <source>Another user is currently uploading footage to this camera.</source>
+      <translation>別のユーザーが現在このカメラに映像をアップロードしています</translation>
     </message>
   </context>
   <context>
@@ -6936,188 +7238,13 @@ to %1</source>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>サーバーに接続できませんでした　ビデオウォールが閉じられます</translation>
     </message>
-  </context>
-  <context>
-    <name>QnWorkbenchExportHandler</name>
     <message>
-      <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>実行可能 %1 メディアファイル (x64) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>実行可能 %1 メディアファイル (x86) (*.exe)</translation>
-    </message>
-    <message>
-      <source>Exporting Layout</source>
-      <translation>レイアウトのエクスポート</translation>
-    </message>
-    <message>
-      <source>Export Video As...</source>
-      <translation>名前を付けてエクスポート...</translation>
-    </message>
-    <message>
-      <source>Timestamps:</source>
-      <translation>タイムスタンプ:</translation>
-    </message>
-    <message>
-      <source>Exporting Video</source>
-      <translation>ビデオエクスポート</translation>
-    </message>
-    <message>
-      <source>Exporting to &quot;%1&quot;...</source>
-      <translation>&quot;%1&quot; にエクスポート中...</translation>
-    </message>
-    <message>
-      <source>Export Layout As...</source>
-      <translation>名前を付けてレイアウトをエクスポート...</translation>
-    </message>
-    <message>
-      <source>%1 Media File (*.nov)</source>
-      <translation>%1 メディアファイル(*.nov)</translation>
-    </message>
-    <message>
-      <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
-      <translation>フィルター、回転、歪み補正、拡張イメージ、カスタムアスペクトの適用（トランスコード必要）</translation>
-    </message>
-    <message>
-      <source>exported</source>
-      <translation>エクスポート</translation>
-    </message>
-    <message>
-      <source>No Timestamp</source>
-      <translation>タイムスタンプなし</translation>
-    </message>
-    <message>
-      <source>Top Left Corner (requires transcoding)</source>
-      <translation>左上（トランスコーディング必要）</translation>
-    </message>
-    <message>
-      <source>Top Right Corner (requires transcoding)</source>
-      <translation>右上（トランスコーディング必要）</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner (requires transcoding)</source>
-      <translation>左下（トランスコーディング必要）</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner (requires transcoding)</source>
-      <translation>右下（トランスコーディング必要）</translation>
-    </message>
-    <message>
-      <source>Save local layout as...</source>
-      <translation>名前を付けてローカルファイルを保存...</translation>
-    </message>
-    <message>
-      <source>Make file read-only.</source>
-      <translation>読取り専用</translation>
-    </message>
-    <message>
-      <source>File already used for recording</source>
-      <translation>すでに記録に使用されているファイル</translation>
-    </message>
-    <message>
-      <source>Please choose another name or wait until recording is finished.</source>
-      <translation>別の名前を選択するか記録が終了するまでお待ちください</translation>
-    </message>
-    <message>
-      <source>You are about to export a long video</source>
-      <translation>長いビデオをエクスポートしようとしています</translation>
-    </message>
-    <message>
-      <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>HDD の空き容量のギガバイト以上を必要としを完了するのに数分かかることがあります。</translation>
-    </message>
-    <message>
-      <source>Export anyway?</source>
-      <translation>エクスポートしますか？</translation>
-    </message>
-    <message>
-      <source>Export to AVI anyway?</source>
-      <translation>AVI にエクスポートしますか？</translation>
-    </message>
-    <message>
-      <source>Selected format not recommended</source>
-      <translation>選択したフォーマットは推奨されません</translation>
-    </message>
-    <message>
-      <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation>このカメラにはダウンスケール回避の為にNOVまたはEXE形式での推奨します</translation>
-    </message>
-    <message>
-      <source>Export with transcoding?</source>
-      <translation>トランスコーディングでエクスポートしますか？</translation>
-    </message>
-    <message>
-      <source>It will increase CPU usage and may take significant time.</source>
-      <translation>CPU 使用率が増加し、かなりの時間がかかることがあります</translation>
-    </message>
-    <message>
-      <source>EXE format not recommended</source>
-      <translation>EXE 形式は推奨されません</translation>
-    </message>
-    <message>
-      <source>Export to EXE anyway?</source>
-      <translation>EXE形式でエクスポートしますか？</translation>
-    </message>
-    <message>
-      <source>Failed to export Multi-Video</source>
-      <translation>複数ビデオのエクスポートに失敗しました</translation>
-    </message>
-    <message>
-      <source>Local files not allowed for Multi-Video export</source>
-      <translation>ローカルファイルをマルチビデオエクスポートには使用できません</translation>
-    </message>
-    <message>
-      <source>Please remove all local files from the layout and try again.</source>
-      <translation>レイアウトからすべてのローカル ファイルを削除して、もう一度やり直してください</translation>
-    </message>
-    <message>
-      <source>Export</source>
-      <translation>エクスポート</translation>
-    </message>
-    <message>
-      <source>You are about to export a lot of video</source>
-      <translation>多くのビデオをエクスポートしようとしています</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>あまりにも短い期間の選択です</translation>
-    </message>
-    <message>
-      <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-      <translation>ラピッドレビューとしてエクスポートするビデオの長さは、少なくとも 10 秒をが必要です</translation>
-    </message>
-    <message>
-      <source>Export completed</source>
-      <translation>エクスポートが完了しました</translation>
-    </message>
-    <message>
-      <source>Failed to export video</source>
-      <translation>エクスポートに失敗しました</translation>
-    </message>
-    <message>
-      <source>AVI format is not recommended</source>
-      <translation>AVI 形式は推奨されません</translation>
-    </message>
-    <message>
-      <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
-      <translation>非連続記録のエクスポートは MKV 形式または他の形式を推奨します</translation>
-    </message>
-    <message>
-      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>Windows の制限により 4 GB 以上のEXEファイルはダブルクリックしても開けません</translation>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>ビデオウォールは削除され、終了します</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
-    <message>
-      <source>Enter Password...</source>
-      <translation>パスワード入力...</translation>
-    </message>
-    <message>
-      <source>Administrator Password</source>
-      <translation>アドミニストレーターパスワード</translation>
-    </message>
     <message>
       <source>Systems will be merged shortly</source>
       <translation>システムをすぐに統合されます</translation>
@@ -7139,14 +7266,6 @@ to %1</source>
       <translation>ライセンスの合計数が減少します</translation>
     </message>
     <message>
-      <source>Password cannot be empty.</source>
-      <translation>パスワードは空白にできません</translation>
-    </message>
-    <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>クラウド システムを統合することはできません</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>システムに接続...</translation>
     </message>
@@ -7157,6 +7276,19 @@ to %1</source>
     <message>
       <source>Server will be connected to System shortly</source>
       <translation>サーバーはすぐにシステムに接続されます</translation>
+    </message>
+    <message>
+      <source>Enter password...</source>
+      <translation>パスワード入力...</translation>
+    </message>
+    <message>
+      <source>Administrator password</source>
+      <translation>管理者のパスワード</translation>
+    </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 システムを統合することはできません</translation>
     </message>
   </context>
   <context>
@@ -7396,6 +7528,153 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnWorkbenchWearableHandler</name>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>すべてのファイル (*.*)</translation>
+    </message>
+    <message>
+      <source>Video (%1)</source>
+      <translation>ビデオ（%1）</translation>
+    </message>
+    <message>
+      <source>Open Wearable Camera Recordings...</source>
+      <translation>ウェアラブルカメラ録画を開く...</translation>
+    </message>
+    <message>
+      <source>Only video files with correct timestamp are supported.</source>
+      <translation>正しいタイムスタンプを持つビデオファイルのみがサポートされます</translation>
+    </message>
+    <message>
+      <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
+      <translation>別のユーザー &quot;%1&quot; が現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
+    </message>
+    <message>
+      <source>Could not start upload as another user is currently uploading footage to this camera.</source>
+      <translation>別のユーザーが現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
+    </message>
+    <message>
+      <source>Failed to add wearable camera</source>
+      <translation>ウェアラブルカメラの追加に失敗しました</translation>
+    </message>
+    <message>
+      <source>No video files found in selected folder</source>
+      <translation>選択したフォルダにビデオファイルがありません</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation>
+        <numerusform>選択したファイル形式はサポートされていません</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation>MKV、AVI、MP4、またはその他のビデオファイルを使用してください</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation>
+        <numerusform>選択したファイルにタイムスタンプがありません</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation>
+        <numerusform>選択したファイルは、既にアップロードされている期間と重複します</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation>
+        <numerusform>これらのファイルは別のウェアラブルカメラにアップロードできます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation>
+        <numerusform>選択したファイルは、既にアップロードされている期間と重複します</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Selected files will not be uploaded</source>
+      <translation>選択したファイルはアップロードされません</translation>
+    </message>
+    <message>
+      <source>Some files will not be uploaded</source>
+      <translation>一部のファイルはアップロードされません</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation>選択したフォルダにアップロードする新しいファイルがありません</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>選択したファイルは古すぎます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>選択したファイルは %1に記録されましたが、最後の %n 日に録画されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>選択したファイルは %1 から %2の間で記録されましたが、最後の %n 日に記録されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>これらのファイルをアップロードした後に一部の映像が削除されることがあります</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>サーバーストレージには空き容量がほとんどありません。いくつかの古い映像は、空き容量を増やすために削除されることがあります。選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されます</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>これを防ぐために、追加のストレージを追加することができます。また、カメラ設定でアーカイブの保持時間を変更することで、最初に削除する映像を制御することもできます</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>アップロードを行いますか？</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>%1へのアップロードを完了できませんでした</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>サーバーストレージに十分なスペースがあることを確認してください</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 - サポートされていないフォーマット</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 - タイムスタンプがありません</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 - カメラのアーカイブ設定より古いです</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
       <source>New Web Page</source>
@@ -7566,6 +7845,20 @@ to %1</source>
         <numerusform>シーケンス表示から%nアイテムを削除しますか？</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Stop uploading?</source>
+      <translation>アップロードを停止しますか？</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>停止</translation>
+    </message>
+    <message numerus="yes">
+      <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
+      <translation>
+        <numerusform>一部のビデオファイルはウェアラブルカメラ %n にアップロード中です</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
@@ -7604,6 +7897,392 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::AnalyticsActionFactory</name>
+    <message>
+      <source>Dynamic</source>
+      <translation>動的</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportProcess</name>
+    <message>
+      <source>Unsupported media for data export.</source>
+      <translation>データのエクスポートにサポートされていないメディア</translation>
+    </message>
+    <message>
+      <source>Selected format is not supported by FFMPEG library.</source>
+      <translation>選択した形式は、FFMPEG ライブラリでサポートされていません</translation>
+    </message>
+    <message>
+      <source>FFMPEG library error.</source>
+      <translation>FFMPEG libraryエラー</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with selected format.</source>
+      <translation>ビデオまたはオーディオコーデックが選択された形式と互換性がありません</translation>
+    </message>
+    <message>
+      <source>File write error.</source>
+      <translation>ファイル書き込みエラー</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>データはエクスポートされませんでした</translation>
+    </message>
+    <message>
+      <source>Internal error</source>
+      <translation>内部エラー</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ExportSettingsDialog</name>
+    <message>
+      <source>exported</source>
+      <translation>エクスポート</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>エクスポート</translation>
+    </message>
+    <message>
+      <source>Rapid Review</source>
+      <translation>ラピッドレビュー</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>エクスポート設定</translation>
+    </message>
+    <message>
+      <source>Add Timestamp</source>
+      <translation>タイムスタンプを追加</translation>
+    </message>
+    <message>
+      <source>Delete Timestamp</source>
+      <translation>タイムスタンプの削除</translation>
+    </message>
+    <message>
+      <source>Timestamp</source>
+      <translation>タイムスタンプ</translation>
+    </message>
+    <message>
+      <source>Add Image</source>
+      <translation>イメージを追加</translation>
+    </message>
+    <message>
+      <source>Delete Image</source>
+      <translation>イメージを削除</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>イメージ:</translation>
+    </message>
+    <message>
+      <source>Add Text</source>
+      <translation>テキストを追加</translation>
+    </message>
+    <message>
+      <source>Delete Text</source>
+      <translation>テキストを削除</translation>
+    </message>
+    <message>
+      <source>Text</source>
+      <translation>テキスト</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>スピードリセット</translation>
+    </message>
+    <message>
+      <source>Add Bookmark Info</source>
+      <translation>ブックマーク情報追加</translation>
+    </message>
+    <message>
+      <source>Delete Bookmark Info</source>
+      <translation>ブックマーク情報削除</translation>
+    </message>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>ブックマーク情報</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::FilenamePanel</name>
+    <message>
+      <source>Folder</source>
+      <translation>フォルダ</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名前</translation>
+    </message>
+    <message>
+      <source>Name cannot be empty.</source>
+      <translation>名前を空にすることはできません</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>選択フォルダー...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Select file...</source>
+      <translation>ファイル選択...</translation>
+    </message>
+    <message>
+      <source>Pictures (%1)</source>
+      <translation>ピクチャ (%1)</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation>エラー</translation>
+    </message>
+    <message>
+      <source>Image cannot be loaded.</source>
+      <translation>画像を読み取ることができません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutThumbnailLoader</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>データがありません</translation>
+    </message>
+    <message>
+      <source>NOT A CAMERA</source>
+      <translation>カメラではありません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionFactory</name>
+    <message>
+      <source>Auto</source>
+      <translation>自動</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>低</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>高</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>カスタム</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RadassActionHandler</name>
+    <message>
+      <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
+      <translation>パフォーマンスを向上させるには、レイアウトの解像度を&quot;自動&quot;に設定します</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::RapidReviewSettingsWidget</name>
+    <message numerus="yes">
+      <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
+      <translation>
+        <numerusform>ラピッドレビューとしてエクスポートするにはビデオの長さは、最低 %n 秒が必要です</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Long</source>
+      <translation>長さ</translation>
+    </message>
+    <message>
+      <source>Short</source>
+      <translation>短い</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::UploadWorker</name>
+    <message>
+      <source>Could not open file &quot;%1&quot;</source>
+      <translation>ファイルを開くことができません"%1"</translation>
+    </message>
+    <message>
+      <source>Could not calculate md5 for file &quot;%1&quot;</source>
+      <translation>ファイル &quot;%1&amp;quot のmd5が計算できませんでした</translation>
+    </message>
+    <message>
+      <source>Could not create upload on the server side</source>
+      <translation>サーバー側でアップロードを作成できませんでした</translation>
+    </message>
+    <message>
+      <source>Could not upload file chunk to the server</source>
+      <translation>ファイルチャンクをサーバーにアップロードできませんでした</translation>
+    </message>
+    <message>
+      <source>Could not check uploaded file on the server</source>
+      <translation>サーバーにアップロードされたファイルをチェックできませんでした</translation>
+    </message>
+    <message>
+      <source>File was corrupted while being uploaded to the server</source>
+      <translation>ファイルがサーバーにアップロードされている間に破損しました</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WearableWorker</name>
+    <message>
+      <source>Failed to send request to the server.</source>
+      <translation>サーバーへのリクエストに失敗しました</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchAnalyticsController</name>
+    <message>
+      <source>%1 Analytics</source>
+      <translation>%1 解析</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::WorkbenchExportHandler</name>
+    <message>
+      <source>Stop Export</source>
+      <translation>エクスポートを停止</translation>
+    </message>
+    <message>
+      <source>Export completed</source>
+      <translation>エクスポートが完了しました</translation>
+    </message>
+    <message>
+      <source>Export failed</source>
+      <translation>エクスポート失敗</translation>
+    </message>
+    <message>
+      <source>Cannot write file</source>
+      <translation>ファイルを書き込めません</translation>
+    </message>
+    <message>
+      <source>%1 is in use by another export.</source>
+      <comment>%1 is file name</comment>
+      <translation>%1は別のエクスポートによって使用されています</translation>
+    </message>
+    <message>
+      <source>Selected period cannot be exported for the current camera.</source>
+      <translation>選択した期間は現在のカメラではエクスポートできません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::ExportLayoutTool</name>
+    <message>
+      <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+      <translation>ファイル&quot;%1&quot; は、別のプロセスで使用されています　別の名前をお試しください</translation>
+    </message>
+    <message>
+      <source>Could not create output file %1...</source>
+      <translation>ファイル %1 を作成できませんでした...</translation>
+    </message>
+    <message>
+      <source>Unknown error has occurred.</source>
+      <translation>不明なエラーが発生しました</translation>
+    </message>
+    <message>
+      <source>Exporting to &quot;%1&quot;...</source>
+      <translation>&quot;%1&quot; にエクスポート中...</translation>
+    </message>
+    <message>
+      <source>Could not export device %1.</source>
+      <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
+      <translation>%1. デバイスをエクスポートできません</translation>
+    </message>
+    <message>
+      <source>Could not export camera %1.</source>
+      <translation>%1. カメラをエクスポートできません</translation>
+    </message>
+    <message>
+      <source>Could not export I/O module %1.</source>
+      <translation>Ioモジュール %1. をエクスポートできませんでした</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::legacy::WorkbenchExportHandler</name>
+    <message>
+      <source>Executable %1 Media File (x64) (*.exe)</source>
+      <translation>実行可能 %1 メディアファイル (x64) (*.exe)</translation>
+    </message>
+    <message>
+      <source>Executable %1 Media File (x86) (*.exe)</source>
+      <translation>実行可能 %1 メディアファイル (x86) (*.exe)</translation>
+    </message>
+    <message>
+      <source>File already used for recording</source>
+      <translation>すでに記録に使用されているファイル</translation>
+    </message>
+    <message>
+      <source>Please choose another name or wait until recording is finished.</source>
+      <translation>別の名前を選択するか記録が終了するまでお待ちください</translation>
+    </message>
+    <message>
+      <source>Exporting Layout</source>
+      <translation>レイアウトのエクスポート</translation>
+    </message>
+    <message>
+      <source>EXE format not recommended</source>
+      <translation>EXE 形式は推奨されません</translation>
+    </message>
+    <message>
+      <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+      <translation>Windows の制限により 4 GB 以上のEXEファイルはダブルクリックしても開けません</translation>
+    </message>
+    <message>
+      <source>Export to EXE anyway?</source>
+      <translation>EXE形式でエクスポートしますか？</translation>
+    </message>
+    <message>
+      <source>Failed to export Multi-Video</source>
+      <translation>複数ビデオのエクスポートに失敗しました</translation>
+    </message>
+    <message>
+      <source>Local files not allowed for Multi-Video export</source>
+      <translation>ローカルファイルをマルチビデオエクスポートには使用できません</translation>
+    </message>
+    <message>
+      <source>Please remove all local files from the layout and try again.</source>
+      <translation>レイアウトからすべてのローカル ファイルを削除して、もう一度やり直してください</translation>
+    </message>
+    <message>
+      <source>Save local layout as...</source>
+      <translation>名前を付けてローカルファイルを保存...</translation>
+    </message>
+    <message>
+      <source>exported</source>
+      <translation>エクスポート</translation>
+    </message>
+    <message>
+      <source>%1 Media File (*.nov)</source>
+      <translation>%1 メディアファイル(*.nov)</translation>
+    </message>
+    <message>
+      <source>Make file read-only.</source>
+      <translation>読取り専用</translation>
+    </message>
+    <message>
+      <source>Export</source>
+      <translation>エクスポート</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
+    <message>
+      <source>No event types supported</source>
+      <translation>サポートされるイベントタイプはありません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
+      <translation>イベントは、解析イベントが上のすべての条件を満たす場合にのみトリガーされます　キーワードフィールドが空白の場合、条件は常に満たされます</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ui::ClipboardButton</name>
     <message>
       <source>Copy</source>
@@ -7632,13 +8311,6 @@ to %1</source>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>貼付け</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>データがありません</translation>
     </message>
   </context>
   <context>
@@ -7677,20 +8349,20 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::action::LayoutTourTextFactory</name>
     <message>
-      <source>Stop Layout Tour</source>
-      <translation type="unfinished">Stop Layout Tour</translation>
-    </message>
-    <message>
       <source>Stop Showreel</source>
       <translation>シーケンス表示停止</translation>
     </message>
     <message>
-      <source>Start Layout Tour</source>
-      <translation type="unfinished">Start Layout Tour</translation>
-    </message>
-    <message>
       <source>Start Showreel</source>
       <translation>シーケンス表示開始</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>ツアー停止</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>ツアー開始</translation>
     </message>
   </context>
   <context>
@@ -7940,6 +8612,18 @@ to %1</source>
       <source>Failed to open server web page</source>
       <translation>サーバーの ウェブ ページを開くのに失敗しました</translation>
     </message>
+    <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation>ウェアラブルカメラはサーバー間で移動できません</translation>
+    </message>
+    <message>
+      <source>Failed to change password</source>
+      <translation>パスワードを変更できませんでした</translation>
+    </message>
+    <message>
+      <source>Failed to change password on %1 of %2 cameras</source>
+      <translation>%2 カメラの %1 のパスワードを変更できませんでした</translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -7948,8 +8632,8 @@ to %1</source>
       <translation>キーボードの矢印キーでレイアウトの切替え　シーケンス表示を終了するには、Escキーを押します</translation>
     </message>
     <message>
-      <source>Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch cameras. To stop the layout tour press Esc.</translation>
+      <source>Press any key to stop the tour.</source>
+      <translation>何かのキーでツアー停止.</translation>
     </message>
   </context>
   <context>
@@ -7970,16 +8654,16 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
-      <source>Delete layout tour %1?</source>
-      <translation>レイアウトツアー%1を削除しますか？</translation>
-    </message>
-    <message>
       <source>Showreel</source>
       <translation>シーケンス表示</translation>
     </message>
     <message>
       <source>Showreel %1</source>
       <translation>シーケンス表示 %1</translation>
+    </message>
+    <message>
+      <source>Delete Showreel %1?</source>
+      <translation>Delete Showreel %1?</translation>
     </message>
   </context>
   <context>

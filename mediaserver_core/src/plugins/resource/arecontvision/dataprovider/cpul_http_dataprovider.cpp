@@ -10,19 +10,14 @@
 #include "cpul_http_dataprovider.h"
 
 
-AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(const QnResourcePtr& res):
-QnPlAVClinetPullStreamReader(res)
+AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(const QnPlAreconVisionResourcePtr& res):
+    QnPlAVClinetPullStreamReader(res)
 {
 
     m_port = 69;
     m_timeout = 500;
-
-    const QnPlAreconVisionResource* avRes = dynamic_cast<const QnPlAreconVisionResource*>(res.data());
-
-    m_panoramic = avRes->isPanoramic();
-    m_dualsensor = avRes->isDualSensor();
-    m_name = avRes->getName();
-    m_auth = avRes->getAuth();
+    m_name = m_camera->getName();
+    m_auth = m_camera->getAuth();
 
 }
 
@@ -123,7 +118,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
             forecast_size = resolutionFULL ? (width*height)/2  : (width*height)/4; // 0.5 meg per megapixel; to avoid mem realock
     }
 
-    CLSimpleHTTPClient http_client(getResource().dynamicCast<QnPlAreconVisionResource>()->getHostAddress(), m_port, m_timeout, m_auth);
+    CLSimpleHTTPClient http_client(m_camera->getHostAddress(), m_port, m_timeout, m_auth);
 
     http_client.doGET(request);
 

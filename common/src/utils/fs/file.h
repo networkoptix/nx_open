@@ -19,6 +19,9 @@
 #pragma warning( disable : 4290 )
 #endif
 
+#if defined (Q_OS_LINUX)
+    int makeUnixOpenFlags(const QIODevice::OpenMode& oflag);
+#endif
 
 class IQnFile
 {
@@ -26,10 +29,10 @@ public:
     virtual QString getFileName() const = 0;
 
     virtual bool open(
-        const QIODevice::OpenMode   &mode, 
+        const QIODevice::OpenMode   &mode,
         unsigned int                systemDependentFlags = 0
     ) = 0;
-    
+
     virtual void close() = 0;
     virtual qint64 read(char* buffer, qint64 count) = 0;
 
@@ -43,7 +46,7 @@ public:
     virtual ~IQnFile() {}
 };
 
-class QN_EXPORT QnFile
+class QnFile
 :
     public IQnFile,
     public std::enable_shared_from_this<QnFile>
@@ -80,6 +83,7 @@ public:
 
     QnFile();
     QnFile(const QString& fName);
+    QnFile(int fd);
     virtual ~QnFile();
     void setFileName(const QString& fName) { m_fileName = fName; }
     virtual QString getFileName() const { return m_fileName; }

@@ -39,8 +39,6 @@ public:
 
 } // namespace
 
-static const int kInterruptBufferSize = 128;
-
 namespace {
 
 int mapAioEventToUdtEvent(aio::EventType et)

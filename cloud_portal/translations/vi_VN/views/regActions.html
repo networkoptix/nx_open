@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Tài khoản được tạo. Thông báo xác nhận được gửi tới Email <br> {{account.email}}
+        Tài khoản được tạo. <br>Thông báo xác nhận được gửi tới Email <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -53,20 +53,20 @@
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Vui lòng nhập Email hợp lệ</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Email này đã được đăng ký trong {{PRODUCT_NAME}}</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Email này đã được đăng ký trong %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
         <div class="form-group" validate-field>
-            <div class="col-sm-offset-4 col-sm-8">
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
-                        I agree to the <a href="/content/eula" target="_blank">Terms and Conditions</a> and
-                        <a href="%PRIVACY_LINK%" target="_blank">Privacy policy</a>
+                        Tôi đồng ý với <a href="/content/eula" target="_blank"> Điều khoản và Điều kiện </a> và
+                          <a href="%PRIVACY_LINK%" target="_blank"> Chính sách bảo mật </a>
                     </label>
                     <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
-                        Please review and agree to the Terms and Conditions and Privacy policy in order to proceed
+                        Vui lòng xem và đồng ý với các điều khoản và điều kiện và quyền riêng tư chính sách để tiếp tục
                     </p>
                 </div>
             </div>

@@ -74,7 +74,7 @@
        <number>8</number>
       </property>
       <item row="1" column="0" colspan="2">
-       <widget class="QnInputField" name="passwordInputField" native="true">
+       <widget class="nx::client::desktop::InputField" name="passwordInputField" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -92,13 +92,22 @@
       <item row="3" column="1">
        <widget class="QLabel" name="invalidCredentialsLabel">
         <property name="text">
-         <string>Incorrect email or password</string>
+         <string notr="true">&lt;Incorrect email or password&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="4" column="1">
        <widget class="QWidget" name="linksWidget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>12</number>
+         </property>
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -159,7 +168,7 @@
        </widget>
       </item>
       <item row="0" column="0" colspan="2">
-       <widget class="QnInputField" name="loginInputField" native="true">
+       <widget class="nx::client::desktop::InputField" name="loginInputField" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -205,9 +214,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnInputField</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

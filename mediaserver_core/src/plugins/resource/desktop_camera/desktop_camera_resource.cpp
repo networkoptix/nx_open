@@ -14,12 +14,12 @@ QString QnDesktopCameraResource::getDriverName() const
     return MANUFACTURE;
 }
 
-QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource() {
+QnDesktopCameraResource::QnDesktopCameraResource()
+{
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
 }
 
-
-QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName): QnPhysicalCameraResource()
+QnDesktopCameraResource::QnDesktopCameraResource(const QString& userName)
 {
     setFlags(flags() | Qn::no_last_gop | Qn::desktop_camera);
     setName(userName);
@@ -29,32 +29,23 @@ QnDesktopCameraResource::~QnDesktopCameraResource()
 {
 }
 
-bool QnDesktopCameraResource::setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS)
+bool QnDesktopCameraResource::setRelayOutputState(const QString& /*outputID*/, bool /*activate*/,
+    unsigned int /*autoResetTimeoutMS*/)
 {
-    Q_UNUSED(outputID)
-    Q_UNUSED(activate)
-    Q_UNUSED(autoResetTimeoutMS)
     return false;
 }
 
 QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
 {
-    return new QnDesktopCameraStreamReader(toSharedPointer());
+    return new QnDesktopCameraStreamReader(toSharedPointer(this));
 }
 
-QnConstResourceAudioLayoutPtr QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
+bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr& source)
 {
-    const QnDesktopCameraStreamReader* deskopReader = dynamic_cast<const QnDesktopCameraStreamReader*>(dataProvider);
-    if (deskopReader && deskopReader->getDPAudioLayout())
-        return deskopReader->getDPAudioLayout();
-    else
-        return QnPhysicalCameraResource::getAudioLayout(dataProvider);
-}
-
-bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
     bool result = base_type::mergeResourcesIfNeeded(source);
 
-    if (getName() != source->getName()) {
+    if (getName() != source->getName())
+    {
         setName(source->getName());
         result = true;
     }
@@ -62,12 +53,24 @@ bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr 
     return result;
 }
 
-bool QnDesktopCameraResource::isReadyToDetach() const {
+bool QnDesktopCameraResource::isReadyToDetach() const
+{
     if (!QnDesktopCameraResourceSearcher::instance())
         return true;
 
     auto camera = this->toSharedPointer().dynamicCast<QnDesktopCameraResource>();
     return !QnDesktopCameraResourceSearcher::instance()->isCameraConnected(camera);  // check if we have already lost connection
+}
+
+nx::mediaserver::resource::StreamCapabilityMap
+    QnDesktopCameraResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex)
+{
+    return nx::mediaserver::resource::StreamCapabilityMap(); //< Not used.
+}
+
+CameraDiagnostics::Result QnDesktopCameraResource::initializeCameraDriver()
+{
+    return CameraDiagnostics::NoErrorResult();
 }
 
 #endif //ENABLE_DESKTOP_CAMERA

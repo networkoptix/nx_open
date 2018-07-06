@@ -8,7 +8,7 @@ class QnProxyReceiverConnection: public QnTCPConnectionProcessor
 {
 public:
     QnProxyReceiverConnection(
-        QSharedPointer<AbstractStreamSocket> socket, QnHttpConnectionListener* owner);
+        QSharedPointer<nx::network::AbstractStreamSocket> socket, QnHttpConnectionListener* owner);
 
 protected:
     virtual void run();

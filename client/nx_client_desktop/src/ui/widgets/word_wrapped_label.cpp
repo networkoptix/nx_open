@@ -110,3 +110,13 @@ void QnWordWrappedLabel::setApproximateLines(int value)
     m_approximateLines = value;
     updateGeometry();
 }
+
+bool QnWordWrappedLabel::openExternalLinks() const
+{
+    return m_label->openExternalLinks();
+}
+
+void QnWordWrappedLabel::setOpenExternalLinks(bool value)
+{
+    m_label->setOpenExternalLinks(true);
+}

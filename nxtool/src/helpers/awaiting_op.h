@@ -34,7 +34,7 @@ namespace rtu
         virtual ~AwaitingOp();
 
         void setServerDiscoveredHandler(const ServerDiscoveredAction &handler);
-        
+
         void setServerDisappearedHandler(const Callback &handler);
 
         void setUnknownAddedHandler(const UnknownAddedHandler &handler);
@@ -50,9 +50,6 @@ namespace rtu
         int changesCount() const;
 
         void resetChangesCount();
-
-    signals:
-        void timeout();
 
     private:
         AwaitingOp(const QUuid &id

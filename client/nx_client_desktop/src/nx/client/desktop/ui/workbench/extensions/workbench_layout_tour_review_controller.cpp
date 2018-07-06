@@ -15,6 +15,8 @@
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
 
+#include <nx/client/core/utils/grid_walker.h>
+
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
@@ -66,36 +68,6 @@ QRect createItemGrid(int itemCount)
     int w = std::max((int) std::ceil(1.0 * itemCount / h), kMinGridSize);
     return QRect(0, 0, w, h);
 }
-
-struct GridWalker
-{
-public:
-    GridWalker(const QRect& grid):
-        x(grid.left()),
-        y(grid.top()),
-        grid(grid)
-    {}
-
-    QPoint pos() const
-    {
-        return {x, y};
-    }
-
-    bool next()
-    {
-        ++x;
-        if (x > grid.right())
-        {
-            x = grid.left();
-            ++y;
-        }
-        return y <= grid.bottom();
-    }
-
-    int x;
-    int y;
-    const QRect grid;
-};
 
 } // namespace
 
@@ -166,7 +138,7 @@ LayoutTourReviewController::~LayoutTourReviewController()
     stopListeningLayout();
 }
 
-void LayoutTourReviewController::handleTourChanged(const ec2::ApiLayoutTourData& tour)
+void LayoutTourReviewController::handleTourChanged(const nx::vms::api::LayoutTourData& tour)
 {
     // Handle only tours we are currently reviewing.
     auto reviewLayout = m_reviewLayouts.value(tour.id);
@@ -228,7 +200,7 @@ void LayoutTourReviewController::stopListeningLayout()
     m_dropPlaceholders.clear();
 }
 
-void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& tour)
+void LayoutTourReviewController::reviewLayoutTour(const nx::vms::api::LayoutTourData& tour)
 {
     if (!tour.isValid())
         return;
@@ -333,7 +305,7 @@ void LayoutTourReviewController::updatePlaceholders()
 
             QSharedPointer<LayoutTourDropPlaceholder> result(new LayoutTourDropPlaceholder());
             result->setRect(geometry);
-            display()->setLayer(result.data(), Qn::BackLayer);
+            display()->setLayer(result.data(), QnWorkbenchDisplay::BackLayer);
             display()->scene()->addItem(result.data());
             return result;
         };
@@ -409,7 +381,7 @@ void LayoutTourReviewController::updateItemsLayout()
     const auto reviewLayout = wbLayout->resource();
     NX_EXPECT(reviewLayout == m_reviewLayouts.value(tourId));
 
-    ec2::ApiLayoutTourItemDataList currentItems;
+    nx::vms::api::LayoutTourDataList currentItems;
 
     auto layoutItems = wbLayout->items().toList();
     QnWorkbenchItem::sortByGeometry(&layoutItems);
@@ -421,7 +393,8 @@ void LayoutTourReviewController::updateItemsLayout()
     }
 
     const auto itemGrid = createItemGrid((int)tour.items.size());
-    GridWalker walker(itemGrid);
+    core::GridWalker walker(itemGrid);
+
 
     // Dynamically reorder existing items to match new order (if something was added or removed).
     for (const auto& item: tour.items)
@@ -434,6 +407,8 @@ void LayoutTourReviewController::updateItemsLayout()
                 return resource && resource->getId() == item.resourceId;
             });
 
+        const bool hasPosition = walker.next();
+        NX_EXPECT(hasPosition);
         // Move existing item to the selected place.
         if (existing != layoutItems.end())
         {
@@ -448,7 +423,6 @@ void LayoutTourReviewController::updateItemsLayout()
         {
             addItemToReviewLayout(reviewLayout, item, walker.pos(), true);
         }
-        walker.next();
     }
 
     // These are items that were not repositioned.
@@ -463,7 +437,7 @@ void LayoutTourReviewController::updateItemsLayout()
 }
 
 void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& layout,
-    const ec2::ApiLayoutTourItemDataList& items)
+    const nx::vms::api::LayoutTourItemDataList& items)
 {
     for (const auto& itemId: layout->getItems().keys())
         qnResourceRuntimeDataManager->cleanupData(itemId);
@@ -472,19 +446,21 @@ void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& la
     const int gridSize = std::min((int)items.size(), qnRuntime->maxSceneItems());
 
     const auto grid = createItemGrid(gridSize);
-    GridWalker walker(grid);
+    core::GridWalker walker(grid);
 
     for (const auto& item: items)
     {
+        const bool hasPosition = walker.next();
+        NX_EXPECT(hasPosition);
+
         addItemToReviewLayout(layout, item, walker.pos(), true);
-        walker.next();
     }
     updateButtons(layout);
 }
 
 void LayoutTourReviewController::addItemToReviewLayout(
     const QnLayoutResourcePtr& layout,
-    const ec2::ApiLayoutTourItemData& item,
+    const nx::vms::api::LayoutTourItemData& item,
     const QPointF& position,
     bool pinItem)
 {
@@ -516,7 +492,7 @@ void LayoutTourReviewController::addResourcesToReviewLayout(
         addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position, false);
 }
 
-bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* items)
+bool LayoutTourReviewController::fillTourItems(nx::vms::api::LayoutTourItemDataList* items)
 {
     NX_EXPECT(items);
     if (!items)

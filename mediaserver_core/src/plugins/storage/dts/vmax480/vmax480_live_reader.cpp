@@ -17,18 +17,14 @@ extern "C"
 #include "vmax480_resource.h"
 #include "utils/common/util.h"
 
-
-
 static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");
 
 // ----------------------------------- QnVMax480LiveProvider -----------------------
 
-QnVMax480LiveProvider::QnVMax480LiveProvider(const QnResourcePtr& dev ):
+QnVMax480LiveProvider::QnVMax480LiveProvider(const QnPlVmax480ResourcePtr& dev ):
     CLServerPushStreamReader(dev),
-    m_maxStream(0),
-    m_opened(false)
+    m_networkRes(dev)
 {
-    m_networkRes = dev.dynamicCast<QnNetworkResource>();
 }
 
 QnVMax480LiveProvider::~QnVMax480LiveProvider()
@@ -41,13 +37,13 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData())
-        return getMetaData();
+    if (needMetadata())
+        return getMetadata();
 
     QnAbstractDataPacketPtr result;
     QElapsedTimer getTimer;
     getTimer.restart();
-    while (!needToStop() && isStreamOpened() && getTimer.elapsed() < MAX_FRAME_DURATION * 2 && !result)
+    while (!needToStop() && isStreamOpened() && getTimer.elapsed() < MAX_FRAME_DURATION_MS * 2 && !result)
     {
         result = m_maxStream->getNextData(this);
     }
@@ -55,7 +51,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
     if (!result)
         closeStream();
 
-    if (!m_needStop) 
+    if (!m_needStop)
     {
         QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(result);
         if (media && (media->dataType != QnAbstractMediaData::EMPTY_DATA)) {
@@ -63,7 +59,7 @@ QnAbstractMediaDataPtr QnVMax480LiveProvider::getNextData()
             if (getResource()->getStatus() == Qn::Unauthorized || getResource()->getStatus() == Qn::Offline)
                 getResource()->setStatus(Qn::Online);
         }
-        else if (m_lastMediaTimer.elapsed() > MAX_FRAME_DURATION * 2) {
+        else if (m_lastMediaTimer.elapsed() > MAX_FRAME_DURATION_MS * 2) {
             m_resource->setStatus(Qn::Offline);
         }
     }
@@ -76,11 +72,9 @@ bool QnVMax480LiveProvider::canChangeStatus() const
     return false; // do not allow to ancessor update status
 }
 
-
-CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(
+    bool /*isCameraControlRequired*/, const QnLiveStreamParams& /*params*/)
 {
-    Q_UNUSED(isCameraControlRequired);
-    Q_UNUSED(params)
     if (m_opened)
         return CameraDiagnostics::NoErrorResult();
 
@@ -88,10 +82,9 @@ CameraDiagnostics::Result QnVMax480LiveProvider::openStreamInternal(bool isCamer
     if (channel > 0)
         channel--;
 
-
     if (m_maxStream == 0)
         m_maxStream = VMaxStreamFetcher::getInstance(GROUP_ID, m_resource.data(), true);
-    m_opened = m_maxStream->registerConsumer(this); 
+    m_opened = m_maxStream->registerConsumer(this);
     m_lastMediaTimer.restart();
 
     return CameraDiagnostics::NoErrorResult();
@@ -134,7 +127,7 @@ void QnVMax480LiveProvider::afterRun()
 
 int QnVMax480LiveProvider::getChannel() const
 {
-    return m_resource.dynamicCast<QnPhysicalCameraResource>()->getChannel();
+    return m_networkRes->getChannel();
 }
 
 #endif // #ifdef ENABLE_VMAX

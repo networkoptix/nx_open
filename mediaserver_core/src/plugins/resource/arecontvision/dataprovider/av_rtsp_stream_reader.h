@@ -8,7 +8,7 @@
 
 #ifdef ENABLE_ARECONT
 
-#include "core/dataprovider/spush_media_stream_provider.h"
+#include <providers/spush_media_stream_provider.h>
 #include "network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
@@ -23,10 +23,10 @@ class QnArecontRtspStreamReader
     typedef QnBasicAvStreamReader<CLServerPushStreamReader> parent_type;
 
 public:
-    QnArecontRtspStreamReader(const QnResourcePtr& res);
+    QnArecontRtspStreamReader(const QnPlAreconVisionResourcePtr& res);
     virtual ~QnArecontRtspStreamReader();
 
-    QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;

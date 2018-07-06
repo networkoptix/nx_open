@@ -53,6 +53,5 @@ int main(int argc, char** argv)
         [](const nx::utils::ArgumentParser& /*args*/)
         {
             return nx::utils::test::DeinitFunctions();
-        },
-        0);
+        });
 }

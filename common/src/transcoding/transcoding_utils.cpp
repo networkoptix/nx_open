@@ -15,7 +15,7 @@ static const int kReadOnlyBufferFlag = 0;
 
 int readFromQIODevice(void* opaque, uint8_t* buf, int size)
 {
-    
+
     auto ioDevice = reinterpret_cast<QIODevice*>(opaque);
     auto result = ioDevice->read((char*)buf, size);
 
@@ -97,7 +97,7 @@ int64_t Helper::durationMs()
         return AV_NOPTS_VALUE;
 
     // Potential overflow here
-    return av_rescale(m_inputFormatContext->duration, 1, AV_TIME_BASE) * 1000; 
+    return av_rescale(m_inputFormatContext->duration, 1, AV_TIME_BASE) * 1000;
 }
 
 QnResourceAudioLayoutPtr Helper::audioLayout()
@@ -171,7 +171,7 @@ Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstCon
     in_filename = "dummy_in";
     out_filename = "dummy_out";
 
-    auto cleanUp = 
+    auto cleanUp =
         [&](Error returnCode) -> Error
         {
             avformat_close_input(&inputFormatContext);
@@ -286,7 +286,6 @@ Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstCon
     {
         AVStream *inputStream, *outputStream;
 
-        //qDebug() << "Reading frame!!!";
         if (av_read_frame(inputFormatContext, &pkt) < 0)
             break;
 
@@ -326,7 +325,6 @@ Error remux(QIODevice* inputMedia, QIODevice* outputMedia, const QString& dstCon
 
         //qDebug() << "PTS/DTS/DURATION" << pkt.pts << pkt.dts << pkt.duration;
 
-        //qDebug() << "Writing frame!!!";
         if (av_interleaved_write_frame(outputFormatContext, &pkt) < 0)
             break;
 

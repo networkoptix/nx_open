@@ -17,7 +17,7 @@ ActionParameters::ActionParameters():
     url(),
     emailAddress(),
     fps(10),
-    streamQuality(Qn::QualityHighest),
+    streamQuality(Qn::StreamQuality::highest),
     recordAfter(0),
     relayOutputId(),
     sayText(),
@@ -30,7 +30,9 @@ ActionParameters::ActionParameters():
     presetId(),
     useSource(false),
     recordBeforeMs(kDefaultRecordBeforeMs),
-    playToClient(true)
+    playToClient(true),
+    authType(nx::network::http::AuthType::authBasicAndDigest),
+    requestType()
 {
 }
 
@@ -43,7 +45,7 @@ bool ActionParameters::isDefault() const
 bool ActionParameters::requireConfirmation(EventType targetEventType) const
 {
     const bool eventTypeAllowed = isSourceCameraRequired(targetEventType)
-        || targetEventType >= userDefinedEvent;
+        || targetEventType >= EventType::userDefinedEvent;
     return needConfirmation && eventTypeAllowed;
 }
 

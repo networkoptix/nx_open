@@ -1,9 +1,10 @@
 #include "dao_rdb_user_authentication.h"
 
-#include <nx/utils/db/query.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql.h>
+#include <nx/utils/db/query.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/time.h>
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
@@ -74,7 +75,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     const std::string& accountId)
 {
     QString sqlRequestStr = R"sql(
-        SELECT nonce, intermediate_response as intermediateResponse, 
+        SELECT nonce, intermediate_response as intermediateResponse,
             expiration_time_utc as expirationTime
         FROM system_user_auth_info
         WHERE account_id=:accountId AND system_id=:systemId
@@ -101,6 +102,41 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     return result;
 }
 
+std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
+    nx::utils::db::QueryContext* const queryContext,
+    int systemCountLimit)
+{
+    const auto currentTime = std::chrono::floor<std::chrono::milliseconds>(
+        nx::utils::utcTime().time_since_epoch());
+
+    nx::utils::db::SqlQuery query(*queryContext->connection());
+    query.setForwardOnly(true);
+    query.prepare(R"sql(
+        SELECT DISTINCT system_id
+        FROM system_user_auth_info
+        WHERE expiration_time_utc < :curTime
+        LIMIT :maxSystemsToReturn
+    )sql");
+    query.bindValue(":curTime", (long long)currentTime.count());
+    query.bindValue(":maxSystemsToReturn", systemCountLimit);
+    try
+    {
+        query.exec();
+    }
+    catch (const nx::utils::db::Exception e)
+    {
+        NX_WARNING(this, lm("Error selecting systems with expired auth records. %1")
+            .args(e.what()));
+        throw;
+    }
+
+    std::vector<std::string> systems;
+    while (query.next())
+        systems.push_back(query.value(0).toString().toStdString());
+
+    return systems;
+}
+
 void UserAuthentication::insertUserAuthRecords(
     nx::utils::db::QueryContext* const queryContext,
     const std::string& systemId,
@@ -112,7 +148,7 @@ void UserAuthentication::insertUserAuthRecords(
         nx::utils::db::SqlQuery query(*queryContext->connection());
         query.prepare(R"sql(
             INSERT INTO system_user_auth_info(
-                system_id, account_id, nonce,   
+                system_id, account_id, nonce,
                 intermediate_response, expiration_time_utc)
             VALUES(:systemId, :accountId, :nonce, :intermediateResponse, :expirationTime)
         )sql");
@@ -190,6 +226,29 @@ void UserAuthentication::deleteAccountAuthRecords(
     {
         NX_WARNING(this, lm("Error deleting account %1 authentication records. %2")
             .arg(accountId).arg(e.what()));
+        throw;
+    }
+}
+
+void UserAuthentication::deleteSystemAuthRecords(
+    nx::utils::db::QueryContext* const queryContext,
+    const std::string& systemId)
+{
+    nx::utils::db::SqlQuery query(*queryContext->connection());
+    query.prepare(R"sql(
+        DELETE FROM system_user_auth_info
+        WHERE system_id = :systemId
+    )sql");
+    query.bindValue(":systemId", QnSql::serialized_field(systemId));
+
+    try
+    {
+        query.exec();
+    }
+    catch (const nx::utils::db::Exception e)
+    {
+        NX_WARNING(this, lm("Error deleting system %1 authentication records. %2")
+            .args(systemId, e.what()));
         throw;
     }
 }

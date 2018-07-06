@@ -103,11 +103,11 @@
     </message>
     <message>
       <source>resuming</source>
-      <translation>reanudado</translation>
+      <translation>reanudando</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation>pausa</translation>
+      <translation>pausado</translation>
     </message>
     <message>
       <source>pausing</source>

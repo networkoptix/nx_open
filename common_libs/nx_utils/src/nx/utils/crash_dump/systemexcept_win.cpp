@@ -13,6 +13,8 @@
 #include <QtCore/QStandardPaths>
 
 #include "nx/utils/app_info.h"
+#include <nx/utils/log/assert.h>
+
 #include "../platform/win32_syscall_resolver.h"
 
 #define MAX_SYMBOL_SIZE 1024
@@ -44,18 +46,28 @@ typedef BOOL (WINAPI *pfMiniDumpWriteDump) (
 
 static void LegacyDump( HANDLE );
 
-static int GetBaseName( const char* name , DWORD len ) {
-    for( DWORD i = len-1 ; i >= 0 ; --i ) {
-        if( name[i] == '\\' || name[i] == '/' )
-            return i+1;
+static int GetBaseName(const char* name, DWORD len)
+{
+    NX_ASSERT(len > 0);
+    if (len == 0)
+        return 0;
+
+    do
+    {
+        --len;
+        if (name[len] == '\\' || name[len] == '/')
+            return len + 1;
     }
+    while (len > 0);
     return 0;
 }
 
 static bool GetProgramName( char* buffer ) {
     char sModuleName[MAX_SYMBOL_SIZE];
+
+    // If the function fails, the return value is 0.
     DWORD dwLen = ::GetModuleFileNameA( NULL, sModuleName, MAX_SYMBOL_SIZE );
-    if( dwLen == MAX_SYMBOL_SIZE || dwLen < 0 )
+    if (dwLen == MAX_SYMBOL_SIZE || dwLen == 0)
         return false;
 
     int iBaseNamePos = GetBaseName( sModuleName , dwLen );

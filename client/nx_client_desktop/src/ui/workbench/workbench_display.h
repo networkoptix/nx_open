@@ -12,10 +12,8 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/graphics/view/graphics_view.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/uuid.h>
@@ -58,13 +56,41 @@ class QnCamDisplay;
  *
  * It presents some low-level functions for viewport and item manipulation.
  */
-class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations
+class QnWorkbenchDisplay:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware,
+    protected QnSceneTransformations
 {
     Q_OBJECT
 
     using base_type = Connective<QObject>;
 
 public:
+
+    /**
+    * Layer of a graphics item on the scene.
+    *
+    * Workbench display presents convenience functions for moving items between layers
+    * and guarantees that items from the layers with higher numbers are always
+    * displayed on top of those from the layers with lower numbers.
+    */
+    enum ItemLayer
+    {
+        InvisibleLayer = -1,        //< Layer for invisible items.
+        EMappingLayer = 0,          /**< Layer for E-Mapping background. */
+        BackLayer,                  /**< Back layer. */
+        PinnedLayer,                /**< Layer for pinned items. */
+        PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
+        UnpinnedLayer,              /**< Layer for unpinned items. */
+        UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
+        ZoomedLayer,                /**< Layer for zoomed items. */
+        FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
+        EffectsLayer,               /**< Layer for top-level effects. */
+        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
+        MessageBoxLayer,            /**< Layer for graphics text messages. */
+        LayerCount
+    };
+
     /**
      * Constructor.
      *
@@ -138,12 +164,12 @@ public:
      * \returns                         Current graphics view of this workbench display.
      *                                  May be NULL.
      */
-    QnGraphicsView* view() const;
+    QGraphicsView* view() const;
 
     /**
      * \param view                      New view for this workbench display.
      */
-    void setView(QnGraphicsView* view);
+    void setView(QGraphicsView* view);
 
     /**
      * \returns                         Grid item.
@@ -249,14 +275,10 @@ public:
 
     void bringToFront(QnWorkbenchItem *item);
 
-
-    Qn::ItemLayer layer(QGraphicsItem *item) const;
-
-    void setLayer(QGraphicsItem *item, Qn::ItemLayer layer);
-
-    void setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer);
-
-    qreal layerZValue(Qn::ItemLayer layer) const;
+    ItemLayer layer(QGraphicsItem *item) const;
+    void setLayer(QGraphicsItem *item, ItemLayer layer);
+    void setLayer(const QList<QGraphicsItem *> &items, ItemLayer layer);
+    qreal layerZValue(ItemLayer layer) const;
 
     void synchronize(QnWorkbenchItem *item, bool animate);
 
@@ -315,17 +337,17 @@ protected:
     void synchronizeAllGeometries(bool animate);
     void synchronizeLayer(QnWorkbenchItem *item);
     void synchronizeLayer(QnResourceWidget *widget);
+    void synchronizePlaceholder(QnResourceWidget *widget);
     void synchronizeSceneBounds();
 
     void updateCurrentMarginFlags();
 
     void adjustGeometryLater(QnWorkbenchItem *item, bool animate);
-    Q_SLOT void adjustGeometry(QnWorkbenchItem *item, bool animate);
-    Q_SIGNAL void geometryAdjustmentRequested(QnWorkbenchItem *item, bool animate);
+    void adjustGeometry(QnWorkbenchItem *item, bool animate);
 
-    qreal layerFrontZValue(Qn::ItemLayer layer) const;
-    Qn::ItemLayer synchronizedLayer(QnResourceWidget *widget) const;
-    Qn::ItemLayer shadowLayer(Qn::ItemLayer itemLayer) const;
+    qreal layerFrontZValue(ItemLayer layer) const;
+    ItemLayer synchronizedLayer(QnResourceWidget *widget) const;
+    ItemLayer shadowLayer(ItemLayer itemLayer) const;
 
     bool addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
@@ -403,7 +425,7 @@ private:
     QGraphicsScene *m_scene;
 
     /** Current view. */
-    QnGraphicsView *m_view;
+    QGraphicsView* m_view = nullptr;
 
     /** Set of flags to simplify and speed up painting. */
     Qn::LightModeFlags m_lightMode;

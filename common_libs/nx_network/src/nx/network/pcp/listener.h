@@ -5,6 +5,8 @@
 #include "nx/utils/thread/long_runnable.h"
 #include <nx/network/socket_factory.h>
 
+namespace nx {
+namespace network {
 namespace pcp {
 
 class NX_NETWORK_API Listener
@@ -30,6 +32,8 @@ private:
     QByteArray m_buffer;
 };
 
-}
+} // namespace pcp
+} // namespace network
+} // namespace nx
 
 #endif // LISTENER_H

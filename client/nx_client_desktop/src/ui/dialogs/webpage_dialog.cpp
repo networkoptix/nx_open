@@ -3,7 +3,9 @@
 
 #include <QtCore/QUrl>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -33,14 +35,14 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent) :
         [this](const QString& url)
         {
             if (url.trimmed().isEmpty())
-                return Qn::ValidationResult(tr("URL cannot be empty."));
+                return ValidationResult(tr("URL cannot be empty."));
 
             return isValidUrl(QUrl::fromUserInput(url))
-                ? Qn::kValidResult
-                : Qn::ValidationResult(tr("Wrong URL format."));
+                ? ValidationResult::kValid
+                : ValidationResult(tr("Wrong URL format."));
         });
 
-    connect(ui->urlInputField, &QnInputField::textChanged, this,
+    connect(ui->urlInputField, &InputField::textChanged, this,
         [this](const QString& text)
         {
             const auto url = this->url();
@@ -49,8 +51,8 @@ QnWebpageDialog::QnWebpageDialog(QWidget* parent) :
 
     ui->urlInputField->setPlaceholderText(lit("example.org"));
 
-    auto aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    auto aligner = new Aligner(this);
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({
         ui->nameInputField,
         ui->urlInputField });

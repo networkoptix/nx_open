@@ -29,7 +29,7 @@ public:
     enum ValidationMode
     {
         VM_Regular,
-        VM_CheckInfo,
+        VM_CanActivate,
         VM_JustCreated
     };
 
@@ -56,6 +56,7 @@ public:
 protected:
     QnLicenseErrorCode isValidEdgeLicense(const QnLicensePtr& license,
         ValidationMode mode = VM_Regular) const;
-    QnLicenseErrorCode isValidStartLicense(const QnLicensePtr& license) const;
+    QnLicenseErrorCode isValidStartLicense(const QnLicensePtr& license,
+        ValidationMode mode = VM_Regular) const;
     bool isAllowedForArm(const QnLicensePtr& license) const;
 };

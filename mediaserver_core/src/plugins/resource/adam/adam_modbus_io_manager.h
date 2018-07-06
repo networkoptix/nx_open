@@ -15,8 +15,6 @@ class QnAdamModbusIOManager:
     public Qn::EnableSafeDirectConnection,
     public QnAbstractIOManager
 {
-    Q_OBJECT
-
     struct PortStateChangeInfo
     {
         PortStateChangeInfo(nx_io_managment::IOPortState _state, bool _isChanged):

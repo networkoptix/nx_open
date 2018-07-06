@@ -3,10 +3,8 @@
 
 #include <QtCore/QObject>
 
-#include <core/resource/resource_fwd.h>
-
-#include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <core/resource/client_resource_fwd.h>
 
 /** Module maintaining connection between desktop resource and a server we are currently connected to. */
 class QnWorkbenchDesktopCameraWatcher: public QObject, public QnSessionAwareDelegate {

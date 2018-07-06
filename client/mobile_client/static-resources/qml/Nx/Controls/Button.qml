@@ -1,8 +1,7 @@
 import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
-
-import com.networkoptix.qml 1.0
+import nx.client.core 1.0
 
 Button
 {
@@ -98,7 +97,7 @@ Button
         }
     }
 
-    ItemMouseTracker
+    MouseTracker
     {
         id: mouseTracker
 

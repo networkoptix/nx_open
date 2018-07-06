@@ -66,7 +66,7 @@ bool QnAvigilonResource::startInputPortMonitoringAsync( std::function<void(bool)
         return false;
     }
 
-    m_checkInputUrl = QUrl(getUrl());
+    m_checkInputUrl = nx::utils::Url(getUrl());
     m_checkInputUrl.setScheme( lit("http") );
     m_checkInputUrl.setPath( lit("/cgi-x/get-digitalio") );
 
@@ -121,15 +121,15 @@ void QnAvigilonResource::checkInputPortState( qint64 timerID )
 
     if( !m_checkInputPortsRequest )
     {
-        m_checkInputPortsRequest = nx_http::AsyncHttpClient::create();
-        connect( m_checkInputPortsRequest.get(), &nx_http::AsyncHttpClient::done,
+        m_checkInputPortsRequest = nx::network::http::AsyncHttpClient::create();
+        connect( m_checkInputPortsRequest.get(), &nx::network::http::AsyncHttpClient::done,
                  this, &QnAvigilonResource::onCheckPortRequestDone, Qt::DirectConnection );
     }
 
     m_checkInputPortsRequest->doGet(m_checkInputUrl);
 }
 
-void QnAvigilonResource::onCheckPortRequestDone( nx_http::AsyncHttpClientPtr httpClient )
+void QnAvigilonResource::onCheckPortRequestDone( nx::network::http::AsyncHttpClientPtr httpClient )
 {
     QnMutexLocker lk(&m_ioPortMutex);
 
@@ -137,7 +137,7 @@ void QnAvigilonResource::onCheckPortRequestDone( nx_http::AsyncHttpClientPtr htt
         return;
 
     if( !httpClient->failed() &&
-        httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok )
+        httpClient->response()->statusLine.statusCode == nx::network::http::StatusCode::ok )
     {
         const auto& msgBody = httpClient->fetchMessageBodyBuffer();
         const QnAvigilonCheckInputPortResponse inputPortsData = 

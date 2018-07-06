@@ -1,5 +1,4 @@
-#ifndef __SSL_SOCKET_H_
-#define __SSL_SOCKET_H_
+#pragma once
 
 #ifdef ENABLE_SSL
 
@@ -9,7 +8,7 @@
 
 #include "abstract_socket.h"
 #include "socket_common.h"
-#include "socket_impl_helper.h"
+#include "deprecated/socket_impl_helper.h"
 #include "ssl/ssl_engine.h"
 
 // Forward
@@ -45,7 +44,6 @@ public:
         bool encriptionEnforced = false);
     virtual ~SslSocket();
 
-    virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
     virtual bool toggleStatisticsCollection(bool val) override;
@@ -53,7 +51,7 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+        std::chrono::milliseconds timeout) override;
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
@@ -65,9 +63,6 @@ public:
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
 
-    virtual void cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
-
     virtual bool setNonBlockingMode(bool val) override;
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool shutdown() override;
@@ -78,11 +73,11 @@ public:
 
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
 
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
 
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
@@ -101,6 +96,8 @@ protected:
         std::unique_ptr<AbstractStreamSocket> wrappedSocket,
         bool isServerSide,
         bool encriptionEnforced);
+
+    virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
     int sendInternal(const void* buffer, unsigned int bufferLen);
@@ -127,7 +124,7 @@ private:
  *
  *  Auto detects whether remote side uses SSL and delegates calls to SslSocket
  *      or to system socket directly.
- *  @note Can only be used on server side for accepting connections
+ *  NOTE: Can only be used on server side for accepting connections
 */
 class NX_NETWORK_API MixedSslSocket:
     public SslSocket
@@ -139,21 +136,21 @@ public:
     virtual int send(const void* buffer, unsigned int bufferLen) override;
     virtual bool setNonBlockingMode(bool val) override;
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
-
     virtual void connectAsync(
         const SocketAddress& addr,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
 
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
+
+protected:
+    virtual void cancelIoInAioThread(
+        nx::network::aio::EventType eventType) override;
 
 private:
     bool updateInternalBlockingMode();
@@ -171,15 +168,14 @@ public:
         std::unique_ptr<AbstractStreamServerSocket> delegateSocket,
         bool allowNonSecureConnect);
 
-    virtual bool listen(int queueLen) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual bool listen(int backlog = kDefaultBacklogSize) override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
+    virtual void cancelIoInAioThread() override;
 
 private:
     const bool m_allowNonSecureConnect;
@@ -196,5 +192,3 @@ private:
 } // namespace nx
 
 #endif // ENABLE_SSL
-
-#endif // __SSL_SOCKET_H_

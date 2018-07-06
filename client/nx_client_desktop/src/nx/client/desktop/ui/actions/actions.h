@@ -193,7 +193,7 @@ enum IDType
      * Opens the Business Events Log dialog.
      * Supports cameras list in the resources field as a cameras filter.
      * Parameters:
-     * <tt>nx::vms::event::EventType EventTypeRole</tt> --- filter by event type.
+     * <tt>nx::vms::api::EventType EventTypeRole</tt> --- filter by event type.
      */
     OpenBusinessLogAction,
 
@@ -453,6 +453,11 @@ enum IDType
     OpenVideoWallReviewAction,
 
     /**
+     * Opens given camera in analytics mode.
+     */
+    StartAnalyticsAction,
+
+    /**
      * Menu containing all layouts belonging to the current user.
      */
     OpenCurrentUserLayoutMenu,
@@ -466,6 +471,12 @@ enum IDType
      * Saves selected layout.
      */
     SaveLayoutAction,
+
+    /**
+     * Saves selected local layout.
+     */
+    SaveLocalLayoutAction,
+    SaveLocalLayoutAsAction,
 
     /**
      * Saves selected layout under another name.
@@ -499,6 +510,15 @@ enum IDType
      * <tt>QString ResourceNameRole</tt> --- name for the new layout.
      */
     SaveLayoutForCurrentUserAsAction,
+
+    /**
+    * Shares selected camera with another user.
+    *
+    * Parameters:
+    * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to share camera with.
+    * <tt>QnUuid UuidRole</tt> --- role id to share camera with.
+    */
+    ShareCameraAction,
 
     /**
      * Performs a fit in view operation.
@@ -632,6 +652,16 @@ enum IDType
      * Opens manual camera addition dialog.
      */
     ServerAddCameraManuallyAction,
+
+    /**
+     * Opens manual device addition dialog.
+     */
+    AddDeviceManuallyAction,
+
+    /**
+     * Opens manual device addition dialog from main menu.
+     */
+    MainMenuAddDeviceManuallyAction,
 
     /**
      * Opens camera list by server
@@ -907,6 +937,10 @@ enum IDType
     LayoutTourSettingsAction,
     CurrentLayoutTourSettingsAction,
 
+    NewWearableCameraAction,
+    UploadWearableCameraFileAction,
+    UploadWearableCameraFolderAction,
+
     /* Timeline actions. */
 
     /**
@@ -930,19 +964,14 @@ enum IDType
     ZoomToTimeSelectionAction,
 
     /**
+     * Exports standalone exe client.
+     */
+    ExportStandaloneClientAction,
+
+    /**
      * Exports selected range.
      */
-    ExportTimeSelectionAction,
-
-    /**
-     * Exports whole layout.
-     */
-    ExportLayoutAction,
-
-    /**
-     * Exports rapid review.
-     */
-    ExportRapidReviewAction,
+    ExportVideoAction,
 
     /**
      * Bookmark selected range.
@@ -1117,6 +1146,14 @@ enum IDType
     * Opens Web Page settings dialog.
     */
     WebPageSettingsAction,
+
+    ChangeDefaultCameraPasswordAction,
+
+    /** Start searhing for local files. */
+    UpdateLocalFilesAction,
+
+    // TODO: #dklychkov Remove when the new scene engine becomes default.
+    OpenNewSceneAction,
 
     ActionCount,
 

@@ -13,6 +13,7 @@ DialogBase
     property size actualQuality
     property var customQualities: []
     property var availableVideoQualities: []
+    property int transcodingSupportStatus: MediaPlayer.TranscodingSupported
 
     deleteOnClose: true
 
@@ -58,6 +59,41 @@ DialogBase
         }
 
         DialogSeparator {}
+
+        Text
+        {
+            width: parent.width
+            topPadding: 8
+            bottomPadding: 8
+            leftPadding: 16
+            rightPadding: 16
+
+            // Workaround for a Qt bug: Text item does not take paddings into account when
+            // calculates its implicit size.
+            height: contentHeight + topPadding + bottomPadding
+
+            font.pixelSize: 13
+            color: ColorTheme.red_main
+
+            text:
+            {
+                if (transcodingSupportStatus === MediaPlayer.TranscodingSupported)
+                    return ""
+
+                if (transcodingSupportStatus === MediaPlayer.TranscodingDisabled)
+                    return qsTr("Transcoding is disabled.")
+                if (transcodingSupportStatus === MediaPlayer.TranscodingNotSupported)
+                    return qsTr("Transcoding is not supported for this camera.")
+                if (transcodingSupportStatus === MediaPlayer.TranscodingNotSupportedForServersOlder30)
+                    return qsTr("Transcoding is not supported for servers with version lower than 3.0.")
+                if (transcodingSupportStatus === MediaPlayer.TranscodingNotSupportedForArmServers)
+                    return qsTr("Transcoding is not supported for ARM servers.")
+
+                return ""
+            }
+            wrapMode: Text.WordWrap
+            visible: text !== ""
+        }
 
         Repeater
         {

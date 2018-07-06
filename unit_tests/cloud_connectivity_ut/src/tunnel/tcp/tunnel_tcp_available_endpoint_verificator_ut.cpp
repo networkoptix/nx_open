@@ -34,7 +34,7 @@ protected:
 
     void givenUnavailableEndpoint()
     {
-        m_endpoint = SocketAddress("example.com", 37);
+        m_endpoint = nx::network::SocketAddress("example.com", 37);
 
         m_verificator->setTimeout(std::chrono::milliseconds(100));
     }
@@ -67,9 +67,9 @@ protected:
 
 private:
     std::unique_ptr<AvailableEndpointVerificator> m_verificator;
-    TestHttpServer m_httpServer;
+    nx::network::http::TestHttpServer m_httpServer;
     nx::utils::SyncQueue<AbstractEndpointVerificator::VerificationResult> m_verificationResults;
-    SocketAddress m_endpoint;
+    nx::network::SocketAddress m_endpoint;
 
     void onVerificationDone(
         AbstractEndpointVerificator::VerificationResult result)

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <plugin
 	name="Nx-Fisheye"
-	version="1" 
+	version="1"
 	unique_id="B6CC59F4-A13D-4329-921D-97114254B4A5">
 	<parameters>
 		<group name = "Imaging">
@@ -168,19 +168,22 @@
 		<group name="Maintenance">
 			<param 	id="SAVE_REBOOT"
 				dataType="Button"
-				name="Reboot" 
+				name="Reboot"
+                confirmation="Are you sure you want to reboot the device?"
 				description="This operation reboots the device."
 				readCmd="system"
                 writeCmd="SAVE_REBOOT"/>
 			<param 	id="CONFIG_RESET"
 				dataType="Button"
 				name="Soft Reset"
+                confirmation="Are you sure you want to reset all settings (except network) to default?"
 				description="Reset settings to factory default except IP settings"
 				readCmd="system"
                 writeCmd="CONFIG_RESET"/>
 			<param 	id="FACTORY_DEFAULT"
 				dataType="Button"
 				name="Hard Reset"
+                confirmation="Are you sure you want to reset all settings (including network) to default?"
 				description="Reset settings to factory default (includes IP settings)"
 				readCmd="system"
                 writeCmd="FACTORY_DEFAULT"/>

@@ -21,7 +21,7 @@ OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
 }
 
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(
-    const QUrl& url,
+    const nx::utils::Url& url,
     const QAuthenticator& auth,
     bool doMultichannelCheck)
 {

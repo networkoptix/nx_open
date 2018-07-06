@@ -34,6 +34,8 @@ http {
 
         # path for static files
         root /app/app/static/$CUSTOMIZATION;
+        error_page 503 /static/503.html;
+        error_page 502 /static/503.html;
 
         location @proxy_to_app {
             proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
@@ -110,6 +112,26 @@ http {
         }
 
         location /static/tiny_mce/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
+        location /static/admin_tools/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;   
+        }
+
+        location /static/css/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;   
+        }
+
+        location /static/cms_images/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;   
+        }
+
+        location /static/bootstrap {
             root /app/app/static/common;
             error_page 404 /static/index.html;
         }

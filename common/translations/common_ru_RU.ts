@@ -53,11 +53,6 @@
       <translation>Найденная система %1 несовместима с версией %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Найденная система %1 находится в безопасном режиме.</translation>
@@ -68,19 +63,33 @@
       <translation>Не удалось настроить удаленную систему %1.</translation>
     </message>
     <message>
+      <source>New System</source>
+      <translation>Новая система</translation>
+    </message>
+    <message>
+      <source>The discovered System %1 is incompatible with the current System.</source>
+      <comment>%1 is name of System</comment>
+      <translation>Обнаружкнная система %1 несовместима с текущей.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 система может быть объединена только с не-%1. Системное имя и пароль берутся из %1 системы.</translation>
+    </message>
+    <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Облачная система может быть объединена только с локальной. Системное имя и пароль берутся из облачной системы.</translation>
     </message>
   </context>
   <context>
@@ -95,7 +104,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -246,18 +255,6 @@
       <translation>Убедитесь, что порт %1 доступен (например, проброшен).</translation>
     </message>
     <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры.</translation>
-    </message>
-    <message>
-      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
-    </message>
-    <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
       <translation>Если это не помогает, восстановите заводские настройки на web-странице устройства.</translation>
     </message>
@@ -304,6 +301,22 @@
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
       <translation>Камера была восстановлена ​​из архива. Удалите камеру и добавьте ее снова, чтобы просмотреть видео в реальном времени.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства (ошибка "%1").</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры (ошибка "%1").</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках I/O модуля (ошибка "%1").</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Обновите прошивку. Минимальная поддерживаемая версия - %1. Текущая версия - %2</translation>
     </message>
   </context>
   <context>
@@ -380,7 +393,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Не найден кодировщик для кодекa %1.</translation>
+      <translation>Не найден кодировщик для кодека %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -415,7 +428,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation>Начать</translation>
+      <translation>Начинается</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -455,7 +468,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation>Неверно</translation>
+      <translation>Неверный</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -463,7 +476,7 @@
     </message>
     <message>
       <source>Free</source>
-      <translation>Бесплатная</translation>
+      <translation>Свободно</translation>
     </message>
     <message>
       <source>Free license</source>
@@ -475,7 +488,15 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>Возобновляемые лицензии</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Лицензии Bridge</translation>
     </message>
   </context>
   <context>
@@ -484,7 +505,8 @@
       <source>%n %2 are used out of %1.</source>
       <translation>
         <numerusform>%n %2 использована из %1.</numerusform>
-        <numerusform>%n %2 использованы из %1.</numerusform>
+        <numerusform>%n %2 использовано из %1.</numerusform>
+        <numerusform>%n %2 использовано из %1.</numerusform>
         <numerusform>%n %2 использовано из %1.</numerusform>
       </translation>
     </message>
@@ -494,6 +516,7 @@
         <numerusform>%n %2 будет использована из %1.</numerusform>
         <numerusform>%n %2 будут использованы из %1.</numerusform>
         <numerusform>%n %2 будет использовано из %1.</numerusform>
+        <numerusform>%n %2 будет использовано из %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -502,11 +525,13 @@
         <numerusform>Активируйте ещё %n %1.</numerusform>
         <numerusform>Активируйте ещё %n %1.</numerusform>
         <numerusform>Активируйте ещё %n %1.</numerusform>
+        <numerusform>Активируйте ещё %n %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <translation>
+        <numerusform>Будет использована ещё %n %1.</numerusform>
         <numerusform>Будет использовано ещё %n %1.</numerusform>
         <numerusform>Будет использовано ещё %n %1.</numerusform>
         <numerusform>Будет использовано ещё %n %1.</numerusform>
@@ -525,7 +550,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation>Срок действия лицензии истёк</translation>
+      <translation>Истёк срок действия лицензии</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -544,8 +569,8 @@
       <translation>Неизвестная ошибка</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Сервер с соответствующим аппаратным Id не найден</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Сервер с соответствующим аппаратным ID не найден</translation>
     </message>
   </context>
   <context>
@@ -563,6 +588,7 @@
         <numerusform>%n камера</numerusform>
         <numerusform>%n камеры</numerusform>
         <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -570,6 +596,7 @@
       <translation>
         <numerusform>%n камера</numerusform>
         <numerusform>%n камеры</numerusform>
+        <numerusform>%n камер</numerusform>
         <numerusform>%n камер</numerusform>
       </translation>
     </message>
@@ -579,6 +606,7 @@
         <numerusform>%n устройство</numerusform>
         <numerusform>%n устройства</numerusform>
         <numerusform>%n устройств</numerusform>
+        <numerusform>%n устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -586,6 +614,7 @@
       <translation>
         <numerusform>%n устройство</numerusform>
         <numerusform>%n устройства</numerusform>
+        <numerusform>%n устройств</numerusform>
         <numerusform>%n устройств</numerusform>
       </translation>
     </message>
@@ -627,6 +656,7 @@
         <numerusform>%n модуль ввода/вывода</numerusform>
         <numerusform>%n модуля ввода/вывода</numerusform>
         <numerusform>%n модулей ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -634,6 +664,7 @@
       <translation>
         <numerusform>%n модуль ввода/вывода</numerusform>
         <numerusform>%n модуля ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
         <numerusform>%n модулей ввода/вывода</numerusform>
       </translation>
     </message>
@@ -658,7 +689,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Неизвестно</translation>
+      <translation>Неизвестный</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -673,12 +704,12 @@
       <translation>Водяной знак: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Аппаратный Id: %1</translation>
+      <source>Time License</source>
+      <translation>Возобновляемая лицензия</translation>
     </message>
     <message>
-      <source>Time License</source>
-      <translation type="unfinished">Time License</translation>
+      <source>Hardware ID: %1</source>
+      <translation>Аппаратный ID: %1</translation>
     </message>
   </context>
   <context>
@@ -689,15 +720,15 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкое</translation>
+      <translation>Низкая</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Среднее</translation>
+      <translation>Средний</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокое</translation>
+      <translation>Высокая</translation>
     </message>
     <message>
       <source>Best</source>
@@ -776,6 +807,10 @@
       <source>Invalid resource type for data export.</source>
       <translation>Недопустимый тип ресурса для экспорта данных.</translation>
     </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Нет данных для экспорта.</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
@@ -788,7 +823,7 @@
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Not Found</source>
@@ -846,7 +881,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>М</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
@@ -900,15 +935,17 @@
         <numerusform>миллисекунда</numerusform>
         <numerusform>миллисекунды</numerusform>
         <numerusform>миллисекунд</numerusform>
+        <numerusform>миллисекунд</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>секунда</numerusform>
         <numerusform>секунды</numerusform>
-        <numerusform>секунд</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
+        <numerusform>секунды</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -917,6 +954,7 @@
       <translation>
         <numerusform>минута</numerusform>
         <numerusform>минуты</numerusform>
+        <numerusform>минут</numerusform>
         <numerusform>минут</numerusform>
       </translation>
     </message>
@@ -927,6 +965,7 @@
         <numerusform>час</numerusform>
         <numerusform>часа</numerusform>
         <numerusform>часов</numerusform>
+        <numerusform>часов</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -935,6 +974,7 @@
       <translation>
         <numerusform>день</numerusform>
         <numerusform>дня</numerusform>
+        <numerusform>дней</numerusform>
         <numerusform>дней</numerusform>
       </translation>
     </message>
@@ -945,6 +985,7 @@
         <numerusform>неделя</numerusform>
         <numerusform>недели</numerusform>
         <numerusform>недель</numerusform>
+        <numerusform>недель</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -954,6 +995,7 @@
         <numerusform>месяц</numerusform>
         <numerusform>месяца</numerusform>
         <numerusform>месяцев</numerusform>
+        <numerusform>месяцев</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -962,6 +1004,7 @@
       <translation>
         <numerusform>год</numerusform>
         <numerusform>года</numerusform>
+        <numerusform>лет</numerusform>
         <numerusform>лет</numerusform>
       </translation>
     </message>
@@ -1005,7 +1048,7 @@
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>Только видео с камер</translation>
+      <translation>Только видео в реальном времени</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1013,7 +1056,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation>Особая</translation>
+      <translation>Особые</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
@@ -1025,7 +1068,7 @@
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation>Может смотреть живое видео со всех камер.</translation>
+      <translation>Может смотреть видео в реальном времени со всех камер.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
@@ -1112,7 +1155,8 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation>
+      <translation type="unfinished">
+        <numerusform>Движение на камере</numerusform>
         <numerusform>Движение на камерах</numerusform>
         <numerusform>Движение на камерах</numerusform>
         <numerusform>Движение на камерах</numerusform>
@@ -1157,6 +1201,7 @@
     <message numerus="yes">
       <source>Input Signal on Devices</source>
       <translation>
+        <numerusform>Входной сигнал на устройстве</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
@@ -1165,6 +1210,7 @@
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
       <translation>
+        <numerusform>Входной сигнал на камере</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
@@ -1173,7 +1219,8 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>Устройств отключены</numerusform>
+        <numerusform>Устройство отключено</numerusform>
+        <numerusform>Устройства отключены</numerusform>
         <numerusform>Устройств отключены</numerusform>
         <numerusform>Устройств отключены</numerusform>
       </translation>
@@ -1181,7 +1228,8 @@
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>Камер отключено</numerusform>
+        <numerusform>Камера отключена</numerusform>
+        <numerusform>Камеры отключены</numerusform>
         <numerusform>Камер отключено</numerusform>
         <numerusform>Камер отключено</numerusform>
       </translation>
@@ -1189,17 +1237,19 @@
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>Конфликт IP адреса устройств</numerusform>
-        <numerusform>Конфликт IP адреса устройств</numerusform>
-        <numerusform>Конфликт IP адреса устройств</numerusform>
+        <numerusform>Конфликт IP адреса устройства</numerusform>
+        <numerusform>Конфликт IP адресов устройств</numerusform>
+        <numerusform>Конфликт IP адресов устройств</numerusform>
+        <numerusform>Конфликт IP адресов устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
-        <numerusform>Конфликт IP адреса камер</numerusform>
-        <numerusform>Конфликт IP адреса камер</numerusform>
-        <numerusform>Конфликт IP адреса камер</numerusform>
+        <numerusform>Конфликт IP адреса камеры</numerusform>
+        <numerusform>Конфликт IP адресов камер</numerusform>
+        <numerusform>Конфликт IP адресов камер</numerusform>
+        <numerusform>Конфликт IP адресов камер</numerusform>
       </translation>
     </message>
     <message>
@@ -1266,11 +1316,11 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>Проблема с лицензией на сервере &apos;%1&apos;</translation>
+      <translation>Проблема с лицензией на сервере &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation>Сервер &apos;%1&apos; завершил резервное копирование архива</translation>
+      <translation>Сервер &quot;%1&quot; завершил резервное копирование архива</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -1335,9 +1385,10 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
+        <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1349,14 +1400,16 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
+        <numerusform>Первое проявление: %2 %1 (всего %n раз)</numerusform>
         <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
-        <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
-        <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
+        <numerusform>Первое проявление: %2 %1 (всего %n раз)</numerusform>
+        <numerusform>Первое проявление: %2 %1 (всего %n раз)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
+        <numerusform>Нет данных в течение %n секунды.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
@@ -1404,7 +1457,7 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>Диск %1 переполнен. Диск содержит слишком много данных, не относящихся к системе.</translation>
+      <translation>Диск &quot;%1&quot; переполнен. Диск содержит слишком много данных, не относящихся к системе.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
@@ -1481,26 +1534,28 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n User</numerusform>
-        <numerusform>%n User</numerusform>
-        <numerusform>%n User</numerusform>
+        <numerusform>%n пользователь</numerusform>
+        <numerusform>%n пользователя</numerusform>
+        <numerusform>%n пользователей</numerusform>
+        <numerusform>%n пользователей</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
       <translation>
-        <numerusform>%n Role</numerusform>
-        <numerusform>%n Role</numerusform>
-        <numerusform>%n Role</numerusform>
+        <numerusform>%n Роль</numerusform>
+        <numerusform>%n Роли</numerusform>
+        <numerusform>%n Ролей</numerusform>
+        <numerusform>%n Ролей</numerusform>
       </translation>
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>Все администраторы</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation>Все пользователи</translation>
+      <translation>Всем пользователям</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1508,15 +1563,15 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Программный триггер</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation type="unfinished">Soft Trigger %1 at %2</translation>
+      <translation>Программный триггер %1 на %2</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Soft Trigger %1 has been activated multiple times</translation>
+      <translation>Программный триггер %1 активирован несколько раз</translation>
     </message>
     <message>
       <source>Send email</source>
@@ -1524,7 +1579,16 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Подтвердить</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Событие аналитики</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 на %2</translation>
     </message>
   </context>
   <context>

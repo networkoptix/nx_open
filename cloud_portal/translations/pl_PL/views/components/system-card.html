@@ -6,10 +6,13 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">Zmień nazwę systemu</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Odłącz od <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Złącz z innym systemem</button>
+        </p>
+        <hr></hr>
+        <button class="btn btn-default" ng-click="disconnect()">Odłącz od <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>Właściciel</h2>
@@ -24,5 +27,23 @@
             <button class="btn btn-default" ng-click="rename()">Zmień nazwę systemu</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Odłącz od mojego konta</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            jest w trakcie złączania z tym systemem</div>
+        <hr></hr>
+        <div class="merge-info-text">W zależności od rozmiaru bazy danych może to potrwać do kilku godzin</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>Ten system jest w trakcie złączania z <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>W zależności od rozmiaru bazy danych może to potrwać do kilku godzin.</p>
+            <p>W trakcie złączania systemów można logować się do nich i odtwarzać wideo, ale nie można zmieniać ich konfiguracji. </p>
+            <p>Po złączeniu systemów wszyscy użytkownicy i kamery z tego systemu będą również dostępne
+                w <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System zostanie usunięty.</p>
+        </div>
     </div>
 </div>

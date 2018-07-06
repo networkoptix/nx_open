@@ -7,5 +7,5 @@ INCLUDEPATH += ${root.dir}/mediaserver_core/src/
 LIBS += $$FESTIVAL_LIB
 
 unix:!mac {
-    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
+    QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/ -pie"
 }

@@ -6,7 +6,8 @@ class QLabel;
 class QPushButton;
 class QGraphicsPixmapItem;
 class QnWordWrappedLabel;
-class QnBusyIndicatorGraphicsWidget;
+
+namespace nx { namespace client { namespace desktop { class BusyIndicatorGraphicsWidget; }}}
 
 class QnStatusOverlayWidget: public GraphicsWidget
 {
@@ -24,7 +25,8 @@ public:
         kIcon           = 0x04,
         kCaption        = 0x08,
         kButton         = 0x10,
-        kDescription    = 0x20
+        kCustomButton    = 0x20,
+        kDescription    = 0x40
     };
     Q_DECLARE_FLAGS(Controls, Control);
 
@@ -41,9 +43,11 @@ public:
     void setCaption(const QString& caption);
     void setDescription(const QString& description);
     void setButtonText(const QString& text);
+    void setCustomButtonText(const QString& text);
 
 signals:
     void actionButtonClicked();
+    void customButtonClicked();
 
 private:
     void setupPreloader();
@@ -69,7 +73,7 @@ private:
     QWidget* const m_extrasContainer;
 
     // Preloader
-    QnBusyIndicatorGraphicsWidget* m_preloader;
+    nx::client::desktop::BusyIndicatorGraphicsWidget* m_preloader;
 
     // Icon overlay
     QGraphicsPixmapItem m_imageItem;
@@ -81,4 +85,5 @@ private:
 
     // Extras
     QPushButton* const m_button;
+    QPushButton* const m_customButton;
 };

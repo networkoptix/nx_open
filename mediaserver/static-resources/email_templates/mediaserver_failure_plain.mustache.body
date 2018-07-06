@@ -1,4 +1,6 @@
-Server {{#source}}"{{&source}}" {{/source}}failed 
+Server {{#source}}"{{&source}}" {{/source}}failed
 
+{{#aggregated}}
 Reason: {{&reason}}
 Time: {{&timestampDate}} {{&timestampTime}}
+{{/aggregated}}

@@ -6,18 +6,18 @@ namespace relay {
 namespace view {
 
 AuthenticationManager::AuthenticationManager(
-    const nx_http::AuthMethodRestrictionList& authRestrictionList)
+    const nx::network::http::AuthMethodRestrictionList& authRestrictionList)
     :
     m_authRestrictionList(authRestrictionList)
 {
 }
 
 void AuthenticationManager::authenticate(
-    const nx_http::HttpServerConnection& /*connection*/,
-    const nx_http::Request& /*request*/,
-    nx_http::server::AuthenticationCompletionHandler completionHandler)
+    const nx::network::http::HttpServerConnection& /*connection*/,
+    const nx::network::http::Request& /*request*/,
+    nx::network::http::server::AuthenticationCompletionHandler completionHandler)
 {
-    completionHandler(nx_http::server::SuccessfulAuthenticationResult());
+    completionHandler(nx::network::http::server::SuccessfulAuthenticationResult());
 }
 
 } // namespace view

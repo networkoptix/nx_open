@@ -1,6 +1,8 @@
 #include "http_server_plain_text_credentials_provider.h"
 
-namespace nx_http {
+namespace nx {
+namespace network {
+namespace http {
 namespace server {
 
 void PlainTextCredentialsProvider::getPasswordByUserName(
@@ -36,4 +38,6 @@ void PlainTextCredentialsProvider::addCredentials(
 }
 
 } // namespace server
-} // namespace nx_http
+} // namespace nx
+} // namespace network
+} // namespace http

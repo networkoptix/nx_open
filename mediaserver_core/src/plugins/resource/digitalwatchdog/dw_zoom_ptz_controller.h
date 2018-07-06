@@ -2,7 +2,9 @@
 #define QN_DW_ZOOM_PTZ_CONTROLLER_H
 
 #ifdef ENABLE_ONVIF
+
 #include <core/ptz/basic_ptz_controller.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 class QnDwZoomPtzController: public QnBasicPtzController {
     Q_OBJECT
@@ -13,7 +15,7 @@ public:
     virtual ~QnDwZoomPtzController();
 
     virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool continuousMove(const QVector3D& speed) override;
 
 private:
     QnDigitalWatchdogResourcePtr m_resource;

@@ -25,12 +25,10 @@ public:
 
 #define IfconfigReply_Fields (rebootNeeded)
 
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (IfconfigReply),
     (json),
     _Fields);
-
 
 namespace
 {
@@ -136,7 +134,6 @@ namespace
 
         return modified;
     }
-
 
     bool isValidIP(const QString& ipAddr)
     {
@@ -274,12 +271,10 @@ int QnIfConfigRestHandler::executePost(
     return CODE_OK;
 }
 
-void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
+void QnIfConfigRestHandler::afterExecute(const QString& /*path*/,
+    const QnRequestParamList& /*params*/, const QByteArray& body,
+    const QnRestConnectionProcessor* /*owner*/)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(params);
-    Q_UNUSED(owner);
-
     QnJsonRestResult reply;
     if (!QJson::deserialize(body, &reply) || reply.error !=  QnJsonRestResult::NoError)
         return;

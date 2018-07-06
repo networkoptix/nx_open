@@ -10,7 +10,7 @@
 
 using namespace nx::network::websocket;
 
-class TestParserHandler : public ParserHandler 
+class TestParserHandler : public ParserHandler
 {
 public:
     MOCK_METHOD2(frameStarted, void(FrameType type, bool fin));

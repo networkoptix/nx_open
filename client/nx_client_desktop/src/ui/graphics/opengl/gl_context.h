@@ -1,12 +1,8 @@
-/**********************************************************
-* 14 oct 2012
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef GLCONTEXT_H
-#define GLCONTEXT_H
+#include <QtCore/QtGlobal>
 
-#if defined(_WIN32) || defined(Q_OS_WIN) || defined(Q_OS_LINUX)
+#if defined(Q_OS_WIN) || defined(Q_OS_LINUX)
 
 #define NX_GLCONTEXT_PRESENT
 
@@ -117,6 +113,4 @@ private:
     void initialize( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith );
 };
 
-#endif  //defined(Q_OS_WIN) || defined(Q_OS_LINUX)
-
-#endif  //GLCONTEXT_H
+#endif // defined(_WIN32) || defined(Q_OS_WIN) || defined(Q_OS_LINUX)

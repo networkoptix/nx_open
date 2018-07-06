@@ -198,15 +198,6 @@ angular.module('nxCommon')
                     }
                 }
 
-                function jumpToPosition(date) {
-                    var lastMinute = scope.scaleManager.lastMinute();
-                    if (date > lastMinute) {
-                        goToLive();
-                    } else {
-                        scope.positionHandler(date);
-                    }
-                }
-
                 function playPause(){
                     if(scope.positionProvider.playing){
                         scope.playHandler(false);
@@ -234,30 +225,28 @@ angular.module('nxCommon')
                     jumpToPosition(date);
                     mouseX *= pixelAspectRatio;
 
-                    if (scope.scaleManager.zoom() < scope.scaleManager.fullZoomOutValue() &&
-                        (mouseX < bufferZone || mouseX > canvas.width - bufferZone)){
-
+                    if (scope.scaleManager.zoom() < scope.scaleManager.fullZoomOutValue()
+                            && (mouseX < bufferZone || mouseX > canvas.width - bufferZone)){
                         var left = (bufferZone + timelineConfig.markerWidth)/canvas.width;
                         var right = (canvas.width - (bufferZone + timelineConfig.markerWidth))/canvas.width;
                         moveTimeToVisiblePosition(mouseX < bufferZone ? left: right);
                     }
                 }
 
+                function jumpToPosition(date){
+                    var lastMinute = scope.scaleManager.lastMinute();
+                    if(date > lastMinute){
+                        goToLive ();
+                    }else {
+                        scope.positionHandler(date);
+                    }
+                }
+
+
+
                 /**
                  * Scrolling functions
                  */
-
-                var dragged = false,
-                    dragStarted = 0,
-                    impetusInit = null,
-                    preventClick = false;
-
-                function scrollbarSliderDragStart() { // Activate Impetus forcibly
-                    impetusInit = null;
-                    dragStarted = mouseXOverTimeline;
-                    dragged = false;
-                    timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
-                }
 
                 // High-level Handlers
                 function scrollbarClickOrHold(){
@@ -284,7 +273,6 @@ angular.module('nxCommon')
                 var mouseXOverTimeline = 0;
                 var mouseYOverTimeline = 0;
                 var mouseOverElements = null;
-                var onReleaseCenter = false;
 
                 function updateMouseCoordinate(event){
                     if(!event){
@@ -306,10 +294,9 @@ angular.module('nxCommon')
                     mouseYOverTimeline = event.offsetY || (event.pageY - $(canvas).offset().top);
 
                     mouseOverElements = timelineRender.checkElementsUnderCursor(mouseXOverTimeline,mouseYOverTimeline);
-                    scope.isPointer = mouseOverElements.leftButton ||
-                                        mouseOverElements.rightButton ||
-                                        mouseOverElements.leftMarker ||
-                                        mouseOverElements.rightMarker;
+                    scope.isPointer = mouseOverElements.leftButton || mouseOverElements.rightButton
+                                                                   || mouseOverElements.leftMarker
+                                                                   || mouseOverElements.rightMarker;
 
                 }
 
@@ -326,29 +313,19 @@ angular.module('nxCommon')
                     scope.$apply();
                 }
 
-                function viewportMouseDown(event) {
-                    updateMouseCoordinate(event);
 
-                    if (mouseOverElements.leftButton) {
-                        scrollButtonClickOrHold(true);
-                        return;
-                    }
-
-                    if (mouseOverElements.rightButton) {
-                        scrollButtonClickOrHold(false);
-                        return;
-                    }
-
-                    if (mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider) {
-                        scrollbarClickOrHold();
-                        return;
-                    }
-
-                    //scrolls timeline to current time
-                    onReleaseCenter = mouseOverElements.leftMarker || mouseOverElements.rightMarker;
-                }
-
+                var dragged = false;
+                var dragStarted = 0;
+                var impetusInit = null;
+                var preventClick = false;
                 // Impetus is inertia drag library
+
+                function scrollbarSliderDragStart(){ // Activate Impetus forcibly
+                    impetusInit = null;
+                    dragStarted = mouseXOverTimeline;
+                    dragged = false;
+                    timelineActions.scrollbarSliderDragStart(mouseXOverTimeline);
+                }
                 new Impetus({
                     source: $canvas.get(0),
                     friction: timelineConfig.intertiaFriction,
@@ -415,6 +392,28 @@ angular.module('nxCommon')
                     }
                 }
 
+                var onReleaseCenter = false;
+                function viewportMouseDown(event){
+                    updateMouseCoordinate(event);
+
+                    if(mouseOverElements.leftButton){
+                        scrollButtonClickOrHold(true);
+                        return;
+                    }
+
+                    if(mouseOverElements.rightButton){
+                        scrollButtonClickOrHold(false);
+                        return;
+                    }
+
+                    if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
+                        scrollbarClickOrHold();
+                        return;
+                    }
+
+                    //scrolls timeline to current time
+                    onReleaseCenter = mouseOverElements.leftMarker || mouseOverElements.rightMarker;
+                }
                 function viewportClick(event){
                     updateMouseCoordinate(event);
 

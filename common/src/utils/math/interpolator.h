@@ -13,15 +13,15 @@
 
 
 template<class T>
-class QnInterpolator: public std::unary_function<T, T> {
+class QnInterpolator {
 public:
     typedef QPair<T, T> point_type;
 
-    explicit QnInterpolator(Qn::ExtrapolationMode extrapolationMode = Qn::ConstantExtrapolation): 
+    explicit QnInterpolator(Qn::ExtrapolationMode extrapolationMode = Qn::ConstantExtrapolation):
         m_extrapolationMode(extrapolationMode)
     {}
 
-    QnInterpolator(const QVector<point_type> &points, Qn::ExtrapolationMode extrapolationMode = Qn::ConstantExtrapolation): 
+    QnInterpolator(const QVector<point_type> &points, Qn::ExtrapolationMode extrapolationMode = Qn::ConstantExtrapolation):
         m_extrapolationMode(extrapolationMode)
     {
         setPoints(points);
@@ -121,7 +121,7 @@ protected:
         T start = m_points.front().first;
         T end = m_points.back().first;
 
-        /* Pass linear extrapolation here so that we don't end up in 
+        /* Pass linear extrapolation here so that we don't end up in
          * infinite recursion due to FP precision errors. */
         return valueInternal(start + qMod(x - start, end - start), Qn::LinearExtrapolation);
     }

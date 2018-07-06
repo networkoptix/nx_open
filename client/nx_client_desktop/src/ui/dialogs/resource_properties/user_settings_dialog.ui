@@ -21,7 +21,7 @@
     <widget class="QTabWidget" name="tabWidget"/>
    </item>
    <item>
-    <widget class="QnAlertBar" name="alertBar" native="true"/>
+    <widget class="nx::client::desktop::AlertBar" name="alertBar" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -44,9 +44,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnAlertBar</class>
+   <class>nx::client::desktop::AlertBar</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/alert_bar.h</header>
+   <header location="global">nx/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

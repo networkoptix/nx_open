@@ -124,7 +124,7 @@ QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
 
         ChunkKey tmp;
 
-        if (cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality))
+        if (cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_HighQuality))
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::HiQualityCatalog, fromTimeMs);
 
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
@@ -141,7 +141,7 @@ QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
             }
         }
 
-        if (cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality))
+        if (cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_LowQuality))
             tmp = getOldestChunk(camera->getUniqueId(), QnServer::LowQualityCatalog, fromTimeMs);
 
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
@@ -264,45 +264,43 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             return CopyError::TargetFileError;
         }
 
-        int bitrate = m_schedule.backupBitrate;
-        if (bitrate <= 0) // not capped
+        const int bitrateMBps = m_schedule.backupBitrate; //< Megabytes per second.
+        if (bitrateMBps <= 0) // not capped
         {
             auto data = fromFile->readAll();
             toFile->write(data);
         }
         else
         {
-            NX_ASSERT(bitrate > 0);
-            qint64 fileSize = fromFile->size();
-            const qint64 timeToWrite = (fileSize / bitrate) * 1000;
+            const qint64 fileSize = fromFile->size();
 
+            const qint64 timeToFileMs = (fileSize * 1000) / bitrateMBps;
             const qint64 CHUNK_SIZE = 4096;
-            const qint64 chunksInFile = fileSize / CHUNK_SIZE;
-            const qint64 timeOnChunk = timeToWrite / chunksInFile;
+            QElapsedTimer writeTimeMs;
+            writeTimeMs.restart();
 
-            while (fileSize > 0)
+            qint64 dataProcessed = 0;
+            while (dataProcessed < fileSize)
             {
-                if (m_interrupted || m_needStop) {
+                if (m_interrupted || m_needStop)
                     return CopyError::Interrupted;
+
+                auto data = fromFile->read(CHUNK_SIZE);
+                if (data.isEmpty())
+                {
+                    NX_WARNING(this, lm("file %1 read error").arg(newFileName));
+                    return CopyError::SourceFileError;
                 }
-                qint64 startTime = qnSyncTime->currentMSecsSinceEpoch();
-                const qint64 writeSize = CHUNK_SIZE < fileSize ? CHUNK_SIZE : fileSize;
-                auto data = fromFile->read(writeSize);
                 if (toFile->write(data) == -1)
                 {
-                    NX_LOG(
-                        lit("[QnScheduleSync::synchronize] file %1 write error")
-                            .arg(newFileName),
-                        cl_logDEBUG1
-                    );
+                    NX_WARNING(this, lm("file %1 write error").arg(newFileName));
                     return CopyError::TargetFileError;
                 }
-                fileSize -= writeSize;
-                qint64 now = qnSyncTime->currentMSecsSinceEpoch();
-                if (now - startTime < timeOnChunk)
-                    std::this_thread::sleep_for(
-                        std::chrono::milliseconds(timeOnChunk - (now - startTime))
-                    );
+                dataProcessed += data.size();
+                int intervalMs = (timeToFileMs * dataProcessed) / fileSize;
+                int needToSleepMs = intervalMs - writeTimeMs.elapsed();
+                if (needToSleepMs > 0)
+                    std::this_thread::sleep_for(std::chrono::milliseconds(needToSleepMs));
             }
         }
 
@@ -363,21 +361,21 @@ void QnScheduleSync::initSyncData()
         Qn::CameraBackupQualities cameraBackupQualities =
             camera->getActualBackupQualities();
 
-        if (cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality))
+        if (cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_HighQuality))
             addSyncDataKey(QnServer::HiQualityCatalog, camera->getUniqueId());
 
-        if (cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality))
+        if (cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_LowQuality))
             addSyncDataKey(QnServer::LowQualityCatalog, camera->getUniqueId());
     }
 }
 
 template<typename NeedMoveOnCB>
-vms::event::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
+vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     // Let's check if at least one target backup storage is available first.
     if (!qnBackupStorageMan->getOptimalStorageRoot()) {
         NX_LOG("[Backup] No approprirate storages found. Bailing out.", cl_logDEBUG1);
-        return vms::event::EventReason::backupFailedNoBackupStorageError;
+        return vms::api::EventReason::backupFailedNoBackupStorageError;
     }
 
     NX_LOG("[Backup] Starting...", cl_logDEBUG2);
@@ -413,15 +411,15 @@ vms::event::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
                 switch (err) {
                 case CopyError::NoBackupStorageError:
                 case CopyError::GetCatalogError:
-                    return vms::event::EventReason::backupFailedNoBackupStorageError;
+                    return vms::api::EventReason::backupFailedNoBackupStorageError;
                 case CopyError::FromStorageError:
-                    return vms::event::EventReason::backupFailedSourceStorageError;
+                    return vms::api::EventReason::backupFailedSourceStorageError;
                 case CopyError::TargetFileError:
-                    return vms::event::EventReason::backupFailedTargetFileError;
+                    return vms::api::EventReason::backupFailedTargetFileError;
                 case CopyError::ChunkError:
-                    return vms::event::EventReason::backupFailedChunkError;
+                    return vms::api::EventReason::backupFailedChunkError;
                 case CopyError::Interrupted:
-                    return vms::event::EventReason::backupCancelled;
+                    return vms::api::EventReason::backupCancelled;
                 }
             }
         }
@@ -429,16 +427,16 @@ vms::event::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         bool needStop = needMoveOnCode != SyncCode::Ok;
         if (needStop) {
             if (needMoveOnCode == SyncCode::OutOfTime) {
-                return vms::event::EventReason::backupEndOfPeriod;
+                return vms::api::EventReason::backupEndOfPeriod;
             } else if (needMoveOnCode == SyncCode::WrongBackupType ||
                        needMoveOnCode == SyncCode::Interrupted) {
-                return vms::event::EventReason::backupCancelled;
+                return vms::api::EventReason::backupCancelled;
             }
             break;
         }
     }
     m_interrupted = true; // we are done till the next backup period
-    return vms::event::EventReason::backupDone;
+    return vms::api::EventReason::backupDone;
 }
 
 void QnScheduleSync::stop()
@@ -584,18 +582,26 @@ void QnScheduleSync::run()
             if (allowedDays.testFlag(ec2::backup::fromQtDOW(today)))
             {
                 const auto curTime = now.time();
-                if (curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec* 1000 &&
-                    m_schedule.backupDurationSec == -1) // sync without end time
-                {
-                    return SyncCode::Ok;
-                }
+                const bool nowIsPastTheBackupStartPoint =
+                    curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec * 1000;
+                const bool syncUntilFinished = m_schedule.backupDurationSec == -1;
 
-                if (curTime.msecsSinceStartOfDay() > m_schedule.backupStartSec * 1000 &&
-                    curTime.msecsSinceStartOfDay() < m_schedule.backupStartSec * 1000 +
-                                                        m_schedule.backupDurationSec * 1000) // 'normal' schedule sync
-                {
+                if (nowIsPastTheBackupStartPoint && syncUntilFinished)
                     return SyncCode::Ok;
-                }
+
+                const auto backupFinishTimePointMs =
+                    m_schedule.backupStartSec * 1000 + m_schedule.backupDurationSec * 1000;
+                const bool backupPeriodNotFinishedYet =
+                    curTime.msecsSinceStartOfDay() < backupFinishTimePointMs;
+
+                if (nowIsPastTheBackupStartPoint && backupPeriodNotFinishedYet)
+                    return SyncCode::Ok;
+
+                if (m_syncing && syncUntilFinished)
+                    return SyncCode::Ok;
+
+                if (m_syncing && backupPeriodNotFinishedYet)
+                    return SyncCode::Ok;
             }
             return SyncCode::OutOfTime;
         };
@@ -633,9 +639,9 @@ void QnScheduleSync::run()
             m_forced = false;
             m_syncing = false;
 
-            bool backupFailed = result != vms::event::EventReason::backupDone &&
-                                result != vms::event::EventReason::backupCancelled &&
-                                result != vms::event::EventReason::backupEndOfPeriod;
+            bool backupFailed = result != vms::api::EventReason::backupDone &&
+                                result != vms::api::EventReason::backupCancelled &&
+                                result != vms::api::EventReason::backupEndOfPeriod;
 
             if (backupFailed && !m_failReported) {
                 emit backupFinished(syncEndTimePointLocal, result);

@@ -1,18 +1,24 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('account', ['cloudApi', 'dialogs', '$q', '$location', '$localStorage', '$rootScope','$base64',
-    function (cloudApi, dialogs, $q, $location, $localStorage, $rootScope,$base64) {
+    .factory('account', ['cloudApi', 'dialogs', '$q', '$location', '$localStorage', '$rootScope', '$base64', '$routeParams',
+    function (cloudApi, dialogs, $q, $location, $localStorage, $rootScope, $base64, $routeParams) {
         $rootScope.session = $localStorage;
 
         var initialState = $rootScope.session.loginState;
         $rootScope.$watch('session.loginState',function(value){  // Catch logout from other tabs
-            if(initialState !== value){
+            if(!$routeParams.next && initialState !== value){
                 document.location.reload();
             }
         });
 
         var service = {
+            checkLoginState:function(){
+                if($rootScope.session.loginState){
+                    return $q.resolve(true);
+                }
+                return $q.reject(false);
+            },
             get:function(){
                 var self = this;
                 if(requestingLogin){
@@ -22,6 +28,7 @@ angular.module('cloudApp')
                         return self.get(); // Try again
                     });
                 }
+                
                 return cloudApi.account().then(function(account){
                     return account.data;
                 });
@@ -119,7 +126,7 @@ angular.module('cloudApp')
                 }
                 return true;
             }
-        }
+        };
 
         // Check auth parameter in url
         var search = $location.search();

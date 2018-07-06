@@ -1,6 +1,6 @@
-#include <boost/optional.hpp>
-
 #include <gtest/gtest.h>
+
+#include <nx/utils/std/optional.h>
 
 #include <statistics/collector.h>
 
@@ -46,7 +46,7 @@ protected:
     }
 
 private:
-    boost::optional<CollectorFactory::Function> m_factoryFuncBak;
+    std::optional<CollectorFactory::Function> m_factoryFuncBak;
     bool m_collectorCreated = false;
 
     std::unique_ptr<AbstractCollector> createCollector(

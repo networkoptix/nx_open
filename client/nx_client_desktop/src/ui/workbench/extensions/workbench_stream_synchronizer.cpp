@@ -25,7 +25,27 @@
 
 #include <nx/fusion/model_functions.h>
 
+#include <nx/utils/datetime.h>
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(time)(speed))
+
+QnStreamSynchronizationState::QnStreamSynchronizationState():
+    QnStreamSynchronizationState(false, AV_NOPTS_VALUE, 0.0)
+{
+}
+
+QnStreamSynchronizationState::QnStreamSynchronizationState(bool started, qint64 time, qreal speed):
+    started(started),
+    time(time),
+    speed(speed)
+{
+}
+
+QnStreamSynchronizationState QnStreamSynchronizationState::live()
+{
+    return QnStreamSynchronizationState(true, DATETIME_NOW, 1.0);
+}
+
 
 QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     QObject(parent),
@@ -130,10 +150,8 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     QnClientVideoCamera *camera = mediaWidget->display()->camera();
     m_syncPlay->addArchiveReader(mediaWidget->display()->archiveReader(), camera->getCamDisplay());
 
-    if (!(widget->options() & QnResourceWidget::SyncPlayForbidden)) {
-        camera->setExternalTimeSource(m_syncPlay);
-        camera->getCamDisplay()->setExternalTimeSource(m_syncPlay); // TODO: #Elric two setExternalTimeSource calls, WTF?
-    }
+    if (!(widget->options() & QnResourceWidget::SyncPlayForbidden))
+        camera->getCamDisplay()->setExternalTimeSource(m_syncPlay);
 
     m_counter->increment();
     connect(mediaWidget->display()->archiveReader(), SIGNAL(destroyed()), m_counter, SLOT(decrement()));

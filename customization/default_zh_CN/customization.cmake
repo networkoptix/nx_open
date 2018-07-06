@@ -1,6 +1,7 @@
-[basic]
+set(build_mobile OFF)
+set(enable_hanwha true)
+
 # Components Namings
-set(parent.customization "default")
 set(product.name "Nx Witness Simplified Chinese")
 set(display.product.name "Nx Witness")
 set(product.name.short "hdwitness_cn")
@@ -8,7 +9,6 @@ set(company.name "Network Optix")
 
 set(product.appName "hdwitness")
 set(display.mobile.name "Nx Mobile")
-set(short.company.name "Nx")
 set(uri.protocol "nx-vms")
 set(liteDeviceName "nx1")
 
@@ -39,7 +39,6 @@ set(customization.serverUpgradeCode "{77de59d1-9d1b-4a4a-a0ae-7f2032500dd6}")
 set(customization.clientBundleUpgradeCode "{732a6919-720b-4380-ac9b-d02ede5ac2e2}")
 set(customization.serverBundleUpgradeCode "{1d68ad5f-2c19-449a-9c71-c9d2457b3856}")
 set(customization.fullBundleUpgradeCode "{414c9665-cd4d-4a41-a1d0-ff98d36f4664}")
-set(customization.nxtoolBundleUpgradeCode "{44053de6-b65a-448d-9936-8aefddb7c85a}")
 
 set(deb.customization.company.name "networkoptix")
 
@@ -59,11 +58,7 @@ set(installer.language "zh_CN")
 set(installer.cultures "zh-cn")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
-set(sign.intermediate.cer "")
 
 # Localization
 set(help.language "chinese")
 set(defaultTranslation zh_CN)
-
-# this is required because of strange maven replacement (_ > -)
-set(customization "default_zh_CN")

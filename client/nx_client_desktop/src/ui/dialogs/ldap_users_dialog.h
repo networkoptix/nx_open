@@ -15,7 +15,7 @@ class QnLdapUsersDialog: public QnSessionAwareButtonBoxDialog {
     typedef QnSessionAwareButtonBoxDialog base_type;
 
 public:
-    explicit QnLdapUsersDialog(QWidget *parent = 0);
+    explicit QnLdapUsersDialog(QWidget *parent);
     ~QnLdapUsersDialog();
 
 private:

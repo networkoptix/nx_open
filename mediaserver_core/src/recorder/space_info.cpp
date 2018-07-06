@@ -1,7 +1,8 @@
 #include <algorithm>
 #include <iterator>
-#include "space_info.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/literal.h>
+#include "space_info.h"
 
 namespace nx{
 namespace recorder {
@@ -33,14 +34,12 @@ void SpaceInfo::storageAdded(int index, int64_t totalSpace)
     m_storageSpaceInfo.emplace_back(index, totalSpace);
 }
 
-void SpaceInfo::storageRebuilded(int index, int64_t freeSpace, int64_t nxOccupiedSpace, int64_t spaceLimit)
+void SpaceInfo::storageChanged(int index, int64_t freeSpace, int64_t nxOccupiedSpace, int64_t spaceLimit)
 {
     QnMutexLocker lock(&m_mutex);
     auto storageIndexIt = storageByIndex(index);
-    bool storageIndexFound = storageIndexIt != m_storageSpaceInfo.cend();
-
-    NX_CRITICAL(storageIndexFound);
-    storageIndexIt->effectiveSpace = freeSpace + nxOccupiedSpace - spaceLimit;
+    NX_CRITICAL(storageIndexIt != m_storageSpaceInfo.cend());
+    storageIndexIt->effectiveSpace = std::max<int64_t>(freeSpace + nxOccupiedSpace - spaceLimit, 0LL);
     NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating effective space for storage %1. \
 Free space = %2, nxOccupiedSpace = %3, spaceLimit = %4, effectiveSpace = %5")
         .arg(storageIndexIt->index)
@@ -79,8 +78,8 @@ int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) co
     for (const auto& spaceInfo: m_storageSpaceInfo)
     {
         if (std::find_if(
-                allowedIndexes.cbegin(), 
-                allowedIndexes.cend(), 
+                allowedIndexes.cbegin(),
+                allowedIndexes.cend(),
                 [&spaceInfo](int index) { return index == spaceInfo.index; }) != allowedIndexes.cend())
         {
             filteredSpaceInfo.emplace_back(spaceInfo);
@@ -89,17 +88,17 @@ int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) co
 
     if(filteredSpaceInfo.empty())
     {
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] Failed to find approprirate storage index"), 
+        NX_LOG(lit("[Storage, SpaceInfo, Selection] Failed to find approprirate storage index"),
             cl_logDEBUG1);
         return -1;
     }
 
     /* use totalSpace based algorithm if effective space is unknown for any of the storages */
-    bool hasStorageWithoutEffectiveSpace = std::any_of(filteredSpaceInfo.cbegin(), 
-        filteredSpaceInfo.cend(), 
+    bool hasStorageWithoutEffectiveSpace = std::any_of(filteredSpaceInfo.cbegin(),
+        filteredSpaceInfo.cend(),
         [](const StorageSpaceInfo& info)
         {
-            return info.effectiveSpace == 0;
+            return info.isEffectiveSpaceSet();
         });
 
     if (hasStorageWithoutEffectiveSpace)
@@ -110,8 +109,8 @@ int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) co
 
 int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, bool byEffectiveSpace) const
 {
-    /* select storage index based on their effective (or total) spaces. 
-    *  Space plays a 'weight' role, but the selection algorithm is essentially random 
+    /* select storage index based on their effective (or total) spaces.
+    *  Space plays a 'weight' role, but the selection algorithm is essentially random
     */
     double randomSelectionPoint = 0.5;
     try
@@ -120,13 +119,19 @@ int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, boo
     }
     catch (const std::exception&)
     {
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] Exception while selecting random point"), 
+        NX_LOG(lit("[Storage, SpaceInfo, Selection] Exception while selecting random point"),
             cl_logDEBUG1);
     }
 
     int64_t totalEffectiveSpace = 0;
     for (const auto& spaceInfo: filteredSpaceInfo)
         totalEffectiveSpace += (byEffectiveSpace ? spaceInfo.effectiveSpace : spaceInfo.totalSpace);
+
+    if (totalEffectiveSpace == 0)
+    {
+        NX_DEBUG(this, "[Storage, SpaceInfo, Selection] No appropriate candidate found");
+        return -1;
+    }
 
     NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating optimal storage index. \
 Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point = %4")
@@ -155,7 +160,7 @@ Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point =
     }
 
     NX_ASSERT(false);
-    NX_LOG(lit("[Storage, SpaceInfo, Selection] No storage index found."), cl_logDEBUG1);   
+    NX_LOG(lit("[Storage, SpaceInfo, Selection] No storage index found."), cl_logDEBUG1);
 
     return -1;
 }

@@ -147,6 +147,52 @@
     </message>
   </context>
   <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
+      <source>Keywords separated by space</source>
+      <translation>מילות מפתח מופרדות ע"י רווח</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Caption contains:</source>
+      <translation>הכתובית מכילה:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Description contains:</source>
+      <translation>התיאור מכיל:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Event Type:</source>
+      <translation>סוג אירוע:</translation>
+    </message>
+  </context>
+  <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
+      <source>Fixed Archive Length</source>
+      <translation>אורך ארכיון קבוע</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Min. Days</source>
+      <translation>מספר ימים מינימלי</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Auto</source>
+      <translation>אוטומטי</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Max. Days</source>
+      <translation>מספר ימים מקסימלי</translation>
+    </message>
+  </context>
+  <context>
     <name>AuditLogDialog</name>
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -334,6 +380,34 @@
     </message>
   </context>
   <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
+      <source>Bookmark Info</source>
+      <translation>פרטי הסימניה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>מחק</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>רוחב אזור</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>גודל גופן</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Include description</source>
+      <translation>כולל תיאור</translation>
+    </message>
+  </context>
+  <context>
     <name>BookmarkWidget</name>
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
@@ -369,7 +443,7 @@
   <context>
     <name>BookmarksLog</name>
     <message>
-      <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
+      <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
       <translation>רענן</translation>
     </message>
@@ -437,7 +511,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>חוקי אירוע</translation>
+      <translation>חוקים</translation>
     </message>
     <message>
       <location/>
@@ -535,12 +609,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <location/>
@@ -567,72 +641,9 @@
     </message>
   </context>
   <context>
-    <name>CameraAdvancedSettingsWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-      <source>Advanced settings are unavailable</source>
-      <translation>הגדרות מתקדמות אינן זמינות</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraExpertSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
-      <source>I have read the manual and understand the risks</source>
-      <translation>קראתי את המדריך ואני מבין את הסיכונים</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Camera Settings Control</source>
-      <translation>שליטה בהגדרות המצלמה</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>אזהרה! צעד זה יהפוך את הגדרות האיכות וקצב הפריימים(FPS) ב"לוח זמני הקלטות" ללא רלוונטיים.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Secondary Stream Control</source>
-      <translation>שליטה בזרם המשני</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Override secondary stream quality</source>
-      <translation>עקוף את איכות הזרם המשני</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Do not use</source>
-      <translation>לא יתבצע שימוש</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Low quality</source>
-      <translation>איכות נמוכה</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Medium quality</source>
-      <translation>איכות בינונית</translation>
-    </message>
-    <message>
-      <location/>
-      <source>High quality</source>
-      <translation>איכות גבוהה</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>אזהרה! בחירה ב"איכות גבוהה" עלולה להשפיע על תפקוד הרשת והמעבד שלך ולגרום לבעיות נוספות.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Archive control</source>
-      <translation>שליטה בארכיון</translation>
-    </message>
-    <message>
-      <location/>
       <source>Do not archive primary stream</source>
       <translation>אל תאחסן את הזרם הראשי</translation>
     </message>
@@ -640,11 +651,6 @@
       <location/>
       <source>Do not archive secondary stream</source>
       <translation>אל תאחסן את הזרם המשני</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Media streaming control</source>
-      <translation>שליטה בזרימת המדיה</translation>
     </message>
     <message>
       <location/>
@@ -673,43 +679,8 @@
     </message>
     <message>
       <location/>
-      <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>אזהרה! "איכות נמוכה" עלולה לגרום לרזולוציית תמונה נמוכה.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Motion detection control</source>
-      <translation>בקרת זיהוי תנועה</translation>
-    </message>
-    <message>
-      <location/>
       <source>Force motion detection for stream:</source>
       <translation>אלץ זיהוי תנועה עבור תזרים:</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation>חישוב קצב תקשורת לכל GOP במקום קצב תקשורתלשנייה (זה יגדיל את קצב התקשורת עבור המצלמה)</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Keep camera streams and profiles settings</source>
-      <translation>שמור על הגדרות תזרימי וידאו למצלמה ופרופילים</translation>
-    </message>
-    <message>
-      <location/>
-      <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation>"אפשר למערכת לבצע אופטימיזציה להגדרות המצלמה  &quot;מבוטל ב"ניהול המערכת &quot;.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation>אזהרה! אל תשנה הגדרות אלו במידה ואינך מבין לחלוטין את ההשפעה האפשרית שלהם על ביצועי המערכת שלך.</translation>
-    </message>
-    <message>
-      <location/>
-      <source>PTZ Control</source>
-      <translation>בקרת PTZ</translation>
     </message>
     <message>
       <location/>
@@ -721,12 +692,87 @@
       <source>Warning! Native camera presets will not be avaliable.</source>
       <translation>אזהרה! פריסטים של המצלמה לא יהיו זמינים.</translation>
     </message>
+    <message>
+      <location/>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation>אזהרה! אל תשנה הגדרות אלו במידה ואינך מבין לחלוטין את ההשפעה האפשרית שלהם על ביצועי המערכת שלך.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera Settings</source>
+      <translation>הגדרות מצלמה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Keep camera stream and profile settings</source>
+      <translation>שמור הגדרות קידוד ופרופיל מצלמה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
+      <translation>הגדרות איכות וFPS בלוח זמנים להקלטה יהיו אי רלוונטיים.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation>חשב bitrate לכל GOP במקום bitrate לשנייה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>It will increase bitrate for camera.</source>
+      <translation>זה יגביר bitrate עבור המצלמה.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Secondary Stream</source>
+      <translation>זרם משני</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disable secondary stream</source>
+      <translation>אל תאפשר זרם וידאו משני</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Motion Detection</source>
+      <translation>זיהוי תנועה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Archive</source>
+      <translation>ארכיון</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Media Streaming</source>
+      <translation>הזרמת מדיה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>PTZ</source>
+      <translation>מצלמה ממונעת</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>חולל</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>אפס</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>זיהוי ID לוגי</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>מזהה קלט</translation>
     </message>
   </context>
@@ -752,7 +798,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>מזהה פלט:</translation>
     </message>
   </context>
@@ -787,26 +833,6 @@
       <location/>
       <source>Do Not Record</source>
       <translation>אל תקליט</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fixed Archive Length</source>
-      <translation>מספר הימים לשמירה בארכיון</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Auto</source>
-      <translation>אוטומטי</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Min. Days</source>
-      <translation>מספר ימים מינימלי</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Max. Days</source>
-      <translation>מספר ימים מקסימלי</translation>
     </message>
     <message>
       <location/>
@@ -868,13 +894,18 @@
       <source>Motion + Lo-Res</source>
       <translation>תנועה + איכות נמוכה</translation>
     </message>
+    <message>
+      <location/>
+      <source>Bitrate</source>
+      <translation>קצב נתונים</translation>
+    </message>
   </context>
   <context>
     <name>ChangeUserPasswordDialog</name>
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>שינוי סיסמא</translation>
+      <translation>שינוי סיסמה</translation>
     </message>
   </context>
   <context>
@@ -883,11 +914,6 @@
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
       <translation>השאר מחובר</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמא שגויים</translation>
     </message>
   </context>
   <context>
@@ -945,6 +971,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>קטגוריה</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -982,7 +1016,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>חוקי אירוע...</translation>
+      <translation>חוקים...</translation>
     </message>
   </context>
   <context>
@@ -1000,17 +1034,17 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <location/>
       <source>Password to authenticate (optional)</source>
-      <translation>סיסמא לאימות (אופציונאלי)</translation>
+      <translation>סיסמה לאימות (אופציונאלי)</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <location/>
@@ -1022,6 +1056,16 @@
       <source>HTTP URL</source>
       <translation>כתובת HTTP</translation>
     </message>
+    <message>
+      <location/>
+      <source>Authentication type</source>
+      <translation>סוג אימות</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Request type</source>
+      <translation>סוג בקשה</translation>
+    </message>
   </context>
   <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
@@ -1032,31 +1076,70 @@
     </message>
   </context>
   <context>
-    <name>ExportRapidReviewDialog</name>
+    <name>ExportLayoutSettingsWidget</name>
     <message>
-      <location filename="../src/nx/client/desktop/ui/dialogs/rapid_review_dialog.ui"/>
-      <source>Export Rapid Review</source>
-      <translation>ייצוא סקירה מהירה</translation>
+      <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>הגדרות ייצוא</translation>
     </message>
     <message>
       <location/>
-      <source>Initial Video Length</source>
-      <translation>משך וידאו מקורי</translation>
+      <source>Make read-only</source>
+      <translation>הפוך לקריאה בלבד</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
+      <source>Export Settings</source>
+      <translation>הגדרות ייצוא</translation>
     </message>
     <message>
       <location/>
-      <source>Exported Video Length</source>
-      <translation>משך וידאו לאחר ייצוא</translation>
+      <source>Apply Filters</source>
+      <translation>החל מסננים</translation>
     </message>
     <message>
       <location/>
-      <source>Frames Interval</source>
-      <translation>מרווח תמונות</translation>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation>סיבוב, Dewarping, שיפור תמונה ועוד.</translation>
     </message>
     <message>
       <location/>
-      <source>Rapid Review speed</source>
-      <translation>מהירות סקירה מהירה</translation>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation>החלת מסננים והוספת שכבות דורשים קידוד אשר יגדיל את השימוש ב- CPU ועלול לקחת זמן משמעותי.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
+      <source>Export Video</source>
+      <translation>יצא וידאו</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single Camera</source>
+      <translation>מצלמה בודדת</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export Settings</source>
+      <translation>הגדרות ייצוא</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Multi Video</source>
+      <translation>מולטי וידאו</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
+      <source>Browse...</source>
+      <translation>סייר...</translation>
     </message>
   </context>
   <context>
@@ -1204,6 +1287,39 @@
       <location/>
       <source>Rotation</source>
       <translation>סיבוב</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
+      <source>Image</source>
+      <translation>תמונה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>מחק</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Size</source>
+      <translation>גודל</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Opacity</source>
+      <translation>אטימות</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default</source>
+      <translation>ברירת מחדל</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>סייר...</translation>
     </message>
   </context>
   <context>
@@ -1397,7 +1513,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>נעול למזהה-חומרה:</translation>
     </message>
   </context>
@@ -1496,7 +1612,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>מזהה-חומרה</translation>
     </message>
   </context>
@@ -1551,12 +1667,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <location/>
@@ -1623,8 +1739,8 @@
     </message>
     <message>
       <location/>
-      <source>Showreel cycle</source>
-      <translation>מחזור סרטון</translation>
+      <source>Tour cycle</source>
+      <translation>Tour cycle</translation>
     </message>
   </context>
   <context>
@@ -1650,7 +1766,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמה:</translation>
+      <translation>סיסמא:</translation>
     </message>
     <message>
       <location/>
@@ -1665,12 +1781,30 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>מקליט</translation>
+      <translation>הקלטה</translation>
     </message>
     <message>
       <location/>
       <source>Expert</source>
       <translation>מומחה</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewWearableCameraDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
+      <source>New Wearable Camera...</source>
+      <translation>מצלמה לבישה חדשה...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>To server</source>
+      <translation>לשרת</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&amp;;quot;מצלמה לבישה&amp;;quot; היא אחסון וירטואלי עבור קובצי וידאו, שניתן להעלותם לכל שרת במערכת ולהיכנס אליו על ידי כל משתמש.</translation>
     </message>
   </context>
   <context>
@@ -1855,7 +1989,7 @@
     <message>
       <location/>
       <source>Enter a valid username and password...</source>
-      <translation>הכנס שם משתמש וסיסמה תקינים...</translation>
+      <translation>הכנס שם משתמש וסיסמא תקינים...</translation>
     </message>
   </context>
   <context>
@@ -1882,11 +2016,6 @@
       <location/>
       <source>Stay logged in</source>
       <translation>השאר מחובר</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Incorrect email or password</source>
-      <translation>דוא"ל או סיסמא שגויים</translation>
     </message>
   </context>
   <context>
@@ -1927,7 +2056,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>המערכת החדשה תקבל שם וסיסמה ממערכת:</translation>
+      <translation>המערכת החדשה תקבל שם וסיסמא ממערכת:</translation>
     </message>
   </context>
   <context>
@@ -2073,7 +2202,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
       <source>LDAP Settings...</source>
-      <translation>הגדרות LDAP...</translation>
+      <translation>LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2083,7 +2212,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>קבל משתמשים מLDAP...</translation>
+      <translation>רענן נתוני LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2132,6 +2261,39 @@
       <location/>
       <source>Place shortcut on desktop.</source>
       <translation>הצב קיצור דרך על שולחן העבודה.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
+      <source>Rapid Review</source>
+      <translation>סקירה מהירה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Initial video length</source>
+      <translation>אורך וידאו הראשונית</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exported video length</source>
+      <translation>אורך וידאו שיוצאו</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Speed</source>
+      <translation>מהירות</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Frames interval</source>
+      <translation>מרווח מסגרות</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset Speed</source>
+      <translation>איפוס מהירות</translation>
     </message>
   </context>
   <context>
@@ -2215,7 +2377,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>מחשב חזק מומלץ עבור רזולוציה ואיכות &quot;הטובים ביותר &quot;.</translation>
+      <translation>מחשב חזק מומלץ עבור רזולוציה ואיכות "הטובים ביותר".</translation>
     </message>
     <message>
       <location/>
@@ -2489,12 +2651,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <location/>
@@ -2520,11 +2682,6 @@
       <location/>
       <source>Reset</source>
       <translation>אפס</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation>TextLabel</translation>
     </message>
   </context>
   <context>
@@ -2699,11 +2856,6 @@
       <source>Backup Settings...</source>
       <translation>הגדרות גיבוי...</translation>
     </message>
-    <message>
-      <location/>
-      <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>ההקלטה לאחסון המושבת תיפסק. עם זאת, מחיקת צילומים מיושנים ממנו תמשיך.</translation>
-    </message>
   </context>
   <context>
     <name>StorageRebuildWidget</name>
@@ -2788,6 +2940,34 @@
     </message>
   </context>
   <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
+      <source>Text</source>
+      <translation>טקסט</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>מחק</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>גודל גופן</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter plain text or HTML</source>
+      <translation>הזן טקסט רגיל או HTML</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Area Width</source>
+      <translation>רוחב שטח</translation>
+    </message>
+  </context>
+  <context>
     <name>TimeServerSelectionWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
@@ -2801,11 +2981,34 @@
     </message>
   </context>
   <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
+      <source>Timestamp</source>
+      <translation>חותמת זמן</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>גודל גופן</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Format</source>
+      <translation>פורמט</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>מחק</translation>
+    </message>
+  </context>
+  <context>
     <name>UserProfileWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation>שינוי סיסמא...</translation>
+      <translation>שינוי סיסמה...</translation>
     </message>
   </context>
   <context>
@@ -2835,14 +3038,18 @@
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>אין עדיין תפקידי משתמש מותאמים אישית. לחץ על  &quot;תפקיד חדש &quot; כדי ליצור אחד.</translation>
+      <source>New role</source>
+      <translation>תפקיד חדש</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>תפקיד חדש</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>אין עדיין תפקידי הרשאות משתמש מותאמים אישית.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>לחץ על לחצן &amp;;quot;תפקיד הרשאות חדש&amp;;quot; כדי ליצור אחד.</translation>
     </message>
   </context>
   <context>
@@ -2861,6 +3068,50 @@ Click &quot;New role&quot; button to create one.</source>
       <location/>
       <source>Edit Roles...</source>
       <translation>עריכת תפקידים...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableMotionWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
+      <source>Motion Detection</source>
+      <translation>זיהוי תנועה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Detect motion in uploaded video</source>
+      <translation>זיהוי תנועה בסרטון שהועלה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Sensitivity</source>
+      <translation>רגישות</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableProgressWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
+      <source>Cancel</source>
+      <translation>ביטול</translation>
+    </message>
+  </context>
+  <context>
+    <name>WearableUploadWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
+      <source>Upload Video</source>
+      <translation>העלאת סרטון</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload File...</source>
+      <translation>העלה קובץ...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Upload Folder...</source>
+      <translation>תיקיה להעלאה...</translation>
     </message>
   </context>
   <context>

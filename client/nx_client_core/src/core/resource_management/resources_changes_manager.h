@@ -87,6 +87,9 @@ public:
     void saveAccessibleResources(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& accessibleResources);
 
+    /** Clean accessible resources for the given user */
+    void cleanAccessibleResources(const QnUuid& subject);
+
     void saveUserRole(const ec2::ApiUserRoleData& role);
     void removeUserRole(const QnUuid& id);
 

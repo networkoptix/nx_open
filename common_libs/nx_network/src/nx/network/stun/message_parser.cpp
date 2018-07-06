@@ -7,6 +7,7 @@
 #include <QString>
 
 namespace nx {
+namespace network {
 namespace stun {
 
 using namespace attrs;
@@ -454,11 +455,10 @@ int MessageParser::parseAttributeFingerprintValue(MessageParserBuffer& buffer)
     }
 }
 
-int MessageParser::parseEndWithFingerprint(MessageParserBuffer& buffer)
+int MessageParser::parseEndWithFingerprint(MessageParserBuffer& /*buffer*/)
 {
     // Finger print MUST BE the last message, if we meet more message than we
     // expected, we just return error that we cannot handle this message now
-    Q_UNUSED(buffer);
     if (m_leftMessageLength != 0)
         return FAILED;
     m_state = HEADER_INITIAL_AND_TYPE;
@@ -473,9 +473,8 @@ std::size_t MessageParser::calculatePaddingSize(std::size_t value_bytes)
     return (value_bytes + kAlignMask) & ~kAlignMask;
 }
 
-int MessageParser::parseEndMessageIntegrity(MessageParserBuffer& buffer)
+int MessageParser::parseEndMessageIntegrity(MessageParserBuffer& /*buffer*/)
 {
-    Q_UNUSED(buffer);
     if (m_leftMessageLength != 0)
     {
         m_state = ATTRIBUTE_ONLY_ALLOW_FINGERPRINT_TYPE;
@@ -567,4 +566,5 @@ nx::network::server::ParserState MessageParser::parse(const nx::Buffer& user_buf
 }
 
 } // namespace stun
+} // namespace network
 } // namespace nx

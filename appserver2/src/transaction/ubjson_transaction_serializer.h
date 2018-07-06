@@ -50,7 +50,6 @@ namespace ec2
         QByteArray serializedTransaction(const QnTransaction<T>& tran)
         {
             QnMutexLocker lock( &m_mutex );
-            Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
             CacheKey key(tran.persistentInfo, tran.command);

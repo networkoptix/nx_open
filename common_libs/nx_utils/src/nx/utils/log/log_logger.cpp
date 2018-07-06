@@ -15,8 +15,13 @@ namespace nx {
 namespace utils {
 namespace log {
 
-Logger::Logger(Level defaultLevel, std::unique_ptr<AbstractWriter> writer):
+Logger::Logger(
+    Level defaultLevel,
+    std::unique_ptr<AbstractWriter> writer,
+    OnLevelChanged onLevelChanged)
+    :
     m_mutex(QnMutex::Recursive),
+    m_onLevelChanged(std::move(onLevelChanged)),
     m_defaultLevel(defaultLevel)
 {
     if (writer)
@@ -75,6 +80,7 @@ void Logger::setDefaultLevel(Level level)
 {
     QnMutexLocker lock(&m_mutex);
     m_defaultLevel = level;
+    handleLevelChange(&lock);
 }
 
 LevelFilters Logger::levelFilters() const
@@ -87,6 +93,16 @@ void Logger::setLevelFilters(LevelFilters filters)
 {
     QnMutexLocker lock(&m_mutex);
     m_levelFilters = std::move(filters);
+    handleLevelChange(&lock);
+}
+
+Level Logger::maxLevel() const
+{
+    QnMutexLocker lock(&m_mutex);
+    Level maxLevel = m_defaultLevel;
+    for (const auto& element: m_levelFilters)
+         maxLevel = std::max(maxLevel, element.second);
+    return maxLevel;
 }
 
 void Logger::setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers)
@@ -112,6 +128,14 @@ boost::optional<QString> Logger::filePath() const
     }
 
     return boost::none;
+}
+
+void Logger::handleLevelChange(QnMutexLockerBase* lock) const
+{
+    decltype(m_onLevelChanged) onLevelChanged = m_onLevelChanged;
+    QnMutexUnlocker unlock(lock);
+    if (onLevelChanged)
+        onLevelChanged();
 }
 
 } // namespace log
