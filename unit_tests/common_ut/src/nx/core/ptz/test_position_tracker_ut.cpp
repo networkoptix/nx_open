@@ -85,7 +85,7 @@ static const AbsoluteMovementTestInput kRelativeMovementTestInput = {
 
 } // namespace
 
-// TODO: #dmishin add tests for cycled mode.
+// TODO: #dmishin add tests for cycled mode and for focus movement.
 
 TEST(TestPositionTrackerTest, continuousMovement)
 {
