@@ -83,23 +83,6 @@ DBResult BaseExecutor::detailResultCode(
     }
 }
 
-DBResult BaseExecutor::lastDBError(QSqlDatabase* const connection) const
-{
-    switch (connection->lastError().type())
-    {
-        case QSqlError::StatementError:
-            return DBResult::statementError;
-        case QSqlError::ConnectionError:
-            return DBResult::connectionError;
-
-        case QSqlError::NoError:    //Qt not always sets error code correctly
-        case QSqlError::TransactionError:
-        case QSqlError::UnknownError:
-        default:
-            return DBResult::ioError;
-    }
-}
-
 //-------------------------------------------------------------------------------------------------
 // UpdateWithoutAnyDataExecutor
 

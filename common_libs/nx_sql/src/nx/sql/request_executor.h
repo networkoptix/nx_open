@@ -10,6 +10,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/optional.h>
 
+#include "db_connection_holder.h"
 #include "db_statistics_collector.h"
 #include "types.h"
 #include "query_context.h"
@@ -59,7 +60,6 @@ protected:
      * Returns more detailed result code if appropriate. Otherwise returns initial one.
      */
     DBResult detailResultCode(QSqlDatabase* const connection, DBResult result) const;
-    DBResult lastDBError(QSqlDatabase* const connection) const;
 
     template<typename Func, typename... Args>
     DBResult invokeDbQueryFunc(Func& func, const Args&... args)
@@ -94,18 +94,29 @@ private:
 //-------------------------------------------------------------------------------------------------
 // UpdateExecutor
 
-template<typename ... CompletionHandlerArgs>
-class BaseUpdateExecutor:
+class AbstractUpdateExecutor:
     public BaseExecutor
 {
-    using base_type = BaseExecutor;
+public:
+    AbstractUpdateExecutor():
+        BaseExecutor(QueryType::modification)
+    {
+    }
+
+    virtual void setExternalTransaction(Transaction* transaction) = 0;
+};
+
+template<typename ... CompletionHandlerArgs>
+class BaseUpdateExecutor:
+    public AbstractUpdateExecutor
+{
+    using base_type = AbstractUpdateExecutor;
 
 public:
     using CompletionHandler =
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, CompletionHandlerArgs...)>;
 
     BaseUpdateExecutor(CompletionHandler completionHandler):
-        base_type(QueryType::modification),
         m_completionHandler(std::move(completionHandler))
     {
     }
@@ -134,7 +145,7 @@ public:
         invokeCompletionHandlerWithDefaultValues(nullptr, errorCode);
     }
 
-    void setExternalTransaction(Transaction* transaction)
+    virtual void setExternalTransaction(Transaction* transaction) override
     {
         m_externalTransaction = transaction;
     }
@@ -171,7 +182,6 @@ private:
         auto result = transaction.begin();
         if (result != DBResult::ok)
         {
-            result = lastDBError(connection);
             invokeCompletionHandlerWithDefaultValues(&queryContext, result);
             return result;
         }
@@ -187,7 +197,6 @@ private:
         result = transaction.commit();
         if (result != DBResult::ok)
         {
-            result = lastDBError(connection);
             transaction.rollback();
             return result;
         }
@@ -254,7 +263,7 @@ private:
             // In case of failed transaction (e.g., commit fails).
             invokeCompletionHandlerWithDefaultValues(
                 queryContext,
-                lastDBError(queryContext->connection()));
+                lastDbError(queryContext->connection()));
         }
     }
 };

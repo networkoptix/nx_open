@@ -44,4 +44,8 @@ private:
     DbConnectionHolder& operator=(const DbConnectionHolder&) = delete;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+NX_SQL_API DBResult lastDbError(QSqlDatabase* const connection);
+
 } // namespace nx::sql

@@ -121,4 +121,23 @@ std::shared_ptr<nx::sql::QueryContext> DbConnectionHolder::createNewTran()
         deleter);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+DBResult lastDbError(QSqlDatabase* const connection)
+{
+    switch (connection->lastError().type())
+    {
+        case QSqlError::StatementError:
+            return DBResult::statementError;
+        case QSqlError::ConnectionError:
+            return DBResult::connectionError;
+
+        case QSqlError::NoError: //< Qt not always sets error code correctly.
+        case QSqlError::TransactionError:
+        case QSqlError::UnknownError:
+        default:
+            return DBResult::ioError;
+    }
+}
+
 } // namespace nx::sql

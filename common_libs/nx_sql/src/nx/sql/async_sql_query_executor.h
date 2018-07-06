@@ -115,6 +115,20 @@ public:
     }
 };
 
+template<typename InputData, typename OutputData> using UpdateQueryWithOutputFunc =
+    nx::utils::MoveOnlyFunc<
+        DBResult(nx::sql::QueryContext*, const InputData&, OutputData* const)>;
+
+template<typename InputData, typename OutputData> using UpdateQueryWithOutputCompletionHandler =
+    nx::utils::MoveOnlyFunc<
+        void(nx::sql::QueryContext*, DBResult, InputData, OutputData)>;
+
+template<typename InputData> using UpdateQueryFunc =
+    nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*, const InputData&)>;
+
+template<typename InputData> using UpdateQueryCompletionHandler =
+    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult, InputData)>;
+
 /**
  * Executes DB request asynchronously.
  * Scales DB operations on multiple threads
@@ -181,13 +195,9 @@ public:
      */
     template<typename InputData, typename OutputData>
     void executeUpdate(
-        nx::utils::MoveOnlyFunc<
-            DBResult(nx::sql::QueryContext*, const InputData&, OutputData* const)
-        > dbUpdateFunc,
+        UpdateQueryWithOutputFunc<InputData, OutputData> dbUpdateFunc,
         InputData input,
-        nx::utils::MoveOnlyFunc<
-            void(nx::sql::QueryContext*, DBResult, InputData, OutputData)
-        > completionHandler)
+        UpdateQueryWithOutputCompletionHandler<InputData, OutputData> completionHandler)
     {
         scheduleQuery<UpdateWithOutputExecutor<InputData, OutputData>>(
             std::move(dbUpdateFunc),
@@ -200,11 +210,9 @@ public:
      */
     template<typename InputData>
     void executeUpdate(
-        nx::utils::MoveOnlyFunc<
-            DBResult(nx::sql::QueryContext*, const InputData&)> dbUpdateFunc,
+        UpdateQueryFunc<InputData> dbUpdateFunc,
         InputData input,
-        nx::utils::MoveOnlyFunc<
-            void(nx::sql::QueryContext*, DBResult, InputData)> completionHandler)
+        UpdateQueryCompletionHandler<InputData> completionHandler)
     {
         scheduleQuery<UpdateExecutor<InputData>>(
             std::move(dbUpdateFunc),

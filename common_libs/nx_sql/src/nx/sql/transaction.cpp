@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include "db_connection_holder.h"
+
 namespace nx::sql {
 
 Transaction::Transaction(QSqlDatabase* const connection):
@@ -29,7 +31,7 @@ DBResult Transaction::begin()
     }
     else
     {
-        return DBResult::connectionError;
+        return lastDbError(m_connection);
     }
 }
 
@@ -38,8 +40,9 @@ DBResult Transaction::commit()
     NX_ASSERT(m_started);
     if (!m_connection->commit())
     {
-        notifyOnTransactionCompletion(DBResult::ioError);
-        return DBResult::ioError;
+        const auto dbError = lastDbError(m_connection);
+        notifyOnTransactionCompletion(dbError);
+        return dbError;
     }
     m_started = false;
     notifyOnSuccessfullCommit();
