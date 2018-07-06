@@ -1,5 +1,7 @@
 #include "abstract_stream_consumer.h"
 
+#include "../utils/utils.h"
+
 namespace nx {
 namespace ffmpeg {
 
@@ -8,14 +10,8 @@ AbstractStreamConsumer::AbstractStreamConsumer(
     const CodecParameters& params)
     :
     m_streamReader(streamReader),
-    m_params(m_params)
+    m_params(params)
 {
-}
-
-AbstractStreamConsumer::~AbstractStreamConsumer()
-{
-    if(auto sr = m_streamReader.lock())
-        sr->removeConsumer(weak_from_this());
 }
 
 int AbstractStreamConsumer::fps() const
@@ -33,19 +29,11 @@ int AbstractStreamConsumer::bitrate() const
     return m_params.bitrate;
 }
 
-void AbstractStreamConsumer::initialize()
-{
-    if(m_ready)
-        return;
-
-    m_ready = true;
-    m_streamReader.lock()->addConsumer(weak_from_this());
-}
-
 void AbstractStreamConsumer::setFps(int fps)
 {
     if(m_params.fps != fps)
     {
+        debug("AbstractStreamConsumer::setFPS(): %d\n", fps);
         m_params.fps = fps;
         m_streamReader.lock()->updateFps();
     }
@@ -55,6 +43,7 @@ void AbstractStreamConsumer::setResolution(int width, int height)
 {
     if(m_params.width != width || m_params.height != height)
     {
+        debug("AbstractStreamConsumer::setResolution(): %d, %d\n", width, height);
         m_params.setResolution(width, height);
         m_streamReader.lock()->updateResolution();
     }
@@ -64,6 +53,7 @@ void AbstractStreamConsumer::setBitrate(int bitrate)
 {
     if(m_params.bitrate != bitrate)
     {
+        debug("AbstractStreamConsumer::setBitrate(): %d\n", bitrate);
         m_params.bitrate = bitrate;
         m_streamReader.lock()->updateBitrate();
     }
