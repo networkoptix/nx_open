@@ -41,6 +41,7 @@ private:
     StreamState m_state;
     
     std::unique_ptr<nx::ffmpeg::Codec> m_videoEncoder;
+    std::unique_ptr<nx::ffmpeg::Codec> m_decoder;
 
     std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
@@ -48,12 +49,14 @@ private:
     struct SwsContext * m_scaleContext = nullptr;
 private:
     int scale(AVFrame* frame, AVFrame * outFrame);
-    int encode(const AVFrame * frame, AVPacket * outPacket) const;
+    int encode(const AVFrame * frame, AVPacket * outPacket);
+    int decode (AVFrame * outFrame, const AVPacket * packet);
 
     bool ensureInitialized();
     int initialize();
     void uninitialize();
     int openVideoEncoder();
+    int openVideoDecoder();
     int initializeScaledFrame(const std::unique_ptr<ffmpeg::Codec>& encoder);
     void setEncoderOptions(const std::unique_ptr<ffmpeg::Codec>& encoder);
     

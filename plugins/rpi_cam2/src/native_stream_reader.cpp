@@ -46,6 +46,8 @@ namespace
             }
         }
     }
+
+    bool initialized = false;
 }
 
 NativeStreamReader::NativeStreamReader(
@@ -74,7 +76,11 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     logError(this);
 
-    m_consumer->initialize();
+    if(!initialized)
+    {
+        m_ffmpegStreamReader->addConsumer(m_consumer);
+        initialized = true;
+    }
 
     std::shared_ptr<ffmpeg::Packet> packet = nullptr;
     while (!packet)
@@ -84,7 +90,6 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     return nxcip::NX_NO_ERROR;
 }
-
 
 } // namespace rpi_cam2
 } // namespace nx

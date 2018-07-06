@@ -41,6 +41,7 @@ StreamReader::StreamReader(
 StreamReader::~StreamReader()
 {
     m_timeProvider->releaseRef();
+    m_ffmpegStreamReader->removeConsumer(m_consumer);
 }
 
 void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -70,7 +71,6 @@ unsigned int StreamReader::releaseRef()
 
 void StreamReader::interrupt()
 {
-    debug("interrupt called\n");
 }
 
 void StreamReader::setFps(int fps)

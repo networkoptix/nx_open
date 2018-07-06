@@ -17,7 +17,7 @@ namespace ffmpeg {
 
 class StreamConsumer;
 
-//! Read a stream using ffmpeg from some type of input
+//! Read a stream using ffmpeg from a camera input device
 class StreamReader
 {
 public:
@@ -37,18 +37,16 @@ public:
 
     CameraState cameraState() const;
 
-    const std::unique_ptr<Codec>& decoder() const;
-    const std::unique_ptr<InputFormat>& inputFormat() const;
-
     void updateFps();
     void updateBitrate();
     void updateResolution();
 
+    //int decode(AVFrame * outframe, const AVPacket * packet);
 private:
     std::string m_url;
     CodecParameters m_codecParams;
 
-    std::unique_ptr<Codec> m_decoder;
+    //std::unique_ptr<Codec> m_decoder;
     std::unique_ptr<InputFormat> m_inputFormat;
 
     CameraState m_cameraState = kOff;
@@ -61,6 +59,10 @@ private:
     bool m_started = false;
 
 private:
+    void updateFpsUnlocked();
+    void updateResolutionUnlocked();
+    void updateBitrateUnlocked();
+    void updateUnlocked();
     void start();
     void stop();
     void run();
@@ -69,7 +71,6 @@ private:
     int initialize();
     void uninitialize();
     void setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat);
-    int decode(AVFrame * outframe, const AVPacket * packet);
 };
 
 class StreamConsumer

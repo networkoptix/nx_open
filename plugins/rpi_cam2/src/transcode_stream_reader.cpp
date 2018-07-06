@@ -28,15 +28,6 @@ namespace rpi_cam2 {
 
 namespace {
 
-int decode(const std::unique_ptr<ffmpeg::Codec>& codec, AVFrame * outFrame, const AVPacket* packet)
-{
-    int decodeCode = 0;
-    int gotFrame = 0;
-    while(!gotFrame && decodeCode >= 0)
-        decodeCode = codec->decode(outFrame, &gotFrame, packet);
-    return decodeCode;
-}
-
 AVPixelFormat suggestPixelFormat(const std::unique_ptr<ffmpeg::Codec>& encoder)
 {
     const AVPixelFormat* supportedFormats = encoder->codec()->pix_fmts;
@@ -44,6 +35,8 @@ AVPixelFormat suggestPixelFormat(const std::unique_ptr<ffmpeg::Codec>& encoder)
         ? ffmpeg::utils::unDeprecatePixelFormat(supportedFormats[0])
         : ffmpeg::utils::suggestPixelFormat(encoder->codecID());
 }
+
+bool scaleContextInit = false;
 
 }
 
@@ -80,8 +73,7 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         packet = m_consumer->popNextPacket();
 
     m_decodedFrame->unreference();
-    int decodeCode =
-        decode(m_ffmpegStreamReader->decoder(), m_decodedFrame->frame(), packet->packet());
+    int decodeCode = decode(m_decodedFrame->frame(), packet->packet());
     if(decodeCode < 0)
         return nxcip::NX_NO_DATA;
 
@@ -104,7 +96,6 @@ void TranscodeStreamReader::setFps(int fps)
     if (m_codecContext.fps() != fps)
     {
         StreamReader::setFps(fps);
-        debug("TranscodeStreamReader::setFps: %d\n", fps);
         m_state = kModified;
     }
 }
@@ -116,7 +107,6 @@ void TranscodeStreamReader::setResolution(const nxcip::Resolution& resolution)
         || currentRes.height != resolution.height)
     {
         StreamReader::setResolution(resolution);
-        debug("TranscodeStreamReader::setResolution: %d, %d\n", resolution.width, resolution.height);
         m_state = kModified;
     }
 }
@@ -126,12 +116,9 @@ void TranscodeStreamReader::setBitrate(int bitrate)
     if (m_codecContext.bitrate() != bitrate)
     {
         StreamReader::setBitrate(bitrate);
-        debug("TranscodeStreamReader::setBitrate: %d\n", bitrate);
         m_state = kModified;
     }
 }
-
-bool inited = false;
 
 /*!
  * Scale @param frame, modifying the preallocated @param outFrame whose size and format are expected
@@ -139,23 +126,22 @@ bool inited = false;
  * */
 int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
 {
-    AVPixelFormat encoderFormat = suggestPixelFormat(m_videoEncoder);
     nxcip::Resolution targetRes = m_codecContext.resolution();
 
     nx::rpi_cam2::utils::TimeProfiler t;
     t.start();
 
-    if(!inited)
+    if (!scaleContextInit)
     {
-        inited = true;
+        scaleContextInit = true;
         m_scaleContext = sws_getCachedContext(
             nullptr,
             frame->width,
             frame->height,
-            ffmpeg::utils::unDeprecatePixelFormat(m_ffmpegStreamReader->decoder()->pixelFormat()),
+            ffmpeg::utils::unDeprecatePixelFormat(m_decoder->pixelFormat()),
             targetRes.width,
             targetRes.height,
-            encoderFormat,
+            suggestPixelFormat(m_videoEncoder),
             SWS_BICUBIC,
             nullptr,
             nullptr,
@@ -188,7 +174,16 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
     return 0;
 }
 
-int TranscodeStreamReader::encode(const AVFrame * frame, AVPacket * outPacket) const
+int TranscodeStreamReader::decode(AVFrame * outFrame, const AVPacket* packet)
+{
+    int decodeCode = 0;
+    int gotFrame = 0;
+    while(!gotFrame && decodeCode >= 0)
+        decodeCode = m_decoder->decode(outFrame, &gotFrame, packet);
+    return decodeCode;
+}
+
+int TranscodeStreamReader::encode(const AVFrame * frame, AVPacket * outPacket)
 {
     int encodeCode = 0;
     int gotPacket = 0;
@@ -203,6 +198,10 @@ int TranscodeStreamReader::initialize()
     if (openCode < 0)
         return openCode;
 
+    openCode = openVideoDecoder();
+    if(openCode < 0)
+        return openCode;
+
     int initCode = initializeScaledFrame(m_videoEncoder);
     if(initCode < 0)
         return initCode;
@@ -212,7 +211,7 @@ int TranscodeStreamReader::initialize()
         return AVERROR(ENOMEM);
     m_decodedFrame = std::move(decodedFrame);
 
-    m_consumer->initialize();
+    m_ffmpegStreamReader->addConsumer(m_consumer);
 
     m_state = kInitialized;
     return 0;
@@ -236,6 +235,23 @@ int TranscodeStreamReader::openVideoEncoder()
         return openCode;
 
     m_videoEncoder = std::move(encoder);
+    return 0;
+}
+
+int TranscodeStreamReader::openVideoDecoder()
+{
+    auto decoder = std::make_unique<ffmpeg::Codec>();
+    // todo initialize this differently for windows
+    int initCode = decoder->initializeDecoder("h264_mmal");
+    if (initCode < 0)
+        return initCode;
+
+    int openCode = decoder->open();
+    if (openCode < 0)
+        return openCode;
+
+    debug("Selected decoder: %s\n", decoder->codec()->name);
+    m_decoder = std::move(decoder);
     return 0;
 }
 
@@ -275,6 +291,7 @@ void TranscodeStreamReader::setEncoderOptions(const std::unique_ptr<ffmpeg::Code
 
 void TranscodeStreamReader::uninitialize()
 {
+    m_decoder.reset(nullptr);
     m_decodedFrame.reset(nullptr);
     m_scaledFrame.reset(nullptr);
     m_videoEncoder.reset(nullptr);

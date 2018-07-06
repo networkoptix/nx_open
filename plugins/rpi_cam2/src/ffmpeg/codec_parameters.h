@@ -9,11 +9,11 @@ namespace ffmpeg {
 
 struct CodecParameters
     {
-        AVCodecID codecID;
-        int fps;
-        int bitrate;
-        int width;
-        int height;
+        AVCodecID codecID = AV_CODEC_ID_NONE;
+        int fps = 0;
+        int bitrate = 0;
+        int width = 0;
+        int height = 0;
 
         CodecParameters(AVCodecID codecID, int fps, int bitrate, int width, int height):
             codecID(codecID),
