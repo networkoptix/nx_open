@@ -46,14 +46,14 @@ private:
     const conf::Settings& m_settings;
     Model* m_model;
     Controller* m_controller;
+    view::GetPostServerTunnelProcessor m_getPostServerTunnelProcessor;
+    view::GetPostClientTunnelProcessor m_getPostClientTunnelProcessor;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
     std::vector<network::SocketAddress> m_httpEndpoint;
     std::vector<network::SocketAddress> m_httpsEndpoint;
-    view::GetPostServerTunnelProcessor m_getPostServerTunnelProcessor;
-    view::GetPostClientTunnelProcessor m_getPostClientTunnelProcessor;
 
     void registerApiHandlers();
     void registerCompatibilityHandlers();

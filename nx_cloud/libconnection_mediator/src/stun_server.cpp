@@ -102,7 +102,7 @@ bool StunServer::bind()
 
     m_endpoints = m_tcpStunServer->endpoints();
 
-    if (!m_udpStunServer->bind(m_endpoints /*m_settings.stun().addrToListenList*/))
+    if (!m_udpStunServer->bind(m_settings.stun().addrToListenList))
     {
         NX_LOGX(lit("Can not bind to UDP addresses: %1")
             .arg(containerString(m_settings.stun().addrToListenList)), cl_logERROR);

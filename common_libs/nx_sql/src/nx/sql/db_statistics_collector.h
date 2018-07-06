@@ -3,8 +3,7 @@
 #include <chrono>
 #include <deque>
 
-#include <boost/optional.hpp>
-
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "types.h"
@@ -13,9 +12,9 @@ namespace nx::sql {
 
 struct NX_SQL_API QueryExecutionInfo
 {
-    boost::optional<DBResult> result;
+    std::optional<DBResult> result;
     std::chrono::milliseconds waitForExecutionDuration;
-    boost::optional<std::chrono::milliseconds> executionDuration;
+    std::optional<std::chrono::milliseconds> executionDuration;
 
     QueryExecutionInfo();
 };

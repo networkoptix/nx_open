@@ -5,7 +5,7 @@ endif()
 
 nx_add_target(nx_sql LIBRARY ${library_type} NO_MOC WERROR
     PUBLIC_LIBS
-        boost openssl Qt5::Core Qt5::Sql
+        Qt5::Core Qt5::Sql
         nx_kit nx_utils
 )
 

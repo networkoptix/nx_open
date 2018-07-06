@@ -56,13 +56,15 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                     log.info('Test {}: {}. Sleeping for {} seconds'.format(wrapper.testmethod_index, f.__name__, delay))
                     time.sleep(delay)
 
-                n_try = 0
-
-                for n_try in range(1, tries):
+                for n_try in range(1, tries + 1):
                     log.info('Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
                     try:
                         f(self)
+                        break
                     except AssertionError:
+                        if n_try == tries:
+                            raise
+
                         log.error('Test {}: failed. Retrying..'.format(f.__name__))
 
                         io = StringIO()
@@ -70,12 +72,7 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                         log.error(io.getvalue())
 
                         time.sleep(RETRY_TIMEOUT)
-                        continue
 
-                n_try += 1
-
-                log.info('Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
-                f(self)
                 log.info('Test {}: success'.format(f.__name__))
 
                 if metric:
