@@ -75,6 +75,7 @@ void ServerTimeSyncManager::broadcastSystemTime()
 
 ServerTimeSyncManager::~ServerTimeSyncManager()
 {
+    stop();
 }
 
 void ServerTimeSyncManager::start()
