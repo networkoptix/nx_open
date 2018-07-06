@@ -44,8 +44,12 @@ public:
     using CreateClientSessionHandler =
         nx::utils::MoveOnlyFunc<void(api::ResultCode, api::CreateClientSessionResponse)>;
 
+    using StartRelayingFunc =
+        nx::utils::MoveOnlyFunc<
+            void(std::unique_ptr<network::AbstractStreamSocket> /*clientTunnel*/)>;
+
     using ConnectToPeerHandler =
-        nx::utils::MoveOnlyFunc<void(api::ResultCode, nx::network::http::ConnectionEvents)>;
+        nx::utils::MoveOnlyFunc<void(api::ResultCode, StartRelayingFunc)>;
 
     //---------------------------------------------------------------------------------------------
 
@@ -111,7 +115,7 @@ private:
         const std::string& connectSessionId,
         const std::string& listeningPeerName,
         std::unique_ptr<network::AbstractStreamSocket> listeningPeerConnection,
-        nx::network::http::HttpServerConnection* httpConnection);
+        std::unique_ptr<network::AbstractStreamSocket> clientTunnel);
     void startRelaying(RelaySession relaySession);
 };
 

@@ -10,7 +10,7 @@ namespace rdb {
 static const char* kSchemaName = "cloud_sync_engine_{C4105732-0097-48FB-AB9B-039A3C057F57}";
 
 StructureUpdater::StructureUpdater(
-    nx::utils::db::AbstractAsyncSqlQueryExecutor* const dbManager)
+    nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager)
     :
     m_updater(kSchemaName, dbManager)
 {

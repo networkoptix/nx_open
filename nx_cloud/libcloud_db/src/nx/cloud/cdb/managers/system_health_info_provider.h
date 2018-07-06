@@ -6,7 +6,7 @@
 
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/counter.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/subscription.h>
 
 #include <nx/data_sync_engine/connection_manager.h>
@@ -42,7 +42,7 @@ class SystemHealthInfoProvider:
 public:
     SystemHealthInfoProvider(
         data_sync_engine::ConnectionManager* ec2ConnectionManager,
-        nx::utils::db::AsyncSqlQueryExecutor* const dbManager);
+        nx::sql::AsyncSqlQueryExecutor* const dbManager);
     virtual ~SystemHealthInfoProvider() override;
 
     virtual bool isSystemOnline(const std::string& systemId) const override;
@@ -54,7 +54,7 @@ public:
 
 private:
     data_sync_engine::ConnectionManager* m_ec2ConnectionManager;
-    nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     dao::rdb::SystemHealthHistoryDataObject m_systemHealthHistoryDataObject;
     nx::utils::SubscriptionId m_systemStatusChangedSubscriptionId;
@@ -69,7 +69,7 @@ private:
 using SystemHealthInfoProviderFactoryFunction =
     std::unique_ptr<AbstractSystemHealthInfoProvider>(
         data_sync_engine::ConnectionManager* ec2ConnectionManager,
-        nx::utils::db::AsyncSqlQueryExecutor* const dbManager);
+        nx::sql::AsyncSqlQueryExecutor* const dbManager);
 
 class SystemHealthInfoProviderFactory:
     public nx::utils::BasicFactory<SystemHealthInfoProviderFactoryFunction>
@@ -84,7 +84,7 @@ public:
 private:
     std::unique_ptr<AbstractSystemHealthInfoProvider> defaultFactory(
         data_sync_engine::ConnectionManager* ec2ConnectionManager,
-        nx::utils::db::AsyncSqlQueryExecutor* const dbManager);
+        nx::sql::AsyncSqlQueryExecutor* const dbManager);
 };
 
 } // namespace cdb

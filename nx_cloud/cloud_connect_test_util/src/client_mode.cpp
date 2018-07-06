@@ -24,18 +24,18 @@ void printConnectOptions(std::ostream* const outStream)
 {
     *outStream <<
         "Connect mode:\n"
-        "  --connect            Enable connect mode\n"
-        "  --ping               Makes connections to verify server responses\n"
-        "  --target={endpoint}  Regular or cloud address of server\n"
+        "  --connect                        Enable connect mode\n"
+        "  --ping                           Makes connections to verify server responses\n"
+        "  --target={endpoint}              Regular or cloud address of server\n"
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
-        "                       Number of connections to try\n"
+        "                                   Number of connections to try\n"
         "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
         "  --bytes-to-receive={N}\n"
-        "                       Bytes to receive before closing connection. No limit by default\n"
-        "  --bytes-to-send={N}  Bytes to send before closing connection. No limit by default\n"
-        "  --forward-address    Use only forwarded address for connect\n"
-        "  --udt                Force using udt socket. Disables cloud connect\n"
-        "  --ssl                Use SSL on top of client sockets\n";
+        "                                   Bytes to receive before closing connection. No limit by default\n"
+        "  --bytes-to-send={N}              Bytes to send before closing connection. No limit by default\n"
+        "  --forward-address                Use only forwarded address for connect\n"
+        "  --udt                            Force using udt socket. Disables cloud connect\n"
+        "  --ssl                            Use SSL on top of client sockets\n";
 }
 
 static bool resolveDomainName(
@@ -244,11 +244,11 @@ void printHttpClientOptions(std::ostream* const outStream)
 {
     *outStream <<
         "Http client mode:\n"
-        "  --http-client                            Enable Http client mode\n"
-        "  --url={http url}                         Url to trigger\n"
+        "  --http-client                    Enable Http client mode\n"
+        "  --url={http url}                 Url to trigger\n"
         "\n"
         "  -o file\n"
-        "  --output-document=file                   Save message received to the file specified\n";
+        "  --output-document=file           Save message received to the file specified\n";
 }
 
 int runInHttpClientMode(const nx::utils::ArgumentParser& args)

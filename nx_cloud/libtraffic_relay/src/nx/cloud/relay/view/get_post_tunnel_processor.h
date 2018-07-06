@@ -9,29 +9,33 @@
 
 #include <nx/cloud/relaying/listening_peer_pool.h>
 
+#include "../controller/connect_session_manager.h"
 #include "../settings.h"
 
 namespace nx::cloud::relay::view {
 
+template<typename RequestSpecificData>
 class GetPostTunnelProcessor:
     public network::http::StreamConnectionHolder
 {
 public:
-    GetPostTunnelProcessor(
-        const conf::Settings& settings,
-        relaying::AbstractListeningPeerPool* listeningPeerPool);
+    GetPostTunnelProcessor(const conf::Settings& settings);
     ~GetPostTunnelProcessor();
 
     network::http::RequestResult processOpenTunnelRequest(
-        network::http::HttpServerConnection* const connection,
-        const std::string& listeningPeerName,
+        RequestSpecificData requestData,
         const network::http::Request& request,
         network::http::Response* const response);
+
+protected:
+    virtual void onTunnelCreated(
+        RequestSpecificData requestData,
+        std::unique_ptr<network::AbstractStreamSocket> connection) = 0;
 
 private:
     struct TunnelContext
     {
-        std::string listeningPeerName;
+        RequestSpecificData requestData;
         std::string urlPath;
         std::unique_ptr<network::http::AsyncMessagePipeline> connection;
     };
@@ -40,28 +44,71 @@ private:
 
     mutable QnMutex m_mutex;
     const conf::Settings& m_settings;
-    relaying::AbstractListeningPeerPool* m_listeningPeerPool;
     Tunnels m_tunnelsInProgress;
 
     virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
         network::http::AsyncMessagePipeline* /*connection*/) override;
 
+    void closeConnection(
+        const QnMutexLockerBase& lock,
+        SystemError::ErrorCode /*closeReason*/,
+        network::http::AsyncMessagePipeline* /*connection*/);
+
     void prepareCreateDownTunnelResponse(
         network::http::Response* const response);
 
     void openUpTunnel(
         network::http::HttpServerConnection* const connection,
-        const std::string& listeningPeerName,
+        RequestSpecificData requestData,
         const std::string& requestPath);
 
     void onMessage(
-        Tunnels::iterator tunnelIter,
+        network::http::AsyncMessagePipeline* tunnel,
         network::http::Message /*httpMessage*/);
 
     bool validateOpenUpChannelMessage(
         const TunnelContext& tunnelContext,
         const network::http::Message& message);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class GetPostServerTunnelProcessor:
+    public GetPostTunnelProcessor<std::string /*listeningPeerName*/>
+{
+    using base_type = GetPostTunnelProcessor<std::string>;
+
+public:
+    GetPostServerTunnelProcessor(
+        const conf::Settings& settings,
+        relaying::AbstractListeningPeerPool* listeningPeerPool);
+
+protected:
+    virtual void onTunnelCreated(
+        std::string listeningPeerName,
+        std::unique_ptr<network::AbstractStreamSocket> connection) override;
+
+private:
+    relaying::AbstractListeningPeerPool* m_listeningPeerPool;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class GetPostClientTunnelProcessor:
+    public GetPostTunnelProcessor<
+        controller::AbstractConnectSessionManager::StartRelayingFunc>
+{
+    using base_type = GetPostTunnelProcessor<
+        controller::AbstractConnectSessionManager::StartRelayingFunc>;
+
+public:
+    GetPostClientTunnelProcessor(const conf::Settings& settings);
+
+protected:
+    virtual void onTunnelCreated(
+        controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
+        std::unique_ptr<network::AbstractStreamSocket> connection) override;
 };
 
 } // namespace nx::cloud::relay::view

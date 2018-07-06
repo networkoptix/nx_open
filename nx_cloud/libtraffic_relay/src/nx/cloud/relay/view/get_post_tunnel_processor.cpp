@@ -6,16 +6,16 @@
 
 namespace nx::cloud::relay::view {
 
-GetPostTunnelProcessor::GetPostTunnelProcessor(
-    const conf::Settings& settings,
-    relaying::AbstractListeningPeerPool* listeningPeerPool)
+template<typename RequestSpecificData>
+GetPostTunnelProcessor<RequestSpecificData>::GetPostTunnelProcessor(
+    const conf::Settings& settings)
     :
-    m_settings(settings),
-    m_listeningPeerPool(listeningPeerPool)
+    m_settings(settings)
 {
 }
 
-GetPostTunnelProcessor::~GetPostTunnelProcessor()
+template<typename RequestSpecificData>
+GetPostTunnelProcessor<RequestSpecificData>::~GetPostTunnelProcessor()
 {
     Tunnels tunnelsInProgress;
     {
@@ -27,16 +27,17 @@ GetPostTunnelProcessor::~GetPostTunnelProcessor()
         tunnelContext.second.connection->pleaseStopSync();
 }
 
-network::http::RequestResult GetPostTunnelProcessor::processOpenTunnelRequest(
-    network::http::HttpServerConnection* const connection,
-    const std::string& listeningPeerName,
-    const network::http::Request& request,
-    network::http::Response* const response)
+template<typename RequestSpecificData>
+network::http::RequestResult
+    GetPostTunnelProcessor<RequestSpecificData>::processOpenTunnelRequest(
+        RequestSpecificData requestData,
+        const network::http::Request& request,
+        network::http::Response* const response)
 {
     using namespace std::placeholders;
 
-    NX_VERBOSE(this, lm("Open GET/POST tunnel request from peer %1 (%2)")
-        .args(listeningPeerName, connection->socket()->getForeignAddress()));
+    NX_VERBOSE(this, lm("Open GET/POST tunnel. Url %1")
+        .args(request.requestLine.url.path()));
 
     network::http::RequestResult requestResult(
         nx::network::http::StatusCode::ok);
@@ -44,21 +45,31 @@ network::http::RequestResult GetPostTunnelProcessor::processOpenTunnelRequest(
     prepareCreateDownTunnelResponse(response);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
-        std::bind(&GetPostTunnelProcessor::openUpTunnel, this,
-            _1, listeningPeerName, request.requestLine.url.path().toStdString());
+        [this, requestData = std::move(requestData),
+            requestPath = request.requestLine.url.path().toStdString()](
+                network::http::HttpServerConnection* connection) mutable
+        {
+            openUpTunnel(
+                connection,
+                std::move(requestData),
+                requestPath);
+        };
 
     return requestResult;
 }
 
-void GetPostTunnelProcessor::prepareCreateDownTunnelResponse(
+template<typename RequestSpecificData>
+void GetPostTunnelProcessor<RequestSpecificData>::prepareCreateDownTunnelResponse(
     network::http::Response* const response)
 {
+    //--
     api::BeginListeningResponse responseData;
     responseData.preemptiveConnectionCount =
         m_settings.listeningPeer().recommendedPreemptiveConnectionCount;
     responseData.keepAliveOptions = m_settings.listeningPeer().tcpKeepAlive;
 
     serializeToHeaders(&response->headers, responseData);
+    //--
 
     response->headers.emplace("Content-Type", "application/octet-stream");
     response->headers.emplace("Content-Length", "10000000000");
@@ -67,9 +78,10 @@ void GetPostTunnelProcessor::prepareCreateDownTunnelResponse(
     response->headers.emplace("Connection", "close");
 }
 
-void GetPostTunnelProcessor::openUpTunnel(
+template<typename RequestSpecificData>
+void GetPostTunnelProcessor<RequestSpecificData>::openUpTunnel(
     network::http::HttpServerConnection* const connection,
-    const std::string& listeningPeerName,
+    RequestSpecificData requestData,
     const std::string& requestPath)
 {
     using namespace std::placeholders;
@@ -83,45 +95,45 @@ void GetPostTunnelProcessor::openUpTunnel(
 
     auto insertionResult = m_tunnelsInProgress.emplace(
         httpPipePtr,
-        TunnelContext{listeningPeerName, requestPath, std::move(httpPipe)});
+        TunnelContext{std::move(requestData), requestPath, std::move(httpPipe)});
 
     insertionResult.first->second.connection->setMessageHandler(
-        std::bind(&GetPostTunnelProcessor::onMessage, this,
-            insertionResult.first, _1));
+        std::bind(&GetPostTunnelProcessor::onMessage, this, httpPipePtr, _1));
     insertionResult.first->second.connection->startReadingConnection();
 }
 
-void GetPostTunnelProcessor::onMessage(
-    Tunnels::iterator tunnelIter,
+template<typename RequestSpecificData>
+void GetPostTunnelProcessor<RequestSpecificData>::onMessage(
+    network::http::AsyncMessagePipeline* tunnel,
     network::http::Message message)
 {
+    QnMutexLocker lock(&m_mutex);
+
+    auto tunnelIter = m_tunnelsInProgress.find(tunnel);
+    if (tunnelIter == m_tunnelsInProgress.end())
+        return; //< GetPostTunnelProcessor is being destroyed.
+
     if (!validateOpenUpChannelMessage(tunnelIter->second, message))
     {
-        NX_DEBUG(this, lm("Invalid up channel message from peer %1 (%2)")
-            .args(tunnelIter->second.listeningPeerName,
-                tunnelIter->second.connection->socket()->getForeignAddress()));
-        closeConnection(SystemError::invalidData, tunnelIter->first);
+        NX_DEBUG(this, lm("Invalid up channel. Url %1")
+            .args(tunnelIter->second.urlPath));
+        closeConnection(lock, SystemError::invalidData, tunnelIter->first);
         return;
     }
 
-    TunnelContext tunnelContext;
-    {
-        QnMutexLocker lock(&m_mutex);
+    auto tunnelContext = std::move(tunnelIter->second);
+    m_tunnelsInProgress.erase(tunnelIter);
 
-        tunnelContext = std::move(tunnelIter->second);
-        m_tunnelsInProgress.erase(tunnelIter);
-    }
+    NX_VERBOSE(this, lm("Successfully opened GET/POST tunnel. Url %1")
+        .args(tunnelContext.urlPath));
 
-    NX_VERBOSE(this, lm("Successfully opened GET/POST tunnel for peer %1 (%2)")
-        .args(tunnelContext.listeningPeerName,
-            tunnelContext.connection->socket()->getForeignAddress()));
-
-    m_listeningPeerPool->addConnection(
-        tunnelContext.listeningPeerName,
+    onTunnelCreated(
+        std::move(tunnelContext.requestData),
         tunnelContext.connection->takeSocket());
 }
 
-bool GetPostTunnelProcessor::validateOpenUpChannelMessage(
+template<typename RequestSpecificData>
+bool GetPostTunnelProcessor<RequestSpecificData>::validateOpenUpChannelMessage(
     const TunnelContext& tunnelContext,
     const network::http::Message& message)
 {
@@ -135,13 +147,63 @@ bool GetPostTunnelProcessor::validateOpenUpChannelMessage(
     return true;
 }
 
-void GetPostTunnelProcessor::closeConnection(
-    SystemError::ErrorCode /*closeReason*/,
+template<typename RequestSpecificData>
+void GetPostTunnelProcessor<RequestSpecificData>::closeConnection(
+    SystemError::ErrorCode closeReason,
     network::http::AsyncMessagePipeline* connection)
 {
     QnMutexLocker lock(&m_mutex);
+    closeConnection(lock, closeReason, connection);
+}
 
+template<typename RequestSpecificData>
+void GetPostTunnelProcessor<RequestSpecificData>::closeConnection(
+    const QnMutexLockerBase& /*lock*/,
+    SystemError::ErrorCode /*closeReason*/,
+    network::http::AsyncMessagePipeline* connection)
+{
     m_tunnelsInProgress.erase(connection);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+template class GetPostTunnelProcessor<std::string>;
+
+GetPostServerTunnelProcessor::GetPostServerTunnelProcessor(
+    const conf::Settings& settings,
+    relaying::AbstractListeningPeerPool* listeningPeerPool)
+    :
+    base_type(settings),
+    m_listeningPeerPool(listeningPeerPool)
+{
+}
+
+void GetPostServerTunnelProcessor::onTunnelCreated(
+    std::string listeningPeerName,
+    std::unique_ptr<network::AbstractStreamSocket> connection)
+{
+    m_listeningPeerPool->addConnection(
+        listeningPeerName,
+        std::move(connection));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+template class GetPostTunnelProcessor<
+    controller::AbstractConnectSessionManager::StartRelayingFunc>;
+
+GetPostClientTunnelProcessor::GetPostClientTunnelProcessor(
+    const conf::Settings& settings)
+    :
+    base_type(settings)
+{
+}
+
+void GetPostClientTunnelProcessor::onTunnelCreated(
+    controller::AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc,
+    std::unique_ptr<network::AbstractStreamSocket> connection)
+{
+    startRelayingFunc(std::move(connection));
 }
 
 } // namespace nx::cloud::relay::view

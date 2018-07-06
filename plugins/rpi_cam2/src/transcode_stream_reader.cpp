@@ -75,9 +75,6 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(!ensureInitialized())
         return nxcip::NX_OTHER_ERROR;
 
-    m_consumer->initialize();
-    m_ffmpegStreamReader->start();
-
     std::shared_ptr<ffmpeg::Packet> packet = nullptr;
     while(!packet)
         packet = m_consumer->popNextPacket();
@@ -186,7 +183,7 @@ int TranscodeStreamReader::scale(AVFrame * frame, AVFrame* outFrame)
 
     t.stop();
 
-    debug("scale times: %d ms\n", t.countMsec());
+    //debug("scale time: %d ms\n", t.countMsec());
 
     return 0;
 }
@@ -214,6 +211,9 @@ int TranscodeStreamReader::initialize()
     if(!decodedFrame || !decodedFrame->frame())
         return AVERROR(ENOMEM);
     m_decodedFrame = std::move(decodedFrame);
+
+    m_consumer->initialize();
+
     m_state = kInitialized;
     return 0;
 }

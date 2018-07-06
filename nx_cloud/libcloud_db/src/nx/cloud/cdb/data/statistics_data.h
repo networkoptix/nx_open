@@ -2,11 +2,10 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-#include <nx/utils/db/db_statistics_collector.h>
+#include <nx/sql/db_statistics_collector.h>
 
 namespace nx {
-namespace utils {
-namespace db {
+namespace sql {
 
 #define DurationStatistics_Fields (min)(max)(average)
 
@@ -18,8 +17,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (DurationStatistics)(QueryStatistics),
     (json))
 
-} // namespace db
-} // namespace utils
+} // namespace sql
 } // namespace nx
 
 namespace nx {
@@ -29,7 +27,7 @@ namespace data {
 struct Statistics
 {
     int onlineServerCount;
-    nx::utils::db::QueryStatistics dbQueryStatistics;
+    nx::sql::QueryStatistics dbQueryStatistics;
     std::size_t pendingSqlQueryCount;
 
     Statistics():

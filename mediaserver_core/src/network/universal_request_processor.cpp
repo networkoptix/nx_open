@@ -85,7 +85,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
     {
         nx::utils::Url url = getDecodedUrl();
         // set variable to true if standard proxy_unauthorized should be used
-        const bool isProxy = nx::vms::network::ProxyConnectionProcessor::needStandardProxy(
+        const bool isProxy = nx::vms::network::ProxyConnectionProcessor::isStandardProxyNeeded(
             d->owner->commonModule(), d->request);
         QElapsedTimer t;
         t.restart();

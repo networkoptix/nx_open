@@ -1,4 +1,4 @@
-#include <nx/utils/db/test_support/test_with_db_helper.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
 
 #define USE_GMOCK
 #include <nx/network/test_support/run_test.h>
@@ -9,7 +9,7 @@ int main(int argc, char** argv)
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
-            nx::utils::db::ConnectionOptions connectionOptions;
+            nx::sql::ConnectionOptions connectionOptions;
             QString driverName;
             args.read("db/driverName", &driverName);
             args.read("db/hostName", &connectionOptions.hostName);
@@ -21,11 +21,11 @@ int main(int argc, char** argv)
             args.read("db/maxConnections", &connectionOptions.maxConnectionCount);
             if (!driverName.isEmpty())
             {
-                connectionOptions.driverType = nx::utils::db::rdbmsDriverTypeFromString(
+                connectionOptions.driverType = nx::sql::rdbmsDriverTypeFromString(
                     driverName.toStdString().c_str());
             }
 
-            nx::utils::db::test::TestWithDbHelper::setDbConnectionOptions(
+            nx::sql::test::TestWithDbHelper::setDbConnectionOptions(
                 std::move(connectionOptions));
 
             return nx::utils::test::DeinitFunctions();

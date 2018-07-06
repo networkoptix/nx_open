@@ -21,8 +21,8 @@ SystemDataObject::SystemDataObject(const conf::Settings& settings):
 {
 }
 
-nx::utils::db::DBResult SystemDataObject::insert(
-    nx::utils::db::QueryContext* const queryContext,
+nx::sql::DBResult SystemDataObject::insert(
+    nx::sql::QueryContext* const queryContext,
     const data::SystemData& system,
     const std::string& accountId)
 {
@@ -44,14 +44,14 @@ nx::utils::db::DBResult SystemDataObject::insert(
         NX_LOG(lm("Could not insert system %1 (%2) into DB. %3")
             .arg(system.name).arg(system.id).arg(insertSystemQuery.lastError().text()),
             cl_logDEBUG1);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::selectSystemSequence(
-    nx::utils::db::QueryContext* const queryContext,
+nx::sql::DBResult SystemDataObject::selectSystemSequence(
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId,
     std::uint64_t* const sequence)
 {
@@ -67,15 +67,15 @@ nx::utils::db::DBResult SystemDataObject::selectSystemSequence(
         NX_LOG(lm("Error selecting sequence of system %1. %2")
             .arg(systemId).arg(selectSystemSequence.lastError().text()),
             cl_logDEBUG1);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
     *sequence = selectSystemSequence.value(0).toULongLong();
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::markSystemForDeletion(
-    nx::utils::db::QueryContext* const queryContext,
+nx::sql::DBResult SystemDataObject::markSystemForDeletion(
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId)
 {
     QSqlQuery markSystemAsRemoved(*queryContext->connection());
@@ -102,14 +102,14 @@ nx::utils::db::DBResult SystemDataObject::markSystemForDeletion(
         NX_LOG(lm("Error marking system %1 as deleted. %2")
             .arg(systemId).arg(markSystemAsRemoved.lastError().text()),
             cl_logDEBUG1);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::deleteSystem(
-    nx::utils::db::QueryContext* const queryContext,
+nx::sql::DBResult SystemDataObject::deleteSystem(
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId)
 {
     QSqlQuery removeSystem(*queryContext->connection());
@@ -120,14 +120,14 @@ nx::utils::db::DBResult SystemDataObject::deleteSystem(
         NX_LOG(lm("Could not delete system %1. %2")
             .arg(systemId).arg(removeSystem.lastError().text()),
             cl_logDEBUG1);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::execSystemNameUpdate(
-    nx::utils::db::QueryContext* const queryContext,
+nx::sql::DBResult SystemDataObject::execSystemNameUpdate(
+    nx::sql::QueryContext* const queryContext,
     const data::SystemAttributesUpdate& data)
 {
     QSqlQuery updateSystemNameQuery(*queryContext->connection());
@@ -142,14 +142,14 @@ nx::utils::db::DBResult SystemDataObject::execSystemNameUpdate(
         NX_LOGX(lm("Failed to update system %1 name in DB to %2. %3")
             .arg(data.systemId).arg(data.name.get())
             .arg(updateSystemNameQuery.lastError().text()), cl_logWARNING);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::execSystemOpaqueUpdate(
-    nx::utils::db::QueryContext* const queryContext,
+nx::sql::DBResult SystemDataObject::execSystemOpaqueUpdate(
+    nx::sql::QueryContext* const queryContext,
     const data::SystemAttributesUpdate& data)
 {
     // TODO: #ak: this is a copy-paste of a previous method. Refactor!
@@ -166,14 +166,14 @@ nx::utils::db::DBResult SystemDataObject::execSystemOpaqueUpdate(
         NX_LOGX(lm("Error updating system %1. %2")
             .arg(data.systemId).arg(updateSystemOpaqueQuery.lastError().text()),
             cl_logWARNING);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::updateSystemStatus(
-    nx::utils::db::QueryContext* const queryContext,
+nx::sql::DBResult SystemDataObject::updateSystemStatus(
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId,
     api::SystemStatus systemStatus)
 {
@@ -196,15 +196,15 @@ nx::utils::db::DBResult SystemDataObject::updateSystemStatus(
         NX_WARNING(this, lm("Failed to update system %1 status to %2 from DB. %3")
             .args(systemId, QnLexical::serialized(systemStatus),
                 updateSystemStatusQuery.lastError().text()));
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemDataObject::fetchSystems(
-    nx::utils::db::QueryContext* queryContext,
-    const nx::utils::db::InnerJoinFilterFields& filterFields,
+nx::sql::DBResult SystemDataObject::fetchSystems(
+    nx::sql::QueryContext* queryContext,
+    const nx::sql::InnerJoinFilterFields& filterFields,
     std::vector<data::SystemData>* const systems)
 {
     constexpr const char kSelectAllSystemsQuery[] =
@@ -222,38 +222,38 @@ nx::utils::db::DBResult SystemDataObject::fetchSystems(
     QString filterStr;
     if (!filterFields.empty())
     {
-        filterStr = nx::utils::db::joinFields(filterFields, " AND ");
+        filterStr = nx::sql::joinFields(filterFields, " AND ");
         sqlQueryStr += " AND " + filterStr;
     }
 
     QSqlQuery readSystemsQuery(*queryContext->connection());
     readSystemsQuery.setForwardOnly(true);
     readSystemsQuery.prepare(sqlQueryStr);
-    nx::utils::db::bindFields(&readSystemsQuery, filterFields);
+    nx::sql::bindFields(&readSystemsQuery, filterFields);
     if (!readSystemsQuery.exec())
     {
         NX_LOG(lit("Failed to read system list with filter \"%1\" from DB. %2")
             .arg(filterStr).arg(readSystemsQuery.lastError().text()),
             cl_logWARNING);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
     QnSql::fetch_many(readSystemsQuery, systems);
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 boost::optional<data::SystemData> SystemDataObject::fetchSystemById(
-    nx::utils::db::QueryContext* queryContext,
+    nx::sql::QueryContext* queryContext,
     const std::string& systemId)
 {
-    const nx::utils::db::InnerJoinFilterFields sqlFilter =
-        {nx::utils::db::SqlFilterFieldEqual(
+    const nx::sql::InnerJoinFilterFields sqlFilter =
+        {nx::sql::SqlFilterFieldEqual(
             "system.id", ":systemId", QnSql::serialized_field(systemId))};
 
     std::vector<data::SystemData> systems;
     const auto result = fetchSystems(queryContext, sqlFilter, &systems);
-    if (result != nx::utils::db::DBResult::ok)
-        throw nx::utils::db::Exception(result);
+    if (result != nx::sql::DBResult::ok)
+        throw nx::sql::Exception(result);
 
     if (systems.empty())
         return boost::none;
@@ -263,8 +263,8 @@ boost::optional<data::SystemData> SystemDataObject::fetchSystemById(
     return std::move(systems[0]);
 }
 
-nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(
-    nx::utils::db::QueryContext* queryContext)
+nx::sql::DBResult SystemDataObject::deleteExpiredSystems(
+    nx::sql::QueryContext* queryContext)
 {
     //dropping expired not-activated systems and expired marked-for-removal systems
     QSqlQuery dropExpiredSystems(*queryContext->connection());
@@ -285,10 +285,10 @@ nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(
     {
         NX_LOGX(lit("Error deleting expired systems from DB. %1").
             arg(dropExpiredSystems.lastError().text()), cl_logWARNING);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 } // namespace rdb

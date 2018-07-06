@@ -4,6 +4,8 @@ import logging
 import xmltodict
 from winrm.exceptions import WinRMTransportError
 
+from framework.os_access.command import Command
+
 _logger = logging.getLogger(__name__)
 
 
@@ -22,18 +24,18 @@ class Shell(object):
 
     def start(self, command, *arguments):
         assert self._shell_id is not None, "Shell is not opened, use shell with `with` clause"
-        return _Command(self._protocol, self._shell_id, command, *arguments)
+        return _WinRMCommand(self._protocol, self._shell_id, command, *arguments)
 
 
-class _Command(object):
+class _WinRMCommand(Command):
     def __init__(self, protocol, shell_id, command, *arguments):
+        super(_WinRMCommand, self).__init__()
         self._protocol = protocol
         self._shell_id = shell_id
         self._command_id = None
         self._command = command
         self._arguments = arguments
         self.is_done = False
-        self.exit_code = None
 
     def __enter__(self):
         # Rewrite with bigger MaxEnvelopeSize, currently hardcoded to 150k, while 8M needed.
@@ -53,11 +55,11 @@ class _Command(object):
             raise
         self._command_id = None
 
-    def send_stdin(self, stdin_bytes, end=False):
+    def send(self, stdin_bytes, is_last=False):
         assert not self.is_done
         _logger.getChild('stdin.size').debug(len(stdin_bytes))
         if len(stdin_bytes) < 8192:
-            _logger.getChild('stdin.data').debug(stdin_bytes.decode(errors='backslashreplace'))
+            _logger.getChild('stdin.data').debug(bytes(stdin_bytes).decode(errors='backslashreplace'))
         # noinspection PyProtectedMember
         rq = {
             'env:Envelope': self._protocol._get_soap_header(
@@ -68,18 +70,22 @@ class _Command(object):
         stream = rq['env:Envelope'].setdefault('env:Body', {}).setdefault('rsp:Send', {}).setdefault('rsp:Stream', {})
         stream['@Name'] = 'stdin'
         stream['@CommandId'] = self._command_id
+        # TODO: Chunked stdin upload.
         stream['#text'] = base64.b64encode(stdin_bytes)
-        if end:
+        sent_bytes = len(stdin_bytes)
+        if is_last:
             stream['@End'] = 'true'
         self._protocol.send_message(xmltodict.unparse(rq))
         try:
-            stdin_text = stdin_bytes.decode('ascii')
+            stdin_text = bytes(stdin_bytes).decode('ascii')
         except UnicodeDecodeError:
             _logger.getChild('stdin').debug("Sent:\n%r", stdin_bytes)
         else:
             _logger.getChild('stdin').debug("Sent:\n%s", stdin_text)
+        return sent_bytes
 
-    def receive_stdout_and_stderr(self):
+    def receive(self, timeout_sec):
+        # TODO: Support timeouts.
         assert not self.is_done
         _logger.getChild('stdout').debug("Receive")
         # noinspection PyProtectedMember
@@ -91,25 +97,10 @@ class _Command(object):
         _logger.getChild('stderr.data').debug(stderr_chunk.decode(errors='backslashreplace'))
         if self.is_done:
             assert isinstance(exit_code, int)
-            self.exit_code = exit_code
         else:
             assert exit_code == -1
-        return stdout_chunk, stderr_chunk
+        return exit_code, stdout_chunk, stderr_chunk
 
 
-def receive_stdout_and_stderr_until_done(command):
-    stdout = bytearray()
-    stderr = bytearray()
-    while not command.is_done:
-        stdout_chunk, stderr_chunk = command.receive_stdout_and_stderr()
-        stdout += stdout_chunk
-        stderr += stderr_chunk
-    return bytes(stdout), bytes(stderr)
-
-
-def run_command(shell, arguments, stdin_bytes=None):
-    with shell.start(*arguments) as command:
-        if stdin_bytes is not None:
-            command.send_stdin(stdin_bytes, end=True)
-        stdout_bytes, stderr_bytes = receive_stdout_and_stderr_until_done(command)
-    return command.exit_code, stdout_bytes, stderr_bytes
+def receive_stdout_and_stderr_until_done(self):
+    raise NotImplementedError("Use Command.communicate")

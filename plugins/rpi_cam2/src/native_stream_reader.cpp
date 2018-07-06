@@ -75,7 +75,6 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     logError(this);
 
     m_consumer->initialize();
-    m_ffmpegStreamReader->start();
 
     std::shared_ptr<ffmpeg::Packet> packet = nullptr;
     while (!packet)

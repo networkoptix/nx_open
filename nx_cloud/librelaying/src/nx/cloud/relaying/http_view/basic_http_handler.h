@@ -44,10 +44,10 @@ public:
     }
 
 protected:
-    Manager* m_manager;
-    ManagerFunc m_managerFunc;
     std::map<relay::api::ResultCode, nx::network::http::StatusCode::Value>
         m_resultCodeToHttpStatusCode;
+    Manager* m_manager;
+    ManagerFunc m_managerFunc;
 
     template<typename ... Args>
     void invokeManagerFunc(
@@ -83,6 +83,24 @@ private:
         Response ... response,
         nx::network::http::ConnectionEvents connectionEvents)
     {
+        this->setConnectionEvents(std::move(connectionEvents));
+        onRequestProcessed(resultCode, std::move(response)...);
+    }
+
+    void onRequestProcessed(
+        relay::api::ResultCode resultCode,
+        Response ... response,
+        nx::utils::MoveOnlyFunc<
+            void(std::unique_ptr<network::AbstractStreamSocket>)> handler)
+    {
+        network::http::ConnectionEvents connectionEvents;
+
+        connectionEvents.onResponseHasBeenSent =
+            [handler = std::move(handler)](
+                network::http::HttpServerConnection* httpConnection)
+            {
+                handler(httpConnection->takeSocket());
+            };
         this->setConnectionEvents(std::move(connectionEvents));
         onRequestProcessed(resultCode, std::move(response)...);
     }

@@ -19,7 +19,7 @@ from framework.merging import (
     setup_cloud_system,
     setup_local_system,
     )
-from framework.rest_api import HttpError
+from framework.rest_api import HttpError, INITIAL_API_PASSWORD
 from framework.utils import bool_to_str, datetime_utc_now, str_to_bool
 from framework.waiting import wait_for_true
 
@@ -286,6 +286,8 @@ def test_restart_one_server(one, two, cloud_account):
 
     # Remove Server2 from database on Server1
     one.api.post('ec2/removeResource', dict(id=guid2))
+    # Restore initial REST API
+    two.api = two.api.with_credentials('admin', INITIAL_API_PASSWORD)
 
     # Start server 2 again and move it from initial to working state
     setup_cloud_system(two, cloud_account, {})

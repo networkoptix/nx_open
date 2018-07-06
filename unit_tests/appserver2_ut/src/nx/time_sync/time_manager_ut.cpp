@@ -18,7 +18,7 @@
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
 
-#include <nx/time_sync/server_time_sync_manager.h>
+#include <nx/vms/time_sync/server_time_sync_manager.h>
 #include <settings.h>
 #include <api/model/time_reply.h>
 
@@ -170,15 +170,15 @@ public:
                     auto globalSettings = commonModule->globalSettings();
                     globalSettings->setSynchronizingTimeWithInternet(m_syncWithInternetEnabled);
 
-                    auto timeSyncManager = m_appserver->moduleInstance()->ecConnection()->timeSyncManager();
+                    auto timeSyncManager = dynamic_cast<nx::vms::time_sync::ServerTimeSyncManager*>
+                        (m_appserver->moduleInstance()->ecConnection()->timeSyncManager());
                     timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
 
                     auto internetTimeFetcher = std::make_unique<TestTimeFetcher>();
                     internetTimeFetcher->setTime(
                         kBaseInternetTime,
                         /*rtt */std::chrono::milliseconds(0));
-                    auto serverTimeFetcher = dynamic_cast<ServerTimeSyncManager*>(timeSyncManager);
-                    serverTimeFetcher->setTimeFetcher(std::move(internetTimeFetcher));
+                    timeSyncManager->setTimeFetcher(std::move(internetTimeFetcher));
 
                     commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
                         std::chrono::milliseconds(100));

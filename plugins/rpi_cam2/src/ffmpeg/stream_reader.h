@@ -34,7 +34,6 @@ public:
 
     void addConsumer(const std::weak_ptr<StreamConsumer>& consumer);
     void removeConsumer(const std::weak_ptr<StreamConsumer>& consumer);
-    void start();
 
     CameraState cameraState() const;
 
@@ -53,15 +52,19 @@ private:
     std::unique_ptr<InputFormat> m_inputFormat;
 
     CameraState m_cameraState = kOff;
-    mutable std::mutex m_mutex;
 
     std::vector<std::weak_ptr<StreamConsumer>> m_consumers;
 
-    bool m_started = false;
+    std::thread m_runThread;
+    mutable std::mutex m_mutex;
     bool m_terminated = false;
+    bool m_started = false;
+
 private:
+    void start();
+    void stop();
     void run();
-    int loadNextData(Packet * copyPacket = nullptr);
+    int readFrame(Packet * copyPacket = nullptr);
     bool ensureInitialized();
     int initialize();
     void uninitialize();

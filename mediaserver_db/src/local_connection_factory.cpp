@@ -59,7 +59,7 @@ LocalConnectionFactory::LocalConnectionFactory(
 	m_jsonTranSerializer(new QnJsonTransactionSerializer()),
 	m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
     m_serverConnector(new nx::vms::network::ReverseConnectionManager(tcpListener)),
-    m_timeSynchronizationManager(new nx::time_sync::ServerTimeSyncManager(
+    m_timeSynchronizationManager(new nx::vms::time_sync::ServerTimeSyncManager(
         commonModule, m_serverConnector.get())),
 	m_terminated(false),
 	m_runningRequests(0),
@@ -1962,7 +1962,7 @@ QnDistributedMutexManager* LocalConnectionFactory::distributedMutex() const
 	return m_distributedMutexManager.get();
 }
 
-nx::time_sync::TimeSyncManager* LocalConnectionFactory::timeSyncManager() const
+nx::vms::time_sync::AbstractTimeSyncManager* LocalConnectionFactory::timeSyncManager() const
 {
 	return m_timeSynchronizationManager.get();
 }

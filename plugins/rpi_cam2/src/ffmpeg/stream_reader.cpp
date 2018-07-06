@@ -38,21 +38,13 @@ StreamReader::StreamReader(const char * url, const CodecParameters& codecParamet
     m_url(url),
     m_codecParams(codecParameters)
 {
+    start();
 }
 
 StreamReader::~StreamReader()
 {
     uninitialize();
-}
-
-void StreamReader::start()
-{
-    if(m_started)
-        return;
-
-    m_started = true;
-    std::thread t(&StreamReader::run, this);
-    t.detach();
+    stop();
 }
 
 void StreamReader::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
@@ -74,9 +66,28 @@ void StreamReader::removeConsumer(const std::weak_ptr<StreamConsumer>& consumer)
 
     if(index < m_consumers.size())
         m_consumers.erase(m_consumers.begin() + index);
+}
 
-    if(m_consumers.empty())
-        m_terminated = true;
+void StreamReader::start()
+{
+    if(m_started)
+        return;
+
+    m_started = true;
+    m_terminated = false;
+    m_runThread = std::thread(&StreamReader::run, this);
+}
+
+void StreamReader::stop()
+{
+    if(m_terminated)
+        return;
+
+    m_terminated = true;
+    m_started = false;
+
+    if(m_runThread.joinable())
+        m_runThread.join();
 }
 
 StreamReader::CameraState StreamReader::cameraState() const
@@ -149,7 +160,6 @@ void StreamReader::updateBitrate()
 void StreamReader::updateResolution()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-
     if (m_consumers.empty())
         return;
 
@@ -182,32 +192,32 @@ void StreamReader::run()
 {
     while (!m_terminated)
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
         if (m_consumers.empty())
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
             continue;
+        }
 
         auto packet = std::make_shared<Packet>();
-        int readCode = loadNextData(packet.get());
+        int readCode = readFrame(packet.get());
         if (readCode < 0)
             continue;
 
+        std::lock_guard<std::mutex> lock(m_mutex);
         for (auto & consumer : m_consumers)
         {
             if (auto c = consumer.lock())
                 c->givePacket(packet);
         }
     }
-
-    m_started = false; 
-    m_terminated = false;
 }
 
-int StreamReader::loadNextData(ffmpeg::Packet * outPacket)
+int StreamReader::readFrame(ffmpeg::Packet * outPacket)
 {
     if(!ensureInitialized())
         return error::lastError();
 
-    outPacket->setCodecID(m_decoder->codecID());
+    outPacket->setCodecID(m_inputFormat->videoCodecID());
     return m_inputFormat->readFrame(outPacket->packet());
 }
 

@@ -3,7 +3,7 @@
 #include <nx/utils/test_support/utils.h>
 
 #include <nx_ec/data/api_user_data.h>
-#include <nx/utils/db/request_execution_thread.h>
+#include <nx/sql/request_execution_thread.h>
 
 #include <nx/data_sync_engine/dao/memory/transaction_data_object_in_memory.h>
 #include <nx/cloud/cdb/ec2/data_conversion.h>
@@ -101,8 +101,8 @@ private:
     data_sync_engine::dao::memory::TransactionDataObject m_transactionDataObject;
     ::ec2::ApiUserData m_transactionData;
     data_sync_engine::Command<::ec2::ApiUserData> m_lastAddedTransaction;
-    nx::utils::db::DbConnectionHolder m_dbConnectionHolder;
-    std::shared_ptr<nx::utils::db::QueryContext> m_currentTran;
+    nx::sql::DbConnectionHolder m_dbConnectionHolder;
+    std::shared_ptr<nx::sql::QueryContext> m_currentTran;
 
     void init()
     {
@@ -127,7 +127,7 @@ private:
         const auto dbResult = m_transactionDataObject.insertOrReplaceTransaction(
             m_currentTran ? m_currentTran.get() : nullptr,
             transactionData);
-        ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
+        ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
     }
 
     data_sync_engine::Command<::ec2::ApiUserData> generateTransaction()
@@ -153,7 +153,7 @@ private:
             0,
             std::numeric_limits<int64_t>::max(),
             &transactions);
-        NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, resultCode);
+        NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, resultCode);
         return transactions;
     }
 };

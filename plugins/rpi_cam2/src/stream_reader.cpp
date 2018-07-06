@@ -70,6 +70,7 @@ unsigned int StreamReader::releaseRef()
 
 void StreamReader::interrupt()
 {
+    debug("interrupt called\n");
 }
 
 void StreamReader::setFps(int fps)
