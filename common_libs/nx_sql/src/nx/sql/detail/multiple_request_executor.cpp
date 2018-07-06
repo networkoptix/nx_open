@@ -1,6 +1,6 @@
 #include "multiple_request_executor.h"
 
-namespace nx::sql {
+namespace nx::sql::detail {
 
 MultipleRequestExecutor::MultipleRequestExecutor(
     std::vector<std::unique_ptr<AbstractUpdateExecutor>> queries)
@@ -71,4 +71,4 @@ void MultipleRequestExecutor::reportQueryFailure(
         [dbResult](auto& query) { query->reportErrorWithoutExecution(dbResult); });
 }
 
-} // namespace nx::sql
+} // namespace nx::sql::detail

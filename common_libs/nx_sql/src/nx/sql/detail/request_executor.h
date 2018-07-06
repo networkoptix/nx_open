@@ -10,14 +10,12 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/optional.h>
 
-#include "db_connection_holder.h"
-#include "db_statistics_collector.h"
-#include "types.h"
-#include "query_context.h"
+#include "../db_connection_holder.h"
+#include "../db_statistics_collector.h"
+#include "../types.h"
+#include "../query_context.h"
 
-namespace nx::sql {
-
-class StatisticsCollector;
+namespace nx::sql::detail {
 
 enum class QueryType
 {
@@ -423,4 +421,4 @@ private:
     nx::utils::MoveOnlyFunc<void(DBResult)> m_completionHandler;
 };
 
-} // namespace nx::sql
+} // namespace nx::sql::detail

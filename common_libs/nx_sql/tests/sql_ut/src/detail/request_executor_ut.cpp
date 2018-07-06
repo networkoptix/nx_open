@@ -1,15 +1,15 @@
-#include "base_db_test.h"
-
 #include <memory>
 
 #include <nx/sql/db_connection_holder.h>
-#include <nx/sql/request_executor.h>
+#include <nx/sql/detail/request_executor.h>
 #include <nx/utils/std/optional.h>
 
-namespace nx::sql::test {
+#include "../base_db_test.h"
+
+namespace nx::sql::detail::test {
 
 class DbRequestExecutor:
-    public BaseDbTest
+    public nx::sql::test::BaseDbTest
 {
 public:
     DbRequestExecutor()
@@ -24,7 +24,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        SelectExecutor selectExecutor(
+        detail::SelectExecutor selectExecutor(
             std::bind(&DbRequestExecutor::queryFunctionThatAlwaysThrows, this, _1),
             std::bind(&DbRequestExecutor::queryCompletionHandler, this, _1));
         m_executeResult = selectExecutor.execute(m_dbConnectionHolder->dbConnection());
@@ -60,4 +60,4 @@ TEST_F(DbRequestExecutor, handles_exception)
     thenExceptionIsHandledAndErrorCodeIsReturned();
 }
 
-} // namespace nx::sql::test
+} // namespace nx::sql::detail::test

@@ -5,7 +5,7 @@
 
 #include "base_request_executor.h"
 
-namespace nx::sql {
+namespace nx::sql::detail {
 
 using CreateRequestExecutorFunc =
     std::unique_ptr<BaseRequestExecutor>(
@@ -28,4 +28,4 @@ private:
         QueryExecutorQueue* const queryExecutorQueue);
 };
 
-} // namespace nx::sql
+} // namespace nx::sql::detail

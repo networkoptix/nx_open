@@ -5,7 +5,7 @@
 
 #include "request_execution_thread.h"
 
-namespace nx::sql {
+namespace nx::sql::detail {
 
 RequestExecutorFactory::RequestExecutorFactory():
     base_type(std::bind(&RequestExecutorFactory::defaultFactoryFunction, this,
@@ -28,4 +28,4 @@ std::unique_ptr<BaseRequestExecutor> RequestExecutorFactory::defaultFactoryFunct
         queryExecutorQueue);
 }
 
-} // namespace nx::sql
+} // namespace nx::sql::detail

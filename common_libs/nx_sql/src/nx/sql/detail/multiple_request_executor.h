@@ -4,7 +4,7 @@
 
 #include "request_executor.h"
 
-namespace nx::sql {
+namespace nx::sql::detail {
 
 class MultipleRequestExecutor:
     public BaseExecutor
@@ -33,4 +33,4 @@ private:
         Transaction* transaction);
 };
 
-} // namespace nx::sql
+} // namespace nx::sql::detail

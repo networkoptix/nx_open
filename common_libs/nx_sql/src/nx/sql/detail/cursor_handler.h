@@ -7,7 +7,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 
-#include "../request_executor.h"
+#include "request_executor.h"
 #include "../query.h"
 
 namespace nx::sql::detail {

@@ -1,6 +1,6 @@
 #include "base_request_executor.h"
 
-namespace nx::sql {
+namespace nx::sql::detail {
 
 BaseRequestExecutor::BaseRequestExecutor(
     const ConnectionOptions& connectionOptions,
@@ -26,4 +26,4 @@ const QueryExecutorQueue* BaseRequestExecutor::queryExecutorQueue() const
     return m_queryExecutorQueue;
 }
 
-} // namespace nx::sql
+} // namespace nx::sql::detail

@@ -12,8 +12,8 @@
 
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/sql_cursor.h>
-#include <nx/sql/request_executor_factory.h>
-#include <nx/sql/request_execution_thread.h>
+#include <nx/sql/detail/request_executor_factory.h>
+#include <nx/sql/detail/request_execution_thread.h>
 #include <nx/sql/query.h>
 
 #include "base_db_test.h"
@@ -46,14 +46,14 @@ void readSqlRecord(SqlQuery* query, Company* company)
 // DbRequestExecutionThreadTestWrapper
 
 class DbRequestExecutionThreadTestWrapper:
-    public DbRequestExecutionThread
+    public detail::DbRequestExecutionThread
 {
 public:
     DbRequestExecutionThreadTestWrapper(
         const ConnectionOptions& connectionOptions,
-        QueryExecutorQueue* const queryExecutorQueue)
+        detail::QueryExecutorQueue* const queryExecutorQueue)
         :
-        DbRequestExecutionThread(connectionOptions, queryExecutorQueue)
+        detail::DbRequestExecutionThread(connectionOptions, queryExecutorQueue)
     {
     }
 
@@ -99,7 +99,7 @@ public:
         using namespace std::placeholders;
 
         m_requestExecutorFactoryBak =
-            RequestExecutorFactory::instance().setCustomFunc(
+            detail::RequestExecutorFactory::instance().setCustomFunc(
                 std::bind(&DbAsyncSqlQueryExecutor::createConnection, this, _1, _2));
 
         connectionOptions().maxConnectionCount = kDefaultMaxConnectionCount;
@@ -107,7 +107,7 @@ public:
 
     ~DbAsyncSqlQueryExecutor()
     {
-        RequestExecutorFactory::instance().setCustomFunc(
+        detail::RequestExecutorFactory::instance().setCustomFunc(
             std::move(m_requestExecutorFactoryBak));
     }
 
@@ -289,7 +289,7 @@ private:
     nx::utils::promise<void> m_finishHangingQuery;
     std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests;
     std::atomic<int> m_concurrentDataModificationRequests;
-    RequestExecutorFactory::Function m_requestExecutorFactoryBak;
+    detail::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
 
     void emulateQueryError(DBResult dbResultToEmulate)
     {
@@ -301,9 +301,9 @@ private:
         NX_GTEST_ASSERT_EQ(dbResultToEmulate, dbResult);
     }
 
-    std::unique_ptr<BaseRequestExecutor> createConnection(
+    std::unique_ptr<detail::BaseRequestExecutor> createConnection(
         const ConnectionOptions& connectionOptions,
-        QueryExecutorQueue* const queryExecutorQueue)
+        detail::QueryExecutorQueue* const queryExecutorQueue)
     {
         auto connection = std::make_unique<DbRequestExecutionThreadTestWrapper>(
             connectionOptions,

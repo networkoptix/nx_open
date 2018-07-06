@@ -9,10 +9,10 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/stoppable.h>
 
-#include "detail/query_queue.h"
+#include "query_queue.h"
 #include "request_executor.h"
 
-namespace nx::sql {
+namespace nx::sql::detail {
 
 enum class ConnectionState
 {
@@ -48,4 +48,4 @@ private:
     QueryExecutorQueue* const m_queryExecutorQueue;
 };
 
-} // namespace nx::sql
+} // namespace nx::sql::detail

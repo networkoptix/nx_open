@@ -6,10 +6,10 @@
 #include <nx/utils/thread/long_runnable.h>
 
 #include "base_request_executor.h"
-#include "db_connection_holder.h"
 #include "request_executor.h"
+#include "../db_connection_holder.h"
 
-namespace nx::sql {
+namespace nx::sql::detail {
 
 /**
  * Connection can be closed by timeout or due to error.
@@ -48,4 +48,4 @@ private:
     static bool isDbErrorRecoverable(DBResult dbResult);
 };
 
-} // namespace nx::sql
+} // namespace nx::sql::detail
