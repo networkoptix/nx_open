@@ -167,7 +167,7 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
     nx::sql::QueryContext* queryContext)
 {
     // TODO: #ak move to TransactionDataObject
-    QSqlQuery selectTransactionStateQuery(*queryContext->connection());
+    QSqlQuery selectTransactionStateQuery(*queryContext->connection()->qtSqlConnection());
     selectTransactionStateQuery.setForwardOnly(true);
     selectTransactionStateQuery.prepare(
         R"sql(

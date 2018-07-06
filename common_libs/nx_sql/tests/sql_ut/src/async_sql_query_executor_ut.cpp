@@ -177,7 +177,7 @@ protected:
                     queries.begin(), queries.end(),
                     [queryContext]()
                     {
-                        return std::make_unique<SqlQuery>(*queryContext->connection());
+                        return std::make_unique<SqlQuery>(queryContext->connection());
                     });
 
                 std::for_each(
@@ -240,7 +240,7 @@ protected:
         asyncSqlQueryExecutor().executeSelect(
             [this, &queryExecuted](QueryContext* queryContext)
             {
-                SqlQuery query(*queryContext->connection());
+                SqlQuery query(queryContext->connection());
                 query.setForwardOnly(true);
                 query.prepare("SELECT * FROM company");
                 query.exec();
@@ -262,7 +262,7 @@ protected:
         asyncSqlQueryExecutor().executeUpdate(
             [this, &queryExecuted](QueryContext* queryContext)
             {
-                SqlQuery query(*queryContext->connection());
+                SqlQuery query(queryContext->connection());
                 query.prepare(
                     "INSERT INTO company (name, yearFounded) VALUES ('DurakTekstil', 1975)");
                 query.exec();
@@ -335,7 +335,7 @@ private:
 
     DBResult selectSomeData(QueryContext* queryContext)
     {
-        SqlQuery query(*queryContext->connection());
+        SqlQuery query(queryContext->connection());
         query.setForwardOnly(true);
         query.prepare("SELECT * FROM company");
         query.exec();
@@ -354,7 +354,7 @@ private:
 
         auto scopedGuard = makeScopeGuard([this]() { --m_concurrentDataModificationRequests; });
 
-        SqlQuery query(*queryContext->connection());
+        SqlQuery query(queryContext->connection());
         query.prepare(
             lm("INSERT INTO company (name, yearFounded) VALUES ('%1', %2)")
                 .args(nx::utils::generateRandomName(7), nx::utils::random::number<int>(1, 2017)));

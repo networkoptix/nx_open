@@ -101,7 +101,7 @@ bool InstanceController::configureDb()
 DBResult InstanceController::configureSqliteInstance(
     QueryContext* queryContext)
 {
-    QSqlQuery enableWalQuery(*queryContext->connection());
+    QSqlQuery enableWalQuery(*queryContext->connection()->qtSqlConnection());
     enableWalQuery.prepare("PRAGMA journal_mode = WAL");
     if (!enableWalQuery.exec())
     {
@@ -111,7 +111,7 @@ DBResult InstanceController::configureSqliteInstance(
         return DBResult::ioError;
     }
 
-    QSqlQuery enableFKQuery(*queryContext->connection());
+    QSqlQuery enableFKQuery(*queryContext->connection()->qtSqlConnection());
     enableFKQuery.prepare("PRAGMA foreign_keys = ON");
     if (!enableFKQuery.exec())
     {

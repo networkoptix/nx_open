@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "query_context.h"
+#include "qt_db_connection.h"
 
 namespace nx::sql {
 
@@ -24,15 +25,15 @@ public:
      */
     bool open();
 
-    QSqlDatabase* dbConnection();
+    AbstractDbConnection* dbConnection();
 
     void close();
 
     std::shared_ptr<nx::sql::QueryContext> begin();
 
 private:
-    QSqlDatabase m_dbConnection;
     const ConnectionOptions m_connectionOptions;
+    QtDbConnection m_connection;
     QString m_connectionName;
 
     bool tuneConnection();
@@ -44,8 +45,6 @@ private:
     DbConnectionHolder& operator=(const DbConnectionHolder&) = delete;
 };
 
-//-------------------------------------------------------------------------------------------------
-
-NX_SQL_API DBResult lastDbError(QSqlDatabase* const connection);
+DBResult lastDbError(QSqlDatabase* dbConnection);
 
 } // namespace nx::sql

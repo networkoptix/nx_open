@@ -123,13 +123,13 @@ void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> tas
             if (isDbErrorRecoverable(result))
             {
                 NX_LOGX(lm("DB query failed with result code %1. Db text %2")
-                    .arg(result).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
+                    .arg(result).arg(m_dbConnectionHolder.dbConnection()->lastErrorText()),
                     cl_logDEBUG1);
             }
             else
             {
                 NX_LOGX(lm("Dropping DB connection due to unrecoverable error %1. Db text %2")
-                    .arg(result).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
+                    .arg(result).arg(m_dbConnectionHolder.dbConnection()->lastErrorText()),
                     cl_logWARNING);
                 closeConnection();
                 break;

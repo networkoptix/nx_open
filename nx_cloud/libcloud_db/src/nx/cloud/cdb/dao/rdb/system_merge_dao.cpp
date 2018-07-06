@@ -18,7 +18,7 @@ SystemMergeDao::SystemMergeDao(
 std::vector<MergeInfo> SystemMergeDao::fetchAll(
     sql::QueryContext* queryContext)
 {
-    sql::SqlQuery query(*queryContext->connection());
+    sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         SELECT master_system_id AS masterSystemId, slave_system_id AS slaveSystemId,
             start_time_utc AS startTime
@@ -35,7 +35,7 @@ void SystemMergeDao::save(
     sql::QueryContext* queryContext,
     const MergeInfo& mergeInfo)
 {
-    sql::SqlQuery query(*queryContext->connection());
+    sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         INSERT INTO system_merge_info (master_system_id, slave_system_id, start_time_utc)
         VALUES (:masterSystemId, :slaveSystemId, :startTime)
@@ -48,7 +48,7 @@ void SystemMergeDao::removeMergeBySlaveSystemId(
     sql::QueryContext* queryContext,
     const std::string& slaveSystemId)
 {
-    sql::SqlQuery query(*queryContext->connection());
+    sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         DELETE FROM system_merge_info WHERE slave_system_id = :slaveSystemId
     )sql");

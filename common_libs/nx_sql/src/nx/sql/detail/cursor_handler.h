@@ -18,7 +18,7 @@ public:
     virtual ~AbstractCursorHandler() = default;
 
     virtual QnUuid id() const = 0;
-    virtual void initialize(QSqlDatabase* const connection) = 0;
+    virtual void initialize(AbstractDbConnection* const connection) = 0;
     virtual void reportErrorWithoutExecution(DBResult errorCode) = 0;
 };
 
@@ -48,9 +48,9 @@ public:
         return m_id;
     }
 
-    virtual void initialize(QSqlDatabase* const connection) override
+    virtual void initialize(AbstractDbConnection* const connection) override
     {
-        m_query = std::make_unique<SqlQuery>(*connection);
+        m_query = std::make_unique<SqlQuery>(connection);
         m_query->setForwardOnly(true);
         try
         {
@@ -119,12 +119,12 @@ public:
 protected:
     CursorHandlerPool* cursorContextPool();
 
-    virtual void executeCursor(QSqlDatabase* const connection) = 0;
+    virtual void executeCursor(AbstractDbConnection* const connection) = 0;
 
 private:
     CursorHandlerPool* m_cursorContextPool;
 
-    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
+    virtual DBResult executeQuery(AbstractDbConnection* const connection) override;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ public:
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
 
 protected:
-    virtual void executeCursor(QSqlDatabase* const connection) override;
+    virtual void executeCursor(AbstractDbConnection* const connection) override;
 
 private:
     std::unique_ptr<AbstractCursorHandler> m_cursorHandler;
@@ -175,7 +175,7 @@ public:
     }
 
 protected:
-    virtual void executeCursor(QSqlDatabase* const /*connection*/) override
+    virtual void executeCursor(AbstractDbConnection* const /*connection*/) override
     {
         auto cursorHandler = cursorContextPool()->cursorHander(m_cursorId);
         if (!cursorHandler)
@@ -218,7 +218,7 @@ public:
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
 
 protected:
-    virtual void executeCursor(QSqlDatabase* const connection) override;
+    virtual void executeCursor(AbstractDbConnection* const connection) override;
 };
 
 } // namespace nx::sql::detail

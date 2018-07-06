@@ -98,7 +98,7 @@ void DbStructureUpdater::updateDbToMultipleSchema(QueryContext* queryContext)
 
 bool DbStructureUpdater::dbVersionTableExists(QueryContext* queryContext)
 {
-    SqlQuery selectDbVersionQuery(*queryContext->connection());
+    SqlQuery selectDbVersionQuery(queryContext->connection());
     try
     {
         selectDbVersionQuery.prepare(R"sql(
@@ -119,7 +119,7 @@ void DbStructureUpdater::createInitialSchema(QueryContext* queryContext)
 {
     NX_VERBOSE(this, lm("Creating maintenance structure"));
 
-    SqlQuery createInitialSchemaQuery(*queryContext->connection());
+    SqlQuery createInitialSchemaQuery(queryContext->connection());
     createInitialSchemaQuery.prepare(R"sql(
         CREATE TABLE db_version_data (
             schema_name VARCHAR(128) NOT NULL PRIMARY KEY,
@@ -131,7 +131,7 @@ void DbStructureUpdater::createInitialSchema(QueryContext* queryContext)
 
 bool DbStructureUpdater::dbVersionTableSupportsMultipleSchemas(QueryContext* queryContext)
 {
-    SqlQuery selectDbVersionQuery(*queryContext->connection());
+    SqlQuery selectDbVersionQuery(queryContext->connection());
     try
     {
         selectDbVersionQuery.prepare(R"sql(
@@ -155,13 +155,13 @@ void DbStructureUpdater::updateDbVersionTable(QueryContext* queryContext)
     try
     {
         SqlQuery::exec(
-            *queryContext->connection(),
+            queryContext->connection(),
             R"sql(
                 ALTER TABLE db_version_data RENAME TO db_version_data_old;
             )sql");
 
         SqlQuery::exec(
-            *queryContext->connection(),
+            queryContext->connection(),
             R"sql(
                 CREATE TABLE db_version_data (
                     schema_name VARCHAR(128) NOT NULL PRIMARY KEY,
@@ -170,14 +170,14 @@ void DbStructureUpdater::updateDbVersionTable(QueryContext* queryContext)
             )sql");
 
         SqlQuery::exec(
-            *queryContext->connection(),
+            queryContext->connection(),
             R"sql(
                 INSERT INTO db_version_data(schema_name, db_version)
                 SELECT "", db_version FROM db_version_data_old
             )sql");
 
         SqlQuery::exec(
-            *queryContext->connection(),
+            queryContext->connection(),
             R"sql(
                 DROP TABLE db_version_data_old;
             )sql");
@@ -193,7 +193,7 @@ void DbStructureUpdater::setDbSchemaName(
     QueryContext* queryContext,
     const std::string& schemaName)
 {
-    SqlQuery setDbSchemaNameQuery(*queryContext->connection());
+    SqlQuery setDbSchemaNameQuery(queryContext->connection());
     setDbSchemaNameQuery.prepare(R"sql(
         UPDATE db_version_data SET schema_name=:schemaName
     )sql");

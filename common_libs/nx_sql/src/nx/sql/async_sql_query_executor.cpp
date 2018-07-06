@@ -15,7 +15,7 @@ void AbstractAsyncSqlQueryExecutor::executeSqlSync(QByteArray sqlStatement)
     executeUpdateQuerySync(
         [&sqlStatement](QueryContext* queryContext)
         {
-            SqlQuery query(*queryContext->connection());
+            SqlQuery query(queryContext->connection());
             query.prepare(sqlStatement);
             query.exec();
         });

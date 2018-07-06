@@ -2,7 +2,7 @@
 
 namespace nx::sql::detail {
 
-MultipleRequestExecutor::MultipleRequestExecutor(
+MultipleQueryExecutor::MultipleQueryExecutor(
     std::vector<std::unique_ptr<AbstractUpdateExecutor>> queries)
     :
     base_type(QueryType::modification),
@@ -10,7 +10,12 @@ MultipleRequestExecutor::MultipleRequestExecutor(
 {
 }
 
-DBResult MultipleRequestExecutor::executeQuery(QSqlDatabase* const connection)
+void MultipleQueryExecutor::reportErrorWithoutExecution(DBResult /*errorCode*/)
+{
+    // TODO
+}
+
+DBResult MultipleQueryExecutor::executeQuery(AbstractDbConnection* const connection)
 {
     Transaction transaction(connection);
 
@@ -36,9 +41,9 @@ DBResult MultipleRequestExecutor::executeQuery(QSqlDatabase* const connection)
     return transaction.commit();
 }
 
-std::tuple<DBResult, typename MultipleRequestExecutor::Queries::iterator>
-    MultipleRequestExecutor::executeQueries(
-        QSqlDatabase* const connection,
+std::tuple<DBResult, typename MultipleQueryExecutor::Queries::iterator>
+    MultipleQueryExecutor::executeQueries(
+        AbstractDbConnection* const connection,
         Transaction* transaction)
 {
     DBResult result = DBResult::ok;
@@ -61,7 +66,7 @@ std::tuple<DBResult, typename MultipleRequestExecutor::Queries::iterator>
     return std::make_tuple(result, queryToExecuteIter);
 }
 
-void MultipleRequestExecutor::reportQueryFailure(
+void MultipleQueryExecutor::reportQueryFailure(
     Queries::iterator begin,
     Queries::iterator end,
     DBResult dbResult)

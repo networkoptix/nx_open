@@ -27,7 +27,7 @@ public:
             m_onBeforeDestructionHandler();
     }
 
-    virtual DBResult execute(QSqlDatabase* const /*connection*/) override
+    virtual DBResult execute(AbstractDbConnection* const /*connection*/) override
     {
         return DBResult::ok;
     }

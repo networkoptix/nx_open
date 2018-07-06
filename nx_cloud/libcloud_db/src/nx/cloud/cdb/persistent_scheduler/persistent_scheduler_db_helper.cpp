@@ -38,7 +38,7 @@ nx::sql::DBResult SchedulerDbHelper::getScheduleData(
     nx::sql::QueryContext* queryContext,
     ScheduleData* scheduleData) const
 {
-    QSqlQuery scheduleDataQuery(*queryContext->connection());
+    QSqlQuery scheduleDataQuery(*queryContext->connection()->qtSqlConnection());
     scheduleDataQuery.setForwardOnly(true);
     scheduleDataQuery.prepare(R"sql( SELECT * FROM schedule_data )sql");
 
@@ -75,7 +75,7 @@ nx::sql::DBResult SchedulerDbHelper::subscribe(
     QnUuid* outTaskId,
     const ScheduleTaskInfo& taskInfo)
 {
-    QSqlQuery subscribeQuery(*queryContext->connection());
+    QSqlQuery subscribeQuery(*queryContext->connection()->qtSqlConnection());
     subscribeQuery.prepare(R"sql(
         INSERT INTO schedule_data(functor_type_id, task_id, schedule_point, period, param_key, param_value)
         VALUES(:functorId, :taskId, :schedulePoint, :period, :paramKey, :paramValue)
@@ -111,7 +111,7 @@ nx::sql::DBResult SchedulerDbHelper::unsubscribe(
     nx::sql::QueryContext* queryContext,
     const QnUuid& taskId)
 {
-    QSqlQuery unsubscribeQuery(*queryContext->connection());
+    QSqlQuery unsubscribeQuery(*queryContext->connection()->qtSqlConnection());
     unsubscribeQuery.prepare(R"sql( DELETE FROM schedule_data WHERE task_id = :taskId )sql");
     unsubscribeQuery.bindValue(":taskId", taskId.toRfc4122());
 

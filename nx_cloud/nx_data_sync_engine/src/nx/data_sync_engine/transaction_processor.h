@@ -309,7 +309,7 @@ private:
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader.systemId)
                 .arg(transactionContext.transportHeader.endpoint)
-                .arg(queryContext->connection()->lastError().text()),
+                .arg(queryContext->connection()->lastErrorText()),
                 cl_logWARNING);
             return dbResultCode;
         }
@@ -325,7 +325,7 @@ private:
                 lm("Error processing transaction %1 received from %2. %3")
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader)
-                .arg(queryContext->connection()->lastError().text()),
+                .arg(queryContext->connection()->lastErrorText()),
                 cl_logWARNING);
         }
         return dbResultCode;

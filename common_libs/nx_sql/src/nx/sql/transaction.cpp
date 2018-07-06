@@ -6,7 +6,7 @@
 
 namespace nx::sql {
 
-Transaction::Transaction(QSqlDatabase* const connection):
+Transaction::Transaction(AbstractDbConnection* const connection):
     m_connection(connection),
     m_started(false)
 {
@@ -24,14 +24,14 @@ Transaction::~Transaction()
 DBResult Transaction::begin()
 {
     NX_ASSERT(!m_started);
-    if (m_connection->transaction())
+    if (m_connection->begin())
     {
         m_started = true;
         return DBResult::ok;
     }
     else
     {
-        return lastDbError(m_connection);
+        return m_connection->lastError();
     }
 }
 
@@ -40,7 +40,7 @@ DBResult Transaction::commit()
     NX_ASSERT(m_started);
     if (!m_connection->commit())
     {
-        const auto dbError = lastDbError(m_connection);
+        const auto dbError = m_connection->lastError();
         notifyOnTransactionCompletion(dbError);
         return dbError;
     }

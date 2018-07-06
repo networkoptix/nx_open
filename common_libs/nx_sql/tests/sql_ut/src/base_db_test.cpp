@@ -41,7 +41,7 @@ void BasicFixture::executeUpdate(const QString& queryText)
     const auto dbResult = executeQuery(
         [queryText](nx::sql::QueryContext* queryContext)
         {
-            SqlQuery query(*queryContext->connection());
+            SqlQuery query(queryContext->connection());
             query.prepare(queryText);
             query.exec();
             return DBResult::ok;

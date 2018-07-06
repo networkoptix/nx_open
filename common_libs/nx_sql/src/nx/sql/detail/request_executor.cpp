@@ -34,7 +34,7 @@ BaseExecutor::~BaseExecutor()
         m_onBeforeDestructionHandler();
 }
 
-DBResult BaseExecutor::execute(QSqlDatabase* const connection)
+DBResult BaseExecutor::execute(AbstractDbConnection* const connection)
 {
     using namespace std::chrono;
 
@@ -64,23 +64,6 @@ void BaseExecutor::setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handle
 void BaseExecutor::setStatisticsCollector(StatisticsCollector* statisticsCollector)
 {
     m_statisticsCollector = statisticsCollector;
-}
-
-DBResult BaseExecutor::detailResultCode(
-    QSqlDatabase* const connection,
-    DBResult result) const
-{
-    if (result != DBResult::ioError)
-        return result;
-    switch (connection->lastError().type())
-    {
-        case QSqlError::StatementError:
-            return DBResult::statementError;
-        case QSqlError::ConnectionError:
-            return DBResult::connectionError;
-        default:
-            return result;
-    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -141,12 +124,11 @@ SelectExecutor::SelectExecutor(
 {
 }
 
-DBResult SelectExecutor::executeQuery(QSqlDatabase* const connection)
+DBResult SelectExecutor::executeQuery(AbstractDbConnection* const connection)
 {
     auto completionHandler = std::move(m_completionHandler);
     QueryContext queryContext(connection, nullptr);
     auto result = invokeDbQueryFunc(m_dbSelectFunc, &queryContext);
-    result = detailResultCode(connection, result);
     if (completionHandler)
         completionHandler(result);
     return result;

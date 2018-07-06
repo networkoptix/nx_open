@@ -6,17 +6,22 @@
 
 namespace nx::sql::detail {
 
-class MultipleRequestExecutor:
+/**
+ * If any query fails, then every query is considered failed and transaction is rolled back.
+ */
+class NX_SQL_API MultipleQueryExecutor:
     public BaseExecutor
 {
     using base_type = BaseExecutor;
 
 public:
-    MultipleRequestExecutor(
+    MultipleQueryExecutor(
         std::vector<std::unique_ptr<AbstractUpdateExecutor>> queries);
 
+    virtual void reportErrorWithoutExecution(DBResult errorCode) override;
+
 protected:
-    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
+    virtual DBResult executeQuery(AbstractDbConnection* const connection) override;
 
 private:
     using Queries = std::vector<std::unique_ptr<AbstractUpdateExecutor>>;
@@ -29,7 +34,7 @@ private:
         DBResult dbResult);
 
     std::tuple<DBResult, typename Queries::iterator> executeQueries(
-        QSqlDatabase* const connection,
+        AbstractDbConnection* const connection,
         Transaction* transaction);
 };
 

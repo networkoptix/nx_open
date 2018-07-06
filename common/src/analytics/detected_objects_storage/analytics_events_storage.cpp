@@ -148,7 +148,7 @@ std::int64_t EventsStorage::insertEvent(
     const common::metadata::DetectionMetadataPacket& packet,
     const common::metadata::DetectedObject& detectedObject)
 {
-    sql::SqlQuery insertEventQuery(*queryContext->connection());
+    sql::SqlQuery insertEventQuery(queryContext->connection());
     insertEventQuery.prepare(QString::fromLatin1(R"sql(
         INSERT INTO event(timestamp_usec_utc, duration_usec,
             device_guid, object_type_id, object_id, attributes,
@@ -181,7 +181,7 @@ void EventsStorage::insertEventAttributes(
     std::int64_t eventId,
     const std::vector<common::metadata::Attribute>& eventAttributes)
 {
-    sql::SqlQuery insertEventAttributesQuery(*queryContext->connection());
+    sql::SqlQuery insertEventAttributesQuery(queryContext->connection());
     insertEventAttributesQuery.prepare(QString::fromLatin1(R"sql(
         INSERT INTO event_properties(docid, content)
         VALUES(:eventId, :content)
@@ -229,7 +229,7 @@ nx::sql::DBResult EventsStorage::selectObjects(
     const Filter& filter,
     std::vector<DetectedObject>* result)
 {
-    sql::SqlQuery selectEventsQuery(*queryContext->connection());
+    sql::SqlQuery selectEventsQuery(queryContext->connection());
     selectEventsQuery.setForwardOnly(true);
     prepareLookupQuery(filter, &selectEventsQuery);
     selectEventsQuery.exec();
@@ -499,7 +499,7 @@ void EventsStorage::queryTrackInfo(
     nx::sql::QueryContext* queryContext,
     std::vector<DetectedObject>* result)
 {
-    sql::SqlQuery trackInfoQuery(*queryContext->connection());
+    sql::SqlQuery trackInfoQuery(queryContext->connection());
     trackInfoQuery.setForwardOnly(true);
     trackInfoQuery.prepare(QString::fromLatin1(R"sql(
         SELECT min(timestamp_usec_utc), max(timestamp_usec_utc)
@@ -536,7 +536,7 @@ nx::sql::DBResult EventsStorage::selectTimePeriods(
 
     // TODO: #ak Aggregate in query.
 
-    sql::SqlQuery query(*queryContext->connection());
+    sql::SqlQuery query(queryContext->connection());
     query.setForwardOnly(true);
     query.prepare(lm(R"sql(
         SELECT timestamp_usec_utc, duration_usec
@@ -579,7 +579,7 @@ nx::sql::DBResult EventsStorage::cleanupData(
 {
     using namespace std::chrono;
 
-    sql::SqlQuery deleteEventsQuery(*queryContext->connection());
+    sql::SqlQuery deleteEventsQuery(queryContext->connection());
     deleteEventsQuery.prepare(QString::fromLatin1(R"sql(
         DELETE FROM event
         WHERE device_guid=:deviceId AND timestamp_usec_utc < :timestampUsec

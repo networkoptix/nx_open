@@ -124,7 +124,8 @@ nx::sql::DBResult TemporaryAccountPasswordManager::removeTemporaryPasswordsFromD
     nx::sql::QueryContext* const queryContext,
     std::string accountEmail)
 {
-    QSqlQuery removeTempPasswordsQuery(*queryContext->connection());
+    QSqlQuery removeTempPasswordsQuery(
+        *queryContext->connection()->qtSqlConnection());
     removeTempPasswordsQuery.prepare(
         R"sql(
         DELETE FROM account_password
@@ -169,7 +170,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fetchTemporaryCredentials(
     const data::TemporaryAccountCredentials& tempPasswordData,
     data::Credentials* credentials)
 {
-    QSqlQuery fetchTempPasswordQuery(*queryContext->connection());
+    QSqlQuery fetchTempPasswordQuery(*queryContext->connection()->qtSqlConnection());
     fetchTempPasswordQuery.prepare(R"sql(
         SELECT ap.login, ap.password_ha1 AS passwordString
         FROM account_password ap, account a
@@ -212,7 +213,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::updateCredentialsAttributes(
     const data::Credentials& credentials,
     const data::TemporaryAccountCredentials& tempPasswordData)
 {
-    QSqlQuery updateTempPasswordQuery(*queryContext->connection());
+    QSqlQuery updateTempPasswordQuery(*queryContext->connection()->qtSqlConnection());
     updateTempPasswordQuery.prepare(
         R"sql(
         UPDATE account_password SET
@@ -345,7 +346,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fillCache()
 nx::sql::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
     nx::sql::QueryContext* queryContext)
 {
-    QSqlQuery readPasswordsQuery(*queryContext->connection());
+    QSqlQuery readPasswordsQuery(*queryContext->connection()->qtSqlConnection());
     readPasswordsQuery.setForwardOnly(true);
     readPasswordsQuery.prepare(
         "SELECT ap.id,                                                          \
@@ -390,7 +391,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::insertTempPassword(
     nx::sql::QueryContext* const queryContext,
     TemporaryAccountCredentialsEx tempPasswordData)
 {
-    QSqlQuery insertTempPasswordQuery(*queryContext->connection());
+    QSqlQuery insertTempPasswordQuery(*queryContext->connection()->qtSqlConnection());
     insertTempPasswordQuery.prepare(
         R"sql(
         INSERT INTO account_password (id, account_id, login, password_ha1, realm,
@@ -440,7 +441,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
     nx::sql::QueryContext* const queryContext,
     std::string tempPasswordID)
 {
-    QSqlQuery deleteTempPassword(*queryContext->connection());
+    QSqlQuery deleteTempPassword(*queryContext->connection()->qtSqlConnection());
     deleteTempPassword.prepare("DELETE FROM account_password WHERE id=:id");
     deleteTempPassword.bindValue(":id", QnSql::serialized_field(tempPasswordID));
     if (!deleteTempPassword.exec())

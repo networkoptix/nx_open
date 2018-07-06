@@ -810,7 +810,7 @@ nx::sql::DBResult SystemManager::insertOwnerSharingToDb(
     {
         NX_LOG(lm("Could not insert system %1 to account %2 binding into DB. %3").
             arg(newSystem.name).arg(newSystem.accountEmail).
-            arg(queryContext->connection()->lastError().text()),
+            arg(queryContext->connection()->lastErrorText()),
             cl_logDEBUG1);
         return resultCode;
     }
@@ -1987,7 +1987,7 @@ nx::sql::DBResult SystemManager::processEc2RemoveUser(
             QnLog::EC2_TRAN_LOG,
             lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
                 .arg(systemId).arg(data.id)
-                .arg(queryContext->connection()->lastError().text()),
+                .arg(queryContext->connection()->lastErrorText()),
             cl_logDEBUG1);
         return dbResult;
     }

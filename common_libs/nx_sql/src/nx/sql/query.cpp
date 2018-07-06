@@ -2,10 +2,17 @@
 
 #include <QtSql/QSqlError>
 
+#include "abstract_db_connection.h"
+
 namespace nx::sql {
 
 SqlQuery::SqlQuery(QSqlDatabase connection):
     m_sqlQuery(connection)
+{
+}
+
+SqlQuery::SqlQuery(AbstractDbConnection* connection):
+    m_sqlQuery(*connection->qtSqlConnection())
 {
 }
 
@@ -95,6 +102,11 @@ void SqlQuery::exec(QSqlDatabase connection, const QByteArray& queryText)
     query.exec();
 }
 
+void SqlQuery::exec(AbstractDbConnection* connection, const QByteArray& queryText)
+{
+    exec(*connection->qtSqlConnection(), queryText);
+}
+
 DBResult SqlQuery::getLastErrorCode()
 {
     switch (m_sqlQuery.lastError().type())
@@ -107,5 +119,28 @@ DBResult SqlQuery::getLastErrorCode()
             return DBResult::ioError;
     }
 }
+
+
+/**
+* Returns more detailed result code if appropriate. Otherwise returns initial one.
+*/
+//DBResult detailResultCode(AbstractDbConnection* const connection, DBResult result) const;
+
+//DBResult BaseExecutor::detailResultCode(
+//    AbstractDbConnection* const connection,
+//    DBResult result) const
+//{
+//    if (result != DBResult::ioError)
+//        return result;
+//    switch (connection->lastError().type())
+//    {
+//        case QSqlError::StatementError:
+//            return DBResult::statementError;
+//        case QSqlError::ConnectionError:
+//            return DBResult::connectionError;
+//        default:
+//            return result;
+//    }
+//}
 
 } // namespace nx::sql

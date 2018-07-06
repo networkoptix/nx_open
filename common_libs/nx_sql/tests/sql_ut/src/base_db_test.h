@@ -45,7 +45,7 @@ protected:
             [queryText, &records](
                 nx::sql::QueryContext* queryContext)
             {
-                sql::SqlQuery query(*queryContext->connection());
+                sql::SqlQuery query(queryContext->connection());
                 query.prepare(queryText);
                 query.exec();
 

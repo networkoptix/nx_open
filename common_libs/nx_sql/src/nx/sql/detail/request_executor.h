@@ -4,12 +4,11 @@
 #include <functional>
 #include <tuple>
 
-#include <QtSql/QSqlDatabase>
-
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/optional.h>
 
+#include "../abstract_db_connection.h"
 #include "../db_connection_holder.h"
 #include "../db_statistics_collector.h"
 #include "../types.h"
@@ -23,7 +22,7 @@ public:
     virtual ~AbstractExecutor() = default;
 
     /** Executed within DB connection thread. */
-    virtual DBResult execute(QSqlDatabase* const connection) = 0;
+    virtual DBResult execute(AbstractDbConnection* const connection) = 0;
     virtual void reportErrorWithoutExecution(DBResult errorCode) = 0;
     virtual QueryType queryType() const = 0;
     virtual void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler) = 0;
@@ -39,19 +38,14 @@ public:
     BaseExecutor(QueryType queryType);
     virtual ~BaseExecutor() override;
 
-    virtual DBResult execute(QSqlDatabase* const connection) override;
+    virtual DBResult execute(AbstractDbConnection* const connection) override;
     virtual QueryType queryType() const override;
     virtual void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     void setStatisticsCollector(StatisticsCollector* statisticsCollector);
 
 protected:
-    virtual DBResult executeQuery(QSqlDatabase* const connection) = 0;
-
-    /**
-     * Returns more detailed result code if appropriate. Otherwise returns initial one.
-     */
-    DBResult detailResultCode(QSqlDatabase* const connection, DBResult result) const;
+    virtual DBResult executeQuery(AbstractDbConnection* const connection) = 0;
 
     template<typename Func, typename... Args>
     DBResult invokeDbQueryFunc(Func& func, const Args&... args)
@@ -113,7 +107,7 @@ public:
     {
     }
 
-    virtual DBResult executeQuery(QSqlDatabase* const connection) override
+    virtual DBResult executeQuery(AbstractDbConnection* const connection) override
     {
         if (m_externalTransaction)
         {
@@ -165,7 +159,7 @@ private:
     CompletionHandler m_completionHandler;
     std::optional<Transaction*> m_externalTransaction;
 
-    DBResult executeQueryUnderNewTransaction(QSqlDatabase* const connection)
+    DBResult executeQueryUnderNewTransaction(AbstractDbConnection* const connection)
     {
         Transaction transaction(connection);
         QueryContext queryContext(connection, &transaction);
@@ -180,7 +174,6 @@ private:
         result = executeQueryUnderTransaction(&queryContext);
         if (result != DBResult::ok)
         {
-            result = detailResultCode(connection, result);
             transaction.rollback();
             return result;
         }
@@ -211,7 +204,6 @@ private:
         auto result = doQuery(queryContext);
         if (result != DBResult::ok)
         {
-            result = detailResultCode(queryContext->connection(), result);
             queryContext->transaction()->addOnTransactionCompletionHandler(
                 std::bind(&BaseUpdateExecutor::invokeCompletionHandlerWithDefaultValues, this,
                     result));
@@ -230,7 +222,6 @@ private:
         auto result = doQuery(queryContext);
         if (result != DBResult::ok)
         {
-            result = detailResultCode(queryContext->connection(), result);
             invokeCompletionHandlerWithDefaultValues(result);
             return result;
         }
@@ -240,7 +231,7 @@ private:
         return DBResult::ok;
     }
 
-    void reportQueryResult(QSqlDatabase* connection, DBResult dbResult)
+    void reportQueryResult(AbstractDbConnection* connection, DBResult dbResult)
     {
         if (dbResult == DBResult::ok)
         {
@@ -250,7 +241,7 @@ private:
         else
         {
             // In case of failed transaction (e.g., commit fails).
-            invokeCompletionHandlerWithDefaultValues(lastDbError(connection));
+            invokeCompletionHandlerWithDefaultValues(connection->lastError());
         }
     }
 };
@@ -407,7 +398,7 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler);
 
-    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
+    virtual DBResult executeQuery(AbstractDbConnection* const connection) override;
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
 
 private:

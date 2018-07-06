@@ -289,7 +289,7 @@ private:
                 delete queryContext;
             };
 
-        QSqlDatabase* dbConnection = m_dbConnectionHolder.dbConnection();
+        auto dbConnection = m_dbConnectionHolder.dbConnection();
         nx::sql::Transaction* transaction = new nx::sql::Transaction(dbConnection);
         NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, transaction->begin());
         return std::shared_ptr<nx::sql::QueryContext>(
