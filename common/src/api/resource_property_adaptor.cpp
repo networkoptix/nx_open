@@ -179,6 +179,11 @@ bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serialize
     return true;
 }
 
+void QnAbstractResourcePropertyAdaptor::setSerializedValue(const QVariant& value)
+{
+    loadValue(value.toString());
+}
+
 void QnAbstractResourcePropertyAdaptor::saveToResource()
 {
     processSaveRequests();
