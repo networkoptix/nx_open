@@ -39,7 +39,7 @@ protected:
     update::info::AbstractUpdateRegistryPtr m_updateRegistry;
     utils::StandaloneTimerManager m_timerManager;
 
-    void checkForRemoteUpdate(utils::TimerId timerId, bool forced);
+    void checkForRemoteUpdate(utils::TimerId timerId);
     void checkForGlobalDictionaryUpdate();
     void refreshStatusAfterCheck();
     void setStatus(
@@ -48,12 +48,13 @@ protected:
         const QList<api::TargetVersionWithEula> targets = QList<api::TargetVersionWithEula>(),
         const QString& releaseNotesUrl = QString(),
         double progress = 0.0f);
+    void addFileToManualDataIfNeeded(const QString& fileName);
+    void updateGlobalRegistryIfNeededUnsafe();
 
     void startPreparing(const QString& updateFilePath);
 
     void onDownloadFinished(const QString& fileName);
     void onDownloadFailed(const QString& fileName);
-    void onFileAdded(const vms::common::p2p::downloader::FileInformation& fileInformation);
     void onFileDeleted(const QString& fileName);
     void onFileInformationChanged(
         const vms::common::p2p::downloader::FileInformation& fileInformation);
@@ -80,7 +81,6 @@ protected:
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
     virtual installer::detail::AbstractUpdates2Installer* installer() = 0;
     virtual QString filePath() const = 0;
-
 };
 
 } // namespace detail

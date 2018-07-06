@@ -395,11 +395,6 @@ public:
         onChunkDownloadFailed(fileName);
     }
 
-    void emitFileAddedSignal(const downloader::FileInformation& fileInformation)
-    {
-        onFileAdded(fileInformation);
-    }
-
     void emitFileInformationChanged(const downloader::FileInformation& fileInformation)
     {
         onFileInformationChanged(fileInformation);
@@ -627,6 +622,12 @@ protected:
         m_updatesManager->emitDownloadFinishedSignal(kFileName);
     }
 
+    void whenExternalDownloadFinishedSuccessfully()
+    {
+        m_downloader.setExternallyAddedFileInformation(downloader::FileInformation::Status::downloaded);
+        m_updatesManager->emitDownloadFinishedSignal(kManualFileName);
+    }
+
     void whenDownloadFinishedUNSuccessfully()
     {
         m_downloader.setCorruptedFileInformation();
@@ -660,23 +661,9 @@ protected:
         m_installer.setExpectedOutcome(PrepareExpectedOutcome::fail_noFreeSpace);
     }
 
-    void whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status status)
-    {
-        downloader::FileInformation fileInformation(kManualFileName);
-        fileInformation.status = status;
-        m_updatesManager->emitFileAddedSignal(fileInformation);
-    }
-
     void whenDownloaderDeleteFileSignalReceived()
     {
         m_updatesManager->emitFileDeletedSignal();
-    }
-
-    void whenDownloaderAddFileSignalWithBadInfoReceived()
-    {
-        downloader::FileInformation fileInformation(kManualFileName);
-        fileInformation.status = downloader::FileInformation::Status::corrupted;
-        m_updatesManager->emitFileAddedSignal(fileInformation);
     }
 
     void thenAdditionalPeersShouldHaveBeenPassedToDownloader()
@@ -781,7 +768,7 @@ TEST_F(Updates2Manager, Download_additionalPeersFromManualData)
     givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
     givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloaded);
     whenServerHasBeenStarted();
-    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloaded);
+    whenExternalDownloadFinishedSuccessfully();
 
     whenDownloadRequestIssuedWithFinalResult(api::Updates2StatusData::StatusCode::preparing);
     thenAdditionalPeersShouldHaveBeenPassedToDownloader();
@@ -793,27 +780,9 @@ TEST_F(Updates2Manager, Download_externalFileAdded_wrongState)
     givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
     givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloading);
     whenServerHasBeenStarted();
-    whenDownloaderAddFileSignalWithBadInfoReceived();
     whenRemoteUpdateDone();
 
     whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::notAvailable);
-    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
-}
-
-TEST_F(Updates2Manager, Download_externalFileAdded_stateDownloading_butThenBecomesCorrupted)
-{
-    givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
-    givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloading);
-    whenServerHasBeenStarted();
-    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloading);
-    whenRemoteUpdateDone();
-
-    thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
-
-    whenDownloaderSetsBadStatusForFile();
-    whenDownloadRequestIssued(api::Updates2StatusData::StatusCode::error);
-    whenRemoteUpdateDone();
-
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
 }
 
@@ -822,7 +791,7 @@ TEST_F(Updates2Manager, Download_externalFileDeleted)
     givenUpdateRegistries(/*remoteHasUpdate*/ false, /*globalHasUpdate*/ false);
     givenFileHasBeenAddedExternally(downloader::FileInformation::Status::downloaded);
     whenServerHasBeenStarted();
-    whenDownloaderAddFileSignalWithFineInfoReceived(downloader::FileInformation::Status::downloaded);
+    whenExternalDownloadFinishedSuccessfully();
     whenRemoteUpdateDone();
 
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::available);
