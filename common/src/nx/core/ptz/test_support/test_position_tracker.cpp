@@ -1,8 +1,11 @@
 #include "test_position_tracker.h"
 
+#include <cmath>
+
 #include <nx/utils/std/optional.h>
 
 using namespace std::chrono;
+using namespace std::chrono_literals;
 
 namespace nx {
 namespace core {
