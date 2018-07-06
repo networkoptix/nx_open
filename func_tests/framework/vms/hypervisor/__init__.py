@@ -3,7 +3,8 @@ from abc import ABCMeta
 from pprint import pformat
 
 
-class Vm(object):
+class VmHardware(object):
+    """Settings hypervisor is responsible for"""
     __metaclass__ = ABCMeta
 
     def __init__(self, name, port_map, macs, networks, bridged, is_running):

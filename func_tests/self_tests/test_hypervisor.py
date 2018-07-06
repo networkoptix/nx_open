@@ -4,7 +4,7 @@ from subprocess import check_call
 
 import pytest
 
-from framework.vms.hypervisor import TemplateVMNotFound, VMNotFound, Vm
+from framework.vms.hypervisor import TemplateVMNotFound, VMNotFound, VmHardware
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def clone_name(hypervisor):
 
 
 def test_find(hypervisor, dummy):
-    assert isinstance(hypervisor.find(dummy), Vm)
+    assert isinstance(hypervisor.find(dummy), VmHardware)
 
 
 def test_clone(hypervisor, template, clone_name):

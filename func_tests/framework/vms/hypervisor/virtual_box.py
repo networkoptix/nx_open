@@ -10,7 +10,7 @@ from pylru import lrudecorator
 
 from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
-from framework.vms.hypervisor import TemplateVMNotFound, VMNotFound, Vm
+from framework.vms.hypervisor import TemplateVMNotFound, VMNotFound, VmHardware
 from framework.vms.hypervisor.hypervisor import Hypervisor
 from framework.vms.port_forwarding import calculate_forwarded_ports
 from framework.waiting import wait_for_true
@@ -37,7 +37,7 @@ def virtual_box_error(code):
     return type('VirtualBoxError_{}'.format(code), (SpecificVirtualBoxError,), {})
 
 
-class VirtualBoxVm(Vm):
+class VirtualBoxVm(VmHardware):
     @staticmethod
     def _parse_port_forwarding(raw_dict):
         ports_dict = {}
