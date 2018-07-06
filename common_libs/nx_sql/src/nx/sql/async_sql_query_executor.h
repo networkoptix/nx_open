@@ -174,7 +174,7 @@ public:
     /**
      * By default, each query type has same priority of kDefaultQueryPriority.
      */
-    void setQueryPriority(detail::QueryType queryType, int newPriority);
+    void setQueryPriority(QueryType queryType, int newPriority);
 
     std::size_t pendingQueryCount() const;
 
@@ -195,7 +195,7 @@ public:
         InputData input,
         UpdateQueryWithOutputCompletionHandler<InputData, OutputData> completionHandler)
     {
-        scheduleQuery<UpdateWithOutputExecutor<InputData, OutputData>>(
+        scheduleQuery<detail::UpdateWithOutputExecutor<InputData, OutputData>>(
             std::move(dbUpdateFunc),
             std::move(completionHandler),
             std::move(input));
@@ -210,7 +210,7 @@ public:
         InputData input,
         UpdateQueryCompletionHandler<InputData> completionHandler)
     {
-        scheduleQuery<UpdateExecutor<InputData>>(
+        scheduleQuery<detail::UpdateExecutor<InputData>>(
             std::move(dbUpdateFunc),
             std::move(completionHandler),
             std::move(input));

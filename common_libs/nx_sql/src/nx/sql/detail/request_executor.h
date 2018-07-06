@@ -17,12 +17,6 @@
 
 namespace nx::sql::detail {
 
-enum class QueryType
-{
-    lookup,
-    modification,
-};
-
 class NX_SQL_API AbstractExecutor
 {
 public:

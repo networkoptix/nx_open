@@ -198,7 +198,7 @@ void AsyncSqlQueryExecutor::setConcurrentModificationQueryLimit(int value)
 }
 
 void AsyncSqlQueryExecutor::setQueryPriority(
-    detail::QueryType queryType,
+    QueryType queryType,
     int newPriority)
 {
     m_queryQueue.setQueryPriority(queryType, newPriority);

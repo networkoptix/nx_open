@@ -4,8 +4,8 @@
 
 #include <QtCore/QDir>
 
-#include <nx/sql/request_executor_factory.h>
-#include <nx/sql/request_execution_thread.h>
+#include <nx/sql/detail/request_executor_factory.h>
+#include <nx/sql/detail/request_execution_thread.h>
 
 #include "functional_tests/test_setup.h"
 #include "functional_tests/test_email_manager.h"
@@ -77,14 +77,14 @@ TEST_F(DbRegress, general)
 namespace {
 
 class QueryExecutorStub:
-    public nx::sql::DbRequestExecutionThread
+    public nx::sql::detail::DbRequestExecutionThread
 {
-    using base_type = nx::sql::DbRequestExecutionThread;
+    using base_type = nx::sql::detail::DbRequestExecutionThread;
 
 public:
     QueryExecutorStub(
         const nx::sql::ConnectionOptions& connectionOptions,
-        nx::sql::QueryExecutorQueue* const queryExecutorQueue)
+        nx::sql::detail::QueryExecutorQueue* const queryExecutorQueue)
         :
         base_type(connectionOptions, queryExecutorQueue)
     {
@@ -96,7 +96,7 @@ public:
     }
 
 protected:
-    virtual void processTask(std::unique_ptr<nx::sql::AbstractExecutor> task) override
+    virtual void processTask(std::unique_ptr<nx::sql::detail::AbstractExecutor> task) override
     {
         if (m_forcedDbResult)
             task->reportErrorWithoutExecution(*m_forcedDbResult);
@@ -125,13 +125,13 @@ public:
 
         // Installing sql query executor that always reports timedout.
         m_requestExecutorFactoryBak =
-            nx::sql::RequestExecutorFactory::instance().setCustomFunc(
+            nx::sql::detail::RequestExecutorFactory::instance().setCustomFunc(
                 std::bind(&DbFailure::createInfiniteLatencyDbQueryExecutorFactory, this, _1, _2));
     }
 
     ~DbFailure()
     {
-        nx::sql::RequestExecutorFactory::instance().setCustomFunc(
+        nx::sql::detail::RequestExecutorFactory::instance().setCustomFunc(
             std::move(m_requestExecutorFactoryBak));
     }
 
@@ -166,7 +166,7 @@ protected:
     }
 
 private:
-    nx::sql::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
+    nx::sql::detail::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
     nx::utils::SyncQueue<api::ResultCode> m_requestResultCodeQueue;
     std::unique_ptr<api::Connection> m_cdbConnection;
     QueryExecutorStub* m_prevDbQueryExecutor = nullptr;
@@ -176,10 +176,10 @@ private:
         m_requestResultCodeQueue.push(resultCode);
     }
 
-    std::unique_ptr<nx::sql::BaseRequestExecutor>
+    std::unique_ptr<nx::sql::detail::BaseRequestExecutor>
         createInfiniteLatencyDbQueryExecutorFactory(
             const nx::sql::ConnectionOptions& connectionOptions,
-            nx::sql::QueryExecutorQueue* const queryExecutorQueue)
+            nx::sql::detail::QueryExecutorQueue* const queryExecutorQueue)
     {
         auto result = std::make_unique<QueryExecutorStub>(
             connectionOptions,
