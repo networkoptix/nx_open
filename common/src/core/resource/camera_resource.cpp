@@ -20,6 +20,7 @@
 #include <utils/common/util.h>
 #include <utils/crypt/symmetrical.h>
 #include <utils/math/math.h>
+#include <nx/utils/log/log_main.h>
 
 namespace {
 
