@@ -33,7 +33,7 @@ void EventsStorage::save(
     m_dbController.queryExecutor().executeUpdate(
         std::bind(&EventsStorage::savePacket, this, _1, std::move(packet)),
         [this, completionHandler = std::move(completionHandler)](
-            sql::QueryContext*, sql::DBResult resultCode)
+            sql::DBResult resultCode)
         {
             completionHandler(dbResultToResultCode(resultCode));
         });
@@ -76,7 +76,7 @@ void EventsStorage::lookup(
     m_dbController.queryExecutor().executeSelect(
         std::bind(&EventsStorage::selectObjects, this, _1, std::move(filter), result.get()),
         [this, result, completionHandler = std::move(completionHandler)](
-            sql::QueryContext*, sql::DBResult resultCode)
+            sql::DBResult resultCode)
         {
             completionHandler(
                 dbResultToResultCode(resultCode),
@@ -96,7 +96,7 @@ void EventsStorage::lookupTimePeriods(
         std::bind(&EventsStorage::selectTimePeriods, this,
             _1, std::move(filter), std::move(options), result.get()),
         [this, result, completionHandler = std::move(completionHandler)](
-            sql::QueryContext*, sql::DBResult resultCode)
+            sql::DBResult resultCode)
         {
             completionHandler(
                 dbResultToResultCode(resultCode),
@@ -115,8 +115,7 @@ void EventsStorage::markDataAsDeprecated(
 
     m_dbController.queryExecutor().executeUpdate(
         std::bind(&EventsStorage::cleanupData, this, _1, deviceId, oldestDataToKeepTimestamp),
-        [this, deviceId, oldestDataToKeepTimestamp](
-            sql::QueryContext*, sql::DBResult resultCode)
+        [this, deviceId, oldestDataToKeepTimestamp](sql::DBResult resultCode)
         {
             if (resultCode == sql::DBResult::ok)
             {

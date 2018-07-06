@@ -114,7 +114,7 @@ class BaseUpdateExecutor:
 
 public:
     using CompletionHandler =
-        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, CompletionHandlerArgs...)>;
+        nx::utils::MoveOnlyFunc<void(DBResult, CompletionHandlerArgs...)>;
 
     BaseUpdateExecutor(CompletionHandler completionHandler):
         m_completionHandler(std::move(completionHandler))
@@ -142,7 +142,7 @@ public:
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
-        invokeCompletionHandlerWithDefaultValues(nullptr, errorCode);
+        invokeCompletionHandlerWithDefaultValues(errorCode);
     }
 
     virtual void setExternalTransaction(Transaction* transaction) override
@@ -153,10 +153,9 @@ public:
 protected:
     virtual DBResult doQuery(QueryContext* queryContext) = 0;
 
-    virtual void reportSuccess(QueryContext* queryContext) = 0;
+    virtual void reportSuccess() = 0;
 
     void invokeCompletionHandler(
-        QueryContext* queryContext,
         DBResult resultCode,
         CompletionHandlerArgs... args)
     {
@@ -166,7 +165,7 @@ protected:
         std::apply(
             completionHandler,
             std::tuple_cat(
-                std::make_tuple(queryContext, resultCode),
+                std::make_tuple(resultCode),
                 std::make_tuple(std::move(args)...)));
     }
 
@@ -182,7 +181,7 @@ private:
         auto result = transaction.begin();
         if (result != DBResult::ok)
         {
-            invokeCompletionHandlerWithDefaultValues(&queryContext, result);
+            invokeCompletionHandlerWithDefaultValues(result);
             return result;
         }
 
@@ -204,9 +203,7 @@ private:
         return DBResult::ok;
     }
 
-    void invokeCompletionHandlerWithDefaultValues(
-        QueryContext* queryContext,
-        DBResult errorCode)
+    void invokeCompletionHandlerWithDefaultValues(DBResult errorCode)
     {
         CompletionHandler completionHandler;
         completionHandler.swap(m_completionHandler);
@@ -214,7 +211,7 @@ private:
         std::tuple<CompletionHandlerArgs...> defaultArgs;
         std::apply(
             completionHandler,
-            std::tuple_cat(std::make_tuple(queryContext, errorCode), std::move(defaultArgs)));
+            std::tuple_cat(std::make_tuple(errorCode), std::move(defaultArgs)));
     }
 
     DBResult executeQueryUnderTransaction(QueryContext* queryContext)
@@ -225,13 +222,13 @@ private:
             result = detailResultCode(queryContext->connection(), result);
             queryContext->transaction()->addOnTransactionCompletionHandler(
                 std::bind(&BaseUpdateExecutor::invokeCompletionHandlerWithDefaultValues, this,
-                    queryContext, result));
+                    result));
             return result;
         }
 
         queryContext->transaction()->addOnTransactionCompletionHandler(
             std::bind(&BaseUpdateExecutor::reportQueryResult, this,
-                queryContext, std::placeholders::_1));
+                queryContext->connection(), std::placeholders::_1));
 
         return DBResult::ok;
     }
@@ -242,28 +239,26 @@ private:
         if (result != DBResult::ok)
         {
             result = detailResultCode(queryContext->connection(), result);
-            invokeCompletionHandlerWithDefaultValues(queryContext, result);
+            invokeCompletionHandlerWithDefaultValues(result);
             return result;
         }
 
-        reportSuccess(queryContext);
+        reportSuccess();
 
         return DBResult::ok;
     }
 
-    void reportQueryResult(QueryContext* queryContext, DBResult dbResult)
+    void reportQueryResult(QSqlDatabase* connection, DBResult dbResult)
     {
         if (dbResult == DBResult::ok)
         {
             // In case of transaction success (query succeeded & committed).
-            reportSuccess(queryContext);
+            reportSuccess();
         }
         else
         {
             // In case of failed transaction (e.g., commit fails).
-            invokeCompletionHandlerWithDefaultValues(
-                queryContext,
-                lastDbError(queryContext->connection()));
+            invokeCompletionHandlerWithDefaultValues(lastDbError(connection));
         }
     }
 };
@@ -281,10 +276,10 @@ public:
     UpdateExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&)> dbUpdateFunc,
         InputData&& input,
-        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(DBResult, InputData)> completionHandler)
     :
         base_type(std::bind(&UpdateExecutor::invokeCompletionHandler2, this,
-            std::placeholders::_1, std::placeholders::_2)),
+            std::placeholders::_1)),
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_input(std::move(input)),
         m_completionHandler(std::move(completionHandler))
@@ -297,20 +292,19 @@ protected:
         return this->invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input);
     }
 
-    virtual void reportSuccess(QueryContext* queryContext) override
+    virtual void reportSuccess() override
     {
-        this->invokeCompletionHandler(queryContext, DBResult::ok);
+        this->invokeCompletionHandler(DBResult::ok);
     }
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&)> m_dbUpdateFunc;
     InputData m_input;
-    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(DBResult, InputData)> m_completionHandler;
 
-    void invokeCompletionHandler2(
-        QueryContext* queryContext, DBResult dbResult)
+    void invokeCompletionHandler2(DBResult dbResult)
     {
-        m_completionHandler(queryContext, dbResult, std::move(m_input));
+        m_completionHandler(dbResult, std::move(m_input));
     }
 };
 
@@ -330,10 +324,10 @@ public:
     UpdateWithOutputExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&, OutputData* const)> dbUpdateFunc,
         InputData&& input,
-        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData, OutputData&&)> completionHandler)
+        nx::utils::MoveOnlyFunc<void(DBResult, InputData, OutputData&&)> completionHandler)
     :
         base_type(std::bind(&UpdateWithOutputExecutor::invokeCompletionHandler2, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)),
+            std::placeholders::_1, std::placeholders::_2)),
         m_dbUpdateFunc(std::move(dbUpdateFunc)),
         m_input(std::move(input)),
         m_completionHandler(std::move(completionHandler))
@@ -346,21 +340,21 @@ protected:
         return this->invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input, &m_output);
     }
 
-    virtual void reportSuccess(QueryContext* queryContext) override
+    virtual void reportSuccess() override
     {
-        this->invokeCompletionHandler(queryContext, DBResult::ok, std::move(m_output));
+        this->invokeCompletionHandler(DBResult::ok, std::move(m_output));
     }
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const, const InputData&, OutputData* const)> m_dbUpdateFunc;
     InputData m_input;
-    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData, OutputData&&)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(DBResult, InputData, OutputData&&)> m_completionHandler;
     OutputData m_output;
 
     void invokeCompletionHandler2(
-        QueryContext* queryContext, DBResult dbResult, OutputData outputData)
+        DBResult dbResult, OutputData outputData)
     {
-        m_completionHandler(queryContext, dbResult, std::move(m_input), std::move(outputData));
+        m_completionHandler(dbResult, std::move(m_input), std::move(outputData));
     }
 };
 
@@ -375,12 +369,12 @@ class NX_SQL_API UpdateWithoutAnyDataExecutor:
 public:
     UpdateWithoutAnyDataExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler);
 
 protected:
     virtual DBResult doQuery(QueryContext* queryContext) override;
 
-    virtual void reportSuccess(QueryContext* queryContext) override;
+    virtual void reportSuccess() override;
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> m_dbUpdateFunc;
@@ -397,12 +391,12 @@ class NX_SQL_API UpdateWithoutAnyDataExecutorNoTran:
 public:
     UpdateWithoutAnyDataExecutorNoTran(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler);
 
 protected:
     virtual DBResult doQuery(QueryContext* queryContext) override;
 
-    virtual void reportSuccess(QueryContext* queryContext) override;
+    virtual void reportSuccess() override;
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> m_dbUpdateFunc;
@@ -419,14 +413,14 @@ class NX_SQL_API SelectExecutor:
 public:
     SelectExecutor(
         nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler);
 
     virtual DBResult executeQuery(QSqlDatabase* const connection) override;
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
 
 private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> m_dbSelectFunc;
-    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<void(DBResult)> m_completionHandler;
 };
 
 } // namespace nx::sql

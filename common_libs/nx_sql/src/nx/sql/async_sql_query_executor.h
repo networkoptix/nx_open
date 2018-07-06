@@ -37,15 +37,15 @@ public:
 
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
     virtual void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
     virtual void executeSelect(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
     //---------------------------------------------------------------------------------------------
     // Synchronous operations.
@@ -68,9 +68,7 @@ public:
                 queryFunc(queryContext);
                 return nx::sql::DBResult::ok;
             },
-            [&queryDonePromise](
-                nx::sql::QueryContext*,
-                nx::sql::DBResult dbResult)
+            [&queryDonePromise](nx::sql::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
@@ -101,9 +99,7 @@ public:
                 result = queryFunc(queryContext);
                 return nx::sql::DBResult::ok;
             },
-            [&queryDonePromise](
-                nx::sql::QueryContext*,
-                nx::sql::DBResult dbResult)
+            [&queryDonePromise](nx::sql::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
@@ -121,13 +117,13 @@ template<typename InputData, typename OutputData> using UpdateQueryWithOutputFun
 
 template<typename InputData, typename OutputData> using UpdateQueryWithOutputCompletionHandler =
     nx::utils::MoveOnlyFunc<
-        void(nx::sql::QueryContext*, DBResult, InputData, OutputData)>;
+        void(DBResult, InputData, OutputData)>;
 
 template<typename InputData> using UpdateQueryFunc =
     nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*, const InputData&)>;
 
 template<typename InputData> using UpdateQueryCompletionHandler =
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult, InputData)>;
+    nx::utils::MoveOnlyFunc<void(DBResult, InputData)>;
 
 /**
  * Executes DB request asynchronously.
@@ -149,15 +145,15 @@ public:
      */
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override;
 
     virtual void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override;
 
     virtual void executeSelect(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override;
 
     virtual DBResult execSqlScriptSync(
         const QByteArray& script,

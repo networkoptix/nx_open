@@ -26,7 +26,7 @@ protected:
 
         SelectExecutor selectExecutor(
             std::bind(&DbRequestExecutor::queryFunctionThatAlwaysThrows, this, _1),
-            std::bind(&DbRequestExecutor::queryCompletionHandler, this, _1, _2));
+            std::bind(&DbRequestExecutor::queryCompletionHandler, this, _1));
         m_executeResult = selectExecutor.execute(m_dbConnectionHolder->dbConnection());
     }
 
@@ -48,7 +48,7 @@ private:
         throw Exception(*m_expectedResult);
     }
 
-    void queryCompletionHandler(QueryContext*, DBResult result)
+    void queryCompletionHandler(DBResult result)
     {
         m_resultProvidedToCompletionHandler = result;
     }

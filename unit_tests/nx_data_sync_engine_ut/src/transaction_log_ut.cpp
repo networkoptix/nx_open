@@ -508,10 +508,8 @@ public:
             m_system.id.c_str(),
             std::bind(&TestTransactionController::doSomeDataModifications, this, _1),
             [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-                nx::sql::QueryContext* queryContext,
-                nx::sql::DBResult dbResult)
+                nx::sql::DBResult /*dbResult*/)
             {
-                onDbTranCompleted(queryContext, dbResult);
             });
     }
 
@@ -637,12 +635,6 @@ private:
             m_cond.wait(lock.mutex());
     }
 
-    void onDbTranCompleted(
-        nx::sql::QueryContext* /*queryContext*/,
-        nx::sql::DBResult /*dbResult*/)
-    {
-    }
-
     TestTransactionController(const TestTransactionController&) = delete;
     TestTransactionController& operator=(const TestTransactionController&) = delete;
 };
@@ -700,7 +692,7 @@ protected:
                 getSystem(0).id.c_str(),
                 std::bind(&TransactionLogOverlappingTransactions::shareSystemToRandomUser, this, _1, i),
                 [this, &transactionsToWait, &cond](
-                    nx::sql::QueryContext*, nx::sql::DBResult dbResult)
+                    nx::sql::DBResult dbResult)
                 {
                     if (dbResult != nx::sql::DBResult::cancelled)
                     {

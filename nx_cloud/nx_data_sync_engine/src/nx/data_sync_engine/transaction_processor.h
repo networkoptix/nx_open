@@ -211,14 +211,12 @@ class TransactionProcessor:
 public:
     typedef Command<TransactionDataType> Ec2Transaction;
 
-    typedef nx::utils::MoveOnlyFunc<
+    using ProcessEc2TransactionFunc = nx::utils::MoveOnlyFunc<
         nx::sql::DBResult(
-            nx::sql::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)
-    > ProcessEc2TransactionFunc;
+            nx::sql::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)>;
 
-    typedef nx::utils::MoveOnlyFunc<
-        void(nx::sql::QueryContext*, nx::sql::DBResult, AuxiliaryArgType)
-    > OnTranProcessedFunc;
+    using OnTranProcessedFunc =
+        nx::utils::MoveOnlyFunc<void(nx::sql::DBResult, AuxiliaryArgType)>;
 
     /**
      * @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
@@ -271,11 +269,9 @@ private:
                     auxiliaryArgPtr);
             },
             [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
-                nx::sql::QueryContext* queryContext,
                 nx::sql::DBResult dbResult) mutable
             {
                 dbProcessingCompleted(
-                    queryContext,
                     dbResult,
                     std::move(*auxiliaryArg),
                     std::move(handler));
@@ -336,13 +332,12 @@ private:
     }
 
     void dbProcessingCompleted(
-        nx::sql::QueryContext* queryContext,
         nx::sql::DBResult dbResult,
         AuxiliaryArgType auxiliaryArg,
         TransactionProcessedHandler completionHandler)
     {
         if (m_onTranProcessedFunc)
-            m_onTranProcessedFunc(queryContext, dbResult, std::move(auxiliaryArg));
+            m_onTranProcessedFunc(dbResult, std::move(auxiliaryArg));
 
         switch (dbResult)
         {

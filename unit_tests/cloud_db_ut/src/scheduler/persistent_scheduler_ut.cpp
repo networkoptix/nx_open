@@ -42,32 +42,34 @@ public:
 
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, nx::sql::DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> completionHandler) override
     {
         incRunningCount();
         std::thread(
-            [this, dbUpdateFunc = std::move(dbUpdateFunc), completionHandler= std::move(completionHandler)]()
+            [this, dbUpdateFunc = std::move(dbUpdateFunc),
+                completionHandler = std::move(completionHandler)]()
             {
-                completionHandler(nullptr, dbUpdateFunc(nullptr));
+                completionHandler(dbUpdateFunc(nullptr));
                 decRunningCount();
             }).detach();
     }
 
     virtual void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> /*dbUpdateFunc*/,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, nx::sql::DBResult)> /*completionHandler*/) override
+        nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> /*completionHandler*/) override
     {
     }
 
     virtual void executeSelect(
         nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, nx::sql::DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> completionHandler) override
     {
         incRunningCount();
         std::thread(
-            [this, dbSelectFunc = std::move(dbSelectFunc), completionHandler= std::move(completionHandler)]()
+            [this, dbSelectFunc = std::move(dbSelectFunc),
+                completionHandler = std::move(completionHandler)]()
             {
-                completionHandler(nullptr, dbSelectFunc(nullptr));
+                completionHandler(dbSelectFunc(nullptr));
                 decRunningCount();
             }).detach();
     }

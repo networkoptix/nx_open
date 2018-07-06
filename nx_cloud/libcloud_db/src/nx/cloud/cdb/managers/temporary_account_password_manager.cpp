@@ -87,7 +87,6 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
         std::move(tmpPasswordDataInternal),
         [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)](
-                nx::sql::QueryContext* /*queryContext*/,
                 nx::sql::DBResult dbResult,
                 TemporaryAccountCredentialsEx tempPasswordData)
         {
@@ -319,7 +318,6 @@ void TemporaryAccountPasswordManager::removeTemporaryCredentialsFromDbDelayed(
         std::bind(&TemporaryAccountPasswordManager::deleteTempPassword, this, _1, _2),
         temporaryCredentials.id,
         [locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-            nx::sql::QueryContext* /*queryContext*/,
             nx::sql::DBResult /*resultCode*/,
             std::string /*tempPasswordId*/)
         {
@@ -334,9 +332,7 @@ nx::sql::DBResult TemporaryAccountPasswordManager::fillCache()
     auto future = cacheFilledPromise.get_future();
     m_dbManager->executeSelect(
         std::bind(&TemporaryAccountPasswordManager::fetchTemporaryPasswords, this, _1),
-        [&cacheFilledPromise](
-            nx::sql::QueryContext* /*queryContext*/,
-            nx::sql::DBResult dbResult)
+        [&cacheFilledPromise](nx::sql::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });

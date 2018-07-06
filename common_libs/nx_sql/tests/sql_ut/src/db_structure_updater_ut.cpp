@@ -37,7 +37,7 @@ public:
 
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override
     {
         m_delegate->executeUpdate(
             std::move(dbUpdateFunc), std::move(completionHandler));
@@ -45,7 +45,7 @@ public:
 
     virtual void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override
     {
         m_delegate->executeUpdateWithoutTran(
             std::move(dbUpdateFunc), std::move(completionHandler));
@@ -53,7 +53,7 @@ public:
 
     virtual void executeSelect(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override
     {
         m_delegate->executeSelect(std::move(dbSelectFunc), std::move(completionHandler));
     }

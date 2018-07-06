@@ -193,9 +193,7 @@ protected:
                     queries.begin(), queries.end(),
                     [this, queryContext](std::unique_ptr<SqlQuery>& query)
                     {
-                        saveQueryResult(
-                            queryContext,
-                            query->next() ? DBResult::ok : DBResult::ioError);
+                        saveQueryResult(query->next() ? DBResult::ok : DBResult::ioError);
                     });
 
                 return DBResult::ok;
@@ -250,7 +248,7 @@ protected:
                 m_finishHangingQuery.get_future().wait();
                 return DBResult::ok;
             },
-            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1, _2));
+            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
 
         queryExecuted.get_future().wait();
     }
@@ -273,7 +271,7 @@ protected:
                 m_finishHangingQuery.get_future().wait();
                 return DBResult::ok;
             },
-            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1, _2));
+            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
 
         queryExecuted.get_future().wait();
     }
@@ -324,7 +322,7 @@ private:
         using namespace std::placeholders;
         asyncSqlQueryExecutor().executeSelect(
             std::bind(&DbAsyncSqlQueryExecutor::selectSomeData, this, _1),
-            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1, _2));
+            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
     }
 
     void issueUpdate()
@@ -332,7 +330,7 @@ private:
         using namespace std::placeholders;
         asyncSqlQueryExecutor().executeUpdate(
             std::bind(&DbAsyncSqlQueryExecutor::insertSomeData, this, _1),
-            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1, _2));
+            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
     }
 
     DBResult selectSomeData(QueryContext* queryContext)
@@ -364,7 +362,7 @@ private:
         return DBResult::ok;
     }
 
-    void saveQueryResult(QueryContext* /*queryContext*/, DBResult dbResult)
+    void saveQueryResult(DBResult dbResult)
     {
         m_queryResults.push(dbResult);
     }

@@ -51,7 +51,6 @@ protected:
         m_persistentDbManager->queryExecutor().executeUpdate(
             queryFunc,
             [&queryDonePromise](
-                nx::sql::QueryContext*,
                 nx::sql::DBResult dbResult,
                 OutputData... /*outputData*/)
             {
@@ -66,9 +65,7 @@ protected:
         nx::utils::promise<nx::sql::DBResult> queryDonePromise;
         m_persistentDbManager->queryExecutor().executeSelect(
             queryFunc,
-            [&queryDonePromise](
-                nx::sql::QueryContext*,
-                nx::sql::DBResult dbResult)
+            [&queryDonePromise](nx::sql::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });

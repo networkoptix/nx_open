@@ -88,7 +88,7 @@ DBResult BaseExecutor::detailResultCode(
 
 UpdateWithoutAnyDataExecutor::UpdateWithoutAnyDataExecutor(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
     :
     base_type(std::move(completionHandler)),
     m_dbUpdateFunc(std::move(dbUpdateFunc))
@@ -100,9 +100,9 @@ DBResult UpdateWithoutAnyDataExecutor::doQuery(QueryContext* queryContext)
     return invokeDbQueryFunc(m_dbUpdateFunc, queryContext);
 }
 
-void UpdateWithoutAnyDataExecutor::reportSuccess(QueryContext* queryContext)
+void UpdateWithoutAnyDataExecutor::reportSuccess()
 {
-    invokeCompletionHandler(queryContext, DBResult::ok);
+    invokeCompletionHandler(DBResult::ok);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ void UpdateWithoutAnyDataExecutor::reportSuccess(QueryContext* queryContext)
 
 UpdateWithoutAnyDataExecutorNoTran::UpdateWithoutAnyDataExecutorNoTran(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
     :
     base_type(std::move(completionHandler)),
     m_dbUpdateFunc(std::move(dbUpdateFunc))
@@ -123,9 +123,9 @@ DBResult UpdateWithoutAnyDataExecutorNoTran::doQuery(QueryContext* queryContext)
     return invokeDbQueryFunc(m_dbUpdateFunc, queryContext);
 }
 
-void UpdateWithoutAnyDataExecutorNoTran::reportSuccess(QueryContext* queryContext)
+void UpdateWithoutAnyDataExecutorNoTran::reportSuccess()
 {
-    invokeCompletionHandler(queryContext, DBResult::ok);
+    invokeCompletionHandler(DBResult::ok);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ void UpdateWithoutAnyDataExecutorNoTran::reportSuccess(QueryContext* queryContex
 
 SelectExecutor::SelectExecutor(
     nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
-    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
     :
     base_type(QueryType::lookup),
     m_dbSelectFunc(std::move(dbSelectFunc)),
@@ -148,13 +148,13 @@ DBResult SelectExecutor::executeQuery(QSqlDatabase* const connection)
     auto result = invokeDbQueryFunc(m_dbSelectFunc, &queryContext);
     result = detailResultCode(connection, result);
     if (completionHandler)
-        completionHandler(&queryContext, result);
+        completionHandler(result);
     return result;
 }
 
 void SelectExecutor::reportErrorWithoutExecution(DBResult errorCode)
 {
-    m_completionHandler(nullptr, errorCode);
+    m_completionHandler(errorCode);
 }
 
 } // namespace nx::sql

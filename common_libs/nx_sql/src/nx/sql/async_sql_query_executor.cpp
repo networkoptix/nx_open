@@ -81,7 +81,7 @@ const ConnectionOptions& AsyncSqlQueryExecutor::connectionOptions() const
 
 void AsyncSqlQueryExecutor::executeUpdate(
     nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
 {
     scheduleQuery<UpdateWithoutAnyDataExecutor>(
         std::move(dbUpdateFunc),
@@ -90,7 +90,7 @@ void AsyncSqlQueryExecutor::executeUpdate(
 
 void AsyncSqlQueryExecutor::executeUpdateWithoutTran(
     nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
 {
     scheduleQuery<UpdateWithoutAnyDataExecutorNoTran>(
         std::move(dbUpdateFunc),
@@ -99,7 +99,7 @@ void AsyncSqlQueryExecutor::executeUpdateWithoutTran(
 
 void AsyncSqlQueryExecutor::executeSelect(
     nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler)
+    nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
 {
     scheduleQuery<SelectExecutor>(
         std::move(dbSelectFunc),
