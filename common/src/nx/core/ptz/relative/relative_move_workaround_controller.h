@@ -5,7 +5,7 @@
 #include <QtCore/QThreadPool>
 
 #include <core/ptz/proxy_ptz_controller.h>
-#include <nx/core/ptz/realtive/relative_move_engine.h>
+#include <nx/core/ptz/relative/relative_move_engine.h>
 #include <nx/core/ptz/sequence_maker.h>
 #include <nx/core/ptz/sequence_executor.h>
 
