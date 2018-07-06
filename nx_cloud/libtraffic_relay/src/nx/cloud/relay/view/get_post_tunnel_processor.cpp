@@ -98,25 +98,28 @@ void GetPostTunnelProcessor<RequestSpecificData>::openUpTunnel(
         TunnelContext{std::move(requestData), requestPath, std::move(httpPipe)});
 
     insertionResult.first->second.connection->setMessageHandler(
-        std::bind(&GetPostTunnelProcessor::onMessage, this,
-            insertionResult.first, _1));
+        std::bind(&GetPostTunnelProcessor::onMessage, this, httpPipePtr, _1));
     insertionResult.first->second.connection->startReadingConnection();
 }
 
 template<typename RequestSpecificData>
 void GetPostTunnelProcessor<RequestSpecificData>::onMessage(
-    typename Tunnels::iterator tunnelIter,
+    network::http::AsyncMessagePipeline* tunnel,
     network::http::Message message)
 {
+    QnMutexLocker lock(&m_mutex);
+
+    auto tunnelIter = m_tunnelsInProgress.find(tunnel);
+    if (tunnelIter == m_tunnelsInProgress.end())
+        return; //< GetPostTunnelProcessor is being destroyed.
+
     if (!validateOpenUpChannelMessage(tunnelIter->second, message))
     {
         NX_DEBUG(this, lm("Invalid up channel. Url %1")
             .args(tunnelIter->second.urlPath));
-        closeConnection(SystemError::invalidData, tunnelIter->first);
+        closeConnection(lock, SystemError::invalidData, tunnelIter->first);
         return;
     }
-
-    QnMutexLocker lock(&m_mutex);
 
     auto tunnelContext = std::move(tunnelIter->second);
     m_tunnelsInProgress.erase(tunnelIter);
@@ -146,11 +149,19 @@ bool GetPostTunnelProcessor<RequestSpecificData>::validateOpenUpChannelMessage(
 
 template<typename RequestSpecificData>
 void GetPostTunnelProcessor<RequestSpecificData>::closeConnection(
-    SystemError::ErrorCode /*closeReason*/,
+    SystemError::ErrorCode closeReason,
     network::http::AsyncMessagePipeline* connection)
 {
     QnMutexLocker lock(&m_mutex);
+    closeConnection(lock, closeReason, connection);
+}
 
+template<typename RequestSpecificData>
+void GetPostTunnelProcessor<RequestSpecificData>::closeConnection(
+    const QnMutexLockerBase& /*lock*/,
+    SystemError::ErrorCode /*closeReason*/,
+    network::http::AsyncMessagePipeline* connection)
+{
     m_tunnelsInProgress.erase(connection);
 }
 
