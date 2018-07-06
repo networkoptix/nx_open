@@ -34,11 +34,11 @@ bool deleteLayoutInternal(const QSqlDatabase& database, int internalId)
     )sql");
 
     QSqlQuery query(database);
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(internalId);
-    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool insertOrReplaceLayout(
@@ -79,12 +79,12 @@ bool insertOrReplaceLayout(
         )
     )sql");
 
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     QnSql::bind(layout, &query);
     query.bindValue(":internalId", internalId);
-    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool removeItems(const QSqlDatabase& database, qint32 internalId)
@@ -94,11 +94,11 @@ bool removeItems(const QSqlDatabase& database, qint32 internalId)
     )sql");
 
     QSqlQuery query(database);
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(internalId);
-    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool cleanupVideoWalls(const QSqlDatabase& database, const QnUuid &layoutId)
@@ -110,12 +110,12 @@ bool cleanupVideoWalls(const QSqlDatabase& database, const QnUuid &layoutId)
     QByteArray emptyId = QnUuid().toRfc4122();
 
     QSqlQuery query(database);
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.bindValue(":empty_id", emptyId);
     query.bindValue(":layout_id", layoutId.toRfc4122());
-    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool updateItems(
@@ -169,7 +169,7 @@ bool updateItems(
         )
     )sql");
 
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     for (const auto& item: layout.items)
@@ -177,7 +177,7 @@ bool updateItems(
         NX_ASSERT(!item.id.isNull(), "Invalid null id item inserting");
         QnSql::bind(item, &query);
         query.bindValue(":layoutId", internalId);
-        if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
             return false;
     }
 
@@ -224,10 +224,10 @@ bool fetchLayouts(
     )sql");
     queryStr = queryStr.arg(filterStr);
 
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
-    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QSqlQuery queryItems(database);
@@ -257,10 +257,10 @@ bool fetchLayouts(
         ORDER BY r.guid
     )sql");
 
-    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&queryItems, queryItemsStr, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::prepareSQLQuery(&queryItems, queryItemsStr, Q_FUNC_INFO))
         return false;
 
-    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&queryItems, Q_FUNC_INFO))
+    if (!nx::sql::SqlQueryExecutionHelper::execSQLQuery(&queryItems, Q_FUNC_INFO))
         return false;
 
     QnSql::fetch_many(query, &layouts);

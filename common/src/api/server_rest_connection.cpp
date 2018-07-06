@@ -6,6 +6,7 @@
 
 #include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
+#include <nx/api/updates2/updates2_action_data.h>
 #include <api/model/update_information_reply.h>
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
@@ -89,6 +90,38 @@ Handle ServerConnection::getServerLocalTime(Result<QnJsonRestResult>::type callb
 {
     QnRequestParamList params{{lit("local"), QnLexical::serialized(true)}};
     return executeGet(lit("/api/gettime"), params, callback, targetThread);
+}
+
+Handle ServerConnection::getUpdateStatus(Result<UpdateStatus>::type callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet(lit("/api/updates2/status"), params, callback, targetThread);
+}
+
+Handle ServerConnection::getUpdateStatusAll(Result<UpdateStatusAll>::type callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet(lit("/api/updates2/status/all"), params, callback, targetThread);
+}
+
+Handle ServerConnection::sendUpdateCommand(const nx::api::Updates2ActionData& request,
+    Result<UpdateStatus>::type callback, QThread* targetThread)
+{
+    auto jsonRequest = QJson::serialized(request);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
+    return executePost(lit("/api/updates2"), QnRequestParamList(),
+        contentType, std::move(jsonRequest), callback, targetThread);
+}
+
+Handle ServerConnection::sendUpdateCommandAll(const nx::api::Updates2ActionData& request,
+    Result<UpdateStatusAll>::type callback, QThread* targetThread)
+{
+    auto jsonRequest = QJson::serialized(request);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
+    return executePost(lit("/api/updates2/all"), QnRequestParamList(),
+        contentType, std::move(jsonRequest), callback, targetThread);
 }
 
 rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRequest& request,

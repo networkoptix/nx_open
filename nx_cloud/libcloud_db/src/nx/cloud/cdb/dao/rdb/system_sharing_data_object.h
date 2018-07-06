@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include <nx/utils/db/filter.h>
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/filter.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include "../../data/system_data.h"
 
@@ -16,62 +16,62 @@ namespace rdb {
 class SystemSharingDataObject
 {
 public:
-    nx::utils::db::DBResult insertOrReplaceSharing(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult insertOrReplaceSharing(
+        nx::sql::QueryContext* const queryContext,
         const api::SystemSharingEx& sharing);
 
-    nx::utils::db::DBResult fetchAllUserSharings(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult fetchAllUserSharings(
+        nx::sql::QueryContext* const queryContext,
         std::vector<api::SystemSharingEx>* const sharings);
 
-    nx::utils::db::DBResult fetchUserSharingsByAccountEmail(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult fetchUserSharingsByAccountEmail(
+        nx::sql::QueryContext* const queryContext,
         const std::string& accountEmail,
         std::vector<api::SystemSharingEx>* const sharings);
 
-    nx::utils::db::DBResult fetchSharing(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult fetchSharing(
+        nx::sql::QueryContext* const queryContext,
         const std::string& accountEmail,
         const std::string& systemId,
         api::SystemSharingEx* const sharing);
 
-    nx::utils::db::DBResult fetchSharing(
-        nx::utils::db::QueryContext* const queryContext,
-        const nx::utils::db::InnerJoinFilterFields& filter,
+    nx::sql::DBResult fetchSharing(
+        nx::sql::QueryContext* const queryContext,
+        const nx::sql::InnerJoinFilterFields& filter,
         api::SystemSharingEx* const sharing);
 
     /**
      * NOTE: Throws on failure.
      */
     std::vector<api::SystemSharingEx> fetchSystemSharings(
-        utils::db::QueryContext* queryContext,
+        sql::QueryContext* queryContext,
         const std::string& systemId);
 
-    nx::utils::db::DBResult deleteSharing(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult deleteSharing(
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId,
-        const nx::utils::db::InnerJoinFilterFields& filterFields = nx::utils::db::InnerJoinFilterFields());
+        const nx::sql::InnerJoinFilterFields& filterFields = nx::sql::InnerJoinFilterFields());
 
     /**
      * New system usage frequency is calculated as max(usage frequency of all account's systems) + 1.
      */
-    nx::utils::db::DBResult calculateUsageFrequencyForANewSystem(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult calculateUsageFrequencyForANewSystem(
+        nx::sql::QueryContext* const queryContext,
         const std::string& accountId,
         const std::string& systemId,
         float* const newSystemInitialUsageFrequency);
 
-    nx::utils::db::DBResult updateUserLoginStatistics(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult updateUserLoginStatistics(
+        nx::sql::QueryContext* queryContext,
         const std::string& accountId,
         const std::string& systemId,
         std::chrono::system_clock::time_point lastloginTime,
         float usageFrequency);
 
 private:
-    nx::utils::db::DBResult fetchUserSharings(
-        nx::utils::db::QueryContext* const queryContext,
-        const nx::utils::db::InnerJoinFilterFields& filterFields,
+    nx::sql::DBResult fetchUserSharings(
+        nx::sql::QueryContext* const queryContext,
+        const nx::sql::InnerJoinFilterFields& filterFields,
         std::vector<api::SystemSharingEx>* const sharings);
 };
 

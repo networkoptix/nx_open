@@ -10,6 +10,23 @@ namespace {
 
 static const double kDefaultSpeedValue = 1.0;
 
+RelativeContinuousMoveComponentMapping* componentPtr(
+    RelativeContinuousMoveMapping& mapping,
+    Component component)
+{
+    switch (component)
+    {
+        case Component::pan: return &mapping.pan;
+        case Component::tilt: return &mapping.tilt;
+        case Component::rotation: return &mapping.rotation;
+        case Component::zoom: return &mapping.zoom;
+        case Component::focus: return &mapping.focus;
+        default:
+            NX_ASSERT(false, lit("Wrong component. We should never be here."));
+            return nullptr;
+    }
+}
+
 } // namespace
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Speed, (json)(eq), PtzSpeed_Fields);
@@ -49,20 +66,27 @@ RelativeContinuousMoveMapping::RelativeContinuousMoveMapping(
 {
 }
 
+RelativeContinuousMoveMapping::RelativeContinuousMoveMapping(
+    const std::vector<Speed>& componentSpeed)
+{
+    const auto minSize = std::min(componentSpeed.size(), kAllComponents.size());
+    for (auto i = 0; i < minSize; ++i)
+    {
+        auto component = componentPtr(*this, kAllComponents[i]);
+        if (!component)
+        {
+            NX_ASSERT(false, "Wrong component type.");
+            continue;
+        }
+
+        component->workingSpeed = componentSpeed[i];
+    }
+}
+
 RelativeContinuousMoveComponentMapping RelativeContinuousMoveMapping::componentMapping(
     Component component) const
 {
-    switch (component)
-    {
-        case Component::pan: return pan;
-        case Component::tilt: return tilt;
-        case Component::rotation: return rotation;
-        case Component::zoom: return zoom;
-        case Component::focus: return focus;
-        default:
-            NX_ASSERT(false, lit("Wrong component. We should never be here."));
-            return RelativeContinuousMoveComponentMapping();
-    }
+    return *(componentPtr(*const_cast<RelativeContinuousMoveMapping*>(this), component));
 }
 
 } // namespace ptz

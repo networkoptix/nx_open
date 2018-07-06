@@ -10,6 +10,7 @@ Common cab files:
         swresample
     4: cmnlib1.cab: Common Libraries 1
         nx_utils
+        nx_sql
         nx_network
         nx_vms_api
         udt

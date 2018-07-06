@@ -17,7 +17,7 @@ INITTARGET="/etc/init"
 INITDTARGET="/etc/init.d"
 SYSTEMDTARGET="/etc/systemd/system"
 
-WORK_DIR="stagebase"
+WORK_DIR="server_build_distribution_tmp"
 STAGE="$WORK_DIR/$ARTIFACT_NAME"
 BINSTAGE="$STAGE$BINTARGET"
 LIBSTAGE="$STAGE$LIBTARGET"
@@ -37,7 +37,7 @@ SERVER_LIB_PATH="$BUILD_DIR/lib"
 SERVER_LIB_PLUGIN_PATH="$SERVER_BIN_PATH/plugins"
 SERVER_LIB_PLUGIN_OPTIONAL_PATH="$SERVER_BIN_PATH/plugins_optional"
 BUILD_INFO_TXT="$BUILD_DIR/build_info.txt"
-LOG_FILE="$LOGS_DIR/server-build-distribution.log"
+LOG_FILE="$LOGS_DIR/server_build_distribution.log"
 
 buildDistribution()
 {
@@ -63,6 +63,7 @@ buildDistribution()
     fi
 
     local LIB
+
     local LIB_BASENAME
     for LIB in "$SERVER_LIB_PATH"/*.so*
     do
@@ -101,21 +102,20 @@ buildDistribution()
         stub_metadata_plugin
     )
 
-    local PLUGIN_FILENAME
     local PLUGIN
 
     for PLUGIN in "${PLUGINS[@]}"
     do
-        PLUGIN_FILENAME="lib$PLUGIN.so"
-        echo "Copying (plugin) $PLUGIN_FILENAME"
-        cp "$SERVER_LIB_PLUGIN_PATH/$PLUGIN_FILENAME" "$LIBPLUGINSTAGE/"
+        LIB="lib$PLUGIN.so"
+        echo "Copying (plugin) $LIB"
+        cp "$SERVER_LIB_PLUGIN_PATH/$LIB" "$LIBPLUGINSTAGE/"
     done
 
     for PLUGIN in "${PLUGINS_OPTIONAL[@]}"
     do
-        PLUGIN_FILENAME="lib$PLUGIN.so"
-        echo "Copying (optional plugin) $PLUGIN_FILENAME"
-        cp "$SERVER_LIB_PLUGIN_OPTIONAL_PATH/$PLUGIN_FILENAME" "$LIBPLUGINSTAGE_OPTIONAL/"
+        LIB="lib$PLUGIN.so"
+        echo "Copying (optional plugin) $LIB"
+        cp "$SERVER_LIB_PLUGIN_OPTIONAL_PATH/$LIB" "$LIBPLUGINSTAGE_OPTIONAL/"
     done
 
     echo "Copying Festival VOX files"

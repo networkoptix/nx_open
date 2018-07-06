@@ -683,7 +683,11 @@
             "keys": [
                 "HANWHA|SNP*"
             ],
-            "ptzCapabilitiesToAdd": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability"
+            "ptzOverride": {
+                "operational": {
+                    "capabilitiesToAdd": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability"
+                }
+            }
         },
         {
             "keys": [
@@ -707,7 +711,7 @@
                 "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
                 "DW|DWC-MB950TIR", "DW|DWC-MV950TIR", "DW|DWC-BVI2IR"
             ],
-            "ptzCapabilities": "NoPtzCapabilities"
+            "operationalPtzCapabilities": "NoPtzCapabilities"
         },
         {
             "keys": [
@@ -721,7 +725,9 @@
                 "Milesight*|MS-C2961-EB",
                 "Dahua|DH-SD22404T-GN"
             ],
-            "ptzTraits": "EightWayPtz"
+            "ptzOverride": {
+                "operational": {"traits": "EightWayPtz"}
+            }
         },
         {
             "keys": [
@@ -738,7 +744,7 @@
                 "Sony|SNC-XM636",
             "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20","DW|DWC-MD421D"
             ],
-            "ptzCapabilities": "ContinuousZoomCapability"
+            "operationalPtzCapabilities": "ContinuousZoomCapability"
         },
         {
             "keys": [
@@ -761,7 +767,7 @@
                 "VISTA|VK2-3MPBIR28V12re",
                 "VISTA|VK2-3MPVRDIR28V12re"
             ],
-            "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
         {
             "keys": [
@@ -769,8 +775,10 @@
                 "DW|DWC-MPT","Win4NET Co., Ltd.|Clebo-MPT",
                 "DW|DWC-MPTFM","Win4NET Co., Ltd.|Clebo-MPTFM"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
-            "ptzTraits": "FourWayPtz"
+            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
+            "ptzOverride": {
+                "operational": {"traits": "FourWayPtz"}
+            }
         },
         {
             "keys": [
@@ -781,7 +789,9 @@
                 "Vista|VK2-3MPEFEDre",
                 "eneo|IEP-63M2812M0A"
             ],
-            "ptzTraits": "FourWayPtz"
+            "ptzOverride": {
+                "operational": {"traits": "FourWayPtz"}
+            }
         },
         {
             "keys": [
@@ -809,7 +819,9 @@
                 "ACTi|V32", "ACTi|V23"
             ],
             "defaultAR": "16x9",
-            "ptzTraits": "EightWayPtz"
+            "ptzOverride": {
+                "operational": {"traits": "EightWayPtz"}
+            }
         },
         {
             "keys": [
@@ -819,20 +831,20 @@
         "Pelco|D5220",
                 "Pelco|PelcoD5220"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
+            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
         {
             "keys": [
                 "VISTA|VK2-1080VRD",
                 "VISTA|VK2-1080VRD3V9"
             ],
-            "ptzCapabilities": ""
+            "operationalPtzCapabilities": ""
         },
     {
             "keys": [
                 "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
             ],
-            "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
+            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },
     {
             "keys": [

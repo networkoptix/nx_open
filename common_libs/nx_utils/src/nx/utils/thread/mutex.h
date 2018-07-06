@@ -1,12 +1,10 @@
-#ifndef NX_MUTEX_H
-#define NX_MUTEX_H
+#pragma once
 
 #include <nx/utils/log/assert.h>
 
 #ifdef USE_OWN_MUTEX
 
 #include <memory>
-
 
 class QnMutexImpl;
 
@@ -16,18 +14,19 @@ class NX_UTILS_API QnMutex
     friend class MutexLockAnalyzer;
 
 public:
-    enum RecursionMode {
+    enum RecursionMode
+    {
         Recursive,
         NonRecursive
     };
 
-    QnMutex( RecursionMode mode = NonRecursive );
+    QnMutex(RecursionMode mode = NonRecursive);
     ~QnMutex();
 
     void lock(
         const char* sourceFile = 0,
         int sourceLine = 0,
-        int lockID = 0 );
+        int lockID = 0);
     void unlock();
     bool tryLock();
     bool isRecursive() const;
@@ -39,14 +38,13 @@ private:
     QnMutex& operator=(const QnMutex&);
 };
 
-//!This class for internal usage only
 class NX_UTILS_API QnMutexLockerBase
 {
 public:
     QnMutexLockerBase(
         QnMutex* const mtx,
         const char* sourceFile,
-        int sourceLine );
+        int sourceLine);
     ~QnMutexLockerBase();
 
     QnMutexLockerBase(QnMutexLockerBase&&);
@@ -57,11 +55,10 @@ public:
     void relock();
     void unlock();
 
-    //!introduced for debugging purposes
     bool isLocked() const;
 
 private:
-    QnMutex* m_mtx;
+    QnMutex * m_mtx;
     const char* m_sourceFile;
     int m_sourceLine;
     bool m_locked;
@@ -75,8 +72,8 @@ private:
 #define CCAT(s1, s2) CONCATENATE_DIRECT(s1, s2)
 #define QnMutexLocker struct CCAT(QnMutexLocker, __LINE__) : public QnMutexLockerBase { CCAT(QnMutexLocker, __LINE__)(QnMutex* mtx) : QnMutexLockerBase( mtx, __FILE__, __LINE__) {} }
 
-class QnReadWriteLock
-    : public QnMutex
+class QnReadWriteLock:
+    public QnMutex
 {
 public:
     void lockForWrite() { lock(); }
@@ -94,21 +91,17 @@ public:
 
 typedef QMutex QnMutex;
 
-/** Adding this class since QMutexLocker does not have move operations */
+/**
+ * Adding this class since QMutexLocker does not have move operations.
+ */
 class QnMutexLocker
 {
 public:
-    QnMutexLocker(QMutex* const mtx)
-    :
+    QnMutexLocker(QMutex* const mtx):
         m_mutex(mtx),
         m_locked(false)
     {
         relock();
-    }
-    ~QnMutexLocker()
-    {
-        if (m_locked)
-            unlock();
     }
 
     QnMutexLocker(QnMutexLocker&& rhs)
@@ -118,6 +111,13 @@ public:
         m_locked = rhs.m_locked;
         rhs.m_locked = false;
     }
+
+    ~QnMutexLocker()
+    {
+        if (m_locked)
+            unlock();
+    }
+
     QnMutexLocker& operator=(QnMutexLocker&& rhs)
     {
         if (this == &rhs)
@@ -142,6 +142,7 @@ public:
         m_mutex->lock();
         m_locked = true;
     }
+
     void unlock()
     {
         NX_ASSERT(m_locked);
@@ -170,6 +171,7 @@ public:
     {
         m_locker->unlock();
     }
+
     ~QnMutexUnlocker()
     {
         m_locker->relock();
@@ -178,5 +180,3 @@ public:
 private:
     QnMutexLockerBase* const m_locker;
 };
-
-#endif  //NX_MUTEX_H

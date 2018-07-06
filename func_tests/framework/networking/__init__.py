@@ -37,7 +37,7 @@ def setup_networks(machines, hypervisor, networks_tree, reachability):
                     machine = allocated_machines[alias]
                 except KeyError:
                     allocated_machines[alias] = machine = machines.get(alias)
-                mac = hypervisor.plug(machine.name, network_uuid)
+                mac = hypervisor.plug_internal(machine.name, network_uuid)
                 machine.os_access.networking.setup_ip(mac, ip, network_ip.prefixlen)
                 if alias != router_alias:
                     # Routes on router was set up when it was interpreted as host.
@@ -77,6 +77,6 @@ def setup_flat_network(machines, network_ip, hypervisor):  # TODO: Use in setup 
     next(iter_ips)  # First IP is usually reserved for router.
     host_ips = dict(zip((machine.alias for machine in machines), iter_ips))
     for machine in machines:
-        mac = hypervisor.plug(machine.name, network_uuid)
+        mac = hypervisor.plug_internal(machine.name, network_uuid)
         machine.os_access.networking.setup_ip(mac, host_ips[machine.alias], network_ip.prefixlen)
     return host_ips

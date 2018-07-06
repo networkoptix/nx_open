@@ -1,74 +1,63 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Інструменти розробника</h2>
         <p>
-            Have an idea on how to improve our developer tools or just want to start a conversation?
+            Є ідея, як поліпшити наші інструменти для розробників або хочете просто поговорити?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Leave feedback</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Залишити відгук</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>Генератор довільних подій</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party systems to a System,
-            which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps build HTTP Generic Event calls.
+            Довільний подія - спосіб відправки подій із сторонніх систем. Довільні події можуть використовуватися для запуску системних дій в механізмі подій і правил.
+            Генератор довільних подій - інструмент, який виконує виклики довільних подій HTTP.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">Генератор довільних подій</a></p>
     </div>
     <div>
-        <h3>Server API</h3>
+        <h3>API сервера</h3>
         <p>
-            Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to
-            access almost every system feature available in the regular client: query/manage system resources (servers,
-            cameras, users, permissions), pull live or recorded video out of System, generate events, create rules,
-            control PTZ cameras, and more.
+            API сервера забезпечує стандартний набір API викликів для зовнішніх систем. Це дає можливість розробникам отримувати доступ до майже кожної функції системи, доступної в звичайному клієнті: запиту і управління системними ресурсами (сервери, камери, користувачі, повноваження), отримання відео в реальному часі або архіву з системи, генеріраціі подій, створення правил, управління PTZ -Камера і багато чому іншому.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation with tools for testing API calls<br>
-            <a href="#/developers/changelog">API Changelog</a>
-            - list of breaking changes in API<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
+            <a href="#/developers/api"><b>Інструмент тестування API (новий)</b></a>
+             - інтерактивна документація з інструментами для тестування викликів API<br>
+             <a href="#/developers/changelog">API-журнал змін</a>
+              - список змін в API, що можуть торкнутися поточний функціонал<br>
+             <a id="api-doc" href="api.xml" target="_blank">Документація API</a>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>Панель відомостей про камеру</h3>
         <p>
-            Displays additional developer-friendly information for cameras in the Web Admin interface:
+            Показує додаткову інформацію по камерах, корисну для розробників, в інтерфейсі Web Admin:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>Ідентифікатор камери</li>
+            <li>Посилання для всіх доступних відеопотоків</li>
+            <li>Прямий експорт відео з браузера</li>
         </ul>
         <p>
-            To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,
-            select the target camera, click on the settings icon (gear), then choose "Camera Details"
+            Щоб відкрити панель відомостей про камери - перейдіть в інтерфейс веб-адміністратора, виберіть <a href="#/view">Вид</a>, виберіть бажану камеру, клацніть значок налаштувань (шестерня), потім виберіть "Відомості про камеру"
         </p>
-        <p><a href="#/view/?cameraLinks">open Camera Details Panel</a></p>
+        <p><a href="#/view/?cameraLinks">відкрити панель відомостей про камеру</a></p>
     </div>
     <div>
-        <h3>Video Source Integration SDK</h3>
+        <h3>SDK для інтеграції джерел відео</h3>
         <p>
-            Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source
-            (IP Cameras, NVRs, DVRs, etc) into System. SDK makes possible to create methods for discovering,
-            displaying, analyzing and recording video. It also allows integrating device I/O ports and motion detection
-            information.
+            SDK надає можливість інтеграції практично будь-якого джерела живого або записаного відео (IP-камер, NVR, цифрових відеореєстраторів, і т. д.) в систему. SDK дозволяє створювати методи для виявлення, відображення, аналізу та запису відео. Також можливо інтегрувати порти пристроїв введення-виведення і дані виявлення руху.
         </p>
-        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >get SDK</a></p>
+        <p><a id="sdk-video" ng-href="#/sdkeula/sdk" >отримати пакет SDK</a></p>
     </div>
 
     <div>
-        <h3>Storage SDK</h3>
+        <h3>SDK для інтеграції сховищ</h3>
         <p>
-            Storage SDK provides the ability to integrate potential storage  into System. It allows developers to
-            read from or write to any storage location: local, remote, and even cloud one. Creating a storage
-            plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of
-            files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.
+            SDK зберігання даних надає можливість інтеграції потенційних сховищ в систему. Це дозволяє розробникам виконувати операції читання/запису в будь-яке місце зберігання: місцеве, віддалене і навіть хмарне. Створення плагіна зберігання даних вимагає реалізації стандартних функцій таких як: потоковий ввід/вивід, перевірка існування файлу, видалення файлу, отримання списку файлів в папці і ін. SDK також містить приклад використання FTP-сервера в якості сховища.
         </p>
-        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >get SDK</a></p>
+        <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >отримати пакет SDK</a></p>
     </div>
 </div>

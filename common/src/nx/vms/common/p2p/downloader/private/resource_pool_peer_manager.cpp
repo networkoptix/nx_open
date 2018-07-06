@@ -64,7 +64,7 @@ nx::network::http::AsyncHttpClientPtr createHttpClient()
     auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient->setMessageBodyReadTimeoutMs(5);
 
     return httpClient;
 }
@@ -313,12 +313,14 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
 
     const auto handle = ++m_currentSelfRequestHandle;
     m_httpClientByHandle[handle] = httpClient;
+
+    qWarning() << "Starting http client" << url.toString() << handle;
     httpClient->doGet(url,
-        [this, handle, callback, httpClient](network::http::AsyncHttpClientPtr client)
+        [this, handle, callback, httpClient, url](network::http::AsyncHttpClientPtr client)
         {
             if (!m_httpClientByHandle.remove(handle))
                 return;
-
+            qWarning() << "http client done" << url.toString() << handle;
             using namespace network;
             QByteArray result;
 

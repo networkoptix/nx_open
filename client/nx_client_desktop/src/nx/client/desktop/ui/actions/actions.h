@@ -224,6 +224,11 @@ enum IDType
     PushMyScreenToVideowallAction,
 
     /**
+     * Open Video Wall Screen Settings dialog.
+     */
+    VideoWallScreenSettingsAction,
+
+    /**
      * Saves videowall review layout.
      */
     SaveVideoWallReviewAction,
@@ -1030,11 +1035,6 @@ enum IDType
     ToggleTitleBarAction,
 
     /**
-     * Shows/hides tree.
-     */
-    ToggleTreeAction,
-
-    /**
      * Pins/unpins tree.
      */
     PinTreeAction,
@@ -1053,8 +1053,6 @@ enum IDType
      * Shows/hides timeline.
      */
     ToggleTimelineAction,
-
-    ToggleNotificationsAction,
 
     PinNotificationsAction,
 

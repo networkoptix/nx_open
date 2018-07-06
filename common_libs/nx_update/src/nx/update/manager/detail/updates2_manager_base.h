@@ -46,6 +46,7 @@ protected:
         api::Updates2StatusData::StatusCode code,
         const QString& message,
         const QList<api::TargetVersionWithEula> targets = QList<api::TargetVersionWithEula>(),
+        const QString& releaseNotesUrl = QString(),
         double progress = 0.0f);
 
     void startPreparing(const QString& updateFilePath);

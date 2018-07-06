@@ -390,6 +390,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     if (d->display())
         d->display()->removeRenderer(m_renderer);
 
+    m_renderer->notInUse();
     m_renderer->destroyAsync();
 
     for (auto* data : m_binaryMotionMask)
@@ -457,6 +458,7 @@ void QnMediaResourceWidget::initRenderer()
     m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QnMediaResourceWidget::updateAspectRatio);
+    m_renderer->inUse();
 }
 
 void QnMediaResourceWidget::initDisplay()
@@ -1098,6 +1100,16 @@ void QnMediaResourceWidget::resumeHomePtzController()
     if (m_homePtzController && options().testFlag(DisplayDewarped)
         && display()->camDisplay()->isRealTimeSource())
             m_homePtzController->resume();
+}
+
+bool QnMediaResourceWidget::forceShowPosition() const
+{
+    const bool isLive = d->display()
+        && d->display()->camDisplay()
+        && d->display()->camDisplay()->isRealTimeSource();
+
+    // In videowall mode position item must always be visible if item is not in live.
+    return qnRuntime->isVideoWallMode() && !isLive;
 }
 
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const
@@ -2324,6 +2336,9 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
     }
     updateCompositeOverlayMode();
     updateIconButton();
+
+    if (qnRuntime->isVideoWallMode())
+        updateHud(false);
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()
@@ -2360,7 +2375,7 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
     else
     {
         /* Stop all ptz activity. */
-        ptzController()->continuousMove(nx::core::ptz::Vector(), nx::core::ptz::Options());
+        ptzController()->continuousMove(nx::core::ptz::Vector());
         suspendHomePtzController();
     }
 
@@ -2401,8 +2416,7 @@ void QnMediaResourceWidget::at_zoomRectChanged()
         m_ptzController->absoluteMove(
             Qn::LogicalPtzCoordinateSpace,
             QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()),
-            2.0,
-            nx::core::ptz::Options());
+            2.0);
     }
 }
 

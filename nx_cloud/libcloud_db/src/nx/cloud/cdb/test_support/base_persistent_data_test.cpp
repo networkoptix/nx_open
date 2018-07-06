@@ -17,7 +17,7 @@ using AccountDataObject = cdb::dao::rdb::AccountDataObject;
 using SystemDataObject = cdb::dao::rdb::SystemDataObject;
 using SystemSharingDataObject = cdb::dao::rdb::SystemSharingDataObject;
 
-DaoHelper::DaoHelper(const nx::utils::db::ConnectionOptions& dbConnectionOptions):
+DaoHelper::DaoHelper(const nx::sql::ConnectionOptions& dbConnectionOptions):
     m_dbConnectionOptions(dbConnectionOptions),
     m_systemDbController(m_settings)
 {
@@ -88,8 +88,8 @@ void DaoHelper::deleteSystemSharing(const api::SystemSharingEx& sharing)
 {
     using namespace std::placeholders;
 
-    const nx::utils::db::InnerJoinFilterFields sqlFilter =
-        {nx::utils::db::SqlFilterFieldEqual("account_id", ":accountId",
+    const nx::sql::InnerJoinFilterFields sqlFilter =
+        {nx::sql::SqlFilterFieldEqual("account_id", ":accountId",
             QnSql::serialized_field(sharing.accountId))};
 
     executeUpdateQuerySyncThrow(
@@ -132,7 +132,7 @@ void DaoHelper::setDbVersionToUpdateTo(unsigned int dbVersion)
     m_dbVersionToUpdateTo = dbVersion;
 }
 
-nx::utils::db::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
+nx::sql::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
 {
     return m_persistentDbManager->queryExecutor();
 }
@@ -140,7 +140,7 @@ nx::utils::db::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
 //-------------------------------------------------------------------------------------------------
 
 BasePersistentDataTest::BasePersistentDataTest(DbInitializationType dbInitializationType):
-    nx::utils::db::test::TestWithDbHelper("cdb", QString()),
+    nx::sql::test::TestWithDbHelper("cdb", QString()),
     DaoHelper(dbConnectionOptions())
 {
     if (dbInitializationType == DbInitializationType::immediate)

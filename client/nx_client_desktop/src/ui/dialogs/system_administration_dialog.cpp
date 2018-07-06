@@ -17,17 +17,16 @@
 #include <ui/widgets/system_settings/server_updates_widget.h>
 #include <ui/widgets/system_settings/routing_management_widget.h>
 #include <ui/widgets/system_settings/smtp/smtp_settings_widget.h>
-
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-
 #include <ui/style/custom_style.h>
-
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
+#include <nx/client/desktop/system_update/multi_server_updates_widget.h>
 #include <utils/common/app_info.h>
+#include <ini.h>
 
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     : base_type(parent)
@@ -44,6 +43,13 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     addPage(LicensesPage,           new QnLicenseManagerWidget(this),       tr("Licenses"));
     addPage(SmtpPage,               smtpWidget,                             tr("Email"));
     addPage(UpdatesPage,            updatesWidget,                          tr("Updates"));
+
+    // This is prototype page for updating many servers in one run
+    if (nx::client::desktop::ini().massSystemUpdatePrototype)
+    {
+        auto multiUpdatesWidget = new nx::client::desktop::MultiServerUpdatesWidget(this);
+        addPage(MassUpdatesPage, multiUpdatesWidget, tr("Mass Updates"));
+    }
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
     addPage(TimeServerSelection,    new QnTimeServerSelectionWidget(this),  tr("Time Synchronization"));

@@ -29,6 +29,8 @@ struct ConfigureSystemData: public PasswordData
     {
         tranLogTime.sequence = params.value(lit("tranLogTimeSequence")).toULongLong();
         tranLogTime.ticks = params.value(lit("tranLogTimeTicks")).toULongLong();
+        if (currentPassword.isEmpty())
+            currentPassword = params.value(lit("oldPassword")); //< Compatibility with previous version.
     }
 
     QnUuid localSystemId;

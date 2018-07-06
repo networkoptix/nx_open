@@ -36,9 +36,9 @@ else
     LIB_INSTALL_PATH="$INSTALL_PATH/mediaserver/lib"
 fi
 
-LOG_FILE="$LOGS_DIR/create_arm_installer.log"
+LOG_FILE="$LOGS_DIR/build_distribution.log"
 
-WORK_DIR="create_arm_installer_tmp"
+WORK_DIR="build_distribution_tmp"
 
 #--------------------------------------------------------------------------------------------------
 
@@ -104,6 +104,7 @@ copyBuildLibs()
         libnx_network
         libnx_update
         libnx_utils
+        libnx_sql
         libnx_vms_api
         libnx_sdk
         libnx_plugin_utils
@@ -290,6 +291,7 @@ copyBins()
 copyMediaserverPlugins()
 {
     mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins"
+    mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins_optional"
 
     if [ "$BOX" = "edge1" ]
     then
@@ -300,23 +302,42 @@ copyMediaserverPlugins()
         return
     fi
 
-    if [ -d "$BIN_BUILD_DIR/plugins" ]
+    local PLUGINS=(
+        generic_multicast_plugin
+        genericrtspplugin
+        mjpg_link
+    )
+    PLUGINS+=(
+        hikvision_metadata_plugin
+        axis_metadata_plugin
+        dw_mtt_metadata_plugin
+        vca_metadata_plugin
+    )
+    if [ "$ENABLE_HANWHA" == "true" ]
     then
-        local FILE
-        for FILE in "$BIN_BUILD_DIR/plugins/"*
-        do
-            if [[ -f $FILE ]] && [[ $FILE != *.debug ]]
-            then
-                if [ "$ENABLE_HANWHA" != "true" ] && [[ "$FILE" == *hanwha* ]]
-                then
-                    continue
-                fi
-
-                echo "Copying plugins/$(basename "$FILE")"
-                cp -r "$FILE" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
-            fi
-        done
+        PLUGINS+=( hanwha_metadata_plugin )
     fi
+
+    local PLUGINS_OPTIONAL=(
+        stub_metadata_plugin
+    )
+
+    local PLUGIN
+    local LIB
+
+    for PLUGIN in "${PLUGINS[@]}"
+    do
+        LIB="lib$PLUGIN.so"
+        echo "Copying (plugin) $LIB"
+        cp "$BIN_BUILD_DIR/plugins/$LIB" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
+    done
+
+    for PLUGIN in "${PLUGINS_OPTIONAL[@]}"
+    do
+        LIB="lib$PLUGIN.so"
+        echo "Copying (optional plugin) $LIB"
+        cp "$BIN_BUILD_DIR/plugins_optional/$LIB" "$MEDIASERVER_BIN_INSTALL_DIR/plugins_optional/"
+    done
 }
 
 # [in] INSTALL_DIR

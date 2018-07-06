@@ -3,13 +3,13 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 
+#include <nx/client/desktop/camera/camera_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/counter_hash.h>
 
 class QnResourceWidget;
-class QnResourceDisplay;
-typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class QnMediaResourceWidget;
 
 /**

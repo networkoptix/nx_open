@@ -13,8 +13,8 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
-#include <nx/utils/db/test_support/test_with_db_helper.h>
-#include <nx/utils/db/types.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
+#include <nx/sql/types.h>
 
 #include "account_with_password.h"
 #include "../cloud_db_service_public.h"
@@ -25,7 +25,7 @@ namespace cdb {
 
 class CdbLauncher:
     public utils::test::ModuleLauncher<CloudDbServicePublic>,
-    public nx::utils::db::test::TestWithDbHelper
+    public nx::sql::test::TestWithDbHelper
 {
 public:
     CdbLauncher(QString tmpDir = QString());

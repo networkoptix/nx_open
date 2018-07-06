@@ -110,11 +110,11 @@ TEST(RelativeMoveWorkaround, relativeMoveProxy)
                 controller.data(),
                 threadPool.get())));
 
-    bool result = relativeMoveController->relativeMove(moveDirection, ptz::Options());
+    bool result = relativeMoveController->relativeMove(moveDirection);
     ASSERT_TRUE(result);
     ASSERT_TRUE(qFuzzyEquals(moveDirection, moveResult));
 
-    result = relativeMoveController->relativeFocus(focusDirection, ptz::Options());
+    result = relativeMoveController->relativeFocus(focusDirection);
     ASSERT_TRUE(result);
     ASSERT_TRUE(qFuzzyEquals(focusDirection, focusResult));
 }
@@ -175,13 +175,13 @@ TEST(RelativeMoveWorkaround, relativeMoveViaAbsoluteMove)
 
     const ptz::Vector moveDirection(0.1, 0.2, 0.3, 0.4);
     const ptz::Vector expectedMoveResult(2, 4, 6, 8);
-    bool result = relativeMoveController->relativeMove(moveDirection, ptz::Options());
+    bool result = relativeMoveController->relativeMove(moveDirection);
 
     ptz::Vector moveResult;
     controller->getPosition(
         Qn::LogicalPtzCoordinateSpace,
         &moveResult,
-        ptz::Options());
+        {nx::core::ptz::Type::operational});
 
     ASSERT_TRUE(result);
     ASSERT_TRUE(qFuzzyEquals(expectedMoveResult, moveResult));

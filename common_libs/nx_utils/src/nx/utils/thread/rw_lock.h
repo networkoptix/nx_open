@@ -12,7 +12,6 @@ enum class RwLockType
     write,
 };
 
-
 /**
  * Read write lock. The write lock is always exclusive (no simultaneous reads and writes allowed)
  * Maximum number of readers is defined by user.

@@ -24,6 +24,9 @@
 #include <api/model/wearable_prepare_data.h>
 #include <api/model/manual_camera_seach_reply.h>
 
+#include <nx/api/updates2/updates2_status_data.h>
+#include <nx/api/updates2/updates2_action_data.h>
+
 /**
  * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
  * This class can be used either for client and server side.
@@ -106,6 +109,20 @@ public:
         QThread* targetThread = 0);
 
     Handle getServerLocalTime(Result<QnJsonRestResult>::type callback, QThread* targetThread = nullptr);
+
+    using UpdateStatus = RestResultWithData<nx::api::Updates2StatusData>;
+
+    Handle getUpdateStatus(Result<UpdateStatus>::type callback, QThread* targetThread = nullptr);
+
+    Handle sendUpdateCommand(const nx::api::Updates2ActionData& request,
+        Result<UpdateStatus>::type callback, QThread* targetThread = nullptr);
+
+    using UpdateStatusAll = RestResultWithData<std::vector<nx::api::Updates2StatusData>>;
+
+    Handle getUpdateStatusAll(Result<UpdateStatusAll>::type callback, QThread* targetThread = nullptr);
+
+    Handle sendUpdateCommandAll(const nx::api::Updates2ActionData& request,
+        Result<UpdateStatusAll>::type callback, QThread* targetThread = nullptr);
 
     /**
     * Get camera thumbnail for specified time.

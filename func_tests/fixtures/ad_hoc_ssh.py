@@ -103,7 +103,7 @@ def ad_hoc_ssh_server(ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key)
         }
     host_config_path = ad_hoc_ssh_dir / 'host_config'
     _write_config(host_config, host_config_path)
-    sshd_command = ['/usr/sbin/sshd', '-D', '-d', '-f', str(host_config_path), '-p', str(port)]
+    sshd_command = ['/usr/sbin/sshd', '-D', '-f', str(host_config_path), '-p', str(port)]
     _logger.info('RUN: %s', sh_command_to_script(sshd_command))
     process = subprocess.Popen(sshd_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 

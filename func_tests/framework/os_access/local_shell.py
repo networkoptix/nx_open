@@ -8,8 +8,8 @@ import time
 from collections import namedtuple
 from contextlib import closing
 
-from framework.os_access.command import Command, Run
-from framework.os_access.posix_shell import PosixOutcome, PosixShell, _DEFAULT_TIMEOUT_SEC, _STREAM_BUFFER_SIZE
+from framework.os_access.command import Command, Run, DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.posix_shell import PosixOutcome, PosixShell, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 
 _logger = logging.getLogger(__name__)
@@ -93,8 +93,6 @@ class _LocalRun(Run):
         return self._process.poll()
 
     def _poll_streams(self, timeout_sec):
-        if self.outcome is not None:
-            _logger.warning("Process exited but some streams open. Go on.")
         try:
             return self._poller.poll(int(math.ceil(timeout_sec * 1000)))
         except select.error as e:
@@ -164,16 +162,18 @@ class _LocalShell(PosixShell):
         return kwargs
 
     @classmethod
-    def command(cls, command, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
+    def command(cls, command, cwd=None, env=None, set_eux=False):
+        if set_eux:
+            return cls.sh_script(sh_command_to_script(command), cwd=cwd, env=env, set_eux=set_eux)
         kwargs = cls._make_kwargs(cwd, env)
         command = [str(arg) for arg in command]
         _logger.debug('Run command:\n%s', sh_command_to_script(command))
         return _LocalCommand(command, shell=False, **kwargs)
 
     @classmethod
-    def sh_script(cls, script, cwd=None, env=None, timeout_sec=_DEFAULT_TIMEOUT_SEC):
-        augmented_script_to_run = sh_augment_script(script, None, None)
-        augmented_script_to_log = sh_augment_script(script, cwd, env)
+    def sh_script(cls, script, cwd=None, env=None, set_eux=True):
+        augmented_script_to_run = sh_augment_script(script, set_eux=set_eux)
+        augmented_script_to_log = sh_augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
         _logger.debug('Run:\n%s', augmented_script_to_log)
         kwargs = cls._make_kwargs(cwd, env)
         return _LocalCommand(augmented_script_to_run, shell=True, **kwargs)

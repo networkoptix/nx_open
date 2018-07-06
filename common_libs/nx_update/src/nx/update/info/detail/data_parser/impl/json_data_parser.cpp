@@ -142,6 +142,7 @@ private:
         CustomizationData customizationData;
         customizationData.name = customizationName;
         customizationData.updatePrefix = customizationInfo.updates_prefix;
+        customizationData.releaseNotesUrl = customizationInfo.release_notes;
 
         for (auto releasesIt = customizationInfo.releases.constBegin();
              releasesIt != customizationInfo.releases.constEnd();

@@ -1,11 +1,8 @@
 #!/bin/bash
 set -euxo pipefail
-: ${1:?"First parameter is existing VM name without '-template'."}
-: ${2:?"Second parameter is dir to put exported VM to."}
-NAME="$1-template"
-EXPORTED="$2/$NAME.ova"
-TEMP="$2/$NAME.bu.ova"
-mkdir -p "$(dirname "$TEMP")"
-VBoxManage export "$NAME" -o "$TEMP" --options nomacs
+: ${1:?"First parameter is existing VM name."}
+: ${2:?"Second parameter is path to new VM image."}
+NAME="$1"
+EXPORTED="$2"
 mkdir -p "$(dirname "$EXPORTED")"
-mv "$TEMP" "$EXPORTED"
+VBoxManage export "$NAME" -o "$EXPORTED" --options nomacs

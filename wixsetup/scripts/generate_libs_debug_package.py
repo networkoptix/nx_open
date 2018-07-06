@@ -11,6 +11,7 @@ def create_libs_debug_file(binaries_dir, output_filename):
     pdb_filenames = [
         'nx_network.pdb',
         'nx_utils.pdb',
+        'nx_sql.pdb',
         'nx_kit.pdb',
         'nx_update.pdb',
         'nx_vms_api.pdb',

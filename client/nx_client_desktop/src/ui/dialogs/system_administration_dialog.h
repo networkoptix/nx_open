@@ -18,6 +18,7 @@ public:
         LicensesPage,
         SmtpPage,
         UpdatesPage,
+        MassUpdatesPage,
         RoutingManagement,
         TimeServerSelection,
         UserManagement,

@@ -45,7 +45,7 @@ function stop() {
 			if wait_until_process_is_dead $PID $STOP_TIMEOUT_SEC; then
 				echo "Mediaserver is dead now"
 			else
-				echo "Unable to kill server, it still alive after $STOP_TIMEOUT_SEC seconds; bailing out."
+				echo "Unable to kill server, it is still alive after $STOP_TIMEOUT_SEC seconds; bailing out."
 				return 1;
 			fi
 		fi
@@ -69,7 +69,7 @@ function make_core_dump() {
 		if wait_until_process_is_dead $PID $CORE_DUMP_TIMEOUT_SEC; then
 			echo "Mediaserver is dead now."
 		else
-			echo "Mediaserver still alive after $CORE_DUMP_TIMEOUT_SEC seconds, bailing out."
+			echo "Mediaserver is still alive after $CORE_DUMP_TIMEOUT_SEC seconds, bailing out."
 			return 1;
 		fi
 	else

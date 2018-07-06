@@ -32,6 +32,26 @@ public:
             m_clientSideApiClient->pleaseStopSync();
         if (m_serverSideApiClient)
             m_serverSideApiClient->pleaseStopSync();
+
+        while (!m_serverTunnelResults.empty())
+        {
+            auto data = m_serverTunnelResults.pop();
+            if (data.connection)
+                data.connection->pleaseStopSync();
+        }
+
+        while (!m_clientTunnelResults.empty())
+        {
+            auto data = m_clientTunnelResults.pop();
+            if (data.connection)
+                data.connection->pleaseStopSync();
+        }
+
+        if (m_prevServerTunnelResult.connection)
+            m_prevServerTunnelResult.connection->pleaseStopSync();
+
+        if (m_prevClientTunnelResult.connection)
+            m_prevClientTunnelResult.connection->pleaseStopSync();
     }
 
 protected:

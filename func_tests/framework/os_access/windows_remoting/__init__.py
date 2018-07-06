@@ -9,6 +9,7 @@ from requests import RequestException
 
 from framework.method_caching import cached_getter
 from framework.os_access.exceptions import exit_status_error_cls
+from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.windows_remoting._cim_query import CIMClass
 from ._cim_query import CIMQuery
 from ._cmd import Shell
@@ -63,8 +64,8 @@ class WinRM(object):
         _logger.debug("Command: %s", list2cmdline(command_str_list))
         return self._shell().start(*command_str_list)
 
-    def run_command(self, command, input=None):
-        return self.command(command).check_output(input)
+    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        return self.command(command).check_output(input, timeout_sec=timeout_sec)
 
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables)

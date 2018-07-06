@@ -22,7 +22,7 @@ QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseContr
     m_camera(resource().dynamicCast<QnVirtualCameraResource>()),
     m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>())
 {
-    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability, ptz::Options()));
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
 }
 
 QnPresetPtzController::~QnPresetPtzController()
@@ -59,12 +59,12 @@ bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
         [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
         {
             QnPtzPresetData data;
-            data.space = hasCapabilities(Ptz::LogicalPositioningPtzCapability, ptz::Options())
+            data.space = hasCapabilities(Ptz::LogicalPositioningPtzCapability)
                 ? Qn::LogicalPtzCoordinateSpace
                 : Qn::DevicePtzCoordinateSpace;
 
             // TODO: #Elric this won't work for async base controller.
-            if (!getPosition(data.space, &data.position, ptz::Options()))
+            if (!getPosition(data.space, &data.position, {nx::core::ptz::Type::operational}))
                 return false;
 
             records.insert(preset.id, QnPtzPresetRecord(preset, data));
@@ -154,7 +154,7 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 
             QnPtzPresetData data = records.value(preset.id).data;
 
-            if (!absoluteMove(data.space, data.position, speed, ptz::Options()))
+            if (!absoluteMove(data.space, data.position, speed, {nx::core::ptz::Type::operational}))
                 return false;
 
             return true;

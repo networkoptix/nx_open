@@ -13,7 +13,7 @@ import boto3
 import docker
 from requests.auth import HTTPDigestAuth
 
-CLOUD_CONNECT_TEST_UTIL_VERSION = '18.1.0.20026'
+CLOUD_CONNECT_TEST_UTIL_VERSION = '18.1.0.20100'
 RETRY_TIMEOUT = 5                                   # seconds
 
 log = logging.getLogger('simple_cloud_test')
@@ -44,21 +44,27 @@ def testclass(cls):
     return cls
 
 
-def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1):
+def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1, debug_skip=0):
     def _testmethod(f):
         def wrapper(self):
             try:
+                if debug_skip and self.debug:
+                    log.info("Skipping test {}: {}".format(wrapper.testmethod_index, f.__name__))
+                    return
+
                 if delay:
                     log.info('Test {}: {}. Sleeping for {} seconds'.format(wrapper.testmethod_index, f.__name__, delay))
                     time.sleep(delay)
 
-                n_try = 0
-
-                for n_try in range(1, tries):
+                for n_try in range(1, tries + 1):
                     log.info('Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
                     try:
                         f(self)
+                        break
                     except AssertionError:
+                        if n_try == tries:
+                            raise
+
                         log.error('Test {}: failed. Retrying..'.format(f.__name__))
 
                         io = StringIO()
@@ -66,12 +72,7 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                         log.error(io.getvalue())
 
                         time.sleep(RETRY_TIMEOUT)
-                        continue
 
-                n_try += 1
-
-                log.info('Running test {}: {}. Try {} of {}'.format(wrapper.testmethod_index, f.__name__, n_try, tries))
-                f(self)
                 log.info('Test {}: success'.format(f.__name__))
 
                 if metric:
@@ -108,13 +109,15 @@ testmethod.counter = 1
 
 @testclass
 class CloudSession(object):
-    def __init__(self, host):
+    def __init__(self, host, debug):
         """
             This class defines tests to be run.
 
             Test are being run in order they appear in the code.
         """
         self.host = host
+        self.debug = debug
+
         self.base_url = 'https://{}'.format(host)
         self.session = requests.Session()
 
@@ -232,7 +235,8 @@ class CloudSession(object):
         except Exception as e:
             status = 1
         finally:
-            self.report_metrics()
+            if not self.debug:
+                self.report_metrics()
 
         return status
 
@@ -283,14 +287,10 @@ class CloudSession(object):
 
         log.info('Got system ID: {}'.format(self.system_id))
 
-    def test_cloud_connect_base(self, extra_args=''):
+    def test_cctu_base(self, command):
         image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:{}'.format(
             CLOUD_CONNECT_TEST_UTIL_VERSION)
-        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
-            user=quote(self.email),
-            password=quote(self.password),
-            system_id=self.system_id,
-            extra_args=extra_args)
+
 
         log.info('Running image: {} command: {}'.format(image, command))
 
@@ -305,9 +305,18 @@ class CloudSession(object):
         log.info('Stderr:\n{}'.format(stderr.decode('utf-8')))
         container.remove()
 
-        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (extra_args: {})'.format(
-            extra_args)
+        assert b'HTTP/1.1 200 OK' in stdout, 'Received invalid output from cloud connect (command: {})'.format(
+            command)
         assert status == 0, 'Cloud connect test util exited with non-zero status {}'.format(status)
+
+    def test_cloud_connect_base(self, extra_args=''):
+        command = '--log-level=DEBUG2 --http-client --url=http://{user}:{password}@{system_id}/ec2/getUsers {extra_args}'.format(
+            user=quote(self.email),
+            password=quote(self.password),
+            system_id=self.system_id,
+            extra_args=extra_args)
+
+        self.test_cctu_base(command)
 
     @testmethod(metric='p2p_connections_failure', continue_if_fails=True)
     def test_cloud_connect_no_proxy(self):
@@ -319,10 +328,28 @@ class CloudSession(object):
 
     @testmethod(metric='cloud_authentication_failure', continue_if_fails=True)
     def test_mediaserver_direct(self):
-        pass
+        r = self.get('/gateway/{}/web/api/moduleInformation'.format(self.system_id))
+        mi = r.json()
+
+        mediaserver_ip = None
+        for ip in mi['reply']['remoteAddresses']:
+            # Here we assume the test and mediaserver are in the same docker network
+            if ip.startswith("172."):
+                mediaserver_ip = ip
+                break
+
+        if not mediaserver_ip:
+            log.warning("Can't find mediaserver IP")
+            return
+
+        ms_url = 'http://{}:7001/ec2/getUsers'.format(mediaserver_ip)
+        r = requests.get(ms_url, auth=HTTPDigestAuth(self.email, self.password))
+
+        assert r.status_code == 200, 'ERROR: Status code is {}'.format(r.status_code)
 
     def test_traffic_relay(self, relay_name):
-        pass
+        command = '--log-level=DEBUG2 --test-relay --relay-url=http://{}.vmsproxy.com/'.format(relay_name)
+        self.test_cctu_base(command)
 
     @testmethod(metric='traffic_relay_failure', host='relay-la', continue_if_fails=True)
     def test_traffic_relay_la(self):
@@ -336,7 +363,7 @@ class CloudSession(object):
     def test_traffic_relay_fr(self):
         self.test_traffic_relay('relay-fr')
 
-    @testmethod(metric='email_failure', continue_if_fails=True)
+    @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
     def restore_password(self):
         r = self.post('/api/account/restorePassword', {"user_email": self.email})
 
@@ -361,7 +388,7 @@ class CloudSession(object):
 
         assert self.system_id == data[0]['id'], 'Invalid response from portal. Invalid system id'
 
-    @testmethod(tries=3)
+    @testmethod(tries=3, debug_skip=True)
     def share_system(self):
         request_data = {
             "email": self.user_email,
@@ -382,7 +409,7 @@ class CloudSession(object):
         data = r.json()
         assert 'id' in data, 'No ID'
 
-    @testmethod(delay=30, metric='view_and_settings_failure', tries=3)
+    @testmethod(delay=30, metric='view_and_settings_failure', tries=3, debug_skip=True)
     def check_system_users(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
@@ -396,14 +423,14 @@ class CloudSession(object):
         assert user is not None, 'No users returned'
         self.vms_user_id = user['vmsUserId']
 
-    @testmethod()
+    @testmethod(debug_skip=True)
     def remove_user(self):
         request_data = {'id': self.vms_user_id}
         auth = HTTPDigestAuth(self.email, self.password)
         self.post('/gateway/{system_id}/ec2/removeUser'.format(system_id=self.system_id),
                   request_data, auth=auth)
 
-    @testmethod(delay=20)
+    @testmethod(delay=20, debug_skip=True)
     def check_vasily_is_absent(self):
         headers = {
             'referer': '{}/systems/{}'.format(self.base_url, self.system_id),
@@ -421,7 +448,12 @@ def main():
 
     host = sys.argv[1]
 
-    session = CloudSession(host)
+    debug = False
+
+    if len(sys.argv) == 3:
+        debug = sys.argv[2] == "debug"
+
+    session = CloudSession(host, debug)
     status = session.run_tests()
     session.close()
 

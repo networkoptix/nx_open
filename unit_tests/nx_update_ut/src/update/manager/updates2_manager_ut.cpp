@@ -76,7 +76,8 @@ public:
 
     virtual info::ResultCode latestUpdate(
         const update::info::UpdateRequestData& /*updateRequestData*/,
-        QList<api::TargetVersionWithEula>* outSoftwareVersions) const override
+        QList<api::TargetVersionWithEula>* outSoftwareVersions,
+        QString* /*outReleaseNotesUrl*/) const override
     {
         if (m_cfg.hasUpdate || !m_manualData.isEmpty())
         {
@@ -124,7 +125,7 @@ public:
 
         QList<api::TargetVersionWithEula> targetVersions;
         return m_cfg.hasUpdate ==
-            (other->latestUpdate(info::UpdateRequestData(), &targetVersions) ==
+            (other->latestUpdate(info::UpdateRequestData(), &targetVersions, nullptr) ==
                 info::ResultCode::ok);
     }
 
@@ -133,7 +134,7 @@ public:
         if (other)
         {
             QList<api::TargetVersionWithEula> targetVersions;
-            m_cfg.hasUpdate |= (other->latestUpdate(info::UpdateRequestData(), &targetVersions) ==
+            m_cfg.hasUpdate |= (other->latestUpdate(info::UpdateRequestData(), &targetVersions, nullptr) ==
                 info::ResultCode::ok);
         }
         m_manualData.append(((TestUpdateRegistry*) other)->m_manualData);

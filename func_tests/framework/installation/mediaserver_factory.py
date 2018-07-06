@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 from framework.artifact import ArtifactType
 from framework.core_file_traceback import create_core_file_traceback
-from framework.installation.make_installation import make_installation
+from framework.installation.make_installation import installer_by_vm_type, make_installation
 from framework.installation.mediaserver import Mediaserver
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.path import copy_file
@@ -15,9 +15,9 @@ TRACEBACK_ARTIFACT_TYPE = ArtifactType(name='core-traceback')
 SERVER_LOG_ARTIFACT_TYPE = ArtifactType(name='log', ext='.log')
 
 
-def make_dirty_mediaserver(name, installation):
+def make_dirty_mediaserver(name, installation, installer):
     """Install mediaserver if needed and construct its object. Nothing else."""
-    installation.install()
+    installation.install(installer)
     mediaserver = Mediaserver(name, installation)
     return mediaserver
 
@@ -45,9 +45,9 @@ def cleanup_mediaserver(mediaserver, ca):
         })
 
 
-def setup_clean_mediaserver(mediaserver_name, installation, ca):
+def setup_clean_mediaserver(mediaserver_name, installation, installer, ca):
     """Get mediaserver as if it hasn't run before."""
-    mediaserver = make_dirty_mediaserver(mediaserver_name, installation)
+    mediaserver = make_dirty_mediaserver(mediaserver_name, installation, installer)
     cleanup_mediaserver(mediaserver, ca)
     return mediaserver
 
@@ -125,9 +125,10 @@ class MediaserverFactory(object):
         # existing client code structure (ClosingPool class) requires this function to have name parameter.
         # It's wrong but requires human-hours of thinking.
         # TODO: Refactor client code so this method doesn't rely on it.
+        installer = installer_by_vm_type(self._mediaserver_installers, vm.type)
         installation = make_installation(self._mediaserver_installers, vm.type, vm.os_access)
         _logger.info("Mediaserver name %s is not same as VM alias %s. Not a mistake?", name, vm.alias)
-        mediaserver = setup_clean_mediaserver(name, installation, self._ca)
+        mediaserver = setup_clean_mediaserver(name, installation, installer, self._ca)
         yield mediaserver
         examine_mediaserver(mediaserver)
         collect_artifacts_from_mediaserver(mediaserver, self._artifact_factory)

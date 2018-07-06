@@ -265,7 +265,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveStreamReader* r
             [reader, this]()
             {
                 auto camera = reader->getResource().dynamicCast<QnSecurityCamResource>();
-                if (camera && camera->getCameraCapabilities().testFlag(Qn::IsSyncPlay))
+                if (camera && camera->getCameraCapabilities().testFlag(Qn::DeviceBasedSync))
                     reader->getArchiveDelegate()->pleaseStop(); //< To avoid block other channels.
             },
             Qt::DirectConnection);

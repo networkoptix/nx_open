@@ -9,8 +9,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include "../abstract_transaction_data_object.h"
 
@@ -23,17 +23,17 @@ class NX_DATA_SYNC_ENGINE_API TransactionDataObject:
     public AbstractTransactionDataObject
 {
 public:
-    virtual nx::utils::db::DBResult insertOrReplaceTransaction(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult insertOrReplaceTransaction(
+        nx::sql::QueryContext* queryContext,
         const TransactionData& transactionData) override;
 
-    virtual nx::utils::db::DBResult updateTimestampHiForSystem(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult updateTimestampHiForSystem(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
         quint64 newValue) override;
 
-    virtual nx::utils::db::DBResult fetchTransactionsOfAPeerQuery(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult fetchTransactionsOfAPeerQuery(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
         const QString& peerId,
         const QString& dbInstanceId,

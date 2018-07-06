@@ -276,6 +276,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
             }
 
         });
+
+    connect(qnRuntime, &QnClientRuntimeSettings::valueChanged, this,
+        [this](int id)
+        {
+           if (id == QnClientRuntimeSettings::VIDEO_WALL_WITH_TIMELINE)
+               updateControlsVisibility(false);
+        });
 }
 
 QnWorkbenchUi::~QnWorkbenchUi()
@@ -436,7 +443,10 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
 
     if (qnRuntime->isVideoWallMode())
     {
-        setTimelineVisible(timelineVisible, animate);
+        if (qnRuntime->videoWallWithTimeline())
+            setTimelineVisible(timelineVisible, animate);
+        else
+            setTimelineVisible(false, false);
         setTreeVisible(false, false);
         setTitleVisible(false, false);
         setNotificationsVisible(false, false);

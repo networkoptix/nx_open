@@ -157,7 +157,7 @@ int QnMediaServerManager<T>::getStorages( const QnUuid& mediaServerId, impl::Get
             handler->done( reqID, errorCode, storages );
         };
     m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
-        nx::vms::api::ParentId, nx::vms::api::StorageDataList, decltype(queryDoneHandler)>
+        nx::vms::api::StorageParentId, nx::vms::api::StorageDataList, decltype(queryDoneHandler)>
             (ApiCommand::getStorages, mediaServerId, queryDoneHandler);
     return reqID;
 }

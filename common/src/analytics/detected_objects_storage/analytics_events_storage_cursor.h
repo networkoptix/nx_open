@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/sql_cursor.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/sql_cursor.h>
 
 #include <analytics/common/object_detection_metadata.h>
 
@@ -26,12 +26,12 @@ class Cursor:
     public AbstractCursor
 {
 public:
-    Cursor(std::unique_ptr<nx::utils::db::Cursor<DetectedObject>> dbCursor);
+    Cursor(std::unique_ptr<nx::sql::Cursor<DetectedObject>> dbCursor);
 
     virtual common::metadata::ConstDetectionMetadataPacketPtr next() override;
 
 private:
-    std::unique_ptr<nx::utils::db::Cursor<DetectedObject>> m_dbCursor;
+    std::unique_ptr<nx::sql::Cursor<DetectedObject>> m_dbCursor;
     common::metadata::DetectionMetadataPacketPtr m_nextPacket;
 
     common::metadata::DetectionMetadataPacketPtr toDetectionMetadataPacket(

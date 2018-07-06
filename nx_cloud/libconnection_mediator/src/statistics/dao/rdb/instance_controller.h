@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/db/db_instance_controller.h>
+#include <nx/sql/db_instance_controller.h>
 
 namespace nx {
 namespace hpm {
@@ -9,10 +9,10 @@ namespace dao {
 namespace rdb {
 
 class InstanceController:
-    public nx::utils::db::InstanceController
+    public nx::sql::InstanceController
 {
 public:
-    InstanceController(const nx::utils::db::ConnectionOptions& connectionOptions);
+    InstanceController(const nx::sql::ConnectionOptions& connectionOptions);
 };
 
 } // namespace rdb

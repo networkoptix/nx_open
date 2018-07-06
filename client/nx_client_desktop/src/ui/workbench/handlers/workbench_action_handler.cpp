@@ -689,6 +689,9 @@ void ActionHandler::at_nextLayoutAction_triggered()
         return;
 
     const auto total = workbench()->layouts().size();
+    if (total == 0)
+        return;
+
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() + 1) % total);
 }
 
@@ -698,6 +701,9 @@ void ActionHandler::at_previousLayoutAction_triggered()
         return;
 
     const auto total = workbench()->layouts().size();
+    if (total == 0)
+        return;
+
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + total) % total);
 }
 

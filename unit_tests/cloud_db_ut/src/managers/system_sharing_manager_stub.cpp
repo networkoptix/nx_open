@@ -27,7 +27,7 @@ boost::optional<api::SystemSharingEx> SystemSharingManagerStub::getSystemSharing
 }
 
 std::vector<api::SystemSharingEx> SystemSharingManagerStub::fetchSystemUsers(
-    utils::db::QueryContext* /*queryContext*/,
+    sql::QueryContext* /*queryContext*/,
     const std::string& systemId)
 {
     QnMutexLocker lock(&m_mutex);

@@ -212,7 +212,7 @@ private:
         qint64 timestampUs,
         QnAbstractStreamDataProvider* dataProvider,
         QnAbstractMediaData::MediaFlags flags);
-
+    bool useRealTimeHurryUp() const;
     void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
 
 protected:

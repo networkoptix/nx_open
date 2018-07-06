@@ -160,7 +160,7 @@ cloud_portal/front_end/config.json
 cloud_portal/front_end/.tmp
 cloud_portal/front_end/.sass-cache
 cloud_portal/front_end/bower_components
-cloud_portal/front_end/test/vqisual
+cloud_portal/front_end/test/visual
 cloud_portal/build_scripts/language_pack
 cloud_portal/build_scripts/stage
 cloud_portal/env

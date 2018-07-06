@@ -1,6 +1,7 @@
 #include "relative_continuous_move_sequence_maker.h"
 
 #include <chrono>
+#include <map>
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -26,6 +27,45 @@ milliseconds defaultCycleDuration(Component component)
             NX_ASSERT(false, "Wrong component type.");
             return 6s;
     }
+}
+
+CommandSequence mergeSortedSequence(const CommandSequence& commandSequence)
+{
+    static const int kMaxComponents = 5; //< Pan, tilt, rotation, zoom, focus.
+    const auto commandSequenceLength = commandSequence.size();
+
+    if (commandSequenceLength > kMaxComponents)
+    {
+        NX_ASSERT(
+            false,
+            lm("Wrong command sequence length - %1 commands, expected no more than %2 componets "
+                "(Pan, Tilt, Rotation, Zoom, Focus)")
+            .args(commandSequenceLength, kMaxComponents));
+
+        return CommandSequence();
+    }
+
+    if (commandSequence.size() < 2)
+        return commandSequence;
+
+    CommandSequence rest;
+    TimedCommand merged = commandSequence[0];
+
+    for (auto i = 1; i < commandSequence.size(); ++i)
+    {
+        auto commandToMerge = commandSequence[i];
+        merged.command += commandToMerge.command;
+        commandToMerge.duration -= merged.duration;
+
+        if (commandToMerge.duration > 0ms)
+            rest.push_back(commandToMerge);
+    }
+
+    if (!rest.empty())
+        rest = mergeSortedSequence(rest);
+
+    rest.push_front(merged);
+    return rest;
 }
 
 TimedCommand makeComponentCommand(
@@ -73,7 +113,7 @@ CommandSequence makeCommandSequence(
         { &relativeMovement.zoom, Component::zoom }
     };
 
-    CommandSequence result;
+    std::map<double, CommandSequence> commandBySpeed;
     for (const auto& component : kComponents)
     {
         const auto value = *component.first;
@@ -84,9 +124,25 @@ CommandSequence makeCommandSequence(
         const auto mapping = movementMapping.componentMapping(componentType);
         const auto command = makeComponentCommand(value, options, componentType, mapping);
 
-        if (!command.command.isNull())
-            result.push_back(command);
+        commandBySpeed[mapping.workingSpeed.absoluteValue].push_back(command);
     }
+
+    CommandSequence result;
+    for (auto& entry: commandBySpeed)
+    {
+        auto& sequence = entry.second;
+        std::sort(
+            sequence.begin(),
+            sequence.end(),
+            [](const TimedCommand& lhs, const TimedCommand& rhs)
+            {
+                return lhs.duration < rhs.duration;
+            });
+
+        const auto merged = mergeSortedSequence(sequence);
+        result.insert(result.cend(), merged.cbegin(), merged.cend());
+    }
+
     return result;
 }
 

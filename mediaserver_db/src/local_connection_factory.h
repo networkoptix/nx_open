@@ -75,6 +75,7 @@ private:
 
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
+    Ec2DirectConnectionPtr m_directConnection;
     std::unique_ptr<nx::vms::network::ReverseConnectionManager> m_serverConnector;
     std::unique_ptr<nx::vms::time_sync::ServerTimeSyncManager> m_timeSynchronizationManager;
 
@@ -88,7 +89,6 @@ private:
     int m_runningRequests;
     bool m_sslEnabled;
 
-    Ec2DirectConnectionPtr m_directConnection;
     bool m_p2pMode = false;
 private:
 

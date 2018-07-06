@@ -24,10 +24,7 @@ QnRemotePtzController::~QnRemotePtzController()
 Ptz::Capabilities QnRemotePtzController::getCapabilities(
     const nx::core::ptz::Options& options) const
 {
-    if (options.type != nx::core::ptz::Type::operational)
-        return Ptz::NoPtzCapabilities;
-
-    Ptz::Capabilities result = m_camera->getPtzCapabilities();
+    Ptz::Capabilities result = m_camera->getPtzCapabilities(options.type);
     if (!result)
         return Ptz::NoPtzCapabilities;
 
@@ -214,7 +211,7 @@ bool QnRemotePtzController::createPreset(const QnPtzPreset& preset)
         Qn::CreatePresetPtzCommand,
         preset,
         ptzCreatePresetAsync,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         preset);
 }
 
@@ -224,7 +221,7 @@ bool QnRemotePtzController::updatePreset(const QnPtzPreset& preset)
         Qn::UpdatePresetPtzCommand,
         preset,
         ptzUpdatePresetAsync,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         preset);
 }
 
@@ -234,7 +231,7 @@ bool QnRemotePtzController::removePreset(const QString& presetId)
         Qn::RemovePresetPtzCommand,
         presetId,
         ptzRemovePresetAsync,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         presetId);
 }
 
@@ -244,7 +241,7 @@ bool QnRemotePtzController::activatePreset(const QString& presetId, qreal speed)
         Qn::ActivatePresetPtzCommand,
         presetId,
         ptzActivatePresetAsync,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         presetId,
         speed);
 }
@@ -255,7 +252,7 @@ bool QnRemotePtzController::getPresets(QnPtzPresetList* /*presets*/) const
         Qn::GetPresetsPtzCommand,
         QVariant(),
         ptzGetPresetsAsync,
-        ptz::Options());
+        {nx::core::ptz::Type::operational});
 }
 
 bool QnRemotePtzController::createTour(
@@ -265,7 +262,7 @@ bool QnRemotePtzController::createTour(
         Qn::CreateTourPtzCommand,
         tour,
         ptzCreateTourAsync,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         tour);
 }
 
@@ -275,7 +272,7 @@ bool QnRemotePtzController::removeTour(const QString& tourId)
         Qn::RemoveTourPtzCommand,
         tourId,
         ptzRemoveTourAsync,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         tourId);
 }
 
@@ -285,7 +282,7 @@ bool QnRemotePtzController::activateTour(const QString& tourId)
         Qn::ActivateTourPtzCommand,
         tourId,
         ptzActivateTourAsync,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         tourId);
 }
 
@@ -295,7 +292,7 @@ bool QnRemotePtzController::getTours(QnPtzTourList* /*tours*/) const
         Qn::GetToursPtzCommand,
         QVariant(),
         ptzGetToursAsync,
-        ptz::Options());
+        {nx::core::ptz::Type::operational});
 }
 
 bool QnRemotePtzController::getActiveObject(QnPtzObject* /*object*/) const
@@ -304,7 +301,7 @@ bool QnRemotePtzController::getActiveObject(QnPtzObject* /*object*/) const
         Qn::GetActiveObjectPtzCommand,
         QVariant(),
         ptzGetActiveObjectAsync,
-        ptz::Options());
+        {nx::core::ptz::Type::operational});
 }
 
 bool QnRemotePtzController::updateHomeObject(const QnPtzObject& homePosition)
@@ -313,7 +310,7 @@ bool QnRemotePtzController::updateHomeObject(const QnPtzObject& homePosition)
         Qn::UpdateHomeObjectPtzCommand,
         homePosition,
         ptzUpdateHomeObjectAsync,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         homePosition);
 }
 
@@ -323,7 +320,7 @@ bool QnRemotePtzController::getHomeObject(QnPtzObject* /*object*/) const
         Qn::GetHomeObjectPtzCommand,
         QVariant(),
         ptzGetHomeObjectAsync,
-        ptz::Options());
+        {nx::core::ptz::Type::operational});
 }
 
 bool QnRemotePtzController::getAuxilaryTraits(

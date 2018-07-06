@@ -9,7 +9,7 @@ using namespace std::literals::chrono_literals;
 
 namespace
 {
-    const milliseconds kDefaultBookmarkDurationMs = 60s;
+    const milliseconds kDefaultBookmarkDuration = 60s;
 
     QnCameraBookmark createValidBookmark(milliseconds startTimeMs = 0ms)
     {
@@ -18,7 +18,7 @@ namespace
         result.name = lit("Bookmark");
         result.cameraId =  guidFromArbitraryData(lit("testcamera"));
         result.startTimeMs = startTimeMs;
-        result.durationMs = kDefaultBookmarkDurationMs;
+        result.durationMs = kDefaultBookmarkDuration;
         NX_ASSERT(result.isValid(), Q_FUNC_INFO, "This function must create valid bookmarks");
 
         return result;

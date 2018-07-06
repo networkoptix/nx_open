@@ -161,7 +161,7 @@ protected:
 
 private:
     CameraDiagnostics::Result initDevice();
-    CameraDiagnostics::Result initSystem();
+    CameraDiagnostics::Result initSystem(const HanwhaInformation& information);
     CameraDiagnostics::Result initBypass();
 
     CameraDiagnostics::Result initMedia();

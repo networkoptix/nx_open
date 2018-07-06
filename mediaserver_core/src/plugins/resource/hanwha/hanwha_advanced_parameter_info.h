@@ -88,9 +88,9 @@ private:
     QSet<QString> m_ptzTraits;
     Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
 
-    static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> m_stringAuxes;
-    static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> m_boolAuxes;
-    static const std::map<QString, QSet<QString> HanwhaAdavancedParameterInfo::*> m_stringSetAuxes;
+    static const std::map<QString, QString HanwhaAdavancedParameterInfo::*> kStringAuxes;
+    static const std::map<QString, bool HanwhaAdavancedParameterInfo::*> kBoolAuxes;
+    static const std::map<QString, QSet<QString> HanwhaAdavancedParameterInfo::*> kStringSetAuxes;
 };
 
 } // namespace plugins

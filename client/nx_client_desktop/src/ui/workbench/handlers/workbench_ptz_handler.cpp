@@ -98,12 +98,9 @@ private:
 
 bool getDevicePosition(const QnPtzControllerPtr &controller, nx::core::ptz::Vector* outPosition)
 {
-    if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability, nx::core::ptz::Options()))
+    if (!controller->hasCapabilities(Ptz::AsynchronousPtzCapability))
     {
-        return controller->getPosition(
-            Qn::DevicePtzCoordinateSpace,
-            outPosition,
-            nx::core::ptz::Options());
+        return controller->getPosition(Qn::DevicePtzCoordinateSpace, outPosition);
     }
     else
     {
@@ -129,10 +126,7 @@ bool getDevicePosition(const QnPtzControllerPtr &controller, nx::core::ptz::Vect
             finishedHandler,
             Qt::QueuedConnection);
 
-        controller->getPosition(
-            Qn::DevicePtzCoordinateSpace,
-            outPosition,
-            nx::core::ptz::Options());
+        controller->getPosition(Qn::DevicePtzCoordinateSpace, outPosition);
 
         eventLoop.exec();
         QObject::disconnect(connection);
@@ -200,8 +194,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    if (!widget->ptzController()->hasCapabilities(
-        Ptz::PresetsPtzCapability, nx::core::ptz::Options()))
+    if (!widget->ptzController()->hasCapabilities(Ptz::PresetsPtzCapability))
     {
         // TODO: #GDM #PTZ show appropriate error message?
         return;
@@ -342,11 +335,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
     for (int i = 0; i <= 20; i++)
     {
         position.zoom = startZ + (endZ - startZ) * i / 20.0;
-        controller->absoluteMove(
-            Qn::DevicePtzCoordinateSpace,
-            position,
-            1.0,
-            nx::core::ptz::Options());
+        controller->absoluteMove(Qn::DevicePtzCoordinateSpace, position, 1.0);
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));
@@ -422,7 +411,7 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     speed = applyRotation(speed, rotation);
 
     nx::core::ptz::Vector speedVector(speed.x(), speed.y(), 0.0, speed.z());
-    controller->continuousMove(speedVector, nx::core::ptz::Options());
+    controller->continuousMove(speedVector);
 }
 
 void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()

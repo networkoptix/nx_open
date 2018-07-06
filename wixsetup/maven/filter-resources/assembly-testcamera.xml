@@ -15,6 +15,7 @@
                 <include>testcamera.exe</include>
                 <include>nx_network.dll</include>
                 <include>nx_utils.dll</include>
+                <include>nx_sql.dll</include>
                 <include>nx_vms_api.dll</include>
                 <include>nx_kit.dll</include>
                 <include>vms_gateway_core.dll</include>

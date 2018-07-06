@@ -21,7 +21,7 @@ class SSHNotConnected(Exception):
 class _SSHCommandOutcome(PosixOutcome):
     def __init__(self, exit_status):
         assert isinstance(exit_status, int)
-        assert 0 <= exit_status <= 255
+        assert 0 <= exit_status <= 255 or exit_status == -1
         self._exit_status = exit_status
 
     @property
@@ -32,7 +32,15 @@ class _SSHCommandOutcome(PosixOutcome):
 
     @property
     def code(self):
+        if self._exit_status == -1:
+            return None
         return self._exit_status
+
+    @property
+    def comment(self):
+        if self._exit_status == -1:
+            return "Unknown exit status: server hasn't sent it"
+        return super(_SSHCommandOutcome, self).comment
 
 
 class _SSHRun(Run):
@@ -52,18 +60,25 @@ class _SSHRun(Run):
         self._channel.setblocking(False)
         # TODO: Check on Windows. Paramiko uses sockets on Windows as prescribed in Python docs.
         # TODO: Wait for exit status too.
-        select.select([self._channel], [], [], timeout_sec)
+        try:
+            select.select([self._channel], [], [], timeout_sec)
+        except ValueError as e:
+            if e.message == "filedescriptor out of range in select()":
+                raise RuntimeError("Limit of file descriptors are reached; use `ulimit -n`")
+            raise
+        chunks = []
         for recv in [self._channel.recv, self._channel.recv_stderr]:
             try:
                 chunk = recv(_STREAM_BUFFER_SIZE)
             except socket.timeout:  # Non-blocking: times out immediately if no data.
-                yield b''
+                chunks.append(b'')
             else:
                 stream_is_closed = len(chunk) == 0  # Exactly as said in its docstring.
                 if stream_is_closed:
-                    yield None
+                    chunks.append(None)
                 else:
-                    yield chunk
+                    chunks.append(chunk)
+        return chunks
 
 
 class _PseudoTerminalSSHRun(_SSHRun):
@@ -160,11 +175,15 @@ class SSH(PosixShell):
         self._key_path = key_path
 
     def __repr__(self):
-        return 'SSH({!r}, {!r}, {!r}, {!r})'.format(self._username, self._hostname, self._port, self._key_path)
+        return '<{!s}>'.format(sh_command_to_script([
+            'ssh', '{!s}@{!s}'.format(self._username, self._hostname),
+            '-p', self._port,
+            '-i', self._key_path,
+            ]))
 
-    def command(self, args, cwd=None, env=None):
+    def command(self, args, cwd=None, env=None, set_eux=True):
         script = sh_command_to_script(args)
-        return self.sh_script(script, cwd=cwd, env=env)
+        return self.sh_script(script, cwd=cwd, env=env, set_eux=set_eux)
 
     def terminal_command(self, args, cwd=None, env=None):
         script = sh_augment_script(sh_command_to_script(args), cwd=cwd, env=env, set_eux=False, shebang=False)
@@ -188,8 +207,8 @@ class SSH(PosixShell):
     def __del__(self):
         self._client().close()
 
-    def sh_script(self, script, cwd=None, env=None):
-        augmented_script = sh_augment_script(script, cwd, env)
+    def sh_script(self, script, cwd=None, env=None, set_eux=True):
+        augmented_script = sh_augment_script(script, cwd=cwd, env=env, set_eux=set_eux)
         return _SSHCommand(self._client(), augmented_script)
 
     def is_working(self):

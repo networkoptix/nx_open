@@ -3,6 +3,7 @@
 
 #include <core/resource/resource.h>
 #include <ui/common/notification_levels.h>
+#include <utils/common/delayed.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 
@@ -109,7 +110,7 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
     {
         if (d->message(row + i) == QnSystemHealth::CloudPromo)
         {
-            menu()->trigger(ui::action::HideCloudPromoAction);
+            executeLater([this]() { menu()->trigger(ui::action::HideCloudPromoAction); }, this);
             break;
         }
     }

@@ -317,7 +317,7 @@ ModuleConnector::Module::Priority
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString()))
         return kCloud;
 
-    return kOther;
+    return kDns;
 }
 
 QString ModuleConnector::Module::idForToStringFromPtr() const

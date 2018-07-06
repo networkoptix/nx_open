@@ -198,7 +198,7 @@ const ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const nx::utils::db::ConnectionOptions& Settings::dbConnectionOptions() const
+const nx::sql::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
 }
@@ -225,7 +225,7 @@ const ListeningPeer& Settings::listeningPeer() const
 
 void Settings::initializeWithDefaultValues()
 {
-    m_dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::sqlite;
+    m_dbConnectionOptions.driverType = nx::sql::RdbmsDriverType::sqlite;
     m_dbConnectionOptions.dbName = "mediator_statistics.sqlite";
 }
 

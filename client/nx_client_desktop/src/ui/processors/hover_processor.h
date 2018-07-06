@@ -98,13 +98,13 @@ signals:
      * This signal is emitted whenever target items get both input focus and
      * mouse hover.
      */
-    void hoverFocusEntered();
+    void hoverAndFocusEntered();
 
     /**
      * This signal is emitted whenever target items lose both input focus and
      * mouse hover.
      */
-    void hoverFocusLeft();
+    void hoverAndFocusLeft();
 
 protected:
     virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;

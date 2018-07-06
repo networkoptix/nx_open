@@ -65,12 +65,13 @@ struct NX_VMS_API VideowallData: ResourceData
     static const QnUuid kResourceTypeId;
 
     bool autorun = false;
+    bool timeline = false;
 
     VideowallItemDataList items;
     VideowallScreenDataList screens;
     VideowallMatrixDataList matrices;
 };
-#define VideowallData_Fields ResourceData_Fields (autorun)(items)(screens)(matrices)
+#define VideowallData_Fields ResourceData_Fields (autorun)(items)(screens)(matrices)(timeline)
 
 struct NX_VMS_API VideowallControlMessageData: Data
 {

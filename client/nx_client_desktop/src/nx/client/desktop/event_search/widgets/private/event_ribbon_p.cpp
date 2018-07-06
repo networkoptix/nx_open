@@ -274,6 +274,9 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         ? kDefaultThumbnailWidth
         : qMin(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
+    const bool precisePreview = !previewCropRect.isEmpty()
+        || index.data(Qn::ForcePrecisePreviewRole).toBool();
+
     api::CameraImageRequest request;
     request.camera = camera;
     request.usecSinceEpoch =
@@ -282,9 +285,9 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     request.size = QSize(thumbnailWidth, 0);
     request.imageFormat = nx::api::ImageRequest::ThumbnailFormat::jpg;
     request.aspectRatio = nx::api::ImageRequest::AspectRatio::source;
-    request.roundMethod = previewCropRect.isEmpty()
-        ? nx::api::ImageRequest::RoundMethod::iFrameAfter
-        : nx::api::ImageRequest::RoundMethod::precise;
+    request.roundMethod = precisePreview
+        ? nx::api::ImageRequest::RoundMethod::precise
+        : nx::api::ImageRequest::RoundMethod::iFrameAfter;
 
     const auto showPreviewTimestamp =
         [tile](CameraThumbnailProvider* provider)

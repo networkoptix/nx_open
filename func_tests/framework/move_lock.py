@@ -17,13 +17,13 @@ class MoveLockNotAcquired(Exception):
 
 class MoveLock(object):
     # TODO: Replace with lockfile (at least, it's in a pip/vendor)
-    def __init__(self, ssh, path, timeout_sec=10):
+    def __init__(self, ssh, path, timeout_sec=60):
         self._ssh = ssh  # type: SSH
         self._path = path  # type: SSHPath
         self._timeout_sec = timeout_sec
 
     def __repr__(self):
-        return '<{} on {}>'.format(self.__class__.__name__, self._ssh)
+        return '<MoveLock {!r}>'.format(self._path)
 
     def __enter__(self):
         # Implemented as single bash script to speedup locking.
@@ -43,8 +43,9 @@ class MoveLock(object):
                             rm -v "$temp_file"
                             exit 2
                         fi
-                        ns=1$(date +%N)
-                        wait_ms=$(( (ns - 1000000000) % 500 ))
+                        # Wait for random period from 0 to 500 ms.
+                        ns=1$(date +%N)  # Get random, prepend with 1 to avoid interpreting as octal.
+                        wait_ms=$(( (ns - 1000000000) % 500 ))  # Remove 1, get random in [0, 500).
                         left_ms=$((left_ms - wait_ms))
                         sleep $(printf "0.%03d" $wait_ms)
                     done
