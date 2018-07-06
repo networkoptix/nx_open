@@ -5,8 +5,9 @@ import {
     Input,
     ViewEncapsulation,
     ViewChild,
-    Renderer2, AfterViewInit
-}                                                           from '@angular/core';
+    Renderer2,
+    AfterViewInit
+} from '@angular/core';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { NgbModal, NgbActiveModal, NgbModalRef }            from '@ng-bootstrap/ng-bootstrap';
 import { NxModalGenericComponent }                          from "../generic/generic.component";
@@ -17,7 +18,7 @@ import { NxModalGenericComponent }                          from "../generic/gen
     styleUrls: [],
     providers: [Location, {provide: LocationStrategy, useClass: PathLocationStrategy}],
 })
-export class LoginModalContent implements OnInit, AfterViewInit {
+export class LoginModalContent implements OnInit, AfterViewInit{
     @Input() auth;
     @Input() language;
     @Input() login;
@@ -69,6 +70,14 @@ export class LoginModalContent implements OnInit, AfterViewInit {
         //this.location.go('/register');
         document.location.href = '/register';
         this.activeModal.close();
+    }
+
+    resetForm() {
+        if (!this.loginForm.valid) {
+            this.loginForm.controls['email'].setErrors(null);
+            this.loginForm.controls['password'].setErrors(null);
+            this.nx_wrong_password = false;
+        }
     }
 
     ngOnInit() {

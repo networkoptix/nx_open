@@ -99,7 +99,15 @@
             font-size   : $font-size-base;
             font-weight : normal;
             margin      : 0;
-            padding     : 0 0 0.5rem 0;
+            padding     : 0;
+        }
+
+        .input-error {
+            margin-top : 8px;
+
+            & + a {
+                margin-top : 8px;
+            }
         }
 
         .checkbox {
