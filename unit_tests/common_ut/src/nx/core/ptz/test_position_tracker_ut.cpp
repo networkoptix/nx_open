@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <thread>
 
 #include <nx/core/ptz/test_support/test_position_tracker.h>
 
