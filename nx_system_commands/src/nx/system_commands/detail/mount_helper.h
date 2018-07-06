@@ -13,12 +13,22 @@ namespace system_commands {
 using uid_t = unsigned int;
 #endif
 
-class MountHelperBase
+struct MountHelperDelegates
+{
+    std::function<SystemCommands::MountCode(const std::string&)> osMount;
+    std::function<bool(const std::string&)> isPathAllowed;
+    std::function<std::string(const std::string&, const std::string&)> credentialsFileName;
+    std::function<uid_t()> gid;
+    std::function<uid_t()> uid;
+};
+
+class MountHelper
 {
 public:
-    MountHelperBase(
+    MountHelper(
         const boost::optional<std::string>& username,
-        const boost::optional<std::string>& password);
+        const boost::optional<std::string>& password,
+        const MountHelperDelegates& delegates);
 
     SystemCommands::MountCode mount(
         const std::string& url,
@@ -35,14 +45,7 @@ private:
     SystemCommands::MountCode m_result = SystemCommands::MountCode::otherError;
     bool m_hasCredentialsError = false;
     bool m_invalidUsername = false;
-
-    virtual SystemCommands::MountCode osMount(const std::string& command) = 0;
-    virtual bool isMountPathAllowed(const std::string& path) const = 0;
-    virtual std::string credentialsFileName(
-        const std::string& username,
-        const std::string& password) const = 0;
-    virtual uid_t gid() const = 0;
-    virtual uid_t uid() const = 0;
+    MountHelperDelegates m_delegates;
 
     void tryMountWithDomain(const std::string& domain);
     void tryMountWithDomainAndPassword(const std::string& domain, const std::string& password);

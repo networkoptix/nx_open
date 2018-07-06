@@ -186,70 +186,22 @@ bool SystemCommands::execute(
     return true;
 }
 
-class MountHelper: public system_commands::MountHelperBase
-{
-public:
-    using system_commands::MountHelperBase::MountHelperBase;
-
-    void setOsMountDelegate(
-        std::function<SystemCommands::MountCode(const std::string&)> osMountDelegate)
-    {
-        m_osMountDelegate = osMountDelegate;
-    }
-
-    void setIsPathAllowedDelegate(std::function<bool(const std::string&)> isPathAllowedDelegate)
-    {
-        m_isPathAllowedDelegate = isPathAllowedDelegate;
-    }
-
-    void setCredentialsFileNameDelegate(
-        std::function<std::string(const std::string&, const std::string&)> credentialsFileNameDelegate)
-    {
-        m_credentialsFileNameDelegate = credentialsFileNameDelegate;
-    }
-
-private:
-    std::function<SystemCommands::MountCode(const std::string&)> m_osMountDelegate;
-    std::function<bool(const std::string&)> m_isPathAllowedDelegate;
-    std::function<std::string(const std::string&, const std::string&)> m_credentialsFileNameDelegate;
-
-    virtual SystemCommands::MountCode osMount(const std::string& command) override
-    {
-        return m_osMountDelegate(command);
-    }
-
-    virtual bool isMountPathAllowed(const std::string& path) const override
-    {
-        return m_isPathAllowedDelegate(path);
-    }
-
-    virtual std::string credentialsFileName(
-        const std::string& username,
-        const std::string& password) const override
-    {
-        return m_credentialsFileNameDelegate(username, password);
-    }
-
-    virtual uid_t gid() const override { return kRealGid; }
-    virtual uid_t uid() const override { return kRealUid; }
-};
-
 SystemCommands::MountCode SystemCommands::mount(
     const std::string& url, const std::string& directory,
     const boost::optional<std::string>& username,
     const boost::optional<std::string>& password, bool reportViaSocket, int socketPostfix)
 {
-    MountHelper mountHelper(username, password);
-    mountHelper.setCredentialsFileNameDelegate(
+    system_commands::MountHelperDelegates delegates;
+    delegates.credentialsFileName =
         [this](const std::string& username, const std::string& password)
         {
             return makeCredentialsFile(username, password, &m_lastError);
-        });
-
-    mountHelper.setIsPathAllowedDelegate(
-        [this](const std::string& path) { return checkMountPermissions(path); });
-
-    mountHelper.setOsMountDelegate(
+        };
+    delegates.gid = []() { return kRealGid; };
+    delegates.uid = []() { return kRealGid; };
+    delegates.isPathAllowed =
+        [this](const std::string& path) { return checkMountPermissions(path); };
+    delegates.osMount =
         [this](const std::string& command)
         {
             if (execute(command))
@@ -258,8 +210,9 @@ SystemCommands::MountCode SystemCommands::mount(
             return (m_lastError.find("13") != std::string::npos) //< 'Permission denied' error code
                 ? MountCode::wrongCredentials
                 : MountCode::otherError;
-        });
+        };
 
+    system_commands::MountHelper mountHelper(username, password, delegates);
     auto result = mountHelper.mount(url, directory);
     if (reportViaSocket)
         system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);

@@ -1,4 +1,4 @@
-#include <nx/system_commands/detail/mount_helper.h>
+ #include <nx/system_commands/detail/mount_helper.h>
 #include <nx/system_commands.h>
 #include <gtest/gtest.h>
 #include <memory>
@@ -70,126 +70,89 @@ static const std::string kDefaultDomain = "WORKGROUP";
 static const std::string kVer1 = "1.0";
 static const std::string kVer2 = "2.0";
 
-class TestMountHelper: public MountHelperBase
+class TestMountHelper: public system_commands::MountHelper
 {
 public:
-    using MountHelperBase::MountHelperBase;
-
-    void setDerivedExpectations(
-        OsMount osMountExpectation,
-        int mountCommandFlags,
-        MountPath mountPathExpectation,
-        CredentialsFileNameCall credentialsFileNameExpectation)
-    {
-        m_osMountExpectation = osMountExpectation;
-        m_mountCommandFlags = mountCommandFlags;
-        m_mountPathExpectation = mountPathExpectation;
-        m_credentialsFileNameExpectation = credentialsFileNameExpectation;
-    }
-
-    int osMountCalledTimes() const { return m_osMountCalledTImes; }
-    bool isCredentialsFileNameCalled() const { return m_credentialsFileNameCalled; }
-    bool isGidCalled() const { return m_gidCalled; }
-    bool isUidCalled() const { return m_uidCalled; }
+    using system_commands::MountHelper::MountHelper;
+    std::vector<std::string> domains() const { return m_domains; }
     std::string username() const { return m_username; }
     std::string password() const { return m_password; }
-    std::vector<std::string> domains() const { return m_domains; }
-
-private:
-    OsMount m_osMountExpectation;
-    int m_mountCommandFlags;
-    MountPath m_mountPathExpectation;
-    CredentialsFileNameCall m_credentialsFileNameExpectation;
-    int m_osMountCalledTImes = 0;
-    mutable bool m_credentialsFileNameCalled = false;
-    mutable bool m_gidCalled = false;
-    mutable bool m_uidCalled = false;
-
-    template<typename Expected, typename Actual>
-    void assertEq(const Expected& expected, const Actual& actual) { ASSERT_EQ(expected, actual); }
-
-    virtual SystemCommands::MountCode osMount(const std::string& command) override
-    {
-        m_osMountCalledTImes++;
-
-        std::stringstream ss;
-        ss << "mount -t cifs '" << kValidUrl << "' '" << kPath << "' -o uid=" << kUid
-           << ",gid=" << kGid << ",credentials=" << kCredentialsFile;
-
-        auto baseCommand = ss.str();
-        assertEq(true, command.find(baseCommand) != std::string::npos);
-        if (m_mountCommandFlags & MountCommandFlags::domain)
-            ss << ",domain=" << kDomain;
-        else if (m_mountCommandFlags & MountCommandFlags::defaultDomain)
-            ss << ",domain=" << kDefaultDomain;
-
-        if (m_mountCommandFlags & MountCommandFlags::ver1)
-            ss << ",vers=" << kVer1;
-        else if (m_mountCommandFlags & MountCommandFlags::ver2)
-            ss << ",vers=" << kVer2;
-
-        baseCommand = ss.str();
-        if (command != baseCommand)
-            return SystemCommands::MountCode::otherError;
-
-        switch (m_osMountExpectation)
-        {
-        case OsMount::called_Ok: return SystemCommands::MountCode::ok;
-        case OsMount::called_wrongCredentials: return SystemCommands::MountCode::wrongCredentials;
-        case OsMount::called_otherError: return SystemCommands::MountCode::otherError;
-        case OsMount::notCalled: assertEq(true, false); break;
-        }
-
-        return SystemCommands::MountCode::otherError;
-    }
-
-    virtual bool isMountPathAllowed(const std::string& /*path*/) const override
-    {
-        switch (m_mountPathExpectation)
-        {
-        case MountPath::invalid:
-            return false;
-        case MountPath::valid:
-            return true;
-        }
-        return false;
-    }
-
-    virtual std::string credentialsFileName(
-        const std::string& /*username*/,
-        const std::string& /*password*/) const override
-    {
-        m_credentialsFileNameCalled = true;
-
-        switch (m_credentialsFileNameExpectation)
-        {
-        case CredentialsFileNameCall::called_Fail:
-            return "";
-        case CredentialsFileNameCall::called_Ok:
-            return kCredentialsFile;
-        case CredentialsFileNameCall::notCalled:
-            break;
-        }
-
-        return "";
-    }
-
-    virtual uid_t gid() const override
-    {
-        m_gidCalled = true;
-        return kGid;
-    }
-
-    virtual uid_t uid() const override
-    {
-        m_uidCalled = true;
-        return kUid;
-    }
 };
 
 class MountHelper: public ::testing::Test
 {
 protected:
+    virtual void SetUp() override
+    {
+        m_delegates.gid = [this]() { m_gidCalled = true; return kGid; };
+        m_delegates.uid = [this]() { m_uidCalled = true; return kUid; };
+        m_delegates.credentialsFileName =
+            [this]( const std::string& username, const std::string& password)
+                {
+                    m_credentialsFileNameCalled = true;
+                    m_providedCredentials.push_back(std::make_pair(username, password));
+
+                    switch (m_credentialsFileNameExpectation)
+                    {
+                    case CredentialsFileNameCall::called_Fail:
+                        return std::string();
+                    case CredentialsFileNameCall::called_Ok:
+                        return kCredentialsFile;
+                    case CredentialsFileNameCall::notCalled:
+                        break;
+                    }
+
+                    return std::string();
+                };
+        m_delegates.isPathAllowed =
+            [this](const std::string& /*path*/)
+            {
+                switch (m_mountPathExpectation)
+                {
+                case MountPath::invalid:
+                    return false;
+                case MountPath::valid:
+                    return true;
+                }
+                return false;
+            };
+        m_delegates.osMount =
+            [this](const std::string& command)
+            {
+                m_osMountCalledTImes++;
+
+                std::stringstream ss;
+                ss << "mount -t cifs '" << kValidUrl << "' '" << kPath << "' -o uid=" << kUid
+                   << ",gid=" << kGid << ",credentials=" << kCredentialsFile;
+
+                auto baseCommand = ss.str();
+                assertEq(true, command.find(baseCommand) != std::string::npos);
+                if (m_mountCommandFlags & MountCommandFlags::domain)
+                    ss << ",domain=" << kDomain;
+                else if (m_mountCommandFlags & MountCommandFlags::defaultDomain)
+                    ss << ",domain=" << kDefaultDomain;
+
+                if (m_mountCommandFlags & MountCommandFlags::ver1)
+                    ss << ",vers=" << kVer1;
+                else if (m_mountCommandFlags & MountCommandFlags::ver2)
+                    ss << ",vers=" << kVer2;
+
+                baseCommand = ss.str();
+                if (command != baseCommand)
+                    return SystemCommands::MountCode::otherError;
+
+                switch (m_osMountExpectation)
+                {
+                case OsMount::called_Ok: return SystemCommands::MountCode::ok;
+                case OsMount::called_wrongCredentials: return SystemCommands::MountCode::wrongCredentials;
+                case OsMount::called_otherError: return SystemCommands::MountCode::otherError;
+                case OsMount::notCalled: assertEq(true, false); break;
+                }
+
+                return SystemCommands::MountCode::otherError;
+            };
+    }
+
     void whenDerivedProvides(
         OsMount osMountExpectation,
         int mountCommandFlags,
@@ -204,12 +167,7 @@ protected:
 
     void whenMountCalled(const std::string& url, const std::string& username)
     {
-        m_mountHelper = std::make_unique<TestMountHelper>(username, kPassword);
-        m_mountHelper->setDerivedExpectations(
-            m_osMountExpectation,
-            m_mountCommandFlags,
-            m_mountPathExpectation,
-            m_credentialsFileNameExpectation);
+        m_mountHelper = std::make_unique<system_commands::MountHelper>(username, kPassword, m_delegates);
         m_result = m_mountHelper->mount(url, kPath);
     }
 
@@ -241,14 +199,14 @@ protected:
             break;
         }
 
-        m_mountHelper = std::make_unique<TestMountHelper>(username, password);
+        TestMountHelper mountHelper(username, password, m_delegates);
         if (userNameExpectation == UserName::present_domain)
         {
-            ASSERT_EQ(kUserName, m_mountHelper->username());
-            auto domains = m_mountHelper->domains();
+            ASSERT_EQ(kUserName, mountHelper.username());
+            auto domains = mountHelper.domains();
             ASSERT_NE(std::find(domains.cbegin(), domains.cend(), kDomain), domains.cend());
         }
-        ASSERT_EQ(password, m_mountHelper->password());
+        ASSERT_EQ(password, mountHelper.password());
     }
 
     void thenMountShouldReturn(SystemCommands::MountCode mountCode)
@@ -261,38 +219,54 @@ protected:
         CredentialsFileNameCall credentialsFileNameCallExpectations,
         GidUidCall gidUidCallExpectations)
     {
-        ASSERT_GE(m_mountHelper->osMountCalledTimes(), osMountCalledTimesAtLeast);
+        ASSERT_GE(m_osMountCalledTImes, osMountCalledTimesAtLeast);
         switch (credentialsFileNameCallExpectations)
         {
         case CredentialsFileNameCall::called_Ok:
         case CredentialsFileNameCall::called_Fail:
-            ASSERT_TRUE(m_mountHelper->isCredentialsFileNameCalled());
+            ASSERT_TRUE(m_credentialsFileNameCalled);
+            ASSERT_NE(
+                std::find(
+                    m_providedCredentials.cbegin(),
+                    m_providedCredentials.cend(),
+                    std::make_pair(kUserName, kPassword)),
+                m_providedCredentials.cend());
             break;
         case CredentialsFileNameCall::notCalled:
-            ASSERT_FALSE(m_mountHelper->isCredentialsFileNameCalled());
+            ASSERT_FALSE(m_credentialsFileNameCalled);
             break;
         }
 
         switch (gidUidCallExpectations)
         {
         case GidUidCall::called:
-            ASSERT_TRUE(m_mountHelper->isGidCalled());
-            ASSERT_TRUE(m_mountHelper->isUidCalled());
+            ASSERT_TRUE(m_gidCalled);
+            ASSERT_TRUE(m_uidCalled);
             break;
         case GidUidCall::notCalled:
-            ASSERT_FALSE(m_mountHelper->isGidCalled());
-            ASSERT_FALSE(m_mountHelper->isUidCalled());
+            ASSERT_FALSE(m_gidCalled);
+            ASSERT_FALSE(m_uidCalled);
             break;
         }
     }
 
 private:
+    system_commands::MountHelperDelegates m_delegates;
     OsMount m_osMountExpectation;
     int m_mountCommandFlags;
     MountPath m_mountPathExpectation;
     CredentialsFileNameCall m_credentialsFileNameExpectation;
     SystemCommands::MountCode m_result = SystemCommands::MountCode::otherError;
-    std::unique_ptr<TestMountHelper> m_mountHelper;
+    std::unique_ptr<nx::system_commands::MountHelper> m_mountHelper;
+    std::vector<std::pair<std::string, std::string>> m_providedCredentials;
+
+    int m_osMountCalledTImes = 0;
+    mutable bool m_credentialsFileNameCalled = false;
+    mutable bool m_gidCalled = false;
+    mutable bool m_uidCalled = false;
+
+    template<typename Expected, typename Actual>
+    void assertEq(const Expected& expected, const Actual& actual) { ASSERT_EQ(expected, actual); }
 };
 
 TEST_F(MountHelper, Credentials_Conversions)
@@ -515,8 +489,6 @@ TEST_F(MountHelper, fail_cantCreateCredentialsFile)
         GidUidCall::notCalled);
     thenMountShouldReturn(SystemCommands::MountCode::otherError);
 }
-
-// #TODO #akulikov test if credentialsFileName() receives correct username and password
 
 } // namespace test
 } // namespace system_commands

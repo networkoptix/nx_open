@@ -5,22 +5,24 @@
 namespace nx {
 namespace system_commands {
 
-MountHelperBase::MountHelperBase(
+MountHelper::MountHelper(
     const boost::optional<std::string>& username,
-    const boost::optional<std::string>& password)
+    const boost::optional<std::string>& password,
+    const MountHelperDelegates& delegates)
     :
     m_username(username ? *username : "guest"),
-    m_password(password ? *password : "")
+    m_password(password ? *password : ""),
+    m_delegates(delegates)
 {
     if (username && !checkAndParseUsername())
         m_invalidUsername = true;
 }
 
-SystemCommands::MountCode MountHelperBase::mount(
+SystemCommands::MountCode MountHelper::mount(
     const std::string& url,
     const std::string& directory)
 {
-    if (!isMountPathAllowed(directory))
+    if (!m_delegates.isPathAllowed(directory))
         return SystemCommands::MountCode::otherError;
 
     if (m_invalidUsername)
@@ -38,7 +40,7 @@ SystemCommands::MountCode MountHelperBase::mount(
     return m_hasCredentialsError ? SystemCommands::MountCode::wrongCredentials : m_result;
 }
 
-bool MountHelperBase::checkAndParseUsername()
+bool MountHelper::checkAndParseUsername()
 {
     auto domainSeparatorPos = m_username.find('\\');
     if (domainSeparatorPos == std::string::npos)
@@ -54,7 +56,7 @@ bool MountHelperBase::checkAndParseUsername()
     return true;
 }
 
-void MountHelperBase::tryMountWithDomain(const std::string& domain)
+void MountHelper::tryMountWithDomain(const std::string& domain)
 {
     if (m_result == SystemCommands::MountCode::ok)
         return;
@@ -63,20 +65,20 @@ void MountHelperBase::tryMountWithDomain(const std::string& domain)
         tryMountWithDomainAndPassword(domain, password);
 }
 
-void MountHelperBase::tryMountWithDomainAndPassword(
+void MountHelper::tryMountWithDomainAndPassword(
     const std::string& domain,
     const std::string& password)
 {
     if (m_result == SystemCommands::MountCode::ok)
         return;
 
-    auto credentialsFile = credentialsFileName(m_username, password);
+    auto credentialsFile = m_delegates.credentialsFileName(m_username, password);
     if (credentialsFile.empty())
         return;
 
     for (const auto& ver: {"", "1.0", "2.0"})
     {
-        m_result = osMount(makeCommandString(domain, ver, credentialsFile));
+        m_result = m_delegates.osMount(makeCommandString(domain, ver, credentialsFile));
         if (m_result == SystemCommands::MountCode::ok)
             break;
 
@@ -85,14 +87,14 @@ void MountHelperBase::tryMountWithDomainAndPassword(
     }
 }
 
-std::string MountHelperBase::makeCommandString(
+std::string MountHelper::makeCommandString(
     const std::string& domain,
     const std::string& ver,
     const std::string& credentialFile)
 {
     std::ostringstream ss;
     ss << "mount -t cifs '" << m_url << "' '" << m_directory << "'"
-        << " -o uid=" << uid() << ",gid=" << gid()
+        << " -o uid=" << m_delegates.uid() << ",gid=" << m_delegates.gid()
         << ",credentials=" << credentialFile;
 
     if (!domain.empty())
