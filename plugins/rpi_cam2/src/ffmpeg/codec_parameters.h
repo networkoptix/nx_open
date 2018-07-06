@@ -1,5 +1,9 @@
 #pragma once
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+}
+
 namespace nx {
 namespace ffmpeg {
 

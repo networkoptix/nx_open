@@ -35,7 +35,7 @@ StreamReader::StreamReader(
         m_codecContext.bitrate(),
         m_codecContext.resolution().width,
         m_codecContext.resolution().height);
-    m_consumer.reset(new ffmpeg::BufferedStreamConsumer(params, m_ffmpegStreamReader));
+    m_consumer.reset(new ffmpeg::BufferedStreamConsumer(m_ffmpegStreamReader, params));
 }
 
 StreamReader::~StreamReader()

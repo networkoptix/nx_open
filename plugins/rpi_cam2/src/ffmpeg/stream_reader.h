@@ -38,12 +38,12 @@ public:
 
     CameraState cameraState() const;
 
-    const std::unique_ptr<Codec>& decoder();
-    const std::unique_ptr<InputFormat>& inputFormat();
+    const std::unique_ptr<Codec>& decoder() const;
+    const std::unique_ptr<InputFormat>& inputFormat() const;
 
-    void setFps(int fps);
-    void setBitrate(int bitrate);
-    void setResolution(int width, int height);
+    void updateFps();
+    void updateBitrate();
+    void updateResolution();
 
 private:
     std::string m_url;
@@ -67,41 +67,15 @@ private:
     void uninitialize();
     void setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat);
     int decode(AVFrame * outframe, const AVPacket * packet);
-    void wait();
 };
 
-class StreamConsumer : public std::enable_shared_from_this<StreamConsumer>
+class StreamConsumer
 {
 public:
-    StreamConsumer(const std::weak_ptr<StreamReader>& streamReader):
-        m_streamReader(streamReader)
-    {
-    }
-
-    ~StreamConsumer()
-    {
-        if (auto sr = m_streamReader.lock())
-            sr->removeConsumer(weak_from_this());
-    }
-    
-    void initialize()
-    {
-        if(m_ready)
-            return;
-
-        m_ready = true;
-        if(auto sr = m_streamReader.lock())
-            sr->addConsumer(weak_from_this());
-    }
-
     virtual int fps() const = 0;
-    virtual void resolution(int * width, int * height) const = 0;
+    virtual void resolution(int *width, int *height) const = 0;
     virtual int bitrate() const = 0;
     virtual void givePacket(const std::shared_ptr<Packet>& packet) = 0;
-
-protected:
-    bool m_ready = false;
-    std::weak_ptr<StreamReader> m_streamReader;
 };
 
 } // namespace ffmpeg

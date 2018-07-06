@@ -4,6 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
+#include "../utils/time_profiler.h"
 #include "../utils/utils.h"
 #include "utils.h"
 #include "input_format.h"
@@ -11,7 +12,6 @@
 #include "packet.h"
 #include "frame.h"
 #include "error.h"
-#include "../utils/time_profiler.h"
 
 namespace nx {
 namespace ffmpeg {
@@ -84,25 +84,22 @@ StreamReader::CameraState StreamReader::cameraState() const
     return m_cameraState;
 }
 
-const std::unique_ptr<ffmpeg::Codec>& StreamReader::decoder()
+const std::unique_ptr<ffmpeg::Codec>& StreamReader::decoder() const
 {
     return m_decoder;
 }
 
-const std::unique_ptr<ffmpeg::InputFormat>& StreamReader::inputFormat()
+const std::unique_ptr<ffmpeg::InputFormat>& StreamReader::inputFormat() const
 {
     return m_inputFormat;
 }
 
-void StreamReader::setFps(int fps)
+void StreamReader::updateFps()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if(m_consumers.empty())
-    {
-        m_codecParams.fps = fps;
         return;
-    }
 
     int largest = 0;
     for (const auto & consumer : m_consumers)
@@ -123,15 +120,12 @@ void StreamReader::setFps(int fps)
     }
 }
 
-void StreamReader::setBitrate(int bitrate)
+void StreamReader::updateBitrate()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (m_consumers.empty())
-    {
-        m_codecParams.bitrate = bitrate;
         return;
-    }
 
     int largest = 0;
     for (const auto & consumer : m_consumers)
@@ -152,15 +146,12 @@ void StreamReader::setBitrate(int bitrate)
     }
 }
 
-void StreamReader::setResolution(int width, int height)
+void StreamReader::updateResolution()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (m_consumers.empty())
-    {
-        m_codecParams.setResolution(width, height);
         return;
-    }
 
     int largestWidth = 0;
     int largestHeight = 0;
@@ -168,13 +159,13 @@ void StreamReader::setResolution(int width, int height)
     {
         if (auto c = consumer.lock())
         {
-            int w;
-            int h;
-            c->resolution(&w, &h);
-            if (w > largestWidth || h > largestHeight)
+            int width;
+            int height;
+            c->resolution(&width, &height);
+            if (width > largestWidth || height > largestHeight)
             {
-                largestWidth = w;
-                largestHeight = h;
+                largestWidth = width;
+                largestHeight = height;
             }
         }
     }
@@ -191,7 +182,6 @@ void StreamReader::run()
 {
     while (!m_terminated)
     {
-        //wait();
         std::lock_guard<std::mutex> lock(m_mutex);
         if (m_consumers.empty())
             continue;
@@ -309,12 +299,6 @@ int StreamReader::decode(AVFrame * outFrame, const AVPacket * packet)
             break;
     }
     return decodeSize;
-}
-
-void StreamReader::wait()
-{
-    float sleep = 1.0 / (float) m_codecParams.fps;
-    std::this_thread::sleep_for(std::chrono::milliseconds((int)(sleep * 1000)));
 }
 
 } // namespace ffmpeg
