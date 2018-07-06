@@ -1,4 +1,4 @@
-#include "request_executor.h"
+#include "query_executor.h"
 
 #include <QtSql/QSqlError>
 

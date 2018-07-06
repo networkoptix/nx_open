@@ -1,4 +1,4 @@
-#include "multiple_request_executor.h"
+#include "multiple_query_executor.h"
 
 namespace nx::sql::detail {
 

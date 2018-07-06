@@ -4,17 +4,17 @@
 
 #include <nx/utils/std/cpp14.h>
 
-#include <nx/sql/detail/request_execution_thread.h>
+#include <nx/sql/detail/query_execution_thread.h>
 
 #include "base_db_test.h"
 
 namespace nx::sql::detail::test {
 
-class DbRequestExecutionThread:
+class QueryExecutionThread:
     public nx::sql::test::BaseDbTest
 {
 public:
-    DbRequestExecutionThread()
+    QueryExecutionThread()
     {
         initializeDatabase();
     }
@@ -22,7 +22,7 @@ public:
 protected:
     void givenRunningThread()
     {
-        m_thread = std::make_unique<detail::DbRequestExecutionThread>(
+        m_thread = std::make_unique<detail::QueryExecutionThread>(
             connectionOptions(),
             &m_queryExecutorQueue);
         m_thread->start();
@@ -40,10 +40,10 @@ protected:
 
 private:
     QueryExecutorQueue m_queryExecutorQueue;
-    std::unique_ptr<detail::DbRequestExecutionThread> m_thread;
+    std::unique_ptr<detail::QueryExecutionThread> m_thread;
 };
 
-TEST_F(DbRequestExecutionThread, stops_after_termination_request)
+TEST_F(QueryExecutionThread, stops_after_termination_request)
 {
     givenRunningThread();
     whenAskedThreadToStop();

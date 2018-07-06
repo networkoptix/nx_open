@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/sql/detail/multiple_request_executor.h>
+#include <nx/sql/detail/multiple_query_executor.h>
 #include <nx/utils/random.h>
 
 namespace nx::sql::detail::test {

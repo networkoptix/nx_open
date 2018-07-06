@@ -10,7 +10,7 @@
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
-#include "request_executor.h"
+#include "query_executor.h"
 
 namespace nx::sql::detail {
 

@@ -4,8 +4,8 @@
 
 #include <QtCore/QDir>
 
-#include <nx/sql/detail/request_executor_factory.h>
-#include <nx/sql/detail/request_execution_thread.h>
+#include <nx/sql/detail/query_executor_factory.h>
+#include <nx/sql/detail/query_execution_thread.h>
 
 #include "functional_tests/test_setup.h"
 #include "functional_tests/test_email_manager.h"
@@ -77,9 +77,9 @@ TEST_F(DbRegress, general)
 namespace {
 
 class QueryExecutorStub:
-    public nx::sql::detail::DbRequestExecutionThread
+    public nx::sql::detail::QueryExecutionThread
 {
-    using base_type = nx::sql::detail::DbRequestExecutionThread;
+    using base_type = nx::sql::detail::QueryExecutionThread;
 
 public:
     QueryExecutorStub(
@@ -176,7 +176,7 @@ private:
         m_requestResultCodeQueue.push(resultCode);
     }
 
-    std::unique_ptr<nx::sql::detail::BaseRequestExecutor>
+    std::unique_ptr<nx::sql::detail::BaseQueryExecutor>
         createInfiniteLatencyDbQueryExecutorFactory(
             const nx::sql::ConnectionOptions& connectionOptions,
             nx::sql::detail::QueryExecutorQueue* const queryExecutorQueue)

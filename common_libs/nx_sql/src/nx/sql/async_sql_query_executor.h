@@ -6,19 +6,16 @@
 #include <functional>
 #include <memory>
 
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlError>
-
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
-#include "detail/base_request_executor.h"
+#include "detail/base_query_executor.h"
 #include "detail/cursor_handler.h"
 #include "detail/query_queue.h"
-#include "detail/request_executor.h"
+#include "detail/query_executor.h"
 #include "types.h"
 #include "query.h"
 #include "query_context.h"
@@ -258,15 +255,15 @@ private:
     struct CursorProcessorContext
     {
         detail::CursorHandlerPool cursorContextPool;
-        std::unique_ptr<detail::BaseRequestExecutor> processingThread;
+        std::unique_ptr<detail::BaseQueryExecutor> processingThread;
     };
 
     const ConnectionOptions m_connectionOptions;
     mutable QnMutex m_mutex;
     detail::QueryQueue m_queryQueue;
-    std::vector<std::unique_ptr<detail::BaseRequestExecutor>> m_dbThreadPool;
+    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreadPool;
     nx::utils::thread m_dropConnectionThread;
-    nx::utils::SyncQueue<std::unique_ptr<detail::BaseRequestExecutor>> m_connectionsToDropQueue;
+    nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
     bool m_terminated;
     StatisticsCollector* m_statisticsCollector;
 
@@ -276,20 +273,20 @@ private:
     bool isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const;
 
     void openNewConnection(const QnMutexLockerBase& /*lk*/);
-    std::unique_ptr<detail::BaseRequestExecutor> createNewConnectionThread(
+    std::unique_ptr<detail::BaseQueryExecutor> createNewConnectionThread(
         const QnMutexLockerBase& /*lock*/,
         detail::QueryQueue* const queryQueue);
-    std::unique_ptr<detail::BaseRequestExecutor> createNewConnectionThread(
+    std::unique_ptr<detail::BaseQueryExecutor> createNewConnectionThread(
         const QnMutexLockerBase& /*lock*/,
         const ConnectionOptions& connectionOptions,
         detail::QueryQueue* const queryQueue);
 
     void dropExpiredConnectionsThreadFunc();
     void reportQueryCancellation(std::unique_ptr<detail::AbstractExecutor>);
-    void onConnectionClosed(detail::BaseRequestExecutor* const executorThreadPtr);
+    void onConnectionClosed(detail::BaseQueryExecutor* const executorThreadPtr);
     void dropConnectionAsync(
         const QnMutexLockerBase&,
-        detail::BaseRequestExecutor* const executorThreadPtr);
+        detail::BaseQueryExecutor* const executorThreadPtr);
 
     template<
         typename Executor, typename UpdateFunc,

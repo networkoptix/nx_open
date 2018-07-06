@@ -1,4 +1,4 @@
-#include "request_execution_thread.h"
+#include "query_execution_thread.h"
 
 #include <QtCore/QUuid>
 #include <QtSql/QSqlError>
@@ -10,11 +10,11 @@
 
 namespace nx::sql::detail {
 
-DbRequestExecutionThread::DbRequestExecutionThread(
+QueryExecutionThread::QueryExecutionThread(
     const ConnectionOptions& connectionOptions,
     QueryExecutorQueue* const queryExecutorQueue)
 :
-    BaseRequestExecutor(connectionOptions, queryExecutorQueue),
+    BaseQueryExecutor(connectionOptions, queryExecutorQueue),
     m_state(ConnectionState::initializing),
     m_terminated(false),
     m_numberOfFailedRequestsInARow(0),
@@ -22,7 +22,7 @@ DbRequestExecutionThread::DbRequestExecutionThread(
 {
 }
 
-DbRequestExecutionThread::~DbRequestExecutionThread()
+QueryExecutionThread::~QueryExecutionThread()
 {
     if (m_queryExecutionThread.joinable())
     {
@@ -32,33 +32,33 @@ DbRequestExecutionThread::~DbRequestExecutionThread()
     m_dbConnectionHolder.close();
 }
 
-void DbRequestExecutionThread::pleaseStop()
+void QueryExecutionThread::pleaseStop()
 {
     m_terminated = true;
 }
 
-void DbRequestExecutionThread::join()
+void QueryExecutionThread::join()
 {
     m_queryExecutionThread.join();
 }
 
-ConnectionState DbRequestExecutionThread::state() const
+ConnectionState QueryExecutionThread::state() const
 {
     return m_state;
 }
 
-void DbRequestExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
+void QueryExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_onClosedHandler = std::move(handler);
 }
 
-void DbRequestExecutionThread::start()
+void QueryExecutionThread::start()
 {
     m_queryExecutionThread =
-        nx::utils::thread(std::bind(&DbRequestExecutionThread::queryExecutionThreadMain, this));
+        nx::utils::thread(std::bind(&QueryExecutionThread::queryExecutionThreadMain, this));
 }
 
-void DbRequestExecutionThread::queryExecutionThreadMain()
+void QueryExecutionThread::queryExecutionThreadMain()
 {
     constexpr const std::chrono::milliseconds kTaskWaitTimeout =
         std::chrono::milliseconds(50);
@@ -107,7 +107,7 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
     }
 }
 
-void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> task)
+void QueryExecutionThread::processTask(std::unique_ptr<AbstractExecutor> task)
 {
     const auto result = task->execute(m_dbConnectionHolder.dbConnection());
     switch (result)
@@ -147,13 +147,13 @@ void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> tas
     }
 }
 
-void DbRequestExecutionThread::closeConnection()
+void QueryExecutionThread::closeConnection()
 {
     m_dbConnectionHolder.close();
     m_state = ConnectionState::closed;
 }
 
-bool DbRequestExecutionThread::isDbErrorRecoverable(DBResult dbResult)
+bool QueryExecutionThread::isDbErrorRecoverable(DBResult dbResult)
 {
     switch (dbResult)
     {

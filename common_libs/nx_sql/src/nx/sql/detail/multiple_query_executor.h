@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "request_executor.h"
+#include "query_executor.h"
 
 namespace nx::sql::detail {
 

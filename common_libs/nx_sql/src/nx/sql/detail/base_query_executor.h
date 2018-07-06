@@ -10,7 +10,7 @@
 #include <nx/utils/thread/stoppable.h>
 
 #include "query_queue.h"
-#include "request_executor.h"
+#include "query_executor.h"
 
 namespace nx::sql::detail {
 
@@ -23,15 +23,15 @@ enum class ConnectionState
 
 using QueryExecutorQueue = detail::QueryQueue;
 
-class NX_SQL_API BaseRequestExecutor:
+class NX_SQL_API BaseQueryExecutor:
     public QnStoppable,
     public QnJoinable
 {
 public:
-    BaseRequestExecutor(
+    BaseQueryExecutor(
         const ConnectionOptions& connectionOptions,
         QueryExecutorQueue* const queryExecutorQueue);
-    virtual ~BaseRequestExecutor() = default;
+    virtual ~BaseQueryExecutor() = default;
 
     virtual ConnectionState state() const = 0;
     virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;

@@ -1,7 +1,7 @@
 #include <memory>
 
 #include <nx/sql/db_connection_holder.h>
-#include <nx/sql/detail/request_executor.h>
+#include <nx/sql/detail/query_executor.h>
 #include <nx/utils/std/optional.h>
 
 #include "../base_db_test.h"

@@ -5,24 +5,24 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/thread/long_runnable.h>
 
-#include "base_request_executor.h"
-#include "request_executor.h"
+#include "base_query_executor.h"
+#include "query_executor.h"
 #include "../db_connection_holder.h"
 
 namespace nx::sql::detail {
 
 /**
  * Connection can be closed by timeout or due to error.
- * Use DbRequestExecutionThread::isOpen to test it.
+ * Use QueryExecutionThread::isOpen to test it.
  */
-class NX_SQL_API DbRequestExecutionThread:
-    public BaseRequestExecutor
+class NX_SQL_API QueryExecutionThread:
+    public BaseQueryExecutor
 {
 public:
-    DbRequestExecutionThread(
+    QueryExecutionThread(
         const ConnectionOptions& connectionOptions,
         QueryExecutorQueue* const queryExecutorQueue);
-    virtual ~DbRequestExecutionThread() override;
+    virtual ~QueryExecutionThread() override;
 
     virtual void pleaseStop() override;
     virtual void join() override;

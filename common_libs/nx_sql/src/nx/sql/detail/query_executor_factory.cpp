@@ -1,9 +1,9 @@
-#include "request_executor_factory.h"
+#include "query_executor_factory.h"
 
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "request_execution_thread.h"
+#include "query_execution_thread.h"
 
 namespace nx::sql::detail {
 
@@ -19,11 +19,11 @@ RequestExecutorFactory& RequestExecutorFactory::instance()
     return staticInstance;
 }
 
-std::unique_ptr<BaseRequestExecutor> RequestExecutorFactory::defaultFactoryFunction(
+std::unique_ptr<BaseQueryExecutor> RequestExecutorFactory::defaultFactoryFunction(
     const ConnectionOptions& connectionOptions,
     QueryExecutorQueue* const queryExecutorQueue)
 {
-    return std::make_unique<DbRequestExecutionThread>(
+    return std::make_unique<QueryExecutionThread>(
         connectionOptions,
         queryExecutorQueue);
 }

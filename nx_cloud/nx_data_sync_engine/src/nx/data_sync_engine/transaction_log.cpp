@@ -1,6 +1,7 @@
 #include "transaction_log.h"
 
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 #include <nx/utils/time.h>
 

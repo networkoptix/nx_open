@@ -1,8 +1,8 @@
-#include "base_request_executor.h"
+#include "base_query_executor.h"
 
 namespace nx::sql::detail {
 
-BaseRequestExecutor::BaseRequestExecutor(
+BaseQueryExecutor::BaseQueryExecutor(
     const ConnectionOptions& connectionOptions,
     QueryExecutorQueue* const queryExecutorQueue)
     :
@@ -11,17 +11,17 @@ BaseRequestExecutor::BaseRequestExecutor(
 {
 }
 
-const ConnectionOptions& BaseRequestExecutor::connectionOptions() const
+const ConnectionOptions& BaseQueryExecutor::connectionOptions() const
 {
     return m_connectionOptions;
 }
 
-QueryExecutorQueue* BaseRequestExecutor::queryExecutorQueue()
+QueryExecutorQueue* BaseQueryExecutor::queryExecutorQueue()
 {
     return m_queryExecutorQueue;
 }
 
-const QueryExecutorQueue* BaseRequestExecutor::queryExecutorQueue() const
+const QueryExecutorQueue* BaseQueryExecutor::queryExecutorQueue() const
 {
     return m_queryExecutorQueue;
 }

@@ -4,7 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include "detail/request_executor_factory.h"
+#include "detail/query_executor_factory.h"
 #include "sql_query_execution_helper.h"
 #include "query.h"
 
@@ -56,7 +56,7 @@ AsyncSqlQueryExecutor::~AsyncSqlQueryExecutor()
     m_connectionsToDropQueue.push(nullptr);
     m_dropConnectionThread.join();
 
-    std::vector<std::unique_ptr<detail::BaseRequestExecutor>> dbThreadPool;
+    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> dbThreadPool;
     decltype(m_cursorProcessorContexts) cursorProcessorContexts;
     {
         QnMutexLocker lk(&m_mutex);
@@ -227,14 +227,14 @@ void AsyncSqlQueryExecutor::openNewConnection(const QnMutexLockerBase& lock)
     m_dbThreadPool.push_back(std::move(executorThread));
 }
 
-std::unique_ptr<detail::BaseRequestExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
+std::unique_ptr<detail::BaseQueryExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
     const QnMutexLockerBase& lock,
     detail::QueryQueue* const queryQueue)
 {
     return createNewConnectionThread(lock, m_connectionOptions, queryQueue);
 }
 
-std::unique_ptr<detail::BaseRequestExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
+std::unique_ptr<detail::BaseQueryExecutor> AsyncSqlQueryExecutor::createNewConnectionThread(
     const QnMutexLockerBase& /*lock*/,
     const ConnectionOptions& connectionOptions,
     detail::QueryQueue* const queryQueue)
@@ -254,7 +254,7 @@ void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
 {
     for (;;)
     {
-        std::unique_ptr<detail::BaseRequestExecutor> dbConnection =
+        std::unique_ptr<detail::BaseQueryExecutor> dbConnection =
             m_connectionsToDropQueue.pop();
         if (!dbConnection)
             return; //null is used as a termination mark
@@ -272,7 +272,7 @@ void AsyncSqlQueryExecutor::reportQueryCancellation(
 }
 
 void AsyncSqlQueryExecutor::onConnectionClosed(
-    detail::BaseRequestExecutor* const executorThreadPtr)
+    detail::BaseQueryExecutor* const executorThreadPtr)
 {
     QnMutexLocker lk(&m_mutex);
     dropConnectionAsync(lk, executorThreadPtr);
@@ -282,12 +282,12 @@ void AsyncSqlQueryExecutor::onConnectionClosed(
 
 void AsyncSqlQueryExecutor::dropConnectionAsync(
     const QnMutexLockerBase& /*lk*/,
-    detail::BaseRequestExecutor* const executorThreadPtr)
+    detail::BaseQueryExecutor* const executorThreadPtr)
 {
     auto it = std::find_if(
         m_dbThreadPool.begin(),
         m_dbThreadPool.end(),
-        [executorThreadPtr](std::unique_ptr<detail::BaseRequestExecutor>& val)
+        [executorThreadPtr](std::unique_ptr<detail::BaseQueryExecutor>& val)
         {
             return val.get() == executorThreadPtr;
         });

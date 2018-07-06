@@ -5,6 +5,7 @@
 #include <boost/algorithm/string/split.hpp>
 
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql_functions.h>

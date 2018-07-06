@@ -12,8 +12,8 @@
 
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/sql_cursor.h>
-#include <nx/sql/detail/request_executor_factory.h>
-#include <nx/sql/detail/request_execution_thread.h>
+#include <nx/sql/detail/query_executor_factory.h>
+#include <nx/sql/detail/query_execution_thread.h>
 #include <nx/sql/query.h>
 
 #include "base_db_test.h"
@@ -43,21 +43,21 @@ void readSqlRecord(SqlQuery* query, Company* company)
 }
 
 //-------------------------------------------------------------------------------------------------
-// DbRequestExecutionThreadTestWrapper
+// QueryExecutionThreadTestWrapper
 
-class DbRequestExecutionThreadTestWrapper:
-    public detail::DbRequestExecutionThread
+class QueryExecutionThreadTestWrapper:
+    public detail::QueryExecutionThread
 {
 public:
-    DbRequestExecutionThreadTestWrapper(
+    QueryExecutionThreadTestWrapper(
         const ConnectionOptions& connectionOptions,
         detail::QueryExecutorQueue* const queryExecutorQueue)
         :
-        detail::DbRequestExecutionThread(connectionOptions, queryExecutorQueue)
+        detail::QueryExecutionThread(connectionOptions, queryExecutorQueue)
     {
     }
 
-    ~DbRequestExecutionThreadTestWrapper()
+    ~QueryExecutionThreadTestWrapper()
     {
         if (m_onDestructionHandler)
             m_onDestructionHandler();
@@ -301,11 +301,11 @@ private:
         NX_GTEST_ASSERT_EQ(dbResultToEmulate, dbResult);
     }
 
-    std::unique_ptr<detail::BaseRequestExecutor> createConnection(
+    std::unique_ptr<detail::BaseQueryExecutor> createConnection(
         const ConnectionOptions& connectionOptions,
         detail::QueryExecutorQueue* const queryExecutorQueue)
     {
-        auto connection = std::make_unique<DbRequestExecutionThreadTestWrapper>(
+        auto connection = std::make_unique<QueryExecutionThreadTestWrapper>(
             connectionOptions,
             queryExecutorQueue);
         if (m_eventsReceiver)
