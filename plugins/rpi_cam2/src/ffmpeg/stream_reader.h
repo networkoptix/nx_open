@@ -31,12 +31,9 @@ public:
 public:
     StreamReader(const char * url, const CodecParameters& codecParameters);
     virtual ~StreamReader();
-    
-    int addRef();
-    int releaseRef();
+
     void addConsumer(const std::weak_ptr<StreamConsumer>& consumer);
     void removeConsumer(const std::weak_ptr<StreamConsumer>& consumer);
-    void run();
     void start();
 
     CameraState cameraState() const;
@@ -48,10 +45,6 @@ public:
     void setBitrate(int bitrate);
     void setResolution(int width, int height);
 
-    int loadNextData(Packet * copyPacket = nullptr);
-
-    const std::unique_ptr<Packet>& currentPacket() const;
-
 private:
     std::string m_url;
     CodecParameters m_codecParams;
@@ -62,15 +55,13 @@ private:
     CameraState m_cameraState = kOff;
     mutable std::mutex m_mutex;
 
-    std::unique_ptr<Packet> m_currentPacket;
-
-    int m_refCount = 0;
-
     std::vector<std::weak_ptr<StreamConsumer>> m_consumers;
 
     bool m_started = false;
     bool m_terminated = false;
 private:
+    void run();
+    int loadNextData(Packet * copyPacket = nullptr);
     bool ensureInitialized();
     int initialize();
     void uninitialize();

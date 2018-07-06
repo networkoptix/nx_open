@@ -28,7 +28,6 @@ StreamReader::StreamReader(
     m_ffmpegStreamReader(ffmpegStreamReader)
 {
     NX_ASSERT(m_timeProvider);
-    m_ffmpegStreamReader->addRef();
 
     ffmpeg::CodecParameters params(
         nx::ffmpeg::utils::toAVCodecID(m_codecContext.codecID()),
@@ -41,7 +40,6 @@ StreamReader::StreamReader(
 
 StreamReader::~StreamReader()
 {
-    m_ffmpegStreamReader->releaseRef();
     m_timeProvider->releaseRef();
 }
 

@@ -22,7 +22,7 @@ extern "C" {
 #include "ffmpeg/error.h"
 
 #include "utils/time_profiler.h"
-s
+
 namespace nx {
 namespace rpi_cam2 {
 
@@ -75,16 +75,16 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(!ensureInitialized())
         return nxcip::NX_OTHER_ERROR;
 
-    ffmpeg::Packet packet;
-    if(m_ffmpegStreamReader->loadNextData(&packet) < 0)
-        return nxcip::NX_IO_ERROR;
+    m_consumer->initialize();
+    m_ffmpegStreamReader->start();
 
-    if(!(packet.packet()->flags & AV_PKT_FLAG_KEY))
-        return nxcip::NX_TRY_AGAIN;
+    std::shared_ptr<ffmpeg::Packet> packet = nullptr;
+    while(!packet)
+        packet = m_consumer->popNextPacket();
 
     m_decodedFrame->unreference();
     int decodeCode =
-        decode(m_ffmpegStreamReader->decoder(), m_decodedFrame->frame(), packet.packet());
+        decode(m_ffmpegStreamReader->decoder(), m_decodedFrame->frame(), packet->packet());
     if(decodeCode < 0)
         return nxcip::NX_NO_DATA;
 

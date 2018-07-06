@@ -45,17 +45,6 @@ StreamReader::~StreamReader()
     uninitialize();
 }
 
-int StreamReader::addRef()
-{
-    return ++m_refCount;
-}
-
-int StreamReader::releaseRef()
-{
-    m_refCount = m_refCount > 0 ? m_refCount - 1 : 0;
-    return m_refCount;
-}
-
 void StreamReader::start()
 {
     if(m_started)
@@ -64,31 +53,6 @@ void StreamReader::start()
     m_started = true;
     std::thread t(&StreamReader::run, this);
     t.detach();
-}
-
-void StreamReader::run()
-{
-    while (!m_terminated)
-    {
-        //wait();
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_consumers.empty())
-            continue;
-
-        auto packet = std::make_shared<Packet>();
-        int readCode = loadNextData(packet.get());
-        if (readCode < 0)
-            continue;
-
-        for (auto & consumer : m_consumers)
-        {
-            if (auto c = consumer.lock())
-                c->givePacket(packet);
-        }
-    }
-
-    m_started = false; 
-    m_terminated = false;
 }
 
 void StreamReader::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
@@ -223,6 +187,31 @@ void StreamReader::setResolution(int width, int height)
     }
 }
 
+void StreamReader::run()
+{
+    while (!m_terminated)
+    {
+        //wait();
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_consumers.empty())
+            continue;
+
+        auto packet = std::make_shared<Packet>();
+        int readCode = loadNextData(packet.get());
+        if (readCode < 0)
+            continue;
+
+        for (auto & consumer : m_consumers)
+        {
+            if (auto c = consumer.lock())
+                c->givePacket(packet);
+        }
+    }
+
+    m_started = false; 
+    m_terminated = false;
+}
+
 int StreamReader::loadNextData(ffmpeg::Packet * outPacket)
 {
     if(!ensureInitialized())
@@ -230,11 +219,6 @@ int StreamReader::loadNextData(ffmpeg::Packet * outPacket)
 
     outPacket->setCodecID(m_decoder->codecID());
     return m_inputFormat->readFrame(outPacket->packet());
-}
-
-const std::unique_ptr<ffmpeg::Packet>& StreamReader::currentPacket() const
-{
-    return m_currentPacket;
 }
 
 bool StreamReader::ensureInitialized()

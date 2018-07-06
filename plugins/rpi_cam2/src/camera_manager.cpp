@@ -99,8 +99,8 @@ unsigned int CameraManager::releaseRef()
 
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    //*encoderCount = ENCODER_COUNT;
-    *encoderCount = 1;
+    *encoderCount = ENCODER_COUNT;
+    //*encoderCount = 1;
     return nxcip::NX_NO_ERROR;
 }
 
