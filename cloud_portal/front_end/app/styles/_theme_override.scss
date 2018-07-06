@@ -284,6 +284,8 @@ button {
     &.focus:not([disabled]):not(.disabled) {
         background-color : transparentize($light5, 0.75);
         border-color     : $light8;
+        outline : none !important;
+        outline : 0 !important;
     }
 
     &:active,
@@ -291,11 +293,13 @@ button {
         background-color : transparentize($light5, 0.5) !important;
         border-color     : transparentize($light5, 0.5) !important;
         @include box-shadow(inset 0px 1px 0px 1px $light9);
-        outline          : none;
+        outline : none !important;
+        outline : 0 !important;
     }
 }
 
 .btn.btn-primary {
+    color            : $brand_contrast !important;
     background-color : $brand_core;
     border-color     : $brand_core;
     &:hover,
@@ -303,14 +307,19 @@ button {
     &.focus {
         background-color : $brand_l1;
         border-color     : $brand_core;
+        outline : none !important;
+        outline : 0 !important;
+        box-shadow : none;
     }
 
     &:active,
     &.active {
         background-color : $brand_core !important;
         border-color     : $brand_core !important;
-        @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
-        outline          : none;
+        // @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
+        outline : none !important;
+        outline : 0 !important;
+        box-shadow : none !important;
     }
 }
 
