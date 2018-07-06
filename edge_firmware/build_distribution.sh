@@ -323,21 +323,20 @@ copyMediaserverPlugins()
     )
 
     local PLUGIN
-    local PLUGIN_FILENAME
-    local -r PLUGIN_BIN_DIR="$BIN_BUILD_DIR/plugins"
+    local LIB
 
     for PLUGIN in "${PLUGINS[@]}"
     do
-        PLUGIN_FILENAME="lib$PLUGIN.so"
-        echo "Copying (plugin) $PLUGIN_FILENAME"
-        cp "$PLUGIN_BIN_DIR/$PLUGIN_FILENAME" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
+        LIB="lib$PLUGIN.so"
+        echo "Copying (plugin) $LIB"
+        cp "$BIN_BUILD_DIR/plugins/$LIB" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
     done
 
     for PLUGIN in "${PLUGINS_OPTIONAL[@]}"
     do
-        PLUGIN_FILENAME="lib$PLUGIN.so"
-        echo "Copying (optional plugin) $PLUGIN_FILENAME"
-        cp "$PLUGIN_BIN_DIR/$PLUGIN_FILENAME" "$MEDIASERVER_BIN_INSTALL_DIR/plugins_optional/"
+        LIB="lib$PLUGIN.so"
+        echo "Copying (optional plugin) $LIB"
+        cp "$BIN_BUILD_DIR/plugins_optional/$LIB" "$MEDIASERVER_BIN_INSTALL_DIR/plugins_optional/"
     done
 }
 
