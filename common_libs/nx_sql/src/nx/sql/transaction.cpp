@@ -36,12 +36,12 @@ DBResult Transaction::begin()
 DBResult Transaction::commit()
 {
     NX_ASSERT(m_started);
-    m_started = false;
     if (!m_connection->commit())
     {
         notifyOnTransactionCompletion(DBResult::ioError);
         return DBResult::ioError;
     }
+    m_started = false;
     notifyOnSuccessfullCommit();
     notifyOnTransactionCompletion(DBResult::ok);
     return DBResult::ok;

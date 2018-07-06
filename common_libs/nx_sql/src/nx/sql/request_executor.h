@@ -112,42 +112,31 @@ public:
 
     virtual DBResult executeQuery(QSqlDatabase* const connection) override
     {
-        Transaction transaction(connection);
-        QueryContext queryContext(connection, &transaction);
-
-        auto result = transaction.begin();
-        if (result != DBResult::ok)
+        if (m_externalTransaction)
         {
-            result = lastDBError(connection);
-            invokeCompletionHandlerWithDefaultValues(&queryContext, result);
-            return result;
+            if (*m_externalTransaction)
+            {
+                QueryContext queryContext(connection, *m_externalTransaction);
+                return executeQueryUnderTransaction(&queryContext);
+            }
+            else
+            {
+                QueryContext queryContext(connection, nullptr);
+                return executeQueryWithoutTransaction(&queryContext);
+            }
         }
 
-        result = doQuery(&queryContext);
-        if (result != DBResult::ok)
-        {
-            result = detailResultCode(connection, result);
-            transaction.rollback();
-            invokeCompletionHandlerWithDefaultValues(&queryContext, result);
-            return result;
-        }
-
-        result = transaction.commit();
-        if (result != DBResult::ok)
-        {
-            result = lastDBError(connection);
-            connection->rollback();
-            invokeCompletionHandlerWithDefaultValues(&queryContext, result);
-            return result;
-        }
-
-        reportSuccess(&queryContext);
-        return DBResult::ok;
+        return executeQueryUnderNewTransaction(connection);
     }
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
         invokeCompletionHandlerWithDefaultValues(nullptr, errorCode);
+    }
+
+    void setExternalTransaction(Transaction* transaction)
+    {
+        m_externalTransaction = transaction;
     }
 
 protected:
@@ -172,6 +161,39 @@ protected:
 
 private:
     CompletionHandler m_completionHandler;
+    std::optional<Transaction*> m_externalTransaction;
+
+    DBResult executeQueryUnderNewTransaction(QSqlDatabase* const connection)
+    {
+        Transaction transaction(connection);
+        QueryContext queryContext(connection, &transaction);
+
+        auto result = transaction.begin();
+        if (result != DBResult::ok)
+        {
+            result = lastDBError(connection);
+            invokeCompletionHandlerWithDefaultValues(&queryContext, result);
+            return result;
+        }
+
+        result = executeQueryUnderTransaction(&queryContext);
+        if (result != DBResult::ok)
+        {
+            result = detailResultCode(connection, result);
+            transaction.rollback();
+            return result;
+        }
+
+        result = transaction.commit();
+        if (result != DBResult::ok)
+        {
+            result = lastDBError(connection);
+            transaction.rollback();
+            return result;
+        }
+
+        return DBResult::ok;
+    }
 
     void invokeCompletionHandlerWithDefaultValues(
         QueryContext* queryContext,
@@ -184,6 +206,56 @@ private:
         std::apply(
             completionHandler,
             std::tuple_cat(std::make_tuple(queryContext, errorCode), std::move(defaultArgs)));
+    }
+
+    DBResult executeQueryUnderTransaction(QueryContext* queryContext)
+    {
+        auto result = doQuery(queryContext);
+        if (result != DBResult::ok)
+        {
+            result = detailResultCode(queryContext->connection(), result);
+            queryContext->transaction()->addOnTransactionCompletionHandler(
+                std::bind(&BaseUpdateExecutor::invokeCompletionHandlerWithDefaultValues, this,
+                    queryContext, result));
+            return result;
+        }
+
+        queryContext->transaction()->addOnTransactionCompletionHandler(
+            std::bind(&BaseUpdateExecutor::reportQueryResult, this,
+                queryContext, std::placeholders::_1));
+
+        return DBResult::ok;
+    }
+
+    DBResult executeQueryWithoutTransaction(QueryContext* queryContext)
+    {
+        auto result = doQuery(queryContext);
+        if (result != DBResult::ok)
+        {
+            result = detailResultCode(queryContext->connection(), result);
+            invokeCompletionHandlerWithDefaultValues(queryContext, result);
+            return result;
+        }
+
+        reportSuccess(queryContext);
+
+        return DBResult::ok;
+    }
+
+    void reportQueryResult(QueryContext* queryContext, DBResult dbResult)
+    {
+        if (dbResult == DBResult::ok)
+        {
+            // In case of transaction success (query succeeded & committed).
+            reportSuccess(queryContext);
+        }
+        else
+        {
+            // In case of failed transaction (e.g., commit fails).
+            invokeCompletionHandlerWithDefaultValues(
+                queryContext,
+                lastDBError(queryContext->connection()));
+        }
     }
 };
 
@@ -210,6 +282,7 @@ public:
     {
     }
 
+protected:
     virtual DBResult doQuery(QueryContext* queryContext) override
     {
         return this->invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input);
@@ -258,6 +331,7 @@ public:
     {
     }
 
+protected:
     virtual DBResult doQuery(QueryContext* queryContext) override
     {
         return this->invokeDbQueryFunc(m_dbUpdateFunc, queryContext, m_input, &m_output);
@@ -294,6 +368,7 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
 
+protected:
     virtual DBResult doQuery(QueryContext* queryContext) override;
 
     virtual void reportSuccess(QueryContext* queryContext) override;
@@ -315,8 +390,7 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
 
-    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
-
+protected:
     virtual DBResult doQuery(QueryContext* queryContext) override;
 
     virtual void reportSuccess(QueryContext* queryContext) override;
