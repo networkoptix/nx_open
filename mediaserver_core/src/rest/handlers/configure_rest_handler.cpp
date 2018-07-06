@@ -87,7 +87,7 @@ int QnConfigureRestHandler::execute(
 
     if (data.hasPassword())
     {
-        if (!data.currentPassword.isEmpty())
+        if (data.currentPassword.isEmpty())
         {
             result.setError(QnJsonRestResult::CantProcessRequest,
                 lit("currentPassword is required for password change"));
