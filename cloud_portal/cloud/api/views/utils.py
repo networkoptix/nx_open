@@ -128,7 +128,7 @@ def download_build(request, build):
 
 
 @api_view(['GET', 'POST'])
-@permission_classes((AllowAny, ))
+@permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def downloads(request):
     customization = settings.CUSTOMIZATION
