@@ -19,57 +19,12 @@ extern "C" {
 #include "ilp_video_packet.h"
 #include "codec_context.h"
 #include "ffmpeg/forward_declarations.h"
-
-namespace nx{ namespace ffmpeg { class StreamReader; } }
+#include "ffmpeg/stream_reader.h"
+#include "ffmpeg/buffered_stream_consumer.h"
 
 namespace nx {
 namespace rpi_cam2 {
-
-class TimeProfiler
-    {
-        typedef std::chrono::high_resolution_clock::time_point timepoint;
-        timepoint startTime;
-        timepoint stopTime;
     
-    public:
-        timepoint now()
-        {
-            return std::chrono::high_resolution_clock::now();
-        }
-
-        void start()
-        {
-            startTime = now();
-        }
-
-        void stop()
-        {
-            stopTime = now();
-        }
-
-        std::chrono::nanoseconds elapsed()
-        {
-            return stopTime - startTime;
-        }
-
-        int64_t countMsec()
-        {
-            return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed()).count();
-            
-        }
-
-        int64_t countUsec()
-        {
-            return std::chrono::duration_cast<std::chrono::microseconds>(elapsed()).count();
-        }
-
-        int64_t countNsec()
-        {
-            return elapsed().count();
-        }
-    };
-    
-
 //!Transfers or transcodes packets from USB webcameras and streams them
 class StreamReader
 :
@@ -91,9 +46,12 @@ public:
     virtual int getNextData( nxcip::MediaDataPacket** packet ) = 0;
     virtual void interrupt() override;
 
-    virtual void setFps( int fps ) = 0;
-    virtual void setResolution(const nxcip::Resolution& resolution) = 0;
-    virtual void setBitrate(int bitrate) = 0;
+    virtual void setFps(int fps);
+
+    virtual void setResolution(const nxcip::Resolution& resolution);
+
+    virtual void setBitrate(int bitrate);
+
     void updateCameraInfo( const nxcip::CameraInfo& info );
 
 protected:
@@ -106,6 +64,7 @@ protected:
     QnMutex m_mutex;
 
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
+    std::shared_ptr<ffmpeg::BufferedStreamConsumer> m_consumer;
 
 protected:
     std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID);

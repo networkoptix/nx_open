@@ -2,6 +2,8 @@
 
 #include "stream_reader.h"
 
+struct SwsContext;
+
 namespace nx { namespace ffmpeg { class StreamReader; } }
 namespace nx { namespace ffmpeg { class Codec; } }
 namespace nx { namespace ffmpeg { class Frame; } }
@@ -30,16 +32,22 @@ public:
     virtual void setBitrate(int bitrate) override;
 
 private:
+    enum StreamState 
+    {
+        kOff,
+        kInitialized,
+        kModified
+    };
+    StreamState m_state;
+    
     std::unique_ptr<nx::ffmpeg::Codec> m_videoEncoder;
-
-    bool m_initialized = false;
-    bool m_modified = true;
 
     std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
     
+    struct SwsContext * m_scaleContext = nullptr;
 private:
-    int scale(AVFrame* frame, AVFrame * outFrame) const;
+    int scale(AVFrame* frame, AVFrame * outFrame);
     int encode(const AVFrame * frame, AVPacket * outPacket) const;
 
     bool ensureInitialized();
@@ -48,7 +56,7 @@ private:
     int openVideoEncoder();
     int initializeScaledFrame(const std::unique_ptr<ffmpeg::Codec>& encoder);
     void setEncoderOptions(const std::unique_ptr<ffmpeg::Codec>& encoder);
-
+    
 };
 
 } // namespace rpi_cam2

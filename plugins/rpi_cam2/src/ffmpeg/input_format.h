@@ -8,6 +8,7 @@ extern "C" {
 
 class AVFormatContext;
 class AVInputFormat;
+class AVStream;
 
 namespace nx {
 namespace ffmpeg {
@@ -31,6 +32,8 @@ public:
 
     AVFormatContext * formatContext() const;
     AVInputFormat * inputFormat() const;
+
+    AVStream * getStream(AVMediaType type, int *streamIndex = nullptr) const;
 
 private:
     AVFormatContext * m_formatContext = nullptr;

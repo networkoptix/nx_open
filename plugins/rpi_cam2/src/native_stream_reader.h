@@ -20,11 +20,6 @@ public:
     virtual ~NativeStreamReader();
 
     virtual int getNextData( nxcip::MediaDataPacket** packet ) override;
-
-    virtual void setFps(int fps) override;
-    virtual void setResolution(const nxcip::Resolution& resolution) override;
-    virtual void setBitrate(int bitrate) override;
-    void updateCameraInfo( const nxcip::CameraInfo& info );
 };
 
 } // namespace rpi_cam2

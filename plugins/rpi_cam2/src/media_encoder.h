@@ -55,7 +55,7 @@ protected:
     std::shared_ptr<nx::ffmpeg::StreamReader> m_ffmpegStreamReader;
     mutable int m_maxBitrate;
 
-    std::unique_ptr<StreamReader> m_streamReader;
+    std::shared_ptr<StreamReader> m_streamReader;
     
 protected:
     QString decodeCameraInfoUrl() const;

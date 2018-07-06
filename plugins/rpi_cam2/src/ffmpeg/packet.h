@@ -15,6 +15,7 @@ class Packet
 {
 public:
     Packet();
+    Packet(const AVCodecID & codecID);
     ~Packet();
 
     AVPacket * packet() const;
@@ -22,9 +23,13 @@ public:
     void initialize();
     void unreference();
     
+    AVCodecID codecID() const;
+    void setCodecID(const AVCodecID& codecID);
+
     int copy(Packet * outPacket) const;
 
 private:
+    AVCodecID m_codecID;
     AVPacket* m_packet;
 };
 

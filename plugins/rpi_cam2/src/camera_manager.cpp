@@ -8,6 +8,7 @@
 #include "native_media_encoder.h"
 #include "transcode_media_encoder.h"
 #include "ffmpeg/stream_reader.h"
+#include "ffmpeg/codec_parameters.h"
 #include "ffmpeg/utils.h"
 
 namespace nx {
@@ -30,9 +31,9 @@ nxcip::CompressionType getPriorityCodec(const std::vector<nxcip::CompressionType
     return nxcip::AV_CODEC_ID_NONE;
 }
 
-nx::ffmpeg::StreamReader::CodecParameters toFfmpegParameters(const CodecContext& codecContext)
+nx::ffmpeg::CodecParameters toFfmpegParameters(const CodecContext& codecContext)
 {
-    return nx::ffmpeg::StreamReader::CodecParameters(
+    return nx::ffmpeg::CodecParameters(
         nx::ffmpeg::utils::toAVCodecID(codecContext.codecID()),
         codecContext.fps(),
         codecContext.bitrate(),
@@ -40,6 +41,8 @@ nx::ffmpeg::StreamReader::CodecParameters toFfmpegParameters(const CodecContext&
         codecContext.resolution().height
     );
 }
+
+int ENCODER_COUNT = 2;
 
 }
 
@@ -55,8 +58,7 @@ CameraManager::CameraManager(
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         nxcip::BaseCameraManager::primaryStreamSoftMotionCapability)
 {
-    int encoderCount = 2;
-    m_encoders.reserve(encoderCount);
+    m_encoders.reserve(ENCODER_COUNT);
     m_encoders.push_back(nullptr);
     m_encoders.push_back(nullptr);    
 }
@@ -97,7 +99,8 @@ unsigned int CameraManager::releaseRef()
 
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
-    *encoderCount = m_encoders.size();
+    //*encoderCount = ENCODER_COUNT;
+    *encoderCount = 1;
     return nxcip::NX_NO_ERROR;
 }
 

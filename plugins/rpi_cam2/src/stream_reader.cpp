@@ -29,6 +29,14 @@ StreamReader::StreamReader(
 {
     NX_ASSERT(m_timeProvider);
     m_ffmpegStreamReader->addRef();
+
+    ffmpeg::CodecParameters params(
+        nx::ffmpeg::utils::toAVCodecID(m_codecContext.codecID()),
+        m_codecContext.fps(),
+        m_codecContext.bitrate(),
+        m_codecContext.resolution().width,
+        m_codecContext.resolution().height);
+    m_consumer.reset(new ffmpeg::BufferedStreamConsumer(params, m_ffmpegStreamReader));
 }
 
 StreamReader::~StreamReader()
@@ -64,6 +72,24 @@ unsigned int StreamReader::releaseRef()
 
 void StreamReader::interrupt()
 {
+}
+
+void StreamReader::setFps(int fps)
+{
+    m_codecContext.setFps(fps);
+    m_consumer->setFps(fps);
+}
+
+void StreamReader::setResolution(const nxcip::Resolution& resolution)
+{
+    m_codecContext.setResolution(resolution);
+    m_consumer->setResolution(resolution.width, resolution.height);
+}
+
+void StreamReader::setBitrate(int bitrate)
+{
+    m_codecContext.setBitrate(bitrate);
+    m_consumer->setBitrate(bitrate);
 }
 
 void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )

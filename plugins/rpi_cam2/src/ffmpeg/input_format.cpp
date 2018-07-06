@@ -95,5 +95,22 @@ AVInputFormat * InputFormat::inputFormat() const
     return m_inputFormat;
 }
 
+AVStream * InputFormat::getStream(AVMediaType type, int * streamIndex) const
+{
+    for (unsigned int i = 0; i < m_formatContext->nb_streams; ++i)
+    {
+        if(!m_formatContext->streams[i] || !m_formatContext->streams[i]->codecpar)
+            continue;
+
+        if (m_formatContext->streams[i]->codecpar->codec_type == type)
+        {
+            if(streamIndex)
+                *streamIndex = i;
+            return m_formatContext->streams[i];
+        }
+    }
+    return nullptr;
+}
+
 } // namespace ffmpeg
 } // namespace nx

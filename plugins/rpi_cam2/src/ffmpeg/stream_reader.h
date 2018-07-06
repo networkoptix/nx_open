@@ -3,14 +3,19 @@
 #include <string>
 #include <memory>
 #include <mutex>
+#include <vector>
+#include <thread>
 
 #include "forward_declarations.h"
 #include "input_format.h"
+#include "codec_parameters.h"
 #include "codec.h"
 #include "packet.h"
 
 namespace nx {
 namespace ffmpeg {
+
+class StreamConsumer;
 
 //! Read a stream using ffmpeg from some type of input
 class StreamReader
@@ -23,39 +28,18 @@ public:
         kModified
     };
 
-    struct CodecParameters
-    {
-        AVCodecID codecID;
-        int fps;
-        int bitrate;
-        int width;
-        int height;
-
-        CodecParameters(AVCodecID codecID, int fps, int bitrate, int width, int height):
-            codecID(codecID),
-            fps(fps),
-            bitrate(bitrate),
-            width(width),
-            height(height)
-        {
-        }
-
-        void setResolution(int width, int height)
-        {
-            this->width = width;
-            this->height = height;
-        }
-    };
-
 public:
     StreamReader(const char * url, const CodecParameters& codecParameters);
     virtual ~StreamReader();
     
     int addRef();
     int releaseRef();
+    void addConsumer(const std::weak_ptr<StreamConsumer>& consumer);
+    void removeConsumer(const std::weak_ptr<StreamConsumer>& consumer);
+    void run();
+    void start();
 
     CameraState cameraState() const;
-    AVCodecID decoderID() const;
 
     const std::unique_ptr<Codec>& decoder();
     const std::unique_ptr<InputFormat>& inputFormat();
@@ -67,6 +51,7 @@ public:
     int loadNextData(Packet * copyPacket = nullptr);
 
     const std::unique_ptr<Packet>& currentPacket() const;
+
 private:
     std::string m_url;
     CodecParameters m_codecParams;
@@ -75,17 +60,57 @@ private:
     std::unique_ptr<InputFormat> m_inputFormat;
 
     CameraState m_cameraState = kOff;
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
 
     std::unique_ptr<Packet> m_currentPacket;
 
     int m_refCount = 0;
+
+    std::vector<std::weak_ptr<StreamConsumer>> m_consumers;
+
+    bool m_started = false;
+    bool m_terminated = false;
 private:
     bool ensureInitialized();
     int initialize();
     void uninitialize();
     void setInputFormatOptions(const std::unique_ptr<InputFormat>& inputFormat);
     int decode(AVFrame * outframe, const AVPacket * packet);
+    void wait();
+};
+
+class StreamConsumer : public std::enable_shared_from_this<StreamConsumer>
+{
+public:
+    StreamConsumer(const std::weak_ptr<StreamReader>& streamReader):
+        m_streamReader(streamReader)
+    {
+    }
+
+    ~StreamConsumer()
+    {
+        if (auto sr = m_streamReader.lock())
+            sr->removeConsumer(weak_from_this());
+    }
+    
+    void initialize()
+    {
+        if(m_ready)
+            return;
+
+        m_ready = true;
+        if(auto sr = m_streamReader.lock())
+            sr->addConsumer(weak_from_this());
+    }
+
+    virtual int fps() const = 0;
+    virtual void resolution(int * width, int * height) const = 0;
+    virtual int bitrate() const = 0;
+    virtual void givePacket(const std::shared_ptr<Packet>& packet) = 0;
+
+protected:
+    bool m_ready = false;
+    std::weak_ptr<StreamReader> m_streamReader;
 };
 
 } // namespace ffmpeg

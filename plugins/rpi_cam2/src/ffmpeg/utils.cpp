@@ -22,27 +22,6 @@ AVCodecID avCodecID(const char * codecName)
     return AV_CODEC_ID_NONE;
 }
 
-AVStream* getAVStream(AVFormatContext * context, AVMediaType mediaType, int * streamIndex)
-{
-    if(!context)
-        return nullptr;
-
-    for (unsigned int i = 0; i < context->nb_streams; ++i)
-    {
-        if(!context->streams[i] || !context->streams[i]->codecpar)
-            continue;
-
-        if (context->streams[i]->codecpar->codec_type == mediaType)
-        {
-            if(streamIndex)
-                *streamIndex = i;
-            return context->streams[i];
-        }
-    }
-
-    return nullptr;
-}
-
 AVPixelFormat suggestPixelFormat(AVCodecID codecID)
 {
     switch (codecID)

@@ -29,6 +29,25 @@
 namespace nx {
 namespace rpi_cam2 {
 
+namespace 
+{
+    int lastErrFfmpeg = 0;
+
+    void logError(const NativeStreamReader * logObject)
+    {
+        if (int err = ffmpeg::error::lastError())
+        {
+            if (err != lastErrFfmpeg)
+            {
+                lastErrFfmpeg = err;
+                std::string errStr = ffmpeg::error::avStrError(err);
+                debug("Last ffmpeg error: %s\n", errStr.c_str());
+                NX_DEBUG(logObject) << "Last ffmpeg error: " << errStr;
+            }
+        }
+    }
+}
+
 NativeStreamReader::NativeStreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
@@ -53,33 +72,18 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    if(nx::ffmpeg::error::hasError())
-        debug("ffmpegError: %s\n", nx::ffmpeg::error::avStrError(nx::ffmpeg::error::lastError()).c_str());
+    logError(this);
 
-    int loadCode = m_ffmpegStreamReader->loadNextData();
-    if(loadCode < 0)
-        return nxcip::NX_IO_ERROR;
+    m_consumer->initialize();
+    m_ffmpegStreamReader->start();
 
-    auto nxPacket = toNxPacket(m_ffmpegStreamReader->currentPacket()->packet(),
-        m_ffmpegStreamReader->decoderID());
-    *lpPacket = nxPacket.release();
+    std::shared_ptr<ffmpeg::Packet> packet = nullptr;
+    while (!packet)
+        packet = m_consumer->popNextPacket();
+
+    *lpPacket = toNxPacket(packet->packet(), packet->codecID()).release();
 
     return nxcip::NX_NO_ERROR;
-}
-
-void NativeStreamReader::setFps(int fps)
-{
-    m_ffmpegStreamReader->setFps(fps);
-}
-
-void NativeStreamReader::setResolution(const nxcip::Resolution& resolution)
-{
-    m_ffmpegStreamReader->setResolution(resolution.width, resolution.height);
-}
-
-void NativeStreamReader::setBitrate(int bitrate)
-{
-    m_ffmpegStreamReader->setBitrate(bitrate);
 }
 
 
