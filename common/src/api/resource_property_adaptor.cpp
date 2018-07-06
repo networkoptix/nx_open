@@ -181,7 +181,17 @@ bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serialize
 
 void QnAbstractResourcePropertyAdaptor::setSerializedValue(const QVariant& value)
 {
-    loadValue(value.toString());
+    bool save = false;
+    {
+        QnMutexLocker locker( &m_mutex );
+        if (!loadValueLocked(value.toString()))
+            return;
+        save = !m_resource.isNull();
+    }
+    if (save)
+        enqueueSaveRequest();
+
+    emit valueChanged();
 }
 
 void QnAbstractResourcePropertyAdaptor::saveToResource()
