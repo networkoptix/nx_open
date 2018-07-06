@@ -50,6 +50,11 @@ private:
         SystemError::ErrorCode /*closeReason*/,
         network::http::AsyncMessagePipeline* /*connection*/) override;
 
+    void closeConnection(
+        QnMutexLockerBase* lock,
+        SystemError::ErrorCode /*closeReason*/,
+        network::http::AsyncMessagePipeline* /*connection*/);
+
     void prepareCreateDownTunnelResponse(
         network::http::Response* const response);
 
@@ -59,7 +64,7 @@ private:
         const std::string& requestPath);
 
     void onMessage(
-        typename Tunnels::iterator tunnelIter,
+        network::http::AsyncMessagePipeline* tunnel,
         network::http::Message /*httpMessage*/);
 
     bool validateOpenUpChannelMessage(
