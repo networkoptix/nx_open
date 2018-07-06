@@ -81,9 +81,9 @@ ServerTimeSyncManager::~ServerTimeSyncManager()
 void ServerTimeSyncManager::start()
 {
     initializeTimeFetcher();
-
+    m_connection = commonModule()->ec2Connection();
     connect(
-        commonModule()->ec2Connection()->getTimeNotificationManager().get(),
+        m_connection->getTimeNotificationManager().get(),
         &ec2::AbstractTimeNotificationManager::primaryTimeServerTimeChanged,
         this,
         [this]()
@@ -104,7 +104,8 @@ void ServerTimeSyncManager::stop()
         m_internetTimeSynchronizer.reset();
     }
 
-    disconnect(commonModule()->ec2Connection()->getTimeNotificationManager().get());
+    if (m_connection)
+        disconnect(m_connection->getTimeNotificationManager().get());
 }
 
 void ServerTimeSyncManager::initializeTimeFetcher()
