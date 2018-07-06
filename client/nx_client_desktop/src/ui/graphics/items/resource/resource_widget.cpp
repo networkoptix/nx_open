@@ -892,6 +892,11 @@ int QnResourceWidget::channelCount() const
     return m_channelsLayout->channelCount();
 }
 
+bool QnResourceWidget::forceShowPosition() const
+{
+    return false;
+}
+
 void QnResourceWidget::updateHud(bool animate)
 {
     /*
@@ -921,7 +926,8 @@ void QnResourceWidget::updateHud(bool animate)
     const bool showOnlyCameraName = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName)
         && !m_mouseInWidget;
     const bool showCameraNameWithButtons = overlaysCanBeVisible && m_mouseInWidget;
-    const bool showPosition = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
+    const bool showPosition = forceShowPosition()
+        || (overlaysCanBeVisible && (detailsVisible || m_mouseInWidget));
     const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible &&
         (m_mouseInWidget || qnRuntime->showFullInfo());
 

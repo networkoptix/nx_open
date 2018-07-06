@@ -303,6 +303,7 @@ protected:
     void setChannelScreenSize(const QSize &size);
     virtual void channelScreenSizeChangedNotify() {}
 
+    virtual bool forceShowPosition() const;
     virtual void updateHud(bool animate);
 
     virtual bool isHovered() const;

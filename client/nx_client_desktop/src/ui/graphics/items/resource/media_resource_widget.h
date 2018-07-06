@@ -224,6 +224,7 @@ protected:
     void suspendHomePtzController();
     void resumeHomePtzController();
 
+    virtual bool forceShowPosition() const override;
     virtual void updateHud(bool animate) override;
 
     void ensureTwoWayAudioWidget();
