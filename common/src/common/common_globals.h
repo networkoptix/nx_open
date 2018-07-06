@@ -453,7 +453,8 @@ using StreamQuality = nx::vms::api::StreamQuality;
                                 // by database, not manually, which is faster.
         BookmarkCreator,        //< Sorted manually!
         BookmarkTags,           //< Sorted manually!
-        BookmarkCameraName      //< Sorted manually!
+        BookmarkCameraName,      //< Sorted manually!
+        BookmarkCameraThenStartTime,
     };
 
     /**

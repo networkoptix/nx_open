@@ -112,6 +112,7 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url,
     Qn::ConnectionRole role,
     bool save)
 {
+    NX_VERBOSE(this, lm("Update %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
     if (!storeUrlForRole(role))
         return;
 
@@ -130,6 +131,7 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url,
             return QString::fromUtf8(QJsonDocument(streamUrls).toJson());
         };
 
+    NX_DEBUG(this, lm("Save %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
     if (updateProperty(Qn::CAMERA_STREAM_URLS, urlUpdater))
     {
         //TODO: #rvasilenko Setter and saving must be split.

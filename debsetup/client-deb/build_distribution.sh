@@ -16,7 +16,7 @@ LIBTARGET="$TARGET/lib"
 INITTARGET="/etc/init"
 INITDTARGET="/etc/init.d"
 
-WORK_DIR="stagebase"
+WORK_DIR="client_build_distribution_tmp"
 STAGE="$WORK_DIR/$ARTIFACT_NAME"
 STAGETARGET="$STAGE/$TARGET"
 BINSTAGE="$STAGE$BINTARGET"
@@ -38,7 +38,7 @@ CLIENT_BG_PATH="$BUILD_DIR/backgrounds"
 ICONS_PATH="$CUSTOMIZATION_DIR/icons/linux/hicolor"
 CLIENT_LIB_PATH="$BUILD_DIR/lib"
 BUILD_INFO_TXT="$BUILD_DIR/build_info.txt"
-LOG_FILE="$LOGS_DIR/client-build-distribution.log"
+LOG_FILE="$LOGS_DIR/client_build_distribution.log"
 
 #--------------------------------------------------------------------------------------------------
 

@@ -199,12 +199,15 @@ void QnMediaResource::setPtzCapabilities(
     {
         case core_ptz::Type::operational:
         {
-            if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME)) //< Why do we need this check?
-                toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+            // TODO: #rvasilenko Why do we need this check?
+            if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
+                toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, (int) capabilities);
+            break;
         }
         case core_ptz::Type::configurational:
         {
-            toResource()->setProperty(Qn::kConfigurationalPtzCapabilities, static_cast<int>(capabilities));
+            toResource()->setProperty(Qn::kConfigurationalPtzCapabilities, (int) capabilities);
+            break;
         }
         default:
             NX_ASSERT(false, "Wrong ptz type, we should never be here");

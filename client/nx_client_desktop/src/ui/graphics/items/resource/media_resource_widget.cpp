@@ -1102,6 +1102,16 @@ void QnMediaResourceWidget::resumeHomePtzController()
             m_homePtzController->resume();
 }
 
+bool QnMediaResourceWidget::forceShowPosition() const
+{
+    const bool isLive = d->display()
+        && d->display()->camDisplay()
+        && d->display()->camDisplay()->isRealTimeSource();
+
+    // In videowall mode position item must always be visible if item is not in live.
+    return qnRuntime->isVideoWallMode() && !isLive;
+}
+
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const
 {
     return m_motionSelection;
@@ -2326,6 +2336,9 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
     }
     updateCompositeOverlayMode();
     updateIconButton();
+
+    if (qnRuntime->isVideoWallMode())
+        updateHud(false);
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()

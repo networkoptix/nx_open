@@ -52,6 +52,21 @@ Vector::Vector(const QVector4D& vector, const ComponentVector<4>& components)
     setComponent(vector.w(), components[3]);
 }
 
+double Vector::component(Component component) const
+{
+    switch (component)
+    {
+        case Component::pan: return pan;
+        case Component::tilt: return tilt;
+        case Component::rotation: return rotation;
+        case Component::zoom: return zoom;
+        case Component::focus: return focus;
+        default:
+            NX_ASSERT(false, lit("Wrong component. We should never be here"));
+            return qQNaN<double>();
+    }
+}
+
 void Vector::setComponent(double value, Component component)
 {
     switch (component)
@@ -74,6 +89,11 @@ void Vector::setComponent(double value, Component component)
         default:
             NX_ASSERT(false, lit("Wrong component. We should never be here"));
     }
+}
+
+bool Vector::operator==(const Vector& other) const
+{
+    return qFuzzyEquals(*this, other);
 }
 
 Vector Vector::operator+(const Vector& other) const
@@ -224,6 +244,11 @@ bool Vector::isNull() const
     return qFuzzyIsNull(*this);
 }
 
+bool Vector::isValid() const
+{
+    return qIsNaN(*this);
+}
+
 Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType) const
 {
     if (restrictionType == LimitsType::position)
@@ -275,7 +300,7 @@ Vector operator*(double scalar, const Vector& ptzVector)
     return ptzVector * scalar;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json)(eq), PtzVector_Fields, (optional, true));
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json), PtzVector_Fields, (optional, true));
 
 } // namespace ptz
 } // namespace core
