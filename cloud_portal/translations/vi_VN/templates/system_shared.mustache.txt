@@ -8,4 +8,4 @@ Xin chào, {{message.fullName}}
 Bạn đã được cấp quyền truy cập vào hệ thống quản lý video "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Xem ở {{PRODUCT_NAME}} Cổng thông tin: {{config.portal_url}} / systems / {{message.system_id}}
+Xem ở %PRODUCT_NAME% Cổng thông tin: {{config.portal_url}} / systems / {{message.system_id}}

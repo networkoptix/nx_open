@@ -37,4 +37,12 @@ def has_value(data_structure_name, context, customization, language):
     data_records = DataRecord.objects.filter(data_structure=data_structure,
                                              customization=customization,
                                              language=language)
-    return data_records.exists()
+    if not data_records.exists():
+        return False
+    record_value = data_records.latest('id').value
+    return record_value != "" and data_structure.default != record_value
+
+
+@register.simple_tag
+def get_datastructure_type(data_structure):
+    return DataStructure.DATA_TYPES[data_structure.type]

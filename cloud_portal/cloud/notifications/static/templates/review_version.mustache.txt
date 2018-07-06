@@ -2,7 +2,7 @@ There is a new revision for {{ message.product }}
 
 Click on the link to review draft {{ message.id }} for {{ message.product }}
 
-Link to review: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 On this page you can
 1) Create a preview to see the most recent changes.

@@ -20,7 +20,9 @@ Check Bad Email Input
     Should Contain    ${class}    has-error
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
     Go To    ${url}
 
@@ -101,6 +103,7 @@ should respond to Enter key and save data
     Input Text    ${REGISTER LAST NAME INPUT}    hamil
     Input Text    ${REGISTER EMAIL INPUT}    ${email}
     Input Text    ${REGISTER PASSWORD INPUT}    ${password}
+    Click Element    ${TERMS AND CONDITIONS CHECKBOX}
     Press Key    ${REGISTER PASSWORD INPUT}    ${ENTER}
     Validate Register Success
 
@@ -116,8 +119,10 @@ should respond to Tab key
     Press Key    ${REGISTER EMAIL INPUT}    ${TAB}
     Element Should Be Focused    ${REGISTER PASSWORD INPUT}
     Press Key    ${REGISTER PASSWORD INPUT}    ${TAB}
-    Element Should Be Focused    ${REGISTER SUBSCRIBE CHECKBOX}
-    Press Key    ${REGISTER SUBSCRIBE CHECKBOX}    ${TAB}
+    Element Should Be Focused    ${TERMS AND CONDITIONS CHECKBOX}
+    Press Key    ${TERMS AND CONDITIONS CHECKBOX}    ${TAB}
+    Press Key    ${TERMS AND CONDITIONS LINK}    ${TAB}
+    Press Key    ${PRIVACY POLICY LINK}    ${TAB}
     Element Should Be Focused    ${CREATE ACCOUNT BUTTON}
 
 should open Terms and conditions in a new page

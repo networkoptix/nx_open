@@ -88,7 +88,7 @@
       "description": "Может смотреть видео в реальном времени и архив"
     },
     "liveViewer": {
-      "label": "Только видео с камер",
+      "label": "Только видео в реальном времени",
       "description": "Может смотреть только видео в реальном времени"
     },
     "advancedViewer": {
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Особые",
-      "description": "Используйте клиентское приложение %PRODUCT_NAME% для настройки особых полномочий"
+      "description": "Используйте клиентское приложение %VMS_NAME% для настройки особых полномочий"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "Этот пользователь имеет полномочия администратора",
     "cantOpenClient": "Приложение %VMS_NAME% не обнаружено. <a href=\"/download\">Скачать</a>",
     "lostConnection": "Подключение к {{systemName}} потеряно",
-    "thisSystem": "система"
+    "thisSystem": "система",
+    "oldSafariNotSupported": "Версии Safari старше 10 не поддерживаются"
   },
   "passwordRequirements": {
     "minLengthMessage": "Пароль должен содержать не менее 8 символов",

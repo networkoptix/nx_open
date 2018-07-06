@@ -1,5 +1,5 @@
 {
-  "language_name": "LANGUAGE_NAME",
+  "language_name": "Polski",
   "productName": "%PRODUCT_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Niestandardowa",
-      "description": "Użyj aplikacji klienckiej %PRODUCT_NAME%, aby skonfigurować uprawnienia niestandardowe"
+      "description": "Użyj aplikacji klienckiej %VMS_NAME% , aby skonfigurować niestandardowe uprawnienia"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "Ten użytkownik ma uprawnienia administratora",
     "cantOpenClient": "Nie wykryto aplikacji %VMS_NAME%. <a href=\"/download\">Pobierz</a>",
     "lostConnection": "Utracono połączenie z {{systemName}}",
-    "thisSystem": "system"
+    "thisSystem": "system",
+    "oldSafariNotSupported": "Wersje Safari starsze niż 10 nie są obsługiwane"
   },
   "passwordRequirements": {
     "minLengthMessage": "Hasło musi zawierać co najmniej 8 znaków",
@@ -160,7 +161,7 @@
     "offline": "Serwer jest odłączony",
     "openClient": "Otwórz w %VMS_NAME%",
     "openClientNoSystem": "Otwórz %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Złącz",
     "mergeSystemTitle": "Złącz systemy",
     "confirmRenameTitle": "Nazwa systemu",
     "confirmRenameAction": "Zachowaj",

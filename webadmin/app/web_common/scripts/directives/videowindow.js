@@ -428,6 +428,7 @@ angular.module('nxCommon')
                     function srcChanged() {
                         scope.loading = true; // source changed - start loading
                         scope.videoFlags.errorLoading = false;
+                        scope.preview = "";
                         if (scope.vgSrc) {
                             scope.preview = getFormatSrc('jpeg');
                             scope.player = detectBestFormat();

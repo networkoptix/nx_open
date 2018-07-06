@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Personalizado",
-      "description": "Use el %PRODUCT_NAME% Aplicación de cliente para establecer permisos personalizados"
+      "description": "Use la aplicación de cliente %VMS_NAME% para configurar permisos personalizados"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "Este usuario tiene permisos de administrador",
     "cantOpenClient": "%VMS_NAME% aplicación no es detectada.<a href=\"/download\">Descargar</a>",
     "lostConnection": "Conexión al {{systemName}} se ha perdido",
-    "thisSystem": "el sistema"
+    "thisSystem": "el sistema",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",
@@ -160,7 +161,7 @@
     "offline": "Sistema está desconectado",
     "openClient": "Abierto en %VMS_NAME%",
     "openClientNoSystem": "Abrir %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Combinar",
     "mergeSystemTitle": "Unir Sistemas",
     "confirmRenameTitle": "Nombre del sistema",
     "confirmRenameAction": "Guardar",
@@ -172,7 +173,7 @@
     "confirmUnshareFromMeAction": "Desconectar",
     "confirmUnshare": "Este usuario no podrá acceder el sistema. ¿Está seguro?",
     "confirmUnshareTitle": "¿Eliminar el usuario?",
-    "confirmUnshareAction": "borrar",
+    "confirmUnshareAction": "Borrar",
     "successDisconnected": "El sistema está desconectado de %PRODUCT_NAME%",
     "successDeleted": "Sistema {{systemName}} se ha eliminado de su cuenta",
     "permissionsRemoved": "Los permisos fueron removidos de {{email}}"
