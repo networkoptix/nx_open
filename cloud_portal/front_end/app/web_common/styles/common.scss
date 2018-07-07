@@ -89,13 +89,17 @@ placeholder{ /* Hack to have full-screen */
 
         position: relative;
         top: 50%;
-        transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
+        transform: translateY(-65%);
+        -ms-transform: translateY(-65%);
 
         font-size:130%;
         font-weight: 300;
         line-height:30px;
         color: $light;
+
+        @include media-breakpoint-down(sm) {
+            top : 40%;
+        }
 
         &>*{
             text-align: center;
@@ -105,24 +109,11 @@ placeholder{ /* Hack to have full-screen */
         .placeholder-icon{
             margin-bottom: 24px;
         }
-
-        @include media-breakpoint-down(md) {
-            .placeholder-icon {
-                margin-bottom: 5px;
-            }
-        }
     
         .placeholder-title{
             font-size: 40px;
             line-height:48px;
             text-transform: uppercase;
-        }
-
-        @include media-breakpoint-down(md) {
-            .placeholder-title {
-                font-size: 20px;
-                line-height: 24px;
-            }
         }
 
         .placeholder-message{
