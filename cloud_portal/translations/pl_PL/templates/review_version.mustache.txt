@@ -2,7 +2,7 @@ Jest dostępna nowa wersja {{ message.product }}
 
 Kliknij link, aby przejrzeć opis wersji {{ message.id }} dla {{ message.product }}
 
-Link do przeglądu: {{ config.portal_url }}/admin/cms/review_version{{ message.id }}
+Link do przeglądu: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 Na tej stronie możesz
 1) Przejrzeć najnowsze zmiany.

@@ -1,0 +1,180 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-push-8">
+            <system-info></system-info>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <alert type="danger" ng-if="settings.flags.noHDD">
+                Questo dispositivo è progettato per funzionare con l'unità disco fisso installata. <br> Spegni il dispositivo e installa un'unità disco fisso.
+            </alert>
+            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+                Questo dispositivo necessita di una connessione di rete per funzionare.<br>Si prega di collegarlo alla rete locale o Internet
+            </alert>
+            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+                Questo dispositivo ha una configurazione di rete errata. <br> Collegalo alla rete o impostare un indirizzo IP corretto.
+            </alert>
+
+
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
+                    <div>
+                        <form novalidate name="settingsForm" class="form-horizontal" role="form" >
+                            <h3>Porta</h3>
+                            <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
+                                <div class="col-xs-6">
+                                    <input type="number" class="form-control" id="port" placeholder="Porta" name="port" ng-model="settings.port"
+                                           min="1"  max="65000"
+                                           pattern ="^\d*$" required>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">Cambiare porta</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3>Reimposta server</h3>
+                        <p>Questa azione ripristinerà questo server ai valori predefiniti (cancella il database e ripristina la configurazione).
+                            Il server verrà separato dal sistema corrente. L'archivio video rimarrà intatto.</p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Ripristina le impostazioni di fabbrica</button></p>
+                    </div>
+                    <div ng-if="user.isOwner">
+                        <h3>Scollegare il server dal sistema</h3>
+                        <p>Questa azione separerà il server dal sistema mantenendo il database, gli utenti locali e la configurazione.
+                            L'archivio video rimarrà intatto. <b> Gli utenti cloud saranno cancellati. </b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Scollegare il server dal sistema</button></p>
+                    </div>
+                    <div>
+                        <h3>Riavvia</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()"> Riavvia server </button> <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()"> Reboot </button></p>
+                    </div>
+                    <div ng-if="user.isOwner">
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
+                            <h3>Cambia password amministratore</h3>
+                            <p>Se System è locale (non connesso al cloud) questo cambierà la password per l'utente "admin" e la password di ripristino (root) su alcuni server. <br> In caso contrario, cambierà solo la password di ripristino.</p>
+                            <div class="col-sm-6">
+                                <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
+                                        ng-click="changePassword()">Cambia Password</button>
+                            </div>
+                        </form>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
+                    <div>
+                        <h3>Nome</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" ng-model="settings.systemName">
+                            </div>
+
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default" ng-click="renameSystem()">Rinominare il sistema</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="canMerge" >
+                        <form class="form-horizontal" >
+                            <h3>Unione dei sistemi</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Unione dei sistemi</button></p>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3>{{Config.cloud.productName}}</h3>
+
+                        <div ng-if="cloudSystemID">
+                            <p>Questo sistema è collegato a {{Config.cloud.productName}}, proprietario del sistema: <b>{{cloudAccountName}}</b></p>
+                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Disconnetti da {{Config.cloud.productName}}</button></p>
+                            <p><a ng-if="!mode.liteClient"
+                                  ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
+                                  target="_blank">Vai al {{Config.cloud.productName}} Portale</a></p>
+                        </div>
+
+                        <div ng-if="!cloudSystemID">
+                            <alert type="warning">Questo sistema non è collegato a {{Config.cloud.productName}}
+                                <a ng-if="!mode.liteClient"
+                                   ng-href="{{Config.cloud.portalUrl}}"
+                                   target="_blank"> Ulteriori informazioni </a></alert>
+                            <alert type="error" ng-if="!hasInternetOnServer">Collegare il server ad Internet per eseguire la configurazione {{Config.cloud.productName}}</alert>
+                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Connessione Internet richiesta per connettere il sistema a {{Config.cloud.productName}}</alert>
+                            <p ng-if="canConnectToCloud"  ><button
+                                    class="btn btn-default"
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient"> Connetti a {{Config.cloud.productName}}</button> <a ng-if="!mode.liteClient"  class="btn btn-default"
+                                   ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
+                                   target="_blank"> Crea {{Config.cloud.productName}} account </a></p>
+                        </div>
+                    </div>
+                </uib-tab>
+
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                    <div ng-if="settings.flags.canSetupNetwork">
+                        <h3>Impostazioni di rete del dispositivo</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Salva le impostazioni e riavvia il dispositivo</button>
+                    </div>
+                    <div ng-if="settings.flags.canSetupTime">
+                        <h3>Data e ora</h3>
+                        <form name="timeSettings">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td><label for="timeZone">Fuso orario</label></td>
+                                        <td><label for="date">Data</label></td>
+                                        <td><label for="time">Orario</label></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><select class="form-control"
+                                                    ng-options="zone.id as zone.name for zone in timeZones"
+                                                    id="timeZone"
+                                                    name="timeZone"
+                                                    ng-model="dateTimeSettings.timeZone"
+                                                    required></select></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       id="date" name="date"
+                                                       class="form-control"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       ng-model="dateTimeSettings.dateTime"
+                                                       required
+ is-open="dateTimeSettings.openDate"
+                                                       close-text="Close" />
+                                                <span class="input-group-btn">
+                                                    <button type="button"
+                                                            class="btn btn-default"
+                                                            ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <button class="btn btn-default" ng-click="saveDateTime()">Salvare data e ora</button>
+                    </div>
+                    <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
+                        <h3>Ripristina le impostazioni del server</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()"> Ripristino completo </button> <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()"> Ripristina tutto tranne la rete </button></p>
+                    </div>
+                    <div ng-if="canRunClient || canStopClient">
+                        <h3>Esegui l'applicazione client sul server</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">Eseguire il client</button>                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Arrestare il client</button></p>
+                        <p>Utilizzare una tastiera / mouse o un'applicazione mobile per controllarlo.</p>
+                    </div>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+    </div>
+</div>

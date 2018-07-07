@@ -15,6 +15,7 @@ public:
     virtual ~AbstractRemoteRelayPeerPool() = default;
 
     virtual bool connectToDb() = 0;
+    virtual bool isConnected() const = 0;
     /**
      * @return Empty string in case of any error.
      */

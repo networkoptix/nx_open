@@ -2,7 +2,7 @@
 
 คลิกที่ลิงก์เพื่อดูร่าง {{ message.id }} สำหรับ {{ message.product }}
 
-ลิงก์ไปวิจารณ์: {{ config.portal_url }} / admin / cms / review_version{{ message.id }}
+ลิงก์ไปวิจารณ์: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
 
 ในหน้านี้คุณสามารถทำได้
 1) สร้างตัวอย่างเพื่อดูการเปลี่ยนแปลงล่าสุด

@@ -2,7 +2,7 @@
 
 #include <nx/utils/test_support/utils.h>
 
-#include <nx/sql/request_execution_thread.h>
+#include <nx/sql/detail/query_execution_thread.h>
 #include <nx/vms/api/data/user_data.h>
 
 #include <nx/data_sync_engine/dao/memory/transaction_data_object_in_memory.h>

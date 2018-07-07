@@ -110,7 +110,6 @@ private:
 
     void processUpdateSystemResult(
         MergeRequestContext* mergeRequestContext,
-        nx::sql::QueryContext* queryContext,
         nx::sql::DBResult dbResult);
 
     nx::sql::DBResult updateSystemStateInDb(

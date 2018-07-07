@@ -130,6 +130,20 @@ bool SqlQueryExecutionHelper::execSQLFile(
     return true;
 }
 
+bool SqlQueryExecutionHelper::execSQLScript(
+    const QByteArray& scriptData,
+    AbstractDbConnection& dbConnection)
+{
+    return execSQLScript(scriptData, *dbConnection.qtSqlConnection());
+}
+
+bool SqlQueryExecutionHelper::execSQLFile(
+    const QString& fileName,
+    AbstractDbConnection& dbConnection)
+{
+    return execSQLFile(fileName, *dbConnection.qtSqlConnection());
+}
+
 void SqlQueryExecutionHelper::bindId(QSqlQuery* query,
     const QString& parameter,
     const QnUuid& id,

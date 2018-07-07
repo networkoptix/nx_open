@@ -1,0 +1,269 @@
+{
+  "language_name": "Italiano",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
+  "dialogs": {
+    "okButton": "Ok",
+    "cancelButton": "Annulla",
+    "loginTitle": "Accedi a %PRODUCT_NAME%",
+    "loginButton": "Accesso",
+    "logoutAuthorisedTitle": "Ha già effettuato l'accesso",
+    "logoutAuthorisedContinueButton": "Continua",
+    "logoutAuthorisedLogoutButton": "Scollegati"
+  },
+  "pageTitles": {
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
+    "registerSuccess": "Benvenuto in",
+    "register": "Creare un account",
+    "changePassword": "Cambia Password -",
+    "account": "Impostazioni dell'account -",
+    "systems": "Sistemi -",
+    "system": "Sistema -",
+    "systemShare": "Condivisione Sistema -",
+    "activate": "Attivazione Account -",
+    "activateSent": "Attivazione Account -",
+    "activateSuccess": "Attivazione dell'account",
+    "activateCode": "Attivazione Account -",
+    "restorePassword": "Reimpostare la Password -",
+    "restorePasswordSuccess": "Password salvata",
+    "restorePasswordCode": "Reimpostare la Password -",
+    "view": "Visualizzazione delle telecamere - ",
+    "debug": "Debug",
+    "login": "Accesso -",
+    "download": "Scarica %VMS_NAME%",
+    "downloadPlatform": "Scarica %VMS_NAME% ",
+    "pageNotFound": "Pagina non trovata"
+  },
+  "systemStatuses": {
+    "notActivated": "non attivato",
+    "activated": "attivato",
+    "online": "online",
+    "offline": "offiline",
+    "unavailable": "non disponibile"
+  },
+  "accessRoles": {
+    "disabled": {
+      "label": "Non attivo",
+      "description": "L'utente è disabilitato e non può accedere al sistema"
+    },
+    "Owner": {
+      "label": "Proprietario",
+      "description": "Accesso illimitato che include la possibilità di condividere e connettere / disconnettere il sistema dal cloud"
+    },
+    "Viewer": {
+      "label": "Visualizzatore",
+      "description": "È possibile visualizzare video in diretta e sfogliare l'archivio"
+    },
+    "Live Viewer": {
+      "label": "Visualizzatore Live",
+      "description": "Possibilita' di visualizzare solo video Live"
+    },
+    "Advanced Viewer": {
+      "label": "Visualizzatore avanzato",
+      "description": "È possibile visualizzare video Live, sfogliare l'archivio, configurare telecamere, controllare PTZ ecc"
+    },
+    "Administrator": {
+      "label": "Amministratore",
+      "description": "Accesso illimitato inclusa la possibilità di condividere"
+    },
+    "Custom": {
+      "label": "Personalizzato",
+      "description": "Utilizzare l'applicazione client %PRODUCT_NAME% per impostare le autorizzazioni personalizzate"
+    },
+    "cloudAdmin": {
+      "label": "Amministratore",
+      "description": "Può configurare il sistema e condividerlo"
+    },
+    "customRole": {
+      "label": "Ruoli personalizzati",
+      "description": "Ruolo utente personalizzato specificato nel Sistema"
+    },
+    "owner": {
+      "label": "Proprietario",
+      "description": "Accesso illimitato che include la possibilità di condividere e connettere / disconnettere il sistema dal cloud"
+    },
+    "viewer": {
+      "label": "Visualizzatore",
+      "description": "È possibile visualizzare video in diretta e sfogliare l'archivio"
+    },
+    "liveViewer": {
+      "label": "Visualizzatore Live",
+      "description": "Possibilita' di visualizzare solo video Live"
+    },
+    "advancedViewer": {
+      "label": "Visualizzatore avanzato",
+      "description": "È possibile visualizzare video Live, sfogliare l'archivio, configurare telecamere, controllare PTZ ecc"
+    },
+    "custom": {
+      "label": "Personalizzato",
+      "description": "Utilizzare l'applicazione client %VMS_NAME% per impostare le autorizzazioni personalizzate"
+    }
+  },
+  "errorCodes": {
+    "ok": "ok",
+    "cantSendActivationPrefix": "Non è possibile inviare e-mail di conferma",
+    "cantDisconnectSystemPrefix": "Impossibile cancellare il sistema",
+    "cantUnshareWithMeSystemPrefix": "Impossibile cancellare il sistema",
+    "cantSharePrefix": "Impossibile condividere il sistema",
+    "cantGetUsersListPrefix": "L'elenco utenti non è disponibile",
+    "cantGetSystemsListPrefix": "L'elenco di sistema non è disponibile",
+    "cantRegisterPrefix": "Si è verificato un errore",
+    "cantGetSystemInfoPrefix": "Le informazioni di sistema non sono disponibili",
+    "cantChangeAccountPrefix": "Impossibile salvare le modifiche",
+    "cantChangePasswordPrefix": "Impossibile salvare la password",
+    "cantActivatePrefix": "Impossibile attivare il tuo account",
+    "cantSendConfirmationPrefix": "Non è possibile inviare e-mail di conferma",
+    "cloudInvalidResponse": "Cloud DB ha restituito una risposta inaspettata",
+    "notAuthorized": "Password errata",
+    "brokenAccount": "Problema inaspettato con l'account. <a href=\"/restore_password\">Ripristina account</a>",
+    "wrongParameters": "Alcuni parametri nel modulo non sono corretti",
+    "wrongCode": "L'account è già attivato o il codice di conferma non è corretto",
+    "wrongCodeRestore": "Il codice di conferma è già utilizzato o errato",
+    "forbidden": "Non ha il permesso per effettuare questa azione",
+    "accountNotActivated": "Questo account non è ancora stato attivato. <a href=\"/activate\">Invia nuovamente il link di attivazione</a>",
+    "accountBlocked": "Questo account è bloccato",
+    "notFound": "Non trovato",
+    "alreadyExists": "Questo account esiste già",
+    "unknownError": "Si è verificato un errore imprevisto",
+    "accountAlreadyActivated": "Questo account è già stato attivato",
+    "emailNotFound": "L'account non esiste.",
+    "EmailAlreadyExists": "Questa email è già registrata",
+    "oldPasswordMistmatch": "Password corrente non è corretta.",
+    "passwordMismatch": "Password errata",
+    "cantEditYourself": "La modifica delle proprie autorizzazioni non è consentita",
+    "cantEditAdmin": "Questo utente ha le autorizzazioni di amministratore",
+    "cantOpenClient": "%VMS_NAME% applicazione non rilevata. <a href=\"/download\">Scarica</a>",
+    "lostConnection": "Connessione a {{systemName}} persa",
+    "thisSystem": "il sistema",
+    "oldSafariNotSupported": "Le versioni di Safari precedenti alla 10 non sono supportate"
+  },
+  "passwordRequirements": {
+    "minLengthMessage": "La password deve contenere almeno 8 caratteri",
+    "requiredMessage": "Usa solo lettere latine, numeri e simboli della tastiera, evita spazi iniziali e finali",
+    "weakMessage": "Utilizzare numeri, lettere maiuscole e minuscole e caratteri speciali per rendere più sicura la password",
+    "strongMessage": "Password sicura!",
+    "commonMessage": "Questa password è nelle migliori e più popolari password utilizzate nel mondo",
+    "missingMessage": "È richiesta la password"
+  },
+  "sharing": {
+    "confirmOwner": "Se cambi proprietario del sistema, revocherai la proprietà dall'account corrente. Questa azione è irreversibile. E' sicuro?",
+    "shareTitle": "Condividere",
+    "shareConfirmButton": "Condividere",
+    "editShareTitle": "Modifica Permessi",
+    "editShareConfirmButton": "Salvare",
+    "permissionsSaved": "Nuove autorizzazioni salvate"
+  },
+  "system": {
+    "yourSystem": "Il suo sistema",
+    "mySystemSearch": "IMeMyMine",
+    "unavailable": "Il server è irraggiungibile",
+    "offline": "Il sistema è offline",
+    "openClient": "Apri in %VMS_NAME%",
+    "openClientNoSystem": "Apri in %VMS_NAME%",
+    "confirmMergeAction": "Unisci",
+    "mergeSystemTitle": "Unione dei sistemi",
+    "confirmRenameTitle": "Nome del sistema",
+    "confirmRenameAction": "Salvare",
+    "successRename": "Nome del sistema salvato",
+    "confirmDisconnectTitle": "Scollegare il sistema da %PRODUCT_NAME%?",
+    "confirmDisconnectAction": "Scollegamento",
+    "confirmUnshareFromMe": "Sta per disconnettere questo Sistema dal suo account. Non sara' in più in grado di accedere a questo Sistema. E' sicuro?",
+    "confirmUnshareFromMeTitle": "Scollegare il sistema da?",
+    "confirmUnshareFromMeAction": "Scollegamento",
+    "confirmUnshare": "Questo utente non sarà in grado di accedere al sistema. E' sicuro?",
+    "confirmUnshareTitle": "Cancella utente?",
+    "confirmUnshareAction": "Elimina",
+    "successDisconnected": "Il sistema è stato scollegato correttamente da %PRODUCT_NAME%",
+    "successDeleted": "Il sistema {{systemName}} è stato eliminato correttamente dal suo account",
+    "permissionsRemoved": "Le autorizzazioni sono state rimosse da {{email}}"
+  },
+  "account": {
+    "accountSavedSuccess": "Il suo account è stato salvato con successo",
+    "activationLinkSent": "Link di attivazione inviato",
+    "passwordChangedSuccess": "Il suo account è stato salvato con successo",
+    "changePassword": "Cambia Password",
+    "newPasswordLabel": "Nuova password",
+    "saveChanges": "Salvare"
+  },
+  "downloads": {
+    "noClientDetectedTitle": "Installa %VMS_NAME% per visualizzare il suo sistema",
+    "action": "Scarica %VMS_NAME%",
+    "mobile": {
+      "ios": {
+        "link": "%IOS_APPLICATION_LINK%"
+      },
+      "android": {
+        "link": "%ANDROID_APPLICATION_LINK%"
+      }
+    },
+    "groups": {
+      "windows": {
+        "label": "Windows",
+        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+      },
+      "mac": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      },
+      "linux": {
+        "label": "Ubuntu Linux",
+        "shortLabel": "Ubuntu",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      },
+      "macos": {
+        "label": "Mac OS",
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+      },
+      "ios": {
+        "label": "iOS",
+        "shortLabel": "iOS"
+      },
+      "android": {
+        "label": "Android",
+        "shortLabel": "Android"
+      },
+      "arm": {
+        "label": "ARM",
+        "shortLabel": "ARM",
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+      }
+    },
+    "platforms": {
+      "win64": "x64",
+      "win86": "x86",
+      "linux64": "x64",
+      "linux86": "x86",
+      "mac": "X"
+    },
+    "appTypes": {
+      "client": "Solo cliente",
+      "server": "Solo server",
+      "bundle": "Client e Server",
+      "servertool": "Strumenti di configurazione"
+    },
+    "releasesTypes": {
+      "beta": "Beta",
+      "betas": "Betas",
+      "rc": "Release Candidate",
+      "release": "Release",
+      "releases": "Releases",
+      "patch": "Patch",
+      "patches": "Patches"
+    }
+  },
+  "activeActions": {
+    "sendConfirm": "Rinvia il link di attivazione",
+    "resetPassword": "Reimpostare la password",
+    "setNewPassword": "Salva password",
+    "setNewPasswordLabel": "Nuova password"
+  },
+  "regActions": {
+    "passwordLabel": "Password",
+    "createAccount": "Creare un account"
+  },
+  "header": {
+    "allSystems": "Tutti i sistemi",
+    "systems": "Sistemi"
+  }
+}

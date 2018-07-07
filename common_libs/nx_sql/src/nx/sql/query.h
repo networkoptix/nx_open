@@ -8,34 +8,69 @@
 
 namespace nx::sql {
 
+class AbstractDbConnection;
+
 /**
  * Follows same conventions as QSqlQuery except error reporting:
  * methods of this class throw nx::sql::Exception on error.
  */
-class NX_SQL_API SqlQuery
+class NX_SQL_API AbstractSqlQuery
+{
+public:
+    virtual ~AbstractSqlQuery() = default;
+
+    virtual void setForwardOnly(bool val) = 0;
+    virtual void prepare(const QString& query) = 0;
+
+    virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept = 0;
+    virtual void bindValue(int pos, const QVariant& value) noexcept = 0;
+    virtual void bindValue(const std::string& placeholder, const std::string& value) noexcept = 0;
+    virtual void bindValue(int pos, const std::string& value) noexcept = 0;
+
+    virtual void exec() = 0;
+
+    virtual bool next() = 0;
+    virtual QVariant value(int index) const = 0;
+    virtual QVariant value(const QString& name) const = 0;
+    virtual QSqlRecord record() = 0;
+
+    // TODO: #ak Remove these methods.
+    // For now they are required for compatibility with QnSql::*.
+    virtual QSqlQuery& impl() = 0;
+    virtual const QSqlQuery& impl() const = 0;
+};
+
+/**
+ * Follows same conventions as QSqlQuery except error reporting:
+ * methods of this class throw nx::sql::Exception on error.
+ */
+class NX_SQL_API SqlQuery:
+    public AbstractSqlQuery
 {
 public:
     SqlQuery(QSqlDatabase connection);
+    SqlQuery(AbstractDbConnection* connection);
 
-    void setForwardOnly(bool val);
-    void prepare(const QString& query);
+    virtual void setForwardOnly(bool val) override;
+    virtual void prepare(const QString& query) override;
 
-    void bindValue(const QString& placeholder, const QVariant& value) noexcept;
-    void bindValue(int pos, const QVariant& value) noexcept;
-    void bindValue(const std::string& placeholder, const std::string& value) noexcept;
-    void bindValue(int pos, const std::string& value) noexcept;
+    virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept override;
+    virtual void bindValue(int pos, const QVariant& value) noexcept override;
+    virtual void bindValue(const std::string& placeholder, const std::string& value) noexcept override;
+    virtual void bindValue(int pos, const std::string& value) noexcept override;
 
-    void exec();
+    virtual void exec() override;
 
-    bool next();
-    QVariant value(int index) const;
-    QVariant value(const QString& name) const;
-    QSqlRecord record();
+    virtual bool next() override;
+    virtual QVariant value(int index) const override;
+    virtual QVariant value(const QString& name) const override;
+    virtual QSqlRecord record() override;
 
-    QSqlQuery& impl();
-    const QSqlQuery& impl() const;
+    virtual QSqlQuery& impl() override;
+    virtual const QSqlQuery& impl() const override;
 
     static void exec(QSqlDatabase connection, const QByteArray& queryText);
+    static void exec(AbstractDbConnection* connection, const QByteArray& queryText);
 
 private:
     QSqlQuery m_sqlQuery;

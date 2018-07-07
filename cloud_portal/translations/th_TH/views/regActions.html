@@ -57,10 +57,16 @@
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> สมัครรับจดหมายข่าวทางอีเมล</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        ฉันยอมรับ<a href="/content/eula" target="_blank">ข้อกำหนดและเงื่อนไข</a>และ<a href="%PRIVACY_LINK%" target="_blank">นโยบายความเป็นส่วนตัว</a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        โปรดอ่านและยอมรับข้อกำหนดในการให้บริการและนโยบายความเป็นส่วนตัวเพื่อดำเนินการต่อ
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,10 +76,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    การคลิก "สร้างบัญชี" หมายความว่าคุณยอมรับ
-                    <div><a href="/content/eula" target="_blank">ข้อกำหนดและเงื่อนไข</a></div>
-                </div>
             </div>
         </div>
     </form>

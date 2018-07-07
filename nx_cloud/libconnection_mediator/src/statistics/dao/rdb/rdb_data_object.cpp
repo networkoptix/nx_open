@@ -25,7 +25,7 @@ nx::sql::DBResult DataObject::save(
             :originatingHostName, :destinationHostEndpoint, :destinationHostName)
     )sql";
 
-    QSqlQuery saveRecordQuery(*queryContext->connection());
+    QSqlQuery saveRecordQuery(*queryContext->connection()->qtSqlConnection());
     if (!saveRecordQuery.prepare(queryText))
     {
         NX_ASSERT(false);
@@ -62,7 +62,7 @@ nx::sql::DBResult DataObject::readAllRecords(
         FROM connect_session_statistics
     )sql";
 
-    QSqlQuery fetchAllRecordsQuery(*queryContext->connection());
+    QSqlQuery fetchAllRecordsQuery(*queryContext->connection()->qtSqlConnection());
     fetchAllRecordsQuery.setForwardOnly(true);
     if (!fetchAllRecordsQuery.prepare(queryText))
     {

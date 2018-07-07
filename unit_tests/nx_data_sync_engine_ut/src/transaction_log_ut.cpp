@@ -7,7 +7,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
 #include <nx/sql/async_sql_query_executor.h>
-#include <nx/sql/request_execution_thread.h>
+#include <nx/sql/detail/query_execution_thread.h>
 #include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <nx_ec/ec_proto_version.h>
@@ -289,7 +289,7 @@ private:
                 delete queryContext;
             };
 
-        QSqlDatabase* dbConnection = m_dbConnectionHolder.dbConnection();
+        auto dbConnection = m_dbConnectionHolder.dbConnection();
         nx::sql::Transaction* transaction = new nx::sql::Transaction(dbConnection);
         NX_GTEST_ASSERT_EQ(nx::sql::DBResult::ok, transaction->begin());
         return std::shared_ptr<nx::sql::QueryContext>(
@@ -508,10 +508,8 @@ public:
             m_system.id.c_str(),
             std::bind(&TestTransactionController::doSomeDataModifications, this, _1),
             [this, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-                nx::sql::QueryContext* queryContext,
-                nx::sql::DBResult dbResult)
+                nx::sql::DBResult /*dbResult*/)
             {
-                onDbTranCompleted(queryContext, dbResult);
             });
     }
 
@@ -637,12 +635,6 @@ private:
             m_cond.wait(lock.mutex());
     }
 
-    void onDbTranCompleted(
-        nx::sql::QueryContext* /*queryContext*/,
-        nx::sql::DBResult /*dbResult*/)
-    {
-    }
-
     TestTransactionController(const TestTransactionController&) = delete;
     TestTransactionController& operator=(const TestTransactionController&) = delete;
 };
@@ -700,7 +692,7 @@ protected:
                 getSystem(0).id.c_str(),
                 std::bind(&TransactionLogOverlappingTransactions::shareSystemToRandomUser, this, _1, i),
                 [this, &transactionsToWait, &cond](
-                    nx::sql::QueryContext*, nx::sql::DBResult dbResult)
+                    nx::sql::DBResult dbResult)
                 {
                     if (dbResult != nx::sql::DBResult::cancelled)
                     {

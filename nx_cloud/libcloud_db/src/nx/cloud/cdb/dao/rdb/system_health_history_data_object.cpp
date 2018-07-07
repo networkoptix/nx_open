@@ -19,7 +19,7 @@ nx::sql::DBResult SystemHealthHistoryDataObject::insert(
     const std::string& systemId,
     const api::SystemHealthHistoryItem& historyItem)
 {
-    QSqlQuery insertHistoryItemQuery(*queryContext->connection());
+    QSqlQuery insertHistoryItemQuery(*queryContext->connection()->qtSqlConnection());
     insertHistoryItemQuery.prepare(R"sql(
         INSERT INTO system_health_history(system_id, state, timestamp_utc)
         VALUES(:systemId, :state, :timestamp)
@@ -48,7 +48,8 @@ nx::sql::DBResult SystemHealthHistoryDataObject::selectHistoryBySystem(
     const std::string& systemId,
     api::SystemHealthHistory* history)
 {
-    QSqlQuery selectSystemHealthHistoryQuery(*queryContext->connection());
+    QSqlQuery selectSystemHealthHistoryQuery(
+        *queryContext->connection()->qtSqlConnection());
     selectSystemHealthHistoryQuery.setForwardOnly(true);
     selectSystemHealthHistoryQuery.prepare(R"sql(
         SELECT state, timestamp_utc as timestamp

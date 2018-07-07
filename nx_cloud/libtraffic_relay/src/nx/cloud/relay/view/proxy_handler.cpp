@@ -96,9 +96,16 @@ void ProxyHandler::selectOnlineHost(
 
     m_detectProxyTargetHandler = std::move(handler);
 
-    findRelayInstanceToRedirectTo(
-        hostNames,
-        std::bind(&ProxyHandler::onRelayInstanceSearchCompleted, this, _1, _2));
+    if (m_remotePeerPool->isConnected())
+    {
+        findRelayInstanceToRedirectTo(
+            hostNames,
+            std::bind(&ProxyHandler::onRelayInstanceSearchCompleted, this, _1, _2));
+    }
+    else
+    {
+        onRelayInstanceSearchCompleted(std::nullopt, std::string());
+    }
 }
 
 std::optional<std::string> ProxyHandler::selectOnlineHostLocally(

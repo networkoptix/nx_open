@@ -23,7 +23,7 @@ boost::optional<std::string> UserAuthentication::fetchSystemNonce(
         WHERE system_id=:systemId
     )sql";
 
-    nx::sql::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.setForwardOnly(true);
     query.prepare(sqlRequestStr);
     query.bindValue(":systemId", QnSql::serialized_field(systemId));
@@ -49,7 +49,7 @@ void UserAuthentication::insertOrReplaceSystemNonce(
     const std::string& systemId,
     const std::string& nonce)
 {
-    nx::sql::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         REPLACE INTO system_auth_info(system_id, nonce)
         VALUES(:systemId, :nonce)
@@ -81,7 +81,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
         WHERE account_id=:accountId AND system_id=:systemId
     )sql";
 
-    nx::sql::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.setForwardOnly(true);
     query.prepare(sqlRequestStr);
     query.bindValue(":systemId", QnSql::serialized_field(systemId));
@@ -109,7 +109,7 @@ std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
     const auto currentTime = std::chrono::floor<std::chrono::milliseconds>(
         nx::utils::utcTime().time_since_epoch());
 
-    nx::sql::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.setForwardOnly(true);
     query.prepare(R"sql(
         SELECT DISTINCT system_id
@@ -145,7 +145,7 @@ void UserAuthentication::insertUserAuthRecords(
 {
     for (const auto& authRecord: userAuthRecords.records)
     {
-        nx::sql::SqlQuery query(*queryContext->connection());
+        nx::sql::SqlQuery query(queryContext->connection());
         query.prepare(R"sql(
             INSERT INTO system_user_auth_info(
                 system_id, account_id, nonce,
@@ -174,7 +174,7 @@ std::vector<AbstractUserAuthentication::SystemInfo> UserAuthentication::fetchAcc
     nx::sql::QueryContext* const queryContext,
     const std::string& accountId)
 {
-    nx::sql::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.setForwardOnly(true);
     query.prepare(R"sql(
         SELECT sta.system_id AS systemId, sta.vms_user_id AS vmsUserId, sai.nonce AS nonce
@@ -211,7 +211,7 @@ void UserAuthentication::deleteAccountAuthRecords(
     nx::sql::QueryContext* const queryContext,
     const std::string& accountId)
 {
-    nx::sql::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         DELETE FROM system_user_auth_info
         WHERE account_id = :accountId
@@ -234,7 +234,7 @@ void UserAuthentication::deleteSystemAuthRecords(
     nx::sql::QueryContext* const queryContext,
     const std::string& systemId)
 {
-    nx::sql::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         DELETE FROM system_user_auth_info
         WHERE system_id = :systemId

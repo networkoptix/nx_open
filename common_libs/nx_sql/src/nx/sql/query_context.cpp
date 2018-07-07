@@ -3,7 +3,7 @@
 namespace nx::sql {
 
 QueryContext::QueryContext(
-    QSqlDatabase* const connection,
+    AbstractDbConnection* const connection,
     Transaction* const transaction)
     :
     m_connection(connection),
@@ -11,12 +11,12 @@ QueryContext::QueryContext(
 {
 }
 
-QSqlDatabase* QueryContext::connection()
+AbstractDbConnection* QueryContext::connection()
 {
     return m_connection;
 }
 
-const QSqlDatabase* QueryContext::connection() const
+const AbstractDbConnection* QueryContext::connection() const
 {
     return m_connection;
 }
