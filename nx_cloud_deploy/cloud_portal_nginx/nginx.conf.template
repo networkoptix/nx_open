@@ -111,6 +111,11 @@ http {
             error_page 404 /static/index.html;
         }
 
+        location /static/autocomplete_light/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
         location /static/tiny_mce/ {
             root /app/app/static/common;
             error_page 404 /static/index.html;
