@@ -49,7 +49,6 @@ INSTALLED_APPS = (
     'admin_tools.dashboard',
 
     'django.contrib.admin',
-    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -322,8 +321,8 @@ AUTH_USER_MODEL = 'api.Account'
 AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 
 
-CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
-CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+CORS_ALLOW_CREDENTIALS = DEBUG
 
 SESSION_COOKIE_SECURE = not LOCAL_ENVIRONMENT
 CSRF_COOKIE_SECURE = not LOCAL_ENVIRONMENT
@@ -388,6 +387,7 @@ DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{custom
 
 MAX_RETRIES = conf['max_retries']
 CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS = 30
+CMS_MAX_FILE_SIZE = 9
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 

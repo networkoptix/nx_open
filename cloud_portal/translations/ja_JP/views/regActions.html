@@ -35,7 +35,7 @@
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">姓は必須です</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">苗字は必須です</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -53,14 +53,20 @@
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">有効なメールアドレスを入力して下さい</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">このEmailは既に %PRODUCT_NAME% に登録されています</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">このメールは既に %PRODUCT_NAME%に登録されています</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Email ニュース レターに申し込む</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        私は <a href="/content/eula" target="_blank">利用規約</a> と <a href="%PRIVACY_LINK%" target="_blank">プライバシー ポリシー</a> に同意します
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        続行するには、利用規約とプライバシーポリシーを確認して同意してください
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,10 +76,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    アカウント作成ボタンを押すことで、次の規約への同意とみなされます
-                    <div><a href="/content/eula" target="_blank">利用規約</a></div>
-                </div>
             </div>
         </div>
     </form>

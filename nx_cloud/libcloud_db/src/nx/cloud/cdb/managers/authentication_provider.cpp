@@ -106,9 +106,9 @@ void AuthenticationProvider::getAuthenticationResponse(
     m_sqlQueryExecutor->executeSelect(
         std::bind(&AuthenticationProvider::validateNonce, this, _1,
             authRequest.nonce, systemId, isNonceValid),
-        [this, completionHandler = std::move(completionHandler), systemId, authRequest, isNonceValid](
-            nx::sql::QueryContext* /*queryContext*/,
-            nx::sql::DBResult dbResult)
+        [this, completionHandler = std::move(completionHandler),
+            systemId, authRequest, isNonceValid](
+                nx::sql::DBResult dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
                 return completionHandler(api::ResultCode::dbError, api::AuthResponse());
@@ -363,10 +363,9 @@ void AuthenticationProvider::checkForExpiredAuthRecordsAsync()
     m_sqlQueryExecutor->executeUpdate(
         std::bind(&AuthenticationProvider::checkForExpiredAuthRecords, this, _1),
         [this, currentRequestIncrement = m_ongoingOperationCounter.getScopedIncrement()](
-            nx::sql::QueryContext* queryContext,
             sql::DBResult result)
         {
-            startCheckForExpiredAuthRecordsTimer(queryContext, result);
+            startCheckForExpiredAuthRecordsTimer(result);
         });
 }
 
@@ -453,9 +452,7 @@ void AuthenticationProvider::updateUserAuthInSystem(
         .args(userSharing.accountEmail, systemId, nonce));
 }
 
-void AuthenticationProvider::startCheckForExpiredAuthRecordsTimer(
-    nx::sql::QueryContext* /*queryContext*/,
-    sql::DBResult result)
+void AuthenticationProvider::startCheckForExpiredAuthRecordsTimer(sql::DBResult result)
 {
     QnMutexLocker lock(&m_mutex);
 

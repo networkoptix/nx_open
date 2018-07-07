@@ -1,5 +1,6 @@
 #pragma once
 
+#include "abstract_db_connection.h"
 #include "transaction.h"
 #include "types.h"
 
@@ -9,11 +10,11 @@ class NX_SQL_API QueryContext
 {
 public:
     QueryContext(
-        QSqlDatabase* const connection,
+        AbstractDbConnection* const connection,
         Transaction* const transaction);
 
-    QSqlDatabase* connection();
-    const QSqlDatabase* connection() const;
+    AbstractDbConnection* connection();
+    const AbstractDbConnection* connection() const;
 
     /**
      * @return Can be null.
@@ -22,7 +23,7 @@ public:
     const Transaction* transaction() const;
 
 private:
-    QSqlDatabase* const m_connection;
+    AbstractDbConnection * const m_connection;
     Transaction* const m_transaction;
 };
 

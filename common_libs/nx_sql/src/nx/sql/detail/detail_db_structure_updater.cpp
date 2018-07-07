@@ -128,7 +128,7 @@ DbStructureUpdater::DbSchemaState DbStructureUpdater::analyzeDbSchemaState(
     DbStructureUpdater::DbSchemaState dbSchemaState{ m_initialVersion, false };
 
     //reading current DB version
-    QSqlQuery fetchDbVersionQuery(*queryContext->connection());
+    QSqlQuery fetchDbVersionQuery(*queryContext->connection()->qtSqlConnection());
     fetchDbVersionQuery.prepare(
         "SELECT db_version FROM db_version_data WHERE schema_name=:schemaName");
     fetchDbVersionQuery.bindValue(":schemaName", QString::fromStdString(m_schemaName));
@@ -157,7 +157,7 @@ DBResult DbStructureUpdater::createInitialSchema(
         {
             NX_LOG(lm("DbStructureUpdater. Failed to create schema of version %1: %2")
                 .arg(m_fullSchemaScriptByVersion.rbegin()->first)
-                .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
+                .arg(queryContext->connection()->lastErrorText()), cl_logWARNING);
             return DBResult::ioError;
         }
         dbSchemaState->version = m_fullSchemaScriptByVersion.rbegin()->first;
@@ -202,7 +202,7 @@ DBResult DbStructureUpdater::applyNextUpdateScript(
             queryContext))
     {
         NX_LOG(lm("DbStructureUpdater. Failure updating to version %1: %2")
-            .arg(dbState->version).arg(queryContext->connection()->lastError().text()),
+            .arg(dbState->version).arg(queryContext->connection()->lastErrorText()),
             cl_logWARNING);
         return DBResult::ioError;
     }
@@ -216,7 +216,7 @@ DBResult DbStructureUpdater::updateDbVersion(
     nx::sql::QueryContext* const queryContext,
     const DbSchemaState& dbSchemaState)
 {
-    QSqlQuery updateDbVersionQuery(*queryContext->connection());
+    QSqlQuery updateDbVersionQuery(*queryContext->connection()->qtSqlConnection());
     updateDbVersionQuery.prepare(R"sql(
         REPLACE INTO db_version_data(schema_name, db_version)
         VALUES (:schemaName, :dbVersion)

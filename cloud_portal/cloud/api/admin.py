@@ -1,5 +1,7 @@
 from django.contrib import admin
-from models import *
+from .models import *
+from django.contrib.auth.models import Group
+from .forms import *
 # Register your models here.
 from cloud import settings
 from cms.admin import CMSAdmin
@@ -14,11 +16,13 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     readonly_fields = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
                        'subscribe', 'language', 'customization')
 
+    exclude = ("user_permissions",)
+
     list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login',)
     search_fields = ('email', 'first_name', 'last_name', 'customization', 'language',)
 
     csv_fields = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
-                    'subscribe', 'is_staff', 'language', 'customization')
+                  'subscribe', 'is_staff', 'language', 'customization')
 
     def save_model(self, request, obj, form, change):
         # forbid creating superusers outside specific domain
@@ -57,5 +61,27 @@ class AccountLoginHistoryAdmin(admin.ModelAdmin):
         cutoff_date = datetime.now() - timedelta(days=settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
         AccountLoginHistory.objects.filter(date__lt=cutoff_date).delete()
 
+    def get_readonly_fields(self, request, obj=None):
+        return list(set(list(self.readonly_fields) +
+                        [field.name for field in obj._meta.fields] +
+                        [field.name for field in obj._meta.many_to_many]))
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
     clean_old_records.short_description = "Remove messages older than {} days".format(
         settings.CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS)
+
+
+admin.site.unregister(Group)
+
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    # Use our custom form.
+    form = GroupAdminForm
+    # Filter permissions horizontal as well.
+    filter_horizontal = ['permissions']

@@ -1,0 +1,178 @@
+{
+    "language_name": "Italiano",
+    "dialogs": {
+        "okButton": "Ok",
+        "openLink": "Visita questo link",
+        "openLinkWithTitle": "A {{title}} Visita questo link"
+    },
+    "setup": {
+        "createAccount": "creare un account",
+        "errorNoHDD": "Questo dispositivo è progettato per funzionare con l'unità disco fisso installata.<br>Spegnere il dispositivo e installare un'unità disco fisso.",
+        "errorNoNetwork": "Questo dispositivo necessita di una connessione di rete per funzionare.<br>Si prega di collegarlo alla rete locale o Internet"
+    },
+    "passwordRequirements": {
+        "minLengthMessage": "La password deve contenere almeno 8 caratteri",
+        "requiredMessage": "Sono consentite solo lettere latine, numeri e simboli della tastiera",
+        "weakMessage": "La password dovrebbe contenere diversi tipi di simboli",
+        "strongMessage": "Password sicura!",
+        "commonMessage": "Questa password è nell'elenco delle password più popolari"
+    },
+    "settings": {
+        "tabs": {
+            "server": "Server",
+            "system": "Sistema",
+            "device": "Dispositivo"
+        },
+        "confirmRestart": "Riavviare il server?",
+        "couldntCheckInternet": "Impossibile controllare la connessione cloud",
+        "confirmRestoreDefault": "Cancella database e impostazioni? Questo processo richiederà del tempo e il server verrà riavviato in seguito.",
+        "confirmRestoreDefaultTitle": "Ripristina le impostazioni di fabbrica",
+        "unexpectedError": "Non riuscito: errore inatteso",
+        "connnetionError": "Errore di connessione",
+        "wrongPassword": "Password errata.",
+        "error": "Errore: ",
+        "restartNeeded": "Modifiche salvate. Riavvia il server per applicare nuove impostazioni?",
+        "settingsSaved": "Impostazioni salvate",
+        "confirmHardwareRestart": "Riavviare il sistema operativo del server?",
+        "confirmRestoreSettings": "Ripristina tutte le impostazioni del server? L'archivio verrà salvato, ma le impostazioni di rete verranno ripristinate.",
+        "confirmRestoreSettingsNotNetwork": "Reimposta la configurazione del server? Le impostazioni di archiviazione e di rete verranno salvate.",
+        "unavailable": "Non disponibile",
+        "unsafePortConfirm": "Non è sicuro usare il numero di porta inferiore a 1025. Il server potrebbe non essere accessibile. Continua comunque?",
+        "confirmDisconnectFromCloud": "Disconnettere il sistema da {{CLOUD_NAME}}",
+        "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Tutti gli utenti cloud verranno eliminati.</span><br><br>Il sistema sarà accessibile tramite la rete locale con account di amministratore locale.",
+        "confirmDisconnectFromCloudAction": "Scollegamento",
+        "disconnectedFromCloudSuccess": "Il sistema è stato disconnesso da {{CLOUD_NAME}} con successo",
+        "confirmDisconnectFromSystem": "Scollega il server dal sistema corrente",
+        "confirmDisconnectFromSystemAction": "Scollegare",
+        "disconnectedFromSystemSuccess": "Il server è stato scollegato correttamente dal sistema",
+        "connectedSuccess": "Il sistema è stato collegato correttamente",
+        "createLocalOwnerTitle": "Crea un amministratore locale",
+        "confirmChangePassword": "Cambia password amministratore",
+        "confirmChangePasswordTitle": "Cambio password di sistema? Interesserà l'utente \"admin\" e la password di root per alcuni server",
+        "confirmChangePasswordAction": "Salvare la nuova password",
+        "nx1ControlHint": "L'applicazione client è stata avviata. Utilizzare una tastiera / mouse o un'applicazione mobile per il controllo."
+    },
+    "settingsConfig": {
+        "arecontRtspEnabled": "Arecont RTSP abilitato",
+        "auditTrailEnabled": "Controllo Audit abilitato",
+        "auditTrailPeriodDays": "Giorni del periodo di controllo audit",
+        "autoDiscoveryEnabled": "Abilita il rilevamento automatico del dispositivo",
+        "autoUpdateThumbnails": "Aggiorna automaticamente le miniature",
+        "backupNewCamerasByDefault": "Backup di nuove videocamere per impostazione predefinita",
+        "backupQualities": "Qualità di backup",
+        "cameraSettingsOptimization": "Consenti l'ottimizzazione delle impostazioni del dispositivo",
+        "clientStatisticsSettingsUrl": "Url relativo alle statistiche del client",
+        "cloudAccountName": "Proprietario account cloud",
+        "cloudConnectRelayingEnabled": "Abilita l'inoltro per la connessione cloud",
+        "cloudConnectUdpHolePunchingEnabled": "Abilita connessione cloud tramite UDP hole punching",
+        "cloudHost": "Host cloud",
+        "cloudSystemID": "Id sistema cloud",
+        "disabledVendors": "Fornitori disabilitati",
+        "ec2AliveUpdateIntervalSec": "Intervallo aggiornamento sistema attivo (secondi)",
+        "ec2ConnectionKeepAliveTimeoutSec": "Timeout connessione keep alive (secondi)",
+        "ec2KeepAliveProbeCount": "Interrogazione connessione keep-alive (secondi)",
+        "emailFrom": "Email da",
+        "emailSignature": "Firma e-mail",
+        "emailSupportEmail": "Email di supporto",
+        "enableEdgeRecording": "Abilitazione della registrazione a bordo",
+        "eventLogPeriodDays": "Periodo del registro eventi (giorni)",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "Eliminare i profili di telecamera su init se necessario",
+        "ldapAdminDn": "LDAP admin DN",
+        "ldapSearchBase": "Base di ricerca LDAP",
+        "ldapSearchFilter": "Filtro di ricerca LDAP",
+        "ldapUri": "URI LDAP",
+        "localSystemId": "ID del sistema locale",
+        "maxDifferenceBetweenSynchronizedAndInternetTime": "Differenza massima tra tempo sincronizzato e Internet (millisecondi)",
+        "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Differenza massima tra ora sincronizzata e locale (millisecondi)",
+        "maxRecordQueueSizeBytes": "Dimensione massima della coda di registrazione (byte)",
+        "maxRecordQueueSizeElements": "Dimensione massima della coda di registrazione (elementi)",
+        "maxRemoteArchiveSynchronizationThreads": "Numero massimo di thread di sincronizzazione dell'archivio remoto",
+        "maxRtspConnectDurationSeconds": "Durata massima secondi collegamento Rtsp",
+        "maxSceneItems": "Elementi massimi di ripresa (0 significa predefinito)",
+        "proxyConnectTimeoutSec": "Timeout connessione proxy (secondi)",
+        "rtpTimeoutMs": "Timeout RTP (millisecondi)",
+        "sequentialFlirOnvifSearcherEnabled": "Utilizzare la ricerca sequenziale Flir Onvif",
+        "serverDiscoveryPingTimeoutSec": "Timeout rilevamento server",
+        "smtpConnectionType": "Tipo di connessione SMTP",
+        "smtpHost": "Host SMTP",
+        "smtpPort": "Porta SMTP",
+        "smtpSimple": "SMTP semplice",
+        "smtpTimeout": "Timeout SMTP",
+        "smtpUser": "Utente SMTP",
+        "statisticsAllowed": "Invia statistiche di utilizzo anonime e rapporti sugli arresti anomali",
+        "statisticsReportLastNumber": "Rapporto statistiche - ultimo numero",
+        "statisticsReportLastTime": "Rapporto statistiche - ultima volta",
+        "statisticsReportLastVersion": "Rapporto statistiche - ultima versione",
+        "statisticsReportServerApi": "Statistiche del server api",
+        "statisticsReportTimeCycle": "Intervallo dei report statistici",
+        "statisticsReportUpdateDelay": "Rapporto statistiche - ritardo aggiornamento",
+        "synchronizeTimeWithInternet": "Sincronizza l'ora con Internet",
+        "systemName": "Nome del sistema",
+        "takeCameraOwnershipWithoutLock": "Assumi la proprietà delle telecamere senza blocco",
+        "timeSynchronizationEnabled": "Sincronizzazione dell'ora abilitata",
+        "updateNotificationsEnabled": "Notifiche di aggiornamento abilitate",
+        "upnpPortMappingEnabled": "Funzione UPNP abilitata",
+        "useTextEmailFormat": "Invia e-mail di testo"
+    },
+    "info": {
+        "tabs": {
+            "healthMonitoring": "Monitor prestazioni",
+            "storage": "Archiviazione",
+            "log": "Registro"
+        }
+    },
+    "join": {
+        "systemIsUnreacheble": "Il sistema è irraggiungibile o non esiste.",
+        "incorrectCurrentPassword": "Password corrente errata.",
+        "incorrectRemotePassword": "Login o password non corretti.",
+        "incompatibleVersion": "Il sistema è irraggiungibile, non esiste o ha una versione incompatibile.",
+        "wrongUrl": "Impossibile connettersi al server specificato.",
+        "newSystemError": "Impossibile unire i sistemi. Il sistema remoto non è configurato.",
+        "safeMode": "Impossibile unire i sistemi. Il sistema remoto è in modalità provvisoria.",
+        "configError": "Impossibile unire i sistemi. Probabilmente uno dei sistemi è in modalità provvisoria.",
+        "cloudError": "Impossibile unire i sistemi. Il sistema dipendente è connesso al cloud. Devi prima scollegarlo.",
+        "cloudBothError": "Impossibile unire i sistemi. Entrambi i sistemi sono collegati al cloud. E' necessario scollegarli prima.",
+        "cloudHostConflict": "Impossibile unire i sistemi, perché i server sono costruiti con diversi host cloud",
+        "licenceError": "Avvertimento! Stai per unire i sistemi con le licenze Starter. È consentita una sola licenza di avviamento per sistema, pertanto la seconda licenza verrà disattivata. Unisci comunque?",
+        "connectionFailed": "Connessione fallita: ",
+        "unknownError": "Errore sconosciuto",
+        "mergeFailed": "Unione non riuscita: ",
+        "mergeSucceed": "Successo Unione.",
+        "newSystemDisplayName": "Nuovo sistema",
+        "incompatibleProtocol": "versione incompatibile",
+        "incompatibleCloudHost": "conflitto nel cloud",
+        "incompatibleCloudState": "cloud connesso"
+    },
+    "login": {
+        "incorrectPassword": "Login o password non corretti"
+    },
+    "navigaion": {
+        "cannotGetUser": "Errore del server: impossibile recuperare i dati utente correnti"
+    },
+    "offlineDialog": {
+        "serverOffline": "il server è offline"
+    },
+    "restartDialog": {
+        "serverStarting": "il server si sta avviando",
+        "serverRestarting": "il server si sta riavviando",
+        "serverOffline": "il server è offline"
+    },
+    "fileUpload": {
+        "started": "Aggiornamento avviato correttamente. Ci vorranno diversi minuti",
+        "upToDate": "Aggiornamento non riuscito. La versione fornita è già installata.",
+        "invalidFile": "Aggiornamento non riuscito. Il file fornito non è un archivio di aggiornamento valido.",
+        "incompatibleSystem": "Aggiornamento non riuscito. Il file fornito è destinato a un altro sistema.",
+        "extractionError": "Aggiornamento non riuscito. Spazio insufficiente per estrarre l'archivio, controllare la memoria disponibile.",
+        "installationError": "Aggiornamento fallito. Impossibile eseguire script di installazione.",
+        "selectFiles": "Selezionare i file"
+    },
+    "advanced": {
+        "free": "Versione gratuita",
+        "total": "Totale",
+        "occupied": "Occupato",
+        "reserved": "Riservato"
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} interfaccia web"
+    }
+}

@@ -41,6 +41,11 @@ public:
 
     void stopAllInstances();
 
+    /**
+     * @return true, if information about peer is available to every relay peer.
+     */
+    bool peerInformationSynchronizedInCluster(const std::string& hostname);
+
 private:
     ListeningPeerPool m_listeningPeerPool;
     std::vector<std::unique_ptr<Relay>> m_relays;

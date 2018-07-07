@@ -33,6 +33,7 @@ public:
     ~RemoteRelayPeerPool();
 
     virtual bool connectToDb() override;
+    virtual bool isConnected() const override;
     /**
      * @return cf::future<Relay instance endpoint that has peer domainName listening>.
      */

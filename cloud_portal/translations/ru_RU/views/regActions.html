@@ -57,10 +57,16 @@
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Подписаться на рассылку</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        Я согласен с <a href="/content/eula" target="_blank">Условиями использования</a> и <a href="%PRIVACY_LINK%" target="_blank">Политикой конфиденциальности</a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        Пожалуйста, просмотрите и согласитесь с условиями использования и политикой конфиденциальности для того, чтобы продолжить
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,10 +76,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    Нажимая на кнопку "Создать учётную запись", вы соглашаетесь соблюдать
-                    <div><a href="/content/eula" target="_blank">Условия и положения</a></div>
-                </div>
             </div>
         </div>
     </form>

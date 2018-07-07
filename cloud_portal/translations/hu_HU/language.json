@@ -61,7 +61,7 @@
     },
     "Advanced Viewer": {
       "label": "Speciális felhasználó",
-      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
+      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb"
     },
     "Administrator": {
       "label": "Adminisztrátor",
@@ -93,11 +93,11 @@
     },
     "advancedViewer": {
       "label": "Speciális felhasználó",
-      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb..."
+      "description": "Élőkép, rögzített kép, kamerák konfigurálása, PTZ vezérlés, stb"
     },
     "custom": {
       "label": "Egyéni",
-      "description": "Egyéni engedélyek konfigurálásához használja a %PRODUCT_NAME% klienst"
+      "description": "Egyéni engedélyek konfigurálásához használja a %VMS_NAME% klienst"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "Ez a felhasználó rendszergazdai jogokkal rendelkezik",
     "cantOpenClient": "%VMS_NAME% nincs törölve. <a href=\"/download\">Letöltés</a>",
     "lostConnection": "{{systemName}} kapcsolat megszakadt",
-    "thisSystem": "a rendszer"
+    "thisSystem": "a rendszer",
+    "oldSafariNotSupported": "A 10-es verziónál régebbi Safari böngésző nem támogatott"
   },
   "passwordRequirements": {
     "minLengthMessage": "A jelszónak legalább 8 karakterből kell állnia",
@@ -160,7 +161,7 @@
     "offline": "A rendszer offline",
     "openClient": "Megnyitás %VMS_NAME% alkalmazással",
     "openClientNoSystem": "%VMS_NAME% Megnyitása",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Összefésülés",
     "mergeSystemTitle": "Rendszerek összevonása",
     "confirmRenameTitle": "Rendszer neve",
     "confirmRenameAction": "Mentés",

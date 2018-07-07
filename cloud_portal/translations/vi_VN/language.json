@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Tùy chỉnh",
-      "description": "Sử dụng ứng dụng Khách hàng %PRODUCT_NAME% để thiết lập quyền tùy chỉnh"
+      "description": "Sử dụng ứng dụng Khách hàng %VMS_NAME% để thiết lập quyền tùy chỉnh"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "Người dùng này có quyền quản trị viên",
     "cantOpenClient": "Ứng dụng %VMS_NAME% ứng dụng không tìm thấy. <a href=\"/download\">Tải xuống</a>",
     "lostConnection": "Kết nối với {{systemName}} bị mất",
-    "thisSystem": "hệ thống"
+    "thisSystem": "hệ thống",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "Mật khẩu phải chứa ít nhất 8 ký tự",
@@ -160,7 +161,7 @@
     "offline": "Hệ thống offline",
     "openClient": "Mở trong %VMS_NAME%",
     "openClientNoSystem": "Mở %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Gộp lại",
     "mergeSystemTitle": "Hợp nhất hệ thống",
     "confirmRenameTitle": "Tên hệ thống",
     "confirmRenameAction": "Tiết kiệm",

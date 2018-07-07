@@ -6,6 +6,8 @@
 
 #include <nx/utils/uuid.h>
 
+#include "abstract_db_connection.h"
+
 namespace nx::sql {
 
 class NX_SQL_API SqlQueryExecutionHelper
@@ -21,6 +23,9 @@ public:
     static bool execSQLScript(const QByteArray& scriptData, QSqlDatabase& database);
     /** Reads file fileName and calls QnDbHelper::execSQLScript. */
     static bool execSQLFile(const QString& fileName, QSqlDatabase& database);
+
+    static bool execSQLScript(const QByteArray& scriptData, AbstractDbConnection& dbConnection);
+    static bool execSQLFile(const QString& fileName, AbstractDbConnection& dbConnection);
 
     /** Bind uuid to a query parameter. By default, null id is bound as NULL (param: optional). */
     static void bindId(QSqlQuery* query,

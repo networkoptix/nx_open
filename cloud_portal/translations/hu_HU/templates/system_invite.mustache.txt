@@ -6,8 +6,8 @@
 
 {{^message.sharer_name}}
 Ha felkérik, hogy csatlakozzon %PRODUCT_NAME% alkalmazáshoz.
-You have been granted access to {{message.system_name}}.
+Hozzáférést kapott a "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Regisztráljon és nézze meg a rendszert: regisztráció/{{config.portal_url}}/{{message.code}}
+Regisztráljon és nézze meg a rendszert: {{config.portal_url}}/register/{{message.code}}
 

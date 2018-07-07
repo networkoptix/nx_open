@@ -38,6 +38,11 @@ public:
         return true;
     }
 
+    virtual bool isConnected() const override
+    {
+        return true;
+    }
+
     virtual cf::future<std::string> findRelayByDomain(
         const std::string& /*domainName*/) const override
     {

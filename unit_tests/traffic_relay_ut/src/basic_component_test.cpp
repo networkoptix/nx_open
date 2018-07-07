@@ -90,6 +90,12 @@ void BasicComponentTest::stopAllInstances()
         relay->stop();
 }
 
+bool BasicComponentTest::peerInformationSynchronizedInCluster(
+    const std::string& hostname)
+{
+    return !m_listeningPeerPool.findRelay(hostname).empty();
+}
+
 std::unique_ptr<model::AbstractRemoteRelayPeerPool>
     BasicComponentTest::createRemoteRelayPeerPool(
         const conf::Settings& /*settings*/)

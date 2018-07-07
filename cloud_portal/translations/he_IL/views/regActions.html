@@ -53,14 +53,20 @@
 
                 <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">אנא הקלד כתובת אימייל תקפה</span></div>
 
-                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">האימייל הזה כבר רשום ב- %PRODUCT_NAME%</span></div>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">האימייל הזה כבר נרשם ב- {{PRODUCT_NAME}}</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> הרשמה לדיוור ישיר</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        אני מסכים ל <a href="/content/eula" target="_blank"> התנאים וההגבלות </a> ו <a href="%PRIVACY_LINK%" target="_blank"> מדיניות פרטיות </a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        נא לעיין ולהסכים לתנאים וההגבלות ולפרטיות המדיניות כדי להמשיך
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,10 +76,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    על ידי לחיצה על "; צור חשבון";, אתה מסכים
-                    <div><a href="/content/eula" target="_blank">תנאי שימוש</a></div>
-                </div>
             </div>
         </div>
     </form>

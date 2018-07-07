@@ -1,6 +1,8 @@
 #pragma once
 
+#include "async_sql_query_executor.h"
 #include "detail/detail_db_structure_updater.h"
+#include "query_context.h"
 
 namespace nx::sql {
 

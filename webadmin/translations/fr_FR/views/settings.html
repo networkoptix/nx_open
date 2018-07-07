@@ -15,8 +15,8 @@
             </alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
@@ -40,9 +40,10 @@
                             Le serveur sera détaché du système actuel. Les archives vidéo resteront intactes.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restaurer les paramètres par défaut</button></p>
                     </div>
-                    <div>
+                    <div ng-if="user.isOwner">
                         <h3>Détacher le serveur du système</h3>
-                        <p>Cette action détachera le serveur de la base de données système, des utilisateurs locaux et de la configuration. Les archives vidéo resteront intactes. <b>Les utilisateurs Cloud seront supprimés.</b></p>
+                        <p>Cette action détachera le serveur de la base de données de maintien du système, des utilisateurs locaux et de la configuration.
+                            Les archives vidéo resteront intactes. <b>Usagers de nuages seront supprimés.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Détacher du système</button></p>
                     </div>
                     <div>
@@ -64,9 +65,9 @@
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>Nom</h3>
                         <div class="row">
@@ -113,13 +114,13 @@
                                    target="_blank">Céer compte {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Paramètres réseau périphérique</h3>
+                        <h3>Paramètres réseau du périphérique</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Enregistrer les paramètres et redémarrer le périphérique</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Enregistrer les paramètres et redémarrer l’appareil</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Date et heure</h3>
@@ -144,7 +145,7 @@
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -157,7 +158,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -176,8 +177,8 @@
                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Arrêter client</button></p>
                         <p>Utiliser un clavier/souris ou une application mobile pour contrôler.</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

@@ -73,8 +73,7 @@ protected:
             nx::network::http::Method::get);
         m_peerServer->server().start();
 
-        while (!relay().moduleInstance()->listeningPeerPool()
-            .isPeerOnline(m_listeningPeerHostName))
+        while (!peerInformationSynchronizedInCluster(m_listeningPeerHostName))
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }

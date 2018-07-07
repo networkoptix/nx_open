@@ -28,10 +28,7 @@ void Collector::saveConnectSessionStatistics(ConnectSession data)
     m_sqlQueryExecutor->executeUpdate(
         std::bind(&dao::AbstractDataObject::save, m_dataObject.get(), _1, std::move(data)),
         [locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-            nx::sql::QueryContext* /*queryContext*/,
-            nx::sql::DBResult /*dbResult*/)
-        {
-        });
+            nx::sql::DBResult /*dbResult*/) {});
 }
 
 //-------------------------------------------------------------------------------------------------

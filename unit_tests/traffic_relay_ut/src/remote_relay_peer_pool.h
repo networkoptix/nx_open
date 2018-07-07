@@ -34,6 +34,8 @@ public:
 
     virtual bool connectToDb() override;
 
+    virtual bool isConnected() const override;
+
     virtual cf::future<std::string /*relay hostname/ip*/> findRelayByDomain(
         const std::string& domainName) const override;
 

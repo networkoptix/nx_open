@@ -4,6 +4,7 @@
 #include <string>
 
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -90,7 +91,7 @@ bool InstanceController::configureDb()
 
     m_queryExecutor->executeUpdateWithoutTran(
         std::bind(&InstanceController::configureSqliteInstance, this, _1),
-        [&](QueryContext* /*queryContext*/, DBResult dbResult)
+        [&](DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -101,7 +102,7 @@ bool InstanceController::configureDb()
 DBResult InstanceController::configureSqliteInstance(
     QueryContext* queryContext)
 {
-    QSqlQuery enableWalQuery(*queryContext->connection());
+    QSqlQuery enableWalQuery(*queryContext->connection()->qtSqlConnection());
     enableWalQuery.prepare("PRAGMA journal_mode = WAL");
     if (!enableWalQuery.exec())
     {
@@ -111,7 +112,7 @@ DBResult InstanceController::configureSqliteInstance(
         return DBResult::ioError;
     }
 
-    QSqlQuery enableFKQuery(*queryContext->connection());
+    QSqlQuery enableFKQuery(*queryContext->connection()->qtSqlConnection());
     enableFKQuery.prepare("PRAGMA foreign_keys = ON");
     if (!enableFKQuery.exec())
     {

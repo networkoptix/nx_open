@@ -16,7 +16,7 @@ nx::sql::DBResult AccountDataObject::insert(
     nx::sql::QueryContext* queryContext,
     const api::AccountData& account)
 {
-    QSqlQuery insertAccountQuery(*queryContext->connection());
+    QSqlQuery insertAccountQuery(*queryContext->connection()->qtSqlConnection());
     insertAccountQuery.prepare(R"sql(
         INSERT INTO account (id, email, password_ha1, password_ha1_sha256,
             full_name, customization, status_code, registration_time_utc)
@@ -40,7 +40,7 @@ nx::sql::DBResult AccountDataObject::update(
     nx::sql::QueryContext* queryContext,
     const api::AccountData& account)
 {
-    QSqlQuery updateAccountQuery(*queryContext->connection());
+    QSqlQuery updateAccountQuery(*queryContext->connection()->qtSqlConnection());
     updateAccountQuery.prepare(R"sql(
         UPDATE account
         SET password_ha1=:passwordHa1, password_ha1_sha256=:passwordHa1Sha256,
@@ -64,7 +64,7 @@ std::optional<api::AccountData> AccountDataObject::fetchAccountByEmail(
     nx::sql::QueryContext* queryContext,
     const std::string& accountEmail)
 {
-    nx::sql::SqlQuery fetchAccountQuery(*queryContext->connection());
+    nx::sql::SqlQuery fetchAccountQuery(queryContext->connection());
     fetchAccountQuery.setForwardOnly(true);
     fetchAccountQuery.prepare(
         R"sql(
@@ -101,7 +101,7 @@ nx::sql::DBResult AccountDataObject::fetchAccounts(
     nx::sql::QueryContext* queryContext,
     std::vector<api::AccountData>* accounts)
 {
-    QSqlQuery readAccountsQuery(*queryContext->connection());
+    QSqlQuery readAccountsQuery(*queryContext->connection()->qtSqlConnection());
     readAccountsQuery.setForwardOnly(true);
     readAccountsQuery.prepare(R"sql(
         SELECT id, email, password_ha1 as passwordHa1, password_ha1_sha256 as passwordHa1Sha256,
@@ -127,7 +127,7 @@ void AccountDataObject::insertEmailVerificationCode(
     const std::string& emailVerificationCode,
     const QDateTime& codeExpirationTime)
 {
-    nx::sql::SqlQuery insertEmailVerificationQuery(*queryContext->connection());
+    nx::sql::SqlQuery insertEmailVerificationQuery(queryContext->connection());
     insertEmailVerificationQuery.prepare(
         "INSERT INTO email_verification( account_id, verification_code, expiration_date ) "
         "VALUES ( (SELECT id FROM account WHERE email=?), ?, ? )");
@@ -156,7 +156,7 @@ std::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmail(
     nx::sql::QueryContext* queryContext,
     const std::string& accountEmail)
 {
-    nx::sql::SqlQuery fetchActivationCodesQuery(*queryContext->connection());
+    nx::sql::SqlQuery fetchActivationCodesQuery(queryContext->connection());
     fetchActivationCodesQuery.setForwardOnly(true);
     fetchActivationCodesQuery.prepare(R"sql(
         SELECT verification_code
@@ -188,7 +188,7 @@ nx::sql::DBResult AccountDataObject::getAccountEmailByVerificationCode(
     const data::AccountConfirmationCode& verificationCode,
     std::string* accountEmail)
 {
-    QSqlQuery getAccountByVerificationCode(*queryContext->connection());
+    QSqlQuery getAccountByVerificationCode(*queryContext->connection()->qtSqlConnection());
     getAccountByVerificationCode.setForwardOnly(true);
     getAccountByVerificationCode.prepare(R"sql(
         SELECT a.email
@@ -214,7 +214,7 @@ nx::sql::DBResult AccountDataObject::removeVerificationCode(
     nx::sql::QueryContext* queryContext,
     const data::AccountConfirmationCode& verificationCode)
 {
-    QSqlQuery removeVerificationCodeQuery(*queryContext->connection());
+    QSqlQuery removeVerificationCodeQuery(*queryContext->connection()->qtSqlConnection());
     removeVerificationCodeQuery.prepare(R"sql(
         DELETE FROM email_verification WHERE verification_code LIKE :code
         )sql");
@@ -236,7 +236,7 @@ nx::sql::DBResult AccountDataObject::updateAccountToActiveStatus(
     const std::string& accountEmail,
     std::chrono::system_clock::time_point activationTime)
 {
-    QSqlQuery updateAccountStatus(*queryContext->connection());
+    QSqlQuery updateAccountStatus(*queryContext->connection()->qtSqlConnection());
     updateAccountStatus.prepare(R"sql(
         UPDATE account SET status_code = ?, activation_time_utc = ? WHERE email = ?
         )sql");
@@ -313,7 +313,7 @@ void AccountDataObject::executeUpdateAccountQuery(
     const std::string& accountEmail,
     std::vector<nx::sql::SqlFilterField> fieldsToSet)
 {
-    nx::sql::SqlQuery updateAccountQuery(*queryContext->connection());
+    nx::sql::SqlQuery updateAccountQuery(queryContext->connection());
     updateAccountQuery.prepare(
         lm("UPDATE account SET %1 WHERE email=:email")
             .arg(nx::sql::joinFields(fieldsToSet, ",")));

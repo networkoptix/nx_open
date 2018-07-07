@@ -1,6 +1,7 @@
 #include "transaction_log.h"
 
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 #include <nx/utils/time.h>
 
@@ -34,7 +35,7 @@ TransactionLog::TransactionLog(
 void TransactionLog::startDbTransaction(
     const nx::String& systemId,
     nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> dbOperationsFunc,
-    nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, nx::sql::DBResult)> onDbUpdateCompleted)
+    nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> onDbUpdateCompleted)
 {
     // TODO: monitoring request queue size and returning ResultCode::retryLater if exceeded
 
@@ -48,12 +49,7 @@ void TransactionLog::startDbTransaction(
             }
             return dbOperationsFunc(queryContext);
         },
-        [systemId, onDbUpdateCompleted = std::move(onDbUpdateCompleted)](
-            nx::sql::QueryContext* queryContext,
-            nx::sql::DBResult dbResult)
-        {
-            onDbUpdateCompleted(queryContext, dbResult);
-        });
+        std::move(onDbUpdateCompleted));
 }
 
 nx::sql::DBResult TransactionLog::updateTimestampHiForSystem(
@@ -108,7 +104,6 @@ void TransactionLog::readTransactions(
             &TransactionLog::fetchTransactions, this,
             _1, systemId, std::move(*from), std::move(*to), maxTransactionsToReturn, outputDataPtr),
         [completionHandler = std::move(completionHandler), outputData = std::move(outputData)](
-            nx::sql::QueryContext* /*queryContext*/,
             nx::sql::DBResult dbResult)
         {
             completionHandler(
@@ -159,9 +154,7 @@ nx::sql::DBResult TransactionLog::fillCache()
     using namespace std::placeholders;
     m_dbManager->executeSelect(
         std::bind(&TransactionLog::fetchTransactionState, this, _1),
-        [&cacheFilledPromise](
-            nx::sql::QueryContext* /*queryContext*/,
-            nx::sql::DBResult dbResult)
+        [&cacheFilledPromise](nx::sql::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -175,7 +168,7 @@ nx::sql::DBResult TransactionLog::fetchTransactionState(
     nx::sql::QueryContext* queryContext)
 {
     // TODO: #ak move to TransactionDataObject
-    QSqlQuery selectTransactionStateQuery(*queryContext->connection());
+    QSqlQuery selectTransactionStateQuery(*queryContext->connection()->qtSqlConnection());
     selectTransactionStateQuery.setForwardOnly(true);
     selectTransactionStateQuery.prepare(
         R"sql(
@@ -343,12 +336,12 @@ int TransactionLog::generateNewTransactionSequence(
 }
 
 void TransactionLog::onDbTransactionCompleted(
-    nx::sql::QueryContext* queryContext,
+    DbTransactionContextMap::iterator queryIterator,
     const nx::String& systemId,
     nx::sql::DBResult dbResult)
 {
     DbTransactionContext currentDbTranContext =
-        m_dbTransactionContexts.take(std::make_pair(queryContext, systemId));
+        m_dbTransactionContexts.take(queryIterator);
     TransactionLogContext* vmsTransactionLogData = nullptr;
     {
         QnMutexLocker lock(&m_mutex);
@@ -372,17 +365,22 @@ TransactionLog::DbTransactionContext& TransactionLog::getDbTransactionContext(
     nx::sql::QueryContext* const queryContext,
     const nx::String& systemId)
 {
-    auto newElementIter = m_dbTransactionContexts.emplace(
-        std::make_pair(queryContext, systemId),
-        DbTransactionContext(),
-        [this, &lock, &systemId, &queryContext](DbTransactionContextMap::iterator newElementIter)
+    auto initializeNewElement =
+        [this, &lock, &systemId, queryContext](
+            DbTransactionContextMap::iterator newElementIter)
         {
             newElementIter->second.cacheTranId =
                 getTransactionLogContext(lock, systemId)->cache.beginTran();
+
             queryContext->transaction()->addOnTransactionCompletionHandler(
                 std::bind(&TransactionLog::onDbTransactionCompleted, this,
-                    queryContext, systemId, std::placeholders::_1));
-        }).first;
+                    newElementIter, systemId, std::placeholders::_1));
+        };
+
+    auto newElementIter = m_dbTransactionContexts.emplace(
+        std::make_pair(queryContext, systemId),
+        DbTransactionContext{VmsTransactionLogCache::InvalidTranId, queryContext},
+        initializeNewElement).first;
     return newElementIter->second;
 }
 
