@@ -231,7 +231,7 @@ def check_code_in_portal(request):
 class AccountAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         # Don't forget to filter out results depending on the visitor !
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated() or not self.request.user.is_superuser:
             return models.Account.objects.none()
 
         qs = models.Account.objects.all()
