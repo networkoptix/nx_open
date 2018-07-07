@@ -31,6 +31,11 @@ class HttpProxy:
     public BasicComponentTest
 {
 public:
+    HttpProxy(BasicComponentTest::Mode mode = BasicComponentTest::Mode::cluster):
+        BasicComponentTest(mode)
+    {
+    }
+
     ~HttpProxy()
     {
         m_peerServer.reset();
@@ -233,6 +238,28 @@ TEST_F(HttpProxyRedirect, request_is_redirected_to_a_proxy_relay_instance)
     givenListeningPeer();
     whenSendHttpRequestViaBadRelay();
     thenResponseFromPeerIsReceived();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpProxyNonClusterMode:
+    public HttpProxy
+{
+    using base_type = HttpProxy;
+
+public:
+    HttpProxyNonClusterMode():
+        base_type(BasicComponentTest::Mode::singleRelay)
+    {
+    }
+};
+
+TEST_F(HttpProxyNonClusterMode, no_cluster_proxy_to_unknown_host_produces_bad_gateway_error)
+{
+    whenSendHttpRequestToUnknownPeer();
+
+    thenResponseIsReceived();
+    andResponseStatusCodeIs(nx::network::http::StatusCode::badGateway);
 }
 
 } // namespace test

@@ -28,7 +28,7 @@ class RelayService:
 {
 public:
     RelayService():
-        BasicComponentTest(false /*do not emulate relay cluster*/)
+        BasicComponentTest(Mode::singleRelay)
     {
     }
 
