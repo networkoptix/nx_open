@@ -1,14 +1,12 @@
 // Nx collapsible element
 .nx-collapsible {
     display: block;
-    transition: opacity .5s ease-out;
     opacity: 0;
     height: 0;
     overflow: hidden;
 
     &.show {
         opacity: 1;
-        transition: opacity .5s ease-in;
         display: block;
         height: auto;
     }
