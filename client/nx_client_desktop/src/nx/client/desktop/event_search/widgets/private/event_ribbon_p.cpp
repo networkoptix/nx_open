@@ -230,6 +230,11 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
         return;
     }
 
+    // Select tile color style.
+    tile->setVisualStyle(index.data(Qn::AlternateColorRole).toBool()
+        ? EventTile::Style::informer
+        : EventTile::Style::standard);
+
     // Check whether the tile is a special progress bar tile.
     const auto progress = index.data(Qn::ProgressValueRole);
     if (progress.canConvert<qreal>())

@@ -57,6 +57,9 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
         case Qn::ResourceRole:
             return QVariant::fromValue(d->resource(index.row()));
 
+        case Qn::AlternateColorRole:
+            return true;
+
         case Qn::RemovableRole:
             return true;
 

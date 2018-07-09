@@ -26,18 +26,6 @@ class CloseButton;
 class EventTile: public Customized<QWidget>
 {
     Q_OBJECT
-    Q_PROPERTY(bool closeable READ closeable WRITE setCloseable)
-    Q_PROPERTY(QString title READ title WRITE setTitle)
-    Q_PROPERTY(QColor titleColor READ titleColor WRITE setTitleColor)
-    Q_PROPERTY(QString description READ description WRITE setDescription)
-    Q_PROPERTY(QString timestamp READ timestamp WRITE setTimestamp)
-    Q_PROPERTY(QPixmap icon READ icon WRITE setIcon)
-    Q_PROPERTY(bool busyIndicatorVisible READ busyIndicatorVisible WRITE setBusyIndicatorVisible)
-    Q_PROPERTY(bool progressBarVisible READ progressBarVisible WRITE setProgressBarVisible)
-    Q_PROPERTY(QString progressTitle READ progressTitle WRITE setProgressTitle)
-    Q_PROPERTY(qreal progressValue READ progressValue WRITE setProgressValue)
-    Q_PROPERTY(bool isRead READ isRead WRITE setRead)
-
     using base_type = Customized<QWidget>;
 
 public:
@@ -117,6 +105,15 @@ public:
     Mode mode() const;
     void setMode(Mode value);
 
+    enum class Style
+    {
+        standard,
+        informer
+    };
+
+    Style visualStyle() const;
+    void setVisualStyle(Style value);
+
 signals:
     void clicked();
 
@@ -133,6 +130,7 @@ protected:
 private:
     void handleHoverChanged(bool hovered);
     void updateBackgroundRole(bool hovered);
+    void updatePalette();
 
 private:
     QScopedPointer<Ui::EventTile> ui;
@@ -144,6 +142,7 @@ private:
     qreal m_progressValue = 0.0;
     bool m_isRead = false;
     bool m_footerEnabled = true;
+    Style m_style = Style::standard;
 };
 
 } // namespace desktop
