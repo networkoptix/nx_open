@@ -101,6 +101,9 @@ TEST_F(BookmarksDatabaseTest, selectTest)
     static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
     static const QnUuid kCameraId2("6FD1F239-CEBC-81BF-C2D4-59789E2CEF05");
 
+    qnServerDb->deleteAllBookmarksForCamera(kCameraId1);
+    qnServerDb->deleteAllBookmarksForCamera(kCameraId2);
+
     const auto startTimeMs = 500;
     const auto periodMs = 1000;
     const auto endTimeMs = startTimeMs + periodMs;
@@ -167,6 +170,7 @@ TEST_F(BookmarksDatabaseTest, rangeTest)
     ASSERT_TRUE(mediaServerLauncher->start());
 
     static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
+    qnServerDb->deleteAllBookmarksForCamera(kCameraId1);
 
     const auto startTimeMs = 500;
     const auto periodMs = 1000;
