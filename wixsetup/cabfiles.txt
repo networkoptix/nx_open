@@ -84,6 +84,7 @@ Server cab files:
         hikvision_metadata_plugin
         axis_metadata_plugin
         vca_metadata_plugin
+        stub_metadata_plugin
         sigar
         qtcore4
         vmaxproxy.exe

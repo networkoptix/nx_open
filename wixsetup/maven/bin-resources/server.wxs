@@ -93,6 +93,8 @@
                     </Component>
                 </Directory>
 
+                <Directory Id="plugins_optional" Name="plugins_optional"/>
+
                 <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>
 
                 <Component Id="ServerSigar">
@@ -115,6 +117,7 @@
 
             </Directory>
         </DirectoryRef>
+
         <ComponentGroup Id="ServerLibs" Directory="MediaServerRootDir">
             <Component>
                 <File Id="nx_utils.dll" Name="nx_utils.dll" Source="$(var.SourceDir)/nx_utils.dll" DiskId="4" />
@@ -239,6 +242,16 @@
         </ComponentGroup>
         <?endif?>
 
+        <ComponentGroup Id="plugins_optional" Directory="plugins_optional">
+            <Component Id="stub_metadata_plugin.dll">
+                <File Id="stub_metadata_plugin.dll"
+                    Source="$(var.plugins_optional_dir)\stub_metadata_plugin.dll"
+                    KeyPath="yes"
+                    DiskId="10" />
+            </Component>
+        </ComponentGroup>
+
+
         <Component Id="ServerBuildInfoTxt" Directory="MediaServerRootDir">
             <File Id="build_info.txt" Name="build_info.txt" Source="$(var.SourceDir)\..\build_info.txt" DiskId="6"/>
         </Component>
@@ -270,6 +283,7 @@
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
             <ComponentGroupRef Id="ServerVoxComponent"/>
+            <ComponentGroupRef Id="plugins_optional"/>
             <ComponentRef Id="ServerSigar"/>
 
 
