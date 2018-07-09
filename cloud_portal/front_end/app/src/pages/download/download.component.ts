@@ -17,6 +17,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
     private platform: any;
     private activeOs: string;
     private routeData: any;
+    private userAuthorized: boolean;
 
     installers: any;
     downloads: any;
@@ -46,6 +47,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
     constructor(@Inject('languageService') private language: any,
                 @Inject('cloudApiService') private cloudApi: any,
                 @Inject('configService') private configService: any,
+                @Inject('authorizationCheckService') private authorizationService: any,
                 @Inject(DOCUMENT) private document: any,
                 private route: ActivatedRoute,
                 private router: Router,
@@ -53,6 +55,7 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
 
         this.setupDefaults();
 
+        this.userAuthorized = false;
         this.downloads = this.configService.config.downloads;
     }
 
@@ -89,41 +92,46 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
     };
 
     ngOnInit(): void {
-        this.routeData = this.route.snapshot.data;
+        this.authorizationService
+            .requireLogin()
+            .then(() => {
+                this.userAuthorized = true;
+                this.routeData = this.route.snapshot.data;
 
-        this.sub = this.route.params.subscribe(params => {
-            this.platform = params['platform'];
+                this.sub = this.route.params.subscribe(params => {
+                    this.platform = params['platform'];
 
-            this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
+                    this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
 
-            for (let mobile in this.downloads.mobile) {
-                if (this.downloads.mobile[mobile].os === this.activeOs) {
-                    if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
-                        this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
+                    for (let mobile in this.downloads.mobile) {
+                        if (this.downloads.mobile[mobile].os === this.activeOs) {
+                            if (this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link !== 'disabled') {
+                                this.document.location.href = this.language.lang.downloads.mobile[this.downloads.mobile[mobile].name].link;
+                                return;
+                            }
+                            break;
+                        }
+                    }
+
+                    let foundPlatform = false;
+                    this.downloads.groups.forEach(platform => {
+                        foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
+                    });
+
+                    if (this.platform && !foundPlatform) {
+                        this.router.navigate(['404']);
+
                         return;
                     }
-                    break;
-                }
-            }
 
-            let foundPlatform = false;
-            this.downloads.groups.forEach(platform => {
-                foundPlatform = ((platform.os || platform.name) === this.activeOs) || foundPlatform;
+                    if (!foundPlatform) {
+                        this.downloads.groups[0].active = true;
+                    }
+                });
+
+                this.getDownloadersPer(this.platform);
+                this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
             });
-
-            if (this.platform && !foundPlatform) {
-                this.router.navigate(['404']);
-
-                return;
-            }
-
-            if (!foundPlatform) {
-                this.downloads.groups[0].active = true;
-            }
-        });
-
-        this.getDownloadersPer(this.platform);
-        this.titleService.setTitle(this.language.lang.pageTitles.downloadPlatform + this.platform);
     }
 
     ngOnDestroy() {
