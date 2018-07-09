@@ -12,6 +12,9 @@ from api.account_backend import AccountBackend
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
     APIInternalException, APINotFoundException, api_success, ErrorCodes, require_params
 
+from dal import autocomplete
+from api import models
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -223,3 +226,15 @@ def check_code_in_portal(request):
     (temp_password, email) = Account.extract_temp_credentials(code)
     email_exists = AccountBackend.is_email_in_portal(email)
     return api_success({'emailExists': email_exists})
+
+
+class AccountAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # Don't forget to filter out results depending on the visitor !
+        if not self.request.user.is_authenticated() or not self.request.user.is_superuser:
+            return models.Account.objects.none()
+
+        qs = models.Account.objects.all()
+        if self.q:
+            qs = qs.filter(email__istartswith=self.q)
+        return qs
