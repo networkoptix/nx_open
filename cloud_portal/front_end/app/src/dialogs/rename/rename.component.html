@@ -15,9 +15,9 @@
                    id="systemName"
                    name="systemName" type="text"
                    required autofocus>
-            <p class="help-block">
+            <p class="help-block"
+               *ngIf="!renameForm.controls['systemName']?.valid && renameForm.controls['systemName']?.touched">
                     <span class="input-error"
-                          *ngIf="!renameForm.controls['systemName']?.valid && renameForm.controls['systemName']?.touched"
                           translate>
                         System name is required
                     </span>

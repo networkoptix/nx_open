@@ -146,6 +146,8 @@ edge_firmware/isd/*.tar.gz
 .vagrant
 **/Makefile
 
+cloud_portal/tmp
+cloud_portal/front_end/package-lock.json
 cloud_portal/front_end/node_modules
 cloud_portal/front_end/app/images/promo
 cloud_portal/front_end/app/images/favicon.ico
@@ -164,6 +166,10 @@ cloud_portal/env
 cloud_portal/cloud/static
 cloud_portal/front_end/**/*.js.map
 cloud_portal/front_end/app/src/**/*.js
+cloud_portal/front_end/app/scripts/services/{language,dialogs,systems,process,nx-config,cloud_api,account,angular-uuid2,authorizationCheckService}.js
+cloud_portal/front_end/app/scripts/downgraded-providers.js
+cloud_portal/front_end/app/{main,polyfills,vendor,overrides.d,app.module,app.component,ajs-upgraded-providers}.js
+
 .DS_Store
 .idea
 *.pyc
@@ -233,12 +239,6 @@ cloud_portal/robot_tests/geckodriver.exe
 cloud_portal/robot_tests/test-cases/outputs/*
 cloud_portal/robot_tests/outputs/
 cloud_portal/robot_tests/IEDriverServer.exe
-
-cloud_portal/front_end/app/scripts/services/{language,dialogs,systems,process,nx-config,cloud_api,account,angular-uuid2,authorizationCheckService}.js
-cloud_portal/front_end/app/scripts/downgraded-providers.js
-cloud_portal/front_end/app/{main,polyfills,vendor,overrides.d,app.module,app.component,ajs-upgraded-providers}.js
-
-cloud_portal/tmp
 
 syntax: regexp
 ^core$

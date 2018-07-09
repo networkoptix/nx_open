@@ -13,6 +13,7 @@
     }
 
     &-content {
+        border        : none;
         border-radius : 2px;
         box-shadow    : 0 16px 32px 0 transparentize(dark(15), 0.8);
     }
@@ -98,7 +99,15 @@
             font-size   : $font-size-base;
             font-weight : normal;
             margin      : 0;
-            padding     : 0 0 0.5rem 0;
+            padding     : 0;
+        }
+
+        .input-error {
+            margin-top : 8px;
+
+            & + a {
+                margin-top : 8px;
+            }
         }
 
         .checkbox {
@@ -111,11 +120,15 @@
             color            : $light16;
             padding          : 0.5rem 0 0 0;
         }
+
+        p:last-of-type {
+            margin-bottom : 1rem;
+        }
     }
 
     &-footer {
         justify-content : flex-start;
         align-items     : baseline;
-        padding         : 1rem;
+        padding         : 0 1rem 1rem;
     }
 }

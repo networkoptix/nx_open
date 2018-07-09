@@ -27,7 +27,9 @@
                     }
                 });
 
-                $rootScope.$on('nx.system.online', function (evt, state) {
+                $rootScope.$on('nx.layout.footer', function (evt, state) {
+                    // An event to control visibility of the footer
+                    // ... i.e. when in "View" the server has list of cameras
                     scope.viewFooter = !state;
                 });
             }

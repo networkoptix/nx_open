@@ -37,7 +37,7 @@ def runTest(key, langList):
         if ping().ok:
             # If the server is up, delete screenshots from previous run and
             # start testing.
-            map(remove, (path.join(loc, file) for file in listdir(loc)
+            map(remove, (path.join(loc, 'combined-results', file) for file in listdir(path.join(loc, 'combined-results'))
                          if file.endswith('.png') and file.find(key) > -1))
             system('robot -N {}_{} -v SCREENSHOTDIRECTORY:{} -v BROWSER:headlesschrome -d {} -e not-ready -V getvars.py:{} test-cases'.format(
                 langList[key], key, path.join(loc, 'combined-results'), path.join(loc, key), key))
@@ -53,9 +53,9 @@ def runTest(key, langList):
 
 def discardLanguageResult(key):
 
-    remove(path.join('outputs', key, 'output.xml'))
-    remove(path.join('outputs', key, 'log.html'))
-    remove(path.join('outputs', key, 'report.html'))
+    remove(path.join(loc, key, 'output.xml'))
+    remove(path.join(loc, key, 'log.html'))
+    remove(path.join(loc, key, 'report.html'))
 
 
 if __name__ == '__main__':

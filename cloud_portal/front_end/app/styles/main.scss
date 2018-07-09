@@ -24,9 +24,11 @@ html {
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 80px;
-  min-width: 360px;
+    @include media-breakpoint-up(lg) {
+        margin-bottom : 80px;
+    }
+
+    min-width     : 360px;
 }
 
 html.webclient-page{
@@ -49,54 +51,58 @@ nx-app {
 }
 
 footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 48px;
-  border-top: 1px solid $common-border-color;
-  padding-bottom: 2px;
+    position         : absolute;
+    bottom           : 0;
+    width            : 100%;
+    border-top       : 1px solid $common-border-color;
+    padding-bottom   : 2px;
+    background-color : $body-bg;
+
+    @include media-breakpoint-down(md) {
+        position   : relative;
+        margin-top : 1rem;
+    }
 
     .row {
-        margin-left: 0;
+        margin-left : 0;
     }
 
-  .nav > li {
-    position: relative;
-    display: block;
+    .nav > li {
+        position : relative;
+        display  : block;
 
-    & > span {
-      line-height: 24px;
-      display: block;
+        & > span {
+            line-height : 24px;
+            display     : block;
+        }
+
+        nx-language-select {
+            padding : 7px 5px 7px 0;
+            display : block;
+        }
     }
 
-    nx-language-select {
-      padding: 7px 5px;
-      display: block;
-    }
-  }
+    .nav > li > a,
+    .nav > li > span {
+        position  : relative;
+        display   : block;
+        font-size : $font-size-sm;
+        padding   : 15px 10px;
+        color     : $light12;
 
-  .nav > li > a,
-  .nav > li > span{
-    position: relative;
-    display: block;
-    font-size: $font-size-sm;
-    padding: 15px 10px;
-    color:  $light12;
-
-    &:hover, &:focus {
-      outline: none !important;
-      outline: 0 !important;
-      box-shadow: none;
-      text-decoration: none !important;
-      background-color: transparentize($light5, 0.75);
-      color:$light16;
+        &:hover, &:focus {
+            outline          : none !important;
+            outline          : 0 !important;
+            box-shadow       : none;
+            text-decoration  : none !important;
+            background-color : transparent;
+            color            : $light16;
+        }
     }
-  }
 
     @include media-breakpoint-down(md) {
         .nav > li > a:not(.company) {
-            padding: 5px;
+            padding : 5px 0;
         }
     }
 
@@ -109,12 +115,12 @@ footer {
         float : right;
     }
 
-    .navbar-right > li > a, .navbar-right > li > span > a{
-    color:$light8;
-    &:hover{
-      color:$light12;
+    .navbar-right > li > a, .navbar-right > li > span > a {
+        color : $light8;
+        &:hover {
+            color : $light12;
+        }
     }
-  }
 }
 
 
@@ -803,20 +809,6 @@ h2.version-number{
     margin-top:10px;
 }
 
-.dropdown-wide{
-    display:inline-block;
-    width:100%;
-
-    .dropdown-menu {
-        top: 32px !important;
-    }
-}
-
-.dropdown, .dropup {
-    .lang-sm {
-        margin-right: $padding-input-horizontal/2;
-    }
-}
 .two-columns{
     -moz-column-count: 2;
     /* Firefox */
@@ -827,7 +819,7 @@ h2.version-number{
 
 @mixin icon{
   display: inline-block;
-  background-size: 112px 56px;
+  background-size: 112px 80px;
   width: 16px;
   height: 16px;
   margin-right: 5px;
@@ -846,16 +838,16 @@ h2.version-number{
 
 .glyphicon-home{
     @include kill-glyphicon;
-    width: 20px;
-    height: 18px;
-    background-position: -26px -34px;
+    width: 24px;
+    height: 24px;
+    background-position: -24px -32px;
 }
 
 .glyphicon-user{
     @include kill-glyphicon;
-    width: 20px;
-    height: 18px;
-    background-position: -2px -34px;
+    width: 24px;
+    height: 24px;
+    background-position: 0 -32px;
 }
 
 .glyphicon-menu-hamburger{

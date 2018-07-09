@@ -41,12 +41,12 @@
                                                 <button class="cast-button" is="google-cast-button" id="castbutton"
                                                         ng-click="showWarning()"></button>
                                             </span>
-                                        <div class="btn-group video-settings-icon">
-                                                <span class="video-icon" data-toggle="dropdown" href="#">
-                                                    <span class="glyphicon glyphicon-cog"></span>
-                                                </span>
+                                        <div class="btn-group video-settings-icon" ng-init="showSettings = false">
+                                            <span class="video-icon" ng-click="showSettings = !showSettings">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </span>
                                             <ul class="dropdown-menu video-settings"
-                                                ng-class="{'no-fullscreen': !enableFullScreen}">
+                                                ng-class="{'no-fullscreen': !enableFullScreen, 'd-block': showSettings}">
                                                 <li class="video-settings-title">Quality</li>
                                                 <li class="video-settings-divider"></li>
                                                 <li ng-repeat="resolution in availableResolutions"

@@ -92,6 +92,10 @@ h1 > .label {
     font-family : $font-family-regular;
 }
 
+p {
+    margin-bottom: 0.5rem;
+}
+
 .card .table-responsive {
     margin-left  : -15px;
     margin-right : -15px;
@@ -268,59 +272,6 @@ button {
         outline    : none !important;
         outline    : 0 !important;
     }
-
-    &.dropdown-toggle {
-        display : flex;
-        padding : 5px 10px;
-
-        &::after {
-            display : none;
-        }
-
-        &:hover {
-            .arrow {
-                &::after {
-                    border-top-color : $light3;
-                    transition       : border-top-color 0.2s ease-in-out;
-                }
-
-                &.up::after {
-                    border-bottom-color : $light3;
-                    border-top-color    : transparent;
-                    transition          : border-bottom-color 0.2s ease-in-out;
-                }
-            }
-        }
-
-        .arrow {
-            position         : relative;
-            bottom           : auto;
-            right            : 0;
-            margin-left      : 10px !important;
-            margin-top       : 6px;
-            border-top-color : $dark_core;
-            border-width     : 6px;
-
-            &:after {
-                bottom           : 2px;
-                border-top-color : $light2;
-            }
-
-            &.up {
-                top                 : auto;
-                left                : auto;
-                border-top-width    : 0;
-                border-bottom-color : $dark_core;
-                margin-top          : 0;
-
-                &:after {
-                    bottom              : 2px;
-                    border-bottom-color : $light2;
-                    border-top-color    : transparent;
-                }
-            }
-        }
-    }
 }
 
 .btn.btn-default, .btn.btn-dropdown-toggle {
@@ -333,6 +284,8 @@ button {
     &.focus:not([disabled]):not(.disabled) {
         background-color : transparentize($light5, 0.75);
         border-color     : $light8;
+        outline : none !important;
+        outline : 0 !important;
     }
 
     &:active,
@@ -340,11 +293,13 @@ button {
         background-color : transparentize($light5, 0.5) !important;
         border-color     : transparentize($light5, 0.5) !important;
         @include box-shadow(inset 0px 1px 0px 1px $light9);
-        outline          : none;
+        outline : none !important;
+        outline : 0 !important;
     }
 }
 
 .btn.btn-primary {
+    color            : $brand_contrast !important;
     background-color : $brand_core;
     border-color     : $brand_core;
     &:hover,
@@ -352,14 +307,19 @@ button {
     &.focus {
         background-color : $brand_l1;
         border-color     : $brand_core;
+        outline : none !important;
+        outline : 0 !important;
+        box-shadow : none;
     }
 
     &:active,
     &.active {
         background-color : $brand_core !important;
         border-color     : $brand_core !important;
-        @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
-        outline          : none;
+        // @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
+        outline : none !important;
+        outline : 0 !important;
+        box-shadow : none !important;
     }
 }
 
@@ -440,7 +400,7 @@ label {
 }
 
 @mixin kill-glyphicon {
-    background-size  : 112px 32px;
+    background-size  : 112px 80px;
     background-image : url('/static/images/portal_icons.png') !important;
     &:before {
         content : none;
@@ -599,7 +559,8 @@ select {
     padding : rem(12px 16px 14px 16px);
 
     .user-name {
-        height : 20px;
+        height : 24px;
+        margin-bottom : 0;
     }
 }
 

@@ -32,6 +32,7 @@
             {% has_value field.name context customization language as record_exists %}
             <label {% if not optional and not record_exists %} class="text-danger" {% endif %}
                    for="id_{{ field.name }}">{{ field.label }}<p class="help">{{field.name}}</p>
+                    {% if not optional %} <p class="help">required</p> {% endif %}
             </label>
             <div id="{{field.name}}" style="width: 100%">
                 {% if field|is_ImageField and field.value %}

@@ -202,7 +202,7 @@
   .glyphicon.glyphicon-arrow-left {
     @include kill-glyphicon;
     width: 20px;
-    height: 12px;
+    height: 12px !important;
     background-position: 0 -175px;
 
   }
@@ -210,7 +210,7 @@
   .glyphicon.glyphicon-arrow-right {
     @include kill-glyphicon;
     width: 20px;
-    height: 12px;
+    height: 12px !important;
     background-position:  0 -188px;
   }
 

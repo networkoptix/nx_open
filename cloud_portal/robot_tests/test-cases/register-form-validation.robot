@@ -85,7 +85,7 @@ Register Form Validation
 
 Check Email Outline
     [Arguments]    ${email}
-    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}/parent::div/parent::div[contains(@class,'has-error')]
+    Wait Until Element Is Visible    ${REGISTER EMAIL INPUT}/parent::div/parent::div[contains(@class,"has-error")]
     Run Keyword If    "${email}"=="${EMPTY}" or "${email}"=="${SPACE}"    Element Should Be Visible    ${EMAIL IS REQUIRED}
     Run Keyword If    "${email}"=="${existing email}"    Element Should Be Visible    ${EMAIL ALREADY REGISTERED}
     Run Keyword Unless    "${email}"=="${EMPTY}" or "${email}"=="${SPACE}" or "${email}"=="${existing email}"    Element Should Be Visible    ${EMAIL INVALID}
@@ -101,12 +101,12 @@ Check Password Outline
 
 Check First Name Outline
     [Arguments]    ${first}
-    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}/parent::div/parent::div[contains(@class,'has-error')]
+    Wait Until Element Is Visible    ${REGISTER FIRST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]
     Element Should Be Visible    ${FIRST NAME IS REQUIRED}
 
 Check Last Name Outline
     [Arguments]    ${last}
-    Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,'has-error')]
+    Wait Until Element Is Visible    ${REGISTER LAST NAME INPUT}/parent::div/parent::div[contains(@class,"has-error")]
     Element Should Be Visible    ${LAST NAME IS REQUIRED}
 
 Check Terms and Conditions

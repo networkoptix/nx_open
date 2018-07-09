@@ -1,5 +1,4 @@
 {
-	"&nbsp;": "&nbsp;",
 	"Account Settings": "Account Settings",
 	"Account not activated": "Account not activated",
 	"Account not found": "Account not found",
@@ -35,6 +34,7 @@
 	"Password is required": "Password is required",
 	"Password:": "Password:",
 	"Permissions": "Permissions",
+	"Please select...": "Please select...",
 	"Portal management": "Portal management",
 	"Release Notes": "Release Notes",
 	"Release notes": "Release notes",

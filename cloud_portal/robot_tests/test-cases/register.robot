@@ -20,7 +20,9 @@ Check Bad Email Input
     Should Contain    ${class}    has-error
 
 Restart
+    Register Keyword To Run On Failure    NONE
     ${status}    Run Keyword And Return Status    Validate Log In
+    Register Keyword To Run On Failure    Failure Tasks
     Run Keyword If    ${status}    Log Out
     Go To    ${url}
 

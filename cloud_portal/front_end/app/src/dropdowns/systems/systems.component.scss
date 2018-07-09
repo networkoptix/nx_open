@@ -14,21 +14,47 @@
         left  : auto !important;
     }
 
-    & li > a {
-        white-space : nowrap;
-        display     : flex;
-        align-items : center;
+    @media (max-width : $collapse-second-width) {
+        left  : 0 !important;
+    }
 
-        @media (max-width : $collapse-first-width) {
-            text-align : right;
+    & li {
+        &.active {
+            display : none;
+
+            @media (max-width : $collapse-first-width) {
+                display: block;
+            }
+
+            a {
+                background-color: $light16 !important;
+
+                .system-name {
+                    color : white;
+                }
+
+                .glyphicon-home {
+                    background-position : 0px -56px !important;
+                }
+            }
         }
 
-        & .system-owner {
-            color : $blue10;
-        }
+        & > a {
+            white-space : nowrap;
+            display     : flex;
+            align-items : center;
 
-        &:hover .system-owner {
-            color : white;
+            @media (max-width : $collapse-first-width) {
+                text-align : right;
+            }
+
+            & .system-owner {
+                color : $light16;
+            }
+
+            & .glyphicon-home {
+                background-position : -24px -56px !important;
+            }
         }
     }
 }
@@ -38,12 +64,12 @@
         left : 16px;
 
         @media (max-width : $collapse-first-width) {
-            right : 36px;
+            right : 38px;
             left  : auto;
         }
 
         @media (max-width : $collapse-second-width) {
-            right : 14px;
+            right : 70px;
             left  : auto;
         }
     }
@@ -58,7 +84,7 @@
     }
 
     .glyphicon {
-        @media (max-width : $collapse-first-width ) {
+        @media (max-width : $collapse-first-width) {
             margin : 0 4px !important;
         }
     }

@@ -58,7 +58,7 @@ angular.module('nxCommon')
                             return src.type === mimeTypes[mediaformat];
                         });
                         if (scope.debugMode) {
-                            console.log('playing', src ? src.src : null);
+                            console.info('playing', src ? src.src : null);
                         }
                         //return 'http://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8';
                         //return 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8';
@@ -269,7 +269,7 @@ angular.module('nxCommon')
                                     scope.vgApi.addEventListener('stalled', resetTimeout);
                                     scope.vgApi.addEventListener('error', function(e){
                                         if(e.target.error.code != 4){
-                                            console.log(e.target.error);
+                                            console.info(e.target.error);
                                             playerErrorHandler(e.target.error);
                                         }
                                     });
@@ -428,6 +428,7 @@ angular.module('nxCommon')
                     function srcChanged() {
                         scope.loading = true; // source changed - start loading
                         scope.videoFlags.errorLoading = false;
+                        scope.preview = "";
                         if (scope.vgSrc) {
                             scope.preview = getFormatSrc('jpeg');
                             scope.player = detectBestFormat();

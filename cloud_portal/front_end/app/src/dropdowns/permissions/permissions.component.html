@@ -1,21 +1,22 @@
 <div ngbDropdown class="d-inline-block dropdown-wide">
 
-    <button class="form-control btn btn-dropdown-toggle"
-            id="permissionsSelect"
-            [ngClass]="{'ng-invalid': !isValid}"
-            ngbDropdownToggle>
+    <a class="form-control btn btn-dropdown-toggle"
+       id="permissionsSelect"
+       [ngClass]="{'ng-invalid': !isValid}"
+       ngbDropdownToggle>
         <span [innerHtml]="selection"></span>
         <div class="nav-arrow">
             <span></span>
             <span></span>
         </div>
-    </button>
+    </a>
 
-    <div ngbDropdownMenu aria-labelledby="permissionsSelect">
-        <button class="dropdown-item"
-                *ngFor="let role of roles"
-                (click)="changePermission(role)">
-            <span>{{role.optionLabel}}</span>
-        </button>
-    </div>
+    <ul ngbDropdownMenu aria-labelledby="permissionsSelect">
+        <li *ngFor="let role of roles" [ngClass]="{'active': role.optionLabel == selection}">
+            <a class="dropdown-item"
+               (click)="changePermission(role)">
+                <span>{{role.optionLabel}}</span>
+            </a>
+        </li>
+    </ul>
 </div>

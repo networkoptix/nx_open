@@ -50,7 +50,7 @@ class CustomContextForm(forms.Form):
                 ds_description += convert_meta_to_description(data_structure.meta_settings)
 
             if data_structure.type == DataStructure.DATA_TYPES.guid:
-                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexdecimal characters (0-9, a-f)"
+                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexdecimal characters (0-9, a-f, A-F)"
 
             ds_language = language
             if not data_structure.translatable:
@@ -76,6 +76,8 @@ class CustomContextForm(forms.Form):
                     attrs={'cols': 120, 'rows': 25, 'class': 'tinymce'})
 
             if data_structure.type == DataStructure.DATA_TYPES.image:
+                if not record_value:
+                    record_value = data_structure.default
                 self.fields[data_structure.name] = forms.ImageField(label=ds_label,
                                                                     help_text=ds_description,
                                                                     initial=record_value,
@@ -84,6 +86,8 @@ class CustomContextForm(forms.Form):
                 continue
 
             elif data_structure.type == DataStructure.DATA_TYPES.file:
+                if not record_value:
+                    record_value = data_structure.default
                 self.fields[data_structure.name] = forms.FileField(label=ds_label,
                                                                    help_text=ds_description,
                                                                    initial=record_value,

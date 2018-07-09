@@ -77,7 +77,7 @@ $header-collapsing-width-1: 1px;
             margin: 0;
             padding: 0 $horizontal-spacing;
             line-height: $line-height;
-            font-size: $font-size-base;
+            font-size: rem(14px);
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -202,10 +202,6 @@ $header-collapsing-width-1: 1px;
         .ellipsis{
             display:none !important;
         }
-
-        .glyphicon{
-            margin-right:0 !important;
-        }
     }
 
     .collapse-first{
@@ -247,10 +243,6 @@ $header-collapsing-width-1: 1px;
             .icon-caret,
             .ellipsis{
                 display:none !important;
-            }
-
-            .glyphicon{
-                margin-right:0 !important;
             }
         }
     }

@@ -19,7 +19,8 @@
                             $scope.system = $scope.currentSystem.mediaserver;
                             delayedUpdateSystemInfo();
 
-                            $rootScope.$emit('nx.system.online', $scope.currentSystem.isOnline);
+                            // Set footer visibility according to system status
+                            $rootScope.$emit('nx.layout.footer', $scope.currentSystem.isOnline);
 
                         }, function () {
                             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}",
@@ -46,7 +47,8 @@
 
                 $scope.$on('$destroy', function (event) {
                     cancelSubscription();
-                    $rootScope.$emit('nx.system.online', false);
+                    // Reset footer visibility state
+                    $rootScope.$emit('nx.layout.footer', false);
                 });
             } ]);
 })();

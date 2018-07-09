@@ -43,6 +43,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = (
+    'dal',
+    'dal_select2',
     'admin_tools',
     'admin_tools.menu',
     'admin_tools.theming',
@@ -321,8 +323,8 @@ AUTH_USER_MODEL = 'api.Account'
 AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 
 
-CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
-CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+CORS_ALLOW_CREDENTIALS = DEBUG
 
 SESSION_COOKIE_SECURE = not LOCAL_ENVIRONMENT
 CSRF_COOKIE_SECURE = not LOCAL_ENVIRONMENT

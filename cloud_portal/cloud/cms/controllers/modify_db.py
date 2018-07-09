@@ -56,15 +56,19 @@ def save_unrevisioned_records(context, customization, language, data_structures,
         if data_structure.type == DataStructure.DATA_TYPES.image\
                 or data_structure.type == DataStructure.DATA_TYPES.file:
             # If a file has been uploaded try to save it
-            if data_structure_name in request_files and request_files[data_structure_name]:
-                new_record_value, file_errors = upload_file(data_structure, request_files[data_structure_name])
-                if file_errors:
-                    upload_errors.extend(file_errors)
-                    continue
+            if data_structure_name in request_files:
+                if request_files[data_structure_name]:
+                    new_record_value, file_errors = upload_file(data_structure, request_files[data_structure_name])
+                    if file_errors:
+                        upload_errors.extend(file_errors)
+                        continue
 
-            # If neither case do nothing for this record
-            elif not data_structure.optional or 'delete_' + data_structure_name not in request_data:
-                continue
+                # If neither case do nothing for this record
+                elif not data_structure.optional:
+                    new_record_value = data_structure.default
+
+                elif 'delete_' + data_structure_name not in request_data:
+                    continue
 
         elif data_structure.type == DataStructure.DATA_TYPES.guid:
 
@@ -83,14 +87,24 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             elif not data_structure.optional and not new_record_value:  # and not data_structure.default:
                 new_record_value = '{' + str(uuid.uuid4()) + '}'
                 upload_errors.append((data_structure_name,
-                                      'No submitted GUID or default value. GUID has been generated.'
+                                      'No submitted GUID or default value. GUID has been generated as {}'
                                       .format(new_record_value)))
 
         elif data_structure_name in request_data:
             new_record_value = request_data[data_structure_name]
 
         if data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced')):
+            upload_errors.append((data_structure_name, "You do not have permission to edit this field"))
             continue
+
+        if not data_structure.optional and not new_record_value:
+            if data_structure.default:
+                new_record_value = data_structure.default
+                upload_errors.append((data_structure_name, "This field cannot be blank. Using default value"))
+            else:
+                upload_errors.append((data_structure_name, "This field cannot be blank"))
+                continue
+
         if records.exists():
             if new_record_value == records.latest('created_date').value:
                 continue
