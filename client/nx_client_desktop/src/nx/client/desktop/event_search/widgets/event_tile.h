@@ -127,6 +127,7 @@ signals:
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
+    virtual QSize minimumSizeHint() const override;
     virtual bool event(QEvent* event) override;
 
 private:

@@ -52,8 +52,6 @@ static const qreal kHighlightCurtainOpacity = 0.25;
 static const auto kHighlightDuration = std::chrono::milliseconds(400);
 static const auto kAnimationDuration = std::chrono::milliseconds(250);
 
-static constexpr int kSeparatorHeight = 6;
-
 QSize minimumWidgetSize(QWidget* widget)
 {
     return widget->minimumSizeHint()
@@ -246,11 +244,7 @@ void EventRibbon::Private::updateTile(EventTile* tile, const QModelIndex& index)
     // Check whether the tile is a special separator tile.
     const auto title = index.data(Qt::DisplayRole).toString();
     if (title.isEmpty())
-    {
-        tile->setFixedHeight(kSeparatorHeight);
-        tile->setAutoFillBackground(false);
         return;
-    }
 
     tile->setTitle(title);
     tile->setIcon(index.data(Qt::DecorationRole).value<QPixmap>());

@@ -36,6 +36,8 @@ static constexpr int kFooterFontWeight = QFont::Normal;
 
 static constexpr int kProgressBarResolution = 1000;
 
+static constexpr int kSeparatorHeight = 6;
+
 } // namespace
 
 EventTile::EventTile(QWidget* parent):
@@ -284,6 +286,11 @@ void EventTile::paintEvent(QPaintEvent* /*event*/)
     painter.setPen(Qt::NoPen);
     painter.setBrush(palette().brush(backgroundRole()));
     painter.drawRoundedRect(rect(), kRoundingRadius, kRoundingRadius);
+}
+
+QSize EventTile::minimumSizeHint() const
+{
+    return base_type::minimumSizeHint().expandedTo({0, kSeparatorHeight});
 }
 
 bool EventTile::event(QEvent* event)
