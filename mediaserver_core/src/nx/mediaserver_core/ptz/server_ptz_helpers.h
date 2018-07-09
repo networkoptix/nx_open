@@ -8,7 +8,7 @@
 #include <core/ptz/ptz_constants.h>
 #include <core/ptz/ptz_controller_pool.h>
 
-#include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
+#include <nx/core/ptz/relative/relative_continuous_move_mapping.h>
 
 namespace nx {
 namespace mediaserver_core {

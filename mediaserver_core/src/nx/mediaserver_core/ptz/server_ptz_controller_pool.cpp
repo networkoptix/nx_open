@@ -9,7 +9,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_mapper.h>
 
-#include <nx/core/ptz/realtive/relative_continuous_move_mapping.h>
+#include <nx/core/ptz/relative/relative_continuous_move_mapping.h>
 
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver_core/ptz/ptz_ini_config.h>

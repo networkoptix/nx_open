@@ -8,7 +8,7 @@
 
 #include <nx/core/ptz/sequence_maker.h>
 #include <nx/core/ptz/sequence_executor.h>
-#include <nx/core/ptz/realtive/relative_move_engine.h>
+#include <nx/core/ptz/relative/relative_move_engine.h>
 
 namespace nx {
 namespace core {
