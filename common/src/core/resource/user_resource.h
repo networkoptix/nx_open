@@ -98,6 +98,8 @@ public:
      */
     void fillId();
 
+    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
+
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
     void userRoleChanged(const QnUserResourcePtr& user);

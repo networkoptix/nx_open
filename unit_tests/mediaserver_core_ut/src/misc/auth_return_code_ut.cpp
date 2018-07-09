@@ -59,6 +59,7 @@ public:
         userData.email = userData.name;
         userData.isEnabled = true;
         userData.isCloud = true;
+        userData.realm = nx::network::AppInfo::realm();
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
 
         ldapUserWithEmptyDigest.id = QnUuid::createUuid();
@@ -99,6 +100,7 @@ public:
 
         userData.id = QnUuid::createUuid();
         userData.name = userName;
+        userData.realm = nx::network::AppInfo::realm();
         userData.digest = nx::network::http::calcHa1(userName, nx::network::AppInfo::realm(), password);
         userData.isEnabled = isEnabled;
         userData.isCloud = false;

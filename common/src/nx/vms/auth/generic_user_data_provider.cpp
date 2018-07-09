@@ -9,6 +9,7 @@
 #include <utils/common/app_info.h>
 
 #include <nx/network/app_info.h>
+#include <nx/utils/log/log.h>
 
 GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
@@ -45,6 +46,7 @@ QnResourcePtr GenericUserDataProvider::findResByName(const QByteArray& nxUserNam
             return server;
     }
 
+    NX_VERBOSE(this, lm("Unable to get user by name: %1").arg(nxUserName));
     return QnResourcePtr();
 }
 
@@ -83,9 +85,17 @@ Qn::AuthResult GenericUserDataProvider::authorize(
         const QByteArray calcResponse = responseHash.result().toHex();
 
         if (calcResponse != authorizationHeader.digest->params["response"])
+        {
+            NX_VERBOSE(this, lm("Wrong digest for %1").args(user));
             return Qn::Auth_WrongPassword;
+        }
+
         if (user && !user->isEnabled())
+        {
+            NX_VERBOSE(this, lm("Disabled user %1").args(user));
             return Qn::Auth_DisabledUser;
+        }
+
         return Qn::Auth_OK;
     }
     else if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::basic)
@@ -98,8 +108,13 @@ Qn::AuthResult GenericUserDataProvider::authorize(
         else if (auto server = res.dynamicCast<QnMediaServerResource>())
         {
             if (server->getAuthKey() == QString::fromUtf8(authorizationHeader.basic->password))
+            {
+                NX_VERBOSE(this, lm("Authorized %1 by server key").args(server));
                 return Qn::Auth_OK;
+            }
         }
+
+        NX_VERBOSE(this, lm("Wrong basic password for %1").args(res));
         return Qn::Auth_WrongPassword;
     }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QSharedPointer>
+#include <nx/utils/log/to_string.h>
 
 template<class Resource>
 class QnSharedResourcePointer: public QSharedPointer<Resource>
@@ -131,5 +132,10 @@ public:
     {
         if (resource)
             resource->initWeakPointer(resource);
+    }
+
+    QString toString() const
+    {
+        return ::toString(this->data());
     }
 };

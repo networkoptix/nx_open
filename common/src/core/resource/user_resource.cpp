@@ -9,6 +9,7 @@
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/log/log.h>
 
 namespace
 {
@@ -184,19 +185,31 @@ bool QnUserResource::checkLocalUserPassword(const QString &password)
     QnMutexLocker locker(&m_mutex);
 
     if (!m_digest.isEmpty())
-        return nx::network::http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
+    {
+        const auto isDigestCorrect = nx::network::http::calcHa1(m_name.toLower(), m_realm, password)
+            == m_digest;
+
+        NX_VERBOSE(this, lm("Digest is %1").args(isDigestCorrect ? "correct" : "incorrect"));
+        return isDigestCorrect;
+    }
 
     //hash is obsolete. Cannot remove it to maintain update from version < 2.3
     //hash becomes empty after changing user's realm
     QList<QByteArray> values = m_hash.split(L'$');
     if (values.size() != 3)
+    {
+        NX_VERBOSE(this, lm("Unable to parse hash: %1").arg(m_hash));
         return false;
+    }
 
     QByteArray salt = values[1];
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(salt);
     md5.addData(password.toUtf8());
-    return md5.result().toHex() == values[2];
+
+    const auto isHashCorrect = md5.result().toHex() == values[2];
+    NX_VERBOSE(this, lm("Hash is %1").arg(isHashCorrect ? "correct" : "incorrect"));
+    return isHashCorrect;
 }
 
 void QnUserResource::setDigest(const QByteArray& digest)
@@ -238,6 +251,8 @@ QString QnUserResource::getRealm() const
 
 void QnUserResource::setRealm(const QString& realm)
 {
+    // Uncoment to debug authorization related problems.
+    // NX_ASSERT(m_digest.isEmpty() || !realm.isEmpty());
     if (setMemberChecked(&QnUserResource::m_realm, realm))
         emit realmChanged(::toSharedPointer(this));
 }
@@ -433,6 +448,8 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
 
 		if (m_realm != localOther->m_realm)
         {
+            // Uncoment to debug authorization related problems.
+            // NX_ASSERT(m_digest.isEmpty() || !localOther->m_realm.isEmpty());
             m_realm = localOther->m_realm;
             notifiers << [r = toSharedPointer(this)]{ emit r->realmChanged(r); };
         }
@@ -479,4 +496,9 @@ void QnUserResource::fillId()
     NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
     QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
     setId(id);
+}
+
+QString QnUserResource::idForToStringFromPtr() const
+{
+    return getName();
 }
