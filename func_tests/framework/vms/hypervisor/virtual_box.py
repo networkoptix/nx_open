@@ -197,11 +197,6 @@ class VirtualBox(Hypervisor):
 
     def unplug_all(self, vm_name):
         info = self.find(vm_name)
-        # Attempt to fix potential failure with networking in VirtualBox.
-        # Sometimes it can be cured by setting `nic1` (host-bound NIC)
-        # to `null` and then back to `nat`.
-        # See: https://networkoptix.atlassian.net/browse/FT-37
-        self._vbox_manage(['controlvm', vm_name, 'nic1', 'null'])
         for nic_index in info.networks:
             if info.networks[nic_index] is not None:
                 self._vbox_manage(
@@ -209,7 +204,6 @@ class VirtualBox(Hypervisor):
         for nic_index in info.bridged:
             self._vbox_manage(
                 ['controlvm', vm_name, 'nic{}'.format(nic_index), 'null'])
-        self._vbox_manage(['controlvm', vm_name, 'nic1', 'nat'])
 
     def list_vm_names(self):
         output = self._vbox_manage(['list', 'vms'])
