@@ -141,8 +141,9 @@ angular.module('nxCommon')
                 url += $.param(data);
             }
             url = this.urlBase + url;
-            if(absoluteUrl){
-                var host = window.location.protocol + "//" +
+
+            if(absoluteUrl && url.indexOf('://') === -1){
+                var host = window.location.protocol + '//' +
                            window.location.hostname +
                            (window.location.port ? ':' + window.location.port: '');
                 url = host + url;
