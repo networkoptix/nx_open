@@ -15,22 +15,24 @@ RelativeContinuousMoveEngine::RelativeContinuousMoveEngine(
 }
 
 bool RelativeContinuousMoveEngine::relativeMove(
-    const nx::core::ptz::Vector& direction,
-    const nx::core::ptz::Options& options)
+    const ptz::Vector& direction,
+    const ptz::Options& options,
+    RelativeMoveDoneCallback doneCallback)
 {
     const auto commandSequence = m_sequenceMaker->makeSequence(direction, options);
-    return m_sequenceExecutor->executeSequence(commandSequence);
+    return m_sequenceExecutor->executeSequence(commandSequence, doneCallback);
 }
 
 bool RelativeContinuousMoveEngine::relativeFocus(
     qreal direction,
-    const nx::core::ptz::Options& options)
+    const ptz::Options& options,
+    RelativeMoveDoneCallback doneCallback)
 {
     const auto sequence = m_sequenceMaker->makeSequence(
         ptz::Vector(0.0, 0.0, 0.0, 0.0, direction),
         options);
 
-    return m_sequenceExecutor->executeSequence(sequence);
+    return m_sequenceExecutor->executeSequence(sequence, doneCallback);
 }
 
 } // namespace ptz

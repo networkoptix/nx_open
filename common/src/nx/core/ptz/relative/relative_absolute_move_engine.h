@@ -15,24 +15,29 @@ public:
     RelativeAbsoluteMoveEngine(QnAbstractPtzController* controller);
 
     virtual bool relativeMove(
-        const nx::core::ptz::Vector& direction,
-        const nx::core::ptz::Options& options) override;
+        const ptz::Vector& direction,
+        const ptz::Options& options,
+        RelativeMoveDoneCallback doneCallback) override;
 
-    virtual bool relativeFocus(qreal direction, const nx::core::ptz::Options& options) override;
+    virtual bool relativeFocus(
+        qreal direction,
+        const ptz::Options& options,
+        RelativeMoveDoneCallback doneCallback) override;
 
 private:
-    Qn::PtzCoordinateSpace bestSpace(const nx::core::ptz::Options& options) const;
+    Qn::PtzCoordinateSpace bestSpace(const ptz::Options& options) const;
 
-    std::optional<nx::core::ptz::Vector> currentPosition(
+    std::optional<ptz::Vector> currentPosition(
         Qn::PtzCoordinateSpace space,
-        const nx::core::ptz::Options& options) const;
+        const ptz::Options& options) const;
 
     std::optional<QnPtzLimits> controllerLimits(
         Qn::PtzCoordinateSpace space,
-        const nx::core::ptz::Options& options) const;
+        const ptz::Options& options) const;
 
 private:
     QnAbstractPtzController* m_controller;
+    RelativeMoveDoneCallback m_moveDoneCallback;
 };
 
 } // namespace ptz

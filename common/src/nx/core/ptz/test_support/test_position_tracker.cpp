@@ -50,7 +50,6 @@ Vector calculatePosition(
 
         const auto effectivePeriodCount = periodCount - (int) periodCount
              + ((std::abs(periodCount > 1)) ? copysign(1, periodCount) : 0);
-
         const auto effectiveMovement = effectivePeriodCount * range;
         const bool isComponentOutOfRange = !cyclingSettings.isComponentCycled(component)
             && (speed > 0

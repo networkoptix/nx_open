@@ -10,6 +10,18 @@ namespace {
 
 static const ptz::Vector kStopCommand(0.0, 0.0, 0.0, 0.0);
 
+void callUnlocked(SequenceExecutedCallback callback, QnMutex* lockedMutex)
+{
+    SequenceExecutedCallback copy;
+    copy.swap(callback);
+    if (copy)
+    {
+        lockedMutex->unlock();
+        copy();
+        lockedMutex->lock();
+    }
+}
+
 } // namespace
 
 ContinuousMoveSequenceExecutor::ContinuousMoveSequenceExecutor(
@@ -27,10 +39,13 @@ ContinuousMoveSequenceExecutor::~ContinuousMoveSequenceExecutor()
     terminate();
 }
 
-bool ContinuousMoveSequenceExecutor::executeSequence(const CommandSequence& sequence)
+bool ContinuousMoveSequenceExecutor::executeSequence(
+    const CommandSequence& sequence,
+    SequenceExecutedCallback sequenceExecutedCallback)
 {
     QnMutexLocker lock(&m_mutex);
     m_sequence = sequence;
+    m_sequenceExecutedCallback = sequenceExecutedCallback;
 
     if (!m_isCommandRunning)
         return executeSequenceInternal(/*isContinuation*/ false);
@@ -41,23 +56,29 @@ bool ContinuousMoveSequenceExecutor::executeSequence(const CommandSequence& sequ
 bool ContinuousMoveSequenceExecutor::executeSequenceInternal(bool isContinuation)
 {
     if (m_terminated)
+    {
+        callUnlocked(m_sequenceExecutedCallback, &m_mutex);
         return false;
+    }
 
     if (m_sequence.empty())
     {
         if (!isContinuation)
+        {
+            callUnlocked(m_sequenceExecutedCallback, &m_mutex);
             return true;
+        }
 
         m_isCommandRunning = true;
-        m_threadPool->start(
-            new nx::utils::FunctorWrapper<std::function<void()>>(
-                [this]()
-                {
-                    QnMutexLocker lock(&m_mutex);
-                    m_controller->continuousMove(kStopCommand);
-                    m_isCommandRunning = false;
-                    m_wait.wakeAll();
-                }));
+        m_threadPool->start(new nx::utils::FunctorWrapper<std::function<void()>>(
+            [this]()
+            {
+                QnMutexLocker lock(&m_mutex);
+                m_controller->continuousMove(kStopCommand);
+                m_isCommandRunning = false;
+                m_wait.wakeAll();
+                callUnlocked(m_sequenceExecutedCallback, &m_mutex);
+            }));
         return true;
     }
 
@@ -76,10 +97,9 @@ bool ContinuousMoveSequenceExecutor::executeSequenceInternal(bool isContinuation
         [this, command, callback = std::move(timerExpiredCallback)]()
         {
             QnMutexLocker lock(&m_mutex);
-            if (m_terminated)
-                return;
+            if (!m_terminated)
+                executeTimedCommand(command, std::move(callback));
 
-            executeTimedCommand(command, std::move(callback));
             m_isCommandRunning = false;
             m_wait.wakeAll();
         }));

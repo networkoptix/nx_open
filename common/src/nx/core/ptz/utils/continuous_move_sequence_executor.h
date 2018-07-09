@@ -27,7 +27,9 @@ public:
 
     ~ContinuousMoveSequenceExecutor();
 
-    virtual bool executeSequence(const CommandSequence& sequence) override;
+    virtual bool executeSequence(
+        const CommandSequence& sequence,
+        SequenceExecutedCallback callback) override;
 
 private:
     bool executeSequenceInternal(bool isContinuation);
@@ -48,6 +50,8 @@ private:
     CommandSequence m_sequence;
     bool m_terminated = false;
     bool m_isCommandRunning = false;
+
+    SequenceExecutedCallback m_sequenceExecutedCallback;
 };
 
 } // namespace ptz
