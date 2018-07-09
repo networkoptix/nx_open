@@ -56,7 +56,7 @@ export class ShareModalContent {
             }
         })[0];
 
-        this.accessDescription = this.language.accessRoles[this.user.role.name].description;
+        this.accessDescription = this.language.accessRoles[this.selectedPermission.name].description;
     }
 
     processAccessRoles() {
@@ -119,6 +119,8 @@ export class ShareModalContent {
         }
 
         this.processAccessRoles();
+
+        this.accessDescription = this.getRoleDescription();
 
         this.sharing = this.process.init(() => {
             if (this.user.role.isOwner) {
