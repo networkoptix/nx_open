@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth.models import Group
+from dal import autocomplete
 
 from cms.models import Customization, UserGroupsToCustomizationPermissions
 
@@ -19,7 +20,14 @@ class GroupAdminForm(forms.ModelForm):
         queryset=User.objects.all(),
         required=False,
         # Use the pretty 'filter_horizontal widget'.
-        widget=FilteredSelectMultiple('users', False)
+        widget=autocomplete.ModelSelect2Multiple(url='account-autocomplete',
+                                         attrs={
+                                             # Set some placeholder
+                                             'data-placeholder': 'Email ...',
+                                             # Only trigger autocompletion after 2 characters have been typed
+                                             'data-minimum-input-length': 2,
+                                         },
+                                         )
     )
 
     customizations = forms.ModelMultipleChoiceField(

@@ -43,6 +43,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = (
+    'dal',
+    'dal_select2',
     'admin_tools',
     'admin_tools.menu',
     'admin_tools.theming',
