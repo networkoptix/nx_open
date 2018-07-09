@@ -215,6 +215,8 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.activeCamera.status === 'Unauthorized') {
 
                 $scope.activeVideoSource = {src: ''};
+                $scope.preview = '';
+
                 return;
             }
 
