@@ -167,19 +167,23 @@ angular.module('cloudApp')
         $scope.$watch('debugProxySettings.systemId', function(){
             cloudApi.getSystemAuth($scope.debugProxySettings.systemId).then(function(data){
                 $scope.debugProxySettings.authPost = data.data.authPost;
+                $scope.debugProxySettings.authGet = data.data.authGet;
             });
         });
         $scope.debugProxyUrl = function(){
-            return '{protocol}//{systemId}.{proxyUrl}/{apiCall}?auth={authPost}'.
+            var auth = ($scope.debugProxySettings.method === 'GET') ? $scope.debugProxySettings.authGet: $scope.debugProxySettings.authPost;
+            return '{protocol}//{systemId}.{proxyUrl}/{apiCall}?auth={auth}'.
                     replace('{protocol}', window.location.protocol).
                     replace('{systemId}', $scope.debugProxySettings.systemId).
                     replace('{proxyUrl}', $scope.debugProxySettings.proxyUrl).
                     replace('{apiCall}', $scope.debugProxySettings.apiCall).
-                    replace('{authPost}', $scope.debugProxySettings.authPost);
+                    replace('{auth}', auth);
         };
         $scope.debugProxy = function(){
-            var data = JSON.parse($scope.debugProxySettings.data);
-
+            var data = null;
+            if($scope.debugProxySettings.data){
+                data = JSON.parse($scope.debugProxySettings.data);
+            }
             $http({
                 method: $scope.debugProxySettings.method,
                 url: $scope.debugProxyUrl(),
