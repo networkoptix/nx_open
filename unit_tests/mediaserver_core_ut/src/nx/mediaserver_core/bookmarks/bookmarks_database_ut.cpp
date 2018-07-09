@@ -165,6 +165,60 @@ TEST_F(BookmarksDatabaseTest, selectTest)
     ASSERT_EQ(0, result.size());
 }
 
+TEST_F(BookmarksDatabaseTest, rangeTest)
+{
+    ASSERT_TRUE(mediaServerLauncher->start());
+
+    static const QnUuid kCameraId1("6FD1F239-CEBC-81BF-C2D4-59789E2CEF04");
+
+    const auto startTimeMs = 500;
+    const auto periodMs = 1000;
+    const auto endTimeMs = startTimeMs + periodMs;
+
+    for (int i = 0; i < 100 * 1000; i += 1000)
+    {
+        QnCameraBookmark bookmark;
+        bookmark.cameraId = kCameraId1;
+        bookmark.startTimeMs = i;
+        bookmark.durationMs = 500;
+        bookmark.name = QString::number(i);
+        bookmark.guid = QnUuid::createUuid();
+        ASSERT_TRUE(qnServerDb->addBookmark(bookmark));
+    }
+
+    QList<QnUuid> cameras;
+    cameras << kCameraId1;
+    QnCameraBookmarkSearchFilter filter;
+    filter.startTimeMs = 1000;
+    filter.endTimeMs = 1600;
+    filter.limit = 100;
+
+    QnCameraBookmarkList result;
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(1, result.size());
+    ASSERT_EQ(1000, result[0].startTimeMs);
+
+    filter.startTimeMs = 1000;
+    filter.endTimeMs = 1600;
+    filter.limit = 100;
+
+    result.clear();
+    filter.startTimeMs = 500;
+    filter.endTimeMs = 1600;
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(0, result[0].startTimeMs);
+    ASSERT_EQ(1000, result[1].startTimeMs);
+
+    result.clear();
+    filter.startTimeMs = 1100;
+    filter.endTimeMs = 2000;
+    qnServerDb->getBookmarks(cameras, filter, result);
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(1000, result[0].startTimeMs);
+    ASSERT_EQ(2000, result[1].startTimeMs);
+}
+
 } // namespace test
 } // namespace bookmarks
 } // namespace mediaserver_core

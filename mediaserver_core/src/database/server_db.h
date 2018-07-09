@@ -92,7 +92,8 @@ private:
     bool getBookmarksInternal(
         const QList<QnUuid>& cameraIds,
         const QnCameraBookmarkSearchFilter &filter,
-        QnCameraBookmarkList &result);
+        QnCameraBookmarkList &result,
+        bool isAdditionRangeRequest);
     bool getMaxBookmarksMaxDurationMs(
         const QList<QnUuid>& cameraIds,
         const QnCameraBookmarkSearchFilter& filter,
