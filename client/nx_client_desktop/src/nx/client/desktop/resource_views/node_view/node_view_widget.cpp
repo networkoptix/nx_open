@@ -85,6 +85,7 @@ NodeViewWidget::NodeViewWidget(QWidget* parent):
     d(new Private(*this))
 {
     setModel(&d->model);
+    setSortingEnabled(true);
     setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 1)));
     setIndentation(style::Metrics::kDefaultIconSize);
 

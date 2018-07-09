@@ -62,7 +62,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     tree->setExpandsOnDoubleClick(true);
     tree->expandAll();
 
-    tree->setProxyModel(new AccessibleLayoutSortModel());
+    tree->setProxyModel(new AccessibleLayoutSortModel(this));
 }
 
 MultipleLayoutSelectionDialog::~MultipleLayoutSelectionDialog()

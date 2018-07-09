@@ -25,7 +25,6 @@ namespace desktop {
 
 AccessibleLayoutSortModel::AccessibleLayoutSortModel(QObject* parent)
 {
-
 }
 
 bool AccessibleLayoutSortModel::lessThan(
@@ -33,19 +32,23 @@ bool AccessibleLayoutSortModel::lessThan(
     const QModelIndex& sourceRight) const
 {
     const auto left = NodeViewModel::nodeFromIndex(sourceLeft);
-    const auto right = NodeViewModel::nodeFromIndex(sourceLeft);
+    const auto right = NodeViewModel::nodeFromIndex(sourceRight);
     if (!left || !right)
         return base_type::lessThan(sourceLeft, sourceRight);
 
     const bool isUser = left->childrenCount() > 0 || right->childrenCount() > 0;
+    const auto leftResource = helpers::getResource(left);
+    const auto rightResource = helpers::getResource(right);
+    if (!leftResource || !rightResource)
+        return base_type::lessThan(sourceLeft, sourceRight);
+
     if (isUser)
     {
-        const auto leftResource = helpers::getResource(left);
-        const auto rightResource = helpers::getResource(right);
         const auto currentUserId = getCurrentUserId();
-        if (leftResource->getId() == currentUserId)
+        if (leftResource && leftResource->getId() == currentUserId)
             return false;
-        if (rightResource->getId() == currentUserId)
+
+        if (rightResource && rightResource->getId() == currentUserId)
             return true;
     }
     return base_type::lessThan(sourceLeft, sourceRight);

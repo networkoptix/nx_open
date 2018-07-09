@@ -181,7 +181,12 @@ QnResourceList getLeafSelectedResources(const NodePtr& node)
 
 QnResourcePtr getResource(const NodePtr& node)
 {
-    return node->data(node_view::nameColumn, node_view::resourceRole).value<QnResourcePtr>();
+    if (node)
+        return node->data(node_view::nameColumn, node_view::resourceRole).value<QnResourcePtr>();
+    else
+        NX_EXPECT(false, "Node is null");
+
+    return QnResourcePtr();
 }
 
 } // namespace helpers
