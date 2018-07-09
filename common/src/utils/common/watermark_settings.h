@@ -4,13 +4,11 @@
 
 struct QnWatermarkSettings
 {
-    int useWatermark = false;
+    int useWatermark = true;
 
     double frequency = 0.5;  //< 0..1
     double opacity = 0.3;    //< 0..1
 };
-
-//bool deserialize(const QString& string, QnWatermarkSettings* settings);
 
 #define QnWatermarkSettings_Fields (useWatermark)(frequency)(opacity)
 

@@ -6,11 +6,12 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 
-#include "resource_property_adaptor.h"
+#include <api/resource_property_adaptor.h>
 
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
+#include <utils/common/watermark_settings.h>
 #include <utils/crypt/symmetrical.h>
 #include <nx/utils/app_info.h>
 
@@ -494,7 +495,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
 
     m_watermarkSettings = new QnJsonResourcePropertyAdaptor<QnWatermarkSettings>(
         kWatermarkSettingsName,
-        watermarkSettings(),
+        QnWatermarkSettings(),
         this);
 
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
@@ -525,6 +526,10 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(
         m_cloudConnectRelayingEnabledAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
         this, &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
+        Qt::QueuedConnection);
+
+    connect(m_watermarkSettings, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::watermarkChanged,
         Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;

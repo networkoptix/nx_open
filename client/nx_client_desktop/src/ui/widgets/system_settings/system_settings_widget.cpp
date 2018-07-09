@@ -4,6 +4,8 @@
 #include <api/global_settings.h>
 
 #include <common/common_module.h>
+#include <utils/common/watermark_settings.h>
+#include <ui/dialogs/watermark_preview_dialog.h>
 
 #include <core/resource/device_dependent_strings.h>
 
@@ -14,7 +16,8 @@
 
 QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     base_type(parent),
-    ui(new Ui::SystemSettingsWidget)
+    ui(new Ui::SystemSettingsWidget),
+    m_watermarkSettings(new QnWatermarkSettings)
 {
     ui->setupUi(this);
 
@@ -36,10 +39,17 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
         ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked());
     });
 
+    connect(ui->watermarkSettingsButton, &QPushButton::pressed, this,
+        [this] { QnWatermarkPreviewDialog::editSettings(*m_watermarkSettings, this); emit hasChangesChanged(); });
+    // This should go before connecting to hasChangesChanged!
+    connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged, this,
+        [this](int state) { m_watermarkSettings->useWatermark = (state == Qt::Checked); });
+
     connect(ui->autoDiscoveryCheckBox,      &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->auditTrailCheckBox,         &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->statisticsReportCheckBox,   &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->autoSettingsCheckBox,       &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->displayWatermarkCheckBox,   &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
     retranslateUi();
 
@@ -48,6 +58,7 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged,           this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,          this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::watermarkChanged,                  this,   &QnSystemSettingsWidget::loadDataToUi);
 }
 
 QnSystemSettingsWidget::~QnSystemSettingsWidget()
@@ -67,7 +78,6 @@ void QnSystemSettingsWidget::retranslateUi()
         tr("Allow System to optimize camera settings")));
 }
 
-
 void QnSystemSettingsWidget::loadDataToUi()
 {
     ui->autoDiscoveryCheckBox->setChecked(qnGlobalSettings->isAutoDiscoveryEnabled());
@@ -76,6 +86,9 @@ void QnSystemSettingsWidget::loadDataToUi()
     ui->settingsWarningLabel->setVisible(false);
 
     ui->statisticsReportCheckBox->setChecked(qnGlobalSettings->isStatisticsAllowed());
+
+    *m_watermarkSettings = qnGlobalSettings->watermarkSettings();
+    ui->displayWatermarkCheckBox->setChecked(m_watermarkSettings->useWatermark);
 }
 
 void QnSystemSettingsWidget::applyChanges()
@@ -87,6 +100,8 @@ void QnSystemSettingsWidget::applyChanges()
     qnGlobalSettings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
     qnGlobalSettings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
     qnGlobalSettings->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());
+
+    qnGlobalSettings->setWatermarkSettings(*m_watermarkSettings);
 
     ui->settingsWarningLabel->setVisible(false);
     qnGlobalSettings->synchronizeNow();
@@ -111,6 +126,9 @@ bool QnSystemSettingsWidget::hasChanges() const
         return true;
 
     if (ui->auditTrailCheckBox->isChecked() != qnGlobalSettings->isAuditTrailEnabled())
+        return true;
+
+    if (*m_watermarkSettings != qnGlobalSettings->watermarkSettings())
         return true;
 
     return false;

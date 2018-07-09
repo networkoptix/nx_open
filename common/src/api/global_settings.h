@@ -12,7 +12,6 @@
 #include <utils/common/connective.h>
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
-#include <utils/common/watermark_settings.h>
 #include <utils/common/optional.h>
 
 #include <common/common_globals.h>
@@ -26,6 +25,8 @@ class QnAbstractResourcePropertyAdaptor;
 template<class T>
 class QnResourcePropertyAdaptor;
 class QSettings;
+
+struct QnWatermarkSettings;
 
 namespace nx {
 namespace settings_names {

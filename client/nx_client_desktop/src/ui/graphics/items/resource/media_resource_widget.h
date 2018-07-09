@@ -61,6 +61,7 @@ class QnIoModuleOverlayWidget;
 class QnScrollableItemsWidget;
 class QnScrollableTextItemsWidget;
 class QnGraphicsStackedWidget;
+class QnWatermarkPainter;
 class QnTwoWayAudioWidget;
 
 struct QnHtmlTextItemOptions;
@@ -385,9 +386,6 @@ private:
     /** Whether motion label positions data is valid. */
     mutable bool m_motionLabelPositionsValid = false;
 
-    /** Whether username watermark is shown. */
-    bool m_showWatermark = true;
-
     QStaticText m_sensStaticText[QnMotionRegion::kSensitivityLevelCount];
 
     QnPtzControllerPtr m_ptzController;
@@ -406,8 +404,9 @@ private:
     QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;
     QnScrollableTextItemsWidget* m_textOverlayWidget = nullptr;
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
-
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
+
+    QScopedPointer<QnWatermarkPainter> m_watermarkPainter;
 
     TriggerDataList m_triggers;
 
