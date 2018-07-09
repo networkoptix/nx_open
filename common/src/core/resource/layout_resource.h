@@ -163,7 +163,7 @@ private:
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
     QSize m_fixedSize;
-    int m_logicalId;
+    int m_logicalId = 0;
     QSize m_backgroundSize;
     QString m_backgroundImageFilename;
     qreal m_backgroundOpacity;
