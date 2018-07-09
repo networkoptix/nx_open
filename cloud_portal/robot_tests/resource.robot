@@ -60,7 +60,7 @@ Log Out
 
 Validate Log Out
     Wait Until Element Is Not Visible    ${BACKDROP}
-    Wait Until Element Is Visible    ${ANONYMOUS BODY}
+    Wait Until Page Contains Element    ${ANONYMOUS BODY}
 
 Register
     [arguments]    ${first name}    ${last name}    ${email}    ${password}    ${checked}=false

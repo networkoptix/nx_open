@@ -206,6 +206,6 @@ handles two tabs, updates second tab state if logout is done on first
     Validate Log Out
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
-    Location Should Be    ${url}/content/eula
+    Location Should Be    ${url}/systems
     Reload Page
     Validate Log Out
