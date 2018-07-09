@@ -915,6 +915,10 @@ TEST_F(Updates2Manager, Cancel_WhileDownloading)
     thenStateShouldFinallyBecome(api::Updates2StatusData::StatusCode::notAvailable);
 }
 
+// #TODO #akulikov Updates2Manager::check() UT
+// #TODO #akulikov alternative servers UT
+// #TODO #akulikov incompatible servers UT
+
 } // namespace test
 } // namespace detail
 } // namespace manager

@@ -332,6 +332,8 @@ TEST_F(AsyncUpdateChecker, CorrectUpdateRegistryProvided)
     thenManuallyAddedDataShouldBeFoundCorrectly();
 }
 
+// #TODO #akulikov findUPdateFile() and latestUpdate() tests for client updates
+
 } // namespace test
 } // namespace info
 } // namespace update
