@@ -1,12 +1,27 @@
 @import '../../styles/theme_palette';
 @import '../../styles/theme_variables';
 
+.dropdown, .dropup {
+    .lang-sm {
+        margin-right : 20px;
+    }
+}
+
 .dropdown {
     @media (max-width : $collapse-second-width) {
         position : inherit;
 
         .dropdown-menu {
             right : 0 !important;
+        }
+    }
+
+    &-wide {
+        display : inline-block;
+        width   : 100%;
+
+        .dropdown-menu {
+            top : 32px !important;
         }
     }
 
