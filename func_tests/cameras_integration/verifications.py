@@ -2,6 +2,7 @@ import traceback
 import logging
 
 from framework.camera import Camera
+from framework.rest_api import HttpError
 
 STAGES = []  # Filled by _stage decorator.
 
@@ -15,6 +16,8 @@ def _stage(is_essential=False, retry_count=0, retry_delay_s=10):
             verifier = Verifier(server, camera_id)
             try:
                 action(verifier, **kwargs)
+            except HttpError as error:
+                verifier.errors.append(str(error))
             except Exception:
                 return Result.on_exception(errors=verifier.errors)
             if verifier.errors:
@@ -92,7 +95,7 @@ class Verifier(object):
             if '=' in key:
                 if not isinstance(actual, list):
                     self.errors.append('{}.{} is {}, expected to be a list'.format(
-                        path, key, type(actual)))
+                        path, key, type(actual).__name__))
                     continue
 
                 item = self._search_item(*key.split('=', 1), items=actual)
@@ -105,7 +108,7 @@ class Verifier(object):
             else:
                 if not isinstance(actual, dict):
                     self.errors.append('{}.{} is {}, expected to be a dict'.format(
-                        path, key, type(actual)))
+                        path, key, type(actual).__name__))
                     continue
 
                 self.expect_values(expected_value, actual.get(key), '{}.{}'.format(path, key))

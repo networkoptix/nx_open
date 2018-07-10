@@ -1,3 +1,4 @@
+import pytest
 import yaml
 import os
 import time
@@ -19,13 +20,17 @@ DISCOVERY_RETRY_DELAY_S = 10
 EXPECTED_CAMERAS_FILE = Path(__file__).parent / 'expected_cameras.yaml'
 
 
-# TODO: Make this test work with fresh configured server on VM with bridged interface.
-def test_cameras(mediaserver_installers, work_dir):
-    installation = make_installation(mediaserver_installers, 'linux', local_access)
-    server = Mediaserver(local_access, installation, password='qweasd123')
-    time.sleep(1)  # TODO: Remove when server is integrated as normal test.
+@pytest.fixture(scope='session')
+def one_vm_type():
+    return 'linux'
 
-    stand = Stand(server)
+
+# TODO: Make this test work with fresh configured server on VM with bridged interface.
+def test_cameras(one_running_mediaserver, one_vm, hypervisor, work_dir):
+    mac = hypervisor.plug_bridged(one_vm.name, 'enp5s0')
+    one_running_mediaserver.os_access.networking.setup_ip(mac, '192.168.0.200', 24)
+
+    stand = Stand(one_running_mediaserver)
     stand.discover_cameras()
     stand.execute_verification_stages()
 
@@ -34,8 +39,8 @@ def test_cameras(mediaserver_installers, work_dir):
         (work_dir / (file_name + '.yaml')).write_bytes(serialized)
 
     save_yaml(stand.result, 'test_result')
-    save_yaml(server.get_resources('ec2/getCamerasEx'), 'discovered_cameras')
-    save_yaml(server.api.get('api/moduleInformation'), 'server_information')
+    save_yaml(one_running_mediaserver.get_resources('ec2/getCamerasEx'), 'discovered_cameras')
+    save_yaml(one_running_mediaserver.api.get('api/moduleInformation'), 'server_information')
     assert stand.is_success
 
 
@@ -44,10 +49,10 @@ class Camera(object):
         self.data = data
         self.is_expected = is_expected
         self.stages = {}
-        self.has_essential_failure = False
+        self.has_essential_failure = not (data and is_expected)
 
     def __nonzero__(self):
-        return self.data and self.is_expected and all(self.stages.itervalues())
+        return bool(self.data and self.is_expected and all(self.stages.itervalues()))
 
     def __repr__(self):
         return repr(self.to_dict())
@@ -57,7 +62,9 @@ class Camera(object):
         return self.data['id']
 
     def to_dict(self):
-        d = dict(status=('ok' if self else 'error'), id=self.id)
+        d = dict(status=('ok' if self else 'error'))
+        if self.data:
+            d['id'] = self.id
         if not self.data:
             d['description'] = "Is not discovered"
         elif not self.is_expected:

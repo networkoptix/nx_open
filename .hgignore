@@ -198,8 +198,6 @@ statserver/dist
 
 *test-tmp.cfg
 func_tests_old/ssh.*.conf
-func_tests/venv
-func_tests/work
 
 statserver/statserver.egg-info
 
