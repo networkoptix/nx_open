@@ -103,6 +103,7 @@ const NodeViewState& NodeViewWidget::state() const
 void NodeViewWidget::applyPatch(const NodeViewStatePatch& patch)
 {
     d->store.applyPatch(patch);
+    d->updateColumns();
 }
 
 void NodeViewWidget::setProxyModel(QSortFilterProxyModel* proxy)
