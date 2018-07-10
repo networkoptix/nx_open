@@ -4,7 +4,7 @@
 #include <rest/server/json_rest_handler.h>
 
 struct CloudCredentialsData;
-namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
+namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
 class QnCommonModule;
 
 class QnSaveCloudSystemCredentialsHandler:

@@ -46,7 +46,7 @@ hpm::MediatorFunctionalTest& TunnelConnector::mediator()
 TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
     std::chrono::milliseconds connectTimeout,
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
-    boost::optional<nx::network::SocketAddress> mediatorAddressForConnector,
+    boost::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint,
     std::function<void(nx::hpm::MediaServerEmulator*)> serverConfig)
 {
     ConnectResult connectResult;
@@ -59,7 +59,7 @@ TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
         actionOnConnectAckResponse,
         system1,
         server1,
-        mediatorAddressForConnector,
+        mediatorStunUdpEndpoint,
         &connectResult);
     return connectResult;
 }
@@ -69,7 +69,7 @@ TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
     const nx::hpm::AbstractCloudDataProvider::System& system,
     const std::unique_ptr<MediaServerEmulator>& server,
-    boost::optional<nx::network::SocketAddress> mediatorAddressForConnector)
+    boost::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint)
 {
     ConnectResult connectResult;
     doSimpleConnectTest(
@@ -77,7 +77,7 @@ TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
         actionOnConnectAckResponse,
         system,
         server,
-        mediatorAddressForConnector,
+        mediatorStunUdpEndpoint,
         &connectResult);
     return connectResult;
 }
@@ -133,7 +133,7 @@ void TunnelConnector::doSimpleConnectTest(
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
     const nx::hpm::AbstractCloudDataProvider::System& system,
     const std::unique_ptr<MediaServerEmulator>& server,
-    boost::optional<nx::network::SocketAddress> mediatorAddressForConnector,
+    boost::optional<nx::network::SocketAddress> mediatorStunUdpEndpoint,
     ConnectResult* const connectResult)
 {
     //starting mediaserver emulator with specified host name
@@ -148,7 +148,7 @@ void TunnelConnector::doSimpleConnectTest(
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(
         nx::network::SocketAddress((server->serverId() + "." + system.id).constData()),
-        mediatorAddressForConnector);
+        mediatorStunUdpEndpoint);
     auto connectorGuard = makeScopeGuard([&connector]() { connector.pleaseStopSync(); });
 
     auto t1 = std::chrono::steady_clock::now();

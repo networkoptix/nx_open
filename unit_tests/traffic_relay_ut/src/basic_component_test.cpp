@@ -31,7 +31,7 @@ nx::utils::Url Relay::basicUrl() const
 
 //-------------------------------------------------------------------------------------------------
 
-BasicComponentTest::BasicComponentTest(bool initializeRelayCluster):
+BasicComponentTest::BasicComponentTest(Mode mode):
     utils::test::TestWithTemporaryDirectory("traffic_relay", QString())
 {
     using namespace std::placeholders;
@@ -39,7 +39,7 @@ BasicComponentTest::BasicComponentTest(bool initializeRelayCluster):
     controller::PublicIpDiscoveryService::setDiscoverFunc(
         []() {return network::HostAddress("127.0.0.1"); });
 
-    if (initializeRelayCluster)
+    if (mode == Mode::cluster)
     {
         m_factoryFunctionBak =
             model::RemoteRelayPeerPoolFactory::instance().setCustomFunc(

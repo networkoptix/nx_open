@@ -1,1 +1,1 @@
-add_subdirectory(cloud_connect_integration_tests NO_MOC)
+add_subdirectory(cloud_connect_integration_tests)

@@ -29,7 +29,13 @@ class BasicComponentTest:
     public utils::test::TestWithTemporaryDirectory
 {
 public:
-    BasicComponentTest(bool initializeRelayCluster = true);
+    enum class Mode
+    {
+        singleRelay,
+        cluster,
+    };
+
+    BasicComponentTest(Mode mode = Mode::cluster);
     ~BasicComponentTest();
 
     void addRelayInstance(

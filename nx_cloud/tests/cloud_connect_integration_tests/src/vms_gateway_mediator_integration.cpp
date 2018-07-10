@@ -56,7 +56,7 @@ protected:
     void whenStartGateway()
     {
         // Specifying mediator port to gateway.
-        const auto mediatorEndpointStr = mediator().stunEndpoint().toStdString();
+        const auto mediatorEndpointStr = mediator().stunTcpEndpoint().toStdString();
         m_vmsGateway.addArg("-general/mediatorEndpoint", mediatorEndpointStr.c_str());
 
         ASSERT_TRUE(m_vmsGateway.startAndWaitUntilStarted());

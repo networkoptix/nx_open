@@ -349,13 +349,15 @@ void BasicTestFixture::initializeCloudModulesXmlWithDirectStunPort()
 {
     static const char* const kCloudModulesXmlTemplate = R"xml(
         <sequence>
-            <set resName="hpm" resValue="stun://%1"/>
+            <set resName="hpm.tcpUrl" resValue="stun://%1"/>
+            <set resName="hpm.udpUrl" resValue="stun://%2"/>
         </sequence>
     )xml";
 
     m_cloudModulesXmlProvider.registerStaticProcessor(
         kCloudModulesXmlPath,
-        lm(kCloudModulesXmlTemplate).arg(m_mediator.stunEndpoint()).toUtf8(),
+        lm(kCloudModulesXmlTemplate).args(
+            m_mediator.stunTcpEndpoint(), m_mediator.stunUdpEndpoint()).toUtf8(),
         "application/xml");
 }
 
@@ -363,10 +365,8 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
 {
     static const char* kCloudModulesXmlTemplate = R"xml(
         <sequence>
-            <sequence>
-                <set resName="hpm.tcpUrl" resValue="http://%1%2"/>
-                <set resName="hpm.udpUrl" resValue="stun://%3"/>
-            </sequence>
+            <set resName="hpm.tcpUrl" resValue="http://%1%2"/>
+            <set resName="hpm.udpUrl" resValue="stun://%3"/>
         </sequence>
     )xml";
 
@@ -374,7 +374,7 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
         kCloudModulesXmlPath,
         lm(kCloudModulesXmlTemplate)
             .arg(m_mediator.httpEndpoint()).arg(nx::hpm::api::kMediatorApiPrefix)
-            .arg(m_mediator.stunEndpoint()).toUtf8(),
+            .arg(m_mediator.stunUdpEndpoint()).toUtf8(),
         "application/xml");
 }
 

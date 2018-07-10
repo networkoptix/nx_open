@@ -84,7 +84,9 @@ void MediatorConnector::mockupCloudModulesXmlUrl(const nx::utils::Url& cloudModu
     m_cloudModulesXmlUrl = cloudModulesXmlUrl;
 }
 
-void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
+void MediatorConnector::mockupMediatorUrl(
+    const nx::utils::Url& mediatorUrl,
+    const network::SocketAddress stunUdpEndpoint)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -102,7 +104,7 @@ void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
 
     m_mediatorUrl = mediatorUrl;
     m_mockedUpMediatorUrl = mediatorUrl;
-    m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
+    m_mediatorUdpEndpoint = stunUdpEndpoint;
     m_promise->set_value(true);
     connectToMediatorAsync();
     if (m_mediatorAvailabilityChangedHandler)
