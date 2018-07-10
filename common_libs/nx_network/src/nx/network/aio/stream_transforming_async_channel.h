@@ -39,6 +39,8 @@ public:
     virtual void readSomeAsync(nx::Buffer* const buffer, UserIoHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, UserIoHandler handler) override;
 
+    int readRawDataFromCache(void* data, size_t count);
+
 protected:
     virtual void cancelIoInAioThread(aio::EventType eventType) override;
 
@@ -131,7 +133,6 @@ private:
         invokeConverter(TransformerFunc func);
 
     int readRawBytes(void* data, size_t count);
-    int readRawDataFromCache(void* data, size_t count);
     void readRawChannelAsync();
     void onSomeRawDataRead(SystemError::ErrorCode, std::size_t);
     int writeRawBytes(const void* data, size_t count);

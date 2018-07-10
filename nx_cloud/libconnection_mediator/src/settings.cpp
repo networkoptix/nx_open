@@ -51,6 +51,8 @@ const QLatin1String kCdbStartTimeout("cloud_db/startTimeout");
 const QLatin1String kStunEndpointsToListen("stun/addrToListenList");
 const QLatin1String kDefaultStunEndpointsToListen("0.0.0.0:3345");
 
+const QLatin1String kStunUdpEndpointsToListen("stun/udpAddrToListenList");
+
 const QLatin1String kStunKeepAliveOptions("stun/keepAliveOptions");
 const QLatin1String kDefaultStunKeepAliveOptions("{ 10, 10, 3 }");
 
@@ -283,6 +285,16 @@ void Settings::loadSettings()
     readEndpointList(
         settings().value(kStunEndpointsToListen, kDefaultStunEndpointsToListen).toString(),
         &m_stun.addrToListenList);
+
+    if (settings().contains(kStunUdpEndpointsToListen))
+    {
+        readEndpointList(
+            settings().value(kStunUdpEndpointsToListen).toString(),
+            &m_stun.udpAddrToListenList);
+    }
+
+    if (m_stun.udpAddrToListenList.empty())
+        m_stun.udpAddrToListenList = m_stun.addrToListenList;
 
     m_stun.keepAliveOptions = network::KeepAliveOptions::fromString(
         settings().value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());

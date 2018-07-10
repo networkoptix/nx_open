@@ -118,7 +118,11 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
+    {
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+            enforcedMediatorEndpoint,
+            enforcedMediatorEndpoint);
+    }
     nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));

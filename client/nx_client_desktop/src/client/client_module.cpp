@@ -606,6 +606,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
     {
         nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+            startupParams.enforceMediatorEndpoint,
             startupParams.enforceMediatorEndpoint);
     }
 

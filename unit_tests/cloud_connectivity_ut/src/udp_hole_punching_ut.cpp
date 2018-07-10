@@ -53,7 +53,8 @@ public:
 
         SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder().setScheme("stun")
-                .setEndpoint(mediator().stunEndpoint()));
+                .setEndpoint(mediator().stunTcpEndpoint()),
+            mediator().stunUdpEndpoint());
         SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 

@@ -72,7 +72,8 @@ private:
 };
 
 MediaServerEmulator::MediaServerEmulator(
-    const network::SocketAddress& mediatorEndpoint,
+    const network::SocketAddress& mediatorUdpEndpoint,
+    const network::SocketAddress& mediatorTcpEndpoint,
     AbstractCloudDataProvider::System systemData,
     nx::String serverName)
 :
@@ -89,7 +90,7 @@ MediaServerEmulator::MediaServerEmulator(
         : std::move(serverName)),
     m_mediatorUdpClient(
         std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
-            mediatorEndpoint,
+            mediatorUdpEndpoint,
             m_mediatorConnector.get())),
     m_action(ActionToTake::proceedWithConnection),
     m_cloudConnectionMethodMask((int)network::cloud::ConnectType::all),
@@ -110,7 +111,8 @@ MediaServerEmulator::MediaServerEmulator(
 
     m_mediatorConnector->mockupMediatorUrl(
         nx::network::url::Builder()
-            .setScheme(network::stun::kUrlSchemeName).setEndpoint(mediatorEndpoint));
+            .setScheme(network::stun::kUrlSchemeName).setEndpoint(mediatorTcpEndpoint),
+        mediatorUdpEndpoint);
 
     m_mediatorConnector->setSystemCredentials(
         api::SystemCredentials(
