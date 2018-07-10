@@ -777,7 +777,7 @@ void AsyncClient::initiateTcpConnection()
     m_state = State::sInit;
 
     SocketAddress remoteAddress;
-    bool isSecureConnection;
+    bool isSecureConnection = false;
     if (m_proxyEndpoint)
     {
         remoteAddress = m_proxyEndpoint.get();
@@ -785,7 +785,7 @@ void AsyncClient::initiateTcpConnection()
     }
     else
     {
-        remoteAddress = SocketAddress(m_contentLocationUrl.host(), m_contentLocationUrl.port(0));
+        remoteAddress = nx::network::url::getEndpoint(m_contentLocationUrl);
         isSecureConnection = m_contentLocationUrl.scheme() == nx::network::http::kSecureUrlSchemeName;
     }
 
