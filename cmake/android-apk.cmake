@@ -34,6 +34,23 @@ function(add_android_apk target)
 
     find_buildtools("${ANDROID_SDK}" buildtools_version)
 
+    if(APK_QML_IMPORT_PATHS)
+        set(qml_import_paths "    \"qml-import-paths\": \"${APK_QML_IMPORT_PATHS}\",\n")
+    else()
+        set(qml_import_paths)
+    endif()
+
+    string(STRIP ${CMAKE_CXX_STANDARD_LIBRARIES} cpp_libs)
+    string(REPLACE "\"" "" cpp_libs ${cpp_libs})
+    string(REPLACE " " ";" cpp_libs ${cpp_libs})
+    if(NOT cpp_libs)
+        message(FATAL_ERROR "Cannot determine path to C++ standard library.")
+    endif()
+    list(GET cpp_libs 0 stdcpp_path)
+    if(stdcpp_path MATCHES "\.so$")
+        set(stdcpp_path  "    \"stdcpp-path\": \"${stdcpp_path}\",\n")
+    endif()
+
     set(settings
         "{\n"
         "    \"description\": \"This file is generated and should not be modified by hand.\",\n"
@@ -48,8 +65,9 @@ function(add_android_apk target)
         "    \"target-architecture\": \"${CMAKE_ANDROID_ARCH_ABI}\",\n"
         "    \"android-package-source-directory\": \"${APK_PACKAGE_SOURCE}\",\n"
         "    \"android-extra-libs\": \"${extra_libs}\",\n"
-        "    \"qml-import-paths\": \"${APK_QML_IMPORT_PATHS}\",\n"
+        ${stdcpp_path}
         "    \"qml-root-path\": \"${APK_QML_ROOT_PATH}\",\n"
+        ${qml_import_paths}
         "    \"application-binary\": \"$<TARGET_FILE:${APK_TARGET}>\"\n"
         "}\n"
     )
