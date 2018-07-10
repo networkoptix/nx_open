@@ -1,18 +1,20 @@
 import pytest
 import yaml
-import os
 import time
 import logging
 from urlparse import urlparse
 from pathlib2 import Path
 
-from framework.installation.make_installation import make_installation
-from framework.installation.mediaserver import Mediaserver
-from framework.os_access.local_access import local_access
-
 import verifications
 
-DISCOVERY_IP_PREFIX = '192.168'  # < TODO: Remove in production.
+# TODO: Move into some config.
+CAMERAS_INTERFACE = 'enp5s0'
+CAMERAS_NETWORK = '192.168.0.'
+SERVER_IP = (CAMERAS_NETWORK + '200', 24)
+
+LICENSE_KEY='IX3Z-HJ82-A2RL-IF38'
+LICENSE_SERVER=('107.23.248.56', 'licensing.networkoptix.com')
+
 DISCOVERY_RETRY_COUNT = 10
 DISCOVERY_RETRY_DELAY_S = 10
 
@@ -27,8 +29,13 @@ def one_vm_type():
 
 # TODO: Make this test work with fresh configured server on VM with bridged interface.
 def test_cameras(one_running_mediaserver, one_vm, hypervisor, work_dir):
-    mac = hypervisor.plug_bridged(one_vm.name, 'enp5s0')
-    one_running_mediaserver.os_access.networking.setup_ip(mac, '192.168.0.200', 24)
+    # Provide access to cameras network.
+    mac = hypervisor.plug_bridged(one_vm.name, CAMERAS_INTERFACE)
+    one_running_mediaserver.os_access.networking.setup_ip(mac, *SERVER_IP)
+
+    # Activate licence on test server for recording.
+    one_running_mediaserver.os_access.networking.static_dns(*LICENSE_SERVER)
+    one_running_mediaserver.api.get('api/activateLicense', params=dict(key=LICENSE_KEY))
 
     stand = Stand(one_running_mediaserver)
     stand.discover_cameras()
@@ -123,7 +130,7 @@ class Stand(object):
             discovered_cameras = {}
             for camera in self.server.get_cameras():
                 ip = urlparse(camera['url']).hostname
-                if ip and ip.startswith(DISCOVERY_IP_PREFIX):
+                if ip and ip.startswith(CAMERAS_NETWORK):
                     discovered_cameras[ip] = camera
 
             logging.info('Discovered cameras: ' + ', '.join(discovered_cameras))

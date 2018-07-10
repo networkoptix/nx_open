@@ -130,3 +130,11 @@ class LinuxNetworking(Networking):
         except exit_status_error_cls(1):  # See man page.
             return False
         return True
+
+    def static_dns(self, ip, name):
+        self._ssh.run_sh_script(
+            # language=Bash
+            '''
+                record="{} {}"
+                grep "$record" /etc/hosts || echo "$record" >> /etc/hosts
+                '''.format(ip, name))
