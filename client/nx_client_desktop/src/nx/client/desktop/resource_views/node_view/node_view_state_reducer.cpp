@@ -8,11 +8,14 @@ namespace desktop {
 
 
 NodeViewStatePatch NodeViewStateReducer::setNodeChecked(
-    const ViewNode::Path& path,
+    const NodePath& path,
     Qt::CheckState checkedState)
 {
     NodeViewStatePatch patch;
-    patch.changedData[path][node_view::checkMarkColumn][Qt::CheckStateRole] = checkedState;
+    NodeViewStatePatch::NodeDescription nodeDescription;
+    nodeDescription.first = path;
+    nodeDescription.second.data[node_view::checkMarkColumn][Qt::CheckStateRole] = checkedState;
+    patch.changedData.append(nodeDescription);
     return patch;
 }
 

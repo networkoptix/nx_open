@@ -9,6 +9,8 @@ namespace client {
 namespace desktop {
 namespace helpers {
 
+NodePtr createTestNode(const QString& caption);
+
 NodePtr createParentedLayoutsNode();
 NodePtr createCurrentUserLayoutsNode();
 

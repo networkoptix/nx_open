@@ -9,7 +9,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class NodeViewState;
+class NodeViewStore;
 class NodeViewStatePatch;
 
 class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
@@ -18,11 +18,9 @@ class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
     using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
-    NodeViewModel(QObject* parent = nullptr);
+    NodeViewModel(NodeViewStore* store, QObject* parent = nullptr);
     virtual ~NodeViewModel();
 
-    const NodeViewState& state() const;
-    void setState(const NodeViewState& state);
     void applyPatch(const NodeViewStatePatch& patch);
 
 public: // Overrides section
@@ -44,7 +42,7 @@ public:
     static NodePtr nodeFromIndex(const QModelIndex& index);
 
 signals:
-    void checkedChanged(const ViewNode::Path& path, Qt::CheckState state);
+    void checkedChanged(const NodePath& path, Qt::CheckState state);
 
 private:
     struct Private;

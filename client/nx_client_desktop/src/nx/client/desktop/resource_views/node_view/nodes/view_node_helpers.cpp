@@ -95,6 +95,13 @@ namespace client {
 namespace desktop {
 namespace helpers {
 
+NodePtr createTestNode(const QString& caption)
+{
+    ViewNode::Data nodeData;
+    nodeData.data[node_view::nameColumn][Qt::DisplayRole] = caption;
+    return ViewNode::create(nodeData);
+}
+
 NodePtr createParentedLayoutsNode()
 {
     const auto commonModule = qnClientCoreModule->commonModule();

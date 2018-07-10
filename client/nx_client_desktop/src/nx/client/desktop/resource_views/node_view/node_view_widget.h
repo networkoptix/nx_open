@@ -21,7 +21,6 @@ public:
     NodeViewWidget(QWidget* parent = nullptr);
     virtual ~NodeViewWidget() override;
 
-    void setState(const NodeViewState& state);
     const NodeViewState& state() const;
 
     void applyPatch(const NodeViewStatePatch& patch);

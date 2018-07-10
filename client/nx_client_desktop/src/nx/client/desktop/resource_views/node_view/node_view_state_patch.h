@@ -9,13 +9,14 @@ namespace desktop {
 
 struct NodeViewStatePatch
 {
-//    using PathList = QList<ViewNode::Path>;
-//    PathList removedNodes;
+    static NodeViewStatePatch fromRootNode(const NodePtr& node);
 
-    using DataChange = QHash<ViewNode::Path, ViewNode::Data::ColumnDataHash>;
-
-    DataChange changedData;
     NodeViewState apply(NodeViewState&& state) const;
+
+    using NodeDescription = QPair<NodePath, ViewNode::Data>;
+    using DataList = QList<NodeDescription>;
+    DataList addedNodes;
+    DataList changedData;
 };
 
 } // namespace desktop

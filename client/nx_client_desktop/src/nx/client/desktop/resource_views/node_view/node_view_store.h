@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nx/client/desktop/utils/base_store.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
@@ -9,10 +8,27 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class NodeViewStore: public BaseStore<NodeViewState, NodeViewStatePatch>
+class NodeViewStore: public QObject
 {
+    Q_OBJECT
+    using base_type = QObject;
+
 public:
-    void setNodeChecked(const ViewNode::Path& path, Qt::CheckState checkedState);
+    NodeViewStore(QObject* parent = nullptr);
+    virtual ~NodeViewStore() override;
+
+    const NodeViewState& state() const;
+
+    void setNodeChecked(const NodePath& path, Qt::CheckState checkedState);
+
+    void applyPatch(const NodeViewStatePatch& state);
+
+signals:
+    void patchApplied(const NodeViewStatePatch& patch);
+
+private:
+    struct Private;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace desktop

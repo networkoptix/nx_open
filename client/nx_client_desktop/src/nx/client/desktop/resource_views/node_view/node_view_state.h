@@ -11,6 +11,7 @@ struct NodeViewState
     NodePtr rootNode;
 
     bool checkable() const;
+    NodePtr nodeByPath(const NodePath& path) const;
 };
 
 } // namespace desktop

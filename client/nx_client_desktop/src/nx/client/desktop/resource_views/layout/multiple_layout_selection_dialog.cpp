@@ -4,6 +4,7 @@
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/layout/accessible_layout_sort_model.h>
 
@@ -57,8 +58,11 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     ui->setupUi(this);
 
     const auto tree = ui->layoutsTree;
-    tree->setState({helpers::createParentedLayoutsNode()});
-    //tree->setState({helpers::createCurrentUserLayoutsNode()});
+    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
+    //tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
+    //tree->applyPatch(NodeViewStatePatch::fromRootNode(
+    //  ViewNode::create({helpers::createTestNode(lit("first"))})));
+
     tree->setExpandsOnDoubleClick(true);
     tree->expandAll();
 

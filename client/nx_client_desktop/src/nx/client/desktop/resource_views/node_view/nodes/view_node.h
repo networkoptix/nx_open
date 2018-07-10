@@ -7,6 +7,8 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class ViewNodePath;
+
 class ViewNode: public QEnableSharedFromThis<ViewNode>
 {
     struct PathInternal;
@@ -26,8 +28,6 @@ public:
     };
 
 public:
-    using Path = std::shared_ptr<PathInternal>;
-
     static NodePtr create(const Data& data);
     static NodePtr create(const NodeList& children);
     static NodePtr create(const Data& data, const NodeList& children);
@@ -38,10 +38,11 @@ public:
     int childrenCount() const;
     const NodeList& children() const;
 
+    void addChild(const NodePtr& child);
     NodePtr nodeAt(int index) const;
 
-    NodePtr nodeAt(const Path& path);
-    Path path(); //< TODO: think abount const
+    NodePtr nodeAt(const NodePath& path);
+    NodePath path(); //< TODO: think abount const
 
     int indexOf(const NodePtr& node) const;
 
@@ -56,8 +57,7 @@ public:
 
     const Data& nodeData() const;
     void setNodeData(const Data& data);
-
-    void applyData(const Data::ColumnDataHash& data);
+    void applyNodeData(const Data& data);
 
 private:
     ViewNode(const Data& data);
@@ -69,7 +69,7 @@ private:
     const QScopedPointer<Private> d;
 };
 
-uint qHash(const nx::client::desktop::ViewNode::Path& path);
+uint qHash(const nx::client::desktop::NodePath& path);
 
 } // namespace desktop
 } // namespace client

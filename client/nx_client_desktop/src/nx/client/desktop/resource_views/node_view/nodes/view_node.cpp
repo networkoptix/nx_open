@@ -2,18 +2,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
-
-namespace {
-
-Qt::ItemFlags getFlags(bool checkable)
-{
-    static constexpr Qt::ItemFlags baseFlags = Qt::ItemIsEnabled;
-    return checkable
-        ? baseFlags | Qt::ItemIsUserCheckable | Qt::ItemIsEditable
-        : baseFlags;
-}
-
-} // namespace
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
 
 namespace nx {
 namespace client {
@@ -49,10 +38,7 @@ NodePtr ViewNode::create(const Data& data, const NodeList& children)
 {
     const auto result = create(data);
     for (const auto& child: children)
-    {
-        child->d->parent = result;
-        result->d->nodes.append(child);
-    }
+        result->addChild(child);
     return result;
 }
 
@@ -81,27 +67,33 @@ const NodeList& ViewNode::children() const
     return d->nodes;
 }
 
+void ViewNode::addChild(const NodePtr& child)
+{
+    child->d->parent = currentSharedNode().toStrongRef();
+    d->nodes.append(child);
+}
+
 NodePtr ViewNode::nodeAt(int index) const
 {
     return d->nodes.at(index);
 }
 
-NodePtr ViewNode::nodeAt(const Path& path)
+NodePtr ViewNode::nodeAt(const NodePath& path)
 {
     auto currentNode = currentSharedNode().toStrongRef();
-    for (const int index: path->indicies)
+    for (const int index: path->indicies())
         currentNode = currentNode->nodeAt(index);
     return currentNode;
 }
 
-ViewNode::Path ViewNode::path()
+NodePath ViewNode::path()
 {
     const auto parentNode = parent();
     if (!parentNode)
-        return Path(new PathInternal());
+        return NodePath(new ViewNodePath());
 
     auto currentPath = parentNode->path();
-    currentPath->indicies.append(parentNode->indexOf(currentSharedNode()));
+    currentPath->appendIndex(parentNode->indexOf(currentSharedNode()));
     return currentPath;
 }
 
@@ -127,7 +119,13 @@ QVariant ViewNode::data(int column, int role) const
 Qt::ItemFlags ViewNode::flags(int column) const
 {
     const auto flagIt = d->nodeData.flags.find(column);
-    return flagIt == d->nodeData.flags.end() ? Qt::ItemIsEnabled : flagIt.value();
+    if (flagIt == d->nodeData.flags.end())
+        return Qt::ItemIsEnabled;
+
+    static constexpr Qt::ItemFlags kCheckableFlags = Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+    return column == node_view::checkMarkColumn
+        ? flagIt.value() | kCheckableFlags
+        : flagIt.value();
 }
 
 NodePtr ViewNode::parent() const
@@ -157,12 +155,11 @@ const ViewNode::Data& ViewNode::nodeData() const
 void ViewNode::setNodeData(const Data& data)
 {
     d->nodeData = data;
-    d->nodeData.flags[node_view::checkMarkColumn] = getFlags(checkable());
 }
 
-void ViewNode::applyData(const Data::ColumnDataHash& data)
+void ViewNode::applyNodeData(const Data& data)
 {
-    for (auto it = data.begin(); it != data.end(); ++it)
+    for (auto it = data.data.begin(); it != data.data.end(); ++it)
     {
         const int column = it.key();
         const auto& roleData = it.value();
@@ -172,6 +169,9 @@ void ViewNode::applyData(const Data::ColumnDataHash& data)
             d->nodeData.data[column][role] = itRoleData.value();
         }
     }
+
+    for (auto it = data.flags.begin(); it != data.flags.end(); ++it)
+        d->nodeData.flags[it.key()] = it.value();
 }
 
 WeakNodePtr ViewNode::currentSharedNode()
@@ -181,9 +181,9 @@ WeakNodePtr ViewNode::currentSharedNode()
     return result.toWeakRef();
 }
 
-uint qHash(const nx::client::desktop::ViewNode::Path& path)
+uint qHash(const nx::client::desktop::NodePath& path)
 {
-    return qHash(path->indicies);
+    return qHash(path->indicies());
 }
 
 } // namespace desktop

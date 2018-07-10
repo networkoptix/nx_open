@@ -12,6 +12,7 @@
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 
@@ -21,23 +22,23 @@ namespace desktop {
 
 struct NodeViewWidget::Private: public QObject
 {
-    Private(NodeViewWidget& owner);
+    Private(NodeViewWidget* owner);
 
     void updateColumns();
     void handleClicked(const QModelIndex& index);
-    void handleCheckedChanged(const ViewNode::Path& path, Qt::CheckState checkedState);
-    void handlePatchApplied();
-    void handleStateChanged();
+    void handleCheckedChanged(const NodePath& path, Qt::CheckState checkedState);
+    void handlePatchApplied(const NodeViewStatePatch& patch);
 
-    NodeViewWidget& owner;
-    NodeViewModel model;
+    NodeViewWidget * const owner;
     NodeViewStore store;
+    NodeViewModel model;
     QSortFilterProxyModel* proxy = nullptr;
     ItemViewUtils::CheckableCheckFunction checkableCheck;
 };
 
-NodeViewWidget::Private::Private(NodeViewWidget& owner):
+NodeViewWidget::Private::Private(NodeViewWidget* owner):
     owner(owner),
+    model(&store),
     checkableCheck(
         [this](const QModelIndex& index) -> bool
         {
@@ -50,39 +51,34 @@ NodeViewWidget::Private::Private(NodeViewWidget& owner):
 
 void NodeViewWidget::Private::updateColumns()
 {
-    const auto header = owner.header();
+    const auto header = owner->header();
 
     header->setStretchLastSection(false);
 
     header->setSectionResizeMode(node_view::nameColumn, QHeaderView::Stretch);
     header->setSectionResizeMode(node_view::checkMarkColumn, QHeaderView::ResizeToContents);
 
-    if (!model.state().checkable())
+    if (!store.state().checkable())
         header->setSectionHidden(node_view::checkMarkColumn, true);
 }
 
 void NodeViewWidget::Private::handleCheckedChanged(
-    const ViewNode::Path& path,
+    const NodePath& path,
     Qt::CheckState checkedState)
 {
     store.setNodeChecked(path, checkedState);
 }
 
-void NodeViewWidget::Private::handlePatchApplied()
+void NodeViewWidget::Private::handlePatchApplied(const NodeViewStatePatch& patch)
 {
-    model.applyPatch(store.lastPatch());
-}
-
-void NodeViewWidget::Private::handleStateChanged()
-{
-    model.setState(store.state());
+    model.applyPatch(patch);
 }
 
 //-------------------------------------------------------------------------------------------------
 
 NodeViewWidget::NodeViewWidget(QWidget* parent):
     base_type(parent),
-    d(new Private(*this))
+    d(new Private(this))
 {
     setModel(&d->model);
     setSortingEnabled(true);
@@ -91,19 +87,12 @@ NodeViewWidget::NodeViewWidget(QWidget* parent):
 
     ItemViewUtils::setupDefaultAutoToggle(this, node_view::checkMarkColumn, d->checkableCheck);
 
-    connect(&d->store, &NodeViewStore::stateChanged, d, &Private::handleStateChanged);
     connect(&d->store, &NodeViewStore::patchApplied, d, &Private::handlePatchApplied);
     connect(&d->model, &NodeViewModel::checkedChanged, d, &Private::handleCheckedChanged);
 }
 
 NodeViewWidget::~NodeViewWidget()
 {
-}
-
-void NodeViewWidget::setState(const NodeViewState& state)
-{
-    d->store.setState(state);
-    d->updateColumns();
 }
 
 const NodeViewState& NodeViewWidget::state() const

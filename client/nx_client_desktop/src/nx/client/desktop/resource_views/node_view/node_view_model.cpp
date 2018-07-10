@@ -1,9 +1,11 @@
 #include "node_view_model.h"
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_store.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
 
 namespace {
 
@@ -26,22 +28,16 @@ namespace desktop {
 
 struct NodeViewModel::Private
 {
-    Private(NodeViewModel* owner);
-
-    NodeViewModel* const owner;
-    NodeViewState state;
-
     QModelIndex getModelIndex(const NodePtr& node, int column = node_view::nameColumn);
-};
+    void addNode(const NodePath& parentPath);
 
-NodeViewModel::Private::Private(NodeViewModel* owner):
-    owner(owner)
-{
-}
+    NodeViewModel* const q;
+    NodeViewStore* const store;
+};
 
 QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int column)
 {
-    const auto parentNode = node->parent();
+    const auto parentNode = node ? node->parent() : NodePtr();
     if (!parentNode) //< It is invisible root node.
         return QModelIndex();
 
@@ -49,13 +45,20 @@ QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int colum
         ? getModelIndex(parentNode)
         : QModelIndex(); //< It is top-level node
 
-    return owner->index(parentNode->indexOf(node), column, parentIndex);
+    return q->index(parentNode->indexOf(node), column, parentIndex);
+}
+
+void NodeViewModel::Private::addNode(const NodePath& path)
+{
+    const auto index = getModelIndex(store->state().nodeByPath(path->parent()));
+    const int row = path->leafIndex();
+    const NodeViewModel::ScopedInsertRows insertGuard(q, index, row, row);
 }
 
 //-------------------------------------------------------------------------------------------------
 
-NodeViewModel::NodeViewModel(QObject* parent):
-    d(new Private(this))
+NodeViewModel::NodeViewModel(NodeViewStore* store, QObject* parent):
+    d(new Private({this, store}))
 {
 }
 
@@ -63,30 +66,23 @@ NodeViewModel::~NodeViewModel()
 {
 }
 
-const NodeViewState& NodeViewModel::state() const
-{
-    return d->state;
-}
-
-void NodeViewModel::setState(const NodeViewState& state)
-{
-    ScopedReset reset(this);
-    d->state = state;
-}
-
 void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
 {
     // TODO: #future uses: add handling of tree structure changes
-    d->state = patch.apply(std::move(d->state));
-    for (auto it = patch.changedData.begin(); it != patch.changedData.end(); ++it)
+
+
+    for (const auto dataDescription: patch.addedNodes)
+        d->addNode(dataDescription.first);
+
+    for (const auto dataDescription: patch.changedData)
     {
-        const auto& path = it.key();
-        const auto& data = it.value();
-        const auto node = d->state.rootNode->nodeAt(path);
+        const auto& path = dataDescription.first;
+        const auto& data = dataDescription.second;
+        const auto node = d->store->state().rootNode->nodeAt(path);
         if (!node)
             continue;
 
-        for (auto itColumnData = data.begin(); itColumnData != data.end(); ++itColumnData)
+        for (auto itColumnData = data.data.begin(); itColumnData != data.data.end(); ++itColumnData)
         {
             const int column = itColumnData.key();
             const auto nodeIndex = d->getModelIndex(node, column);
@@ -106,7 +102,7 @@ QModelIndex NodeViewModel::index(
 
     const auto node = parent.isValid()
         ? nodeFromIndex(parent)->nodeAt(row).data()
-        : d->state.rootNode->nodeAt(row).data();
+        : d->store->state().rootNode->nodeAt(row).data();
 
     return createIndex(row, column, node);
 }
@@ -124,8 +120,8 @@ QModelIndex NodeViewModel::parent(const QModelIndex& child) const
 
 int NodeViewModel::rowCount(const QModelIndex& parent) const
 {
-    const auto node = parent.isValid() ? nodeFromIndex(parent) : d->state.rootNode;
-    return node->childrenCount();
+    const auto node = parent.isValid() ? nodeFromIndex(parent) : d->store->state().rootNode;
+    return node ? node->childrenCount() : 0;
 }
 
 int NodeViewModel::columnCount(const QModelIndex& parent) const
