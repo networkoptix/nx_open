@@ -9,9 +9,11 @@ namespace ssl {
 namespace detail {
 
 StreamSocketToTwoWayPipelineAdapter::StreamSocketToTwoWayPipelineAdapter(
-    AbstractStreamSocket* streamSocket)
+    AbstractStreamSocket* streamSocket,
+    aio::StreamTransformingAsyncChannel* asyncSslChannel)
     :
-    m_streamSocket(streamSocket)
+    m_streamSocket(streamSocket),
+    m_asyncSslChannel(asyncSslChannel)
 {
 }
 
@@ -21,6 +23,10 @@ StreamSocketToTwoWayPipelineAdapter::~StreamSocketToTwoWayPipelineAdapter()
 
 int StreamSocketToTwoWayPipelineAdapter::read(void* data, size_t count)
 {
+    const int bytesReadFromCache = m_asyncSslChannel->readRawDataFromCache(data, count);
+    if (bytesReadFromCache > 0)
+        return bytesReadFromCache;
+
     const int bytesRead = m_streamSocket->recv(
         data, static_cast<int>(count), getFlagsForCurrentThread());
     return bytesTransferredToPipelineReturnCode(bytesRead);
@@ -77,7 +83,6 @@ StreamSocket::StreamSocket(
     :
     base_type(delegate.get()),
     m_delegate(std::move(delegate)),
-    m_socketToPipelineAdapter(m_delegate.get()),
     m_proxyConverter(nullptr)
 {
     if (isServerSide)
@@ -89,6 +94,10 @@ StreamSocket::StreamSocket(
     m_asyncTransformingChannel = std::make_unique<aio::StreamTransformingAsyncChannel>(
         aio::makeAsyncChannelAdapter(m_delegate.get()),
         &m_proxyConverter);
+
+    m_socketToPipelineAdapter =
+        std::make_unique<detail::StreamSocketToTwoWayPipelineAdapter>(
+            m_delegate.get(), m_asyncTransformingChannel.get());
 
     base_type::bindToAioThread(m_delegate->getAioThread());
 }
@@ -168,10 +177,10 @@ int StreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     // TODO: #ak setFlagsForCallsInThread is a hack. Have to pass flags
     // via m_sslPipeline->read call or get rid of flags in StreamSocket::recv at all.
     if (flags != 0)
-        m_socketToPipelineAdapter.setFlagsForCallsInThread(std::this_thread::get_id(), flags);
+        m_socketToPipelineAdapter->setFlagsForCallsInThread(std::this_thread::get_id(), flags);
     const int result = m_sslPipeline->read(buffer, bufferLen);
     if (flags != 0)
-        m_socketToPipelineAdapter.setFlagsForCallsInThread(std::this_thread::get_id(), 0);
+        m_socketToPipelineAdapter->setFlagsForCallsInThread(std::this_thread::get_id(), 0);
     if (result >= 0)
         return result;
     handleSslError(result);
@@ -246,8 +255,8 @@ void StreamSocket::stopWhileInAioThread()
 
 void StreamSocket::switchToSyncModeIfNeeded()
 {
-    m_sslPipeline->setInput(&m_socketToPipelineAdapter);
-    m_sslPipeline->setOutput(&m_socketToPipelineAdapter);
+    m_sslPipeline->setInput(m_socketToPipelineAdapter.get());
+    m_sslPipeline->setOutput(m_socketToPipelineAdapter.get());
 }
 
 void StreamSocket::switchToAsyncModeIfNeeded()
