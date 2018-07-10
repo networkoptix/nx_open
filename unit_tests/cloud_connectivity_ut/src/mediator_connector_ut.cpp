@@ -125,7 +125,7 @@ protected:
 
     void andNewMediatorEndpointIsAvailable()
     {
-        while (*m_mediatorConnector->udpEndpoint() != m_mediator->moduleInstance()->impl()->stunEndpoints().front())
+        while (*m_mediatorConnector->udpEndpoint() != m_mediator->moduleInstance()->impl()->stunUdpEndpoints().front())
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
@@ -238,24 +238,32 @@ public:
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> get(
         nx::utils::test::ModuleLauncher<MediatorProcessPublic>* mediator)
     {
-        nx::network::SocketAddress mediatorStunEndpoint;
+        nx::network::SocketAddress mediatorStunTcpEndpoint;
+        nx::network::SocketAddress mediatorStunUdpEndpoint;
         if (mediator)
         {
-            mediatorStunEndpoint =
-                mediator->moduleInstance()->impl()->stunEndpoints().front();
+            mediatorStunTcpEndpoint =
+                mediator->moduleInstance()->impl()->stunTcpEndpoints().front();
+            mediatorStunUdpEndpoint =
+                mediator->moduleInstance()->impl()->stunUdpEndpoints().front();
         }
         else
         {
-            mediatorStunEndpoint = nx::network::SocketAddress(
+            mediatorStunTcpEndpoint = nx::network::SocketAddress(
                 nx::network::HostAddress::localhost,
                 nx::utils::random::number<int>(30000, 40000));
+            mediatorStunUdpEndpoint = mediatorStunTcpEndpoint;
         }
 
         auto modulesXml = lm(
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"
             "<sequence>\r\n"
-            "<set resName=\"hpm\" resValue=\"stun://%1\"/>\r\n"
-            "</sequence>\r\n").args(mediatorStunEndpoint).toUtf8();
+                "<sequence>\r\n"
+                    "<set resName=\"hpm.tcpUrl\" resValue=\"stun://%1\"/>\r\n"
+                    "<set resName=\"hpm.udpUrl\" resValue=\"stun://%2\"/>\r\n"
+                "</sequence>\r\n"
+            "</sequence>\r\n"
+        ).args(mediatorStunTcpEndpoint, mediatorStunUdpEndpoint).toUtf8();
         return std::make_unique<nx::network::http::BufferSource>(
             "text/xml",
             std::move(modulesXml));
@@ -275,19 +283,19 @@ public:
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> get(
         nx::utils::test::ModuleLauncher<MediatorProcessPublic>* mediator)
     {
-        nx::network::SocketAddress mediatorStunEndpoint;
+        nx::network::SocketAddress mediatorStunUdpEndpoint;
         nx::network::SocketAddress mediatorHttpEndpoint;
         if (mediator)
         {
             mediatorHttpEndpoint = mediator->moduleInstance()->impl()->httpEndpoints().front();
-            mediatorStunEndpoint = mediator->moduleInstance()->impl()->stunEndpoints().front();
+            mediatorStunUdpEndpoint = mediator->moduleInstance()->impl()->stunUdpEndpoints().front();
         }
         else
         {
-            mediatorStunEndpoint = nx::network::SocketAddress(
+            mediatorStunUdpEndpoint = nx::network::SocketAddress(
                 nx::network::HostAddress::localhost,
                 nx::utils::random::number<int>(30000, 40000));
-            mediatorHttpEndpoint = mediatorStunEndpoint;
+            mediatorHttpEndpoint = mediatorStunUdpEndpoint;
         }
 
         auto modulesXml = lm(
@@ -298,7 +306,7 @@ public:
                     "<set resName=\"hpm.udpUrl\" resValue=\"stun://%3\"/>\r\n"
                 "</sequence>\r\n"
             "</sequence>\r\n"
-            ).args(mediatorHttpEndpoint, kMediatorApiPrefix, mediatorStunEndpoint).toUtf8();
+            ).args(mediatorHttpEndpoint, kMediatorApiPrefix, mediatorStunUdpEndpoint).toUtf8();
         return std::make_unique<nx::network::http::BufferSource>(
             "text/xml",
             std::move(modulesXml));

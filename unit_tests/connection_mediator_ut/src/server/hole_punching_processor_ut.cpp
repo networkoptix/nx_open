@@ -51,7 +51,8 @@ public:
 protected:
     void reinitializeUdpClient()
     {
-        m_udpClient = std::make_unique<nx::hpm::api::MediatorClientUdpConnection>(stunEndpoint());
+        m_udpClient =
+            std::make_unique<nx::hpm::api::MediatorClientUdpConnection>(stunUdpEndpoint());
     }
 
     void resetUdpClient()

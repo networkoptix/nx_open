@@ -37,7 +37,8 @@ public:
         \param serverName If empty, name is generated
     */
     MediaServerEmulator(
-        const network::SocketAddress& mediatorEndpoint,
+        const network::SocketAddress& mediatorUdpEndpoint,
+        const network::SocketAddress& mediatorTcpEndpoint,
         AbstractCloudDataProvider::System systemData,
         nx::String serverName = nx::String());
     virtual ~MediaServerEmulator();

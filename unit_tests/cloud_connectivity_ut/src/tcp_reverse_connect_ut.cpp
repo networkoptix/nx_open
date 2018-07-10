@@ -33,7 +33,8 @@ protected:
 
         ASSERT_NE(nullptr, m_server);
         SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
-            url::Builder().setScheme("stun").setEndpoint(m_mediator.stunEndpoint()));
+            url::Builder().setScheme("stun").setEndpoint(m_mediator.stunTcpEndpoint()),
+            m_mediator.stunUdpEndpoint());
         SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 

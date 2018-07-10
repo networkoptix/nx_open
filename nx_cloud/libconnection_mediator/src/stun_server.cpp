@@ -36,18 +36,18 @@ void StunServer::listen()
     {
         throw std::runtime_error(
             lm("Error listening on TCP addresses %1")
-                .arg(containerString(m_endpoints)).toStdString());
+                .arg(containerString(m_tcpEndpoints)).toStdString());
     }
 
     if (!m_udpStunServer->listen())
     {
         throw std::runtime_error(
             lm("Error listening on UDP addresses %1")
-                .arg(containerString(m_endpoints)).toStdString());
+                .arg(containerString(m_udpEndpoints)).toStdString());
     }
 
-    NX_LOGX(lit("STUN Server is listening on %1")
-        .arg(containerString(m_endpoints)), cl_logALWAYS);
+    NX_ALWAYS(this, lm("STUN Server is listening on tcp/%1 and udp/%2")
+        .args(containerString(m_tcpEndpoints), containerString(m_udpEndpoints)));
 }
 
 void StunServer::stopAcceptingNewRequests()
@@ -56,9 +56,14 @@ void StunServer::stopAcceptingNewRequests()
     m_udpStunServer->forEachListener(&network::stun::UdpServer::stopReceivingMessagesSync);
 }
 
-const std::vector<network::SocketAddress>& StunServer::endpoints() const
+const std::vector<network::SocketAddress>& StunServer::udpEndpoints() const
 {
-    return m_endpoints;
+    return m_udpEndpoints;
+}
+
+const std::vector<network::SocketAddress>& StunServer::tcpEndpoints() const
+{
+    return m_tcpEndpoints;
 }
 
 network::stun::MessageDispatcher& StunServer::dispatcher()
@@ -88,7 +93,7 @@ bool StunServer::bind()
 
     if (!m_tcpStunServer->bind(m_settings.stun().addrToListenList))
     {
-        NX_LOGX(lit("Can not bind to TCP addresses: %1")
+        NX_LOGX(lit("Cannot bind to TCP endpoint(s): %1")
             .arg(containerString(m_settings.stun().addrToListenList)), cl_logERROR);
         return false;
     }
@@ -100,14 +105,16 @@ bool StunServer::bind()
                 m_settings.stun().connectionInactivityTimeout);
         });
 
-    m_endpoints = m_tcpStunServer->endpoints();
+    m_tcpEndpoints = m_tcpStunServer->endpoints();
 
-    if (!m_udpStunServer->bind(m_settings.stun().addrToListenList))
+    if (!m_udpStunServer->bind(m_settings.stun().udpAddrToListenList))
     {
-        NX_LOGX(lit("Can not bind to UDP addresses: %1")
-            .arg(containerString(m_settings.stun().addrToListenList)), cl_logERROR);
+        NX_LOGX(lit("Cannot bind to UDP endpoint(s): %1")
+            .arg(containerString(m_settings.stun().udpAddrToListenList)), cl_logERROR);
         return false;
     }
+
+    m_udpEndpoints = m_udpStunServer->endpoints();
 
     return true;
 }

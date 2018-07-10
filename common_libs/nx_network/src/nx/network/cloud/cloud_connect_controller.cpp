@@ -2,6 +2,7 @@
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/app_info.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/kit/ini_config.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/std/cpp14.h>
@@ -191,7 +192,8 @@ void CloudConnectController::applySettings()
     if (!m_impl->settings.forcedMediatorUrl.empty())
     {
         mediatorConnector().mockupMediatorUrl(
-            QString::fromStdString(m_impl->settings.forcedMediatorUrl));
+            QString::fromStdString(m_impl->settings.forcedMediatorUrl),
+            url::getEndpoint(utils::Url(m_impl->settings.forcedMediatorUrl)));
     }
 
     if (m_impl->settings.isUdpHpDisabled)
