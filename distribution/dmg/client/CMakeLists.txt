@@ -31,7 +31,7 @@ nx_configure_directory(
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} "${releaseVersion.full}")
 nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file})
 
-add_custom_target(desktop_client_dmg ALL
+add_custom_target(distribution_dmg_client ALL
     DEPENDS desktop_client applauncher
         ${configured_files} ${copied_files} ${customization_files}
         ${customization_dir}/icons/macosx/logo.icns
