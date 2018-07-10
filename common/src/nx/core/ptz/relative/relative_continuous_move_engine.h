@@ -23,10 +23,14 @@ public:
         const std::shared_ptr<SequenceExecutor>& sequenceExecutor);
 
     virtual bool relativeMove(
-        const nx::core::ptz::Vector& direction,
-        const nx::core::ptz::Options& options) override;
+        const ptz::Vector& direction,
+        const ptz::Options& options,
+        RelativeMoveDoneCallback doneCallback) override;
 
-    virtual bool relativeFocus(qreal direction, const nx::core::ptz::Options& options) override;
+    virtual bool relativeFocus(
+        qreal direction,
+        const ptz::Options& options,
+        RelativeMoveDoneCallback doneCallback) override;
 
 private:
     std::shared_ptr<SequenceMaker> m_sequenceMaker;

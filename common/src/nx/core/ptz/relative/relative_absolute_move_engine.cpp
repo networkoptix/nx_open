@@ -1,5 +1,7 @@
 #include "relative_absolute_move_engine.h"
 
+#include <nx/utils/scope_guard.h>
+
 namespace nx {
 namespace core {
 namespace ptz {
@@ -10,9 +12,11 @@ RelativeAbsoluteMoveEngine::RelativeAbsoluteMoveEngine(QnAbstractPtzController* 
 }
 
 bool RelativeAbsoluteMoveEngine::relativeMove(
-    const nx::core::ptz::Vector& direction,
-    const nx::core::ptz::Options& options)
+    const ptz::Vector& direction,
+    const ptz::Options& options,
+    RelativeMoveDoneCallback doneCallback)
 {
+    const auto guard = makeScopeGuard([&doneCallback]() { doneCallback(); });
     const auto space = bestSpace(options);
     if (space == Qn::InvalidPtzCoordinateSpace)
         return false;
@@ -40,15 +44,17 @@ bool RelativeAbsoluteMoveEngine::relativeMove(
 }
 
 bool RelativeAbsoluteMoveEngine::relativeFocus(
-    qreal direction,
-    const nx::core::ptz::Options& options)
+    qreal /*direction*/,
+    const ptz::Options& /*options*/,
+    RelativeMoveDoneCallback doneCallback)
 {
     NX_ASSERT(false, lit("Absolute focus positioning is not supported"));
+    doneCallback();
     return false;
 }
 
 Qn::PtzCoordinateSpace RelativeAbsoluteMoveEngine::bestSpace(
-    const nx::core::ptz::Options& options) const
+    const ptz::Options& options) const
 {
     const auto capabilities = m_controller->getCapabilities(options);
     if (capabilities & Ptz::LogicalPositioningPtzCapability)

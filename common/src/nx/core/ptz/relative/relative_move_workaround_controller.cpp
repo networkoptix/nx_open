@@ -2,6 +2,8 @@
 #include "relative_continuous_move_engine.h"
 #include "relative_absolute_move_engine.h"
 
+#include <nx/utils/scope_guard.h>
+
 #include <map>
 
 namespace nx {
@@ -108,6 +110,13 @@ bool RelativeMoveWorkaroundController::relativeMove(
     const nx::core::ptz::Vector& direction,
     const nx::core::ptz::Options& options)
 {
+    auto guard = makeScopeGuard(
+        [this]()
+        {
+            if (m_relativeMoveDoneCallback)
+                m_relativeMoveDoneCallback();
+        });
+
     if (qFuzzyIsNull(direction))
         return true;
 
@@ -149,16 +158,39 @@ bool RelativeMoveWorkaroundController::relativeMove(
             return false;
     }
 
+    int enginesInvolved = !qFuzzyIsNull(absoluteVector) + !qFuzzyIsNull(continuousVector);
+    if (enginesInvolved == 0)
+        return true;
+
+    guard.disarm();
+    const auto id = createTrigger(
+        [this]()
+        {
+            if (m_relativeMoveDoneCallback)
+                m_relativeMoveDoneCallback();
+        },
+        enginesInvolved);
+
     if (!qFuzzyIsNull(absoluteVector))
     {
-        if (!m_absoluteMoveEngine->relativeMove(absoluteVector, options))
+        if (!m_absoluteMoveEngine->relativeMove(
+            absoluteVector,
+            options,
+            [this, id]() { trigger(id); }))
+        {
             return false;
+        }
     }
 
     if (!qFuzzyIsNull(continuousVector))
     {
-        if (!m_continuousMoveEngine->relativeMove(continuousVector, options))
+        if (!m_continuousMoveEngine->relativeMove(
+            continuousVector,
+            options,
+            [this, id]() { trigger(id); }))
+        {
             return false;
+        }
     }
 
     return true;
@@ -168,6 +200,13 @@ bool RelativeMoveWorkaroundController::relativeFocus(
     qreal direction,
     const nx::core::ptz::Options& options)
 {
+    auto guard = makeScopeGuard(
+        [this]()
+        {
+            if (m_relativeMoveDoneCallback)
+                m_relativeMoveDoneCallback();
+        });
+
     if (qFuzzyIsNull(direction))
         return true;
 
@@ -179,9 +218,21 @@ bool RelativeMoveWorkaroundController::relativeFocus(
         return base_type::relativeFocus(direction, options);
 
     if (isContinuous(extensionCapability))
-        return m_continuousMoveEngine->relativeFocus(direction, options);
+    {
+        guard.disarm(); //< Callback will be called by the movement engine.
+        return m_continuousMoveEngine->relativeFocus(
+            direction,
+            options,
+            m_relativeMoveDoneCallback);
+    }
 
     return false;
+}
+
+void RelativeMoveWorkaroundController::setRelativeMoveDoneCallback(
+    RelativeMoveDoneCallback callback)
+{
+    m_relativeMoveDoneCallback = callback;
 }
 
 Ptz::Capability RelativeMoveWorkaroundController::extendsWith(
@@ -190,6 +241,41 @@ Ptz::Capability RelativeMoveWorkaroundController::extendsWith(
 {
     const auto capabilities = base_type::getCapabilities(options);
     return extendsCapabilitiesWith(relativeCapability, capabilities);
+}
+
+QnUuid RelativeMoveWorkaroundController::createTrigger(
+    RelativeMoveDoneCallback callback,
+    int engineCount)
+{
+    QnMutexLocker lock(&m_triggerMutex);
+    while (true)
+    {
+        const auto id = QnUuid::createUuid();
+        if (m_callbackTriggers.find(id) != m_callbackTriggers.cend()) //< Just in case.
+            continue;
+
+        auto trigger = std::make_shared<CallbackTrigger>(callback, engineCount);
+        m_callbackTriggers[id] = trigger;
+
+        return id;
+    }
+}
+
+void RelativeMoveWorkaroundController::trigger(const QnUuid& id)
+{
+    QnMutexLocker lock(&m_triggerMutex);
+    auto itr = m_callbackTriggers.find(id);
+    if (itr == m_callbackTriggers.cend())
+        return;
+
+    auto trigger = itr->second;
+
+    m_triggerMutex.unlock();
+    const bool hasBeenTriggered = trigger->trigger();
+    m_triggerMutex.lock();
+
+    if (hasBeenTriggered)
+        m_callbackTriggers.erase(id);
 }
 
 } // namespace ptz
