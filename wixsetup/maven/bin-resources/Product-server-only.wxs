@@ -230,7 +230,7 @@
             <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 
-        <Media Id="1" Cabinet="srvmisc.cab" EmbedCab="yes" />
+        <Media Id="1" Cabinet="server_private.cab" EmbedCab="yes" />
 
         <Media Id="2" Cabinet="cmnff1.cab" EmbedCab="$(var.NoStrip)" />
         <Media Id="3" Cabinet="cmnff2.cab" EmbedCab="$(var.NoStrip)" />

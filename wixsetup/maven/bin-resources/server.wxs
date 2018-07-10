@@ -64,35 +64,7 @@
                     </RegistryKey>
                 </Component>
 
-                <Directory Id="ServerPlugins" Name="plugins">
-                    <Component Id="ServerRtspPlugin">
-                        <File Id="genericrtspplugin.dll" Name="genericrtspplugin.dll" Source="$(var.PluginsDir)\genericrtspplugin.dll" DiskId="10" />
-                    </Component>
-                    <Component Id="ServerHttpPlugin">
-                        <File Id="mjpg_link.dll" Name="mjpg_link.dll" Source="$(var.PluginsDir)\mjpg_link.dll" DiskId="10" />
-                    </Component>
-                    <Component Id="ServerMulticastPlugin">
-                        <File Id="generic_multicast_plugin.dll" Name="generic_multicast_plugin.dll" Source="$(var.PluginsDir)\generic_multicast_plugin.dll" DiskId="10" />
-                    </Component>
-                    <?if $(var.enable_hanwha) = "true"?>
-                        <Component Id="ServerHanwhaMetadataPlugin">
-                            <File Id="hanwha_metadata_plugin.dll" Name="hanwha_metadata_plugin.dll" Source="$(var.PluginsDir)\hanwha_metadata_plugin.dll" DiskId="10" />
-                        </Component>
-                    <?endif?>
-                    <Component Id="ServerDwMttMetadataPlugin">
-                        <File Id="dw_mtt_metadata_plugin.dll" Name="dw_mtt_metadata_plugin.dll" Source="$(var.PluginsDir)\dw_mtt_metadata_plugin.dll" DiskId="10" />
-                    </Component>
-                    <Component Id="ServerHikvisionMetadataPlugin">
-                        <File Id="hikvision_metadata_plugin.dll" Name="hikvision_metadata_plugin.dll" Source="$(var.PluginsDir)\hikvision_metadata_plugin.dll" DiskId="10" />
-                    </Component>
-                    <Component Id="ServerAxisMetadataPlugin">
-                        <File Id="axis_metadata_plugin.dll" Name="axis_metadata_plugin.dll" Source="$(var.PluginsDir)\axis_metadata_plugin.dll" DiskId="10" />
-                    </Component>
-                    <Component Id="ServerVcaMetadataPlugin">
-                        <File Id="vca_metadata_plugin.dll" Name="vca_metadata_plugin.dll" Source="$(var.PluginsDir)\vca_metadata_plugin.dll" DiskId="10" />
-                    </Component>
-                </Directory>
-
+                <Directory Id="plugins" Name="plugins"/>
                 <Directory Id="plugins_optional" Name="plugins_optional"/>
 
                 <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>
@@ -141,7 +113,7 @@
                 <File Id="nx_kit.dll" Name="nx_kit.dll" Source="$(var.SourceDir)/nx_kit.dll" DiskId="4" />
             </Component>
             <Component>
-                <File Id="nx_update.dll" Name="nx_update.dll" Source="$(var.SourceDir)/nx_update.dll" DiskId="10" />
+                <File Id="nx_update.dll" Name="nx_update.dll" Source="$(var.SourceDir)/nx_update.dll" DiskId="4" />
             </Component>
         </ComponentGroup>
 
@@ -242,15 +214,6 @@
         </ComponentGroup>
         <?endif?>
 
-        <ComponentGroup Id="plugins_optional" Directory="plugins_optional">
-            <Component Id="stub_metadata_plugin.dll">
-                <File Id="stub_metadata_plugin.dll"
-                    Source="$(var.plugins_optional_dir)\stub_metadata_plugin.dll"
-                    KeyPath="yes"
-                    DiskId="10" />
-            </Component>
-        </ComponentGroup>
-
 
         <Component Id="ServerBuildInfoTxt" Directory="MediaServerRootDir">
             <File Id="build_info.txt" Name="build_info.txt" Source="$(var.SourceDir)\..\build_info.txt" DiskId="6"/>
@@ -269,20 +232,11 @@
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerLibs"/>
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
-            <ComponentRef Id="ServerRtspPlugin"/>
-            <ComponentRef Id="ServerHttpPlugin"/>
-            <ComponentRef Id="ServerMulticastPlugin"/>
-            <?if $(var.enable_hanwha) = "true"?>
-                <ComponentRef Id="ServerHanwhaMetadataPlugin"/>
-            <?endif?>
-            <ComponentRef Id="ServerDwMttMetadataPlugin"/>
-            <ComponentRef Id="ServerHikvisionMetadataPlugin"/>
-            <ComponentRef Id="ServerAxisMetadataPlugin"/>
-            <ComponentRef Id="ServerVcaMetadataPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
             <ComponentGroupRef Id="ServerVoxComponent"/>
+            <ComponentGroupRef Id="plugins"/>
             <ComponentGroupRef Id="plugins_optional"/>
             <ComponentRef Id="ServerSigar"/>
 

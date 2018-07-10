@@ -12,6 +12,7 @@ Common cab files:
         nx_utils
         nx_sql
         nx_network
+        nx_update
         nx_vms_api
         udt
         nx_kit
@@ -40,6 +41,10 @@ Common cab files:
 Client cab files:
     1: clmisc.cab: Client Misc
         NovFileAssociation
+        Vox!!!
+        ClientQml
+        VC14Runtime!!!
+
     10: clqt1.cab: Client Qt Libraries 1
         Qt5OpenGL
         Qt5WebChannel
@@ -73,18 +78,12 @@ Client cab files:
         qt.conf
 
 Server cab files:
-    1: srvmisc.cab:
-        -
+    1: server_private.cab:
+        * plugins
+        * plugins_optional
+        Vox!!!
+        VC14Runtime!!!
     10: srvlib.cab:
-        genericrtspplugin
-        mjpg_link
-        generic_multicast_plugin
-        hanwha_metadata_plugin
-        dw_mtt_metadata_plugin
-        hikvision_metadata_plugin
-        axis_metadata_plugin
-        vca_metadata_plugin
-        stub_metadata_plugin
         sigar
         qtcore4
         vmaxproxy.exe
@@ -92,7 +91,6 @@ Server cab files:
         Qt5WebSockets
         acs_stream_source_mr
         VmaxProxyPid
-        nx_update
     11: srvexec.cab: Server Executables
         mediaserver.exe
 

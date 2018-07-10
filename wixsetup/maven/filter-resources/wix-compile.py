@@ -63,6 +63,8 @@ client_components = [
 
 server_components = [
     'ServerVox',
+    'server_plugins',
+    'server_plugins_optional',
     'Server',
     'traytool',
     'ServerVcrt14',
