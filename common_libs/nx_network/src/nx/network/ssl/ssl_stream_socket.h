@@ -32,8 +32,8 @@ public:
     void setFlagsForCallsInThread(std::thread::id threadId, int flags);
 
 private:
-    AbstractStreamSocket* m_streamSocket;
-    aio::StreamTransformingAsyncChannel* m_asyncSslChannel;
+    AbstractStreamSocket* m_streamSocket = nullptr;
+    aio::StreamTransformingAsyncChannel* m_asyncSslChannel = nullptr;
     mutable QnMutex m_mutex;
     std::map<std::thread::id, int> m_threadIdToFlags;
 
