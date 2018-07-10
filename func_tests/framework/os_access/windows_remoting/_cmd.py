@@ -1,7 +1,9 @@
 import base64
 import logging
+import xml.etree.ElementTree as ET
 from contextlib import closing
 from pprint import pformat
+from subprocess import list2cmdline
 
 import xmltodict
 from winrm.exceptions import WinRMTransportError
@@ -62,15 +64,37 @@ class _WinRMCommandOutcome(CommandOutcome):
 
 class _WinRMRun(Run):
     def __init__(self, protocol, shell_id, command, *arguments):
+         
         # Rewrite with bigger MaxEnvelopeSize, currently hardcoded to 150k, while 8M needed.
         self._protocol = protocol
         self._shell_id = shell_id
         _logger.getChild('command').debug(' '.join([command] + list(arguments)))
-        self._command_id = self._protocol.run_command(
-            self._shell_id,
-            command, arguments,
-            console_mode_stdin=False,
-            skip_cmd_shell=True)
+
+        req = {
+            'env:Envelope': self._protocol._get_soap_header(
+                resource_uri='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd',  # NOQA
+                action='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command',  # NOQA
+                shell_id=shell_id)}
+
+        # `WINRS_SKIP_CMD_SHELL` and `WINRS_CONSOLEMODE_STDIN` don't work.
+        # See: https://social.msdn.microsoft.com/Forums/azure/en-US/d089b9b6-f7d3-439f-94f3-6e75497d113a
+        # Commands are executed with `cmd /c`.
+        # `cmd /c` has its own special (but simple) quoting rules. Thoroughly read output of `cmd /?`.
+        # In short, quote normally, and then simply put quotes around.
+        # It would fail only if complete script is a path that is very unlikely.
+
+        req['env:Envelope']['env:Body'] = {
+            'rsp:CommandLine': {
+                'rsp:Command': '"' + list2cmdline([command] + list(arguments)) + '"',
+                }
+            }
+
+        res = self._protocol.send_message(xmltodict.unparse(req))
+        root = ET.fromstring(res)
+        self._command_id = next(
+            node for node in root.findall('.//*')
+            if node.tag.endswith('CommandId')).text
+
         # TODO: Prohibit writes when passing up.
         self._is_done = False
         self._outcome = None
