@@ -4,6 +4,8 @@
 #include <api/model/api_ioport_data.h>
 #include <core/ptz/ptz_mapper.h>
 #include <core/ptz/ptz_constants.h>
+#include <core/ptz/workaround_ptz_controller.h>
+#include <nx/core/ptz/override.h>
 #include <core/onvif/onvif_config_data.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/credentials.h>
@@ -36,6 +38,7 @@ public:
         registerKey<QnBounds>(Qn::LOW_STREAM_BITRATE_BOUNDS_PARAM_NAME);
 
         registerKey<std::vector<QnCameraAdvancedParameterOverload>>(Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
+        registerKey<nx::core::ptz::Override>(kPtzOverride);
     }
 
 protected:
