@@ -33,28 +33,6 @@ namespace hpm {
 
 static constexpr size_t kMaxBindRetryCount = 10;
 
-static network::SocketAddress findFreeTcpAndUdpLocalAddress()
-{
-    for (size_t attempt = 0; attempt < kMaxBindRetryCount; ++attempt)
-    {
-        const network::SocketAddress address(
-            network::HostAddress::localhost,
-            nx::utils::random::number<uint16_t>(5000, 50000));
-
-        network::TCPServerSocket tcpSocket(AF_INET);
-        if (!tcpSocket.bind(address))
-            continue;
-
-        network::UDPSocket udpSocket(AF_INET);
-        if (!udpSocket.bind(address))
-            continue;
-
-        return tcpSocket.getLocalAddress();
-    }
-
-    return network::SocketAddress::anyPrivateAddress;
-}
-
 MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     utils::test::TestWithTemporaryDirectory("hpm", QString()),
     m_testFlags(flags),
