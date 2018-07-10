@@ -296,7 +296,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         int bytesRead = m_RtpSession.readBinaryResponce(m_demuxedData, rtpChannelNum);
         if (bytesRead < 0 &&
-            SystemError::getLastOSErrorCode() == SystemError::timedOut &&
+            (SystemError::getLastOSErrorCode() == SystemError::timedOut ||
+             SystemError::getLastOSErrorCode() == SystemError::again) &&
             m_onSocketReadTimeoutCallback &&
             m_RtpSession.lastReceivedDataTimer().isValid() &&
             m_RtpSession.lastReceivedDataTimer().elapsed() < m_RtpSession.sessionTimeoutMs())

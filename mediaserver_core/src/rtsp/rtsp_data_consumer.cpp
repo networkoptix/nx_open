@@ -80,6 +80,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_videoChannels(1)
 {
     m_timer.start();
+    m_keepAliveTimer.restart();
     m_needKeyData.fill(false);
 }
 
@@ -725,6 +726,19 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
             mediaSocket->send(m_sendBuffer.data(), m_sendBuffer.size());
             m_sendBuffer.clear();
+
+            // get rtcp report to check keepalive timeout
+            int bytesRead = 0;
+            uint8_t buffer[1024];
+            do
+            {
+                bytesRead = trackInfo->rtcpSocket->recv(buffer, sizeof(buffer));
+                if (bytesRead > 0)
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    m_keepAliveTimer.restart();
+                }
+            } while(bytesRead > 0 && !m_needStop);
         }
     }
 
@@ -745,6 +759,13 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         m_lastLiveTime = media->timestamp;
 
     return true;
+}
+
+
+std::chrono::milliseconds QnRtspDataConsumer::timeFromLastReceiverReport()
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_keepAliveTimer.elapsed();
 }
 
 QnMutex* QnRtspDataConsumer::dataQueueMutex()
