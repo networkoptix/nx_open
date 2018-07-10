@@ -155,6 +155,31 @@ static const std::vector<RangeDescriptor> kRangeDescriptors = {
         "ptzcontrol/relative/control/Zoom",
         "ptzcontrol/absolute/control/Zoom"
     },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Pan",
+        "image/ptr/control/Pan"
+    },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Tilt",
+        "image/ptr/control/Tilt"
+    },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Zoom",
+        "image/focus/control/Zoom"
+    },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Rotate",
+        "image/ptr/control/Rotate"
+    },
+    {
+        core::ptz::Type::configurational,
+        "Continuous.Focus",
+        "image/focus/control/Focus"
+    }
 };
 
 struct PtzTraitDescriptor
@@ -1401,14 +1426,24 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
 {
     HanwhaPtzRangeMap result;
 
-    auto parameterIsOk =
+    auto isParameterOk =
         [](const auto& parameter)
         {
             if (parameter == boost::none)
                 return false;
 
-            const auto min = parameter->floatMin();
-            const auto max = parameter->floatMax();
+            const auto parameterType = parameter->type();
+            if (parameterType == HanwhaCgiParameterType::enumeration)
+                return true;
+
+            const double min = parameterType == HanwhaCgiParameterType::floating
+                ? parameter->floatMin()
+                : (float) parameter->min();
+
+            const double max = parameterType == HanwhaCgiParameterType::floating
+                ? parameter->floatMax()
+                : (float) parameter->max();
+
             return !qFuzzyEquals(min, max) && max > min;
         };
 
@@ -1421,7 +1456,7 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
             continue;
         }
         auto parameter = parameters.parameter(descriptor.cgiParameter);
-        if (!parameterIsOk(parameter))
+        if (!isParameterOk(parameter))
         {
             if (descriptor.alternativeCgiParameter.isEmpty())
                 continue;
@@ -1429,7 +1464,7 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
             const auto alternativeParameter = parameters.parameter(
                 descriptor.alternativeCgiParameter);
 
-            if (!parameterIsOk(alternativeParameter))
+            if (!isParameterOk(alternativeParameter))
                 continue;
 
             const auto range = alternativeParameter->floatMax() - alternativeParameter->floatMin();

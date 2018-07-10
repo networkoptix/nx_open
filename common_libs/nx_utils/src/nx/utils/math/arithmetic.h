@@ -14,7 +14,12 @@ enum class Sign
 template <typename NumberType>
 inline Sign sign(NumberType number)
 {
-    return (Sign) ((NumberType(0) - number) < (number < NumberType(0)));
+    if (number < 0)
+        return Sign::negative;
+    else if (number > 0)
+        return Sign::positive;
+
+    return Sign::zero;
 }
 
 } // namespace math
