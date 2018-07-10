@@ -1,0 +1,33 @@
+# This file is filtered by cmake; intended to be sourced into build_distribution.sh.
+
+CUSTOMIZATION="@deb.customization.company.name@"
+CUSTOMIZATION_DIR="@customization_dir@"
+CUSTOMIZATION_NAME="@customization@" #< E.g. for "networkoptix", the value is "default".
+FULL_CUSTOMIZATION="@company.name@"
+FULL_PRODUCT_NAME="@company.name@ @product.name@ Client.conf"
+FULL_APPLAUNCHER_NAME="@company.name@ Launcher.conf"
+VERSION="@releaseVersion@.@buildNumber@"
+RELEASE_VERSION="@releaseVersion@"
+
+CURRENT_BUILD_DIR="@CMAKE_CURRENT_BINARY_DIR@"
+BUILD_DIR="@CMAKE_BINARY_DIR@" #< Top-level build dir, containing "bin", "lib", etc.
+LOGS_DIR="@CMAKE_BINARY_DIR@/build_logs"
+DISTRIBUTION_OUTPUT_DIR="@distribution_output_dir@" #< If empty, CURRENT_BUILD_DIR will be used.
+QT_DIR="@QT_DIR@"
+SOURCE_DIR="@CMAKE_SOURCE_DIR@"
+
+COMPILER="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
+LDFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
+ARCH="@arch@"
+CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
+
+URI_PROTOCOL="@uri.protocol@"
+INSTALLER_NAME="@installer.name@"
+LANUCHER_VERSION_FILE="@launcher.version.file@"
+APPLAUNCHER_BINARY_NAME="@applauncher.binary.name@"
+CLIENT_BINARY_NAME="@client.binary.name@"
+CLIENT_HELP_PATH="@help_directory@/bin/help"
+ARTIFACT_NAME="@client_distribution_name@"
+UPDATE_NAME="@client_update_distribution_name@.zip"
+ARCHITECTURE="@os.arch@"

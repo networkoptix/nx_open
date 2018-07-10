@@ -232,21 +232,7 @@ if(withTests)
 endif()
 
 if(withDistributions)
-    if(WINDOWS)
-        add_subdirectory(wixsetup)
-    endif()
-
-    if(LINUX AND box STREQUAL "none") #< Desktop Linux.
-        add_subdirectory(debsetup)
-    endif()
-
-    if(MACOSX)
-        add_subdirectory(macsetup)
-    endif()
-
-    if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
-        add_subdirectory(edge_firmware)
-    endif()
+    add_subdirectory(distribution)
 endif()
 
 include(fix_qt_vars)
