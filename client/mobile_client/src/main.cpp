@@ -1,3 +1,4 @@
+#include <QtCore/QScopedPointer>
 #include <QtCore/QDir>
 #include <QtGui/QFont>
 #include <QtQml/QQmlEngine>
@@ -128,7 +129,7 @@ int runUi(QtSingleGuiApplication* application)
     engine->rootContext()->setContextObject(context);
 
     QQmlComponent mainComponent(engine, QUrl(lit("main.qml")));
-    QPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
+    QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
 
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(
             new QnTextureSizeHelper(mainWindow.data()));
@@ -198,8 +199,8 @@ int runUi(QtSingleGuiApplication* application)
             QDesktopServices::openUrl(initialIntentData);
     #endif
 
-    QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow,
-        [&context, mainWindow](const QString& serializedMessage)
+    QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow.data(),
+        [&context, &mainWindow](const QString& serializedMessage)
         {
             NX_LOG(lit("Processing application message BEGIN: %1")
                 .arg(serializedMessage), cl_logDEBUG1);
