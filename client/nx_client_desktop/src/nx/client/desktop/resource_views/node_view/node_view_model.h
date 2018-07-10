@@ -42,7 +42,7 @@ public:
     static NodePtr nodeFromIndex(const QModelIndex& index);
 
 signals:
-    void checkedChanged(const NodePath& path, Qt::CheckState state);
+    void checkedChanged(const ViewNodePath& path, Qt::CheckState state);
 
 private:
     struct Private;

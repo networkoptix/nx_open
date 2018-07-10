@@ -78,22 +78,22 @@ NodePtr ViewNode::nodeAt(int index) const
     return d->nodes.at(index);
 }
 
-NodePtr ViewNode::nodeAt(const NodePath& path)
+NodePtr ViewNode::nodeAt(const ViewNodePath& path)
 {
     auto currentNode = currentSharedNode().toStrongRef();
-    for (const int index: path->indicies())
+    for (const int index: path.indicies())
         currentNode = currentNode->nodeAt(index);
     return currentNode;
 }
 
-NodePath ViewNode::path()
+ViewNodePath ViewNode::path()
 {
     const auto parentNode = parent();
     if (!parentNode)
-        return NodePath(new ViewNodePath());
+        return ViewNodePath();
 
     auto currentPath = parentNode->path();
-    currentPath->appendIndex(parentNode->indexOf(currentSharedNode()));
+    currentPath.appendIndex(parentNode->indexOf(currentSharedNode()));
     return currentPath;
 }
 
@@ -181,9 +181,9 @@ WeakNodePtr ViewNode::currentSharedNode()
     return result.toWeakRef();
 }
 
-uint qHash(const nx::client::desktop::NodePath& path)
+uint qHash(const nx::client::desktop::ViewNodePath& path)
 {
-    return qHash(path->indicies());
+    return qHash(path.indicies());
 }
 
 } // namespace desktop

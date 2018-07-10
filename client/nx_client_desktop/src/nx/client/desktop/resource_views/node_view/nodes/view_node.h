@@ -41,8 +41,8 @@ public:
     void addChild(const NodePtr& child);
     NodePtr nodeAt(int index) const;
 
-    NodePtr nodeAt(const NodePath& path);
-    NodePath path(); //< TODO: think abount const
+    NodePtr nodeAt(const ViewNodePath& path);
+    ViewNodePath path(); //< TODO: think abount const
 
     int indexOf(const NodePtr& node) const;
 
@@ -69,7 +69,7 @@ private:
     const QScopedPointer<Private> d;
 };
 
-uint qHash(const nx::client::desktop::NodePath& path);
+uint qHash(const nx::client::desktop::ViewNodePath& path);
 
 } // namespace desktop
 } // namespace client

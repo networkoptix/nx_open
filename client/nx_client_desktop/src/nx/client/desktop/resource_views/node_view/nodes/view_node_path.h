@@ -2,8 +2,6 @@
 
 #include <QtCore/QList>
 
-#include <nx/client/desktop/resource_views/node_view/nodes/view_node_fwd.h>
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -21,7 +19,7 @@ public:
     void appendIndex(int index);
     int leafIndex() const;
 
-    NodePath parent() const;
+    ViewNodePath parentPath() const;
 
 private:
     Indicies m_indicies;

@@ -30,7 +30,7 @@ bool NodeViewState::checkable() const
     return checkableInternal(rootNode);
 }
 
-NodePtr NodeViewState::nodeByPath(const NodePath& path) const
+NodePtr NodeViewState::nodeByPath(const ViewNodePath& path) const
 {
     return rootNode ? rootNode->nodeAt(path) : NodePtr();
 }

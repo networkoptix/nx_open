@@ -19,7 +19,9 @@ public:
 
     const NodeViewState& state() const;
 
-    void setNodeChecked(const NodePath& path, Qt::CheckState checkedState);
+    void setNodeChecked(
+        const ViewNodePath& path,
+        Qt::CheckState checkedState);
 
     void applyPatch(const NodeViewStatePatch& state);
 

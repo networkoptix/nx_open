@@ -29,14 +29,14 @@ int ViewNodePath::leafIndex() const
     return m_indicies.isEmpty() ? -1 : m_indicies.last();
 }
 
-NodePath ViewNodePath::parent() const
+ViewNodePath ViewNodePath::parentPath() const
 {
     if (m_indicies.isEmpty())
-        return NodePath(new ViewNodePath());
+        return ViewNodePath();
 
     auto indicies = m_indicies;
     indicies.pop_back();
-    return NodePath(new ViewNodePath(indicies));
+    return ViewNodePath(indicies);
 }
 
 } // namespace desktop

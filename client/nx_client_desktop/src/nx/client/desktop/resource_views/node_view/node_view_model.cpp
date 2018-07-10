@@ -29,7 +29,6 @@ namespace desktop {
 struct NodeViewModel::Private
 {
     QModelIndex getModelIndex(const NodePtr& node, int column = node_view::nameColumn);
-    void addNode(const NodePath& parentPath);
 
     NodeViewModel* const q;
     NodeViewStore* const store;
@@ -48,13 +47,6 @@ QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int colum
     return q->index(parentNode->indexOf(node), column, parentIndex);
 }
 
-void NodeViewModel::Private::addNode(const NodePath& path)
-{
-    const auto index = getModelIndex(store->state().nodeByPath(path->parent()));
-    const int row = path->leafIndex();
-    const NodeViewModel::ScopedInsertRows insertGuard(q, index, row, row);
-}
-
 //-------------------------------------------------------------------------------------------------
 
 NodeViewModel::NodeViewModel(NodeViewStore* store, QObject* parent):
@@ -70,15 +62,18 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
 {
     // TODO: #future uses: add handling of tree structure changes
 
-
-    for (const auto dataDescription: patch.addedNodes)
-        d->addNode(dataDescription.first);
-
-    for (const auto dataDescription: patch.changedData)
+    for (const auto description: patch.addedNodes)
     {
-        const auto& path = dataDescription.first;
-        const auto& data = dataDescription.second;
-        const auto node = d->store->state().rootNode->nodeAt(path);
+        const auto& path = description.path;
+        const auto index = d->getModelIndex(d->store->state().nodeByPath(path.parentPath()));
+        const int row = path.leafIndex();
+        const NodeViewModel::ScopedInsertRows insertGuard(this, index, row, row);
+    }
+
+    for (const auto description: patch.changedData)
+    {
+        const auto& data = description.data;
+        const auto node = d->store->state().rootNode->nodeAt(description.path);
         if (!node)
             continue;
 

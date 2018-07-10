@@ -2,6 +2,7 @@
 
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
 
 namespace nx {
 namespace client {
@@ -13,7 +14,12 @@ struct NodeViewStatePatch
 
     NodeViewState apply(NodeViewState&& state) const;
 
-    using NodeDescription = QPair<NodePath, ViewNode::Data>;
+    struct NodeDescription
+    {
+        ViewNodePath path;
+        ViewNode::Data data;
+    };
+
     using DataList = QList<NodeDescription>;
     DataList addedNodes;
     DataList changedData;

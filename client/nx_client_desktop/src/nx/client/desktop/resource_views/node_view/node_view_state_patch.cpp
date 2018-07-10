@@ -11,7 +11,7 @@ void addNode(NodeViewStatePatch::DataList& data, const NodePtr& node)
         return;
 
     const auto path = node->path();
-    data.append(NodeViewStatePatch::NodeDescription(path, node->nodeData()));
+    data.append({path, node->nodeData()});
     for (const auto child: node->children())
         addNode(data, child);
 }
@@ -31,12 +31,10 @@ NodeViewStatePatch NodeViewStatePatch::fromRootNode(const NodePtr& node)
 
 NodeViewState NodeViewStatePatch::apply(NodeViewState&& state) const
 {
-    for (const auto dataDescription: addedNodes)
+    for (const auto description: addedNodes)
     {
-        const auto path = dataDescription.first;
-        const auto nodeData = dataDescription.second;
-        const auto node = ViewNode::create(nodeData);
-        if (path->isEmpty())
+        const auto node = ViewNode::create(description.data);
+        if (description.path.isEmpty())
         {
             if (state.rootNode)
             {
@@ -47,16 +45,14 @@ NodeViewState NodeViewStatePatch::apply(NodeViewState&& state) const
             state.rootNode = node;
             continue;
         }
-        const auto parentNode = state.nodeByPath(path->parent());
+        const auto parentNode = state.nodeByPath(description.path.parentPath());
         parentNode->addChild(node);
     }
 
-    for (const auto dataDescription: changedData)
+    for (const auto description: changedData)
     {
-        const auto& path = dataDescription.first;
-        const auto& nodeData = dataDescription.second;
-        if (const auto node = state.rootNode->nodeAt(path))
-            node->applyNodeData(nodeData);
+        if (const auto node = state.rootNode->nodeAt(description.path))
+            node->applyNodeData(description.data);
     }
     return state;
 }

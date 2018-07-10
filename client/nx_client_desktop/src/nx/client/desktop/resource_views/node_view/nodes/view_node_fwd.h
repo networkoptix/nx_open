@@ -13,7 +13,6 @@ class ViewNodePath;
 using NodePtr = QSharedPointer<ViewNode>;
 using WeakNodePtr = QWeakPointer<ViewNode>;
 using NodeList = QList<NodePtr>;
-using NodePath = QSharedPointer<ViewNodePath>;
 
 } // namespace desktop
 } // namespace client
