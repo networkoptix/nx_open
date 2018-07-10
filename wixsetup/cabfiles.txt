@@ -15,9 +15,9 @@ Common cab files:
         udt
         nx_kit
     5: cmnicu.cab: Common ICU
-        icudt58
-        icuin58
-        icuuc58
+        icudt60
+        icuin60
+        icuuc60
     6: cmnlib2.cab: Common Libraries 2
         quazip
         ssl_libeay32
@@ -44,11 +44,12 @@ Client cab files:
         Qt5WebChannel
         Qt5PrintSupport
         Qt5MultimediaWidgets
-        Qt5MultimediaQuick_p
+        Qt5MultimediaQuick
         Qt5Qml
         Qt5Quick
         Qt5QuickWidgets
-        Qt5LabsTemplates
+        Qt5QuickTemplates2
+        Qt5QuickControls2
     11: clqt2.cab: Client Qt Libraries 2
         Qt5WebKit
         Qt5WebKitWidgets

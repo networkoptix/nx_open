@@ -32,13 +32,13 @@
 
         <ComponentGroup Id="TrayToolQTLibraries" Directory="TrayToolRootDir">
             <Component>
-                <File Id="TrayToolicudt58.dll" Name="icudt58.dll" Source="$(var.QtDir)\icudt58.dll" DiskId="5" />
+                <File Id="TrayToolicudt60.dll" Name="icudt60.dll" Source="$(var.IcuDir)\icudt60.dll" DiskId="5" />
             </Component>
             <Component>
-                <File Id="TrayToolicuin58.dll" Name="icuin58.dll" Source="$(var.QtDir)\icuin58.dll" DiskId="5" />
+                <File Id="TrayToolicuin60.dll" Name="icuin60.dll" Source="$(var.IcuDir)\icuin60.dll" DiskId="5" />
             </Component>
             <Component>
-                <File Id="TrayToolicuuc58.dll" Name="icuuc58.dll" Source="$(var.QtDir)\icuuc58.dll" DiskId="5" />
+                <File Id="TrayToolicuuc60.dll" Name="icuuc60.dll" Source="$(var.IcuDir)\icuuc60.dll" DiskId="5" />
             </Component>
             <Component>
                 <File Id="TrayToolQt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="7" />

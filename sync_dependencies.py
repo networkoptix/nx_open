@@ -43,6 +43,7 @@ def determine_package_versions(
         "cassandra": "2.7.0",
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
+        "icu": "60.2",
         "deepstream": "0.1",
         "help": customization + "-3.2",
         "server-external": release_version,
@@ -94,7 +95,7 @@ def determine_package_versions(
         v["festival-vox"] = v["festival"]
 
     if platform == "windows" and debug:
-        for package in ("festival", "openal", "openssl", "sigar"):
+        for package in ("qt", "festival", "openal", "openssl", "sigar", "icu"):
             v[package] += "-debug"
 
     return v
@@ -154,6 +155,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("appserver-2.2.1")
 
     if platform == "windows":
+        sync("icu", path_variable="icu_directory")
         sync("directx")
         sync("vcredist-2015", path_variable="vcredist_directory")
         sync("vmaxproxy-2.1")

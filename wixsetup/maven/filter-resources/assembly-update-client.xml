@@ -60,10 +60,11 @@
                 <include>Qt5Concurrent.dll</include>
                 <include>Qt5Core.dll</include>
                 <include>Qt5Gui.dll</include>
-                <include>Qt5LabsTemplates.dll</include>
+                <include>Qt5QuickTemplates2.dll</include>
+                <include>Qt5QuickControls2.dll</include>
                 <include>Qt5Multimedia.dll</include>
                 <include>Qt5MultimediaWidgets.dll</include>
-                <include>Qt5MultimediaQuick_p.dll</include>
+                <include>Qt5MultimediaQuick.dll</include>
                 <include>Qt5Network.dll</include>
                 <include>Qt5OpenGL.dll</include>
                 <include>Qt5PrintSupport.dll</include>
