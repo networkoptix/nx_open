@@ -64,7 +64,7 @@ rm "$SRC/DS_Store"
 
 python macdeployqt.py "$APP_DIR" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
 
-if [ '${mac.skip.sign}' == 'false'  ]
+if [ '@mac.skip.sign@' == 'false'  ]
 then
     codesign -f -v --deep -s "@mac.sign.identity@" "$APP_DIR"
 fi
