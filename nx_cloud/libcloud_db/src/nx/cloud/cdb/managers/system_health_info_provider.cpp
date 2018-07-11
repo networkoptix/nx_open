@@ -56,7 +56,6 @@ void SystemHealthInfoProvider::getSystemHealthHistory(
         [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler),
             resultData = std::move(resultData)](
-                nx::sql::QueryContext* /*queryContext*/,
                 nx::sql::DBResult dbResult)
         {
             completionHandler(dbResultToApiResult(dbResult), std::move(*resultData));
@@ -80,7 +79,6 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
         std::bind(&dao::rdb::SystemHealthHistoryDataObject::insert,
             &m_systemHealthHistoryDataObject, _1, systemId, healthHistoryItem),
         [this, systemId, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-            nx::sql::QueryContext* /*queryContext*/,
             nx::sql::DBResult dbResult)
         {
             NX_LOGX(lm("Save system %1 history item finished with result %2")

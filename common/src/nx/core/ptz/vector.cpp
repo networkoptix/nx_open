@@ -257,14 +257,16 @@ Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType)
             std::clamp(pan, limits.minPan, limits.maxPan),
             std::clamp(tilt, limits.minTilt, limits.maxTilt),
             std::clamp(rotation, limits.minRotation, limits.maxRotation),
-            std::clamp(zoom, limits.minFov, limits.maxFov));
+            std::clamp(zoom, limits.minFov, limits.maxFov),
+            std::clamp(focus, limits.minFocus, limits.maxFocus));
     }
 
     return Vector(
             std::clamp(pan, limits.minPanSpeed, limits.maxPanSpeed),
             std::clamp(tilt, limits.minTiltSpeed, limits.maxTiltSpeed),
             std::clamp(rotation, limits.minRotationSpeed, limits.maxRotationSpeed),
-            std::clamp(zoom, limits.minZoomSpeed, limits.maxZoomSpeed));
+            std::clamp(zoom, limits.minZoomSpeed, limits.maxZoomSpeed),
+            std::clamp(focus, limits.minFocusSpeed, limits.maxFocusSpeed));
 }
 
 /*static*/ Vector Vector::rangeVector(const QnPtzLimits& limits, LimitsType limitsType)
@@ -275,14 +277,16 @@ Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType)
             limits.maxPan - limits.minPan,
             limits.maxTilt - limits.minTilt,
             limits.maxRotation - limits.minRotation,
-            limits.maxFov - limits.minFov);
+            limits.maxFov - limits.minFov,
+            limits.maxFocus - limits.minFocus);
     }
 
     return Vector(
         limits.maxPanSpeed - limits.minPanSpeed,
         limits.maxTiltSpeed - limits.minTiltSpeed,
         limits.maxRotationSpeed - limits.minRotationSpeed,
-        limits.maxZoomSpeed - limits.minZoomSpeed);
+        limits.maxZoomSpeed - limits.minZoomSpeed,
+        limits.maxFocusSpeed - limits.minFocusSpeed);
 }
 
 Vector operator*(const Vector& ptzVector, double scalar)

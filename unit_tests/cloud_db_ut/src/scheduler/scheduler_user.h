@@ -100,7 +100,7 @@ public:
                 completionHandler(taskId, task);
                 return nx::sql::DBResult::ok;
             },
-            [](nx::sql::QueryContext* /*queryContext*/, nx::sql::DBResult /*result*/) {});
+            [](nx::sql::DBResult /*result*/) {});
     }
 
     void subscribe(
@@ -133,9 +133,7 @@ public:
                 completionHandler(taskId);
                 return nx::sql::DBResult::ok;
             },
-            [](nx::sql::QueryContext* /*queryContext*/, nx::sql::DBResult /*result*/)
-            {
-            });
+            [](nx::sql::DBResult /*result*/) {});
     }
 
     void setShouldUnsubscribe(const QnUuid& taskId, UnsubscribeCb unsubscribeCb)

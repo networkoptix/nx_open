@@ -305,10 +305,10 @@ ModuleConnector::Module::Priority
     if (m_id.isNull())
         return kDefault;
 
-    if (host == nx::network::HostAddress::localhost || host.toString().toLower() == lit("localhost"))
+    if (host.isLocalHost())
         return kLocalHost;
 
-    if (host.isLocal())
+    if (host.isLocalNetwork())
         return kLocalNetwork;
 
     if (host.ipV4() || (bool) host.ipV6().first)
@@ -317,7 +317,7 @@ ModuleConnector::Module::Priority
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString()))
         return kCloud;
 
-    return kDns;
+    return kDns; // TODO: Consider to check if it is valid DNS.
 }
 
 QString ModuleConnector::Module::idForToStringFromPtr() const

@@ -52,15 +52,15 @@
       "description": "不受限權限包括共用及從雲端連接/斷開系統的能力"
     },
     "Viewer": {
-      "label": "瀏覽者",
+      "label": "瀏覽",
       "description": "可以瀏覽即時影像和回放錄影資料"
     },
     "Live Viewer": {
-      "label": "即時影像瀏覽者",
+      "label": "即時影像瀏覽",
       "description": "只能瀏覽即時影像"
     },
     "Advanced Viewer": {
-      "label": "進階瀏覽者",
+      "label": "進階瀏覽",
       "description": "可以瀏覽即時影像, 回放錄影資料, 設定攝影機, 控制 PTZ 等"
     },
     "Administrator": {
@@ -84,11 +84,11 @@
       "description": "不受限權限包括共用及從雲端連接/斷開系統的能力"
     },
     "viewer": {
-      "label": "瀏覽者",
+      "label": "瀏覽",
       "description": "可以瀏覽即時影像和回放錄影資料"
     },
     "liveViewer": {
-      "label": "即時影像瀏覽者",
+      "label": "即時影像瀏覽",
       "description": "只能瀏覽即時影像"
     },
     "advancedViewer": {
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "自訂",
-      "description": "使用 %PRODUCT_NAME% 用戶端應用程式可以設置自訂權限"
+      "description": "請使用 %VMS_NAME% 客戶端應用程式以設定自訂權限"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "此使用者具有管理員權限",
     "cantOpenClient": "%VMS_NAME% 應用程式未檢測到.<a href=\"/download\"> 下載</a>",
     "lostConnection": "與 {{systemName}} 的連線斷開了",
-    "thisSystem": "系統"
+    "thisSystem": "系統",
+    "oldSafariNotSupported": "不支持10歲以上的Safari版本"
   },
   "passwordRequirements": {
     "minLengthMessage": "密碼必須包含至少 8 個字元",
@@ -160,7 +161,7 @@
     "offline": "系統處於離線狀態",
     "openClient": "在 %VMS_NAME% 中打開",
     "openClientNoSystem": "開啟 %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "合併",
     "mergeSystemTitle": "合併系統",
     "confirmRenameTitle": "系統名稱",
     "confirmRenameAction": "儲存",

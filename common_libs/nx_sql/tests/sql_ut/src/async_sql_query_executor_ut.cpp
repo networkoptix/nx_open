@@ -12,8 +12,8 @@
 
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/sql_cursor.h>
-#include <nx/sql/request_executor_factory.h>
-#include <nx/sql/request_execution_thread.h>
+#include <nx/sql/detail/query_executor_factory.h>
+#include <nx/sql/detail/query_execution_thread.h>
 #include <nx/sql/query.h>
 
 #include "base_db_test.h"
@@ -43,21 +43,21 @@ void readSqlRecord(SqlQuery* query, Company* company)
 }
 
 //-------------------------------------------------------------------------------------------------
-// DbRequestExecutionThreadTestWrapper
+// QueryExecutionThreadTestWrapper
 
-class DbRequestExecutionThreadTestWrapper:
-    public DbRequestExecutionThread
+class QueryExecutionThreadTestWrapper:
+    public detail::QueryExecutionThread
 {
 public:
-    DbRequestExecutionThreadTestWrapper(
+    QueryExecutionThreadTestWrapper(
         const ConnectionOptions& connectionOptions,
-        QueryExecutorQueue* const queryExecutorQueue)
+        detail::QueryExecutorQueue* const queryExecutorQueue)
         :
-        DbRequestExecutionThread(connectionOptions, queryExecutorQueue)
+        detail::QueryExecutionThread(connectionOptions, queryExecutorQueue)
     {
     }
 
-    ~DbRequestExecutionThreadTestWrapper()
+    ~QueryExecutionThreadTestWrapper()
     {
         if (m_onDestructionHandler)
             m_onDestructionHandler();
@@ -99,7 +99,7 @@ public:
         using namespace std::placeholders;
 
         m_requestExecutorFactoryBak =
-            RequestExecutorFactory::instance().setCustomFunc(
+            detail::RequestExecutorFactory::instance().setCustomFunc(
                 std::bind(&DbAsyncSqlQueryExecutor::createConnection, this, _1, _2));
 
         connectionOptions().maxConnectionCount = kDefaultMaxConnectionCount;
@@ -107,7 +107,7 @@ public:
 
     ~DbAsyncSqlQueryExecutor()
     {
-        RequestExecutorFactory::instance().setCustomFunc(
+        detail::RequestExecutorFactory::instance().setCustomFunc(
             std::move(m_requestExecutorFactoryBak));
     }
 
@@ -177,7 +177,7 @@ protected:
                     queries.begin(), queries.end(),
                     [queryContext]()
                     {
-                        return std::make_unique<SqlQuery>(*queryContext->connection());
+                        return std::make_unique<SqlQuery>(queryContext->connection());
                     });
 
                 std::for_each(
@@ -193,9 +193,7 @@ protected:
                     queries.begin(), queries.end(),
                     [this, queryContext](std::unique_ptr<SqlQuery>& query)
                     {
-                        saveQueryResult(
-                            queryContext,
-                            query->next() ? DBResult::ok : DBResult::ioError);
+                        saveQueryResult(query->next() ? DBResult::ok : DBResult::ioError);
                     });
 
                 return DBResult::ok;
@@ -242,7 +240,7 @@ protected:
         asyncSqlQueryExecutor().executeSelect(
             [this, &queryExecuted](QueryContext* queryContext)
             {
-                SqlQuery query(*queryContext->connection());
+                SqlQuery query(queryContext->connection());
                 query.setForwardOnly(true);
                 query.prepare("SELECT * FROM company");
                 query.exec();
@@ -250,7 +248,7 @@ protected:
                 m_finishHangingQuery.get_future().wait();
                 return DBResult::ok;
             },
-            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1, _2));
+            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
 
         queryExecuted.get_future().wait();
     }
@@ -264,7 +262,7 @@ protected:
         asyncSqlQueryExecutor().executeUpdate(
             [this, &queryExecuted](QueryContext* queryContext)
             {
-                SqlQuery query(*queryContext->connection());
+                SqlQuery query(queryContext->connection());
                 query.prepare(
                     "INSERT INTO company (name, yearFounded) VALUES ('DurakTekstil', 1975)");
                 query.exec();
@@ -273,7 +271,7 @@ protected:
                 m_finishHangingQuery.get_future().wait();
                 return DBResult::ok;
             },
-            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1, _2));
+            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
 
         queryExecuted.get_future().wait();
     }
@@ -291,7 +289,7 @@ private:
     nx::utils::promise<void> m_finishHangingQuery;
     std::atomic<int> m_maxNumberOfConcurrentDataModificationRequests;
     std::atomic<int> m_concurrentDataModificationRequests;
-    RequestExecutorFactory::Function m_requestExecutorFactoryBak;
+    detail::RequestExecutorFactory::Function m_requestExecutorFactoryBak;
 
     void emulateQueryError(DBResult dbResultToEmulate)
     {
@@ -303,11 +301,11 @@ private:
         NX_GTEST_ASSERT_EQ(dbResultToEmulate, dbResult);
     }
 
-    std::unique_ptr<BaseRequestExecutor> createConnection(
+    std::unique_ptr<detail::BaseQueryExecutor> createConnection(
         const ConnectionOptions& connectionOptions,
-        QueryExecutorQueue* const queryExecutorQueue)
+        detail::QueryExecutorQueue* const queryExecutorQueue)
     {
-        auto connection = std::make_unique<DbRequestExecutionThreadTestWrapper>(
+        auto connection = std::make_unique<QueryExecutionThreadTestWrapper>(
             connectionOptions,
             queryExecutorQueue);
         if (m_eventsReceiver)
@@ -324,7 +322,7 @@ private:
         using namespace std::placeholders;
         asyncSqlQueryExecutor().executeSelect(
             std::bind(&DbAsyncSqlQueryExecutor::selectSomeData, this, _1),
-            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1, _2));
+            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
     }
 
     void issueUpdate()
@@ -332,12 +330,12 @@ private:
         using namespace std::placeholders;
         asyncSqlQueryExecutor().executeUpdate(
             std::bind(&DbAsyncSqlQueryExecutor::insertSomeData, this, _1),
-            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1, _2));
+            std::bind(&DbAsyncSqlQueryExecutor::saveQueryResult, this, _1));
     }
 
     DBResult selectSomeData(QueryContext* queryContext)
     {
-        SqlQuery query(*queryContext->connection());
+        SqlQuery query(queryContext->connection());
         query.setForwardOnly(true);
         query.prepare("SELECT * FROM company");
         query.exec();
@@ -356,7 +354,7 @@ private:
 
         auto scopedGuard = makeScopeGuard([this]() { --m_concurrentDataModificationRequests; });
 
-        SqlQuery query(*queryContext->connection());
+        SqlQuery query(queryContext->connection());
         query.prepare(
             lm("INSERT INTO company (name, yearFounded) VALUES ('%1', %2)")
                 .args(nx::utils::generateRandomName(7), nx::utils::random::number<int>(1, 2017)));
@@ -364,7 +362,7 @@ private:
         return DBResult::ok;
     }
 
-    void saveQueryResult(QueryContext* /*queryContext*/, DBResult dbResult)
+    void saveQueryResult(DBResult dbResult)
     {
         m_queryResults.push(dbResult);
     }

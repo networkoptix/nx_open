@@ -15,7 +15,7 @@ nx::sql::DBResult SystemSharingDataObject::insertOrReplaceSharing(
     nx::sql::QueryContext* const queryContext,
     const api::SystemSharingEx& sharing)
 {
-    QSqlQuery replaceSharingQuery(*queryContext->connection());
+    QSqlQuery replaceSharingQuery(*queryContext->connection()->qtSqlConnection());
     replaceSharingQuery.prepare(R"sql(
         REPLACE INTO system_to_account(
             account_id, system_id, access_role_id, user_role_id, custom_permissions,
@@ -126,7 +126,7 @@ nx::sql::DBResult SystemSharingDataObject::deleteSharing(
     const std::string& systemId,
     const nx::sql::InnerJoinFilterFields& filterFields)
 {
-    QSqlQuery removeSharingQuery(*queryContext->connection());
+    QSqlQuery removeSharingQuery(*queryContext->connection()->qtSqlConnection());
     QString sqlQueryStr = R"sql(
         DELETE FROM system_to_account WHERE system_id=:systemId
     )sql";
@@ -160,7 +160,8 @@ nx::sql::DBResult SystemSharingDataObject::calculateUsageFrequencyForANewSystem(
     const std::string& systemId,
     float* const newSystemInitialUsageFrequency)
 {
-    QSqlQuery calculateUsageFrequencyForTheNewSystem(*queryContext->connection());
+    QSqlQuery calculateUsageFrequencyForTheNewSystem(
+        *queryContext->connection()->qtSqlConnection());
     calculateUsageFrequencyForTheNewSystem.setForwardOnly(true);
     calculateUsageFrequencyForTheNewSystem.prepare(R"sql(
         SELECT MAX(usage_frequency) + 1
@@ -192,7 +193,8 @@ nx::sql::DBResult SystemSharingDataObject::updateUserLoginStatistics(
     std::chrono::system_clock::time_point lastloginTime,
     float usageFrequency)
 {
-    QSqlQuery updateUsageStatisticsQuery(*queryContext->connection());
+    QSqlQuery updateUsageStatisticsQuery(
+        *queryContext->connection()->qtSqlConnection());
     updateUsageStatisticsQuery.prepare(R"sql(
         UPDATE system_to_account
         SET last_login_time_utc=:last_login_time_utc, usage_frequency=:usage_frequency
@@ -244,7 +246,7 @@ nx::sql::DBResult SystemSharingDataObject::fetchUserSharings(
         sqlRequestStr += " AND " + filterStr;
     }
 
-    QSqlQuery selectSharingQuery(*queryContext->connection());
+    QSqlQuery selectSharingQuery(*queryContext->connection()->qtSqlConnection());
     selectSharingQuery.setForwardOnly(true);
     selectSharingQuery.prepare(sqlRequestStr);
     nx::sql::bindFields(&selectSharingQuery, filterFields);

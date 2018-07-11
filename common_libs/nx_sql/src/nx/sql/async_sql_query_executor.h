@@ -6,19 +6,16 @@
 #include <functional>
 #include <memory>
 
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlError>
-
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
-#include "base_request_executor.h"
+#include "detail/base_query_executor.h"
 #include "detail/cursor_handler.h"
 #include "detail/query_queue.h"
-#include "request_executor.h"
+#include "detail/query_executor.h"
 #include "types.h"
 #include "query.h"
 #include "query_context.h"
@@ -37,15 +34,15 @@ public:
 
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
     virtual void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
     virtual void executeSelect(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) = 0;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) = 0;
 
     //---------------------------------------------------------------------------------------------
     // Synchronous operations.
@@ -68,9 +65,7 @@ public:
                 queryFunc(queryContext);
                 return nx::sql::DBResult::ok;
             },
-            [&queryDonePromise](
-                nx::sql::QueryContext*,
-                nx::sql::DBResult dbResult)
+            [&queryDonePromise](nx::sql::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
@@ -101,9 +96,7 @@ public:
                 result = queryFunc(queryContext);
                 return nx::sql::DBResult::ok;
             },
-            [&queryDonePromise](
-                nx::sql::QueryContext*,
-                nx::sql::DBResult dbResult)
+            [&queryDonePromise](nx::sql::DBResult dbResult)
             {
                 queryDonePromise.set_value(dbResult);
             });
@@ -114,6 +107,20 @@ public:
         return result;
     }
 };
+
+template<typename InputData, typename OutputData> using UpdateQueryWithOutputFunc =
+    nx::utils::MoveOnlyFunc<
+        DBResult(nx::sql::QueryContext*, const InputData&, OutputData* const)>;
+
+template<typename InputData, typename OutputData> using UpdateQueryWithOutputCompletionHandler =
+    nx::utils::MoveOnlyFunc<
+        void(DBResult, InputData, OutputData)>;
+
+template<typename InputData> using UpdateQueryFunc =
+    nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*, const InputData&)>;
+
+template<typename InputData> using UpdateQueryCompletionHandler =
+    nx::utils::MoveOnlyFunc<void(DBResult, InputData)>;
 
 /**
  * Executes DB request asynchronously.
@@ -135,15 +142,15 @@ public:
      */
     virtual void executeUpdate(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override;
 
     virtual void executeUpdateWithoutTran(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override;
 
     virtual void executeSelect(
         nx::utils::MoveOnlyFunc<DBResult(nx::sql::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, DBResult)> completionHandler) override;
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler) override;
 
     virtual DBResult execSqlScriptSync(
         const QByteArray& script,
@@ -181,15 +188,11 @@ public:
      */
     template<typename InputData, typename OutputData>
     void executeUpdate(
-        nx::utils::MoveOnlyFunc<
-            DBResult(nx::sql::QueryContext*, const InputData&, OutputData* const)
-        > dbUpdateFunc,
+        UpdateQueryWithOutputFunc<InputData, OutputData> dbUpdateFunc,
         InputData input,
-        nx::utils::MoveOnlyFunc<
-            void(nx::sql::QueryContext*, DBResult, InputData, OutputData)
-        > completionHandler)
+        UpdateQueryWithOutputCompletionHandler<InputData, OutputData> completionHandler)
     {
-        scheduleQuery<UpdateWithOutputExecutor<InputData, OutputData>>(
+        scheduleQuery<detail::UpdateWithOutputExecutor<InputData, OutputData>>(
             std::move(dbUpdateFunc),
             std::move(completionHandler),
             std::move(input));
@@ -200,13 +203,11 @@ public:
      */
     template<typename InputData>
     void executeUpdate(
-        nx::utils::MoveOnlyFunc<
-            DBResult(nx::sql::QueryContext*, const InputData&)> dbUpdateFunc,
+        UpdateQueryFunc<InputData> dbUpdateFunc,
         InputData input,
-        nx::utils::MoveOnlyFunc<
-            void(nx::sql::QueryContext*, DBResult, InputData)> completionHandler)
+        UpdateQueryCompletionHandler<InputData> completionHandler)
     {
-        scheduleQuery<UpdateExecutor<InputData>>(
+        scheduleQuery<detail::UpdateExecutor<InputData>>(
             std::move(dbUpdateFunc),
             std::move(completionHandler),
             std::move(input));
@@ -254,15 +255,15 @@ private:
     struct CursorProcessorContext
     {
         detail::CursorHandlerPool cursorContextPool;
-        std::unique_ptr<BaseRequestExecutor> processingThread;
+        std::unique_ptr<detail::BaseQueryExecutor> processingThread;
     };
 
     const ConnectionOptions m_connectionOptions;
     mutable QnMutex m_mutex;
     detail::QueryQueue m_queryQueue;
-    std::vector<std::unique_ptr<BaseRequestExecutor>> m_dbThreadPool;
+    std::vector<std::unique_ptr<detail::BaseQueryExecutor>> m_dbThreadPool;
     nx::utils::thread m_dropConnectionThread;
-    nx::utils::SyncQueue<std::unique_ptr<BaseRequestExecutor>> m_connectionsToDropQueue;
+    nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
     bool m_terminated;
     StatisticsCollector* m_statisticsCollector;
 
@@ -272,20 +273,20 @@ private:
     bool isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const;
 
     void openNewConnection(const QnMutexLockerBase& /*lk*/);
-    std::unique_ptr<BaseRequestExecutor> createNewConnectionThread(
+    std::unique_ptr<detail::BaseQueryExecutor> createNewConnectionThread(
         const QnMutexLockerBase& /*lock*/,
         detail::QueryQueue* const queryQueue);
-    std::unique_ptr<BaseRequestExecutor> createNewConnectionThread(
+    std::unique_ptr<detail::BaseQueryExecutor> createNewConnectionThread(
         const QnMutexLockerBase& /*lock*/,
         const ConnectionOptions& connectionOptions,
         detail::QueryQueue* const queryQueue);
 
     void dropExpiredConnectionsThreadFunc();
-    void reportQueryCancellation(std::unique_ptr<AbstractExecutor>);
-    void onConnectionClosed(BaseRequestExecutor* const executorThreadPtr);
+    void reportQueryCancellation(std::unique_ptr<detail::AbstractExecutor>);
+    void onConnectionClosed(detail::BaseQueryExecutor* const executorThreadPtr);
     void dropConnectionAsync(
         const QnMutexLockerBase&,
-        BaseRequestExecutor* const executorThreadPtr);
+        detail::BaseQueryExecutor* const executorThreadPtr);
 
     template<
         typename Executor, typename UpdateFunc,

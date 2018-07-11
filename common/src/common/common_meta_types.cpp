@@ -105,6 +105,8 @@
 #include <nx/vms/common/p2p/downloader/file_information.h>
 #include <nx/vms/api/metatypes.h>
 
+#include <nx/core/ptz/override.h>
+
 namespace {
     bool qn_commonMetaTypes_initialized = false;
 }
@@ -326,6 +328,7 @@ void QnCommonMetaTypes::initialize()
     QnJsonSerializer::registerSerializer<TwoWayAudioParams>();
     QnJsonSerializer::registerSerializer<QnBounds>();
     QnJsonSerializer::registerSerializer<std::vector<QString>>();
+    QnJsonSerializer::registerSerializer<nx::core::ptz::Override>();
 
     QnJsonSerializer::registerSerializer<std::vector<QnCameraAdvancedParameterOverload>>();
     QnJsonSerializer::registerSerializer<nx::media::CameraTraits>();

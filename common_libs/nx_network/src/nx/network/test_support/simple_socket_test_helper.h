@@ -234,7 +234,7 @@ void socketTransferSync(
     nx::utils::thread clientThread(
         [endpointToConnectTo, &testMessage, &clientMaker]()
         {
-            const auto clientCount = testClientCount();
+            const auto clientCount = 1/*testClientCount()*/;
             for (size_t i = 0; i != clientCount; ++i)
             {
                 auto client = clientMaker();

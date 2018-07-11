@@ -8,4 +8,4 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Orientation)
 
 } // namespace Qt
 
-QN_FUSION_DECLARE_FUNCTIONS(Qt::Orientations, (metatype)(numeric)(lexical))
+QN_FUSION_DECLARE_FUNCTIONS(Qt::Orientations, (numeric)(lexical))

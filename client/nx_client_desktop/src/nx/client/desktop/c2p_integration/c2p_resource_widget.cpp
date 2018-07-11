@@ -36,7 +36,7 @@ C2pResourceWidget::C2pResourceWidget(
         });
 }
 
-void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestamp)
+void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestampSec)
 {
     QnVirtualCameraResourceList cameras;
     for (auto name: cameraNames.split(L',', QString::SplitBehavior::SkipEmptyParts))
@@ -51,13 +51,19 @@ void C2pResourceWidget::c2pplayback(const QString& cameraNames, int timestamp)
             cameras.push_back(camera);
         }
     }
+
+    const std::chrono::seconds timestamp(timestampSec);
+
     if (!cameras.empty())
         resetC2pLayout(cameras, timestamp);
 }
 
 void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& cameras,
-     qint64 timestampMs)
+     std::chrono::milliseconds timestamp)
 {
+    qDebug() << "timestamp" << timestamp.count()
+        << QDateTime::fromMSecsSinceEpoch(timestamp.count()).toString("dd hh:mm::ss");
+
     const auto currentItemId = this->item()->uuid();
     auto currentLayout = item()->layout()->resource();
     auto existingItems = currentLayout->getItems();
@@ -101,7 +107,9 @@ void C2pResourceWidget::resetC2pLayout(const QnVirtualCameraResourceList& camera
     {
         if (item.uuid == currentItemId)
             continue;
-        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole, timestampMs);
+
+        qnResourceRuntimeDataManager->setLayoutItemData(item.uuid, Qn::ItemTimeRole,
+            timestamp.count());
     }
 }
 

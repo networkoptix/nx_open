@@ -235,7 +235,7 @@ void Controller::initializeDataSynchronizationEngine()
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
                 return nx::sql::DBResult::ok;
             },
-            [](nx::sql::QueryContext*, nx::sql::DBResult, int) {});
+            [](nx::sql::DBResult, int) {});
 }
 
 } // namespace cdb

@@ -1085,9 +1085,10 @@ bool QnServerDb::getMaxBookmarksMaxDurationMs(
 
 bool QnServerDb::getBookmarks(
     const QList<QnUuid>& cameraIds,
-    const QnCameraBookmarkSearchFilter& filter,
+    const QnCameraBookmarkSearchFilter& constFilter,
     QnCameraBookmarkList& result)
 {
+    QnCameraBookmarkSearchFilter filter(constFilter);
     bool isRangeClosed = filter.startTimeMs.count() > 0
         && filter.endTimeMs.count() < std::numeric_limits<qint64>().max();
     if (isRangeClosed)
@@ -1097,31 +1098,35 @@ bool QnServerDb::getBookmarks(
         // Optimization. Do two separate SQL requests to force SqLite use index.
         bookmarks.resize(2);
 
-        qint64 maxDurationMs = 0;
-        if (!getMaxBookmarksMaxDurationMs(cameraIds, filter, &maxDurationMs))
+        // Bookmarks that starts before startTime but ends after startTime
+        if (!getBookmarksInternal(cameraIds, filter, bookmarks[1], /*isAdditionRangeRequest*/ true))
             return false;
 
-        QnCameraBookmarkList result2;
-        QnCameraBookmarkSearchFilter filter2(filter);
-        filter2.endTimeMs = filter.startTimeMs;
-        filter2.startTimeMs = milliseconds(filter.startTimeMs.count() - maxDurationMs);
+        QnCameraBookmark::sortBookmarks(
+            commonModule(),
+            bookmarks[1],
+            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
 
-        if (!getBookmarksInternal(cameraIds, filter, bookmarks[0]))
-            return false;
+        // Bookmarks between start end end time
+        bool needSecondRequest = true;
+        if (filter.limit > 0)
+        {
+            filter.limit -= bookmarks[1].size();
+            if (filter.limit <= 0)
+                needSecondRequest = false;
+        }
 
-        if (!getBookmarksInternal(cameraIds, filter2, bookmarks[1]))
+        if (!getBookmarksInternal(cameraIds, filter, bookmarks[0], /*isAdditionRangeRequest*/ false))
             return false;
 
         result = QnCameraBookmark::mergeCameraBookmarks(
             commonModule(),
             bookmarks,
-            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime),
-            QnBookmarkSparsingOptions(),
-            filter.limit);
+            QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime));
     }
     else
     {
-        if (!getBookmarksInternal(cameraIds, filter, result))
+        if (!getBookmarksInternal(cameraIds, filter, result, false))
             return false;
     }
 
@@ -1133,7 +1138,8 @@ bool QnServerDb::getBookmarks(
 bool QnServerDb::getBookmarksInternal(
     const QList<QnUuid>& cameraIds,
     const QnCameraBookmarkSearchFilter& filter,
-    QnCameraBookmarkList& result)
+    QnCameraBookmarkList& result,
+    bool isAdditionRangeRequest)
 {
     QString queryTemplate = QString(R"(
         SELECT
@@ -1141,7 +1147,7 @@ bool QnServerDb::getBookmarksInternal(
             name as name,
             start_time as startTimeMs,
             duration as durationMs,
-            start_time + duration as endTimeMs,
+            end_time as endTimeMs,
             description as description,
             timeout as timeout,
             camera_guid as cameraId,
@@ -1150,8 +1156,12 @@ bool QnServerDb::getBookmarksInternal(
             (SELECT group_concat(name) FROM bookmark_tags t where t.bookmark_guid = guid) as tags
         FROM bookmarks
         WHERE %1
-        ORDER BY camera_guid, start_time
+        ORDER BY camera_guid,
     )");
+    if (isAdditionRangeRequest)
+        queryTemplate += " end_time ";
+    else
+        queryTemplate += " start_time ";
 
     QList<QVariant> bindings;
 
@@ -1173,17 +1183,24 @@ bool QnServerDb::getBookmarksInternal(
 
     if (filter.startTimeMs.count() > 0 && filter.endTimeMs.count() < std::numeric_limits<qint64>().max())
     {
-        addFilter("start_time between ? AND ?",
-            qint64(filter.startTimeMs.count()),
-            qint64(filter.endTimeMs.count()));
+        if (isAdditionRangeRequest)
+        {
+            addFilter("end_time >= ? AND start_time <= ?",
+                (qint64) filter.startTimeMs.count(), (qint64) filter.endTimeMs.count());
+        }
+        else
+        {
+            addFilter("start_time between ? AND ?",
+                (qint64) filter.startTimeMs.count(), (qint64) filter.endTimeMs.count());
+        }
     }
     else if (filter.endTimeMs.count() < std::numeric_limits<qint64>().max())
     {
-        addFilter("start_time <= ?", qint64(filter.endTimeMs.count()));
+        addFilter("start_time <= ?", (qint64) filter.endTimeMs.count());
     }
     else if (filter.startTimeMs.count() > 0)
     {
-        addFilter("start_time + duration  >= ?", qint64(filter.startTimeMs.count()));
+        addFilter("start_time + duration  >= ?", (qint64) filter.startTimeMs.count());
     }
 
     if (!filter.text.isEmpty())
@@ -1310,8 +1327,13 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
         static const auto kUpdateQueryText =
             R"(
                 UPDATE bookmarks
-                SET camera_guid = :cameraId, start_time = :startTimeMs,
-                    duration = :durationMs, name = :name, description = :description,
+                SET
+                    camera_guid = :cameraId,
+                    start_time = :startTimeMs,
+                    duration = :durationMs,
+                    end_time = :startTimeMs + :durationMs,
+                    name = :name,
+                    description = :description,
                     timeout = :timeout
                 WHERE guid = :guid)";
 
@@ -1319,9 +1341,9 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
             R"(
                 INSERT
                 INTO bookmarks
-                    (guid, camera_guid, start_time, duration, name, description, timeout,
+                    (guid, camera_guid, start_time, duration, end_time, name, description, timeout,
                         creator_guid, created)
-                VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :name, :description, :timeout,
+                VALUES (:guid, :cameraId, :startTimeMs, :durationMs, :startTimeMs + :durationMs, :name, :description, :timeout,
                     :creatorId, :creationTimeStampMs)
             )";
 

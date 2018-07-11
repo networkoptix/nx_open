@@ -251,6 +251,7 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
         qreal speed = value.toFloat(&ok);
         if (ok)
         {
+            speed *= 0.01;
             serverConnection->ptzContinuousFocusAsync(m_camera, speed, options, this, slot);
             qDebug() << "Sending custom_focus(" << speed << ")";
         }

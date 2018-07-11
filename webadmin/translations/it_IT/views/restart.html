@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h3 class="modal-title">Riavvio del sistema...</h3>
+</div>
+
+<form class="form" role="form" id="restartDialog">
+    <div class="col-sm-12">
+        <p>Il riavvio del sistema potrebbe richiedere del tempo. Successivamente la pagina verrà aggiornata automaticamente.</p>
+        <uib-progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</uib-progressbar>
+
+        <p>Se non succede niente per un po ', si prega di aggiornare la pagina manualmente</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Ricaricare</button>
+    </div>
+
+</form>

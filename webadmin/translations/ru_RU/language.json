@@ -174,52 +174,5 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web-интерфейс"
-    },
-    "common": {
-        "voiceCommands": {
-            "search": "find + [text for searchbar]",
-            "pause": "пауза",
-            "help": "help | show commands",
-            "collapse all servers": "свернуть все серверы",
-            "collapse server": "collapse server + [server name]",
-            "play": "воспроизвести",
-            "clear search": "очистить поиск",
-            "live": "go to live | show me live",
-            "expand all servers": "развернуть все серверы",
-            "stop listening": "прекратить прослушивание",
-            "expand server": "expand server + [server name]",
-            "view": "view + [camera name]"
-        },
-        "systemOffline": "Система не в сети",
-        "cameraLinks": {
-            "copyToClipboard": "копировать в буфер",
-            "highStream": "Выс. кач-во",
-            "copyDefaultText": "копировать",
-            "unknown": "Неизвестный",
-            "lowStream": "Низ. кач-во",
-            "transcoding": "Перекодирование",
-            "copyActiveText": "скопировано в буфер обмена"
-        },
-        "searchCamPlaceholder": "Поиск",
-        "cameraStates": {
-            "noFormat": "Этот браузер не поддерживает воспроизведение видео с этой камеры.",
-            "ieWin10": "Пожалуйста, используйте браузеры Microsoft Edge или Google Chrome.",
-            "iosVideoTooLarge": "iOS не поддерживает видео с разрешением больше чем fullHD (2MP: 1920x1080).",
-            "unauthorized": "Требуется аутентификация",
-            "ubuntuNX": "Этот обозреватель не поддерживает воспроизведение видео с серверов на базе ARM. Требуется обозреватель Chromium.",
-            "ieNoWebm": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
-            "flashOrWebmRequired": "Видео не может быть воспроизведено. Возможно, требуется <a href='https://get.adobe.com/flashplayer/' target='_blank'>установить Adobe Flash</a> или <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для воспроизведения видео с серверов в Internet Explorer.",
-            "noArmSupport": "Этот браузер или устройство не поддерживает воспроизведение видео с серверов на базе ARM.",
-            "error": "Ошибка",
-            "offline": "Не в сети",
-            "noData": "Нет данных",
-            "flashRequired": "Пожалуйста, <a href='https://get.adobe.com/flashplayer/' target='_blank'>установите Adobe Flash</a> для воспроизведения видео."
-        },
-        "chromeCastWarning": "Chromecast является ресурсоемким и может вызывать проблемы на вашем сервере.",
-        "resolution": {
-            "high": "Высокая",
-            "auto": "Авто",
-            "low": "Низкая"
-        }
     }
 }

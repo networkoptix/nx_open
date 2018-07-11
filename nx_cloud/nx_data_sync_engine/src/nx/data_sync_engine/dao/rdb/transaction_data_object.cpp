@@ -14,7 +14,7 @@ nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
     nx::sql::QueryContext* queryContext,
     const TransactionData& tran)
 {
-    QSqlQuery saveTranQuery(*queryContext->connection());
+    QSqlQuery saveTranQuery(*queryContext->connection()->qtSqlConnection());
     saveTranQuery.prepare(
         R"sql(
         REPLACE INTO transaction_log(system_id, peer_guid, db_guid, sequence,
@@ -49,7 +49,7 @@ nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
     const nx::String& systemId,
     quint64 newValue)
 {
-    QSqlQuery saveSystemTimestampSequence(*queryContext->connection());
+    QSqlQuery saveSystemTimestampSequence(*queryContext->connection()->qtSqlConnection());
     saveSystemTimestampSequence.prepare(
         R"sql(
         REPLACE INTO transaction_source_settings(system_id, timestamp_hi) VALUES (?, ?)
@@ -77,7 +77,7 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     std::int64_t maxSequence,
     std::vector<dao::TransactionLogRecord>* const transactions)
 {
-    QSqlQuery fetchTransactionsOfAPeerQuery(*queryContext->connection());
+    QSqlQuery fetchTransactionsOfAPeerQuery(*queryContext->connection()->qtSqlConnection());
     fetchTransactionsOfAPeerQuery.prepare(
         R"sql(
             SELECT tran_data, tran_hash, timestamp, sequence

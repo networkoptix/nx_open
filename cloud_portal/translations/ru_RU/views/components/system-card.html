@@ -7,7 +7,7 @@
             <button class="btn btn-default" ng-click="rename()">Переименовать систему</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Объединить с другой системой</button>
         </p>
         <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()">Отсоединить от
@@ -33,19 +33,18 @@
 <div class="panel panel-default" ng-if="currentlyMerging">
     <div class="panel-body" ng-if="isMaster && system.isMine">
         <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
+            объединяется с этой системой</div>
         <hr></hr>
-        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+        <div class="merge-info-text">В зависимости от размера базы данных может потребоваться до нескольких часов</div>
     </div>
     <div class="panel-body" ng-if="!isMaster || !system.isMine">
-        <div>This system is being merged to
+        <div>Эта система объединяется с 
             <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr></hr>
         <div class="merge-info-text">
-            <p>Depending of the size of the database it may take up to several hours.</p>
-            <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System, and this system will be deleted.</p>
+            <p>В зависимости от размера базы данных может потребоваться до нескольких часов.</p>
+            <p>До окончания объединения вы можете войти в эту систему и посмотреть видео, но не можете изменить какие-либо настройки.</p>
+            <p>После завершения объединения все пользователи и камеры из этой системы станут доступны в <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. Система, и эта система будет удалены.</p>
         </div>
     </div>
 </div>

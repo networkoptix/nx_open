@@ -15,16 +15,11 @@ namespace core_ptz = nx::core::ptz;
 
 namespace {
 
-static const QString kOverride("ptzOverride");
-
-static const QString kOperationalPtzCapabilitiesOverride("operationalPtzCapabilities");
-static const QString kConfigurationalPtzCapabilitiesOverride("configurationalPtzCapabilities");
-
 core_ptz::Override loadOverride(const QnVirtualCameraResourcePtr& camera)
 {
     core_ptz::Override ptzOverride;
     const auto resourceData = qnStaticCommon->dataPool()->data(camera);
-    resourceData.value<core_ptz::Override>(kOverride, &ptzOverride);
+    resourceData.value<core_ptz::Override>(kPtzOverride, &ptzOverride);
 
     const std::map<QString, decltype(core_ptz::OverridePart::capabilitiesOverride)> overrides = {
         {kOperationalPtzCapabilitiesOverride, ptzOverride.operational.capabilitiesOverride},

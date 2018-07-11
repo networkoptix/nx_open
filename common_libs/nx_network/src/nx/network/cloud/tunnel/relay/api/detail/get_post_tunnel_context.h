@@ -17,6 +17,8 @@ public:
     std::unique_ptr<network::AbstractStreamSocket> connection;
     nx::Buffer serializedOpenUpChannelRequest;
 
+    virtual ~TunnelContext() = default;
+
     virtual bool parseOpenDownChannelResponse(
         const network::http::Response& response) = 0;
 

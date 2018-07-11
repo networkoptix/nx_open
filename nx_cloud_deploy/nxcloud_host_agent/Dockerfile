@@ -7,6 +7,7 @@ FROM python:3.6-alpine3.7
 COPY --from=builder /go/bin/docker-credential-ecr-login /usr/local/bin/
 COPY docker/pip.conf /root/.config/pip/pip.conf
 
+COPY docker/config.json /root/.docker/config.json
 COPY docker/aws_config /root/.aws/config
 COPY docker/aws_credentials /root/.aws/credentials
 COPY nxcloud_run_config.yaml /root/nxcloud_run_config.yaml

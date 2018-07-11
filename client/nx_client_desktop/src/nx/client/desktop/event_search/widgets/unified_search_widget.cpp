@@ -143,13 +143,21 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->showPreviewsButton->setChecked(ui->ribbon->previewsEnabled());
     ui->showInfoButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
     ui->showPreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
-    ui->showInfoButton->setIcon(qnSkin->icon(lit("text_buttons/text.png")));
-    ui->showPreviewsButton->setIcon(qnSkin->icon(lit("text_buttons/image.png")));
+    ui->showInfoButton->setIcon(qnSkin->icon(
+        "text_buttons/text.png", "text_buttons/text_selected.png"));
+    ui->showPreviewsButton->setIcon(qnSkin->icon(
+        "text_buttons/image.png", "text_buttons/image_selected.png"));
 
     connect(ui->showInfoButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setFootersEnabled);
     connect(ui->showPreviewsButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setPreviewsEnabled);
+
+    ui->ribbon->setViewportMargins(0, style::Metrics::kStandardPadding);
+
+    ui->ribbon->scrollBar()->ensurePolished();
+    setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
+        colorTheme()->color("dark5"));
 }
 
 UnifiedSearchWidget::~UnifiedSearchWidget()

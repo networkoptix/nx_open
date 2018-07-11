@@ -68,6 +68,10 @@ class FileSystemPath(PurePath):
             self.rmtree()
         self.mkdir(parents=True)
 
+    def ensure_file_is_missing(self):
+        if self.exists():
+            self.unlink()
+
     @classmethod
     def tmp_file(cls, base_name):
         random_name = os.urandom(6).encode('hex')

@@ -72,7 +72,9 @@ public:
      * Injects mediator url.
      * As a result, no mediator url resolution will happen.
      */
-    void mockupMediatorUrl(const utils::Url &mediatorUrl);
+    void mockupMediatorUrl(
+        const utils::Url& mediatorUrl,
+        const network::SocketAddress stunUdpEndpoint);
 
     void setSystemCredentials(boost::optional<SystemCredentials> value);
     virtual boost::optional<SystemCredentials> getSystemCredentials() const override;

@@ -29,7 +29,7 @@ public:
         const QnSecurityCamResourcePtr& camResource,
         qint64 startTimestamp,
         unsigned int maxChunkNumberInPlaylist,
-        qint64 targetDurationUsec,
+        std::chrono::microseconds targetDuration,
         MediaQuality streamQuality);
     virtual ~ArchivePlaylistManager();
 
@@ -46,8 +46,8 @@ private:
     const QnSecurityCamResourcePtr m_camResource;
     qint64 m_startTimestamp;
     unsigned int m_maxChunkNumberInPlaylist;
-    const qint64 m_targetDurationUsec;
-    const qint64 m_getNextIFrameLoopMaxSize;
+    std::chrono::microseconds m_targetDuration;
+    qint64 m_getNextIFrameLoopMaxSize;
     MediaQuality m_streamQuality;
     mutable QnMutex m_mutex;
     std::deque<AbstractPlaylistManager::ChunkData> m_chunks;

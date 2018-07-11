@@ -60,6 +60,21 @@ void EventRibbon::setFootersEnabled(bool value)
     d->setFootersEnabled(value);
 }
 
+Qt::ScrollBarPolicy EventRibbon::scrollBarPolicy() const
+{
+    return d->scrollBarPolicy();
+}
+
+void EventRibbon::setScrollBarPolicy(Qt::ScrollBarPolicy value)
+{
+    d->setScrollBarPolicy(value);
+}
+
+void EventRibbon::setViewportMargins(int top, int bottom)
+{
+    d->setViewportMargins(top, bottom);
+}
+
 QScrollBar* EventRibbon::scrollBar() const
 {
     return d->scrollBar();

@@ -2,6 +2,7 @@
 
 #include <map>
 #include <set>
+#include <chrono>
 
 #include <QSharedPointer>
 #include <QString>
@@ -32,7 +33,7 @@ public:
      */
     Session(
         const QString& id,
-        unsigned int targetDurationMS,
+        std::chrono::milliseconds targetDuration,
         bool _isLive,
         MediaQuality streamQuality,
         const QnVideoCameraPtr& videoCamera,
@@ -40,7 +41,7 @@ public:
     ~Session();
 
     const QString& id() const;
-    unsigned int targetDurationMS() const;
+    std::chrono::milliseconds targetDuration() const;
     bool isLive() const;
     MediaQuality streamQuality() const;
 
@@ -69,7 +70,7 @@ public:
 
 private:
     const QString m_id;
-    const unsigned int m_targetDurationMS;
+    const std::chrono::milliseconds m_targetDuration;
     const bool m_live;
     const MediaQuality m_streamQuality;
     const QnUuid m_cameraId;

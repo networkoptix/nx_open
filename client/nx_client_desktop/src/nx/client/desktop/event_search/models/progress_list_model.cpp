@@ -97,6 +97,9 @@ QVariant ProgressListModel::data(const QModelIndex& index, int role) const
         case Qn::AnimatedRole:
             return true;
 
+        case Qn::AlternateColorRole:
+            return true;
+
         default:
             return QVariant();
     }

@@ -41,6 +41,7 @@ struct CloudDb
 struct Stun
 {
     std::list<network::SocketAddress> addrToListenList;
+    std::list<network::SocketAddress> udpAddrToListenList;
     boost::optional<network::KeepAliveOptions> keepAliveOptions;
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };

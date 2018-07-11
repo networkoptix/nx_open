@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "แบบกำหนดเอง",
-      "description": "ใช้แอ็พพลิเคชันไคลเอ็นต์ %PRODUCT_NAME% เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
+      "description": "ใช้แอ็พพลิเคชัน %VMS_NAME% Client เพื่อตั้งค่าสิทธิ์ที่กำหนดเอง"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "ผู้ใช้มีสิทธิ์ของผู้ดูแลระบบ",
     "cantOpenClient": "ไม่พบแอ็พพลิเคชัน %VMS_NAME% <a href=\"/download\">Download</a>",
     "lostConnection": "การเชื่อมต่อกับ {{systemName}} สูญหาย",
-    "thisSystem": "ระบบ"
+    "thisSystem": "ระบบ",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "รหัสผ่านต้องมีอักขระอย่างน้อย 8 ตัว",
@@ -160,7 +161,7 @@
     "offline": "ระบบออฟไลน์",
     "openClient": "เปิดใน %VMS_NAME%",
     "openClientNoSystem": "เปิด %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "ผสาน",
     "mergeSystemTitle": "รวมระบบ",
     "confirmRenameTitle": "ชื่อระบบ",
     "confirmRenameAction": "บันทึก",

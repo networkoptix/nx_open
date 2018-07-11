@@ -1,9 +1,8 @@
 #pragma once
 
-#include <QtSql/QSqlDatabase>
-
 #include <nx/utils/move_only_func.h>
 
+#include "abstract_db_connection.h"
 #include "types.h"
 
 namespace nx::sql {
@@ -11,7 +10,7 @@ namespace nx::sql {
 class NX_SQL_API Transaction
 {
 public:
-    Transaction(QSqlDatabase* const connection);
+    Transaction(AbstractDbConnection* const connection);
     /** Does rollback(), if commit() or rollback() has not been called yet. */
     ~Transaction();
 
@@ -32,7 +31,7 @@ public:
         nx::utils::MoveOnlyFunc<void(DBResult)> func);
 
 private:
-    QSqlDatabase* const m_connection;
+    AbstractDbConnection* const m_connection;
     bool m_started;
     std::vector<nx::utils::MoveOnlyFunc<void()>> m_onSuccessfulCommitHandlers;
     std::vector<nx::utils::MoveOnlyFunc<void(DBResult)>> m_onTransactionCompletedHandlers;

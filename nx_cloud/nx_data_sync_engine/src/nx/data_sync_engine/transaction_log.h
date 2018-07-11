@@ -69,7 +69,7 @@ public:
     void startDbTransaction(
         const nx::String& systemId,
         nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*, nx::sql::DBResult)> onDbUpdateCompleted);
+        nx::utils::MoveOnlyFunc<void(nx::sql::DBResult)> onDbUpdateCompleted);
 
     /**
      * @note This call should be made only once when generating first transaction.
@@ -240,13 +240,8 @@ public:
 private:
     struct DbTransactionContext
     {
-    public:
-        VmsTransactionLogCache::TranId cacheTranId;
-
-        DbTransactionContext():
-            cacheTranId(VmsTransactionLogCache::InvalidTranId)
-        {
-        }
+        VmsTransactionLogCache::TranId cacheTranId = VmsTransactionLogCache::InvalidTranId;
+        nx::sql::QueryContext* queryContext = nullptr;
     };
 
     struct TransactionLogContext
@@ -333,7 +328,7 @@ private:
         const nx::String& systemId);
 
     void onDbTransactionCompleted(
-        nx::sql::QueryContext* dbConnection,
+        DbTransactionContextMap::iterator queryIterator,
         const nx::String& systemId,
         nx::sql::DBResult dbResult);
 

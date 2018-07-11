@@ -45,7 +45,7 @@ protected:
             [queryText, &records](
                 nx::sql::QueryContext* queryContext)
             {
-                sql::SqlQuery query(*queryContext->connection());
+                sql::SqlQuery query(queryContext->connection());
                 query.prepare(queryText);
                 query.exec();
 
@@ -58,9 +58,7 @@ protected:
 
                 return DBResult::ok;
             },
-            [&queryCompletedPromise](
-                nx::sql::QueryContext* /*queryContext*/,
-                DBResult dbResult)
+            [&queryCompletedPromise](DBResult dbResult)
             {
                 queryCompletedPromise.set_value(dbResult);
             });
@@ -78,8 +76,7 @@ protected:
         //starting async operation
         asyncSqlQueryExecutor().executeUpdate(
             dbQueryFunc,
-            [&queryCompletedPromise](
-                nx::sql::QueryContext* /*queryContext*/, DBResult dbResult)
+            [&queryCompletedPromise](DBResult dbResult)
             {
                 queryCompletedPromise.set_value(dbResult);
             });

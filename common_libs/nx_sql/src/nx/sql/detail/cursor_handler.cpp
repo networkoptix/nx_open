@@ -72,7 +72,7 @@ CursorHandlerPool* BasicCursorOperationExecutor::cursorContextPool()
     return m_cursorContextPool;
 }
 
-DBResult BasicCursorOperationExecutor::executeQuery(QSqlDatabase* const connection)
+DBResult BasicCursorOperationExecutor::executeQuery(AbstractDbConnection* const connection)
 {
     m_cursorContextPool->cleanupDroppedCursors();
 
@@ -97,7 +97,7 @@ void CursorCreator::reportErrorWithoutExecution(DBResult errorCode)
     m_cursorHandler->reportErrorWithoutExecution(errorCode);
 }
 
-void CursorCreator::executeCursor(QSqlDatabase* const connection)
+void CursorCreator::executeCursor(AbstractDbConnection* const connection)
 {
     m_cursorHandler->initialize(connection); //< Throws on failure.
 
@@ -118,7 +118,7 @@ void CleanUpDroppedCursorsExecutor::reportErrorWithoutExecution(DBResult /*error
 {
 }
 
-void CleanUpDroppedCursorsExecutor::executeCursor(QSqlDatabase* const /*connection*/)
+void CleanUpDroppedCursorsExecutor::executeCursor(AbstractDbConnection* const /*connection*/)
 {
     // No need to do anything. Cleanup is done before this call.
 }

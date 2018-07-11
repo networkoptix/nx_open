@@ -410,11 +410,7 @@ void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget
         ->instrument<ToolTipInstrument>();
 
     if (toolTipInstrument)
-    {
-        const auto ribbons = m_eventPanel->findChildren<EventRibbon*>();
-        for (auto ribbon: ribbons)
-            toolTipInstrument->addIgnoredWidget(ribbon);
-    }
+        toolTipInstrument->addIgnoredItem(eventPanelContainer);
 
     connect(m_eventPanel.data(), &EventPanel::tileHovered,
         this, &NotificationsWorkbenchPanel::at_eventTileHovered);

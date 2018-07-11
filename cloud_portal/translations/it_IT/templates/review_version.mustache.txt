@@ -1,0 +1,10 @@
+C'è una nuova revisione per {{ message.product }}
+
+Clicchi sul link per rivedere il progetto {{ message.id }} per {{ message.product }}
+
+Link per la Revisione: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+
+Su questa pagina è possibile
+1) Creare un'anteprima per visualizzare le modifiche più recenti.
+2) Pubblicare questa versione che consente di aggiornare tutti i contenuti.
+3) modificare contesti facendo clic sul pulsante di registrazione di modifica. Per vedere queste modifiche è necessario creare una nuova versione.

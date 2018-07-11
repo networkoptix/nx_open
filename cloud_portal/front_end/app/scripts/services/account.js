@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('account', ['cloudApi', 'dialogs', '$q', '$location', '$localStorage', '$rootScope','$base64',
-    function (cloudApi, dialogs, $q, $location, $localStorage, $rootScope,$base64) {
+    .factory('account', ['cloudApi', 'dialogs', '$q', '$location', '$localStorage', '$rootScope', '$base64', '$routeParams',
+    function (cloudApi, dialogs, $q, $location, $localStorage, $rootScope, $base64, $routeParams) {
         $rootScope.session = $localStorage;
 
         var initialState = $rootScope.session.loginState;
         $rootScope.$watch('session.loginState',function(value){  // Catch logout from other tabs
-            if(initialState !== value){
+            if(!$routeParams.next && initialState !== value){
                 document.location.reload();
             }
         });

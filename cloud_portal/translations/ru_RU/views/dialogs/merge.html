@@ -3,10 +3,10 @@
         <div class="modal-body">
             <div>
                 <p class="help-block-no-height">
-                    You can merge cloud Systems, where you are owner.
+                    Вы можете объединять те облачные системы, где вы являетесь владельцем.
                 </p>
                 <p class="help-block-no-height">
-                    Connect System you want to merge with this one to Nx Cloud or merge locally using Nx Witness Client.
+                    Подключите объединяемую систему к %PRODUCT_NAME% или объедините локально с помощью клиентского приложения %VMS_NAME%.
                 </p>
             </div>
         </div>
@@ -17,18 +17,18 @@
     <form ng-if="showMergeForm" name="mergeForm" novalidate>
         <div class="modal-body">
             <div class="form-group">
-                <label for="system">Merge current System with</label>
+                <label for="system">Объединить текущую систему с</label>
                 <select class="form-control" name="targetSystem" id="system" ng-model="targetSystem"
                         ng-options="system as addStatus(system) for system in systems"></select>
             </div>
             <p ng-if="systemMergeable =='offline'"
-               class="help-block-no-height warning-label">System {{targetSystem.name}} is offline. Cannot be merged with the current one.</p>
+               class="help-block-no-height warning-label">Система {{targetSystem.name}} отключена. Не может быть объединена с текущей.</p>
             <p ng-if="systemMergeable =='cannotMerge'"
-               class="help-block-no-height warning-label">System {{targetSystem.name}} is incompatable. Cannot be merged with the current one.</p>
+               class="help-block-no-height warning-label">Система {{targetSystem.name}} несовместима. Не может быть объединена с текущей.</p>
             <p ng-if="systemMergeable == ''"
-               class="help-block-no-height">You can only merge Systems in which you have owner permissions.</p>
+               class="help-block-no-height">Вы можете объединять только те системы, в которых у вас есть права владельца.</p>
             <div>
-                <div ng-class="{'text-muted': systemStatus != ''}">Took system name and settings from</div>
+                <div ng-class="{'text-muted': systemStatus != ''}">Системное имя и настройки получено из</div>
                 <div ng-init="$parent.masterSystemId=system.id">
                     <div>
                         <input type="radio" id="firstSystem" ng-model="$parent.masterSystemId" ng-value="system.id"

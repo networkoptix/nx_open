@@ -10,6 +10,8 @@
 #include <QtCore/QMap>
 #include <QtCore/QSet>
 
+#include <ui/style/helper.h>
+
 #include <nx/utils/disconnect_helper.h>
 
 class QScrollBar;
@@ -44,6 +46,11 @@ public:
     bool footersEnabled() const;
     void setFootersEnabled(bool value);
 
+    Qt::ScrollBarPolicy scrollBarPolicy() const;
+    void setScrollBarPolicy(Qt::ScrollBarPolicy value);
+
+    void setViewportMargins(int top, int bottom);
+
     int count() const;
 
     int unreadCount() const;
@@ -77,6 +84,9 @@ private:
     void clearShiftAnimations();
 
     void showContextMenu(EventTile* tile, const QPoint& posRelativeToTile);
+
+    void setScrollBarRelevant(bool value);
+    void updateScrollBarVisibility();
 
     int indexOf(EventTile* tile) const;
     int indexAtPos(const QPoint& pos) const;
@@ -120,9 +130,15 @@ private:
 
     QMap<int, int> m_currentShifts; //< Maps item index to shift value. Sorted (!).
 
+    Qt::ScrollBarPolicy m_scrollBarPolicy = Qt::ScrollBarAlwaysOn;
+
     bool m_showDefaultToolTips = false;
     bool m_previewsEnabled = true;
     bool m_footersEnabled = true;
+    bool m_scrollBarRelevant = true;
+
+    int m_topMargin = style::Metrics::kStandardPadding;
+    int m_bottomMargin = style::Metrics::kStandardPadding;
 };
 
 } // namespace desktop

@@ -3,7 +3,7 @@
 #include <vector>
 #include <chrono>
 
-#include <nx/core/ptz/realtive/relative_continuous_move_sequence_maker.h>
+#include <nx/core/ptz/relative/relative_continuous_move_sequence_maker.h>
 
 using namespace std::chrono;
 using namespace std::chrono_literals;

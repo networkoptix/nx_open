@@ -80,7 +80,6 @@ void SystemMergeManager::processMergeHistoryRecord(
             return sql::DBResult::ok;
         },
         [completionHandler = std::move(completionHandler)](
-            nx::sql::QueryContext* /*queryContext*/,
             sql::DBResult dbResultCode)
         {
             completionHandler(dbResultToApiResult(dbResultCode));
@@ -287,12 +286,11 @@ void SystemMergeManager::processVmsMergeRequestResult(
             mergeRequestContext->idOfSystemToMergeTo,
             mergeRequestContext->idOfSystemToBeMerged),
         std::bind(&SystemMergeManager::processUpdateSystemResult, this,
-            mergeRequestContext, _1, _2));
+            mergeRequestContext, _1));
 }
 
 void SystemMergeManager::processUpdateSystemResult(
     MergeRequestContext* mergeRequestContextPtr,
-    nx::sql::QueryContext* /*queryContext*/,
     nx::sql::DBResult dbResult)
 {
     NX_VERBOSE(this, lm("Merge %1 into %2. Updating system %1 status completed with result %3")

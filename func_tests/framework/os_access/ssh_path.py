@@ -52,7 +52,9 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     @classmethod
     def tmp(cls):
-        return cls('/tmp/func_tests')
+        temp_dir = cls('/tmp/func_tests')
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        return temp_dir
 
     def __repr__(self):
         return '<SSHPath {!s} on {!r}>'.format(self, self._ssh)

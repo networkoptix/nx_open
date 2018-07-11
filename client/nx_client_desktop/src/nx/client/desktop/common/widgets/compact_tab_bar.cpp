@@ -4,6 +4,7 @@
 #include <QtGui/QHoverEvent>
 #include <QtGui/QPainter>
 #include <QtWidgets/QStyle>
+#include <QtWidgets/QToolTip>
 
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -36,6 +37,7 @@ public:
     void paint();
     QSize tabSizeHint(int index) const;
 
+    int hoveredTab() const;
     void setHoveredTab(int index);
 
     void tabInserted(int index);
@@ -91,6 +93,11 @@ QSize CompactTabBar::Private::tabSizeHint(int index) const
         std::max({textSize.height(), iconSize.height(), q->minimumHeight()}));
 
     return result;
+}
+
+int CompactTabBar::Private::hoveredTab() const
+{
+    return m_hoveredTab;
 }
 
 void CompactTabBar::Private::setHoveredTab(int index)
@@ -297,6 +304,14 @@ bool CompactTabBar::event(QEvent* event)
         case QEvent::Leave:
             d->setHoveredTab(-1);
             break;
+
+        case QEvent::ToolTip:
+            if (d->hoveredTab() == currentIndex())
+            {
+                QToolTip::hideText();
+                event->accept();
+                return true; //< Do not show tooltip for current tab.
+            }
 
         default:
             break;

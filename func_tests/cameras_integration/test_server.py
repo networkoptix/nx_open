@@ -1,31 +1,51 @@
+import pytest
 import yaml
-import os
 import time
 import logging
 from urlparse import urlparse
 from pathlib2 import Path
 
-from framework.installation.make_installation import make_installation
-from framework.installation.mediaserver import Mediaserver
-from framework.os_access.local_access import local_access
+from framework.merging import setup_local_system
 
 import verifications
 
-DISCOVERY_IP_PREFIX = '192.168'  # < TODO: Remove in production.
 DISCOVERY_RETRY_COUNT = 10
 DISCOVERY_RETRY_DELAY_S = 10
 
-# TODO: Pass this file by test paramiters.
-EXPECTED_CAMERAS_FILE = Path(__file__).parent / 'expected_cameras.yaml'
+
+@pytest.fixture(scope='session')
+def one_vm_type():
+    return 'linux'
 
 
-# TODO: Make this test work with fresh configured server on VM with bridged interface.
-def test_cameras(mediaserver_installers, work_dir):
-    installation = make_installation(mediaserver_installers, 'linux', local_access)
-    server = Mediaserver(local_access, installation, password='qweasd123')
-    time.sleep(1)  # TODO: Remove when server is integrated as normal test.
+@pytest.fixture
+def config(test_config):
+    return test_config.with_defaults(
+        CAMERAS_INTERFACE='enp5s0',
+        CAMERAS_NETWORK='192.168.0',
+        CAMERAS_NETWORK_IP='200',
+        EXPECTED_CAMERAS_FILE=Path(__file__).parent / 'expected_cameras.yaml',
+        )
 
-    stand = Stand(server)
+
+@pytest.fixture
+def one_licensed_server(one_mediaserver):
+    # TODO: Implement and use fake licensed server without hardcoded key.
+    # TODO: Move this fixture into fixtures.mediaservers.
+    one_mediaserver.os_access.networking.static_dns('107.23.248.56', 'licensing.networkoptix.com')
+    one_mediaserver.start()
+    setup_local_system(one_mediaserver, {})
+    one_mediaserver.api.get('api/activateLicense', params=dict(key='3JHU-7G4J-2CS3-BFNI'))
+    return one_mediaserver
+
+
+def test_cameras(hypervisor, one_vm, one_licensed_server, config, work_dir):
+    one_licensed_server.os_access.networking.setup_network(
+        hypervisor.plug_bridged(one_vm.name, config.CAMERAS_INTERFACE),
+        config.CAMERAS_NETWORK, config.CAMERAS_NETWORK_IP)
+
+    expected_cameras = yaml.load(Path(config.EXPECTED_CAMERAS_FILE).read_bytes())
+    stand = Stand(one_licensed_server, config.CAMERAS_NETWORK, expected_cameras)
     stand.discover_cameras()
     stand.execute_verification_stages()
 
@@ -34,8 +54,8 @@ def test_cameras(mediaserver_installers, work_dir):
         (work_dir / (file_name + '.yaml')).write_bytes(serialized)
 
     save_yaml(stand.result, 'test_result')
-    save_yaml(server.get_resources('ec2/getCamerasEx'), 'discovered_cameras')
-    save_yaml(server.api.get('api/moduleInformation'), 'server_information')
+    save_yaml(one_licensed_server.get_resources('CamerasEx'), 'discovered_cameras')
+    save_yaml(one_licensed_server.api.get('api/moduleInformation'), 'server_information')
     assert stand.is_success
 
 
@@ -44,10 +64,10 @@ class Camera(object):
         self.data = data
         self.is_expected = is_expected
         self.stages = {}
-        self.has_essential_failure = False
+        self.has_essential_failure = not (data and is_expected)
 
     def __nonzero__(self):
-        return self.data and self.is_expected and all(self.stages.itervalues())
+        return bool(self.data and self.is_expected and all(self.stages.itervalues()))
 
     def __repr__(self):
         return repr(self.to_dict())
@@ -57,7 +77,9 @@ class Camera(object):
         return self.data['id']
 
     def to_dict(self):
-        d = dict(status=('ok' if self else 'error'), id=self.id)
+        d = dict(status=('ok' if self else 'error'))
+        if self.data:
+            d['id'] = self.id
         if not self.data:
             d['description'] = "Is not discovered"
         elif not self.is_expected:
@@ -91,12 +113,13 @@ class RetryWithDelay(object):
 
 
 class Stand(object):
-    def __init__(self, server):
+    def __init__(self, server, cameras_network, expected_cameras):
+        self.cameras_network = cameras_network
         self.server = server
         self.server_information = self.server.api.get('api/moduleInformation')
         self.actual_cameras = {}
         self.expected_cameras = {}
-        for ip, rules in yaml.load(EXPECTED_CAMERAS_FILE.read_bytes()).iteritems():
+        for ip, rules in expected_cameras.iteritems():
             stages = self._filter_stages(rules)
             if stages.has_key('discovery'):
                 self.expected_cameras[ip] = stages
@@ -114,9 +137,9 @@ class Stand(object):
         retry = RetryWithDelay(DISCOVERY_RETRY_COUNT, DISCOVERY_RETRY_DELAY_S)
         while retry.next_try():
             discovered_cameras = {}
-            for camera in self.server.get_cameras():
+            for camera in self.server.get_resources('Cameras'):
                 ip = urlparse(camera['url']).hostname
-                if ip and ip.startswith(DISCOVERY_IP_PREFIX):
+                if ip and ip.startswith(self.cameras_network):
                     discovered_cameras[ip] = camera
 
             logging.info('Discovered cameras: ' + ', '.join(discovered_cameras))

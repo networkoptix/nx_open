@@ -45,7 +45,7 @@ class LocalConnectionFactory;
 
 } // namespace ec2
 
-namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
+namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
 
 void restartServer(int restartTimeout);
 
