@@ -77,7 +77,7 @@ def encode_camera_credentials(login, password):
 class Mediaserver(object):
     """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(self, name, installation, **kwargs):  # type: (str, Installation) -> None
+    def __init__(self, name, installation):  # type: (str, Installation) -> None
         self.name = name
         self.installation = installation
         self.service = installation.service
@@ -85,7 +85,7 @@ class Mediaserver(object):
         self.port = 7001
         forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
         forwarded_address = installation.os_access.port_map.remote.address
-        self.api = RestApi(name, forwarded_address, forwarded_port, **kwargs)
+        self.api = RestApi(name, forwarded_address, forwarded_port)
 
     def __repr__(self):
         return '<Mediaserver {} at {}>'.format(self.name, self.api.url(''))
@@ -197,22 +197,16 @@ class Mediaserver(object):
         return open_media_stream(self.api.url(''), self.api.user, self.api.password, stream_type, camera.mac_addr)
 
     def get_resources(self, path, *args, **kwargs):
-        resources = self.api.get(path, *args, **kwargs)
+        resources = self.api.get('ec2/get' + path, *args, **kwargs)
         for resource in resources:
             for p in resource.pop('addParams', []):
                 resource[p['name']] = p['value']
         return parse_json_fields(resources)
 
-    def get_cameras(self):
-        return self.get_resources('/ec2/getCameras')
-
     def get_resource(self, path, id, **kwargs):
         resources = self.get_resources(path, params=dict(id=id))
         assert len(resources) == 1
         return resources[0]
-
-    def get_camera(self, id):
-        return self.get_resource('/ec2/getCamerasEx', id)
 
     def set_camera_credentials(self, id, login, password):
         c = encode_camera_credentials(login, password)

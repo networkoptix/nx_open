@@ -54,7 +54,7 @@ def test_cameras(hypervisor, one_vm, one_licensed_server, config, work_dir):
         (work_dir / (file_name + '.yaml')).write_bytes(serialized)
 
     save_yaml(stand.result, 'test_result')
-    save_yaml(one_licensed_server.get_resources('ec2/getCamerasEx'), 'discovered_cameras')
+    save_yaml(one_licensed_server.get_resources('CamerasEx'), 'discovered_cameras')
     save_yaml(one_licensed_server.api.get('api/moduleInformation'), 'server_information')
     assert stand.is_success
 
@@ -137,7 +137,7 @@ class Stand(object):
         retry = RetryWithDelay(DISCOVERY_RETRY_COUNT, DISCOVERY_RETRY_DELAY_S)
         while retry.next_try():
             discovered_cameras = {}
-            for camera in self.server.get_cameras():
+            for camera in self.server.get_resources('Cameras'):
                 ip = urlparse(camera['url']).hostname
                 if ip and ip.startswith(self.cameras_network):
                     discovered_cameras[ip] = camera
