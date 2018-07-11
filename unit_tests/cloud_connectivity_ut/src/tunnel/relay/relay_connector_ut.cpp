@@ -248,6 +248,16 @@ public:
         resetClientFactoryToDefault();
     }
 
+    ~RelayConnectorRedirect()
+    {
+        while (!m_connectResults.empty())
+        {
+            auto connectResult = m_connectResults.pop();
+            if (connectResult.connection)
+                connectResult.connection->pleaseStopSync();
+        }
+    }
+
 protected:
     void whenCreateConnectSessionThatIsRedirectedToAnotherRelayInstance()
     {
