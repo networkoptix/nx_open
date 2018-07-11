@@ -21,14 +21,13 @@ class GroupAdminForm(forms.ModelForm):
         required=False,
         # Use the pretty 'filter_horizontal widget'.
         widget=autocomplete.ModelSelect2Multiple(url='account-autocomplete',
-                                         attrs={
-                                             # Set some placeholder
-                                             'data-placeholder': 'Email ...',
-                                             # Only trigger autocompletion after 2 characters have been typed
-                                             'data-minimum-input-length': 2,
-                                         },
-                                         )
-    )
+                                                 attrs={
+                                                     # Set some placeholder
+                                                     'data-placeholder': 'Email ...',
+                                                     # Only trigger autocompletion after 2 characters have been typed
+                                                     'data-minimum-input-length': 2
+                                                 })
+                                            )
 
     customizations = forms.ModelMultipleChoiceField(
         queryset=Customization.objects.all(),
@@ -54,6 +53,11 @@ class GroupAdminForm(forms.ModelForm):
         for customization in self.cleaned_data['customizations']:
             if not UserGroupsToCustomizationPermissions.objects.filter(group=self.instance, customization=customization).exists():
                 UserGroupsToCustomizationPermissions(group=self.instance, customization=customization).save()
+
+        remove_permissions = UserGroupsToCustomizationPermissions.objects.filter(group=self.instance)\
+                                                                 .exclude(customization__in=self.cleaned_data['customizations'])
+        for customization_group in remove_permissions:
+            customization_group.delete()
 
     def save(self, *args, **kwargs):
         # Default save
