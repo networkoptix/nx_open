@@ -695,7 +695,7 @@ void EventRibbon::Private::setScrollBarPolicy(Qt::ScrollBarPolicy value)
         return;
 
     m_scrollBarPolicy = value;
-    updateScrollBarState();
+    updateScrollBarVisibility();
 }
 
 void EventRibbon::Private::updateScrollRange()
