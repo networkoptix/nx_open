@@ -53,6 +53,7 @@ EventTile::EventTile(QWidget* parent):
     m_closeButton->setHidden(true);
     auto anchor = new WidgetAnchor(m_closeButton);
     anchor->setEdges(Qt::RightEdge | Qt::TopEdge);
+    anchor->setMargins({0, 6, 2, 0}); //< Fine-tuned in correspondence with UI-file.
 
     auto sizePolicy = ui->timestampLabel->sizePolicy();
     sizePolicy.setRetainSizeWhenHidden(true);
