@@ -5,7 +5,7 @@
 
 #include <common/common_module.h>
 #include <utils/common/watermark_settings.h>
-#include <ui/dialogs/watermark_preview_dialog.h>
+#include <ui/dialogs/watermark_preview_dialog_iface.h>
 
 #include <core/resource/device_dependent_strings.h>
 
@@ -40,7 +40,7 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     });
 
     connect(ui->watermarkSettingsButton, &QPushButton::pressed, this,
-        [this] { QnWatermarkPreviewDialog::editSettings(*m_watermarkSettings, this); emit hasChangesChanged(); });
+        [this] { ui::dialogs::watermark_preview::editSettings(*m_watermarkSettings, this); emit hasChangesChanged(); });
     // This should go before connecting to hasChangesChanged!
     connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged, this,
         [this](int state) { m_watermarkSettings->useWatermark = (state == Qt::Checked); });

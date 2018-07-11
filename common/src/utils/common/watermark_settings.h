@@ -4,7 +4,7 @@
 
 struct QnWatermarkSettings
 {
-    int useWatermark = true;
+    int useWatermark = false;
 
     double frequency = 0.5;  //< 0..1
     double opacity = 0.3;    //< 0..1

@@ -36,4 +36,5 @@ private:
     QnWatermarkSettings m_settings;
     QScopedPointer<QnWatermarkPainter> m_painter;
     QScopedPointer<QPixmap> m_baseImage;
+    bool m_lockUpdate = false;
 };
