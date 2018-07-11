@@ -14,6 +14,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
+#include <core/resource_access/resource_access_filter.h>
 
 namespace {
 
@@ -371,12 +372,23 @@ QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString& uniqueId) con
 QnResourcePtr QnResourcePool::getResourceByDescriptor(
     const QnLayoutItemResourceDescriptor& descriptor) const
 {
-    QnResourcePtr result;
     if (!descriptor.id.isNull())
-        result = getResourceById(descriptor.id);
-    if (!result)
-        result = getResourceByUniqueId(descriptor.uniqueId);
-    return result;
+    {
+        if (const auto result = getResourceById(descriptor.id))
+            return result;
+    }
+
+    if (descriptor.uniqueId.isEmpty())
+        return QnResourcePtr();
+
+    if (const auto result = getResourceByUniqueId(descriptor.uniqueId))
+        return result;
+
+    auto openableInLayout =
+        getResourcesByLogicalId(descriptor.uniqueId.toInt()).filtered(
+            QnResourceAccessFilter::isShareableMedia);
+
+    return openableInLayout.empty() ? QnResourcePtr() : openableInLayout.first();
 }
 
 QnResourceList QnResourcePool::getResourcesWithFlag(Qn::ResourceFlag flag) const
