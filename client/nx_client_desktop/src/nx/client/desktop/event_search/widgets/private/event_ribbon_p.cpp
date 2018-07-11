@@ -70,7 +70,7 @@ EventRibbon::Private::Private(EventRibbon* q):
     q->setAttribute(Qt::WA_Hover);
     m_viewport->setAttribute(Qt::WA_Hover);
 
-    m_scrollBar->setHidden(true);
+    setScrollBarRelevant(false);
     m_scrollBar->setSingleStep(kScrollBarStep);
     m_scrollBar->setFixedWidth(m_scrollBar->sizeHint().width());
 
@@ -81,8 +81,7 @@ EventRibbon::Private::Private(EventRibbon* q):
     viewportAnchor->setEdges(Qt::LeftEdge | Qt::RightEdge | Qt::TopEdge | Qt::BottomEdge);
 
     const int mainPadding = q->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
-    static constexpr int kExtraPadding = 1; //< Gap between scrollbar and tiles.
-    viewportAnchor->setMargins(mainPadding, 0, mainPadding + kExtraPadding, 0);
+    viewportAnchor->setMargins(mainPadding, 0, mainPadding * 2, 0);
 
     installEventHandler(m_viewport,
         {QEvent::Show, QEvent::Hide, QEvent::Resize, QEvent::LayoutRequest},
@@ -563,9 +562,7 @@ void EventRibbon::Private::clear()
     m_totalHeight = 0;
 
     clearShiftAnimations();
-
-    m_scrollBar->setVisible(false);
-    m_scrollBar->setValue(0);
+    setScrollBarRelevant(false);
 
     q->updateGeometry();
 
@@ -658,14 +655,55 @@ int EventRibbon::Private::calculateHeight(QWidget* widget) const
         : widget->sizeHint().expandedTo(minimumWidgetSize(widget)).height();
 }
 
+void EventRibbon::Private::setScrollBarRelevant(bool value)
+{
+    if (m_scrollBarRelevant == value)
+        return;
+
+    m_scrollBarRelevant = value;
+    if (!m_scrollBarRelevant)
+        m_scrollBar->setValue(0);
+
+    m_scrollBar->setEnabled(m_scrollBarRelevant);
+    updateScrollBarVisibility();
+}
+
+void EventRibbon::Private::updateScrollBarVisibility()
+{
+    switch (m_scrollBarPolicy)
+    {
+        case Qt::ScrollBarAlwaysOn:
+            m_scrollBar->show();
+            break;
+        case Qt::ScrollBarAlwaysOff:
+            m_scrollBar->hide();
+            break;
+        default:
+            m_scrollBar->setVisible(m_scrollBarRelevant);
+            break;
+    }
+}
+
+Qt::ScrollBarPolicy EventRibbon::Private::scrollBarPolicy() const
+{
+    return m_scrollBarPolicy;
+}
+
+void EventRibbon::Private::setScrollBarPolicy(Qt::ScrollBarPolicy value)
+{
+    if (m_scrollBarPolicy == value)
+        return;
+
+    m_scrollBarPolicy = value;
+    updateScrollBarState();
+}
+
 void EventRibbon::Private::updateScrollRange()
 {
     const auto viewHeight = m_viewport->height();
     m_scrollBar->setMaximum(qMax(m_totalHeight - viewHeight, 1));
     m_scrollBar->setPageStep(viewHeight);
-    m_scrollBar->setVisible(m_totalHeight > viewHeight);
-    if (m_scrollBar->isHidden())
-        m_scrollBar->setValue(0);
+    setScrollBarRelevant(m_totalHeight > viewHeight);
 }
 
 QnNotificationLevel::Value EventRibbon::Private::highestUnreadImportance() const
@@ -715,7 +753,7 @@ void EventRibbon::Private::doUpdateView()
 
     updateCurrentShifts();
 
-    const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
+    const int base = m_scrollBarRelevant ? m_scrollBar->value() : 0;
     const int height = m_viewport->height();
 
     const auto secondInView = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base,
@@ -923,7 +961,7 @@ void EventRibbon::Private::updateHover(bool hovered, const QPoint& mousePos)
 int EventRibbon::Private::indexAtPos(const QPoint& pos) const
 {
     const auto viewportPos = m_viewport->mapFrom(q, pos);
-    const int base = m_scrollBar->isHidden() ? 0 : m_scrollBar->value();
+    const int base = m_scrollBarRelevant ? m_scrollBar->value() : 0;
 
     const auto next = std::upper_bound(m_tiles.cbegin(), m_tiles.cend(), base + viewportPos.y(),
         [this](int left, EventTile* right) { return left < m_positions.value(right); });

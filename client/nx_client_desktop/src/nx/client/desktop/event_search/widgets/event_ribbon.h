@@ -36,6 +36,9 @@ public:
     bool footersEnabled() const;
     void setFootersEnabled(bool value);
 
+    Qt::ScrollBarPolicy scrollBarPolicy() const;
+    void setScrollBarPolicy(Qt::ScrollBarPolicy value);
+
     virtual QSize sizeHint() const override;
 
     QScrollBar* scrollBar() const;

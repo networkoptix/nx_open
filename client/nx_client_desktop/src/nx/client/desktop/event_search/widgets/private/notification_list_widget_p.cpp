@@ -3,6 +3,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
@@ -13,6 +14,7 @@
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
 #include <nx/client/desktop/common/utils/custom_painted.h>
+#include <ui/common/palette.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -30,6 +32,7 @@
 #include <nx/client/desktop/event_search/models/progress_list_model.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -112,6 +115,10 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     verticalLayout->addStretch(1);
 
     m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_eventRibbon->scrollBar()->ensurePolished();
+    setPaletteColor(m_eventRibbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
+        colorTheme()->color("dark5"));
 
     auto sortModel = new SystemHealthSortFilterModel(this);
     auto systemHealthListModel = new SubsetListModel(sortModel, 0, QModelIndex(), this);

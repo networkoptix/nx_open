@@ -60,6 +60,16 @@ void EventRibbon::setFootersEnabled(bool value)
     d->setFootersEnabled(value);
 }
 
+Qt::ScrollBarPolicy EventRibbon::scrollBarPolicy() const
+{
+    return d->scrollBarPolicy();
+}
+
+void EventRibbon::setScrollBarPolicy(Qt::ScrollBarPolicy value)
+{
+    d->setScrollBarPolicy(value);
+}
+
 QScrollBar* EventRibbon::scrollBar() const
 {
     return d->scrollBar();

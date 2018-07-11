@@ -152,6 +152,10 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
         ui->ribbon, &EventRibbon::setFootersEnabled);
     connect(ui->showPreviewsButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setPreviewsEnabled);
+
+    ui->ribbon->scrollBar()->ensurePolished();
+    setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
+        colorTheme()->color("dark5"));
 }
 
 UnifiedSearchWidget::~UnifiedSearchWidget()

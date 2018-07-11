@@ -251,6 +251,9 @@
         "palette": {
             "default": {
                 "midlight":         "dark13"
+            },
+            "disabled": {
+                "midlight":         "dark13.setAlpha(77)"
             }
         }
     },
