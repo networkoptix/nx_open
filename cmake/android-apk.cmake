@@ -32,7 +32,7 @@ function(add_android_apk target)
 
     string(REPLACE ";" "," extra_libs "${APK_EXTRA_LIBS}")
 
-    find_buildtools("${ANDROID_SDK}" buildtools_version)
+    find_buildtools("${android_sdk_directory}" buildtools_version)
 
     if(APK_QML_IMPORT_PATHS)
         set(qml_import_paths "    \"qml-import-paths\": \"${APK_QML_IMPORT_PATHS}\",\n")
@@ -55,7 +55,7 @@ function(add_android_apk target)
         "{\n"
         "    \"description\": \"This file is generated and should not be modified by hand.\",\n"
         "    \"qt\": \"${QT_DIR}\",\n"
-        "    \"sdk\": \"${ANDROID_SDK}\",\n"
+        "    \"sdk\": \"${android_sdk_directory}\",\n"
         "    \"sdkBuildToolsRevision\": \"${buildtools_version}\",\n"
         "    \"ndk\": \"${CMAKE_ANDROID_NDK}\",\n"
         "    \"toolchain-prefix\": \"${CMAKE_CXX_ANDROID_TOOLCHAIN_MACHINE}\",\n"

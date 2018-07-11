@@ -101,4 +101,10 @@ macro(load_dependencies)
 
         string(REPLACE ";" " " cpp_runtime_libs_string "${cpp_runtime_libs}")
     endif()
+
+    if(ANDROID)
+        if(NOT android_sdk_directory)
+            set(android_sdk_directory $ENV{ANDROID_HOME})
+        endif()
+    endif()
 endmacro()

@@ -45,6 +45,8 @@ def determine_package_versions(
         "gstreamer": "1.0",
         "icu": "60.2",
         "deepstream": "0.1",
+        "android-sdk": "28",
+        "android-ndk": "r17",
         "help": customization + "-3.2",
         "server-external": release_version,
         "certificates": customization,
@@ -119,9 +121,9 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
             sync("linux/clang")
     elif platform == "android":
         if "ANDROID_HOME" not in os.environ:
-            sync("android/android-sdk")
+            sync("android/android-sdk", path_variable="android_sdk_directory")
         if "ANDROID_NDK" not in os.environ:
-            sync("android/android-ndk-r17")
+            sync("android/android-ndk")
 
     sync("qt", path_variable="QT_DIR")
     sync("any/boost")
