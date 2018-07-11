@@ -277,8 +277,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     base_type(context, item, parent),
     d(new QnMediaResourceWidgetPrivate(base_type::resource())),
     m_posUtcMs(DATETIME_INVALID),
-    m_itemId(item->uuid()),
-    m_watermarkPainter(new QnWatermarkPainter)
+    m_watermarkPainter(new QnWatermarkPainter),
+    m_itemId(item->uuid())
 {
     NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");
 
