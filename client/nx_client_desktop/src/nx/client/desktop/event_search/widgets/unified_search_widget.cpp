@@ -85,6 +85,8 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->placeholderText->setFont(font);
     ui->placeholderText->setForegroundRole(QPalette::Mid);
 
+    ui->counterLabel->setForegroundRole(QPalette::Mid);
+
     ui->typeButton->hide();
     ui->areaButton->hide();
     ui->cameraButton->hide();
