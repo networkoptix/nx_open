@@ -62,8 +62,8 @@ namespace ec2
         void at_gotLockRequest(nx::vms::api::LockData lockInfo);
         void at_gotLockResponse(nx::vms::api::LockData lockInfo);
         //void at_gotUnlockRequest(nx::vms::api::LockData lockInfo);
-        void at_newPeerFound(QnUuid peer, Qn::PeerType peerType);
-        void at_peerLost(QnUuid peer, Qn::PeerType peerType);
+        void at_newPeerFound(QnUuid peer, nx::vms::api::PeerType peerType);
+        void at_peerLost(QnUuid peer, nx::vms::api::PeerType peerType);
         void at_timeout();
     private:
         bool isAllPeersReady() const;

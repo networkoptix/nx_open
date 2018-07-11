@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
     ini().reload();
     initLog(startupParams.logLevel);
 
-    QnStaticCommonModule staticModule(Qn::PT_MobileClient, QnAppInfo::brand(),
+    QnStaticCommonModule staticModule(nx::vms::api::PeerType::mobileClient, QnAppInfo::brand(),
         QnAppInfo::customizationName());
     Q_UNUSED(staticModule);
 

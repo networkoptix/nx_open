@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-void PrintTo(const Qn::GlobalPermissions& val, ::std::ostream* os)
+void PrintTo(const GlobalPermissions& val, ::std::ostream* os)
 {
     *os << QnLexical::serialized(val).toStdString();
 }

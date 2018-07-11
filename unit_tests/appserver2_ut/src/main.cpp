@@ -10,7 +10,7 @@
 
 int main(int argc, char** argv)
 {
-    QnStaticCommonModule staticCommonModule(Qn::PeerType::PT_Server);
+    QnStaticCommonModule staticCommonModule(nx::vms::api::PeerType::server);
 
     std::unique_ptr<QCoreApplication> application;
     QnCommonMetaTypes::initialize();

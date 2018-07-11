@@ -76,7 +76,7 @@ private:
         ASSERT_EQ(versionsCount, (int) customizationIt->versions.size());
 
         const auto& versions = customizationIt->versions;
-        ASSERT_EQ(QnSoftwareVersion(lastVersion), versions[versions.size() - 1]);
+        ASSERT_EQ(nx::utils::SoftwareVersion(lastVersion), versions[versions.size() - 1]);
     }
 };
 

@@ -205,7 +205,7 @@ int QnCameraSettingsRestHandler::executeGet(
     {
         if (!owner->resourceAccessManager()->hasGlobalPermission(
             owner->accessRights(),
-            Qn::GlobalPermission::GlobalEditCamerasPermission))
+            GlobalPermission::editCameras))
         {
             return nx::network::http::StatusCode::forbidden;
         }

@@ -96,7 +96,7 @@ void QnMergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(
 void QnMergeSystemsRestHandler::initiateConnectionToRemoteServer(
     QnCommonModule* commonModule,
     const QUrl& remoteModuleUrl,
-    const QnModuleInformationWithAddresses& remoteModuleInformation)
+    const nx::vms::api::ModuleInformationWithAddresses& remoteModuleInformation)
 {
     nx::vms::discovery::ModuleEndpoint module(
         remoteModuleInformation,

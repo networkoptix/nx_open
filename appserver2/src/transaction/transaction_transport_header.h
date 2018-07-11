@@ -20,7 +20,10 @@ namespace ec2 {
     struct QnTransactionTransportHeader
     {
         QnTransactionTransportHeader(): sequence(0), flags(Qn::TT_None), distance(0) {}
-        QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet()):
+        QnTransactionTransportHeader(
+            nx::vms::api::PeerSet processedPeers,
+            nx::vms::api::PeerSet dstPeers = {})
+            :
             processedPeers(processedPeers),
             dstPeers(dstPeers),
             sequence(0),
@@ -34,8 +37,8 @@ namespace ec2 {
 
         bool isNull() const;
 
-        QnPeerSet processedPeers;
-        QnPeerSet dstPeers;
+        nx::vms::api::PeerSet processedPeers;
+        nx::vms::api::PeerSet dstPeers;
         int sequence;
         QnUuid sender;
         QnUuid senderRuntimeID;

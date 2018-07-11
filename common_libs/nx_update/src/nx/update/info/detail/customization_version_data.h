@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utils/common/software_version.h>
 #include <nx/update/info/detail/data_parser/update_data.h>
+#include <nx/utils/software_version.h>
 
 namespace nx {
 namespace update {
@@ -11,14 +11,14 @@ namespace detail {
 struct CustomizationVersionData
 {
     QString name;
-    QnSoftwareVersion version;
-
-    CustomizationVersionData(const QString& name, const QnSoftwareVersion& version):
-        name(name),
-        version(version)
-    {}
+    nx::utils::SoftwareVersion version;
 
     CustomizationVersionData() = default;
+    CustomizationVersionData(const QString& name, const nx::utils::SoftwareVersion& version):
+        name(name),
+        version(version)
+    {
+    }
 };
 
 inline bool operator<(const CustomizationVersionData& lhs, const CustomizationVersionData& rhs)

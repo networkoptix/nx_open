@@ -2,7 +2,7 @@
 
 #include <limits>
 
-#include <nx_ec/data/api_resource_data.h>
+#include <nx/vms/api/data/resource_data.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/fusion/serialization/sql_functions.h>
@@ -77,7 +77,7 @@ SystemManager::SystemManager(
 
     // Registering transaction handler.
     m_ec2SyncronizationEngine->incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveUser, ::ec2::ApiUserData, data::SystemSharing>(
+        <::ec2::ApiCommand::saveUser, vms::api::UserData, data::SystemSharing>(
             std::bind(&SystemManager::processEc2SaveUser, this, _1, _2, _3, _4),
             std::bind(&SystemManager::onEc2SaveUserDone, this, _1, _2));
 
@@ -323,7 +323,7 @@ void SystemManager::shareSystem(
     if (sharing.customPermissions.empty())
     {
         bool isAdmin = false;
-        Qn::GlobalPermissions permissions(Qn::NoPermissions);
+        GlobalPermissions permissions(Qn::NoPermissions);
         ec2::accessRoleToPermissions(sharing.accessRole, &permissions, &isAdmin);
         sharing.customPermissions = QnLexical::serialized(permissions).toStdString();
     }
@@ -800,7 +800,7 @@ nx::sql::DBResult SystemManager::insertOwnerSharingToDb(
         ownerSharing->accountEmail).toSimpleString().toStdString();
     ownerSharing->isEnabled = true;
     ownerSharing->customPermissions = QnLexical::serialized(
-        static_cast<Qn::GlobalPermissions>(Qn::GlobalAdminPermissionSet)).toStdString();
+        static_cast<GlobalPermissions>(GlobalPermission::adminPermissions)).toStdString();
     const auto resultCode = updateSharingInDbAndGenerateTransaction(
         queryContext,
         newSystem.accountEmail,
@@ -1376,7 +1376,7 @@ nx::sql::DBResult SystemManager::generateSaveUserTransaction(
     const api::SystemSharing& sharing,
     const api::AccountData& account)
 {
-    ::ec2::ApiUserData userData;
+    vms::api::UserData userData;
     ec2::convert(sharing, &userData);
     userData.isCloud = true;
     userData.fullName = QString::fromStdString(account.fullName);
@@ -1887,7 +1887,7 @@ void SystemManager::expiredSystemsDeletedFromDb(
 nx::sql::DBResult SystemManager::processEc2SaveUser(
     nx::sql::QueryContext* queryContext,
     const nx::String& systemId,
-    data_sync_engine::Command<::ec2::ApiUserData> transaction,
+    data_sync_engine::Command<vms::api::UserData> transaction,
     data::SystemSharing* const systemSharingData)
 {
     const auto& vmsUser = transaction.params;

@@ -40,7 +40,7 @@ static void fillConfig(QCoreApplication& app)
 
 int main(int argc, char** argv)
 {
-    QnStaticCommonModule staticCommonModule(Qn::PeerType::PT_Server);
+    QnStaticCommonModule staticCommonModule(nx::vms::api::PeerType::server);
 
 #ifndef ENABLE_CLOUD_TEST
     QCoreApplication app(argc, argv);

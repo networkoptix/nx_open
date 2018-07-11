@@ -1,10 +1,10 @@
 import logging
 from pprint import pformat
-from subprocess import call, check_call
+from subprocess import check_call
 
 import pytest
 
-from framework.vms.hypervisor import VMInfo, VMNotFound, TemplateVMNotFound
+from framework.vms.hypervisor import TemplateVMNotFound, VMNotFound, VmHardware
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def clone_name(hypervisor):
 
 
 def test_find(hypervisor, dummy):
-    assert isinstance(hypervisor.find(dummy), VMInfo)
+    assert isinstance(hypervisor.find(dummy), VmHardware)
 
 
 def test_clone(hypervisor, template, clone_name):

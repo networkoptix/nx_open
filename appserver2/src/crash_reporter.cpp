@@ -278,8 +278,8 @@ nx::network::http::HttpHeaders ReportData::makeHttpHeaders() const
 
     const auto uuidHash = m_host.commonModule()->moduleGUID().toSimpleString().replace(lit("-"), lit(""));
     const auto version = nx::utils::AppInfo::applicationFullVersion();
-    const auto systemInfo = QnSystemInformation::currentSystemInformation().toString();
-    const auto systemRuntime = QnSystemInformation::currentSystemRuntime();
+    const auto systemInfo = QnAppInfo::currentSystemInformation().toString();
+    const auto systemRuntime = nx::vms::api::SystemInformation::currentSystemRuntime();
     const auto system = lit( "%1 %2" ).arg( systemInfo ).arg( systemRuntime )
             .replace( QChar( ' ' ), QChar( '-' ) );
 

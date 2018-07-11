@@ -5,17 +5,18 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/merge_systems_common.h>
 
+#include <nx/vms/api/data_fwd.h>
+
 struct MergeSystemData;
 
-namespace ec2 {
-    class AbstractTransactionMessageBus;
-}
+namespace ec2 { class AbstractTransactionMessageBus; }
 
 class QnCommonModule;
 
 class QnMergeSystemsRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
+
 public:
     QnMergeSystemsRestHandler(ec2::AbstractTransactionMessageBus* messageBus);
 
@@ -46,5 +47,5 @@ private:
     void initiateConnectionToRemoteServer(
         QnCommonModule* commonModule,
         const QUrl& remoteModuleUrl,
-        const QnModuleInformationWithAddresses& remoteModuleInformation);
+        const nx::vms::api::ModuleInformationWithAddresses& remoteModuleInformation);
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <ui/graphics/items/resource/web_resource_widget.h>
 
 namespace nx {
@@ -17,10 +19,11 @@ public:
         QnWorkbenchItem* item,
         QGraphicsItem* parent = nullptr);
 
-    Q_INVOKABLE void c2pplayback(const QString& cameraNames, int timestamp);
+    Q_INVOKABLE void c2pplayback(const QString& cameraNames, int timestampSec);
 
 private:
-    void resetC2pLayout(const QnVirtualCameraResourceList& cameras, qint64 timestampMs);
+    void resetC2pLayout(const QnVirtualCameraResourceList& cameras,
+        std::chrono::milliseconds timestamp);
 };
 
 

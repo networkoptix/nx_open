@@ -338,9 +338,9 @@ void AsyncHttpClient::setProxyUserCredentials(const Credentials& userCredentials
     m_delegate.setProxyUserCredentials(userCredentials);
 }
 
-void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
+void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure)
 {
-    m_delegate.setProxyVia(proxyEndpoint);
+    m_delegate.setProxyVia(proxyEndpoint, isSecure);
 }
 
 void AsyncHttpClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)

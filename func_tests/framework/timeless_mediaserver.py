@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from framework.installation.make_installation import make_installation
+from framework.installation.make_installation import installer_by_vm_type, make_installation
 from framework.installation.mediaserver_factory import (
     cleanup_mediaserver,
     collect_artifacts_from_mediaserver,
@@ -11,8 +11,9 @@ from framework.merging import setup_local_system
 @contextmanager
 def timeless_mediaserver(vm, mediaserver_installers, ca, artifact_factory):
     """Mediaserver never exposed to internet depending on machine time"""
+    installer = installer_by_vm_type(mediaserver_installers, vm.type)
     installation = make_installation(mediaserver_installers, vm.type, vm.os_access)
-    mediaserver = make_dirty_mediaserver(vm.alias, installation)
+    mediaserver = make_dirty_mediaserver(vm.alias, installation, installer)
     mediaserver.stop(already_stopped_ok=True)
     vm.os_access.networking.disable_internet()
     cleanup_mediaserver(mediaserver, ca)

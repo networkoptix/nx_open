@@ -169,6 +169,11 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
     else
         frame = srcFrame;
 
+    // TODO: srcFrame->scaled can return an empty pointer. Maybe we should do something more sensitive here
+    NX_ASSERT(frame);
+    if (!frame)
+        return frame;
+
     int left = 0;
     int right = frame->width;
     int top = 0;

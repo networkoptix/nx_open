@@ -22,7 +22,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
     QVariantMap& fullData)
 {
     int port = owner->owner()->getPort();
-    nx::utils::Url url(lit("http://localhost:%1/%2").arg(port).arg(QnTcpListener::normalizedPath(command)));
+    nx::utils::Url url(lit("https://localhost:%1/%2").arg(port).arg(QnTcpListener::normalizedPath(command)));
     QUrlQuery urlQuery;
     for (auto itr = params.begin(); itr != params.end(); ++itr)
         urlQuery.addQueryItem(itr.key(), itr.value());

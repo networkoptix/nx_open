@@ -2,20 +2,18 @@
 
 #include <cassert>
 
+#include <api/resource_property_adaptor.h>
+#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
-
-#include "resource_property_adaptor.h"
-
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
 #include <utils/crypt/symmetrical.h>
-#include <nx/utils/app_info.h>
 
-#include <nx_ec/data/api_resource_data.h>
-#include <common/common_module.h>
+#include <nx/utils/app_info.h>
+#include <nx/vms/api/data/resource_data.h>
 
 namespace
 {

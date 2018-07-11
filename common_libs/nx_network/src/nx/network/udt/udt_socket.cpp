@@ -549,7 +549,7 @@ UdtStreamSocket::UdtStreamSocket(
     m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, ipVersion))
 {
     if (state == detail::SocketState::connected)
-        m_isInternetConnection = !getForeignAddress().address.isLocal();
+        m_isInternetConnection = !getForeignAddress().address.isLocalNetwork();
 }
 
 UdtStreamSocket::~UdtStreamSocket()
@@ -805,7 +805,7 @@ bool UdtStreamSocket::connectToIp(
         return false;
     }
     m_state = detail::SocketState::connected;
-    m_isInternetConnection = !getForeignAddress().address.isLocal();
+    m_isInternetConnection = !getForeignAddress().address.isLocalNetwork();
     return true;
 }
 

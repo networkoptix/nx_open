@@ -231,13 +231,13 @@ void BookmarkSearchListModel::Private::clipToSelectedTimePeriod()
 
 bool BookmarkSearchListModel::Private::hasAccessRights() const
 {
-    return q->accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission);
+    return q->accessController()->hasGlobalPermission(GlobalPermission::viewBookmarks);
 }
 
 void BookmarkSearchListModel::Private::watchBookmarkChanges()
 {
     // TODO: #vkutin Check whether qnCameraBookmarksManager won't emit these signals
-    // if current user has no Qn::GlobalViewBookmarksPermission
+    // if current user has no GlobalPermission::viewBookmarks
 
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkAdded,
         this, &Private::addBookmark);

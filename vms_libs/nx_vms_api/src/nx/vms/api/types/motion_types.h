@@ -32,5 +32,10 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionStreamType)
 } // namespace vms
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::MotionType, (metatype)(numeric)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::MotionTypes, (metatype)(numeric)(lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::MotionType,
+    (metatype)(numeric)(lexical)(debug),
+    NX_VMS_API)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::MotionTypes,
+    (metatype)(numeric)(lexical)(debug),
+    NX_VMS_API)

@@ -202,10 +202,10 @@ public:
             auto id = commonModule->moduleGUID();
             auto resourcePool = m_appserver->moduleInstance()->commonModule()->resourcePool();
             auto server = resourcePool->getResourceById<QnMediaServerResource>(id);
-            auto flags = server->getServerFlags() | Qn::SF_HasPublicIP;
+            auto flags = server->getServerFlags() | nx::vms::api::SF_HasPublicIP;
             server->setServerFlags(flags);
 
-            ec2::ApiMediaServerData apiServer;
+            nx::vms::api::MediaServerData apiServer;
             ec2::fromResourceToApi(server, apiServer);
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
@@ -235,11 +235,11 @@ public:
         m_appserver->moduleInstance()->connectTo(remotePeer->m_appserver->moduleInstance().get());
     }
 
-    ::ec2::ApiPeerData peerData() const
+    nx::vms::api::PeerData peerData() const
     {
-        ::ec2::ApiPeerData peerData;
+        nx::vms::api::PeerData peerData;
         peerData.id = commonModule()->moduleGUID();
-        peerData.peerType = Qn::PT_Server;
+        peerData.peerType = nx::vms::api::PeerType::server;
         return peerData;
     }
 

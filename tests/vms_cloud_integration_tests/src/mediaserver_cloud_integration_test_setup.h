@@ -49,7 +49,7 @@ public:
     void changeCloudOwnerAccountPassword();
     void switchToDefaultCredentials();
     void waitForCloudDataSynchronizedToTheMediaServer();
-    ::ec2::ApiUserData inviteRandomCloudUser();
+    nx::vms::api::UserData inviteRandomCloudUser();
     void waitForUserToAppearInCloud(const std::string& email);
 
 protected:

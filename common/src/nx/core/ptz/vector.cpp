@@ -52,6 +52,21 @@ Vector::Vector(const QVector4D& vector, const ComponentVector<4>& components)
     setComponent(vector.w(), components[3]);
 }
 
+double Vector::component(Component component) const
+{
+    switch (component)
+    {
+        case Component::pan: return pan;
+        case Component::tilt: return tilt;
+        case Component::rotation: return rotation;
+        case Component::zoom: return zoom;
+        case Component::focus: return focus;
+        default:
+            NX_ASSERT(false, lit("Wrong component. We should never be here"));
+            return qQNaN<double>();
+    }
+}
+
 void Vector::setComponent(double value, Component component)
 {
     switch (component)
@@ -74,6 +89,11 @@ void Vector::setComponent(double value, Component component)
         default:
             NX_ASSERT(false, lit("Wrong component. We should never be here"));
     }
+}
+
+bool Vector::operator==(const Vector& other) const
+{
+    return qFuzzyEquals(*this, other);
 }
 
 Vector Vector::operator+(const Vector& other) const
@@ -129,6 +149,77 @@ Vector Vector::operator/(double scalar) const
         focus / scalar);
 }
 
+Vector& Vector::operator+=(const Vector& other)
+{
+    pan += other.pan;
+    tilt += other.tilt;
+    rotation += other.rotation;
+    zoom += other.zoom;
+    focus += other.focus;
+    return *this;
+}
+
+Vector& Vector::operator-=(const Vector& other)
+{
+    pan -= other.pan;
+    tilt -= other.tilt;
+    rotation -= other.rotation;
+    zoom -= other.zoom;
+    focus -= other.focus;
+    return *this;
+}
+
+Vector& Vector::operator*=(const Vector& other)
+{
+    pan *= other.pan;
+    tilt *= other.tilt;
+    rotation *= other.rotation;
+    zoom *= other.zoom;
+    focus *= other.focus;
+    return *this;
+}
+
+Vector& Vector::operator*=(double scalar)
+{
+    pan *= scalar;
+    tilt *= scalar;
+    rotation *= scalar;
+    zoom *= scalar;
+    focus *= scalar;
+    return *this;
+}
+
+Vector& Vector::operator/=(const Vector& other)
+{
+    (other.pan == 0) ? (pan /= other.pan) : qQNaN<double>();
+    (other.tilt == 0) ? (tilt /= other.tilt) : qQNaN<double>();
+    (other.rotation == 0) ? (rotation /= other.rotation) : qQNaN<double>();
+    (other.zoom == 0) ? (zoom /= other.zoom) : qQNaN<double>();
+    (other.focus == 0) ? (focus /= other.focus) : qQNaN<double>();
+    return *this;
+}
+
+Vector& Vector::operator/=(double scalar)
+{
+    if (scalar == 0)
+    {
+        pan = qQNaN<double>();
+        tilt = qQNaN<double>();
+        rotation /= qQNaN<double>();
+        zoom /= qQNaN<double>();
+        focus /= qQNaN<double>();
+    }
+    else
+    {
+        pan /= scalar;
+        tilt /= scalar;
+        rotation /= scalar;
+        zoom /= scalar;
+        focus /= scalar;
+    }
+    return *this;
+}
+
 double Vector::length() const
 {
     return std::sqrt(lengthSquared());
@@ -153,6 +244,11 @@ bool Vector::isNull() const
     return qFuzzyIsNull(*this);
 }
 
+bool Vector::isValid() const
+{
+    return qIsNaN(*this);
+}
+
 Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType) const
 {
     if (restrictionType == LimitsType::position)
@@ -161,14 +257,16 @@ Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType)
             std::clamp(pan, limits.minPan, limits.maxPan),
             std::clamp(tilt, limits.minTilt, limits.maxTilt),
             std::clamp(rotation, limits.minRotation, limits.maxRotation),
-            std::clamp(zoom, limits.minFov, limits.maxFov));
+            std::clamp(zoom, limits.minFov, limits.maxFov),
+            std::clamp(focus, limits.minFocus, limits.maxFocus));
     }
 
     return Vector(
             std::clamp(pan, limits.minPanSpeed, limits.maxPanSpeed),
             std::clamp(tilt, limits.minTiltSpeed, limits.maxTiltSpeed),
             std::clamp(rotation, limits.minRotationSpeed, limits.maxRotationSpeed),
-            std::clamp(zoom, limits.minZoomSpeed, limits.maxZoomSpeed));
+            std::clamp(zoom, limits.minZoomSpeed, limits.maxZoomSpeed),
+            std::clamp(focus, limits.minFocusSpeed, limits.maxFocusSpeed));
 }
 
 /*static*/ Vector Vector::rangeVector(const QnPtzLimits& limits, LimitsType limitsType)
@@ -179,14 +277,16 @@ Vector Vector::restricted(const QnPtzLimits& limits, LimitsType restrictionType)
             limits.maxPan - limits.minPan,
             limits.maxTilt - limits.minTilt,
             limits.maxRotation - limits.minRotation,
-            limits.maxFov - limits.minFov);
+            limits.maxFov - limits.minFov,
+            limits.maxFocus - limits.minFocus);
     }
 
     return Vector(
         limits.maxPanSpeed - limits.minPanSpeed,
         limits.maxTiltSpeed - limits.minTiltSpeed,
         limits.maxRotationSpeed - limits.minRotationSpeed,
-        limits.maxZoomSpeed - limits.minZoomSpeed);
+        limits.maxZoomSpeed - limits.minZoomSpeed,
+        limits.maxFocusSpeed - limits.minFocusSpeed);
 }
 
 Vector operator*(const Vector& ptzVector, double scalar)
@@ -204,7 +304,7 @@ Vector operator*(double scalar, const Vector& ptzVector)
     return ptzVector * scalar;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json)(eq), PtzVector_Fields, (optional, true));
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Vector, (json), PtzVector_Fields, (optional, true));
 
 } // namespace ptz
 } // namespace core

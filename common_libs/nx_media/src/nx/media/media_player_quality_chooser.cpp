@@ -410,12 +410,12 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
     if (!server)
         return Player::TranscodingNotSupported;
 
-    if (server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding))
+    if (server->getServerFlags().testFlag(vms::api::SF_SupportsTranscoding))
         return Player::TranscodingSupported;
 
     if (requestType == TranscodingRequestType::detailed)
     {
-        if (server->getVersion() < QnSoftwareVersion(3, 0))
+        if (server->getVersion() < nx::utils::SoftwareVersion(3, 0))
             return Player::TranscodingNotSupportedForServersOlder30;
 
         const auto& info = server->getSystemInfo();

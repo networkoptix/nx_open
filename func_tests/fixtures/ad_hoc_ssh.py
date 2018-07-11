@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from netaddr.ip import IPAddress
 from pathlib2 import Path
 
-from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_shell import SSH
 from framework.os_access.posix_shell_utils import sh_command_to_script
 from framework.waiting import wait_for_true
 
@@ -103,7 +103,7 @@ def ad_hoc_ssh_server(ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key)
         }
     host_config_path = ad_hoc_ssh_dir / 'host_config'
     _write_config(host_config, host_config_path)
-    sshd_command = ['/usr/sbin/sshd', '-D', '-d', '-f', str(host_config_path), '-p', str(port)]
+    sshd_command = ['/usr/sbin/sshd', '-D', '-f', str(host_config_path), '-p', str(port)]
     _logger.info('RUN: %s', sh_command_to_script(sshd_command))
     process = subprocess.Popen(sshd_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 

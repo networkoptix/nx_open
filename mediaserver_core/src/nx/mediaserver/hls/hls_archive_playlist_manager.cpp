@@ -19,19 +19,19 @@ namespace hls {
 static const qint64 MAX_GOP_LENGTH_SEC = 100;
 static const qint64 USEC_IN_MSEC = 1000;
 static const qint64 MSEC_IN_SEC = 1000;
+static const qint64 kDefaultNextIFrameLoopSize = 5;
 
 ArchivePlaylistManager::ArchivePlaylistManager(
     const QnSecurityCamResourcePtr& camResource,
     qint64 startTimestamp,
     unsigned int maxChunkNumberInPlaylist,
-    qint64 targetDurationUsec,
+    std::chrono::microseconds targetDuration,
     MediaQuality streamQuality)
     :
     m_camResource(camResource),
     m_startTimestamp(startTimestamp),
     m_maxChunkNumberInPlaylist(maxChunkNumberInPlaylist),
-    m_targetDurationUsec(targetDurationUsec),
-    m_getNextIFrameLoopMaxSize(MAX_GOP_LENGTH_SEC * USEC_IN_MSEC * MSEC_IN_SEC / m_targetDurationUsec),
+    m_targetDuration(targetDuration),
     m_streamQuality(streamQuality),
     m_totalPlaylistDuration(0),
     m_prevChunkEndTimestamp(0),
@@ -43,6 +43,9 @@ ArchivePlaylistManager::ArchivePlaylistManager(
     m_discontinuityDetected(false)
 {
     NX_ASSERT(m_maxChunkNumberInPlaylist > 0);
+    m_getNextIFrameLoopMaxSize = std::max<qint64>(
+        (MAX_GOP_LENGTH_SEC * USEC_IN_MSEC * MSEC_IN_SEC) / m_targetDuration.count(),
+        kDefaultNextIFrameLoopSize);
 }
 
 ArchivePlaylistManager::~ArchivePlaylistManager()
@@ -69,7 +72,10 @@ bool ArchivePlaylistManager::initialize()
         m_delegate = archiveDelegate;
     else
         m_delegate.reset(new QnThumbnailsArchiveDelegate(archiveDelegate));
-    m_delegate->setRange(m_startTimestamp, std::numeric_limits<qint64>::max(), m_targetDurationUsec);
+    m_delegate->setRange(
+        m_startTimestamp,
+        std::numeric_limits<qint64>::max(),
+        m_targetDuration.count());
 
     const QnAbstractMediaDataPtr& nextData = m_delegate->getNextData();
     if (!nextData)
@@ -174,7 +180,7 @@ bool ArchivePlaylistManager::addOneMoreChunk()
         else
         {
             //TODO/HLS: #ak some correction is required to call addOneMoreChunk() at appropriate time
-            chunkData.duration = m_targetDurationUsec;
+            chunkData.duration = m_targetDuration.count();
         }
         //have to insert EXT-X-DISCONTINUITY tag before next chunk
         m_discontinuityDetected = true;

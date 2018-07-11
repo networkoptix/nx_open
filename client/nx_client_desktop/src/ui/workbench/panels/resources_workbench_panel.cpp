@@ -24,6 +24,7 @@
 #include <ui/graphics/items/generic/resizer_widget.h>
 #include <ui/graphics/items/controls/control_background_widget.h>
 #include <ui/processors/hover_processor.h>
+#include <ui/style/skin.h>
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
@@ -55,14 +56,9 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     widget(new QnResourceBrowserWidget(nullptr, context())),
     item(new QnMaskedProxyWidget(parentWidget)),
     xAnimator(new VariantAnimator(widget)),
-    m_ignoreClickEvent(false),
-    m_visible(false),
-    m_resizing(false),
-    m_updateResizerGeometryLater(false),
     m_resizerWidget(new QnResizerWidget(Qt::Horizontal, parentWidget)),
     m_backgroundItem(new QnControlBackgroundWidget(Qt::LeftEdge, parentWidget)),
-    m_showButton(newShowHideButton(parentWidget, context(), action::ToggleTreeAction)),
-    m_pinButton(newPinButton(parentWidget, context(), action::PinTreeAction)),
+    m_showButton(newShowHideButton(parentWidget, context(), action::PinTreeAction)),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
     m_showingProcessor(new HoverFocusProcessor(parentWidget)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget)),
@@ -119,19 +115,12 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     connect(item, &QGraphicsWidget::geometryChanged, widget,
         &QnResourceBrowserWidget::hideToolTip);
 
-    action(action::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
+    m_opened = (settings.state == Qn::PaneState::Opened);
+    setShowButtonIcon();
     m_showButton->setFocusProxy(item);
     m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
-    connect(action(action::ToggleTreeAction), &QAction::toggled, this,
-        [this](bool checked)
-        {
-            if (!m_ignoreClickEvent)
-                setOpened(checked, true);
-        });
 
     action(action::PinTreeAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
-    m_pinButton->setFocusProxy(item);
-    m_pinButton->setZValue(ControlItemZOrder);
     connect(action(action::PinTreeAction), &QAction::toggled, this,
         [this](bool checked)
         {
@@ -170,7 +159,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_hidingProcessor->setFocusLeaveDelay(NxUi::kClosePanelTimeoutMs);
     connect(menu(), &nx::client::desktop::ui::action::Manager::menuAboutToHide, m_hidingProcessor,
         &HoverFocusProcessor::forceFocusLeave);
-    connect(m_hidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this,
+    connect(m_hidingProcessor, &HoverFocusProcessor::hoverAndFocusLeft, this,
         [this]
         {
             /* Do not auto-hide tree if we have opened context menu. */
@@ -191,7 +180,6 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(item));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_backgroundItem));
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
-    m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_pinButton));
 
     /* Create a shadow: */
     auto shadow = new QnEdgeShadowWidget(item, item, Qt::RightEdge, NxUi::kShadowThickness);
@@ -205,7 +193,7 @@ bool ResourceTreeWorkbenchPanel::isPinned() const
 
 bool ResourceTreeWorkbenchPanel::isOpened() const
 {
-    return action(action::ToggleTreeAction)->isChecked();
+    return m_opened;
 }
 
 void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
@@ -219,8 +207,7 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_showingProcessor->forceHoverLeave(); /* So that it don't bring it back. */
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_ignoreClickEvent, true);
-    action(action::ToggleTreeAction)->setChecked(opened);
+    m_opened = opened;
 
     xAnimator->stop();
     qnWorkbenchAnimations->setupAnimator(xAnimator, opened
@@ -235,6 +222,7 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
         item->setX(newX);
 
     m_resizerWidget->setEnabled(opened);
+    setShowButtonIcon();
 
     emit openedChanged(opened, animate);
 }
@@ -270,7 +258,6 @@ void ResourceTreeWorkbenchPanel::setOpacity(qreal opacity, bool animate)
     {
         m_opacityAnimatorGroup->pause();
         opacityAnimator(item)->setTargetValue(opacity);
-        opacityAnimator(m_pinButton)->setTargetValue(opacity);
         opacityAnimator(m_backgroundItem)->setTargetValue(opacity);
         opacityAnimator(m_showButton)->setTargetValue(opacity);
         m_opacityAnimatorGroup->start();
@@ -279,7 +266,6 @@ void ResourceTreeWorkbenchPanel::setOpacity(qreal opacity, bool animate)
     {
         m_opacityAnimatorGroup->stop();
         item->setOpacity(opacity);
-        m_pinButton->setOpacity(opacity);
         m_backgroundItem->setOpacity(opacity);
         m_showButton->setOpacity(opacity);
     }
@@ -350,6 +336,14 @@ void ResourceTreeWorkbenchPanel::setProxyUpdatesEnabled(bool updatesEnabled)
 void ResourceTreeWorkbenchPanel::setShowButtonUsed(bool used)
 {
     m_showButton->setAcceptedMouseButtons(used ? Qt::LeftButton : Qt::NoButton);
+}
+
+void ResourceTreeWorkbenchPanel::setShowButtonIcon()
+{
+    m_showButton->setIcon(qnSkin->icon(m_opened
+        ? "panel/slide_pin.png"
+        : "panel/slide_right.png",
+        "panel/slide_left.png"));
 }
 
 void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
@@ -452,10 +446,6 @@ void ResourceTreeWorkbenchPanel::updateControlsGeometry()
     m_showButton->setPos(QPointF(
         qMax(parentWidgetRect.left(), geometry.right()),
         (parentWidgetRect.top() + parentWidgetRect.bottom() - m_showButton->size().height())/2.0));
-
-    m_pinButton->setPos(QPointF(
-        geometry.right() - m_pinButton->size().width() - 1.0,
-        geometry.top() + 1.0));
 
     updateResizerGeometry();
 

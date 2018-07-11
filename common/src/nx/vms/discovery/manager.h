@@ -11,11 +11,11 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-struct ModuleEndpoint: QnModuleInformation
+struct ModuleEndpoint: api::ModuleInformation
 {
     nx::network::SocketAddress endpoint;
 
-    ModuleEndpoint(QnModuleInformation old = {}, nx::network::SocketAddress endpoint = {});
+    ModuleEndpoint(api::ModuleInformation old = {}, nx::network::SocketAddress endpoint = {});
     bool operator==(const ModuleEndpoint& rhs) const;
 };
 

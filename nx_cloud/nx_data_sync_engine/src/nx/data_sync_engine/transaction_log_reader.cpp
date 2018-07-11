@@ -32,8 +32,8 @@ void TransactionLogReader::stopWhileInAioThread()
 }
 
 void TransactionLogReader::readTransactions(
-    boost::optional<::ec2::QnTranState> from,
-    boost::optional<::ec2::QnTranState> to,
+    boost::optional<vms::api::TranState> from,
+    boost::optional<vms::api::TranState> to,
     int maxTransactionsToReturn,
     TransactionsReadHandler completionHandler)
 {
@@ -47,7 +47,7 @@ void TransactionLogReader::readTransactions(
             completionHandler = std::move(completionHandler)](
                 ResultCode resultCode,
                 std::vector<dao::TransactionLogRecord> serializedTransactions,
-                ::ec2::QnTranState readedUpTo) mutable
+                vms::api::TranState readedUpTo) mutable
         {
             const auto locker = sharedGuard->lock();
             if (!locker)
@@ -74,7 +74,7 @@ void TransactionLogReader::readTransactions(
 void TransactionLogReader::onTransactionsRead(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
-    ::ec2::QnTranState readedUpTo,
+    vms::api::TranState readedUpTo,
     TransactionsReadHandler completionHandler)
 {
     NX_ASSERT(m_dataFormat == Qn::UbjsonFormat);
@@ -86,7 +86,7 @@ void TransactionLogReader::onTransactionsRead(
         std::move(readedUpTo));
 }
 
-::ec2::QnTranState TransactionLogReader::getCurrentState() const
+vms::api::TranState TransactionLogReader::getCurrentState() const
 {
     return m_transactionLog->getTransactionState(m_systemId);
 }

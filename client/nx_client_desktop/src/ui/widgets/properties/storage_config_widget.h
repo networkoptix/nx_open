@@ -19,6 +19,8 @@
 
 #include <utils/common/connective.h>
 
+#include <nx/vms/api/types/resource_types.h>
+
 namespace Ui {
     class StorageConfigWidget;
 } // namespace Ui
@@ -58,7 +60,7 @@ private:
     void at_storageView_clicked(const QModelIndex& index);
 
     void applyCamerasToBackup(const QnVirtualCameraResourceList& cameras,
-        Qn::CameraBackupQualities quality);
+        nx::vms::api::CameraBackupQualities quality);
 
     void updateCamerasForBackup(const QnVirtualCameraResourceList& cameras);
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
@@ -122,7 +124,7 @@ private:
     bool m_backupCancelled;
     bool m_updating;
 
-    Qn::CameraBackupQualities m_quality;
+    nx::vms::api::CameraBackupQualities m_quality;
     QnVirtualCameraResourceList m_camerasToBackup;
     bool m_backupNewCameras;
 

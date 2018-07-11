@@ -224,7 +224,7 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 }
 
 void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
-    const ec2::ApiUserRoleData& userRole)
+    const nx::vms::api::UserRoleData& userRole)
 {
     NX_EXPECT(mode() == Mode::cached);
 
@@ -232,7 +232,7 @@ void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
     handleSubjectAdded(userRole);
 }
 
-void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
+void QnBaseResourceAccessProvider::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
     NX_EXPECT(mode() == Mode::cached);
     handleSubjectRemoved(userRole);

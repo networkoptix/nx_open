@@ -170,7 +170,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createResourceNode(
 {
     NodeType nodeType = NodeType::resource;
 
-    if (model->context()->accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+    if (model->context()->accessController()->hasGlobalPermission(GlobalPermission::admin)
         && QnMediaServerResource::isHiddenServer(resource->getParentResource()))
     {
         nodeType = NodeType::edge;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtCore>
-#include <utils/common/software_version.h>
 #include <nx/update/info/file_data.h>
 
 namespace nx {

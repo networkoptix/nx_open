@@ -303,7 +303,7 @@ bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
     /* We can get here either user id or role id. User should be checked additionally, role is
      * always counted as valid (if exists). */
     return !userRolesManager()->userRole(resourceId).isNull()
-        || userRolesManager()->predefinedRole(resourceId) != Qn::UserRole::CustomUserRole;
+        || userRolesManager()->predefinedRole(resourceId) != Qn::UserRole::customUserRole;
 }
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
@@ -670,7 +670,7 @@ bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*u
 // QnRequiredPermissionSubjectPolicy
 
 QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(
-    Qn::GlobalPermission requiredPermission,
+    GlobalPermission requiredPermission,
     const QString& permissionName,
     bool allowEmptySelection)
     :
@@ -695,13 +695,13 @@ bool QnRequiredPermissionSubjectPolicy::isRoleValid(const QnUuid& roleId) const
     const auto role = userRolesManager()->predefinedRole(roleId);
     switch (role)
     {
-        case Qn::UserRole::CustomPermissions:
+        case Qn::UserRole::customPermissions:
         {
             NX_ASSERT(false); //< Should never happen.
             return false;
         }
 
-        case Qn::UserRole::CustomUserRole:
+        case Qn::UserRole::customUserRole:
         {
             const auto customRole = userRolesManager()->userRole(roleId);
             return customRole.permissions.testFlag(m_requiredPermission);

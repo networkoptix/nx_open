@@ -3,7 +3,7 @@ import pytest
 from defaults import defaults
 from framework.networking.linux import LinuxNetworking
 from framework.networking.windows import WindowsNetworking
-from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_shell import SSH
 from framework.os_access.windows_remoting import WinRM
 from framework.vms.factory import SSH_PRIVATE_KEY_PATH
 from framework.waiting import wait_for_true

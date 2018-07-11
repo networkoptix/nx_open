@@ -67,6 +67,8 @@ static int registerQtResources()
     return 0;
 }
 
+using namespace nx::vms;
+
 namespace ec2 {
 
 int m_instanceCounter = 0;
@@ -143,7 +145,7 @@ int Appserver2Process::exec()
     std::unique_ptr<ec2::LocalConnectionFactory>
         ec2ConnectionFactory(new ec2::LocalConnectionFactory(
             m_commonModule.get(),
-            Qn::PT_Server,
+            api::PeerType::server,
             settings.isP2pMode(),
             &tcpListener));
 
@@ -253,10 +255,10 @@ nx::network::SocketAddress Appserver2Process::endpoint() const
 
 void Appserver2Process::updateRuntimeData()
 {
-    ec2::ApiRuntimeData runtimeData;
+    nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = m_commonModule->moduleGUID();
     runtimeData.peer.instanceId = m_commonModule->runningInstanceGUID();
-    runtimeData.peer.peerType = Qn::PT_Server;
+    runtimeData.peer.peerType = api::PeerType::server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
@@ -463,15 +465,15 @@ void Appserver2Process::addSelfServerResource(
     server->setId(commonModule()->moduleGUID());
     m_commonModule->resourcePool()->addResource(server);
     server->setStatus(Qn::Online);
-    server->setServerFlags(Qn::SF_HasPublicIP);
+    server->setServerFlags(nx::vms::api::SF_HasPublicIP);
     server->setName(QString::number(m_instanceCounter));
 
     m_commonModule->bindModuleInformation(server);
 
-    ::ec2::ApiMediaServerData apiServer;
+    api::MediaServerData apiServer;
     apiServer.id = commonModule()->moduleGUID();
     apiServer.name = server->getName();
-    ::ec2::fromResourceToApi(server, apiServer);
+    ec2::fromResourceToApi(server, apiServer);
     if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer)
         != ec2::ErrorCode::ok)
     {
@@ -490,8 +492,9 @@ bool initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 
 bool initUsers(ec2::AbstractECConnection* ec2Connection)
 {
-    ec2::ApiUserDataList users;
-    const ec2::ErrorCode errorCode = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+    nx::vms::api::UserDataList users;
+    const ec2::ErrorCode errorCode =
+        ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
     auto messageProcessor = ec2Connection->commonModule()->messageProcessor();
     if (errorCode != ec2::ErrorCode::ok)
         return false;
@@ -518,7 +521,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     settings->setAutoDiscoveryEnabled(false);
 
     //read server list
-    ec2::ApiMediaServerDataList mediaServerList;
+    nx::vms::api::MediaServerDataList mediaServerList;
     auto resultCode =
         connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList);
     if (resultCode != ec2::ErrorCode::ok)
@@ -536,7 +539,7 @@ bool Appserver2Process::createInitialData(const QString& systemName)
     for (const auto &camera : cameraList)
         messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
 
-    ec2::ApiMediaServerData serverData;
+    nx::vms::api::MediaServerData serverData;
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
     if (resTypePtr.isNull())
         return false;

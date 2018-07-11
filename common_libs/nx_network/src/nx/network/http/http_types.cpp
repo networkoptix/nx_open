@@ -54,6 +54,11 @@ int defaultPortForScheme(const StringType& scheme)
     return -1;
 }
 
+int defaultPort(bool isSecure)
+{
+    return isSecure ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
+}
+
 StringType getHeaderValue(const HttpHeaders& headers, const StringType& headerName)
 {
     HttpHeaders::const_iterator it = headers.lower_bound(headerName);
@@ -690,18 +695,18 @@ StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
     return buf;
 }
 
-static StringType kSetCookieHeader("Set-Cookie");
+static StringType kSetCookieHeaderName("Set-Cookie");
 
 void Response::setCookie(const StringType& name, const StringType& value, const StringType& path)
 {
     insertHeader(&headers,
-        {kSetCookieHeader, name + "=" + value + "; Path=" + path});
+        {kSetCookieHeaderName, name + "=" + value + "; Path=" + path});
 }
 
-void Response::removeCookie(const StringType& name)
+void Response::setDeletedCookie(const StringType& name)
 {
     insertHeader(&headers,
-        {kSetCookieHeader,name + "=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
+        {kSetCookieHeaderName,name + "=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
 }
 
 std::map<StringType, StringType> Response::getCookies() const

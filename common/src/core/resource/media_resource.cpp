@@ -16,6 +16,9 @@
 
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/core/ptz/component.h>
+
+namespace core_ptz = nx::core::ptz;
 
 namespace {
 
@@ -166,27 +169,71 @@ void QnMediaResource::clearCustomAspectRatio()
     this->toResource()->setProperty(::customAspectRatioKey, QString());
 }
 
-Ptz::Capabilities QnMediaResource::getPtzCapabilities() const
+Ptz::Capabilities QnMediaResource::getPtzCapabilities(core_ptz::Type ptzType) const
+{
+    switch (ptzType)
+    {
+        case core_ptz::Type::operational:
+            return operationalPtzCapabilities();
+        case core_ptz::Type::configurational:
+            return Ptz::Capabilities(
+                toResource()->getProperty(Qn::kConfigurationalPtzCapabilities).toInt());
+        default:
+            NX_ASSERT(false, "Wrong ptz type, we should never be here");
+            return Ptz::NoPtzCapabilities;
+    }
+}
+
+bool QnMediaResource::hasAnyOfPtzCapabilities(
+    Ptz::Capabilities capabilities,
+    nx::core::ptz::Type ptzType) const
+{
+    return getPtzCapabilities(ptzType) & capabilities;
+}
+
+void QnMediaResource::setPtzCapabilities(
+    Ptz::Capabilities capabilities,
+    core_ptz::Type ptzType)
+{
+    switch (ptzType)
+    {
+        case core_ptz::Type::operational:
+        {
+            // TODO: #rvasilenko Why do we need this check?
+            if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
+                toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, (int) capabilities);
+            break;
+        }
+        case core_ptz::Type::configurational:
+        {
+            toResource()->setProperty(Qn::kConfigurationalPtzCapabilities, (int) capabilities);
+            break;
+        }
+        default:
+            NX_ASSERT(false, "Wrong ptz type, we should never be here");
+    }
+
+}
+
+void QnMediaResource::setPtzCapability(
+    Ptz::Capabilities capability,
+    bool value,
+    core_ptz::Type ptzType)
+{
+    setPtzCapabilities(value
+        ? (getPtzCapabilities(ptzType) | capability)
+        : (getPtzCapabilities(ptzType) & ~capability), ptzType);
+}
+
+Ptz::Capabilities QnMediaResource::operationalPtzCapabilities() const
 {
     return Ptz::Capabilities(toResource()->getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
 }
 
-bool QnMediaResource::hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const
-{
-    return getPtzCapabilities() & capabilities;
-}
-
-void QnMediaResource::setPtzCapabilities(Ptz::Capabilities capabilities)
+void QnMediaResource::setOperationalPtzCapabilities(Ptz::Capabilities capabilities)
 {
     if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
         toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
-}
-
-void QnMediaResource::setPtzCapability(Ptz::Capabilities capability, bool value)
-{
-    setPtzCapabilities(value
-        ? (getPtzCapabilities() | capability)
-        : (getPtzCapabilities() & ~capability));
 }
 
 bool QnMediaResource::canDisableNativePtzPresets() const

@@ -5,17 +5,19 @@
 #include "ec2_connection.h"
 
 #include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
 #include <llutil/hardware_id.h>
+#include <utils/common/delayed.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec_api.h>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/vms/api/data_fwd.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/scope_guard.h>
-#include <utils/common/delayed.h>
-#include <core/resource/media_server_resource.h>
 
 namespace nx {
 namespace mediaserver {
@@ -34,7 +36,7 @@ struct ServerInfo
 struct ServerLicenseInfo
 {
     ServerInfo info;
-    ec2::ApiDetailedLicenseDataList licenses;
+    vms::api::DetailedLicenseDataList licenses;
 };
 
 struct LicenseError
@@ -47,7 +49,7 @@ struct CheckLicenseResponse
 {
     QString status;
     QMap<QString, LicenseError> licenseErrors;
-    QVector<ec2::ApiDetailedLicenseData> licenses;
+    QVector<vms::api::DetailedLicenseData> licenses;
 };
 
 QN_FUSION_ADAPT_STRUCT(ServerInfo, (brand)(version)(latestHwid)(hwids))
@@ -90,7 +92,9 @@ void LicenseWatcher::startUpdate()
         return;
 
     m_httpClient->setProxyVia(
-    nx::network::SocketAddress(nx::network::HostAddress::localhost, QUrl(server->getUrl()).port()));
+        nx::network::SocketAddress(
+            nx::network::HostAddress::localhost, QUrl(server->getUrl()).port()),
+        /**isSecure*/ true);
     m_httpClient->setProxyUserName(server->getId().toString());
     m_httpClient->setProxyUserPassword(server->getAuthKey());
 
@@ -164,7 +168,7 @@ void LicenseWatcher::processResponse(QByteArray responseData)
         }
     }
 
-    QMap<QString, ec2::ApiDetailedLicenseData> existingLicenses;
+    QMap<QString, vms::api::DetailedLicenseData> existingLicenses;
     for (const auto& license: licenseData().licenses)
         existingLicenses.insert(license.key, license);
 
@@ -194,7 +198,7 @@ void LicenseWatcher::stopHttpClient()
 
 ServerLicenseInfo LicenseWatcher::licenseData() const
 {
-    ec2::ApiRuntimeData runtimeData = runtimeInfoManager()->items()
+    const auto runtimeData = runtimeInfoManager()->items()
         ->getItem(commonModule()->moduleGUID()).data;
 
     ServerLicenseInfo result;
@@ -214,7 +218,7 @@ ServerLicenseInfo LicenseWatcher::licenseData() const
 
     for (const auto& license: licenseList)
     {
-        ec2::ApiDetailedLicenseData licenseData;
+        vms::api::DetailedLicenseData licenseData;
         ec2::fromResourceToApi(license, licenseData);
         if (result.info.hwids.contains(licenseData.hardwareId))
             result.licenses.push_back(licenseData);

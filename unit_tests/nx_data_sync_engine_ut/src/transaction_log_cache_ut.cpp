@@ -115,7 +115,7 @@ protected:
     void assertCacheStateIsValid()
     {
         const auto newSequence = m_cache.generateTransactionSequence(
-            ::ec2::ApiPersistentIdData(QnUuid(m_peerId), m_dbId));
+            vms::api::PersistentIdData(QnUuid(m_peerId), m_dbId));
         if (!m_transactionSequenceGenerated.empty())
         {
             ASSERT_GT(newSequence, *m_transactionSequenceGenerated.begin());
@@ -163,7 +163,7 @@ private:
         transactionHeader.transactionType = ::ec2::TransactionType::Cloud;
         transactionHeader.persistentInfo.sequence =
             m_cache.generateTransactionSequence(
-                ::ec2::ApiPersistentIdData(QnUuid(m_peerId), m_dbId));
+                vms::api::PersistentIdData(QnUuid(m_peerId), m_dbId));
         transactionHeader.persistentInfo.dbID = m_dbId;
         transactionHeader.persistentInfo.timestamp =
             m_cache.generateTransactionTimestamp(tranId);

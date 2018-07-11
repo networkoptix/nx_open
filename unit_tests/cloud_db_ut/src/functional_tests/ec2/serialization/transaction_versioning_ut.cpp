@@ -1,11 +1,10 @@
 #include <gtest/gtest.h>
 
-#include <nx/fusion/model_functions.h>
-
 #include <database/migrations/add_history_attributes_to_transaction.h>
-#include <nx_ec/data/api_data.h>
-#include <nx_ec/data/api_resource_data.h>
-#include <nx_ec/data/api_user_data.h>
+
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/data/user_data.h>
 
 namespace nx {
 namespace cdb {
@@ -55,7 +54,7 @@ struct ApiResourceData: ApiIdData
 struct ApiUserData: ApiResourceData
 {
     bool isAdmin;
-    Qn::GlobalPermissions permissions;
+    GlobalPermissions permissions;
     QnUuid userRoleId;
     QString email;
     QnLatin1Array digest;
@@ -135,7 +134,7 @@ TEST_F(TransactionVersioning, QnAbstractTransaction_relevance)
 
 TEST_F(TransactionVersioning, ApiUserData_relevance)
 {
-    testTwoWayStructureRelevance<::ec2::ApiUserData, compatibility::ApiUserData>();
+    testTwoWayStructureRelevance<nx::vms::api::UserData, compatibility::ApiUserData>();
 }
 
 TEST_F(TransactionVersioning, ApiIdData_relevance)

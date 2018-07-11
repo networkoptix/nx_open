@@ -13,9 +13,10 @@
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
+#include <utils/common/ldap_fwd.h>
+#include <utils/email/email_fwd.h>
 
 #include <core/ptz/ptz_fwd.h>
-#include <utils/common/ldap_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/event/event_fwd.h>
@@ -362,7 +363,7 @@ private:
     void addOldVersionPtzParams(const QnNetworkResourcePtr& camera, QnRequestParamList& params);
 
 private:
-    QnSoftwareVersion m_serverVersion;
+    nx::vms::api::SoftwareVersion m_serverVersion;
     QString m_serverId; // for debug purposes so storing in string to avoid conversions
     QString m_proxyAddr;
     int m_proxyPort;

@@ -2,6 +2,8 @@
 
 #include "resource_data.h"
 
+#include <QtCore/QString>
+
 #include <nx/utils/latin1_array.h>
 
 namespace nx {
@@ -16,6 +18,9 @@ struct NX_VMS_API CameraData: ResourceData
     void fillId();
 
     static QnUuid physicalIdToId(const QString& physicalId);
+
+    static const QnUuid kDesktopCameraTypeId;
+    static const QnUuid kWearableCameraTypeId;
 
     QnLatin1Array mac;
     QString physicalId;
@@ -35,3 +40,4 @@ struct NX_VMS_API CameraData: ResourceData
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::CameraData)
+Q_DECLARE_METATYPE(nx::vms::api::CameraDataList)

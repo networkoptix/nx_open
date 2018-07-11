@@ -49,4 +49,3 @@ TEST(UbJsonTest, chronoTypes)
     const std::chrono::milliseconds result = QnUbjson::deserialized<std::chrono::milliseconds>(data);
     ASSERT_EQ(value, result);
 }
-

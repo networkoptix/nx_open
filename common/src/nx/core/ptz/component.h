@@ -23,6 +23,14 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Component)
 template<int VectorSize>
 using ComponentVector = std::array<Component, VectorSize>;
 
+static const ComponentVector<5> kAllComponents = {
+    Component::pan,
+    Component::tilt,
+    Component::rotation,
+    Component::zoom,
+    Component::focus
+};
+
 } // namespace ptz
 } // namespace core
 } // namespace nx

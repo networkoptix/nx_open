@@ -46,7 +46,7 @@ public:
     void setProxyCredentials(
         const std::string& login,
         const std::string& password);
-    void setProxyVia(const nx::network::SocketAddress& proxyEndpoint);
+    void setProxyVia(const nx::network::SocketAddress& proxyEndpoint, bool isSecure);
 
     void setRequestTimeout(std::chrono::milliseconds);
     std::chrono::milliseconds requestTimeout() const;

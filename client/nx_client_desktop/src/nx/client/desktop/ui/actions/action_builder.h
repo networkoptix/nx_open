@@ -44,7 +44,7 @@ public:
     Builder toolTipFormat(const QString& toolTipFormat);
     Builder flags(ActionFlags flags);
     Builder mode(ClientModes mode);
-    Builder requiredGlobalPermission(Qn::GlobalPermission permission);
+    Builder requiredGlobalPermission(GlobalPermission permission);
     Builder requiredTargetPermissions(int key, Qn::Permissions permissions);
     Builder requiredTargetPermissions(Qn::Permissions permissions);
     Builder separator(bool isSeparator = true);

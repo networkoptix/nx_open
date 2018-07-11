@@ -22,9 +22,11 @@ namespace ec2
         void setUserDataHandler(QnMutexUserDataHandler* userDataHandler);
 
         QnTransactionMessageBus* messageBus() const;
+
     signals:
-        void peerFound(QnUuid data, Qn::PeerType peerType);
-        void peerLost(QnUuid data, Qn::PeerType peerType);
+        void peerFound(QnUuid data, nx::vms::api::PeerType peerType);
+        void peerLost(QnUuid data, nx::vms::api::PeerType peerType);
+
     private:
         qint64 newTimestamp();
     private:

@@ -285,7 +285,7 @@ void PeerRegistrator::clientBind(
     };
 
     // Only local peers are alowed while auth is not avaliable for clients:
-    if (!connection->getSourceAddress().address.isLocal())
+    if (!connection->getSourceAddress().address.isLocalNetwork())
         return reject(api::ResultCode::notAuthorized);
 
     if (requestData.tcpReverseEndpoints.empty())

@@ -4,17 +4,19 @@ import datetime
 import logging
 import tempfile
 import time
+import json
 
 import pytz
 import requests.exceptions
 from pathlib2 import Path
+from Crypto.Cipher import AES
 
 from framework.api_shortcuts import get_server_id
 from framework.camera import Camera, SampleMediaFile, make_schedule_task
 from framework.installation.installation import Installation
 from framework.media_stream import open_media_stream
 from framework.method_caching import cached_property
-from framework.os_access.posix_shell import local_shell
+from framework.os_access.local_shell import local_shell
 from framework.rest_api import RestApi
 from framework.utils import datetime_utc_to_timestamp
 from framework.waiting import wait_for_true
@@ -46,6 +48,30 @@ class TimePeriod(object):
         return (isinstance(other, TimePeriod)
                 and other.start == self.start
                 and other.duration == self.duration)
+
+
+def parse_json_fields(data):
+    if isinstance(data, dict):
+        return {k: parse_json_fields(v) for k, v in data.iteritems()}
+    if isinstance(data, list):
+        return [parse_json_fields(i) for i in data]
+    if isinstance(data, basestring):
+        try:
+            data = json.loads(data)
+        except ValueError:
+            pass
+        else:
+            return parse_json_fields(data)
+    return data
+
+
+def encode_camera_credentials(login, password):
+    # Do not try to understand this code, this is hardcoded the same way as in common library.
+    data = ':'.join([login, password])
+    data += chr(0) * (16 - (len(data) % 16))
+    key = '4453D6654C634636990B2E5AA69A1312'.decode('hex')
+    iv = '000102030405060708090a0b0c0d0e0f'.decode('hex')
+    return AES.new(key, AES.MODE_CBC, iv).encrypt(data).encode('hex')
 
 
 class Mediaserver(object):
@@ -125,17 +151,19 @@ class Mediaserver(object):
         camera.id = result['id']
         return camera.id
 
-    def set_camera_recording(self, camera, recording):
+    def set_camera_recording(self, camera, recording, options={}):
         assert camera, 'Camera %r is not yet registered on server' % camera
         schedule_tasks = [make_schedule_task(day_of_week + 1) for day_of_week in range(7)]
+        for task in schedule_tasks:
+            task.update(options)
         self.api.post('ec2/saveCameraUserAttributes', dict(
             cameraId=camera.id, scheduleEnabled=recording, scheduleTasks=schedule_tasks))
 
-    def start_recording_camera(self, camera):
-        self.set_camera_recording(camera, recording=True)
+    def start_recording_camera(self, camera, options={}):
+        self.set_camera_recording(camera, recording=True, options=options)
 
-    def stop_recording_camera(self, camera):
-        self.set_camera_recording(camera, recording=False)
+    def stop_recording_camera(self, camera, options={}):
+        self.set_camera_recording(camera, recording=False, options=options)
 
     @property
     def storage(self):
@@ -167,6 +195,22 @@ class Mediaserver(object):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
         assert isinstance(camera, Camera), repr(camera)
         return open_media_stream(self.api.url(''), self.api.user, self.api.password, stream_type, camera.mac_addr)
+
+    def get_resources(self, path, *args, **kwargs):
+        resources = self.api.get('ec2/get' + path, *args, **kwargs)
+        for resource in resources:
+            for p in resource.pop('addParams', []):
+                resource[p['name']] = p['value']
+        return parse_json_fields(resources)
+
+    def get_resource(self, path, id, **kwargs):
+        resources = self.get_resources(path, params=dict(id=id))
+        assert len(resources) == 1
+        return resources[0]
+
+    def set_camera_credentials(self, id, login, password):
+        c = encode_camera_credentials(login, password)
+        self.api.post("ec2/setResourceParams", [dict(resourceId=id, name='credentials', value=c)])
 
 
 class Storage(object):

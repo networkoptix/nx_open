@@ -35,6 +35,10 @@ public:
         qreal speed,
         const nx::core::ptz::Options& options) override;
 
+    virtual bool relativeMove(
+        const nx::core::ptz::Vector& relativeMovementVector,
+        const nx::core::ptz::Options& options) override;
+
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
         nx::core::ptz::Vector* outPosition,

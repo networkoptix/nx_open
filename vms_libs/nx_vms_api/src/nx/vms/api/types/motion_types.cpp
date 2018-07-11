@@ -2,6 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::MotionType, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionType,
     (nx::vms::api::MT_Default, "MT_Default")
     (nx::vms::api::MT_HardwareGrid, "MT_HardwareGrid")
@@ -9,6 +10,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionType,
     (nx::vms::api::MT_MotionWindow, "MT_MotionWindow")
     (nx::vms::api::MT_NoMotion, "MT_NoMotion"))
 
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::MotionTypes, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionTypes,
     (nx::vms::api::MT_Default, "MT_Default")
     (nx::vms::api::MT_HardwareGrid, "MT_HardwareGrid")
@@ -16,7 +18,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionTypes,
     (nx::vms::api::MT_MotionWindow, "MT_MotionWindow")
     (nx::vms::api::MT_NoMotion, "MT_NoMotion"))
 
-QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::MotionStreamType, (numeric))
+QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::MotionStreamType, (numeric)(debug))
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, MotionStreamType,
     (nx::vms::api::MotionStreamType::automatic, "auto")
     (nx::vms::api::MotionStreamType::primary, "primary")

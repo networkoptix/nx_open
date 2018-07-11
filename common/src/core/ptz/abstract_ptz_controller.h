@@ -48,14 +48,14 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     bool hasCapabilities(
         Ptz::Capabilities capabilities,
-        const nx::core::ptz::Options& options) const;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) const;
 
     /**
      * @returns PTZ capabilities that this controller implements.
      * @param options Additional options (e.g. ptz type)
      */
     virtual Ptz::Capabilities getCapabilities(
-        const nx::core::ptz::Options& options) const = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) const = 0;
 
     /**
      * @param command Ptz command to check.
@@ -64,7 +64,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     bool supports(
         Qn::PtzCommand command,
-        const nx::core::ptz::Options& options) const;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) const;
 
     /**
      * Starts or stops continuous PTZ movement.
@@ -84,7 +84,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool continuousMove(
         const nx::core::ptz::Vector& speed,
-        const nx::core::ptz::Options& options) = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) = 0;
 
     /**
      * Starts or stops continuous focus movement.
@@ -103,7 +103,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool continuousFocus(
         qreal speed,
-        const nx::core::ptz::Options &options) = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) = 0;
 
     /**
      * Sets camera PTZ position in the given coordinate space.
@@ -126,7 +126,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
         Qn::PtzCoordinateSpace space,
         const nx::core::ptz::Vector& position,
         qreal speed,
-        const nx::core::ptz::Options& options) = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) = 0;
 
     /**
      * Moves camera's viewport relative to current viewport. New viewport
@@ -146,10 +146,10 @@ public slots: //< Class is exposed to QML. All functions in section below are in
         qreal aspectRatio,
         const QRectF& viewport,
         qreal speed,
-        const nx::core::ptz::Options& options) = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) = 0;
 
     /**
-     * Moves the camera realtive to its current position.
+     * Moves the camera relative to its current position.
      *
      * This function is expected to be implemented if this controller has
      * at least one of the <tt>Ptz::RelativePtrzCapabilities</tt>.
@@ -160,7 +160,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool relativeMove(
         const nx::core::ptz::Vector& direction,
-        const nx::core::ptz::Options& options) = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) = 0;
 
     /**
      * Changes the camera focus relatively to its current position.
@@ -174,7 +174,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool relativeFocus(
         qreal direction,
-        const nx::core::ptz::Options& options) = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) = 0;
 
     /**
      * Gets PTZ position from camera in the given coordinate space.
@@ -191,7 +191,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
         nx::core::ptz::Vector* outPosition,
-        const nx::core::ptz::Options& options) const = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) const = 0;
 
     /**
      * Gets PTZ limits of the camera.
@@ -207,7 +207,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
     virtual bool getLimits(
         Qn::PtzCoordinateSpace space,
         QnPtzLimits* limits,
-        const nx::core::ptz::Options& options) const = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) const = 0;
 
     /**
      * Returns the camera streams's flipped state. This function can be used for
@@ -222,7 +222,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      */
     virtual bool getFlip(
         Qt::Orientations* flip,
-        const nx::core::ptz::Options& options) const = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) const = 0;
 
     /**
      * Saves current PTZ position as a preset, either as a new one or
@@ -370,12 +370,12 @@ public slots: //< Class is exposed to QML. All functions in section below are in
 
     virtual bool getAuxilaryTraits(
         QnPtzAuxilaryTraitList* auxilaryTraits,
-        const nx::core::ptz::Options& options) const = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) const = 0;
 
     virtual bool runAuxilaryCommand(
         const QnPtzAuxilaryTrait& trait,
         const QString& data,
-        const nx::core::ptz::Options& options) = 0;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) = 0;
 
     /**
      * Gets all PTZ data associated with this controller in a single operation.
@@ -389,7 +389,7 @@ public slots: //< Class is exposed to QML. All functions in section below are in
     virtual bool getData(
         Qn::PtzDataFields query,
         QnPtzData* data,
-        const nx::core::ptz::Options& options) const;
+        const nx::core::ptz::Options& options = {nx::core::ptz::Type::operational}) const;
 
 signals:
     void changed(Qn::PtzDataFields fields);

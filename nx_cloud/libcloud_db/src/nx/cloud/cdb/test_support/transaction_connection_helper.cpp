@@ -8,6 +8,7 @@
 #include <nx/utils/random.h>
 
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
+#include <nx/vms/api/types/connection_types.h>
 
 namespace nx {
 namespace cdb {
@@ -237,12 +238,12 @@ void TransactionConnectionHelper::startConnection(
     }
 }
 
-ec2::ApiPeerData TransactionConnectionHelper::localPeer() const
+nx::vms::api::PeerData TransactionConnectionHelper::localPeer() const
 {
-    return ec2::ApiPeerData(
+    return nx::vms::api::PeerData(
         m_moduleGuid,
         m_runningInstanceGuid,
-        Qn::PT_Server);
+        nx::vms::api::PeerType::server);
 }
 
 void TransactionConnectionHelper::onTransactionConnectionStateChanged(

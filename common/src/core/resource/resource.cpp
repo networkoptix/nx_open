@@ -1,26 +1,22 @@
 #include "resource.h"
+#include "resource_consumer.h"
+#include "resource_property.h"
 
 #include <typeinfo>
 
 #include <QtCore/QMetaObject>
 #include <QtCore/QRunnable>
 
-#include <nx_ec/data/api_resource_data.h>
-#include <nx/utils/log/log.h>
-
-#include <core/resource/camera_advanced_param.h>
-#include "core/resource_management/resource_pool.h"
-
-#include "resource_consumer.h"
-#include "resource_property.h"
-
-#include "utils/common/util.h"
-#include "../resource_management/resource_properties.h"
-#include "../resource_management/status_dictionary.h"
-
 #include <common/common_module.h>
+#include <core/resource/camera_advanced_param.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+#include <utils/common/util.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/api/data/resource_data.h>
 
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;

@@ -615,6 +615,8 @@ begin_label:
         return result;
     }
 
+    if (m_delegate->startTime() == qint64(AV_NOPTS_VALUE))
+        return createEmptyPacket(reverseMode); //< No data at archive
     QnCompressedVideoDataPtr videoData;
 
     if (m_skipFramesToTime != 0)
@@ -1203,6 +1205,9 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
     if (m_navDelegate) {
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
+
+    if (m_resource)
+        NX_VERBOSE(this, lm("Set position %1 for device %2").args(mksecToDateTime(mksec), m_resource->getUniqueId()));
 
     qint64 newTime = mksec;
     m_playbackMaskSync.lock();

@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <nx_ec/transaction_timestamp.h>
+#include <nx/vms/api/data/timestamp.h>
 
-namespace ec2 {
+using nx::vms::api::Timestamp;
 
 TEST(TransactionTimestamp, addNegative)
 {
@@ -51,5 +51,3 @@ TEST(TransactionTimestamp, subtractPositiveOverflow)
     ASSERT_EQ(0U, ts.sequence);
     ASSERT_EQ(std::numeric_limits<std::uint64_t>::max() - 1, ts.ticks);
 }
-
-} // namespace ec2

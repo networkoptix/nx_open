@@ -6,8 +6,12 @@ namespace nx {
 namespace vms {
 namespace api {
 
-struct WebPageData: ResourceData
+struct NX_VMS_API WebPageData: ResourceData
 {
+    WebPageData(): ResourceData(kResourceTypeId) {}
+
+    static const QString kResourceTypeName;
+    static const QnUuid kResourceTypeId;
 };
 #define WebPageData_Fields ResourceData_Fields
 
@@ -16,3 +20,4 @@ struct WebPageData: ResourceData
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::WebPageData)
+Q_DECLARE_METATYPE(nx::vms::api::WebPageDataList)

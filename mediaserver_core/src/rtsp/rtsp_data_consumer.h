@@ -68,6 +68,7 @@ public:
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
     void setResource(const QnResourcePtr& resource);
+    std::chrono::milliseconds timeFromLastReceiverReport();
 protected:
     //QnMediaContextPtr getGeneratedContext(AVCodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
@@ -95,6 +96,7 @@ private:
     QByteArray m_codecCtxData;
     //QMap<int, QList<int> > m_ctxSended;
     QElapsedTimer m_timer;
+    nx::utils::ElapsedTimer m_keepAliveTimer;
     //quint16 m_sequence[MAX_RTP_CHANNELS];
     //qint64 m_firstRtpTime[MAX_RTP_CHANNELS];
     QnRtspConnectionProcessor* m_owner;

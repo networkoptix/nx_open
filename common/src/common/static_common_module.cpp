@@ -8,10 +8,13 @@
 #include <api/http_client_pool.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <network/cloud/cloud_media_server_endpoint_verificator.h>
+#include <utils/common/app_info.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/synctime.h>
 
 #include "common_meta_types.h"
+
+using namespace nx;
 
 struct QnStaticCommonModulePrivate
 {
@@ -19,7 +22,7 @@ struct QnStaticCommonModulePrivate
 };
 
 QnStaticCommonModule::QnStaticCommonModule(
-    Qn::PeerType localPeerType,
+    vms::api::PeerType localPeerType,
     const QString& brand,
     const QString& customization,
     const QString& customCloudHost,
@@ -58,10 +61,12 @@ QnStaticCommonModule::QnStaticCommonModule(
     instance<nx::network::http::ClientPool>();
 }
 
-void QnStaticCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
+void QnStaticCommonModule::loadResourceData(
+    QnResourceDataPool*dataPool, const QString& fileName, bool required)
+{
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
-
-    NX_ASSERT(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an NX_ASSERT here? Something is wrong with resource data json file. */
+    NX_ASSERT(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");
+    //< Getting an NX_ASSERT here? Something is wrong with resource data json file.
 }
 
 QnStaticCommonModule::~QnStaticCommonModule()
@@ -76,7 +81,7 @@ QnStaticCommonModule::~QnStaticCommonModule()
     m_private = nullptr;
 }
 
-Qn::PeerType QnStaticCommonModule::localPeerType() const
+vms::api::PeerType QnStaticCommonModule::localPeerType() const
 {
     return m_localPeerType;
 }
@@ -91,17 +96,17 @@ QString QnStaticCommonModule::customization() const
     return m_customization;
 }
 
-QnSoftwareVersion QnStaticCommonModule::engineVersion() const
+nx::utils::SoftwareVersion QnStaticCommonModule::engineVersion() const
 {
     return m_engineVersion;
 }
 
-void QnStaticCommonModule::setEngineVersion(const QnSoftwareVersion &version)
+void QnStaticCommonModule::setEngineVersion(const nx::utils::SoftwareVersion& version)
 {
     m_engineVersion = version;
 }
 
-QnResourceDataPool * QnStaticCommonModule::dataPool() const
+QnResourceDataPool* QnStaticCommonModule::dataPool() const
 {
     return m_dataPool;
 }

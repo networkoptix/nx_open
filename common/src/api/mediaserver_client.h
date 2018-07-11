@@ -20,10 +20,10 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/type_utils.h>
+#include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/data/module_information.h>
 
 #include <analytics/detected_objects_storage/analytics_events_storage.h>
-#include <network/module_information.h>
-#include <nx_ec/data/api_resource_data.h>
 #include <nx_ec/ec_api.h>
 #include <rest/server/json_rest_result.h>
 
@@ -65,8 +65,8 @@ public:
     QnJsonRestResult saveCloudSystemCredentials(const CloudCredentialsData& request);
 
     void getModuleInformation(
-        std::function<void(QnJsonRestResult, QnModuleInformation)> completionHandler);
-    QnJsonRestResult getModuleInformation(QnModuleInformation* result);
+        std::function<void(QnJsonRestResult, nx::vms::api::ModuleInformation)> completionHandler);
+    QnJsonRestResult getModuleInformation(nx::vms::api::ModuleInformation* result);
 
     void setupLocalSystem(
         const SetupLocalSystemData& request,
@@ -92,13 +92,13 @@ public:
     // /ec2/ requests
 
     void ec2GetUsers(
-        std::function<void(ec2::ErrorCode, ec2::ApiUserDataList)> completionHandler);
-    ec2::ErrorCode ec2GetUsers(ec2::ApiUserDataList* result);
+        std::function<void(ec2::ErrorCode, nx::vms::api::UserDataList)> completionHandler);
+    ec2::ErrorCode ec2GetUsers(nx::vms::api::UserDataList* result);
 
     void ec2SaveUser(
-        const ec2::ApiUserData& request,
+        const nx::vms::api::UserData& request,
         std::function<void(ec2::ErrorCode)> completionHandler);
-    ec2::ErrorCode ec2SaveUser(const ec2::ApiUserData& request);
+    ec2::ErrorCode ec2SaveUser(const nx::vms::api::UserData& request);
 
     void ec2GetSettings(
         std::function<void(
@@ -118,9 +118,10 @@ public:
         const QnUuid& resourceId,
         nx::vms::api::ResourceParamDataList* result);
 
-    void ec2GetSystemMergeHistory(
-        std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)> completionHandler);
-    ec2::ErrorCode ec2GetSystemMergeHistory(ec2::ApiSystemMergeHistoryRecordList* result);
+    void ec2GetSystemMergeHistory(std::function<
+        void(ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)> completionHandler);
+
+    ec2::ErrorCode ec2GetSystemMergeHistory(nx::vms::api::SystemMergeHistoryRecordList* result);
 
     void ec2AnalyticsLookupDetectedObjects(
         const nx::analytics::storage::Filter& request,
