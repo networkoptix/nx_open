@@ -74,7 +74,7 @@ class Result(object):
 class Verifier(object):
     def __init__(self, server, id):
         self.server = server
-        self.data = self.server.get_camera(id)
+        self.data = self.server.get_resource('CamerasEx', id)
         self.camera = Camera(None, None, self.data['name'], self.data['mac'], id)
         self.errors = []
 

@@ -1751,10 +1751,18 @@ void QnNxStyle::drawComplexControl(
                     }
 
                     /* Handle hovered & pressed states: */
-                    if (scrollBar->state.testFlag(State_Sunken))
-                        sliderColor = sliderColor.lighter(1);
-                    else if (scrollBar->state.testFlag(State_MouseOver))
-                        sliderColor = sliderColor.lighter(scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                    if (scrollBar->state.testFlag(State_Enabled))
+                    {
+                        if (scrollBar->state.testFlag(State_Sunken))
+                        {
+                            sliderColor = sliderColor.lighter(1);
+                        }
+                        else if (scrollBar->state.testFlag(State_MouseOver))
+                        {
+                            sliderColor = sliderColor.lighter(
+                                scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                        }
+                    }
 
                     /* Paint: */
                     if (style == CommonScrollBar)

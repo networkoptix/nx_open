@@ -24,6 +24,7 @@ struct Http
      */
     int tcpBacklogSize;
     boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
+    bool serveOptions;
 
     Http();
 };

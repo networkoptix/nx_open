@@ -44,12 +44,15 @@ void ReverseConnectionManager::startReceivingNotifications(ec2::AbstractECConnec
 ReverseConnectionManager::~ReverseConnectionManager()
 {
     decltype (m_runningHttpClients) httpClients;
+    decltype (m_preparedSockets) preparedSockets;
     {
         QnMutexLocker lock(&m_mutex);
         std::swap(httpClients, m_runningHttpClients);
+        std::swap(preparedSockets, m_preparedSockets);
     }
     for (const auto& client: httpClients)
         client->pleaseStopSync();
+    preparedSockets.clear();
 }
 
 void ReverseConnectionManager::at_reverseConnectionRequested(

@@ -28,6 +28,9 @@ static constexpr int kDefaultHttpTcpBacklogSize = 4096;
 const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityTimeout");
 const std::chrono::minutes kDefaultHttpInactivityTimeout(1);
 
+const QLatin1String kHttpServeOptions("http/serveOptions");
+const bool kDefaultHttpServeOptions = true;
+
 //-------------------------------------------------------------------------------------------------
 // Https
 
@@ -64,7 +67,8 @@ static const QString kModuleName = lit("traffic_relay");
 
 Http::Http():
     tcpBacklogSize(kDefaultHttpTcpBacklogSize),
-    connectionInactivityTimeout(kDefaultHttpInactivityTimeout)
+    connectionInactivityTimeout(kDefaultHttpInactivityTimeout),
+    serveOptions(kDefaultHttpServeOptions)
 {
     endpoints.push_back(network::SocketAddress(kDefaultHttpEndpointsToListen));
 }
@@ -162,6 +166,9 @@ void Settings::loadHttp()
     m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
         settings().value(kHttpConnectionInactivityTimeout).toString(),
         kDefaultHttpInactivityTimeout);
+
+    m_http.serveOptions = settings().value(
+        kHttpServeOptions, kDefaultHttpServeOptions).toBool();
 }
 
 void Settings::loadEndpointList(

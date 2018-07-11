@@ -5,21 +5,12 @@ import logging
 from urlparse import urlparse
 from pathlib2 import Path
 
+from framework.merging import setup_local_system
+
 import verifications
-
-# TODO: Move into some config.
-CAMERAS_INTERFACE = 'enp5s0'
-CAMERAS_NETWORK = '192.168.0.'
-SERVER_IP = (CAMERAS_NETWORK + '200', 24)
-
-LICENSE_KEY='IX3Z-HJ82-A2RL-IF38'
-LICENSE_SERVER=('107.23.248.56', 'licensing.networkoptix.com')
 
 DISCOVERY_RETRY_COUNT = 10
 DISCOVERY_RETRY_DELAY_S = 10
-
-# TODO: Pass this file by test paramiters.
-EXPECTED_CAMERAS_FILE = Path(__file__).parent / 'expected_cameras.yaml'
 
 
 @pytest.fixture(scope='session')
@@ -27,17 +18,34 @@ def one_vm_type():
     return 'linux'
 
 
-# TODO: Make this test work with fresh configured server on VM with bridged interface.
-def test_cameras(one_running_mediaserver, one_vm, hypervisor, work_dir):
-    # Provide access to cameras network.
-    mac = hypervisor.plug_bridged(one_vm.name, CAMERAS_INTERFACE)
-    one_running_mediaserver.os_access.networking.setup_ip(mac, *SERVER_IP)
+@pytest.fixture
+def config(test_config):
+    return test_config.with_defaults(
+        CAMERAS_INTERFACE='enp5s0',
+        CAMERAS_NETWORK='192.168.0',
+        CAMERAS_NETWORK_IP='200',
+        EXPECTED_CAMERAS_FILE=Path(__file__).parent / 'expected_cameras.yaml',
+        )
 
-    # Activate licence on test server for recording.
-    one_running_mediaserver.os_access.networking.static_dns(*LICENSE_SERVER)
-    one_running_mediaserver.api.get('api/activateLicense', params=dict(key=LICENSE_KEY))
 
-    stand = Stand(one_running_mediaserver)
+@pytest.fixture
+def one_licensed_server(one_mediaserver):
+    # TODO: Implement and use fake licensed server without hardcoded key.
+    # TODO: Move this fixture into fixtures.mediaservers.
+    one_mediaserver.os_access.networking.static_dns('107.23.248.56', 'licensing.networkoptix.com')
+    one_mediaserver.start()
+    setup_local_system(one_mediaserver, {})
+    one_mediaserver.api.get('api/activateLicense', params=dict(key='3JHU-7G4J-2CS3-BFNI'))
+    return one_mediaserver
+
+
+def test_cameras(hypervisor, one_vm, one_licensed_server, config, work_dir):
+    one_licensed_server.os_access.networking.setup_network(
+        hypervisor.plug_bridged(one_vm.name, config.CAMERAS_INTERFACE),
+        config.CAMERAS_NETWORK, config.CAMERAS_NETWORK_IP)
+
+    expected_cameras = yaml.load(Path(config.EXPECTED_CAMERAS_FILE).read_bytes())
+    stand = Stand(one_licensed_server, config.CAMERAS_NETWORK, expected_cameras)
     stand.discover_cameras()
     stand.execute_verification_stages()
 
@@ -46,8 +54,8 @@ def test_cameras(one_running_mediaserver, one_vm, hypervisor, work_dir):
         (work_dir / (file_name + '.yaml')).write_bytes(serialized)
 
     save_yaml(stand.result, 'test_result')
-    save_yaml(one_running_mediaserver.get_resources('ec2/getCamerasEx'), 'discovered_cameras')
-    save_yaml(one_running_mediaserver.api.get('api/moduleInformation'), 'server_information')
+    save_yaml(one_licensed_server.get_resources('CamerasEx'), 'discovered_cameras')
+    save_yaml(one_licensed_server.api.get('api/moduleInformation'), 'server_information')
     assert stand.is_success
 
 
@@ -105,12 +113,13 @@ class RetryWithDelay(object):
 
 
 class Stand(object):
-    def __init__(self, server):
+    def __init__(self, server, cameras_network, expected_cameras):
+        self.cameras_network = cameras_network
         self.server = server
         self.server_information = self.server.api.get('api/moduleInformation')
         self.actual_cameras = {}
         self.expected_cameras = {}
-        for ip, rules in yaml.load(EXPECTED_CAMERAS_FILE.read_bytes()).iteritems():
+        for ip, rules in expected_cameras.iteritems():
             stages = self._filter_stages(rules)
             if stages.has_key('discovery'):
                 self.expected_cameras[ip] = stages
@@ -128,9 +137,9 @@ class Stand(object):
         retry = RetryWithDelay(DISCOVERY_RETRY_COUNT, DISCOVERY_RETRY_DELAY_S)
         while retry.next_try():
             discovered_cameras = {}
-            for camera in self.server.get_cameras():
+            for camera in self.server.get_resources('Cameras'):
                 ip = urlparse(camera['url']).hostname
-                if ip and ip.startswith(CAMERAS_NETWORK):
+                if ip and ip.startswith(self.cameras_network):
                     discovered_cameras[ip] = camera
 
             logging.info('Discovered cameras: ' + ', '.join(discovered_cameras))
