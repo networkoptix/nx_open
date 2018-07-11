@@ -45,6 +45,7 @@
 #include <nx/mediaserver/resource/shared_context_pool.h>
 #include <nx/mediaserver/root_tool.h>
 
+#include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -67,20 +68,8 @@ void installTranslations()
     QnTranslationManager::installTranslation(defaultTranslation);
 }
 
-QDir downloadsDirectory()
-{
-    const QString varDir = qnServerModule->roSettings()->value("varDir").toString();
-    if (varDir.isEmpty())
-        return QDir();
-
-    const QDir dir(varDir + lit("/downloads"));
-    if (!dir.exists())
-        QDir().mkpath(dir.absolutePath());
-
-    return dir;
-}
-
 } // namespace
+
 
 QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
@@ -196,6 +185,15 @@ QnMediaServerModule::QnMediaServerModule(
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
+}
+
+QDir QnMediaServerModule::downloadsDirectory() const
+{
+    const QDir dir(getDataDirectory() + "downloads");
+    if (!dir.exists())
+        QDir().mkpath(dir.absolutePath());
+
+    return dir;
 }
 
 QnMediaServerModule::~QnMediaServerModule()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QDir>
 
 #include <nx/utils/singleton.h>
 #include <utils/common/instance_storage.h>
@@ -103,6 +104,8 @@ private:
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
+
+    QDir downloadsDirectory() const;
 };
 
 #define qnServerModule QnMediaServerModule::instance()
