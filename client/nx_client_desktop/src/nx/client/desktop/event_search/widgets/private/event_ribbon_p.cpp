@@ -40,6 +40,9 @@ namespace {
 static constexpr int kDefaultTileSpacing = 1;
 static constexpr int kScrollBarStep = 16;
 
+static constexpr int kTopMargin = 8;
+static constexpr int kBottomMargin = 8;
+
 // Approximate default height of an invisible tile.
 // When tile becomes visible its true height can be computed and used.
 static constexpr int kApproximateTileHeight = 40;
@@ -764,7 +767,7 @@ void EventRibbon::Private::doUpdateView()
     if (!m_currentShifts.empty())
         firstIndexToUpdate = qMin(firstIndexToUpdate, m_currentShifts.begin().key());
 
-    int currentPosition = 0;
+    int currentPosition = kTopMargin;
     if (firstIndexToUpdate > 0)
     {
         const auto prevTile = m_tiles[firstIndexToUpdate - 1];
@@ -813,6 +816,8 @@ void EventRibbon::Private::doUpdateView()
         currentPosition += (*iter)->height() + kDefaultTileSpacing;
         ++iter;
     }
+
+    currentPosition += kBottomMargin;
 
     if (m_totalHeight != currentPosition)
     {

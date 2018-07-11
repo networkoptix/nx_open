@@ -92,7 +92,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
     auto layout = new QVBoxLayout(q);
     layout->setSpacing(0);
     layout->addWidget(m_placeholder);
-    layout->addSpacing(8);
     layout->addWidget(m_eventRibbon);
 
     const auto verticalLayout = new QVBoxLayout(m_placeholder);
