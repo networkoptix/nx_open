@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/utils/db/db_structure_updater.h>
+#include <nx/sql/db_structure_updater.h>
 
 namespace nx {
 namespace data_sync_engine {
@@ -14,10 +14,10 @@ public:
      * Structure update is done in initializer.
      * NOTE: Throws on error.
      */
-    StructureUpdater(nx::utils::db::AbstractAsyncSqlQueryExecutor* const dbManager);
+    StructureUpdater(nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
 
 private:
-    nx::utils::db::DbStructureUpdater m_updater;
+    nx::sql::DbStructureUpdater m_updater;
 };
 
 } // namespace rdb

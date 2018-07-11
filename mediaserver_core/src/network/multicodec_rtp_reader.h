@@ -128,6 +128,7 @@ private:
         ~TrackInfo() { }
         QnRtspIoDevice* ioDevice; //< External reference; do not delete.
         std::shared_ptr<QnRtpStreamParser> parser;
+        int rtcpChannelNumber = 0;
     };
 
     QnRtpStreamParser* createParser(const QString& codecName);

@@ -5,10 +5,10 @@
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/basic_factory.h>
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/filter.h>
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/filter.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include "../data/system_data.h"
 
@@ -35,14 +35,14 @@ class AbstractSystemMergeDao
 public:
     virtual ~AbstractSystemMergeDao() = default;
 
-    virtual std::vector<MergeInfo> fetchAll(utils::db::QueryContext* queryContext) = 0;
+    virtual std::vector<MergeInfo> fetchAll(sql::QueryContext* queryContext) = 0;
 
     virtual void save(
-        utils::db::QueryContext* queryContext,
+        sql::QueryContext* queryContext,
         const MergeInfo& mergeInfo) = 0;
 
     virtual void removeMergeBySlaveSystemId(
-        utils::db::QueryContext* queryContext,
+        sql::QueryContext* queryContext,
         const std::string& slaveSystemId) = 0;
 };
 
@@ -50,7 +50,7 @@ public:
 
 using SystemMergeDaoFactoryFunction =
     std::unique_ptr<AbstractSystemMergeDao>(
-        nx::utils::db::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
 
 class SystemMergeDaoFactory:
     public nx::utils::BasicFactory<SystemMergeDaoFactoryFunction>
@@ -64,7 +64,7 @@ public:
 
 private:
     std::unique_ptr<AbstractSystemMergeDao> defaultFactoryFunction(
-        nx::utils::db::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
 };
 
 } // namespace dao

@@ -25,7 +25,7 @@ public:
     }
 
     std::unique_ptr<::nx::network::AbstractStreamSocket> dstSocket;
-    ::nx::utils::Url lastConnectedUrl;
+    ::nx::utils::Url lastConnectedEndpoint;
     std::chrono::milliseconds connectTimeout;
 	std::chrono::steady_clock::time_point lastIoTimePoint;
     ::nx::vms::network::ReverseConnectionManager* reverseConnectionManager = nullptr;

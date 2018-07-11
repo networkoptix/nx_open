@@ -4,7 +4,7 @@ from uuid import UUID
 from netaddr import IPAddress, IPNetwork
 
 from framework.api_shortcuts import get_local_system_id
-from framework.rest_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, RestApiError
+from framework.rest_api import DEFAULT_API_PASSWORD, DEFAULT_API_USER, INITIAL_API_PASSWORD, RestApiError
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -100,6 +100,7 @@ def setup_local_system(mediaserver, system_settings):
         'systemSettings': system_settings,
         })
     assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
+    mediaserver.api = mediaserver.api.with_credentials(mediaserver.api.user, DEFAULT_API_PASSWORD)
     wait_for_true(lambda: local_system_is_set_up(mediaserver), "local system is set up")
     return response['settings']
 

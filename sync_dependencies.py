@@ -110,7 +110,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     sync = syncher.sync
 
     if platform == "linux":
-        if box == "bpi":
+        if box in ("bananapi", "bpi"):
             sync("bpi/gcc")
         else:
             sync("linux-%s/gcc" % arch)

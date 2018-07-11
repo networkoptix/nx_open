@@ -226,7 +226,7 @@ bool QnThreadedPtzController::createPreset(
         void*,
         preset,
         createPreset,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         preset);
 }
 
@@ -237,7 +237,7 @@ bool QnThreadedPtzController::updatePreset(const QnPtzPreset& preset)
         void*,
         preset,
         updatePreset,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         preset);
 }
 
@@ -248,7 +248,7 @@ bool QnThreadedPtzController::removePreset(const QString& presetId)
         void*,
         presetId,
         removePreset,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         presetId);
 }
 
@@ -259,7 +259,7 @@ bool QnThreadedPtzController::activatePreset(const QString& presetId, qreal spee
         void*,
         presetId,
         activatePreset,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         presetId,
         speed);
 }
@@ -271,7 +271,7 @@ bool QnThreadedPtzController::getPresets(QnPtzPresetList* /*presets*/) const
         QnPtzPresetList,
         result,
         getPresets,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         &result);
 }
 
@@ -282,7 +282,7 @@ bool QnThreadedPtzController::createTour(const QnPtzTour& tour)
         void*,
         tour,
         createTour,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         tour);
 }
 
@@ -293,7 +293,7 @@ bool QnThreadedPtzController::removeTour(const QString& tourId)
         void*,
         tourId,
         removeTour,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         tourId);
 }
 
@@ -304,7 +304,7 @@ bool QnThreadedPtzController::activateTour(const QString& tourId)
         void*,
         tourId,
         activateTour,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         tourId);
 }
 
@@ -315,7 +315,7 @@ bool QnThreadedPtzController::getTours(QnPtzTourList* /*tours*/) const
         QnPtzTourList,
         result,
         getTours,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         &result);
 }
 
@@ -326,7 +326,7 @@ bool QnThreadedPtzController::getActiveObject(QnPtzObject* /*object*/) const
         QnPtzObject,
         result,
         getActiveObject,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         &result);
 }
 
@@ -338,7 +338,7 @@ bool QnThreadedPtzController::updateHomeObject(
         void*,
         homePosition,
         updateHomeObject,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         homePosition);
 }
 
@@ -350,7 +350,7 @@ bool QnThreadedPtzController::getHomeObject(
         QnPtzObject,
         result,
         getHomeObject,
-        ptz::Options(),
+        {nx::core::ptz::Type::operational},
         &result);
 }
 

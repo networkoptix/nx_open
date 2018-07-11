@@ -41,7 +41,6 @@ struct QnPtzPresetData
 
     nx::core::ptz::Vector position;
     Qn::PtzCoordinateSpace space;
-    bool isValid = true;
 };
 
 #define QnPtzPresetData_Fields (position)(space)

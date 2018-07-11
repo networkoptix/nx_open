@@ -32,7 +32,7 @@
 #include <recorder/file_deletor.h>
 
 #include <core/resource/avi/avi_resource.h>
-#include <core/ptz/server_ptz_controller_pool.h>
+#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
 #include <core/dataprovider/data_provider_factory.h>
 
 #include <recorder/storage_db_pool.h>
@@ -64,8 +64,9 @@
 #include "wearable_upload_manager.h"
 #include <core/resource/resource_command_processor.h>
 #include <nx/vms/network/reverse_connection_manager.h>
-#include <nx/time_sync/server_time_sync_manager.h>
+#include <nx/vms/time_sync/server_time_sync_manager.h>
 
+using namespace nx;
 using namespace nx::mediaserver;
 
 namespace {
@@ -118,7 +119,11 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
+    {
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+            enforcedMediatorEndpoint,
+            enforcedMediatorEndpoint);
+    }
     nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
@@ -127,7 +132,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
-    store(new QnServerPtzControllerPool(commonModule()));
+    store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
 
     store(new QnStorageDbPool(commonModule()));
 

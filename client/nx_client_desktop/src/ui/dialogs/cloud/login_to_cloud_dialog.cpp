@@ -106,6 +106,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     opacityEffect = new QGraphicsOpacityEffect(this);
     opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
     ui->linksWidget->setGraphicsEffect(opacityEffect);
+    ui->hintLabel->setVisible(false);
 
     d->updateUi();
     d->lockUi(false);
@@ -232,6 +233,8 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
 
     QWidget* focusWidget = nullptr;
 
+    bool showHint = false;
+
     switch (errorCode)
     {
         case QnCloudStatusWatcher::NoError:
@@ -260,6 +263,14 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
             focusWidget = q->ui->passwordInputField;
             break;
 
+        case QnCloudStatusWatcher::UserTemporaryLockedOut:
+            q->ui->passwordInputField->clear();
+            q->ui->passwordInputField->reset();
+            showHint = true;
+            q->ui->hintLabel->setText(QnCloudResultMessages::userLockedOut());
+            setWarningStyle(q->ui->hintLabel);
+            focusWidget = q->ui->loginButton;
+            break;
         case QnCloudStatusWatcher::UnknownError:
         default:
         {
@@ -270,6 +281,9 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     }
 
     unlockUi();
+
+    if (showHint != q->ui->hintLabel->isVisible())
+        q->ui->hintLabel->setVisible(showHint);
 
     if (focusWidget)
         focusWidget->setFocus();

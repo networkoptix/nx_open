@@ -29,7 +29,8 @@ public:
 
     virtual ResultCode latestUpdate(
         const UpdateRequestData& updateRequestData,
-        QList<api::TargetVersionWithEula>* outSoftwareVersion) const override;
+        QList<api::TargetVersionWithEula>* outSoftwareVersion,
+        QString* outReleaseNotesUrl) const override;
 
     virtual void addFileData(const ManualFileData& manualFileData) override;
     virtual void removeFileData(const QString& fileName) override;

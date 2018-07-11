@@ -2,12 +2,14 @@
 
 #include "data.h"
 
-#include <nx/vms/api/types/motion_types.h>
-#include <nx/vms/api/types/resource_types.h>
+#include <vector>
+
+#include <QtCore/QString>
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/latin1_array.h>
-
+#include <nx/vms/api/types/motion_types.h>
+#include <nx/vms/api/types/resource_types.h>
 
 namespace nx {
 namespace vms {
@@ -101,4 +103,7 @@ struct NX_VMS_API CameraAttributesData: Data
 } // namespace vms
 } // namespace nx
 
+Q_DECLARE_METATYPE(nx::vms::api::ScheduleTaskData)
+Q_DECLARE_METATYPE(nx::vms::api::ScheduleTaskWithRefData)
 Q_DECLARE_METATYPE(nx::vms::api::CameraAttributesData)
+Q_DECLARE_METATYPE(nx::vms::api::CameraAttributesDataList)

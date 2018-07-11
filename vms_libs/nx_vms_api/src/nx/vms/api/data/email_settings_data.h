@@ -2,13 +2,15 @@
 
 #include "data.h"
 
+#include <QtCore/QString>
+
 #include <nx/vms/api/types/smtp_types.h>
 
 namespace nx {
 namespace vms {
 namespace api {
 
-struct EmailSettingsData: Data
+struct NX_VMS_API EmailSettingsData: Data
 {
     QString host;
     int port = 0;
@@ -22,3 +24,5 @@ struct EmailSettingsData: Data
 } // namespace api
 } // namespace vms
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::EmailSettingsData)

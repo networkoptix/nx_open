@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Özel Ayarlar",
-      "description": "Özel izinler ayarlamak için %PRODUCT_NAME% İstemci uygulamasını kullanın"
+      "description": "Özel izinler ayarlamak için %VMS_NAME% İstemci uygulamasını kullanın"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "Bu kullanıcının yönetici izinleri var",
     "cantOpenClient": "%VMS_NAME% uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
-    "thisSystem": "sistem"
+    "thisSystem": "sistem",
+    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez."
   },
   "passwordRequirements": {
     "minLengthMessage": "Şifre en az 8 karakter içermelidir",
@@ -160,7 +161,7 @@
     "offline": "Sistem çevrimdışı",
     "openClient": "%VMS_NAME% içinde aç",
     "openClientNoSystem": "Aç%VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Birleştir",
     "mergeSystemTitle": "Sistemleri Birleştir",
     "confirmRenameTitle": "Sistem Adı",
     "confirmRenameAction": "Kaydet",
@@ -208,7 +209,7 @@
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS,  LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
       },
       "macos": {
         "label": "Mac OS",
@@ -225,7 +226,7 @@
       "arm": {
         "label": "ARM",
         "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS,  LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
       }
     },
     "platforms": {

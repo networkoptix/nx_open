@@ -28,6 +28,8 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
+#include <ui/graphics/items/resource/button_ids.h>
+#include <ui/help/help_topics.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
 
@@ -240,6 +242,7 @@ protected:
     void suspendHomePtzController();
     void resumeHomePtzController();
 
+    virtual bool forceShowPosition() const override;
     virtual void updateHud(bool animate) override;
 
     void ensureTwoWayAudioWidget();
@@ -254,7 +257,7 @@ private slots:
     void at_screenshotButton_clicked();
     void at_ptzButton_toggled(bool checked);
     void at_fishEyeButton_toggled(bool checked);
-    void at_histogramButton_toggled(bool checked);
+    void at_imageEnhancementButton_toggled(bool checked);
     void at_ioModuleButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
     void processSettingsRequest();
@@ -360,6 +363,15 @@ private:
         QnSoftwareTriggerButton* button,
         const SoftwareTriggerInfo& info,
         bool enabledBySchedule);
+
+    void createActionAndButton(
+        const char* iconName,
+        bool checked,
+        const QString& shortcut,
+        const QString& toolTip,
+        Qn::HelpTopic helpTopic,
+        Qn::WidgetButtons buttonId, const QString& buttonName,
+        void (QnMediaResourceWidget::*executor)(bool checked));
 
     void getResourceStates();
 

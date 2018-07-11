@@ -5,15 +5,14 @@
 #include <QtCore/QDateTime>
 
 #include <common/common_globals.h>
-
 #include <core/resource/resource_fwd.h>
+#include <utils/common/instance_storage.h>
 
 #include <nx/utils/singleton.h>
-
-#include <utils/common/instance_storage.h>
-#include <utils/common/software_version.h>
+#include <nx/utils/software_version.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/types/connection_types.h>
 
 class QnResourceDataPool;
 struct QnStaticCommonModulePrivate;
@@ -24,51 +23,52 @@ struct QnStaticCommonModulePrivate;
  * All singletons and initialization/deinitialization code goes here.
  */
 class QnStaticCommonModule:
-    public QObject,
-    public QnInstanceStorage,
-    public Singleton<QnStaticCommonModule>
+	public QObject,
+	public QnInstanceStorage,
+	public Singleton<QnStaticCommonModule>
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    QnStaticCommonModule(
-        Qn::PeerType localPeerType = Qn::PeerType::PT_NotDefined,
-        const QString& brand = QString(),
-        const QString& customization = QString(),
-        const QString& customCloudHost = QString(),
-        QObject *parent = nullptr);
-    virtual ~QnStaticCommonModule();
+	QnStaticCommonModule(
+        nx::vms::api::PeerType localPeerType = nx::vms::api::PeerType::notDefined,
+		const QString& brand = QString(),
+		const QString& customization = QString(),
+		const QString& customCloudHost = QString(),
+		QObject *parent = nullptr);
+	virtual ~QnStaticCommonModule();
 
-    using Singleton<QnStaticCommonModule>::instance;
-    using QnInstanceStorage::instance;
-    using QnInstanceStorage::store;
+	using Singleton<QnStaticCommonModule>::instance;
+	using QnInstanceStorage::instance;
+	using QnInstanceStorage::store;
 
-    Qn::PeerType localPeerType() const;
-    QString brand() const;
-    QString customization() const;
+    nx::vms::api::PeerType localPeerType() const;
+	QString brand() const;
+	QString customization() const;
 
-    QnSoftwareVersion engineVersion() const;
-    void setEngineVersion(const QnSoftwareVersion &version);
+    nx::utils::SoftwareVersion engineVersion() const;
+    void setEngineVersion(const nx::utils::SoftwareVersion& version);
 
     QnResourceDataPool *dataPool() const;
 
-    void setModuleShortId(const QnUuid& id, int number);
-    int moduleShortId(const QnUuid& id) const;
-    QString moduleDisplayName(const QnUuid& id) const;
+	void setModuleShortId(const QnUuid& id, int number);
+	int moduleShortId(const QnUuid& id) const;
+	QString moduleDisplayName(const QnUuid& id) const;
+
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
-    mutable QnMutex m_mutex;
+	mutable QnMutex m_mutex;
 	QMap<QnUuid, int> m_longToShortInstanceId;
-    QnStaticCommonModulePrivate* m_private;
+	QnStaticCommonModulePrivate* m_private;
 
-    const Qn::PeerType m_localPeerType;
-    const QString m_brand;
-    const QString m_customization;
-    QnSoftwareVersion m_engineVersion;
+    const nx::vms::api::PeerType m_localPeerType;
+	const QString m_brand;
+	const QString m_customization;
+    nx::utils::SoftwareVersion m_engineVersion;
 
-    QnResourceDataPool* m_dataPool = nullptr;
+	QnResourceDataPool* m_dataPool = nullptr;
 };
 
 #define qnStaticCommon (QnStaticCommonModule::instance())

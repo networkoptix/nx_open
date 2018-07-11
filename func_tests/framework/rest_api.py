@@ -7,7 +7,6 @@ which automatically translated to
 But for POST method keyword parameters are translated to json request body.
 """
 import base64
-import csv
 import hashlib
 import json
 import logging
@@ -18,8 +17,9 @@ import requests.exceptions
 from requests.auth import HTTPDigestAuth
 
 DEFAULT_API_USER = 'admin'
-DEFAULT_API_PASSWORD = 'admin'
-STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, 'qweasd123']  # do not mask these passwords in log files
+INITIAL_API_PASSWORD = 'admin'
+DEFAULT_API_PASSWORD = 'qweasd123'
+STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, INITIAL_API_PASSWORD]  # do not mask these passwords in log files
 REST_API_TIMEOUT_SEC = 20
 MAX_CONTENT_LEN_TO_LOG = 1000
 
@@ -81,7 +81,7 @@ class RestApi(object):
     HttpError...401...
     """
 
-    def __init__(self, alias, hostname, port, username='admin', password='admin', ca_cert=None):
+    def __init__(self, alias, hostname, port, username='admin', password=INITIAL_API_PASSWORD, ca_cert=None):
         self._port = port
         self._hostname = hostname
         self._alias = alias
@@ -111,17 +111,12 @@ class RestApi(object):
             ca_cert=self.ca_cert)
 
     def auth_key(self, method):
+        # `requests.auth.HTTPDigestAuth.build_digest_header` does the same but it substitutes empty path with '/'.
+        # No straightforward way of getting key has been found.
+        # This method is used only for specific tests, so there is no need to save one HTTP request.
         path = ''
-        header = self._auth.build_digest_header(method, path)
-        if header is None:  # First time requested.
-            response = self.get('api/getNonce')
-            realm, nonce = response['realm'], response['nonce']
-        else:
-            key, value = header.split(' ', 1)
-            assert key.lower() == 'digest'
-            info = dict(csv.reader(value.split(', '), delimiter='=', doublequote=False))
-            realm, nonce = info['realm'], info['nonce']
-        # requests.auth.HTTPDigestAuth.build_digest_header does the same but it substitutes empty path with '/'.
+        response = self.get('api/getNonce')
+        realm, nonce = response['realm'], response['nonce']
         ha1 = hashlib.md5(':'.join([self.user.lower(), realm, self.password]).encode()).hexdigest()
         ha2 = hashlib.md5(':'.join([method, path]).encode()).hexdigest()  # Empty path.
         digest = hashlib.md5(':'.join([ha1, nonce, ha2]).encode()).hexdigest()
@@ -180,10 +175,12 @@ class RestApi(object):
         _logger.debug('JSON payload:\n%s', json.dumps(data, indent=4))
         return self.request('POST', path, json=data, **kwargs)
 
-    def request(self, method, path, secure=False, timeout=None, **kwargs):
+    def request(self, method, path, secure=False, timeout=None, auth=None, **kwargs):
         url = self.url(path, secure=secure)
         response = requests.request(
-            method, url, auth=self._auth, verify=str(self.ca_cert),
+            method, url,
+            auth=auth or self._auth,
+            verify=str(self.ca_cert),
             allow_redirects=False,
             timeout=timeout or REST_API_TIMEOUT_SEC,
             **kwargs)

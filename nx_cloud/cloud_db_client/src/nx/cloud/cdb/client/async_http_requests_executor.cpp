@@ -41,12 +41,14 @@ void AsyncRequestsExecutor::setProxyCredentials(
     m_auth.proxyUser.authToken.setPassword(password.c_str());
 }
 
-void AsyncRequestsExecutor::setProxyVia(const nx::network::SocketAddress& proxyEndpoint)
+void AsyncRequestsExecutor::setProxyVia(
+    const nx::network::SocketAddress& proxyEndpoint, bool isSecure)
 {
     NX_ASSERT(proxyEndpoint.port > 0);
 
     QnMutexLocker lk(&m_mutex);
     m_auth.proxyEndpoint = proxyEndpoint;
+    m_auth.isProxySecure = isSecure;
 }
 
 void AsyncRequestsExecutor::setRequestTimeout(

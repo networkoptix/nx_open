@@ -24,7 +24,7 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());
 
-    auto createUser = [&launcher](const QString& name, Qn::GlobalPermission permissions)
+    auto createUser = [&launcher](const QString& name, GlobalPermission permissions)
     {
         QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
         user->setId(QnUuid::createUuid());
@@ -55,7 +55,7 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
             launcher.commonModule(),
             &jsonTranSerializer,
             &ubjsonTranSerializer);
-        messageBus.init<ec2::QnTransactionMessageBus>(Qn::PeerType::PT_Server);
+        messageBus.init<ec2::QnTransactionMessageBus>(nx::vms::api::PeerType::server);
 
         ec2::ServerQueryProcessorAccess access(nullptr/*QnDbManager*/, &messageBus);
         access.getAccess(userAccess).processUpdateAsync(
@@ -68,9 +68,9 @@ TEST(ExecActionAccessRightsTest, main) //< Crash on QnDbManager nullptr
         return resultFuture.get();
     };
 
-    createUser(lit("Vasya"), Qn::GlobalUserInputPermission);
-    createUser(lit("Admin"), Qn::GlobalAdminPermission);
-    createUser(lit("Petya"), Qn::GlobalLiveViewerPermissionSet);
+    createUser(lit("Vasya"), GlobalPermission::userInput);
+    createUser(lit("Admin"), GlobalPermission::admin);
+    createUser(lit("Petya"), GlobalPermission::liveViewerPermissions);
 
     auto vasya = findUserByName("Vasya");
     auto admin = findUserByName("Admin");

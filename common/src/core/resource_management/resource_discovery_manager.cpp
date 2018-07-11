@@ -31,6 +31,7 @@
 #include <common/common_module.h>
 #include "core/resource/media_server_resource.h"
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/media_server_data.h>
 
 #ifdef __arm__
     static const int kThreadCount = 8;
@@ -158,7 +159,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
     if (resourceType.isNull())
         return result;
 
-    if (resourceTypeId == qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId))
+    if (resourceTypeId == nx::vms::api::StorageData::kResourceTypeId)
     {
         result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), params.url));
         NX_ASSERT(result); //storage can not be null
@@ -365,7 +366,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
     }
 #endif
-    if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
+    if (mServer->getServerFlags().testFlag(nx::vms::api::SF_Edge) && !mServer->isRedundancy())
         return false; // do not transfer cameras from edge server
 
     if (camera->preferredServerId() == ownGuid)

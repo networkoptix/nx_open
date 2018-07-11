@@ -34,6 +34,7 @@ public:
         NoError,
         InvalidEmail,
         InvalidPassword,
+        UserTemporaryLockedOut,
         AccountNotActivated,
         UnknownError
     };

@@ -22,8 +22,7 @@ int QnLogRestHandler::executeGet(
     const QnRestConnectionProcessor* processor)
 {
     if (!processor->resourceAccessManager()->hasGlobalPermission(
-            processor->accessRights(),
-            Qn::GlobalPermission::GlobalAdminPermission))
+        processor->accessRights(), GlobalPermission::admin))
     {
         return nx::network::http::StatusCode::forbidden;
     }

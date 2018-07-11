@@ -114,7 +114,7 @@ struct CameraSettingsDialogState
     bool hasChanges = false;
     bool readOnly = true;
     bool settingsOptimizationEnabled = false;
-    Qn::GlobalPermissions globalPermissions = Qn::NoGlobalPermissions;
+    GlobalPermissions globalPermissions;
 
     // Generic cameras info.
 

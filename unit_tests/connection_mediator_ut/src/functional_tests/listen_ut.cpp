@@ -131,7 +131,7 @@ protected:
 
         auto stunClient = std::make_shared<nx::network::stun::AsyncClient>();
         stunClient->connect(nx::network::url::Builder()
-            .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
+            .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunTcpEndpoint()));
         stunClient->setOnConnectionClosedHandler(
             std::bind(&ListeningPeer::saveConnectionClosedEvent, this, stunClient.get(), _1));
         auto connection = std::make_unique<nx::hpm::api::MediatorServerTcpConnection>(

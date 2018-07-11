@@ -30,6 +30,7 @@ def port(udp_socket):
 pytest_plugins = ['fixtures.ad_hoc_ssh']
 
 
+@pytest.mark.xfail(reason="`nc` on Ubuntu 14.04 doesn't support broadcasts")
 def test_broadcast(ssh, udp_socket, port):
     sent_data = b"Hi there!"
     try:

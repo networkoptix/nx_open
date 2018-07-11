@@ -32,8 +32,8 @@ public:
 
     void updatePermissions();
 
-    virtual Qn::GlobalPermissions rawPermissions() const override;
-    virtual void setRawPermissions(Qn::GlobalPermissions value) override;
+    virtual GlobalPermissions rawPermissions() const override;
+    virtual void setRawPermissions(GlobalPermissions value) override;
 
     virtual QSet<QnUuid> accessibleResources() const override;
     virtual void setAccessibleResources(const QSet<QnUuid>& value) override;

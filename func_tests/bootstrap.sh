@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 # Used variables.
-: ${BASE_DIR:?}
+: ${BASE_DIR:?"Run: BASE_DIR=... ./bootstrap.sh; func_tests-bin, func_tests-work, func_tests-venv will appear there."}
 : ${BIN_DIR:="${BASE_DIR}/func_tests-bin"}
 : ${WORK_DIR:="${BASE_DIR}/func_tests-work"}
 : ${VENV_DIR:="${BASE_DIR}/func_tests-venv"}

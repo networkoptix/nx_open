@@ -3,7 +3,7 @@ import pytest
 from defaults import defaults
 from framework.networking.linux import LinuxNetworking
 from framework.networking.windows import WindowsNetworking
-from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_shell import SSH
 from framework.os_access.windows_remoting import WinRM
 from framework.vms.factory import SSH_PRIVATE_KEY_PATH
 from framework.waiting import wait_for_true
@@ -28,7 +28,7 @@ def linux_vm_info(vm_types):
 
 @pytest.fixture(scope='session')
 def windows_vm_info(vm_types):
-    with vm_types['linux'].obtained('raw-linux') as (info, index):
+    with vm_types['windows'].obtained('raw-windows') as (info, index):
         return info
 
 

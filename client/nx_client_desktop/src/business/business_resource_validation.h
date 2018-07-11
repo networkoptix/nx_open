@@ -259,7 +259,7 @@ class QnRequiredPermissionSubjectPolicy: public QnSubjectValidationPolicy
     using base_type = QnSubjectValidationPolicy;
 
 public:
-    explicit QnRequiredPermissionSubjectPolicy(Qn::GlobalPermission requiredPermission,
+    explicit QnRequiredPermissionSubjectPolicy(GlobalPermission requiredPermission,
         const QString& permissionName = QString(), bool allowEmptySelection = false);
 
     virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
@@ -270,6 +270,6 @@ private:
     bool isRoleValid(const QnUuid& roleId) const;
 
 private:
-    const Qn::GlobalPermission m_requiredPermission;
+    const GlobalPermission m_requiredPermission;
     const QString m_permissionName;
 };

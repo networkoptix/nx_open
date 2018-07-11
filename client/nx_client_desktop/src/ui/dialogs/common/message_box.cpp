@@ -611,13 +611,14 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,
                 stretch,
                 alignment
             );
+            break;
         case QnMessageBox::Layout::AfterMainLabel:
             ui->verticalLayout->insertWidget(
                 ui->verticalLayout->indexOf(ui->mainLabel) + 1,
                 widget,
                 stretch,
                 alignment);
-
+            break;
         default:
             break;
     }
@@ -692,7 +693,9 @@ int QnMessageBox::exec()
     d->detectEscapeButton();
     if (d->buttonDetection)
         d->stylizeButtons();
-    NX_ASSERT(d->escapeButton);
+
+    // We really can survive without proper escape button.
+    //NX_ASSERT(d->escapeButton);
 
     if (d->informativeLabels.isEmpty() && d->customWidgets.isEmpty() && !isCheckBoxEnabled())
     {

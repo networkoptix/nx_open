@@ -17,8 +17,8 @@ namespace data_sync_engine {
 
 struct UpdateHistoryData
 {
-    ::ec2::ApiPersistentIdData updatedBy;
-    ::ec2::Timestamp timestamp;
+    vms::api::PersistentIdData updatedBy;
+    vms::api::Timestamp timestamp;
 };
 
 /**
@@ -38,7 +38,7 @@ public:
     {
         /** map<transaction hash, peer which updated transaction> */
         std::map<nx::Buffer, UpdateHistoryData> transactionHashToUpdateAuthor;
-        ::ec2::QnTranState transactionState;
+        vms::api::TranState transactionState;
         boost::optional<std::uint64_t> timestampSequence;
     };
 
@@ -52,10 +52,10 @@ public:
         const QByteArray& hash) const;
 
     void restoreTransaction(
-        ::ec2::ApiPersistentIdData tranStateKey,
+        vms::api::PersistentIdData tranStateKey,
         int sequence,
         const nx::Buffer& tranHash,
-        const ::ec2::Timestamp& timestamp);
+        const vms::api::Timestamp& timestamp);
 
     TranId beginTran();
     void commit(TranId tranId);
@@ -70,11 +70,11 @@ public:
      * @return nullptr if tranId is unknown.
      */
     const VmsDataState* state(TranId tranId) const;
-    ::ec2::Timestamp generateTransactionTimestamp(TranId tranId);
-    int generateTransactionSequence(const ::ec2::ApiPersistentIdData& tranStateKey);
-    void shiftTransactionSequence(const ::ec2::ApiPersistentIdData& tranStateKey, int delta);
+    vms::api::Timestamp generateTransactionTimestamp(TranId tranId);
+    int generateTransactionSequence(const vms::api::PersistentIdData& tranStateKey);
+    void shiftTransactionSequence(const vms::api::PersistentIdData& tranStateKey, int delta);
 
-    ::ec2::QnTranState committedTransactionState() const;
+    vms::api::TranState committedTransactionState() const;
     std::uint64_t committedTimestampSequence() const;
 
 private:
@@ -83,14 +83,12 @@ private:
         VmsDataState data;
     };
 
-    ::ec2::Timestamp m_maxTimestamp;
+    vms::api::Timestamp m_maxTimestamp;
     std::map<TranId, TranContext> m_tranIdToContext;
     mutable QnMutex m_mutex;
     TranId m_tranIdSequence;
     TransactionTimestampCalculator m_timestampCalculator;
     VmsDataState m_committedData;
-    /** map<peer, transport sequence> */
-    //std::map<::ec2::QnTranStateKey, int> m_lastTransportSeq;
 
     std::uint64_t timestampSequence(const QnMutexLockerBase& /*lock*/, TranId tranId) const;
 

@@ -3,8 +3,8 @@
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <nx/utils/db/db_connection_holder.h>
-#include <nx/utils/db/test_support/test_with_db_helper.h>
+#include <nx/sql/db_connection_holder.h>
+#include <nx/sql/test_support/test_with_db_helper.h>
 
 #include <statistics/dao/rdb/instance_controller.h>
 #include <statistics/dao/rdb/rdb_data_object.h>
@@ -17,12 +17,12 @@ namespace rdb {
 namespace test {
 
 class StatisticsRdbDataObject:
-    public nx::utils::db::test::TestWithDbHelper,
+    public nx::sql::test::TestWithDbHelper,
     public ::testing::Test
 {
 public:
     StatisticsRdbDataObject():
-        nx::utils::db::test::TestWithDbHelper("hpm", QString())
+        nx::sql::test::TestWithDbHelper("hpm", QString())
     {
         init();
     }
@@ -35,11 +35,11 @@ protected:
         for (const auto& statsRecord: m_records)
         {
             ASSERT_EQ(
-                nx::utils::db::DBResult::ok,
+                nx::sql::DBResult::ok,
                 m_dao.save(queryContext.get(), statsRecord));
         }
         ASSERT_EQ(
-            nx::utils::db::DBResult::ok,
+            nx::sql::DBResult::ok,
             queryContext->transaction()->commit());
     }
 
@@ -56,7 +56,7 @@ protected:
         const auto queryContext = m_dbConnection->begin();
         std::deque<stats::ConnectSession> readRecords;
         ASSERT_EQ(
-            nx::utils::db::DBResult::ok,
+            nx::sql::DBResult::ok,
             m_dao.readAllRecords(queryContext.get(), &readRecords));
 
         auto comparator =
@@ -72,14 +72,14 @@ protected:
     }
 
 private:
-    std::unique_ptr<nx::utils::db::DbConnectionHolder> m_dbConnection;
+    std::unique_ptr<nx::sql::DbConnectionHolder> m_dbConnection;
     std::unique_ptr<rdb::InstanceController> m_dbInstance;
     rdb::DataObject m_dao;
     std::deque<stats::ConnectSession> m_records;
 
     void init()
     {
-        m_dbConnection = std::make_unique<nx::utils::db::DbConnectionHolder>(dbConnectionOptions());
+        m_dbConnection = std::make_unique<nx::sql::DbConnectionHolder>(dbConnectionOptions());
         ASSERT_TRUE(m_dbConnection->open());
 
         ASSERT_NO_THROW(

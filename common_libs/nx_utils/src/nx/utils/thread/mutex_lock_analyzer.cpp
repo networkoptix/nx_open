@@ -1,8 +1,3 @@
-/**********************************************************
-* 13 feb 2015
-* akolesnikov@networkoptix.com
-***********************************************************/
-
 #if defined(USE_OWN_MUTEX)
 
 #if defined(_WIN32)
@@ -26,21 +21,20 @@
 #include <nx/utils/log/log.h>
 
 #if defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
-    static bool kDoAnalyseForDeadlock = true;
+static bool kDoAnalyseForDeadlock = true;
 #else
-    static bool kDoAnalyseForDeadlock = false;
+static bool kDoAnalyseForDeadlock = false;
 #endif
 
 //-------------------------------------------------------------------------------------------------
 // class MutexLockKey
 
-MutexLockKey::MutexLockKey()
-:
-    line( 0 ),
-    mutexPtr( nullptr ),
-    lockID( 0 ),
-    threadHoldingMutex( 0 ),
-    lockRecursionDepth( 0 )
+MutexLockKey::MutexLockKey():
+    line(0),
+    mutexPtr(nullptr),
+    lockID(0),
+    threadHoldingMutex(0),
+    lockRecursionDepth(0)
 {
 }
 
@@ -49,95 +43,92 @@ MutexLockKey::MutexLockKey(
     int _sourceLine,
     QnMutex* _mutexPtr,
     size_t _lockID,
-    std::uintptr_t _threadHoldingMutex )
-:
-    sourceFile( _sourceFile ),
-    line( _sourceLine ),
-    mutexPtr( _mutexPtr ),
-    lockID( _lockID ),
-    threadHoldingMutex( _threadHoldingMutex ),
-    lockRecursionDepth( 0 )
+    std::uintptr_t _threadHoldingMutex)
+    :
+    sourceFile(_sourceFile),
+    line(_sourceLine),
+    mutexPtr(_mutexPtr),
+    lockID(_lockID),
+    threadHoldingMutex(_threadHoldingMutex),
+    lockRecursionDepth(0)
 {
 }
 
-bool MutexLockKey::operator<( const MutexLockKey& rhs ) const
+bool MutexLockKey::operator<(const MutexLockKey& rhs) const
 {
     //return mutexPtr < rhs.mutexPtr;
-    if( sourceFile < rhs.sourceFile )
+    if (sourceFile < rhs.sourceFile)
         return true;
-    if( sourceFile > rhs.sourceFile )
+    if (sourceFile > rhs.sourceFile)
         return false;
 
-    if( line < rhs.line )
+    if (line < rhs.line)
         return true;
-    if( line > rhs.line )
+    if (line > rhs.line)
         return false;
 
-    if( mutexPtr < rhs.mutexPtr )
+    if (mutexPtr < rhs.mutexPtr)
         return true;
-    if( mutexPtr > rhs.mutexPtr )
+    if (mutexPtr > rhs.mutexPtr)
         return false;
 
     return lockID < rhs.lockID;
 }
 
-bool MutexLockKey::operator==( const MutexLockKey& rhs ) const
+bool MutexLockKey::operator==(const MutexLockKey& rhs) const
 {
-    //return mutexPtr == rhs.mutexPtr;
-
     return sourceFile == rhs.sourceFile
         && line == rhs.line
         && mutexPtr == rhs.mutexPtr
         && lockID == rhs.lockID;
 }
 
-bool MutexLockKey::operator!=( const MutexLockKey& rhs ) const
+bool MutexLockKey::operator!=(const MutexLockKey& rhs) const
 {
-    return !( *this == rhs );
+    return !(*this == rhs);
 }
 
 QString MutexLockKey::toString() const
 {
-    return QString( "%1:%2. mutex %3, relock number %4" ).
+    return QString("%1:%2. mutex %3, relock number %4").
         arg(QLatin1String(sourceFile)).arg(line).arg((size_t)mutexPtr, 0, 16).arg(lockID);
 }
 
 //-------------------------------------------------------------------------------------------------
 // class LockGraphEdgeData
 
-LockGraphEdgeData::TwoMutexLockData::TwoMutexLockData()
-:
-    threadID( 0 )
+LockGraphEdgeData::TwoMutexLockData::TwoMutexLockData():
+    threadID(0)
 {
 }
 
 LockGraphEdgeData::TwoMutexLockData::TwoMutexLockData(
     std::uintptr_t _threadID,
     MutexLockKey _firstLocked,
-    MutexLockKey _secondLocked )
-:
-    threadID( _threadID ),
-    firstLocked( _firstLocked ),
-    secondLocked( _secondLocked )
+    MutexLockKey _secondLocked)
+    :
+    threadID(_threadID),
+    firstLocked(_firstLocked),
+    secondLocked(_secondLocked)
 {
 }
 
-bool LockGraphEdgeData::TwoMutexLockData::operator<( const TwoMutexLockData& rhs ) const
+bool LockGraphEdgeData::TwoMutexLockData::operator<(const TwoMutexLockData& rhs) const
 {
-    if( threadID < rhs.threadID )
+    if (threadID < rhs.threadID)
         return true;
-    if( rhs.threadID < threadID )
+    if (rhs.threadID < threadID)
         return false;
 
-    if( firstLocked < rhs.firstLocked )
+    if (firstLocked < rhs.firstLocked)
         return true;
-    if( rhs.firstLocked < firstLocked )
+    if (rhs.firstLocked < firstLocked)
         return false;
 
     return secondLocked < rhs.secondLocked;
 }
 
-bool LockGraphEdgeData::TwoMutexLockData::operator==( const TwoMutexLockData& rhs ) const
+bool LockGraphEdgeData::TwoMutexLockData::operator==(const TwoMutexLockData& rhs) const
 {
     return
         threadID == rhs.threadID &&
@@ -145,7 +136,7 @@ bool LockGraphEdgeData::TwoMutexLockData::operator==( const TwoMutexLockData& rh
         secondLocked == rhs.secondLocked;
 }
 
-bool LockGraphEdgeData::TwoMutexLockData::operator!=( const TwoMutexLockData& rhs ) const
+bool LockGraphEdgeData::TwoMutexLockData::operator!=(const TwoMutexLockData& rhs) const
 {
     return !(*this == rhs);
 }
@@ -155,34 +146,32 @@ LockGraphEdgeData::LockGraphEdgeData()
 {
 }
 
-LockGraphEdgeData::LockGraphEdgeData( LockGraphEdgeData&& rhs )
-:
-    lockPositions( std::move(rhs.lockPositions) )
+LockGraphEdgeData::LockGraphEdgeData(LockGraphEdgeData&& rhs):
+    lockPositions(std::move(rhs.lockPositions))
 {
 }
 
-LockGraphEdgeData::LockGraphEdgeData( const LockGraphEdgeData& rhs )
-:
-    lockPositions( rhs.lockPositions )
+LockGraphEdgeData::LockGraphEdgeData(const LockGraphEdgeData& rhs):
+    lockPositions(rhs.lockPositions)
 {
 }
 
-LockGraphEdgeData& LockGraphEdgeData::operator=( LockGraphEdgeData&& rhs )
+LockGraphEdgeData& LockGraphEdgeData::operator=(LockGraphEdgeData&& rhs)
 {
-    lockPositions = std::move( rhs.lockPositions );
+    lockPositions = std::move(rhs.lockPositions);
     return *this;
 }
 
-bool LockGraphEdgeData::connectedTo( const LockGraphEdgeData& rhs ) const
+bool LockGraphEdgeData::connectedTo(const LockGraphEdgeData& rhs) const
 {
-    for( const TwoMutexLockData& lockData: lockPositions )
+    for (const TwoMutexLockData& lockData: lockPositions)
     {
         //if there is an element in rhs with same thread id and rhs.firstLocked == secondLocked, than connected
-        auto iter = rhs.lockPositions.lower_bound( TwoMutexLockData(
-            lockData.threadID, lockData.secondLocked, MutexLockKey() ) );
-        if( iter != rhs.lockPositions.end() &&
+        auto iter = rhs.lockPositions.lower_bound(TwoMutexLockData(
+            lockData.threadID, lockData.secondLocked, MutexLockKey()));
+        if (iter != rhs.lockPositions.end() &&
             iter->threadID == lockData.threadID &&
-            iter->firstLocked == lockData.secondLocked )
+            iter->firstLocked == lockData.secondLocked)
         {
             return true;    //connected
         }
@@ -194,9 +183,10 @@ bool LockGraphEdgeData::connectedTo( const LockGraphEdgeData& rhs ) const
     return !is_equal_sorted_ranges_if(
         lockPositions.cbegin(), lockPositions.cend(),
         rhs.lockPositions.cbegin(), rhs.lockPositions.cend(),
-        []( const TwoMutexLockData& one, const TwoMutexLockData& two ){
+        [](const TwoMutexLockData& one, const TwoMutexLockData& two)
+        {
             return one.threadID < two.threadID;
-        } );
+        });
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -255,40 +245,40 @@ const ThreadContext* ThreadContextGuard::operator->() const
 //-------------------------------------------------------------------------------------------------
 // class MutexLockAnalyzer
 
-void MutexLockAnalyzer::mutexCreated( QnMutex* const /*mutex*/ )
+void MutexLockAnalyzer::mutexCreated(QnMutex* const /*mutex*/)
 {
 }
 
-void MutexLockAnalyzer::beforeMutexDestruction( QnMutex* const mutex )
+void MutexLockAnalyzer::beforeMutexDestruction(QnMutex* const mutex)
 {
     if (kDoAnalyseForDeadlock)
     {
-        QWriteLocker lk( &m_mutex );
-        m_lockDigraph.removeVertice( mutex );
+        QWriteLocker lk(&m_mutex);
+        m_lockDigraph.removeVertice(mutex);
     }
 }
 
-void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition )
+void MutexLockAnalyzer::afterMutexLocked(const MutexLockKey& mutexLockPosition)
 {
     const auto curThreadId = ::currentThreadSystemId();
     ThreadContextGuard threadContext(&m_threadContextPool);
 
-    if( threadContext->currentLockPath.empty() )
+    if (threadContext->currentLockPath.empty())
     {
-        threadContext->currentLockPath.push_front( mutexLockPosition );
+        threadContext->currentLockPath.push_front(mutexLockPosition);
         return;
     }
 
     const MutexLockKey& prevLock = threadContext->currentLockPath.front();
-    if( prevLock.mutexPtr == mutexLockPosition.mutexPtr )
+    if (prevLock.mutexPtr == mutexLockPosition.mutexPtr)
     {
-        if( mutexLockPosition.mutexPtr->m_impl->recursive )
+        if (mutexLockPosition.mutexPtr->m_impl->recursive)
         {
             ++threadContext->currentLockPath.front().lockRecursionDepth;
             return;     //ignoring recursive lock
         }
 
-        threadContext->currentLockPath.push_front( mutexLockPosition );
+        threadContext->currentLockPath.push_front(mutexLockPosition);
         const QString& deadLockMsg = QString::fromLatin1(
             "Detected deadlock. Double mutex lock. Path:\n"
             "    %1\n").
@@ -299,20 +289,20 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
         return;
     }
 
-    threadContext->currentLockPath.push_front( mutexLockPosition );
-    if( !kDoAnalyseForDeadlock )
+    threadContext->currentLockPath.push_front(mutexLockPosition);
+    if (!kDoAnalyseForDeadlock)
         return;
 
-    QReadLocker readLock( &m_mutex );
+    QReadLocker readLock(&m_mutex);
 
     LockGraphEdgeData::TwoMutexLockData curMutexLockData(
         curThreadId,
         prevLock,
-        mutexLockPosition );
+        mutexLockPosition);
 
     const LockGraphEdgeData* existingEdgeData = nullptr;
-    if( m_lockDigraph.findEdge( prevLock.mutexPtr, mutexLockPosition.mutexPtr, &existingEdgeData ) &&
-        (existingEdgeData->lockPositions.find( curMutexLockData ) != existingEdgeData->lockPositions.end()) )
+    if (m_lockDigraph.findEdge(prevLock.mutexPtr, mutexLockPosition.mutexPtr, &existingEdgeData) &&
+        (existingEdgeData->lockPositions.find(curMutexLockData) != existingEdgeData->lockPositions.end()))
     {
         //no need to check for deadlock if graph is not modified
         return;
@@ -325,18 +315,20 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
     //    Consider following: m1->m2, m2->m1. But both lock happen in the same thread only,
     //    so deadlock is possible.
     //    NOTE: recursive locking is handled separately
-    if( m_lockDigraph.findAnyPathIf(
+    if (m_lockDigraph.findAnyPathIf(
             mutexLockPosition.mutexPtr, prevLock.mutexPtr,
             &existingPath, &edgesTravelled,
-            [curThreadId]( const LockGraphEdgeData& edgeData )->bool {
+            [curThreadId](const LockGraphEdgeData& edgeData)->bool
+            {
                 return std::find_if(
-                        edgeData.lockPositions.cbegin(),
-                        edgeData.lockPositions.cend(),
-                        [curThreadId](const LockGraphEdgeData::TwoMutexLockData& lockData){
-                            return lockData.threadID != curThreadId;
-                        }
-                    ) != edgeData.lockPositions.cend();
-            } ) )
+                    edgeData.lockPositions.cbegin(),
+                    edgeData.lockPositions.cend(),
+                    [curThreadId](const LockGraphEdgeData::TwoMutexLockData& lockData) {
+                        return lockData.threadID != curThreadId;
+                    }
+                ) != edgeData.lockPositions.cend();
+            }
+        ))
     {
         //found path can still be not connected
         //Example: imagine that mtx1 has been locked with mtx4 already locked
@@ -350,7 +342,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
         //    - from {mtx2, line 20} to {mtx3, line 40}, thread 1
         //    - from {mtx3, line 50} to {mtx4, line 60}, thread 2
 
-        if( pathConnected( edgesTravelled ) )
+        if (pathConnected(edgesTravelled))
         {
             //found deadlock between prevLock and mutexLockPosition
             const QString& deadLockMsg = QString::fromLatin1(
@@ -366,22 +358,22 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
             std::cerr << deadLockMsg.toStdString() << std::endl;
             NX_ALWAYS(this, deadLockMsg);
 
-            #if defined(_WIN32)
-                DebugBreak();
-            #elif defined(__linux__)
-                kill(getppid(), SIGTRAP);
-            #endif
+#if defined(_WIN32)
+            DebugBreak();
+#elif defined(__linux__)
+            kill(getppid(), SIGTRAP);
+#endif
         }
     }
 
     //upgrading lock
     readLock.unlock();
-    QWriteLocker writeLock( &m_mutex );
+    QWriteLocker writeLock(&m_mutex);
 
     //OK to add edge
     std::pair<LockGraphEdgeData*, bool> p = m_lockDigraph.addEdge(
-        prevLock.mutexPtr, mutexLockPosition.mutexPtr, LockGraphEdgeData() );
-    p.first->lockPositions.insert( std::move(curMutexLockData) );
+        prevLock.mutexPtr, mutexLockPosition.mutexPtr, LockGraphEdgeData());
+    p.first->lockPositions.insert(std::move(curMutexLockData));
 }
 
 void MutexLockAnalyzer::expectNoLocks()
@@ -389,7 +381,7 @@ void MutexLockAnalyzer::expectNoLocks()
     ThreadContextGuard threadContext(&m_threadContextPool);
 
     std::vector<MutexLockKey> path;
-    for (const auto& key: threadContext->currentLockPath)
+    for (const auto& key : threadContext->currentLockPath)
     {
         if (!key.mutexPtr->isRecursive())
             path.push_back(key);
@@ -399,64 +391,64 @@ void MutexLockAnalyzer::expectNoLocks()
         .container(path, QString::fromLatin1("\n"), QString(), QString()));
 }
 
-void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPosition )
+void MutexLockAnalyzer::beforeMutexUnlocked(const MutexLockKey& mutexLockPosition)
 {
     ThreadContextGuard threadContext(&m_threadContextPool);
 
-    NX_CRITICAL( !threadContext->currentLockPath.empty() );
-    if( threadContext->currentLockPath.front().lockRecursionDepth > 0 )
+    NX_CRITICAL(!threadContext->currentLockPath.empty());
+    if (threadContext->currentLockPath.front().lockRecursionDepth > 0)
     {
         --threadContext->currentLockPath.front().lockRecursionDepth;
         return;
     }
 
-    NX_ASSERT( mutexLockPosition == threadContext->currentLockPath.front() );
+    NX_ASSERT(mutexLockPosition == threadContext->currentLockPath.front());
     threadContext->currentLockPath.pop_front();
 }
 
-void MutexLockAnalyzer::threadStarted( std::uintptr_t /*sysThreadID*/ )
+void MutexLockAnalyzer::threadStarted(std::uintptr_t /*sysThreadID*/)
 {
     //TODO #ak
 }
 
-void MutexLockAnalyzer::threadStopped( std::uintptr_t /*sysThreadID*/ )
+void MutexLockAnalyzer::threadStopped(std::uintptr_t /*sysThreadID*/)
 {
     //TODO #ak
 }
 
-Q_GLOBAL_STATIC( MutexLockAnalyzer, MutexLockAnalyzer_instance )
+Q_GLOBAL_STATIC(MutexLockAnalyzer, MutexLockAnalyzer_instance)
 
 MutexLockAnalyzer* MutexLockAnalyzer::instance()
 {
     return MutexLockAnalyzer_instance();
 }
 
-QString MutexLockAnalyzer::pathToString( const std::list<LockGraphEdgeData>& edgesTravelled )
+QString MutexLockAnalyzer::pathToString(const std::list<LockGraphEdgeData>& edgesTravelled)
 {
     MutexLockKey prevSecondLock;
     std::uintptr_t prevLockThreadID = 0;
     QString pathStr;
-    for( auto it = edgesTravelled.cbegin(); it != edgesTravelled.cend(); ++it )
+    for (auto it = edgesTravelled.cbegin(); it != edgesTravelled.cend(); ++it)
     {
         const LockGraphEdgeData& edge = *it;
 
-        NX_ASSERT( !edge.lockPositions.empty() );
+        NX_ASSERT(!edge.lockPositions.empty());
         //selecting which lockPositions element to use
         const LockGraphEdgeData::TwoMutexLockData& lockData = *edge.lockPositions.cbegin();
 
         bool lockStackChanged = false;
-        if( it != edgesTravelled.cbegin() )
+        if (it != edgesTravelled.cbegin())
         {
-            if( lockData.firstLocked != prevSecondLock ||
-                lockData.threadID != prevLockThreadID )
+            if (lockData.firstLocked != prevSecondLock ||
+                lockData.threadID != prevLockThreadID)
             {
                 lockStackChanged = true;
             }
         }
 
-        if( lockStackChanged )
+        if (lockStackChanged)
             pathStr += "----------------\n";
-        if( lockStackChanged || (it == edgesTravelled.cbegin()) )
+        if (lockStackChanged || (it == edgesTravelled.cbegin()))
             pathStr += lockData.firstLocked.toString() + "\n";
         pathStr += QString::fromLatin1("    thread %1\n").arg(lockData.threadID, 0, 16);
         pathStr += lockData.secondLocked.toString() + "\n";
@@ -468,14 +460,14 @@ QString MutexLockAnalyzer::pathToString( const std::list<LockGraphEdgeData>& edg
     return pathStr;
 }
 
-bool MutexLockAnalyzer::pathConnected( const std::list<LockGraphEdgeData>& edgesTravelled ) const
+bool MutexLockAnalyzer::pathConnected(const std::list<LockGraphEdgeData>& edgesTravelled) const
 {
     const LockGraphEdgeData* prevEdgeData = nullptr;
-    for( const LockGraphEdgeData& edgeData: edgesTravelled )
+    for (const LockGraphEdgeData& edgeData : edgesTravelled)
     {
-        if( prevEdgeData )
+        if (prevEdgeData)
         {
-            if( !prevEdgeData->connectedTo( edgeData ) )
+            if (!prevEdgeData->connectedTo(edgeData))
                 return false;
         }
 

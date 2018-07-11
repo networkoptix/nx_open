@@ -217,7 +217,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
 
         if (rpResource->getMaxChannels() > 1  && !shouldAppearAsSingleChannel) {
             resource->setGroupId(rpResource->getPhysicalId());
-            resource->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+            resource->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
         }
 
         resList << resource;
@@ -308,14 +308,14 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const nx::util
                 if (resource->getMaxChannels() > 1)
                 {
                     resource->setGroupId(resource->getPhysicalId());
-                    resource->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+                    resource->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
                 }
 
                 for (int i = 1; i < resource->getMaxChannels(); ++i)
                 {
                     QnPlOnvifResourcePtr res = createResource(resource->getTypeId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
                     res->setGroupId(resource->getPhysicalId());
-                    res->setGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
+                    res->setDefaultGroupName(resource->getModel() + QLatin1String(" ") + resource->getHostAddress());
                     res->setVendor( manufacturer );
                     res->setPhysicalId(resource->getPhysicalId());
                     res->update(resource);

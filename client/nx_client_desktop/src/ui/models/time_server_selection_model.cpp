@@ -1,66 +1,61 @@
 #include "time_server_selection_model.h"
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+#include <algorithm>
+
+#include <api/model/time_reply.h>
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
-
-#include <translation/datetime_formatter.h>
 #include <common/common_module.h>
-
 #include <core/resource_management/resource_changes_listener.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
-
-#include <nx_ec/ec_api.h>
-
 #include <text/time_strings.h>
-
+#include <translation/datetime_formatter.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
-#include <nx/client/core/watchers/server_time_watcher.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <utils/common/guarded_callback.h>
 #include <utils/common/synctime.h>
 
-#include <boost/algorithm/cxx11/any_of.hpp>
-#include <algorithm>
-#include <api/model/time_reply.h>
-
+#include <nx_ec/ec_api.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
+#include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/algorithm/index_of.h>
-#include <utils/common/guarded_callback.h>
 
 namespace {
 
-    template<class T>
-    QVector<T> sortedVector(const QVector<T>& unsorted)
-    {
-        auto sorted = unsorted;
-        std::sort(sorted.begin(), sorted.end());
-        return sorted;
-    }
+template<class T>
+QVector<T> sortedVector(const QVector<T>& unsorted)
+{
+    auto sorted = unsorted;
+    std::sort(sorted.begin(), sorted.end());
+    return sorted;
+}
 
-    QVector<unsigned int> kOffsetThresholdSeconds = sortedVector<unsigned int>(
-        { 3, 5, 10, 30, 60, 180, 300, 600 });
+QVector<unsigned int> kOffsetThresholdSeconds = sortedVector<unsigned int>(
+    { 3, 5, 10, 30, 60, 180, 300, 600 });
 
-    QVector<int> kTextRoles = {
-        Qt::DisplayRole,
-        Qt::StatusTipRole,
-        Qt::WhatsThisRole,
-        Qt::AccessibleTextRole,
-        Qt::AccessibleDescriptionRole,
-        Qt::ToolTipRole };
+QVector<int> kTextRoles = {
+    Qt::DisplayRole,
+    Qt::StatusTipRole,
+    Qt::WhatsThisRole,
+    Qt::AccessibleTextRole,
+    Qt::AccessibleDescriptionRole,
+    Qt::ToolTipRole };
 
-    QVector<int> kCheckboxRoles = {
-        Qt::DisplayRole,
-        Qt::CheckStateRole };
+QVector<int> kCheckboxRoles = {
+    Qt::DisplayRole,
+    Qt::CheckStateRole };
 
-    QVector<int> kForegroundRole = {
-        Qt::ForegroundRole };
+QVector<int> kForegroundRole = {
+    Qt::ForegroundRole };
 
-    QString serverName(const QnResourcePtr& server)
-    {
-        return server
-            ? QnResourceDisplayInfo(server).toString(Qn::RI_NameOnly)
-            : QnTimeServerSelectionModel::tr("Server");
-    }
+QString serverName(const QnResourcePtr& server)
+{
+    return server
+        ? QnResourceDisplayInfo(server).toString(Qn::RI_NameOnly)
+        : QnTimeServerSelectionModel::tr("Server");
+}
 
 } // namespace
 
@@ -563,6 +558,6 @@ void QnTimeServerSelectionModel::updateHasInternetAccess()
         [](const QnMediaServerResourcePtr& server)
         {
             return server->getStatus() == Qn::Online
-                && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+                && server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
         });
 }

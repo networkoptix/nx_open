@@ -165,7 +165,7 @@ void QnTransactionMessageBus::proxyTransaction(
     const QnTransaction<T>& tran,
     const QnTransactionTransportHeader& transportHeader)
 {
-    if (ApiPeerData::isClient(m_localPeerType))
+    if (nx::vms::api::PeerData::isClient(m_localPeerType))
         return;
 
     auto newTransportHeader = transportHeader;
@@ -260,7 +260,7 @@ bool QnTransactionMessageBus::processSpecialTransaction(
         return true;
     }
 
-    if (tran.isLocal() && ApiPeerData::isServer(m_localPeerType))
+    if (tran.isLocal() && nx::vms::api::PeerData::isServer(m_localPeerType))
     {
         printTransaction("reject local transaction",
             tran, transactionHash, transportHeader, sender);
@@ -306,7 +306,7 @@ bool QnTransactionMessageBus::processSpecialTransaction(
             // We are only interested in relevant notifications triggered.
             // Also they are allowed only if sender is Admin.
             if (!commonModule()->resourceAccessManager()->hasGlobalPermission(
-                sender->getUserAccessData(), Qn::GlobalAdminPermission))
+                sender->getUserAccessData(), GlobalPermission::admin))
             {
                 NX_WARNING(QnLog::EC2_TRAN_LOG,
                     lm("Can't handle transaction %1 because of no administrator rights. "

@@ -23,7 +23,7 @@ bool VmsTransactionLogCache::isShouldBeIgnored(
 
     QnMutexLocker lock(&m_mutex);
 
-    ApiPersistentIdData key(tran.peerID, tran.persistentInfo.dbID);
+    vms::api::PersistentIdData key(tran.peerID, tran.persistentInfo.dbID);
     NX_ASSERT(tran.persistentInfo.sequence != 0);
     const auto currentSequence = m_committedData.transactionState.values.value(key);
     if (currentSequence >= tran.persistentInfo.sequence)
@@ -60,10 +60,10 @@ bool VmsTransactionLogCache::isShouldBeIgnored(
 }
 
 void VmsTransactionLogCache::restoreTransaction(
-    ::ec2::ApiPersistentIdData tranStateKey,
+    vms::api::PersistentIdData tranStateKey,
     int sequence,
     const nx::Buffer& tranHash,
-    const ::ec2::Timestamp& timestamp)
+    const vms::api::Timestamp& timestamp)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -151,7 +151,7 @@ void VmsTransactionLogCache::insertOrReplaceTransaction(
 
     m_timestampCalculator.shiftTimestampIfNeeded(transaction.persistentInfo.timestamp);
 
-    const ::ec2::ApiPersistentIdData tranKey(
+    const vms::api::PersistentIdData tranKey(
         transaction.peerID,
         transaction.persistentInfo.dbID);
 
@@ -170,17 +170,17 @@ const VmsDataState* VmsTransactionLogCache::state(TranId tranId) const
     return tranContext ? &tranContext->data : nullptr;
 }
 
-::ec2::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId tranId)
+vms::api::Timestamp VmsTransactionLogCache::generateTransactionTimestamp(TranId tranId)
 {
     QnMutexLocker lock(&m_mutex);
-    ::ec2::Timestamp timestamp;
+    vms::api::Timestamp timestamp;
     timestamp.sequence = timestampSequence(lock, tranId);
     timestamp.ticks = m_timestampCalculator.calculateNextTimeStamp().ticks;
     return timestamp;
 }
 
 int VmsTransactionLogCache::generateTransactionSequence(
-    const ::ec2::ApiPersistentIdData& tranStateKey)
+    const vms::api::PersistentIdData& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
     int& currentSequence = m_committedData.transactionState.values[tranStateKey];
@@ -189,7 +189,7 @@ int VmsTransactionLogCache::generateTransactionSequence(
 }
 
 void VmsTransactionLogCache::shiftTransactionSequence(
-    const ::ec2::ApiPersistentIdData& tranStateKey,
+    const vms::api::PersistentIdData& tranStateKey,
     int delta)
 {
     QnMutexLocker lock(&m_mutex);
@@ -197,7 +197,7 @@ void VmsTransactionLogCache::shiftTransactionSequence(
     currentSequence += delta;
 }
 
-::ec2::QnTranState VmsTransactionLogCache::committedTransactionState() const
+vms::api::TranState VmsTransactionLogCache::committedTransactionState() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_committedData.transactionState;

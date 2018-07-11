@@ -70,7 +70,7 @@ void QnAutoRequestForwarder::processRequest(nx::network::http::Request* const re
         auto servers = resourcePool()->getResources<QnMediaServerResource>().filtered(
             [](const QnMediaServerResourcePtr server)
             {
-                return server->getServerFlags().testFlag(Qn::SF_HasPublicIP)
+                return server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP)
                     && server->getStatus() == Qn::Online;
             });
         if (!servers.isEmpty())

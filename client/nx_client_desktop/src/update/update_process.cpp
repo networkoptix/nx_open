@@ -331,7 +331,7 @@ void QnUpdateProcess::checkFreeSpace()
         return;
     }
 
-    QHash<QnSystemInformation, QString> fileBySystemInformation;
+    QHash<nx::vms::api::SystemInformation, QString> fileBySystemInformation;
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it)
         fileBySystemInformation[it.key()] = it.value()->fileName;
 
@@ -419,7 +419,7 @@ void QnUpdateProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo &data) {
 }
 
 void QnUpdateProcess::installIncompatiblePeers() {
-    QHash<QnSystemInformation, QString> targetFiles;
+    QHash<nx::vms::api::SystemInformation, QString> targetFiles;
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it)
         targetFiles[it.key()] = it.value()->fileName;
 
@@ -530,7 +530,7 @@ void QnUpdateProcess::clearUpdateFlag() {
 }
 
 void QnUpdateProcess::uploadUpdatesToServers() {
-    QHash<QnSystemInformation, QString> fileBySystemInformation;
+    QHash<nx::vms::api::SystemInformation, QString> fileBySystemInformation;
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it)
         fileBySystemInformation[it.key()] = it.value()->fileName;
 

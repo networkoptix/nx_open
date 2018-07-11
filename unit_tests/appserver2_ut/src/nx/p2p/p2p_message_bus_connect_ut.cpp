@@ -111,11 +111,11 @@ protected:
     {
         auto commonModule = server->moduleInstance()->commonModule();
         auto connection = server->moduleInstance()->ecConnection();
-        ApiRuntimeData runtimeData;
+        nx::vms::api::RuntimeData runtimeData;
         runtimeData.peer.id = commonModule->moduleGUID();
         runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
         runtimeData.peer.persistentId = commonModule->dbId();
-        runtimeData.peer.peerType = Qn::PT_Server;
+        runtimeData.peer.peerType = nx::vms::api::PeerType::server;
 
         connection->getMiscManager(Qn::kSystemAccess)
             ->saveRuntimeInfo(
@@ -161,7 +161,7 @@ protected:
             auto serverRes = commonModule->resourcePool()->
                 getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
             auto flags = serverRes->getServerFlags();
-            flags |= Qn::SF_P2pSyncDone;
+            flags |= nx::vms::api::SF_P2pSyncDone;
             serverRes->setServerFlags(flags);
             commonModule->bindModuleInformation(serverRes);
         }

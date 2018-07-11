@@ -3,10 +3,10 @@
 #include <set>
 #include <map>
 
-#include <network/module_information.h>
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/retry_timer.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace nx {
 namespace vms {
@@ -19,8 +19,9 @@ class ModuleConnector:
     public nx::network::aio::BasicPollable
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<void(
-        QnModuleInformation, nx::network::SocketAddress /*endpoint*/, nx::network::HostAddress /*ip*/)> ConnectedHandler;
+    typedef nx::utils::MoveOnlyFunc<void(api::ModuleInformation,
+        nx::network::SocketAddress /*endpoint*/, nx::network::HostAddress /*ip*/)> ConnectedHandler;
+
     typedef nx::utils::MoveOnlyFunc<void(QnUuid)> DisconnectedHandler;
 
     ModuleConnector(nx::network::aio::AbstractAioThread* thread = nullptr);
@@ -47,7 +48,9 @@ private:
         InformationReader(const ModuleConnector* parent);
         ~InformationReader();
 
-        void setHandler(std::function<void(boost::optional<QnModuleInformation>, QString)> handler);
+        void setHandler(
+            std::function<void(boost::optional<api::ModuleInformation>, QString)> handler);
+
         void start(const nx::network::SocketAddress& endpoint);
         nx::network::HostAddress ip() const { return m_socket->getForeignAddress().address; }
 
@@ -59,7 +62,7 @@ private:
         nx::network::SocketAddress m_endpoint;
         nx::Buffer m_buffer;
         std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
-        std::function<void(boost::optional<QnModuleInformation>, QString)> m_handler;
+        std::function<void(boost::optional<api::ModuleInformation>, QString)> m_handler;
         nx::utils::ObjectDestructionFlag m_destructionFlag;
     };
 
@@ -76,7 +79,7 @@ private:
         QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
     private:
-        enum Priority { kDefault, kOther, kLocalHost, kLocalNetwork, kIp, kCloud };
+        enum Priority { kDefault, kDns, kLocalHost, kLocalNetwork, kIp, kCloud };
         typedef std::map<Priority, std::set<nx::network::SocketAddress>> Endpoints;
 
         Priority hostPriority(const nx::network::HostAddress& host) const;
@@ -84,7 +87,7 @@ private:
         void connectToGroup(Endpoints::iterator endpointsGroup);
         void connectToEndpoint(const nx::network::SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
         bool saveConnection(nx::network::SocketAddress endpoint, std::unique_ptr<InformationReader> reader,
-            const QnModuleInformation& information);
+            const api::ModuleInformation& information);
 
     private:
         ModuleConnector* const m_parent;

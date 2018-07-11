@@ -1,16 +1,21 @@
 #pragma once
 
-#include <nx/vms/api/types/event_rule_types.h>
-
 #include "id_data.h"
 
+#include <vector>
+
+#include <QtCore/QString>
+#include <QtCore/QtGlobal>
+#include <QtCore/QByteArray>
+
 #include <nx/utils/latin1_array.h>
+#include <nx/vms/api/types/event_rule_types.h>
 
 namespace nx {
 namespace vms {
 namespace api {
 
-struct EventRuleData: IdData
+struct NX_VMS_API EventRuleData: IdData
 {
     EventType eventType = EventType::undefinedEvent;
     std::vector<QnUuid> eventResourceIds;
@@ -34,7 +39,7 @@ struct EventRuleData: IdData
     (eventState)(actionType)(actionResourceIds)(actionParams) \
     (aggregationPeriod)(disabled)(comment)(schedule)(system)
 
-struct EventActionData: Data
+struct NX_VMS_API EventActionData: Data
 {
     ActionType actionType = ActionType::undefinedAction;
     EventState toggleState = EventState::undefined;
@@ -49,7 +54,7 @@ struct EventActionData: Data
 #define EventActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resourceIds) \
     (params)(runtimeParams)(ruleId)(aggregationCount)
 
-struct ResetEventRulesData: Data
+struct NX_VMS_API ResetEventRulesData: Data
 {
     // TODO: #rvasilenko these rules are not used right now. Cannot remove as this type is used
     // to deduct transaction type by template substitution.
@@ -63,3 +68,6 @@ struct ResetEventRulesData: Data
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::EventRuleData)
+Q_DECLARE_METATYPE(nx::vms::api::EventRuleDataList)
+Q_DECLARE_METATYPE(nx::vms::api::EventActionData)
+Q_DECLARE_METATYPE(nx::vms::api::EventActionDataList)

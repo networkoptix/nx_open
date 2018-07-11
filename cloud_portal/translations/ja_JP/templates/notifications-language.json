@@ -6,7 +6,7 @@
     "emailSubject": "パスワードをリセット"
   },
   "system_invite": {
-    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} さんが {{PRODUCT_NAME}}{{/message.sharer_name}}{{^message.sharer_name}}に招待しました　ビデオシステム {{message.system_name}} が{{/message.sharer_name}}さんと共有されました"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} さんが %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}に招待しました　ビデオシステム {{message.system_name}} が{{/message.sharer_name}}さんと共有されました"
   },
   "system_shared": {
     "emailSubject": "ビデオ システム {{message.system_name}} が共有されました"

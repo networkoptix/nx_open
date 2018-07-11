@@ -364,7 +364,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
     else
     {
         /* Only admins can see some system health events */
-        if (adminOnlyMessage(message) && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        if (adminOnlyMessage(message) && !accessController()->hasGlobalPermission(GlobalPermission::admin))
             canShow = false;
     }
 
@@ -438,7 +438,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         case QnSystemHealth::CloudPromo:
         {
             const bool isOwner = context()->user()
-                && context()->user()->userRole() == Qn::UserRole::Owner;
+                && context()->user()->userRole() == Qn::UserRole::owner;
 
             const bool canShow =
                 // show only to owners

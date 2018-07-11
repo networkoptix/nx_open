@@ -11,7 +11,7 @@ namespace dao {
 namespace memory {
 
 boost::optional<std::string> UserAuthentication::fetchSystemNonce(
-    nx::utils::db::QueryContext* const /*queryContext*/,
+    nx::sql::QueryContext* const /*queryContext*/,
     const std::string& systemId)
 {
     QnMutexLocker locker(&m_mutex);
@@ -23,7 +23,7 @@ boost::optional<std::string> UserAuthentication::fetchSystemNonce(
 }
 
 void UserAuthentication::insertOrReplaceSystemNonce(
-    nx::utils::db::QueryContext* const /*queryContext*/,
+    nx::sql::QueryContext* const /*queryContext*/,
     const std::string& systemId,
     const std::string& nonce)
 {
@@ -33,7 +33,7 @@ void UserAuthentication::insertOrReplaceSystemNonce(
 }
 
 api::AuthInfo UserAuthentication::fetchUserAuthRecords(
-    nx::utils::db::QueryContext* const /*queryContext*/,
+    nx::sql::QueryContext* const /*queryContext*/,
     const std::string& systemId,
     const std::string& accountId)
 {
@@ -47,7 +47,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
 }
 
 std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
-    nx::utils::db::QueryContext* const /*queryContext*/,
+    nx::sql::QueryContext* const /*queryContext*/,
     int systemCountLimit)
 {
     QnMutexLocker locker(&m_mutex);
@@ -75,7 +75,7 @@ std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
 }
 
 void UserAuthentication::insertUserAuthRecords(
-    nx::utils::db::QueryContext* const /*queryContext*/,
+    nx::sql::QueryContext* const /*queryContext*/,
     const std::string& systemId,
     const std::string& accountId,
     const api::AuthInfo& userAuthRecords)
@@ -87,7 +87,7 @@ void UserAuthentication::insertUserAuthRecords(
 
 std::vector<AbstractUserAuthentication::SystemInfo>
     UserAuthentication::fetchAccountSystems(
-        nx::utils::db::QueryContext* const /*queryContext*/,
+        nx::sql::QueryContext* const /*queryContext*/,
         const std::string& accountId)
 {
     QnMutexLocker locker(&m_mutex);
@@ -115,7 +115,7 @@ std::vector<AbstractUserAuthentication::SystemInfo>
 }
 
 void UserAuthentication::deleteAccountAuthRecords(
-    nx::utils::db::QueryContext* const /*queryContext*/,
+    nx::sql::QueryContext* const /*queryContext*/,
     const std::string& accountId)
 {
     QnMutexLocker locker(&m_mutex);
@@ -130,7 +130,7 @@ void UserAuthentication::deleteAccountAuthRecords(
 }
 
 void UserAuthentication::deleteSystemAuthRecords(
-    nx::utils::db::QueryContext* const /*queryContext*/,
+    nx::sql::QueryContext* const /*queryContext*/,
     const std::string& systemId)
 {
     QnMutexLocker locker(&m_mutex);

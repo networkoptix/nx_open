@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql.h>
-#include <nx/utils/db/query.h>
+#include <nx/sql/query.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 
@@ -14,7 +14,7 @@ namespace dao {
 namespace rdb {
 
 boost::optional<std::string> UserAuthentication::fetchSystemNonce(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId)
 {
     QString sqlRequestStr = R"sql(
@@ -23,7 +23,7 @@ boost::optional<std::string> UserAuthentication::fetchSystemNonce(
         WHERE system_id=:systemId
     )sql";
 
-    nx::utils::db::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.setForwardOnly(true);
     query.prepare(sqlRequestStr);
     query.bindValue(":systemId", QnSql::serialized_field(systemId));
@@ -31,7 +31,7 @@ boost::optional<std::string> UserAuthentication::fetchSystemNonce(
     {
         query.exec();
     }
-    catch (const nx::utils::db::Exception& e)
+    catch (const nx::sql::Exception& e)
     {
         NX_WARNING(this, lm("Error selecting system %1 nonce. %2")
             .arg(systemId).arg(e.what()));
@@ -45,11 +45,11 @@ boost::optional<std::string> UserAuthentication::fetchSystemNonce(
 }
 
 void UserAuthentication::insertOrReplaceSystemNonce(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId,
     const std::string& nonce)
 {
-    nx::utils::db::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         REPLACE INTO system_auth_info(system_id, nonce)
         VALUES(:systemId, :nonce)
@@ -61,7 +61,7 @@ void UserAuthentication::insertOrReplaceSystemNonce(
     {
         query.exec();
     }
-    catch (const nx::utils::db::Exception& e)
+    catch (const nx::utils::db::Exception e)
     {
         NX_WARNING(this, lm("Error inserting system %1 nonce %2. %3")
             .arg(systemId).arg(nonce).arg(e.what()));
@@ -70,7 +70,7 @@ void UserAuthentication::insertOrReplaceSystemNonce(
 }
 
 api::AuthInfo UserAuthentication::fetchUserAuthRecords(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId,
     const std::string& accountId)
 {
@@ -81,7 +81,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
         WHERE account_id=:accountId AND system_id=:systemId
     )sql";
 
-    nx::utils::db::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.setForwardOnly(true);
     query.prepare(sqlRequestStr);
     query.bindValue(":systemId", QnSql::serialized_field(systemId));
@@ -90,7 +90,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     {
         query.exec();
     }
-    catch (const nx::utils::db::Exception& e)
+    catch (const nx::utils::db::Exception e)
     {
         NX_WARNING(this, lm("Error selecting user %1 auth records for system %2. %3")
             .arg(accountId).arg(systemId).arg(e.what()));
@@ -103,13 +103,13 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
 }
 
 std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     int systemCountLimit)
 {
     const auto currentTime = std::chrono::floor<std::chrono::milliseconds>(
         nx::utils::utcTime().time_since_epoch());
 
-    nx::utils::db::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.setForwardOnly(true);
     query.prepare(R"sql(
         SELECT DISTINCT system_id
@@ -123,7 +123,7 @@ std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
     {
         query.exec();
     }
-    catch (const nx::utils::db::Exception& e)
+    catch (const nx::utils::db::Exception e)
     {
         NX_WARNING(this, lm("Error selecting systems with expired auth records. %1")
             .args(e.what()));
@@ -138,14 +138,14 @@ std::vector<std::string> UserAuthentication::fetchSystemsWithExpiredAuthRecords(
 }
 
 void UserAuthentication::insertUserAuthRecords(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId,
     const std::string& accountId,
     const api::AuthInfo& userAuthRecords)
 {
     for (const auto& authRecord: userAuthRecords.records)
     {
-        nx::utils::db::SqlQuery query(*queryContext->connection());
+        nx::sql::SqlQuery query(queryContext->connection());
         query.prepare(R"sql(
             INSERT INTO system_user_auth_info(
                 system_id, account_id, nonce,
@@ -160,7 +160,7 @@ void UserAuthentication::insertUserAuthRecords(
         {
             query.exec();
         }
-        catch(const nx::utils::db::Exception& e)
+        catch(const nx::utils::db::Exception e)
         {
             NX_WARNING(this, lm("Error inserting user %1 auth records (%2) for system %3. %4")
                 .arg(accountId).arg(userAuthRecords.records.size())
@@ -171,10 +171,10 @@ void UserAuthentication::insertUserAuthRecords(
 }
 
 std::vector<AbstractUserAuthentication::SystemInfo> UserAuthentication::fetchAccountSystems(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     const std::string& accountId)
 {
-    nx::utils::db::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.setForwardOnly(true);
     query.prepare(R"sql(
         SELECT sta.system_id AS systemId, sta.vms_user_id AS vmsUserId, sai.nonce AS nonce
@@ -187,7 +187,7 @@ std::vector<AbstractUserAuthentication::SystemInfo> UserAuthentication::fetchAcc
     {
         query.exec();
     }
-    catch (const nx::utils::db::Exception& e)
+    catch (const nx::utils::db::Exception e)
     {
         NX_WARNING(this, lm("Error selecting every system auth info for account %1. %2")
             .arg(accountId).arg(e.what()));
@@ -208,10 +208,10 @@ std::vector<AbstractUserAuthentication::SystemInfo> UserAuthentication::fetchAcc
 }
 
 void UserAuthentication::deleteAccountAuthRecords(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     const std::string& accountId)
 {
-    nx::utils::db::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         DELETE FROM system_user_auth_info
         WHERE account_id = :accountId
@@ -222,7 +222,7 @@ void UserAuthentication::deleteAccountAuthRecords(
     {
         query.exec();
     }
-    catch (const nx::utils::db::Exception& e)
+    catch (const nx::utils::db::Exception e)
     {
         NX_WARNING(this, lm("Error deleting account %1 authentication records. %2")
             .arg(accountId).arg(e.what()));
@@ -231,10 +231,10 @@ void UserAuthentication::deleteAccountAuthRecords(
 }
 
 void UserAuthentication::deleteSystemAuthRecords(
-    nx::utils::db::QueryContext* const queryContext,
+    nx::sql::QueryContext* const queryContext,
     const std::string& systemId)
 {
-    nx::utils::db::SqlQuery query(*queryContext->connection());
+    nx::sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         DELETE FROM system_user_auth_info
         WHERE system_id = :systemId
@@ -245,7 +245,7 @@ void UserAuthentication::deleteSystemAuthRecords(
     {
         query.exec();
     }
-    catch (const nx::utils::db::Exception& e)
+    catch (const nx::utils::db::Exception e)
     {
         NX_WARNING(this, lm("Error deleting system %1 authentication records. %2")
             .args(systemId, e.what()));

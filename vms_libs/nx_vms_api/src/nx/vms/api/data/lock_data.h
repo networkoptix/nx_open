@@ -2,13 +2,17 @@
 
 #include "data.h"
 
+#include <QtCore/QString>
+#include <QtCore/QtGlobal>
+#include <QtCore/QByteArray>
+
 #include <nx/utils/uuid.h>
 
 namespace nx {
 namespace vms {
 namespace api {
 
-struct LockData: Data
+struct NX_VMS_API LockData: Data
 {
     QString name;
     QnUuid peer;

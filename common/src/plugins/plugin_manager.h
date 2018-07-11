@@ -86,14 +86,12 @@ signals:
     void pluginLoaded();
 
 private:
-    nxpl::PluginInterface* const m_pluginContainer;
-    QList<QSharedPointer<QPluginLoader>> m_qtPlugins;
-    QList<nxpl::PluginInterface*> m_nxPlugins;
-    QHash<const nxpl::PluginInterface*, QString> m_libNameByNxPlugin;
-    mutable QnMutex m_mutex;
-
-    void loadPluginsFromDir(
+    void loadPluginsFromDirWithBlackList(
         const QStringList& disabledLibNames,
+        const std::vector<nxpl::Setting>& settingsForPlugin,
+        const QString& dirToSearchIn);
+
+    void loadPluginsFromDirWithWhiteList(
         const QStringList& enabledLibNames,
         const std::vector<nxpl::Setting>& settingsForPlugin,
         const QString& dirToSearchIn);
@@ -103,4 +101,11 @@ private:
         const std::vector<nxpl::Setting>& settingsForPlugin,
         const QString& filename,
         const QString& libName);
+
+private:
+    nxpl::PluginInterface* const m_pluginContainer;
+    QList<QSharedPointer<QPluginLoader>> m_qtPlugins;
+    QList<nxpl::PluginInterface*> m_nxPlugins;
+    QHash<const nxpl::PluginInterface*, QString> m_libNameByNxPlugin;
+    mutable QnMutex m_mutex;
 };

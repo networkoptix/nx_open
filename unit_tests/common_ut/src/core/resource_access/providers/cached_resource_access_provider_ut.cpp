@@ -47,7 +47,7 @@ TEST_F(QnCachedResourceAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
-    ec2::ApiUserRoleData userRole;
+    nx::vms::api::UserRoleData userRole;
     QnResourceAccessSubject subject(userRole);
     ASSERT_FALSE(subject.isValid());
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
@@ -56,14 +56,14 @@ TEST_F(QnCachedResourceAccessProviderTest, checkInvalidAccess)
 TEST_F(QnCachedResourceAccessProviderTest, checkAccessThroughChild)
 {
     auto camera = addCamera();
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kPermissions);
 }
 
 TEST_F(QnCachedResourceAccessProviderTest, checkAccessThroughSecondChild)
 {
     auto camera = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
     ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kShared);
 }
@@ -71,7 +71,7 @@ TEST_F(QnCachedResourceAccessProviderTest, checkAccessThroughSecondChild)
 TEST_F(QnCachedResourceAccessProviderTest, checkAccessThroughBothChildren)
 {
     auto camera = addCamera();
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
     ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kPermissions);
 }
@@ -79,21 +79,21 @@ TEST_F(QnCachedResourceAccessProviderTest, checkAccessThroughBothChildren)
 TEST_F(QnCachedResourceAccessProviderTest, checkAccessAdding)
 {
     auto camera = addCamera();
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
     awaitAccessValue(user, camera, kShared);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
     awaitAccessValue(user, camera, kPermissions);
-    user->setRawPermissions(Qn::GlobalAdminPermission);
+    user->setRawPermissions(GlobalPermission::admin);
 }
 
 TEST_F(QnCachedResourceAccessProviderTest, checkAccessRemoving)
 {
     auto camera = addCamera();
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
     ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kPermissions);
     awaitAccessValue(user, camera, kShared);
-    user->setRawPermissions(Qn::NoGlobalPermissions);
+    user->setRawPermissions(GlobalPermission::none);
     awaitAccessValue(user, camera, kNone);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>());
 }
@@ -101,7 +101,7 @@ TEST_F(QnCachedResourceAccessProviderTest, checkAccessRemoving)
 TEST_F(QnCachedResourceAccessProviderTest, checkDuplicatedSignals)
 {
     auto camera = addCamera();
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
     awaitAccessValue(user, camera, kNone);
 
@@ -109,7 +109,7 @@ TEST_F(QnCachedResourceAccessProviderTest, checkDuplicatedSignals)
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>());
 
     /* And here - should. */
-    user->setRawPermissions(Qn::NoGlobalPermissions);
+    user->setRawPermissions(GlobalPermission::none);
 }
 
 TEST_F(QnCachedResourceAccessProviderTest, checkSequentialAccessAdding)
@@ -125,10 +125,10 @@ TEST_F(QnCachedResourceAccessProviderTest, checkSequentialAccessAdding)
     auto videoWallLayout = addLayoutForVideoWall(videoWall);
     videoWallLayout->addItem(layoutItem);
 
-    auto user = addUser(Qn::NoGlobalPermissions);
+    auto user = addUser(GlobalPermission::none);
 
     awaitAccessValue(user, camera, Source::videowall);
-    user->setRawPermissions(Qn::GlobalControlVideoWallPermission);
+    user->setRawPermissions(GlobalPermission::controlVideowall);
 
     awaitAccessValue(user, camera, Source::layout);
     auto sharedIds = QSet<QnUuid>() << sharedLayout->getId();
@@ -139,7 +139,7 @@ TEST_F(QnCachedResourceAccessProviderTest, checkSequentialAccessAdding)
     sharedResourcesManager()->setSharedResources(user, sharedIds);
 
     awaitAccessValue(user, camera, Source::permissions);
-    user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
+    user->setRawPermissions(GlobalPermission::accessAllMedia);
 }
 
 TEST_F(QnCachedResourceAccessProviderTest, checkSequentialAccessRemoving)
@@ -155,14 +155,14 @@ TEST_F(QnCachedResourceAccessProviderTest, checkSequentialAccessRemoving)
     auto videoWallLayout = addLayoutForVideoWall(videoWall);
     videoWallLayout->addItem(layoutItem);
 
-    auto user = createUser(Qn::GlobalAccessAllMediaPermission);
+    auto user = createUser(GlobalPermission::accessAllMedia);
     awaitAccessValue(user, camera, Source::permissions);
     resourcePool()->addResource(user);   //permissions
 
     auto sharedIds = QSet<QnUuid>() << sharedLayout->getId() << camera->getId();
     sharedResourcesManager()->setSharedResources(user, sharedIds);
     awaitAccessValue(user, camera, Source::shared);
-    user->setRawPermissions(Qn::GlobalControlVideoWallPermission); // shared
+    user->setRawPermissions(GlobalPermission::controlVideowall); // shared
 
     awaitAccessValue(user, camera, Source::layout);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << sharedLayout->getId());
@@ -192,7 +192,7 @@ TEST_F(QnCachedResourceAccessProviderTest, checkAccessProviders)
     /* Now function will return full list of all providers. */
     QnResourceList expectedProviders;
 
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
     expectedProviders << videoWall << videoWallLayout;
     accessProvider()->accessibleVia(user, camera, &providers);
     ASSERT_EQ(expectedProviders, providers);
@@ -225,7 +225,7 @@ TEST_F(QnCachedResourceAccessProviderTest, checkAccessLevels)
 
     QSet<Source> expectedLevels;
     expectedLevels << Source::videowall;
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
 
@@ -239,7 +239,7 @@ TEST_F(QnCachedResourceAccessProviderTest, checkAccessLevels)
     expectedLevels << Source::shared;
     ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
 
-    user->setRawPermissions(Qn::GlobalAdminPermission);
+    user->setRawPermissions(GlobalPermission::admin);
     expectedLevels << Source::permissions;
     ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
 }

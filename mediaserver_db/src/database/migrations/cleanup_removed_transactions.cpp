@@ -7,9 +7,9 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include <nx/utils/db/sql_query_execution_helper.h>
+#include <nx/sql/sql_query_execution_helper.h>
 
-using namespace nx::utils::db;
+using namespace nx::sql;
 
 namespace {
 

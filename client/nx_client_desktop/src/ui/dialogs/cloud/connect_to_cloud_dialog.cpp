@@ -32,6 +32,7 @@
 #include <nx/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/client/desktop/common/widgets/input_field.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/network/app_info.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -49,7 +50,7 @@ rest::QnConnectionPtr getPublicServerConnection(QnResourcePool* resourcePool)
 {
     for (const QnMediaServerResourcePtr server: resourcePool->getAllServers(Qn::Online))
     {
-        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP))
             continue;
 
         return server->restConnection();
@@ -313,6 +314,10 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
 
             case api::ResultCode::accountNotActivated:
                 showCredentialsError(QnCloudResultMessages::accountNotActivated());
+                break;
+
+            case api::ResultCode::accountBlocked:
+                showCredentialsError(QnCloudResultMessages::userLockedOut());
                 break;
 
             default:

@@ -33,7 +33,7 @@ protected:
     {
         ASSERT_TRUE(startAndWaitUntilStarted());
 
-        m_udpClient = std::make_unique<nx::network::stun::UdpClient>(stunEndpoint());
+        m_udpClient = std::make_unique<nx::network::stun::UdpClient>(stunUdpEndpoint());
     }
 
     void sendResolvePeerRequest(const nx::String& hostName)

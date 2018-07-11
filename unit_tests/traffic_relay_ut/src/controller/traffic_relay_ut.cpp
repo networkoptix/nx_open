@@ -199,7 +199,7 @@ protected:
 
         for (const auto& serverId: m_serverIds)
         {
-            const auto sessionCount = nx::utils::random::number<int>(1, 11);
+            const auto sessionCount = nx::utils::random::number<int>(2, 11);
             createMultipleSessions(serverId, sessionCount);
         }
     }

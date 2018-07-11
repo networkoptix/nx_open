@@ -15,16 +15,17 @@
 
 #include <nx_ec/ec_api.h>
 
-#include <network/module_information.h>
-
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/compatibility_version_installation_dialog.h>
 #include <ui/help/help_topics.h>
 
 #include <utils/applauncher_utils.h>
-#include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
 #include <nx/network/http/http_types.h>
+
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
@@ -264,7 +265,7 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
 }
 
 bool QnConnectionDiagnosticsHelper::getInstalledVersions(
-    QList<QnSoftwareVersion>* versions)
+    QList<nx::utils::SoftwareVersion>* versions)
 {
     /* Try to run applauncher if it is not running. */
     if (!applauncher::checkOnline())
@@ -303,8 +304,8 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
     const QString clientVersion = qnStaticCommon->engineVersion().toString();
     const QString serverVersion = serverInfo.version.toString(
         CompatibilityVersionInstallationDialog::useUpdate(serverInfo.version)
-        ? QnSoftwareVersion::FullFormat
-        : QnSoftwareVersion::MinorFormat);
+        ? nx::utils::SoftwareVersion::FullFormat
+        : nx::utils::SoftwareVersion::MinorFormat);
 
     QString devModeText;
     if (qnRuntime->isDevMode())
@@ -346,7 +347,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 {
     using namespace Qn;
 
-    QList<QnSoftwareVersion> versions;
+    QList<nx::utils::SoftwareVersion> versions;
     if (!getInstalledVersions(&versions))
         return handleApplauncherError(parentWidget);
     bool isInstalled = versions.contains(connectionInfo.version);
@@ -357,8 +358,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         {
             QString versionString = connectionInfo.version.toString(
                 CompatibilityVersionInstallationDialog::useUpdate(connectionInfo.version)
-                ? QnSoftwareVersion::FullFormat
-                : QnSoftwareVersion::MinorFormat);
+                ? nx::utils::SoftwareVersion::FullFormat
+                : nx::utils::SoftwareVersion::MinorFormat);
 
             auto extras = getDiffVersionFullExtras(connectionInfo,
                 tr("You have to download another version of %1 to "
@@ -416,7 +417,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
             default:
             {
                 // trying to restore installation
-                const auto version = connectionInfo.version.toString(QnSoftwareVersion::MinorFormat);
+                const auto version = connectionInfo.version.toString(
+                    nx::utils::SoftwareVersion::MinorFormat);
                 QnMessageBox dialog(QnMessageBoxIcon::Critical,
                     tr("Failed to download and launch version %1").arg(version),
                     QString(),

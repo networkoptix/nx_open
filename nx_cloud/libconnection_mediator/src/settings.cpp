@@ -51,6 +51,8 @@ const QLatin1String kCdbStartTimeout("cloud_db/startTimeout");
 const QLatin1String kStunEndpointsToListen("stun/addrToListenList");
 const QLatin1String kDefaultStunEndpointsToListen("0.0.0.0:3345");
 
+const QLatin1String kStunUdpEndpointsToListen("stun/udpAddrToListenList");
+
 const QLatin1String kStunKeepAliveOptions("stun/keepAliveOptions");
 const QLatin1String kDefaultStunKeepAliveOptions("{ 10, 10, 3 }");
 
@@ -198,7 +200,7 @@ const ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const nx::utils::db::ConnectionOptions& Settings::dbConnectionOptions() const
+const nx::sql::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
 }
@@ -225,7 +227,7 @@ const ListeningPeer& Settings::listeningPeer() const
 
 void Settings::initializeWithDefaultValues()
 {
-    m_dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::sqlite;
+    m_dbConnectionOptions.driverType = nx::sql::RdbmsDriverType::sqlite;
     m_dbConnectionOptions.dbName = "mediator_statistics.sqlite";
 }
 
@@ -283,6 +285,16 @@ void Settings::loadSettings()
     readEndpointList(
         settings().value(kStunEndpointsToListen, kDefaultStunEndpointsToListen).toString(),
         &m_stun.addrToListenList);
+
+    if (settings().contains(kStunUdpEndpointsToListen))
+    {
+        readEndpointList(
+            settings().value(kStunUdpEndpointsToListen).toString(),
+            &m_stun.udpAddrToListenList);
+    }
+
+    if (m_stun.udpAddrToListenList.empty())
+        m_stun.udpAddrToListenList = m_stun.addrToListenList;
 
     m_stun.keepAliveOptions = network::KeepAliveOptions::fromString(
         settings().value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());

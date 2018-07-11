@@ -533,6 +533,14 @@
         }
     },
 
+    "nx::client::desktop::ServerUpdatesModel": {
+        "colors": {
+            "latest": "green_l2",
+            "target": "yellow_core",
+            "error": "red_l2"
+        }
+    },
+
     "QnStatusOverlayWidget": {
         "palette": { "default": {
             "window": "dark5.setAlpha(217)",
@@ -888,8 +896,7 @@
     "nx::client::desktop::EventTile": {
         "palette": {
             "default": {
-                "window": "dark7",
-                "midlight": "dark8",
+                "base": "dark7",
                 "light": "light10",
                 "windowText": "light16",
                 "text": "light4",

@@ -33,6 +33,14 @@ public:
         qreal speed,
         const nx::core::ptz::Options& options) override;
 
+    virtual bool relativeMove(
+        const nx::core::ptz::Vector& relativeMovementVector,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool relativeFocus(
+        qreal relativeFocusMovement,
+        const nx::core::ptz::Options& options) override;
+
     virtual bool getPosition(
         Qn::PtzCoordinateSpace space,
         nx::core::ptz::Vector* position,
@@ -72,6 +80,7 @@ private:
     Ptz::Capabilities m_capabilities;
     Qt::Orientations m_flip;
     QnPtzLimits m_limits;
+    QnPtzLimits m_rawLimits;
     QnLinearFunction m_35mmEquivToCameraZoom, m_cameraTo35mmEquivZoom;
     QVector3D m_maxDeviceSpeed;
 

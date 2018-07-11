@@ -129,9 +129,9 @@ public:
     void setSupportsTranscoding(bool supportsTranscoding)
     {
         if (supportsTranscoding)
-            setServerFlags(getServerFlags() | Qn::SF_SupportsTranscoding);
+            setServerFlags(getServerFlags() | nx::vms::api::SF_SupportsTranscoding);
         else
-            setServerFlags(getServerFlags() & ~Qn::SF_SupportsTranscoding);
+            setServerFlags(getServerFlags() & ~nx::vms::api::SF_SupportsTranscoding);
     }
 };
 

@@ -6,19 +6,16 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <common/common_globals.h>
+#include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_fwd.h>
-
-#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 #include <utils/common/optional.h>
 
-#include <common/common_globals.h>
-
-#include <core/resource/resource_fwd.h>
-#include <nx_ec/data/api_resource_data.h>
-#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 class QnAbstractResourcePropertyAdaptor;
 

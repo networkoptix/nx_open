@@ -9,7 +9,7 @@
 #include "transaction_descriptor.h"
 
 namespace ec2 {
-    
+
 namespace ApiCommand
 {
     QString toString(Value val) { return getTransactionDescriptorByValue(val)->getName(); }
@@ -63,7 +63,8 @@ QnUuid QnAbstractTransaction::makeHash(const QByteArray& data1, const QByteArray
     return QnUuid::fromRfc4122(hash.result());
 }
 
-QnUuid QnAbstractTransaction::makeHash(const QByteArray &extraData, const ApiDiscoveryData &data)
+QnUuid QnAbstractTransaction::makeHash(
+    const QByteArray& extraData, const nx::vms::api::DiscoveryData& data)
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData);

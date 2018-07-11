@@ -100,16 +100,17 @@ void MediatorRelayIntegrationTestSetup::SetUp()
     m_stunClient = std::make_shared<nx::network::stun::AsyncClient>();
     m_stunClient->connect(
         nx::network::url::Builder().setScheme(nx::network::stun::kUrlSchemeName)
-        .setEndpoint(stunEndpoint()));
+            .setEndpoint(stunTcpEndpoint()));
     m_serverConnection =
         std::make_unique<api::MediatorServerTcpConnection>(m_stunClient, this);
 
     m_mediaServerEmulator = std::make_unique<MediaServerEmulator>(
-        stunEndpoint(),
+        stunUdpEndpoint(),
+        stunTcpEndpoint(),
         system);
 
     m_mediatorUdpClient = std::make_unique<api::MediatorClientUdpConnection>(
-        stunEndpoint());
+        stunUdpEndpoint());
 }
 
 void MediatorRelayIntegrationTestSetup::issueListenRequest()

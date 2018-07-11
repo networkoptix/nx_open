@@ -10,11 +10,15 @@ class Installation(object):
     __metaclass__ = ABCMeta
 
     @abstractproperty
+    def identity(self):
+        pass
+
+    @abstractproperty
     def os_access(self):
         return OSAccess()
 
     @abstractmethod
-    def install(self):
+    def install(self, installer):
         pass
 
     @abstractmethod

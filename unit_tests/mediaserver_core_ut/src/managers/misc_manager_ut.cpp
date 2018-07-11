@@ -25,7 +25,7 @@ public:
 protected:
     void whenAddedMergeHistoryRecord()
     {
-        m_originalRecords.push_back(ApiSystemMergeHistoryRecord());
+        m_originalRecords.push_back(nx::vms::api::SystemMergeHistoryRecord());
         m_originalRecords.back().mergedSystemCloudId = QnUuid::createUuid().toSimpleByteArray();
         m_originalRecords.back().mergedSystemLocalId = QnUuid::createUuid().toSimpleByteArray();
         m_originalRecords.back().timestamp = nx::utils::random::number<int>();
@@ -43,7 +43,7 @@ protected:
         for (int i = 0; i < recordsToAdd; ++i)
             whenAddedMergeHistoryRecord();
     }
-    
+
     void whenRestartedServer()
     {
         m_appserver2.process().restart();
@@ -51,7 +51,7 @@ protected:
 
     void thenMergeHistoryCanBeRead()
     {
-        ApiSystemMergeHistoryRecordList mergeHistory;
+        nx::vms::api::SystemMergeHistoryRecordList mergeHistory;
         ASSERT_EQ(
             ::ec2::ErrorCode::ok,
             m_appserver2.ecConnection()->getMiscManager(Qn::kSystemAccess)->
@@ -62,7 +62,7 @@ protected:
 
 private:
     PeerWrapper m_appserver2;
-    ApiSystemMergeHistoryRecordList m_originalRecords;
+    nx::vms::api::SystemMergeHistoryRecordList m_originalRecords;
 
     virtual void SetUp() override
     {

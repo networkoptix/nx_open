@@ -1,41 +1,45 @@
-#ifndef QN_WORKBENCH_VERSION_MISMATCH_WATCHER_H
-#define QN_WORKBENCH_VERSION_MISMATCH_WATCHER_H
+#pragma once
 
 #include <QObject>
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>
-
-#include <utils/common/software_version.h>
 #include <utils/common/connective.h>
-
 #include <ui/workbench/workbench_context_aware.h>
 
-struct QnAppInfoMismatchData {
-    QnAppInfoMismatchData(): component(Qn::AnyComponent) {}
-    QnAppInfoMismatchData(Qn::SystemComponent component, QnSoftwareVersion version):
+#include <nx/utils/software_version.h>
+
+struct QnAppInfoMismatchData
+{
+    QnAppInfoMismatchData() = default;
+    QnAppInfoMismatchData(Qn::SystemComponent component, const nx::utils::SoftwareVersion& version):
         component(component), version(version){}
 
-    Qn::SystemComponent component;
-    QnSoftwareVersion version;
+    Qn::SystemComponent component = Qn::AnyComponent;
+    nx::utils::SoftwareVersion version;
     QnResourcePtr resource;
 
-    bool isValid() const {return component != Qn::AnyComponent; }
+    bool isValid() const { return component != Qn::AnyComponent; }
 };
 
-class QnWorkbenchVersionMismatchWatcher: public Connective<QObject>, public QnWorkbenchContextAware {
+class QnWorkbenchVersionMismatchWatcher:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware
+{
     Q_OBJECT
+    using base_type = Connective<QObject>;
 
-    typedef Connective<QObject> base_type;
 public:
-    QnWorkbenchVersionMismatchWatcher(QObject *parent = NULL);
+    QnWorkbenchVersionMismatchWatcher(QObject* parent = nullptr);
     virtual ~QnWorkbenchVersionMismatchWatcher();
 
     bool hasMismatches() const;
     QList<QnAppInfoMismatchData> mismatchData() const;
-    QnSoftwareVersion latestVersion(Qn::SystemComponent component = Qn::AnyComponent) const;
+    nx::utils::SoftwareVersion latestVersion(Qn::SystemComponent component = Qn::AnyComponent) const;
 
-    static bool versionMismatches(QnSoftwareVersion left, QnSoftwareVersion right, bool concernBuild = false);
+    static bool versionMismatches(const nx::utils::SoftwareVersion& left,
+        const nx::utils::SoftwareVersion& right, bool concernBuild = false);
+
 signals:
     bool mismatchDataChanged();
 
@@ -47,6 +51,3 @@ private:
     QList<QnAppInfoMismatchData> m_mismatchData;
     bool m_hasMismatches;
 };
-
-
-#endif // QN_WORKBENCH_VERSION_MISMATCH_WATCHER_H

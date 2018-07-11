@@ -6,26 +6,26 @@ namespace nx {
 namespace p2p {
 namespace test {
 
-ApiPersistentIdData genId()
+vms::api::PersistentIdData genId()
 {
-    return ApiPersistentIdData(QnUuid::createUuid(), QnUuid::createUuid());
+    return vms::api::PersistentIdData(QnUuid::createUuid(), QnUuid::createUuid());
 }
 
 TEST(P2pRouting, distanceTo)
 {
     BidirectionRoutingInfo routing(genId());
 
-    ec2::ApiPersistentIdData via1 = genId();
-    ec2::ApiPersistentIdData to1 = genId();
-    ec2::ApiPersistentIdData to2 = genId();
-    ec2::ApiPersistentIdData to3 = to2;
+    vms::api::PersistentIdData via1 = genId();
+    vms::api::PersistentIdData to1 = genId();
+    vms::api::PersistentIdData to2 = genId();
+    vms::api::PersistentIdData to3 = to2;
     to3.persistentId = QnUuid::createUuid();
 
     routing.addRecord(via1, to1, RoutingRecord(1, via1));
     routing.addRecord(via1, to2, RoutingRecord(2, via1));
     routing.addRecord(via1, to3, RoutingRecord(3, via1));
 
-    ec2::ApiPersistentIdData via2 = genId();
+    vms::api::PersistentIdData via2 = genId();
     routing.addRecord(via2, to1, RoutingRecord(4, via2));
     routing.addRecord(via2, to2, RoutingRecord(5, via2));
     routing.addRecord(via2, to3, RoutingRecord(6, via2));
@@ -56,17 +56,17 @@ TEST(P2pRouting, routeTo)
 {
     BidirectionRoutingInfo routing(genId());
 
-    ec2::ApiPersistentIdData via1 = genId();
-    ec2::ApiPersistentIdData to1 = genId();
-    ec2::ApiPersistentIdData to2 = genId();
-    ec2::ApiPersistentIdData to3 = to2;
+    vms::api::PersistentIdData via1 = genId();
+    vms::api::PersistentIdData to1 = genId();
+    vms::api::PersistentIdData to2 = genId();
+    vms::api::PersistentIdData to3 = to2;
     to3.persistentId = QnUuid::createUuid();
 
     routing.addRecord(via1, to1, RoutingRecord(1, via1));
     routing.addRecord(via1, to2, RoutingRecord(2, via1));
     routing.addRecord(via1, to3, RoutingRecord(3, via1));
 
-    ec2::ApiPersistentIdData via2 = genId();
+    vms::api::PersistentIdData via2 = genId();
     routing.addRecord(via2, to1, RoutingRecord(4, via2));
     routing.addRecord(via2, to2, RoutingRecord(5, via2));
     routing.addRecord(via2, to3, RoutingRecord(6, via2));

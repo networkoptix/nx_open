@@ -9,7 +9,8 @@
 #include <nx/utils/time.h>
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
-#include <nx/time_sync/time_sync_manager.h>
+#include <nx/network/app_info.h>
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 int QnTimeRestHandler::executeGet(
     const QString& /*path*/,

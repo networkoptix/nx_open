@@ -33,43 +33,17 @@ namespace hpm {
 
 static constexpr size_t kMaxBindRetryCount = 10;
 
-static network::SocketAddress findFreeTcpAndUdpLocalAddress()
-{
-    for (size_t attempt = 0; attempt < kMaxBindRetryCount; ++attempt)
-    {
-        const network::SocketAddress address(
-            network::HostAddress::localhost,
-            nx::utils::random::number<uint16_t>(5000, 50000));
-
-        network::TCPServerSocket tcpSocket(AF_INET);
-        if (!tcpSocket.bind(address))
-            continue;
-
-        network::UDPSocket udpSocket(AF_INET);
-        if (!udpSocket.bind(address))
-            continue;
-
-        return tcpSocket.getLocalAddress();
-    }
-
-    return network::SocketAddress::anyPrivateAddress;
-}
-
 MediatorFunctionalTest::MediatorFunctionalTest(int flags):
     utils::test::TestWithTemporaryDirectory("hpm", QString()),
     m_testFlags(flags),
-    m_stunPort(0),
     m_httpPort(0)
 {
     if (m_testFlags & initializeSocketGlobals)
         nx::network::SocketGlobals::cloud().reinitialize();
 
-    m_stunAddress = findFreeTcpAndUdpLocalAddress();
-    NX_LOGX(lm("STUN TCP & UDP endpoint: %1").arg(m_stunAddress), cl_logINFO);
-
     addArg("/path/to/bin");
     addArg("-e");
-    addArg("-stun/addrToListenList", m_stunAddress.toStdString().c_str());
+    addArg("-stun/addrToListenList", "127.0.0.1:0");
     addArg("-http/addrToListenList", network::SocketAddress::anyPrivateAddressV4.toStdString().c_str());
     addArg("-log/logLevel", "DEBUG2");
     addArg("-general/dataDir", testDataDir().toLatin1().constData());
@@ -94,10 +68,8 @@ bool MediatorFunctionalTest::waitUntilStarted()
     if (!utils::test::ModuleLauncher<MediatorProcessPublic>::waitUntilStarted())
         return false;
 
-    const auto& stunEndpoints = moduleInstance()->impl()->stunEndpoints();
-    if (stunEndpoints.empty())
-        return false;
-    m_stunPort = stunEndpoints.front().port;
+    m_stunTcpEndpoint = moduleInstance()->impl()->stunTcpEndpoints().front();
+    m_stunUdpEndpoint = moduleInstance()->impl()->stunUdpEndpoints().front();
 
     const auto& httpEndpoints = moduleInstance()->impl()->httpEndpoints();
     if (httpEndpoints.empty())
@@ -108,16 +80,26 @@ bool MediatorFunctionalTest::waitUntilStarted()
     {
         network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
             nx::network::url::Builder()
-                .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunEndpoint()));
+                .setScheme(nx::network::stun::kUrlSchemeName).setEndpoint(stunTcpEndpoint()),
+            stunUdpEndpoint());
         network::SocketGlobals::cloud().mediatorConnector().enable(true);
     }
 
     return true;
 }
 
-network::SocketAddress MediatorFunctionalTest::stunEndpoint() const
+network::SocketAddress MediatorFunctionalTest::stunUdpEndpoint() const
 {
-    return network::SocketAddress(network::HostAddress::localhost, m_stunPort);
+    return network::SocketAddress(
+        network::HostAddress::localhost,
+        moduleInstance()->impl()->stunUdpEndpoints().front().port);
+}
+
+network::SocketAddress MediatorFunctionalTest::stunTcpEndpoint() const
+{
+    return network::SocketAddress(
+        network::HostAddress::localhost,
+        moduleInstance()->impl()->stunTcpEndpoints().front().port);
 }
 
 network::SocketAddress MediatorFunctionalTest::httpEndpoint() const
@@ -171,7 +153,8 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
     ServerTweak::Value tweak)
 {
     auto server = std::make_unique<MediaServerEmulator>(
-        stunEndpoint(),
+        stunUdpEndpoint(),
+        stunTcpEndpoint(),
         system,
         std::move(name));
 
@@ -255,7 +238,8 @@ void MediatorFunctionalTest::beforeModuleCreation()
     if (m_httpPort != 0)
         httpEndpoint.port = m_httpPort;
 
-    addArg("-stun/addrToListenList", m_stunAddress.toStdString().c_str());
+    addArg("-stun/addrToListenList", m_stunTcpEndpoint.toStdString().c_str());
+    addArg("-stun/udpAddrToListenList", m_stunUdpEndpoint.toStdString().c_str());
     addArg("-http/addrToListenList", httpEndpoint.toStdString().c_str());
 }
 

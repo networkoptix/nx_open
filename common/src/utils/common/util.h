@@ -97,3 +97,6 @@ uint qt4Hash(const QString& key);
 #ifdef _DEBUG
 QString debugTime(qint64 timeMSec, const QString &fmt = QString());
 #endif
+
+
+QString mksecToDateTime(qint64 valueUsec);

@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <nx/utils/uuid.h>
-#include <utils/common/system_information.h>
+#include <nx/vms/api/data/system_information.h>
 
 namespace nx {
 namespace vms {
@@ -13,13 +13,14 @@ namespace peer_selection {
 
 struct PeerInformation
 {
-    QnSystemInformation systemInformation;
+    nx::vms::api::SystemInformation systemInformation;
     QnUuid id;
 
-    PeerInformation(const QnSystemInformation& systemInformation, const QnUuid& id):
+    PeerInformation(const nx::vms::api::SystemInformation& systemInformation, const QnUuid& id):
         systemInformation(systemInformation),
         id(id)
-    {}
+    {
+    }
 };
 
 using PeerInformationList = QList<PeerInformation>;

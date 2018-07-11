@@ -3,7 +3,7 @@ from collections import namedtuple
 from contextlib import contextmanager
 
 from framework.os_access.local_path import LocalPath
-from framework.os_access.ssh_access import SSHAccess
+from framework.os_access.ssh_access import VmSshAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.vms.vm_type import VMType
 from framework.waiting import wait_for_true
@@ -30,7 +30,7 @@ class VMFactory(object):
         with self._vm_types[vm_type].obtained(alias) as (info, vm_index):
             vm_type_configuration = self._vm_configuration[vm_type]
             if vm_type_configuration['os_family'] == 'linux':
-                os_access = SSHAccess(info.port_map, info.macs, 'root', SSH_PRIVATE_KEY_PATH)
+                os_access = VmSshAccess(info.port_map, info.macs, 'root', SSH_PRIVATE_KEY_PATH)
             elif vm_type_configuration['os_family'] == 'windows':
                 os_access = WindowsAccess(info.port_map, info.macs, u'Administrator', u'qweasd123')
             else:

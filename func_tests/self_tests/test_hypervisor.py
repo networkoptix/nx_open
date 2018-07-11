@@ -1,10 +1,10 @@
 import logging
 from pprint import pformat
-from subprocess import call, check_call
+from subprocess import check_call
 
 import pytest
 
-from framework.vms.hypervisor import VMInfo, VMNotFound
+from framework.vms.hypervisor import TemplateVMNotFound, VMNotFound, VmHardware
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def clone_name(hypervisor):
 
 
 def test_find(hypervisor, dummy):
-    assert isinstance(hypervisor.find(dummy), VMInfo)
+    assert isinstance(hypervisor.find(dummy), VmHardware)
 
 
 def test_clone(hypervisor, template, clone_name):
@@ -74,3 +74,9 @@ def test_list(hypervisor):
     for name in names:
         hypervisor.destroy(name)
     assert not set(names) & set(hypervisor.list_vm_names())
+
+
+def test_template_not_found_error(hypervisor):
+    with pytest.raises(TemplateVMNotFound) as excinfo:
+        hypervisor.clone('missing-vm-source', 'unused-vm-target')
+    assert excinfo.value.message == "Template VM is missing: 'missing-vm-source'"

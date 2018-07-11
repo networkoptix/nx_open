@@ -231,11 +231,5 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 } // namespace vms
 } // namespace nx
 
-#define NX_VMS_API_EVENT_ENUM_TYPES \
-    (nx::vms::api::EventReason) \
-    (nx::vms::api::EventType) \
-    (nx::vms::api::ActionType) \
-    (nx::vms::api::EventState)
-
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventType, (metatype)(lexical), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ActionType, (metatype)(lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::EventType, (metatype)(lexical)(debug), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::ActionType, (metatype)(lexical)(debug), NX_VMS_API)

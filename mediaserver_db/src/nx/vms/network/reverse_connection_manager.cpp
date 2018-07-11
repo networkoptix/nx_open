@@ -53,7 +53,7 @@ ReverseConnectionManager::~ReverseConnectionManager()
 }
 
 void ReverseConnectionManager::at_reverseConnectionRequested(
-    const ec2::ApiReverseConnectionData& data)
+    const nx::vms::api::ReverseConnectionData& data)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -144,7 +144,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::get
 
     auto doSocketRequest = [&](int socketCount)
     {
-        ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
+        ec2::QnTransaction<nx::vms::api::ReverseConnectionData> tran(
             ec2::ApiCommand::openReverseConnection,
             commonModule()->moduleGUID());
         tran.params.targetServer = commonModule()->moduleGUID();

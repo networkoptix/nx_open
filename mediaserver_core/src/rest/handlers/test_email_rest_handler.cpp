@@ -5,10 +5,10 @@
 #include <nx/email/email_manager_impl.h>
 #include <network/tcp_connection_priv.h>
 #include <utils/email/email.h>
-#include <nx/email/email_manager_impl.h>
 
 #include "nx_ec/data/api_conversion_functions.h"
-#include "nx_ec/data/api_email_data.h"
+#include <nx/vms/api/data/email_settings_data.h>
+
 #include <rest/server/rest_connection_processor.h>
 
 int QnTestEmailSettingsHandler::executePost(

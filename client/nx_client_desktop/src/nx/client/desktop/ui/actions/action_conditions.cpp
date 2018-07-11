@@ -970,7 +970,7 @@ ActionVisibility ToggleTitleBarCondition::check(const Parameters& /*parameters*/
 
 ActionVisibility NoArchiveCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
 {
-    return context->accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
+    return context->accessController()->hasGlobalPermission(GlobalPermission::viewArchive)
         ? InvisibleAction
         : EnabledAction;
 }
@@ -1279,7 +1279,7 @@ ActionVisibility PtzCondition::check(const QnResourceWidgetList& widgets, QnWork
 
 bool PtzCondition::check(const QnPtzControllerPtr &controller)
 {
-    return controller && controller->hasCapabilities(m_capabilities, nx::core::ptz::Options());
+    return controller && controller->hasCapabilities(m_capabilities);
 }
 
 ActionVisibility NonEmptyVideowallCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
@@ -1684,7 +1684,7 @@ ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition)
     return new ScopedCondition(scope, std::move(condition));
 }
 
-ConditionWrapper hasGlobalPermission(Qn::GlobalPermission permission)
+ConditionWrapper hasGlobalPermission(GlobalPermission permission)
 {
     return new CustomBoolCondition(
         [permission](const Parameters& /*parameters*/, QnWorkbenchContext* context)
@@ -1878,6 +1878,16 @@ ConditionWrapper canCancelWearableCameraUpload()
             return state.isRunning()
                 ? (state.isCancellable() ? EnabledAction : DisabledAction)
                 : InvisibleAction;
+        });
+}
+
+ConditionWrapper currentLayoutIsVideowallScreen()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            const auto layout = context->workbench()->currentLayout();
+            return layout && !layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull();
         });
 }
 

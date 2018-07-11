@@ -136,6 +136,7 @@ class _WindowsRegistryKey(object):
         return values
 
     def create(self):
+        """Create, if don't exist, key and its parents"""
         self.query.invoke_method(u'CreateKey', {
             u'hDefKey': self.hive.int_value, u'sSubKeyName': self.key})
 

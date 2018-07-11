@@ -5,7 +5,7 @@ namespace nx {
 namespace api {
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Updates2ActionData, ActionCode)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Updates2ActionData), (json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Updates2ActionData), (json)(ubjson), _Fields)
 
 } // namespace api
 } // namespace nx

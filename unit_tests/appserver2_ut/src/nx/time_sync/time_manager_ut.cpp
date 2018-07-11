@@ -18,7 +18,7 @@
 #include <api/runtime_info_manager.h>
 #include <common/common_module.h>
 
-#include <nx/time_sync/server_time_sync_manager.h>
+#include <nx/vms/time_sync/server_time_sync_manager.h>
 #include <settings.h>
 #include <api/model/time_reply.h>
 
@@ -170,15 +170,15 @@ public:
                     auto globalSettings = commonModule->globalSettings();
                     globalSettings->setSynchronizingTimeWithInternet(m_syncWithInternetEnabled);
 
-                    auto timeSyncManager = m_appserver->moduleInstance()->ecConnection()->timeSyncManager();
+                    auto timeSyncManager = dynamic_cast<nx::vms::time_sync::ServerTimeSyncManager*>
+                        (m_appserver->moduleInstance()->ecConnection()->timeSyncManager());
                     timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
 
                     auto internetTimeFetcher = std::make_unique<TestTimeFetcher>();
                     internetTimeFetcher->setTime(
                         kBaseInternetTime,
                         /*rtt */std::chrono::milliseconds(0));
-                    auto serverTimeFetcher = dynamic_cast<ServerTimeSyncManager*>(timeSyncManager);
-                    serverTimeFetcher->setTimeFetcher(std::move(internetTimeFetcher));
+                    timeSyncManager->setTimeFetcher(std::move(internetTimeFetcher));
 
                     commonModule->globalSettings()->setOsTimeChangeCheckPeriod(
                         std::chrono::milliseconds(100));
@@ -202,10 +202,10 @@ public:
             auto id = commonModule->moduleGUID();
             auto resourcePool = m_appserver->moduleInstance()->commonModule()->resourcePool();
             auto server = resourcePool->getResourceById<QnMediaServerResource>(id);
-            auto flags = server->getServerFlags() | Qn::SF_HasPublicIP;
+            auto flags = server->getServerFlags() | nx::vms::api::SF_HasPublicIP;
             server->setServerFlags(flags);
 
-            ec2::ApiMediaServerData apiServer;
+            nx::vms::api::MediaServerData apiServer;
             ec2::fromResourceToApi(server, apiServer);
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
@@ -235,11 +235,11 @@ public:
         m_appserver->moduleInstance()->connectTo(remotePeer->m_appserver->moduleInstance().get());
     }
 
-    ::ec2::ApiPeerData peerData() const
+    nx::vms::api::PeerData peerData() const
     {
-        ::ec2::ApiPeerData peerData;
+        nx::vms::api::PeerData peerData;
         peerData.id = commonModule()->moduleGUID();
-        peerData.peerType = Qn::PT_Server;
+        peerData.peerType = nx::vms::api::PeerType::server;
         return peerData;
     }
 

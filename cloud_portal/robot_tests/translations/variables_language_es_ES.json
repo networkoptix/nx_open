@@ -1,5 +1,5 @@
 {
-    "YOU HAVE NO SYSTEMS TEXT": "No tiene ningún sistema conectado a %PRODUCT_NAME%",
+    "YOU HAVE NO SYSTEMS TEXT": "No tienes ningún sistema conectado al %PRODUCT_NAME%",
     "LOG OUT BUTTON TEXT": "Cerrar Sessión",
     "ACCOUNT SETTINGS BUTTON TEXT": "Configuración de cuenta",
     "RESET EMAIL SENT MESSAGE TEXT": "Las instrucciones del reinicio de la contraseña son enviadas al correo electrónico %email%",
@@ -16,7 +16,7 @@
     "YOUR ACCOUNT IS SUCCESSFULLY SAVED": "Su cuenta se ha guardado",
     "ACCOUNT SUCCESSFULLY ACTIVATED TEXT": "Su cuenta se ha guardado",
     "SYSTEM NAME SAVED": "Nombre del sistema guardado",
-    "ACCOUNT IS CREATED": "Cuenta creada",
+    "ACCOUNT IS CREATED": "La cuenta ha sido creada",
     "CONFIRMATION MESSAGE IS SENT TO": "Mensaje de confirmación es enviado a %email%",
     "CANNOT SAVE PASSWORD": "No se puede guardar la contraseña:",
     "PASSWORD INCORRECT": "La contraseña actual es incorrecta.",
@@ -28,10 +28,10 @@
     "SHARE PERMISSIONS HINT ADV VIEWER": "Puede ver el vídeo vivo, hojear el archivo, configurar cámaras, controlar PTZ etc",
     "SHARE PERMISSIONS HINT VIEWER": "Puede ver video en vivo y ver el archivo",
     "SHARE PERMISSIONS HINT LIVE VIEWER": "Sólo puede ver vídeo en vivo",
-    "SHARE PERMISSIONS HINT CUSTOM": "Use la aplicación de cliente %PRODUCT_NAME% para configurar permisos personalizados",
+    "SHARE PERMISSIONS HINT CUSTOM": "Use el %PRODUCT_NAME% Aplicación de cliente para establecer permisos personalizados",
     "ACCOUNT TEXT": "Cuenta",
     "EDIT USER BUTTON TEXT": "Editar",
-    "DELETE USER BUTTON TEXT": "borrar",
+    "DELETE USER BUTTON TEXT": "Borrar",
     "DELETE USER CANCEL BUTTON TEXT": "Cancelar",
     "OWNER TEXT": "Propietario",
     "ADMIN TEXT": "Administrador",
@@ -56,8 +56,9 @@
     "PASSWORD TOO SHORT TEXT": "La contraseña debe tener al menos 8 caracteres",
     "PASSWORD TOO COMMON TEXT": "Esta contraseña se encuentra entre los más populares en el mundo",
     "PASSWORD IS WEAK TEXT": "Uso de números, letras mayúsculas y minúsculas y caracteres especiales para hacer su contraseña más fuerte",
-    "THIS LINK IS BROKEN TEXT": "Este enlace está roto,<br>\n            El sistema puede estar desconectado de %PRODUCT_NAME%,<br>\n            El acceso a este sistema puede ser revocado, <br>\n            o puede haber iniciado sesión en una cuenta diferente",
+    "TERMS AND CONDITIONS ERROR TEXT": "Revise y acepte los Términos y condiciones y la Política de privacidad para poder proceder",
+    "THIS LINK IS BROKEN TEXT": "Este enlace está roto,<br>\n            Sistema podriá estar desconectado de %PRODUCT_NAME%,<br>\n            El acceso a este Sistema puede ser revocado, <br>\n            o puede que haya iniciado sesión en una cuenta diferente",
     "PAGE NOT FOUND": "Página no encontrada",
-    "TAKE ME HOME": "Llévame a casa",
-    "OPEN NX WITNESS BUTTON TEXT": "Abierto %VMS_NAME%"
+    "TAKE ME HOME": "Ir a inicio",
+    "OPEN NX WITNESS BUTTON TEXT": "Abrir %VMS_NAME%"
 }

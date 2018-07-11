@@ -147,9 +147,9 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThrea
 {
     baseController = controller;
 
-    if(baseController->hasCapabilities(Ptz::AsynchronousPtzCapability, ptz::Options())){
+    if(baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)){
         /* Just use it as is. */
-    } else if(baseController->hasCapabilities(Ptz::VirtualPtzCapability, ptz::Options())) {
+    } else if(baseController->hasCapabilities(Ptz::VirtualPtzCapability)) {
         usingBlockingController = true;
     } else {
         baseController.reset(new QnThreadedPtzController(baseController, threadPool));
@@ -169,7 +169,7 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThrea
 void QnTourPtzExecutorPrivate::updateDefaults()
 {
     defaultSpace =
-        baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability, ptz::Options())
+        baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability)
             ? Qn::LogicalPtzCoordinateSpace
             : Qn::DevicePtzCoordinateSpace;
 
@@ -182,8 +182,8 @@ void QnTourPtzExecutorPrivate::updateDefaults()
         : Qn::GetDevicePositionPtzCommand;
 
     canReadPosition =
-        baseController->hasCapabilities(Ptz::DevicePositioningPtzCapability, ptz::Options())
-        || baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability, ptz::Options());
+        baseController->hasCapabilities(Ptz::DevicePositioningPtzCapability)
+        || baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability);
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
@@ -334,7 +334,7 @@ void QnTourPtzExecutorPrivate::requestPosition()
         return;
 
     nx::core::ptz::Vector position;
-    baseController->getPosition(defaultSpace, &position, ptz::Options());
+    baseController->getPosition(defaultSpace, &position);
 
     needPositionUpdate = false;
     waitingForNewPosition = true;

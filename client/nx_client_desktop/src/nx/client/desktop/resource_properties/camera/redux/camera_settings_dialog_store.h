@@ -37,7 +37,7 @@ public:
     void applyChanges();
     void setReadOnly(bool value);
     void setSettingsOptimizationEnabled(bool value);
-    void setGlobalPermissions(Qn::GlobalPermissions value);
+    void setGlobalPermissions(GlobalPermissions value);
     void setSingleWearableState(const WearableState& value);
     void loadCameras(const QnVirtualCameraResourceList& cameras);
     void setSingleCameraUserName(const QString& text);

@@ -3,21 +3,21 @@
 #include <QtCore/QCollator>
 
 #include <api/global_settings.h>
+#include <common/common_module.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/utils/random.h>
-#include <nx/utils/app_info.h>
-
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
-#include <network/system_helpers.h>
-
 #include <licensing/license_validator.h>
+#include <network/system_helpers.h>
 #include <nx_ec/data/api_conversion_functions.h>
-#include <common/common_module.h>
+
 #include <nx/fusion/serialization/json.h>
+#include <nx/utils/random.h>
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/log.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);
@@ -31,6 +31,8 @@ static const uint kGrowTimerCycleRatio = 2; //< Make cycle longer in case of fai
 static const uint kMaxTimerCycle = 24 * 60 * 60 * 1000; //< MSecs, once a day at least.
 
 static const QString kServerReportApi = lit("statserver/api/report");
+
+using namespace nx::vms;
 
 namespace ec2
 {
@@ -64,7 +66,7 @@ namespace ec2
 
         ErrorCode errCode;
 
-        ApiMediaServerDataExList mediaServers;
+        api::MediaServerDataExList mediaServers;
         errCode = m_ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersExSync(&mediaServers);
         if (errCode != ErrorCode::ok)
             return errCode;
@@ -79,7 +81,7 @@ namespace ec2
 
         for (auto& cam: cameras)
         {
-            if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
+            if (cam.typeId != nx::vms::api::CameraData::kDesktopCameraTypeId)
                 outData->cameras.push_back(std::move(cam));
         }
 
@@ -90,7 +92,7 @@ namespace ec2
 
         for (const auto& license: licenses)
         {
-            ApiLicenseData apiLicense;
+            nx::vms::api::LicenseData apiLicense;
             fromResourceToApi(license, apiLicense);
             ApiLicenseStatistics statLicense(std::move(apiLicense));
             QnLicenseValidator validator(m_ec2Connection->commonModule());
@@ -111,7 +113,7 @@ namespace ec2
         if (errCode != ErrorCode::ok)
             return errCode;
 
-        ApiUserDataList users;
+        nx::vms::api::UserDataList users;
         errCode = m_ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
         if (errCode != ErrorCode::ok)
             return errCode;

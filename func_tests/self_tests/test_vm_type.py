@@ -37,7 +37,7 @@ def vm_type(hypervisor, node_dir, template_url):
         {
             'host_ports_base': 38000,
             'host_ports_per_vm': 1,
-            'forwarded_ports': {},
+            'vm_ports_to_host_port_offsets': {},
             },
         template_url=template_url,
         )

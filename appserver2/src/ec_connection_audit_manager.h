@@ -35,32 +35,32 @@ public:
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiMediaServerUserAttributesData& params,
+        const nx::vms::api::MediaServerUserAttributesData& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiMediaServerUserAttributesDataList& params,
+        const nx::vms::api::MediaServerUserAttributesDataList& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiStorageData& params,
+        const nx::vms::api::StorageData& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiStorageDataList& params,
+        const nx::vms::api::StorageDataList& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiUserData& params,
+        const nx::vms::api::UserData& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(
         ApiCommand::Value command,
-        const ApiUserDataList& params,
+        const nx::vms::api::UserDataList& params,
         const QnAuthSession& authInfo);
 
     void addAuditRecord(

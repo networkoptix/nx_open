@@ -1,11 +1,15 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/serialization/json.h>
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/vms/discovery/udp_multicast_finder.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace nx {
 namespace vms {
@@ -17,19 +21,21 @@ class DiscoveryUdpMulticastFinder: public testing::Test
 public:
     DiscoveryUdpMulticastFinder(): systemId(QnUuid::createUuid()) {}
 
-    QnModuleInformationWithAddresses makeModuleInformation() const
+    nx::vms::api::ModuleInformationWithAddresses makeModuleInformation() const
     {
-        QnModuleInformationWithAddresses module;
+        nx::vms::api::ModuleInformationWithAddresses module;
         module.id = QnUuid::createUuid();
         module.localSystemId = systemId;
         module.type = lit("test");
         module.customization = lit("test");
         module.brand = lit("test");
-        module.version = QnSoftwareVersion(1, 2, 3, 123);
+        module.version = nx::utils::SoftwareVersion(1, 2, 3, 123);
         module.type = lit("test");
         module.name = lit("test");
         module.port = 7001;
         module.remoteAddresses.insert("127.0.0.1");
+        module.realm = nx::network::AppInfo::realm();
+        module.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
 
         NX_LOGX(lm("New module: %1").arg(module.id), cl_logINFO);
         return module;
@@ -44,12 +50,13 @@ protected:
 
 TEST_F(DiscoveryUdpMulticastFinder, Base)
 {
-    utils::TestSyncMultiQueue<QnModuleInformationWithAddresses, nx::network::SocketAddress> discoveryQueue;
+    utils::TestSyncMultiQueue<
+        nx::vms::api::ModuleInformationWithAddresses, nx::network::SocketAddress> discoveryQueue;
     moduleFinder.setSendInterval(std::chrono::milliseconds(500));
     moduleFinder.updateInterfaces();
     moduleFinder.listen(
-        [this, &discoveryQueue](
-            const QnModuleInformationWithAddresses& module, const nx::network::SocketAddress& endpoint)
+        [this, &discoveryQueue](const nx::vms::api::ModuleInformationWithAddresses& module,
+            const nx::network::SocketAddress& endpoint)
         {
             if (module.localSystemId == systemId)
                 discoveryQueue.push(module, endpoint);
@@ -57,7 +64,7 @@ TEST_F(DiscoveryUdpMulticastFinder, Base)
 
     const auto interfaceCount = (size_t) nx::network::getLocalIpV4AddressList().size();
     const auto waitForDiscovery =
-        [&](const QnModuleInformationWithAddresses& information)
+        [&](const nx::vms::api::ModuleInformationWithAddresses& information)
         {
             for (size_t i = 0; i < interfaceCount; ++i)
             {
@@ -96,7 +103,8 @@ TEST_F(DiscoveryUdpMulticastFinder, UpdateInterfacesAndModuleInformation)
     moduleFinder.setUpdateInterfacesInterval(std::chrono::milliseconds(50));
     moduleFinder.updateInterfaces();
     moduleFinder.listen(
-        [this](QnModuleInformationWithAddresses module, nx::network::SocketAddress endpoint)
+        [this](nx::vms::api::ModuleInformationWithAddresses module,
+            nx::network::SocketAddress endpoint)
         {
             NX_VERBOSE(this, lm("Found module %1 on %2").args(module.id, endpoint));
         });
@@ -114,7 +122,8 @@ TEST_F(DiscoveryUdpMulticastFinder, DISABLED_RealUse)
 {
     moduleFinder.updateInterfaces();
     moduleFinder.listen(
-        [this](QnModuleInformationWithAddresses module, nx::network::SocketAddress endpoint)
+        [this](nx::vms::api::ModuleInformationWithAddresses module,
+            nx::network::SocketAddress endpoint)
         {
             NX_INFO(this, lm("Found module %1 on %2").args(module.id, endpoint));
         });

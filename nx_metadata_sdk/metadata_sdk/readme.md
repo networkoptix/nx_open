@@ -61,9 +61,9 @@ The included `Stub Metadata Plugin` source files can be compiled and linked usin
 Prerequisites:
 ```
 CMake >= 3.3.2
-Windows: Microsoft Visual Studio >= 12
-Linux (including Nvidia Tegra native compiling): gcc >= 4.8.4, make or Ninja (recommended)
-Nvidia Tegra cross-compiling: sysroot, arm-64 gcc >= 7 (e.g. Linaro), make or Ninja (recommended)
+Windows: Microsoft Visual Studio >= 2015
+Linux (including Nvidia Tegra native compiling): gcc >= 7.3, make or Ninja (recommended)
+Nvidia Tegra cross-compiling: sysroot, arm-64 gcc >= 7.3 (e.g. Linaro), make or Ninja (recommended)
 ```
 
 First, create a build directory at any convenient location:

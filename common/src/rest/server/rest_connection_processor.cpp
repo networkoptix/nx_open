@@ -33,7 +33,7 @@ QnRestProcessorPool::QnRestProcessorPool()
 {
 }
 
-void QnRestProcessorPool::registerHandler(const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions )
+void QnRestProcessorPool::registerHandler(const QString& path, QnRestRequestHandler* handler, GlobalPermission permissions )
 {
     m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
     handler->setPath(path);

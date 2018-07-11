@@ -22,25 +22,25 @@ public:
         Years
     };
 
-    QnTimeStep();
+    QnTimeStep() = default;
 
     QnTimeStep(Type type, milliseconds unitMSecs, int stepUnits, int wrapUnits,
         const QString& format, const QString& longFormat, bool isRelative = true);
 
     /** Type of the time step. */
-    Type type;
+    Type type = Milliseconds;
 
     /** Size of the unit in which step value is measured, in milliseconds. */
-    milliseconds unitMSecs;
+    milliseconds unitMSecs = milliseconds(0);
 
     /** Time step, in milliseconds */
-    milliseconds stepMSecs;
+    milliseconds stepMSecs = milliseconds(0);
 
     /** Time step, in units. */
-    int stepUnits;
+    int stepUnits = 0;
 
     /** Number of units for a wrap-around. */
-    int wrapUnits;
+    int wrapUnits = 0;
 
     /** Format string for the step value. */
     QString format;
@@ -50,10 +50,10 @@ public:
 
     /** Whether this time step is to be used for relative times (e.g. time intervals),
      * or for absolute times (i.e. obtained via <tt>QDateTime::toMSecsSinceEpoch</tt>). */
-    bool isRelative;
+    bool isRelative = true;
 
     /** Index of this time step in the enclosing list. */
-    int index;
+    int index = 0;
 };
 
 // We do not want chrono::milliseconds propagate to hashes etc., so we leave qint64..
@@ -71,10 +71,12 @@ QnTimeStepLongCacheKey longCacheKey(std::chrono::milliseconds msecs, int height,
 
 // TODO: #Elric #TR what to do with locale-translation inconsistencies?
 
+// Used for time label below ticks (both smaller and bigger).
 QString toShortString(std::chrono::milliseconds msecs, const QnTimeStep &step);
 
 QString toLongestShortString(const QnTimeStep &step);
 
+// Used for upper time labels in rectangles.
 QString toLongString(std::chrono::milliseconds msecs, const QnTimeStep &step);
 
 #endif // QN_TIME_STEP_H

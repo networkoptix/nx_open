@@ -84,9 +84,9 @@ void SystemMergeFixture::waitUntilAllServersSynchronizedData()
     }
 }
 
-ApiSystemMergeHistoryRecordList SystemMergeFixture::waitUntilMergeHistoryIsAdded()
+nx::vms::api::SystemMergeHistoryRecordList SystemMergeFixture::waitUntilMergeHistoryIsAdded()
 {
-    ApiSystemMergeHistoryRecordList mergeHistory;
+    nx::vms::api::SystemMergeHistoryRecordList mergeHistory;
     for (;;)
     {
         const auto errorCode =

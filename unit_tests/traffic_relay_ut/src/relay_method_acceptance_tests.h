@@ -4,6 +4,7 @@
 
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/cloud/relaying/listening_peer_pool.h>
 #include <nx/utils/string.h>
 #include <nx/utils/thread/sync_queue.h>
 
@@ -32,6 +33,26 @@ public:
             m_clientSideApiClient->pleaseStopSync();
         if (m_serverSideApiClient)
             m_serverSideApiClient->pleaseStopSync();
+
+        while (!m_serverTunnelResults.empty())
+        {
+            auto data = m_serverTunnelResults.pop();
+            if (data.connection)
+                data.connection->pleaseStopSync();
+        }
+
+        while (!m_clientTunnelResults.empty())
+        {
+            auto data = m_clientTunnelResults.pop();
+            if (data.connection)
+                data.connection->pleaseStopSync();
+        }
+
+        if (m_prevServerTunnelResult.connection)
+            m_prevServerTunnelResult.connection->pleaseStopSync();
+
+        if (m_prevClientTunnelResult.connection)
+            m_prevClientTunnelResult.connection->pleaseStopSync();
     }
 
 protected:
@@ -72,6 +93,12 @@ protected:
         ASSERT_EQ(api::ResultCode::ok, m_prevServerTunnelResult.resultCode);
     }
 
+    void andServerIsOnlineOnRelay()
+    {
+        while (!relay().moduleInstance()->listeningPeerPool().isPeerOnline(m_serverPeerName))
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
     //---------------------------------------------------------------------------------------------
     // Client.
 
@@ -96,7 +123,9 @@ protected:
     void givenListeningServer()
     {
         whenInitiateServerTunnel();
+
         thenServerTunnelSucceeded();
+        andServerIsOnlineOnRelay();
     }
 
     void whenClientConnectedToServer()

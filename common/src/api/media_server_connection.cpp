@@ -25,6 +25,9 @@
 #include <utils/common/ldap.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
+
+#include <nx/vms/api/data/email_settings_data.h>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/network/http/http_types.h>
@@ -286,10 +289,10 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnConfigureReply>(this, response, handle);
             break;
         case ModulesInformationObject:
-            processJsonReply<QList<QnModuleInformation>>(this, response, handle);
+            processJsonReply<QList<nx::vms::api::ModuleInformation>>(this, response, handle);
             break;
         case PingSystemObject:
-            processJsonReply<QnModuleInformation>(this, response, handle);
+            processJsonReply<nx::vms::api::ModuleInformation>(this, response, handle);
             break;
         case GetNonceObject:
             processJsonReply<QnGetNonceReply>(this, response, handle);
@@ -301,7 +304,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processUbjsonReply<QnAuditRecordList>(this, response, handle);
             break;
         case MergeSystemsObject:
-            processJsonReply<QnModuleInformation>(this, response, handle);
+            processJsonReply<nx::vms::api::ModuleInformation>(this, response, handle);
             break;
         case ec2RecordedTimePeriodsObject:
             processCompressedPeriodsReply<MultiServerPeriodDataList>(this, response, handle);
@@ -546,7 +549,7 @@ void QnMediaServerConnection::addOldVersionPtzParams(
     const QnNetworkResourcePtr& camera,
     QnRequestParamList& params)
 {
-    if (m_serverVersion < QnSoftwareVersion(3, 0))
+    if (m_serverVersion < nx::utils::SoftwareVersion(3, 0))
         params << QnRequestParam("resourceId", QnLexical::serialized(camera->getUniqueId()));
 }
 
@@ -1251,7 +1254,7 @@ int QnMediaServerConnection::pingSystemAsync(
     params << QnRequestParam("getKey", getKey);
 
     return sendAsyncGetRequestLogged(PingSystemObject,
-        params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+        params, QN_STRINGIZE_TYPE(nx::vms::api::ModuleInformation), target, slot);
 }
 
 int QnMediaServerConnection::getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot)
@@ -1297,7 +1300,7 @@ int QnMediaServerConnection::mergeSystemAsync(
         ignoreIncompatible ? lit("true") : lit("false"));
 
     return sendAsyncGetRequestLogged(MergeSystemsObject,
-        params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+        params, QN_STRINGIZE_TYPE(nx::vms::api::ModuleInformation), target, slot);
 }
 
 int QnMediaServerConnection::modulesInformation(QObject* target, const char* slot)
@@ -1305,20 +1308,20 @@ int QnMediaServerConnection::modulesInformation(QObject* target, const char* slo
     QnRequestParamList params;
     params << QnRequestParam("allModules", lit("true"));
     return sendAsyncGetRequestLogged(ModulesInformationObject,
-        params, QN_STRINGIZE_TYPE(QList<QnModuleInformation>), target, slot);
+        params, QN_STRINGIZE_TYPE(QList<nx::vms::api::ModuleInformation>), target, slot);
 }
 
 int QnMediaServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request, QObject* target, const char* slot)
 {
-    QnSoftwareVersion connectionVersion;
+    nx::utils::SoftwareVersion connectionVersion;
     if (const auto& connection = commonModule()->ec2Connection())
         connectionVersion = connection->connectionInfo().version;
 
     QnChunksRequestData fixedFormatRequest(request);
     fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
 
-    if (!connectionVersion.isNull() && connectionVersion < QnSoftwareVersion(3, 0))
+    if (!connectionVersion.isNull() && connectionVersion < nx::utils::SoftwareVersion(3, 0))
         fixedFormatRequest.requestVersion = QnChunksRequestData::RequestVersion::v2_6;
 
     return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,

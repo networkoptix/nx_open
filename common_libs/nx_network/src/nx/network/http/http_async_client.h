@@ -265,7 +265,7 @@ public:
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
 
-    void setProxyVia(const SocketAddress& proxyEndpoint);
+    void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure);
 
     /** If set to true client will not try to add Authorization header to the first request. false by default. */
     void setDisablePrecalculatedAuthorization(bool val);
@@ -337,12 +337,14 @@ private:
     Credentials m_user;
     Credentials m_proxyUser;
     boost::optional<SocketAddress> m_proxyEndpoint;
+    bool m_isProxySecure = false;
     bool m_authorizationTried;
     bool m_proxyAuthorizationTried;
     bool m_ha1RecalcTried;
     bool m_terminated;
     quint64 m_totalBytesReadPerRequest; //< total read bytes per request
     int m_totalRequestsSentViaCurrentConnection; //< total sent requests via single connection
+    int m_totalRequestsSent; //< total sent requests
     bool m_contentEncodingUsed;
     std::chrono::milliseconds m_sendTimeout;
     std::chrono::milliseconds m_responseReadTimeout;
@@ -361,7 +363,6 @@ private:
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
     int m_maxNumberOfRedirects = 5;
-    std::unique_ptr<AbstractStreamSocket> m_userDefinedSocket;
 
     virtual void stopWhileInAioThread() override;
 
@@ -372,7 +373,7 @@ private:
     void resetDataBeforeNewRequest();
     void initiateHttpMessageDelivery();
     bool canExistingConnectionBeUsed() const;
-    void initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> socket = std::unique_ptr<AbstractStreamSocket>());
+    void initiateTcpConnection();
     /**
      * @return Bytes parsed or -1 in case of error.
      */

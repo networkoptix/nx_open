@@ -1,6 +1,5 @@
 #include "websocket_transaction_transport.h"
 
-#include <nx_ec/data/api_peer_data.h>
 #include <nx/p2p/p2p_serialization.h>
 #include <transaction/connection_guard.h>
 
@@ -18,8 +17,8 @@ WebSocketTransactionTransport::WebSocketTransactionTransport(
     const nx::String& systemId,
     const QnUuid& connectionId,
     std::unique_ptr<network::websocket::WebSocket> webSocket,
-    ::ec2::ApiPeerDataEx localPeerData,
-    ::ec2::ApiPeerDataEx remotePeerData)
+    vms::api::PeerDataEx localPeerData,
+    vms::api::PeerDataEx remotePeerData)
     :
     nx::p2p::ConnectionBase(
         remotePeerData,
@@ -115,7 +114,7 @@ void WebSocketTransactionTransport::readTransactions()
     m_tranLogRequestInProgress = true;
     m_transactionLogReader->readTransactions(
         m_remoteSubscription,
-        boost::optional<::ec2::QnTranState>(), //< toState. Unlimited
+        boost::optional<vms::api::TranState>(), //< toState. Unlimited
         kMaxTransactionsPerIteration,
         std::bind(&WebSocketTransactionTransport::onTransactionsReadFromLog, this, _1, _2, _3));
 }
@@ -123,7 +122,7 @@ void WebSocketTransactionTransport::readTransactions()
 void WebSocketTransactionTransport::onTransactionsReadFromLog(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
-    ::ec2::QnTranState readedUpTo)
+    vms::api::TranState readedUpTo)
 {
     m_tranLogRequestInProgress = false;
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))

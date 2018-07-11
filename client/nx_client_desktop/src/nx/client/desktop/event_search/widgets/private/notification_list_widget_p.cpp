@@ -54,7 +54,24 @@ public:
     }
 };
 
+class SeparatorListModel: public QAbstractListModel
+{
+public:
+    using QAbstractListModel::QAbstractListModel; //< Forward constructors.
+
+    virtual int rowCount(const QModelIndex& parent) const override
+    {
+        return parent.isValid() ? 0 : 1;
+    }
+
+    virtual QVariant data(const QModelIndex& index, int role) const override
+    {
+        return QVariant();
+    }
+};
+
 static constexpr int kPlaceholderFontPixelSize = 15;
+
 } // namespace
 
 
@@ -104,8 +121,10 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
 
     auto progressModel = new ProgressListModel(this);
 
+    auto separatorModel = new SeparatorListModel(this);
+
     m_eventRibbon->setModel(new ConcatenationListModel(
-        {systemHealthListModel, progressModel, m_notificationsModel}, this));
+        {systemHealthListModel, progressModel, separatorModel, m_notificationsModel}, this));
 
     connect(m_eventRibbon, &EventRibbon::tileHovered, q, &NotificationListWidget::tileHovered);
 

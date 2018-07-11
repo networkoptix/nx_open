@@ -6,20 +6,20 @@ namespace stats {
 namespace dao {
 namespace memory {
 
-nx::utils::db::DBResult InMemoryDataObject::save(
-    nx::utils::db::QueryContext* /*queryContext*/,
+nx::sql::DBResult InMemoryDataObject::save(
+    nx::sql::QueryContext* /*queryContext*/,
     ConnectSession connectionRecord)
 {
     m_records.push_back(connectionRecord);
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult InMemoryDataObject::readAllRecords(
-    nx::utils::db::QueryContext* /*queryContext*/,
+nx::sql::DBResult InMemoryDataObject::readAllRecords(
+    nx::sql::QueryContext* /*queryContext*/,
     std::deque<ConnectSession>* connectionRecords)
 {
     *connectionRecords = m_records;
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 const std::deque<ConnectSession>& InMemoryDataObject::records() const

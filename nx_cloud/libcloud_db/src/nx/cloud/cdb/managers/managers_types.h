@@ -5,7 +5,7 @@
 
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/db/types.h>
+#include <nx/sql/types.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/data_sync_engine/result_code.h>
@@ -13,7 +13,7 @@
 namespace nx {
 namespace cdb {
 
-api::ResultCode dbResultToApiResult(nx::utils::db::DBResult);
+api::ResultCode dbResultToApiResult(nx::sql::DBResult);
 
 api::ResultCode ec2ResultToResult(data_sync_engine::ResultCode resultCode);
 

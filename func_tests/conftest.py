@@ -1,15 +1,18 @@
 import logging
+import logging.config
 
 import pytest
 from pathlib2 import Path
+import yaml
 
 from defaults import defaults
-from framework.artifact import ArtifactFactory
+from framework.artifact import ArtifactFactory, ArtifactType
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.metrics_saver import MetricsSaver
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
+from framework.os_access.path import copy_file
 
 pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
 
@@ -42,16 +45,16 @@ def pytest_addoption(parser):
         '--customization',
         help="Dir name from nx_vms/customization. Only checked against customization of installer.")
     parser.addoption(
-        '--max-log-width',
-        default=defaults.get('max_log_width', 500),
-        type=int,
-        help="Maximum log message length. [%(default)s]")
-    parser.addoption(
         '--log-level',
         type=str.upper,
         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
         help="Log level. [%(default)s]",
         default=defaults.get('log_level', 'DEBUG'))
+    parser.addoption(
+        '--logging-config',
+        type=Path,
+        default=defaults.get('logging_config'),
+        help="Configuration file for logging, in yaml format. Relative to project dir.")
     parser.addoption(
         '--tests-config-file',
         type=TestsConfig.from_yaml_file,
@@ -87,6 +90,26 @@ def node_dir(request, work_dir):
     return node_dir
 
 
+@pytest.fixture()
+def artifacts_dir(node_dir, artifact_factory):
+    dir = node_dir / 'artifacts'
+    dir.mkdir(exist_ok=True)
+    yield dir
+    for entry in dir.glob('*'):
+        if not entry.suffix:
+            _logger.error("Won't store artifact: no suffix: %s", entry.name)
+            continue
+        if entry.suffix == '.cap' or entry.suffix == '.pcap':
+            mime_type = 'application/cap'
+        else:
+            _logger.error("Won't store artifact: unknown suffix: %s", entry.name)
+            continue
+        type = ArtifactType(entry.suffix[1:], mime_type, entry.suffix)
+        factory = artifact_factory([entry.stem], name=entry.stem, artifact_type=type)
+        path = factory.produce_file_path()
+        copy_file(entry, path)
+
+
 @pytest.fixture(scope='session')
 def bin_dir(request):
     bin_dir = request.config.getoption('--bin-dir')
@@ -101,20 +124,15 @@ def ca(work_dir):
 
 @pytest.fixture(scope='session', autouse=True)
 def init_logging(request, work_dir):
+    logging_config_path = request.config.getoption('--logging-config')
+    if logging_config_path:
+        full_path = LocalPath(request.config.rootdir, logging_config_path)
+        config_text = full_path.read_text()
+        config = yaml.load(config_text)
+        logging.config.dictConfig(config)
+        logging.info('Logging is initialized from "%s".', full_path)
+
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)  # It's WARNING by default. Level constraints are set in handlers.
-
-    logging.getLogger('SMB.SMBConnection').setLevel(logging.INFO)  # Big files cause too many logs.
-    logging.getLogger('paramiko.transport').setLevel(logging.INFO)  # Big files cause too many logs.
-
-    stderr_log_width = request.config.getoption('--max-log-width')
-    stderr_handler = logging.StreamHandler()
-    # %(message).10s truncates log message to 10 characters.
-    stderr_handler.setFormatter(logging.Formatter(
-        '%(asctime)-15s %(name)s %(levelname)s %(message).{:d}s'.format(stderr_log_width)))
-    stderr_handler.setLevel(request.config.getoption('--log-level'))
-    root_logger.addHandler(stderr_handler)
-
     file_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
     for level in {logging.DEBUG, logging.INFO}:
         file_name = logging.getLevelName(level).lower() + '.log'

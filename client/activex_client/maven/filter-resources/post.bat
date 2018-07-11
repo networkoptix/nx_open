@@ -4,7 +4,7 @@ set CONFIG=%1
 echo config = %CONFIG%
 
 set AXHDW=%~dp0
-set bebin_path=${root.dir}\build_environment\target\bin
+set bebin_path=${CMAKE_SOURCE_DIR}\build_environment\target\bin
 set PATH=%bebin_path%\%CONFIG%;%PATH%
 set IDC=${qt.dir}\bin\idc.exe
 

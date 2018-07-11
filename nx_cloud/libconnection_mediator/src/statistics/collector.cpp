@@ -8,7 +8,7 @@ namespace stats {
 
 Collector::Collector(
     const conf::Statistics& settings,
-    nx::utils::db::AsyncSqlQueryExecutor* sqlQueryExecutor)
+    nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor)
     :
     m_settings(settings),
     m_sqlQueryExecutor(sqlQueryExecutor),
@@ -28,10 +28,7 @@ void Collector::saveConnectSessionStatistics(ConnectSession data)
     m_sqlQueryExecutor->executeUpdate(
         std::bind(&dao::AbstractDataObject::save, m_dataObject.get(), _1, std::move(data)),
         [locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-            nx::utils::db::QueryContext* /*queryContext*/,
-            nx::utils::db::DBResult /*dbResult*/)
-        {
-        });
+            nx::sql::DBResult /*dbResult*/) {});
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -56,7 +53,7 @@ CollectorFactory& CollectorFactory::instance()
 
 std::unique_ptr<AbstractCollector> CollectorFactory::defaultFactoryFunction(
     const conf::Statistics& settings,
-    nx::utils::db::AsyncSqlQueryExecutor* sqlQueryExecutor)
+    nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor)
 {
     return std::make_unique<Collector>(settings, sqlQueryExecutor);
 }

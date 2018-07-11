@@ -16,6 +16,7 @@
 #include <nx/network/flash_socket/types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/utils/log/log.h>
 #include <api/global_settings.h>
 #include <nx/network/rtsp/rtsp_types.h>
@@ -85,7 +86,7 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
     {
         nx::utils::Url url = getDecodedUrl();
         // set variable to true if standard proxy_unauthorized should be used
-        const bool isProxy = nx::vms::network::ProxyConnectionProcessor::needStandardProxy(
+        const bool isProxy = nx::vms::network::ProxyConnectionProcessor::isStandardProxyNeeded(
             d->owner->commonModule(), d->request);
         QElapsedTimer t;
         t.restart();
@@ -267,8 +268,18 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
 
 bool QnUniversalRequestProcessor::redicrectToScheme(const char* scheme)
 {
-    Q_D(QnUniversalRequestProcessor);
     const auto schemeString = QString::fromUtf8(scheme);
+    Q_D(QnUniversalRequestProcessor);
+
+    const auto listener = dynamic_cast<QnHttpConnectionListener*>(d->owner);
+    if (listener && listener->isProxy(d->request))
+    {
+        NX_ASSERT(false, lm("Unable to redirect sheme %1 for proxy").arg(schemeString));
+        d->response.messageBody = STATIC_FORBIDDEN_HTML;
+        sendResponse(CODE_FORBIDDEN, "text/html; charset=utf-8");
+        return true;
+    }
+
     nx::utils::Url url(d->request.requestLine.url);
     if (url.scheme() == schemeString)
     {

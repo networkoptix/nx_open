@@ -10,14 +10,15 @@
 #include <boost/optional.hpp>
 #endif
 
-#include <common/common_globals.h>
 #include <api/model/backup_status_reply.h>
-#include <recorder/storage_manager.h>
-#include <core/resource/server_backup_schedule.h>
-#include <nx_ec/data/api_media_server_data.h>
-#include "nx/utils/thread/long_runnable.h"
+#include <common/common_globals.h>
 #include <common/common_module_aware.h>
+#include <core/resource/server_backup_schedule.h>
+#include <recorder/storage_manager.h>
+
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/vms/api/types/days_of_week.h>
 
 class QnScheduleSync: public QnLongRunnable, public QnCommonModuleAware
 {
@@ -150,7 +151,7 @@ private:
     // Interrupted by user OR current backup session is over
     std::atomic<bool>       m_interrupted;
     bool                    m_failReported;
-    ec2::backup::DayOfWeek  m_curDow;
+    nx::vms::api::DayOfWeek m_curDow;
 
     QnServerBackupSchedule  m_schedule;
     qint64                  m_syncTimePoint;

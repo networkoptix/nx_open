@@ -14,12 +14,12 @@ SystemHealthHistoryDataObject::SystemHealthHistoryDataObject()
 {
 }
 
-nx::utils::db::DBResult SystemHealthHistoryDataObject::insert(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult SystemHealthHistoryDataObject::insert(
+    nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     const api::SystemHealthHistoryItem& historyItem)
 {
-    QSqlQuery insertHistoryItemQuery(*queryContext->connection());
+    QSqlQuery insertHistoryItemQuery(*queryContext->connection()->qtSqlConnection());
     insertHistoryItemQuery.prepare(R"sql(
         INSERT INTO system_health_history(system_id, state, timestamp_utc)
         VALUES(:systemId, :state, :timestamp)
@@ -37,18 +37,19 @@ nx::utils::db::DBResult SystemHealthHistoryDataObject::insert(
         NX_LOG(lm("Could not insert system %1 history into DB. %2")
             .arg(systemId).arg(insertHistoryItemQuery.lastError().text()),
             cl_logDEBUG1);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult SystemHealthHistoryDataObject::selectHistoryBySystem(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult SystemHealthHistoryDataObject::selectHistoryBySystem(
+    nx::sql::QueryContext* queryContext,
     const std::string& systemId,
     api::SystemHealthHistory* history)
 {
-    QSqlQuery selectSystemHealthHistoryQuery(*queryContext->connection());
+    QSqlQuery selectSystemHealthHistoryQuery(
+        *queryContext->connection()->qtSqlConnection());
     selectSystemHealthHistoryQuery.setForwardOnly(true);
     selectSystemHealthHistoryQuery.prepare(R"sql(
         SELECT state, timestamp_utc as timestamp
@@ -61,12 +62,12 @@ nx::utils::db::DBResult SystemHealthHistoryDataObject::selectHistoryBySystem(
         NX_LOG(lm("Error selecting system %1 history. %2")
             .arg(systemId).arg(selectSystemHealthHistoryQuery.lastError().text()),
             cl_logDEBUG1);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
     QnSql::fetch_many(selectSystemHealthHistoryQuery, &history->events);
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 } // namespace rdb

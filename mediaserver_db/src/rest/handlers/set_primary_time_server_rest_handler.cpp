@@ -3,7 +3,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
 #include <nx_ec/ec_api.h>
-#include <nx/time_sync/time_sync_manager.h>
+#include <nx/vms/time_sync/time_sync_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <api/global_settings.h>
 #include <core/resource/media_server_resource.h>
@@ -19,14 +19,18 @@ int SetPrimaryTimeServerRestHandler::executePost(
     const QnRestConnectionProcessor* owner)
 {
     auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();
-    result = execute(timeSyncManager, QJson::deserialized<nx::vms::api::IdData>(body).id);
+    result = execute(
+        timeSyncManager,
+        owner->commonModule(),
+        QJson::deserialized<nx::vms::api::IdData>(body).id);
     return nx::network::http::StatusCode::ok;
 }
 
 QnJsonRestResult SetPrimaryTimeServerRestHandler::execute(
-    nx::time_sync::TimeSyncManager* timeSyncManager, const QnUuid& id)
+    nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager,
+    QnCommonModule* commonModule,
+    const QnUuid& id)
 {
-    auto commonModule = timeSyncManager->commonModule();
     auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(id);
     QnJsonRestResult result;
     if (!server && !id.isNull())

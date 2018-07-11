@@ -1,6 +1,7 @@
 #include "webpage_resource.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/api/data/webpage_data.h>
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, WebPageSubtype,
     (nx::vms::api::WebPageSubtype::none, QString())
@@ -18,7 +19,7 @@ using namespace nx::vms::api;
 QnWebPageResource::QnWebPageResource(QnCommonModule* commonModule):
     base_type(commonModule)
 {
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId));
+    setTypeId(nx::vms::api::WebPageData::kResourceTypeId);
     addFlags(Qn::web_page);
 
     connect(this, &QnResource::propertyChanged, this,

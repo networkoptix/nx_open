@@ -7,6 +7,7 @@ from framework.installation.installer import Installer, PackageNameParseError
 from framework.installation.mediaserver_factory import MediaserverFactory
 from framework.merging import merge_systems, setup_local_system
 from framework.os_access.local_path import LocalPath
+from framework.os_access.path import copy_file
 
 _logger = logging.getLogger(__name__)
 
@@ -28,9 +29,12 @@ def mediaserver_installers(request):
         except PackageNameParseError as e:
             _logger.debug("File {}: {!s}".format(path, e.message))
             continue
+        if installer.product != 'server':
+            _logger.debug("File %s: not a 'server' (%r)", path, installer)
+            continue
         _logger.info("File {}: {!r}".format(path, installer))
         installers.append(installer)
-    if len(set((installer.customization, installer.version) for installer in installers)) != 1:
+    if len(set((installer.identity.customization, installer.identity.version) for installer in installers)) != 1:
         raise ValueError("Only one version and customizations expected in {}: {}".format(installers_dir, installers))
     installers_by_platform = {installer.platform: installer for installer in installers}
     return installers_by_platform
@@ -42,11 +46,15 @@ def mediaserver_factory(mediaserver_installers, artifact_factory, ca):
 
 
 @pytest.fixture()
-def two_stopped_mediaservers(mediaserver_factory, two_vms):
+def two_stopped_mediaservers(mediaserver_factory, two_vms, artifacts_dir):
     first_vm, second_vm = two_vms
     with mediaserver_factory.allocated_mediaserver('first', first_vm) as first_mediaserver:
         with mediaserver_factory.allocated_mediaserver('second', second_vm) as second_mediaserver:
-            yield first_mediaserver, second_mediaserver
+            with first_mediaserver.os_access.traffic_capture.capturing() as first_cap:
+                with second_mediaserver.os_access.traffic_capture.capturing() as second_cap:
+                    yield first_mediaserver, second_mediaserver
+            copy_file(first_cap, artifacts_dir / 'first.cap')
+            copy_file(second_cap, artifacts_dir / 'second.cap')
 
 
 @pytest.fixture()
@@ -70,9 +78,11 @@ def two_merged_mediaservers(two_separate_mediaservers):
 
 
 @pytest.fixture()
-def one_mediaserver(one_vm, mediaserver_factory):
+def one_mediaserver(one_vm, mediaserver_factory, artifacts_dir):
     with mediaserver_factory.allocated_mediaserver('single', one_vm) as mediaserver:
-        yield mediaserver
+        with mediaserver.os_access.traffic_capture.capturing() as single_cap:
+            yield mediaserver
+        copy_file(single_cap, artifacts_dir / 'single.cap')
 
 
 @pytest.fixture()

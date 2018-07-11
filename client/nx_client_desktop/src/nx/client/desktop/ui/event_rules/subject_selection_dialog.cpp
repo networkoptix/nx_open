@@ -255,7 +255,7 @@ void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
     for (const auto& user: users)
     {
         userIds.insert(user->getId());
-        nonCustomUsers = nonCustomUsers || user->userRole() != Qn::UserRole::CustomPermissions;
+        nonCustomUsers = nonCustomUsers || user->userRole() != Qn::UserRole::customPermissions;
     }
 
     m_users->setCheckedUsers(userIds);

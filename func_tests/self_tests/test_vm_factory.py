@@ -25,12 +25,8 @@ def vm_type(hypervisor):
         {
             'host_ports_base': 39000,
             'host_ports_per_vm': 1,
-            'forwarded_ports': {
-                'ssh': {
-                    'guest_port': 22,
-                    'host_port_offset': 0,
-                    'protocol': 'tcp',
-                    },
+            'vm_ports_to_host_port_offsets': {
+                'tcp/22': 0,
                 },
             },
         )

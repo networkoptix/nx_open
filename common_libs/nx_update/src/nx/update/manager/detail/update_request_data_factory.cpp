@@ -13,7 +13,7 @@ UpdateRequestDataFactory::FactoryFunc UpdateRequestDataFactory::s_factoryFunc = 
 
 update::info::UpdateRequestData UpdateRequestDataFactory::create(
     bool isClient,
-    const QnSoftwareVersion* targetVersion)
+    const nx::utils::SoftwareVersion* targetVersion)
 {
     if (s_factoryFunc)
         return s_factoryFunc();
@@ -21,7 +21,7 @@ update::info::UpdateRequestData UpdateRequestDataFactory::create(
     return update::info::UpdateRequestData(
         nx::network::SocketGlobals::cloud().cloudHost(),
         QnAppInfo::customizationName(),
-        QnSoftwareVersion(QnAppInfo::applicationVersion()),
+        nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()),
         update::info::OsVersion(
             QnAppInfo::applicationPlatform(),
             QnAppInfo::applicationArch(),

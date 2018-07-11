@@ -9,7 +9,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 
 #include "persistent_scheduler_db_helper.h"
 #include "persistent_scheduler_common.h"
@@ -19,7 +19,7 @@ namespace cdb {
 
 class PersistentScheduler;
 
-using OnTimerUserFunc = nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)>;
+using OnTimerUserFunc = nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)>;
 
 class AbstractPersistentScheduleEventReceiver
 {
@@ -36,7 +36,7 @@ class PersistentScheduler
     using FunctorToReceiverMap = std::unordered_map<QnUuid, AbstractPersistentScheduleEventReceiver*>;
 public:
     PersistentScheduler(
-        nx::utils::db::AbstractAsyncSqlQueryExecutor* sqlExecutor,
+        nx::sql::AbstractAsyncSqlQueryExecutor* sqlExecutor,
         AbstractSchedulerDbHelper* dbHelper);
     ~PersistentScheduler();
 
@@ -47,14 +47,14 @@ public:
     void start();
     void stop();
 
-    nx::utils::db::DBResult subscribe(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult subscribe(
+        nx::sql::QueryContext* queryContext,
         const QnUuid& functorId,
         QnUuid* outTaskId,
         std::chrono::milliseconds timeout,
         const ScheduleParams& params);
 
-    nx::utils::db::DBResult unsubscribe(nx::utils::db::QueryContext* queryContext, const QnUuid& taskId);
+    nx::sql::DBResult unsubscribe(nx::sql::QueryContext* queryContext, const QnUuid& taskId);
 
 private:
     void addTimer(
@@ -64,8 +64,8 @@ private:
 
     void removeTimer(const QnUuid& taskId);
 
-    nx::utils::db::DBResult subscribe(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult subscribe(
+        nx::sql::QueryContext* queryContext,
         const QnUuid& functorId,
         QnUuid* outTaskId,
         const ScheduleTaskInfo& taskInfo);
@@ -76,7 +76,7 @@ private:
         const nx::cdb::ScheduleParams& params);
 
 private:
-    nx::utils::db::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;
+    nx::sql::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;
     AbstractSchedulerDbHelper* m_dbHelper;
     FunctorToReceiverMap m_functorToReceiver;
     QnMutex m_mutex;

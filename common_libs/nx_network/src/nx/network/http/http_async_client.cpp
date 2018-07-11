@@ -70,6 +70,7 @@ AsyncClient::AsyncClient():
     m_terminated(false),
     m_totalBytesReadPerRequest(0),
     m_totalRequestsSentViaCurrentConnection(0),
+    m_totalRequestsSent(0),
     m_contentEncodingUsed(true),
     m_sendTimeout(Timeouts::kDefaultSendTimeout),
     m_responseReadTimeout(Timeouts::kDefaultResponseReadTimeout),
@@ -88,7 +89,7 @@ AsyncClient::AsyncClient():
 AsyncClient::AsyncClient(std::unique_ptr<AbstractStreamSocket> socket):
     AsyncClient()
 {
-    m_userDefinedSocket = std::move(socket);
+    m_socket = std::move(socket);
 }
 
 AsyncClient::~AsyncClient()
@@ -484,10 +485,10 @@ void AsyncClient::setAuth(const AuthInfo& auth)
     m_user = auth.user;
     m_proxyUser = auth.proxyUser;
 
-    setProxyVia(auth.proxyEndpoint);
+    setProxyVia(auth.proxyEndpoint, auth.isProxySecure);
 }
 
-void AsyncClient::setProxyVia(const SocketAddress& proxyEndpoint)
+void AsyncClient::setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure)
 {
     if (proxyEndpoint.isNull())
     {
@@ -497,6 +498,7 @@ void AsyncClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
         NX_ASSERT(proxyEndpoint.port > 0);
         m_proxyEndpoint = proxyEndpoint;
+        m_isProxySecure = isSecure;
     }
 }
 
@@ -720,6 +722,7 @@ void AsyncClient::initiateHttpMessageDelivery()
     }
 
     ++m_totalRequestsSentViaCurrentConnection;
+    ++m_totalRequestsSent;
     m_totalBytesReadPerRequest = 0;
 
     m_state = State::sInit;
@@ -742,9 +745,10 @@ void AsyncClient::initiateHttpMessageDelivery()
                     std::bind(&AsyncClient::asyncSendDone, this, _1, _2));
                 return;
             }
-
-            m_socket.reset();
-            initiateTcpConnection(std::move(m_userDefinedSocket));
+            // Keep socket for the very first request if it pass in constructor.
+            if (m_totalRequestsSent > 1)
+                m_socket.reset();
+            initiateTcpConnection();
         });
 }
 
@@ -768,22 +772,27 @@ bool AsyncClient::canExistingConnectionBeUsed() const
     return canUseExistingConnection;
 }
 
-void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> socket)
+void AsyncClient::initiateTcpConnection()
 {
     m_state = State::sInit;
 
-    const SocketAddress remoteAddress =
-        m_proxyEndpoint
-        ? m_proxyEndpoint.get()
-        : SocketAddress(
-            m_contentLocationUrl.host(),
-            m_contentLocationUrl.port(nx::network::http::defaultPortForScheme(m_contentLocationUrl.scheme().toLatin1())));
-
-    if (socket)
+    SocketAddress remoteAddress;
+    bool isSecureConnection = false;
+    if (m_proxyEndpoint)
     {
-        m_socket = std::move(socket);
+        remoteAddress = m_proxyEndpoint.get();
+        isSecureConnection = m_isProxySecure;
     }
     else
+    {
+        remoteAddress = nx::network::url::getEndpoint(m_contentLocationUrl);
+        isSecureConnection = m_contentLocationUrl.scheme() == nx::network::http::kSecureUrlSchemeName;
+    }
+
+    if (remoteAddress.port == 0)
+        remoteAddress.port = nx::network::http::defaultPort(isSecureConnection);
+
+    if (!m_socket)
     {
         const int ipVersion =
             (bool)HostAddress(m_contentLocationUrl.host()).isPureIpV6()
@@ -791,7 +800,7 @@ void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> so
             : SocketFactory::tcpClientIpVersion();
 
         m_socket = SocketFactory::createStreamSocket(
-            m_contentLocationUrl.scheme() == lm("https"),
+            isSecureConnection,
             nx::network::NatTraversalSupport::enabled,
             ipVersion);
         NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
@@ -821,7 +830,7 @@ void AsyncClient::initiateTcpConnection(std::unique_ptr<AbstractStreamSocket> so
             std::bind(
                 &AsyncClient::asyncConnectDone,
                 this,
-                SystemError::getLastOSErrorCode()));
+                SystemError::noError));
     }
     else
     {

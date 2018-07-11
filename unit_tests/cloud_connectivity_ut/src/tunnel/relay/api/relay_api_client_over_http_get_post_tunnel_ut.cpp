@@ -13,6 +13,12 @@ class RelayApiClientOverHttpGetPostTunnelTypeSet:
 public:
     using Client = ClientOverHttpGetPostTunnel;
 
+    ~RelayApiClientOverHttpGetPostTunnelTypeSet()
+    {
+        m_asyncCallProvider.executeInAioThreadSync(
+            [this]() { m_connections.clear(); });
+    }
+
     void initializeHttpServer(
         nx::network::http::TestHttpServer* httpServer,
         const std::string& baseUrlPath)
@@ -23,13 +29,16 @@ public:
             httpServer,
             baseUrlPath);
 
-        registerOpenClientTunnelViaUpgradeHandler(
-            httpServer,
-            baseUrlPath);
-
         httpServer->registerRequestProcessorFunc(
             network::url::normalizePath(
                 lm("%1/%2").args(baseUrlPath, kServerTunnelPath).toQString()),
+            std::bind(&RelayApiClientOverHttpGetPostTunnelTypeSet::openTunnelChannelDown, this,
+                _1, _2, _3, _4, _5),
+            nx::network::http::Method::get);
+
+        httpServer->registerRequestProcessorFunc(
+            network::url::normalizePath(
+                lm("%1/%2").args(baseUrlPath, kClientGetPostTunnelPath).toQString()),
             std::bind(&RelayApiClientOverHttpGetPostTunnelTypeSet::openTunnelChannelDown, this,
                 _1, _2, _3, _4, _5),
             nx::network::http::Method::get);
@@ -37,12 +46,12 @@ public:
 
 private:
     std::list<std::unique_ptr<network::http::AsyncMessagePipeline>> m_connections;
+    network::aio::BasicPollable m_asyncCallProvider;
 
     virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
         network::http::AsyncMessagePipeline* /*connection*/) override
     {
-        // TODO
     }
 
     void openTunnelChannelDown(
@@ -72,6 +81,7 @@ private:
             std::make_unique<network::http::AsyncMessagePipeline>(
                 this,
                 connection->takeSocket()));
+        m_connections.back()->bindToAioThread(m_asyncCallProvider.getAioThread());
         m_connections.back()->setMessageHandler(
             std::bind(&RelayApiClientOverHttpGetPostTunnelTypeSet::onMessage, this, _1));
         m_connections.back()->startReadingConnection();
@@ -79,7 +89,6 @@ private:
 
     void onMessage(network::http::Message /*httpMessage*/)
     {
-        // TODO
         auto connection = m_connections.back()->takeSocket();
         m_connections.pop_back();
         saveTunnelConnection(std::move(connection));

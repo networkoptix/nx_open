@@ -358,7 +358,7 @@ TEST_F(Proxy, proxyByRequestUrl)
         lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
             .arg(testPathAndQuery);
     nx::network::http::HttpClient httpClient;
-    httpClient.setProxyVia(endpoint());
+    httpClient.setProxyVia(endpoint(), /*isSecure*/ false);
     testProxyUrl(&httpClient, targetUrl, {nx::network::http::StatusCode::ok});
 }
 
@@ -372,7 +372,7 @@ TEST_F(Proxy, proxyingChunkedBody)
        lit("http://%1%2").arg(testHttpServer()->serverAddress().toString())
             .arg(checkuedTestPathAndQuery);
     nx::network::http::HttpClient httpClient;
-    httpClient.setProxyVia(endpoint());
+    httpClient.setProxyVia(endpoint(), /*isSecure*/ false);
     testProxyUrl(&httpClient, targetUrl, {nx::network::http::StatusCode::ok});
 }
 
@@ -387,7 +387,7 @@ TEST_F(Proxy, proxyingUndefinedContentLength)
         .arg(lit("%1?%2&undefinedContentLength").arg(testPath).arg(testQuery));
 
     nx::network::http::HttpClient httpClient;
-    httpClient.setProxyVia(endpoint());
+    httpClient.setProxyVia(endpoint(), /*isSecure*/ false);
     testProxyUrl(&httpClient, targetUrl, {nx::network::http::StatusCode::ok});
 }
 

@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include <nx/utils/std/optional.h>
+#include <nx/utils/math/arithmetic.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -10,25 +11,13 @@ namespace plugins {
 
 namespace {
 
-static const QString kZeroString = lit("0");
-
-enum class NumberClass
-{
-    negative,
-    positive,
-    zero
-};
-
 template<typename T>
-NumberClass numberClass(T number)
+nx::utils::math::Sign sign(T number)
 {
     if (qFuzzyIsNull(number))
-        return NumberClass::zero;
+        return nx::utils::math::Sign::zero;
 
-    if (number < 0)
-        return NumberClass::negative;
-
-    return NumberClass::positive;
+    return nx::utils::math::sign(number);
 }
 
 template<typename T>
@@ -256,9 +245,11 @@ void HanwhaRange::calculateRangeMap()
 
 bool HanwhaRange::calculateNumericRangeMap()
 {
+    using namespace nx::utils;
+
     bool success = false;
     const auto possibleValues = m_parameter.possibleValues();
-    std::map<NumberClass, std::vector<QString>> enumOptionsByNumberClass;
+    std::map<math::Sign, std::vector<QString>> enumOptionsBySign;
     for (const auto& value: possibleValues)
     {
         const auto numericValue = value.toDouble(&success);
@@ -268,35 +259,34 @@ bool HanwhaRange::calculateNumericRangeMap()
             return false;
         }
 
-        const auto numberType = numberClass(numericValue);
-        enumOptionsByNumberClass[numberType].push_back(value);
+        enumOptionsBySign[sign(numericValue)].push_back(value);
     }
 
-    auto rangeBoundsByNumberClass =
-        [this](NumberClass numberClass)
+    auto rangeBoundsBySign =
+        [this](math::Sign sign)
         {
-            switch (numberClass)
+            switch (sign)
             {
-                case NumberClass::negative:
+                case math::Sign::negative:
                     return Range<double>(m_mappingMin, 0.0);
-                case NumberClass::positive:
+                case math::Sign::positive:
                     return Range<double>(0.0, m_mappingMax);
-                case NumberClass::zero:
+                case math::Sign::zero:
                 default:
                     return Range<double>(0.0, 0.0);
             }
         };
 
     RangeMap<double> rangeMap;
-    for (const auto& entry: enumOptionsByNumberClass)
+    for (const auto& entry: enumOptionsBySign)
     {
-        const auto numberClass = entry.first;
-        if (numberClass == NumberClass::zero)
+        const auto sign = entry.first;
+        if (sign == math::Sign::zero)
             continue;
 
         const auto& options = entry.second;
         const auto optionsCount = options.size();
-        const auto fullRange = rangeBoundsByNumberClass(numberClass);
+        const auto fullRange = rangeBoundsBySign(sign);
         const double step = rangeLength(fullRange) / optionsCount;
 
         for (auto i = 0; i < optionsCount; ++i)

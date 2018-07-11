@@ -4,6 +4,7 @@
 #else
     #include <signal.h>
     #include <unistd.h>
+    #include <pthread.h>
 #endif
 
 #include "log.h"
@@ -34,8 +35,7 @@ void crashProgram()
         #if defined(_WIN32)
             *reinterpret_cast<volatile int*>(0) = 7;
         #else
-            const pid_t pid = getpid();
-            kill(pid, SIGTRAP);
+            pthread_kill(pthread_self(), SIGTRAP);
         #endif
     #else
         *reinterpret_cast<volatile int*>(0) = 7;

@@ -2,10 +2,13 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx/utils/test_support/test_options.h>
-#include <nx/utils/log/log.h>
 #include <api/common_message_processor.h>
 #include <api/global_settings.h>
+
+#include <nx/network/app_info.h>
+#include <nx/utils/test_support/test_options.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/api/data/peer_data.h>
 
 namespace nx {
 namespace p2p {
@@ -34,15 +37,16 @@ void P2pMessageBusTestBase::createData(
 
     settings->synchronizeNow();
 
-    std::vector<ec2::ApiUserData> users;
+    std::vector<nx::vms::api::UserData> users;
 
     for (int i = 0; i < userCount; ++i)
     {
-        ec2::ApiUserData userData;
+        nx::vms::api::UserData userData;
         userData.id = QnUuid::createUuid();
         userData.name = lm("user_%1").arg(i);
         userData.isEnabled = true;
         userData.isCloud = false;
+        userData.realm = nx::network::AppInfo::realm();
         users.push_back(userData);
     }
 
@@ -192,7 +196,7 @@ bool P2pMessageBusTestBase::waitForConditionOnAllServers(
 }
 
 void P2pMessageBusTestBase::checkMessageBus(
-    std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+    std::function<bool(MessageBus*, const vms::api::PersistentIdData&)> checkFunction,
     const QString& errorMessage)
 {
     int syncDoneCounter = 0;
@@ -207,7 +211,7 @@ void P2pMessageBusTestBase::checkMessageBus(
 }
 
 void P2pMessageBusTestBase::checkMessageBusInternal(
-    std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
+    std::function<bool(MessageBus*, const vms::api::PersistentIdData&)> checkFunction,
     const QString& errorMessage,
     bool waitForSync,
     int* outSyncDoneCounter)
@@ -227,7 +231,7 @@ void P2pMessageBusTestBase::checkMessageBusInternal(
             for (const auto& serverTo : m_servers)
             {
                 const auto& commonModuleTo = serverTo->moduleInstance()->commonModule();
-                ec2::ApiPersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
+                vms::api::PersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
                 bool result = checkFunction(bus, peer);
                 if (!result)
                 {
@@ -252,17 +256,20 @@ void P2pMessageBusTestBase::checkMessageBusInternal(
         && timer.elapsed() < kMaxSyncTimeoutMs);
 }
 
-bool P2pMessageBusTestBase::checkSubscription(const MessageBus* bus, const ApiPersistentIdData& peer)
+bool P2pMessageBusTestBase::checkSubscription(
+    const MessageBus* bus, const vms::api::PersistentIdData& peer)
 {
     return bus->isSubscribedTo(peer);
 }
 
-bool P2pMessageBusTestBase::checkDistance(const MessageBus* bus, const ApiPersistentIdData& peer)
+bool P2pMessageBusTestBase::checkDistance(const MessageBus* bus,
+    const vms::api::PersistentIdData& peer)
 {
     return bus->distanceTo(peer) <= kMaxOnlineDistance;
 }
 
-bool P2pMessageBusTestBase::checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& /*peer*/)
+bool P2pMessageBusTestBase::checkRuntimeInfo(const MessageBus* bus,
+    const vms::api::PersistentIdData& /*peer*/)
 {
     return bus->runtimeInfo().size() == m_servers.size();
 }

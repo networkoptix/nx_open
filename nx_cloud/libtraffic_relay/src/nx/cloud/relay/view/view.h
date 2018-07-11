@@ -46,27 +46,28 @@ private:
     const conf::Settings& m_settings;
     Model* m_model;
     Controller* m_controller;
+    view::GetPostServerTunnelProcessor m_getPostServerTunnelProcessor;
+    view::GetPostClientTunnelProcessor m_getPostClientTunnelProcessor;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx::network::http::AuthMethodRestrictionList m_authRestrictionList;
     view::AuthenticationManager m_authenticationManager;
     std::unique_ptr<MultiHttpServer> m_multiAddressHttpServer;
     std::vector<network::SocketAddress> m_httpEndpoint;
     std::vector<network::SocketAddress> m_httpsEndpoint;
-    view::GetPostTunnelProcessor m_getPostTunnelProcessor;
 
     void registerApiHandlers();
     void registerCompatibilityHandlers();
 
-    template<typename Handler, typename Arg>
+    template<typename Handler, typename ... Arg>
     void registerApiHandler(
         const nx::network::http::StringType& method,
-        Arg arg);
+        Arg... arg);
 
-    template<typename Handler, typename Arg>
+    template<typename Handler, typename ... Arg>
     void registerApiHandler(
         const char* path,
         const nx::network::http::StringType& method,
-        Arg arg);
+        Arg... arg);
 
     void loadSslCertificate();
 

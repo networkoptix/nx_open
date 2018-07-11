@@ -1,6 +1,6 @@
 #include "p2p_message_bus_test_base.h"
 
-#include <QtCore/QElapsedTimer>
+//#include <QtCore/QElapsedTimer>
 
 #include <core/resource_access/user_access_data.h>
 
@@ -18,11 +18,13 @@
 
 #include <atomic>
 
+
 namespace nx {
 namespace p2p {
 namespace test {
 
-static const std::chrono::seconds kMaxSyncTimeout(15 * 1000);
+using namespace std::literals::chrono_literals;
+static const std::chrono::seconds kMaxSyncTimeout = 15s;
 
 //helper functions
 static bool isOnline(const Appserver2Ptr& server)
@@ -40,9 +42,9 @@ static ec2::AbstractECConnection* getConnection(const Appserver2Ptr& server)
     return server->moduleInstance()->ecConnection();
 }
 
-static nx::p2p::MessageBus* getBus(const Appserver2Ptr& server)
+AbstractTransactionMessageBus* getBus(const Appserver2Ptr& server)
 {
-    return server->moduleInstance()->ecConnection()->messageBus()->dynamicCast<nx::p2p::MessageBus*>();
+    return server->moduleInstance()->ecConnection()->messageBus();
 }
 
 static QnResourcePool* getPool(const Appserver2Ptr& server)
@@ -74,7 +76,7 @@ public:
         for (size_t i = 0; i < 3; ++i)
         {
             auto directConnection = dynamic_cast<Ec2DirectConnection*>(m_servers[i]->moduleInstance()->ecConnection());
-            directConnection->orphanCameraWatcher()->changeIntervalAsync(1000);
+            directConnection->orphanCameraWatcher()->changeIntervalAsync(1s);
         }
 
         createData(m_servers[0], 2, 0);
@@ -337,11 +339,9 @@ public:
             fromResourceListToApi(cameras1, cameraList1);
             fromResourceListToApi(cameras2, cameraList2);
 
-
             return cameras1.empty() && cameras2.empty();
         }, kMaxSyncTimeout);
         ASSERT_TRUE(result1);
-
 
         std::this_thread::sleep_for(std::chrono::seconds(3));
 
@@ -360,7 +360,6 @@ public:
             fromResourceListToApi(cameras1, cameraList1);
             fromResourceListToApi(cameras2, cameraList2);
 
-
             return cameras1.empty() && cameras2.empty();
         }, kMaxSyncTimeout);
         ASSERT_TRUE(result2);
@@ -368,13 +367,10 @@ public:
 
     }
 
-
 };
 
 TEST_F(P2pOrphanCamerasEraseTest, a_server_looks_for_orphan_cameras_and_erases_them)
 {
-//    const_cast<bool&>(ec2::ini().isP2pMode) = true;
-
     givenThreeSyncronizedServersAndTwoCamerasOnServer0();
 
     whenDisconnectServer2();
