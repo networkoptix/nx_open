@@ -93,7 +93,7 @@
 
         <!-- Trying to kill old applauncher nicely. Notice: new applauncher may be left running during update. -->
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[ClientRootDir]$(var.minilauncherBinaryName)&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[InstallDirRoot]$(var.minilauncherBinaryName)&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
@@ -128,22 +128,8 @@
             <Custom Action="CloseAppLauncherAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
         </InstallExecuteSequence>
 
-        <Media Id="1" Cabinet="clmisc.cab" EmbedCab="yes" />
-
-        <Media Id="2" Cabinet="cmnff1.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="3" Cabinet="cmnff2.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="4" Cabinet="cmnlib1.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="5" Cabinet="cmnicu.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="6" Cabinet="cmnlib2.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="7" Cabinet="cmnqt1.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="8" Cabinet="cmnqt2.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="9" Cabinet="cmnqtui.cab" EmbedCab="$(var.NoStrip)" />
-
-        <Media Id="10" Cabinet="clqt1.cab" EmbedCab="yes" />
-        <Media Id="11" Cabinet="clqt2.cab" EmbedCab="yes" />
-        <Media Id="12" Cabinet="clqtpl.cab" EmbedCab="yes" />
-        <Media Id="13" Cabinet="cllibs.cab" EmbedCab="yes" />
-        <Media Id="14" Cabinet="clexec.cab" EmbedCab="yes" />
+        <Media Id="1" Cabinet="client.cab" EmbedCab="yes" />
+        <Media Id="2" Cabinet="shared.cab" EmbedCab="$(var.NoStrip)" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="MyPicturesFolder">

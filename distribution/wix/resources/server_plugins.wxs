@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <?include BuildVars.wxi ?>
+        <ComponentGroup Id="plugins" Directory="plugins" Source="$(var.PluginsDir)">
+            <Component><File Name="genericrtspplugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="mjpg_link.dll" KeyPath="yes"/></Component>
+            <Component><File Name="generic_multicast_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="dw_mtt_metadata_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="hikvision_metadata_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="axis_metadata_plugin.dll" KeyPath="yes"/></Component>
+            <Component><File Name="vca_metadata_plugin.dll" KeyPath="yes"/></Component>
+            <?if $(var.enable_hanwha) = "true"?>
+                <Component><File Name="hanwha_metadata_plugin.dll" KeyPath="yes"/></Component>
+            <?endif?>
+        </ComponentGroup>
+
+        <ComponentGroup Id="plugins_optional" Directory="plugins_optional" Source="$(var.plugins_optional_dir)">
+            <Component><File Name="stub_metadata_plugin.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

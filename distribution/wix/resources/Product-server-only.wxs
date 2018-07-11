@@ -230,19 +230,8 @@
             <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 
-        <Media Id="1" Cabinet="server_private.cab" EmbedCab="yes" />
-
-        <Media Id="2" Cabinet="cmnff1.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="3" Cabinet="cmnff2.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="4" Cabinet="cmnlib1.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="5" Cabinet="cmnicu.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="6" Cabinet="cmnlib2.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="7" Cabinet="cmnqt1.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="8" Cabinet="cmnqt2.cab" EmbedCab="$(var.NoStrip)" />
-        <Media Id="9" Cabinet="cmnqtui.cab" EmbedCab="$(var.NoStrip)" />
-
-        <Media Id="10" Cabinet="srvlib.cab" EmbedCab="yes" />
-        <Media Id="11" Cabinet="srvexec.cab" EmbedCab="yes" />
+        <Media Id="1" Cabinet="server.cab" EmbedCab="yes" />
+        <Media Id="2" Cabinet="shared.cab" EmbedCab="$(var.NoStrip)" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="MyPicturesFolder">
