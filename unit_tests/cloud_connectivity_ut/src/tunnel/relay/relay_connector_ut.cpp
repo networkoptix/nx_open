@@ -248,16 +248,6 @@ public:
         resetClientFactoryToDefault();
     }
 
-    ~RelayConnectorRedirect()
-    {
-        while (!m_connectResults.empty())
-        {
-            auto connectResult = m_connectResults.pop();
-            if (connectResult.connection)
-                connectResult.connection->pleaseStopSync();
-        }
-    }
-
 protected:
     void whenCreateConnectSessionThatIsRedirectedToAnotherRelayInstance()
     {
@@ -290,6 +280,15 @@ private:
         SystemError::ErrorCode systemErrorCode;
         std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         bool stillValid;
+
+        ConnectResult(ConnectResult&&) = default;
+        ConnectResult& operator=(ConnectResult&&) = default;
+
+        ~ConnectResult()
+        {
+            if (connection)
+                connection->pleaseStopSync();
+        }
     };
 
     nx::network::http::TestHttpServer m_redirectingRelay;
