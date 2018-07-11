@@ -205,9 +205,6 @@
          </item>
          <item>
           <widget class="nx::client::desktop::ToolButton" name="showInfoButton">
-           <property name="toolTip">
-            <string>Show/hide information</string>
-           </property>
            <property name="text">
             <string notr="true"/>
            </property>
@@ -218,9 +215,6 @@
          </item>
          <item>
           <widget class="nx::client::desktop::ToolButton" name="showPreviewsButton">
-           <property name="toolTip">
-            <string>Show/hide thumbnails</string>
-           </property>
            <property name="text">
             <string notr="true"/>
            </property>

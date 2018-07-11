@@ -148,10 +148,33 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->showPreviewsButton->setIcon(qnSkin->icon(
         "text_buttons/image.png", "text_buttons/image_selected.png"));
 
+    const auto updateInformationToolTip =
+        [this]()
+        {
+            ui->showInfoButton->setToolTip(ui->showInfoButton->isChecked()
+                ? tr("Hide information")
+                : tr("Show information"));
+        };
+
+    const auto updateThumbnailsToolTip =
+        [this]()
+        {
+            ui->showPreviewsButton->setToolTip(ui->showPreviewsButton->isChecked()
+                ? tr("Hide thumbnails")
+                : tr("Show thumbnails"));
+        };
+
+    updateInformationToolTip();
+    updateThumbnailsToolTip();
+
     connect(ui->showInfoButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setFootersEnabled);
+    connect(ui->showInfoButton, &QToolButton::toggled,
+        this, updateInformationToolTip);
     connect(ui->showPreviewsButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setPreviewsEnabled);
+    connect(ui->showPreviewsButton, &QToolButton::toggled,
+        this, updateThumbnailsToolTip);
 
     ui->ribbon->setViewportMargins(0, style::Metrics::kStandardPadding);
 
