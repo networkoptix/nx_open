@@ -39,6 +39,8 @@ public:
     Qt::ScrollBarPolicy scrollBarPolicy() const;
     void setScrollBarPolicy(Qt::ScrollBarPolicy value);
 
+    void setViewportMargins(int top, int bottom);
+
     virtual QSize sizeHint() const override;
 
     QScrollBar* scrollBar() const;

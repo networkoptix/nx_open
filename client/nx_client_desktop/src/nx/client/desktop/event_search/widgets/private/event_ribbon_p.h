@@ -10,6 +10,8 @@
 #include <QtCore/QMap>
 #include <QtCore/QSet>
 
+#include <ui/style/helper.h>
+
 #include <nx/utils/disconnect_helper.h>
 
 class QScrollBar;
@@ -46,6 +48,8 @@ public:
 
     Qt::ScrollBarPolicy scrollBarPolicy() const;
     void setScrollBarPolicy(Qt::ScrollBarPolicy value);
+
+    void setViewportMargins(int top, int bottom);
 
     int count() const;
 
@@ -132,6 +136,9 @@ private:
     bool m_previewsEnabled = true;
     bool m_footersEnabled = true;
     bool m_scrollBarRelevant = true;
+
+    int m_topMargin = style::Metrics::kStandardPadding;
+    int m_bottomMargin = style::Metrics::kStandardPadding;
 };
 
 } // namespace desktop

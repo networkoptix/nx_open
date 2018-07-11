@@ -153,6 +153,8 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     connect(ui->showPreviewsButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setPreviewsEnabled);
 
+    ui->ribbon->setViewportMargins(0, style::Metrics::kStandardPadding);
+
     ui->ribbon->scrollBar()->ensurePolished();
     setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
         colorTheme()->color("dark5"));
