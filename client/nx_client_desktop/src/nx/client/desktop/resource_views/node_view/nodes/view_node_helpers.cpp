@@ -95,11 +95,13 @@ namespace client {
 namespace desktop {
 namespace helpers {
 
-NodePtr createTestNode(const QString& caption)
+NodePtr createNode(
+    const QString& caption,
+    const NodeList& children)
 {
     ViewNode::Data nodeData;
     nodeData.data[node_view::nameColumn][Qt::DisplayRole] = caption;
-    return ViewNode::create(nodeData);
+    return ViewNode::create(nodeData, children);
 }
 
 NodePtr createParentedLayoutsNode()

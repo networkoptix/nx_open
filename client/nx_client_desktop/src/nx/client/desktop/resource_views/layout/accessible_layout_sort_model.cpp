@@ -27,6 +27,26 @@ AccessibleLayoutSortModel::AccessibleLayoutSortModel(QObject* parent)
 {
 }
 
+QModelIndex AccessibleLayoutSortModel::mapToSource(const QModelIndex &proxyIndex) const
+{
+    const auto res = base_type::mapToSource(proxyIndex);
+    qWarning() << "+++ mapToSource" << proxyIndex << " to " << res;
+    return res;
+}
+
+QModelIndex AccessibleLayoutSortModel::mapFromSource(const QModelIndex &sourceIndex) const
+{
+    const auto res = base_type::mapFromSource(sourceIndex);
+    qWarning() << "+++ mapFromSource" << sourceIndex << " to " << res;
+    return res;
+}
+
+bool AccessibleLayoutSortModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+    qWarning() << "-------" << source_row << source_parent;
+    return base_type::filterAcceptsRow(source_row, source_parent);
+}
+
 bool AccessibleLayoutSortModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
@@ -34,13 +54,13 @@ bool AccessibleLayoutSortModel::lessThan(
     const auto left = NodeViewModel::nodeFromIndex(sourceLeft);
     const auto right = NodeViewModel::nodeFromIndex(sourceRight);
     if (!left || !right)
-        return base_type::lessThan(sourceLeft, sourceRight);
+        return !base_type::lessThan(sourceLeft, sourceRight);
 
     const bool isUser = left->childrenCount() > 0 || right->childrenCount() > 0;
     const auto leftResource = helpers::getResource(left);
     const auto rightResource = helpers::getResource(right);
     if (!leftResource || !rightResource)
-        return base_type::lessThan(sourceLeft, sourceRight);
+        return !base_type::lessThan(sourceLeft, sourceRight);
 
     if (isUser)
     {
@@ -51,7 +71,7 @@ bool AccessibleLayoutSortModel::lessThan(
         if (rightResource && rightResource->getId() == currentUserId)
             return true;
     }
-    return base_type::lessThan(sourceLeft, sourceRight);
+    return !base_type::lessThan(sourceLeft, sourceRight);
 }
 
 } // namespace desktop

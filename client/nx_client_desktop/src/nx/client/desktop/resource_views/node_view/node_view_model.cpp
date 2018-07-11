@@ -64,10 +64,17 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
 
     for (const auto description: patch.addedNodes)
     {
-        const auto& path = description.path;
-        const auto index = d->getModelIndex(d->store->state().nodeByPath(path.parentPath()));
+        const auto path = description.path;
+        if (path.isEmpty())
+            continue;
+
+        const auto parentPath = path.parentPath();
+        const auto parentNode = d->store->state().nodeByPath(parentPath);
+        const auto parentIndex = d->getModelIndex(parentNode);
         const int row = path.leafIndex();
-        const NodeViewModel::ScopedInsertRows insertGuard(this, index, row, row);
+        qWarning() << "--- Inserting " << description.data.data[0][Qt::DisplayRole]
+            << " to parent " << parentIndex << " with " << row;
+        const NodeViewModel::ScopedInsertRows insertGuard(this, parentIndex, row, row);
     }
 
     for (const auto description: patch.changedData)
@@ -115,8 +122,12 @@ QModelIndex NodeViewModel::parent(const QModelIndex& child) const
 
 int NodeViewModel::rowCount(const QModelIndex& parent) const
 {
-    const auto node = parent.isValid() ? nodeFromIndex(parent) : d->store->state().rootNode;
-    return node ? node->childrenCount() : 0;
+    const auto res = [this, parent]()
+    {
+        const auto node = parent.isValid() ? nodeFromIndex(parent) : d->store->state().rootNode;
+        return node ? node->childrenCount() : 0;
+    }();
+    return res;
 }
 
 int NodeViewModel::columnCount(const QModelIndex& parent) const

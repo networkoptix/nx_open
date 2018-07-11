@@ -73,7 +73,7 @@ void ViewNode::addChild(const NodePtr& child)
     d->nodes.append(child);
 }
 
-NodePtr ViewNode::nodeAt(int index) const
+NodePtr ViewNode::nodeAt(int index)
 {
     return d->nodes.at(index);
 }
@@ -86,7 +86,7 @@ NodePtr ViewNode::nodeAt(const ViewNodePath& path)
     return currentNode;
 }
 
-ViewNodePath ViewNode::path()
+ViewNodePath ViewNode::path() const
 {
     const auto parentNode = parent();
     if (!parentNode)
@@ -97,9 +97,15 @@ ViewNodePath ViewNode::path()
     return currentPath;
 }
 
-int ViewNode::indexOf(const NodePtr& node) const
+int ViewNode::indexOf(const ConstNodePtr& node) const
 {
-    return d->nodes.indexOf(node);
+    const auto count = d->nodes.size();
+    for (int i = 0; i != count; ++i)
+    {
+        if (d->nodes.at(i).data() == node.data())
+            return i;
+    }
+    return -1;
 }
 
 QVariant ViewNode::data(int column, int role) const
@@ -180,6 +186,14 @@ WeakNodePtr ViewNode::currentSharedNode()
     NX_EXPECT(result, "No shared pointer exists for current node");
     return result.toWeakRef();
 }
+
+ConstWeakNodePtr ViewNode::currentSharedNode() const
+{
+    const auto result = sharedFromThis();
+    NX_EXPECT(result, "No shared pointer exists for current node");
+    return result.toWeakRef();
+}
+
 
 uint qHash(const nx::client::desktop::ViewNodePath& path)
 {

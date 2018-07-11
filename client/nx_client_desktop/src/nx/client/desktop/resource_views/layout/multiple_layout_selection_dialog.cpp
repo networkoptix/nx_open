@@ -55,18 +55,27 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::MultipleLayoutSelectionDialog)
 {
+    using namespace helpers; //< TODO: remove me
+
     ui->setupUi(this);
 
     const auto tree = ui->layoutsTree;
-    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
+    tree->setProxyModel(new QSortFilterProxyModel(this));
+
+    //tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
     //tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
-    //tree->applyPatch(NodeViewStatePatch::fromRootNode(
-    //  ViewNode::create({helpers::createTestNode(lit("first"))})));
+
+    tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
+//        createNode(lit("zero")),
+        createNode(lit("first"), { createNode(lit("1_1")) }),
+//        createNode(lit("second"))
+    })));
+
+//    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createTestNode(lit("first"))));
 
     tree->setExpandsOnDoubleClick(true);
     tree->expandAll();
 
-    tree->setProxyModel(new AccessibleLayoutSortModel(this));
 }
 
 MultipleLayoutSelectionDialog::~MultipleLayoutSelectionDialog()

@@ -26,7 +26,9 @@ void ViewNodePath::appendIndex(int index)
 
 int ViewNodePath::leafIndex() const
 {
-    return m_indicies.isEmpty() ? -1 : m_indicies.last();
+    return m_indicies.isEmpty()
+        ? 0 //< Root node is always single and has '0' index.
+        : m_indicies.last();
 }
 
 ViewNodePath ViewNodePath::parentPath() const

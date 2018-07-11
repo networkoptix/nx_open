@@ -39,12 +39,12 @@ public:
     const NodeList& children() const;
 
     void addChild(const NodePtr& child);
-    NodePtr nodeAt(int index) const;
 
+    NodePtr nodeAt(int index);
     NodePtr nodeAt(const ViewNodePath& path);
-    ViewNodePath path(); //< TODO: think abount const
+    ViewNodePath path() const;
 
-    int indexOf(const NodePtr& node) const;
+    int indexOf(const ConstNodePtr& node) const;
 
     bool hasData(int column, int role) const;
     QVariant data(int column, int role) const;
@@ -63,6 +63,7 @@ private:
     ViewNode(const Data& data);
 
     WeakNodePtr currentSharedNode();
+    ConstWeakNodePtr currentSharedNode() const;
 
 private:
     struct Private;
