@@ -14,6 +14,7 @@
 
 #include "create_get_post_tunnel_handler.h"
 #include "http_handlers.h"
+#include "options_request_handler.h"
 #include "proxy_handler.h"
 #include "../controller/connect_session_manager.h"
 #include "../controller/controller.h"
@@ -148,6 +149,12 @@ void View::registerApiHandlers()
     registerApiHandler<relaying::BeginListeningUsingConnectMethodHandler>(
         nx::network::http::Method::connect,
         &m_controller->listeningPeerManager());
+
+    if (m_settings.http().serveOptions)
+    {
+        registerApiHandler<view::OptionsRequestHandler>(
+            nx::network::http::Method::options);
+    }
 
     // TODO: #ak Following handlers are here for compatibility with 3.1-beta.
     // Keep until 3.2 release just in case.
