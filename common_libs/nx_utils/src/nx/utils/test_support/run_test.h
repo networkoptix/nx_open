@@ -8,6 +8,8 @@
     #include <gmock/gmock.h>
 #endif
 
+#include <QtCore/QCoreApplication>
+
 #include <nx/kit/ini_config.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/move_only_func.h>
@@ -74,6 +76,8 @@ inline int runTest(
     InitFunction extraInit = nullptr,
     int gtestRunFlags = 0)
 {
+    QCoreApplication application(argc, argv);
+
     return runTest(
         argc,
         (const char**) argv,
