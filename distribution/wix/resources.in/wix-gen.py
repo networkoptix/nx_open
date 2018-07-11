@@ -55,21 +55,12 @@ def generate_client_qml():
         'var.ClientQmlDir')
 
 
-def generate_client_vox():
+def generate_vox():
     harvest_dir(
         '${VoxSourceDir}',
-        'ClientVox.wxs',
-        'ClientVoxComponent',
-        '${customization}VoxDir',
-        'var.VoxSourceDir')
-
-
-def generate_server_vox():
-    harvest_dir(
-        '${VoxSourceDir}',
-        'ServerVox.wxs',
-        'ServerVoxComponent',
-        '${customization}ServerVoxDir',
+        'vox.wxs',
+        'vox',
+        'vox',
         'var.VoxSourceDir')
 
 
@@ -78,7 +69,7 @@ def generate_vcrt_14_client():
         '${VC14RedistPath}/bin',
         'ClientVcrt14.wxs',
         'ClientVcrt14ComponentGroup',
-        'ClientRootDir',
+        'InstallDirRoot',
         'var.Vcrt14SrcDir')
 
 
@@ -87,7 +78,7 @@ def generate_vcrt_14_mediaserver():
         '${VC14RedistPath}/bin',
         'ServerVcrt14.wxs',
         'ServerVcrt14ComponentGroup',
-        'MediaServerRootDir',
+        'InstallDirRoot',
         'var.Vcrt14SrcDir')
 
 
@@ -105,8 +96,7 @@ def main():
     generate_fonts()
     generate_help()
     generate_client_qml()
-    generate_client_vox()
-    generate_server_vox()
+    generate_vox()
     generate_vcrt_14_client()
     generate_vcrt_14_mediaserver()
     generate_vcrt_14_traytool()

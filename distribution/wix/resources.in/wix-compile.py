@@ -47,10 +47,12 @@ wix_extensions = [
 ]
 
 client_components = [
+    'shared_libraries',
+    'client_libraries',
     'Associations',
     'ClientDlg',
     'ClientFonts',
-    'ClientVox',
+    'vox',
     'ClientBg',
     'ClientQml',
     'Client',
@@ -62,7 +64,9 @@ client_components = [
     'Product-client-only']
 
 server_components = [
-    'ServerVox',
+    'shared_libraries',
+    'vox',
+    'server_plugins',
     'Server',
     'traytool',
     'ServerVcrt14',
