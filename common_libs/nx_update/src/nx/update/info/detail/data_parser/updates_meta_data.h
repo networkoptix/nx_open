@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/common/software_version.h>
+#include <nx/utils/software_version.h>
 
 namespace nx {
 namespace update {
@@ -13,12 +13,8 @@ struct AlternativeServerData
     QString url;
     QString name;
 
-    AlternativeServerData(const QString& url, const QString& name):
-        url(url),
-        name(name)
-    {}
-
     AlternativeServerData() = default;
+    AlternativeServerData(const QString& url, const QString& name): url(url), name(name) {}
 };
 
 inline bool operator == (const AlternativeServerData& lhs, const AlternativeServerData& rhs)
@@ -30,7 +26,8 @@ struct CustomizationData
 {
     QString name;
     QString updatePrefix;
-    QList<QnSoftwareVersion> versions;
+    QString releaseNotesUrl;
+    QList<nx::utils::SoftwareVersion> versions;
 };
 
 inline bool operator == (const CustomizationData& lhs, const CustomizationData& rhs)

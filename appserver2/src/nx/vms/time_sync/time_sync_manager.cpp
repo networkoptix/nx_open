@@ -1,21 +1,21 @@
 #include "time_sync_manager.h"
 
+#include <api/global_settings.h>
+#include <api/model/time_reply.h>
+#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <common/common_module.h>
-#include <api/global_settings.h>
-#include <nx/utils/elapsed_timer.h>
-#include <nx_ec/data/api_reverse_connection_data.h>
-#include <nx/network/time/time_protocol_client.h>
-#include <utils/common/rfc868_servers.h>
-#include <nx/network/socket_factory.h>
-#include <nx/network/http/http_client.h>
-#include <nx/utils/time.h>
 #include <network/router.h>
-#include <nx/fusion/serialization/json.h>
 #include <rest/server/json_rest_result.h>
-#include <api/model/time_reply.h>
+#include <utils/common/rfc868_servers.h>
+
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_client.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/time/time_protocol_client.h>
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/time.h>
 #include <common/static_common_module.h>
 
 namespace nx {

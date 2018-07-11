@@ -1,10 +1,9 @@
-
 #include "license.h"
+
 #include <cassert>
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QSettings>
-#include <nx/utils/uuid.h>
 #include <QtCore/QStringList>
 
 #include <openssl/rsa.h>
@@ -12,85 +11,87 @@
 #include <openssl/bio.h>
 #include <openssl/err.h>
 
-#include <licensing/license_validator.h>
-
-#include <utils/common/app_info.h>
+#include <api/runtime_info_manager.h>
 #include <common/common_globals.h>
+#include <common/common_module.h>
+#include <licensing/license_validator.h>
+#include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
-#include "common/common_module.h"
 
-#include "api/runtime_info_manager.h"
-#include <nx_ec/data/api_runtime_data.h>
-#include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
+#include <nx/utils/uuid.h>
+#include <nx/vms/api/data/license_data.h>
+
+using namespace nx::vms;
+
 namespace {
-    const char *networkOptixRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
-        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAN4wCk8ISwRsPH0Ev/ljnEygpL9n7PhA\n"
-        "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
-        "-----END PUBLIC KEY-----";
 
-    // This key is introduced in v2.3 to make new license types do not work in v2.2 and earlier
-    const char *networkOptixRSAPublicKey2 = "-----BEGIN PUBLIC KEY-----\n"
-        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALiqxgrnU2hl+8DVzgXrj6u4V+5ksnR5\n"
-        "vtLsDeNC9eU2aLCt0Ba4KLnuVnDDWSXQ9914i8s0KXXTM+GOHpvrChUCAwEAAQ==\n"
-        "-----END PUBLIC KEY-----";
+static constexpr char* nxRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
+    "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAN4wCk8ISwRsPH0Ev/ljnEygpL9n7PhA\n"
+    "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
+    "-----END PUBLIC KEY-----";
 
-    // This key is introduced in v2.4 to make iomodule and starter license types do not work in v2.3 and earlier
-    const char *networkOptixRSAPublicKey3 = "-----BEGIN PUBLIC KEY-----\n"
-        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtb16Q2sJL/eZqNpfItB0\n"
-        "oMdhttY9Ov21QN8PedcJm8+1t/qjVBg2c1AxJsMnX+0MH4dcbC9W2JCU+e2vMCX7\n"
-        "HMUW4gpmvRtHPDhNutgyByOVJ7TXzCrHR/5xCXojiOLISdikVyP+IDYP+ATe5mM5\n"
-        "GIWG1uTTaG7gwwJn2IVggBzUapRWAm3VZUpytfPaLzqucc/zuvoMSUD5K9DZqg4p\n"
-        "Meu8VWFCPA7VhFKyuTtdTjrj/72WpLdlcSbARYjjqOO51KUIESXrGUEiw1Mo0OOn\n"
-        "acOz/C4G+lXfFDOALsYUNeG//UibSsfLPghvcIXdC7ghMtYBIzafA/UVcQOqZWPK\n"
-        "6wIDAQAB\n"
-        "-----END PUBLIC KEY-----";
+// This key is introduced in v2.3 to make new license types do not work in v2.2 and earlier
+static constexpr char* nxRSAPublicKey2 = "-----BEGIN PUBLIC KEY-----\n"
+    "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALiqxgrnU2hl+8DVzgXrj6u4V+5ksnR5\n"
+    "vtLsDeNC9eU2aLCt0Ba4KLnuVnDDWSXQ9914i8s0KXXTM+GOHpvrChUCAwEAAQ==\n"
+    "-----END PUBLIC KEY-----";
 
-    /* One analog encoder requires one license to maintain this number of cameras. */
-    const int camerasPerAnalogEncoderCount = 1;
+// This key is introduced in v2.4 to make iomodule and starter license types do not work in v2.3 and earlier
+static constexpr char* nxRSAPublicKey3 = "-----BEGIN PUBLIC KEY-----\n"
+    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtb16Q2sJL/eZqNpfItB0\n"
+    "oMdhttY9Ov21QN8PedcJm8+1t/qjVBg2c1AxJsMnX+0MH4dcbC9W2JCU+e2vMCX7\n"
+    "HMUW4gpmvRtHPDhNutgyByOVJ7TXzCrHR/5xCXojiOLISdikVyP+IDYP+ATe5mM5\n"
+    "GIWG1uTTaG7gwwJn2IVggBzUapRWAm3VZUpytfPaLzqucc/zuvoMSUD5K9DZqg4p\n"
+    "Meu8VWFCPA7VhFKyuTtdTjrj/72WpLdlcSbARYjjqOO51KUIESXrGUEiw1Mo0OOn\n"
+    "acOz/C4G+lXfFDOALsYUNeG//UibSsfLPghvcIXdC7ghMtYBIzafA/UVcQOqZWPK\n"
+    "6wIDAQAB\n"
+    "-----END PUBLIC KEY-----";
 
-    bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
-    {
+/* One analog encoder requires one license to maintain this number of cameras. */
+static constexpr int camerasPerAnalogEncoderCount = 1;
+
+bool isSignatureMatch(
+    const QByteArray& data, const QByteArray& signature, const QByteArray& publicKey)
+{
 #ifdef ENABLE_SSL
-        // Calculate SHA1 hash
-        QCryptographicHash hash(QCryptographicHash::Sha1);
-        hash.addData(data);
-        QByteArray dataHash = hash.result();
+    // Calculate SHA1 hash
+    QCryptographicHash hash(QCryptographicHash::Sha1);
+    hash.addData(data);
+    QByteArray dataHash = hash.result();
 
-        // Load RSA public key
-        BIO *bp = BIO_new_mem_buf(const_cast<char *>(publicKey.data()), publicKey.size());
-        RSA* publicRSAKey = PEM_read_bio_RSA_PUBKEY(bp, 0, 0, 0);
-        BIO_free(bp);
+    // Load RSA public key
+    BIO *bp = BIO_new_mem_buf(const_cast<char *>(publicKey.data()), publicKey.size());
+    RSA* publicRSAKey = PEM_read_bio_RSA_PUBKEY(bp, 0, 0, 0);
+    BIO_free(bp);
 
-        if (publicRSAKey == 0)
-            return false;
+    if (publicRSAKey == 0)
+        return false;
 
-        if (signature.size() != RSA_size(publicRSAKey))
-        {
-            RSA_free(publicRSAKey);
-            return false;
-        }
-
-        // Decrypt data
-        QScopedArrayPointer<unsigned char> decrypted(new unsigned char[signature.size()]);
-        int ret = RSA_public_decrypt(signature.size(), (const unsigned char*)signature.data(), decrypted.data(), publicRSAKey, RSA_PKCS1_PADDING);
+    if (signature.size() != RSA_size(publicRSAKey))
+    {
         RSA_free(publicRSAKey);
-        if (ret == -1)
-            return false;
-
-        // Verify signature is correct
-        return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
-#else
-        // TODO: #Elric #android
-        return true;
-#endif
+        return false;
     }
 
+    // Decrypt data
+    QScopedArrayPointer<unsigned char> decrypted(new unsigned char[signature.size()]);
+    int ret = RSA_public_decrypt(signature.size(), (const unsigned char*)signature.data(), decrypted.data(), publicRSAKey, RSA_PKCS1_PADDING);
+    RSA_free(publicRSAKey);
+    if (ret == -1)
+        return false;
+
+    // Verify signature is correct
+    return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
+#else
+    // TODO: #Elric #android
+    return true;
+#endif
+}
 
 /** Make sure class names totally the same as on the activation server. */
-static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
-{
+static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
     LicenseTypeInfo(Qn::LC_Trial,           "trial",         1, false),
     LicenseTypeInfo(Qn::LC_Analog,          "analog",        0, false),
     LicenseTypeInfo(Qn::LC_Professional,    "digital",       0, /*allowedToShareChannel*/ true),
@@ -104,12 +105,11 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_Bridge,          "bridge",        0, false),
     LicenseTypeInfo(Qn::LC_Invalid,         "",              1, false),
 };
-} // anonymous namespace
 
-LicenseTypeInfo::LicenseTypeInfo() :
-    licenseType(Qn::LC_Count),
-    allowedForARM(0)
-{}
+} // namespace
+
+// ------------------------------------------------------------------------------------------------
+// LicenseTypeInfo
 
 LicenseTypeInfo::LicenseTypeInfo(
     Qn::LicenseType licenseType,
@@ -121,12 +121,11 @@ LicenseTypeInfo::LicenseTypeInfo(
     className(className),
     allowedForARM(allowedForARM),
     allowedToShareChannel(allowedToShareChannel)
-{}
+{
+}
 
-
-// -------------------------------------------------------------------------- //
+// ------------------------------------------------------------------------------------------------
 // QnLicense
-// -------------------------------------------------------------------------- //
 
 QnLicense::QnLicense(const QByteArray& licenseBlock):
     m_rawLicense(licenseBlock)
@@ -134,20 +133,20 @@ QnLicense::QnLicense(const QByteArray& licenseBlock):
     loadLicenseBlock(licenseBlock);
 }
 
-QnLicense::QnLicense(const ec2::ApiDetailedLicenseData& value)
+QnLicense::QnLicense(const api::DetailedLicenseData& value)
 {
-    QList<QByteArray> params;
-    params << QByteArray("NAME=").append(value.name);
-    params << QByteArray("SERIAL=").append(value.key);
-    params << QByteArray("HWID=").append(value.hardwareId);
-    params << QByteArray("COUNT=").append(QByteArray::number(value.cameraCount));
-    params << QByteArray("CLASS=").append(value.licenseType);
-    params << QByteArray("VERSION=").append(value.version);
-    params << QByteArray("BRAND=").append(value.brand);
-    params << QByteArray("EXPIRATION=").append(value.expiration);
-    params << QByteArray("SIGNATURE2=").append(value.signature);
+    const QList<QByteArray> params{
+        QByteArray("NAME=").append(value.name),
+        QByteArray("SERIAL=").append(value.key),
+        QByteArray("HWID=").append(value.hardwareId),
+        QByteArray("COUNT=").append(QByteArray::number(value.cameraCount)),
+        QByteArray("CLASS=").append(value.licenseType),
+        QByteArray("VERSION=").append(value.version),
+        QByteArray("BRAND=").append(value.brand),
+        QByteArray("EXPIRATION=").append(value.expiration),
+        QByteArray("SIGNATURE2=").append(value.signature)};
 
-    auto licenseBlock = params.join('\n');
+    const auto licenseBlock = params.join('\n');
     loadLicenseBlock(licenseBlock);
 }
 
@@ -164,7 +163,7 @@ void QnLicense::loadLicenseBlock( const QByteArray& licenseBlock )
     this->m_rawLicense = licenseBlock;
 }
 
-QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
+QnLicensePtr QnLicense::readFromStream(QTextStream& stream)
 {
     QByteArray licenseBlock;
     while (!stream.atEnd()) {
@@ -381,7 +380,8 @@ QString QnLicense::xclass() const
     return m_class;
 }
 
-void QnLicense::setClass(const QString &xclass) {
+void QnLicense::setClass(const QString& xclass)
+{
     m_class = xclass;
 }
 
@@ -498,13 +498,17 @@ void QnLicense::parseLicenseBlock(
     }
 }
 
-void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock )
+void QnLicense::verify(const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock)
 {
-    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey3)) ||
-        isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey2)) ||
-        isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), QByteArray(networkOptixRSAPublicKey))) {
+    if (isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey3)
+        || isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey2)
+        || isSignatureMatch(v2LicenseBlock, QByteArray::fromBase64(m_signature2), nxRSAPublicKey))
+    {
         m_isValid2 = true;
-    } else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), QByteArray(networkOptixRSAPublicKey)) && m_brand.isEmpty()) {
+    }
+    else if (isSignatureMatch(v1LicenseBlock, QByteArray::fromBase64(m_signature), nxRSAPublicKey)
+        && m_brand.isEmpty())
+    {
         m_class = QLatin1String("digital");
         m_version = QLatin1String("1.4");
         m_expiration = QLatin1String("");
@@ -512,33 +516,34 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
     }
 }
 
-LicenseTypeInfo QnLicense::licenseTypeInfo(Qn::LicenseType licenseType) {
+LicenseTypeInfo QnLicense::licenseTypeInfo(Qn::LicenseType licenseType)
+{
     return ::licenseTypeInfo[licenseType];
 }
 
-// -------------------------------------------------------------------------- //
+// ------------------------------------------------------------------------------------------------
 // QnLicenseListHelper
-// -------------------------------------------------------------------------- //
 
-QnLicenseListHelper::QnLicenseListHelper()
-{}
-
-QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList) {
+QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList)
+{
     update(licenseList);
 }
 
-bool QnLicenseListHelper::haveLicenseKey(const QByteArray &key) const {
+bool QnLicenseListHelper::haveLicenseKey(const QByteArray& key) const
+{
     return m_licenseDict.contains(key);
 }
 
-QnLicensePtr QnLicenseListHelper::getLicenseByKey(const QByteArray& key) const {
+QnLicensePtr QnLicenseListHelper::getLicenseByKey(const QByteArray& key) const
+{
     if (m_licenseDict.contains(key))
         return m_licenseDict[key];
     else
         return QnLicensePtr();
 }
 
-QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
+QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const
+{
     return m_licenseDict.keys();
 }
 
@@ -563,16 +568,16 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType,
     return result;
 }
 
-void QnLicenseListHelper::update(const QnLicenseList& licenseList) {
+void QnLicenseListHelper::update(const QnLicenseList& licenseList)
+{
     m_licenseDict.clear();
-    for (const QnLicensePtr& license: licenseList) {
+    for (const auto& license: licenseList)
         m_licenseDict[license->key()] = license;
-    }
 }
 
-// -------------------------------------------------------------------------- //
+// ------------------------------------------------------------------------------------------------
 // QnLicensePool
-// -------------------------------------------------------------------------- //
+
 QnLicensePool::QnLicensePool(QObject* parent):
     QObject(parent),
     QnCommonModuleAware(parent),
@@ -587,12 +592,13 @@ QnLicensePool::QnLicensePool(QObject* parent):
 
 void QnLicensePool::at_timer()
 {
-    for(const QnLicensePtr& license: m_licenseDict)
+    for (const auto& license: m_licenseDict)
     {
         if (validateLicense(license) == QnLicenseErrorCode::Expired)
         {
             qint64 experationDelta = qnSyncTime->currentMSecsSinceEpoch() - license->expirationTime();
-            if (experationDelta < m_timer.interval()) {
+            if (experationDelta < m_timer.interval())
+            {
                 emit licensesChanged();
                 break;
             }
@@ -602,8 +608,7 @@ void QnLicensePool::at_timer()
 
 QnLicenseList QnLicensePool::getLicenses() const
 {
-    QnMutexLocker locker( &m_mutex );
-
+    QnMutexLocker locker(&m_mutex);
     return m_licenseDict.values();
 }
 
@@ -612,7 +617,7 @@ bool QnLicensePool::isLicenseValid(const QnLicensePtr& license) const
     return m_licenseValidator->isValid(license);
 }
 
-bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
+bool QnLicensePool::addLicense_i(const QnLicensePtr& license)
 {
     if (!license)
         return false;
@@ -622,26 +627,27 @@ bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
     return isLicenseValid(license);
 }
 
-void QnLicensePool::addLicense(const QnLicensePtr &license)
+void QnLicensePool::addLicense(const QnLicensePtr& license)
 {
-    QnMutexLocker locker( &m_mutex );
+    QnMutexLocker locker(&m_mutex);
 
     addLicense_i(license);
     emit licensesChanged();
 }
 
-void QnLicensePool::removeLicense(const QnLicensePtr &license)
+void QnLicensePool::removeLicense(const QnLicensePtr& license)
 {
-    QnMutexLocker locker( &m_mutex );
+    QnMutexLocker locker(&m_mutex);
     m_licenseDict.remove(license->key());
     emit licensesChanged();
 }
 
-bool QnLicensePool::addLicenses_i(const QnLicenseList &licenses)
+bool QnLicensePool::addLicenses_i(const QnLicenseList& licenses)
 {
     bool atLeastOneAdded = false;
 
-    for(const QnLicensePtr& license: licenses) {
+    for(const QnLicensePtr& license: licenses)
+    {
         if (addLicense_i(license))
             atLeastOneAdded = true;
     }
@@ -649,20 +655,20 @@ bool QnLicensePool::addLicenses_i(const QnLicenseList &licenses)
     return atLeastOneAdded;
 }
 
-void QnLicensePool::addLicenses(const QnLicenseList &licenses)
+void QnLicensePool::addLicenses(const QnLicenseList& licenses)
 {
-    QnMutexLocker locker( &m_mutex );
+    QnMutexLocker locker(&m_mutex);
 
     addLicenses_i(licenses);
     emit licensesChanged();
 }
 
-void QnLicensePool::replaceLicenses(const ec2::ApiLicenseDataList& licenses)
+void QnLicensePool::replaceLicenses(const api::LicenseDataList& licenses)
 {
     QnLicenseList qnLicences;
-    fromApiToResourceList(licenses, qnLicences);
+    ec2::fromApiToResourceList(licenses, qnLicences);
 
-    QnMutexLocker locker( &m_mutex );
+    QnMutexLocker locker(&m_mutex);
 
     m_licenseDict.clear();
     addLicenses_i(qnLicences);
@@ -672,22 +678,20 @@ void QnLicensePool::replaceLicenses(const ec2::ApiLicenseDataList& licenses)
 
 void QnLicensePool::reset()
 {
-    QnMutexLocker locker( &m_mutex );
-
+    QnMutexLocker locker(&m_mutex);
     m_licenseDict = QnLicenseDict();
-
     emit licensesChanged();
 }
 
 bool QnLicensePool::isEmpty() const
 {
-    QnMutexLocker locker( &m_mutex );
-
+    QnMutexLocker locker(&m_mutex);
     return m_licenseDict.isEmpty();
 }
 
 
-QVector<QString> QnLicensePool::hardwareIds() const {
+QVector<QString> QnLicensePool::hardwareIds() const
+{
     return commonModule()->runtimeInfoManager()->remoteInfo().data.hardwareIds;
 }
 

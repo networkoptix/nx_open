@@ -17,7 +17,7 @@ def set_cloud_host(installation, new_host):
     for lib_name in {'lib/libnx_network.so', 'lib/libcommon.so', 'nx_network.dll'}:
         lib_path = installation.dir / lib_name
         info_path = lib_path.with_name(lib_path.name + '.info')
-        version = installation.installer.version
+        version = installation.identity.version
         try:
             info_raw = info_path.read_text()
         except DoesNotExist:

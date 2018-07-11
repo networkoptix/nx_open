@@ -818,7 +818,7 @@ void QnResourceBrowserWidget::clearSelection()
 void QnResourceBrowserWidget::updateIcons()
 {
     QnResourceItemDelegate::Options opts = QnResourceItemDelegate::RecordingIcons;
-    if (accessController()->hasGlobalPermission(Qn::GlobalEditCamerasPermission))
+    if (accessController()->hasGlobalPermission(GlobalPermission::editCameras))
         opts |= QnResourceItemDelegate::ProblemIcons;
 
     ui->resourceTreeWidget->itemDelegate()->setOptions(opts);

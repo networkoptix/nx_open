@@ -44,16 +44,19 @@ void ReverseConnectionManager::startReceivingNotifications(ec2::AbstractECConnec
 ReverseConnectionManager::~ReverseConnectionManager()
 {
     decltype (m_runningHttpClients) httpClients;
+    decltype (m_preparedSockets) preparedSockets;
     {
         QnMutexLocker lock(&m_mutex);
         std::swap(httpClients, m_runningHttpClients);
+        std::swap(preparedSockets, m_preparedSockets);
     }
     for (const auto& client: httpClients)
         client->pleaseStopSync();
+    preparedSockets.clear();
 }
 
 void ReverseConnectionManager::at_reverseConnectionRequested(
-    const ec2::ApiReverseConnectionData& data)
+    const nx::vms::api::ReverseConnectionData& data)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -144,7 +147,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> ReverseConnectionManager::get
 
     auto doSocketRequest = [&](int socketCount)
     {
-        ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
+        ec2::QnTransaction<nx::vms::api::ReverseConnectionData> tran(
             ec2::ApiCommand::openReverseConnection,
             commonModule()->moduleGUID());
         tran.params.targetServer = commonModule()->moduleGUID();

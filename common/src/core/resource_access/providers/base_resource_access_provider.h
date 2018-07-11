@@ -52,8 +52,8 @@ protected:
     virtual void handleResourceAdded(const QnResourcePtr& resource);
     virtual void handleResourceRemoved(const QnResourcePtr& resource);
 
-    void handleRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole);
-    void handleRoleRemoved(const ec2::ApiUserRoleData& userRole);
+    void handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
+    void handleRoleRemoved(const nx::vms::api::UserRoleData& userRole);
 
     virtual void handleSubjectAdded(const QnResourceAccessSubject& subject);
     virtual void handleSubjectRemoved(const QnResourceAccessSubject& subject);

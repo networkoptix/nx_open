@@ -64,6 +64,7 @@ typedef nx::Buffer StringType;
 int NX_NETWORK_API strcasecmp(const StringType& one, const StringType& two);
 
 int NX_NETWORK_API defaultPortForScheme(const StringType& scheme);
+int NX_NETWORK_API defaultPort(bool isSecure);
 
 /**
  * Comparator for case-insensitive comparison in STL associative containers.
@@ -341,7 +342,7 @@ public:
     StringType toMultipartString(const ConstBufferRefType& boundary) const;
 
     void setCookie(const StringType& name, const StringType& value, const StringType& path = "/");
-    void removeCookie(const StringType& name);
+    void setDeletedCookie(const StringType& name);
     std::map<StringType, StringType> getCookies() const;
 };
 

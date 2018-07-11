@@ -67,6 +67,7 @@ EventPanel::Private::Private(EventPanel* q):
     layout->addWidget(m_tabs);
     m_tabs->addTab(m_notificationsTab, qnSkin->icon(lit("events/tabs/notifications.png")),
         tr("Notifications", "Notifications tab title"));
+    m_tabs->setTabToolTip(0, m_tabs->tabText(0));
 
     connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
         this, &Private::updateUnreadCounter);
@@ -112,10 +113,11 @@ EventPanel::Private::Private(EventPanel* q):
     q->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(q, &EventPanel::customContextMenuRequested,
         this, &EventPanel::Private::showContextMenu);
-
 }
 
-EventPanel::Private::~Private() = default;
+EventPanel::Private::~Private()
+{
+}
 
 void EventPanel::Private::updateTabs()
 {
@@ -135,6 +137,7 @@ void EventPanel::Private::updateTabs()
                 else
                     NX_ASSERT(index == nextTabIndex);
 
+                m_tabs->setTabToolTip(nextTabIndex, text);
                 ++nextTabIndex;
             }
             else

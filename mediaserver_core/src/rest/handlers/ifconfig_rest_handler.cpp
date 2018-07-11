@@ -225,7 +225,8 @@ int QnIfConfigRestHandler::executePost(
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
         return CODE_OK;
     }
-    if (!(mServer->getServerFlags() & Qn::SF_IfListCtrl)) {
+    if (!(mServer->getServerFlags().testFlag(nx::vms::api::SF_IfListCtrl)))
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("This server doesn't support interface list control"));
         return CODE_OK;
     }

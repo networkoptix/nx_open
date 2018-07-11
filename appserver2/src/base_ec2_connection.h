@@ -2,34 +2,29 @@
 
 #include <memory>
 
-#include "core/resource_management/resource_pool.h"
-#include "ec_connection_notification_manager.h"
-#include "ec_connection_audit_manager.h"
-#include "nx_ec/data/api_media_server_data.h"
-#include "nx_ec/data/api_full_info_data.h"
-#include <nx/vms/api/data/videowall_data.h>
-#include "nx_ec/data/api_conversion_functions.h"
-
+#include <core/resource_management/resource_pool.h>
+#include <ec_connection_notification_manager.h>
+#include <ec_connection_audit_manager.h>
+#include <managers/event_rules_manager.h>
+#include <managers/camera_manager.h>
+#include <managers/layout_manager.h>
+#include <managers/layout_tour_manager.h>
+#include <managers/license_manager.h>
+#include <managers/stored_file_manager.h>
+#include <managers/media_server_manager.h>
+#include <managers/resource_manager.h>
+#include <managers/user_manager.h>
+#include <managers/videowall_manager.h>
+#include <managers/webpage_manager.h>
+#include <managers/updates_manager.h>
+#include <managers/misc_manager.h>
+#include <managers/discovery_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <transaction/message_bus_adapter.h>
 
-#include <managers/event_rules_manager.h>
-#include "managers/camera_manager.h"
-#include "managers/layout_manager.h"
-#include <managers/layout_tour_manager.h>
-#include "managers/license_manager.h"
-#include "managers/stored_file_manager.h"
-#include "managers/media_server_manager.h"
-#include "managers/resource_manager.h"
-#include "managers/user_manager.h"
-#include "managers/videowall_manager.h"
-#include "managers/webpage_manager.h"
-#include "managers/updates_manager.h"
-#include "managers/misc_manager.h"
-#include "managers/discovery_manager.h"
-#include <nx/vms/time_sync/abstract_time_sync_manager.h>
+#include <nx/vms/time_sync/time_sync_manager.h>
 
-namespace ec2
-{
+namespace ec2 {
 
 class ECConnectionNotificationManager;
 class Ec2DirectConnectionFactory;

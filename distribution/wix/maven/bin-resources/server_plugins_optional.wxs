@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <?include BuildVars.wxi ?>
+         <ComponentGroup Id="plugins_optional" Directory="plugins_optional" Source="$(var.plugins_optional_dir)">
+            <Component><File Name="stub_metadata_plugin.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

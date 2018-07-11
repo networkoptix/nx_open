@@ -162,7 +162,7 @@ protected:
                 account.email.c_str(),
                 nx::network::http::PasswordAuthToken(account.password.c_str())));
 
-            ec2::ApiUserDataList users;
+            nx::vms::api::UserDataList users;
             ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
         }
     }
@@ -179,7 +179,7 @@ protected:
 
 private:
     std::vector<nx::cdb::AccountWithPassword> m_additionalCloudUsers;
-    ::ec2::ApiUserData m_invitedUserEc2Data;
+    nx::vms::api::UserData m_invitedUserEc2Data;
     nx::cdb::AccountWithPassword m_invitedAccount;
     boost::optional<nx::cdb::api::AccountConfirmationCode> m_prevActivationCode;
 
@@ -238,7 +238,7 @@ private:
         mediaServerClient->setUserCredentials(nx::network::http::Credentials(
             m_invitedAccount.email.c_str(),
             nx::network::http::PasswordAuthToken(m_invitedAccount.password.c_str())));
-        ec2::ApiUserDataList users;
+        nx::vms::api::UserDataList users;
         return mediaServerClient->ec2GetUsers(&users);
     }
 };

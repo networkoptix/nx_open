@@ -304,7 +304,7 @@ bool QnCachingPtzController::initialize()
         return false;
 
     QnPtzData data;
-    return getData(Qn::AllPtzFields, &data, nx::core::ptz::Options());
+    return getData(Qn::AllPtzFields, &data, {nx::core::ptz::Type::operational});
 }
 
 template<class T>

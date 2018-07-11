@@ -3,14 +3,14 @@
 #include <list>
 
 #include <common/common_module.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_access/resource_access_filter.h>
-
-#include <utils/common/warnings.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <core/resource/avi/avi_resource.h>
+#include <utils/common/warnings.h>
+
+#include <nx/vms/api/data/layout_data.h>
 
 QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -22,7 +22,7 @@ QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     m_locked(false)
 {
     addFlags(Qn::layout);
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
+    setTypeId(nx::vms::api::LayoutData::kResourceTypeId);
 }
 
 QString QnLayoutResource::getUniqueId() const
@@ -216,6 +216,18 @@ void QnLayoutResource::updateInternal(const QnResourcePtr &other, Qn::NotifierLi
         {
             m_locked = localOther->m_locked;
             notifiers << [r = toSharedPointer(this)]{ emit r->lockedChanged(r); };
+        }
+
+        if (m_fixedSize != localOther->m_fixedSize)
+        {
+            m_fixedSize = localOther->m_fixedSize;
+            notifiers << [r = toSharedPointer(this)]{ emit r->fixedSizeChanged(r); };
+        }
+
+        if (m_logicalId != localOther->m_logicalId)
+        {
+            m_logicalId = localOther->m_logicalId;
+            notifiers << [r = toSharedPointer(this)]{ emit r->logicalIdChanged(r); };
         }
 
         setItemsUnderLockInternal(m_items.data(), localOther->m_items.data(), notifiers);

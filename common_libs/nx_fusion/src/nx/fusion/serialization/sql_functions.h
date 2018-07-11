@@ -108,7 +108,6 @@ inline void deserialize_field(const QVariant &value, std::chrono::milliseconds *
     *target = std::chrono::milliseconds(value.value<qint64>());
 }
 
-
 /**
  * Representing system_clock::time_point in SQL as milliseconds since epoch (1970-01-01T00:00).
  */

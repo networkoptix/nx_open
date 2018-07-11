@@ -42,8 +42,10 @@ public:
         {
             NX_INFO(this, lm("No update package found for %1")
                 .args(m_updateRequestData.toString()));
+            return;
         }
 
+        m_releaseNotesUrl = m_customizationData.releaseNotesUrl;
     }
 
     virtual ~UpdateDataFinder() = default;
@@ -54,14 +56,16 @@ public:
     }
 
     QList<api::TargetVersionWithEula> versions() const { return m_versions; }
+    QString releaseNotesUrl() const { return m_releaseNotesUrl; }
 
 protected:
     const UpdateRequestData& m_updateRequestData;
     const detail::CustomizationVersionToUpdate& m_customizationVersionToUpdate;
     const CustomizationData& m_customizationData;
     mutable QList<api::TargetVersionWithEula> m_versions;
+    mutable QString m_releaseNotesUrl;
 
-    bool hasNewerVersions(const QnSoftwareVersion& currentNxVersion) const
+    bool hasNewerVersions(const nx::utils::SoftwareVersion& currentNxVersion) const
     {
         if (m_customizationData.versions.last() <= currentNxVersion)
             return false;
@@ -81,7 +85,7 @@ protected:
         return true;
     }
 
-    void checkForUpdateData(const QnSoftwareVersion& version) const
+    void checkForUpdateData(const nx::vms::api::SoftwareVersion& version) const
     {
         if (version <= m_updateRequestData.currentNxVersion)
             return;
@@ -107,7 +111,7 @@ protected:
     }
 
     virtual bool checkPackages(const UpdateData& /*updateData*/,
-        const QnSoftwareVersion& /*version*/) const
+        const nx::utils::SoftwareVersion& /*version*/) const
     {
         return true;
     }
@@ -137,8 +141,7 @@ private:
     mutable bool m_found = false;
 
     virtual bool checkPackages(
-        const UpdateData& updateData,
-        const QnSoftwareVersion& version) const override
+        const UpdateData& updateData, const nx::utils::SoftwareVersion& version) const override
     {
         if (*m_updateRequestData.targetVersion != version)
             return false;
@@ -152,10 +155,8 @@ private:
         return m_found;
     }
 
-    void checkPackage(
-        const QString& target,
-        const FileData& fileData,
-        const QnSoftwareVersion& version) const
+    void checkPackage(const QString& target, const FileData& fileData,
+        const nx::utils::SoftwareVersion& version) const
     {
         if (m_found)
             return;
@@ -437,7 +438,7 @@ private:
             ManualFileData manualFileData;
             manualFileData.file = arrayObj[kFileKey].toString();
             manualFileData.isClient = arrayObj[kIsClientKey].toBool();
-            manualFileData.nxVersion = QnSoftwareVersion(arrayObj[kNxVersionKey].toString());
+            manualFileData.nxVersion = nx::utils::SoftwareVersion(arrayObj[kNxVersionKey].toString());
             manualFileData.osVersion = OsVersion::deserialize(arrayObj[kOsVersionKey].toString());
 
             auto peersArrayObj = arrayObj[kPeersKey].toArray();
@@ -579,7 +580,7 @@ private:
 
     void fillCustomizationVersions(
         const QJsonArray& customizationDataArray,
-        QList<QnSoftwareVersion>& customizationDataList)
+        QList<nx::utils::SoftwareVersion>& customizationDataList)
     {
         for (int i = 0; i < customizationDataArray.size(); ++i)
             appendCustomizationVersion(customizationDataArray[i], customizationDataList);
@@ -587,7 +588,7 @@ private:
 
     void appendCustomizationVersion(
         const QJsonValue& jsonValue,
-        QList<QnSoftwareVersion>& customizationDataList)
+        QList<nx::utils::SoftwareVersion>& customizationDataList)
     {
         if (!m_ok)
             return;
@@ -598,7 +599,7 @@ private:
             return;
         }
 
-        customizationDataList.append(QnSoftwareVersion(jsonValue.toString()));
+        customizationDataList.append(nx::utils::SoftwareVersion(jsonValue.toString()));
     }
 
     void deserializeCustomizationVersionToUpdate()
@@ -655,7 +656,7 @@ private:
 
         CustomizationVersionData customizationVersionData(
             customizationVersionToUpdateObject[kCustomizationVersionNameKey].toString(),
-            QnSoftwareVersion(
+            nx::utils::SoftwareVersion(
                 customizationVersionToUpdateObject[kCustomizationVersionVersionKey].toString()));
 
         if (!customizationVersionToUpdateObject.contains(kUpdateKey)
@@ -918,13 +919,15 @@ bool CommonUpdateRegistry::equals(AbstractUpdateRegistry* other) const
 
 ResultCode CommonUpdateRegistry::latestUpdate(
     const UpdateRequestData& updateRequestData,
-    QList<api::TargetVersionWithEula> *outSoftwareVersion) const
+    QList<api::TargetVersionWithEula> *outSoftwareVersion,
+    QString *outReleaseNotesUrl) const
 {
     for (const auto& md: m_manualData)
     {
         if (updateRequestData.currentNxVersion < md.nxVersion
             && updateRequestData.osVersion == md.osVersion
-            && outSoftwareVersion && !outSoftwareVersion->contains(md.nxVersion))
+            && outSoftwareVersion
+            && !outSoftwareVersion->contains(nx::vms::api::SoftwareVersion(md.nxVersion)))
         {
             outSoftwareVersion->append(api::TargetVersionWithEula(md.nxVersion));
         }
@@ -946,7 +949,11 @@ ResultCode CommonUpdateRegistry::latestUpdate(
         return ResultCode::noData;
     }
 
-    *outSoftwareVersion = updateDataFinder.versions();
+    if (outSoftwareVersion)
+        *outSoftwareVersion = updateDataFinder.versions();
+    if (outReleaseNotesUrl)
+        *outReleaseNotesUrl = updateDataFinder.releaseNotesUrl();
+
     return ResultCode::ok;
 }
 

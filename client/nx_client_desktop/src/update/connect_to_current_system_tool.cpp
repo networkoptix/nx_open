@@ -14,7 +14,6 @@
 #include <network/system_helpers.h>
 
 #include <utils/merge_systems_tool.h>
-#include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 
@@ -166,7 +165,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
     connect(m_mergeTool, &QnMergeSystemsTool::mergeFinished, this,
         [this](
             utils::MergeSystemsStatus::Value mergeStatus,
-            const QnModuleInformation& moduleInformation)
+            const nx::vms::api::ModuleInformation& moduleInformation)
         {
             if (mergeStatus != utils::MergeSystemsStatus::ok)
             {

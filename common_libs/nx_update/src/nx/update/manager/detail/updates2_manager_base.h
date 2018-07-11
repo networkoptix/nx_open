@@ -2,6 +2,7 @@
 
 #include <nx/api/updates2/updates2_status_data.h>
 #include <nx/update/info/abstract_update_registry.h>
+#include <nx/utils/software_version.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/update/manager/detail/updates2_status_data_ex.h>
@@ -21,7 +22,7 @@ class NX_UPDATE_API Updates2ManagerBase: public QObject
 public:
     Updates2ManagerBase();
     api::Updates2StatusData status();
-    api::Updates2StatusData download(const QnSoftwareVersion& targetVersion);
+    api::Updates2StatusData download(const nx::utils::SoftwareVersion& targetVersion);
     api::Updates2StatusData install();
     api::Updates2StatusData cancel();
     api::Updates2StatusData check();
@@ -38,20 +39,22 @@ protected:
     update::info::AbstractUpdateRegistryPtr m_updateRegistry;
     utils::StandaloneTimerManager m_timerManager;
 
-    void checkForRemoteUpdate(utils::TimerId timerId, bool forced);
+    void checkForRemoteUpdate(utils::TimerId timerId);
     void checkForGlobalDictionaryUpdate();
     void refreshStatusAfterCheck();
     void setStatus(
         api::Updates2StatusData::StatusCode code,
         const QString& message,
         const QList<api::TargetVersionWithEula> targets = QList<api::TargetVersionWithEula>(),
+        const QString& releaseNotesUrl = QString(),
         double progress = 0.0f);
+    void addFileToManualDataIfNeeded(const QString& fileName);
+    void updateGlobalRegistryIfNeededUnsafe();
 
     void startPreparing(const QString& updateFilePath);
 
     void onDownloadFinished(const QString& fileName);
     void onDownloadFailed(const QString& fileName);
-    void onFileAdded(const vms::common::p2p::downloader::FileInformation& fileInformation);
     void onFileDeleted(const QString& fileName);
     void onFileInformationChanged(
         const vms::common::p2p::downloader::FileInformation& fileInformation);
@@ -78,7 +81,6 @@ protected:
     virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
     virtual installer::detail::AbstractUpdates2Installer* installer() = 0;
     virtual QString filePath() const = 0;
-
 };
 
 } // namespace detail

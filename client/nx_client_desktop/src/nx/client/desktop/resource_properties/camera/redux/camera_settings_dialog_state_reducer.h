@@ -16,7 +16,7 @@ public:
     static State applyChanges(State state);
     static State setReadOnly(State state, bool value);
     static State setSettingsOptimizationEnabled(State state, bool value);
-    static State setGlobalPermissions(State state, Qn::GlobalPermissions value);
+    static State setGlobalPermissions(State state, GlobalPermissions value);
     static State setSingleWearableState(State state, const WearableState& value);
 
     static State loadCameras(State state, const QnVirtualCameraResourceList& cameras);

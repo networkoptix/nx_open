@@ -1,8 +1,10 @@
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
 #include <nx/update/installer/detail/updates2_installer_base.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/raii_guard.h>
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include <nx/vms/api/data/system_information.h>
 
 namespace nx {
 namespace update {
@@ -11,6 +13,7 @@ namespace detail {
 namespace test {
 
 using namespace ::testing;
+using nx::vms::api::SystemInformation;
 
 namespace {
 
@@ -26,7 +29,7 @@ public:
     MOCK_METHOD0(cleanInstallerDirectory, bool());
     MOCK_CONST_METHOD0(createZipExtractor, AbstractZipExtractorPtr());
     MOCK_CONST_METHOD1(updateInformation, QVariantMap(const QString&));
-    MOCK_CONST_METHOD0(systemInformation, QnSystemInformation());
+    MOCK_CONST_METHOD0(systemInformation, SystemInformation());
     MOCK_CONST_METHOD1(checkExecutable, bool(const QString&));
     MOCK_CONST_METHOD2(
         initializeUpdateLog,
@@ -225,9 +228,9 @@ private:
                     case ExpectedPrepareOutcome::fail_platformNotMatches:
                     case ExpectedPrepareOutcome::fail_archNotMatches:
                     case ExpectedPrepareOutcome::fail_modificationNotMatches:
-                        return QnSystemInformation(kValidPlatform, kValidArch, KValidModification);
+                        return SystemInformation(kValidPlatform, kValidArch, KValidModification);
                     default:
-                        return QnSystemInformation();
+                        return SystemInformation();
                 }
             };
 

@@ -11,6 +11,7 @@
 #include <plugins/resource/desktop_camera/desktop_camera_resource.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/camera_data.h>
 
 namespace {
 
@@ -142,7 +143,7 @@ QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(c
 {
     auto cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(info.userName));
     cam->setModel(lit("virtual desktop camera"));   // TODO: #GDM globalize the constant
-    cam->setTypeId(QnResourceTypePool::kDesktopCameraTypeUuid);
+    cam->setTypeId(nx::vms::api::CameraData::kDesktopCameraTypeId);
     cam->setPhysicalId(info.uniqueId);
     return cam;
 }

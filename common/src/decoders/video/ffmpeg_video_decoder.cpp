@@ -571,7 +571,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         AVPixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height ||
-            outFrame->format != correctedPixelFormat || outFrame->linesize[0] != m_frame->linesize[0]))
+            outFrame->format != correctedPixelFormat || outFrame->linesize[0] != copyFromFrame->linesize[0]))
         {
             outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, m_frame->linesize[0]);
         }
@@ -601,17 +601,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
         if (!outFrame->isExternalData())
         {
-            if (outFrame->format == AV_PIX_FMT_YUV420P)
-            {
-                // optimization
-                outFrame->copyDataFrom(m_frame);
-            }
-            else 
-            {
-                // TODO: Edit CLVideoDecoderOutput::copyDataFrom so it an be used in both cases.
-                av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), 
-                    m_context->pix_fmt, m_context->width, m_context->height);
-            }
+            outFrame->copyDataFrom(copyFromFrame);
             // pkt_dts and pkt_pts are mixed up after decoding in ffmpeg. So, we have to use dts here instead of pts
             outFrame->pkt_dts = m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
         }

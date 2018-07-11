@@ -122,7 +122,7 @@ void Appserver2MessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
         return;
     QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(resourceId);
 
-    ec2::ApiMediaServerData apiServer;
+    nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(mServer, apiServer);
     auto connection = commonModule()->ec2Connection();
     connection->getMediaServerManager(Qn::kSystemAccess)->save(
@@ -147,12 +147,14 @@ void Appserver2MessageProcessor::updateResource(
     }
 }
 
-void Appserver2MessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType /*peerType*/)
+void Appserver2MessageProcessor::handleRemotePeerFound(
+    QnUuid peer, nx::vms::api::PeerType /*peerType*/)
 {
     commonModule()->statusDictionary()->setValue(peer, Qn::Online);
 }
 
-void Appserver2MessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType /*peerType*/)
+void Appserver2MessageProcessor::handleRemotePeerLost(
+    QnUuid peer, nx::vms::api::PeerType /*peerType*/)
 {
     commonModule()->statusDictionary()->setValue(peer, Qn::Offline);
 }

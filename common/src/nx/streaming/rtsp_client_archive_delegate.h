@@ -67,6 +67,8 @@ public:
     void setPlayNowModeAllowed(bool value);
 
     virtual int getSequence() const override;
+
+    virtual void pleaseStop() override;
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:

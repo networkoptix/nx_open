@@ -399,6 +399,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
 
     /* Set up context menu. */
+    // #sandreenko most probably this is to activate key shortcuts, not for the menu.
     QWidget *window = display()->view()->window();
     window->addAction(action(action::ToggleSmartSearchAction));
     window->addAction(action(action::ToggleInfoAction));

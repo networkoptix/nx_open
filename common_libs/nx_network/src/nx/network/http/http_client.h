@@ -101,7 +101,7 @@ public:
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);
     void setAuthType(AuthType value);
-    void setProxyVia(const SocketAddress& proxyEndpoint);
+    void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure);
 
     void setDisablePrecalculatedAuthorization(bool value);
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
@@ -139,6 +139,7 @@ private:
     std::optional<QString> m_userPassword;
     std::size_t m_maxInternalBufferSize;
     std::optional<SocketAddress> m_proxyEndpoint;
+    bool m_isProxySecure = false;
     std::optional<AuthType> m_authType;
 
     bool m_precalculatedAuthorizationDisabled = false;

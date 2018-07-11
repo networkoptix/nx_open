@@ -138,7 +138,7 @@ void PlayerDataConsumer::updateMediaEvent(const QnAbstractMediaDataPtr& data)
             if (!metadata || metadata->metadataType != MetadataType::MediaStreamEvent)
                 return Qn::MediaStreamEvent::NoEvent;
 
-            const auto stringData = QString::fromLatin1(metadata->data(), metadata->dataSize());
+            const auto stringData = QString::fromLatin1(metadata->data(), int(metadata->dataSize()));
             const auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(stringData);
             return mediaEvent;
         };
@@ -184,7 +184,7 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     const auto audioFrame = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
     if (audioFrame && m_audioEnabled)
         return processAudioFrame(audioFrame);
-    
+
     auto metadataFrame = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
     if (metadataFrame)
         emit gotMetadata(metadataFrame);

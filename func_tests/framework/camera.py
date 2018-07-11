@@ -90,12 +90,12 @@ def make_schedule_task(day_of_week):
 
 class Camera(object):
 
-    def __init__(self, vm_address, discovery_listener, name, mac_addr):
+    def __init__(self, vm_address, discovery_listener, name, mac_addr, id=None):
         self._vm_address = vm_address  # IPAddress or None
         self._discovery_listener = discovery_listener
         self.name = name
         self.mac_addr = mac_addr
-        self.id = None  # camera guid on server, set when registered on server
+        self.id = id  # camera guid on server, set when registered on server
 
     def __str__(self):
         return '%s at %s' % (self.name, self.mac_addr)

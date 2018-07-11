@@ -71,7 +71,7 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
     if (!aggregator)
     {
         // We may got here if role is deleted while user is not
-        NX_EXPECT(subject.isUser() && subject.user()->userRole() == Qn::UserRole::CustomUserRole);
+        NX_EXPECT(subject.isUser() && subject.user()->userRole() == Qn::UserRole::customUserRole);
         aggregator = m_aggregatorsBySubject.value(subject.id());
     }
 

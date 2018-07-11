@@ -175,7 +175,7 @@ ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaR
     bool anyQuality = forced || layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
 
     const QnMediaServerResourcePtr server = display->resource()->getParentResource().dynamicCast<QnMediaServerResource>();
-    if (!server || (server->getServerFlags() & Qn::SF_Edge))
+    if (!server || server->getServerFlags().testFlag(nx::vms::api::SF_Edge))
         anyQuality = true; // local file or edge cameras will be done locally
 
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params

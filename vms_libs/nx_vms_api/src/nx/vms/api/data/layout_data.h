@@ -2,13 +2,16 @@
 
 #include "resource_data.h"
 
+#include <QtCore/QString>
+#include <QtCore/QtGlobal>
+
 #include <nx/utils/latin1_array.h>
 
 namespace nx {
 namespace vms {
 namespace api {
 
-struct LayoutItemData: IdData
+struct NX_VMS_API LayoutItemData: IdData
 {
     qint32 flags = 0;
     float left = 0;
@@ -31,8 +34,13 @@ struct LayoutItemData: IdData
     (resourceId)(resourcePath)(zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId) \
     (contrastParams)(dewarpingParams)(displayInfo)
 
-struct LayoutData: ResourceData
+struct NX_VMS_API LayoutData: ResourceData
 {
+    LayoutData(): ResourceData(kResourceTypeId) {}
+
+    static const QString kResourceTypeName;
+    static const QnUuid kResourceTypeId;
+
     float cellAspectRatio = 0;
     float horizontalSpacing = 0;
     float verticalSpacing = 0;
@@ -56,4 +64,6 @@ struct LayoutData: ResourceData
 } // namespace nx
 
 Q_DECLARE_METATYPE(nx::vms::api::LayoutItemData)
+Q_DECLARE_METATYPE(nx::vms::api::LayoutItemDataList)
 Q_DECLARE_METATYPE(nx::vms::api::LayoutData)
+Q_DECLARE_METATYPE(nx::vms::api::LayoutDataList)

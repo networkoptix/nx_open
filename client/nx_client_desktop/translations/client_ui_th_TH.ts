@@ -1993,6 +1993,29 @@
     </message>
   </context>
   <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>แบบฟอร์ม</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>ชื่อไฟล์:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>เลือกไฟล์...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>ค้นหา...</translation>
+    </message>
+  </context>
+  <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>

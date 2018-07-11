@@ -25,6 +25,9 @@ public:
         /** Videowall client mode - client should not be controlled manually. */
         VIDEO_WALL_MODE,
 
+        /** Allow timeline to be displayed on the Video Wall. */
+        VIDEO_WALL_WITH_TIMELINE,
+
         /** ActiveX library mode - client is embedded to another window. */
         ACTIVE_X_MODE,
 
@@ -61,18 +64,23 @@ public:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
-        QN_DECLARE_RW_PROPERTY(bool,    isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false)
-        QN_DECLARE_RW_PROPERTY(int,     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0)
-        QN_DECLARE_RW_PROPERTY(bool,    isDevMode,              setDevMode,                 DEV_MODE,                   false)
-        QN_DECLARE_RW_PROPERTY(int,     lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        -1)
-        QN_DECLARE_RW_PROPERTY(bool,    isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
-        QN_DECLARE_RW_PROPERTY(bool,    isActiveXMode,          setActiveXMode,             ACTIVE_X_MODE,              false)
-        QN_DECLARE_RW_PROPERTY(bool,    showFullInfo,           setShowFullInfo,            SHOW_FULL_INFO,             false)
-        QN_DECLARE_RW_PROPERTY(bool,    ignoreVersionMismatch,  setIgnoreVersionMismatch,   IGNORE_VERSION_MISMATCH,    false)
-        QN_DECLARE_RW_PROPERTY(bool,    isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
-        QN_DECLARE_RW_PROPERTY(QString, locale,                 setLocale,                  LOCALE,                     QString())
-        QN_DECLARE_RW_PROPERTY(bool,    isProfilerMode,         setProfilerMode,            PROFILER_MODE,              false)
-        QN_DECLARE_RW_PROPERTY(int,     maxSceneItemsOverride,  setMaxSceneItemsOverride,   MAX_SCENE_ITEMS_OVERRIDE,   0)
+        QN_DECLARE_RW_PROPERTY(bool, isSoftwareYuv, setSoftwareYuv, SOFTWARE_YUV, false)
+        QN_DECLARE_RW_PROPERTY(int, debugCounter, setDebugCounter, DEBUG_COUNTER, 0)
+        QN_DECLARE_RW_PROPERTY(bool, isDevMode, setDevMode, DEV_MODE, false)
+        QN_DECLARE_RW_PROPERTY(int, lightModeOverride, setLightModeOverride, LIGHT_MODE_OVERRIDE,
+            -1)
+        QN_DECLARE_RW_PROPERTY(bool, isVideoWallMode, setVideoWallMode, VIDEO_WALL_MODE, false)
+        QN_DECLARE_RW_PROPERTY(bool, videoWallWithTimeline, setVideoWallWithTimeLine,
+            VIDEO_WALL_WITH_TIMELINE, true)
+        QN_DECLARE_RW_PROPERTY(bool, isActiveXMode, setActiveXMode, ACTIVE_X_MODE, false)
+        QN_DECLARE_RW_PROPERTY(bool, showFullInfo, setShowFullInfo, SHOW_FULL_INFO, false)
+        QN_DECLARE_RW_PROPERTY(bool, ignoreVersionMismatch, setIgnoreVersionMismatch,
+            IGNORE_VERSION_MISMATCH, false)
+        QN_DECLARE_RW_PROPERTY(bool, isGlDoubleBuffer, setGLDoubleBuffer, GL_DOUBLE_BUFFER, true)
+        QN_DECLARE_RW_PROPERTY(QString, locale, setLocale, LOCALE, QString())
+        QN_DECLARE_RW_PROPERTY(bool, isProfilerMode, setProfilerMode, PROFILER_MODE, false)
+        QN_DECLARE_RW_PROPERTY(int, maxSceneItemsOverride, setMaxSceneItemsOverride,
+            MAX_SCENE_ITEMS_OVERRIDE, 0)
     QN_END_PROPERTY_STORAGE()
 
 };

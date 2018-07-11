@@ -1,6 +1,6 @@
 find_package(Qt5 COMPONENTS SerialPort REQUIRED)
 
-nx_add_server_plugin(ssc_metadata_plugin
+nx_add_server_plugin(ssc_metadata_plugin OPTIONAL
     PRIVATE_LIBS
         Qt5::Core
         Qt5::SerialPort

@@ -1,5 +1,9 @@
 #include "abstract_transaction_transport.h"
 
+#include <nx/vms/api/types/connection_types.h>
+
+using namespace nx::vms;
+
 namespace ec2 {
 
 static bool skipTransactionForMobileClient(ApiCommand::Value command)
@@ -38,15 +42,15 @@ static bool skipTransactionForMobileClient(ApiCommand::Value command)
 
 bool QnAbstractTransactionTransport::shouldTransactionBeSentToPeer(const QnAbstractTransaction& transaction)
 {
-    if (remotePeer().peerType == Qn::PT_OldMobileClient && skipTransactionForMobileClient(transaction.command))
+    if (remotePeer().peerType == api::PeerType::oldMobileClient && skipTransactionForMobileClient(transaction.command))
         return false;
-    else if (remotePeer().peerType == Qn::PT_OldServer)
+    else if (remotePeer().peerType == api::PeerType::oldServer)
         return false;
 
     else if (transaction.isLocal() && !remotePeer().isClient())
         return false;
 
-    if (remotePeer().peerType == Qn::PT_CloudServer)
+    if (remotePeer().peerType == api::PeerType::cloudServer)
     {
         if (transaction.transactionType != TransactionType::Cloud &&
             transaction.command != ApiCommand::tranSyncRequest &&

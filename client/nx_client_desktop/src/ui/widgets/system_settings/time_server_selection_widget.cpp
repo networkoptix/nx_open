@@ -11,8 +11,6 @@
 #include <common/common_module.h>
 #include <translation/datetime_formatter.h>
 
-#include <nx_ec/data/api_runtime_data.h>
-
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/style/helper.h>
 #include <ui/models/time_server_selection_model.h>
@@ -20,6 +18,7 @@
 #include <ui/help/help_topic_accessor.h>
 
 #include <nx/utils/string.h>
+#include <nx/vms/api/types/connection_types.h>
 #include <utils/common/synctime.h>
 
 //#define QN_TIME_SERVER_SELECTION_DEBUG
@@ -29,6 +28,8 @@
 #else
 #define PRINT_DEBUG(MSG)
 #endif
+
+using namespace nx;
 
 namespace {
 

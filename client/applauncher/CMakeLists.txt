@@ -4,7 +4,10 @@ nx_configure_file(maven/filter-resources/applauncher_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
 nx_add_target(applauncher EXECUTABLE SIGNED
-    ADDITIONAL_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/applauncher_app_info_impl.cpp"
+    ADDITIONAL_SOURCES
+        "${CMAKE_CURRENT_BINARY_DIR}/applauncher_app_info_impl.cpp"
+    RC_FILE
+        "applauncher.rc"
     PUBLIC_LIBS
         qtsinglecoreapplication
         nx_kit

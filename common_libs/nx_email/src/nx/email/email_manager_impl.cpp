@@ -2,9 +2,10 @@
 
 #include <memory>
 
+#include <QtCore/QFile>
+#include <QtCore/QIODevice>
+
 #include <api/global_settings.h>
-#include <api/model/email_attachment.h>
-#include <nx_ec/data/api_email_data.h>
 #include <nx/utils/log/log.h>
 #include <utils/email/email.h>
 #include <utils/crypt/symmetrical.h>
@@ -13,17 +14,42 @@
 #include "smtpclient/QnSmtpMime"
 #include <common/common_module.h>
 
-
 namespace {
-    SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct)
-    {
-        if (ct == QnEmail::ConnectionType::ssl)
-            return SmtpClient::SslConnection;
-        else if (ct == QnEmail::ConnectionType::tls)
-            return SmtpClient::TlsConnection;
 
-        return SmtpClient::TcpConnection;
-    }
+SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct)
+{
+    if (ct == QnEmail::ConnectionType::ssl)
+        return SmtpClient::SslConnection;
+
+    if (ct == QnEmail::ConnectionType::tls)
+        return SmtpClient::TlsConnection;
+
+    return SmtpClient::TcpConnection;
+}
+
+} // namespace
+
+EmailManagerImpl::Attachment::Attachment(
+    QString filename,
+    const QString& contentFilename,
+    QString mimetype)
+    :
+    Attachment(std::move(filename), std::move(mimetype))
+{
+    QFile contentFile(contentFilename);
+    contentFile.open(QIODevice::ReadOnly);
+    content = contentFile.readAll();
+}
+
+EmailManagerImpl::Attachment::Attachment(
+    QString filename,
+    QIODevice& io,
+    QString mimetype)
+    :
+    Attachment(std::move(filename), std::move(mimetype))
+{
+    io.open(QIODevice::ReadOnly);
+    content = io.readAll();
 }
 
 EmailManagerImpl::EmailManagerImpl(QnCommonModule* commonModule):
@@ -31,16 +57,16 @@ EmailManagerImpl::EmailManagerImpl(QnCommonModule* commonModule):
 {
 }
 
-SmtpOperationResult EmailManagerImpl::testConnection(const QnEmailSettings &settings) const
+SmtpOperationResult EmailManagerImpl::testConnection(const QnEmailSettings& settings) const
 {
-    int port = settings.port ? settings.port : QnEmailSettings::defaultPort(settings.connectionType);
+    int port = settings.port
+        ? settings.port
+        : QnEmailSettings::defaultPort(settings.connectionType);
 
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
 
-    SmtpOperationResult lastSmtpResult;
-
-    lastSmtpResult = smtp.connectToHost();
+    SmtpOperationResult lastSmtpResult = smtp.connectToHost();
     if (!lastSmtpResult)
         return lastSmtpResult;
 
@@ -54,12 +80,13 @@ SmtpOperationResult EmailManagerImpl::testConnection(const QnEmailSettings &sett
 
 SmtpOperationResult EmailManagerImpl::sendEmail(
     const QnEmailSettings& settings,
-    const ec2::ApiEmailData& data ) const
+    const Message& message) const
 {
+    // Empty settings should not give us an error while trying to send email, should them?
     if (!settings.isValid())
-        return SmtpOperationResult();    // empty settings should not give us an error while trying to send email, should them?
+        return SmtpOperationResult();
 
-    MimeMessage message;
+    MimeMessage mimeMessage;
     QString sender;
     if (!settings.email.isEmpty())
         sender = QnEmailAddress(settings.email).value();
@@ -70,40 +97,47 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
     else
         sender = QString("%1@%2").arg(settings.user, settings.server);
 
-    message.setSender(EmailAddress(sender));
-    for (const QString &recipient: data.to)
-        message.addRecipient(EmailAddress(recipient));
+    mimeMessage.setSender(EmailAddress(sender));
+    for (const QString& recipient: message.to)
+        mimeMessage.addRecipient(EmailAddress(recipient));
 
-    message.setSubject(data.subject);
+    mimeMessage.setSubject(message.subject);
 
-    MimeMultiPart *mainPart = new MimeMultiPart(MimeMultiPart::Alternative);
-    MimeMultiPart *bodyPart = new MimeMultiPart(MimeMultiPart::Related);
-    if (!data.body.isEmpty())
+    auto mainPart = new MimeMultiPart(MimeMultiPart::Alternative);
+    auto bodyPart = new MimeMultiPart(MimeMultiPart::Related);
+    if (!message.body.isEmpty())
     {
-        mainPart->addPart(new MimeText(data.plainBody));
-        bodyPart->addPart(new MimeHtml(data.body));
+        mainPart->addPart(new MimeText(message.plainBody));
+        bodyPart->addPart(new MimeHtml(message.body));
 
-        for (const QnEmailAttachmentPtr& attachment: data.attachments)
-            bodyPart->addPart(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
-    } else
+        for (const auto& attachment: message.attachments)
+            bodyPart->addPart(
+                new MimeInlineFile(
+                    attachment->content,
+                    attachment->filename,
+                    attachment->mimetype));
+    }
+    else
     {
-        bodyPart->addPart(new MimeText(data.plainBody));
+        bodyPart->addPart(new MimeText(message.plainBody));
 
-        for (const QnEmailAttachmentPtr& attachment: data.attachments)
-            bodyPart->addPart(new MimeFile(attachment->content, attachment->filename, attachment->mimetype));
+        for (const auto& attachment: message.attachments)
+            bodyPart->addPart(
+                new MimeFile(attachment->content, attachment->filename, attachment->mimetype));
     }
 
     mainPart->addPart(bodyPart);
 
-    message.setContent(mainPart);
+    mimeMessage.setContent(mainPart);
 
     // Actually send
-    int port = settings.port ? settings.port : QnEmailSettings::defaultPort(settings.connectionType);
+    int port = settings.port
+        ? settings.port
+        : QnEmailSettings::defaultPort(settings.connectionType);
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
 
-    SmtpOperationResult lastSmtpResult;
-    lastSmtpResult = smtp.connectToHost();
+    SmtpOperationResult lastSmtpResult = smtp.connectToHost();
 
     if (!lastSmtpResult)
     {
@@ -131,7 +165,7 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
         }
     }
 
-    lastSmtpResult = smtp.sendMail(message);
+    lastSmtpResult = smtp.sendMail(mimeMessage);
     if (!lastSmtpResult)
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
@@ -148,9 +182,9 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
     return lastSmtpResult;
 }
 
-SmtpOperationResult EmailManagerImpl::sendEmail( const ec2::ApiEmailData& data ) const
+SmtpOperationResult EmailManagerImpl::sendEmail(const Message& message) const
 {
     return sendEmail(
         commonModule()->globalSettings()->emailSettings(),
-        data );
+        message);
 }

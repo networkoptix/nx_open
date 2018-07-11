@@ -9,8 +9,6 @@
 #include <nx/vms/event/event_fwd.h>
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_peer_alive_data.h"
-#include "nx_ec/data/api_runtime_data.h"
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
@@ -37,7 +35,9 @@ public:
      */
     virtual void updateResource(const QnResourcePtr& resource, ec2::NotificationSource source);
 
-    virtual void updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source);
+    virtual void updateResource(
+        const nx::vms::api::UserData& user,
+        ec2::NotificationSource source);
     virtual void updateResource(
         const nx::vms::api::LayoutData& layout,
         ec2::NotificationSource source);
@@ -51,20 +51,20 @@ public:
         const nx::vms::api::CameraData& camera,
         ec2::NotificationSource source);
     virtual void updateResource(
-        const ec2::ApiMediaServerData& server,
+        const nx::vms::api::MediaServerData& server,
         ec2::NotificationSource source);
     virtual void updateResource(
-        const ec2::ApiStorageData& storage,
+        const nx::vms::api::StorageData& storage,
         ec2::NotificationSource source);
 
     void resetServerUserAttributesList(
-        const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList);
+        const nx::vms::api::MediaServerUserAttributesDataList& serverUserAttributesList);
     void resetCameraUserAttributesList(
         const nx::vms::api::CameraAttributesDataList& cameraUserAttributesList);
     void resetPropertyList(const nx::vms::api::ResourceParamWithRefDataList& params);
     void resetStatusList(const nx::vms::api::ResourceStatusDataList& params);
-    void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
-    void resetUserRoles(const ec2::ApiUserRoleDataList& roles);
+    void resetAccessRights(const nx::vms::api::AccessRightsDataList& accessRights);
+    void resetUserRoles(const nx::vms::api::UserRoleDataList& roles);
     void resetEventRules(const nx::vms::api::EventRuleDataList& eventRules);
 
 signals:
@@ -83,13 +83,13 @@ signals:
 
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 
-    void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
-    void remotePeerFound(QnUuid data, Qn::PeerType peerType);
-    void remotePeerLost(QnUuid data, Qn::PeerType peerType);
+    void runtimeInfoChanged(const nx::vms::api::RuntimeData& runtimeInfo);
+    void remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
+    void remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
 
     void syncTimeChanged(qint64 syncTime);
 
-    void discoveredServerChanged(const ec2::ApiDiscoveredServerData &discoveredServer);
+    void discoveredServerChanged(const nx::vms::api::DiscoveredServerData& discoveredServer);
 
 protected:
     virtual Qt::ConnectionType handlerConnectionType() const;
@@ -97,10 +97,10 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection);
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection);
 
-    virtual void handleRemotePeerFound(QnUuid data, Qn::PeerType peerType);
-    virtual void handleRemotePeerLost(QnUuid data, Qn::PeerType peerType);
+    virtual void handleRemotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
+    virtual void handleRemotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
 
-    virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData);
+    virtual void onGotInitialNotification(const nx::vms::api::FullInfoData& fullData);
     virtual void onResourceStatusChanged(
         const QnResourcePtr &resource,
         Qn::ResourceStatus status,
@@ -110,8 +110,8 @@ protected:
     virtual void handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour);
 
     void resetResourceTypes(const nx::vms::api::ResourceTypeDataList& resTypes);
-    void resetResources(const ec2::ApiFullInfoData& fullData);
-    void resetLicenses(const ec2::ApiLicenseDataList& licenses);
+    void resetResources(const nx::vms::api::FullInfoData& fullData);
+    void resetLicenses(const nx::vms::api::LicenseDataList& licenses);
     void resetCamerasWithArchiveList(const nx::vms::api::ServerFootageDataList& cameraHistoryList);
     void resetTime();
 
@@ -126,11 +126,11 @@ public slots:
     void on_licenseRemoved(const QnLicensePtr &license);
 
 private slots:
-    void on_gotInitialNotification(const ec2::ApiFullInfoData& fullData);
-    void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
+    void on_gotInitialNotification(const nx::vms::api::FullInfoData& fullData);
+    void on_gotDiscoveryData(const nx::vms::api::DiscoveryData& discoveryData, bool addInformation);
 
-    void on_remotePeerFound(QnUuid data, Qn::PeerType peerType);
-    void on_remotePeerLost(QnUuid data, Qn::PeerType peerType);
+    void on_remotePeerFound(QnUuid data, nx::vms::api::PeerType peerType);
+    void on_remotePeerLost(QnUuid data, nx::vms::api::PeerType peerType);
 
     void on_resourceStatusChanged(
         const QnUuid& resourceId,
@@ -141,15 +141,16 @@ private slots:
     void on_resourceRemoved(const QnUuid& resourceId );
     void on_resourceStatusRemoved(const QnUuid& resourceId);
 
-    void on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights);
-    void on_userRoleChanged(const ec2::ApiUserRoleData& userRole);
+    void on_accessRightsChanged(const nx::vms::api::AccessRightsData& accessRights);
+    void on_userRoleChanged(const nx::vms::api::UserRoleData& userRole);
     void on_userRoleRemoved(const QnUuid& userRoleId);
 
     void on_cameraUserAttributesChanged(const nx::vms::api::CameraAttributesData& userAttributes);
     void on_cameraUserAttributesRemoved(const QnUuid& cameraId);
     void on_cameraHistoryChanged(const nx::vms::api::ServerFootageData& cameraHistory);
 
-    void on_mediaServerUserAttributesChanged(const ec2::ApiMediaServerUserAttributesData& userAttributes);
+    void on_mediaServerUserAttributesChanged(
+        const nx::vms::api::MediaServerUserAttributesData& userAttributes);
     void on_mediaServerUserAttributesRemoved(const QnUuid& serverId);
 
     void on_businessEventRemoved(const QnUuid &id);

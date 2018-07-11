@@ -36,6 +36,16 @@ struct HanwhaIni: public nx::kit::IniConfig
         forcedSecondaryStreamUrl,
         "Force use of the given URL for the secondary stream.");
 
+    NX_INI_FLAG(
+        1,
+        enableSingleSeekPerGroup,
+        "Send single PLAY request on archive seek operation for NVRs");
+
+    NX_INI_FLAG(
+        1,
+        enableArchivePositionExtrapolation,
+        "Enable archive position extrapolation "
+        "when no data is received from NVR during some period");
 };
 
 inline HanwhaIni& ini()

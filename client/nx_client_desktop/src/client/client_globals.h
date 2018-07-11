@@ -219,14 +219,14 @@ namespace Qn
         ActionEmitterType,                          /** */
         ActionEmittedBy,                            /** */
 
-        GlobalPermissionsRole,                      /**< Global permissions role. Value of type Qn::GlobalPermissions. */
+        GlobalPermissionsRole,                      /**< Global permissions role. Value of type GlobalPermissions. */
         UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
         ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
         ResolutionModeRole,                         /**< Role for resolution mode. */
 
         ForceShowCamerasList,                       /**< Used for default password dialog. */
-        ParentWidgetRole,                           /** Used for dialg's parent widget*/
+        ParentWidgetRole,                           /**< Used for dialog's parent widget. */
 
         TimestampRole,                              /**< Role for timestamp in microseconds since epoch (qint64). */
         TimestampTextRole,                          /**< Role for timestamp text (QString). */
@@ -243,6 +243,7 @@ namespace Qn
         DurationRole,                               /**< Role for duration in milliseconds (qint64). */
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
+        ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */
 
         // Model notification roles. Do not necessarily pass any data but implement
         // item-related view-to-model notifications via setData which can be proxied.

@@ -14,6 +14,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <nx/network/app_info.h>
 
 namespace {
 

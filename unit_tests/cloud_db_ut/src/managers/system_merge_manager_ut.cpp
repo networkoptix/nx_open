@@ -223,7 +223,7 @@ private:
     }
 
     void deliverMergeHistoryRecord(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord)
     {
         queryExecutor().executeUpdateQuerySync(
             [this, &mergeHistoryRecord](nx::sql::QueryContext* queryContext)
@@ -234,10 +234,10 @@ private:
             });
     }
 
-    ::ec2::ApiSystemMergeHistoryRecord prepareMergeHistoryRecord(
+    nx::vms::api::SystemMergeHistoryRecord prepareMergeHistoryRecord(
         const std::string& authKey)
     {
-        ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
+        nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
         mergeHistoryRecord.mergedSystemCloudId = m_slaveSystem.id.c_str();
         mergeHistoryRecord.mergedSystemLocalId = QnUuid::createUuid().toSimpleByteArray();
         mergeHistoryRecord.username = m_ownerAccount.email.c_str();

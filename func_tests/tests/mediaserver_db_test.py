@@ -99,15 +99,20 @@ def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
     try:
         wait_for_true(
             lambda: one.api.get('ec2/getFullInfo') == two.api.get('ec2/getFullInfo'),
-            "Servers have the same ec2/getFullInfo {}".format(stage))
+            "Servers have the same ec2/getFullInfo {}".format(stage),
+            timeout_sec=90)
     except WaitTimeout:
-        full_info_one = 'full_info_one_{}'.format(stage)
-        full_info_two = 'full_info_two_{}'.format(stage)
-        artifact_factory([full_info_one],
-                         name=full_info_one).save_as_json(one.api.get('ec2/getFullInfo'))
-        artifact_factory([full_info_two],
-                         name=full_info_two).save_as_json(one.api.get('ec2/getFullInfo'))
-        raise
+        # Re-check condition & store ec2/getFullInfo to artifacts
+        full_info_one = one.api.get('ec2/getFullInfo')
+        full_info_two = two.api.get('ec2/getFullInfo')
+        if full_info_one != full_info_two:
+            full_info_one_desc = 'full_info_one_{}'.format(stage)
+            full_info_two_desc = 'full_info_two_{}'.format(stage)
+            artifact_factory([full_info_one_desc],
+                             name=full_info_one_desc).save_as_json(full_info_one)
+            artifact_factory([full_info_two_desc],
+                             name=full_info_two_desc).save_as_json(full_info_two)
+            assert full_info_one == full_info_two
     return one.api.get('ec2/getFullInfo')
 
 

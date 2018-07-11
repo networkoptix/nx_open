@@ -21,6 +21,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/dummy_handler.h>
 #include <rest/server/json_rest_result.h>
+#include <utils/common/app_info.h>
 
 #include "vms_utils.h"
 
@@ -33,7 +34,7 @@ namespace {
 using MergeStatus = ::utils::MergeSystemsStatus::Value;
 
 // Minimal server version which could be configured.
-static const QnSoftwareVersion kMinimalVersion(2, 3);
+static const nx::utils::SoftwareVersion kMinimalVersion = {2, 3};
 
 static const std::chrono::milliseconds kRequestTimeout = std::chrono::minutes(1);
 
@@ -101,7 +102,8 @@ void SystemMergeProcessor::saveBackupOfSomeLocalData()
     m_cloudAuthKey = m_commonModule->globalSettings()->cloudAuthKey().toUtf8();
 }
 
-const QnModuleInformationWithAddresses& SystemMergeProcessor::remoteModuleInformation() const
+const nx::vms::api::ModuleInformationWithAddresses&
+    SystemMergeProcessor::remoteModuleInformation() const
 {
     return m_remoteModuleInformation;
 }
@@ -251,9 +253,9 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::checkWhetherMergeIsPo
             m_commonModule->moduleGUID());
     bool isDefaultSystemName;
     if (data.takeRemoteSettings)
-        isDefaultSystemName = m_remoteModuleInformation.serverFlags.testFlag(Qn::SF_NewSystem);
+        isDefaultSystemName = m_remoteModuleInformation.serverFlags.testFlag(api::SF_NewSystem);
     else
-        isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(Qn::SF_NewSystem));
+        isDefaultSystemName = mServer && (mServer->getServerFlags().testFlag(api::SF_NewSystem));
     if (isDefaultSystemName)
     {
         NX_LOG(lit("SystemMergeProcessor. Can not merge to the non configured system"), cl_logDEBUG1);
@@ -345,7 +347,8 @@ bool SystemMergeProcessor::applyCurrentSettings(
     const QString& postKey,
     bool oneServer)
 {
-    auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(m_commonModule->moduleGUID());
+    auto server = m_commonModule->resourcePool()->getResourceById<QnMediaServerResource>(
+        m_commonModule->moduleGUID());
     if (!server)
         return false;
     Q_ASSERT(!server->getAuthKey().isEmpty());
@@ -361,7 +364,7 @@ bool SystemMergeProcessor::applyCurrentSettings(
      * Save current server to the foreign system.
      * It could be only way to pass authentication if current admin user is disabled
      */
-    fromResourceToApi(server, data.foreignServer);
+    ec2::fromResourceToApi(server, data.foreignServer);
 
     /**
      * Save current admin and cloud users to the foreign system
@@ -370,8 +373,8 @@ bool SystemMergeProcessor::applyCurrentSettings(
     {
         if (user->isCloud() || user->isBuiltInAdmin())
         {
-            ec2::ApiUserData apiUser;
-            fromResourceToApi(user, apiUser);
+            nx::vms::api::UserData apiUser;
+            ec2::fromResourceToApi(user, apiUser);
             data.foreignUsers.push_back(apiUser);
 
             for (const auto& param : user->params())
@@ -449,10 +452,9 @@ bool SystemMergeProcessor::applyRemoteSettings(
 {
     /* Read admin user from the remote server */
 
-    ec2::ApiUserDataList users;
+    nx::vms::api::UserDataList users;
     if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
         return false;
-
 
     QnJsonRestResult pingRestResult;
     if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
@@ -468,7 +470,6 @@ bool SystemMergeProcessor::applyRemoteSettings(
         if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
             return false;
     }
-
 
     // 1. update settings in remove database to ensure they have priority while merge
     {
@@ -495,7 +496,7 @@ bool SystemMergeProcessor::applyRemoteSettings(
 
     for (const auto& userData : users)
     {
-        QnUserResourcePtr user = fromApiToResource(userData);
+        QnUserResourcePtr user = ec2::fromApiToResource(userData);
         if (user->isCloud() || user->isBuiltInAdmin())
         {
             data.foreignUsers.push_back(userData);
@@ -517,8 +518,8 @@ bool SystemMergeProcessor::applyRemoteSettings(
                 m_commonModule->moduleGUID());
         if (!mServer)
             return false;
-        ec2::ApiMediaServerData currentServer;
-        fromResourceToApi(mServer, currentServer);
+        api::MediaServerData currentServer;
+        ec2::fromResourceToApi(mServer, currentServer);
 
         nx::network::http::HttpClient client;
         client.setResponseReadTimeout(kRequestTimeout);
@@ -611,7 +612,7 @@ void SystemMergeProcessor::addAuthToRequest(
 nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformation(
     const nx::utils::Url& url,
     const QString& authenticationKey,
-    QnModuleInformationWithAddresses* moduleInformation)
+    nx::vms::api::ModuleInformationWithAddresses* moduleInformation)
 {
     QByteArray moduleInformationData;
     {
@@ -644,7 +645,7 @@ nx::network::http::StatusCode::Value SystemMergeProcessor::fetchModuleInformatio
     }
 
     const auto json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
-    *moduleInformation = json.deserialized<QnModuleInformationWithAddresses>();
+    *moduleInformation = json.deserialized<nx::vms::api::ModuleInformationWithAddresses>();
 
     return nx::network::http::StatusCode::ok;
 }
@@ -653,9 +654,9 @@ bool SystemMergeProcessor::addMergeHistoryRecord(const MergeSystemData& data)
 {
     const auto& mergedSystemModuleInformation = data.takeRemoteSettings
         ? m_localModuleInformation
-        : static_cast<const QnModuleInformation&>(m_remoteModuleInformation);
+        : m_remoteModuleInformation;
 
-    ::ec2::ApiSystemMergeHistoryRecord mergeHistoryRecord;
+    nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
     mergeHistoryRecord.timestamp = QDateTime::currentMSecsSinceEpoch();
     mergeHistoryRecord.mergedSystemLocalId =
         mergedSystemModuleInformation.localSystemId.toSimpleByteArray();

@@ -147,7 +147,7 @@ Builder Builder::mode(ClientModes mode)
     return *this;
 }
 
-Builder Builder::requiredGlobalPermission(Qn::GlobalPermission permission)
+Builder Builder::requiredGlobalPermission(GlobalPermission permission)
 {
     m_action->setRequiredGlobalPermission(permission);
 

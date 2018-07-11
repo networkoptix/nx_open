@@ -168,7 +168,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::LoginDialog),
-    m_requestHandle(-1),
+    m_connectionsModel(new QStandardItemModel(this)),
     m_renderingWidget(new QnRenderingWidget(this))
 {
     ui->setupUi(this);
@@ -212,7 +212,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     layout->addWidget(m_renderingWidget);
     DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(m_renderingWidget);
 
-    m_connectionsModel = new QStandardItemModel(this);
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
     m_lastUsedItem = NULL;
@@ -520,8 +519,8 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
                 || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult;
 
             auto versionFormat = showBuild
-                ? QnSoftwareVersion::FullFormat
-                : QnSoftwareVersion::BugfixFormat;
+                ? nx::utils::SoftwareVersion::FullFormat
+                : nx::utils::SoftwareVersion::BugfixFormat;
 
             vm.title += lit(" (v%1)")
                 .arg(data.info.version.toString(versionFormat));

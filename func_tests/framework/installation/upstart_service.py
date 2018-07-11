@@ -3,7 +3,7 @@ import re
 
 from framework.installation.service import Service, ServiceStatus
 from framework.os_access.exceptions import Timeout
-from framework.os_access.posix_shell import SSH
+from framework.os_access.ssh_shell import SSH
 
 _logger = logging.getLogger(__name__)
 
@@ -77,17 +77,19 @@ class LinuxAdHocService(Service):
     Its interface mimic a `service` command.
     """
 
-    # TODO: Consider creating another Upstart conf file.
+    START_STOP_TIMEOUT_SEC = 20
 
     def __init__(self, ssh, dir):
         self._ssh = ssh
         self._service_script_path = dir / 'server_ctl.sh'
 
     def start(self, timeout_sec=None):
-        return self._ssh.run_command([self._service_script_path, 'start'], timeout_sec=timeout_sec)
+        return self._ssh.run_command(
+            [self._service_script_path, 'start'], timeout_sec=timeout_sec or self.START_STOP_TIMEOUT_SEC)
 
     def stop(self, timeout_sec=None):
-        return self._ssh.run_command([self._service_script_path, 'stop'], timeout_sec=timeout_sec)
+        return self._ssh.run_command(
+            [self._service_script_path, 'stop'], timeout_sec=timeout_sec or self.START_STOP_TIMEOUT_SEC)
 
     def status(self):
         # TODO: Make a script.

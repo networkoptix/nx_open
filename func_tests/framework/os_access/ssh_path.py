@@ -52,7 +52,12 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     @classmethod
     def tmp(cls):
-        return cls('/tmp/func_tests')
+        temp_dir = cls('/tmp/func_tests')
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        return temp_dir
+
+    def __repr__(self):
+        return '<SSHPath {!s} on {!r}>'.format(self, self._ssh)
 
     def exists(self):
         try:
@@ -151,7 +156,9 @@ class SSHPath(FileSystemPath, PurePosixPath):
                 test ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 3
                 cat "$SELF"
                 ''',
-            env={'SELF': self})
+            env={'SELF': self},
+            timeout_sec=600,
+            )
 
     @_raising_on_exit_status({2: BadParent, 3: BadParent, 4: NotAFile})
     def write_bytes(self, contents, offset=None):
@@ -170,7 +177,9 @@ class SSHPath(FileSystemPath, PurePosixPath):
                 stat --printf="%s" "$SELF"
                 ''',
             env={'SELF': self, 'OFFSET': offset},
-            input=contents)
+            input=contents,
+            timeout_sec=600,
+            )
         written = int(output)
         return written
 

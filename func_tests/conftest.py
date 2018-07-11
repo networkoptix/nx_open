@@ -6,12 +6,13 @@ from pathlib2 import Path
 import yaml
 
 from defaults import defaults
-from framework.artifact import ArtifactFactory
+from framework.artifact import ArtifactFactory, ArtifactType
 from framework.ca import CA
 from framework.config import SingleTestConfig, TestParameter, TestsConfig
 from framework.metrics_saver import MetricsSaver
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.local_path import LocalPath
+from framework.os_access.path import copy_file
 
 pytest_plugins = ['fixtures.vms', 'fixtures.mediaservers', 'fixtures.cloud', 'fixtures.layouts', 'fixtures.media']
 
@@ -89,6 +90,26 @@ def node_dir(request, work_dir):
     return node_dir
 
 
+@pytest.fixture()
+def artifacts_dir(node_dir, artifact_factory):
+    dir = node_dir / 'artifacts'
+    dir.mkdir(exist_ok=True)
+    yield dir
+    for entry in dir.glob('*'):
+        if not entry.suffix:
+            _logger.error("Won't store artifact: no suffix: %s", entry.name)
+            continue
+        if entry.suffix == '.cap' or entry.suffix == '.pcap':
+            mime_type = 'application/cap'
+        else:
+            _logger.error("Won't store artifact: unknown suffix: %s", entry.name)
+            continue
+        type = ArtifactType(entry.suffix[1:], mime_type, entry.suffix)
+        factory = artifact_factory([entry.stem], name=entry.stem, artifact_type=type)
+        path = factory.produce_file_path()
+        copy_file(entry, path)
+
+
 @pytest.fixture(scope='session')
 def bin_dir(request):
     bin_dir = request.config.getoption('--bin-dir')
@@ -109,6 +130,7 @@ def init_logging(request, work_dir):
         config_text = full_path.read_text()
         config = yaml.load(config_text)
         logging.config.dictConfig(config)
+        logging.info('Logging is initialized from "%s".', full_path)
 
     root_logger = logging.getLogger()
     file_formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')

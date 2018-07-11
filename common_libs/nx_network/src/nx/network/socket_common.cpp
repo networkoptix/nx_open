@@ -192,7 +192,14 @@ IpV6WithScope HostAddress::ipV6() const
     return IpV6WithScope();
 }
 
-bool HostAddress::isLocal() const
+bool HostAddress::isLocalHost() const
+{
+    return (m_string == localhost.m_string)
+        || (ipV4() == localhost.m_ipV4)
+        || (ipV6().first == localhost.m_ipV6);
+}
+
+bool HostAddress::isLocalNetwork() const
 {
     if (const auto& ip = ipV4())
     {

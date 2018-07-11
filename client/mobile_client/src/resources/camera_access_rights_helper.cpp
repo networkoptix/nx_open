@@ -109,10 +109,10 @@ void QnCameraAccessRightsHelperPrivate::setCanManagePtz(bool value)
 void QnCameraAccessRightsHelperPrivate::updateAccessRights()
 {
     setCanViewArchive(camera && user
-        && resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalViewArchivePermission));
+        && resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::viewArchive));
 
     setCanManagePtz(camera && user
-        && resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalUserInputPermission));
+        && resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::userInput));
 }
 
 void QnCameraAccessRightsHelperPrivate::at_userWatcher_userChanged(const QnUserResourcePtr &newUser)

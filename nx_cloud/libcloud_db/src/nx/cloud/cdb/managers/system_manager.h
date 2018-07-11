@@ -16,16 +16,14 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
+#include <nx/data_sync_engine/transaction_log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
-#include <nx_ec/data/api_data.h>
-#include <nx_ec/data/api_user_data.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/sql/filter.h>
-
-#include <nx/data_sync_engine/transaction_log.h>
+#include <nx/vms/api/data_fwd.h>
 
 #include "account_manager.h"
 #include "cache.h"
@@ -514,7 +512,7 @@ private:
     nx::sql::DBResult processEc2SaveUser(
         nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        data_sync_engine::Command<::ec2::ApiUserData> data,
+        data_sync_engine::Command<nx::vms::api::UserData> data,
         data::SystemSharing* const systemSharingData);
 
     void onEc2SaveUserDone(

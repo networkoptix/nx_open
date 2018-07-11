@@ -115,7 +115,8 @@ public:
     IpV6WithScope ipV6() const;
     boost::optional<uint32_t> scopeId() const;
 
-    bool isLocal() const;
+    bool isLocalHost() const;
+    bool isLocalNetwork() const;
     bool isIpAddress() const;
     bool isPureIpV6() const;
 

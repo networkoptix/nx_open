@@ -12,6 +12,7 @@
 #include <plugins/resource/hanwha/hanwha_remote_archive_manager.h>
 #include <plugins/resource/hanwha/hanwha_archive_delegate.h>
 #include <plugins/resource/hanwha/hanwha_range.h>
+#include <plugins/resource/hanwha/hanwha_ptz_common.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 
 #include <core/ptz/ptz_auxilary_trait.h>
@@ -39,7 +40,6 @@ Q_DECLARE_FLAGS(HanwhaProfileParameterFlags, HanwhaProfileParameterFlag);
 class HanwhaResource: public QnPlOnvifResource
 {
     using base_type = QnPlOnvifResource;
-
 public:
     HanwhaResource() = default;
     virtual ~HanwhaResource() override;
@@ -161,7 +161,7 @@ protected:
 
 private:
     CameraDiagnostics::Result initDevice();
-    CameraDiagnostics::Result initSystem();
+    CameraDiagnostics::Result initSystem(const HanwhaInformation& information);
     CameraDiagnostics::Result initBypass();
 
     CameraDiagnostics::Result initMedia();
@@ -197,6 +197,7 @@ private:
 
     void cleanUpOnProxiedDeviceChange();
 
+    HanwhaPtzRangeMap fetchPtzRanges();
     QnPtzAuxilaryTraitList calculatePtzTraits() const;
     void calculateAutoFocusSupport(QnPtzAuxilaryTraitList* outTraitList) const;
 
@@ -348,8 +349,8 @@ private:
 
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
-    std::map<QString, HanwhaRange> m_configurationalPtzRanges;
-    std::map<nx::core::ptz::Type, Ptz::Capabilities> m_ptzCapabilities = {
+    HanwhaPtzRangeMap m_ptzRanges;
+    HanwhaPtzCapabilitiesMap m_ptzCapabilities = {
         {nx::core::ptz::Type::operational, Ptz::NoPtzCapabilities},
         {nx::core::ptz::Type::configurational, Ptz::NoPtzCapabilities}
     };

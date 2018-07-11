@@ -27,8 +27,8 @@ struct Distance
 
 QnFisheyeCalibrator::QnFisheyeCalibrator()
 {
-    m_filteredFrame = 0;
-    m_grayImageBuffer = 0;
+    m_filteredFrame = nullptr;
+    m_grayImageBuffer = nullptr;
     m_width = 0;
     m_height = 0;
     m_center = QPointF(0.0, 0.0);
@@ -174,7 +174,7 @@ qreal QnFisheyeCalibrator::findElipse(qreal& newRadius)
     return a / b;
 }
 
-void QnFisheyeCalibrator::findCircleParams()
+QnFisheyeCalibrator::Error QnFisheyeCalibrator::findCircleParams()
 {
     QVector<Distance> distances;
     distances.resize(4);
@@ -183,7 +183,7 @@ void QnFisheyeCalibrator::findCircleParams()
     for (int y = 0; y < m_height; ++y)
     {
         if (needToStop())
-            return;
+            return ErrorInterrupted;
 
         int xLeft = findPixel(y, 0, 1);
         if (xLeft == -1)
@@ -208,7 +208,7 @@ void QnFisheyeCalibrator::findCircleParams()
     for (int y = m_height-1; y > 0; --y)
     {
         if (needToStop())
-            return;
+            return NoError;
 
         int xLeft = findPixel(y, 0, 1);
         if (xLeft == -1)
@@ -232,10 +232,8 @@ void QnFisheyeCalibrator::findCircleParams()
     }
 
     std::sort(distances.begin(), distances.end());
-    if (distances[3].distance == INT64_MAX || distances[0].distance == 0) {
-        emit finished (ErrorNotFisheyeImage);
-        return; // not found
-    }
+    if (distances[3].distance == INT64_MAX || distances[0].distance == 0)
+        return ErrorNotFisheyeImage; // not found
 
     // remove most far point
     int leftDistance = distances[1].distance - distances[0].distance;
@@ -258,10 +256,8 @@ void QnFisheyeCalibrator::findCircleParams()
     qreal ma = (a2.y() - a1.y()) / (a2.x() - a1.x());
     qreal mb = (a3.y() - a2.y()) / (a3.x() - a2.x());
 
-    if ((ma == 0 && mb == 0) || ma > 1e9 || mb > 1e9 || ma < -1e9 || mb < -1e9) {
-        emit finished (ErrorNotFisheyeImage);
-        return;
-    }
+    if ((ma == 0 && mb == 0) || ma > 1e9 || mb > 1e9 || ma < -1e9 || mb < -1e9)
+        return ErrorNotFisheyeImage;
 
     qreal centerX = ma * mb * (a1.y() - a3.y()) + mb * (a1.x() + a2.x()) - ma * (a2.x() + a3.x());
     centerX /= 2 * (mb - ma);
@@ -285,7 +281,7 @@ void QnFisheyeCalibrator::findCircleParams()
         setHorizontalStretch(1.0);
     }
 
-    emit finished(NoError);
+    return NoError;
 }
 
 int QnFisheyeCalibrator::findYThreshold(QImage frame)
@@ -387,11 +383,15 @@ void QnFisheyeCalibrator::analyseFrameAsync(QImage frame)
 
 void QnFisheyeCalibrator::run()
 {
-    analyseFrame(m_analysedFrame);
+    auto result = analyseFrame(m_analysedFrame);
+    emit finished(result);
 }
 
-void QnFisheyeCalibrator::analyseFrame(QImage frame)
+QnFisheyeCalibrator::Error QnFisheyeCalibrator::analyseFrame(QImage frame)
 {
+    if (frame.width() == 0 || frame.height() == 0)
+        return Error::ErrorInvalidInput;
+
     frame = frame.scaled(frame.width() / 2, frame.height() / 2); // addition filtering
 
     if (frame.format() != QImage::Format_Indexed8)
@@ -401,45 +401,58 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
         uchar* inputData[4];
         inputData[0] = static_cast<uchar*>(qMallocAligned(inputNumBytes, 32));
         inputData[1] = inputData[2] = inputData[3] = 0;
+        // We can return early, but still need to clean up allocated data.
+        std::unique_ptr<void, decltype(&qFreeAligned)> inputDataGuard(inputData[0], &qFreeAligned);
+
         memcpy(inputData[0], frame.bits(), inputNumBytes);
 
         int roundWidth = qPower2Ceil((unsigned)frame.width(),32);
         int numBytes = avpicture_get_size(AV_PIX_FMT_GRAY8, roundWidth, frame.height());
+
+        // ffmpeg returns -1 in case of error
+        if (numBytes < 0)
+            return ErrorInternal;
+
         qFreeAligned(m_grayImageBuffer);
         m_grayImageBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
+        if (!m_grayImageBuffer)
+            return ErrorInternal;
 
-        SwsContext* scaleContext = sws_getContext(frame.width(), frame.height(), AV_PIX_FMT_RGBA,
-            frame.width(), frame.height(), AV_PIX_FMT_GRAY8, SWS_BICUBIC, NULL, NULL, NULL);
+        if (SwsContext* scaleContext = sws_getContext(frame.width(), frame.height(), AV_PIX_FMT_RGBA,
+            frame.width(), frame.height(), AV_PIX_FMT_GRAY8, SWS_BICUBIC, NULL, NULL, NULL))
+        {
+            AVPicture dstPict;
+            avpicture_fill(&dstPict, m_grayImageBuffer, AV_PIX_FMT_GRAY8, roundWidth, frame.height());
 
-        AVPicture dstPict;
-        avpicture_fill(&dstPict, m_grayImageBuffer, AV_PIX_FMT_GRAY8, roundWidth, frame.height());
+            int inputLinesize[4] = { frame.bytesPerLine() , 0, 0, 0 };
 
-        int inputLinesize[4];
-        inputLinesize[0] = frame.bytesPerLine();
-        inputLinesize[1] = inputLinesize[2] = inputLinesize[3] = 0;
-
-        QImage newFrame(m_grayImageBuffer, frame.width(), frame.height(), roundWidth, QImage::Format_Indexed8);
-        sws_scale(scaleContext, inputData, inputLinesize, 0, frame.height(), dstPict.data, dstPict.linesize);
-        sws_freeContext(scaleContext);
-        qFreeAligned(inputData[0]);
-
-        frame = newFrame;
+            QImage newFrame(m_grayImageBuffer, frame.width(), frame.height(), roundWidth, QImage::Format_Indexed8);
+            sws_scale(scaleContext, inputData, inputLinesize, 0, frame.height(), dstPict.data, dstPict.linesize);
+            sws_freeContext(scaleContext);
+            frame = newFrame;
+        }
+        else
+        {
+            return ErrorInternal;
+        }
     }
-
-    m_width = frame.width();
-    m_height = frame.height();
 
     const int Y_THRESHOLD = findYThreshold(frame);
 
-    if (Y_THRESHOLD == -1) {
-        emit finished (ErrorTooLowLight);
-        return;
+    if (Y_THRESHOLD == -1)
+    {
+        return ErrorTooLowLight;
     }
 
-
     const quint8* curPtr = (const quint8*) frame.bits();
+    if (!curPtr)
+        return ErrorInvalidInput;
+
     delete m_filteredFrame;
     m_filteredFrame = new quint8[frame.width() * frame.height()];
+
+    m_width = frame.width();
+    m_height = frame.height();
 
     quint8* dstPtr = m_filteredFrame;
     int srcYStep = frame.bytesPerLine();
@@ -456,7 +469,7 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
     for (int y = 1; y < m_height - 1; ++y)
     {
         if (needToStop())
-            return;
+            return ErrorInterrupted;
 
         *dstPtr++ = 0;
         curPtr++;
@@ -483,8 +496,7 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
         *dstPtr++ = 0;
     }
 
-
-    findCircleParams();
+    return findCircleParams();
 
 #if 0
     // update source frame for test purpose

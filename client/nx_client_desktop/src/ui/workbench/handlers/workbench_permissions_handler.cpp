@@ -80,7 +80,7 @@ void PermissionsHandler::shareLayoutWith(const QnLayoutResourcePtr& layout,
         return;
 
     /* Admins anyway have all shared layouts. */
-    if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+    if (resourceAccessManager()->hasGlobalPermission(subject, GlobalPermission::admin))
         return;
 
     auto accessible = sharedResourcesManager()->sharedResources(subject);
@@ -98,7 +98,7 @@ void PermissionsHandler::shareCameraWith(const QnVirtualCameraResourcePtr &camer
     if (!camera || !subject.isValid())
         return;
 
-    if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+    if (resourceAccessManager()->hasGlobalPermission(subject, GlobalPermission::admin))
         return;
 
     auto accessible = sharedResourcesManager()->sharedResources(subject);
@@ -112,7 +112,7 @@ void PermissionsHandler::shareCameraWith(const QnVirtualCameraResourcePtr &camer
 bool PermissionsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
     const QnLayoutResourceList& layouts)
 {
-    if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(subject, GlobalPermission::accessAllMedia))
         return true;
 
     /* Calculate all resources that were available through these layouts. */

@@ -32,7 +32,7 @@ void loadResourcesFromEcs(
     ec2::ErrorCode rez;
     {
         //reading servers list
-        ec2::ApiMediaServerDataList mediaServerList;
+        api::MediaServerDataList mediaServerList;
         while (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(). Can't get servers."), cl_logERROR);
@@ -41,7 +41,7 @@ void loadResourcesFromEcs(
                 return;
         }
 
-        ec2::ApiDiscoveryDataList discoveryDataList;
+        api::DiscoveryDataList discoveryDataList;
         while (ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(). Can't get discovery data."), cl_logERROR);
@@ -52,7 +52,7 @@ void loadResourcesFromEcs(
 
         QMultiHash<QnUuid, nx::utils::Url> additionalAddressesById;
         QMultiHash<QnUuid, nx::utils::Url> ignoredAddressesById;
-        for (const ec2::ApiDiscoveryData &data : discoveryDataList)
+        for (const api::DiscoveryData &data : discoveryDataList)
         {
             additionalAddressesById.insert(data.id, data.url);
             if (data.ignore)
@@ -104,7 +104,7 @@ void loadResourcesFromEcs(
         messageProcessor->resetStatusList(statusList);
 
         //reading server attributes
-        ec2::ApiMediaServerUserAttributesDataList mediaServerUserAttributesList;
+        api::MediaServerUserAttributesDataList mediaServerUserAttributesList;
         while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
@@ -191,8 +191,8 @@ void loadResourcesFromEcs(
     }
 
     {
-        //loading users
-        ec2::ApiUserDataList users;
+        // Loading users.
+        nx::vms::api::UserDataList users;
         while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
@@ -252,7 +252,7 @@ void loadResourcesFromEcs(
 
     {
         //loading accessible resources
-        ec2::ApiAccessRightsDataList accessRights;
+        nx::vms::api::AccessRightsDataList accessRights;
         while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get accessRights. Reason: " << ec2::toString(rez);
@@ -264,8 +264,8 @@ void loadResourcesFromEcs(
     }
 
     {
-        //loading user roles
-        ec2::ApiUserRoleDataList userRoles;
+        // Loading user roles.
+        api::UserRoleDataList userRoles;
         while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserRolesSync(&userRoles)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);

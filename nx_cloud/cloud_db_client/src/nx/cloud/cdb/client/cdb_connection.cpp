@@ -78,9 +78,9 @@ void Connection::setProxyVia(
     std::uint16_t proxyPort)
 {
     const nx::network::SocketAddress proxyEndpoint(proxyHost.c_str(), proxyPort);
-    m_accountManager->setProxyVia(proxyEndpoint);
-    m_systemManager->setProxyVia(proxyEndpoint);
-    m_authProvider->setProxyVia(proxyEndpoint);
+    m_accountManager->setProxyVia(proxyEndpoint, /*isSecure*/ true);
+    m_systemManager->setProxyVia(proxyEndpoint, /*isSecure*/ true);
+    m_authProvider->setProxyVia(proxyEndpoint, /*isSecure*/ true);
 }
 
 void Connection::setRequestTimeout(std::chrono::milliseconds timeout)
