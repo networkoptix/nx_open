@@ -67,7 +67,7 @@ if(NOT targetDevice MATCHES "android|ios|edge1")
     endif()
 endif()
 
-nx_enable_camera_vendor_old(wearable)
+nx_enable_camera_vendor(wearable)
 
 # TODO: mediaserver_core uses MDNS unconditionally, so disabling this macro always leads to build
 # failure.
