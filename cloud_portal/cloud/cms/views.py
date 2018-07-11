@@ -90,7 +90,7 @@ def advanced_touched_without_permission(request_data, customization, data_struct
             if data_record.exists():
                 db_record_value = data_record.latest('created_date').value
             else:
-                db_record_value = data_structure.default
+                db_record_value = data_structure[0].default
 
             if request_data[ds_name] != db_record_value:
                     return True
@@ -117,21 +117,30 @@ def context_editor_action(request, context_id, language_code):
     if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
         last_language = Language.by_code(request_data['currentLanguage'])
 
-        upload_errors = save_unrevisioned_records(context, customization, last_language,
-                                                  context.datastructure_set.all(), request_data,
-                                                  request_files, request.user)
+        upload_errors, saved = save_unrevisioned_records(context, customization, last_language,
+                                                           context.datastructure_set.all(), request_data,
+                                                           request_files, request.user)
 
     elif 'Preview' in request_data or 'SaveDraft' in request_data:
-        upload_errors = save_unrevisioned_records(context, customization, language, context.datastructure_set.all(),
-                                                  request_data, request_files, request.user)
+        upload_errors, saved = save_unrevisioned_records(context, customization, language,
+                                                           context.datastructure_set.all(), request_data,
+                                                           request_files, request.user)
 
         if 'Preview' in request_data:
             saved_msg += " Preview has been created."
 
     elif 'SendReview' in request_data:
-        upload_errors = send_version_for_review(context, customization, language, context.datastructure_set.all(),
-                                                context.product, request_data, request_files, request.user)
-        saved_msg += " A new version has been created."
+        upload_errors, saved = save_unrevisioned_records(context, customization, language,
+                                                           context.datastructure_set.all(), request_data,
+                                                           request_files, request.user)
+        if upload_errors:
+            warning_no_error_msg = "Cannot have any errors when sending for review."
+            messages.warning(request, "{} - {}".format(context.product.name, warning_no_error_msg))
+            saved = False
+        else:
+            saved = send_version_for_review(customization, context.product, request.user)
+            saved_msg += " A new version has been created."
+
 
     else:
         saved = False
@@ -142,6 +151,8 @@ def context_editor_action(request, context_id, language_code):
     if saved:
         messages.success(request, saved_msg)
         preview_link = generate_preview_link(context)
+    else:
+        messages.warning(request, "Nothing was saved because no records were changed")
 
     # The form is made here so that all of the changes to fields are sent with the new form
     form = initialize_form(context, customization, language, request.user)
@@ -165,7 +176,7 @@ def page_editor(request, context_id=None, language_code=None):
 
         context, customization, language, form, preview_link = context_editor_action(request, context_id, language_code)
 
-        if 'SendReview' in request.POST:
+        if 'SendReview' in request.POST and preview_link:
             return redirect(reverse('version', args=[ContentVersion.objects.latest('created_date').id]))
 
     return render(request, 'context_editor.html',
