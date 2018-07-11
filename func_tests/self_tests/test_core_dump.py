@@ -27,8 +27,8 @@ def test_parse(one_running_mediaserver):
         # r'srv*;'
         # r'srv*http://msdl.microsoft.com/download/symbols;'
         r'\\cinas\beta-builds\repository\v1\develop\vms\444\default\windows-x64\bin;'
-        r'\\cinas\beta-builds\repository\v1\develop\vms\444\default\windows-x64\bin\plugins;'
-        r'\\cinas\beta-builds\repository\v1\develop\vms\444\default\windows-x64\bin\plugins_optional;'
+        # r'\\cinas\beta-builds\repository\v1\develop\vms\444\default\windows-x64\bin\plugins;'
+        # r'\\cinas\beta-builds\repository\v1\develop\vms\444\default\windows-x64\bin\plugins_optional;'
     )
     dump_path = 'C:\Users\Administrator\AppData\Local\Temp\mediaserver (2).DMP'
     # pid = one_running_mediaserver.service.status().pid
