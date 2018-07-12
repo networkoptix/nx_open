@@ -13,7 +13,7 @@
 
             // gatewayHost: '{host}/gateway/{systemId}',
             // gatewayHost: '{systemId}.gw.vmsproxy.com',
-            gatewayHost: '{systemId}.relay-bur.vmsproxy.hdw.mx',
+            trafficRelayHost: '{systemId}.relay-bur.vmsproxy.hdw.mx',
 
             googleTagsCode: 'GTM-5MRNWP',
             apiBase: '/api',

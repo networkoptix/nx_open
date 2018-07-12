@@ -66,7 +66,7 @@ angular.module('nxCommon')
             var urlBase = '';
             if(this.systemId){
                 urlBase = window.location.protocol +'//' +
-                    (Config.gatewayHost.replace('{host}', window.location.host).
+                    (Config.trafficRelayHost.replace('{host}', window.location.host).
                                         replace('{systemId}', this.systemId));
             }
             urlBase += '/web';
@@ -77,7 +77,7 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.apiHost = function(){
             if(this.systemId){
-                return Config.gatewayHost.replace('{host}', window.location.host).replace('{systemId}', this.systemId);
+                return Config.trafficRelayHost.replace('{host}', window.location.host).replace('{systemId}', this.systemId);
             }
             return window.location.host;
         };
