@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QMetaType>
 
 #include <nx/fusion/model_functions_fwd.h>
