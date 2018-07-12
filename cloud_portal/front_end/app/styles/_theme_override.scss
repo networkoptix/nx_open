@@ -182,17 +182,16 @@ label {
     border           : 1px solid #d7dfe3;
     border-radius    : 2px;
     transition       : border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-
     box-shadow       : none;
     padding          : $padding-base-vertical $padding-input-horizontal;
-
-    &:focus {
-        box-shadow : none;
-    }
 
     &[disabled],
     fieldset[disabled] & {
         opacity : 0.3;
+    }
+
+    &:focus {
+        border-color : $input-border;
     }
 
     &:invalid:not(.ng-untouched) {
@@ -207,14 +206,6 @@ label {
 
 .form-control:read-only:focus {
     border-color : $input-border;
-}
-
-.form-control:focus {
-    border-color : $input-border-focus;
-}
-
-.form-control:focus + .input-group-addon {
-    border-color : $input-border-focus;
 }
 
 select.form-control {
@@ -251,14 +242,10 @@ button {
     &:focus,
     &.focus {
         box-shadow : none;
-        outline    : none !important;
-        outline    : 0 !important;
     }
 }
 
 .btn {
-    outline       : none !important;
-    outline       : 0 !important;
     max-width     : 278px;
     text-overflow : ellipsis;
     overflow      : hidden;
@@ -277,8 +264,6 @@ button {
     &:focus,
     &.focus {
         box-shadow : none;
-        outline    : none !important;
-        outline    : 0 !important;
     }
 }
 
@@ -287,13 +272,9 @@ button {
     background-color : transparent;
     border-color     : $light5;
 
-    &:hover:not([disabled]):not(.disabled),
-    &:focus:not([disabled]):not(.disabled),
-    &.focus:not([disabled]):not(.disabled) {
+    &:hover:not([disabled]):not(.disabled) {
         background-color : transparentize($light5, 0.75);
         border-color     : $light8;
-        outline : none !important;
-        outline : 0 !important;
     }
 
     &:active,
@@ -301,8 +282,6 @@ button {
         background-color : transparentize($light5, 0.5) !important;
         border-color     : transparentize($light5, 0.5) !important;
         @include box-shadow(inset 0px 1px 0px 1px $light9);
-        outline : none !important;
-        outline : 0 !important;
     }
 }
 
@@ -315,19 +294,14 @@ button {
     &.focus {
         background-color : $brand_l1;
         border-color     : $brand_core;
-        outline : none !important;
-        outline : 0 !important;
-        box-shadow : none;
+        box-shadow       : none;
     }
 
     &:active,
     &.active {
         background-color : $brand_core !important;
         border-color     : $brand_core !important;
-        // @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
-        outline : none !important;
-        outline : 0 !important;
-        box-shadow : none !important;
+        box-shadow       : none !important;
     }
 }
 

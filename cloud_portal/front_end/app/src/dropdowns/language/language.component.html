@@ -2,7 +2,7 @@
      placement="{{ !accountMode ? 'top-left' : 'down-left' }}"
      [ngClass]="{ 'dropdown-wide': accountMode}">
 
-    <a class="btn btn-default"
+    <button class="btn btn-default"
             id="languageSelect"
             ngbDropdownToggle>
         <span class="lang-sm" lang="{{activeLanguage.language}}"></span>
@@ -11,18 +11,18 @@
             <span></span>
             <span></span>
         </div>
-    </a>
+    </button>
 
-    <div ngbDropdownMenu aria-labelledby="languageSelect"
+    <ul ngbDropdownMenu aria-labelledby="languageSelect"
          [ngClass]="{'two-columns': languages.length>12}">
 
-        <button class="dropdown-item"
+        <li class="dropdown-item"
                 *ngFor="let lang of languages"
                 [ngClass]="{'active': lang.language === activeLanguage.language}"
                 (click)="changeLanguage(lang.language)">
 
             <span class="lang-sm" lang="{{lang.language}}"></span>
             <span>{{lang.name}}</span>
-        </button>
-    </div>
+        </li>
+    </ul>
 </div>

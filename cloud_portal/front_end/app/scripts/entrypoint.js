@@ -1,5 +1,4 @@
 import 'angular';
-// import 'bootstrap';
 import 'ng-toast';
 import 'ngstorage';
 import 'angular-route';
@@ -10,6 +9,7 @@ import 'angular-sanitize';
 import '@ng-bootstrap/ng-bootstrap';
 import 'angular-clipboard';
 import 'jquery-mousewheel';
+import 'what-input';
 
 import 'ng-toast/dist/ngToast.css';
 import 'ng-toast/dist/ngToast-animations.css';

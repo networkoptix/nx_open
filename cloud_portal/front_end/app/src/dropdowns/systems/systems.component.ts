@@ -39,6 +39,10 @@ export class NxSystemsDropdown implements OnInit, OnDestroy, OnChanges {
         this.active.settings = this.activeSystem && this.activeSystem.id && !this.isActive('/view');
     }
 
+    fireEvent (evt) {
+        // alert('EVENT!');
+    }
+
     trackByFn(index, item) {
         return item.id;
     }

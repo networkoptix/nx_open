@@ -31,6 +31,21 @@ body {
     min-width     : 360px;
 }
 
+[data-whatintent='mouse'] *:focus {
+    outline : none !important;
+}
+
+[data-whatelement='input'] input:focus {
+    outline : none !important;
+    @extend #outline;
+}
+
+[data-whatintent='keyboard'] button:focus:not([disabled]):not(.disabled),
+[data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled) {
+    outline : none !important;
+    @extend #outline;
+}
+
 html.webclient-page{
     overflow: hidden; /* WEB-564: this is another hack: we hide scroll for view page */
 
@@ -91,8 +106,6 @@ footer {
         color     : $light12;
 
         &:hover, &:focus {
-            outline          : none !important;
-            outline          : 0 !important;
             box-shadow       : none;
             text-decoration  : none !important;
             background-color : transparent;

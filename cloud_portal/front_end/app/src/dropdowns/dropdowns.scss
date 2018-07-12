@@ -8,30 +8,12 @@
 }
 
 .dropdown {
-    @media (max-width : $collapse-second-width) {
-        position : inherit;
-
-        .dropdown-menu {
-            right : 0 !important;
-        }
-    }
-
     &-wide {
         display : inline-block;
         width   : 100%;
 
         .dropdown-menu {
             top : 32px !important;
-        }
-    }
-
-    &.show {
-        .dropdown-toggle {
-            background-color : $light5;
-        }
-
-        .dropdown-toggle-transparent {
-            background-color : transparentize($light5, 0.75) !important;
         }
     }
 
@@ -43,6 +25,7 @@
         &:hover {
             background-color : $light5 !important;
             color            : $dark9 !important;
+            box-shadow       : none !important;
 
             .arrow {
                 &::after {
@@ -133,7 +116,21 @@
     .dropdown-toggle-transparent {
         background-color : transparent;
 
+        &:focus {
+            background-color : transparent !important;
+        }
+
         &:hover {
+            background-color : transparentize($light5, 0.75) !important;
+        }
+    }
+
+    &.show {
+        .dropdown-toggle {
+            background-color : $light5;
+        }
+
+        .dropdown-toggle-transparent {
             background-color : transparentize($light5, 0.75) !important;
         }
     }
