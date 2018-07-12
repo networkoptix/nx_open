@@ -116,6 +116,7 @@ class OSAccess(object):
 
     @abstractmethod
     def make_core_dump(self, pid):
+        # TODO: Find and return path.
         pass
 
     @abstractmethod
