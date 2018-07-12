@@ -84,6 +84,11 @@ h6 {
     color       : $dark9;
 }
 
+.h7 {
+    @extend h6;
+    font-family : $font-family-regular;
+}
+
 h1 > .label {
     font-size      : 60%;
     vertical-align : 33%;
@@ -444,35 +449,6 @@ select {
     }
 }
 
-.nav-tabs {
-    .nav-item {
-        margin-right : 2px;
-    }
-}
-
-.nav-tabs .nav-link {
-    border-top-left-radius  : 2px;
-    border-top-right-radius : 2px;
-
-    &.active {
-        background-color : $light1;
-        border-bottom    : 1px solid transparent;
-
-        .tab-heading {
-            border-bottom : 1px solid #d7dfe3;
-            padding       : 10px 0;
-        }
-    }
-}
-
-.nav-tabs > li > a {
-    line-height : 22px;
-}
-
-.nav-tabs > li > a:hover {
-    background-color : #fff !important;
-}
-
 .info-icon.active {
     color : $brand_core !important;
 }
@@ -583,12 +559,30 @@ select {
 
 ngb-tabset {
     .nav-tabs {
-        a {
-            color       : $dark12;
-            font-size   : $h5-font-size;
-            font-family : $font-family-medium;
-            line-height : 26px;
-            padding     : 7px 20px;
+        .nav-item {
+            .nav-link {
+                border-top-left-radius  : 2px;
+                border-top-right-radius : 2px;
+                color                   : $dark12;
+                font-size               : $h5-font-size;
+                font-family             : $font-family-medium;
+                line-height             : 26px;
+                padding                 : 10px 20px;
+
+                &.active {
+                    background-color : $light1 !important;
+                    border-bottom    : 1px solid transparent;
+
+                    .tab-heading {
+                        border-bottom : 1px solid #d7dfe3;
+                        padding       : 14px 0;
+                    }
+                }
+
+                &:hover {
+                    background-color : transparentize($light5, 0.75);
+                }
+            }
         }
     }
 }

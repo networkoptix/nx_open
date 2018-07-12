@@ -748,13 +748,49 @@ h1 .badge {
     }
 }
 
+.installers {
+    .links {
+        &.a-link {
+            width : 160px;
+            float : left;
+        }
+
+        @media (max-width : 991px) {
+            width : 50% !important;
+            float : left;
+        }
+
+        @media (max-width : 768px) {
+            width : 100% !important;
+            float : left;
+        }
+    }
+}
+
+.mobile-badge {
+    float      : left;
+    margin-top : 24px;
+
+    .mobile-link {
+        margin-right : 0.5rem;
+    }
+}
+
 .download-button {
-    max-width     : fit-content;
-    margin-bottom : 8px;
-    margin-top    : 0;
+    max-width : fit-content;
+    margin    : 0 0 8px 0;
+    padding   : 0 12px 0 0;
 
     .installer-name {
         font-weight : normal;
+    }
+
+    .media-left {
+        height          : 64px;
+        width           : 64px;
+        display         : flex;
+        align-items     : center;
+        justify-content : center;
     }
 
     .media-body {
@@ -768,14 +804,18 @@ h1 .badge {
     }
 
     & + p {
-        color: $light16;
+        color         : $light16;
+        margin-bottom : 1rem;
+        font-size     : rem(12px);
     }
 }
 
-h2.version-number{
-    font-weight: bold;
-    font-size: 32px;
-    margin: 10px 0;
+h2.version-number {
+    line-height : 34px;
+    font-weight : bold;
+    font-size   : 32px;
+    margin      : 0 0 8px 0;
+    font-family : $font-family-medium;
 }
 
 .disabled{
