@@ -105,7 +105,7 @@ def artifacts_dir(node_dir, artifact_factory):
     for entry in dir.glob('*'):
         # noinspection PyUnresolvedReferences
         mime_type = mimetypes.types_map.get(entry.suffix, 'application/octet-stream')
-        type = ArtifactType(entry.suffix[1:], mime_type, entry.suffix)
+        type = ArtifactType(entry.suffix[1:] if entry.suffix else 'unknown_type', mime_type)
         factory = artifact_factory([entry.stem], name=entry.stem, artifact_type=type)
         path = factory.produce_file_path()
         copy_file(entry, path)
