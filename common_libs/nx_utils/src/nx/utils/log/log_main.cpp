@@ -16,31 +16,44 @@ public:
         updateMaxLevel();
     }
 
-    std::shared_ptr<Logger> main()
+    std::shared_ptr<AbstractLogger> main()
     {
         QnMutexLocker lock(&m_mutex);
         return m_mainLogger;
     }
 
-    std::shared_ptr<Logger> add(const std::set<Tag>& filters)
+    void setMainLogger(std::unique_ptr<AbstractLogger> logger)
     {
-        QnMutexLocker lock(&m_mutex);
-        const auto logger = std::make_shared<Logger>(
-            Level::none, /*writer*/ nullptr, [this](){ onLevelChanged(); });
-        for(auto& f: filters)
-            m_loggersByTags.emplace(f, logger);
+        if (!logger)
+            return;
 
-        updateMaxLevel();
-        return logger;
+        QnMutexLocker lock(&m_mutex);
+        m_mainLogger = std::move(logger);
     }
 
-    std::shared_ptr<Logger> get(const Tag& tag, bool exactMatch) const
+    void add(std::unique_ptr<AbstractLogger> logger)
+    {
+        if (!logger)
+            return;
+
+        QnMutexLocker lock(&m_mutex);
+
+        std::shared_ptr<AbstractLogger> sharedLogger(std::move(logger));
+
+        sharedLogger->setOnLevelChanged([this]() { onLevelChanged(); });
+        for (auto& f: sharedLogger->tags())
+            m_loggersByTags.emplace(f, sharedLogger);
+
+        updateMaxLevel();
+    }
+
+    std::shared_ptr<AbstractLogger> get(const Tag& tag, bool exactMatch) const
     {
         QnMutexLocker lock(&m_mutex);
         if (exactMatch)
         {
             const auto it = m_loggersByTags.find(tag);
-            return (it == m_loggersByTags.end()) ? std::shared_ptr<Logger>() : it->second;
+            return (it == m_loggersByTags.end()) ? std::shared_ptr<AbstractLogger>() : it->second;
         }
 
         for (auto& it: m_loggersByTags)
@@ -74,8 +87,8 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    std::shared_ptr<Logger> m_mainLogger;
-    std::map<Tag, std::shared_ptr<Logger>> m_loggersByTags;
+    std::shared_ptr<AbstractLogger> m_mainLogger;
+    std::map<Tag, std::shared_ptr<AbstractLogger>> m_loggersByTags;
     std::atomic<Level> m_maxLevel{Level::none};
 };
 
@@ -94,22 +107,27 @@ static LoggerCollection* loggerCollection()
 
 } // namespace
 
-std::shared_ptr<Logger> mainLogger()
+std::shared_ptr<AbstractLogger> mainLogger()
 {
     return loggerCollection()->main();
 }
 
-std::shared_ptr<Logger> addLogger(const std::set<Tag>& filters)
+void setMainLogger(std::unique_ptr<AbstractLogger> logger)
 {
-    return loggerCollection()->add(filters);
+    return loggerCollection()->setMainLogger(std::move(logger));
 }
 
-std::shared_ptr<Logger> getLogger(const Tag& tag)
+void addLogger(std::unique_ptr<AbstractLogger> logger)
+{
+    loggerCollection()->add(std::move(logger));
+}
+
+std::shared_ptr<AbstractLogger> getLogger(const Tag& tag)
 {
     return loggerCollection()->get(tag, /*exactMatch*/ false);
 }
 
-std::shared_ptr<Logger> getExactLogger(const Tag& tag)
+std::shared_ptr<AbstractLogger> getExactLogger(const Tag& tag)
 {
     return loggerCollection()->get(tag, /*exactMatch*/ true);
 }

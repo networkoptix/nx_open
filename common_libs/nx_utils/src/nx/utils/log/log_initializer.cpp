@@ -6,6 +6,7 @@
 #include <nx/utils/string.h>
 
 #include "log_main.h"
+#include "log_logger.h"
 
 namespace {
 
@@ -19,20 +20,20 @@ namespace log {
 
 static std::atomic<bool> isInitializedGlobally(false);
 
-void initialize(
+std::unique_ptr<AbstractLogger> buildLogger(
     const Settings& settings,
     const QString& applicationName,
     const QString& binaryPath,
-    std::shared_ptr<Logger> logger)
+    const std::set<Tag>& tags)
 {
     if (settings.level.primary == Level::undefined || settings.level.primary == Level::notConfigured)
-        return;
+        return nullptr;
 
-    if (!logger)
-        logger = mainLogger();
+    auto logger = std::make_unique<Logger>(tags);
 
-    // Can not be reinitialized if initialized globally.
-    if (!isInitializedGlobally.load())
+    // Cannot be reinitialized if initialized globally.
+    // Why can't I set writer to my custom logger if mainLogger has already been initialized? What's the point?
+    //if (!isInitializedGlobally.load())
     {
         logger->setDefaultLevel(settings.level.primary);
         logger->setLevelFilters(settings.level.filters);
@@ -70,6 +71,8 @@ void initialize(
     write(lm("Log file size: %2, backup count: %3, file: %4").args(
         nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
         filePath ? *filePath : QString("-")));
+
+    return logger;
 }
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)

@@ -161,8 +161,9 @@ int main(int argc, char* argv[])
         settings.maxBackupCount = 5;
         settings.logBaseName = logFilePath;
 
-        nx::utils::log::initialize(
-            settings, QnApplauncherAppInfo::applicationName());
+        nx::utils::log::setMainLogger(
+            nx::utils::log::buildLogger(
+                settings, QnApplauncherAppInfo::applicationName()));
     }
 
     InstallationManager installationManager;

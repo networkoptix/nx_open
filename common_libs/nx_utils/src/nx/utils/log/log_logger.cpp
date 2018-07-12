@@ -15,6 +15,12 @@ namespace nx {
 namespace utils {
 namespace log {
 
+Logger::Logger(const std::set<Tag>& tags):
+    m_mutex(QnMutex::Recursive),
+    m_tags(tags)
+{
+}
+
 Logger::Logger(
     Level defaultLevel,
     std::unique_ptr<AbstractWriter> writer,
@@ -26,6 +32,11 @@ Logger::Logger(
 {
     if (writer)
         m_writers.push_back(std::move(writer));
+}
+
+std::set<Tag> Logger::tags() const
+{
+    return m_tags;
 }
 
 void Logger::log(Level level, const Tag& tag, const QString& message)
@@ -105,12 +116,6 @@ Level Logger::maxLevel() const
     return maxLevel;
 }
 
-void Logger::setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_writers = std::move(writers);
-}
-
 void Logger::setWriter(std::unique_ptr<AbstractWriter> writer)
 {
     QnMutexLocker lock(&m_mutex);
@@ -118,7 +123,13 @@ void Logger::setWriter(std::unique_ptr<AbstractWriter> writer)
     m_writers.push_back(std::move(writer));
 }
 
-boost::optional<QString> Logger::filePath() const
+void Logger::setOnLevelChanged(OnLevelChanged onLevelChanged)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_onLevelChanged = std::move(onLevelChanged);
+}
+
+std::optional<QString> Logger::filePath() const
 {
     QnMutexLocker lock(&m_mutex);
     for (const auto& writer: m_writers)
@@ -127,7 +138,7 @@ boost::optional<QString> Logger::filePath() const
             return file->makeFileName();
     }
 
-    return boost::none;
+    return std::nullopt;
 }
 
 void Logger::handleLevelChange(QnMutexLockerBase* lock) const

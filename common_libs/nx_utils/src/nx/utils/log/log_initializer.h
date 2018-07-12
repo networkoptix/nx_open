@@ -1,6 +1,6 @@
 #pragma once
 
-#include "log_logger.h"
+#include "abstract_logger.h"
 #include "log_settings.h"
 
 namespace nx { namespace utils { class ArgumentParser; } }
@@ -9,11 +9,11 @@ namespace nx {
 namespace utils {
 namespace log {
 
-void NX_UTILS_API initialize(
+NX_UTILS_API std::unique_ptr<AbstractLogger> buildLogger(
     const Settings& settings,
     const QString& applicationName,
     const QString& binaryPath = QString(),
-    std::shared_ptr<Logger> logger = nullptr);
+    const std::set<Tag>& tags = {});
 
 void NX_UTILS_API initializeGlobally(const nx::utils::ArgumentParser& arguments);
 

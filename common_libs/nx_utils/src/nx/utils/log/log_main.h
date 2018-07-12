@@ -7,16 +7,17 @@ namespace utils {
 namespace log {
 
 /** @return Main logger. */
-NX_UTILS_API std::shared_ptr<Logger> mainLogger();
+NX_UTILS_API std::shared_ptr<AbstractLogger> mainLogger();
 
-/** Creates a logger for specific filters. */
-NX_UTILS_API std::shared_ptr<Logger> addLogger(const std::set<Tag>& filters);
+NX_UTILS_API void setMainLogger(std::unique_ptr<AbstractLogger> logger);
 
-/** @return Logger by tag or main if no specific logger is set. */
-NX_UTILS_API std::shared_ptr<Logger> getLogger(const Tag& tag);
+NX_UTILS_API void addLogger(std::unique_ptr<AbstractLogger> logger);
 
-/** @return Logger by exact tag, nullptr otherwise. */
-NX_UTILS_API std::shared_ptr<Logger> getExactLogger(const Tag& tag);
+/** @return AbstractLogger by tag or main if no specific logger is set. */
+NX_UTILS_API std::shared_ptr<AbstractLogger> getLogger(const Tag& tag);
+
+/** @return AbstractLogger by exact tag, nullptr otherwise. */
+NX_UTILS_API std::shared_ptr<AbstractLogger> getExactLogger(const Tag& tag);
 
 /** Removes specific loggers for filters, so such messagess will go to main log. */
 NX_UTILS_API void removeLoggers(const std::set<Tag>& filters);
@@ -48,7 +49,7 @@ public:
 protected:
    const Level m_level;
    const Tag m_tag;
-   std::shared_ptr<Logger> m_logger;
+   std::shared_ptr<AbstractLogger> m_logger;
 };
 
 class Stream: public Helper

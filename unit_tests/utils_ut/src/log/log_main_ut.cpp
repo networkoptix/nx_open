@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/log/log_settings.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_options.h>
 
@@ -17,17 +19,27 @@ static const Tag kNamespaceTag(lit("nx::utils::log::test"));
 class LogMainTest: public ::testing::Test
 {
 public:
-    LogMainTest():
+    LogMainTest(std::unique_ptr<AbstractWriter> customWriter = nullptr):
         initialLevel(mainLogger()->defaultLevel())
     {
         mainLogger()->setDefaultLevel(Level::none);
 
-        logger = addLogger({kTestTag, kNamespaceTag});
-        EXPECT_EQ(Level::none, maxLevel());
-        logger->setDefaultLevel(levelFromString("INFO"));
-        EXPECT_EQ(Level::info, maxLevel());
-        logger->setWriter(std::unique_ptr<AbstractWriter>(buffer = new Buffer));
-        logger->setLevelFilters(LevelFilters{{kNamespaceTag, Level::verbose}});
+        log::Settings settings;
+        settings.level.primary = levelFromString("INFO");
+        settings.level.filters = LevelFilters{{kNamespaceTag, Level::verbose}};
+
+        auto logger = buildLogger(
+            settings,
+            QString("log_ut"),
+            QString(),
+            {kTestTag, kNamespaceTag});
+
+        if (customWriter)
+            logger->setWriter(std::move(customWriter));
+        else
+            logger->setWriter(std::unique_ptr<AbstractWriter>(buffer = new Buffer));
+        log::addLogger(std::move(logger));
+
         EXPECT_EQ(Level::verbose, maxLevel());
     }
 
@@ -52,7 +64,6 @@ public:
         }
     }
 
-    std::shared_ptr<Logger> logger;
     Buffer* buffer;
     const Level initialLevel;
 };
@@ -108,12 +119,14 @@ TEST_F(LogMainTest, This)
 
 class LogMainPerformanceTest: public LogMainTest
 {
+    using base_type = LogMainTest;
+
 public:
-    LogMainPerformanceTest()
+    LogMainPerformanceTest():
+        base_type(std::make_unique<NullDevice>())
     {
         // FIXME: #mshevchenko Should we use setLevelFilters() here instead?
         // logger->setExceptionFilters({lit("nx::utils::log::test::Enabled")});
-        logger->setWriter(std::make_unique<NullDevice>());
     }
 
     template<typename Action>
