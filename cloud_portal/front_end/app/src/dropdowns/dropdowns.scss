@@ -71,10 +71,6 @@ header {
             }
         }
 
-        &::after {
-            display : none !important;
-        }
-
         .arrow {
             position         : relative;
             bottom           : auto;
@@ -168,6 +164,10 @@ header {
             background-color : transparentize($light5, 0.75) !important;
         }
     }
+}
+
+.dropdown-toggle::after {
+    display : none !important;
 }
 
 nx-select.ng-invalid:not(.ng-untouched) {

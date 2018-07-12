@@ -178,5 +178,5 @@ $collapse-first-width: 920px;
 $collapse-second-width: 700px;
 
 #outline {
-    box-shadow : 0 0 2px 1px transparentize($brand_l2, 0.4) !important;
+    box-shadow : inset 0 0 2px 1px transparentize($brand_l2, 0.4) !important;
 }
