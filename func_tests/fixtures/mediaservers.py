@@ -8,6 +8,7 @@ from framework.installation.mediaserver_factory import MediaserverFactory
 from framework.merging import merge_systems, setup_local_system
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file
+import framework.licensing as licensing
 
 _logger = logging.getLogger(__name__)
 
@@ -89,4 +90,22 @@ def one_mediaserver(one_vm, mediaserver_factory, artifacts_dir):
 def one_running_mediaserver(one_mediaserver):
     one_mediaserver.start()
     setup_local_system(one_mediaserver, {})
+    return one_mediaserver
+
+
+@pytest.fixture(scope='session')
+def required_licenses():
+    return [dict(n_cameras=100)]
+
+
+@pytest.fixture
+def one_licensed_server(one_mediaserver, required_licenses):
+    one_mediaserver.os_access.networking.static_dns(licensing.TEST_SERVER_IP, licensing.DNS)
+    one_mediaserver.start()
+    setup_local_system(one_mediaserver, {})
+
+    server = licensing.ServerApi()
+    for license in required_licenses:
+        one_mediaserver.api.get('api/activateLicense', params=dict(key=server.generate(**license)))
+
     return one_mediaserver
