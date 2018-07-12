@@ -86,7 +86,7 @@ class WindowsInstallation(Installation):
             )
         self.os_access.parse_core_dump(path, symbols_path=symbols_path, timeout_sec=600)
 
-    def restore_mediaserver_conf(self):
+    def _restore_conf(self):
         self._config_key_backup.copy_values_to(self._config_key)
 
     def update_mediaserver_conf(self, new_configuration):

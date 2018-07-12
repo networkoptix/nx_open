@@ -275,13 +275,13 @@ def test_merge_resources(two_separate_mediaservers):
 
 
 @pytest.mark.cloud
-def test_restart_one_server(one, two, cloud_account):
+def test_restart_one_server(one, two, cloud_account, ca):
     merge_systems(one, two)
 
     # Stop Server2 and clear its database
     guid2 = get_server_id(two.api)
     two.stop()
-    two.installation.var.rmtree()
+    two.installation.cleanup(ca.generate_key_and_cert())
     two.start()
 
     # Remove Server2 from database on Server1

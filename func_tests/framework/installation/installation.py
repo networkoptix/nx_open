@@ -17,10 +17,9 @@ class Installation(object):
         self.os_access = os_access  # type: OSAccess
         self.dir = dir  # type: FileSystemPath
         self.binary = dir / binary_file  # type: FileSystemPath
-        self.var = dir / var_dir  # type: FileSystemPath
+        self._var = dir / var_dir  # type: FileSystemPath
         self._core_dumps_dirs = [dir / core_dumps_dir for core_dumps_dir in core_dumps_dirs]
         self._core_dump_glob = core_dump_glob  # type: str
-        self.key_pair = self.var / 'ssl' / 'cert.pem'
 
     @abstractproperty
     def identity(self):
@@ -39,7 +38,7 @@ class Installation(object):
         return Service()
 
     @abstractmethod
-    def restore_mediaserver_conf(self):
+    def _restore_conf(self):
         pass
 
     @abstractmethod
@@ -47,7 +46,7 @@ class Installation(object):
         pass
 
     def list_log_files(self):
-        return self.var.joinpath('log').glob('log_file*.log')
+        return self._var.joinpath('log').glob('log_file*.log')
 
     def list_core_dumps(self):
         return [
@@ -66,15 +65,16 @@ class Installation(object):
         for core_dump_path in self.list_core_dumps():
             core_dump_path.unlink()
         try:
-            _logger.info("Remove var directory %s.", self.var)
-            self.var.rmtree()
+            _logger.info("Remove var directory %s.", self._var)
+            self._var.rmtree()
         except DoesNotExist:
             pass
-        _logger.info("Put key pair to %s.", self.key_pair)
-        self.key_pair.parent.mkdir(parents=True, exist_ok=True)
-        self.key_pair.write_text(new_key_pair)
+        key_pair_file = self._var / 'ssl' / 'cert.pem'
+        _logger.info("Put key pair to %s.", key_pair_file)
+        key_pair_file.parent.mkdir(parents=True, exist_ok=True)
+        key_pair_file.write_text(new_key_pair)
         _logger.info("Update conf file.")
-        self.restore_mediaserver_conf()
+        self._restore_conf()
         self.update_mediaserver_conf({
             'logLevel': 'DEBUG2',
             'tranLogLevel': 'DEBUG2',
