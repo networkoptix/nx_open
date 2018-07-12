@@ -294,10 +294,8 @@ void initLog(const QString& logLevel)
 
     if (ini().enableLog)
     {
-        nx::utils::log::setMainLogger(
-            nx::utils::log::buildLogger(
-                logSettings,
-                /*applicationName*/ lit("mobile_client")));
+        std::unique_ptr<nx::utils::log::AbstractWriter> logWriter;
+
         const QString tcpLogAddress(QLatin1String(ini().tcpLogAddress));
         if (!tcpLogAddress.isEmpty())
         {
@@ -306,9 +304,16 @@ void initLog(const QString& logLevel)
             int port = 7001;
             if (params.size() >= 2)
                 port = params[1].toInt();
-            nx::utils::log::mainLogger()->setWriter(
-                std::make_unique<TcpLogWriterOut>(nx::network::SocketAddress(address, port)));
+            logWriter = std::make_unique<TcpLogWriterOut>(nx::network::SocketAddress(address, port));
         }
+
+        nx::utils::log::setMainLogger(
+            nx::utils::log::buildLogger(
+                logSettings,
+                /*applicationName*/ lit("mobile_client"),
+                QString(),
+                std::set<Tag>(),
+                std::move(logWriter)));
     }
 
     if (ini().enableEc2TranLog)
