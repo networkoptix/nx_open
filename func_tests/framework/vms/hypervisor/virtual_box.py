@@ -144,7 +144,7 @@ class VirtualBoxVm(VmHardware):
             OneWayPortMap.forwarding(cls._parse_port_forwarding(raw_dict)),
             OneWayPortMap.direct(cls._parse_host_address(raw_dict)))
         macs, networks, bridged = cls._parse_nic_occupation(raw_dict)
-        return cls(name, ports_map, macs, networks, bridged, raw_dict['VMState'] == 'running')
+        return cls(name, ports_map, macs, networks, bridged, raw_dict['description'], raw_dict['VMState'] == 'running')
 
 
 class VirtualBox(Hypervisor):

@@ -7,13 +7,14 @@ class VmHardware(object):
     """Settings hypervisor is responsible for"""
     __metaclass__ = ABCMeta
 
-    def __init__(self, name, port_map, macs, networks, bridged, is_running):
+    def __init__(self, name, port_map, macs, networks, bridged, description, is_running):
         self.name = name
         self.port_map = port_map
         self.macs = macs
         self.networks = networks
         self.bridged = bridged
         self.is_running = is_running
+        self.description = description
 
     def __repr__(self):
         if not self.is_running:
