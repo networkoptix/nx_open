@@ -12,8 +12,20 @@
         display : inline-block;
         width   : 100%;
 
+        .dropdown-toggle {
+            max-width : none;
+            width     : 100%;
+
+            .arrow {
+                position     : absolute;
+                margin-top   : 4px;
+                margin-right : 10px !important;
+            }
+        }
+
         .dropdown-menu {
-            top : 32px !important;
+            width : 100%;
+            top   : 32px !important;
         }
     }
 

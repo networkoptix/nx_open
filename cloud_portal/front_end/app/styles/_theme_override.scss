@@ -181,7 +181,7 @@ label {
     background-image : none;
     border           : 1px solid #d7dfe3;
     border-radius    : 2px;
-    transition       : border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition       : none;
     box-shadow       : none;
     padding          : $padding-base-vertical $padding-input-horizontal;
 
@@ -212,25 +212,6 @@ select.form-control {
     -webkit-appearance : none;
     -moz-appearance    : none;
     background-color   : transparent;
-}
-
-.dropdown {
-    &.dropdown-wide {
-        .dropdown-menu {
-            width : 100%;
-        }
-
-        .dropdown-toggle {
-            max-width : none;
-            width     : 100%;
-
-            .arrow {
-                position     : absolute;
-                margin-top   : 4px;
-                margin-right : 10px !important;
-            }
-        }
-    }
 }
 
 button {
