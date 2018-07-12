@@ -123,7 +123,6 @@ class MediaserverFactory(object):
         # TODO: Refactor client code so this method doesn't rely on it.
         installer = installer_by_vm_type(self._mediaserver_installers, vm.type)
         installation = make_installation(self._mediaserver_installers, vm.type, vm.os_access)
-        _logger.info("Mediaserver name %s is not same as VM alias %s. Not a mistake?", name, vm.alias)
         mediaserver = setup_clean_mediaserver(name, installation, installer, self._ca)
         yield mediaserver
         examine_mediaserver(mediaserver)
