@@ -8,7 +8,8 @@ namespace NxUi {
 enum class WebViewStyle
 {
     common,
-    eula
+    eula,
+    c2p,
 };
 
 QPalette createWebViewPalette(WebViewStyle style = WebViewStyle::common);

@@ -51,6 +51,7 @@
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_tool.h>
 
+#include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -83,6 +84,7 @@ void installTranslations()
 }
 
 } // namespace
+
 
 QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
