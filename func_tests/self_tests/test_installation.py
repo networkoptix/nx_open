@@ -1,6 +1,7 @@
 import logging
 
 import pytest
+from pathlib2 import Path
 
 from framework.installation.make_installation import installer_by_vm_type, make_installation
 from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, setup_clean_mediaserver
@@ -35,7 +36,8 @@ def linux_multi_vm(vm_factory):
 @pytest.fixture
 def group_install_os_access(request, config):
     if config.OS_ACCESS:
-        return PhysicalSshAccess(config.OS_ACCESS['address'], config.OS_ACCESS['username'], config.OS_ACCESS['key_path'])
+        key = Path(config.OS_ACCESS['key_path']).read_text()
+        return PhysicalSshAccess(config.OS_ACCESS['address'], config.OS_ACCESS['username'], key)
     else:
         vm = request.getfixturevalue('linux_multi_vm')
         return vm.os_access

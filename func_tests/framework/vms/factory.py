@@ -30,7 +30,7 @@ class VMFactory(object):
             vm_type_configuration = self._vm_configuration[vm_type]
             username, password, key = info.description.split('\n', 2)
             if vm_type_configuration['os_family'] == 'linux':
-                os_access = VmSshAccess(info.port_map, info.macs, username, SSH_PRIVATE_KEY_PATH)
+                os_access = VmSshAccess(info.port_map, info.macs, username, key)
             elif vm_type_configuration['os_family'] == 'windows':
                 os_access = WindowsAccess(info.port_map, info.macs, username, password)
             else:
