@@ -98,6 +98,23 @@ class WindowsInstallation(Installation):
         dumps = dumps_from_mediaserver + dumps_from_procdump
         return dumps
 
+    def parse_core_dump(self, path):
+        symbols_path = str.format(
+            r'cache*;'
+            # By some obscure reason, when run via WinRM, `cdb` cannot fetch `.pdb` from Microsoft Symbol Server.
+            # (Same command, copied from `procmon`, works like a charm.)
+            # Hope symbols exported from DLLs will suffice.
+            # r'srv*;'
+            r'{build_dir}\{build}\{customization}\windows-x64\bin;'
+            # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins;'
+            # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins_optional;'
+            ,
+            build_dir=r'\\cinas\beta-builds\repository\v1\develop\vms',
+            build=self.identity.version.build,
+            customization=self.identity.customization.customization_name,
+            )
+        self.os_access.parse_core_dump(path, symbols_path=symbols_path, timeout_sec=600)
+
     def restore_mediaserver_conf(self):
         self._config_key_backup.copy_values_to(self._config_key)
 

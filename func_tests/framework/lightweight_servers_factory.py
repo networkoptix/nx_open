@@ -16,7 +16,6 @@ from framework.os_access.path import copy_file
 from framework.rest_api import RestApi
 from framework.waiting import wait_for_true
 from . import utils
-from .core_file_traceback import create_core_file_traceback
 from .template_renderer import TemplateRenderer
 from .utils import GrowingSleep
 
@@ -234,9 +233,10 @@ class LightweightServersHost(object):
             local_core_path = artifact_factory.produce_file_path()
             copy_file(remote_core_path, local_core_path)
             _logger.debug('core file for lws at %s is stored to %s', self._host_name, local_core_path)
-            traceback = create_core_file_traceback(
-                self._os_access, self._installation.dir / LWS_BINARY_NAME,
-                self._physical_installation_host.unpacked_mediaserver_dir / 'lib', remote_core_path)
+            traceback = self._os_access.parse_core_dump(
+                remote_core_path,
+                self._installation.dir / LWS_BINARY_NAME,
+                self._physical_installation_host.unpacked_mediaserver_dir / 'lib')
             artifact_factory = self._artifact_factory(
                 ['lws', self._host_name, fname, 'traceback'],
                 name='%s-tb' % fname, is_error=True, artifact_type=TRACEBACK_ARTIFACT_TYPE)

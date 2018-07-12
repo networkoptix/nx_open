@@ -119,6 +119,12 @@ class OSAccess(object):
         pass
 
     @abstractmethod
+    def parse_core_dump(self, path, **options):
+        """Parse process dump with OS-specific options"""
+        # TODO: Decide on placement of this method. Where should it reside given that arguments differ?
+        pass
+
+    @abstractmethod
     def make_fake_disk(self, name, size_bytes):
         return self.Path()
 

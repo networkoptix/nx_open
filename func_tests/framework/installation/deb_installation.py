@@ -57,6 +57,9 @@ class DebInstallation(Installation):
     def list_core_dumps(self):
         return self._bin.glob('core.*')
 
+    def parse_core_dump(self, path):
+        return self.os_access.parse_core_dump(path, self.binary, self.dir / 'lib')
+
     def restore_mediaserver_conf(self):
         self._posix_shell.run_command(['cp', self._config_initial, self._config])
 

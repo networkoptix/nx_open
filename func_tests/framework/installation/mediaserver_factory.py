@@ -2,7 +2,6 @@ import logging
 from contextlib import contextmanager
 
 from framework.artifact import ArtifactType
-from framework.core_file_traceback import create_core_file_traceback
 from framework.installation.make_installation import installer_by_vm_type, make_installation
 from framework.installation.mediaserver import Mediaserver
 from framework.os_access.exceptions import DoesNotExist
@@ -89,18 +88,14 @@ def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
         copy_file(core_dump, local_core_dump_path)
         # noinspection PyBroadException
         try:
-            traceback = create_core_file_traceback(
-                mediaserver.os_access,
-                mediaserver.installation.binary,
-                mediaserver.installation.dir / 'lib',
-                core_dump)
+            traceback = mediaserver.installation.parse_core_dump(core_dump)
             code_dumps_artifact_factory = root_artifact_factory(
                 ['server', mediaserver.name.lower(), core_dump.name, 'traceback'],
                 name='%s-%s-tb' % (mediaserver.name.lower(), core_dump.name),
                 is_error=True,
                 artifact_type=TRACEBACK_ARTIFACT_TYPE)
             local_traceback_path = code_dumps_artifact_factory.produce_file_path()
-            local_traceback_path.write_bytes(traceback)
+            local_traceback_path.write_text(traceback)
             _logger.warning(
                 'Core dump on %r: %s, %s.',
                 mediaserver, local_core_dump_path, local_traceback_path)

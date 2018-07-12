@@ -20,6 +20,20 @@ class PosixAccess(OSAccess):
     def make_core_dump(self, pid):
         self.shell.run_sh_script('gcore -o /proc/$PID/cwd/core.$(date +%s) $PID', env={'PID': pid})
 
+    def parse_core_dump(self, path, executable_path=None, lib_path=None, timeout_sec=600):
+        output = self.run_command([
+            'gdb',
+            '--quiet',
+            '--core', path,
+            '--exec', executable_path,
+            '--eval-command', 'set solib-search-path {}'.format(lib_path),
+            '--eval-command', 'set print static-members off',
+            '--eval-command', 'thread apply all backtrace',
+            '--eval-command', 'quit',
+            ],
+            timeout_sec=timeout_sec)
+        return output.decode('ascii')
+
     def make_fake_disk(self, name, size_bytes):
         mount_point = self.Path('/mnt') / name
         image_path = mount_point.with_suffix('.image')

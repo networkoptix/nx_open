@@ -44,3 +44,8 @@ class Installation(object):
     @abstractmethod
     def read_log(self):
         return b'log file contents'
+
+    @abstractmethod
+    def parse_core_dump(self, path):
+        """Parse MediaServer process dump"""
+        return u''
