@@ -49,7 +49,7 @@ def generate_languages_files():
                                  'File: ' + language_json_filename + '\n')
                 name = lang
             if name in languages_names:
-                raise ValueError('CRITICAL  ERROR: For BORIS to fix: language.json has not unique language_name. '
+                raise ValueError('CRITICAL ERROR: For BORIS to fix: language.json has not unique language_name. '
                                  'File: ' + language_json_filename)
             languages_names.append(name)
 
