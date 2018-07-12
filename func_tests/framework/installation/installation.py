@@ -44,7 +44,7 @@ class Installation(object):
         pass
 
     def read_log(self):
-        file = self.var / 'log' / 'log_file.txt'
+        file = self.var / 'log' / 'log_file.log'
         try:
             return file.read_bytes()
         except DoesNotExist:
