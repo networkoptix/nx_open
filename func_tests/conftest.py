@@ -95,6 +95,8 @@ def node_dir(request, work_dir):
 mimetypes.add_type('application/vnd.tcpdump.pcap', '.cap')
 mimetypes.add_type('application/vnd.tcpdump.pcap', '.pcap')
 mimetypes.add_type('text/plain', '.log')
+mimetypes.add_type('application/x-yaml', '.yaml')
+mimetypes.add_type('application/x-yaml', '.yml')
 
 
 @pytest.fixture()
