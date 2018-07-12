@@ -120,14 +120,11 @@ export class LoginModalContent implements OnInit, AfterViewInit{
                     this.renderer.selectRootElement('#email').select();
                 },
                 accountBlocked: () => {
-                    this.auth.password = '';
                     this.loginForm.controls['password'].markAsPristine();
                     this.loginForm.controls['password'].markAsUntouched();
 
                     this.nx_account_blocked = true;
                     this.loginForm.controls['password'].setErrors({'nx_account_blocked': true});
-
-                    this.renderer.selectRootElement('#password').focus();
                 },
                 portalError: this.language.lang.errorCodes.brokenAccount
             }
