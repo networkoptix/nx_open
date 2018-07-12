@@ -24,9 +24,10 @@ class CameraManager;
 class MediaEncoder: public nxcip::CameraMediaEncoder4
 {
 public:
-    MediaEncoder(CameraManager* const cameraManager,
-                 nxpl::TimeProvider *const timeProvider,
-                 int encoderNumber );
+    MediaEncoder(
+        CameraManager* const cameraManager,
+        nxpl::TimeProvider *const timeProvider,
+        int encoderNumber );
     virtual ~MediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface

@@ -104,6 +104,13 @@ static const QString HTTPS_PROTO_NAME( QString::fromLatin1("https") );
 
 bool DiscoveryManager::validateUrl(const QUrl& url)
 {
+    nxpt::ScopedRef<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
+    if (!plugin)
+        return false;
+
+    if (plugin->isStreamRunning(url))
+        return true;
+
     nx_http::HttpClient httpClient;
     if (!httpClient.doGet(url))
         return false;
@@ -232,7 +239,7 @@ int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDa
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
 {
-    return new CameraManager( info, m_timeProvider);
+    return new CameraManager(info, m_timeProvider);
 }
 
 int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )

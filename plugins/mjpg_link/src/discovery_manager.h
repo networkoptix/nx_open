@@ -15,7 +15,6 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
-
 struct UrlPathReplaceRecord
 {
     QString fromPath;
@@ -64,6 +63,7 @@ public:
         Does nothing
     */
     virtual int getReservedModelList( char** modelList, int* count ) override;
+
 private:
     QList<QUrl> translateUrlHook(const QUrl& url) const;
     QString getGroupName(const QUrl& url) const;

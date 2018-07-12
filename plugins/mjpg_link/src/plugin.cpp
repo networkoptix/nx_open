@@ -4,8 +4,19 @@
 ***********************************************************/
 
 #include "plugin.h"
+
+#include <chrono>
+
 #include "discovery_manager.h"
 
+using namespace std::chrono;
+using namespace std::literals::chrono_literals;
+
+namespace {
+
+static const milliseconds kStreamStateExpirationPeriod = 5000ms;
+
+} // namespace
 
 extern "C"
 {
@@ -100,4 +111,25 @@ nxpt::CommonRefManager* HttpLinkPlugin::refManager()
 HttpLinkPlugin* HttpLinkPlugin::instance()
 {
     return httpLinkPluginInstance;
+}
+
+void HttpLinkPlugin::setStreamState(const QUrl& url, bool isStreamRunning)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto& streamState = m_streamStateCache[url];
+    streamState.isRunning = isStreamRunning;
+    if (isStreamRunning)
+        streamState.timer.restart();
+}
+
+bool HttpLinkPlugin::isStreamRunning(const QUrl& url) const
+{
+    QnMutexLocker lock(&m_mutex);
+    auto itr = m_streamStateCache.find(url);
+    if (itr == m_streamStateCache.cend())
+        return false;
+
+    const auto& streamState = itr->second;
+
+    return streamState.isRunning && !streamState.timer.hasExpired(kStreamStateExpirationPeriod);
 }
