@@ -28,10 +28,11 @@ class VMFactory(object):
     def allocated_vm(self, alias, vm_type='linux'):
         with self._vm_types[vm_type].obtained(alias) as (info, vm_index):
             vm_type_configuration = self._vm_configuration[vm_type]
+            username, password, key = info.description.split('\n', 2)
             if vm_type_configuration['os_family'] == 'linux':
-                os_access = VmSshAccess(info.port_map, info.macs, 'root', SSH_PRIVATE_KEY_PATH)
+                os_access = VmSshAccess(info.port_map, info.macs, username, SSH_PRIVATE_KEY_PATH)
             elif vm_type_configuration['os_family'] == 'windows':
-                os_access = WindowsAccess(info.port_map, info.macs, u'Administrator', u'qweasd123')
+                os_access = WindowsAccess(info.port_map, info.macs, username, password)
             else:
                 raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", vm_type_configuration['os_family'])
             wait_for_true(os_access.is_accessible, timeout_sec=vm_type_configuration['power_on_timeout_sec'])
