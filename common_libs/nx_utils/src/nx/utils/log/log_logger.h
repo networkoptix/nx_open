@@ -10,13 +10,11 @@ class NX_UTILS_API Logger:
     public AbstractLogger
 {
 public:
-    Logger(const std::set<Tag>& tags);
-
     /** Initializes log with minimal level and writers, no writers means std out and err. */
     Logger(
+        const std::set<Tag>& tags,
         Level defaultLevel = Level::none,
-        std::unique_ptr<AbstractWriter> writer = nullptr,
-        OnLevelChanged onLevelChanged = nullptr);
+        std::unique_ptr<AbstractWriter> writer = nullptr);
 
     virtual std::set<Tag> tags() const override;
 
@@ -40,11 +38,11 @@ public:
     /** @return Maximum possible log level, according to the current settings. */
     virtual Level maxLevel() const override;
 
-    virtual void setWriter(std::unique_ptr<AbstractWriter> writer) override;
-
     virtual void setOnLevelChanged(OnLevelChanged onLevelChanged) override;
 
     virtual std::optional<QString> filePath() const override;
+
+    void setWriter(std::unique_ptr<AbstractWriter> writer);
 
 private:
     void handleLevelChange(QnMutexLockerBase* lock) const;
@@ -52,8 +50,8 @@ private:
 private:
     mutable QnMutex m_mutex;
     const std::set<Tag> m_tags;
-    OnLevelChanged m_onLevelChanged;
     Level m_defaultLevel = Level::none;
+    OnLevelChanged m_onLevelChanged;
     std::vector<std::unique_ptr<AbstractWriter>> m_writers;
     LevelFilters m_levelFilters;
 };

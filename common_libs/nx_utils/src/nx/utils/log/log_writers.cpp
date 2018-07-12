@@ -149,6 +149,12 @@ std::vector<QString> Buffer::takeMessages()
     return messages;
 }
 
+void Buffer::clear()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_messages.clear();
+}
+
 void NullDevice::write(Level /*level*/, const QString& /*message*/)
 {
 }

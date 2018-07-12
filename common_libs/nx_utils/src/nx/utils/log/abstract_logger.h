@@ -14,9 +14,9 @@ namespace log {
 class NX_UTILS_API AbstractLogger
 {
 public:
-    virtual ~AbstractLogger() = default;
-
     using OnLevelChanged = std::function<void()>;
+
+    virtual ~AbstractLogger() = default;
 
     virtual std::set<Tag> tags() const = 0;
 
@@ -39,8 +39,6 @@ public:
 
     /** @return Maximum possible log level, according to the current settings. */
     virtual Level maxLevel() const = 0;
-
-    virtual void setWriter(std::unique_ptr<AbstractWriter> writer) = 0;
 
     virtual void setOnLevelChanged(OnLevelChanged onLevelChanged) = 0;
 

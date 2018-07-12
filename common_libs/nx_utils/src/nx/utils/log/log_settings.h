@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "log_logger.h"
 
 class QnSettings;
@@ -8,7 +10,7 @@ namespace nx {
 namespace utils {
 namespace log {
 
-class NX_UTILS_API Settings
+class NX_UTILS_API LoggerSettings
 {
 public:
     LevelSettings level;
@@ -17,13 +19,25 @@ public:
     uint8_t maxBackupCount = 5;
     QString logBaseName;
 
-    Settings();
+    LoggerSettings() = default;
+
+    /** Rewrites values from settings if specified. */
+    void load(const QnSettings& settings, const QString& prefix = QLatin1String("log"));
+    void updateDirectoryIfEmpty(const QString& dataDirectory);
+};
+
+class NX_UTILS_API Settings
+{
+public:
+    std::vector<LoggerSettings> loggers;
+
+    Settings() = default;
 
     /** Rewrites values from settings if specified. */
     void load(const QnSettings& settings, const QString& prefix = QLatin1String("log"));
 
     /** Updates directory if it's not specified from dataDirectory */
-    void updateDirectoryIfEmpty(const QString dataDirectory);
+    void updateDirectoryIfEmpty(const QString& dataDirectory);
 };
 
 } // namespace log

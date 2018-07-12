@@ -19,26 +19,29 @@ static const Tag kNamespaceTag(lit("nx::utils::log::test"));
 class LogMainTest: public ::testing::Test
 {
 public:
-    LogMainTest(std::unique_ptr<AbstractWriter> customWriter = nullptr):
+    LogMainTest(std::unique_ptr<AbstractWriter> logWriter = nullptr):
         initialLevel(mainLogger()->defaultLevel())
     {
         mainLogger()->setDefaultLevel(Level::none);
 
         log::Settings settings;
-        settings.level.primary = levelFromString("INFO");
-        settings.level.filters = LevelFilters{{kNamespaceTag, Level::verbose}};
+        settings.loggers.resize(1);
+        settings.loggers.front().level.primary = levelFromString("INFO");
+        settings.loggers.front().level.filters = LevelFilters{{kNamespaceTag, Level::verbose}};
 
-        auto logger = buildLogger(
+        if (!logWriter)
+            logWriter = std::unique_ptr<AbstractWriter>(buffer = new Buffer);
+
+        log::addLogger(buildLogger(
             settings,
             QString("log_ut"),
             QString(),
-            {kTestTag, kNamespaceTag});
+            {kTestTag, kNamespaceTag},
+            std::move(logWriter)));
 
-        if (customWriter)
-            logger->setWriter(std::move(customWriter));
-        else
-            logger->setWriter(std::unique_ptr<AbstractWriter>(buffer = new Buffer));
-        log::addLogger(std::move(logger));
+        // Ignoring initialization messages.
+        if (buffer)
+            buffer->clear();
 
         EXPECT_EQ(Level::verbose, maxLevel());
     }
@@ -64,7 +67,7 @@ public:
         }
     }
 
-    Buffer* buffer;
+    Buffer* buffer = nullptr;
     const Level initialLevel;
 };
 

@@ -24,10 +24,11 @@ TEST(Settings, correct_parsing)
     log::Settings logSettings;
     logSettings.load(settings, "log");
 
-    ASSERT_EQ(Level::verbose, logSettings.level.primary);
-    ASSERT_EQ(QString("/var/log/"), logSettings.directory);
-    ASSERT_EQ(77, logSettings.maxBackupCount);
-    ASSERT_EQ(184632U, logSettings.maxFileSize);
+    ASSERT_EQ(1U, logSettings.loggers.size());
+    ASSERT_EQ(Level::verbose, logSettings.loggers.front().level.primary);
+    ASSERT_EQ(QString("/var/log/"), logSettings.loggers.front().directory);
+    ASSERT_EQ(77, logSettings.loggers.front().maxBackupCount);
+    ASSERT_EQ(184632U, logSettings.loggers.front().maxFileSize);
 }
 
 } // namespace test

@@ -15,19 +15,13 @@ namespace nx {
 namespace utils {
 namespace log {
 
-Logger::Logger(const std::set<Tag>& tags):
-    m_mutex(QnMutex::Recursive),
-    m_tags(tags)
-{
-}
-
 Logger::Logger(
+    const std::set<Tag>& tags,
     Level defaultLevel,
-    std::unique_ptr<AbstractWriter> writer,
-    OnLevelChanged onLevelChanged)
+    std::unique_ptr<AbstractWriter> writer)
     :
     m_mutex(QnMutex::Recursive),
-    m_onLevelChanged(std::move(onLevelChanged)),
+    m_tags(tags),
     m_defaultLevel(defaultLevel)
 {
     if (writer)

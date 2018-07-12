@@ -35,6 +35,7 @@ public:
      * Caller is responsible for existingSettings life time.
      */
     QnSettings(QSettings* existingSettings);
+    QnSettings(nx::utils::ArgumentParser args);
 
     void parseArgs(int argc, const char* argv[]);
     bool contains(const QString& key) const;
@@ -51,7 +52,7 @@ private:
     const QString m_organizationName;
     const QString m_applicationName;
     const QString m_moduleName;
-    const QSettings::Scope m_scope;
+    const QSettings::Scope m_scope = QSettings::Scope::UserScope;
 
     std::unique_ptr<QSettings> m_ownSettings;
     QSettings* m_systemSettings = nullptr;

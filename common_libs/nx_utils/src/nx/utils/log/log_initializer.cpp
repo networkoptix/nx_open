@@ -1,18 +1,12 @@
 #include "log_initializer.h"
 
-#include <nx/utils/app_info.h>
 #include <nx/utils/argument_parser.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/utils/string.h>
 
+#include "logger_builder.h"
 #include "log_main.h"
 #include "log_logger.h"
-
-namespace {
-
-static const QString kDefaultLogBaseName("log_file");
-
-} // namespace
 
 namespace nx {
 namespace utils {
@@ -20,63 +14,32 @@ namespace log {
 
 static std::atomic<bool> isInitializedGlobally(false);
 
+//-------------------------------------------------------------------------------------------------
+
 std::unique_ptr<AbstractLogger> buildLogger(
     const Settings& settings,
     const QString& applicationName,
     const QString& binaryPath,
-    const std::set<Tag>& tags)
+    const std::set<Tag>& tags,
+    std::unique_ptr<AbstractWriter> writer)
 {
-    if (settings.level.primary == Level::undefined || settings.level.primary == Level::notConfigured)
-        return nullptr;
-
-    auto logger = std::make_unique<Logger>(tags);
-
-    // Cannot be reinitialized if initialized globally.
-    // Why can't I set writer to my custom logger if mainLogger has already been initialized? What's the point?
-    //if (!isInitializedGlobally.load())
-    {
-        logger->setDefaultLevel(settings.level.primary);
-        logger->setLevelFilters(settings.level.filters);
-        const QString baseName = settings.logBaseName.isEmpty()
-            ? kDefaultLogBaseName
-            : settings.logBaseName;
-        if (baseName != QLatin1String("-"))
-        {
-            File::Settings fileSettings;
-            fileSettings.size = settings.maxFileSize;
-            fileSettings.count = settings.maxBackupCount;
-            fileSettings.name = settings.directory.isEmpty()
-                ? baseName
-                : (settings.directory + "/" + baseName);
-
-            logger->setWriter(std::make_unique<File>(fileSettings));
-        }
-        else
-        {
-            logger->setWriter(std::make_unique<StdOut>());
-        }
-    }
-
-    const nx::utils::log::Tag kStart(QLatin1String("START"));
-    const auto write = [&](const Message& message) { logger->log(Level::always, kStart, message); };
-    write(QByteArray(80, '='));
-    write(lm("%1 started, version: %2, revision: %3").args(
-        applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));
-
-    if (!binaryPath.isEmpty())
-        write(lm("Binary path: %1").arg(binaryPath));
-
-    const auto filePath = logger->filePath();
-    write(lm("Log level: %1").arg(settings.level));
-    write(lm("Log file size: %2, backup count: %3, file: %4").args(
-        nx::utils::bytesToString(settings.maxFileSize), settings.maxBackupCount,
-        filePath ? *filePath : QString("-")));
-
-    return logger;
+    return LoggerBuilder::buildLogger(
+        settings,
+        applicationName,
+        binaryPath,
+        tags,
+        std::move(writer));
 }
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)
 {
+#if 1
+    log::Settings logSettings;
+    logSettings.load(arguments);
+    setMainLogger(buildLogger(logSettings, QString()));
+
+    // NOTE: Default log level is ensured by LevelSettings::primary default value.
+#else
     const auto logger = mainLogger();
     isInitializedGlobally = true;
 
@@ -106,6 +69,7 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
         if (!isLogLevelSpecified)
             logger->setDefaultLevel(kDefaultLevel);
     }
+#endif
 }
 
 } // namespace log
