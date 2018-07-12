@@ -26,6 +26,7 @@
 #include "settings.h"
 
 #include <utils/common/delayed.h>
+#include <utils/common/util.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
@@ -189,7 +190,7 @@ QnMediaServerModule::QnMediaServerModule(
 
 QDir QnMediaServerModule::downloadsDirectory() const
 {
-    const QDir dir(getDataDirectory() + "downloads");
+    const QDir dir(closeDirPath(getDataDirectory()) + "downloads");
     if (!dir.exists())
         QDir().mkpath(dir.absolutePath());
 
