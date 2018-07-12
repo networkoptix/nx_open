@@ -53,7 +53,7 @@ def winrm_shell(winrm):
 def ssh(linux_vm_info):
     port = linux_vm_info.port_map.remote.tcp(22)
     address = linux_vm_info.port_map.remote.address
-    username, _, key = linux_vm_info.description
+    username, _, key = linux_vm_info.description.split('\n', 2)
     ssh = SSH(address, port, username, key)
     wait_for_true(ssh.is_working)
     return ssh
