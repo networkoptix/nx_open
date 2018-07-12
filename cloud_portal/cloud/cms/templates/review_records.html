@@ -86,7 +86,7 @@
 		{% if perms.cms.force_update and version.state == 'current' and product.can_preview %}
 			<button class="btn btn-sm btn-danger" type="submit" name="Force Update">Force Update</button>
 		{% endif %}
-		{% if version.state == 'current' and not product.can_preview %}
+		{% if version.state == 'current' and not product.can_preview and product.name %}
 		<button class="btn btn-sm btn-default">
 			<a href="{% url 'download_package' product.name %}?version_id={{version.id}}"download>Download</a>
 		</button>
@@ -97,7 +97,7 @@
 		{% if not version.accepted_date %}
 			{% if product.can_preview %}
         	<button class="btn btn-sm btn-primary" type="submit" name="Preview">Generate Preview</button>
-			{% else %}
+			{% elif product.name %}
 			<button class="btn btn-sm btn-default">
 				<a href="{% url 'download_package' product.name %}?version_id={{version.id}}"download>Download</a>
 			</button>

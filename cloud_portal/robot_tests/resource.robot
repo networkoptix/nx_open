@@ -235,6 +235,17 @@ Reset user owner first/last name
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
 
+Reset user password to base
+    [arguments]    ${email}    ${current password}
+    Go To    ${url}/account/password
+    Log In    ${email}    ${current password}    None
+    Validate Log In
+    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+    Input Text    ${CURRENT PASSWORD INPUT}    ${current password}
+    Input Text    ${NEW PASSWORD INPUT}    ${BASE PASSWORD}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
+
 Add notowner
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}
