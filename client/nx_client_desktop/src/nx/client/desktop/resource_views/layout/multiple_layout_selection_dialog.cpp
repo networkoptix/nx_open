@@ -59,9 +59,10 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
 
     ui->setupUi(this);
 
-    const auto tree = ui->layoutsTree;
+    const auto proxyModel = new AccessibleLayoutSortModel(this);
 
-    tree->setProxyModel(new AccessibleLayoutSortModel(this));
+    const auto tree = ui->layoutsTree;
+    tree->setProxyModel(proxyModel);
     tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
     //tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
 
@@ -71,10 +72,11 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
 //        createNode(lit("second"))
 //    })));
 
-
     tree->setExpandsOnDoubleClick(true);
     tree->expandAll();
 
+    connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
+        [proxyModel](const QString& text) { proxyModel->setFilter(text); });
 }
 
 MultipleLayoutSelectionDialog::~MultipleLayoutSelectionDialog()
