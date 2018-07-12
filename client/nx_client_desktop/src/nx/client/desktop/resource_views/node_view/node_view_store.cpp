@@ -23,7 +23,7 @@ void NodeViewStore::Private::applyPatch(const NodeViewStatePatch& patch)
         return;
 
     const QScopedValueRollback<bool> guard(actionInProgress, true);
-    state = patch.apply(std::move(state));
+    state = applyNodeViewPatch(std::move(state), patch);
     emit q->patchApplied(patch);
 }
 

@@ -31,7 +31,7 @@ struct NodeViewModel::Private
     QModelIndex getModelIndex(const NodePtr& node, int column = node_view::nameColumn);
 
     NodeViewModel* const q;
-    NodeViewStore* const store;
+    NodeViewState state;
 };
 
 QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int column)
@@ -49,8 +49,8 @@ QModelIndex NodeViewModel::Private::getModelIndex(const NodePtr& node, int colum
 
 //-------------------------------------------------------------------------------------------------
 
-NodeViewModel::NodeViewModel(NodeViewStore* store, QObject* parent):
-    d(new Private({this, store}))
+NodeViewModel::NodeViewModel(QObject* parent):
+    d(new Private({this}))
 {
 }
 
@@ -60,38 +60,49 @@ NodeViewModel::~NodeViewModel()
 
 void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
 {
-    // TODO: #future uses: add handling of tree structure changes
-
-    for (const auto description: patch.addedNodes)
-    {
-        const auto path = description.path;
-        if (path.isEmpty())
-            continue;
-
-        const auto parentPath = path.parentPath();
-        const auto parentNode = d->store->state().nodeByPath(parentPath);
-        const auto parentIndex = d->getModelIndex(parentNode);
-        const int row = path.leafIndex();
-        qWarning() << "--- Inserting " << description.data.data[0][Qt::DisplayRole]
-            << " to parent " << parentIndex << " with " << row;
-        const NodeViewModel::ScopedInsertRows insertGuard(this, parentIndex, row, row);
-    }
-
-    for (const auto description: patch.changedData)
-    {
-        const auto& data = description.data;
-        const auto node = d->store->state().rootNode->nodeAt(description.path);
-        if (!node)
-            continue;
-
-        for (auto itColumnData = data.data.begin(); itColumnData != data.data.end(); ++itColumnData)
+    const auto getAddNodeGuard =
+        [this](const NodeViewStatePatch::NodeDescription& description) -> QnRaiiGuardPtr
         {
-            const int column = itColumnData.key();
-            const auto nodeIndex = d->getModelIndex(node, column);
-            const auto roles = itColumnData.value().keys();
-            emit dataChanged(nodeIndex, nodeIndex, roles.toVector());
-        }
-    }
+            const auto path = description.path;
+            if (path.isEmpty())
+                return QnRaiiGuardPtr();
+
+            const auto parentPath = path.parentPath();
+            const auto parentNode = d->state.nodeByPath(parentPath);
+            const auto parentIndex = d->getModelIndex(parentNode);
+            const int row = path.leafIndex();
+            return QnRaiiGuardPtr(new NodeViewModel::ScopedInsertRows(this, parentIndex, row, row));
+        };
+
+    const auto getDataChangedGuard =
+        [this](const NodeViewStatePatch::NodeDescription& description) -> QnRaiiGuardPtr
+        {
+            const auto node = d->state.rootNode->nodeAt(description.path);
+            const auto nodeData = description.data.data;
+
+            using RolesData = QPair<int, QVector<int>>;
+            using RolesDataList = QList<RolesData>;
+            RolesDataList changedData;
+            for (auto it = nodeData.begin(); it != nodeData.end(); ++it)
+            {
+                const int column = it.key();
+                const auto roles = it.value().keys();
+                changedData.append(RolesData(column, roles.toVector()));
+            }
+            return QnRaiiGuard::createDestructible(
+                [this, changedData, node]()
+                {
+                    for (const auto data: changedData)
+                    {
+                        const int column = data.first;
+                        const auto roles = data.second;
+                        const auto nodeIndex = d->getModelIndex(node, column);
+                        emit dataChanged(nodeIndex, nodeIndex, roles);
+                    }
+                });
+        };
+
+    applyNodeViewPatch(std::move(d->state), patch, getAddNodeGuard, getDataChangedGuard);
 }
 
 QModelIndex NodeViewModel::index(
@@ -104,7 +115,7 @@ QModelIndex NodeViewModel::index(
 
     const auto node = parent.isValid()
         ? nodeFromIndex(parent)->nodeAt(row).data()
-        : d->store->state().rootNode->nodeAt(row).data();
+        : d->state.rootNode->nodeAt(row).data();
 
     return createIndex(row, column, node);
 }
@@ -122,12 +133,8 @@ QModelIndex NodeViewModel::parent(const QModelIndex& child) const
 
 int NodeViewModel::rowCount(const QModelIndex& parent) const
 {
-    const auto res = [this, parent]()
-    {
-        const auto node = parent.isValid() ? nodeFromIndex(parent) : d->store->state().rootNode;
-        return node ? node->childrenCount() : 0;
-    }();
-    return res;
+    const auto node = parent.isValid() ? nodeFromIndex(parent) : d->state.rootNode;
+    return node ? node->childrenCount() : 0;
 }
 
 int NodeViewModel::columnCount(const QModelIndex& parent) const

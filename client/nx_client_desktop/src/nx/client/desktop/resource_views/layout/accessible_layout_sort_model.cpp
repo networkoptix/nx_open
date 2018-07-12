@@ -27,26 +27,6 @@ AccessibleLayoutSortModel::AccessibleLayoutSortModel(QObject* parent)
 {
 }
 
-QModelIndex AccessibleLayoutSortModel::mapToSource(const QModelIndex &proxyIndex) const
-{
-    const auto res = base_type::mapToSource(proxyIndex);
-    qWarning() << "+++ mapToSource" << proxyIndex << " to " << res;
-    return res;
-}
-
-QModelIndex AccessibleLayoutSortModel::mapFromSource(const QModelIndex &sourceIndex) const
-{
-    const auto res = base_type::mapFromSource(sourceIndex);
-    qWarning() << "+++ mapFromSource" << sourceIndex << " to " << res;
-    return res;
-}
-
-bool AccessibleLayoutSortModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
-{
-    qWarning() << "-------" << source_row << source_parent;
-    return base_type::filterAcceptsRow(source_row, source_parent);
-}
-
 bool AccessibleLayoutSortModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const

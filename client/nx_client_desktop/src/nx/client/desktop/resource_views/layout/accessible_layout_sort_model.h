@@ -14,16 +14,10 @@ class AccessibleLayoutSortModel: public QSortFilterProxyModel
 public:
     AccessibleLayoutSortModel(QObject* parent = nullptr);
 
-    virtual QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
-    virtual QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
-
 protected:
     virtual bool lessThan(
         const QModelIndex& sourceLeft,
         const QModelIndex& sourceRight) const override;
-
-    virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
-
 };
 
 } // namespace desktop

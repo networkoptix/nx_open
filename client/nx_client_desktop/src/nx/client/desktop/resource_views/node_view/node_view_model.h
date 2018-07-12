@@ -18,7 +18,7 @@ class NodeViewModel: public ScopedModelOperations<QAbstractItemModel>
     using base_type = ScopedModelOperations<QAbstractItemModel>;
 
 public:
-    NodeViewModel(NodeViewStore* store, QObject* parent = nullptr);
+    NodeViewModel(QObject* parent = nullptr);
     virtual ~NodeViewModel();
 
     void applyPatch(const NodeViewStatePatch& patch);

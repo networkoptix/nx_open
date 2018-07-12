@@ -16,6 +16,7 @@ void addNode(NodeViewStatePatch::DataList& data, const NodePtr& node)
         addNode(data, child);
 }
 
+
 } // namespace
 
 namespace nx {
@@ -29,9 +30,19 @@ NodeViewStatePatch NodeViewStatePatch::fromRootNode(const NodePtr& node)
     return patch;
 }
 
-NodeViewState NodeViewStatePatch::apply(NodeViewState&& state) const
+NodeViewState applyNodeViewPatch(
+    NodeViewState&& state,
+    const NodeViewStatePatch& patch,
+    const GetNodeOperationGuard& getNodeGuard,
+    const GetNodeOperationGuard& getDataChangedGuard)
 {
-    for (const auto description: addedNodes)
+    static const auto emptyNodeGuard =
+        [](const NodeViewStatePatch::NodeDescription& /*description*/){ return QnRaiiGuardPtr(); };
+
+    const auto safeGetAddNodeGuard = getNodeGuard ? getNodeGuard : emptyNodeGuard;
+    const auto safeGetDataChangedGuard = getDataChangedGuard ? getDataChangedGuard : emptyNodeGuard;
+
+    for (const auto description: patch.addedNodes)
     {
         const auto node = ViewNode::create(description.data);
         if (description.path.isEmpty())
@@ -42,17 +53,23 @@ NodeViewState NodeViewStatePatch::apply(NodeViewState&& state) const
                 NX_EXPECT(false, "Can't add node replacing root one!");
                 continue;
             }
+
+            const auto addNodeGuard = safeGetAddNodeGuard(description);
             state.rootNode = node;
             continue;
         }
         const auto parentNode = state.nodeByPath(description.path.parentPath());
+        const auto addNodeGuard = safeGetAddNodeGuard(description);
         parentNode->addChild(node);
     }
 
-    for (const auto description: changedData)
+    for (const auto description: patch.changedData)
     {
         if (const auto node = state.rootNode->nodeAt(description.path))
+        {
+            const auto dataChangedGuard = safeGetDataChangedGuard(description);
             node->applyNodeData(description.data);
+        }
     }
     return state;
 }

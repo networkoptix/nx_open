@@ -48,7 +48,7 @@ protected:
         }
     };
 
-    class ScopedInsertRows final: QnRaiiGuard
+    class ScopedInsertRows final: public QnRaiiGuard
     {
     public:
         ScopedInsertRows(ScopedModelOperations* model, const QModelIndex& parent,
