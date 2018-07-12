@@ -15,6 +15,7 @@ using namespace std::literals::chrono_literals;
 namespace {
 
 static const milliseconds kStreamStateExpirationPeriod = 5000ms;
+static const minutes kStreamStateCacheCleanupPeriod = 5min;
 
 } // namespace
 
@@ -31,8 +32,7 @@ extern "C"
 
 static HttpLinkPlugin* httpLinkPluginInstance = NULL;
 
-HttpLinkPlugin::HttpLinkPlugin()
-:
+HttpLinkPlugin::HttpLinkPlugin():
     m_refManager( this ),
     m_timeProvider(nullptr)
 {
@@ -116,10 +116,18 @@ HttpLinkPlugin* HttpLinkPlugin::instance()
 void HttpLinkPlugin::setStreamState(const QUrl& url, bool isStreamRunning)
 {
     QnMutexLocker lock(&m_mutex);
-    auto& streamState = m_streamStateCache[url];
-    streamState.isRunning = isStreamRunning;
+    if (!m_streamStateCacheCleanupTimer.isValid()
+        || m_streamStateCacheCleanupTimer.hasExpired(kStreamStateCacheCleanupPeriod))
+    {
+        cleanStreamCacheUp();
+    }
+
+    auto& timer = m_streamStateCache[url];
     if (isStreamRunning)
-        streamState.timer.restart();
+        timer.restart();
+    else
+        timer.invalidate();
+
 }
 
 bool HttpLinkPlugin::isStreamRunning(const QUrl& url) const
@@ -129,7 +137,23 @@ bool HttpLinkPlugin::isStreamRunning(const QUrl& url) const
     if (itr == m_streamStateCache.cend())
         return false;
 
-    const auto& streamState = itr->second;
+    const auto& timer = itr->second;
+    return timer.isValid() && !timer.hasExpired(kStreamStateExpirationPeriod);
+}
 
-    return streamState.isRunning && !streamState.timer.hasExpired(kStreamStateExpirationPeriod);
+void HttpLinkPlugin::cleanStreamCacheUp()
+{
+    for (auto itr = m_streamStateCache.cbegin(); itr != m_streamStateCache.cend();)
+    {
+        auto& timer = itr->second;
+        if (!timer.isValid() || timer.hasExpired(kStreamStateExpirationPeriod))
+        {
+            itr = m_streamStateCache.erase(itr);
+        }
+        else
+        {
+            ++itr;
+        }
+    }
+    m_streamStateCacheCleanupTimer.restart();
 }

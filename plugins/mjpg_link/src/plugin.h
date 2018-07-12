@@ -16,12 +16,6 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/mutex.h>
 
-struct StreamStateCache
-{
-    bool isRunning = false;
-    nx::utils::ElapsedTimer timer;
-};
-
 class DiscoveryManager;
 
 //!Main plugin class. Hosts and initializes necessary internal data
@@ -60,11 +54,16 @@ public:
     bool isStreamRunning(const QUrl& url) const;
 
 private:
+    void cleanStreamCacheUp();
+
+private:
     mutable QnMutex m_mutex;
     nxpt::CommonRefManager m_refManager;
     std::unique_ptr<DiscoveryManager> m_discoveryManager;
     nxpl::TimeProvider *m_timeProvider;
-    std::map<QUrl, StreamStateCache> m_streamStateCache;
+
+    nx::utils::ElapsedTimer m_streamStateCacheCleanupTimer;
+    std::map<QUrl, nx::utils::ElapsedTimer> m_streamStateCache;
 };
 
 #endif  //IMAGE_LIBRARY_PLUGIN_H
