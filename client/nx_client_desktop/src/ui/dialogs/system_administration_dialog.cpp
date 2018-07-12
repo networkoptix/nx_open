@@ -7,8 +7,9 @@
 
 #include <common/common_module.h>
 
+#include <api/global_settings.h>
+
 #include <ui/widgets/system_settings/license_manager_widget.h>
-#include <ui/widgets/system_settings/system_settings_widget.h>
 #include <ui/widgets/system_settings/database_management_widget.h>
 #include <ui/widgets/system_settings/time_server_selection_widget.h>
 #include <ui/widgets/system_settings/general_system_administration_widget.h>
@@ -23,11 +24,7 @@
 
 #include <ui/style/custom_style.h>
 
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
-
-#include <utils/common/app_info.h>
 
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     : base_type(parent)
@@ -70,6 +67,15 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
         setPageEnabled(UpdatesPage, !readOnly);
     });
     setPageEnabled(UpdatesPage, !commonModule()->isReadOnly());
+
+    const auto updateTimeSyncPage =
+        [this]
+        {
+            setPageEnabled(TimeServerSelection, globalSettings()->isTimeSynchronizationEnabled());
+        };
+    connect(globalSettings(), &QnGlobalSettings::timeSynchronizationSettingsChanged, this,
+        updateTimeSyncPage);
+    updateTimeSyncPage();
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog()
