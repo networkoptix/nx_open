@@ -5,6 +5,7 @@ from io import BytesIO
 from framework.installation.installation import Installation
 from framework.installation.installer import InstallIdentity
 from framework.os_access.exceptions import DoesNotExist
+from framework.os_access.posix_access import PosixAccess
 from framework.os_access.posix_shell import PosixShell
 
 if sys.version_info[:2] == (2, 7):
@@ -32,7 +33,7 @@ class DebInstallation(Installation):
         self.var = self.dir / 'var'
         self._log_file = self.var / 'log' / 'log_file.log'
         self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self.posix_access = posix_access
+        self.posix_access = posix_access  # type: PosixAccess
         self._identity = self._NOT_SET
 
     @property
