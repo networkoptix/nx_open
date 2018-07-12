@@ -558,12 +558,13 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         ec2TranLogLevel = qnSettings->ec2TranLogLevel();
 
     nx::utils::log::Settings logSettings;
-    logSettings.maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
-    logSettings.maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();
+    logSettings.loggers.resize(1);
+    logSettings.loggers.front().maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
+    logSettings.loggers.front().maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
-    logSettings.level.parse(logLevel);
-    logSettings.logBaseName = logFile.isEmpty()
+    logSettings.loggers.front().level.parse(logLevel);
+    logSettings.loggers.front().logBaseName = logFile.isEmpty()
         ? lit("client_log") + logFileNameSuffix
         : logFile;
 
@@ -575,8 +576,8 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
 
     if (ec2TranLogLevel != lit("none"))
     {
-        logSettings.level.parse(ec2TranLogLevel);
-        logSettings.logBaseName = lit("ec2_tran") + logFileNameSuffix;
+        logSettings.loggers.front().level.parse(ec2TranLogLevel);
+        logSettings.loggers.front().logBaseName = lit("ec2_tran") + logFileNameSuffix;
         nx::utils::log::addLogger(
             nx::utils::log::buildLogger(
                 logSettings,
@@ -589,7 +590,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
         nx::utils::log::addLogger(
             std::make_unique<nx::utils::log::Logger>(
-                {nx::utils::log::Tag(lit("DecodedPictureToOpenGLUploader"))},
+                std::set<nx::utils::log::Tag>{nx::utils::log::Tag(lit("DecodedPictureToOpenGLUploader"))},
                 nx::utils::log::Level::info));
     }
 

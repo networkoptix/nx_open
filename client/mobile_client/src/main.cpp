@@ -280,13 +280,14 @@ private:
 void initLog(const QString& logLevel)
 {
     nx::utils::log::Settings logSettings;
-    logSettings.level.parse(logLevel);
+    logSettings.loggers.resize(1);
+    logSettings.loggers.front().level.parse(logLevel);
     if (*ini().logLevel)
-        logSettings.level.parse(QString::fromUtf8(ini().logLevel));
+        logSettings.loggers.front().level.parse(QString::fromUtf8(ini().logLevel));
 
-    logSettings.maxFileSize = 10 * 1024 * 1024;
-    logSettings.maxBackupCount = 5;
-    logSettings.logBaseName = *ini().logFile
+    logSettings.loggers.front().maxFileSize = 10 * 1024 * 1024;
+    logSettings.loggers.front().maxBackupCount = 5;
+    logSettings.loggers.front().logBaseName = *ini().logFile
         ? QString::fromUtf8(ini().logFile)
         : QnAppInfo::isAndroid()
             ? lit("-")
@@ -312,13 +313,13 @@ void initLog(const QString& logLevel)
                 logSettings,
                 /*applicationName*/ lit("mobile_client"),
                 QString(),
-                std::set<Tag>(),
+                std::set<nx::utils::log::Tag>(),
                 std::move(logWriter)));
     }
 
     if (ini().enableEc2TranLog)
     {
-        logSettings.logBaseName = QnAppInfo::isAndroid()
+        logSettings.loggers.front().logBaseName = QnAppInfo::isAndroid()
             ? lit("-")
             : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran"));
         nx::utils::log::addLogger(

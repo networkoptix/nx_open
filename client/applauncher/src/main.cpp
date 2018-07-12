@@ -156,10 +156,11 @@ int main(int argc, char* argv[])
     if (!logFilePath.isEmpty() && !logLevel.isEmpty())
     {
         nx::utils::log::Settings settings;
-        settings.level.parse(logLevel);
-        settings.maxFileSize = 1024 * 1024 * 10;
-        settings.maxBackupCount = 5;
-        settings.logBaseName = logFilePath;
+        settings.loggers.resize(1);
+        settings.loggers.front().level.parse(logLevel);
+        settings.loggers.front().maxFileSize = 1024 * 1024 * 10;
+        settings.loggers.front().maxBackupCount = 5;
+        settings.loggers.front().logBaseName = logFilePath;
 
         nx::utils::log::setMainLogger(
             nx::utils::log::buildLogger(

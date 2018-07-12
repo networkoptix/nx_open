@@ -24,7 +24,7 @@ QnSettings::QnSettings(QSettings* existingSettings):
 }
 
 QnSettings::QnSettings(nx::utils::ArgumentParser args):
-    m_args(std::move(m_args))
+    m_args(std::move(args))
 {
 }
 

@@ -20,7 +20,7 @@ static bool hasPermission(const QnRestConnectionProcessor* processor)
         processor->accessRights(), GlobalPermission::admin);
 }
 
-static QString levelString(const std::shared_ptr<Logger>& logger)
+static QString levelString(const std::shared_ptr<AbstractLogger>& logger)
 {
     LevelSettings settings(logger->defaultLevel(), logger->levelFilters());
     return settings.toString();
@@ -71,7 +71,7 @@ JsonRestResponse QnLogLevelRestHandler::executeGet(const JsonRestRequest& reques
 
 JsonRestResponse QnLogLevelRestHandler::manageLogLevelById(const JsonRestRequest& request)
 {
-    std::shared_ptr<nx::utils::log::Logger> logger;
+    std::shared_ptr<nx::utils::log::AbstractLogger> logger;
     const auto logId = request.params.value(kIdParam);
     {
         bool isLogIdInt = false;

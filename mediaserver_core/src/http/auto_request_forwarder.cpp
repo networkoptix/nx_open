@@ -32,8 +32,8 @@ QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
     if (ini().verboseAutoRequestForwarder)
     {
         nx::utils::log::addLogger(
-            std::make_unque<nx::utils::log::Logger>(
-                {nx::utils::log::Tag(this)},
+            std::make_unique<nx::utils::log::Logger>(
+                std::set<nx::utils::log::Tag>{nx::utils::log::Tag(this)},
                 nx::utils::log::Level::verbose));
         NX_VERBOSE(this) << lm("Verbose logging started: .ini verboseAutoRequestForwarder=true");
     }
