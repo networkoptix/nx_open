@@ -75,8 +75,18 @@ window.L = {};
                 var appState = {
                         viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
                         previewPath: '',
-                        viewsDirCommon: 'static/web_common/views/'
+                        viewsDirCommon: 'static/web_common/views/',
+                        trafficRelayHost: '{host}/gateway/{systemId}'
                     };
+
+                $.ajax({
+                    url: 'api/utils/settings',
+                    async: false,
+                    dataType: 'json'
+                }).done(function(response){
+                    appState.trafficRelayHost = response.trafficRelayHost;
+                    angular.extend(CONFIG, appState);
+                });
 
                 $.ajax({
                     // url: 'static/views/language.json',

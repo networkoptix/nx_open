@@ -11,10 +11,6 @@
             // viewsDirCommon: 'static/web_common/views/',
             // ***************************************************************
 
-            // gatewayHost: '{host}/gateway/{systemId}',
-            // gatewayHost: '{systemId}.gw.vmsproxy.com',
-            trafficRelayHost: '{systemId}.relay-bur.vmsproxy.hdw.mx',
-
             googleTagsCode: 'GTM-5MRNWP',
             apiBase: '/api',
             realm: 'VMS',
