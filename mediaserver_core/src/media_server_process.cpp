@@ -2989,8 +2989,7 @@ void MediaServerProcess::prepareOsResources()
         MSSettings::defaultConfigDirectory(),
         qnServerModule->roSettings()->fileName(),
         qnServerModule->runTimeSettings()->fileName(),
-        QnFileConnectionProcessor::externalPackagePath(),
-        getDataDirectory(),
+        QnFileConnectionProcessor::externalPackagePath()
     };
     for (const auto& path: chmodPaths)
     {
