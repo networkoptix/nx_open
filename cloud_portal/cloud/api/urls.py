@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^utils/downloads/history$',           utils.downloads_history),
     url(r'^utils/downloads/(?P<build>.+?)$',    utils.download_build),
     url(r'^utils/downloads/?$',                 utils.downloads),
+    url(r'^utils/settings/?$',                  utils.settings),
 
 
     url(r'^account/activate$',           account.activate),

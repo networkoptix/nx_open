@@ -189,3 +189,13 @@ def downloads(request):
     else:
         downloads_json = json.loads(downloads_json)
     return Response(downloads_json)
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def settings(request):
+    settings_object = {
+        'trafficRelayHost':settings.TRAFFIC_RELAY_HOST
+    }
+    return Response(settings_object)
