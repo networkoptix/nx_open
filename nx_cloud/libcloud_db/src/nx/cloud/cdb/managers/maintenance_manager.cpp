@@ -2,15 +2,16 @@
 
 #include <nx/utils/log/log.h>
 
-#include "../ec2/synchronization_engine.h"
+#include <nx/cloud/cdb/managers/managers_types.h>
+#include <nx/data_sync_engine/synchronization_engine.h>
 
 namespace nx {
 namespace cdb {
 
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
-    ec2::SyncronizationEngine* const syncronizationEngine,
-    const nx::utils::db::InstanceController& dbInstanceController)
+    data_sync_engine::SyncronizationEngine* const syncronizationEngine,
+    const nx::sql::InstanceController& dbInstanceController)
     :
     m_moduleGuid(moduleGuid),
     m_syncronizationEngine(syncronizationEngine),
@@ -35,9 +36,17 @@ void MaintenanceManager::getVmsConnections(
             lock = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)]()
         {
-            completionHandler(
-                api::ResultCode::ok,
-                m_syncronizationEngine->connectionManager().getVmsConnections());
+            const auto ec2Connections =
+                m_syncronizationEngine->connectionManager().getConnections();
+            api::VmsConnectionDataList result;
+            result.connections.reserve(ec2Connections.size());
+            for (const auto& connection: ec2Connections)
+            {
+                result.connections.push_back(
+                    {connection.systemId, connection.peerEndpoint.toStdString()});
+            }
+
+            completionHandler(api::ResultCode::ok, std::move(result));
         });
 }
 
@@ -72,7 +81,7 @@ void MaintenanceManager::getStatistics(
         {
             data::Statistics statistics;
             statistics.onlineServerCount =
-                (int)m_syncronizationEngine->connectionManager().getVmsConnectionCount();
+                (int)m_syncronizationEngine->connectionManager().getConnectionCount();
             statistics.dbQueryStatistics =
                 m_dbInstanceController.statisticsCollector().getQueryStatistics();
             statistics.pendingSqlQueryCount =
@@ -85,13 +94,15 @@ void MaintenanceManager::getStatistics(
 void MaintenanceManager::onTransactionLogRead(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     const std::string& systemId,
-    api::ResultCode resultCode,
-    std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,
-    ::ec2::QnTranState /*readedUpTo*/,
+    data_sync_engine::ResultCode ec2ResultCode,
+    std::vector<data_sync_engine::dao::TransactionLogRecord> serializedTransactions,
+    vms::api::TranState /*readedUpTo*/,
     std::function<void(
         api::ResultCode,
         ::ec2::ApiTransactionDataList)> completionHandler)
 {
+    api::ResultCode resultCode = ec2ResultToResult(ec2ResultCode);
+
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("system %1. Read %2 transactions. Result code %3")
             .arg(systemId).arg(serializedTransactions.size()).arg(api::toString(resultCode)),

@@ -71,10 +71,13 @@ class ConnectedSocketsSupplier
 {
 public:
     ConnectedSocketsSupplier();
+    ~ConnectedSocketsSupplier();
+
     bool connectSockets();
     std::unique_ptr<AbstractStreamSocket> clientSocket();
     std::unique_ptr<AbstractStreamSocket> serverSocket();
     std::string lastError();
+
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_acceptor;
     std::unique_ptr<TestStreamSocketDelegate> m_clientSocket;
@@ -101,6 +104,18 @@ ConnectedSocketsSupplier::ConnectedSocketsSupplier():
         return;
 
     initClientSocket();
+}
+
+ConnectedSocketsSupplier::~ConnectedSocketsSupplier()
+{
+    if (m_acceptor)
+        m_acceptor->pleaseStopSync();
+
+    if (m_clientSocket)
+        m_clientSocket->pleaseStopSync();
+
+    if (m_acceptedClientSocket)
+        m_acceptedClientSocket->pleaseStopSync();
 }
 
 bool ConnectedSocketsSupplier::initAcceptor()
@@ -235,7 +250,8 @@ std::string ConnectedSocketsSupplier::lastError()
 }
 // -------------------------------------------------------------------------------------------------
 
-class WebSocket : public ::testing::Test
+class WebSocket:
+    public ::testing::Test
 {
 protected:
     WebSocket():
@@ -243,14 +259,24 @@ protected:
         m_clientSocketDestroyed(false),
         m_serverSocketDestroyed(false),
         readyFuture(readyPromise.get_future())
-    {}
+    {
+    }
+
+    ~WebSocket()
+    {
+        if (clientWebSocket)
+            clientWebSocket->pleaseStopSync();
+        if (serverWebSocket)
+            serverWebSocket->pleaseStopSync();
+    }
 
     virtual void SetUp() override
     {
         ASSERT_TRUE(m_socketsSupplier.connectSockets()) << m_socketsSupplier.lastError();
     }
 
-    void givenServerClientWebSockets(std::chrono::milliseconds clientTimeout,
+    void givenServerClientWebSockets(
+        std::chrono::milliseconds clientTimeout,
         std::chrono::milliseconds serverTimeout)
     {
         clientWebSocket.reset(
@@ -278,11 +304,18 @@ protected:
         givenServerClientWebSockets(kAliveTimeout, kAliveTimeout);
     }
 
+    void givenServerClientWebSocketsWithShortTimeout()
+    {
+        givenClientModes(SendMode::singleMessage, ReceiveMode::message);
+        givenServerModes(SendMode::singleMessage, ReceiveMode::message);
+        givenServerClientWebSockets(kShortTimeout, kShortTimeout * 100);
+    }
+
     void givenServerClientWebSocketsWithDifferentTimeouts()
     {
         givenClientModes(SendMode::singleMessage, ReceiveMode::message);
         givenServerModes(SendMode::singleMessage, ReceiveMode::message);
-        givenServerClientWebSockets(kAliveTimeout, kAliveTimeout * 100);
+        givenServerClientWebSockets(kShortTimeout, kShortTimeout * 100);
     }
 
     void givenClientTestDataPrepared(int size)
@@ -558,7 +591,8 @@ protected:
     std::future<void> readyFuture;
     Role serverRole = Role::undefined;
 
-    const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(3000);
+    const std::chrono::milliseconds kAliveTimeout = std::chrono::milliseconds(100000);
+    const std::chrono::milliseconds kShortTimeout = std::chrono::milliseconds(3000);
 };
 
 TEST_F(WebSocket, MultipleMessages_twoWay)
@@ -828,7 +862,7 @@ protected:
         std::thread(
             [this]()
             {
-                std::this_thread::sleep_for(kAliveTimeout * 2);
+                std::this_thread::sleep_for(kShortTimeout * 2);
                 try { readyPromise.set_value(); } catch (...) {}
             }).detach();
 
@@ -848,7 +882,7 @@ protected:
     bool isClientSending = true;
     bool isTimeoutError = false;
     int sentMessageCount = 0;
-    const int kTotalMessageCount = 100;
+    const int kTotalMessageCount = 30;
     std::queue<nx::Buffer> sendQueue;
 };
 
@@ -864,7 +898,7 @@ TEST_F(WebSocket_PingPong, PingPong_pingsBecauseOfNoData)
     isServerResponding = false;
     isClientSending = false;
 
-    givenServerClientWebSockets();
+    givenServerClientWebSocketsWithShortTimeout();
     whenConnectionIsIdleForSomeTime();
     thenItsBeenKeptAliveByThePings();
 }

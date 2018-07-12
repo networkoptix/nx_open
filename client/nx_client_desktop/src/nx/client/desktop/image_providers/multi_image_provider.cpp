@@ -14,7 +14,11 @@ static const QSize kMaxSize(400, 160);
 
 } // namespace
 
-QnMultiImageProvider::QnMultiImageProvider(
+namespace nx {
+namespace client {
+namespace desktop {
+
+MultiImageProvider::MultiImageProvider(
     Providers providers,
     Qt::Orientation orientation,
     int spacing,
@@ -28,7 +32,7 @@ QnMultiImageProvider::QnMultiImageProvider(
     int key = 0;
     for (const auto& provider: m_providers)
     {
-        connect(provider.get(), &QnImageProvider::imageChanged, this,
+        connect(provider.get(), &ImageProvider::imageChanged, this,
             [this, key](const QImage &loadedImage)
             {
                 if (loadedImage.isNull())
@@ -76,21 +80,21 @@ QnMultiImageProvider::QnMultiImageProvider(
                 emit imageChanged(m_image);
             });
 
-        connect(provider.get(), &QnImageProvider::statusChanged, this,
+        connect(provider.get(), &ImageProvider::statusChanged, this,
             [this] {emit statusChanged(status()); });
-        connect(provider.get(), &QnImageProvider::sizeHintChanged, this,
+        connect(provider.get(), &ImageProvider::sizeHintChanged, this,
             [this] { emit sizeHintChanged(sizeHint()); });
 
         ++key;
     }
 }
 
-QImage QnMultiImageProvider::image() const
+QImage MultiImageProvider::image() const
 {
     return m_image;
 }
 
-QSize QnMultiImageProvider::sizeHint() const
+QSize MultiImageProvider::sizeHint() const
 {
     if (!m_image.isNull())
         return m_image.size();
@@ -101,7 +105,7 @@ QSize QnMultiImageProvider::sizeHint() const
     return Geometry::bounded(m_providers.front()->sizeHint(), kMaxSize, Qt::KeepAspectRatio).toSize();
 }
 
-Qn::ThumbnailStatus QnMultiImageProvider::status() const
+Qn::ThumbnailStatus MultiImageProvider::status() const
 {
     // TODO: #gdm improve logic, statusChanged
     for (const auto& provider: m_providers)
@@ -112,8 +116,12 @@ Qn::ThumbnailStatus QnMultiImageProvider::status() const
     return Qn::ThumbnailStatus::Loading;
 }
 
-void QnMultiImageProvider::doLoadAsync()
+void MultiImageProvider::doLoadAsync()
 {
     for (const auto& provider: m_providers)
         provider->loadAsync();
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

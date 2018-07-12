@@ -17,6 +17,7 @@
 #include <nx/client/desktop/image_providers/image_provider.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/common/connective.h>
+#include <utils/common/aspect_ratio.h>
 
 class QPainter;
 class QnProgressDialog;
@@ -35,21 +36,21 @@ struct QnScreenshotParameters
     QnItemDewarpingParams itemDewarpingParams;
     ImageCorrectionParams imageCorrectionParams;
     QRectF zoomRect;
-    qreal customAspectRatio = 0;
+    QnAspectRatio customAspectRatio;
     qreal rotationAngle = 0;
 
-    QString timeString() const;
+    QString timeString(bool forFilename = false) const;
 };
 
 /* Proxy class, that starts loading instantly after base provider is set and notifies only once. */
 // TODO: #vkutin #gdm Use nx::client::desktop::ProxyImageProvider instead
-class QnScreenshotLoader: public QnImageProvider {
+class QnScreenshotLoader: public nx::client::desktop::ImageProvider {
     Q_OBJECT
 public:
     QnScreenshotLoader(const QnScreenshotParameters& parameters, QObject *parent = 0);
     virtual ~QnScreenshotLoader();
 
-    void setBaseProvider(QnImageProvider* imageProvider);
+    void setBaseProvider(nx::client::desktop::ImageProvider* imageProvider);
 
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
@@ -65,7 +66,7 @@ private slots:
     void at_imageLoaded(const QImage &image);
 
 private:
-    QScopedPointer<QnImageProvider> m_baseProvider;
+    QScopedPointer<nx::client::desktop::ImageProvider> m_baseProvider;
     QnScreenshotParameters m_parameters;
     bool m_isReady;
 };
@@ -84,7 +85,8 @@ public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);
 
 private:
-    QnImageProvider* getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced = false) const;
+    nx::client::desktop::ImageProvider* getLocalScreenshotProvider(QnMediaResourceWidget *widget,
+        const QnScreenshotParameters &parameters, bool forced = false) const;
 
 private slots:
     void at_takeScreenshotAction_triggered();

@@ -17,7 +17,7 @@ namespace plugins {
 
 namespace {
 
-const std::chrono::milliseconds kHttpTimeout(4000);
+const std::chrono::milliseconds kHttpTimeout(10000);
 
 const QString kPathTemplate = lit("/stw-cgi/%1.cgi");
 const QString kAttributesPathTemplate = lit("/stw-cgi/attributes.cgi/%1");
@@ -29,8 +29,8 @@ const QString kAction = lit("action");
 
 HanwhaRequestHelper::HanwhaRequestHelper(
     const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext,
-    int bypassChannel)
-:
+    boost::optional<int> bypassChannel)
+    :
     m_resourceContext(resourceContext),
     m_bypassChannel(bypassChannel)
 {
@@ -42,7 +42,14 @@ HanwhaAttributes HanwhaRequestHelper::fetchAttributes(const QString& attributesP
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     auto url = buildAttributesUrl(attributesPath);
 
-    if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
+    const bool success = doRequestInternal(
+        url,
+        m_resourceContext->authenticator(),
+        nx::utils::RwLockType::read,
+        &buffer,
+        &statusCode);
+
+    if (!success)
         return HanwhaAttributes(statusCode);
 
     return HanwhaAttributes(buffer, statusCode);
@@ -54,7 +61,14 @@ HanwhaCgiParameters HanwhaRequestHelper::fetchCgiParameters(const QString& cgiPa
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
     auto url = buildAttributesUrl(cgiParametersPath);
 
-    if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
+    const bool success = doRequestInternal(
+        url,
+        m_resourceContext->authenticator(),
+        nx::utils::RwLockType::read,
+        &buffer,
+        &statusCode);
+
+    if (!success)
         return HanwhaCgiParameters(statusCode);
 
     return HanwhaCgiParameters(buffer, statusCode);
@@ -64,60 +78,67 @@ HanwhaResponse HanwhaRequestHelper::doRequest(
     const QString& cgi,
     const QString& submenu,
     const QString& action,
-    const HanwhaRequestHelper::Parameters& parameters,
-    const QString& groupBy)
+    nx::utils::RwLockType requestType,
+    const HanwhaRequestHelper::Parameters& parameters)
 {
     nx::Buffer buffer;
     auto url = buildRequestUrl(cgi, submenu, action, parameters);
 
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined;
-    if (!doRequestInternal(url, m_resourceContext->authenticator(), &buffer, &statusCode))
+
+    const bool success = doRequestInternal(
+        url,
+        m_resourceContext->authenticator(),
+        requestType,
+        &buffer,
+        &statusCode);
+
+    if (!success)
         return HanwhaResponse(statusCode, url.toString(QUrl::RemoveUserInfo));
 
-    return HanwhaResponse(buffer, statusCode, url.toString(QUrl::RemoveUserInfo), groupBy);
+    return HanwhaResponse(buffer, statusCode, url.toString(QUrl::RemoveUserInfo), m_groupBy);
 }
 
 HanwhaResponse HanwhaRequestHelper::view(
     const QString& path,
-    const Parameters& parameters,
-    const QString& groupBy)
+    const Parameters& parameters)
 {
-    return splitAndDoRequest(lit("view"), path, parameters, groupBy);
+    return splitAndDoRequest(lit("view"), path, parameters, nx::utils::RwLockType::read);
 }
 
 HanwhaResponse HanwhaRequestHelper::set(const QString& path, const Parameters& parameters)
 {
-    return splitAndDoRequest(lit("set"), path, parameters);
+    return splitAndDoRequest(lit("set"), path, parameters, nx::utils::RwLockType::write);
 }
 
 HanwhaResponse HanwhaRequestHelper::update(const QString& path, const Parameters& parameters)
 {
-    return splitAndDoRequest(lit("update"), path, parameters);
+    return splitAndDoRequest(lit("update"), path, parameters, nx::utils::RwLockType::write);
 }
 
 HanwhaResponse HanwhaRequestHelper::add(const QString& path, const Parameters& parameters)
 {
-    return splitAndDoRequest(lit("add"), path, parameters);
+    return splitAndDoRequest(lit("add"), path, parameters, nx::utils::RwLockType::write);
 }
 
 HanwhaResponse HanwhaRequestHelper::remove(const QString& path, const Parameters& parameters)
 {
-    return splitAndDoRequest(lit("remove"), path, parameters);
+    return splitAndDoRequest(lit("remove"), path, parameters, nx::utils::RwLockType::write);
 }
 
 HanwhaResponse HanwhaRequestHelper::control(const QString& path, const Parameters& parameters)
 {
-    return splitAndDoRequest(lit("control"), path, parameters);
+    return splitAndDoRequest(lit("control"), path, parameters, nx::utils::RwLockType::write);
 }
 
 HanwhaResponse HanwhaRequestHelper::check(const QString& path, const Parameters& parameters)
 {
-    return splitAndDoRequest(lit("check"), path, parameters);
+    return splitAndDoRequest(lit("check"), path, parameters, nx::utils::RwLockType::read);
 }
 
-void HanwhaRequestHelper::setIgnoreMutexAnalyzer(bool ignoreMutexAnalyzer)
+void HanwhaRequestHelper::setGroupBy(const QString& groupBy)
 {
-    m_ignoreMutexAnalyzer = ignoreMutexAnalyzer;
+    m_groupBy = groupBy;
 }
 
 utils::Url HanwhaRequestHelper::buildRequestUrl(
@@ -186,6 +207,7 @@ nx::utils::Url HanwhaRequestHelper::buildAttributesUrl(const QString& attributes
 bool HanwhaRequestHelper::doRequestInternal(
     const utils::Url& url,
     const QAuthenticator& auth,
+    nx::utils::RwLockType requestType,
     nx::Buffer* outBuffer,
     nx::network::http::StatusCode::Value* outStatusCode)
 {
@@ -195,18 +217,16 @@ bool HanwhaRequestHelper::doRequestInternal(
 
     nx::network::http::HttpClient httpClient;
 
-    httpClient.setIgnoreMutexAnalyzer(m_ignoreMutexAnalyzer);
+    httpClient.setIgnoreMutexAnalyzer(true);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
-    httpClient.setSendTimeoutMs(kHttpTimeout.count());
-    httpClient.setMessageBodyReadTimeoutMs(kHttpTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kHttpTimeout.count());
+    httpClient.setSendTimeout(kHttpTimeout);
+    httpClient.setMessageBodyReadTimeout(kHttpTimeout);
+    httpClient.setResponseReadTimeout(kHttpTimeout);
 
-    auto realUrl = m_bypassChannel == kHanwhaNoBypassChannel
-        ? url
-        : makeBypassUrl(url);
+    auto realUrl = m_bypassChannel == boost::none ? url : makeBypassUrl(url);
 
-    QnSemaphoreLocker lock(m_resourceContext->requestSemaphore());
+    nx::utils::RwLocker lock(m_resourceContext->requestLock(), requestType);
     if (!httpClient.doGet(realUrl))
     {
         NX_VERBOSE(m_resourceContext.get(), lm("%1 has failed").args(realUrl));
@@ -228,12 +248,12 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
     const QString& action,
     const QString& path,
     const Parameters& parameters,
-    const QString& groupBy)
+    nx::utils::RwLockType requestType)
 {
     if (!m_resourceContext)
     {
         return HanwhaResponse(nx::network::http::StatusCode::serviceUnavailable,
-            lit("Resource is not initilized, try different server"));
+            lit("Resource is not initialized, try different server"));
     }
 
     auto split = path.split(L'/');
@@ -251,25 +271,33 @@ HanwhaResponse HanwhaRequestHelper::splitAndDoRequest(
         return HanwhaResponse(nx::network::http::StatusCode::undefined, urlString);
     }
 
-    return doRequest(split[0], split[1], action, parameters, groupBy);
+    return doRequest(split[0], split[1], action, requestType, parameters);
 }
 
 nx::utils::Url HanwhaRequestHelper::makeBypassUrl(const nx::utils::Url& url) const
 {
+    const bool isChannelCorrect = m_bypassChannel != boost::none;
+    NX_ASSERT(isChannelCorrect);
+    if (!isChannelCorrect)
+        return nx::utils::Url();
+
     nx::utils::Url bypassUrl(url);
     bypassUrl.setPath(lit("/stw-cgi/bypass.cgi"));
 
     QUrlQuery bypassQuery;
     bypassQuery.addQueryItem(lit("msubmenu"), lit("bypass"));
     bypassQuery.addQueryItem(lit("action"), lit("control"));
-    bypassQuery.addQueryItem(lit("Channel"), QString::number(m_bypassChannel));
+    bypassQuery.addQueryItem(lit("Channel"), QString::number(m_bypassChannel.get()));
 
-    QString bypassUriString = url.path();
-    auto query = url.query();
-    if (!query.isEmpty())
-        bypassUriString.append(lit("?")).append(query);
+    nx::utils::Url proxiedUrl(url);
+    QUrlQuery proxiedUrlQuery(proxiedUrl.query());
+    proxiedUrlQuery.removeQueryItem(kHanwhaChannelProperty);
+    proxiedUrl.setHost(QString());
+    proxiedUrl.setQuery(proxiedUrlQuery);
 
-    bypassQuery.addQueryItem(lit("BypassURI"), bypassUriString);
+    bypassQuery.addQueryItem(
+        lit("BypassURI"),
+        proxiedUrl.toString(QUrl::RemoveScheme | QUrl::RemoveAuthority));
 
     bypassUrl.setQuery(bypassQuery);
     return bypassUrl;

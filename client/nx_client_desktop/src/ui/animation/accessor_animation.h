@@ -4,18 +4,18 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QPointer>
 
-#include <ui/common/accessor.h>
+#include <nx/client/desktop/common/utils/accessor.h>
 
 class QnAccessorAnimation: public QVariantAnimation {
     Q_OBJECT;
 public:
     QnAccessorAnimation(QObject *parent = NULL): QVariantAnimation(parent) {}
 
-    AbstractAccessor *accessor() const {
+    nx::client::desktop::AbstractAccessor *accessor() const {
         return m_accessor.data();
     }
 
-    void setAccessor(AbstractAccessor *accessor) {
+    void setAccessor(nx::client::desktop::AbstractAccessor *accessor) {
         m_accessor.reset(accessor);
     }
 
@@ -45,6 +45,6 @@ protected:
     }
 
 private:
-    QScopedPointer<AbstractAccessor> m_accessor;
+    QScopedPointer<nx::client::desktop::AbstractAccessor> m_accessor;
     QPointer<QObject> m_target;
 };

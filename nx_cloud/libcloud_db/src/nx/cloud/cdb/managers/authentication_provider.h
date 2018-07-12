@@ -5,7 +5,10 @@
 #include <QtCore/QByteArray>
 
 #include <nx/cloud/cdb/api/auth_provider.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/network/aio/timer.h>
+#include <nx/utils/counter.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "account_manager.h"
 #include "system_sharing_manager.h"
@@ -35,20 +38,20 @@ class AuthenticationProvider:
 public:
     AuthenticationProvider(
         const conf::Settings& settings,
-        nx::utils::db::AsyncSqlQueryExecutor* sqlQueryExecutor,
+        nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor,
         AbstractAccountManager* accountManager,
         AbstractSystemSharingManager* systemSharingManager,
         const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
         ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus);
     virtual ~AuthenticationProvider();
 
-    virtual nx::utils::db::DBResult afterSharingSystem(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult afterSharingSystem(
+        nx::sql::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         SharingType sharingType) override;
 
     virtual void afterUpdatingAccountPassword(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const api::AccountData& account) override;
 
     /**
@@ -76,17 +79,21 @@ private:
     };
 
     const conf::Settings& m_settings;
-    nx::utils::db::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
+    nx::sql::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
     AbstractAccountManager* m_accountManager;
     AbstractSystemSharingManager* m_systemSharingManager;
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;
     std::unique_ptr<dao::AbstractUserAuthentication> m_authenticationDataObject;
     ec2::AbstractVmsP2pCommandBus* m_vmsP2pCommandBus;
+    nx::network::aio::Timer m_updateExpiredAuthTimer;
+    nx::utils::Counter m_ongoingOperationCounter;
+    bool m_terminated = false;
+    mutable QnMutex m_mutex;
 
     boost::optional<AccountWithEffectivePassword>
         getAccountByLogin(const std::string& login) const;
-    nx::utils::db::DBResult validateNonce(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult validateNonce(
+        nx::sql::QueryContext* queryContext,
         const std::string& nonce,
         const std::string& systemId,
         std::shared_ptr<bool> isNonceValid);
@@ -100,10 +107,10 @@ private:
         const std::string& passwordHa1) const;
 
     std::string fetchOrCreateNonce(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId);
     void addUserAuthRecord(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& vmsUserId,
         const api::AccountData& account,
@@ -111,12 +118,31 @@ private:
     api::AuthInfoRecord generateAuthRecord(
         const api::AccountData& account,
         const std::string& nonce);
-    void removeExpiredRecords(api::AuthInfo* userAuthenticationRecords);
     void generateUpdateUserAuthInfoTransaction(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& vmsUserId,
         const api::AuthInfo& userAuthenticationRecords);
+
+    //---------------------------------------------------------------------------------------------
+    // Updating expired auth records.
+
+    void checkForExpiredAuthRecordsAsync();
+
+    sql::DBResult checkForExpiredAuthRecords(
+        sql::QueryContext* queryContext);
+
+    void updateSystemAuth(
+        sql::QueryContext* queryContext,
+        const std::string& systemId);
+
+    void updateUserAuthInSystem(
+        nx::sql::QueryContext* queryContext,
+        const std::string& systemId,
+        const std::string& nonce,
+        const api::SystemSharingEx& userSharing);
+
+    void startCheckForExpiredAuthRecordsTimer(sql::DBResult result);
 };
 
 } // namespace cdb

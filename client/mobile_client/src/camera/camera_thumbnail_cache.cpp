@@ -133,41 +133,47 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
     if (thumbnailData.time > 0 && thumbnailData.time + refreshInterval > m_elapsedTimer.elapsed())
         return;
 
-    auto handleReply = [this, id] (bool success, rest::Handle handleId, const QByteArray &imageData)
-    {
-        Q_UNUSED(handleId)
-
-        bool thumbnailLoaded = false;
-        QString thumbnailId;
-
+    const auto handleReply =
+        [this, id, guard = QPointer<QnCameraThumbnailCache>(this)](
+            bool success,
+            rest::Handle /*requestId*/,
+            QByteArray imageData,
+            const nx::network::http::HttpHeaders& /*headers*/)
         {
-            QPixmap pixmap;
-            if (success && !imageData.isEmpty())
-                pixmap = QPixmap::fromImage(decompressJpegImage(imageData));
+            if (!guard)
+                return;
 
-            QnMutexLocker lock(&m_mutex);
+            bool thumbnailLoaded = false;
+            QString thumbnailId;
 
-            ThumbnailData &thumbnailData = m_thumbnailByResourceId[id];
-
-            if (success)
             {
-                if (!pixmap.isNull())
+                QPixmap pixmap;
+                if (success && !imageData.isEmpty())
+                    pixmap = QPixmap::fromImage(decompressJpegImage(imageData));
+
+                QnMutexLocker lock(&m_mutex);
+
+                ThumbnailData &thumbnailData = m_thumbnailByResourceId[id];
+
+                if (success)
                 {
-                    thumbnailId = getThumbnailId(id, thumbnailData.time);
-                    m_pixmaps.remove(thumbnailData.thumbnailId);
-                    m_pixmaps.insert(thumbnailId, pixmap);
-                    thumbnailLoaded = true;
+                    if (!pixmap.isNull())
+                    {
+                        thumbnailId = getThumbnailId(id, thumbnailData.time);
+                        m_pixmaps.remove(thumbnailData.thumbnailId);
+                        m_pixmaps.insert(thumbnailId, pixmap);
+                        thumbnailLoaded = true;
+                    }
+                    thumbnailData.thumbnailId = thumbnailId;
+                    thumbnailData.time = m_elapsedTimer.elapsed();
                 }
-                thumbnailData.thumbnailId = thumbnailId;
-                thumbnailData.time = m_elapsedTimer.elapsed();
+
+                thumbnailData.loading = false;
             }
 
-            thumbnailData.loading = false;
-        }
-
-        if (thumbnailLoaded)
-            emit thumbnailUpdated(id, thumbnailId);
-    };
+            if (thumbnailLoaded)
+                emit thumbnailUpdated(id, thumbnailId);
+        };
 
     m_request.camera = camera;
     int handle = server->restConnection()->cameraThumbnailAsync(m_request, handleReply, m_decompressThread);

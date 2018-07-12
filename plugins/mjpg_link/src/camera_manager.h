@@ -6,7 +6,7 @@
 #ifndef ILP_CAMERA_MANAGER_H
 #define ILP_CAMERA_MANAGER_H
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
 #include <plugins/plugin_tools.h>
@@ -64,14 +64,15 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     /*!
-        Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager, 
+        Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
         since \a AxisCameraDiscoveryManager instance is not required for \a AxisCameraManager object
     */
     nxpt::ScopedRef<HttpLinkPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     nxpl::TimeProvider *const m_timeProvider;
-    std::unique_ptr<MediaEncoder> m_encoder;
+    static const int kEncoderCount = 2;
+    std::unique_ptr<MediaEncoder> m_encoder[kEncoderCount];
 };
 
 #endif  //ILP_CAMERA_MANAGER_H

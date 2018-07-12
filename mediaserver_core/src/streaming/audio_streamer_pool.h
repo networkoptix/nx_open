@@ -8,6 +8,7 @@
 #include <camera/video_camera.h>
 
 class QnAbstractAudioTransmitter;
+namespace nx { namespace mediaserver { namespace resource { class Camera; } }}
 
 class QnAudioStreamerPool:
     public Singleton<QnAudioStreamerPool>,
@@ -40,7 +41,7 @@ private:
     QString calcActionUniqueKey(const nx::vms::event::AbstractActionPtr& action) const;
 
     QnVideoCameraPtr getTransmitSource(const QString& sourceId) const;
-    QnSecurityCamResourcePtr getTransmitDestination(const QnUuid& resourceId) const;
+    nx::mediaserver::resource::CameraPtr getTransmitDestination(const QnUuid& resourceId) const;
 private:
     QnMutex m_prolongedProvidersMutex;
     QMap<QString, QnAbstractStreamDataProviderPtr> m_actionDataProviders;

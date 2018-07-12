@@ -3,6 +3,7 @@
 #include <QtCore/QSharedMemory>
 #include <QtCore/QRect>
 #include <QtCore/QTimer>
+#include <QtCore/QSet>
 
 struct ScreenUsageData
 {

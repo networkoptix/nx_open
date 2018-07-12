@@ -18,6 +18,17 @@ function(nx_set_variable_if_empty variable value)
     endif()
 endfunction()
 
+function(nx_split_string var string)
+    cmake_parse_arguments(SPLIT "" "SEPARATOR" "" ${ARGN})
+
+    if(NOT SPLIT_SEPARATOR)
+        set(SPLIT_SEPARATOR "[\n| |\t]+")
+    endif()
+
+    string(REGEX REPLACE "${SPLIT_SEPARATOR}" ";" result "${string}")
+    set(${var} ${result} PARENT_SCOPE)
+endfunction()
+
 function(nx_init_known_files_list)
     get_property(property_set GLOBAL PROPERTY known_files SET)
 
@@ -29,6 +40,12 @@ endfunction()
 function(nx_store_known_file file_name)
     file(RELATIVE_PATH file ${CMAKE_BINARY_DIR} "${file_name}")
     set_property(GLOBAL APPEND_STRING PROPERTY known_files "${file}\n")
+endfunction()
+
+function(nx_store_known_files)
+    foreach(file_name ${ARGV})
+        nx_store_known_file(${file_name})
+    endforeach()
 endfunction()
 
 function(nx_save_known_files)
@@ -61,8 +78,6 @@ function(nx_copy)
     foreach(src ${COPY_UNPARSED_ARGUMENTS})
         nx_get_copy_full_destination_name(dst ${src} ${COPY_DESTINATION})
 
-        set(need_copy FALSE)
-
         if(COPY_IF_NEWER)
             file(TIMESTAMP "${src}" src_ts)
             file(TIMESTAMP "${dst}" dst_ts)
@@ -80,6 +95,9 @@ function(nx_copy)
             endif()
         else()
             message(STATUS "Copying ${src} to ${dst}")
+            # CMake skips copying if source and destination timestamps are equal. We have to remove
+            # the existing destination file to ensure the file is updated.
+            file(REMOVE ${dst})
             file(COPY "${src}" DESTINATION "${COPY_DESTINATION}")
         endif()
 

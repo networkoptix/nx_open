@@ -7,9 +7,9 @@ namespace nx {
 namespace mediaserver {
 namespace metadata {
 
-QnUuid guidByEventType(nx::vms::event::EventType eventType);
+QnUuid guidByEventType(nx::vms::api::EventType eventType);
 
-nx::vms::event::EventType eventTypeByGuid(const QnUuid& eventTypeGuid);
+nx::vms::api::EventType eventTypeByGuid(const QnUuid& eventTypeGuid);
 
 } // namespace metadata
 } // namespace mediaserver

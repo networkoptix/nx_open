@@ -1,23 +1,19 @@
 #pragma once
 
-#include <QtCore/QAbstractListModel>
+#include <QtGui/QStandardItemModel>
 
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/uuid.h>
-
-namespace nx { namespace api { struct AnalyticsEventTypeWithRef; } }
+#include <common/common_module_aware.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
 
-class AnalyticsSdkEventModel: public QAbstractListModel
+class AnalyticsSdkEventModel: public QnCommonModuleAware, public QStandardItemModel
 {
-    Q_OBJECT
-    using base_type = QAbstractListModel;
-
 public:
     enum DataRole
     {
@@ -28,17 +24,9 @@ public:
     AnalyticsSdkEventModel(QObject* parent = nullptr);
     ~AnalyticsSdkEventModel();
 
-    virtual int rowCount(const QModelIndex& parent) const override;
-    virtual QVariant data(const QModelIndex& index, int role) const override;
-
     void loadFromCameras(const QnVirtualCameraResourceList& cameras);
 
     bool isValid() const;
-
-private:
-    struct Private;
-    QScopedPointer<Private> d;
-
 };
 
 } // namespace ui

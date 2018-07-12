@@ -4,6 +4,7 @@
 #include <QString>
 
 #include <core/resource/resource_fwd.h>
+#include <common/common_globals.h>
 
 //!Holds types related to performing camera availability diagnostics
 namespace CameraDiagnostics {
@@ -68,6 +69,7 @@ enum Value
     cameraPluginError,
     liveVideoIsNotSupportedError,
     tooManyOpenedConnections,
+    cameraOldFirmwareError,
     unknown
 };
 
@@ -104,6 +106,7 @@ public:
 
     explicit operator bool() const;
     QString toString(QnResourcePool* resourcePool) const;
+    Qn::MediaStreamEvent toMediaStreamEvent() const;
 };
 
 class NoErrorResult: public Result
@@ -276,6 +279,15 @@ public:
         const QString& errorString)
         :
         Result(ErrorCode::cameraInvalidParams, errorString)
+    {
+    }
+};
+
+class CameraOldFirmware: public Result
+{
+public:
+    CameraOldFirmware(const QString& minimalVersion, const QString& currentVersion):
+        Result(ErrorCode::cameraOldFirmwareError,minimalVersion,currentVersion)
     {
     }
 };

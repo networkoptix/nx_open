@@ -1,5 +1,6 @@
 #include "http_server_connection.h"
 
+#include <atomic>
 #include <memory>
 
 #include <QtCore/QDateTime>
@@ -25,6 +26,13 @@ HttpServerConnection::HttpServerConnection(
 {
 }
 
+SocketAddress HttpServerConnection::clientEndpoint() const
+{
+    return m_clientEndpoint
+        ? *m_clientEndpoint
+        : socket()->getForeignAddress();
+}
+
 void HttpServerConnection::setPersistentConnectionEnabled(bool value)
 {
     m_persistentConnectionEnabled = value;
@@ -36,6 +44,8 @@ void HttpServerConnection::processMessage(nx::network::http::Message requestMess
     {
         NX_VERBOSE(this, lm("Processing request %1 received from %2")
             .args(requestMessage.request->requestLine.url.toString(), getForeignAddress()));
+
+        extractClientEndpoint(requestMessage.headers());
     }
 
     // TODO: #ak Incoming message body. Use AbstractMsgBodySource.
@@ -54,6 +64,46 @@ void HttpServerConnection::processMessage(nx::network::http::Message requestMess
     }
 
     authenticate(std::move(requestMessage));
+}
+
+void HttpServerConnection::extractClientEndpoint(const HttpHeaders& headers)
+{
+    extractClientEndpointFromXForwardedHeader(headers);
+    if (!m_clientEndpoint)
+        extractClientEndpointFromForwardedHeader(headers);
+
+    if (m_clientEndpoint && m_clientEndpoint->port == 0)
+        m_clientEndpoint->port = socket()->getForeignAddress().port;
+}
+
+void HttpServerConnection::extractClientEndpointFromXForwardedHeader(
+    const HttpHeaders& headers)
+{
+    header::XForwardedFor xForwardedFor;
+    auto xForwardedForIter = headers.find(header::XForwardedFor::NAME);
+    if (xForwardedForIter != headers.end() &&
+        xForwardedFor.parse(xForwardedForIter->second))
+    {
+        m_clientEndpoint.emplace(
+            SocketAddress(xForwardedFor.client.constData(), 0));
+
+        auto xForwardedPortIter = headers.find("X-Forwarded-Port");
+        if (xForwardedPortIter != headers.end())
+            m_clientEndpoint->port = xForwardedPortIter->second.toInt();
+    }
+}
+
+void HttpServerConnection::extractClientEndpointFromForwardedHeader(
+    const HttpHeaders& headers)
+{
+    header::Forwarded forwarded;
+    auto forwardedIter = headers.find(header::Forwarded::NAME);
+    if (forwardedIter != headers.end() &&
+        forwarded.parse(forwardedIter->second) &&
+        !forwarded.elements.front().for_.isEmpty())
+    {
+        m_clientEndpoint.emplace(forwarded.elements.front().for_);
+    }
 }
 
 void HttpServerConnection::authenticate(nx::network::http::Message requestMessage)
@@ -141,7 +191,7 @@ void HttpServerConnection::sendUnauthorizedResponse(
     {
         response.response->headers.emplace(
             header::WWWAuthenticate::NAME,
-            authenticationResult.wwwAuthenticate.get().serialized());
+            authenticationResult.wwwAuthenticate->serialized());
     }
 
     prepareAndSendResponse(
@@ -388,9 +438,9 @@ void HttpServerConnection::fullMessageHasBeenSent()
     NX_ASSERT(!m_responseQueue.empty());
     if (m_responseQueue.front().connectionEvents.onResponseHasBeenSent)
     {
-        auto handler =
-            std::move(m_responseQueue.front().connectionEvents.onResponseHasBeenSent);
-        handler(this);
+        nx::utils::swapAndCall(
+            m_responseQueue.front().connectionEvents.onResponseHasBeenSent,
+            this);
     }
     m_responseQueue.pop_front();
 

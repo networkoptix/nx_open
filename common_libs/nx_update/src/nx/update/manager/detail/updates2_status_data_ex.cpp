@@ -3,9 +3,10 @@
 
 namespace nx {
 namespace update {
+namespace manager {
 namespace detail {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Updates2StatusDataEx), (json)(eq), _Fields)
 
 const api::Updates2StatusData& Updates2StatusDataEx::base() const
 {
@@ -17,9 +18,12 @@ Updates2StatusDataEx::Updates2StatusDataEx(
     const QnUuid& serverId,
     StatusCode status,
     QString message,
+    const QList<api::TargetVersionWithEula>& targetVersions,
+    const QString& releaseNotesUrl,
     double progress)
     :
-    api::Updates2StatusData(serverId, status, std::move(message), progress),
+    api::Updates2StatusData(serverId, status, std::move(message), targetVersions, releaseNotesUrl,
+        progress),
     lastRefreshTime(lastRefreshTime)
 {}
 
@@ -32,25 +36,11 @@ void Updates2StatusDataEx::fromBase(const api::Updates2StatusData& other)
 void Updates2StatusDataEx::clone(const Updates2StatusDataEx& other)
 {
     lastRefreshTime = other.lastRefreshTime;
-    files = other.files;
+    file = other.file;
     static_cast<Updates2StatusData&>(*this) = other;
 }
 
-bool operator == (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs)
-{
-    return lhs.lastRefreshTime == rhs.lastRefreshTime
-        && lhs.serverId == rhs.serverId
-        && lhs.message == rhs.message
-        && std::abs(lhs.progress - rhs.progress) < std::numeric_limits<double>::epsilon()
-        && lhs.state == rhs.state
-        && lhs.files == rhs.files;
-}
-
-bool operator != (const Updates2StatusDataEx& lhs, const Updates2StatusDataEx& rhs)
-{
-    return !(lhs == rhs);
-}
-
 } // namespace detail
+} // namespace manager
 } // namespace update
 } // namespace nx

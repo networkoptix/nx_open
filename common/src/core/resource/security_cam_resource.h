@@ -1,5 +1,4 @@
-#ifndef sequrity_cam_resource_h_1239
-#define sequrity_cam_resource_h_1239
+#pragma once
 
 #include <mutex>
 #include <map>
@@ -9,12 +8,11 @@
 #include <nx/api/analytics/supported_events.h>
 #include <nx/vms/event/events/events_fwd.h>
 
+#include <nx/core/resource/device_type.h>
+
 #include <utils/common/value_cache.h>
 #include <common/common_globals.h>
 #include <api/model/api_ioport_data.h>
-
-#include <core/dataconsumer/audio_data_transmitter.h>
-#include <core/misc/schedule_task.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/motion_window.h>
@@ -25,11 +23,6 @@
 #include <core/dataprovider/live_stream_params.h>
 
 class QnAbstractArchiveDelegate;
-class QnDataProviderFactory;
-
-#ifdef ENABLE_DATA_PROVIDERS
-typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
-#endif
 
 class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
@@ -74,8 +67,6 @@ public:
     /** sets the distance between I frames */
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) {}
 
-    void setDataProviderFactory(QnDataProviderFactory* dpFactory);
-
     QList<QnMotionRegion> getMotionRegionList() const;
     void setMotionRegionList(const QList<QnMotionRegion>& maskList);
 
@@ -93,10 +84,11 @@ public:
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
     QnScheduleTaskList getScheduleTasks() const;
 
-    virtual bool hasDualStreaming() const;
+    /** @return true if dual streaming is supported */
+    virtual bool hasDualStreamingInternal() const;
 
-    /** Return true if dual streaming supported and don't blocked by user */
-    virtual bool hasDualStreaming2() const;
+    /** @return true if dual streaming is supported and don't blocked by user */
+    virtual bool hasDualStreaming() const;
 
     /** Returns true if camera stores archive on a external system */
     bool isDtsBased() const;
@@ -126,6 +118,13 @@ public:
      */
     bool isSharingLicenseInGroup() const;
 
+    bool isNvr() const;
+
+    bool isMultiSensorCamera() const;
+
+    nx::core::resource::DeviceType deviceType() const;
+
+    void setDeviceType(nx::core::resource::DeviceType);
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
@@ -158,24 +157,21 @@ public:
     //!Returns user-defined camera name (if not empty), default name otherwise
     QString getUserDefinedName() const;
 
-    //!Returns user-defined group name (if not empty) or server-defined group name
-    virtual QString getGroupName() const;
-    //!Returns server-defined group name
+    //!Returns user-defined group name (if not empty) or default group name
+    virtual QString getUserDefinedGroupName() const;
+    //!Returns default group name
     QString getDefaultGroupName() const;
-    virtual void setGroupName(const QString& value);
+    virtual void setDefaultGroupName(const QString& value);
     //!Set group name (the one is show to the user in client)
     /*!
         This name is set by user.
-        \a setGroupName name is generally set automatically (e.g., by server)
+        \a setDefaultGroupName name is generally set automatically (e.g., by server)
     */
     void setUserDefinedGroupName( const QString& value );
     virtual QString getGroupId() const;
     virtual void setGroupId(const QString& value);
 
     virtual QString getSharedId() const;
-
-    void setScheduleDisabled(bool value);
-    bool isScheduleDisabled() const;
 
     /** Check if a license is used for the current camera. */
     bool isLicenseUsed() const;
@@ -187,9 +183,6 @@ public:
     bool isAudioEnabled() const;
     bool isAudioForced() const;
     void setAudioEnabled(bool value);
-
-    bool isAdvancedWorking() const;
-    void setAdvancedWorking(bool value);
 
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
@@ -208,6 +201,9 @@ public:
 
     QString getVendor() const;
     void setVendor(const QString &value);
+
+    virtual int logicalId() const override;
+    virtual void setLogicalId(int value) override;
 
     bool isGroupPlayOnly() const;
 
@@ -237,7 +233,7 @@ public:
     void addStatusFlags(Qn::CameraStatusFlag value);
     void removeStatusFlags(Qn::CameraStatusFlag value);
 
-    bool needCheckIpConflicts() const;
+    virtual bool needCheckIpConflicts() const;
 
     void setMaxDays(int value);
     int maxDays() const;
@@ -245,11 +241,17 @@ public:
     void setMinDays(int value);
     int minDays() const;
 
+    int recordBeforeMotionSec() const;
+    void setRecordBeforeMotionSec(int value);
+
+    int recordAfterMotionSec() const;
+    void setRecordAfterMotionSec(int value);
+
     void setPreferredServerId(const QnUuid& value);
     QnUuid preferredServerId() const;
 
     nx::api::AnalyticsSupportedEvents analyticsSupportedEvents() const;
-    void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
+    virtual void setAnalyticsSupportedEvents(const nx::api::AnalyticsSupportedEvents& eventsList);
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
@@ -278,16 +280,14 @@ public:
     void setIOPorts(const QnIOPortDataList& ports);
 
     virtual bool setProperty(
-		const QString &key,
-		const QString &value,
-		PropertyOptions options = DEFAULT_OPTIONS) override;
+        const QString &key,
+        const QString &value,
+        PropertyOptions options = DEFAULT_OPTIONS) override;
 
     virtual bool setProperty(
-		const QString &key,
-		const QVariant& value,
-		PropertyOptions options = DEFAULT_OPTIONS) override;
-
-    virtual bool removeProperty(const QString& key) override;
+        const QString &key,
+        const QVariant& value,
+        PropertyOptions options = DEFAULT_OPTIONS) override;
 
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;
@@ -300,9 +300,10 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual QnAudioTransmitterPtr getAudioTransmitter();
-#endif
+    /**
+     * Return non zero media event error if camera resource has an issue.
+     */
+    Qn::MediaStreamEvent checkForErrors() const;
 
     bool isEnoughFpsToRunSecondStream(int currentFps) const;
     virtual nx::core::resource::AbstractRemoteArchiveManager* remoteArchiveManager();
@@ -314,7 +315,7 @@ public:
     static float rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps);
 
     virtual bool captureEvent(const nx::vms::event::AbstractEventPtr& event);
-    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::event::EventType eventType) const;
+    virtual bool doesEventComeFromAnalyticsDriver(nx::vms::api::EventType eventType) const;
 
     /**
      * Update user password at the camera. This function is able to change password for existing user only.
@@ -343,13 +344,12 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    void scheduleDisabledChanged(const QnResourcePtr &resource);
+    void licenseUsedChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
     void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
     void statusFlagsChanged(const QnResourcePtr &resource);
-    void licenseUsedChanged(const QnResourcePtr &resource);
     void licenseTypeChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
     void backupQualitiesChanged(const QnResourcePtr &resource);
@@ -357,7 +357,7 @@ signals:
     void disableDualStreamingChanged(const QnResourcePtr& resource);
     void audioEnabledChanged(const QnResourcePtr &resource);
 
-    void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     //!Emitted on camera input port state has been changed
     /*!
@@ -396,15 +396,11 @@ protected slots:
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
-#ifdef ENABLE_DATA_PROVIDERS
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role) override;
-#endif
-
     virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
-    virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
+    virtual void setMotionMaskPhysical(int /*channel*/) {}
     //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
         \warning Excess calls of this method is legal and MUST be correctly handled in implementation
@@ -421,12 +417,8 @@ protected:
     virtual bool isInputPortMonitored() const;
 
     virtual Qn::LicenseType calculateLicenseType() const;
-protected:
-#ifdef ENABLE_DATA_PROVIDERS
-    QnAudioTransmitterPtr m_audioTransmitter;
-#endif
+
 private:
-    QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
     QString m_groupName;
@@ -436,7 +428,7 @@ private:
     QString m_model;
     QString m_vendor;
     CachedValue<Qn::LicenseType> m_cachedLicenseType;
-    CachedValue<bool> m_cachedHasDualStreaming2;
+    CachedValue<bool> m_cachedHasDualStreaming;
     CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
     CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
     CachedValue<bool> m_cachedIsDtsBased;
@@ -447,6 +439,7 @@ private:
     Qn::MotionType calculateMotionType() const;
     CachedValue<nx::api::AnalyticsSupportedEvents> m_cachedAnalyticsSupportedEvents;
     CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
+    CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
 
 private slots:
     void resetCachedValues();
@@ -455,4 +448,16 @@ private slots:
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)
 Q_DECLARE_METATYPE(QnSecurityCamResourceList)
 
-#endif //sequrity_cam_resource_h_1239
+class QnC2pCameraResource: public QnSecurityCamResource
+{
+public:
+    QnC2pCameraResource(QnCommonModule* commonModule = nullptr):
+        QnSecurityCamResource(commonModule)
+    {
+    }
+    virtual QString getDriverName() const override {return QnResourceTypePool::kC2pCameraTypeId;}
+    virtual QnAbstractStreamDataProvider* createLiveDataProvider() override {return nullptr;}
+};
+
+Q_DECLARE_METATYPE(QnC2pCameraResourcePtr)
+Q_DECLARE_METATYPE(QnC2pCameraResourceList)

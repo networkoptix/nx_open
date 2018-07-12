@@ -1,5 +1,5 @@
 <div class="container" >
-    <h1>Download</h1>
+    <h1>Scarica</h1>
 
     <div class="col-md-8">
     <uib-tabset>
@@ -13,11 +13,11 @@
                 <div class="panel-body flex-md">
                     <div class="col-md-4  col-md-push-8 border-left-md">
                         <p>
-                            <b>Latest version</b>
+                            <b>Ultima versione</b>
                             <h2 class="version-number"><b>{{downloadsData.version}}</b></h2>
                         </p>
                         <p>
-                            <a ng-href="{{downloadsData.releaseNotes}}" target="_blank">What's new?</a>
+                            <a ng-href="{{downloadsData.releaseNotes}}" target="_blank">Che cosa è nuovo?</a>
                             <br>&nbsp;
                         </p>
                     </div>
@@ -25,23 +25,15 @@
                     <div class="col-md-8 col-md-pull-4 ">
                         <div class="row">
                             <div class="col-md-12">
-                                <a class="media btn btn-lg btn-default download-button" ng-href="{{platform.installers[0].url}}" >
-                                      <div class="media-left">
-                                            <span class="download-link"></span>
-                                      </div>
-                                      <div class="media-body text-left">
-                                            <h2><b>Download {{VMS_NAME}}</b></h2>
-                                            <span class="installer-name">{{$root.L.downloads.groups[platform.name].shortLabel ||
-                                                $root.L.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</span>
-                                      </div>
-                                </a>
+                                <a class="media btn btn-lg btn-default download-button" ng-href="{{platform.installers[0].url}}" ><div class="media-left"><span class="download-link"></span></div> <div class="media-body text-left"><h2><b>Scarica %VMS_NAME%< / 4 > <div class="installer-name">{{$root. L.downloads.Groups[platform.name].shortLabel | |
+                                                $root. L.downloads.Groups[platform.name]. Label}} {{platform.installers[0].formatName}}</div></div></a>
                                 <p class="small" ng-if="$root.L.downloads.groups[platform.name].supported"
                                    ng-bind-html="$root.L.downloads.groups[platform.name].supported"></p>
                             </div>
                         </div>
 
                         <div ng-if="platform.installers.length>1">
-                            <h5><b>Other packages:</b></h5>
+                            <h5><b>Altri pacchetti:</b></h5>
                             <div class="row">
                                 <div class="col-sm-4 col-md-6 col-lg-4" ng-repeat="link in platform.installers"
                                      ng-if="$index < (platform.installers.length / 2)">

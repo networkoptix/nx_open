@@ -3,7 +3,7 @@
 angular.module('nxCommon')
     .service('chromeCast', function () {
         var self = this;
-        if(!window.chrome){
+        if(jscd.browser.toLowerCase() != 'chrome'){
             return;
         }
         if(chrome.cast){

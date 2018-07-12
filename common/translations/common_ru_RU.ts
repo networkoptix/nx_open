@@ -53,11 +53,6 @@
       <translation>Найденная система %1 несовместима с версией %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Найденная система %1 находится в безопасном режиме.</translation>
@@ -68,21 +63,6 @@
       <translation>Не удалось настроить удаленную систему %1.</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Облачная система может быть объединена только с локальной. Системное имя и пароль берутся из облачной системы.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Новая система</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>Обнаружкнная система %1 несовместима с текущей.</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 система может быть объединена только с не-%1. Системное имя и пароль берутся из %1 системы.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
+    </message>
+    <message>
+      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Системное событие</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>Система, уже привязана к облаку (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>Сервер не подключен к Интернету.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Не удалось сохранить учетные данные облака в локальную базу данных</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Не удалось сохранить владельца облака в локальной базе данных</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Не удалось подключиться к облаку: %1</translation>
     </message>
   </context>
   <context>
@@ -314,6 +334,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках I/O модуля (ошибка "%1").</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Обновите прошивку. Минимальная поддерживаемая версия - %1. Текущая версия - %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -488,7 +512,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
@@ -500,6 +524,7 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
+        <numerusform>%n %2 использована из %1.</numerusform>
         <numerusform>%n %2 использовано из %1.</numerusform>
         <numerusform>%n %2 использовано из %1.</numerusform>
         <numerusform>%n %2 использовано из %1.</numerusform>
@@ -508,7 +533,8 @@
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 будет использовано из %1.</numerusform>
+        <numerusform>%n %2 будет использована из %1.</numerusform>
+        <numerusform>%n %2 будут использованы из %1.</numerusform>
         <numerusform>%n %2 будет использовано из %1.</numerusform>
         <numerusform>%n %2 будет использовано из %1.</numerusform>
       </translation>
@@ -519,11 +545,13 @@
         <numerusform>Активируйте ещё %n %1.</numerusform>
         <numerusform>Активируйте ещё %n %1.</numerusform>
         <numerusform>Активируйте ещё %n %1.</numerusform>
+        <numerusform>Активируйте ещё %n %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <translation>
+        <numerusform>Будет использована ещё %n %1.</numerusform>
         <numerusform>Будет использовано ещё %n %1.</numerusform>
         <numerusform>Будет использовано ещё %n %1.</numerusform>
         <numerusform>Будет использовано ещё %n %1.</numerusform>
@@ -561,8 +589,8 @@
       <translation>Неизвестная ошибка</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Сервер с соответствующим аппаратным Id не найден</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Сервер с соответствующим аппаратным ID не найден</translation>
     </message>
   </context>
   <context>
@@ -580,14 +608,16 @@
         <numerusform>%n камера</numerusform>
         <numerusform>%n камеры</numerusform>
         <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n камера</numerusform>
-        <numerusform>%n камеры</numerusform>
-        <numerusform>%n камер</numerusform>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камера</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -596,14 +626,16 @@
         <numerusform>%n устройство</numerusform>
         <numerusform>%n устройства</numerusform>
         <numerusform>%n устройств</numerusform>
+        <numerusform>%n устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n устройство</numerusform>
-        <numerusform>%n устройства</numerusform>
-        <numerusform>%n устройств</numerusform>
+        <numerusform>%n устройство</numerusform>
+        <numerusform>%n устройство</numerusform>
+        <numerusform>%n устройство</numerusform>
       </translation>
     </message>
     <message>
@@ -642,16 +674,18 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуля ввода/вывода</numerusform>
-        <numerusform>%n модулей ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуля ввода/вывода</numerusform>
-        <numerusform>%n модулей ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуль ввода/вывода</numerusform>
       </translation>
     </message>
     <message>
@@ -690,12 +724,12 @@
       <translation>Водяной знак: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Аппаратный Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Возобновляемая лицензия</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Аппаратный ID: %1</translation>
     </message>
   </context>
   <context>
@@ -830,161 +864,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>Некорректный параметр</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>мс</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>с</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>м</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>ч</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>д</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>н</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>М</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>г</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>мсек</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>сек</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>мин</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>ч</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>дн</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>нед</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>мес</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>лет</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>миллисекунда</numerusform>
-        <numerusform>миллисекунда</numerusform>
-        <numerusform>миллисекунда</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>секунды</numerusform>
-        <numerusform>секунды</numerusform>
-        <numerusform>секунды</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>минут</numerusform>
-        <numerusform>минут</numerusform>
-        <numerusform>минут</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>часов</numerusform>
-        <numerusform>часов</numerusform>
-        <numerusform>часов</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>дней</numerusform>
-        <numerusform>дней</numerusform>
-        <numerusform>дней</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>недель</numerusform>
-        <numerusform>недель</numerusform>
-        <numerusform>недель</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>месяцев</numerusform>
-        <numerusform>месяцев</numerusform>
-        <numerusform>месяцев</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>лет</numerusform>
-        <numerusform>лет</numerusform>
-        <numerusform>лет</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1133,7 +1012,8 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation>
+      <translation type="unfinished">
+        <numerusform>Движение на камере</numerusform>
         <numerusform>Движение на камерах</numerusform>
         <numerusform>Движение на камерах</numerusform>
         <numerusform>Движение на камерах</numerusform>
@@ -1178,6 +1058,7 @@
     <message numerus="yes">
       <source>Input Signal on Devices</source>
       <translation>
+        <numerusform>Входной сигнал на устройстве</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
         <numerusform>Входной сигнал на устройствах</numerusform>
@@ -1186,6 +1067,7 @@
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
       <translation>
+        <numerusform>Входной сигнал на камере</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
         <numerusform>Входной сигнал на камерах</numerusform>
@@ -1194,7 +1076,8 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>Устройств отключены</numerusform>
+        <numerusform>Устройство отключено</numerusform>
+        <numerusform>Устройства отключены</numerusform>
         <numerusform>Устройств отключены</numerusform>
         <numerusform>Устройств отключены</numerusform>
       </translation>
@@ -1202,7 +1085,8 @@
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>Камер отключено</numerusform>
+        <numerusform>Камера отключена</numerusform>
+        <numerusform>Камеры отключены</numerusform>
         <numerusform>Камер отключено</numerusform>
         <numerusform>Камер отключено</numerusform>
       </translation>
@@ -1210,17 +1094,19 @@
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
+        <numerusform>Конфликт IP адреса устройства</numerusform>
+        <numerusform>Конфликт IP адресов устройств</numerusform>
         <numerusform>Конфликт IP адреса устройств</numerusform>
-        <numerusform>Конфликт IP адреса устройств</numerusform>
-        <numerusform>Конфликт IP адреса устройств</numerusform>
+        <numerusform>Конфликт IP адресов устройств</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
+        <numerusform>Конфликт IP адреса камеры</numerusform>
+        <numerusform>Конфликт IP адресов камер</numerusform>
         <numerusform>Конфликт IP адреса камер</numerusform>
-        <numerusform>Конфликт IP адреса камер</numerusform>
-        <numerusform>Конфликт IP адреса камер</numerusform>
+        <numerusform>Конфликт IP адресов камер</numerusform>
       </translation>
     </message>
     <message>
@@ -1356,9 +1242,10 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
+        <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1373,11 +1260,14 @@
         <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
         <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
         <numerusform>Первое проявление: %2 %1 (всего %n раза)</numerusform>
+        <numerusform>Первое проявление: %2 %1 (всего %n раз)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
+        <numerusform>Нет данных в течение %n секунд.</numerusform>
+        <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
@@ -1502,17 +1392,19 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n User</numerusform>
-        <numerusform>%n User</numerusform>
-        <numerusform>%n User</numerusform>
+        <numerusform>%n пользователь</numerusform>
+        <numerusform>%n пользователя</numerusform>
+        <numerusform>%n пользователей</numerusform>
+        <numerusform>%n пользователей</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
       <translation>
+        <numerusform>%n Роль</numerusform>
+        <numerusform>%n Роли</numerusform>
         <numerusform>%n Role</numerusform>
-        <numerusform>%n Role</numerusform>
-        <numerusform>%n Role</numerusform>
+        <numerusform>%n Ролей</numerusform>
       </translation>
     </message>
     <message>
@@ -1521,7 +1413,7 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>Все пользователи</translation>
+      <translation>Всем пользователям</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1555,6 +1447,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 на %2</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Открыть раскладку</translation>
     </message>
   </context>
   <context>

@@ -1,17 +1,16 @@
 #include "fisheye_calibration_widget.h"
 #include "ui_fisheye_calibration_widget.h"
+#include "fisheye_calibration_image_widget.h"
 
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
 #include <client/client_globals.h>
-
+#include <ui/common/read_only.h>
 #include <ui/fisheye/fisheye_calibrator.h>
 
 #include <nx/client/desktop/image_providers/image_provider.h>
 #include <nx/utils/math/fuzzy.h>
-
-#include "fisheye_calibration_image_widget.h"
 
 namespace nx {
 namespace client {
@@ -53,13 +52,13 @@ void FisheyeCalibrationWidget::init()
     updatePage();
 }
 
-QnImageProvider* FisheyeCalibrationWidget::imageProvider() const
+ImageProvider* FisheyeCalibrationWidget::imageProvider() const
 {
     return m_imageProvider.data();
 }
 
-// TODO: #GDM change to QnCameraThumbnailManager
-void FisheyeCalibrationWidget::setImageProvider(QnImageProvider* provider)
+// TODO: #GDM change to CameraThumbnailManager
+void FisheyeCalibrationWidget::setImageProvider(ImageProvider* provider)
 {
     if (m_imageProvider)
     {
@@ -72,11 +71,11 @@ void FisheyeCalibrationWidget::setImageProvider(QnImageProvider* provider)
     if (!m_imageProvider)
         return;
 
-    connect(m_imageProvider, &QnImageProvider::imageChanged, ui->imageWidget,
+    connect(m_imageProvider, &ImageProvider::imageChanged, ui->imageWidget,
         &FisheyeCalibrationImageWidget::setImage);
-    connect(m_imageProvider, &QnImageProvider::statusChanged, this,
+    connect(m_imageProvider, &ImageProvider::statusChanged, this,
         &FisheyeCalibrationWidget::updatePage);
-    connect(m_imageProvider, &QnImageProvider::imageChanged, this,
+    connect(m_imageProvider, &ImageProvider::imageChanged, this,
         &FisheyeCalibrationWidget::updatePage);
 
     updatePage();
@@ -115,6 +114,16 @@ void FisheyeCalibrationWidget::setRadius(qreal radius)
     update();
 }
 
+bool FisheyeCalibrationWidget::isReadOnly() const
+{
+    return ::isReadOnly(ui->imageWidget);
+}
+
+void FisheyeCalibrationWidget::setReadOnly(bool value)
+{
+    ::setReadOnly(ui->imageWidget, value);
+}
+
 void FisheyeCalibrationWidget::updatePage()
 {
     const bool imageLoaded = m_imageProvider &&
@@ -137,18 +146,23 @@ void FisheyeCalibrationWidget::at_calibrator_finished(int errorCode)
 void FisheyeCalibrationWidget::at_image_animationFinished()
 {
     emit autoCalibrationFinished();
+    const QString errorCaption = tr("Auto calibration failed");
+
     switch (m_lastError)
     {
         case QnFisheyeCalibrator::ErrorNotFisheyeImage:
-            QnMessageBox::critical(this,
-                tr("Auto calibration failed"), tr("Image is not round."));
+            QnMessageBox::critical(this, errorCaption, tr("Image is not round."));
             break;
 
         case QnFisheyeCalibrator::ErrorTooLowLight:
-            QnMessageBox::critical(this,
-                tr("Auto calibration failed"), tr("Image might be too dim."));
+            QnMessageBox::critical(this, errorCaption, tr("Image might be too dim."));
             break;
-
+        case QnFisheyeCalibrator::ErrorInvalidInput:
+            QnMessageBox::critical(this, errorCaption, tr("Invalid input image."));
+            break;
+        case QnFisheyeCalibrator::ErrorInternal:
+            QnMessageBox::critical(this, errorCaption, tr("Internal error."));
+            break;
         default:
             break;
     }
@@ -156,6 +170,9 @@ void FisheyeCalibrationWidget::at_image_animationFinished()
 
 void FisheyeCalibrationWidget::autoCalibrate()
 {
+    if (isReadOnly())
+        return;
+
     ui->imageWidget->beginSearchAnimation();
     m_calibrator->analyseFrameAsync(ui->imageWidget->image());
 }

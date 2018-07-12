@@ -79,15 +79,20 @@ QnAviArchiveDelegate* QnAviResource::createArchiveDelegate() const
     return aviDelegate;
 }
 
-QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnAviResource::createDataProvider(
+    const QnResourcePtr& resource,
+    Qn::ConnectionRole /*role*/)
 {
-    if (FileTypeSupport::isImageFileExt(getUrl())) {
-        return new QnSingleShotFileStreamreader(toSharedPointer());
-    }
+    if (FileTypeSupport::isImageFileExt(resource->getUrl()))
+        return new QnSingleShotFileStreamreader(resource);
 
-    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
+    const auto aviResource = resource.dynamicCast<QnAviResource>();
+    NX_EXPECT(aviResource);
+    if (!aviResource)
+        return nullptr;
 
-    result->setArchiveDelegate(createArchiveDelegate());
+    QnArchiveStreamReader* result = new QnArchiveStreamReader(aviResource);
+    result->setArchiveDelegate(aviResource->createArchiveDelegate());
     return result;
 }
 
@@ -102,9 +107,17 @@ QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStre
 
 bool QnAviResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
 {
-    return dataProvider ? dataProvider->hasVideo() : true;
-}
+    if (dataProvider)
+        return dataProvider->hasVideo();
 
+    if (!m_hasVideo.is_initialized())
+    {
+        const QScopedPointer<QnAviArchiveDelegate> archiveDelegate(createArchiveDelegate());
+        archiveDelegate->open(toSharedPointer(this));
+        m_hasVideo = archiveDelegate->hasVideo();
+    }
+    return *m_hasVideo;
+}
 
 QnConstResourceAudioLayoutPtr QnAviResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
@@ -175,8 +188,10 @@ void QnAviResource::setDewarpingParams(const QnMediaDewarpingParams& params)
     }
 }
 
-qreal QnAviResource::customAspectRatio() const
+QnAspectRatio QnAviResource::customAspectRatio() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_aviMetadata ? m_aviMetadata->overridenAr : base_type::customAspectRatio();
+    return m_aviMetadata && !qFuzzyIsNull(m_aviMetadata->overridenAr)
+        ? QnAspectRatio::closestStandardRatio(m_aviMetadata->overridenAr)
+        : base_type::customAspectRatio();
 }

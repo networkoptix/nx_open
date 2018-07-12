@@ -1,13 +1,13 @@
+set(build_mobile OFF)
+
 set(defaultSkin "dark_orange")
 
 # Components Namings
-set(parent.customization "digitalwatchdog")
 set(product.name "NTN")
 set(display.product.name "NTN")
 set(product.name.short "dwspectrum")
 set(product.appName "ntnspectrum")
 set(company.name "NuTech National")
-set(short.company.name "NTN")
 set(uri.protocol "dw-vms")
 set(cloudName "NTN Cloud")
 set(installer.name "ntnspectrum")
@@ -30,7 +30,9 @@ set(customization.serverUpgradeCode "{d40d7717-5fa1-445f-a472-d597227f21bd}")
 set(customization.clientBundleUpgradeCode "{1bbba74f-4ca1-4953-8d7d-a3f0992ca513}")
 set(customization.serverBundleUpgradeCode "{2f601a77-297e-402b-baee-2a93c070dc0f}")
 set(customization.fullBundleUpgradeCode "{586fb805-c215-4ff3-a355-dfa0e79eb0f0}")
-set(customization.nxtoolBundleUpgradeCode "{0a616c4f-81f7-4102-afb2-0cb3788a785c}")
+
+#set(nxtool.company.name "NTN")
+#set(nxtool.bundleUpgradeCode "{0a616c4f-81f7-4102-afb2-0cb3788a785c}")
 
 set(deb.customization.company.name "nutech")
 

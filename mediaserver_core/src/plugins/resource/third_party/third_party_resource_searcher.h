@@ -15,12 +15,12 @@
 
 #include <nx/network/upnp/upnp_search_handler.h>
 
-#include "third_party_resource.h"
-#include "../mdns/mdns_resource_searcher.h"
-#include "plugins/resource/upnp/upnp_resource_searcher.h"
-#include "plugins/camera_plugin.h"
-#include "plugins/camera_plugin_qt_wrapper.h"
+#include <camera/camera_plugin.h>
 
+#include <plugins/resource/third_party/third_party_resource.h>
+#include <plugins/resource/mdns/mdns_resource_searcher.h>
+#include <plugins/resource/upnp/upnp_resource_searcher.h>
+#include <plugins/camera_plugin_qt_wrapper.h>
 
 /*!
     \note One object is created for all loaded plugin
@@ -77,10 +77,10 @@ private:
     QnResourceList doCustomSearch();
     QnResourceList createResListFromCameraInfoList(
         nxcip_qt::CameraDiscoveryManager* const discoveryManager,
-        const QVector<nxcip::CameraInfo>& cameraInfoArray );
+        const QVector<nxcip::CameraInfo2>& cameraInfoArray );
     QnThirdPartyResourcePtr createResourceFromCameraInfo(
         nxcip_qt::CameraDiscoveryManager* const discoveryManager,
-        const nxcip::CameraInfo& cameraInfo );
+        const nxcip::CameraInfo2& cameraInfo );
 };
 
 #endif // ENABLE_THIRD_PARTY

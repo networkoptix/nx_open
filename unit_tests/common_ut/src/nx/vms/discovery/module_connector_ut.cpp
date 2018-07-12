@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/app_info.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket_global.h>
@@ -32,7 +34,8 @@ public:
         connector.setReconnectPolicy(kReconnectPolicy);
 
         connector.setConnectHandler(
-            [this](QnModuleInformation information, nx::network::SocketAddress endpoint, nx::network::HostAddress /*ip*/)
+            [this](nx::vms::api::ModuleInformation information,
+                nx::network::SocketAddress endpoint, nx::network::HostAddress /*ip*/)
             {
                 QnMutexLocker lock(&m_mutex);
                 auto& knownEndpoint = m_knownServers[information.id];
@@ -75,6 +78,8 @@ public:
 
     void expectConnect(const QnUuid& id, const nx::network::SocketAddress& endpoint)
     {
+        NX_INFO(this, lm("Excpecting connect to %1 on %2").args(id, endpoint));
+
         QnMutexLocker lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
         while (m_knownServers.count(id) == 0 || m_knownServers[id].toString() != endpoint.toString())
@@ -86,6 +91,8 @@ public:
 
     void expectDisconnect(const QnUuid& id)
     {
+        NX_INFO(this, lm("Excpecting disconnect of %1").arg(id));
+
         QnMutexLocker lock(&m_mutex);
         const auto start = std::chrono::steady_clock::now();
         while (m_knownServers.count(id) != 0)
@@ -97,13 +104,25 @@ public:
 
     void expectNoChanges()
     {
+        NX_INFO(this, "Excpecting no changes");
+
         QnMutexLocker lock(&m_mutex);
         ASSERT_FALSE(waitCondition(kExpectNoChanesDelay)) << "Unexpected event";
     }
 
+    void expectPossibleChange()
+    {
+        NX_INFO(this, "Excpecting possible address change");
+
+        QnMutexLocker lock(&m_mutex);
+        waitCondition(kExpectNoChanesDelay);
+    }
+
     nx::network::SocketAddress addMediaserver(QnUuid id, nx::network::HostAddress ip = nx::network::HostAddress::localhost)
     {
-        QnModuleInformation module;
+        nx::vms::api::ModuleInformation module;
+        module.realm = nx::network::AppInfo::realm();
+        module.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
         module.id = id;
 
         QnJsonRestResult result;
@@ -168,7 +187,7 @@ TEST_F(DiscoveryModuleConnector, AddEndpoints)
 
     const auto endpoint1replace = addMediaserver(id1);
     connector.newEndpoints({endpoint1replace}, id1);
-    expectNoChanges();
+    expectPossibleChange(); //< Endpoint will be changed if works faster.
 
     removeMediaserver(endpoint1);
     expectConnect(id1, endpoint1replace);
@@ -222,31 +241,29 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     expectConnect(id, localEndpoint); //< Local is prioritized.
 
     removeMediaserver(localEndpoint);
-    expectConnect(id, networkEndpoint);  //< Network is a second choice.
+    expectConnect(id, networkEndpoint); //< Network is a second choice.
 
     const auto newLocalEndpoint = addMediaserver(id);
     connector.newEndpoints({newLocalEndpoint}, id);
-    expectConnect(id, newLocalEndpoint);  //< Expected switch to a new local endpoint.
+    expectConnect(id, newLocalEndpoint); //< New local is prioritized.
 
     const auto dnsRealEndpoint = addMediaserver(id);
     const auto cloudRealEndpoint = addMediaserver(id);
     const nx::network::SocketAddress dnsEndpoint(kLocalDnsHost, dnsRealEndpoint.port);
     const nx::network::SocketAddress cloudEndpoint(kLocalCloudHost, cloudRealEndpoint.port);
-    connector.newEndpoints({dnsEndpoint, cloudEndpoint}, id);
 
-    removeMediaserver(networkEndpoint);
-    expectNoChanges(); // Not any reconnects are expected.
+    connector.newEndpoints({dnsEndpoint, cloudEndpoint}, id);
+    expectConnect(id, dnsEndpoint);  //< DNS is the most prioritized.
 
     removeMediaserver(newLocalEndpoint);
-    expectConnect(id, dnsEndpoint);  //< DNS is the most prioritized now.
-
+    removeMediaserver(networkEndpoint);
     removeMediaserver(dnsRealEndpoint);
     expectConnect(id, cloudEndpoint);  //< Cloud endpoint is the last possible option.
 
     const auto newDnsRealEndpoint = addMediaserver(id);
     const nx::network::SocketAddress newDnsEndpoint(kLocalDnsHost, newDnsRealEndpoint.port);
     connector.newEndpoints({newDnsEndpoint}, id);
-    expectConnect(id, newDnsEndpoint);  //< Expected switch to DNS as better choise than cloud.
+    expectConnect(id, newDnsEndpoint);
 
     removeMediaserver(cloudRealEndpoint);
     removeMediaserver(newDnsRealEndpoint);
@@ -277,6 +294,11 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
 
     connector.setForbiddenEndpoints({}, id);
     expectConnect(id, endpoint3); //< The last one is unblocked now.
+
+    const auto endpoint4 = addMediaserver(id);
+    connector.newEndpoints({endpoint4}, id);
+    connector.setForbiddenEndpoints({endpoint3}, id);
+    expectConnect(id, endpoint4); //< Automatic switch from blocked endpoint.
 }
 
 // This unit test is just for easy debug agains real mediaserver.
@@ -284,6 +306,31 @@ TEST_F(DiscoveryModuleConnector, DISABLED_RealLocalServer)
 {
     connector.newEndpoints({ nx::network::SocketAddress("127.0.0.1:7001") }, QnUuid());
     std::this_thread::sleep_for(std::chrono::hours(1));
+}
+
+TEST_F(DiscoveryModuleConnector, IgnoredEndpointsByStrings)
+{
+    const auto firstId = QnUuid::createUuid();
+    const auto firstEndpoint1 = addMediaserver(firstId);
+    const auto firstEndpoint2 = addMediaserver(firstId);
+
+    connector.newEndpoints({firstEndpoint1}, firstId);
+    expectConnect(firstId, firstEndpoint1); //< Only have one.
+
+    connector.newEndpoints({firstEndpoint2}, firstId);
+    connector.setForbiddenEndpoints({firstEndpoint1.toString()}, firstId);
+    expectConnect(firstId, firstEndpoint2); //< Switch to a single avaliable.
+
+    const auto secondId = QnUuid::createUuid();
+    const auto secondEndpoint1 = addMediaserver(secondId);
+    const auto secondEndpoint2 = addMediaserver(secondId);
+
+    connector.newEndpoints({secondEndpoint1});
+    expectConnect(secondId, secondEndpoint1); //< Detect correct serverId.
+
+    connector.newEndpoints({secondEndpoint2}, secondId);
+    connector.setForbiddenEndpoints({secondEndpoint1.toString()}, secondId);
+    expectConnect(secondId, secondEndpoint2); //< Switch to a single avaliable.
 }
 
 } // namespace test

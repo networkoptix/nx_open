@@ -4,11 +4,13 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <ui/common/read_only.h>
-#include <ui/common/aligner.h>
-#include <ui/utils/validators.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/validators.h>
 
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
+
+using namespace nx::client::desktop;
 
 QnEmailSettings QnSimpleSmtpSettings::toSettings(const QnEmailSettings &base) const
 {
@@ -53,18 +55,18 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
     ui->emailInputField->setValidator([](const QString& text)
     {
         if (!nx::email::isValidAddress(text))
-            return Qn::ValidationResult(tr("Email is not valid."));
+            return ValidationResult(tr("Email is not valid."));
 
         QnEmailAddress email(text);
         if (email.smtpServer().isNull())
-            return Qn::ValidationResult(tr("No preset found. Use \"Advanced\" option."));
+            return ValidationResult(tr("No preset found. Use \"Advanced\" option."));
 
-        return Qn::kValidResult;
+        return ValidationResult::kValid;
     });
 
     // TODO: #GDM #tr strings duplication
     ui->passwordInputField->setTitle(tr("Password"));
-    ui->passwordInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Password cannot be empty.")));
+    ui->passwordInputField->setValidator(defaultNonEmptyValidator(tr("Password cannot be empty.")));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
 
     // TODO: #GDM #tr strings duplication
@@ -73,8 +75,8 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
     ui->supportInputField->setTitle(tr("Support Signature"));
     ui->supportInputField->setPlaceholderText(QnAppInfo::supportUrl());
 
-    QnAligner* aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    Aligner* aligner = new Aligner(this);
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
 
     for (auto field : {
         ui->emailInputField,
@@ -82,7 +84,7 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
         ui->signatureInputField,
         ui->supportInputField })
     {
-        connect(field, &QnInputField::textChanged, this, &QnSmtpSimpleSettingsWidget::settingsChanged);
+        connect(field, &InputField::textChanged, this, &QnSmtpSimpleSettingsWidget::settingsChanged);
         aligner->addWidget(field);
     }
 }

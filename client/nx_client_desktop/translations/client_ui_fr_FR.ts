@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Désactiver seulement si le client utilise trop le CPU</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Longueur maximale du tampon direct</translation>
     </message>
@@ -173,11 +168,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Longeur d'Archive Fixe</translation>
     </message>
@@ -315,7 +305,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation>Départ</translation>
+      <translation>Démarrer</translation>
     </message>
   </context>
   <context>
@@ -745,7 +735,7 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>Archive</translation>
     </message>
     <message>
       <location/>
@@ -755,14 +745,29 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Générer</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Restaurer</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>ID logique</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>ID d'entrée</translation>
     </message>
   </context>
@@ -788,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>ID de sortie:</translation>
     </message>
   </context>
@@ -958,6 +963,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>Description contient:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Catégorie</translation>
     </message>
   </context>
   <context>
@@ -1415,7 +1428,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>URL Serveur</translation>
+      <translation>Serveur URL</translation>
     </message>
     <message>
       <location/>
@@ -1495,7 +1508,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>Verrouillé sur ID Matériel:</translation>
     </message>
   </context>
@@ -1594,7 +1607,7 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
+      <source>Hardware ID</source>
       <translation>ID Matériel</translation>
     </message>
   </context>
@@ -1722,7 +1735,12 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Cycle de tour</translation>
+      <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>Adresses IP pour les caméras et serveurs, groupes d’utilisateurs, etc.</translation>
     </message>
   </context>
   <context>
@@ -1776,17 +1794,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Nouvelle caméra portable ...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Au serveur</translation>
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Caméra Portablea&quot; est un stockage virtuel pour les fichiers vidéo, qui peut être envoyer sur n'importe quel serveur de votre Système et accessible à tout utilisateur.</translation>
     </message>
   </context>
   <context>
@@ -1972,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation>Entrer nom d'usager et mot de passe valide...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>Formulaire</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>Nom de fichier:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>Sélectionner un fichier...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Parcourir...</translation>
     </message>
   </context>
   <context>
@@ -2665,18 +2706,6 @@
       <source>Reset</source>
       <translation>Restaurer</translation>
     </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2989,7 +3018,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Format</translation>
     </message>
     <message>
       <location/>
@@ -3032,15 +3061,18 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Il n’y a pas de rôle d'usager personnalisé.
-Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
+      <source>New role</source>
+      <translation>Nouveau rôle</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Nouveau rôle</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Il n'y a pas encore de rôles utilisateur personnalisés.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Cliquez sur le bouton &quot;Nouveau rôle&quot; pour en créer un.</translation>
     </message>
   </context>
   <context>
@@ -3065,18 +3097,13 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Détection de mouvement</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Détecter mouvement dans la vidéo envoyé</translation>
     </message>
     <message>
       <location/>
@@ -3088,11 +3115,6 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Annuler</translation>
     </message>
@@ -3101,23 +3123,18 @@ Cliquez &quot;Nouveau rôle&quot; pour en créer un.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Formulaire</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Envoyer Vidéo</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Envoyer Fichier...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Envoyer Dossier...</translation>
     </message>
   </context>
   <context>

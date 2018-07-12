@@ -2,13 +2,13 @@
 @import '_theme_palette';
 @import 'custom/_custom_palette';
 @import '_theme_variables';
-@import '../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap';
 @import '_theme_override';
 @import '_header';
 
 @import '_big_brother';
 
-@import 'common';
+@import '../../../../webadmin/app/web_common/styles/common';
 
 html {
   position: relative;
@@ -354,7 +354,7 @@ a.disabled {
 }
 td{
     &.user-name{
-      max-width: 200px;
+      max-width: 175px;
     }
     &.user-email{
       @include ellipsis;
@@ -626,7 +626,6 @@ h1.process-success{
     margin-bottom:8px;
     margin-top:0;
     .installer-name{
-        display:block;
         font-weight: normal;
     }
     .media-body{
@@ -673,13 +672,6 @@ h2.version-number{
     .border-left-md{
       border-left:1px solid $common-border-color;
     }
-}
-
-.conditions-note{
-    display:inline-block;
-    padding-left: 10px;
-    line-height:16px;
-    color:$dark16;
 }
 
 .help-topic{

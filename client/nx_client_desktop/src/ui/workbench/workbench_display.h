@@ -12,9 +12,10 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <nx/client/desktop/camera/camera_fwd.h>
+
 #include <ui/common/scene_transformations.h>
 #include <ui/animation/animation_timer_listener.h>
-#include <ui/graphics/view/graphics_view.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/uuid.h>
@@ -38,8 +39,6 @@ class QnWorkbenchItem;
 
 class QnWorkbenchLayout;
 class QnResourceWidget;
-class QnResourceDisplay;
-typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class ViewportAnimator;
 class WidgetAnimator;
 class QnCurtainAnimator;
@@ -165,12 +164,12 @@ public:
      * \returns                         Current graphics view of this workbench display.
      *                                  May be NULL.
      */
-    QnGraphicsView* view() const;
+    QGraphicsView* view() const;
 
     /**
      * \param view                      New view for this workbench display.
      */
-    void setView(QnGraphicsView* view);
+    void setView(QGraphicsView* view);
 
     /**
      * \returns                         Grid item.
@@ -426,7 +425,7 @@ private:
     QGraphicsScene *m_scene;
 
     /** Current view. */
-    QnGraphicsView *m_view;
+    QGraphicsView* m_view = nullptr;
 
     /** Set of flags to simplify and speed up painting. */
     Qn::LightModeFlags m_lightMode;

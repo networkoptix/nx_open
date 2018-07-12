@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 
-#include <nx/cloud/cdb/ec2/synchronization_engine.h>
-#include <nx/cloud/cdb/managers/system_manager.h>
-#include <nx/cloud/cdb/stree/stree_manager.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/timer_manager.h>
 
+#include <nx/data_sync_engine/synchronization_engine.h>
+#include <nx/cloud/cdb/managers/system_manager.h>
+#include <nx/cloud/cdb/stree/stree_manager.h>
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
+
 #include "account_manager_stub.h"
-#include "base_persistent_data_test.h"
 #include "system_health_info_provider_stub.h"
 #include "../functional_tests/test_email_manager.h"
 
@@ -133,7 +134,7 @@ private:
     AccountManagerStub m_accountManagerStub;
     SystemHealthInfoProviderStub m_systemHealthInfoProvider;
     TestEmailManager m_emailManager;
-    ec2::SyncronizationEngine m_ec2SyncronizationEngine;
+    data_sync_engine::SyncronizationEngine m_ec2SyncronizationEngine;
     std::unique_ptr<cdb::SystemManager> m_systemManager;
     std::string m_systemId;
     api::AccountData m_ownerAccount;

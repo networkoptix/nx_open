@@ -5,25 +5,45 @@ QnBasicPtzController::QnBasicPtzController(const QnResourcePtr& resource):
 {
 }
 
-Ptz::Capabilities QnBasicPtzController::getCapabilities() const
+Ptz::Capabilities QnBasicPtzController::getCapabilities(
+    const nx::core::ptz::Options& /*options*/) const
 {
     return Ptz::NoPtzCapabilities;
 }
 
-bool QnBasicPtzController::continuousMove(const QVector3D& /*spped*/)
+bool QnBasicPtzController::continuousMove(
+    const nx::core::ptz::Vector& /*speed*/,
+    const nx::core::ptz::Options& /*options*/)
 {
     return false;
 }
 
-bool QnBasicPtzController::continuousFocus(qreal /*speed*/)
+bool QnBasicPtzController::continuousFocus(
+    qreal /*speed*/,
+    const nx::core::ptz::Options& /*options*/)
 {
     return false;
 }
 
 bool QnBasicPtzController::absoluteMove(
     Qn::PtzCoordinateSpace /*space*/,
-    const QVector3D& /*position*/,
-    qreal /*speed*/)
+    const nx::core::ptz::Vector& /*position*/,
+    qreal /*speed*/,
+    const nx::core::ptz::Options& /*options*/)
+{
+    return false;
+}
+
+bool QnBasicPtzController::relativeMove(
+    const nx::core::ptz::Vector& /*direction*/,
+    const nx::core::ptz::Options& /*options*/)
+{
+    return false;
+}
+
+bool QnBasicPtzController::relativeFocus(
+    qreal /*direction*/,
+    const nx::core::ptz::Options& /*options*/)
 {
     return false;
 }
@@ -31,26 +51,31 @@ bool QnBasicPtzController::absoluteMove(
 bool QnBasicPtzController::viewportMove(
     qreal /*ratio*/,
     const QRectF& /*viewport*/,
-    qreal /*speed*/)
+    qreal /*speed*/,
+    const nx::core::ptz::Options& /*options*/)
 {
     return false;
 }
 
 bool QnBasicPtzController::getPosition(
     Qn::PtzCoordinateSpace /*space*/,
-    QVector3D* /*position*/) const
+    nx::core::ptz::Vector* /*position*/,
+    const nx::core::ptz::Options& /*options*/) const
 {
     return false;
 }
 
 bool QnBasicPtzController::getLimits(
     Qn::PtzCoordinateSpace /*space*/,
-    QnPtzLimits* /*limits*/) const
+    QnPtzLimits* /*limits*/,
+    const nx::core::ptz::Options& /*options*/) const
 {
     return false;
 }
 
-bool QnBasicPtzController::getFlip(Qt::Orientations* /*flip*/) const
+bool QnBasicPtzController::getFlip(
+    Qt::Orientations* /*flip*/,
+    const nx::core::ptz::Options& /*options*/) const
 {
     return false;
 }
@@ -115,14 +140,17 @@ bool QnBasicPtzController::getHomeObject(QnPtzObject* /*object*/) const
     return false;
 }
 
-bool QnBasicPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* /*traits*/) const
+bool QnBasicPtzController::getAuxilaryTraits(
+    QnPtzAuxilaryTraitList* /*traits*/,
+    const nx::core::ptz::Options& /*options*/) const
 {
     return false;
 }
 
 bool QnBasicPtzController::runAuxilaryCommand(
     const QnPtzAuxilaryTrait& /*trait*/,
-    const QString& /*data*/)
+    const QString& /*data*/,
+    const nx::core::ptz::Options& /*options*/)
 {
     return false;
 }

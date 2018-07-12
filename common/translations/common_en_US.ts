@@ -53,11 +53,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Cannot connect to the other System because current System is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>The discovered System %1 is in safe mode.</source>
         <comment>%1 is name of System</comment>
         <translation></translation>
@@ -65,21 +60,6 @@
     <message>
         <source>Could not configure the remote System %1.</source>
         <comment>%1 is name of System</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Both Systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation></translation>
     </message>
     <message>
@@ -91,6 +71,26 @@
         <comment>%1 is name of System</comment>
         <translation></translation>
     </message>
+    <message>
+        <source>Cannot connect to the other System because current System is already connected to %1.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+        <comment>%1 is the short cloud name (like Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both Systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like Nx Cloud)</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -98,26 +98,6 @@
         <source>System Event</source>
         <comment>Shows that the bookmark was created by a system event</comment>
         <translation></translation>
-    </message>
-    <message>
-        <source>System already bound to cloud (id %1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server is not connected to the Internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to save cloud credentials to local DB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to save cloud owner to local DB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not connect to cloud: %1</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -334,6 +314,10 @@
         <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -508,11 +492,11 @@
     </message>
     <message>
         <source>Bridge</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Bridge Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -577,8 +561,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server with matching Hardware Id not found</source>
-        <translation></translation>
+        <source>Server with matching Hardware ID not found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -700,12 +684,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>Hardware Id: %1</source>
+        <source>Time License</source>
         <translation></translation>
     </message>
     <message>
-        <source>Time License</source>
-        <translation></translation>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -805,7 +789,7 @@
     </message>
     <message>
         <source>No data exported.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -907,7 +891,7 @@
     <message>
         <source>days</source>
         <comment>Long suffix for displaying days</comment>
-        <translation>day</translation>
+        <translation></translation>
     </message>
     <message>
         <source>wks</source>
@@ -1141,10 +1125,6 @@
         </translation>
     </message>
     <message>
-        <source>Storage Failure</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Network Issue</source>
         <translation></translation>
     </message>
@@ -1248,10 +1228,6 @@
     </message>
     <message>
         <source>Motion on %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Storage Failure at %1</source>
         <translation></translation>
     </message>
     <message>
@@ -1539,15 +1515,19 @@
     </message>
     <message>
         <source>Analytics Event</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 at %2</source>
         <comment>Analytics Event at some camera</comment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Storage Issue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open layout</source>
+        <source>Storage Issue at %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

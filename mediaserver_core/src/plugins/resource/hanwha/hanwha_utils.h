@@ -8,6 +8,8 @@
 
 #include <boost/optional/optional.hpp>
 
+#include <nx/core/resource/device_type.h>
+
 #include <common/common_globals.h>
 #include <utils/media/h264_common.h>
 #include <utils/media/hevc_common.h>
@@ -83,9 +85,27 @@ boost::optional<AVCodecID> toCodecId(const boost::optional<QString>& str);
 
 boost::optional<QSize> toQSize(const boost::optional<QString>& str);
 
-boost::optional<QSize> toQDateTime(const boost::optional<QString>& str);
+HanwhaChannelProfiles parseProfiles(
+    const HanwhaResponse& response,
+    const boost::optional<int>& forcedChannel = boost::none);
 
-HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response);
+QString profileSuffixByRole(Qn::ConnectionRole role);
+
+QString profileFullProductName(const QString& applicationName);
+
+boost::optional<HanwhaVideoProfile> findProfile(
+    const HanwhaProfileMap& profiles,
+    Qn::ConnectionRole role,
+    const QString& applicationName);
+
+std::set<int> findProfilesToRemove(
+    const HanwhaProfileMap& profiles,
+    boost::optional<HanwhaVideoProfile> primaryProfile,
+    boost::optional<HanwhaVideoProfile> secondaryProfile);
+
+bool isPropertyBelongsToChannel(const QString& fullPropertyName, int channel);
+
+nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType);
 
 template<typename T>
 T fromHanwhaString(const QString& str)

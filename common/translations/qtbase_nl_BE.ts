@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation type="unfinished">&amp;HTML:</translation>
+      <translation>&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
@@ -721,7 +721,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Opslaan</translation>
+      <translation>&amp;Save</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>

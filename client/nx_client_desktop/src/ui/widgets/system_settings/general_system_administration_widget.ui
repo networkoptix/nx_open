@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QnPanel" name="widget" native="true">
+    <widget class="nx::client::desktop::Panel" name="widget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -51,7 +51,7 @@
        <number>16</number>
       </property>
       <item>
-       <widget class="QnEditableLabel" name="systemNameLabel" native="true"/>
+       <widget class="nx::client::desktop::EditableLabel" name="systemNameLabel" native="true"/>
       </item>
       <item>
        <widget class="QWidget" name="buttonWidget" native="true">
@@ -151,13 +151,20 @@
      </property>
     </spacer>
    </item>
+   <item>
+    <widget class="nx::client::desktop::AlertBar" name="forceVideoEncryptionWarning" native="true">
+     <property name="text" stdset="0">
+      <string>Encrypting video traffic will significantly increase CPU usage.</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -173,10 +180,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnEditableLabel</class>
+   <class>nx::client::desktop::EditableLabel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/editable_label.h</header>
+   <header location="global">nx/client/desktop/common/widgets/editable_label.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::AlertBar</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/common/widgets/message_bar.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

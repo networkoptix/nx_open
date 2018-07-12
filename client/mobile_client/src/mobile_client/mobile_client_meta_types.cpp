@@ -12,18 +12,15 @@
 #include <models/camera_list_model.h>
 #include <models/calendar_model.h>
 #include <models/layouts_model.h>
-#include <resources/resource_helper.h>
-#include <resources/media_resource_helper.h>
 #include <resources/camera_access_rights_helper.h>
 #include <utils/mobile_app_info.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <camera/camera_chunk_provider.h>
 #include <camera/active_camera_thumbnail_loader.h>
 #include <camera/thumbnail_cache_accessor.h>
-#include <nx/mobile_client/media/media_player.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/cloud_system_information_watcher.h>
-#include <watchers/user_watcher.h>
+#include <nx/client/core/watchers/user_watcher.h>
 #include <mobile_client/mobile_client_ui_controller.h>
 #include <client_core/client_core_meta_types.h>
 #include <controllers/lite_client_controller.h>
@@ -36,6 +33,9 @@
 #include <nx/client/core/resource/layout_accessor.h>
 #include <nx/client/core/animation/kinetic_animation.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
+#include <nx/client/mobile/models/action_buttons_model.h>
+#include <nx/client/mobile/software_trigger/software_triggers_controller.h>
+#include <nx/client/mobile/two_way_audio/voice_spectrum_item.h>
 
 using namespace nx::client::mobile;
 
@@ -49,7 +49,6 @@ void QnMobileClientMetaTypes::initialize()
 
 void QnMobileClientMetaTypes::registerMetaTypes()
 {
-    qRegisterMetaType<nx::media::PlayerStatistics>();
     QnJsonSerializer::registerSerializer<InterClientMessage::Command>();
 }
 
@@ -64,8 +63,6 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");
-    qmlRegisterType<QnResourceHelper>("Nx.Core", 1, 0, "ResourceHelper");
-    qmlRegisterType<QnMediaResourceHelper>("Nx.Core", 1, 0, "MediaResourceHelper");
     qmlRegisterType<nx::client::core::resource::LayoutAccessor>("Nx.Core", 1, 0, "LayoutAccessor");
     qmlRegisterType<nx::client::core::animation::KineticAnimation>("Nx.Core", 1, 0, "KineticAnimation");
     qmlRegisterType<QnCameraAccessRightsHelper>("com.networkoptix.qml", 1, 0, "QnCameraAccessRightsHelper");
@@ -73,11 +70,9 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnCloudStatusWatcher>("com.networkoptix.qml", 1, 0, "QnCloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
-    qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
-    /* NxMediaPlayer should not be used.
-       It is here only to allow assignments of MediaPlayer to properties of this type. */
-    qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
-    qmlRegisterUncreatableType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer", lit("Cannot create an instance of abstract class."));
+    qmlRegisterType<nx::client::core::UserWatcher>("com.networkoptix.qml", 1, 0, "nx::client::core::UserWatcher");
+
+
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickTextInput>("Nx.Controls", 1, 0, "TextInput");
@@ -98,4 +93,8 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
 
     qmlRegisterSingletonType(QUrl(lit("qrc:///qml/QnTheme.qml")), "com.networkoptix.qml", 1, 0, "QnTheme");
+
+    nx::client::mobile::ActionButtonsModel::registerQmlType();
+    nx::client::mobile::SoftwareTriggersController::registerQmlType();
+    nx::client::mobile::VoiceSpectrumItem::registerQmlType();
 }

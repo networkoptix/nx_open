@@ -91,17 +91,20 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     QGraphicsItem* parent)
     :
     base_type(context, item, parent),
-    m_previewPainter(new LayoutPreviewPainter(context->instance<QnCameraThumbnailManager>()))
+    m_previewPainter(new LayoutPreviewPainter(context->resourcePool()))
 {
-    context->instance<QnCameraThumbnailManager>()->setAutoRotate(false); //< TODO: VMS-6759
+    context->instance<CameraThumbnailManager>()->setAutoRotate(false); //< TODO: VMS-6759
 
     setOption(QnResourceWidget::InfoOverlaysForbidden);
     setOption(QnResourceWidget::WindowRotationForbidden);
 
     QnLayoutResourcePtr layout = resource().dynamicCast<QnLayoutResource>();
+
     if (!layout)
     {
         layout = QnLayoutResource::createFromResource(resource());
+        QString name = lit("Tour@%1").arg(resource()->getName());
+        layout->setName(name);
         connect(resource(), &QnResource::propertyChanged, this,
             [this](const QnResourcePtr& resource, const QString& key)
             {

@@ -2,11 +2,14 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
+#include <QtCore/QThread>
 
 #include <map>
 #include <vector>
 
 #include <boost/optional/optional.hpp>
+
+#include "resource_metadata_context.h"
 
 #include <nx/utils/log/log.h>
 #include <common/common_module_aware.h>
@@ -20,9 +23,11 @@
 #include <nx/mediaserver/metadata/rule_holder.h>
 #include <nx/fusion/serialization/json.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
-#include "resource_metadata_context.h"
 #include <nx/streaming/video_data_packet.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/debugging/abstract_visual_metadata_debugger.h>
+#include <nx/sdk/metadata/uncompressed_video_frame.h>
+#include <nx/mediaserver/server_module_aware.h>
 
 class QnMediaServerModule;
 class QnCompressedVideoData;
@@ -34,13 +39,14 @@ namespace metadata {
 class MetadataHandler;
 
 class ManagerPool final:
-    public Connective<QObject>
+    public Connective<QObject>,
+    public nx::mediaserver::ServerModuleAware
 {
     using ResourceMetadataContextMap = std::map<QnUuid, ResourceMetadataContext>;
 
     Q_OBJECT
 public:
-    ManagerPool(QnMediaServerModule* commonModule);
+    ManagerPool(QnMediaServerModule* serverModule);
     ~ManagerPool();
     void init();
     void stop();
@@ -50,16 +56,16 @@ public:
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
     /**
-     * Return QnAbstractDataReceptor that will receive data from audio/video data provider.
+     * @return An object that will receive the data from a video data provider.
      */
-    QWeakPointer<VideoDataReceptor> mediaDataReceptor(const QnUuid& id);
+    QWeakPointer<VideoDataReceptor> createVideoDataReceptor(const QnUuid& id);
 
     /**
      * Register data receptor that will receive metadata packets.
      */
     void registerDataReceptor(
         const QnResourcePtr& resource,
-        QWeakPointer<QnAbstractDataReceptor> metadaReceptor);
+        QWeakPointer<QnAbstractDataReceptor> dataReceptor);
 
     using PluginList = QList<nx::sdk::metadata::Plugin*>;
 
@@ -79,12 +85,25 @@ public slots:
     void initExistingResources();
 
 private:
-    void loadSettingsFromFile(std::vector<nxpl::Setting>* settings, const char* filename);
+    using PixelFormat = nx::sdk::metadata::UncompressedVideoFrame::PixelFormat;
 
-    void setManagerDeclaredSettings(
-        sdk::metadata::CameraManager* manager, const QnSecurityCamResourcePtr& camera);
+    std::vector<nxpl::Setting> loadSettingsFromFile(
+        const QString& fileDescription, const QString& filename);
 
-    void setPluginDeclaredSettings(sdk::metadata::Plugin* plugin);
+    void saveManifestToFile(
+        const char* manifest,
+        const QString& fileDescription,
+        const QString& pluginLibName,
+        const QString& filenameExtraSuffix = "");
+
+    void setCameraManagerDeclaredSettings(
+        sdk::metadata::CameraManager* manager,
+        const QnSecurityCamResourcePtr& camera,
+        const QString& pluginLibName);
+
+    void setPluginDeclaredSettings(
+        sdk::metadata::Plugin* plugin,
+        const QString& pluginLibName);
 
     void createCameraManagersForResourceUnsafe(const QnSecurityCamResourcePtr& camera);
 
@@ -93,6 +112,8 @@ private:
         nx::sdk::metadata::Plugin* plugin) const;
 
     void releaseResourceCameraManagersUnsafe(const QnSecurityCamResourcePtr& camera);
+
+    void releaseResourceCameraManagersUnsafe(const QnUuid& resourceId);
 
     MetadataHandler* createMetadataHandler(
         const QnResourcePtr& resource,
@@ -129,7 +150,7 @@ private:
         const nx::api::AnalyticsDriverManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
-    void mergePluginManifestToServer(
+    nx::api::AnalyticsDriverManifest mergePluginManifestToServer(
         const nx::api::AnalyticsDriverManifest& manifest,
         const QnMediaServerResourcePtr& server);
 
@@ -138,6 +159,7 @@ private:
         boost::optional<nx::api::AnalyticsDriverManifest>
     >
     loadManagerManifest(
+        const nx::sdk::metadata::Plugin* plugin,
         nx::sdk::metadata::CameraManager* manager,
         const QnSecurityCamResourcePtr& camera);
 
@@ -156,14 +178,31 @@ private:
 
     void warnOnce(bool* warningIssued, const QString& message);
 
+    boost::optional<PixelFormat> pixelFormatFromManifest(
+        const nx::api::AnalyticsDriverManifest& manifest);
+
+    static AVPixelFormat rgbToAVPixelFormat(PixelFormat pixelFormat);
+
+    static nx::sdk::metadata::UncompressedVideoFrame* videoDecoderOutputToUncompressedVideoFrame(
+        const CLConstVideoDecoderOutputPtr& frame, PixelFormat pixelFormat);
+
 private:
     ResourceMetadataContextMap m_contexts;
-    QnMediaServerModule* m_serverModule;
     QnMutex m_contextMutex;
     bool m_compressedFrameWarningIssued = false;
     bool m_uncompressedFrameWarningIssued = false;
+    nx::debugging::VisualMetadataDebuggerPtr m_visualMetadataDebugger;
+    QThread* m_thread;
 };
 
 } // namespace metadata
 } // namespace mediaserver
+} // namespace nx
+
+namespace nx {
+namespace sdk {
+
+QString toString(const nx::sdk::CameraInfo& cameraInfo);
+
+} // namespace sdk
 } // namespace nx

@@ -8,17 +8,18 @@
 
 class QLabel;
 class QStackedWidget;
-class QnBusyIndicatorWidget;
-class QnAutoscaledPlainText;
-class QnImageProvider;
-
 
 namespace nx {
 namespace client {
 namespace desktop {
 
+class BusyIndicatorWidget;
+class AutoscaledPlainText;
+class ImageProvider;
+
 /**
- * The widget shows image from QnImageProvider
+ * The widget shows image that it receives from ImageProvider.
+ * Busy indicator is shown until the image is loaded.
  */
 class AsyncImageWidget : public Connective<QWidget>
 {
@@ -29,10 +30,10 @@ public:
     explicit AsyncImageWidget(QWidget* parent = nullptr);
     virtual ~AsyncImageWidget();
 
-    QnImageProvider* imageProvider() const;
-    void setImageProvider(QnImageProvider* provider);
+    ImageProvider* imageProvider() const;
+    void setImageProvider(ImageProvider* provider);
 
-    QnBusyIndicatorWidget* busyIndicator() const;
+    BusyIndicatorWidget* busyIndicator() const;
 
     virtual QSize sizeHint() const override;
 
@@ -66,6 +67,18 @@ public:
     void setAutoScaleUp(bool value);
     bool autoScaleUp() const;
 
+    enum class ReloadMode
+    {
+        showLoadingIndicator,
+        showPreviousImage
+    };
+
+    ReloadMode reloadMode() const;
+    void setReloadMode(ReloadMode value);
+
+    // If set to true, widget shows "NO DATA" until reset to false.
+    void setNoDataMode(bool noData);
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void changeEvent(QEvent* event) override;
@@ -81,10 +94,10 @@ private:
 
 private:
     mutable QSize m_cachedSizeHint;
-    QnAutoscaledPlainText* const m_placeholder = nullptr;
-    QnBusyIndicatorWidget* const m_indicator = nullptr;
+    AutoscaledPlainText* const m_placeholder = nullptr;
+    BusyIndicatorWidget* const m_indicator = nullptr;
     QPixmap m_preview;
-    QPointer<QnImageProvider> m_imageProvider;
+    QPointer<ImageProvider> m_imageProvider;
     QPalette::ColorRole m_borderRole = QPalette::Shadow;
     QRectF m_highlightRect;
     CropMode m_cropMode = CropMode::never;
@@ -92,6 +105,10 @@ private:
     bool m_autoScaleDown = true;
     // Should the widget enlarge image up to size of the widget
     bool m_autoScaleUp = false;
+    ReloadMode m_reloadMode = ReloadMode::showLoadingIndicator;
+    Qn::ThumbnailStatus m_previousStatus = Qn::ThumbnailStatus::Invalid;
+    // Show "NO DATA" no matter what.
+    bool m_noDataMode = false;
 };
 
 } // namespace desktop

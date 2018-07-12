@@ -2,21 +2,23 @@
 
 #include <chrono>
 
-#include <QtCore/QUrl>
+#include <QtCore/QString>
 
-#include <plugins/plugin_internal_tools.h> //< nxpt::fromQnUuidToPluginGuid
-
-#include <nx/sdk/metadata/common_event.h>
-#include <nx/sdk/metadata/common_metadata_packet.h>
-#include <nx/api/analytics/device_manifest.h>
-
-#include "nx/vca/camera_controller.h"
-
-// TODO: #szaitsev: Redirect NX_DEBUG_STREAM to NX_UTILS_LOG_STREAM_NO_SPACE.
-
+#define NX_PRINT_PREFIX "[metadata::vca::Manager] "
 #include <nx/kit/debug.h>
 
 #include <nx/fusion/serialization/json.h>
+
+#include <nx/sdk/metadata/common_event.h>
+#include <nx/sdk/metadata/common_metadata_packet.h>
+
+#include <nx/api/analytics/device_manifest.h>
+
+#include <nx/mediaserver_plugins/utils/uuid.h>
+
+#include <nx/utils/std/cppnx.h>
+
+#include "nx/vca/camera_controller.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -25,8 +27,11 @@ namespace vca {
 
 namespace {
 
-static const std::chrono::seconds kConnectTimeout(5);
-static const std::chrono::seconds kReceiveTimeout(30);
+static const std::chrono::seconds kReconnectTimeout(30);
+static const std::chrono::seconds kSendTimeout(15);
+static const std::chrono::seconds kReceiveTimeout(15);
+
+const QString heartbeatEventName("heartbeat");
 
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
@@ -40,8 +45,8 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(
     const AnalyticsEventType& event, bool active)
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
-    commonEvent->setTypeId(nxpt::fromQnUuidToPluginGuid(event.typeId));
-    commonEvent->setCaption(event.name.value.toStdString());
+    commonEvent->setTypeId(
+        nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(event.typeId));
     commonEvent->setDescription(event.name.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
@@ -63,56 +68,48 @@ nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
     return packet;
 }
 
-static const int kEventMessageParameterCount = 9;
-static const std::array<QByteArray, kEventMessageParameterCount> kEventMessageKeys = {
-    "ip",
-    "unitname",
-    "datetime",
-    "dts",
-    "type",
-    "info",
-    "id",
-    "rulesname",
-    "rulesdts",
-};
+template<class T, size_t N, class Check = std::enable_if_t<!std::is_same<const char*, T>::value>>
+std::array<T, N> makeEventSearchKeys(const std::array<T, N>& src)
+{
+    std::array<T, N> result;
+    std::transform(src.begin(), src.end(), result.begin(),
+        [](const auto& item)
+        {
+            static const T prefix("\n");
+            static const T postfix("=");
+            return prefix + item + postfix;
+        });
+    return result;
+}
 
-// Values of event message parameters may contain names form kEventMessageParameterNames, so to
-// avoid search errors we extend key strings with '\n' symbol, '=' symbol is added for convenience.
-static const std::array<QByteArray, kEventMessageParameterCount> kEventMessageSearchKeys = {
-    "\nip=",
-    "\nunitname=",
-    "\ndatetime=",
-    "\ndts=",
-    "\ntype=",
-    "\ninfo=",
-    "\nid=",
-    "\nrulesname=",
-    "\nrulesdts=",
-};
+static const auto kEventMessageKeys = nx::utils::make_array<QByteArray>(
+    "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts");
 
-std::pair<const char*, const char*> findString(const char* msg, const char* end,
+static const auto kEventMessageSearchKeys = makeEventSearchKeys(kEventMessageKeys);
+
+std::pair<const char*, const char*> findString(const char* messageBegin, const char* messageEnd,
     const QByteArray& key)
 {
-    const char* keyValue = std::search(msg, end, key.begin(), key.end());
-    if (keyValue == end)
-        return std::make_pair(msg, msg);
+    const char* keyValue = std::search(messageBegin, messageEnd, key.begin(), key.end());
+    if (keyValue == messageEnd)
+        return std::make_pair(messageBegin, messageBegin);
     const char* Value = keyValue + key.size();
-    const char* ValueEnd = std::find(Value, end, '\n');
+    const char* ValueEnd = std::find(Value, messageEnd, '\n');
     return std::make_pair(Value, ValueEnd);
 }
 
-EventMessage parseMessage(const char* msg, int len)
+EventMessage parseMessage(const char* message, int messageLength)
 {
-    const char* cur = msg;
-    const char* end = msg + len;
+    const char* current = message;
+    const char* end = message + messageLength;
     EventMessage eventMessage;
 
-    for (int i = 0; i < kEventMessageParameterCount; ++i)
+    for (int i = 0; i < kEventMessageSearchKeys.size(); ++i)
     {
-        auto view = findString(cur, end, kEventMessageSearchKeys[i]);
+        auto view = findString(current, end, kEventMessageSearchKeys[i]);
         QByteArray value = QByteArray(view.first, view.second - view.first);
         eventMessage.parameters.insert(std::make_pair(kEventMessageKeys[i], value));
-        cur = view.second;
+        current = view.second;
     }
     return eventMessage;
 }
@@ -165,10 +162,10 @@ nx::sdk::Error prepare(nx::vca::CameraController& vcaCameraConrtoller)
 
     // Switch on VCA-camera heartbeat and set interval slightly less then kReceiveTimeout.
     if (!vcaCameraConrtoller.setHeartbeat(
-        nx::vca::Heartbeat(kReceiveTimeout - std::chrono::seconds(2),
-        /*enabled*/ true)))
+        nx::vca::Heartbeat(kReceiveTimeout - std::chrono::seconds(2), /*enabled*/ true)))
     {
         NX_PRINT << "Failed to set VCA-camera heartbeat";
+        return nx::sdk::Error::networkError;
     }
 
     return nx::sdk::Error::noError;
@@ -180,6 +177,8 @@ Manager::Manager(Plugin* plugin,
     const nx::sdk::CameraInfo& cameraInfo,
     const AnalyticsDriverManifest& typedManifest)
 {
+    m_reconnectTimer.bindToAioThread(m_stopEventTimer.getAioThread());
+
     m_url = cameraInfo.url;
     m_auth.setUser(cameraInfo.login);
     m_auth.setPassword(cameraInfo.password);
@@ -192,13 +191,13 @@ Manager::Manager(Plugin* plugin,
 
     static const int kBufferCapacity = 4096;
     m_buffer.reserve(kBufferCapacity);
-    NX_PRINT << "Manager created " << this;
+    NX_PRINT << "VCA metadata manager created";
 }
 
 Manager::~Manager()
 {
     stopFetchingMetadata();
-    NX_PRINT << "Manager destroyed " << this;
+    NX_PRINT << "VCA metadata manager destroyed";
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
@@ -216,8 +215,56 @@ void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)
     return nullptr;
 }
 
-void Manager::onReceive(SystemError::ErrorCode, size_t)
+void Manager::treatMessage(int size)
 {
+    std::replace(m_buffer.data(), m_buffer.data() + size - 1, '\0', '_');
+    EventMessage message = parseMessage(m_buffer.data(), size);
+
+    const auto parameterIterator = message.parameters.find("type");
+    if (parameterIterator != message.parameters.end())
+        NX_PRINT << "Message received. Type = " << parameterIterator->second.constData();
+    else
+    {
+        NX_PRINT << "Message with unknown type received. Type = "
+            << parameterIterator->second.constData();
+        return;
+    }
+    const QString internalName = parameterIterator->second;
+
+    auto it = std::find_if(m_eventsToCatch.begin(), m_eventsToCatch.end(),
+        [&internalName](ElapsedEvent& event)
+    {
+        return event.type.internalName == internalName;
+    });
+    if (it != m_eventsToCatch.cend())
+    {
+        sendEventStartedPacket(it->type);
+        if (it->type.isStateful())
+        {
+            it->timer.start();
+            m_stopEventTimer.start(timeTillCheck(), [this](){ onTimer(); });
+        }
+    }
+    else if (internalName != heartbeatEventName)
+    {
+
+        NX_PRINT << "Packed with undefined event type received. Uuid = "
+            << internalName.toStdString();
+    }
+
+    cleanBuffer(m_buffer, size);
+}
+
+void Manager::onReceive(SystemError::ErrorCode code , size_t size)
+{
+    if (code != SystemError::noError || size == 0) //< connection broken or closed
+    {
+        NX_PRINT << "Receive failed. Connection broken or closed. Next connection attempt in"
+            << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
+        m_reconnectTimer.start(kReconnectTimeout, [this]() { reconnectSocket(); });
+        return;
+    }
+
     static const int kPrefixSize = 8;
     static const int kSizeSize = 8;
     static const int kPostfixSize = 12;
@@ -243,8 +290,8 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         }
         if (memcmp(m_buffer.data(), kPreamble, kPrefixSize) != 0)
         {
-            // Corrupted message. Throw all received data away and read new.
-            NX_PRINT << "Wrong preamble = " << m_buffer.mid(0, kPrefixSize).data()
+            NX_PRINT << "Corrupted message. Wrong preamble, preamble = "
+                << m_buffer.mid(0, kPrefixSize).data()
                 << ", buffer size = " << m_buffer.size();
             cleanBuffer(m_buffer, m_buffer.size());
             break;
@@ -253,8 +300,7 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         int size = atoi(p);
         if (size == 0 || size > m_buffer.capacity())
         {
-            // Corrupted message. Throw all received data away and read new.
-            NX_PRINT << "Wrong message size, message size = " << size
+            NX_PRINT << "Corrupted message. Wrong message size, message size = " << size
                 << ", buffer size = " << m_buffer.size();
             cleanBuffer(m_buffer, m_buffer.size());
             break;
@@ -267,37 +313,14 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
         }
 
         NX_PRINT << "Message ready, size = " << size << " buffer size = " << m_buffer.size();
-
-        std::replace(m_buffer.data(), m_buffer.data() + size - 1, '\0', '_');
-        EventMessage message = parseMessage(m_buffer.data(), size);
-
-        auto it = message.parameters.find("type");
-        if (it != message.parameters.end())
-            NX_PRINT << "Message received, type=" << it->second.constData() << ".";
-        else
-            NX_PRINT << "Message with unknown type received.";
-
-        const AnalyticsEventType& event = m_plugin->eventByInternalName(it->second);
-
-        if (std::find(m_eventsToCatch.cbegin(), m_eventsToCatch.cend(), event.typeId)
-            != m_eventsToCatch.cend())
-        {
-            sendEventStartedPacket(event);
-            if (event.isStateful())
-            {
-                event.elapsedTimer.start();
-                m_timer.start(timeTillCheck(), [this](){ onTimer(); });
-            }
-        }
-
-        cleanBuffer(m_buffer, size);
+        treatMessage(size);
         NX_PRINT << "Message treated, size = " << size << " buffer size = " << m_buffer.size()
             << "\n";
     }
     NX_PRINT << "Buffer processing finished. Iteration id = " << id
         << " buffer size = " << m_buffer.size();
 
-    this->m_tcpSocket->readSomeAsync(
+    m_tcpSocket->readSomeAsync(
         &m_buffer,
         [this](SystemError::ErrorCode errorCode, size_t size)
         {
@@ -307,14 +330,13 @@ void Manager::onReceive(SystemError::ErrorCode, size_t)
 
 std::chrono::milliseconds Manager::timeTillCheck() const
 {
-    qint64 maxElapsed = 0;
-    for (const QnUuid& id: m_eventsToCatch)
+    std::chrono::milliseconds maxElapsed(0);
+    for (const ElapsedEvent& event: m_eventsToCatch)
     {
-        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        if (event.timerStarted())
-            maxElapsed = std::max(maxElapsed, event.elapsedTimer.elapsed());
+        if (event.type.isStateful())
+            maxElapsed = std::max(maxElapsed, event.timer.elapsedSinceStart());
     }
-    auto result = kMinTimeBetweenEvents - std::chrono::milliseconds(maxElapsed);
+    auto result = kMinTimeBetweenEvents - maxElapsed;
     result = std::max(result, std::chrono::milliseconds::zero());
     return result;
 }
@@ -339,33 +361,74 @@ void Manager::sendEventStoppedPacket(const AnalyticsEventType& event) const
 
 void Manager::onTimer()
 {
-    for (const QnUuid& id: m_eventsToCatch)
+    for (ElapsedEvent& event: m_eventsToCatch)
     {
-        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        if (event.timerStarted() && event.elapsedTimer.hasExpired(kMinTimeBetweenEvents.count()))
+        if (event.timer.hasExpiredSinceStart(kMinTimeBetweenEvents))
         {
-            event.elapsedTimer.invalidate();
-            sendEventStoppedPacket(event);
+            event.timer.stop();
+            sendEventStoppedPacket(event.type);
         }
     }
 
     if (isTimerNeeded())
-        m_timer.start(timeTillCheck(), [this](){ onTimer(); });
+        m_stopEventTimer.start(timeTillCheck(), [this](){ onTimer(); });
 }
 
 /*
- * We need timer if at least one state-dependent event took place recently (i.e. no longer then
- * kMinTimeBetweenEvents ms ago).
+ * We need timer if at least one state-dependent event took place recently (i.e. its timer has been
+ * started, but not stopped yet).
  */
 bool Manager::isTimerNeeded() const
 {
-    for (const QnUuid& id: m_eventsToCatch)
+    for (const ElapsedEvent& event: m_eventsToCatch)
     {
-        const AnalyticsEventType& event = m_plugin->eventByUuid(id);
-        if (event.timerStarted())
+        if (event.timer.isStarted())
             return true;
     }
     return false;
+}
+
+void Manager::onConnect(SystemError::ErrorCode code)
+{
+    if (code != SystemError::noError)
+    {
+        NX_PRINT << "Failed to connect to VCA camera notification server. Next connection attempt in"
+            << std::chrono::seconds(kReconnectTimeout).count() << " seconds.";
+        m_reconnectTimer.start(kReconnectTimeout, [this]() { reconnectSocket(); });
+        return;
+    }
+    NX_PRINT << "Connection to VCA camera notification server established";
+
+    cleanBuffer(m_buffer, m_buffer.size());
+
+    m_tcpSocket->readSomeAsync(
+        &m_buffer,
+        [this](SystemError::ErrorCode errorCode, size_t size)
+        {
+            this->onReceive(errorCode, size);
+        });
+}
+
+void Manager::reconnectSocket()
+{
+    m_reconnectTimer.pleaseStop(
+        [this]()
+    {
+        using namespace std::chrono;
+        m_tcpSocket.reset();
+        m_tcpSocket = std::make_unique<nx::network::TCPSocket>();
+        m_tcpSocket->setNonBlockingMode(true);
+        m_tcpSocket->bindToAioThread(m_reconnectTimer.getAioThread());
+        m_tcpSocket->setSendTimeout(duration_cast<milliseconds>(kSendTimeout).count());
+        m_tcpSocket->setRecvTimeout(duration_cast<milliseconds>(kReceiveTimeout).count());
+
+        m_tcpSocket->connectAsync(
+            m_cameraAddress,
+            [this](SystemError::ErrorCode code)
+        {
+            return this->onConnect(code);
+        });
+    });
 }
 
 nx::sdk::Error Manager::setHandler(nx::sdk::metadata::MetadataHandler* handler)
@@ -383,11 +446,22 @@ nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeL
     if (error != nx::sdk::Error::noError)
         return error;
 
-    m_eventsToCatch.resize(typeListSize);
     for (int i = 0; i < typeListSize; ++i)
     {
-        m_eventsToCatch[i] = nxpt::fromPluginGuidToQnUuid(typeList[i]);
+        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(typeList[i]);
+        const AnalyticsEventType* eventType = m_plugin->eventByUuid(id);
+        if (!eventType)
+            NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();
+        else
+            m_eventsToCatch.emplace_back(*eventType);
     }
+
+    QByteArray eventNames;
+    for (const auto& event : m_eventsToCatch)
+    {
+        eventNames = eventNames + event.type.internalName.toUtf8() + " ";
+    }
+    NX_PRINT << "Server demanded to start fetching event(s): " << eventNames.toStdString();
 
     if (!vcaCameraConrtoller.readTcpServerPort())
     {
@@ -399,24 +473,9 @@ nx::sdk::Error Manager::startFetchingMetadata(nxpl::NX_GUID* typeList, int typeL
     QString ipPort = kAddressPattern.arg(
         m_url.host(), QString::number(vcaCameraConrtoller.tcpServerPort()));
 
-    nx::network::SocketAddress vcaAddress(ipPort);
-    m_tcpSocket = new nx::network::TCPSocket;
-    if (!m_tcpSocket->connect(vcaAddress, kConnectTimeout))
-    {
-        NX_PRINT << "Failed to connect to camera tcp notification server";
-        return nx::sdk::Error::networkError;
-    }
-    m_tcpSocket->bindToAioThread(m_timer.getAioThread());
-    m_tcpSocket->setNonBlockingMode(true);
-    m_tcpSocket->setRecvTimeout(kReceiveTimeout.count() * 1000);
-    NX_PRINT << "Connection to camera tcp notification server established";
+    m_cameraAddress = nx::network::SocketAddress(ipPort);
 
-    m_tcpSocket->readSomeAsync(
-        &m_buffer,
-        [this](SystemError::ErrorCode errorCode, size_t size)
-        {
-            this->onReceive(errorCode, size);
-        });
+    reconnectSocket();
 
     return nx::sdk::Error::noError;
 }
@@ -426,16 +485,15 @@ nx::sdk::Error Manager::stopFetchingMetadata()
     if (m_tcpSocket)
     {
         nx::utils::promise<void> promise;
-        m_timer.pleaseStop(
+        m_reconnectTimer.pleaseStop(
             [&]()
             {
-                m_tcpSocket->pleaseStopSync();
+                m_stopEventTimer.pleaseStopSync();
+                m_tcpSocket.reset();
+                m_eventsToCatch.clear();
                 promise.set_value();
             });
         promise.get_future().wait();
-
-        delete m_tcpSocket;
-        m_tcpSocket = nullptr;
     }
     return nx::sdk::Error::noError;
 }

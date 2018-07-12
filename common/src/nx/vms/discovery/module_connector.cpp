@@ -34,7 +34,7 @@ void ModuleConnector::setDisconnectTimeout(std::chrono::milliseconds value)
     m_disconnectTimeout = value;
 }
 
-void ModuleConnector::setReconnectPolicy(network::RetryPolicy value)
+void ModuleConnector::setReconnectPolicy(nx::network::RetryPolicy value)
 {
     NX_ASSERT(m_modules.size() == 0);
     m_retryPolicy = value;
@@ -130,7 +130,7 @@ ModuleConnector::InformationReader::~InformationReader()
 }
 
 void ModuleConnector::InformationReader::setHandler(
-    std::function<void(boost::optional<QnModuleInformation>, QString)> handler)
+    std::function<void(boost::optional<nx::vms::api::ModuleInformation>, QString)> handler)
 {
     m_handler = std::move(handler);
 }
@@ -197,8 +197,8 @@ void ModuleConnector::InformationReader::readUntilError()
             return nx::utils::swapAndCall(m_handler, boost::none, restResult.errorString);
         }
 
-        QnModuleInformation moduleInformation;
-        if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
+        nx::vms::api::ModuleInformation moduleInformation;
+        if (!QJson::deserialize(restResult.reply, &moduleInformation)
             || moduleInformation.id.isNull())
         {
             return nx::utils::swapAndCall(m_handler, boost::none, restResult.errorString);
@@ -265,7 +265,12 @@ void ModuleConnector::Module::addEndpoints(std::set<nx::network::SocketAddress> 
             hasNewEndpoints |= (bool) saveEndpoint(std::move(endpoint));
 
         if (hasNewEndpoints)
-            ensureConnection();
+        {
+            if (m_connectedReader || !m_attemptingReaders.empty())
+                remakeConnection();
+            else
+                ensureConnection();
+        }
     }
 }
 
@@ -275,11 +280,23 @@ void ModuleConnector::Module::ensureConnection()
         connectToGroup(m_endpoints.begin());
 }
 
+void ModuleConnector::Module::remakeConnection()
+{
+    NX_DEBUG(this, "Initiate reconnect for better endpoints");
+    m_connectedReader.reset();
+    ensureConnection();
+}
+
 void ModuleConnector::Module::setForbiddenEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
-    m_forbiddenEndpoints = std::move(endpoints);
+    if (m_forbiddenEndpoints != endpoints)
+    {
+        m_forbiddenEndpoints = std::move(endpoints);
+        if (m_connectedReader || !m_attemptingReaders.empty())
+            remakeConnection();
+    }
 }
 
 ModuleConnector::Module::Priority
@@ -288,10 +305,10 @@ ModuleConnector::Module::Priority
     if (m_id.isNull())
         return kDefault;
 
-    if (host == nx::network::HostAddress::localhost)
+    if (host.isLocalHost())
         return kLocalHost;
 
-    if (host.isLocal())
+    if (host.isLocalNetwork())
         return kLocalNetwork;
 
     if (host.ipV4() || (bool) host.ipV6().first)
@@ -300,7 +317,7 @@ ModuleConnector::Module::Priority
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host.toString()))
         return kCloud;
 
-    return kOther;
+    return kDns; // TODO: Consider to check if it is valid DNS.
 }
 
 QString ModuleConnector::Module::idForToStringFromPtr() const
@@ -393,7 +410,8 @@ void ModuleConnector::Module::connectToEndpoint(
     (*readerIt)->start(endpoint);
     (*readerIt)->setHandler(
         [this, endpoint, endpointsGroup, readerIt](
-            boost::optional<QnModuleInformation> information, QString description) mutable
+            boost::optional<nx::vms::api::ModuleInformation> information,
+            const QString& description) mutable
        {
            std::unique_ptr<InformationReader> reader(std::move(*readerIt));
            m_attemptingReaders.erase(readerIt);
@@ -428,7 +446,7 @@ void ModuleConnector::Module::connectToEndpoint(
 }
 
 bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint,
-    std::unique_ptr<InformationReader> reader, const QnModuleInformation& information)
+    std::unique_ptr<InformationReader> reader, const nx::vms::api::ModuleInformation& information)
 {
     NX_ASSERT(!m_id.isNull());
     if (m_id.isNull())
@@ -444,7 +462,8 @@ bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint
 
     m_connectedReader = std::move(reader);
     m_connectedReader->setHandler(
-        [this, endpoint](boost::optional<QnModuleInformation> information, QString description) mutable
+        [this, endpoint](boost::optional<nx::vms::api::ModuleInformation> information,
+            QString description) mutable
         {
             if (information)
             {

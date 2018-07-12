@@ -13,8 +13,8 @@
 #include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
 #include <nx/cloud/cdb/stree/stree_manager.h>
 #include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
-#include "base_persistent_data_test.h"
 #include "temporary_account_password_manager_stub.h"
 #include "../functional_tests/test_email_manager.h"
 
@@ -137,8 +137,8 @@ protected:
 
     void thenProperTemporaryCodeIsCreated()
     {
-        ASSERT_EQ(1U, m_tempPasswordManager.registeredCredentials().size());
-        const auto& tempCredentials = m_tempPasswordManager.registeredCredentials()[0];
+        ASSERT_FALSE(m_tempPasswordManager.registeredCredentials().empty());
+        const auto& tempCredentials = m_tempPasswordManager.registeredCredentials().back();
         ASSERT_EQ(1, tempCredentials.maxUseCount);
 
         auto curTime = nx::utils::utcTime();
@@ -162,7 +162,7 @@ private:
     data::AccountData m_account;
 
     virtual void afterUpdatingAccountPassword(
-        nx::utils::db::QueryContext* const /*queryContext*/,
+        nx::sql::QueryContext* const /*queryContext*/,
         const api::AccountData& account)
     {
         m_extensionCalls.push(account);

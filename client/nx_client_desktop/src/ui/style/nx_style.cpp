@@ -40,22 +40,22 @@
 
 #include <QtWidgets/private/qabstractitemview_p.h>
 
-#include <nx/client/desktop/ui/common/detail/base_input_field.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/widgets/detail/base_input_field.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/utils/widget_utils.h>
 
 #include <ui/common/indents.h>
-#include <ui/common/popup_shadow.h>
-#include <ui/common/link_hover_processor.h>
+#include <nx/client/desktop/common/utils/popup_shadow.h>
+#include <nx/client/desktop/common/utils/link_hover_processor.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
 #include <ui/widgets/common/scroll_bar_proxy.h>
 #include <ui/widgets/calendar_widget.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/object_companion.h>
+#include <nx/client/desktop/common/utils/object_companion.h>
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -63,10 +63,11 @@
 #include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/client/core/utils/geometry.h>
+#include "webview_style.h"
+
 
 using namespace style;
 using namespace nx::client::desktop;
-using namespace nx::client::desktop::ui;
 using nx::client::core::Geometry;
 
 namespace
@@ -811,7 +812,7 @@ void QnNxStyle::drawPrimitive(
 
             if (option->state.testFlag(State_Enabled))
             {
-                using InputField = ui::detail::BaseInputField;
+                using InputField = nx::client::desktop::detail::BaseInputField;
                 if (auto inputTextField = qobject_cast<const InputField*>(widget->parentWidget()))
                 {
                     readOnly = inputTextField->isReadOnly();
@@ -1750,10 +1751,18 @@ void QnNxStyle::drawComplexControl(
                     }
 
                     /* Handle hovered & pressed states: */
-                    if (scrollBar->state.testFlag(State_Sunken))
-                        sliderColor = sliderColor.lighter(1);
-                    else if (scrollBar->state.testFlag(State_MouseOver))
-                        sliderColor = sliderColor.lighter(scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                    if (scrollBar->state.testFlag(State_Enabled))
+                    {
+                        if (scrollBar->state.testFlag(State_Sunken))
+                        {
+                            sliderColor = sliderColor.lighter(1);
+                        }
+                        else if (scrollBar->state.testFlag(State_MouseOver))
+                        {
+                            sliderColor = sliderColor.lighter(
+                                scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                        }
+                    }
 
                     /* Paint: */
                     if (style == CommonScrollBar)
@@ -3918,10 +3927,10 @@ void QnNxStyle::polish(QWidget *widget)
                     widget->setFont(font);
                 }
 
-                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
+                if (!ObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
                     && !qobject_cast<QnCalendarWidget*>(calendar))
                 {
-                    QnObjectCompanionManager::attach(calendar,
+                    ObjectCompanionManager::attach(calendar,
                         new CalendarDelegateReplacement(view, calendar),
                         kCalendarDelegateCompanion);
                 }
@@ -3958,12 +3967,12 @@ void QnNxStyle::polish(QWidget *widget)
         d->polishInputDialog(inputDialog);
 
     if (auto label = qobject_cast<QLabel*>(widget))
-        QnObjectCompanion<QnLinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
+        ObjectCompanion<LinkHoverProcessor>::install(label, kLinkHoverProcessorCompanion, true);
 
     if (kCustomizePopupShadows && popupToCustomizeShadow)
     {
         /* Create customized shadow: */
-        if (auto shadow = QnObjectCompanion<QnPopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion, true))
+        if (auto shadow = ObjectCompanion<PopupShadow>::install(popupToCustomizeShadow, kPopupShadowCompanion, true))
         {
             QnPaletteColor shadowColor = mainColor(Colors::kBase).darker(3);
             shadowColor.setAlphaF(0.5);
@@ -3983,6 +3992,12 @@ void QnNxStyle::polish(QWidget *widget)
     {
         if (widget->focusPolicy() != Qt::NoFocus)
             widget->setFocusPolicy(Qt::TabFocus);
+    }
+
+    if (widget->inherits("WebCore::QtWebComboBox"))
+    {
+        auto palette = NxUi::createWebViewPalette();
+        widget->setPalette(palette);
     }
 }
 
@@ -4026,13 +4041,13 @@ void QnNxStyle::unpolish(QWidget* widget)
     }
 
     if (auto calendar = qobject_cast<QCalendarWidget*>(widget))
-        QnObjectCompanionManager::uninstall(calendar, kCalendarDelegateCompanion);
+        ObjectCompanionManager::uninstall(calendar, kCalendarDelegateCompanion);
 
     if (kCustomizePopupShadows && popupWithCustomizedShadow)
-        QnObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
+        ObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
 
     if (auto label = qobject_cast<QLabel*>(widget))
-        QnObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);
+        ObjectCompanionManager::uninstall(label, kLinkHoverProcessorCompanion);
 
     if (auto tabBar = qobject_cast<QTabBar*>(widget))
     {

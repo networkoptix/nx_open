@@ -25,7 +25,6 @@ int NALUnit::calc_rbsp_trailing_bits_cnt(uint8_t val)
     return cnt;
 }
 
-
 void NALUnit::write_rbsp_trailing_bits(BitStreamWriter& writer)
 {
     writer.putBit(1);
@@ -151,10 +150,10 @@ int NALUnit::encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, siz
         else
             srcBuffer++;
     }
-    
+
     NX_ASSERT(srcEnd >= srcStart);
     //conversion to uint possible cause srcEnd should always be greater then srcStart
-    if (dstBufferSize < uint(srcEnd - srcStart)) 
+    if (dstBufferSize < uint(srcEnd - srcStart))
         return -1;
     memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
@@ -168,25 +167,29 @@ int NALUnit::decodeNAL(const quint8* srcBuffer, const quint8* srcEnd, quint8* ds
     for (srcBuffer += 3; srcBuffer < srcEnd;)
     {
         if (*srcBuffer > 3)
+        {
             srcBuffer += 4;
-        /*
-        else if (*srcBuffer == 3) {
-            if (srcBuffer[-1] == 3 && srcBuffer[-2] == 0 && srcBuffer[-3] == 0)
-            srcBuffer++;
         }
-        */
-        else if (srcBuffer[-3] == 0 && srcBuffer[-2] == 0  && srcBuffer[-1] == 3) {
+        else if (srcBuffer[-3] == 0 && srcBuffer[-2] == 0  && srcBuffer[-1] == 3)
+        {
             if (dstBufferSize < (size_t) (srcBuffer - srcStart))
                 return -1;
+
             memcpy(dstBuffer, srcStart, srcBuffer - srcStart - 1);
             dstBuffer += srcBuffer - srcStart - 1;
             dstBufferSize -= srcBuffer - srcStart;
             *dstBuffer++ = *srcBuffer++;
             srcStart = srcBuffer;
         }
-        else 
+        else
+        {
             srcBuffer++;
+        }
     }
+
+    if (dstBufferSize < srcEnd - srcStart)
+        return -2;
+
     memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
     return dstBuffer - initDstBuffer;
@@ -242,7 +245,6 @@ void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, quint32 value)
     bitWriter.putBits(nBit, value - (x-1));
 }
 
-
 int NALUnit::extractUEGolombCode(BitStreamReader& bitReader)
 {
     int cnt = 0;
@@ -263,7 +265,6 @@ int NALUnit::deserialize(quint8* buffer, quint8* end)
 {
     if (end == buffer)
         return NOT_ENOUGHT_BUFFER;
-
 
     //NX_ASSERT((*buffer & 0x80) == 0);
     if ((*buffer & 0x80) != 0) {
@@ -286,7 +287,7 @@ int NALUnit::serializeBuffer(quint8* dstBuffer, quint8* dstEnd, bool writeStartC
 {
     if (m_nalBufferLen == 0)
         return 0;
-    if (writeStartCode) 
+    if (writeStartCode)
     {
         if (dstEnd - dstBuffer < 4)
             return -1;
@@ -326,7 +327,6 @@ void NALUnit::scaling_list(int* scalingList, int sizeOfScalingList, bool& useDef
         lastScale = scalingList[ j ];
     }
 }
-
 
 int ceil_log2(double val)
 {
@@ -418,14 +418,14 @@ int PPSUnit::deserialize()
         slice_group_map_type = 0;
         if( num_slice_groups_minus1 > 0 ) {
             slice_group_map_type = extractUEGolombCode();
-            if( slice_group_map_type  ==  0 ) 
+            if( slice_group_map_type  ==  0 )
             {
                 if (num_slice_groups_minus1 >= 256)
                     THROW_BITSTREAM_ERR;
                 for( int iGroup = 0; iGroup <= num_slice_groups_minus1; iGroup++ )
                     run_length_minus1[iGroup] = extractUEGolombCode();
             }
-            else if( slice_group_map_type  ==  2) 
+            else if( slice_group_map_type  ==  2)
             {
                 if (num_slice_groups_minus1 >= 256)
                     THROW_BITSTREAM_ERR;
@@ -434,20 +434,20 @@ int PPSUnit::deserialize()
                     bottom_right[ iGroup ] = extractUEGolombCode();
                 }
             }
-            else if(  slice_group_map_type  ==  3  ||  
-                        slice_group_map_type  ==  4  ||  
-                        slice_group_map_type  ==  5 ) 
+            else if(  slice_group_map_type  ==  3  ||
+                        slice_group_map_type  ==  4  ||
+                        slice_group_map_type  ==  5 )
             {
                 slice_group_change_direction_flag = bitReader.getBits(1);
                 slice_group_change_rate = extractUEGolombCode() + 1;
-            } else if( slice_group_map_type  ==  6 ) 
+            } else if( slice_group_map_type  ==  6 )
             {
                 int pic_size_in_map_units_minus1 = extractUEGolombCode();
                 if (pic_size_in_map_units_minus1 >= 256)
                     THROW_BITSTREAM_ERR;
                 for( int i = 0; i <= pic_size_in_map_units_minus1; i++ ) {
                     int bits = ceil_log2( num_slice_groups_minus1 + 1 );
-                    Q_UNUSED(bits);
+                    (void)bits;
                     slice_group_id[i] = bitReader.getBits(1);
                 }
             }
@@ -456,8 +456,8 @@ int PPSUnit::deserialize()
         num_ref_idx_l1_active_minus1 = extractUEGolombCode();
         weighted_pred_flag = bitReader.getBit();
         weighted_bipred_idc = bitReader.getBits(2);
-        pic_init_qp_minus26 = extractSEGolombCode();  // relative to 26 
-        pic_init_qs_minus26 = extractSEGolombCode();  // relative to 26 
+        pic_init_qp_minus26 = extractSEGolombCode();  // relative to 26
+        pic_init_qs_minus26 = extractSEGolombCode();  // relative to 26
         chroma_qp_index_offset =  extractSEGolombCode();
         deblocking_filter_control_present_flag = bitReader.getBit();
         constrained_intra_pred_flag = bitReader.getBit();
@@ -499,7 +499,7 @@ void PPSUnit::duplicatePPS(PPSUnit& oldPPS, int ppsID, bool cabac)
     memcpy(this, &oldPPS, sizeof(PPSUnit));
     m_nalBuffer = new quint8[oldPPS.m_nalBufferLen + 400]; // 4 bytes reserved for new ppsID and cabac values
     m_nalBuffer[0] = oldPPS.m_nalBuffer[0];
-    
+
     pic_parameter_set_id = ppsID;
     entropy_coding_mode_flag = cabac;
 
@@ -527,7 +527,6 @@ void PPSUnit::duplicatePPS(PPSUnit& oldPPS, int ppsID, bool cabac)
     NX_ASSERT(m_nalBufferLen <= oldPPS.m_nalBufferLen + 4);
 }
 
-
 // -------------------- SPSUnit --------------------------
 int SPSUnit::deserialize()
 {
@@ -554,7 +553,7 @@ int SPSUnit::deserialize()
         bitReader.setBuffer(m_nalBuffer + 4, m_nalBuffer + m_nalBufferLen);
         seq_parameter_set_id = extractUEGolombCode();
         pic_order_cnt_type = 0;
-        if( profile_idc == 100 || profile_idc == 110 || profile_idc == 122 || profile_idc  ==  144) 
+        if( profile_idc == 100 || profile_idc == 110 || profile_idc == 122 || profile_idc  ==  144)
         {
             chroma_format_idc = extractUEGolombCode();
             if(chroma_format_idc == 3)
@@ -565,31 +564,31 @@ int SPSUnit::deserialize()
             seq_scaling_matrix_present_flag = bitReader.getBits(1);
             if(seq_scaling_matrix_present_flag != 0)
             {
-                for(int i = 0; i < 8; i++) 
+                for(int i = 0; i < 8; i++)
                 {
                     seq_scaling_list_present_flag[i] = bitReader.getBits(1);
                     if( seq_scaling_list_present_flag[i]){
-                        if( i < 6 ) 
-                            scaling_list( ScalingList4x4[ i ], 16, 
+                        if( i < 6 )
+                            scaling_list( ScalingList4x4[ i ], 16,
                                                UseDefaultScalingMatrix4x4Flag[i]);
                         else
                             scaling_list( ScalingList8x8[ i - 6 ], 64,
                                                UseDefaultScalingMatrix8x8Flag[i-6]);
                     }
                 }
-                
+
             }
         }
         log2_max_frame_num = extractUEGolombCode() + 4;
 
         // next parameters not used  now.
-        
+
         pic_order_cnt_type = extractUEGolombCode();
         log2_max_pic_order_cnt_lsb = 0;
         delta_pic_order_always_zero_flag = 0;
         if( pic_order_cnt_type == 0)
             log2_max_pic_order_cnt_lsb = extractUEGolombCode() + 4;
-        else if( pic_order_cnt_type == 1 ) 
+        else if( pic_order_cnt_type == 1 )
         {
             delta_pic_order_always_zero_flag = bitReader.getBits(1);
             offset_for_non_ref_pic = extractSEGolombCode();
@@ -634,13 +633,12 @@ int SPSUnit::deserialize()
     }
 }
 
-
 void SPSUnit::deserializeVuiParameters()
 {
     aspect_ratio_info_present_flag = bitReader.getBit();
     if( aspect_ratio_info_present_flag ) {
         aspect_ratio_idc = bitReader.getBits(8);
-        if( aspect_ratio_idc  ==  Extended_SAR ) 
+        if( aspect_ratio_idc  ==  Extended_SAR )
         {
             sar_width  = bitReader.getBits(16);
             sar_height = bitReader.getBits(16);
@@ -673,8 +671,8 @@ void SPSUnit::deserializeVuiParameters()
         fixed_frame_rate_flag = bitReader.getBit();
     }
     nal_hrd_parameters_bit_pos = bitReader.getBitsCount() +  32;
-    
-    //orig_hrd_parameters_present_flag = 
+
+    //orig_hrd_parameters_present_flag =
     nal_hrd_parameters_present_flag = bitReader.getBit();
     if( nal_hrd_parameters_present_flag )
         hrd_parameters();
@@ -732,14 +730,14 @@ void SPSUnit::insertHdrParameters()
     int tmpVal = reader.getBits(nal_hrd_parameters_bit_pos & 7);
     writer.putBits(nal_hrd_parameters_bit_pos & 7, tmpVal);
     writer.putBit(nal_hrd_parameters_present_flag);
-    serializeHDRParameters(writer); 
+    serializeHDRParameters(writer);
     reader.skipBit(); // nal_hrd_parameters_present_flag
     reader.skipBit(); // vcl_hrd_parameters_present_flag
     writer.putBit(vcl_hrd_parameters_present_flag);
     if (vcl_hrd_parameters_present_flag) { // this field exists in input stream
         //reader.skipBit(); // low_delay_hrd_flag
     }
-    else 
+    else
         writer.putBit(low_delay_hrd_flag);
     // copy end of SPS
     int bitRest = full_sps_bit_len - reader.getBitsCount() - beforeBytes*8;
@@ -758,7 +756,6 @@ void SPSUnit::insertHdrParameters()
     m_nalBufferLen =  writer.getBitsCount()/8 + beforeBytes;
 }
 
-
 int SPSUnit::getMaxBitrate()
 {
     if (bit_rate_value_minus1 == 0)
@@ -767,7 +764,7 @@ int SPSUnit::getMaxBitrate()
         return (bit_rate_value_minus1[0]+1) << (6 + bit_rate_scale);
 }
 
-void SPSUnit::hrd_parameters() 
+void SPSUnit::hrd_parameters()
 {
     cpb_cnt_minus1 = extractUEGolombCode();
     bit_rate_scale = bitReader.getBits(4);
@@ -783,7 +780,7 @@ void SPSUnit::hrd_parameters()
         delete[] cbr_flag;
     cbr_flag = new quint8[cpb_cnt_minus1 + 1];
 
-    for( int SchedSelIdx = 0; SchedSelIdx <= cpb_cnt_minus1; SchedSelIdx++) 
+    for( int SchedSelIdx = 0; SchedSelIdx <= cpb_cnt_minus1; SchedSelIdx++)
     {
         bit_rate_value_minus1[ SchedSelIdx ] = extractUEGolombCode();
         cpb_size_value_minus1[ SchedSelIdx ] = extractUEGolombCode();
@@ -796,7 +793,7 @@ void SPSUnit::hrd_parameters()
 }
 
 int SPSUnit::getCropY() const {
-    if (chroma_format_idc == 0) 
+    if (chroma_format_idc == 0)
         return (2 - frame_mbs_only_flag) * (frame_crop_top_offset + frame_crop_bottom_offset);
     else {
         int SubHeightC = 1;
@@ -807,7 +804,7 @@ int SPSUnit::getCropY() const {
 }
 
 int SPSUnit::getCropX() const {
-    if (chroma_format_idc == 0) 
+    if (chroma_format_idc == 0)
         return frame_crop_left_offset + frame_crop_right_offset;
     else {
         int SubWidthC = 1;
@@ -829,7 +826,7 @@ double SPSUnit::getFPS() const
         return 0;
 }
 
-void SPSUnit::setFps(double fps) 
+void SPSUnit::setFps(double fps)
 {
     time_scale = (quint32)(fps+0.5) * 1000000;
     //time_scale = (quint32)(fps+0.5) * 1000;
@@ -889,8 +886,7 @@ int SliceUnit::deserialize(const SPSUnit* sps,const PPSUnit* pps)
     return deserialize(m_nalBuffer, m_nalBuffer + m_nalBufferLen, spsMap, ppsMap);
 }
 
-
-int SliceUnit::deserialize(quint8* buffer, quint8* end, 
+int SliceUnit::deserialize(quint8* buffer, quint8* end,
                             const QMap<quint32, const SPSUnit*>& spsMap,
                             const QMap<quint32, const PPSUnit*>& ppsMap)
 {
@@ -943,7 +939,6 @@ bool SliceUnit::moveHeaderField(int fieldOffset, int newLen, int oldLen)
     if (bitDiff > NAL_RESERVED_SPACE*8)
         return false;
 
-
     NX_ASSERT(bitDiff >= 0);
     if (bitDiff > 0)
     {
@@ -959,7 +954,7 @@ bool SliceUnit::moveHeaderField(int fieldOffset, int newLen, int oldLen)
             if (newHeaderLenInBytes > oldHeaderLenInBytes)
             {
                 uint8_t* sliceData = m_nalBuffer + oldHeaderLenInBytes;
-                memmove(sliceData + newHeaderLenInBytes - oldHeaderLenInBytes, 
+                memmove(sliceData + newHeaderLenInBytes - oldHeaderLenInBytes,
                     sliceData, m_nalBufferLen - oldHeaderLenInBytes);
             }
             moveBits(m_nalBuffer, fieldOffset, fieldOffset + bitDiff, m_fullHeaderLen-fieldOffset);
@@ -969,12 +964,12 @@ bool SliceUnit::moveHeaderField(int fieldOffset, int newLen, int oldLen)
             {
                 int bitRest = 8 - (newHeaderLenInBits % 8);
                 int mask = 0;
-                for (int i = 0; i < bitRest; ++i) 
+                for (int i = 0; i < bitRest; ++i)
                     mask = (mask << 1) + 1;
-                m_nalBuffer[newHeaderLenInBytes-1] |= mask; // add padding cabac_alignment_one_bit 
+                m_nalBuffer[newHeaderLenInBytes-1] |= mask; // add padding cabac_alignment_one_bit
             }
         }
-        else 
+        else
         {
             int oldLenInBits = m_nalBufferLen * 8;
             int trailingBits = calc_rbsp_trailing_bits_cnt(m_nalBuffer[m_nalBufferLen-1]);
@@ -982,7 +977,7 @@ bool SliceUnit::moveHeaderField(int fieldOffset, int newLen, int oldLen)
             int newLenInBits = oldLenInBits + bitDiff;
             moveBits(m_nalBuffer, fieldOffset, fieldOffset+bitDiff, oldLenInBits);
             m_nalBufferLen = newLenInBits / 8;
-            if (newLenInBits % 8 == 0) 
+            if (newLenInBits % 8 == 0)
                 m_nalBuffer[m_nalBufferLen] = 0x80; // trailing bits
             else {
                 quint8 mask = 1;
@@ -995,7 +990,7 @@ bool SliceUnit::moveHeaderField(int fieldOffset, int newLen, int oldLen)
         }
     }
     updateBits(fieldOffset-8, bitDiff, 0); // reader does not include first NAL bytes, so -8 bits
-    m_fullHeaderLen += bitDiff; 
+    m_fullHeaderLen += bitDiff;
     return true;
 }
 
@@ -1025,7 +1020,7 @@ bool SliceUnit::increasePicOrderFieldLen(int newLen, int oldLen)
             if (newHeaderLenInBytes > oldHeaderLenInBytes)
             {
                 uint8_t* sliceData = m_nalBuffer + oldHeaderLenInBytes;
-                memmove(sliceData + newHeaderLenInBytes - oldHeaderLenInBytes, 
+                memmove(sliceData + newHeaderLenInBytes - oldHeaderLenInBytes,
                         sliceData, m_nalBufferLen - oldHeaderLenInBytes);
             }
             moveBits(m_nalBuffer, picOrderBitPos, picOrderBitPos + bitDiff, m_fullHeaderLen-picOrderBitPos);
@@ -1035,12 +1030,12 @@ bool SliceUnit::increasePicOrderFieldLen(int newLen, int oldLen)
             {
                 int bitRest = 8 - (newHeaderLenInBits % 8);
                 int mask = 0;
-                for (int i = 0; i < bitRest; ++i) 
+                for (int i = 0; i < bitRest; ++i)
                     mask = (mask << 1) + 1;
-                m_nalBuffer[newHeaderLenInBytes-1] |= mask; // add padding cabac_alignment_one_bit 
+                m_nalBuffer[newHeaderLenInBytes-1] |= mask; // add padding cabac_alignment_one_bit
             }
         }
-        else 
+        else
         {
             int oldLenInBits = m_nalBufferLen * 8;
             int trailingBits = calc_rbsp_trailing_bits_cnt(m_nalBuffer[m_nalBufferLen-1]);
@@ -1048,7 +1043,7 @@ bool SliceUnit::increasePicOrderFieldLen(int newLen, int oldLen)
             int newLenInBits = oldLenInBits + bitDiff;
             moveBits(m_nalBuffer, picOrderBitPos, picOrderBitPos+bitDiff, oldLenInBits);
             m_nalBufferLen = newLenInBits / 8;
-            if (newLenInBits % 8 == 0) 
+            if (newLenInBits % 8 == 0)
                 m_nalBuffer[m_nalBufferLen] = 0x80; // trailing bits
             else {
                 int mask = 1;
@@ -1067,7 +1062,7 @@ bool SliceUnit::increasePicOrderFieldLen(int newLen, int oldLen)
         }
     }
     updateBits(m_picOrderBitPos, bitDiff, 0);
-    m_fullHeaderLen += bitDiff; 
+    m_fullHeaderLen += bitDiff;
 }
 */
 
@@ -1078,7 +1073,7 @@ void NALUnit::updateBits(int bitOffset, int bitLen, int value)
     BitStreamWriter bitWriter;
     int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
-    
+
     quint8* ptr_end = (quint8*) bitReader.getBuffer() + (bitOffset + bitLen)/8;
     int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
 
@@ -1094,7 +1089,6 @@ void NALUnit::updateBits(int bitOffset, int bitLen, int value)
     }
     bitWriter.flushBits();
 }
-
 
 int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMap,
                                       const QMap<quint32, const PPSUnit*>& ppsMap)
@@ -1128,7 +1122,7 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMa
         if( nal_unit_type == 5)
             idr_pic_id = extractUEGolombCode();
         m_picOrderBitPos = -1;
-        if( sps->pic_order_cnt_type ==  0) 
+        if( sps->pic_order_cnt_type ==  0)
         {
             m_picOrderBitPos = bitReader.getBitsCount(); //getBitContext.buffer
             m_picOrderNumBits = sps->log2_max_pic_order_cnt_lsb;
@@ -1140,7 +1134,7 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMa
         if (m_shortDeserializeMode)
             return 0;
 
-        if(sps->pic_order_cnt_type == 1 && !sps->delta_pic_order_always_zero_flag) 
+        if(sps->pic_order_cnt_type == 1 && !sps->delta_pic_order_always_zero_flag)
         {
             delta_pic_order_cnt[0] = extractSEGolombCode();
             if( pps->pic_order_present_flag && !m_field_pic_flag)
@@ -1149,12 +1143,11 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMa
         if(pps->redundant_pic_cnt_present_flag)
             redundant_pic_cnt = extractUEGolombCode();
 
-
         if( slice_type  ==  B_TYPE )
             direct_spatial_mv_pred_flag = bitReader.getBit();
         num_ref_idx_l0_active_minus1 = pps->num_ref_idx_l0_active_minus1;
         num_ref_idx_l1_active_minus1 = pps->num_ref_idx_l1_active_minus1;
-        if( slice_type == P_TYPE || slice_type == SP_TYPE || slice_type == B_TYPE ) 
+        if( slice_type == P_TYPE || slice_type == SP_TYPE || slice_type == B_TYPE )
         {
             num_ref_idx_active_override_flag = bitReader.getBit();
             if( num_ref_idx_active_override_flag ) {
@@ -1195,7 +1188,7 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMa
 #endif
         return 0;
     } catch(BitStreamException) {
-        return NOT_ENOUGHT_BUFFER;    
+        return NOT_ENOUGHT_BUFFER;
     }
 }
 
@@ -1266,7 +1259,7 @@ void SliceUnit::dec_ref_pic_marking()
     if( nal_unit_type  ==  nuSliceIDR ) {
         no_output_of_prior_pics_flag = bitReader.getBits(1);
         long_term_reference_flag = bitReader.getBits(1);
-    } else 
+    } else
     {
         adaptive_ref_pic_marking_mode_flag =  bitReader.getBits(1);
         if( adaptive_ref_pic_marking_mode_flag )
@@ -1338,7 +1331,7 @@ int SliceUnit::NextMbAddress(int n)
     int PicHeightInMbs = FrameHeightInMbs / ( 1 + m_field_pic_flag );
     int PicWidthInMbs = FrameWidthInMbs / ( 1 + m_field_pic_flag );
     int PicSizeInMbs = PicWidthInMbs * PicHeightInMbs;
-    Q_UNUSED(PicSizeInMbs);
+    (void)PicSizeInMbs;
     int i = n + 1;
     //while( i < PicSizeInMbs  &&  MbToSliceGroupMap[ i ]  !=  MbToSliceGroupMap[ n ] )
     //    i++;
@@ -1384,7 +1377,7 @@ int SliceUnit::deserializeSliceData()
             }*/
         }
         if( moreDataFlag ) {
-            if( MbaffFrameFlag && ( CurrMbAddr % 2  ==  0  ||  
+            if( MbaffFrameFlag && ( CurrMbAddr % 2  ==  0  ||
                 ( CurrMbAddr % 2  ==  1  &&  prevMbSkipped ) ) ) {
                     //mb_field_decoding_flag = bitReader.getBit(); // || ae(v) for CABAC
                     bitReader.skipBit();
@@ -1394,7 +1387,7 @@ int SliceUnit::deserializeSliceData()
         if( !pps->entropy_coding_mode_flag )
             moreDataFlag = bitReader.getBitsLeft() >= 8; //more_rbsp_data();
         /*else {
-            
+
             if( slice_type  !=  I  &&  slice_type  !=  SI )
                 prevMbSkipped = mb_skip_flag
             if( MbaffFrameFlag  &&  CurrMbAddr % 2  ==  0 )
@@ -1403,7 +1396,7 @@ int SliceUnit::deserializeSliceData()
                 end_of_slice_flag
                 moreDataFlag = !end_of_slice_flag
             }
-            
+
         }*/
         CurrMbAddr = NextMbAddress( CurrMbAddr );
     } while( moreDataFlag);
@@ -1417,7 +1410,7 @@ void SliceUnit::macroblock_layer()
 int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint32, SPSUnit*>& spsMap,
                                     const QMap<quint32, PPSUnit*>& ppsMap, quint8* dstBuffer, int dstBufferLen)
 {
-    try 
+    try
     {
         dstBuffer[0] = dstBuffer[1] = dstBuffer[2] = 0;
         dstBuffer[3] = 1;
@@ -1446,7 +1439,7 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
         }
         if( nal_unit_type == 5)
             writeUEGolombCode(bitWriter, idr_pic_id);
-        if( sps->pic_order_cnt_type ==  0) 
+        if( sps->pic_order_cnt_type ==  0)
         {
             m_picOrderBitPos = bitWriter.getBitsCount(); //getBitContext.buffer
             m_picOrderNumBits = sps->log2_max_pic_order_cnt_lsb;
@@ -1456,8 +1449,7 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
         }
         NX_ASSERT (m_shortDeserializeMode == false);
 
-
-        if(sps->pic_order_cnt_type == 1 && !sps->delta_pic_order_always_zero_flag) 
+        if(sps->pic_order_cnt_type == 1 && !sps->delta_pic_order_always_zero_flag)
         {
             writeSEGolombCode(bitWriter, delta_pic_order_cnt[0]);
             if( pps->pic_order_present_flag && !m_field_pic_flag)
@@ -1466,11 +1458,10 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
         if(pps->redundant_pic_cnt_present_flag)
             writeSEGolombCode(bitWriter, redundant_pic_cnt);
 
-
         if( slice_type  ==  B_TYPE ) {
             bitWriter.putBit(direct_spatial_mv_pred_flag);
         }
-        if( slice_type == P_TYPE || slice_type == SP_TYPE || slice_type == B_TYPE ) 
+        if( slice_type == P_TYPE || slice_type == SP_TYPE || slice_type == B_TYPE )
         {
             bitWriter.putBit(num_ref_idx_active_override_flag);
             if( num_ref_idx_active_override_flag ) {
@@ -1497,7 +1488,7 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
             writeSEGolombCode(bitWriter, slice_qs_delta);
         }
         if( pps->deblocking_filter_control_present_flag ) {
-            writeUEGolombCode(bitWriter, disable_deblocking_filter_idc); 
+            writeUEGolombCode(bitWriter, disable_deblocking_filter_idc);
             if( disable_deblocking_filter_idc != 1 ) {
                 writeSEGolombCode(bitWriter, slice_alpha_c0_offset_div2);
                 writeSEGolombCode(bitWriter, slice_beta_offset_div2);
@@ -1515,13 +1506,12 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
     }
 }
 
-
 void SliceUnit::write_dec_ref_pic_marking(BitStreamWriter& bitWriter)
 {
     if( nal_unit_type  ==  5 ) {
         bitWriter.putBit(no_output_of_prior_pics_flag);
         bitWriter.putBit(long_term_reference_flag);
-    } else 
+    } else
     {
         bitWriter.putBit(adaptive_ref_pic_marking_mode_flag);
         if( adaptive_ref_pic_marking_mode_flag )
@@ -1530,13 +1520,12 @@ void SliceUnit::write_dec_ref_pic_marking(BitStreamWriter& bitWriter)
     }
 }
 
-
 void SliceUnit::write_pred_weight_table(BitStreamWriter& bitWriter)
 {
     writeUEGolombCode(bitWriter, luma_log2_weight_denom);
     if( sps->chroma_format_idc  !=  0 )
         writeUEGolombCode(bitWriter, chroma_log2_weight_denom);
-    for(int i = 0; i <= num_ref_idx_l0_active_minus1; i++ ) 
+    for(int i = 0; i <= num_ref_idx_l0_active_minus1; i++ )
     {
         if (luma_weight_l0[i] != INT_MAX) {
             bitWriter.putBit(1);
@@ -1614,7 +1603,7 @@ void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
         quint8* curBuff = m_nalBuffer + 1;
         while (curBuff < nalEnd-1) {
             int payloadType = 0;
-            for(; *curBuff  ==  0xFF && curBuff < nalEnd; curBuff++) 
+            for(; *curBuff  ==  0xFF && curBuff < nalEnd; curBuff++)
                 payloadType += 0xFF;
             if (curBuff >= nalEnd)
                 return;
@@ -1623,7 +1612,7 @@ void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
                 return;
 
             int payloadSize = 0;
-            for(; *curBuff  ==  0xFF && curBuff < nalEnd; curBuff++) 
+            for(; *curBuff  ==  0xFF && curBuff < nalEnd; curBuff++)
                 payloadSize += 0xFF;
             if (curBuff >= nalEnd)
                 return;
@@ -1673,7 +1662,7 @@ int SEIUnit::updateSeiParam(SPSUnit& sps, bool removePulldown, int orig_hrd_para
         tmpBuffer[tmpBufferLen++] = payloadSize;
         if (curBuff >= nalEnd)
             break;
-        if (payloadType == 1) 
+        if (payloadType == 1)
         { // pic_timing
             pic_timing(sps, curBuff, payloadSize, orig_hrd_parameters_present_flag);
             if (removePulldown) {
@@ -1700,8 +1689,8 @@ int SEIUnit::updateSeiParam(SPSUnit& sps, bool removePulldown, int orig_hrd_para
         }
         else if (payloadType == 0 && (
             (!orig_hrd_parameters_present_flag && !sps.vcl_hrd_parameters_present_flag) || removePulldown)
-            ) 
-        { 
+            )
+        {
             tmpBufferLen -= 2; // skip this sei message
         }
         else {
@@ -1770,9 +1759,9 @@ void SEIUnit::sei_payload(SPSUnit& sps, int payloadType, const quint8* curBuff, 
         reserved_sei_message( payloadSize );
     /*
     if( !byte_aligned( ) ) {
-    bit_equal_to_one  // equal to 1 
+    bit_equal_to_one  // equal to 1
     while( !byte_aligned( ) )
-    bit_equal_to_zero  // equal to 0 
+    bit_equal_to_zero  // equal to 0
     }
     */
 }
@@ -1789,7 +1778,7 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
     writer.putBits(8, 0);
     int beforeMessageLen = writer.getBitsCount();
     // pic timing
-    if (sps.nal_hrd_parameters_present_flag || sps.vcl_hrd_parameters_present_flag) 
+    if (sps.nal_hrd_parameters_present_flag || sps.vcl_hrd_parameters_present_flag)
     {
         m_cpb_removal_delay_baseaddr = writer.getBuffer();
         m_cpb_removal_delay_bitpos = writer.getBitsCount();
@@ -1816,7 +1805,7 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
                 NumClockTS = 3;
                 break;
         }
-        for(int i = 0; i < NumClockTS; i++ ) 
+        for(int i = 0; i < NumClockTS; i++ )
             writer.putBit(0); //clock_timestamp_flag
     }
     write_byte_align_bits(writer);
@@ -1841,14 +1830,14 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
     // buffering period
     writeUEGolombCode(writer, sps.seq_parameter_set_id);
     if (sps.nal_hrd_parameters_present_flag) { // NalHrdBpPresentFlag
-        for(int SchedSelIdx = 0; SchedSelIdx <= sps.cpb_cnt_minus1; SchedSelIdx++ ) 
+        for(int SchedSelIdx = 0; SchedSelIdx <= sps.cpb_cnt_minus1; SchedSelIdx++ )
         {
             writer.putBits(sps.initial_cpb_removal_delay_length_minus1 + 1, initial_cpb_removal_delay[SchedSelIdx]);
             writer.putBits(sps.initial_cpb_removal_delay_length_minus1 + 1, initial_cpb_removal_delay_offset[SchedSelIdx]);
         }
     }
     if (sps.vcl_hrd_parameters_present_flag) { // NalHrdBpPresentFlag
-        for(int SchedSelIdx = 0; SchedSelIdx <= sps.cpb_cnt_minus1; SchedSelIdx++ ) 
+        for(int SchedSelIdx = 0; SchedSelIdx <= sps.cpb_cnt_minus1; SchedSelIdx++ )
         {
             writer.putBits(sps.initial_cpb_removal_delay_length_minus1 + 1, initial_cpb_removal_delay[SchedSelIdx]);
             writer.putBits(sps.initial_cpb_removal_delay_length_minus1 + 1, initial_cpb_removal_delay_offset[SchedSelIdx]);
@@ -1864,8 +1853,8 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
     writer.flushBits();
 }
 
-void SEIUnit::pic_timing(SPSUnit& sps, const quint8* curBuff, int payloadSize, 
-                         bool orig_hrd_parameters_present_flag) 
+void SEIUnit::pic_timing(SPSUnit& sps, const quint8* curBuff, int payloadSize,
+                         bool orig_hrd_parameters_present_flag)
 {
     /*
     bool nal_hrd_param_flag = sps.nal_hrd_parameters_present_flag;
@@ -1876,18 +1865,18 @@ void SEIUnit::pic_timing(SPSUnit& sps, const quint8* curBuff, int payloadSize,
     bool CpbDpbDelaysPresentFlag = orig_hrd_parameters_present_flag == 1 || sps.vcl_hrd_parameters_present_flag == 1;
     bitReader.setBuffer(curBuff, curBuff + payloadSize);
     cpb_removal_delay = dpb_output_delay = 0;
-    if( CpbDpbDelaysPresentFlag ) {        
+    if( CpbDpbDelaysPresentFlag ) {
         cpb_removal_delay = bitReader.getBits(sps.cpb_removal_delay_length_minus1 + 1);
         dpb_output_delay = bitReader.getBits(sps.dpb_output_delay_length_minus1 + 1);
-    }        
-    if( sps.pic_struct_present_flag ) {        
+    }
+    if( sps.pic_struct_present_flag ) {
         pic_struct = bitReader.getBits(4);
         pic_struct = pic_struct;
         /*
         int numClockTS = 0; //getNumClockTS();
         for( int i = 0; i < numClockTS; i++ ) {
             Clock_timestamp_flag[i] = bitReader.getBit();
-            if( clock_timestamp_flag[i] ) {        
+            if( clock_timestamp_flag[i] ) {
                 Ct_type    = bitReader.getBits(2);
                 nuit_field_based_flag = bitReader.getBit();
                 counting_type bitReader.getBits(5);
@@ -1895,13 +1884,13 @@ void SEIUnit::pic_timing(SPSUnit& sps, const quint8* curBuff, int payloadSize,
                 discontinuity_flag    = bitReader.getBit();
                 cnt_dropped_flag = bitReader.getBit();
                 n_frames = bitReader.getBits(8);
-                if( full_timestamp_flag ) {        
+                if( full_timestamp_flag ) {
                     seconds_value = bitReader.getBits(6);
                     minutes_value = bitReader.getBits(6);
                     hours_value = bitReader.getBits(5);
-                } else {        
+                } else {
                     seconds_flag = bitReader.getBit();
-                    if( seconds_flag ) {        
+                    if( seconds_flag ) {
                         seconds_value = bitReader.getBits(6);
                         minutes_flag = bitReader.getBit();
                         if( minutes_flag ) {
@@ -1936,7 +1925,7 @@ void SEIUnit::pan_scan_rect(int /*payloadSize*/) {}
 void SEIUnit::filler_payload(int /*payloadSize*/) {}
 void SEIUnit::user_data_registered_itu_t_t35(int /*payloadSize*/) {}
 
-void SEIUnit::user_data_unregistered(const quint8* data, int payloadSize) 
+void SEIUnit::user_data_unregistered(const quint8* data, int payloadSize)
 {
     m_userDataPayload << QPair<const quint8*, int>(data, payloadSize);
 }
@@ -1958,7 +1947,6 @@ void SEIUnit::film_grain_characteristics(int /*payloadSize*/) {}
 void SEIUnit::deblocking_filter_display_preference(int /*payloadSize*/) {}
 void SEIUnit::stereo_video_info(int /*payloadSize*/) {}
 void SEIUnit::reserved_sei_message(int /*payloadSize*/) {}
-
 
 namespace h264
 {

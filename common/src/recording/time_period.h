@@ -7,9 +7,16 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-class QN_EXPORT QnTimePeriod
+class QnTimePeriod;
+
+class QnTimePeriod
 {
 public:
+
+    static const qint64 UnlimitedPeriod;
+    static const qint64 kMaxTimeValue;
+    static const qint64 kMinTimeValue;
+
     /**
      * Constructs a null time period.
      */
@@ -38,8 +45,15 @@ public:
     static constexpr QnTimePeriod fromInterval(qint64 startTimeMs, qint64 endTimeMs)
     {
         return startTimeMs <= endTimeMs
-            ? QnTimePeriod(startTimeMs, endTimeMs)
-            : QnTimePeriod(endTimeMs, startTimeMs);
+            ? QnTimePeriod(startTimeMs, endTimeMs - startTimeMs)
+            : QnTimePeriod(endTimeMs, startTimeMs - endTimeMs);
+    };
+
+    static constexpr QnTimePeriod fromInterval(
+        const std::chrono::milliseconds& startTime,
+        const std::chrono::milliseconds& endTime)
+    {
+        return fromInterval(startTime.count(), endTime.count());
     };
 
     QnTimePeriod& operator = (const QnTimePeriod &other);
@@ -143,6 +157,9 @@ public:
 
     void setStartTime(std::chrono::milliseconds value);
     std::chrono::milliseconds startTime() const;
+
+    void setEndTime(std::chrono::milliseconds value);
+    std::chrono::milliseconds endTime() const;
 
     void setDuration(std::chrono::milliseconds value);
     std::chrono::milliseconds duration() const;

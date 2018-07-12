@@ -22,6 +22,9 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+using nx::vms::api::EventType;
+using nx::vms::api::ActionType;
+
 namespace {
 
 // In "live mode", every kUpdateTimerInterval newly happened events are fetched.
@@ -75,12 +78,12 @@ void EventSearchListModel::Private::setCamera(const QnVirtualCameraResourcePtr& 
     refreshUpdateTimer();
 }
 
-vms::event::EventType EventSearchListModel::Private::selectedEventType() const
+vms::api::EventType EventSearchListModel::Private::selectedEventType() const
 {
     return m_selectedEventType;
 }
 
-void EventSearchListModel::Private::setSelectedEventType(vms::event::EventType value)
+void EventSearchListModel::Private::setSelectedEventType(vms::api::EventType value)
 {
     if (m_selectedEventType == value)
         return;
@@ -119,8 +122,7 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
                 return QVariant();
             /*fallthrough*/
         case Qn::TimestampRole:
-            return QVariant::fromValue(std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::microseconds(event.eventParams.eventTimestampUsec)).count());
+            return QVariant::fromValue(event.eventParams.eventTimestampUsec);
 
         case Qn::ResourceRole:
             return hasPreview(event.eventParams.eventType)
@@ -153,7 +155,7 @@ void EventSearchListModel::Private::clear()
 
 bool EventSearchListModel::Private::hasAccessRights() const
 {
-    return q->accessController()->hasGlobalPermission(Qn::GlobalViewLogsPermission);
+    return q->accessController()->hasGlobalPermission(GlobalPermission::viewLogs);
 }
 
 rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
@@ -344,10 +346,10 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
         if (timestampMs(event) > m_latestTimeMs)
             break;
 
-        if (!alreadyExists(event) && event.actionType != vms::event::undefinedAction)
+        if (!alreadyExists(event) && event.actionType != ActionType::undefinedAction)
             continue;
 
-        event.actionType = vms::event::undefinedAction; //< Use as flag.
+        event.actionType = ActionType::undefinedAction; //< Use as flag.
         --count;
     }
 
@@ -359,7 +361,7 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
     ScopedInsertRows insertRows(q,  0, count - 1);
     for (auto iter = data.rbegin(); iter != data.rend(); ++iter)
     {
-        if (iter->actionType != vms::event::undefinedAction)
+        if (iter->actionType != ActionType::undefinedAction)
             m_data.push_front(std::move(*iter));
     }
 
@@ -395,7 +397,7 @@ rest::Handle EventSearchListModel::Private::getEvents(const QnTimePeriod& period
     return server->restConnection()->getEvents(request, internalCallback, thread());
 }
 
-QString EventSearchListModel::Private::title(vms::event::EventType eventType) const
+QString EventSearchListModel::Private::title(vms::api::EventType eventType) const
 {
     return m_helper->eventName(eventType);
 }
@@ -410,41 +412,41 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
 {
     switch (parameters.eventType)
     {
-        case nx::vms::event::EventType::storageFailureEvent:
+        case nx::vms::api::EventType::storageFailureEvent:
             return qnSkin->pixmap(lit("events/storage_red.png"));
 
-        case nx::vms::event::EventType::backupFinishedEvent:
+        case nx::vms::api::EventType::backupFinishedEvent:
             return qnSkin->pixmap(lit("events/storage_green.png"));
 
-        case nx::vms::event::EventType::serverStartEvent:
+        case nx::vms::api::EventType::serverStartEvent:
             return qnSkin->pixmap(lit("events/server.png"));
 
-        case nx::vms::event::EventType::serverFailureEvent:
+        case nx::vms::api::EventType::serverFailureEvent:
             return qnSkin->pixmap(lit("events/server_red.png"));
 
-        case nx::vms::event::EventType::serverConflictEvent:
+        case nx::vms::api::EventType::serverConflictEvent:
             return qnSkin->pixmap(lit("events/server_yellow.png"));
 
-        case nx::vms::event::EventType::licenseIssueEvent:
+        case nx::vms::api::EventType::licenseIssueEvent:
             return qnSkin->pixmap(lit("events/license_red.png"));
 
-        case nx::vms::event::EventType::cameraDisconnectEvent:
+        case nx::vms::api::EventType::cameraDisconnectEvent:
             return qnSkin->pixmap(lit("events/connection_red.png"));
 
-        case nx::vms::event::EventType::networkIssueEvent:
-        case nx::vms::event::EventType::cameraIpConflictEvent:
+        case nx::vms::api::EventType::networkIssueEvent:
+        case nx::vms::api::EventType::cameraIpConflictEvent:
             return qnSkin->pixmap(lit("events/connection_yellow.png"));
 
-        case nx::vms::event::EventType::softwareTriggerEvent:
+        case nx::vms::api::EventType::softwareTriggerEvent:
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
                 parameters.description, QPalette().light().color());
 
         // TODO: #vkutin Fill with actual pixmaps as soon as they're created.
-        case nx::vms::event::EventType::cameraMotionEvent:
-        case nx::vms::event::EventType::cameraInputEvent:
+        case nx::vms::api::EventType::cameraMotionEvent:
+        case nx::vms::api::EventType::cameraInputEvent:
             return qnSkin->pixmap(lit("tree/camera.png"));
 
-        case nx::vms::event::EventType::analyticsSdkEvent:
+        case nx::vms::api::EventType::analyticsSdkEvent:
             return QPixmap();
 
         default:
@@ -452,37 +454,37 @@ QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters&
     }
 }
 
-QColor EventSearchListModel::Private::color(vms::event::EventType eventType)
+QColor EventSearchListModel::Private::color(vms::api::EventType eventType)
 {
     switch (eventType)
     {
-        case nx::vms::event::EventType::cameraDisconnectEvent:
-        case nx::vms::event::EventType::storageFailureEvent:
-        case nx::vms::event::EventType::serverFailureEvent:
+        case nx::vms::api::EventType::cameraDisconnectEvent:
+        case nx::vms::api::EventType::storageFailureEvent:
+        case nx::vms::api::EventType::serverFailureEvent:
             return qnGlobals->errorTextColor();
 
-        case nx::vms::event::EventType::networkIssueEvent:
-        case nx::vms::event::EventType::cameraIpConflictEvent:
-        case nx::vms::event::EventType::serverConflictEvent:
+        case nx::vms::api::EventType::networkIssueEvent:
+        case nx::vms::api::EventType::cameraIpConflictEvent:
+        case nx::vms::api::EventType::serverConflictEvent:
             return qnGlobals->warningTextColor();
 
-        case nx::vms::event::EventType::backupFinishedEvent:
+        case nx::vms::api::EventType::backupFinishedEvent:
             return qnGlobals->successTextColor();
 
-        //case nx::vms::event::EventType::licenseIssueEvent: //< TODO: normal or warning?
+        //case nx::vms::api::EventType::licenseIssueEvent: //< TODO: normal or warning?
         default:
             return QColor();
     }
 }
 
-bool EventSearchListModel::Private::hasPreview(vms::event::EventType eventType)
+bool EventSearchListModel::Private::hasPreview(vms::api::EventType eventType)
 {
     switch (eventType)
     {
-        case vms::event::cameraMotionEvent:
-        case vms::event::analyticsSdkEvent:
-        case vms::event::cameraInputEvent:
-        case vms::event::userDefinedEvent:
+        case EventType::cameraMotionEvent:
+        case EventType::analyticsSdkEvent:
+        case EventType::cameraInputEvent:
+        case EventType::userDefinedEvent:
             return true;
 
         default:

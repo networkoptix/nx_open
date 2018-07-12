@@ -49,7 +49,6 @@ namespace
     }
 }
 
-
 QnDlink_cam_info::QnDlink_cam_info()
 {
 }
@@ -75,7 +74,6 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width) const
     }
 
     QSize result = resolutions.at(0);
-
 
     for(const QSize& size: resolutions)
     {
@@ -142,7 +140,6 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
     return resolutionCloseTo(480);
 }
 
-
 // =======================================================================================
 
 QnPlDlinkResource::QnPlDlinkResource()
@@ -164,7 +161,8 @@ void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completion
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody ) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
+        nx::network::http::HttpHeaders /*httpResponseHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
             statusCode != nx::network::http::StatusCode::ok )
@@ -215,7 +213,7 @@ QnAbstractStreamDataProvider* QnPlDlinkResource::createLiveDataProvider()
     //return new MJPEGStreamReader(toSharedPointer(), "ipcam/stream.cgi?nowprofileid=2&audiostream=0");
     //return new MJPEGStreamReader(toSharedPointer(), "video/mjpg.cgi");
     //return new MJPEGStreamReader(toSharedPointer(), "video/mjpg.cgi?profileid=2");
-    return new PlDlinkStreamReader(toSharedPointer());
+    return new PlDlinkStreamReader(toSharedPointer(this));
 }
 
 void QnPlDlinkResource::setCroppingPhysical(QRect /*cropping*/)
@@ -249,10 +247,8 @@ CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-
     if (cam_info_file.size()==0)
         return CameraDiagnostics::UnknownErrorResult();
-
 
     QList<QByteArray> lines = cam_info_file.split('\n');
 
@@ -323,7 +319,6 @@ CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
         }
     }
 
-
     std::sort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), std::greater<int>());
     std::sort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
 
@@ -336,7 +331,6 @@ CameraDiagnostics::Result QnPlDlinkResource::initializeCameraDriver()
     // =======remove elements with diff aspect ratio
     if (m_camInfo.resolutions.size() < 2)
         return CameraDiagnostics::UnknownErrorResult();
-
 
     int w_0 = m_camInfo.resolutions.at(0).width();
     int h_0 = m_camInfo.resolutions.at(0).height();
@@ -380,11 +374,8 @@ static void setBitAt(int x, int y, unsigned char* data)
     data[offset] |= 0x01 << (x&7);
 }
 
-
 void QnPlDlinkResource::setMotionMaskPhysical(int channel)
 {
-    Q_UNUSED(channel);
-
     if (channel != 0)
         return; // motion info used always once even for multisensor cameras
 
@@ -417,12 +408,10 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     unsigned char maskBit[Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8];
     QnMetaDataV1::createMask(getMotionMask(0),  (char*)maskBit);
 
-
     QImage img(Qn::kMotionGridWidth, Qn::kMotionGridHeight, QImage::Format_Mono);
     memset(img.bits(), 0, img.byteCount());
     img.setColor(0, qRgb(0, 0, 0));
     img.setColor(1, qRgb(255, 255, 255));
-
 
     for (int x = 0; x  < Qn::kMotionGridWidth; ++x)
     {
@@ -432,8 +421,6 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
                 img.setPixel(x,y,1);
         }
     }
-
-
 
     QImage imgOut = img.scaled(32, 16);//, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
@@ -451,8 +438,6 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
         }
     }
 
-
-
     QString str;
     QTextStream stream(&str);
     stream << "config/motion.cgi?enable=yes&motioncvalue=" << sensitivity << "&mbmask=";
@@ -466,7 +451,6 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     }
 
     stream.flush();
-
 
     CLHttpStatus status;
     QByteArray result = downloadFile(status, str,  getHostAddress(), 80, 1000, getAuth());

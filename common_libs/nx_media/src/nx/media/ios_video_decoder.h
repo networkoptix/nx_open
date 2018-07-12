@@ -1,4 +1,5 @@
 #pragma once
+#include <QtCore/QtGlobal>
 #if defined (Q_OS_IOS)
 
 #include <QtCore/QObject>
@@ -19,7 +20,7 @@ class IOSVideoDecoderPrivate;
 class IOSVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    IOSVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
+    IOSVideoDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
     virtual ~IOSVideoDecoder();
 
     static bool isCompatible(
@@ -32,6 +33,7 @@ public:
     virtual int decode(
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
+    virtual Capabilities capabilities() const override;
 private:
     void ffmpegToQtVideoFrame(QVideoFramePtr* result);
 

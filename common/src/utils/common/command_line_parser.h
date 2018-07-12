@@ -22,7 +22,7 @@ namespace detail {
     }
 }
 
-class QN_EXPORT QnCommandLineParameter {
+class QnCommandLineParameter {
 public:
     template<class T>
     QnCommandLineParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
@@ -89,7 +89,7 @@ private:
 };
 
 
-class QN_EXPORT QnCommandLineParser
+class QnCommandLineParser
 {
 public:
     QnCommandLineParser() {}

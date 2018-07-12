@@ -20,8 +20,6 @@ struct AnalyticsEventType: nx::api::Analytics::EventType
 {
     // VCA-camera event type name (this name is sent by VCA-camera tcp notification server).
     QString internalName;
-    mutable QElapsedTimer elapsedTimer;
-    bool timerStarted() const noexcept { return elapsedTimer.isValid(); }
 };
 #define VcaAnalyticsEventType_Fields AnalyticsEventType_Fields(internalName)
 

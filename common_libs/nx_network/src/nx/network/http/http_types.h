@@ -41,6 +41,9 @@ const int DEFAULT_HTTPS_PORT = 443;
 NX_NETWORK_API extern const char* const kUrlSchemeName;
 NX_NETWORK_API extern const char* const kSecureUrlSchemeName;
 
+QString NX_NETWORK_API urlSheme(bool isSecure);
+bool NX_NETWORK_API isUrlSheme(const QString& scheme);
+
 /**
  * TODO: #ak Consider using another container.
  * Need some buffer with:
@@ -61,12 +64,12 @@ typedef nx::Buffer StringType;
 int NX_NETWORK_API strcasecmp(const StringType& one, const StringType& two);
 
 int NX_NETWORK_API defaultPortForScheme(const StringType& scheme);
+int NX_NETWORK_API defaultPort(bool isSecure);
 
 /**
  * Comparator for case-insensitive comparison in STL associative containers.
  */
-struct NX_NETWORK_API ci_less:
-    std::binary_function<QByteArray, QByteArray, bool>
+struct NX_NETWORK_API ci_less
 {
     /** Case-independent (ci) compare_less binary function. */
     bool operator() (const QByteArray& c1, const QByteArray& c2) const
@@ -179,6 +182,7 @@ enum Value
 
     internalServerError = 500,
     notImplemented = 501,
+    badGateway = 502,
     serviceUnavailable = 503
 };
 
@@ -204,8 +208,12 @@ public:
     static const StringType put;
     static const StringType delete_;
     static const StringType options;
+    static const StringType connect;
 
     static bool isMessageBodyAllowed(ValueType);
+    static bool isMessageBodyAllowedInResponse(
+        ValueType method,
+        StatusCode::Value statusCode);
 };
 
 /**
@@ -332,6 +340,10 @@ public:
         const ConstBufferRefType& boundary) const;
     StringType toString() const;
     StringType toMultipartString(const ConstBufferRefType& boundary) const;
+
+    void setCookie(const StringType& name, const StringType& value, const StringType& path = "/");
+    void setDeletedCookie(const StringType& name);
+    std::map<StringType, StringType> getCookies() const;
 };
 
 NX_NETWORK_API bool isMessageBodyPresent(const Response& response);
@@ -672,6 +684,44 @@ public:
     bool operator==(const StrictTransportSecurity&) const;
     bool parse(const nx::network::http::StringType& strValue);
     StringType toString() const;
+};
+
+class NX_NETWORK_API XForwardedFor
+{
+public:
+    static const StringType NAME;
+
+    StringType client;
+    std::vector<StringType> proxies;
+
+    bool parse(const StringType& str);
+};
+
+struct NX_NETWORK_API ForwardedElement
+{
+    StringType by;
+    StringType for_;
+    StringType host;
+    StringType proto;
+
+    bool parse(const StringType& str);
+
+    bool operator==(const ForwardedElement& right) const;
+};
+
+class NX_NETWORK_API Forwarded
+{
+public:
+    static const StringType NAME;
+
+    std::vector<ForwardedElement> elements;
+
+    Forwarded() = default;
+    Forwarded(std::vector<ForwardedElement> elements);
+
+    bool parse(const StringType& str);
+
+    bool operator==(const Forwarded& right) const;
 };
 
 } // namespace header

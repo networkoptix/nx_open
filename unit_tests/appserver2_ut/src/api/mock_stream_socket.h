@@ -5,30 +5,27 @@
 class MockStreamSocket: public nx::network::AbstractStreamSocket
 {
 public:
-    virtual bool setNoDelay(bool value) override { QN_UNUSED(value); return true; }
-    virtual bool getNoDelay(bool* value) const override { QN_UNUSED(value); return true; }
-    virtual bool toggleStatisticsCollection(bool val) override { QN_UNUSED(val); return true; }
-    virtual bool getConnectionStatistics(nx::network::StreamSocketInfo* info) override { QN_UNUSED(info); return true; }
-    virtual bool setKeepAlive(boost::optional<nx::network::KeepAliveOptions> info) override { QN_UNUSED(info); return true; }
-    virtual bool getKeepAlive(boost::optional<nx::network::KeepAliveOptions>* result) const override { QN_UNUSED(result); return true; }
+    virtual bool setNoDelay(bool /*value*/) override { return true; }
+    virtual bool getNoDelay(bool* /*value*/) const override { return true; }
+    virtual bool toggleStatisticsCollection(bool /*val*/) override { return true; }
+    virtual bool getConnectionStatistics(nx::network::StreamSocketInfo* /*info*/) override { return true; }
+    virtual bool setKeepAlive(boost::optional<nx::network::KeepAliveOptions> /*info*/) override { return true; }
+    virtual bool getKeepAlive(boost::optional<nx::network::KeepAliveOptions>* /*result*/) const override { return true; }
 
     virtual bool connect(
         const nx::network::SocketAddress& remoteSocketAddress,
-        std::chrono::milliseconds timeout) override
+        std::chrono::milliseconds /*timeout*/) override
     {
-        QN_UNUSED(remoteSocketAddress, timeout);
         return true;
     }
 
-    virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override
+    virtual int recv(void* /*buffer*/, unsigned int bufferLen, int /*flags*/ = 0) override
     {
-        QN_UNUSED(buffer, flags);
         return bufferLen;
     }
 
-    virtual int send(const void* buffer, unsigned int bufferLen) override
+    virtual int send(const void* /*buffer*/, unsigned int bufferLen) override
     {
-        QN_UNUSED(buffer);
         return bufferLen;
     }
 
@@ -40,43 +37,32 @@ public:
     virtual bool isConnected() const { return true; };
 
     virtual void connectAsync(
-        const nx::network::SocketAddress& address,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+        const nx::network::SocketAddress& /*address*/,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/) override
     {
-        QN_UNUSED(address, handler);
     }
 
     virtual void readSomeAsync(
-        nx::Buffer* const buffer,
-        nx::network::IoCompletionHandler handler) override
+        nx::Buffer* const /*buffer*/,
+        nx::network::IoCompletionHandler /*handler*/) override
     {
-        QN_UNUSED(buffer, handler);
     }
 
     virtual void sendAsync(
-        const nx::Buffer& buffer,
-        nx::network::IoCompletionHandler handler) override
+        const nx::Buffer& /*buffer*/,
+        nx::network::IoCompletionHandler /*handler*/) override
     {
-        QN_UNUSED(buffer, handler);
     }
 
     virtual void registerTimer(
-        std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void()> handler) override
+        std::chrono::milliseconds /*timeout*/,
+        nx::utils::MoveOnlyFunc<void()> /*handler*/) override
     {
-        QN_UNUSED(timeout, handler);
     }
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        QN_UNUSED(eventType, handler);
-    }
+    virtual void cancelIoInAioThread(nx::network::aio::EventType /*eventType*/) override {}
 
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override { QN_UNUSED(eventType); }
-
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override { QN_UNUSED(handler); }
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> /*handler*/) override {}
 
     virtual void pleaseStopSync() {}
 
@@ -199,6 +185,11 @@ public:
         return true;
     }
 
+    virtual bool setIpv6Only(bool /*val*/) override
+    {
+        return true;
+    }
+
     virtual SOCKET_HANDLE handle() const override
     {
         return SOCKET_HANDLE();
@@ -209,9 +200,9 @@ public:
         return nullptr;
     }
 
-    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override { QN_UNUSED(handler); }
+    virtual void post(nx::utils::MoveOnlyFunc<void()> /*handler*/) override {}
 
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override { QN_UNUSED(handler); }
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> /*handler*/) override {}
 
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override
     {
@@ -234,4 +225,3 @@ private:
     nx::network::aio::AbstractAioThread* m_aioThread = nullptr;
     nx::network::SocketAddress m_localAddress;
 };
-

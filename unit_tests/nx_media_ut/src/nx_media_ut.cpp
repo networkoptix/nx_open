@@ -51,11 +51,17 @@ static QString qSizeToString(const QSize& size)
 class MockVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    MockVideoDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/)
+    MockVideoDecoder(
+        const RenderContextSynchronizerPtr& /*synchronizer*/, const QSize& /*resolution*/)
     {
     }
 
     virtual ~MockVideoDecoder() {}
+
+    virtual Capabilities capabilities() const override
+    {
+        return Capability::noCapability;
+    }
 
     static bool isCompatible(
         const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/)
@@ -123,9 +129,9 @@ public:
     void setSupportsTranscoding(bool supportsTranscoding)
     {
         if (supportsTranscoding)
-            setServerFlags(getServerFlags() | Qn::SF_SupportsTranscoding);
+            setServerFlags(getServerFlags() | nx::vms::api::SF_SupportsTranscoding);
         else
-            setServerFlags(getServerFlags() & ~Qn::SF_SupportsTranscoding);
+            setServerFlags(getServerFlags() & ~nx::vms::api::SF_SupportsTranscoding);
     }
 };
 
@@ -186,7 +192,7 @@ public:
     /** Either resolution can be empty - the corresponding stream will not be created. */
     void setStreams(QSize highResolution, QSize lowResolution)
     {
-        removeProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
+        setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString());
 
         // For mock camera, use a codec that will never match any reasonable transcoding codec.
         static const int kCodec = /*102400*/ AV_CODEC_ID_PROBE;
@@ -572,7 +578,9 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     T.channels(4).noTrans()
                .low(320, 240).high(1920, 1080).max(1920, 1080).req(high) >> low;
 
-    #undef T
+    T                        .high(4096, 2160).max(1920, 1080).req(1080) >> QSize(1920, 1012);
+
+#undef T
 }
 
 } // namespace test

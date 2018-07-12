@@ -24,21 +24,22 @@
 
 #include <utils/common/html.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/busy_indicator_button.h>
-#include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/common/widgets/busy_indicator_button.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/network/app_info.h>
 
 #include <watchers/cloud_status_watcher.h>
 
 #include <utils/common/app_info.h>
 
 using namespace nx::cdb;
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -49,7 +50,7 @@ rest::QnConnectionPtr getPublicServerConnection(QnResourcePool* resourcePool)
 {
     for (const QnMediaServerResourcePtr server: resourcePool->getAllServers(Qn::Online))
     {
-        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP))
             continue;
 
         return server->restConnection();
@@ -86,7 +87,7 @@ private:
 public:
     std::unique_ptr<api::Connection> cloudConnection;
     bool linkedSuccessfully;
-    QnBusyIndicatorButton* indicatorButton;
+    BusyIndicatorButton* indicatorButton;
 };
 
 QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
@@ -96,7 +97,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
 {
     ui->setupUi(this);
     setWindowTitle(tr("Connect to %1",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
 
     Q_D(QnConnectToCloudDialog);
 
@@ -120,21 +121,21 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->enterCloudAccountLabel->setFont(font);
     ui->enterCloudAccountLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->enterCloudAccountLabel->setText(tr("Enter %1 Account",
-        "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+        "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
     ui->enterCloudAccountLabel->setForegroundRole(QPalette::Light);
 
     ui->loginInputField->setTitle(tr("Email"));
-    ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
+    ui->loginInputField->setValidator(defaultEmailValidator(false));
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
-    ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
+    ui->passwordInputField->setValidator(defaultPasswordValidator(false));
 
     ui->createAccountLabel->setText(makeHref(tr("Create account"), urlHelper.createAccountUrl()));
     ui->forgotPasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
 
-    auto aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    auto aligner = new Aligner(this);
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
 
     auto opacityEffect = new QGraphicsOpacityEffect(this);
@@ -146,8 +147,8 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     auto effectiveName = qnCloudStatusWatcher->effectiveUserName();
     ui->loginInputField->setText(effectiveName);
 
-    connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
-    connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
+    connect(ui->loginInputField,    &InputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
+    connect(ui->passwordInputField, &InputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
     connect(this, &QnConnectToCloudDialog::bindFinished,
         d, &QnConnectToCloudDialogPrivate::at_bindFinished, Qt::QueuedConnection);
     setWarningStyle(ui->invalidCredentialsLabel);
@@ -187,7 +188,7 @@ QnConnectToCloudDialogPrivate::QnConnectToCloudDialogPrivate(QnConnectToCloudDia
     QObject(parent),
     q_ptr(parent),
     linkedSuccessfully(false),
-    indicatorButton(new QnBusyIndicatorButton(parent))
+    indicatorButton(new BusyIndicatorButton(parent))
 {
 }
 
@@ -273,10 +274,10 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)
     Q_Q(QnConnectToCloudDialog);
 
     linkedSuccessfully = true;
-    q->menu()->trigger(action::HideCloudPromoAction);
+    q->menu()->trigger(ui::action::HideCloudPromoAction);
 
-    QnMessageBox::success(q->parentWidget(),
-        tr("System connected to %1", "%1 is the cloud name (like 'Nx Cloud')")
+    QnMessageBox::success(q,
+        tr("System connected to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::network::AppInfo::cloudName()));
 
     // Since we have QTBUG-40585 event loops of dialogs shouldn't be intersected.
@@ -288,7 +289,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
     Q_Q(QnConnectToCloudDialog);
 
     QnMessageBox::critical(q,
-        tr("Failed to connect System to %1", "%1 is the cloud name (like 'Nx Cloud')")
+        tr("Failed to connect System to %1", "%1 is the cloud name (like Nx Cloud)")
             .arg(nx::network::AppInfo::cloudName()),
         message);
 
@@ -308,11 +309,15 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         {
             case api::ResultCode::badUsername:
             case api::ResultCode::notAuthorized:
-                showCredentialsError(QnCloudResultMessages::invalidCredentials());
+                showCredentialsError(QnCloudResultMessages::invalidPassword());
                 break;
 
             case api::ResultCode::accountNotActivated:
                 showCredentialsError(QnCloudResultMessages::accountNotActivated());
+                break;
+
+            case api::ResultCode::accountBlocked:
+                showCredentialsError(QnCloudResultMessages::userLockedOut());
                 break;
 
             default:

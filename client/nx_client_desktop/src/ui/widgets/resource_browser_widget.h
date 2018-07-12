@@ -32,13 +32,11 @@ class HoverFocusProcessor;
 class QnResourceTreeModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
-class QnTextEditLabel;
+class TextEditLabel;
 class QnGraphicsToolTipWidget;
-class QnCameraThumbnailManager;
+namespace nx { namespace client { namespace desktop { class CameraThumbnailManager; }}}
 
-namespace Ui {
-    class ResourceBrowserWidget;
-}
+namespace Ui { class ResourceBrowserWidget; }
 
 class QnResourceBrowserWidget:
     public QWidget,
@@ -159,6 +157,6 @@ private:
     QMap<nx::client::desktop::ui::action::IDType, QAction*> m_renameActions;
     QnDisconnectHelperPtr m_disconnectHelper;
 
-    QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
+    QScopedPointer<nx::client::desktop::CameraThumbnailManager> m_thumbnailManager;
     QnResourcePtr m_tooltipResource;
 };

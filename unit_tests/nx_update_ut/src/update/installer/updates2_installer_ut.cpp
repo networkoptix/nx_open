@@ -1,15 +1,19 @@
-#include <nx/update/installer/detail/updates2_installer_base.h>
-#include <nx/utils/std/future.h>
-#include <nx/utils/raii_guard.h>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <nx/update/installer/detail/updates2_installer_base.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/raii_guard.h>
+#include <nx/vms/api/data/system_information.h>
+
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 namespace test {
 
 using namespace ::testing;
+using nx::vms::api::SystemInformation;
 
 namespace {
 
@@ -24,8 +28,8 @@ public:
     MOCK_CONST_METHOD0(dataDirectoryPath, QString());
     MOCK_METHOD0(cleanInstallerDirectory, bool());
     MOCK_CONST_METHOD0(createZipExtractor, AbstractZipExtractorPtr());
-    MOCK_CONST_METHOD0(updateInformation, QVariantMap());
-    MOCK_CONST_METHOD0(systemInformation, QnSystemInformation());
+    MOCK_CONST_METHOD1(updateInformation, QVariantMap(const QString&));
+    MOCK_CONST_METHOD0(systemInformation, SystemInformation());
     MOCK_CONST_METHOD1(checkExecutable, bool(const QString&));
     MOCK_CONST_METHOD2(
         initializeUpdateLog,
@@ -56,7 +60,7 @@ public:
 
     virtual void extractAsync(
         const QString& /*filePath*/,
-        const QString& /*outputDir*/,
+        const QString& outputDir,
         ExtractHandler extractHandler) override
     {
         {
@@ -65,7 +69,7 @@ public:
         }
 
         std::thread(
-            [this, self = this, extractHandler]()
+            [this, self = this, extractHandler, outputDir]()
             {
                 auto decReqCountGuard = QnRaiiGuard::createDestructible(
                     [self]()
@@ -86,9 +90,9 @@ public:
                     case ExpectedPrepareOutcome::fail_platformNotMatches:
                     case ExpectedPrepareOutcome::fail_archNotMatches:
                     case ExpectedPrepareOutcome::fail_modificationNotMatches:
-                        return extractHandler(QnZipExtractor::Error::Ok);
+                        return extractHandler(QnZipExtractor::Error::Ok, outputDir);
                     case ExpectedPrepareOutcome::fail_noFreeSpace:
-                        return extractHandler(QnZipExtractor::Error::NoFreeSpace);
+                        return extractHandler(QnZipExtractor::Error::NoFreeSpace, QString());
                     case ExpectedPrepareOutcome::fail_cleanFailed:
                         NX_ASSERT(false);
                         break;
@@ -97,7 +101,7 @@ public:
                         QnMutexLocker lock(&self->m_mutex);
                         while (!m_mayProceed)
                             m_proceedCondition.wait(lock.mutex());
-                        return extractHandler(QnZipExtractor::Error::Ok);
+                        return extractHandler(QnZipExtractor::Error::Ok, outputDir);
                     }
                     case ExpectedPrepareOutcome::fail_unknown:
                         NX_ASSERT(false);
@@ -224,9 +228,9 @@ private:
                     case ExpectedPrepareOutcome::fail_platformNotMatches:
                     case ExpectedPrepareOutcome::fail_archNotMatches:
                     case ExpectedPrepareOutcome::fail_modificationNotMatches:
-                        return QnSystemInformation(kValidPlatform, kValidArch, KValidModification);
+                        return SystemInformation(kValidPlatform, kValidArch, KValidModification);
                     default:
-                        return QnSystemInformation();
+                        return SystemInformation();
                 }
             };
 
@@ -294,7 +298,7 @@ private:
                     || expectedOutcome == ExpectedPrepareOutcome::fail_archNotMatches
                     || expectedOutcome == ExpectedPrepareOutcome::fail_modificationNotMatches)
                 {
-                    EXPECT_CALL(m_updates2Installer, updateInformation())
+                    EXPECT_CALL(m_updates2Installer, updateInformation(_))
                         .Times(1)
                         .WillOnce(Return(createUpdateInformation()));
 
@@ -313,7 +317,7 @@ private:
 
                 if (expectedOutcome == ExpectedPrepareOutcome::fail_noExecutableKeyInUpdateJson)
                 {
-                    EXPECT_CALL(m_updates2Installer, updateInformation())
+                    EXPECT_CALL(m_updates2Installer, updateInformation(_))
                         .Times(1)
                         .WillOnce(Return(createUpdateInformation()));
                 }
@@ -343,7 +347,7 @@ private:
                 break;
             case ExpectedPrepareOutcome::fail_noUpdateJsonFile:
                 prepareExtractorCalls(1);
-                EXPECT_CALL(m_updates2Installer, updateInformation())
+                EXPECT_CALL(m_updates2Installer, updateInformation(_))
                     .Times(1)
                     .WillOnce(Return(createUpdateInformation()));
                 break;
@@ -426,5 +430,6 @@ TEST_F(Updates2Installer, prepareFailed_modificationNotMatches)
 
 } // namespace test
 } // namespace detail
+} // namespace installer
 } // namespace update
 } // namespace nx

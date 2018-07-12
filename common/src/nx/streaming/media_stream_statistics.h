@@ -17,7 +17,7 @@ enum QnMediaStreamStatisticsEvent
     CL_STAT_END //< Must not be used in onEvent.
 };
 
-class QN_EXPORT QnMediaStreamStatistics
+class QnMediaStreamStatistics
 {
     struct EventStat
     {

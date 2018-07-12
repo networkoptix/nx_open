@@ -24,6 +24,9 @@
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
+#include <nx/client/desktop/resource_views/data/camera_extra_status.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
@@ -40,22 +43,31 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 constexpr int kSeparatorItemHeight = 16;
 constexpr int kExtraTextMargin = 5;
 static constexpr int kMaxResourceNameLength = 120; // TODO: #GDM Think about common place to use.
 
+bool isCollapsibleNode(const QModelIndex& index)
+{
+    NX_ASSERT(index.model());
+    if (!index.model())
+        return false;
+
+    return index.model()->rowCount(index) > 0;
+}
+
 } // namespace
 
 
 QnResourceItemDelegate::QnResourceItemDelegate(QObject* parent):
     base_type(parent),
-    m_workbench(),
     m_recordingIcon(qnSkin->icon("tree/recording.png")),
     m_scheduledIcon(qnSkin->icon("tree/scheduled.png")),
     m_buggyIcon(qnSkin->icon("tree/buggy.png")),
-    m_colors(),
     m_fixedHeight(style::Metrics::kViewRowHeight),
     m_rowSpacing(0),
     m_customInfoLevel(Qn::ResourceInfoLevel::RI_Invalid),
@@ -236,7 +248,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         if (textEnd > textPos.x())
         {
             const auto main = m_textPixmapCache.pixmap(baseName, option.font, mainColor,
-                textEnd - textPos.x(), option.textElideMode);
+                textEnd - textPos.x() + 1, option.textElideMode);
 
             if (!main.pixmap.isNull())
             {
@@ -257,29 +269,8 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         }
     }
 
-    QRect extraIconRect(iconRect);
-    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-
-    /* Draw "recording" or "scheduled" icon: */
-    if (m_options.testFlag(RecordingIcons))
-    {
-        extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
-
-        const bool recording = camera && camera->getStatus() == Qn::Recording;
-        const bool scheduled = camera && !camera->isScheduleDisabled();
-
-        if (recording || scheduled)
-            (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, extraIconRect);
-    }
-
-    /* Draw "problems" icon: */
-    if (m_options.testFlag(ProblemIcons))
-    {
-        extraIconRect.moveLeft(extraIconRect.left() - extraIconRect.width());
-        if (camera && camera->statusFlags().testFlag(Qn::CSF_HasIssuesFlag))
-            m_buggyIcon.paint(painter, extraIconRect);
-    }
+    const auto indentation = style->pixelMetric(QStyle::PM_TreeViewIndentation);
+    paintExtraStatus(painter, iconRect, index);
 }
 
 QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const
@@ -366,8 +357,8 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
     if (option->icon.isNull())
         option->decorationSize = defaultDecorationSize;
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (Qn::isSeparatorNode(nodeType))
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
+    if (isSeparatorNode(nodeType))
         option->features = QStyleOptionViewItem::None;
     else
         option->features |= QStyleOptionViewItem::HasDisplay;
@@ -463,12 +454,12 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
     if (!workbench())
         return ItemState::normal;
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
 
     switch (nodeType)
     {
-        case Qn::CurrentSystemNode:
-        case Qn::CurrentUserNode:
+        case ResourceTreeNodeType::currentSystem:
+        case ResourceTreeNodeType::currentUser:
             return ItemState::selected;
 
         /*
@@ -480,10 +471,10 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
          * Videowall is Selected when we are in videowall review or control mode.
         */
 
-        case Qn::ResourceNode:
-        case Qn::SharedLayoutNode:
-        case Qn::EdgeNode:
-        case Qn::SharedResourceNode:
+        case ResourceTreeNodeType::resource:
+        case ResourceTreeNodeType::sharedLayout:
+        case ResourceTreeNodeType::edge:
+        case ResourceTreeNodeType::sharedResource:
         {
             QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
             NX_ASSERT(resource);
@@ -499,16 +490,16 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
             return itemStateForMediaResource(index);
         }
 
-        case Qn::RecorderNode:
+        case ResourceTreeNodeType::recorder:
             return itemStateForRecorder(index);
 
-        case Qn::LayoutItemNode:
+        case ResourceTreeNodeType::layoutItem:
             return itemStateForLayoutItem(index);
 
-        case Qn::VideoWallItemNode:
+        case ResourceTreeNodeType::videoWallItem:
             return itemStateForVideoWallItem(index);
 
-        case Qn::LayoutTourNode:
+        case ResourceTreeNodeType::layoutTour:
             return itemStateForLayoutTour(index);
 
         default:
@@ -704,13 +695,13 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     if (infoLevel == Qn::RI_NameOnly)
         return;
 
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+    const auto nodeType = index.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
 
-    if (nodeType == Qn::VideoWallItemNode)
+    if (nodeType == ResourceTreeNodeType::videoWallItem)
     {
         // skip videowall screens
     }
-    else if (nodeType == Qn::RecorderNode)
+    else if (nodeType == ResourceTreeNodeType::recorder)
     {
         auto firstChild = index.model()->index(0, 0, index);
         if (!firstChild.isValid()) /* This can happen in rows deleting */
@@ -723,7 +714,8 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         if (!resource)
             return;
 
-        if ((nodeType == Qn::LayoutItemNode || nodeType == Qn::SharedResourceNode)
+        if ((nodeType == ResourceTreeNodeType::layoutItem
+                || nodeType == ResourceTreeNodeType::sharedResource)
             && resource->hasFlags(Qn::server)
             && !resource->hasFlags(Qn::fake))
         {
@@ -767,4 +759,52 @@ QVariant QnResourceItemDelegate::rowCheckState(const QModelIndex& index) const
 
     const auto checkIndex = index.sibling(index.row(), m_checkBoxColumn);
     return checkIndex.data(Qt::CheckStateRole);
+}
+
+void QnResourceItemDelegate::paintExtraStatus(
+    QPainter* painter,
+    const QRect& iconRect,
+    const QModelIndex& index) const
+{
+    const auto extraStatus = index.data(Qn::CameraExtraStatusRole).value<CameraExtraStatus>();
+    if (extraStatus == CameraExtraStatus())
+        return;
+
+    QRect extraIconRect(iconRect);
+
+    // Check if there are too much icons for this indentaion level.
+    const auto shiftIconLeft =
+        [&extraIconRect]
+        {
+            const int pos = extraIconRect.left() - style::Metrics::kDefaultIconSize;
+            extraIconRect.moveLeft(pos);
+            return pos >= 0;
+        };
+
+    // Leave space for collapser if needed.
+    if (isCollapsibleNode(index))
+        shiftIconLeft();
+
+    // Draw "recording" or "scheduled" icon.
+    if (m_options.testFlag(RecordingIcons)
+        && (extraStatus.testFlag(CameraExtraStatusFlag::recording)
+            || extraStatus.testFlag(CameraExtraStatusFlag::scheduled)))
+    {
+        if (!shiftIconLeft())
+            return;
+
+        const auto& icon = extraStatus.testFlag(CameraExtraStatusFlag::recording)
+            ? m_recordingIcon
+            : m_scheduledIcon;
+        icon.paint(painter, extraIconRect);
+    }
+
+    // Draw "problems" icon.
+    if (m_options.testFlag(ProblemIcons) && extraStatus.testFlag(CameraExtraStatusFlag::buggy))
+    {
+        if (!shiftIconLeft())
+            return;
+
+        m_buggyIcon.paint(painter, extraIconRect);
+    }
 }

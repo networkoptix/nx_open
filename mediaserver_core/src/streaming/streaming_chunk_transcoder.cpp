@@ -6,7 +6,8 @@
 #include <nx/utils/timer_manager.h>
 
 #include <api/helpers/camera_id_helper.h>
-#include <providers/h264_mp4_to_annexb.h>
+#include <providers/filtered_ondemand_data_provider.h>
+#include <media/filters/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <recording/time_period.h>
@@ -18,6 +19,8 @@
 #include "live_media_cache_reader.h"
 #include "streaming_chunk_cache_key.h"
 #include "streaming_chunk_transcoder_thread.h"
+#include <media_server/media_server_module.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 /**
  * Maximum time offset (in micros) requested chunk can be ahead of current live position.
@@ -216,7 +219,8 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
         }
         else
         {
-            mediaDataProvider = createArchiveReader(cameraResource, transcodeParams, QnUuid());
+            mediaDataProvider = createArchiveReader(
+                cameraResource, transcodeParams, QnUuid());
             //< TODO: #dmishin Pass real client id
         }
 
@@ -224,13 +228,14 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
             return nullptr;
 
         dataSourceCtx->mediaDataProvider = AbstractOnDemandDataProviderPtr(
-            new H264Mp4ToAnnexB(mediaDataProvider));
+            new FilteredOnDemandDataProvider(mediaDataProvider, std::make_shared<H264Mp4ToAnnexB>()));
     }
 
     if (!dataSourceCtx->transcoder)
     {
         // Creating transcoder.
-        dataSourceCtx->transcoder = createTranscoder(cameraResource, transcodeParams);
+        dataSourceCtx->transcoder =
+            createTranscoder(cameraResource, transcodeParams);
         if (!dataSourceCtx->transcoder)
         {
             NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
@@ -297,7 +302,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
 
     // Creating archive reader.
     QSharedPointer<QnAbstractStreamDataProvider> dp(
-        cameraResource->createDataProvider(Qn::CR_Archive));
+        qnServerModule->dataProviderFactory()->createDataProvider(cameraResource, Qn::CR_Archive));
     if (!dp)
     {
         NX_LOGX(lm("StreamingChunkTranscoder::transcodeAsync. "
@@ -325,6 +330,7 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
     archiveReader->setPlaybackRange(QnTimePeriod(
         transcodeParams.startTimestamp() / USEC_IN_MSEC,
         duration_cast<milliseconds>(transcodeParams.duration()).count()));
+
     auto mediaDataProvider = OnDemandMediaDataProviderPtr(new OnDemandMediaDataProvider(dp));
     archiveReader->start();
 
@@ -479,7 +485,7 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
                                                 //< This resolution is ignored when TM_DirectStreamCopy is used.
         }
     }
-    if (transcoder->setVideoCodec(codecID, transcodeMethod, Qn::QualityNormal, videoResolution) != 0)
+    if (transcoder->setVideoCodec(codecID, transcodeMethod, Qn::StreamQuality::normal, videoResolution) != 0)
     {
         NX_LOGX(lm("Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
             arg(transcodeParams.videoCodec()).arg(transcodeParams.startTimestamp()).
@@ -488,16 +494,17 @@ std::unique_ptr<QnTranscoder> StreamingChunkTranscoder::createTranscoder(
         return nullptr;
     }
 
-    // TODO/hls: #ak Hls audio.
-    if (!transcodeParams.audioCodec().isEmpty())
+    if (transcodeParams.audioCodecId() != AV_CODEC_ID_NONE)
     {
-        //if( transcoder->setAudioCodec( AV_CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
-        //{
-        //    NX_LOGX(lm("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
-        //        arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp()).
-        //        arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
-        //    return nullptr;
-        //}
+        if (transcoder->setAudioCodec(
+                transcodeParams.audioCodecId(),
+                QnTranscoder::TM_DirectStreamCopy) != 0)
+        {
+            NX_LOGX(lm("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
+                arg(transcodeParams.audioCodecId()).arg(transcodeParams.startTimestamp()).
+                arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING);
+            return nullptr;
+        }
     }
 
     return transcoder;

@@ -9,8 +9,9 @@ from rdep import Rdep
 class RdepSyncher:
     def __init__(self, rdep_repo_root):
         self.versions = {}
+        self.locations = {}
         self.rdep_target = None
-        self.prefer_debug_packages = False
+        self.use_local = False
 
         self.rdep = Rdep(rdep_repo_root)
         self.rdep.fast_check = True
@@ -25,26 +26,23 @@ class RdepSyncher:
         self.rdep.targets = [target] if target else [self.rdep_target]
 
         version = self.versions.get(pack)
+        path = self.locations.get(pack)
 
         full_package_name = pack + "-" + version if version else pack
 
-        package_found = False
-        if self.prefer_debug_packages:
-            if self.rdep.sync_package(full_package_name + "-debug"):
-                package_found = True
-                full_package_name += "-debug"
+        if not path:
+            sync_func = self.rdep.locate_package if self.use_local else self.rdep.sync_package
 
-        if not package_found:
-            package_found = self.rdep.sync_package(full_package_name)
+            if not sync_func(full_package_name):
+                if not optional:
+                    print("error: Cannot sync package {}".format(package), file=sys.stderr)
+                    exit(1)
 
-        if not package_found:
-            if not optional:
-                print("error: Cannot sync package {}".format(package), file=sys.stderr)
-                exit(1)
+                return False
 
-            return False
+            path = self.rdep.locate_package(full_package_name)
 
-        path = self.rdep.locate_package(full_package_name).replace("\\", "/")
+        path = path.replace("\\", "/")
 
         self._synched_package_dirs.append(path)
         if path_variable:

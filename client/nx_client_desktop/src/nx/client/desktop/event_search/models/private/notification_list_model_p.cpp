@@ -29,6 +29,9 @@ namespace desktop {
 
 using namespace ui;
 
+using nx::vms::api::EventType;
+using nx::vms::api::ActionType;
+
 namespace {
 
 static const auto kDisplayTimeout = std::chrono::milliseconds(12500);
@@ -116,11 +119,15 @@ NotificationListModel::Private::ExtraData NotificationListModel::Private::extraD
 
 void NotificationListModel::Private::addNotification(const vms::event::AbstractActionPtr& action)
 {
+    using namespace std::chrono;
+
     const auto& params = action->getRuntimeParams();
     const auto ruleId = action->getRuleId();
 
     auto title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
-    const auto timestampMs = params.eventTimestampUsec / 1000;
+    const auto timestampUs = params.eventTimestampUsec;
+    const auto timestampMs =
+        duration_cast<milliseconds>(microseconds(params.eventTimestampUsec)).count();
 
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -139,7 +146,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
     alarmCameras = alarmCameras.toSet().toList();
 
-    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
+    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
     {
         if (alarmCameras.isEmpty())
             return;
@@ -151,8 +158,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
             {
                 for (const auto& id: ids)
                 {
-                    if (q->indexOf(id).data(Qn::TimestampRole).value<qint64>() == timestampMs)
-                    return;
+                    if (q->indexOf(id).data(Qn::TimestampRole).value<qint64>() == timestampUs)
+                        return;
                 }
             }
         }
@@ -164,8 +171,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         vms::event::AggregationInfo(), qnSettings->extraInfoInTree());
 
     // TODO: #GDM #3.1 move this code to ::eventDetails()
-    if (params.eventType == vms::event::licenseIssueEvent
-        && params.reasonCode == vms::event::EventReason::licenseRemoved)
+    if (params.eventType == EventType::licenseIssueEvent
+        && params.reasonCode == vms::api::EventReason::licenseRemoved)
     {
         QStringList disabledCameras;
         for (const auto& stringId: params.description.split(L';'))
@@ -189,11 +196,11 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.toolTip = tooltip.join(lit("<br>"));
     eventData.helpId = QnBusiness::eventHelpId(params.eventType);
     eventData.level = QnNotificationLevel::valueOf(action);
-    eventData.timestampMs = timestampMs;
+    eventData.timestampUs = timestampUs;
     eventData.removable = true;
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
 
-    if (action->actionType() == vms::event::playSoundAction)
+    if (action->actionType() == ActionType::playSoundAction)
     {
         const auto soundUrl = action->getParams().url;
         if (!m_itemsByLoadingSound.contains(soundUrl))
@@ -202,7 +209,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         m_itemsByLoadingSound.insert(soundUrl, eventData.id);
     }
 
-    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
+    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
     {
         eventData.actionId = action::OpenInAlarmLayoutAction;
         eventData.actionParameters = alarmCameras;
@@ -213,20 +220,20 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     {
         switch (params.eventType)
         {
-            case vms::event::cameraMotionEvent:
-            case vms::event::softwareTriggerEvent:
-            case vms::event::analyticsSdkEvent:
+            case EventType::cameraMotionEvent:
+            case EventType::softwareTriggerEvent:
+            case EventType::analyticsSdkEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 eventData.actionId = action::OpenInNewTabAction;
                 eventData.actionParameters = action::Parameters(camera)
                     .withArgument(Qn::ItemTimeRole, timestampMs);
                 eventData.previewCamera = camera;
-                eventData.previewTimeMs = timestampMs;
+                eventData.previewTimeUs = timestampUs;
                 break;
             }
 
-            case vms::event::cameraInputEvent:
+            case EventType::cameraInputEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 eventData.actionId = action::OpenInNewTabAction;
@@ -235,8 +242,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 break;
             }
 
-            case vms::event::cameraDisconnectEvent:
-            case vms::event::networkIssueEvent:
+            case EventType::cameraDisconnectEvent:
+            case EventType::networkIssueEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 eventData.actionId = action::CameraSettingsAction;
@@ -245,10 +252,10 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 break;
             }
 
-            case vms::event::storageFailureEvent:
-            case vms::event::backupFinishedEvent:
-            case vms::event::serverStartEvent:
-            case vms::event::serverFailureEvent:
+            case EventType::storageFailureEvent:
+            case EventType::backupFinishedEvent:
+            case EventType::serverStartEvent:
+            case EventType::serverFailureEvent:
             {
                 NX_ASSERT(hasViewPermission);
                 eventData.actionId = action::ServerSettingsAction;
@@ -256,7 +263,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 break;
             }
 
-            case vms::event::cameraIpConflictEvent:
+            case EventType::cameraIpConflictEvent:
             {
                 const auto& webPageAddress = params.caption;
                 eventData.actionId = action::BrowseUrlAction;
@@ -264,13 +271,13 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                 break;
             }
 
-            case vms::event::licenseIssueEvent:
+            case EventType::licenseIssueEvent:
             {
                 eventData.actionId = action::PreferencesLicensesTabAction;
                 break;
             }
 
-            case vms::event::userDefinedEvent:
+            case EventType::userDefinedEvent:
             {
                 auto sourceCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                     params.metadata.cameraRefs);
@@ -283,7 +290,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
                     if (sourceCameras.size() == 1)
                         eventData.previewCamera = sourceCameras[0];
                     eventData.cameras = sourceCameras;
-                    eventData.previewTimeMs = timestampMs;
+                    eventData.previewTimeUs = timestampUs;
                     camera = sourceCameras.first();
                 }
                 break;
@@ -294,10 +301,10 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         }
     }
 
-    if (eventData.removable && action->actionType() != vms::event::playSoundAction)
+    if (eventData.removable && action->actionType() != ActionType::playSoundAction)
         eventData.lifetimeMs = std::chrono::milliseconds(kDisplayTimeout).count();
 
-    if (action->actionType() == vms::event::showPopupAction && camera)
+    if (action->actionType() == ActionType::showPopupAction && camera)
         setupAcknowledgeAction(eventData, camera, action);
 
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
@@ -333,7 +340,7 @@ void NotificationListModel::Private::removeNotification(const vms::event::Abstra
                 q->removeEvent(id);
         };
 
-    if (action->actionType() == vms::event::playSoundAction)
+    if (action->actionType() == ActionType::playSoundAction)
     {
         for (const auto& ids: uuidHash.values()) //< Must iterate a copy of the list.
             removeEvents(ids.toList());
@@ -353,13 +360,13 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     const QnVirtualCameraResourcePtr& camera,
     const nx::vms::event::AbstractActionPtr& action)
 {
-    if (action->actionType() != vms::event::ActionType::showPopupAction)
+    if (action->actionType() != vms::api::ActionType::showPopupAction)
     {
         NX_ASSERT(false, Q_FUNC_INFO, "Invalid action type");
         return;
     }
 
-    if (!context()->accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission))
+    if (!context()->accessController()->hasGlobalPermission(GlobalPermission::manageBookmarks))
         return;
 
     auto& actionParams = action->getParams();
@@ -415,15 +422,15 @@ QPixmap NotificationListModel::Private::pixmapForAction(
             break;
     }
 
-    if (action->actionType() == vms::event::playSoundAction)
+    if (action->actionType() == ActionType::playSoundAction)
         return qnSkin->pixmap("events/sound.png");
 
-    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
+    if (action->actionType() == ActionType::showOnAlarmLayoutAction)
         return qnSkin->pixmap("events/alarm.png");
 
     const auto& params = action->getRuntimeParams();
 
-    if (params.eventType >= vms::event::userDefinedEvent)
+    if (params.eventType >= EventType::userDefinedEvent)
     {
         const auto camList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
             params.metadata.cameraRefs);
@@ -434,10 +441,10 @@ QPixmap NotificationListModel::Private::pixmapForAction(
 
     switch (params.eventType)
     {
-        case vms::event::cameraMotionEvent:
-        case vms::event::cameraInputEvent:
-        case vms::event::cameraIpConflictEvent:
-        case vms::event::analyticsSdkEvent:
+        case EventType::cameraMotionEvent:
+        case EventType::cameraInputEvent:
+        case EventType::cameraIpConflictEvent:
+        case EventType::analyticsSdkEvent:
         {
             const auto resource = resourcePool()->getResourceById(params.eventResourceId);
             return toPixmap(resource
@@ -445,27 +452,27 @@ QPixmap NotificationListModel::Private::pixmapForAction(
                 : qnResIconCache->icon(QnResourceIconCache::Camera));
         }
 
-        case vms::event::softwareTriggerEvent:
+        case EventType::softwareTriggerEvent:
         {
             return QnSoftwareTriggerPixmaps::colorizedPixmap(
                 action->getRuntimeParams().description,
                 color.isValid() ? color : QPalette().light().color());
         }
 
-        case vms::event::storageFailureEvent:
+        case EventType::storageFailureEvent:
             return qnSkin->pixmap("events/storage.png");
 
-        case vms::event::cameraDisconnectEvent:
-        case vms::event::networkIssueEvent:
+        case EventType::cameraDisconnectEvent:
+        case EventType::networkIssueEvent:
             return qnSkin->pixmap("events/connection.png");
 
-        case vms::event::serverStartEvent:
-        case vms::event::serverFailureEvent:
-        case vms::event::serverConflictEvent:
-        case vms::event::backupFinishedEvent:
+        case EventType::serverStartEvent:
+        case EventType::serverFailureEvent:
+        case EventType::serverConflictEvent:
+        case EventType::backupFinishedEvent:
             return qnSkin->pixmap("events/server.png");
 
-        case vms::event::licenseIssueEvent:
+        case EventType::licenseIssueEvent:
             return qnSkin->pixmap("events/license.png");
 
         default:

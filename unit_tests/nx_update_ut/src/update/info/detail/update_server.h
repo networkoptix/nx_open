@@ -44,8 +44,8 @@ private:
         for (const auto& updateTestData : test_support::updateTestDataList())
         {
             QString updatePath = lit("/%1/%2%3")
-                .arg(updateTestData.customization)
-                .arg(updateTestData.version)
+                .arg(updateTestData.customization())
+                .arg(updateTestData.build)
                 .arg(m_updatePathSuffix);
             m_httpServer.registerStaticProcessor(updatePath, updateTestData.json, m_jsonMimeType);
         }

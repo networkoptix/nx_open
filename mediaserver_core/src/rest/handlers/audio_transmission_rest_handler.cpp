@@ -14,13 +14,11 @@ namespace
 }
 
 int QnAudioTransmissionRestHandler::executeGet(
-    const QString &path,
+    const QString& /*path*/,
     const QnRequestParams &params,
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* )
 {
-    QN_UNUSED(path);
-
     QString errorStr;
     if (!validateParams(params, errorStr))
     {

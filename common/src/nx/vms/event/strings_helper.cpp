@@ -2,6 +2,7 @@
 
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/resource_display_info.h>
@@ -82,29 +83,31 @@ QString StringsHelper::actionName(ActionType value) const
 {
     switch (value)
     {
-        case undefinedAction:         return QString();
-        case bookmarkAction:          return tr("Bookmark");
-        case panicRecordingAction:    return tr("Panic recording");
-        case sendMailAction:          return tr("Send email");
-        case diagnosticsAction:       return tr("Write to log");
-        case showPopupAction:         return tr("Show notification");
-        case playSoundAction:         return tr("Repeat sound");
-        case playSoundOnceAction:     return tr("Play sound");
-        case sayTextAction:           return tr("Speak");
-        case executePtzPresetAction:  return tr("Execute PTZ preset");
-        case showTextOverlayAction:   return tr("Show text overlay");
-        case showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
-        case execHttpRequestAction:   return tr("Do HTTP request");
-        case acknowledgeAction:       return tr("Acknowledge");
-        case openLayoutAction:        return tr("Open layout");
+        case ActionType::undefinedAction:         return QString();
+        case ActionType::bookmarkAction:          return tr("Bookmark");
+        case ActionType::panicRecordingAction:    return tr("Panic recording");
+        case ActionType::sendMailAction:          return tr("Send email");
+        case ActionType::diagnosticsAction:       return tr("Write to log");
+        case ActionType::showPopupAction:         return tr("Show notification");
+        case ActionType::playSoundAction:         return tr("Repeat sound");
+        case ActionType::playSoundOnceAction:     return tr("Play sound");
+        case ActionType::sayTextAction:           return tr("Speak");
+        case ActionType::executePtzPresetAction:  return tr("Execute PTZ preset");
+        case ActionType::showTextOverlayAction:   return tr("Show text overlay");
+        case ActionType::showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
+        case ActionType::execHttpRequestAction:   return tr("Do HTTP request");
+        case ActionType::acknowledgeAction:       return tr("Acknowledge");
+        case ActionType::openLayoutAction:        return tr("Open layout");
+        case ActionType::fullscreenCameraAction:  return tr("Set to fullscreen");
+        case ActionType::exitFullscreenAction:    return tr("Exit fullscreen");
 
-        case cameraOutputAction:
+        case ActionType::cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Device output"),
                 tr("Camera output"));
 
-        case cameraRecordingAction:
+        case ActionType::cameraRecordingAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Device recording"),
@@ -120,50 +123,50 @@ QString StringsHelper::actionName(ActionType value) const
 
 QString StringsHelper::eventName(EventType value, int count) const
 {
-    if (value >= userDefinedEvent)
+    if (value >= EventType::userDefinedEvent)
     {
         QString result = tr("Generic Event");
-        if (value > userDefinedEvent)
-            result += lit(" (%1)").arg((int)value - (int)userDefinedEvent); // reserved for future use
+        if (value > EventType::userDefinedEvent)
+            result += lit(" (%1)").arg((int)value - (int)EventType::userDefinedEvent); // reserved for future use
         return result;
     }
 
     switch (value)
     {
-        case cameraMotionEvent:    return tr("Motion on Cameras", "", count);
-        case storageFailureEvent:  return tr("Storage Failure");
-        case networkIssueEvent:    return tr("Network Issue");
-        case serverFailureEvent:   return tr("Server Failure");
-        case serverConflictEvent:  return tr("Server Conflict");
-        case serverStartEvent:     return tr("Server Started");
-        case licenseIssueEvent:    return tr("License Issue");
-        case backupFinishedEvent:  return tr("Archive backup finished");
-        case analyticsSdkEvent:    return tr("Analytics Event");
+        case EventType::cameraMotionEvent:    return tr("Motion on Cameras", "", count);
+        case EventType::storageFailureEvent:  return tr("Storage Issue");
+        case EventType::networkIssueEvent:    return tr("Network Issue");
+        case EventType::serverFailureEvent:   return tr("Server Failure");
+        case EventType::serverConflictEvent:  return tr("Server Conflict");
+        case EventType::serverStartEvent:     return tr("Server Started");
+        case EventType::licenseIssueEvent:    return tr("License Issue");
+        case EventType::backupFinishedEvent:  return tr("Archive backup finished");
+        case EventType::analyticsSdkEvent:    return tr("Analytics Event");
 
-        case anyServerEvent:       return tr("Any Server Issue");
-        case anyEvent:             return tr("Any Event");
+        case EventType::anyServerEvent:       return tr("Any Server Issue");
+        case EventType::anyEvent:             return tr("Any Event");
 
-        case softwareTriggerEvent: return tr("Soft Trigger");
+        case EventType::softwareTriggerEvent: return tr("Soft Trigger");
 
-        case cameraInputEvent:
+        case EventType::cameraInputEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                     tr("Input Signal on Devices", "", count),
                     tr("Input Signal on Cameras", "", count));
 
-        case cameraDisconnectEvent:
+        case EventType::cameraDisconnectEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Devices Disconnected", "", count),
                 tr("Cameras Disconnected", "", count));
 
-        case cameraIpConflictEvent:
+        case EventType::cameraIpConflictEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Devices IP Conflict", "", count),
                 tr("Cameras IP Conflict", "", count));
 
-        case anyCameraEvent:
+        case EventType::anyCameraEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Any Device Issue"),
@@ -183,50 +186,50 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
 
     switch (params.eventType)
     {
-        case undefinedEvent:
+        case EventType::undefinedEvent:
             return tr("Undefined event has occurred on %1").arg(resourceName);
 
-        case cameraDisconnectEvent:
+        case EventType::cameraDisconnectEvent:
             return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Device %1 was disconnected"),
                     tr("Camera %1 was disconnected"),
                     tr("I/O Module %1 was disconnected")), camera).arg(resourceName);
 
-        case cameraInputEvent:
+        case EventType::cameraInputEvent:
             return tr("Input on %1").arg(resourceName);
 
-        case cameraMotionEvent:
+        case EventType::cameraMotionEvent:
             return tr("Motion on %1").arg(resourceName);
 
-        case storageFailureEvent:
-            return tr("Storage Failure at %1").arg(resourceName);
+        case EventType::storageFailureEvent:
+            return tr("Storage Issue at %1").arg(resourceName);
 
-        case networkIssueEvent:
+        case EventType::networkIssueEvent:
             return tr("Network Issue at %1").arg(resourceName);
 
-        case serverFailureEvent:
+        case EventType::serverFailureEvent:
             return tr("Server \"%1\" Failure").arg(resourceName);
 
-        case cameraIpConflictEvent:
+        case EventType::cameraIpConflictEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
                 tr("Device IP Conflict at %1", "Device IP Conflict at <server_name>"),
                 tr("Camera IP Conflict at %1", "Camera IP Conflict at <server_name>"))
                 .arg(resourceName);
 
-        case serverConflictEvent:
+        case EventType::serverConflictEvent:
             return tr("Server \"%1\" Conflict").arg(resourceName);
 
-        case serverStartEvent:
+        case EventType::serverStartEvent:
             return tr("Server \"%1\" Started").arg(resourceName);
 
-        case licenseIssueEvent:
+        case EventType::licenseIssueEvent:
             return tr("Server \"%1\" has a license problem").arg(resourceName);
 
-        case backupFinishedEvent:
+        case EventType::backupFinishedEvent:
             return tr("Server \"%1\" has finished an archive backup").arg(resourceName);
 
-        case userDefinedEvent:
+        case EventType::userDefinedEvent:
         {
             if (!params.caption.isEmpty())
                 return params.caption;
@@ -236,12 +239,19 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 : tr("Generic Event at %1").arg(params.resourceName);
         }
 
-        case softwareTriggerEvent:
+        case EventType::softwareTriggerEvent:
             return tr("Soft Trigger %1 at %2")
                 .arg(getSoftwareTriggerName(params))
                 .arg(resourceName);
 
-        case analyticsSdkEvent:
+        case EventType::analyticsSdkEvent:
+            if (!params.caption.isEmpty())
+            {
+                return lit("%1 - %2")
+                    .arg(getAnalyticsSdkEventName(params))
+                    .arg(params.caption);
+            }
+
             return tr("%1 at %2", "Analytics Event at some camera")
                 .arg(getAnalyticsSdkEventName(params))
                 .arg(resourceName);
@@ -253,7 +263,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
 
 QString StringsHelper::eventAtResources(const EventParameters& params) const
 {
-    if (params.eventType == softwareTriggerEvent)
+    if (params.eventType == EventType::softwareTriggerEvent)
     {
         return tr("Soft Trigger %1 has been activated multiple times")
             .arg(getSoftwareTriggerName(params));
@@ -291,7 +301,7 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
     if (!sourceText.isEmpty())
         result << tr("Source: %1").arg(sourceText);
 
-    if (eventType >= userDefinedEvent || eventType == analyticsSdkEvent)
+    if (eventType >= EventType::userDefinedEvent || eventType == EventType::analyticsSdkEvent)
     {
         if (!params.caption.isEmpty() && !params.description.startsWith(params.caption))
             result << tr("Caption: %1").arg(params.caption);
@@ -316,23 +326,23 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
     QStringList result;
     switch (params.eventType)
     {
-        case cameraInputEvent:
+        case EventType::cameraInputEvent:
         {
             result << tr("Input Port: %1").arg(params.inputPortId);
             break;
         }
 
-        case storageFailureEvent:
-        case networkIssueEvent:
-        case serverFailureEvent:
-        case licenseIssueEvent:
-        case backupFinishedEvent:
+        case EventType::storageFailureEvent:
+        case EventType::networkIssueEvent:
+        case EventType::serverFailureEvent:
+        case EventType::licenseIssueEvent:
+        case EventType::backupFinishedEvent:
         {
             result << tr("Reason: %1").arg(eventReason(params));
             break;
         }
 
-        case cameraIpConflictEvent:
+        case EventType::cameraIpConflictEvent:
         {
             result << tr("Conflicting Address: %1").arg(params.caption);
             int n = 0;
@@ -342,7 +352,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
             break;
         }
 
-        case serverConflictEvent:
+        case EventType::serverConflictEvent:
         {
             if (!params.description.isEmpty())
             {
@@ -368,16 +378,16 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
             break;
         }
 
-        case serverStartEvent:
+        case EventType::serverStartEvent:
             break;
 
-        case analyticsSdkEvent:
-        case userDefinedEvent:
+        case EventType::analyticsSdkEvent:
+        case EventType::userDefinedEvent:
             if (!params.description.isEmpty())
                 result << params.description;
             break;
 
-        case softwareTriggerEvent:
+        case EventType::softwareTriggerEvent:
             result << tr("Trigger: %1").arg(getSoftwareTriggerName(params));
             break;
 
@@ -388,7 +398,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
     return result;
 }
 
-QString StringsHelper::eventTimestampShort(const EventParameters &params,
+QString StringsHelper::eventTimestampInHtml(const EventParameters &params,
     int aggregationCount) const
 {
     const auto ts = params.eventTimestampUsec;
@@ -397,11 +407,11 @@ QString StringsHelper::eventTimestampShort(const EventParameters &params,
     const int count = qMax(aggregationCount, 1);
     return count == 1
         ? tr("%2 <b>%1</b>", "%1 means time, %2 means date")
-            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
-            .arg(time.date().toString(Qt::DefaultLocaleShortDate))
+            .arg(datetime::toString(time.time()))
+            .arg(datetime::toString(time.date()))
         : tr("%n times, first: %2 <b>%1</b>", "%1 means time, %2 means date", count)
-            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
-            .arg(time.date().toString(Qt::DefaultLocaleShortDate));
+            .arg(datetime::toString(time.time()))
+            .arg(datetime::toString(time.date()));
 }
 
 QString StringsHelper::eventTimestamp(const EventParameters &params,
@@ -413,25 +423,25 @@ QString StringsHelper::eventTimestamp(const EventParameters &params,
     const int count = qMax(aggregationCount, 1);
     return count == 1
         ? tr("Time: %1 on %2", "%1 means time, %2 means date")
-            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
-            .arg(time.date().toString(Qt::DefaultLocaleShortDate))
+            .arg(datetime::toString(time.time()))
+            .arg(datetime::toString(time.date()))
         : tr("First occurrence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
-            .arg(time.time().toString(Qt::DefaultLocaleShortDate))
-            .arg(time.date().toString(Qt::DefaultLocaleShortDate));
+            .arg(datetime::toString(time.time()))
+            .arg(datetime::toString(time.date()));
 }
 
 QString StringsHelper::eventTimestampDate(const EventParameters &params) const
 {
 	quint64 ts = params.eventTimestampUsec;
 	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return time.date().toString(Qt::DefaultLocaleShortDate);
+	return datetime::toString(time.date());
 }
 
 QString StringsHelper::eventTimestampTime(const EventParameters &params) const
 {
 	quint64 ts = params.eventTimestampUsec;
 	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-	return time.time().toString(Qt::DefaultLocaleShortDate);
+	return datetime::toString(time.time());
 }
 
 QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
@@ -545,7 +555,8 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             qint64 timeStampMs = params.description.toLongLong();
             QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
             // todo: #gdm add server/client timezone conversion
-            result = tr("Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+            result = tr("Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1").
+                arg(datetime::toString(dt));
         }
         case EventReason::backupDone:
         {
@@ -557,7 +568,8 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             qint64 timeStampMs = params.description.toLongLong();
             QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
             // todo: #gdm add server/client timezone conversion
-            result = tr("Archive backup is canceled by user. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+            result = tr("Archive backup is canceled by user. Data is backed up to %1").
+                arg(datetime::toString(dt));
             break;
         }
         case EventReason::licenseRemoved:
@@ -697,22 +709,23 @@ QString StringsHelper::defaultSoftwareTriggerName()
     return tr("Trigger Name");
 }
 
-QString StringsHelper::getSoftwareTriggerName(const QString& id)
+
+QString StringsHelper::getSoftwareTriggerName(const QString& name)
 {
-    const auto triggerId = id.trimmed();
+    const auto triggerId = name.trimmed();
     return triggerId.isEmpty() ? defaultSoftwareTriggerName() : triggerId;
 }
 
 QString StringsHelper::getSoftwareTriggerName(const EventParameters& params)
 {
-    NX_ASSERT(params.eventType == softwareTriggerEvent);
+    NX_ASSERT(params.eventType == EventType::softwareTriggerEvent);
     return getSoftwareTriggerName(params.caption);
 }
 
 QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const QString& locale) const
 {
-    NX_ASSERT(params.eventType == analyticsSdkEvent);
+    NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
     QnUuid driverId = params.analyticsDriverId();
     NX_EXPECT(!driverId.isNull());

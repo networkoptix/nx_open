@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/param.h>
 
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 
@@ -20,6 +20,7 @@
 #include <utils/common/util.h>
 #include <utils/crypt/symmetrical.h>
 #include <utils/math/math.h>
+#include <nx/utils/log/log_main.h>
 
 namespace {
 
@@ -53,17 +54,15 @@ QString QnVirtualCameraResource::getUniqueId() const
     return getPhysicalId();
 }
 
-QString QnVirtualCameraResource::toSearchString() const
+QStringList QnVirtualCameraResource::searchFilters() const
 {
-    QString result;
-    QTextStream(&result)
-        << QnNetworkResource::toSearchString()
-        << " "
+    QStringList result = QnNetworkResource::searchFilters()
         << getModel()
-        << " "
         << getFirmware()
-        << " "
-        << getVendor(); // TODO: #Elric evil!
+        << getVendor();
+    const int logicalId = this->logicalId();
+    if (logicalId > 0)
+        result << QString::number(logicalId);
     return result;
 }
 
@@ -74,7 +73,7 @@ bool QnVirtualCameraResource::isForcedAudioSupported() const {
 
 void QnVirtualCameraResource::forceEnableAudio()
 {
-	if (isForcedAudioSupported())
+    if (isForcedAudioSupported())
         return;
     setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     saveParams();
@@ -110,9 +109,12 @@ QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
     return streamUrls[roleStr].toString();
 }
 
-void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::ConnectionRole role)
+void QnVirtualCameraResource::updateSourceUrl(const QString& url,
+    Qn::ConnectionRole role,
+    bool save)
 {
-    if (!storeUrlForRole(role) || url.isEmpty())
+    NX_VERBOSE(this, lm("Update %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
+    if (!storeUrlForRole(role))
         return;
 
     auto cachedUrl = m_cachedStreamUrls.find(role);
@@ -130,14 +132,19 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::Connection
             return QString::fromUtf8(QJsonDocument(streamUrls).toJson());
         };
 
+    NX_DEBUG(this, lm("Save %1 stream %2 URL: %3").args(getPhysicalId(), role, url));
     if (updateProperty(Qn::CAMERA_STREAM_URLS, urlUpdater))
-        saveParams();
+    {
+        //TODO: #rvasilenko Setter and saving must be split.
+        if (save)
+            saveParams();
+    }
 }
 
 int QnVirtualCameraResource::saveAsync()
 {
-    ec2::ApiCameraData apiCamera;
-    fromResourceToApi(toSharedPointer(this), apiCamera);
+    nx::vms::api::CameraData apiCamera;
+    ec2::fromResourceToApi(toSharedPointer(this), apiCamera);
 
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
@@ -152,8 +159,8 @@ void QnVirtualCameraResource::issueOccured() {
         tooManyIssues = m_issueCounter >= MAX_ISSUE_CNT;
         m_lastIssueTimer.restart();
     }
-    if (tooManyIssues && !hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-        addStatusFlags(Qn::CSF_HasIssuesFlag);
+    if (tooManyIssues && !hasStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag)) {
+        addStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag);
         saveAsync();
     }
 }
@@ -166,8 +173,8 @@ void QnVirtualCameraResource::cleanCameraIssues() {
             return;
         m_issueCounter = 0;
     }
-    if (hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-        removeStatusFlags(Qn::CSF_HasIssuesFlag);
+    if (hasStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag)) {
+        removeStatusFlags(Qn::CameraStatusFlag::CSF_HasIssuesFlag);
         saveAsync();
     }
 }
@@ -183,16 +190,16 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
     return supportedMediaStreams;
 }
 
-CameraMediaStreamInfo QnVirtualCameraResource::defaultStream() const
+CameraMediaStreamInfo QnVirtualCameraResource::streamInfo(Qn::StreamIndex index) const
 {
     const auto streams = mediaStreams().streams;
-    auto defaultStream = std::find_if(streams.cbegin(), streams.cend(),
-        [](const CameraMediaStreamInfo& stream)
+    auto stream = std::find_if(streams.cbegin(), streams.cend(),
+        [index](const CameraMediaStreamInfo& stream)
         {
-            return (Qn::StreamIndex) stream.encoderIndex == Qn::StreamIndex::primary;
+            return (Qn::StreamIndex) stream.encoderIndex == index;
         });
-    if (defaultStream != streams.cend())
-        return *defaultStream;
+    if (stream != streams.cend())
+        return *stream;
 
     return CameraMediaStreamInfo();
 }
@@ -201,12 +208,24 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
 {
     using nx::vms::common::core::resource::SensorDescription;
 
-    qreal customAr = customAspectRatio();
-    if (!qFuzzyIsNull(customAr))
-        return QnAspectRatio::closestStandardRatio(static_cast<float>(customAr));
+    const auto customAr = customAspectRatio();
 
-    const auto stream = defaultStream();
-    const QSize size = stream.getResolution();
+    if (customAr.isValid())
+        return customAr;
+
+    // The rest of the code deals with auto aspect ratio.
+    // Aspect ration should be forced to AS of the first stream. Note: primary stream AR could be
+    // changed on the fly and a camera may not have a primary stream. In this case natural
+    // secondary stream AS should be used.
+    const auto stream = streamInfo(Qn::StreamIndex::primary);
+    QSize size = stream.getResolution();
+    if (size.isEmpty())
+    {
+        // Trying to use size from secondary stream
+        const auto secondary = streamInfo(Qn::StreamIndex::secondary);
+        size = secondary.getResolution();
+    }
+
     if (size.isEmpty())
         return QnAspectRatio();
 
@@ -244,7 +263,7 @@ static const bool transcodingAvailable = false;
 bool QnVirtualCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
 {
     //saving hasDualStreaming flag before locking mutex
-    const auto hasDualStreamingLocal = hasDualStreaming2();
+    const auto hasDualStreamingLocal = hasDualStreaming();
 
     //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
     QnMutexLocker lk( &m_mediaStreamsMutex );
@@ -395,6 +414,13 @@ bool QnVirtualCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitr
                 QString::fromUtf8(QJson::serialized(bitrateInfos)));
 
     return true;
+}
+
+void QnVirtualCameraResource::emitPropertyChanged(const QString& key)
+{
+    if (key == Qn::PTZ_CAPABILITIES_PARAM_NAME)
+        emit ptzCapabilitiesChanged(::toSharedPointer(this));
+    base_type::emitPropertyChanged(key);
 }
 
 void QnVirtualCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )

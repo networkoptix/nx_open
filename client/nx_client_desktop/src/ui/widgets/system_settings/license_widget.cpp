@@ -10,7 +10,6 @@
 
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/style/custom_style.h>
 
 #include <utils/email/email.h>
@@ -20,9 +19,9 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/html.h>
 
-#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/common/widgets/clipboard_button.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 namespace {
 bool isValidSerialKey(const QString &key)
@@ -72,21 +71,25 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     setPaletteColor(ui->manualActivationTextWidget, QPalette::WindowText,
         ui->manualActivationTextWidget->palette().color(QPalette::Light));
 
-    QString emailUrl(QnAppInfo::licensingEmailAddress());
-    QnEmailAddress licensingEmail(emailUrl);
+    const QString licensingAddress(QnAppInfo::licensingEmailAddress());
+    const QnEmailAddress licensingEmail(licensingAddress);
     QString activationText;
     if (licensingEmail.isValid())
     {
-        const QString emailLink = makeMailHref(emailUrl, emailUrl);
+        const QString emailLink = makeMailHref(licensingAddress, licensingAddress);
         activationText =
-            tr("Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
+            tr("Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
             .arg(emailLink);
     }
     else
     {
-        const QString siteLink = makeHref(emailUrl, emailUrl);
+        // Http links must be displayed on a separate string to avoid line break on "http://".
+        static const QString kLineBreak = lit("<br>");
+        const QString siteLink = kLineBreak
+            + makeHref(licensingAddress, licensingAddress)
+            + kLineBreak;
         activationText =
-            tr("Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.")
+            tr("Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
             .arg(siteLink);
     }
 
@@ -229,10 +232,10 @@ void QnLicenseWidget::changeEvent(QEvent *event)
 
 void QnLicenseWidget::at_browseLicenseFileButton_clicked()
 {
-    QString fileName = QnFileDialog::getOpenFileName(this,
+    QString fileName = QFileDialog::getOpenFileName(this,
                                                      tr("Open License File"),
                                                      QString(),
-                                                     tr("All files (*.*)"),
+                                                     tr("All files") + lit(" (*.*)"),
                                                      0,
                                                      QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())

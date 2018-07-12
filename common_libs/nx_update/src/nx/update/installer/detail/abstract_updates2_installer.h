@@ -6,6 +6,7 @@
 
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 
 enum class PrepareResult
@@ -31,5 +32,6 @@ public:
 };
 
 } // namespace detail
+} // namespace installer
 } // namespace update
 } // namespace nx

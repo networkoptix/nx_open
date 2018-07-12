@@ -53,11 +53,6 @@
       <translation>検出されたシステム %1 は互換性のないバージョン %2 です</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>現在のシステムは既に %1 に接続されているために他のシステムに接続できません</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>検出されたシステム %1 はセーフモードです</translation>
@@ -68,21 +63,6 @@
       <translation>リモート システム %1 を構成できませんでした</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>両方のシステムは %1 に接続しています　統合は許可されていません</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>これらのシステムは異なる %1 の URL で構築されています　統合は許可されていません</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>クラウド システムへの統合はクラウドに接続されていないシステムとのみ結合できます　システム名とパスワードはクラウド システムから取得されます。</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>新規システム</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>検出されたシステム%1は、現在のシステムと互換性がありません</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>現在のシステムは既に %1 に接続されているために他のシステムに接続できません</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>両方のシステムは %1 に接続しています　統合は許可されていません</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>これらのシステムは異なる %1 の URL で構築されています　統合は許可されていません</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>システムイベント</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>システムは既にクラウド（id %1）に接続されています</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>サーバーがインターネットに接続されていません</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>クラウドの資格情報をローカル データベースに保存できませんでした</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>クラウドの所有者をローカル データベースに保存できませんでした</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>クラウド  %1 に接続できません</translation>
     </message>
   </context>
   <context>
@@ -313,6 +333,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>まず、録画をOnにしてI/Oモジュール設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>ファームウェアを更新してください。最小サポートバージョンは %1です。現在のバージョンは %2です</translation>
     </message>
   </context>
   <context>
@@ -553,7 +577,7 @@
       <translation>不明なエラー</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>サーバーのハードウェアIDが見つかりません</translation>
     </message>
   </context>
@@ -670,12 +694,12 @@
       <translation>透かし: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ハードウェア Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>タイムライセンス</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ハードウェア ID: %1</translation>
     </message>
   </context>
   <context>
@@ -810,145 +834,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>無効なパラメータ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ミリ秒</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>分</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>時</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>日</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>週</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>年</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>ミリ秒</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>分</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>時</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation> 日</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>週</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>月</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>年</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>ミリ秒</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>秒</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>分</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>時</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform> 日</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>週</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform> 月</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform> 年</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1495,6 +1380,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%2 の %1</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>レイアウトを開く</translation>
     </message>
   </context>
   <context>

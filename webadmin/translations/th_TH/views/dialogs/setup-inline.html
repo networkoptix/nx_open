@@ -278,14 +278,15 @@
         <div class="form-group" validate-field>
 
             <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
-                   typeahead="system as system.visibleName for system in discoveredUrls | filter: {isNew:false, visibleName: $viewValue} | limitTo:8"
-                   typeahead-input-formatter="getSystemName($model)"
-                   typeahead-focus-on-select="false"
-                   typeahead-min-length="0"
-                   typeahead-show-hint="true"
-                   typeahead-focus-first="false"
-                   typeahead-focus
+                   uib-typeahead="system as system.visibleName for system in discoveredUrls | filter: {isNew:false, visibleName: $viewValue} | limitTo:8"
+                   uib-typeahead-input-formatter="getSystemName($model)"
+                   uib-typeahead-focus-on-select="false"
+                   uib-typeahead-min-length="0"
+                   uib-typeahead-show-hint="true"
+                   uib-typeahead-focus-first="false"
+                   uib-typeahead-focus
  placeholder="ระบบ URL ที่มีอยู่ (https://host:port)"
+                   ng-change="clearRemoteError()"
                    required
  class="form-control">
 
@@ -440,8 +441,7 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>ไม่สามารถตั้งค่าระบบได้</h2>
-    <p class="master-description">Something went totally wrong. <br>
-        Error description: {{settings.localError}}
+    <p class="master-description">มีบางอย่างผิดพลาดไปหมด <br> คำอธิบายข้อผิดพลาด: {{settings.localError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">ลองใหม่อีกครั้ง</button>

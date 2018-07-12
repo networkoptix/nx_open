@@ -19,7 +19,9 @@ nx_add_target(common LIBRARY
         Qt5::Xml Qt5::XmlPatterns Qt5::Sql
         ffmpeg
         detection_plugin_interface
-        nx_network nx_utils nx_fusion
+        nx_vms_api
+        nx_network nx_utils nx_sql nx_fusion
+        nx_plugin_utils
         cloud_db_client
 )
 

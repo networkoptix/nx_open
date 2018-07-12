@@ -17,7 +17,7 @@
 #include <database/server_db.h>
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
-#include <nx_ec/data/api_business_rule_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/event/action_factory.h>
@@ -86,29 +86,29 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
 {
     switch(action->actionType())
     {
-        case vms::event::sendMailAction:
+        case vms::api::ActionType::sendMailAction:
         {
             // Look for server with public IP address.
             const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
                 commonModule()->moduleGUID());
-            if (!server || (server->getServerFlags() & Qn::SF_HasPublicIP))
+            if (!server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); //< Do not proxy.
 
             const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
             for (const auto& server: onlineServers)
             {
-                if (server->getServerFlags() & Qn::SF_HasPublicIP)
+                if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                     return server;
             }
             return QnMediaServerResourcePtr();
         }
 
-        case vms::event::diagnosticsAction:
-        case vms::event::showPopupAction:
-        case vms::event::showTextOverlayAction:
-        case vms::event::showOnAlarmLayoutAction:
-        case vms::event::execHttpRequestAction:
-        case vms::event::openLayoutAction:
+        case vms::api::ActionType::diagnosticsAction:
+        case vms::api::ActionType::showPopupAction:
+        case vms::api::ActionType::showTextOverlayAction:
+        case vms::api::ActionType::showOnAlarmLayoutAction:
+        case vms::api::ActionType::execHttpRequestAction:
+        case vms::api::ActionType::openLayoutAction:
             return QnMediaServerResourcePtr(); //< Don't transfer to other server, execute here.
 
         default:
@@ -153,7 +153,7 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
     if (routeToServer)
     {
         // TODO: #rvasilenko It is better to use action.clone() here.
-        ec2::ApiBusinessActionData actionData;
+        nx::vms::api::EventActionData actionData;
         vms::event::AbstractActionPtr actionToSend;
 
         ec2::fromResourceToApi(action, actionData);
@@ -211,17 +211,18 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 
     switch (action->actionType())
     {
-        case vms::event::showTextOverlayAction:
-        case vms::event::showOnAlarmLayoutAction:
+        case vms::api::ActionType::showTextOverlayAction:
+        case vms::api::ActionType::showOnAlarmLayoutAction:
+        case vms::api::ActionType::fullscreenCameraAction:
         {
             if (action->getParams().useSource)
                 resources << resourcePool()->getResourcesByIds<QnNetworkResource>(action->getSourceResources());
             break;
         }
 
-        case vms::event::sayTextAction:
-        case vms::event::playSoundAction:
-        case vms::event::playSoundOnceAction:
+        case vms::api::ActionType::sayTextAction:
+        case vms::api::ActionType::playSoundAction:
+        case vms::api::ActionType::playSoundOnceAction:
         {
             if (!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
             {
@@ -273,14 +274,14 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
 
-        if (action->getToggleState() == vms::event::EventState::active)
+        if (action->getToggleState() == vms::api::EventState::active)
         {
             QSet<QnUuid>& runningRules = m_actionInProgress[actionKey];
             runningRules.insert(ruleId);
             if (runningRules.size() > 2)
                 return true; //< Ignore duplicated start.
         }
-        else if (action->getToggleState() == vms::event::EventState::inactive)
+        else if (action->getToggleState() == vms::api::EventState::inactive)
         {
             QSet<QnUuid>& runningRules = m_actionInProgress[actionKey];
             runningRules.remove(ruleId);
@@ -293,15 +294,17 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
 
     switch (action->actionType())
     {
-        case vms::event::diagnosticsAction:
+        case vms::api::ActionType::diagnosticsAction:
             return true;
 
-        case vms::event::showPopupAction:
+        case vms::api::ActionType::showPopupAction:
             action->getParams().actionId = QnUuid::createUuid();
             /*fallthrough*/
-        case vms::event::showOnAlarmLayoutAction:
-        case vms::event::openLayoutAction:
-        case vms::event::showTextOverlayAction:
+        case vms::api::ActionType::showOnAlarmLayoutAction:
+        case vms::api::ActionType::openLayoutAction:
+        case vms::api::ActionType::showTextOverlayAction:
+        case vms::api::ActionType::fullscreenCameraAction:
+        case vms::api::ActionType::exitFullscreenAction:
             return broadcastAction(action);
         default:
             break;
@@ -319,7 +322,7 @@ bool RuleProcessor::updateProlongedActionStartTime(const vms::event::AbstractAct
     }
 
     if (action->getParams().durationMs > 0
-        || action->getToggleState() != vms::event::EventState::active)
+        || action->getToggleState() != vms::api::EventState::active)
     {
         return false;
     }
@@ -341,7 +344,7 @@ bool RuleProcessor::popProlongedActionStartTime(
     }
 
     if (action->getParams().durationMs > 0
-        || action->getToggleState() == vms::event::EventState::active)
+        || action->getToggleState() == vms::api::EventState::active)
     {
         return false;
     }
@@ -434,7 +437,7 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
 
     // Ignore 'Off' event if some event resources are still running.
-    if (event->getToggleState() == vms::event::EventState::inactive && !runtimeRule.resources.isEmpty())
+    if (event->getToggleState() == vms::api::EventState::inactive && !runtimeRule.resources.isEmpty())
         return vms::event::AbstractActionPtr();
 
     if (!runtimeRule.isActionRunning.isEmpty())
@@ -442,13 +445,13 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
         // Toggle event repeated with some interval with state 'on'.
         // If toggled action is used and condition is no longer valid, stop action.
         // If toggle event goes to 'off', stop action.
-        if (!condOK || event->getToggleState() == vms::event::EventState::inactive)
+        if (!condOK || event->getToggleState() == vms::api::EventState::inactive)
             action = vms::event::ActionFactory::instantiateAction(
                 commonModule(),
                 rule,
                 event,
                 commonModule()->moduleGUID(),
-                vms::event::EventState::inactive);
+                vms::api::EventState::inactive);
         else
             return vms::event::AbstractActionPtr(); //< Ignore repeating 'On' event.
     }
@@ -461,7 +464,7 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
             commonModule()->moduleGUID());
     }
 
-    bool isActionRunning = action && action->getToggleState() == vms::event::EventState::active;
+    bool isActionRunning = action && action->getToggleState() == vms::api::EventState::active;
     if (isActionRunning)
         runtimeRule.isActionRunning.insert(QnUuid());
     else
@@ -483,7 +486,7 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
         RunningRuleInfo& runtimeRule = itr.value();
         QnUuid resId = event->getResource() ? event->getResource()->getId() : QnUuid();
 
-        if (condOK && event->getToggleState() == vms::event::EventState::active)
+        if (condOK && event->getToggleState() == vms::api::EventState::active)
         {
             // Allow separate action for each resource of source event but ingore repeated 'on' state.
             if (runtimeRule.isActionRunning.contains(resId))
@@ -500,9 +503,8 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     if (!condOK)
         return vms::event::AbstractActionPtr();
 
-    if (rule->eventState() != vms::event::EventState::undefined && rule->eventState() != event->getToggleState())
+    if (rule->eventState() != vms::api::EventState::undefined && rule->eventState() != event->getToggleState())
         return vms::event::AbstractActionPtr();
-
 
     if (rule->aggregationPeriod() == 0 || !vms::event::allowsAggregation(rule->actionType()))
     {
@@ -512,7 +514,7 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     }
 
     QString eventKey = rule->getUniqueId();
-    if (event->getResource() && event->getEventType() != vms::event::softwareTriggerEvent)
+    if (event->getResource() && event->getEventType() != vms::api::EventType::softwareTriggerEvent)
         eventKey += event->getResource()->getUniqueId();
 
     ProcessorAggregationInfo& aggInfo = m_aggregateActions[eventKey];
@@ -546,7 +548,7 @@ bool RuleProcessor::actionRequiresLogging(const vms::event::AbstractActionPtr& a
     const vms::event::EventParameters& eventParameters = rule->eventParams();
     const auto eventType = action->getRuntimeParams().eventType;
 
-    return eventType != vms::event::EventType::userDefinedEvent || !eventParameters.omitDbLogging;
+    return eventType != vms::api::EventType::userDefinedEvent || !eventParameters.omitDbLogging;
 }
 
 void RuleProcessor::at_timer()
@@ -608,7 +610,7 @@ vms::event::AbstractActionList RuleProcessor::matchActions(
         // For continuing event put information to m_eventsInProgress.
         QnUuid resId = event->getResource() ? event->getResource()->getId() : QnUuid();
         RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
-        if (event->getToggleState() == vms::event::EventState::active)
+        if (event->getToggleState() == vms::api::EventState::active)
             runtimeRule.resources[resId] = event;
         else
             runtimeRule.resources.remove(resId);
@@ -631,15 +633,13 @@ vms::event::AbstractActionList RuleProcessor::matchActions(
     return std::move(result);
 }
 
-void RuleProcessor::at_actionDelivered(const vms::event::AbstractActionPtr& action)
+void RuleProcessor::at_actionDelivered(const vms::event::AbstractActionPtr& /*action*/)
 {
-    Q_UNUSED(action)
     // TODO: #vasilenko implement me.
 }
 
-void RuleProcessor::at_actionDeliveryFailed(const vms::event::AbstractActionPtr& action)
+void RuleProcessor::at_actionDeliveryFailed(const vms::event::AbstractActionPtr& /*action*/)
 {
-    Q_UNUSED(action)
     // TODO: #vasilenko implement me.
 }
 
@@ -653,8 +653,13 @@ void RuleProcessor::at_broadcastActionFinished(int handle, ec2::ErrorCode errorC
 
 bool RuleProcessor::broadcastAction(const vms::event::AbstractActionPtr& action)
 {
-    commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->broadcastBusinessAction(
-        action, this, &RuleProcessor::at_broadcastActionFinished);
+    nx::vms::api::EventActionData actionData;
+    ec2::fromResourceToApi(action, actionData);
+    commonModule()->ec2Connection()->getEventRulesManager(Qn::kSystemAccess)->
+        broadcastEventAction(
+            actionData,
+            this,
+            &RuleProcessor::at_broadcastActionFinished);
     return true;
 }
 
@@ -716,7 +721,7 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
         if (rule->isDisabled())
             continue;
 
-        if (rule->eventType() == vms::event::cameraInputEvent)
+        if (rule->eventType() == vms::api::EventType::cameraInputEvent)
         {
             auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(rule->eventResources());
             if (resList.isEmpty() ||            //< Listening to all cameras.
@@ -753,7 +758,7 @@ void RuleProcessor::terminateRunningRule(const vms::event::RulePtr& rule)
                     rule,
                     event,
                     commonModule()->moduleGUID(),
-                    vms::event::EventState::inactive);
+                    vms::api::EventState::inactive);
                 if (action)
                     executeAction(action);
             }
@@ -793,7 +798,7 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
 {
     // Notifying resources to start input monitoring.
     {
-        if (businessRule->eventType() == vms::event::cameraInputEvent)
+        if (businessRule->eventType() == vms::api::EventType::cameraInputEvent)
         {
             auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 businessRule->eventResources());
@@ -812,7 +817,7 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
 
     // Notifying resources about recording action.
     {
-        if (businessRule->actionType() == vms::event::cameraRecordingAction)
+        if (businessRule->actionType() == vms::api::ActionType::cameraRecordingAction)
         {
             auto resList = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
                 businessRule->actionResources());

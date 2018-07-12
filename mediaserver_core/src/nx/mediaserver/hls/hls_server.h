@@ -13,6 +13,8 @@
 
 #include "hls_playlist_manager.h"
 
+struct QnJsonRestResult;
+
 namespace nx {
 namespace mediaserver {
 namespace hls {
@@ -42,7 +44,7 @@ class HttpLiveStreamingProcessor
     public QnTCPConnectionProcessor
 {
     Q_OBJECT
-
+    using base_type = QnTCPConnectionProcessor;
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
@@ -87,7 +89,10 @@ private:
     /*!
         In case of success, adds Content-Type, Content-Length headers to \a response
     */
-    nx::network::http::StatusCode::Value getRequestedFile( const nx::network::http::Request& request, nx::network::http::Response* const response );
+    nx::network::http::StatusCode::Value getRequestedFile(
+        const nx::network::http::Request& request,
+        nx::network::http::Response* const response,
+        QnJsonRestResult* error);
     void sendResponse( const nx::network::http::Response& response );
     /*!
         \return false, if no more data to send (reached end of file)
@@ -100,7 +105,8 @@ private:
         const Qn::UserAccessData& accessRights,
         const QnVideoCameraPtr& videoCamera,
         const std::multimap<QString, QString>& requestParams,
-        nx::network::http::Response* const response );
+        nx::network::http::Response* const response,
+        QnJsonRestResult* error);
     //!Generates variant playlist (containing references to other playlists providing different qualities)
     nx::network::http::StatusCode::Value getVariantPlaylist(
         Session* session,
@@ -119,7 +125,7 @@ private:
     nx::network::http::StatusCode::Value getResourceChunk(
         const nx::network::http::Request& request,
         const QStringRef& uniqueResourceID,
-        const QnSecurityCamResourcePtr& camResource,
+        const QnSecurityCamResourcePtr& cameraResource,
         const std::multimap<QString, QString>& requestParams,
         nx::network::http::Response* const response );
 
@@ -131,7 +137,8 @@ private:
         const QnSecurityCamResourcePtr& camResource,
         const QnVideoCameraPtr& videoCamera,
         MediaQuality streamQuality,
-        Session** session );
+        Session** session,
+        QnJsonRestResult* error);
     int estimateStreamBitrate(
         Session* const session,
         QnSecurityCamResourcePtr camResource,
@@ -139,10 +146,11 @@ private:
         MediaQuality streamQuality );
     void ensureChunkCacheFilledEnoughForPlayback( Session* const session, MediaQuality streamQuality );
 
+    AVCodecID detectAudioCodecId(const StreamingChunkCacheKey& chunkParams);
+
     static RequestParams readRequestParams(
         const std::multimap<QString, QString>& requestParams);
 };
-
 } // namespace hls
 } // namespace mediaserver
 } // namespace nx

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('dialogs', ['$http', '$modal', '$q', '$location', function ($http, $modal, $q, $location) {
+    .factory('dialogs', ['$http', '$uibModal', '$q', '$location', function ($http, $uibModal, $q, $location) {
         function openDialog(settings){
 
             //scope.inline = typeof($location.search().inline) != 'undefined';
@@ -11,7 +11,7 @@ angular.module('webadminApp')
             }
 
             // Check 401 against offline
-            var modalInstance = $modal.open({
+            var  modalInstance = $uibModal.open({
                 controller: 'DialogCtrl',
                 templateUrl: Config.viewsDir + 'components/dialog.html',
                 animation: !isInline(),
@@ -114,33 +114,33 @@ angular.module('webadminApp')
                 }).result;
             }
         };
-    }]).controller("DialogCtrl", ['$scope', '$modalInstance', 'settings', function($scope, $modalInstance, settings){
+    }]).controller("DialogCtrl", ['$scope', '$uibModalInstance', 'settings', function($scope, $uibModalInstance, settings){
         $scope.settings = settings;
         $scope.settings.localLogin = $scope.settings.localLogin || Config.defaultLogin;
         $scope.forms = {};
         $scope.close = function(){
-            $modalInstance.dismiss('close');
+            $uibModalInstance.dismiss('close');
         };
 
         $scope.ok = function(){
             if($scope.settings.createLoginAndPassword){
-                $modalInstance.close( {
+                $uibModalInstance.close( {
                     login: $scope.settings.localLogin,
                     password: $scope.settings.localPassword
                 });
             }
             if($scope.settings.needOldPassword){
-                $modalInstance.close( $scope.settings.oldPassword);
+                $uibModalInstance.close( $scope.settings.oldPassword);
             }
 
-            $modalInstance.close('ok');
+            $uibModalInstance.close('ok');
         };
 
         $scope.cancel = function(){
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
 
         $scope.$on('$routeChangeStart', function(){
-            $modalInstance.close();
+            $uibModalInstance.close();
         });
     }]);

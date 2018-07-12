@@ -7,7 +7,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/deprecated/simple_http_client.h>
 
-#include <core/resource/camera_resource.h>
+#include <nx/mediaserver/resource/camera.h>
+
 #include <nx/fusion//model_functions.h>
 
 #include "mediaserver_ini.h"
@@ -28,14 +29,9 @@ static QnAbstractMediaDataPtr createMetadataPacket()
 }
 
 
-CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
+CLServerPushStreamReader::CLServerPushStreamReader(const nx::mediaserver::resource::CameraPtr& dev):
     QnLiveStreamProvider(dev),
-    m_needReopen(false),
-    m_cameraAudioEnabled(false),
-    m_openStreamResult(CameraDiagnostics::ErrorCode::unknown),
-    m_openStreamCounter(0),
-    m_FrameCnt(0),
-    m_openedWithStreamCtrl(false)
+    m_camera(dev)
 {
 }
 
@@ -88,7 +84,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
 {
     onStreamReopen();
     m_FrameCnt = 0;
-    bool isInitialized = m_resource->isInitialized();
+    bool isInitialized = m_camera->isInitialized();
     if (!isInitialized)
     {
         if (m_openStreamResult)
@@ -116,15 +112,15 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
 
         setNeedKeyData();
         if (isInitialized)
-		{
+        {
             mFramesLost++;
             m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
             if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
             {
-                if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
-                    getResource()->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? Qn::Unauthorized : Qn::Offline);
+                if (canChangeStatus() && m_camera->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
+                    m_camera->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? Qn::Unauthorized : Qn::Offline);
                 m_stat[0].onLostConnection();
                 mFramesLost = 0;
             }
@@ -185,11 +181,11 @@ void CLServerPushStreamReader::run()
             if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
             {
                 if (canChangeStatus())
-                    getResource()->setStatus(Qn::Offline);
+                    m_camera->setStatus(Qn::Offline);
                 if (m_FrameCnt > 0)
-                    m_resource->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
+                    m_camera->setLastMediaIssue(CameraDiagnostics::BadMediaStreamResult());
                 else
-                    m_resource->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());
+                    m_camera->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());
                 m_stat[0].onLostConnection();
             }
             if (mFramesLost > MAX_LOST_FRAME)
@@ -198,15 +194,15 @@ void CLServerPushStreamReader::run()
         }
         m_FrameCnt++;
 
-        if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
+        if (m_camera->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
 
         checkAndFixTimeFromCamera(data);
 
         if (canChangeStatus())
         {
-            if (getResource()->getStatus() == Qn::Unauthorized || getResource()->getStatus() == Qn::Offline)
-                getResource()->setStatus(Qn::Online);
+            if (m_camera->getStatus() == Qn::Unauthorized || m_camera->getStatus() == Qn::Offline)
+                m_camera->setStatus(Qn::Online);
         }
 
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
@@ -218,7 +214,7 @@ void CLServerPushStreamReader::run()
             {
                 m_stat[0].onEvent(CL_STAT_CAMRESETED);
             }
-            m_resource->setLastMediaIssue(CameraDiagnostics::NoErrorResult());
+            m_camera->setLastMediaIssue(CameraDiagnostics::NoErrorResult());
             mFramesLost = 0;
         }
 
@@ -285,20 +281,20 @@ void CLServerPushStreamReader::run()
 void CLServerPushStreamReader::beforeRun()
 {
     QnAbstractMediaStreamDataProvider::beforeRun();
-    getResource()->init();
-
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        m_cameraAudioEnabled = camera->isAudioEnabled();
-        // TODO: #GDM get rid of resourceChanged
-        connect(camera.data(),  &QnResource::resourceChanged, this,
-            &CLServerPushStreamReader::at_resourceChanged, Qt::DirectConnection);
-    }
+    m_camera->init();
+    m_cameraAudioEnabled = m_camera->isAudioEnabled();
+    connect(
+        m_camera.data(),
+        &QnSecurityCamResource::audioEnabledChanged,
+        this,
+        &CLServerPushStreamReader::at_audioEnabledChanged,
+        Qt::DirectConnection);
 }
 
 void CLServerPushStreamReader::afterRun()
 {
     QnAbstractMediaStreamDataProvider::afterRun();
-    m_resource->disconnect(this, SLOT(at_resourceChanged(QnResourcePtr)));
+    m_camera->disconnect(this);
 }
 
 void CLServerPushStreamReader::pleaseReopenStream()
@@ -307,14 +303,12 @@ void CLServerPushStreamReader::pleaseReopenStream()
         m_needReopen = true;
 }
 
-void CLServerPushStreamReader::at_resourceChanged(const QnResourcePtr& res)
+void CLServerPushStreamReader::at_audioEnabledChanged(const QnResourcePtr& res)
 {
-    NX_ASSERT(res == getResource(), Q_FUNC_INFO, "Make sure we are listening to correct resource");
-    if (QnSecurityCamResourcePtr camera = res.dynamicCast<QnSecurityCamResource>()) {
-        if (m_cameraAudioEnabled != camera->isAudioEnabled())
-            pleaseReopenStream();
-        m_cameraAudioEnabled = camera->isAudioEnabled();
-    }
+    if (m_cameraAudioEnabled != m_camera->isAudioEnabled())
+        pleaseReopenStream();
+    m_cameraAudioEnabled = m_camera->isAudioEnabled();
+
 }
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -36,6 +36,11 @@ bool AnalyticsSearchListModel::isConstrained() const
     return filterRect().isValid() || base_type::isConstrained();
 }
 
+bool AnalyticsSearchListModel::canFetchMore(const QModelIndex& parent) const
+{
+    return rowCount() < Private::kMaximumItemCount && base_type::canFetchMore(parent);
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

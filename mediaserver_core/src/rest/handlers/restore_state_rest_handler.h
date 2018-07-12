@@ -15,25 +15,25 @@ class QnRestoreStateRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 public:
-    virtual int executeGet(
-        const QString& path,
-        const QnRequestParams& params,
-        QnJsonRestResult& result,
-        const QnRestConnectionProcessor* owner) override;
+    // virtual int executeGet for RestoreState request must not be overriden.
+    // Parent's method returns badRequest for this request.
+
     virtual int executePost(
         const QString& path,
         const QnRequestParams& params,
         const QByteArray& body,
         QnJsonRestResult &result,
         const QnRestConnectionProcessor* owner) override;
+
 private:
     virtual void afterExecute(
         const QString& path,
         const QnRequestParamList& params,
         const QByteArray& body,
         const QnRestConnectionProcessor* owner) override;
-    int execute(
-        PasswordData passwordData,
+
+    bool verifyCurrentPassword(
+        const QnRequestParams& params,
         const QnRestConnectionProcessor* owner,
-        QnJsonRestResult& result);
+        QnJsonRestResult* result = nullptr);
 };

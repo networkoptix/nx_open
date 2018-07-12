@@ -21,9 +21,13 @@ struct AnalyticsAction
     /** Id of a metadata object to which the action is applied. */
     QnUuid objectId;
 
+    QnUuid cameraId;
+
+    qint64 timestampUs;
+
     QMap<QString, QString> params;
 };
-#define AnalyticsAction_Fields (driverId)(actionId)(objectId)(params)
+#define AnalyticsAction_Fields (driverId)(actionId)(objectId)(cameraId)(timestampUs)(params)
 
 struct AvailableAnalyticsActionsOfPlugin
 {

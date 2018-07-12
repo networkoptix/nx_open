@@ -5,17 +5,15 @@
 
 #include <utils/common/connective.h>
 
-namespace Ui {
-class FisheyeCalibrationWidget;
-}
-
 class QTimer;
 class QnFisheyeCalibrator;
-class QnImageProvider;
+namespace Ui { class FisheyeCalibrationWidget; }
 
 namespace nx {
 namespace client {
 namespace desktop {
+
+class ImageProvider;
 
 class FisheyeCalibrationWidget: public Connective<QWidget>
 {
@@ -35,8 +33,11 @@ public:
     void setHorizontalStretch(const qreal& value);
     qreal horizontalStretch() const;
 
-    void setImageProvider(QnImageProvider *provider);
-    QnImageProvider* imageProvider() const;
+    void setImageProvider(ImageProvider *provider);
+    ImageProvider* imageProvider() const;
+
+    bool isReadOnly() const;
+    void setReadOnly(bool value);
 
     void init();
 
@@ -55,9 +56,8 @@ private:
 private:
     QScopedPointer<Ui::FisheyeCalibrationWidget> ui;
     QScopedPointer<QnFisheyeCalibrator> m_calibrator;
-    QPointer<QnImageProvider> m_imageProvider;
-
-    int m_lastError;
+    QPointer<ImageProvider> m_imageProvider;
+    int m_lastError = 0;
 };
 
 } // namespace desktop

@@ -9,12 +9,10 @@ angular.module('webadminApp', [
     'ui.bootstrap',
     'tc.chartjs',
     'ngStorage',
-    'typeahead-focus',
-    'ui.timepicker',
     'angular-clipboard'
 ]).config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.defaults.xsrfCookieName = 'nx-vms-csrf-token';
-    $httpProvider.defaults.xsrfHeaderName = 'Nx-Vms-Csrf-Token';
+    $httpProvider.defaults.xsrfCookieName = 'x-runtime-guid';
+    $httpProvider.defaults.xsrfHeaderName = 'X-Runtime-Guid';
 }]).config(['$routeProvider', function ($routeProvider) {
 
     var universalResolves = {

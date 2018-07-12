@@ -54,6 +54,13 @@ const QLatin1String kDefaultHttpSslSupport("true");
 const QLatin1String kHttpSslCertPath("http/sslCertPath");
 const QLatin1String kDefaultHttpSslCertPath("");
 
+const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityTimeout");
+const std::chrono::milliseconds kDefaultHttpConnectionInactivityTimeout = std::chrono::minutes(1);
+
+//proxy
+const QLatin1String kProxyTargetConnectionInactivityTimeout("proxy/targetConnectionInactivityTimeout");
+const std::chrono::milliseconds kDefaultProxyTargetConnectionInactivityTimeout = std::chrono::minutes(2);
+
 //cloudConnect
 const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
 const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
@@ -62,7 +69,7 @@ const QLatin1String kAllowIpTarget("cloudConnect/allowIpTarget");
 const QLatin1String kDefaultAllowIpTarget("false");
 
 const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
-const QLatin1String kDefaultFetchPublicIpUrl("http://networkoptix.com/myip");
+const QLatin1String kDefaultFetchPublicIpUrl("http://tools.vmsproxy.com/myip");
 
 const QLatin1String kPublicIpAddress("cloudConnect/publicIpAddress");
 const QLatin1String kDefaultPublicIpAddress("");
@@ -98,9 +105,17 @@ Http::Http():
     proxyTargetPort(0),
     connectSupport(false),
     allowTargetEndpointInUrl(false),
-    sslSupport(true)
+    sslSupport(true),
+    connectionInactivityTimeout(kDefaultHttpConnectionInactivityTimeout)
 {
 }
+
+Proxy::Proxy():
+    targetConnectionInactivityTimeout(kDefaultProxyTargetConnectionInactivityTimeout)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
 
 Settings::Settings():
     base_type(
@@ -140,6 +155,11 @@ const Http& Settings::http() const
     return m_http;
 }
 
+const Proxy& Settings::proxy() const
+{
+    return m_proxy;
+}
+
 const CloudConnect& Settings::cloudConnect() const
 {
     return m_cloudConnect;
@@ -153,6 +173,7 @@ const relaying::Settings& Settings::listeningPeer() const
 void Settings::loadSettings()
 {
     using namespace std::chrono;
+    using namespace nx::network::http::server;
 
     //general
     const QStringList& httpAddrToListenStrList = settings().value(
@@ -221,6 +242,16 @@ void Settings::loadSettings()
         settings().value(
             kHttpSslCertPath,
             kDefaultHttpSslCertPath).toString();
+    m_http.connectionInactivityTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kHttpConnectionInactivityTimeout).toString(),
+            kDefaultHttpConnectionInactivityTimeout);
+
+    //proxy
+    m_proxy.targetConnectionInactivityTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kProxyTargetConnectionInactivityTimeout).toString(),
+            kDefaultProxyTargetConnectionInactivityTimeout);
 
     //CloudConnect
     m_cloudConnect.replaceHostAddressWithPublicAddress =
@@ -255,11 +286,11 @@ void Settings::loadSettings()
 
     auto preferedSslMode = settings().value(kPreferedSslMode, kDefaultPreferedSslMode).toString();
     if (preferedSslMode == "enabled" || preferedSslMode == "true")
-        m_cloudConnect.preferedSslMode = SslMode::enabled;
+        m_cloudConnect.preferedSslMode = proxy::SslMode::enabled;
     else if (preferedSslMode == "disabled" || preferedSslMode == "false")
-        m_cloudConnect.preferedSslMode = SslMode::disabled;
+        m_cloudConnect.preferedSslMode = proxy::SslMode::disabled;
     else
-        m_cloudConnect.preferedSslMode = SslMode::followIncomingConnection;
+        m_cloudConnect.preferedSslMode = proxy::SslMode::followIncomingConnection;
 
     m_listeningPeer.load(settings());
 }

@@ -22,12 +22,16 @@ QnStorageResource* QnDbStorageResource::instance(QnCommonModule* commonModule, c
     return new QnDbStorageResource(commonModule);
 }
 
-QIODevice* QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
+QIODevice* QnDbStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
     m_filePath = removeProtocolPrefix(fileName);
 
     auto resCommonModule = commonModule();
-    NX_ASSERT(resCommonModule, "Common module should be set");
+    if (!resCommonModule)
+    {
+        NX_ASSERT(false, "Common module should be set");
+        return nullptr;
+    }
 
     auto connection = resCommonModule->ec2Connection();
 
@@ -53,9 +57,8 @@ int QnDbStorageResource::getCapabilities() const
     return m_capabilities;
 }
 
-QString QnDbStorageResource::removeProtocolPrefix(const QString &url) const
+QString QnDbStorageResource::removeProtocolPrefix(const QString& url) const
 {
     auto prefix = url.indexOf(QLatin1String("://"));
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
-

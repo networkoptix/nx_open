@@ -1,7 +1,8 @@
 #include "iqinvision_resource_searcher.h"
+#include "iqinvision_request_helper.h"
+#include "iqinvision_common.h"
 
 #include <nx/network/nettools.h>
-
 #include "core/resource/camera_resource.h"
 #include "iqinvision_resource.h"
 #include "utils/common/sleep.h"
@@ -80,12 +81,64 @@ bool QnPlIqResourceSearcher::isIqeModel(const QString& model)
 }
 
 QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(
-    const nx::utils::Url& url, const QAuthenticator& /*auth*/, bool isSearchAction)
+    const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if (!url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>(); //< Search if only host is present, not specific protocol.
 
-    return QList<QnResourcePtr>();
+    using namespace nx::mediaserver_core;
+
+    nx::utils::Url iqEyeUrl(url);
+    iqEyeUrl.setScheme(QString::fromLatin1(nx::network::http::kUrlSchemeName));
+
+    QnPlIqResourcePtr resource(new QnPlIqResource);
+    resource->setUrl(iqEyeUrl.toString());
+    resource->setAuth(auth);
+
+    auto helper = plugins::IqInvisionRequestHelper(resource);
+
+    const auto manufacturerResponse = helper.oid(plugins::kIqInvisionOidManufacturer);
+    if (!manufacturerResponse.isSuccessful())
+        return QList<QnResourcePtr>();
+
+    const auto vendor = manufacturerResponse.toString().trimmed();
+    if (vendor != plugins::kIqInvisionManufacturer)
+        return QList<QnResourcePtr>();
+
+    resource->setVendor(manufacture());
+
+    const auto macAddressResponse = helper.oid(plugins::kIqInvisionOidMacAddress);
+    if (!macAddressResponse.isSuccessful())
+        return QList<QnResourcePtr>();
+
+    const nx::network::QnMacAddress macAddress(macAddressResponse.toString().trimmed());
+    if (macAddress.isNull())
+        return QList<QnResourcePtr>();
+
+    resource->setMAC(macAddress);
+
+    auto modelResponse = helper.oid(plugins::kIqInvisionOidModel);
+    if (!modelResponse.isSuccessful())
+        return QList<QnResourcePtr>();
+
+    const auto model = modelResponse.toString().trimmed();
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), model);
+    if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
+        return QList<QnResourcePtr>();
+
+    const auto resourceTypeId = resourceType(model);
+    if (resourceTypeId.isNull())
+        return QList<QnResourcePtr>();
+
+    resource->setModel(model);
+    resource->setName(model);
+    resource->setTypeId(resourceTypeId);
+
+    const auto firmwareResponse = helper.oid(plugins::kIqInvisionOidFirmware);
+    if (firmwareResponse.isSuccessful())
+        resource->setFirmware(firmwareResponse.toString().trimmed());
+
+    return {resource};
 }
 
 QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
@@ -153,14 +206,9 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name, false);
+    const auto rt = resourceType(name);
     if (rt.isNull())
-    {
-        // Try with default camera name.
-        rt = qnResTypePool->getResourceTypeId(manufacture(), kDefaultResourceType);
-        if (rt.isNull())
-            return localResults;
-    }
+        return localResults;
 
     resource->setTypeId(rt);
     resource->setName(name);
@@ -175,12 +223,6 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 void QnPlIqResourceSearcher::processNativePacket(
     QnResourceList& result, const QByteArray& responseData)
 {
-#if 0 // debug
-    QFile gggFile("c:/123");
-    gggFile.open(QFile::ReadOnly);
-    responseData = gggFile.readAll();
-#endif // 0
-
     if (responseData.at(0) != 0x01 || responseData.at(1) != 0x04 || responseData.at(2) != 0x00 ||
         responseData.at(3) != 0x00 || responseData.at(4) != 0x00 || responseData.at(5) != 0x00)
     {
@@ -207,13 +249,9 @@ void QnPlIqResourceSearcher::processNativePacket(
     }
 
     const QString nameStr = QString::fromLatin1(name);
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr, /*showWarning*/ false);
+    const auto rt = resourceType(nameStr);
     if (rt.isNull())
-    {
-        rt = qnResTypePool->getResourceTypeId(manufacture(), kDefaultResourceType);
-        if (rt.isNull())
-            return;
-    }
+        return;
 
     QnPlIqResourcePtr resource (new QnPlIqResource());
     in_addr* peerAddr = (in_addr*) (responseData.data() + 32);
@@ -225,6 +263,16 @@ void QnPlIqResourceSearcher::processNativePacket(
     resource->setHostAddress(peerAddress.toString());
 
     result.push_back(resource);
+}
+
+QnUuid QnPlIqResourceSearcher::resourceType(const QString& model) const
+{
+    QnUuid resourceType = qnResTypePool->getResourceTypeId(manufacture(), model, false);
+    if (!resourceType.isNull())
+        return resourceType;
+
+    // Try with default camera name.
+    return qnResTypePool->getResourceTypeId(manufacture(), kDefaultResourceType);
 }
 
 QnResourceList QnPlIqResourceSearcher::findResources()

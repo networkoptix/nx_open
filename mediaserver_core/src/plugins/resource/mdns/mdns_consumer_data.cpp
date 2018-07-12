@@ -6,6 +6,7 @@ namespace detail {
 
 bool ConsumerDataList::registerConsumer(uintptr_t consumer)
 {
+    QnMutexLocker lock(&m_mutex);
     bool hasThisConsumer = std::any_of(
         m_data.cbegin(),
         m_data.cend(),
@@ -17,7 +18,7 @@ bool ConsumerDataList::registerConsumer(uintptr_t consumer)
     if (hasThisConsumer)
         return false;
 
-    m_data.push_back(std::make_pair(consumer, ConsumerData()));
+    m_data.push_back(std::make_pair(consumer, std::make_shared<ConsumerData>()));
     return true;
 }
 
@@ -26,16 +27,23 @@ void ConsumerDataList::addData(
     const QString& localAddress,
     const QByteArray &responseData)
 {
-    for (auto& idConsumerPair: m_data)
-        idConsumerPair.second.addEntry(remoteAddress, localAddress, responseData);
+    decltype(m_data) localData;
+    {
+        QnMutexLocker lock(&m_mutex);
+        localData = m_data;
+    }
+
+    for (auto& idConsumerPair: localData)
+        idConsumerPair.second->addEntry(remoteAddress, localAddress, responseData);
 }
 
-const ConsumerData* ConsumerDataList::data(uintptr_t id) const
+std::shared_ptr<const ConsumerData> ConsumerDataList::data(uintptr_t id) const
 {
+    QnMutexLocker lock(&m_mutex);
     for (auto& idConsumerPair: m_data)
     {
         if (idConsumerPair.first == id)
-            return &idConsumerPair.second;
+            return idConsumerPair.second;
     }
 
     return nullptr;
@@ -43,8 +51,9 @@ const ConsumerData* ConsumerDataList::data(uintptr_t id) const
 
 void ConsumerDataList::clearRead()
 {
+    QnMutexLocker lock(&m_mutex);
     for (auto& idConsumerPair: m_data)
-        idConsumerPair.second.clearIfRead();
+        idConsumerPair.second->clearIfRead();
 }
 
 } // namespace detail
@@ -54,6 +63,9 @@ const int ConsumerData::kMaxEntriesCount = 256;
 
 void ConsumerData::forEachEntry(EntryFunc func) const
 {
+    // TODO: It's safer to only copy m_addrToEntries under mutex so func is called mutex free,
+    // but it will affect performance.
+    QnMutexLocker lock(&m_mutex);
     for (auto it = m_addrToEntries.cbegin(); it != m_addrToEntries.cend(); ++it)
     {
         const QString& remoteAddress = it.key();
@@ -68,6 +80,7 @@ void ConsumerData::addEntry(
     const QString& localAddress,
     const QByteArray& responseData)
 {
+    QnMutexLocker lock(&m_mutex);
     RemoteAddrToEntries::iterator it = m_addrToEntries.find(remoteAddress);
     if (it == m_addrToEntries.end())
     {
@@ -83,6 +96,7 @@ void ConsumerData::addEntry(
 
 void ConsumerData::clearIfRead()
 {
+    QnMutexLocker lock(&m_mutex);
     if (!m_read)
         return;
 

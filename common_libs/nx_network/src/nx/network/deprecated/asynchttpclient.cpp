@@ -18,8 +18,6 @@
 #include "nx/network/http/buffer_source.h"
 #include "nx/network/http/custom_headers.h"
 
-#include <nx/fusion/model_functions.h>
-
 using std::make_pair;
 
 namespace nx {
@@ -27,6 +25,17 @@ namespace network {
 namespace http {
 
 AsyncHttpClient::AsyncHttpClient()
+{
+    initDelegate();
+}
+
+AsyncHttpClient::AsyncHttpClient(std::unique_ptr<AbstractStreamSocket> socket):
+    m_delegate(std::move(socket))
+{
+    initDelegate();
+}
+
+void AsyncHttpClient::initDelegate()
 {
     using namespace std::placeholders;
 
@@ -329,9 +338,14 @@ void AsyncHttpClient::setProxyUserCredentials(const Credentials& userCredentials
     m_delegate.setProxyUserCredentials(userCredentials);
 }
 
-void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
+void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure)
 {
-    m_delegate.setProxyVia(proxyEndpoint);
+    m_delegate.setProxyVia(proxyEndpoint, isSecure);
+}
+
+void AsyncHttpClient::setMaxNumberOfRedirects(int maxNumberOfRedirects)
+{
+    m_delegate.setMaxNumberOfRedirects(maxNumberOfRedirects);
 }
 
 void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
@@ -409,6 +423,12 @@ AsyncHttpClientPtr AsyncHttpClient::create()
     return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(new AsyncHttpClient()));
 }
 
+AsyncHttpClientPtr AsyncHttpClient::create(std::unique_ptr<AbstractStreamSocket> socket)
+{
+    return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(
+        new AsyncHttpClient(std::move(socket))));
+}
+
 QString AsyncHttpClient::endpointWithProtocol(const nx::utils::Url& url)
 {
     return lm("%1://%2:%3")
@@ -479,10 +499,11 @@ const char* AsyncHttpClient::toString(State state)
 
 void downloadFileAsyncEx(
     const nx::utils::Url& url,
-    std::function<void(SystemError::ErrorCode, int, nx::network::http::StringType, nx::network::http::BufferType)> completionHandler,
-    nx::network::http::AsyncHttpClientPtr httpClientCaptured)
+    DownloadCompletionHandlerEx completionHandlerEx,
+    nx::network::http::AsyncHttpClientPtr httpClientCaptured,
+    nx::network::http::Method::ValueType method)
 {
-    auto requestCompletionFunc = [httpClientCaptured, completionHandler]
+    auto requestCompletionFunc = [httpClientCaptured, completionHandlerEx]
         (nx::network::http::AsyncHttpClientPtr httpClient) mutable
     {
         httpClientCaptured->disconnect(nullptr, (const char*)nullptr);
@@ -490,63 +511,65 @@ void downloadFileAsyncEx(
 
         if (httpClient->failed())
         {
-            completionHandler(
+            completionHandlerEx(
                 SystemError::connectionReset,
                 nx::network::http::StatusCode::ok,
                 nx::network::http::StringType(),
-                nx::network::http::BufferType());
+                nx::network::http::BufferType(),
+                nx::network::http::HttpHeaders());
             return;
         }
 
         if (httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::ok &&
             httpClient->response()->statusLine.statusCode != nx::network::http::StatusCode::partialContent)
         {
-            completionHandler(
+            completionHandlerEx(
                 SystemError::noError,
                 httpClient->response()->statusLine.statusCode,
                 nx::network::http::StringType(),
-                nx::network::http::BufferType());
+                nx::network::http::BufferType(),
+                nx::network::http::HttpHeaders());
             return;
         }
 
-        completionHandler(
+        completionHandlerEx(
             SystemError::noError,
             httpClient->response()->statusLine.statusCode,
             httpClient->contentType(),
-            httpClient->fetchMessageBodyBuffer());
+            httpClient->fetchMessageBodyBuffer(),
+            httpClient->response()->headers);
     };
     QObject::connect(
         httpClientCaptured.get(), &nx::network::http::AsyncHttpClient::done,
         httpClientCaptured.get(), requestCompletionFunc,
         Qt::DirectConnection);
 
-    httpClientCaptured->doGet(url);
-}
-
-void downloadFileAsync(
-    const nx::utils::Url& url,
-    std::function<void(SystemError::ErrorCode, int, nx::network::http::BufferType)> completionHandler,
-    const nx::network::http::HttpHeaders& extraHeaders,
-    AuthType authType,
-    AsyncHttpClient::Timeouts timeouts)
-{
-    auto handler = [completionHandler](
-        SystemError::ErrorCode osErrorCode,
-        int statusCode,
-        nx::network::http::StringType,
-        nx::network::http::BufferType msgBody)
+    if (method == nx::network::http::Method::get)
     {
-        completionHandler(osErrorCode, statusCode, msgBody);
-    };
-    downloadFileAsyncEx(url, handler, extraHeaders, authType, timeouts);
+        httpClientCaptured->doGet(url);
+    }
+    else if (method == nx::network::http::Method::delete_)
+    {
+        httpClientCaptured->doDelete(url);
+    }
+    //else if (method == nx::network::http::Method::options)
+    // {
+    //    httpClientCaptured->doOptions(url);
+    // }
+    else
+    {
+        NX_ASSERT(0, "Unsupported HTTP method");
+        requestCompletionFunc(httpClientCaptured);
+    }
 }
 
 void downloadFileAsyncEx(
     const nx::utils::Url& url,
-    std::function<void(SystemError::ErrorCode, int, nx::network::http::StringType, nx::network::http::BufferType)> completionHandler,
+    DownloadCompletionHandlerEx completionHandlerEx,
     const nx::network::http::HttpHeaders& extraHeaders,
     AuthType authType,
-    AsyncHttpClient::Timeouts timeouts)
+    AsyncHttpClient::Timeouts timeouts,
+    nx::network::http::Method::ValueType method)
 {
     nx::network::http::AsyncHttpClientPtr httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setAdditionalHeaders(extraHeaders);
@@ -554,7 +577,26 @@ void downloadFileAsyncEx(
     httpClient->setSendTimeoutMs(timeouts.sendTimeout.count());
     httpClient->setResponseReadTimeoutMs(timeouts.responseReadTimeout.count());
     httpClient->setMessageBodyReadTimeoutMs(timeouts.messageBodyReadTimeout.count());
-    downloadFileAsyncEx(url, completionHandler, std::move(httpClient));
+    downloadFileAsyncEx(url, completionHandlerEx, std::move(httpClient), method);
+}
+
+void downloadFileAsync(
+    const nx::utils::Url& url,
+    DownloadCompletionHandler completionHandler,
+    const nx::network::http::HttpHeaders& extraHeaders,
+    AuthType authType,
+    AsyncHttpClient::Timeouts timeouts)
+{
+    DownloadCompletionHandlerEx handler = [completionHandler](
+        SystemError::ErrorCode osErrorCode,
+        int statusCode,
+        nx::network::http::StringType,
+        nx::network::http::BufferType msgBody,
+        nx::network::http::HttpHeaders httpHeaders)
+        {
+            completionHandler(osErrorCode, statusCode, msgBody, httpHeaders);
+        };
+    downloadFileAsyncEx(url, handler, extraHeaders, authType, timeouts);
 }
 
 SystemError::ErrorCode downloadFileSync(
@@ -569,14 +611,16 @@ SystemError::ErrorCode downloadFileSync(
     downloadFileAsync(
         url,
         [&resultingErrorCode, statusCode, msgBody, &mtx, &condVar, &done]
-    (SystemError::ErrorCode errorCode, int _statusCode, const nx::network::http::BufferType& _msgBody) {
-        resultingErrorCode = errorCode;
-        *statusCode = _statusCode;
-        *msgBody = _msgBody;
-        std::unique_lock<std::mutex> lk(mtx);
-        done = true;
-        condVar.notify_all();
-    });
+        (SystemError::ErrorCode errorCode, int _statusCode, const nx::network::http::BufferType& _msgBody,
+            nx::network::http::HttpHeaders /*httpHeaders*/)
+        {
+            resultingErrorCode = errorCode;
+            *statusCode = _statusCode;
+            *msgBody = _msgBody;
+            std::unique_lock<std::mutex> lk(mtx);
+            done = true;
+            condVar.notify_all();
+        });
 
     std::unique_lock<std::mutex> lk(mtx);
     while (!done)
@@ -593,7 +637,8 @@ void uploadDataAsync(
     const UploadCompletionHandler& callback,
     const AuthType authType,
     const QString& user,
-    const QString& password)
+    const QString& password,
+    nx::network::http::Method::ValueType method)
 {
     nx::network::http::AsyncHttpClientPtr httpClientHolder = nx::network::http::AsyncHttpClient::create();
     httpClientHolder->setAdditionalHeaders(extraHeaders);
@@ -627,7 +672,12 @@ void uploadDataAsync(
     QObject::connect(httpClientHolder.get(), &nx::network::http::AsyncHttpClient::done,
         httpClientHolder.get(), completionFunc, Qt::DirectConnection);
 
-    httpClientHolder->doPost(url, contentType, data);
+    if (method == nx::network::http::Method::put)
+        httpClientHolder->doPut(url, contentType, data);
+    else if (method.isEmpty() || method == nx::network::http::Method::post)
+        httpClientHolder->doPost(url, contentType, data);
+    else
+        NX_ASSERT(0, "Unsupported HTTP method");
 }
 
 SystemError::ErrorCode uploadDataSync(

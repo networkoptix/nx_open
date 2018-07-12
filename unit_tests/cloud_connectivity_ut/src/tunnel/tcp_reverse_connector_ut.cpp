@@ -17,7 +17,7 @@ namespace test {
 static std::vector<Buffer> kRequestLines
 {
     "OPTIONS * HTTP/1.1",
-    "Host: 127.0.0.1",
+    "Host: localhost",
     "Upgrade: NXRC/1.0",
     "Connection: Upgrade",
     "Nxrc-Host-Name: client",

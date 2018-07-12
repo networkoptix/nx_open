@@ -138,7 +138,6 @@ QnCameraPool::QnCameraPool(
     m_cameraNum(0),
     m_noSecondaryStream(noSecondaryStream),
     m_fps(fps)
-
 {
     m_discoveryListener = new QnCameraDiscoveryListener(localInterfacesToListen);
     m_discoveryListener->start();
@@ -157,7 +156,10 @@ void QnCameraPool::addCameras(
     QStringList secondaryFileList,
     int offlineFreq)
 {
-    qDebug() << "Add" << count << "cameras from primary file(s)" << primaryFileList << " secondary file(s)" << secondaryFileList << "offlineFreq=" << offlineFreq;
+    qDebug().nospace() << "Add " << count << " camera(s), offlineFreq=" << offlineFreq << ":";
+    qDebug() << "    Primary file(s):" << primaryFileList;
+    if (!m_noSecondaryStream)
+        qDebug() << "    Secondary file(s):" << secondaryFileList;
     QMutexLocker lock(&m_mutex);
     if (!cameraForEachFile)
     {
@@ -165,12 +167,16 @@ void QnCameraPool::addCameras(
         {
             QnTestCamera* camera = new QnTestCamera(++m_cameraNum, includePts);
             camera->setPrimaryFileList(primaryFileList);
-            camera->setSecondaryFileList(secondaryFileList);
+            if (!m_noSecondaryStream)
+                camera->setSecondaryFileList(secondaryFileList);
             camera->setOfflineFreq(offlineFreq);
             foreach(QString fileName, primaryFileList)
                 QnFileCache::instance()->getMediaData(fileName);
-            foreach(QString fileName, secondaryFileList)
-                QnFileCache::instance()->getMediaData(fileName);
+            if (!m_noSecondaryStream)
+            {
+                foreach(QString fileName, secondaryFileList)
+                    QnFileCache::instance()->getMediaData(fileName);
+            }
             m_cameras.insert(camera->getMac(), camera);
         }
     }
@@ -183,7 +189,8 @@ void QnCameraPool::addCameras(
 
             QnTestCamera* camera = new QnTestCamera(++m_cameraNum, includePts);
             camera->setPrimaryFileList(QStringList() << primaryFile);
-            camera->setSecondaryFileList(QStringList() << secondaryFile);
+            if (!m_noSecondaryStream)
+                camera->setSecondaryFileList(QStringList() << secondaryFile);
             camera->setOfflineFreq(offlineFreq);
 
             QnFileCache::instance()->getMediaData(primaryFile);

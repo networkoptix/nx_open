@@ -11,14 +11,16 @@
 
 #include <client/client_settings.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/views/checkboxed_header_view.h>
+#include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <nx/utils/log/log.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -69,7 +71,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     scrollBar->setUseMaximumSpace(true);
     ui->camerasTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    m_header = new QnCheckBoxedHeaderView(CheckBoxColumn, this);
+    m_header = new CheckableHeaderView(CheckBoxColumn, this);
     ui->camerasTable->setHorizontalHeader(m_header);
     m_header->setVisible(true);
     m_header->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -101,7 +103,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 
     ui->progressWidget->setVisible(false);
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({
         ui->singleCameraLabel,
         ui->startIPLabel,
@@ -120,7 +122,7 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
         return;
 
     if (m_server)
-        disconnect(m_server, NULL, this, NULL);
+        m_server->disconnect(this);
 
     m_server = server;
     if (server) {

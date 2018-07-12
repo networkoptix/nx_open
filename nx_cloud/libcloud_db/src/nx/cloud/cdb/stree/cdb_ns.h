@@ -54,7 +54,8 @@ enum Value
 
     credentialsType = 100,
     credentialsExpirationPeriod,
-    credentialsProlongationPeriod
+    credentialsProlongationPeriod,
+    credentialsId,
 };
 
 } // namespace attr

@@ -40,6 +40,8 @@ struct TestIniConfig: IniConfig
     NX_INI_STRING("\"enquoted string\"", str4, "Enquoted string.");
     NX_INI_STRING("simple string", str5, "Simple string.");
     NX_INI_INT(113, number, "Test number.");
+    NX_INI_FLOAT(310.55f, floatNumber ,"Test float number.");
+    NX_INI_DOUBLE(-0.45, doubleNumber, "Test double number.");
 };
 
 static const TestIniConfig defaultIni("will_not_load_from_file.ini");
@@ -69,6 +71,8 @@ struct SavedIniConfig: IniConfig
     NX_INI_STRING("\"Another enquoted string\"", str4, "Enquoted string.");
     NX_INI_STRING("Another simple string", str5, "Simple string.");
     NX_INI_INT(777, number, "Test number.");
+    NX_INI_FLOAT(0.432f, floatNumber ,"Test float number.");
+    NX_INI_DOUBLE(34.45, doubleNumber, "Test double number.");
 };
 
 template<class ExpectedIni, class ActualIni>
@@ -187,13 +191,13 @@ static void testReload(
     else
     {
         std::cerr << "+++++++ END" << std::endl;
-        if (ini().isEnabled())
+        if (IniConfig::isEnabled())
             ASSERT_FALSE(outputStr.empty());
         else
             ASSERT_TRUE(outputStr.empty()); //< If disabled, there should be no output.
     }
 
-    if (ini().isEnabled())
+    if (IniConfig::isEnabled())
         assertIniEquals(expectedIni, ini(), line);
     else
         assertIniEquals(defaultIni, ini(), line); //< If disabled, values never change.
@@ -201,18 +205,19 @@ static void testReload(
 
 TEST(iniConfig, test)
 {
-    std::cerr << "ini().isEnabled() -> " << (ini().isEnabled() ? "true" : "false") << std::endl;
+    std::cerr << "IniConfig::isEnabled() -> " << (IniConfig::isEnabled() ? "true" : "false")
+        << std::endl;
 
     // Check path properties of IniConfig.
-    ASSERT_STREQ(iniFileName.c_str(), ini().iniFile());
-    ASSERT_TRUE(ini().iniFileDir() != nullptr);
-    if (ini().isEnabled())
-        ASSERT_TRUE(ini().iniFileDir()[0] != '\0');
-    ASSERT_EQ(std::string(ini().iniFileDir()) + iniFileName, ini().iniFilePath());
+    ASSERT_STREQ(iniFileName, ini().iniFile());
+    ASSERT_TRUE(IniConfig::iniFilesDir() != nullptr);
+    if (IniConfig::isEnabled())
+        ASSERT_TRUE(IniConfig::iniFilesDir()[0] != '\0');
+    ASSERT_EQ(std::string(IniConfig::iniFilesDir()) + iniFileName, ini().iniFilePath());
 
     // Create directory for ini files. Works for Windows as well.
-    if (ini().isEnabled())
-        system((std::string("mkdir ") + ini().iniFileDir()).c_str()); //< Ignore possible errors.
+    if (IniConfig::isEnabled())
+        system((std::string("mkdir ") + IniConfig::iniFilesDir()).c_str()); //< Ignore errors.
 
     std::remove(ini().iniFilePath()); //< Clean up from failed runs (if any).
 

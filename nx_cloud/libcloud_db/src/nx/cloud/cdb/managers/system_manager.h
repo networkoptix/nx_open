@@ -16,18 +16,19 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
+#include <nx/data_sync_engine/transaction_log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
-#include <nx_ec/data/api_data.h>
-#include <nx_ec/data/api_user_data.h>
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
-#include <nx/utils/db/async_sql_query_executor.h>
-#include <nx/utils/db/filter.h>
+#include <nx/sql/async_sql_query_executor.h>
+#include <nx/sql/filter.h>
+#include <nx/vms/api/data_fwd.h>
 
 #include "account_manager.h"
 #include "cache.h"
 #include "data_view.h"
+#include "extension_pool.h"
 #include "managers_types.h"
 #include "system_sharing_manager.h"
 #include "../access_control/auth_types.h"
@@ -37,7 +38,8 @@
 #include "../data/account_data.h"
 #include "../data/data_filter.h"
 #include "../data/system_data.h"
-#include "../ec2/transaction_log.h"
+
+namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
 namespace nx {
 namespace cdb {
@@ -47,14 +49,19 @@ namespace conf { class Settings; } // namespace conf
 class AbstractEmailManager;
 class AbstractAccountManager;
 class AbstractSystemHealthInfoProvider;
-
-namespace ec2 {
-
-class SyncronizationEngine;
-
-} // namespace ec2
-
 class InviteUserNotification;
+
+//-------------------------------------------------------------------------------------------------
+
+class AbstractSystemExtension
+{
+public:
+    virtual ~AbstractSystemExtension() = default;
+
+    virtual void modifySystemBeforeProviding(api::SystemDataEx* system) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 class AbstractSystemManager
 {
@@ -63,20 +70,25 @@ public:
 
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const = 0;
 
-    virtual nx::utils::db::DBResult fetchSystemById(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult fetchSystemById(
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         data::SystemData* const system) = 0;
 
-    virtual nx::utils::db::DBResult updateSystemStatus(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult updateSystemStatus(
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         api::SystemStatus systemStatus) = 0;
 
-    virtual nx::utils::db::DBResult markSystemForDeletion(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult markSystemForDeletion(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId) = 0;
+
+    virtual void addExtension(AbstractSystemExtension*) = 0;
+    virtual void removeExtension(AbstractSystemExtension*) = 0;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Provides methods for manipulating system data on persisent storage.
@@ -105,15 +117,14 @@ public:
         nx::utils::StandaloneTimerManager* const timerManager,
         AbstractAccountManager* const accountManager,
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
-        nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
+        nx::sql::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
-        ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
+        data_sync_engine::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
         const nx::network::http::StringType& username,
-        std::function<bool(const nx::Buffer&)> validateHa1Func,
-        const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+        const std::function<bool(const nx::Buffer&)>& validateHa1Func,
         nx::utils::stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
@@ -164,26 +175,34 @@ public:
 
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const override;
 
-    virtual nx::utils::db::DBResult fetchSystemById(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult fetchSystemById(
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         data::SystemData* const system) override;
 
-    virtual nx::utils::db::DBResult updateSystemStatus(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult updateSystemStatus(
+        nx::sql::QueryContext* queryContext,
         const std::string& systemId,
         api::SystemStatus systemStatus) override;
 
-    virtual nx::utils::db::DBResult markSystemForDeletion(
-        nx::utils::db::QueryContext* const queryContext,
+    virtual nx::sql::DBResult markSystemForDeletion(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId) override;
+
+    //---------------------------------------------------------------------------------------------
+    // AbstractSystemSharingManager overrides.
 
     virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
         const std::string& systemId) const override;
+
     virtual boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
         const std::string& systemId) const override;
+
+    virtual std::vector<api::SystemSharingEx> fetchSystemUsers(
+        sql::QueryContext* queryContext,
+        const std::string& systemId) override;
 
     std::vector<api::SystemSharingEx> fetchAllSharings() const;
 
@@ -194,6 +213,9 @@ public:
 
     virtual void addSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
     virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
+
+    virtual void addExtension(AbstractSystemExtension*) override;
+    virtual void removeExtension(AbstractSystemExtension*) override;
 
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
@@ -264,9 +286,9 @@ private:
     nx::utils::StandaloneTimerManager* const m_timerManager;
     AbstractAccountManager* const m_accountManager;
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
-    nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::sql::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
-    ec2::SyncronizationEngine* const m_ec2SyncronizationEngine;
+    data_sync_engine::SyncronizationEngine* const m_ec2SyncronizationEngine;
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
@@ -277,41 +299,44 @@ private:
     std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
     std::set<AbstractSystemSharingExtension*> m_systemSharingExtensions;
+    ExtensionPool<AbstractSystemExtension> m_extensions;
 
     virtual void afterUpdatingAccount(
-        nx::utils::db::QueryContext*,
+        nx::sql::QueryContext*,
         const data::AccountUpdateDataWithEmail&) override;
 
-    nx::utils::db::DBResult insertSystemToDB(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult insertSystemToDB(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemRegistrationDataWithAccount& newSystem,
         InsertNewSystemToDbResult* const result);
-    nx::utils::db::DBResult insertNewSystemDataToDb(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult insertNewSystemDataToDb(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemRegistrationDataWithAccount& newSystem,
         InsertNewSystemToDbResult* const result);
-    nx::utils::db::DBResult insertOwnerSharingToDb(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult insertOwnerSharingToDb(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         const data::SystemRegistrationDataWithAccount& newSystem,
         nx::cdb::data::SystemSharing* const ownerSharing);
+
     void systemAdded(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
+        nx::sql::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
         InsertNewSystemToDbResult systemData,
         std::function<void(api::ResultCode, data::SystemData)> completionHandler);
 
     void markSystemForDeletionInCache(const std::string& systemId);
 
-    nx::utils::db::DBResult deleteSystemFromDB(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult deleteSystemFromDB(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemId& systemId);
+
     void systemDeleted(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
+        nx::sql::DBResult dbResult,
         data::SystemId systemId,
         std::function<void(api::ResultCode)> completionHandler);
 
@@ -321,35 +346,37 @@ private:
     /**
      * @param inviteeAccount Filled with attributes of account sharing.accountEmail.
      */
-    nx::utils::db::DBResult shareSystem(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult shareSystem(
+        nx::sql::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         NotificationCommand notificationCommand,
         data::AccountData* const inviteeAccount);
-    nx::utils::db::DBResult addNewSharing(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult addNewSharing(
+        nx::sql::QueryContext* const queryContext,
         const data::AccountData& inviteeAccount,
         const data::SystemSharing& sharing);
-    nx::utils::db::DBResult deleteSharing(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult deleteSharing(
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         const data::AccountData& inviteeAccount);
 
-    nx::utils::db::DBResult insertOrReplaceSharing(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult insertOrReplaceSharing(
+        nx::sql::QueryContext* const queryContext,
         api::SystemSharingEx sharing);
 
     template<typename Notification>
-    nx::utils::db::DBResult fillSystemSharedNotification(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult fillSystemSharedNotification(
+        nx::sql::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const std::string& systemId,
         const std::string& inviteeEmail,
         Notification* const notification);
 
-    nx::utils::db::DBResult notifyUserAboutNewSystem(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult notifyUserAboutNewSystem(
+        nx::sql::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const data::AccountData& inviteeAccount,
         const api::SystemSharing& sharing);
@@ -362,74 +389,86 @@ private:
     boost::optional<std::vector<api::SystemDataEx>> selectSystemsFromCacheByFilter(
         const nx::utils::stree::AbstractResourceReader& requestResources,
         const data::DataFilter& filter);
+
     void addUserAccessInfo(const std::string& accountEmail, api::SystemDataEx& systemDataEx);
 
     /**
      * Fetch existing account or create a new one sending corresponding notification.
      */
-    nx::utils::db::DBResult fetchAccountToShareWith(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult fetchAccountToShareWith(
+        nx::sql::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         data::AccountData* const inviteeAccount,
         bool* const isNewAccount);
-    nx::utils::db::DBResult inviteNewUserToSystem(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult inviteNewUserToSystem(
+        nx::sql::QueryContext* const queryContext,
         const std::string& inviterEmail,
         const data::AccountData& inviteeAccount,
         const std::string& systemId);
-    nx::utils::db::DBResult scheduleInvintationNotificationDelivery(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult scheduleInvintationNotificationDelivery(
+        nx::sql::QueryContext* const queryContext,
         const std::string& inviterEmail,
         const data::AccountData& inviteeAccount,
         const std::string& systemId);
-    nx::utils::db::DBResult prepareInviteNotification(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult prepareInviteNotification(
+        nx::sql::QueryContext* const queryContext,
         const std::string& inviterEmail,
         const data::AccountData& inviteeAccount,
         const std::string& systemId,
         InviteUserNotification* const notification);
-    nx::utils::db::DBResult updateSharingInDbAndGenerateTransaction(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult updateSharingInDbAndGenerateTransaction(
+        nx::sql::QueryContext* const queryContext,
         const std::string& grantorEmail,
         const data::SystemSharing& sharing,
         NotificationCommand notificationCommand);
 
-    nx::utils::db::DBResult generateSaveUserTransaction(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult generateSaveUserTransaction(
+        nx::sql::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         const api::AccountData& account);
-    nx::utils::db::DBResult generateUpdateFullNameTransaction(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult generateUpdateFullNameTransaction(
+        nx::sql::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         const std::string& newFullName);
-    nx::utils::db::DBResult generateRemoveUserTransaction(
-        nx::utils::db::QueryContext* const queryContext,
-        const api::SystemSharing& sharing);
-    nx::utils::db::DBResult generateRemoveUserFullNameTransaction(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult generateRemoveUserTransaction(
+        nx::sql::QueryContext* const queryContext,
         const api::SystemSharing& sharing);
 
-    nx::utils::db::DBResult placeUpdateUserTransactionToEachSystem(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult generateRemoveUserFullNameTransaction(
+        nx::sql::QueryContext* const queryContext,
+        const api::SystemSharing& sharing);
+
+    nx::sql::DBResult placeUpdateUserTransactionToEachSystem(
+        nx::sql::QueryContext* const queryContext,
         const data::AccountUpdateDataWithEmail& accountData);
+
     void updateSharingInCache(data::SystemSharing sharing);
+
     void updateSharingInCache(
         api::SystemSharingEx sharing,
         bool updateExFields = true);
 
-    nx::utils::db::DBResult updateSystem(
-        nx::utils::db::QueryContext* const queryContext,
+    nx::sql::DBResult updateSystem(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data);
-    nx::utils::db::DBResult renameSystem(
-        nx::utils::db::QueryContext* const queryContext,
+
+    nx::sql::DBResult renameSystem(
+        nx::sql::QueryContext* const queryContext,
         const data::SystemAttributesUpdate& data);
+
     void updateSystemAttributesInCache(
         data::SystemAttributesUpdate data);
+
     void systemNameUpdated(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
+        nx::sql::DBResult dbResult,
         data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
@@ -438,14 +477,17 @@ private:
         const QnMutexLockerBase& lock,
         SystemDictionary& systemByIdIndex,
         typename SystemDictionary::iterator systemIter);
+
     template<typename Handler>
     void updateSystemInCache(std::string systemId, Handler handler);
+
     void updateSystemStatusInCache(std::string systemId, api::SystemStatus systemStatus);
 
-    nx::utils::db::DBResult saveUserSessionStart(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult saveUserSessionStart(
+        nx::sql::QueryContext* queryContext,
         const data::UserSessionDescriptor& userSessionDescriptor,
         SaveUserSessionResult* const result);
+
     void updateSystemUsageStatisticsCache(
         const data::UserSessionDescriptor& userSessionDescriptor,
         const SaveUserSessionResult& usageStatistics);
@@ -456,58 +498,56 @@ private:
     api::SystemAccessRoleList getSharingPermissions(
         api::SystemAccessRole accessRole) const;
 
-    nx::utils::db::DBResult fillCache();
-    template<typename Func> nx::utils::db::DBResult doBlockingDbQuery(Func func);
-    nx::utils::db::DBResult fetchSystemToAccountBinder(
-        nx::utils::db::QueryContext* queryContext);
+    nx::sql::DBResult fillCache();
+    template<typename Func> nx::sql::DBResult doBlockingDbQuery(Func func);
+    nx::sql::DBResult fetchSystemToAccountBinder(
+        nx::sql::QueryContext* queryContext);
 
     void dropExpiredSystems(uint64_t timerId);
     void expiredSystemsDeletedFromDb(
         nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult);
+        nx::sql::DBResult dbResult);
 
     /** Processes saveUser transaction received from mediaserver. */
-    nx::utils::db::DBResult processEc2SaveUser(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult processEc2SaveUser(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiUserData> data,
+        data_sync_engine::Command<nx::vms::api::UserData> data,
         data::SystemSharing* const systemSharingData);
+
     void onEc2SaveUserDone(
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
+        nx::sql::DBResult dbResult,
         data::SystemSharing sharing);
 
-    nx::utils::db::DBResult processEc2RemoveUser(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult processEc2RemoveUser(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiIdData> data,
+        data_sync_engine::Command<nx::vms::api::IdData> data,
         data::SystemSharing* const systemSharingData);
+
     void onEc2RemoveUserDone(
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
+        nx::sql::DBResult dbResult,
         data::SystemSharing sharing);
 
-    nx::utils::db::DBResult processSetResourceParam(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult processSetResourceParam(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data,
+        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data,
         data::SystemAttributesUpdate* const systemNameUpdate);
+
     void onEc2SetResourceParamDone(
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult,
+        nx::sql::DBResult dbResult,
         data::SystemAttributesUpdate systemNameUpdate);
 
-    nx::utils::db::DBResult processRemoveResourceParam(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult processRemoveResourceParam(
+        nx::sql::QueryContext* queryContext,
         const nx::String& systemId,
-        ::ec2::QnTransaction<::ec2::ApiResourceParamWithRefData> data);
-    void onEc2RemoveResourceParamDone(
-        nx::utils::db::QueryContext* /*queryContext*/,
-        nx::utils::db::DBResult dbResult);
+        data_sync_engine::Command<nx::vms::api::ResourceParamWithRefData> data);
+
+    void onEc2RemoveResourceParamDone(nx::sql::DBResult dbResult);
 
     template<typename ExtensionFuncPtr, typename... Args>
-    nx::utils::db::DBResult invokeSystemSharingExtension(
+    nx::sql::DBResult invokeSystemSharingExtension(
         ExtensionFuncPtr extensionFunc,
         const Args&... args);
 };

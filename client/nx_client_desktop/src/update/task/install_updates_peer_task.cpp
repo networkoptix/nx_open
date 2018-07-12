@@ -4,43 +4,45 @@
 
 #include <QtCore/QTimer>
 
-#include <common/common_module.h>
 
 #include <api/app_server_connection.h>
 #include <api/model/upload_update_reply.h>
-#include <nx_ec/ec_proto_version.h>
+#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <client/client_message_processor.h>
-#include <utils/common/delete_later.h>
-#include <nx/utils/log/log.h>
 #include <network/router.h>
+#include <nx_ec/ec_proto_version.h>
+#include <utils/common/delete_later.h>
 
-namespace detail {
-    using namespace std::chrono;
+#include <nx/utils/log/log.h>
 
-    const int kCheckTimeoutMs = milliseconds(minutes(20)).count();
-    const int kStartPingTimeoutMs = milliseconds(minutes(1)).count();
-    const int kPingIntervalMs = milliseconds(seconds(10)).count();
-    const int kShortTimeoutMs = milliseconds(minutes(1)).count();
+namespace {
 
-    const QnSoftwareVersion kUnauthenticatedUpdateMinVersion(3, 0);
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
-    QnInstallUpdatesPeerTask::PeersToQueryMap sortedPeers(QnRouter* router, const QSet<QnUuid>& peers)
-    {
-        QnInstallUpdatesPeerTask::PeersToQueryMap result;
+constexpr milliseconds kCheckTimeoutMs = 20min;
+constexpr milliseconds kStartPingTimeoutMs = 1min;
+constexpr milliseconds kPingIntervalMs = 10s;
 
-        if (!router)
-            return result;
+static const nx::utils::SoftwareVersion kUnauthenticatedUpdateMinVersion(3, 0);
 
-        for (const auto& id: peers)
-            result.emplace(router->routeTo(id).distance, id);
+QnInstallUpdatesPeerTask::PeersToQueryMap sortedPeers(QnRouter* router, const QSet<QnUuid>& peers)
+{
+    QnInstallUpdatesPeerTask::PeersToQueryMap result;
 
+    if (!router)
         return result;
-    }
 
-} using namespace detail;
+    for (const auto& id: peers)
+        result.emplace(router->routeTo(id).distance, id);
+
+    return result;
+}
+
+} // namespace;
 
 QnInstallUpdatesPeerTask::QnInstallUpdatesPeerTask(QObject* parent):
     QnNetworkPeerTask(parent)
@@ -61,7 +63,7 @@ void QnInstallUpdatesPeerTask::setUpdateId(const QString& updateId)
     m_updateId = updateId;
 }
 
-void QnInstallUpdatesPeerTask::setVersion(const QnSoftwareVersion& version)
+void QnInstallUpdatesPeerTask::setVersion(const nx::utils::SoftwareVersion& version)
 {
     m_version = version;
 }
@@ -88,8 +90,8 @@ void QnInstallUpdatesPeerTask::doStart()
 
     m_ecServer = commonModule()->currentServer();
 
-    connect(resourcePool(), &QnResourcePool::resourceChanged,
-        this, &QnInstallUpdatesPeerTask::at_resourceChanged);
+    connect(resourcePool(), &QnResourcePool::statusChanged,
+        this, &QnInstallUpdatesPeerTask::at_resourceStatusChanged);
 
     m_stoppingPeers = m_restartingPeers = m_pendingPeers = peers();
 
@@ -100,8 +102,7 @@ void QnInstallUpdatesPeerTask::doStart()
 
     m_peersToQuery = sortedPeers(commonModule()->router(), peers());
 
-    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Start installing update [%1].").arg(m_updateId),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lm("Start installing update [%1].").arg(m_updateId));
 
     queryNextGroup();
 }
@@ -131,13 +132,8 @@ void QnInstallUpdatesPeerTask::queryNextGroup()
 
         int handle = -1;
 
-        NX_LOG(
-            lit("Update: QnInstallUpdatePeerTask: Updating server [%1, %2, %3], distance %4.")
-                .arg(server->getName())
-                .arg(server->getApiUrl().toString())
-                .arg(server->getVersion().toString())
-                .arg(distance),
-            cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Updating server [%1, %2, %3], distance %4.").args(
+            server->getName(), server->getApiUrl(), server->getVersion(), distance));
 
         if (server->getVersion() >= kUnauthenticatedUpdateMinVersion)
         {
@@ -159,13 +155,16 @@ void QnInstallUpdatesPeerTask::queryNextGroup()
         }
 
         m_serverByRequest.insert(handle, server);
+
+        connect(server.data(), &QnMediaServerResource::versionChanged,
+            this, &QnInstallUpdatesPeerTask::at_serverVersionChanged);
     }
 }
 
 void QnInstallUpdatesPeerTask::startWaiting()
 {
-    m_checkTimer->start(kCheckTimeoutMs);
-    m_pingTimer->start(kStartPingTimeoutMs);
+    m_checkTimer->start(kCheckTimeoutMs.count());
+    m_pingTimer->start(kStartPingTimeoutMs.count());
 
     int peersSize = m_pendingPeers.size();
 
@@ -175,8 +174,8 @@ void QnInstallUpdatesPeerTask::startWaiting()
     connect(progressTimer, &QTimer::timeout,  this,
         [this, peersSize]
         {
-            int progress =
-                (kCheckTimeoutMs - m_checkTimer->remainingTime()) * 100 / kCheckTimeoutMs;
+            int progress = (kCheckTimeoutMs.count() - m_checkTimer->remainingTime())
+                * 100 / kCheckTimeoutMs.count();
             progress = qBound(0, progress, 100);
 
             /* Count finished peers. */
@@ -218,12 +217,12 @@ void QnInstallUpdatesPeerTask::removeWaitingPeer(const QnUuid& id)
         queryNextGroup();
 }
 
-void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr& resource)
+void QnInstallUpdatesPeerTask::at_resourceStatusChanged(const QnResourcePtr& resource)
 {
-    QnUuid peerId = resource->getId();
+    const auto peerId = resource->getId();
 
     /* Stop ping timer if the main server has appeared online */
-    if (resource->getId() == m_ecServer->getId()
+    if (peerId == m_ecServer->getId()
         && !m_stoppingPeers.contains(peerId)
         && resource->getStatus() == Qn::Online)
     {
@@ -237,6 +236,11 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr& resource)
         m_stoppingPeers.remove(peerId);
     else if (!m_stoppingPeers.contains(peerId))
         m_restartingPeers.remove(peerId);
+}
+
+void QnInstallUpdatesPeerTask::at_serverVersionChanged(const QnResourcePtr& resource)
+{
+    const auto peerId = resource->getId();
 
     const auto server = resource.dynamicCast<QnMediaServerResource>();
     NX_ASSERT(server);
@@ -249,28 +253,21 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr& resource)
         m_stoppingPeers.remove(peerId);
         m_restartingPeers.remove(peerId);
 
-        NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Installation finished [%1, %2].")
-           .arg(server->getName()).arg(server->getId().toString()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Installation finished [%1, %2].").args(
+            server->getName(), server->getId()));
 
         emit peerFinished(peerId);
     }
 
     if (m_pendingPeers.isEmpty())
     {
-        NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Finished."), cl_logDEBUG1);
+        NX_DEBUG(this, "Finished.");
         finish(NoError);
         return;
     }
 
     if (peerUpdateFinished)
         removeWaitingPeer(peerId);
-
-    if (m_restartingPeers.isEmpty())
-    {
-        /* When all peers were restarted we only have to wait for saveServer transactions.
-           It shouldn't take long time. So restart timer to a short timeout. */
-        m_checkTimer->start(kShortTimeoutMs);
-    }
 }
 
 void QnInstallUpdatesPeerTask::at_checkTimer_timeout()
@@ -292,17 +289,16 @@ void QnInstallUpdatesPeerTask::at_checkTimer_timeout()
 
     int result = m_pendingPeers.isEmpty() ? NoError : InstallationFailed;
 
-    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Finished on timeout [%1].").arg(result),
-        cl_logDEBUG1);
+    NX_DEBUG(this, lm("Finished on timeout [%1].").arg(result));
 
     finish(result);
 }
 
 void QnInstallUpdatesPeerTask::at_pingTimer_timeout()
 {
-    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Ping EC."), cl_logDEBUG2);
+    NX_VERBOSE(this, "Ping EC.");
 
-    m_pingTimer->setInterval(kPingIntervalMs);
+    m_pingTimer->setInterval(kPingIntervalMs.count());
 
     if (!m_ecConnection)
     {
@@ -311,21 +307,21 @@ void QnInstallUpdatesPeerTask::at_pingTimer_timeout()
     }
 
     m_ecConnection->modulesInformation(
-        this, SLOT(at_gotModuleInformation(int,QList<QnModuleInformation>,int)));
+        this, SLOT(at_gotModuleInformation(int, QList<nx::vms::api::ModuleInformation>, int)));
 }
 
 void QnInstallUpdatesPeerTask::at_gotModuleInformation(
-    int status, const QList<QnModuleInformation>& modules, int handle)
+    int status, const QList<nx::vms::api::ModuleInformation>& modules, int handle)
 {
     Q_UNUSED(handle)
 
     if (status != 0)
     {
-        NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Ping EC failed."), cl_logDEBUG2);
+        NX_VERBOSE(this, "Ping EC failed.");
         return;
     }
 
-    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Ping EC succeed."), cl_logDEBUG2);
+    NX_VERBOSE(this, "Ping EC succeed.");
 
     for (const auto& moduleInformation: modules)
     {
@@ -338,23 +334,17 @@ void QnInstallUpdatesPeerTask::at_gotModuleInformation(
         {
             m_protoProblemDetected = true;
             emit protocolProblemDetected();
-            NX_LOG(
-                lit("Update: QnInstallUpdatesPeerTask: Protocol problem found: %1 != %2.")
-                    .arg(moduleInformation.protoVersion).arg(nx_ec::EC2_PROTO_VERSION),
-                cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Protocol problem found: %1 != %2.").args(
+                moduleInformation.protoVersion, nx_ec::EC2_PROTO_VERSION));
         }
 
         if (server->getVersion() != moduleInformation.version)
         {
-            NX_LOG(
-                lit("Update: QnInstallUpdatesPeerTask: "
-                    "Ping reply: Updating server version: %1 [%2].")
-                    .arg(moduleInformation.id.toString())
-                    .arg(moduleInformation.version.toString()),
-                cl_logDEBUG2);
+            NX_VERBOSE(this, lm("Ping reply: Updating server version: %1 [%2].").args(
+                moduleInformation.id, moduleInformation.version));
 
             server->setVersion(moduleInformation.version);
-            at_resourceChanged(server);
+            at_serverVersionChanged(server);
         }
     }
 }
@@ -366,13 +356,8 @@ void QnInstallUpdatesPeerTask::at_installUpdateResponse(
     if (!server)
         return;
 
-    NX_LOG(
-        lit("Update: QnInstallUpdatePeerTask: Reply [status = %1, reply = %2, server: %3, %4].")
-            .arg(status)
-            .arg(reply.offset)
-            .arg(server->getName())
-            .arg(server->getApiUrl().toString()),
-        cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Reply [status = %1, reply = %2, server: %3, %4].").args(
+        status, reply.offset, server->getName(), server->getApiUrl()));
 
     if (status != 0 || reply.offset != ec2::AbstractUpdatesManager::NoError)
     {

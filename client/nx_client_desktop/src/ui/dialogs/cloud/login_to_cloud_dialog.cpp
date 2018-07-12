@@ -10,19 +10,22 @@
 
 #include <helpers/cloud_url_helper.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/palette.h>
+#include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/cloud/cloud_result_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/input_field.h>
+#include <nx/client/desktop/common/widgets/input_field.h>
 
 #include <watchers/cloud_status_watcher.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/html.h>
+
+using namespace nx::client::desktop;
 
 namespace
 {
@@ -40,13 +43,12 @@ public:
     QnLoginToCloudDialogPrivate(QnLoginToCloudDialog* parent);
 
     void updateUi();
+    void resetErrorState();
     void lockUi(bool locked = true);
     void unlockUi();
     void at_loginButton_clicked();
     void at_cloudStatusWatcher_statusChanged(QnCloudStatusWatcher::Status status);
     void at_cloudStatusWatcher_error();
-
-    void showCredentialsError(const QString& text);
 };
 
 QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
@@ -58,21 +60,19 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     Q_D(QnLoginToCloudDialog);
 
-    setWindowTitle(tr("Log in to %1", "%1 is the cloud name (like 'Nx Cloud')")
+    setWindowTitle(tr("Log in to %1", "%1 is the cloud name (like Nx Cloud)")
         .arg(nx::network::AppInfo::cloudName()));
 
     ui->loginInputField->setTitle(tr("Email"));
-    ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
+    ui->loginInputField->setValidator(defaultEmailValidator(false));
 
     ui->passwordInputField->setTitle(tr("Password"));
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
-    ui->passwordInputField->setValidator(Qn::defaultPasswordValidator(false));
-
-    setWarningStyle(ui->invalidCredentialsLabel);
+    ui->passwordInputField->setValidator(defaultPasswordValidator(false));
 
     connect(ui->loginButton,        &QPushButton::clicked,      d, &QnLoginToCloudDialogPrivate::at_loginButton_clicked);
-    connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
-    connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
+    connect(ui->loginInputField,    &InputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
+    connect(ui->passwordInputField, &InputField::textChanged, d, &QnLoginToCloudDialogPrivate::updateUi);
 
     using nx::vms::utils::SystemUri;
     QnCloudUrlHelper urlHelper(
@@ -83,7 +83,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
 
-    ui->cloudWelcomeLabel->setText(tr("Welcome to %1!", "%1 is the cloud name (like 'Nx Cloud')")
+    ui->cloudWelcomeLabel->setText(tr("Welcome to %1!", "%1 is the cloud name (like Nx Cloud)")
         .arg(nx::network::AppInfo::cloudName()));
     ui->cloudImageLabel->setPixmap(qnSkin->pixmap("cloud/cloud_64.png"));
 
@@ -96,8 +96,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     const QColor nxColor(qApp->palette().color(QPalette::Normal, QPalette::BrightText));
     setPaletteColor(ui->cloudWelcomeLabel, QPalette::WindowText, nxColor);
 
-    auto aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    auto aligner = new Aligner(this);
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->loginInputField, ui->passwordInputField, ui->spacer });
 
     auto opacityEffect = new QGraphicsOpacityEffect(this);
@@ -106,6 +106,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     opacityEffect = new QGraphicsOpacityEffect(this);
     opacityEffect->setOpacity(style::Hints::kDisabledItemOpacity);
     ui->linksWidget->setGraphicsEffect(opacityEffect);
+    ui->hintLabel->setVisible(false);
 
     d->updateUi();
     d->lockUi(false);
@@ -133,14 +134,6 @@ void QnLoginToCloudDialog::showEvent(QShowEvent* event)
         ui->passwordInputField->setFocus();
 }
 
-void QnLoginToCloudDialogPrivate::showCredentialsError(const QString& text)
-{
-    Q_Q(QnLoginToCloudDialog);
-    q->ui->invalidCredentialsLabel->setHidden(text.isEmpty());
-    q->ui->invalidCredentialsLabel->setText(text);
-    q->ui->containerWidget->layout()->activate();
-}
-
 QnLoginToCloudDialogPrivate::QnLoginToCloudDialogPrivate(QnLoginToCloudDialog* parent) :
     QObject(parent),
     q_ptr(parent)
@@ -150,11 +143,22 @@ QnLoginToCloudDialogPrivate::QnLoginToCloudDialogPrivate(QnLoginToCloudDialog* p
 void QnLoginToCloudDialogPrivate::updateUi()
 {
     Q_Q(QnLoginToCloudDialog);
+
+    resetErrorState();
+
     q->ui->loginButton->setEnabled(
         q->ui->loginInputField->isValid() &&
-        q->ui->passwordInputField->isValid());
+                q->ui->passwordInputField->isValid());
+}
 
-    showCredentialsError(QString());
+void QnLoginToCloudDialogPrivate::resetErrorState()
+{
+    Q_Q(QnLoginToCloudDialog);
+
+    q->ui->loginInputField->setCustomHint(QString());
+    q->ui->passwordInputField->setCustomHint(QString());
+    resetStyle(q->ui->loginInputField);
+    resetStyle(q->ui->passwordInputField);
 }
 
 void QnLoginToCloudDialogPrivate::lockUi(bool locked)
@@ -165,7 +169,7 @@ void QnLoginToCloudDialogPrivate::lockUi(bool locked)
 
     q->ui->logoPanel->setEnabled(enabled);
     q->ui->containerWidget->setEnabled(enabled);
-    q->ui->loginButton->setEnabled(enabled && q->ui->invalidCredentialsLabel->isHidden());
+    q->ui->loginButton->setEnabled(enabled && q->ui->passwordInputField->isValid());
 
     q->ui->logoPanel->graphicsEffect()->setEnabled(locked);
     q->ui->linksWidget->graphicsEffect()->setEnabled(locked);
@@ -181,10 +185,9 @@ void QnLoginToCloudDialogPrivate::unlockUi()
 void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
 {
     lockUi();
+    resetErrorState();
 
     Q_Q(QnLoginToCloudDialog);
-
-    showCredentialsError(QString());
 
     qnCloudStatusWatcher->resetCredentials();
 
@@ -223,31 +226,65 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
 
 void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
 {
+    Q_Q(QnLoginToCloudDialog);
+
     const auto errorCode = qnCloudStatusWatcher->error();
     qnCloudStatusWatcher->disconnect(this);
+
+    QWidget* focusWidget = nullptr;
+
+    bool showHint = false;
 
     switch (errorCode)
     {
         case QnCloudStatusWatcher::NoError:
             break;
 
-        case QnCloudStatusWatcher::InvalidCredentials:
-            showCredentialsError(QnCloudResultMessages::invalidCredentials());
+        case QnCloudStatusWatcher::InvalidEmail:
+            q->ui->passwordInputField->clear();
+            q->ui->passwordInputField->reset();
+            q->ui->loginInputField->setCustomHint(QnCloudResultMessages::accountNotFound());
+            setWarningStyle(q->ui->loginInputField);
+            focusWidget = q->ui->loginInputField;
             break;
 
         case QnCloudStatusWatcher::AccountNotActivated:
-            showCredentialsError(QnCloudResultMessages::accountNotActivated());
+            q->ui->passwordInputField->clear();
+            q->ui->passwordInputField->reset();
+            q->ui->loginInputField->setCustomHint(QnCloudResultMessages::accountNotActivated());
+            setWarningStyle(q->ui->loginInputField);
+            focusWidget = q->ui->loginInputField;
             break;
 
+        case QnCloudStatusWatcher::InvalidPassword:
+            q->ui->passwordInputField->clear();
+            q->ui->passwordInputField->setCustomHint(QnCloudResultMessages::invalidPassword());
+            setWarningStyle(q->ui->passwordInputField);
+            focusWidget = q->ui->passwordInputField;
+            break;
+
+        case QnCloudStatusWatcher::UserTemporaryLockedOut:
+            q->ui->passwordInputField->clear();
+            q->ui->passwordInputField->reset();
+            showHint = true;
+            q->ui->hintLabel->setText(QnCloudResultMessages::userLockedOut());
+            setWarningStyle(q->ui->hintLabel);
+            focusWidget = q->ui->loginButton;
+            break;
         case QnCloudStatusWatcher::UnknownError:
         default:
         {
-            Q_Q(QnLoginToCloudDialog);
-
             QnMessageBox::critical(q, tr("Failed to login to %1",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName()));
+                "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName()));
             break;
         }
     }
+
     unlockUi();
+
+    if (showHint != q->ui->hintLabel->isVisible())
+        q->ui->hintLabel->setVisible(showHint);
+
+    if (focusWidget)
+        focusWidget->setFocus();
 }

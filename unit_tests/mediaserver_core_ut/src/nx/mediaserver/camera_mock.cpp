@@ -6,6 +6,11 @@ namespace mediaserver {
 namespace resource {
 namespace test {
 
+CameraDiagnostics::Result CameraMock::initialize()
+{
+    return initInternal();
+}
+
 boost::optional<QString> CameraMock::getApiParameter(const QString& id)
 {
     const auto it = m_apiAadvancedParameters.find(id);
@@ -49,6 +54,11 @@ void CameraMock::setStreamCapabilityMaps(StreamCapabilityMap primary, StreamCapa
 {
     m_streamCapabilityMaps[Qn::StreamIndex::primary] = std::move(primary);
     m_streamCapabilityMaps[Qn::StreamIndex::secondary] = std::move(secondary);
+}
+
+void CameraMock::setMediaTraits(nx::media::CameraTraits traits)
+{
+    m_mediaTraits = std::move(traits);
 }
 
 void CameraMock::enableSetProperty(bool isEnabled)
@@ -100,6 +110,11 @@ QnCameraAdvancedParams CameraMock::makeParameterDescriptions(const std::vector<Q
     return descriptions;
 }
 
+void CameraMock::setPtzController(QnAbstractPtzController* controller)
+{
+    m_ptzController = controller;
+}
+
 QString CameraMock::getDriverName() const
 {
     return lit("mock");
@@ -129,6 +144,16 @@ StreamCapabilityMap CameraMock::getStreamCapabilityMapFromDrives(Qn::StreamIndex
     return m_streamCapabilityMaps.value(streamIndex);
 }
 
+nx::media::CameraTraits CameraMock::mediaTraits() const
+{
+    return m_mediaTraits;
+}
+
+QnAbstractPtzController* CameraMock::createPtzControllerInternal() const
+{
+    return m_ptzController;
+}
+
 QString CameraMock::getProperty(const QString& key) const
 {
     return m_properties[key];
@@ -143,15 +168,6 @@ bool CameraMock::setProperty(const QString& key, const QString& value, PropertyO
     return true;
 }
 
-bool CameraMock::removeProperty(const QString& key)
-{
-    if (!isSetProprtyEnabled)
-        return false;
-
-    m_properties.erase(key);
-    return true;
-}
-
 bool CameraMock::isCameraControlDisabled() const
 {
     return false;
@@ -159,10 +175,15 @@ bool CameraMock::isCameraControlDisabled() const
 
 Qn::MotionType CameraMock::getMotionType() const
 {
-    return Qn::MT_SoftwareGrid;
+    return Qn::MotionType::MT_SoftwareGrid;
 }
 
 bool CameraMock::saveParams()
+{
+    return true;
+}
+
+bool CameraMock::hasDualStreamingInternal() const
 {
     return true;
 }
@@ -172,16 +193,27 @@ bool CameraMock::hasDualStreaming() const
     return true;
 }
 
-bool CameraMock::hasDualStreaming2() const
-{
-    return true;
-}
-
 QnSharedResourcePointer<CameraMock> CameraTest::newCamera(std::function<void(CameraMock*)> setup)
 {
     QnSharedResourcePointer<CameraMock> camera(new CameraMock());
     setup(camera.data());
     return camera->initInternal() ? camera : QnSharedResourcePointer<CameraMock>();
+}
+
+void CameraTest::SetUp()
+{
+    m_dataProviderFactory.reset(new QnDataProviderFactory());
+    m_dataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
+}
+
+void CameraTest::TearDown()
+{
+    m_dataProviderFactory.reset();
+}
+
+QnDataProviderFactory* CameraTest::dataProviderFactory() const
+{
+    return m_dataProviderFactory.data();
 }
 
 } // namespace test

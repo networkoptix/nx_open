@@ -8,7 +8,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/client/desktop/ui/graphics/painters/highlighted_area_text_painter.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 
 namespace nx {
 namespace client {
@@ -251,7 +251,7 @@ void AreaTooltipItem::paint(
         QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
         QnScopedPainterAntialiasingRollback(painter, true);
 
-        const ui::PainterTransformScaleStripper scaleStripper(painter);
+        const PainterTransformScaleStripper scaleStripper(painter);
 
         const auto rect = scaleStripper.mapRect(
             Geometry::eroded(boundingRect(), kArrowSize.height()));

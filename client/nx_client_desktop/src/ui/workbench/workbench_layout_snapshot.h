@@ -7,7 +7,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_item_data.h>
 
-// TODO: #GDM replace with ec2::ApiLayoutData
+// TODO: #4.0  #GDM replace with nx::vms::api::LayoutData
 class QnWorkbenchLayoutSnapshot
 {
 public:
@@ -23,6 +23,8 @@ public:
     QSize backgroundSize;
     QString backgroundImageFilename;
     qreal backgroundOpacity;
+    QSize fixedSize;
+    qint32 logicalId = 0;
 
     bool locked;
 

@@ -6,6 +6,7 @@
 
 #include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
+#include <nx/api/updates2/updates2_action_data.h>
 #include <api/model/update_information_reply.h>
 #include <api/app_server_connection.h>
 #include <api/helpers/empty_request_data.h>
@@ -14,27 +15,26 @@
 #include <api/helpers/send_statistics_request_data.h>
 #include <api/helpers/event_log_request_data.h>
 #include <api/helpers/event_log_multiserver_request_data.h>
-#include <nx/api/mediaserver/image_request.h>
-
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx_ec/data/api_data.h>
-
-#include <nx/vms/event/rule_manager.h>
-#include <nx/vms/event/rule.h>
-#include <nx/fusion/model_functions.h>
 #include <network/router.h>
-#include <nx/network/http/custom_headers.h>
-#include <nx/network/http/http_types.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
-#include <common/common_module.h>
 
+#include <nx/api/mediaserver/image_request.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/random.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data_fwd.h>
+#include <nx/vms/event/rule_manager.h>
+#include <nx/vms/event/rule.h>
+
+using namespace nx;
 
 namespace {
 
@@ -77,7 +77,10 @@ ServerConnection::~ServerConnection()
         httpPool->terminate(handle);
 }
 
-rest::Handle ServerConnection::cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread)
+rest::Handle ServerConnection::cameraHistoryAsync(
+    const QnChunksRequestData& request,
+    Result<nx::vms::api::CameraHistoryDataList>::type callback,
+    QThread* targetThread)
 {
     return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback, targetThread);
 }
@@ -87,6 +90,38 @@ Handle ServerConnection::getServerLocalTime(Result<QnJsonRestResult>::type callb
 {
     QnRequestParamList params{{lit("local"), QnLexical::serialized(true)}};
     return executeGet(lit("/api/gettime"), params, callback, targetThread);
+}
+
+Handle ServerConnection::getUpdateStatus(Result<UpdateStatus>::type callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet(lit("/api/updates2/status"), params, callback, targetThread);
+}
+
+Handle ServerConnection::getUpdateStatusAll(Result<UpdateStatusAll>::type callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet(lit("/api/updates2/status/all"), params, callback, targetThread);
+}
+
+Handle ServerConnection::sendUpdateCommand(const nx::api::Updates2ActionData& request,
+    Result<UpdateStatus>::type callback, QThread* targetThread)
+{
+    auto jsonRequest = QJson::serialized(request);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
+    return executePost(lit("/api/updates2"), QnRequestParamList(),
+        contentType, std::move(jsonRequest), callback, targetThread);
+}
+
+Handle ServerConnection::sendUpdateCommandAll(const nx::api::Updates2ActionData& request,
+    Result<UpdateStatusAll>::type callback, QThread* targetThread)
+{
+    auto jsonRequest = QJson::serialized(request);
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
+    return executePost(lit("/api/updates2/all"), QnRequestParamList(),
+        contentType, std::move(jsonRequest), callback, targetThread);
 }
 
 rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRequest& request,
@@ -114,14 +149,14 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QString& sourceId,
 }
 
 rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-    nx::vms::event::EventState toggleState, GetCallback callback, QThread* targetThread)
+    nx::vms::api::EventState toggleState, GetCallback callback, QThread* targetThread)
 {
     QnRequestParamList params;
     params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
-    params.insert(lit("event_type"), QnLexical::serialized(nx::vms::event::softwareTriggerEvent));
+    params.insert(lit("event_type"), QnLexical::serialized(nx::vms::api::EventType::softwareTriggerEvent));
     params.insert(lit("inputPortId"), triggerId);
     params.insert(lit("eventResourceId"), cameraId.toString());
-    if (toggleState != nx::vms::event::EventState::undefined)
+    if (toggleState != nx::vms::api::EventState::undefined)
         params.insert(lit("state"), QnLexical::serialized(toggleState));
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
@@ -133,13 +168,13 @@ QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
     if (!server)
         return QnMediaServerResourcePtr(); //< something wrong. No current server available
 
-    if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+    if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
         return server;
 
     // Current server doesn't have internet access. Try to find another one
     for (const auto server: commonModule()->resourcePool()->getAllServers(Qn::Online))
     {
-        if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
             return server;
     }
     return QnMediaServerResourcePtr(); //< no internet access found
@@ -393,6 +428,19 @@ Handle ServerConnection::addFileUpload(
         targetThread);
 }
 
+Handle ServerConnection::validateFileInformation(
+    const QString& url,
+    int expectedSize,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloads/%1/validate").arg(url),
+        QnRequestParamList{{lit("expected"), QString::number(expectedSize)}},
+        callback,
+        targetThread);
+}
+
 Handle ServerConnection::removeFileDownload(
     const QString& fileName,
     bool deleteData,
@@ -443,7 +491,8 @@ Handle ServerConnection::downloadFileChunkFromInternet(
         lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(chunkIndex),
         QnRequestParamList{
             {lit("url"), url.toString()},
-            {lit("chunkSize"), QString::number(chunkSize)}},
+            {lit("chunkSize"), QString::number(chunkSize)},
+            {lit("fromInternet"), lit("true")}},
         callback,
         targetThread);
 }
@@ -495,7 +544,7 @@ Handle ServerConnection::getTimeOfServersAsync(
 }
 
 rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
-    nx::vms::event::EventState toggleState,
+    nx::vms::api::EventState toggleState,
     GetCallback callback,
     QThread* targetThread)
 {
@@ -515,7 +564,7 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
         params.insert(lit("eventResourceId"), randomResource.toString());
     }
     else if (nx::vms::event::isSourceCameraRequired(rule->eventType())
-        || rule->eventType() >= nx::vms::event::userDefinedEvent)
+        || rule->eventType() >= nx::vms::api::EventType::userDefinedEvent)
     {
         auto randomCamera = nx::utils::random::choice(
             commonModule()->resourcePool()->getAllCameras(QnResourcePtr(), true));
@@ -528,7 +577,7 @@ rest::Handle ServerConnection::testEventRule(const QnUuid& ruleId,
         params.insert(lit("eventResourceId"), randomServer->getId().toString());
     }
 
-    if (toggleState != nx::vms::event::EventState::undefined)
+    if (toggleState != nx::vms::api::EventState::undefined)
         params.insert(lit("state"), QnLexical::serialized(toggleState));
 
     params.insert(lit("inputPortId"), rule->eventParams().inputPortId);
@@ -638,7 +687,6 @@ Handle ServerConnection::releaseWearableCameraLock(
         callback,
         targetThread);
 }
-
 
 Handle ServerConnection::consumeWearableCameraFile(
     const QnNetworkResourcePtr& camera,
@@ -785,11 +833,11 @@ T parseMessageBody(
     return T();
 }
 
-template <typename ResultType>
+template <typename CallbackType>
 Handle ServerConnection::executeGet(
     const QString& path,
     const QnRequestParamList& params,
-    Callback<ResultType> callback,
+    CallbackType callback,
     QThread* targetThread)
 {
     auto request = prepareRequest(nx::network::http::Method::get, prepareUrl(path, params));
@@ -886,6 +934,38 @@ void invoke(Callback<ResultType> callback,
     }
 }
 
+void invoke(ServerConnection::Result<QByteArray>::type callback,
+    QThread* targetThread,
+    bool success,
+    const Handle& id,
+    QByteArray result,
+    const nx::network::http::HttpHeaders& headers,
+    const QString &serverId,
+    const QElapsedTimer& elapsed
+)
+{
+    if (success)
+        trace(serverId, id, lit("Reply success for %1ms").arg(elapsed.elapsed()));
+    else
+        trace(serverId, id, lit("Reply failed for %1ms").arg(elapsed.elapsed()));
+
+    if (targetThread)
+    {
+        auto ptr = std::make_shared<QByteArray>(result);
+        executeDelayed(
+            [callback, headers, success, id, ptr]() mutable
+            {
+                callback(success, id, std::move(*ptr), headers);
+            },
+            0,
+            targetThread);
+    }
+    else
+    {
+        callback(success, id, result, headers);
+    }
+}
+
 template <typename ResultType>
 Handle ServerConnection::executeRequest(
     const nx::network::http::ClientPool::Request& request,
@@ -899,15 +979,17 @@ Handle ServerConnection::executeRequest(
         timer.start();
 
         return sendRequest(request,
-            [callback, targetThread, serverId, timer]
-            (Handle id,
+            [callback, targetThread, serverId, timer](
+                Handle id,
                 SystemError::ErrorCode osErrorCode,
                 int statusCode,
                 nx::network::http::StringType contentType,
-                nx::network::http::BufferType msgBody)
+                nx::network::http::BufferType msgBody,
+                const nx::network::http::HttpHeaders& /*headers*/)
             {
                 bool success = false;
-                if( osErrorCode == SystemError::noError && statusCode == nx::network::http::StatusCode::ok)
+                if (osErrorCode == SystemError::noError
+                    && statusCode == nx::network::http::StatusCode::ok)
                 {
                     const auto format = Qn::serializationFormatFromHttpContentType(contentType);
                     auto result = parseMessageBody<ResultType>(format, msgBody, &success);
@@ -931,7 +1013,7 @@ Handle ServerConnection::executeRequest(
 
 Handle ServerConnection::executeRequest(
     const nx::network::http::ClientPool::Request& request,
-    Callback<QByteArray> callback,
+    Result<QByteArray>::type callback,
     QThread* targetThread)
 {
     if (callback)
@@ -942,10 +1024,14 @@ Handle ServerConnection::executeRequest(
 
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
-            [callback, targetThread, targetThreadGuard, serverId, timer]
-            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::StringType contentType, nx::network::http::BufferType msgBody)
+            [callback, targetThread, targetThreadGuard, serverId, timer](
+                Handle id,
+                SystemError::ErrorCode osErrorCode,
+                int statusCode,
+                nx::network::http::StringType /*contentType*/,
+                nx::network::http::BufferType msgBody,
+                const nx::network::http::HttpHeaders& headers)
             {
-                Q_UNUSED(contentType)
                 bool success = (osErrorCode == SystemError::noError
                     && statusCode >= nx::network::http::StatusCode::ok
                     && statusCode <= nx::network::http::StatusCode::partialContent);
@@ -953,7 +1039,8 @@ Handle ServerConnection::executeRequest(
                 if (targetThread && targetThreadGuard.isNull())
                     return;
 
-                invoke(callback, targetThread, success, id, std::move(msgBody), serverId, timer);
+                invoke(callback, targetThread, success, id, std::move(msgBody), headers, serverId,
+                    timer);
             });
     }
 
@@ -973,8 +1060,13 @@ Handle ServerConnection::executeRequest(
 
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
-            [callback, targetThread, targetThreadGuard, serverId, timer]
-            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::StringType, nx::network::http::BufferType)
+            [callback, targetThread, targetThreadGuard, serverId, timer](
+                Handle id,
+                SystemError::ErrorCode osErrorCode,
+                int statusCode,
+                nx::network::http::StringType /*contentType*/,
+                nx::network::http::BufferType /*msgBody*/,
+                const nx::network::http::HttpHeaders& /*headers*/)
             {
                 bool success = (osErrorCode == SystemError::noError
                     && statusCode >= nx::network::http::StatusCode::ok
@@ -1056,7 +1148,6 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
         request.url.setPort(route.addr.port);
     }
 
-
     request.url.setUserName(user);
     request.url.setPassword(password);
 
@@ -1074,12 +1165,14 @@ Handle ServerConnection::sendRequest(
     return requestId;
 }
 
-void ServerConnection::onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient)
+void ServerConnection::onHttpClientDone(
+    int requestId, nx::network::http::AsyncHttpClientPtr httpClient)
 {
     QnMutexLocker lock(&m_mutex);
     auto itr = m_runningRequests.find(requestId);
     if (itr == m_runningRequests.end())
-        return; // request canceled
+        return; //< Request cancelled.
+
     HttpCompletionFunc callback = itr.value();
     m_runningRequests.remove(requestId);
 
@@ -1088,17 +1181,24 @@ void ServerConnection::onHttpClientDone(int requestId, nx::network::http::AsyncH
     nx::network::http::StringType contentType;
     nx::network::http::BufferType messageBody;
 
-    if (httpClient->failed()) {
+    if (httpClient->failed())
+    {
         systemError = SystemError::connectionReset;
     }
-    else {
-        statusCode = (nx::network::http::StatusCode::Value) httpClient->response()->statusLine.statusCode;
+    else
+    {
+        statusCode =
+            (nx::network::http::StatusCode::Value) httpClient->response()->statusLine.statusCode;
         contentType = httpClient->contentType();
         messageBody = httpClient->fetchMessageBodyBuffer();
     }
     lock.unlock();
     if (callback)
-        callback(requestId, systemError, statusCode, contentType, messageBody);
+    {
+        const auto response = httpClient->response();
+        const auto headers = response ? response->headers : nx::network::http::HttpHeaders();
+        callback(requestId, systemError, statusCode, contentType, messageBody, headers);
+    }
 };
 
 } // namespace rest

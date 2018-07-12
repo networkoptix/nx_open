@@ -1,5 +1,7 @@
 #include "bookmark_search_list_model_p.h"
 
+#include <chrono>
+
 #include <QtGui/QPalette>
 #include <QtGui/QPixmap>
 
@@ -14,6 +16,8 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/pending_operation.h>
 
+using std::chrono::milliseconds;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -21,10 +25,10 @@ namespace desktop {
 namespace {
 
 static const auto lowerBoundPredicate =
-    [](const QnCameraBookmark& left, qint64 right) { return left.startTimeMs > right; };
+    [](const QnCameraBookmark& left, qint64 right) { return left.startTimeMs.count() > right; };
 
 static const auto upperBoundPredicate =
-    [](qint64 left, const QnCameraBookmark& right) { return left > right.startTimeMs; };
+    [](qint64 left, const QnCameraBookmark& right) { return left > right.startTimeMs.count(); };
 
 } // namespace
 
@@ -88,10 +92,13 @@ QVariant BookmarkSearchListModel::Private::data(const QModelIndex& index, int ro
 
         case Qn::TimestampRole:
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(bookmark.startTimeMs);
+        {
+            using namespace std::chrono;
+            return QVariant::fromValue(microseconds(bookmark.startTimeMs).count());
+        }
 
         case Qn::DurationRole:
-            return QVariant::fromValue(bookmark.durationMs);
+            return QVariant::fromValue(bookmark.durationMs.count());
 
         case Qn::UuidRole:
             return QVariant::fromValue(bookmark.guid);
@@ -139,8 +146,8 @@ void BookmarkSearchListModel::Private::clear()
 rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
 {
     QnCameraBookmarkSearchFilter filter;
-    filter.startTimeMs = period.startTimeMs;
-    filter.endTimeMs = period.endTimeMs();
+    filter.startTimeMs = milliseconds(period.startTimeMs);
+    filter.endTimeMs = milliseconds(period.endTimeMs());
     filter.text = m_filterText;
     filter.orderBy.column = Qn::BookmarkStartTime;
     filter.orderBy.order = Qt::DescendingOrder;
@@ -199,8 +206,8 @@ bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& period
     if (count > 0)
     {
         qDebug() << "Committing" << count << "bookmarks from"
-            << utils::timestampToRfc2822((end-1)->startTimeMs) << "to"
-            << utils::timestampToRfc2822(begin->startTimeMs);
+            << utils::timestampToRfc2822(((end-1)->startTimeMs).count()) << "to"
+            << utils::timestampToRfc2822((begin->startTimeMs).count());
 
         if (q->fetchDirection() == FetchDirection::earlier)
         {
@@ -216,7 +223,7 @@ bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& period
         }
 
         for (auto iter = begin; iter != end; ++iter)
-            m_guidToTimestampMs[iter->guid] = iter->startTimeMs;
+            m_guidToTimestampMs[iter->guid] = iter->startTimeMs.count();
     }
     else
     {
@@ -238,13 +245,13 @@ void BookmarkSearchListModel::Private::clipToSelectedTimePeriod()
 
 bool BookmarkSearchListModel::Private::hasAccessRights() const
 {
-    return q->accessController()->hasGlobalPermission(Qn::GlobalViewBookmarksPermission);
+    return q->accessController()->hasGlobalPermission(GlobalPermission::viewBookmarks);
 }
 
 void BookmarkSearchListModel::Private::watchBookmarkChanges()
 {
     // TODO: #vkutin Check whether qnCameraBookmarksManager won't emit these signals
-    // if current user has no Qn::GlobalViewBookmarksPermission
+    // if current user has no GlobalPermission::viewBookmarks
 
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkAdded,
         this, &Private::addBookmark);
@@ -259,7 +266,7 @@ void BookmarkSearchListModel::Private::watchBookmarkChanges()
 void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookmark)
 {
     // Skip bookmarks outside of time range.
-    if (!fetchedTimeWindow().contains(bookmark.startTimeMs))
+    if (!fetchedTimeWindow().contains(bookmark.startTimeMs.count()))
         return;
 
     if (m_guidToTimestampMs.contains(bookmark.guid))
@@ -270,13 +277,13 @@ void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookm
     }
 
     const auto insertionPos = std::lower_bound(m_data.cbegin(), m_data.cend(),
-        bookmark.startTimeMs, lowerBoundPredicate);
+        bookmark.startTimeMs.count(), lowerBoundPredicate);
 
     const auto index = std::distance(m_data.cbegin(), insertionPos);
 
     ScopedInsertRows insertRows(q,  index, index);
     m_data.insert(m_data.begin() + index, bookmark);
-    m_guidToTimestampMs[bookmark.guid] = bookmark.startTimeMs;
+    m_guidToTimestampMs[bookmark.guid] = bookmark.startTimeMs.count();
 }
 
 void BookmarkSearchListModel::Private::updateBookmark(const QnCameraBookmark& bookmark)
@@ -346,7 +353,7 @@ QPixmap BookmarkSearchListModel::Private::pixmap()
 
 QColor BookmarkSearchListModel::Private::color()
 {
-    return QPalette().color(QPalette::LinkVisited);
+    return QPalette().color(QPalette::Light);
 }
 
 } // namespace desktop

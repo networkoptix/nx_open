@@ -16,6 +16,7 @@
 #include "controller.h"
 #include "libconnection_mediator_app_info.h"
 #include "settings.h"
+#include "statistics/statistics_provider.h"
 #include "statistics/stats_manager.h"
 #include "view.h"
 
@@ -29,12 +30,17 @@ MediatorProcess::MediatorProcess(int argc, char **argv):
 
 std::vector<network::SocketAddress> MediatorProcess::httpEndpoints() const
 {
-    return m_view->httpEndpoints();
+    return m_view->httpServer().endpoints();
 }
 
-std::vector<network::SocketAddress> MediatorProcess::stunEndpoints() const
+std::vector<network::SocketAddress> MediatorProcess::stunUdpEndpoints() const
 {
-    return m_view->stunEndpoints();
+    return m_view->stunServer().udpEndpoints();
+}
+
+std::vector<network::SocketAddress> MediatorProcess::stunTcpEndpoints() const
+{
+    return m_view->stunServer().tcpEndpoints();
 }
 
 ListeningPeerPool* MediatorProcess::listeningPeerPool() const
@@ -72,6 +78,11 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
 
     View view(settings, &controller);
     m_view = &view;
+
+    stats::Provider statisticsProvider(
+        view.httpServer().server(),
+        view.stunServer().server());
+    view.httpServer().registerStatisticsApiHandlers(statisticsProvider);
 
     NX_INFO(this, lm("Initializating view"));
 

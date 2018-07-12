@@ -106,7 +106,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>Logboek...</translation>
+      <translation>Gebeurtenissenlog...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
@@ -194,11 +194,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>Nieuwe schermindeling...</translation>
+      <translation>Nieuwe lay-out...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>Open schermindeling...</translation>
+      <translation>Nieuwe lay-out...</translation>
     </message>
     <message>
       <source>Open...</source>
@@ -222,11 +222,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>Huidige schermindeling opslaan</translation>
+      <translation>Huidige lay-out opslaan</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation>Huidige schermindeling opslaan als...</translation>
+      <translation>Bewaar huidige lay-out als...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
@@ -317,7 +317,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation>Gebeurtenisregels...</translation>
+      <translation>Event regels...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -397,7 +397,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation>Toon op alarm scherm</translation>
+      <translation>Openen in alarm lay-out</translation>
     </message>
     <message>
       <source>Open in New Window</source>
@@ -441,7 +441,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Verwijderen</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
@@ -453,11 +453,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation>Schermindeling opslaan</translation>
+      <translation>Layout opslaan</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation>Sla de schermindeling op als...</translation>
+      <translation>Sla de layout op als...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
@@ -537,11 +537,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation>Verwijderen uit de schermindeling</translation>
+      <translation>Verwijderen uit de lay-out</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation>Delen van de schermindeling beëindigen</translation>
+      <translation>Lay-out delen beëindigen</translation>
     </message>
     <message>
       <source>Edit...</source>
@@ -557,7 +557,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>Schermindeling instellen als achtergrond</translation>
+      <translation>Lay-out instellen als achtergrond</translation>
     </message>
     <message>
       <source>User Settings...</source>
@@ -565,11 +565,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation>Gebruikersprofielen...</translation>
+      <translation>Gebruikersrollen...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation>Profielinstellingen...</translation>
+      <translation>Rolinstellingen...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -649,7 +649,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation>Schermindeling instellingen...</translation>
+      <translation>Lay-out instellingen...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
@@ -848,6 +848,22 @@ to view more bookmarks</source>
       <translation>Maak een showreel</translation>
     </message>
     <message>
+      <source>Wearable Camera...</source>
+      <translation>Draagbare camera...</translation>
+    </message>
+    <message>
+      <source>New Wearable Camera...</source>
+      <translation>Nieuwe draagbare camera...</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>Upload bestand...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>Upload map...</translation>
+    </message>
+    <message>
       <source>Start Analytics...</source>
       <translation>Start Analytics...</translation>
     </message>
@@ -874,22 +890,6 @@ to view more bookmarks</source>
     <message>
       <source>Cell Spacing...</source>
       <translation>Celafstand...</translation>
-    </message>
-    <message>
-      <source>Wearable Camera...</source>
-      <translation>Draagbare camera...</translation>
-    </message>
-    <message>
-      <source>New Wearable Camera...</source>
-      <translation>Nieuwe draagbare camera...</translation>
-    </message>
-    <message>
-      <source>Upload File...</source>
-      <translation>Upload bestand...</translation>
-    </message>
-    <message>
-      <source>Upload Folder...</source>
-      <translation>Upload map...</translation>
     </message>
   </context>
   <context>
@@ -978,8 +978,8 @@ to view more bookmarks</source>
       <translation>Aantal deactiveringen overschreden voor deze licentie.</translation>
     </message>
     <message>
-      <source>Hardware Id of Server with this license does not match Hardware Id on which license was activated.</source>
-      <translation>Hardware-Id van server met deze licentie komt niet overeen met hardware-id waarop de licentie is geactiveerd.</translation>
+      <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation>Hardware-ID van server met deze licentie komt niet overeen met Hardware-ID waarop de licentie is geactiveerd.</translation>
     </message>
   </context>
   <context>
@@ -1001,12 +1001,12 @@ to view more bookmarks</source>
       <translation>U staat op het punt een lange video te exporteren. Het kan meer dan een gigabyte aan harde schijfruimte vereisen en het kan enkele minuten duren voordat het voltooid is.</translation>
     </message>
     <message>
-      <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>Lokale bestanden, widgets en webpagina's voor servermonitoring worden niet geëxporteerd.</translation>
-    </message>
-    <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
       <translation>Geëxporteerd. EXE-bestand heeft een grootte van meer dan 4 GB en kan niet worden geopend door te dubbelklikken in Windows. Het kan alleen in %1 Client worden gespeeld.</translation>
+    </message>
+    <message>
+      <source>Local files, server monitor widgets and webpages will not be exported.</source>
+      <translation>Lokale bestanden, widgets en webpagina's voor servermonitoring worden niet geëxporteerd.</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
@@ -1120,18 +1120,17 @@ to view more bookmarks</source>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
       <translation>Bestand &quot;%1&quot; kan niet worden weggeschreven. Probeer een andere naam.</translation>
     </message>
-    <message numerus="yes">
-      <source>Filename should not contain the following reserved characters:
-%1</source>
-      <translation type="unfinished">
-        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten: %1</numerusform>
-        <numerusform>Filename should not contain the following reserved characters:
-%1</numerusform>
-      </translation>
-    </message>
     <message>
-      <source>Filename &quot;%1&quot; is reserved by operating system. Please try another name.</source>
+      <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
       <translation>De bestandsnaam &quot;%1&quot; is gereserveerd door het besturingssysteem. Probeer een andere naam.</translation>
+    </message>
+    <message numerus="yes">
+      <source>File name must not contain the following reserved characters:</source>
+      <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
+      <translation>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten:</numerusform>
+        <numerusform>De bestandsnaam mag de volgende tekens niet bevatten:</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1172,14 +1171,6 @@ to view more bookmarks</source>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
       <translation>Alleen letters, cijfers en symbolen van het toetsenbord zijn toegestaan.</translation>
     </message>
-    <message>
-      <source>Long</source>
-      <translation>Lang</translation>
-    </message>
-    <message>
-      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Alleen letters, cijfers en toetsenbordsymbolen %1 zijn toegestaan.</translation>
-    </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
@@ -1193,6 +1184,10 @@ to view more bookmarks</source>
         <numerusform>Wachtwoord moet ten minste %n karakters hebben.</numerusform>
         <numerusform>Wachtwoord moet ten minste %n karakters hebben.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Long</source>
+      <translation>Lang</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1215,6 +1210,10 @@ to view more bookmarks</source>
         <numerusform>Wachtwoord mag niet %n of meer opeenvolgende karakters bevatten.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
+      <translation>Alleen letters, cijfers en toetsenbordsymbolen %1 zijn toegestaan.</translation>
+    </message>
   </context>
   <context>
     <name>PermissionsInfoTable</name>
@@ -1224,7 +1223,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Gedeelde schermindelingen</translation>
+      <translation>Gedeelde lay-outs</translation>
     </message>
     <message>
       <source>All</source>
@@ -1369,9 +1368,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>en %n meer</numerusform>
-        <numerusform>...and %n more</numerusform>
+        <numerusform>en %n meer</numerusform>
       </translation>
     </message>
   </context>
@@ -1379,11 +1378,11 @@ to view more bookmarks</source>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Door het geven van toegang tot sommige schermindelingen, geeft u ook toegang tot alle camera's in deze schermindeling. Daarmee krijgt de gebruiker toegang tot extra camera's op deze schermindeling.</translation>
+      <translation>Door het geven van toegang tot sommige lay-outs, geeft u ook toegang tot alle camera's in deze lay-out. Daarmee krijgt de gebruiker toegang tot extra camera's op deze lay-outs.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's en apparaten</translation>
+      <translation>Alle camera's &amp; apparaten</translation>
     </message>
   </context>
   <context>
@@ -1403,6 +1402,14 @@ to view more bookmarks</source>
       <source>Folder not found</source>
       <translation>Map niet gevonden</translation>
     </message>
+    <message>
+      <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
+      <translation>Helpt problemen met OpenGL te voorkomen, wat resulteert in een 100% CPU-belasting.</translation>
+    </message>
+    <message>
+      <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
+      <translation>Aanpassen aan de kleinste waarde die de liveweergave niet verslechtert. Een grotere buffer maakt het afspelen soepeler, maar vergroot de vertraging tussen de werkelijkheid en de weergave; een kleinere buffer verlaagt de vertraging maar kan schokkende beelden gedurende de weergave veroorzaken.</translation>
+    </message>
   </context>
   <context>
     <name>QnArchiveLengthWidget</name>
@@ -1413,6 +1420,18 @@ to view more bookmarks</source>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
+    </message>
+    <message>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>Het archief kan worden verwijderd voor het geval er geen ruimte is voor nieuwe opnamen.</translation>
+    </message>
+    <message>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>De instellingen Min en Max bepalen de duur dat het archief voor deze camera moet worden bewaard.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>Als de optie &quot;Auto&quot; is ingeschakeld, worden de oudste opnames van alle camera's eerst verwijderd.</translation>
     </message>
   </context>
   <context>
@@ -1498,37 +1517,37 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Dit aparaat is verwijderd uit het systeem</numerusform>
         <numerusform>Deze apparaten worden verwijderd uit het systeem</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Deze camera wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze camera's worden verwijderd uit het systeem</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Deze server wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze server worden verwijderd uit het systeem</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Deze gebruiker wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze gebruikers worden verwijderd uit het systeem</numerusform>
-        <numerusform>These users are removed from System</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Deze bron wordt verwijderd uit het systeem</numerusform>
         <numerusform>Deze bronnen worden verwijderd uit het systeem</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
       </translation>
     </message>
     <message>
@@ -1540,7 +1559,7 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>Unknown</translation>
+      <translation>Onbekend</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1608,9 +1627,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n action(s)</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%n actie</numerusform>
         <numerusform>%n acties</numerusform>
-        <numerusform>%n action(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1759,9 +1778,9 @@ to view more bookmarks</source>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>U heeft %n notificaties</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+        <numerusform>U heeft %n notificaties</numerusform>
       </translation>
     </message>
   </context>
@@ -1804,7 +1823,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -1819,16 +1838,16 @@ to view more bookmarks</source>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 van %n apparaten</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+        <numerusform>%1 van %n apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 van %n camera's</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+        <numerusform>%1 van %n camera's</numerusform>
       </translation>
     </message>
     <message>
@@ -1841,9 +1860,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%1 van %n I/O module</numerusform>
         <numerusform>%1 van %n I/O modules</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -1866,9 +1885,9 @@ to view more bookmarks</source>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%n server</numerusform>
         <numerusform>%n servers</numerusform>
-        <numerusform>%n Server(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -1905,9 +1924,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Source and %n more cameras</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Bron- en %n meer camera</numerusform>
         <numerusform>Bron- en %n meer camera's</numerusform>
-        <numerusform>Source and %n more cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -1924,7 +1943,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Een willekeurige server</translation>
+      <translation>Een willekeurige Server</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -1992,7 +2011,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>Geen gebeurtenisregels</translation>
+      <translation>Geen event regels</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -2110,9 +2129,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n apparaat gevonden</numerusform>
-        <numerusform>%n devices found</numerusform>
+        <numerusform>%n apparaten gevonden</numerusform>
       </translation>
     </message>
     <message>
@@ -2146,9 +2165,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices added.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n apparaten toegevoegd.</numerusform>
-        <numerusform>%n devices added.</numerusform>
+        <numerusform>%n apparaten toegevoegd.</numerusform>
       </translation>
     </message>
     <message>
@@ -2157,9 +2176,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>Het toevoegen van %n het apparaat is niet gelukt</numerusform>
         <numerusform>Het toevoegen van %n apparaten is niet gelukt</numerusform>
-        <numerusform>Failed to add %n devices</numerusform>
       </translation>
     </message>
     <message>
@@ -2193,18 +2212,6 @@ to view more bookmarks</source>
       <translation>Laden...</translation>
     </message>
     <message>
-      <source>Primary Stream</source>
-      <translation>Hoofd stream</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Secundair stream</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Camera heeft geen secundaire stream</translation>
-    </message>
-    <message>
       <source>This I/O module has no advanced settings</source>
       <translation>Deze I/O module heeft geen geavanceerde instellingen</translation>
     </message>
@@ -2213,8 +2220,36 @@ to view more bookmarks</source>
       <translation>Deze camera heeft geen geavanceerde instellingen</translation>
     </message>
     <message>
+      <source>Settings</source>
+      <translation>Instellingen</translation>
+    </message>
+    <message>
+      <source>Web</source>
+      <translation>Web</translation>
+    </message>
+    <message>
+      <source>No settings</source>
+      <translation>Geen instellingen</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Secundair stream</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O Module ID</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Camera ID</translation>
+    </message>
+    <message>
       <source>Audio Stream</source>
       <translation>Audio stream</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Hoofd stream</translation>
     </message>
     <message>
       <source>URL is not available. Open stream and try again.</source>
@@ -2229,24 +2264,8 @@ to view more bookmarks</source>
       <translation>I/O module heeft geen audio stream</translation>
     </message>
     <message>
-      <source>I/O Module Id</source>
-      <translation>I/O Module ID</translation>
-    </message>
-    <message>
-      <source>Camera Id</source>
-      <translation>Camera ID</translation>
-    </message>
-    <message>
-      <source>Settings</source>
-      <translation>Instellingen</translation>
-    </message>
-    <message>
-      <source>Web</source>
-      <translation>Web</translation>
-    </message>
-    <message>
-      <source>No settings</source>
-      <translation>Geen instellingen</translation>
+      <source>Camera has no secondary stream</source>
+      <translation>Camera heeft geen secundaire stream</translation>
     </message>
   </context>
   <context>
@@ -2268,9 +2287,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%1 biedt geen ondersteuning voor twee-weg audio</numerusform>
         <numerusform>%1 bieden geen ondersteuning voor twee-weg audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
       </translation>
     </message>
   </context>
@@ -2359,6 +2378,25 @@ to view more bookmarks</source>
       <source>Edge</source>
       <translation>Edge</translation>
     </message>
+    <message numerus="yes">
+      <source>This ID is already used on the following %n cameras: %1</source>
+      <translation>
+        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera: %1</numerusform>
+        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
+      <translation>Helpt beeldkwaliteitsproblemen bij sommige camera's oplossen; voor anderen veroorzaakt kan het een toename van de bitrate veroorzaken.</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a camera for quick identification and access</source>
+      <translation>Aangepast nummer dat kan worden toegewezen aan een camera voor snelle identificatie en toegang</translation>
+    </message>
+    <message>
+      <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
+      <translation>De server zal geen camera-instellingen veranderen, deze zal de camerastream zoals aangeleverd ontvangen en gebruiken.</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
@@ -2371,9 +2409,9 @@ to view more bookmarks</source>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%1 geeft geen inputpoort</numerusform>
         <numerusform>%1 geeft geen inputpoorten</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
       </translation>
     </message>
   </context>
@@ -2411,16 +2449,16 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n apparaat gevonden</numerusform>
-        <numerusform>%n devices found</numerusform>
+        <numerusform>%n apparaten gevonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%n camera gevonden</numerusform>
         <numerusform>%n camera's gevonden</numerusform>
-        <numerusform>%n cameras found</numerusform>
       </translation>
     </message>
     <message>
@@ -2433,9 +2471,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%n I/O module gevonden</numerusform>
         <numerusform>%n I/O modules gevonden</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
       </translation>
     </message>
     <message>
@@ -2477,6 +2515,10 @@ to view more bookmarks</source>
       <source>Server</source>
       <translation>Server</translation>
     </message>
+    <message>
+      <source>ID</source>
+      <translation>ID</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraMotionMaskWidget</name>
@@ -2513,7 +2555,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>Opname of bewegingsdetectie is uitgeschakeld voor %1</translation>
     </message>
   </context>
   <context>
@@ -2527,18 +2569,14 @@ to view more bookmarks</source>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
+      <translation>
+        <numerusform>%1 heeft geen relaisuitgang</numerusform>
         <numerusform>%1 hebben geen relaisuitgangen</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
       </translation>
     </message>
   </context>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
-    <message>
-      <source>Password shouldn&apos;t be equal to camera&apos;s user name</source>
-      <translation>Wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera's</translation>
-    </message>
     <message>
       <source>New Password</source>
       <translation>Nieuw wachtwoord</translation>
@@ -2555,12 +2593,16 @@ to view more bookmarks</source>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
       <translation>Wachtwoord moet minstens 8 symbolen lang zijn en verschillende tekens bevatten.</translation>
     </message>
+    <message>
+      <source>Password should not be equal to camera&apos;s user name</source>
+      <translation>Het wachtwoord mag niet gelijk zijn aan de gebruikersnaam van de camera's</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>Opname is uitgeschakeld voor %1</translation>
     </message>
   </context>
   <context>
@@ -2637,6 +2679,14 @@ to view more bookmarks</source>
       <source>More Settings</source>
       <translation>Meer instellingen</translation>
     </message>
+    <message>
+      <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
+      <translation>De kwaliteitsinstelling bepaalt alleen de compressiesnelheid en heeft geen invloed op de resolutie. Laag, Gemiddeld, Hoog en Beste zijn vooraf ingestelde bitrate-waarden.</translation>
+    </message>
+    <message>
+      <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
+      <translation>Kies eerst een opnameoptie en pas deze vervolgens toe op dag- en tijdblokken in het opnameschema. (0 blok is 12:00 uur tot 01:00 uur, 23 blok is 11:00 uur tot 12:00 uur.)</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraSettingsDialog</name>
@@ -2698,23 +2748,23 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wijzigingen voor de volgende %n apparaten worden niet opgeslagen:</numerusform>
-        <numerusform>Changes to the following %n devices are not saved:</numerusform>
+        <numerusform>Wijzigingen voor de volgende %n apparaten worden niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n cameras are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wijzigingen voor de volgende %n camera's worden niet opgeslagen:</numerusform>
-        <numerusform>Changes to the following %n cameras are not saved:</numerusform>
+        <numerusform>Wijzigingen voor de volgende %n camera's worden niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Wijzigingen voor de volgende %n I/O-modules worden niet opgeslagen:</numerusform>
-        <numerusform>Changes to the following %n I/O Modules are not saved:</numerusform>
+        <numerusform>Wijzigingen voor de volgende %n I/O-modules worden niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message>
@@ -2734,11 +2784,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation>Kan eigenschappen voor verschillende draagbare en niet-draagbare camera's niet bewerken.</translation>
+      <translation>Kan de eigenschappen voor verschillende draagbare en niet-draagbare camera's niet bewerken.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation>Kan eigenschappen voor verschillende draagbare niet bewerken.</translation>
+      <translation>Kan de eigenschappen voor verschillende draagbare camera's niet bewerken.</translation>
     </message>
   </context>
   <context>
@@ -2789,51 +2839,60 @@ devices</source>
     </message>
     <message>
       <source>Disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Ontkoppel het systeem van %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Open %1 Portal</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Maak een %1 account aan</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Systeem verbinden met %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Maak %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Verbind systeem met %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Meer informatie over %1</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultMessages</name>
     <message>
-      <source>Incorrect email or password</source>
-      <translation>Incorrecte email of wachtwoord</translation>
+      <source>Account not found</source>
+      <translation>Account niet gevonden</translation>
     </message>
     <message>
-      <source>Account isn&apos;t activated. Please check your email and follow provided instructions</source>
-      <translation>Account is niet geactiveerd. Controleer uw e-mail en volg de instructies</translation>
+      <source>Account is not activated.</source>
+      <translation>Account is niet geactiveerd.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 and follow the provided instructions.</source>
+      <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
+      <translation>Meld u aan bij %1 en volg de instructies.</translation>
+    </message>
+    <message>
+      <source>Invalid password</source>
+      <translation>Ongeldig wachtwoord</translation>
     </message>
   </context>
   <context>
@@ -2848,7 +2907,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kan niet verbinden met %1</translation>
     </message>
   </context>
@@ -2867,7 +2926,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Create account</source>
@@ -2879,12 +2938,12 @@ to %1</source>
     </message>
     <message>
       <source>Connect to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Verbind met %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Voer %1 account in</translation>
     </message>
   </context>
@@ -2896,12 +2955,12 @@ to %1</source>
     </message>
     <message>
       <source>System connected to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Systeem verbonden met %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Kan het systeem niet verbinden met %1</translation>
     </message>
   </context>
@@ -3053,11 +3112,6 @@ to %1</source>
       <translation>Gebruik is nu niet toegestaan. Mogelijkerwijs, omdat de server nu opnieuw opstart. Probeer het later nogmaals.</translation>
     </message>
     <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Verbinding met %1 is nog niet klaar. Controleer de internetverbinding van de server of probeer het later nogmaals.</translation>
-    </message>
-    <message>
       <source>Connection to Server could not be established.</source>
       <translation>Verbinding met de server kon niet worden vastgesteld.</translation>
     </message>
@@ -3065,12 +3119,17 @@ to %1</source>
       <source>This user is disabled by system administrator.</source>
       <translation>Deze gebruiker is uitgeschakeld door systeembeheerder.</translation>
     </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Verbinding met %1 is nog niet klaar. Controleer de internetverbinding van de server of probeer het later nogmaals.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
     <message>
       <source>Success</source>
-      <translation>Succes</translation>
+      <translation>Gelukt</translation>
     </message>
     <message>
       <source>Request timeout</source>
@@ -3088,16 +3147,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Server API</source>
-      <translation>Server API</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Als het veld leeg is, wordt het event altijd geactiveerd.</translation>
     </message>
     <message>
-      <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Als u Generic Event wilt genereren, raadpleegt u %1.</translation>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met één van de gekozen trefwoorden.</translation>
     </message>
     <message>
-      <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
-      <translation>Een event wordt alleen geactiveerd als het generic event voldoet aan alle bovenstaande voorwaarden. Als een trefwoordveld leeg is, is er automatisch aan deze voorwaarde voldaan. Is het trefwoordveld niet leeg is, dan wordt aan deze voorwaarde voldaan als het generic event voldoet aan één van de trefwoorden.</translation>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de titel met één van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de omschrijving met één van de gekozen trefwoorden.</translation>
     </message>
   </context>
   <context>
@@ -3167,8 +3230,8 @@ to %1</source>
       <translation>De systeemconfiguratie zal worden hersteld van de backup, de server applicatie wordt opnieuw gestart.</translation>
     </message>
     <message>
-      <source>You can create a backup for System configurations that can be restored in case of failure.</source>
-      <translation>U kunt een backup maken voor de systeemconfiguraties die kunnen worden hersteld bij storingen.</translation>
+      <source>Database Backup Files</source>
+      <translation>Database Backup Bestanden</translation>
     </message>
   </context>
   <context>
@@ -3181,16 +3244,13 @@ to %1</source>
       <source>Some of selected cameras requires password to be set up.</source>
       <translation>Voor sommige geselecteerde camera's moet een wachtwoord worden ingesteld.</translation>
     </message>
-    <message numerus="yes">
-      <source>Set Password</source>
-      <translation>
-        <numerusform>Stel nieuw wachtwoord in</numerusform>
-        <numerusform>Stel nieuw wachtwoord in</numerusform>
-      </translation>
-    </message>
     <message>
       <source>Ask your system administrator to do it.</source>
       <translation>Vraag uw systeembeheerder om het te doen.</translation>
+    </message>
+    <message>
+      <source>Set Password</source>
+      <translation>Wachtwoorden instellen</translation>
     </message>
   </context>
   <context>
@@ -3263,11 +3323,11 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Internal Error</source>
@@ -3290,27 +3350,35 @@ to %1</source>
       <translation>Verbinding verbreken</translation>
     </message>
     <message>
-      <source>All cloud users will be deleted.</source>
-      <translation>Alle cloud gebruikers zullen worden verwijderd.</translation>
-    </message>
-    <message>
-      <source>Failed to disconnect System from %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Kon het verbinding met het systeem niet verbreken vanaf %1</translation>
-    </message>
-    <message>
-      <source>Disconnect System from %1?</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Ontkoppel het systeem van %1?</translation>
-    </message>
-    <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
       <translation>U wordt losgekoppeld van dit systeem en kan opnieuw inloggen via het lokale netwerk met een lokaal account</translation>
     </message>
     <message>
+      <source>Failed to disconnect System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kon het verbinding met het systeem niet verbreken vanaf %1</translation>
+    </message>
+    <message>
+      <source>Disconnect System from %1?</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Ontkoppel het systeem van %1?</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Alle %1 gebruikers zullen worden verwijderd.</translation>
+    </message>
+    <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>U kunt niet verbinden met dit systeem met uw %1 account nadat u dit systeem hebt verbroken van %1.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnEmptyBusinessActionWidget</name>
+    <message>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>Paniekopname schakelt opname-instellingen voor alle camera's naar maximale FPS en kwaliteit.</translation>
     </message>
   </context>
   <context>
@@ -3337,16 +3405,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Logboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+      <translation>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
-      <translation type="unfinished">
-        <numerusform>Logboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
-        <numerusform>Event log for %1 - %n event(s) found</numerusform>
+      <translation>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
       </translation>
     </message>
     <message>
@@ -3374,7 +3442,7 @@ to %1</source>
     </message>
     <message>
       <source>Event</source>
-      <translation>Gebeurtenis</translation>
+      <translation>Event</translation>
     </message>
     <message>
       <source>Source</source>
@@ -3399,9 +3467,9 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (%n keer)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+        <numerusform>%1 (%n keer)</numerusform>
       </translation>
     </message>
     <message>
@@ -3410,23 +3478,23 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>en %n gebruikers meer...</numerusform>
-        <numerusform>and %n users more...</numerusform>
+        <numerusform>en %n gebruikers meer...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>en %n meer...</numerusform>
-        <numerusform>and %n more...</numerusform>
+        <numerusform>en %n meer...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Verwijderde onderwerpen</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Verwijderde onderwerpen</numerusform>
       </translation>
     </message>
     <message>
@@ -3548,6 +3616,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnFisheyeSettingsWidget</name>
+    <message>
+      <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+      <translation>Gebruik deze instelling om vervorming te compenseren als de camera niet exact verticaal of horizontaal is gemonteerd.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
@@ -3615,6 +3690,14 @@ to %1</source>
     <message>
       <source>Open Camera List</source>
       <translation>Open cameralijst</translation>
+    </message>
+    <message>
+      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
+      <translation>De back-up omvat server- en camerainstellingen, gebruikers, webpagina's, gebeurtenisregels, etc. Video data wordt niet opgeslagen.</translation>
+    </message>
+    <message>
+      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
+      <translation>Creëert een back-up van de systeemconfiguratie om het systeem te kunnnen herstellen in geval van een storing.</translation>
     </message>
   </context>
   <context>
@@ -3708,7 +3791,7 @@ to %1</source>
       <translation>Impuls</translation>
     </message>
     <message>
-      <source>Id</source>
+      <source>ID</source>
       <translation>ID</translation>
     </message>
   </context>
@@ -3789,10 +3872,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+        <numerusform>Test succesvol afgerond: %n gebruikers gevonden.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>Als u andere LDAP-instellingen dan &quot;Zoekfilter&quot; wijzigt, leidt dit tot problemen met de verbinding voor alle LDAP gebruikers.</translation>
     </message>
   </context>
   <context>
@@ -3814,7 +3901,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3853,11 +3940,26 @@ to %1</source>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>Time-out</translation>
+      <translation>Uitgesteld</translation>
     </message>
     <message>
       <source>Import Selected</source>
       <translation>Selectie importeren</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnLensCameraAdvancedParamWidget</name>
+    <message>
+      <source>Zoom</source>
+      <translation>Zoom</translation>
+    </message>
+    <message>
+      <source>Rotation:</source>
+      <translation>Rotatie:</translation>
+    </message>
+    <message>
+      <source>Focus</source>
+      <translation>Focus</translation>
     </message>
   </context>
   <context>
@@ -3891,8 +3993,8 @@ to %1</source>
       <translation>Functies:</translation>
     </message>
     <message>
-      <source>Locked to Hardware Id</source>
-      <translation>Gelieerd aan Hardware Id</translation>
+      <source>Locked to Hardware ID</source>
+      <translation>Gelieerd aan Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -3927,7 +4029,7 @@ to %1</source>
     </message>
     <message>
       <source>Error</source>
-      <translation>Error</translation>
+      <translation>Fout</translation>
     </message>
     <message>
       <source>Server not found</source>
@@ -3959,9 +4061,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>De licentie verloopt over %n dagen</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+        <numerusform>De licentie verloopt over %n dagen</numerusform>
       </translation>
     </message>
     <message>
@@ -4053,16 +4155,16 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ten minste %n %1 zijn vereist</numerusform>
-        <numerusform>At least %n %1 are required</numerusform>
+        <numerusform>Ten minste %n %1 zijn vereist</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %1 zijn momenteel in gebruik</numerusform>
-        <numerusform>%n %1 are currently in use</numerusform>
+        <numerusform>%n %1 zijn momenteel in gebruik</numerusform>
       </translation>
     </message>
     <message>
@@ -4071,9 +4173,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Licenties deactiveren?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Licenties deactiveren?</numerusform>
       </translation>
     </message>
     <message>
@@ -4082,23 +4184,23 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Het deactiveren van %n licenties is mislukt</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Het deactiveren van %n licenties is mislukt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 van %n licenties kunnen niet worden gedeactiveerd</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 van %n licenties kunnen niet worden gedeactiveerd</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Het deactiveren van de licenties is mislukt</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Het deactiveren van de licenties is mislukt</numerusform>
       </translation>
     </message>
     <message>
@@ -4119,14 +4221,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n licenties gedeactiveerd</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenties gedeactiveerd</numerusform>
       </translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Verwijder</translation>
+      <translation>Verwijderen</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4134,9 +4236,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n kanalen.</numerusform>
-        <numerusform>%n channels.</numerusform>
+        <numerusform>%n kanalen.</numerusform>
       </translation>
     </message>
     <message>
@@ -4145,9 +4247,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deactiveren %n overige</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactiveren %n overige</numerusform>
       </translation>
     </message>
     <message>
@@ -4167,16 +4269,16 @@ to %1</source>
       <translation>Neem contact op met customer support om een ​​geldige licentiecode te verkrijgen.</translation>
     </message>
     <message>
-      <source>This license is already activated and linked to Hardware Id %1</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan hardware Id %1</translation>
-    </message>
-    <message>
-      <source>This license is already activated and linked to Hardware Id %1 on %2</source>
-      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware Id %1 op %2</translation>
-    </message>
-    <message>
       <source>If the problem persists please contact Customer Support.</source>
       <translation>Als het probleem aanhoudt, neem dan contact op met customer support.</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1</translation>
+    </message>
+    <message>
+      <source>This license is already activated and linked to Hardware ID %1 on %2</source>
+      <translation>Deze licentie is al geactiveerd en gekoppeld aan Hardware ID %1 op %2</translation>
     </message>
   </context>
   <context>
@@ -4194,43 +4296,43 @@ to %1</source>
       <translation>Open Licentiebestand</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Alle bestanden (*.*)</translation>
-    </message>
-    <message>
       <source>Failed to open file</source>
       <translation>Kan het bestand niet openen</translation>
     </message>
     <message>
-      <source>Please send email with License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-Id dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <source>All files</source>
+      <translation>Alle bestanden</translation>
     </message>
     <message>
-      <source>Please send License Key and Hardware Id provided to %1 to obtain an Activation Key file.</source>
-      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+      <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
+    </message>
+    <message>
+      <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+      <translation>Stuur alsjeblieft een e-mail met de licentiecode en het Hardware-ID dat is verstrekt aan %1 om een ​​activatie bestand te verkrijgen.</translation>
     </message>
   </context>
   <context>
     <name>QnLicensesProposeWidget</name>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruik licenties voor de geselecteerde %n apparaten</numerusform>
-        <numerusform>Use licenses for selected %n devices</numerusform>
+        <numerusform>Gebruik licenties voor de geselecteerde %n apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruik licenties voor de geselecteerde %n camera's</numerusform>
-        <numerusform>Use licenses for selected %n cameras</numerusform>
+        <numerusform>Gebruik licenties voor de geselecteerde %n camera's</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruik licenties voor de geselecteerde %n I / O-modules</numerusform>
-        <numerusform>Use licenses for selected %n I/O modules</numerusform>
+        <numerusform>Gebruik licenties voor de geselecteerde %n I / O-modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4245,7 +4347,7 @@ to %1</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
       <source>Failed to login to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Inloggen mislukt op %1</translation>
     </message>
   </context>
@@ -4257,11 +4359,11 @@ to %1</source>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation>Persoonlijke instellingen</translation>
+      <translation>Personalisatie</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>Schermopname</translation>
+      <translation>Scherm Opname</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -4347,11 +4449,11 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Accounts aanmaken</translation>
+      <translation>Account aanmaken</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -4363,12 +4465,12 @@ to %1</source>
     </message>
     <message>
       <source>Log in to %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Meld u aan bij %1</translation>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Inloggen op %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Welkom bij %1!</translation>
     </message>
   </context>
@@ -4417,6 +4519,18 @@ to %1</source>
     <message>
       <source>No image</source>
       <translation>Geen afbeelding</translation>
+    </message>
+    <message>
+      <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
+      <translation>Stelt de tijd in die moet worden gebruikt in de client (tijdlijn, tijdstempels, enz.) wanneer client- en servermachines zich in verschillende tijdzones bevinden.</translation>
+    </message>
+    <message>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>Geeft IP-adressen weer voor camera's en servers en rechten voor gebruikers.</translation>
+    </message>
+    <message>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>Lengte van de weergave voor elke camera in de schermindeling als u een tour cyclus start.</translation>
     </message>
   </context>
   <context>
@@ -4467,7 +4581,7 @@ to %1</source>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Low-Res</translation>
+      <translation>Lo-Res</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
@@ -4680,9 +4794,9 @@ to %1</source>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
       <source>%n more notifications</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n meer meldingen</numerusform>
-        <numerusform>%n more notifications</numerusform>
+        <numerusform>%n meer meldingen</numerusform>
       </translation>
     </message>
   </context>
@@ -4762,16 +4876,16 @@ to %1</source>
   <context>
     <name>QnPerformanceTest</name>
     <message>
-      <source>For full - featured mode, please use another computer</source>
-      <translation>Gebruik om gebruik te maken van de volledige functionaliteit een andere computer</translation>
-    </message>
-    <message>
       <source>%1 can work in configuration mode only</source>
       <translation>%1 kan alleen in de configuratie modus werken</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
       <translation>De prestaties van deze computer kunnen alleen in de configuratiemodus %1 uitvoeren.</translation>
+    </message>
+    <message>
+      <source>For full-featured mode please use another computer</source>
+      <translation>Gebruik om gebruik te maken van de volledige functionaliteit een andere computer</translation>
     </message>
   </context>
   <context>
@@ -4878,23 +4992,23 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Deze preset wordt geactiveerd na %n minuten inactiviteit</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+        <numerusform>Deze preset wordt geactiveerd na %n minuten inactiviteit</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Tour heeft %n identieke posities</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
+        <numerusform>Tour heeft %n identieke posities</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>about %n minute(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>ongeveer %n minuten</numerusform>
-        <numerusform>about %n minute(s)</numerusform>
+        <numerusform>ongeveer %n minuten</numerusform>
       </translation>
     </message>
     <message>
@@ -5029,22 +5143,6 @@ to %1</source>
       <source>Quarter Native</source>
       <translation>Kwart van de oorspronkelijke resolutie</translation>
     </message>
-    <message>
-      <source>1920x1080</source>
-      <translation>1920x1080</translation>
-    </message>
-    <message>
-      <source>1280x720</source>
-      <translation>1280x720</translation>
-    </message>
-    <message>
-      <source>640x480</source>
-      <translation>640x480</translation>
-    </message>
-    <message>
-      <source>320x240</source>
-      <translation>320x240</translation>
-    </message>
   </context>
   <context>
     <name>QnRecordingStatsModel</name>
@@ -5115,25 +5213,25 @@ to %1</source>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Totaal %1 %n apparaten</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
+        <numerusform>Totaal %1 %n apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Totaal %1 %n camera's</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
+        <numerusform>Totaal %1 %n camera's</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Totaal %1 %n I / O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
+        <numerusform>Totaal %1 %n I / O modules</numerusform>
       </translation>
     </message>
     <message>
@@ -5187,9 +5285,9 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected roles have no %2 permission</source>
       <comment>%1 is number of selected roles, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n van %1 geselecteerde profielen hebben geen toestemming voor %2</numerusform>
-        <numerusform>%n of %1 selected roles have no %2 permission</numerusform>
+        <numerusform>%n van %1 geselecteerde profielen hebben geen toestemming voor %2</numerusform>
       </translation>
     </message>
     <message>
@@ -5205,9 +5303,9 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n van %1 geselecteerde gebruikers hebben geen toestemming voor %2</numerusform>
-        <numerusform>%n of %1 selected users have no %2 permission</numerusform>
+        <numerusform>%n van %1 geselecteerde gebruikers hebben geen toestemming voor %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5284,7 +5382,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's &amp; apparaten</translation>
+      <translation>Alle camera's en apparaten</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -5292,7 +5390,7 @@ to %1</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Gedeelde lay-outs</translation>
+      <translation>Gedeelde schermindelingen</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -5371,7 +5469,7 @@ to %1</source>
     </message>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -5409,7 +5507,7 @@ to %1</source>
     <name>QnSearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation>Search</translation>
+      <translation>Zoek</translation>
     </message>
   </context>
   <context>
@@ -5455,9 +5553,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+        <numerusform>%n servers</numerusform>
       </translation>
     </message>
   </context>
@@ -5477,9 +5575,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n gebruikers</numerusform>
-        <numerusform>%n Users</numerusform>
+        <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>
   </context>
@@ -5487,9 +5585,9 @@ to %1</source>
     <name>QnSendEmailActionDelegate</name>
     <message numerus="yes">
       <source>%n additional</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n extra</numerusform>
-        <numerusform>%n additional</numerusform>
+        <numerusform>%n extra</numerusform>
       </translation>
     </message>
     <message>
@@ -5498,9 +5596,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n van %1 gebruikers hebben een ongeldig e-mailadres</numerusform>
-        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n van %1 gebruikers hebben een ongeldig e-mailadres</numerusform>
       </translation>
     </message>
     <message>
@@ -5509,9 +5607,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n van %1 extra e-mailadressen zijn ongeldig</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n van %1 extra e-mailadressen zijn ongeldig</numerusform>
       </translation>
     </message>
     <message>
@@ -5607,16 +5705,12 @@ to %1</source>
       <translation>Om problemen te vermijden, moet u het maximale aantal camera's aanpassen</translation>
     </message>
     <message>
-      <source>server will take devices automatically from offline servers</source>
-      <translation>server zal automatisch apparaten van offline servers overnemen</translation>
-    </message>
-    <message>
-      <source>server will take cameras automatically from offline servers</source>
-      <translation>server zal automatisch camera's van offline servers overnemen</translation>
-    </message>
-    <message>
       <source>Failover</source>
       <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
+      <translation>Servers met geactiveerde failover nemen automatisch camera's over van offline servers.</translation>
     </message>
   </context>
   <context>
@@ -5635,10 +5729,6 @@ to %1</source>
     <message>
       <source>Select Update File...</source>
       <translation>Selecteer Update bestand...</translation>
-    </message>
-    <message>
-      <source>Update Files (*.zip)</source>
-      <translation>Updatebestanden (*.zip)</translation>
     </message>
     <message>
       <source>Release notes</source>
@@ -5762,9 +5852,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Niet genoeg vrije ruimte bij %n servers:</numerusform>
-        <numerusform>Not enough free space at %n Servers:</numerusform>
+        <numerusform>Niet genoeg vrije ruimte bij %n servers:</numerusform>
       </translation>
     </message>
     <message>
@@ -5823,6 +5913,18 @@ to %1</source>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
       <translation>Incompatibele %1 versie. Voor het updaten eerst de verbinding verbreken vanaf %1.</translation>
+    </message>
+    <message>
+      <source>Update Files</source>
+      <translation>Bestanden bijwerken</translation>
+    </message>
+    <message>
+      <source>Validating the update...</source>
+      <translation>De update valideren...</translation>
+    </message>
+    <message>
+      <source>Checking for free space...</source>
+      <translation>Controleren op vrije ruimte...</translation>
     </message>
   </context>
   <context>
@@ -5924,6 +6026,10 @@ to %1</source>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
       <translation>&quot;Motion + Low - Res&quot; opnameoptie kan niet worden ingesteld.</translation>
     </message>
+    <message>
+      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
+      <translation>Het geüploade archief kan automatisch worden verwijderd als er geen vrije ruimte meer is op de serveropslag. De oudste beelden van alle camera's op de server worden eerst verwijderd.</translation>
+    </message>
   </context>
   <context>
     <name>QnSmtpAdvancedSettingsWidget</name>
@@ -5949,7 +6055,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5976,7 +6082,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -6075,10 +6181,6 @@ to %1</source>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
-      <source>NOT ENOUGH LICENCES</source>
-      <translation>ONVOLDOENDE LICENTIES</translation>
-    </message>
-    <message>
       <source>NO DATA</source>
       <translation>GEEN GEGEVENS</translation>
     </message>
@@ -6124,11 +6226,15 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Activeer licentie</translation>
+      <translation>Licentie activeren</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
       <translation>Controleer de verificatiegegevens</translation>
+    </message>
+    <message>
+      <source>NO LIVE STREAM</source>
+      <translation>GEEN LIVE STREAM</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -6143,8 +6249,12 @@ to %1</source>
       <translation>Instellen voor deze camera</translation>
     </message>
     <message>
-      <source>NO LIVE STREAM</source>
-      <translation>GEEN LIVE STREAM</translation>
+      <source>UNSUPPORTED FIRMWARE VERSION</source>
+      <translation>NIET-ONDERSTEUNDE FIRMWAREVERSIE</translation>
+    </message>
+    <message>
+      <source>NOT ENOUGH LICENSES</source>
+      <translation>NIET GENOEG LICENTIES</translation>
     </message>
   </context>
   <context>
@@ -6172,7 +6282,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -6296,6 +6406,10 @@ to %1</source>
     <message>
       <source>Recording was enabled on the USB storage</source>
       <translation>Opname is ingeschakeld op de USB-opslag</translation>
+    </message>
+    <message>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Door opnieuw te indexeren kunnen problemen met het archief of de back-up worden opgelost als deze verloren of beschadigd zijn geraakt of als er hardware is vervangen.</translation>
     </message>
   </context>
   <context>
@@ -6506,17 +6620,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Verbinden</translation>
-    </message>
-    <message>
-      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Sluit uw systeem aan op %1 &amp;mdash; en maak het overal toegankelijk!</translation>
-    </message>
-    <message>
-      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Bekijk %1 &amp;mdash; en verbind met uw systeem vanaf elke locatie!</translation>
+      <translation>Verbind</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6564,11 +6668,21 @@ to %1</source>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Extern archief synchronisatie</translation>
+      <translation>Externe archief synchronisatie</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
       <translation>Archief integriteit probleem gedetecteerd</translation>
+    </message>
+    <message>
+      <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Sluit uw systeem aan op %1 &amp;mdash; en maak het overal toegankelijk!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Bekijk %1 &amp;mdash; en verbind met uw systeem vanaf elke locatie!</translation>
     </message>
   </context>
   <context>
@@ -6588,6 +6702,18 @@ to %1</source>
     <message>
       <source>Allow System to optimize camera settings</source>
       <translation>Laat het systeem toe om de camera-instellingen te optimaliseren</translation>
+    </message>
+    <message>
+      <source>Tracks and logs all user actions.</source>
+      <translation>Traceert en logt alle gebruikersacties.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>Bevat informatie over het systeem, zoals cameramodellen en firmwareversies, aantal servers, enz.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>Bevat geen persoonlijke informatie en is volledig anoniem.</translation>
     </message>
   </context>
   <context>
@@ -6654,16 +6780,6 @@ to %1</source>
       <translation>Er zijn geen miniaturen beschikbaar</translation>
     </message>
     <message>
-      <source>hh:mm</source>
-      <comment>Format for displaying hours and minutes on timeline.</comment>
-      <translation>uu:mm</translation>
-    </message>
-    <message>
-      <source>h ap</source>
-      <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-      <translation>u ap</translation>
-    </message>
-    <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
       <translation>dd</translation>
@@ -6676,42 +6792,37 @@ to %1</source>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>yyyy</translation>
+      <translation>jjjj</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM jjjj uu:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM jjjj uu:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h ap</translation>
+      <translation>dd MMMM jjjj u ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM yyyy</translation>
+      <translation>dd MMMM jjjj</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
+      <translation>MMMM, jjjj</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>yyyy</translation>
-    </message>
-    <message>
-      <source>h:mm ap</source>
-      <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-      <translation>h:mm ap</translation>
+      <translation>jjjj</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -6781,37 +6892,37 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Het probleem is veroorzaakt door %n servers:</numerusform>
-        <numerusform>The problem is caused by %n servers:</numerusform>
+        <numerusform>Het probleem is veroorzaakt door %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Er is geen vrije ruimte over op %n servers:</numerusform>
-        <numerusform>No free space left on %n servers:</numerusform>
+        <numerusform>Er is geen vrije ruimte over op %n servers:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n servers reageren niet:</numerusform>
-        <numerusform>%n servers are not responding:</numerusform>
+        <numerusform>%n servers reageren niet:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n servers zijn offline gegaan:</numerusform>
-        <numerusform>%n servers have gone offline:</numerusform>
+        <numerusform>%n servers zijn offline gegaan:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Authenticatie mislukt voor %n servers:</numerusform>
-        <numerusform>Authentication failed for %n servers:</numerusform>
+        <numerusform>Authenticatie mislukt voor %n servers:</numerusform>
       </translation>
     </message>
     <message>
@@ -6846,16 +6957,17 @@ to %1</source>
       <translation>Lokale gebruiker</translation>
     </message>
     <message>
-      <source>Cloud user</source>
-      <translation>Cloud gebruiker</translation>
-    </message>
-    <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Role</source>
       <translation>Rol</translation>
+    </message>
+    <message>
+      <source>%1 user</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 gebruikers</translation>
     </message>
   </context>
   <context>
@@ -6903,12 +7015,16 @@ to %1</source>
       <source>Edit</source>
       <translation>Aanpassen</translation>
     </message>
+    <message>
+      <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
+      <translation>Gebruikers kunnen vanaf een LDAP-server worden geïmporteerd. Ze kunnen alleen inloggen als de LDAP-server online is en hun accounts actief zijn.</translation>
+    </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6916,7 +7032,7 @@ to %1</source>
     </message>
     <message>
       <source>Role</source>
-      <translation>Profiel</translation>
+      <translation>Rol</translation>
     </message>
     <message>
       <source>Email</source>
@@ -6958,9 +7074,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
-        <numerusform>Selecteer alstublieft een actie voor %n gebruikers met dit profiel</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+      <translation>
+        <numerusform>Selecteer alstublieft een actie voor %n gebruikers met deze rol</numerusform>
+        <numerusform>Selecteer alstublieft een actie voor %n gebruikers met deze rol</numerusform>
       </translation>
     </message>
   </context>
@@ -6980,7 +7096,7 @@ to %1</source>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Schermindelingen</translation>
+      <translation>Layouts</translation>
     </message>
     <message>
       <source>New Role</source>
@@ -7003,11 +7119,11 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation>Camera's en apparaten</translation>
+      <translation>Camera's &amp;&amp; apparaten</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Schermindelingen</translation>
+      <translation>Layouts</translation>
     </message>
     <message>
       <source>Send Invite</source>
@@ -7039,7 +7155,7 @@ to %1</source>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Deze gebruiker heeft zich nog niet aangemeld voor %1</translation>
     </message>
   </context>
@@ -7050,12 +7166,8 @@ to %1</source>
       <translation>Lokaal</translation>
     </message>
     <message>
-      <source>Cloud</source>
-      <translation>Cloud</translation>
-    </message>
-    <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7083,7 +7195,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -7094,8 +7206,28 @@ to %1</source>
       <translation>Wachtwoorden komen niet overeen.</translation>
     </message>
     <message>
-      <source>Cloud user with specified email already exists.</source>
-      <translation>Cloud gebruiker met dit e-mailadres bestaat al.</translation>
+      <source>%1 user with specified email already exists.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 gebruiker met opgegeven email bestaat al.</translation>
+    </message>
+    <message>
+      <source>Local users</source>
+      <translation>Lokale Gebruikers</translation>
+    </message>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 gebruikers</translation>
+    </message>
+    <message>
+      <source>%1 belong to this system only and are fully managed by system administrators.</source>
+      <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
+      <translation>%1 behoren alleen tot dit systeem en worden volledig beheerd door de systeembeheerders.</translation>
+    </message>
+    <message>
+      <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
+      <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
+      <translation>%1 kunnen toegang hebben tot verschillende systemen. Alleen beheerders kunnen hun rechten beheren.</translation>
     </message>
   </context>
   <context>
@@ -7153,9 +7285,9 @@ to %1</source>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>PC %1 - Weergave %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+        <numerusform>PC %1 - Weergave %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7169,27 +7301,24 @@ to %1</source>
   <context>
     <name>QnWearableProgressWidget</name>
     <message>
-      <source>Uploading %1... %2	%p%</source>
-      <translation>Uploaden %1... %2	%p%</translation>
-    </message>
-    <message numerus="yes">
-      <source>(%n more file(s) in queue)</source>
-      <translation>
-        <numerusform>(%n meer bestand(en) in de wachtrij)</numerusform>
-        <numerusform>(%n meer bestand(en) in de wachtrij)</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Stop uploading?</source>
       <translation>Stoppen met uploaden?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation>Reeds geuploade bestanden worden bewaard.</translation>
+      <translation>Reeds geüploade bestanden worden bewaard.</translation>
     </message>
     <message>
-      <source>Finalizing %1... %2	%p%</source>
-      <translation>Finaliseren %1... %2%p%</translation>
+      <source>(%1 of %2)</source>
+      <translation>(%1 van %2)</translation>
+    </message>
+    <message>
+      <source>Uploading %1...</source>
+      <translation>Uploaden %1...</translation>
+    </message>
+    <message>
+      <source>Finalizing %1...</source>
+      <translation>Afronden %1...</translation>
     </message>
   </context>
   <context>
@@ -7268,9 +7397,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Bladwijzer %n verwijderen?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
+        <numerusform>Bladwijzer %n verwijderen?</numerusform>
       </translation>
     </message>
   </context>
@@ -7292,6 +7421,25 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Kon geen verbinding maken met de server. Videowall wordt afgesloten.</translation>
+    </message>
+    <message>
+      <source>Video Wall is removed on the server and will be closed.</source>
+      <translation>Videomuur is verwijderd op de server en zal worden gesloten.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Om de software te kunnen gebruiken dient u eerst de gebruiksrechtovereenkomst accepteren</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Accepteren</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Afwijzen</translation>
     </message>
   </context>
   <context>
@@ -7317,10 +7465,6 @@ to %1</source>
       <translation>Totaal aantal licenties zal afnemen</translation>
     </message>
     <message>
-      <source>Cloud Systems cannot be merged</source>
-      <translation>Cloud systemen kunnen niet worden samengevoegd</translation>
-    </message>
-    <message>
       <source>Connecting to the current System...</source>
       <translation>Verbinding maken met het huidige systeem...</translation>
     </message>
@@ -7340,14 +7484,19 @@ to %1</source>
       <source>Administrator password</source>
       <translation>Admin wachtwoord</translation>
     </message>
+    <message>
+      <source>%1 Systems cannot be merged</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 Systemen kunnen niet worden samengevoegd</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>De volgende %n items zijn niet opgeslagen:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
+        <numerusform>De volgende %n items zijn niet opgeslagen:</numerusform>
       </translation>
     </message>
     <message>
@@ -7360,9 +7509,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The following %n items are not deleted:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>De volgende %n items zijn niet verwijderd:</numerusform>
-        <numerusform>The following %n items are not deleted:</numerusform>
+        <numerusform>De volgende %n items zijn niet verwijderd:</numerusform>
       </translation>
     </message>
     <message>
@@ -7371,9 +7520,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kan %n items niet verwijderen:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
+        <numerusform>Kan %n items niet verwijderen:</numerusform>
       </translation>
     </message>
     <message>
@@ -7529,9 +7678,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Verwijder %n items?</numerusform>
       </translation>
     </message>
     <message>
@@ -7548,9 +7697,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n matrixen?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
+        <numerusform>Verwijder %n matrixen?</numerusform>
       </translation>
     </message>
     <message>
@@ -7585,10 +7734,6 @@ to %1</source>
   <context>
     <name>QnWorkbenchWearableHandler</name>
     <message>
-      <source>Could not add wearable camera to server &quot;%1&quot;.</source>
-      <translation>Draagbare camera kon niet worden toegevoegd aan server &quot;%1&quot;.</translation>
-    </message>
-    <message>
       <source>All files (*.*)</source>
       <translation>Alle bestanden (*.*)</translation>
     </message>
@@ -7598,85 +7743,11 @@ to %1</source>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation>Open draagbare Camera opnames...</translation>
-    </message>
-    <message>
-      <source>No video files found in &quot;%1&quot;</source>
-      <translation>Geen videobestanden gevonden in &quot;%1&quot;</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file format(s) are not supported</source>
-      <translation>
-        <numerusform>Geselecteerde bestandsindeling (en) worden niet ondersteund</numerusform>
-        <numerusform>Geselecteerde bestandsindeling (en) worden niet ondersteund</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Only video files are supported.</source>
-      <translation>Alleen videobestanden worden ondersteund.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) do not have timestamp(s)</source>
-      <translation>
-        <numerusform>Geselecteerde bestand (en) hebben geen tijdstempel (s)</numerusform>
-        <numerusform>Geselecteerde bestand (en) hebben geen tijdstempel (s)</numerusform>
-      </translation>
+      <translation>Open draagbare camera opnames...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
       <translation>Alleen videobestanden met de juiste tijdstempel worden ondersteund.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos are already being uploaded</source>
-      <translation>
-        <numerusform>Geselecteerde bestand (en) overlappen met video's die al geüpload worden</numerusform>
-        <numerusform>Geselecteerde bestand (en) overlappen met video's die al geüpload worden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>You can upload these file(s) to a different instance of a Wearable Camera.</source>
-      <translation>
-        <numerusform>U kunt deze bestand(en) uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
-        <numerusform>U kunt deze bestand(en) uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) cover periods for which videos have already been uploaded</source>
-      <translation>
-        <numerusform>Geselecteerde bestand (en) overlappen met video's die al geüpload werden</numerusform>
-        <numerusform>Geselecteerde bestand (en) overlappen met video's die al geüpload werden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Selected file(s) will not be uploaded</source>
-      <translation>
-        <numerusform>Geselecteerde bestand (en) worden niet geüpload</numerusform>
-        <numerusform>Geselecteerde bestand (en) worden niet geüpload</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Some file(s) will not be uploaded</source>
-      <translation>
-        <numerusform>Sommige bestand(en) zullen niet worden geüpload</numerusform>
-        <numerusform>Sommige bestand(en) zullen niet worden geüpload</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>There is no new files to upload in &quot;%1&quot;</source>
-      <translation>Er zijn geen nieuwe bestanden om te uploaden in &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Not enough space on server storage</source>
-      <translation>Niet genoeg schijfruimte op de server om op te slaan</translation>
-    </message>
-    <message numerus="yes">
-      <source>File(s) size - %1
-Free space - %2</source>
-      <translation>
-        <numerusform>Grootte bestand (en) - %1Vrije ruimte - %2</numerusform>
-        <numerusform>Grootte bestand (en) - %1
-Vrije ruimte - %2</numerusform>
-      </translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7687,24 +7758,134 @@ Vrije ruimte - %2</numerusform>
       <translation>Kan niet starten met uploaden omdat een andere gebruiker momenteel beeldmateriaal naar deze camera aan het uploaden is.</translation>
     </message>
     <message>
-      <source>File format of &quot;%1&quot; is not supported.</source>
-      <translation>Bestandsformaat van &quot;%1&quot; wordt niet ondersteund.</translation>
+      <source>Failed to add wearable camera</source>
+      <translation>Toevoegen van draagbare camera mislukt</translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; does not have timestamp.</source>
-      <translation>Bestand &quot;%1&quot; heeft geen tijdstempel.</translation>
+      <source>No video files found in selected folder</source>
+      <translation>Geen videobestanden gevonden in de geselecteerde map</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file formats are not supported</source>
+      <translation>
+        <numerusform>Geselecteerde bestandsindelingen worden niet ondersteund</numerusform>
+        <numerusform>Geselecteerde bestandsindelingen worden niet ondersteund</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video is already being uploaded.</source>
-      <translation>Bestand &quot;%1&quot; overlapt met video die al geüpload word.</translation>
+      <source>Use .MKV, .AVI, .MP4 or other video files.</source>
+      <translation>Gebruik .MKV, .AVI, .MP4 of andere videobestanden.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files do not have timestamps</source>
+      <translation>
+        <numerusform>Geselecteerde bestanden hebben geen tijdstempel</numerusform>
+        <numerusform>Geselecteerde bestanden hebben geen tijdstempel</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos are already being uploaded</source>
+      <translation>
+        <numerusform>Geselecteerde bestanden overlappen met video's die al geüpload worden</numerusform>
+        <numerusform>Geselecteerde bestanden overlappen met video's die al geüpload worden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>You can upload these files to a different instance of a Wearable Camera.</source>
+      <translation>
+        <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
+        <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files cover periods for which videos have already been uploaded</source>
+      <translation>
+        <numerusform>Geselecteerde bestanden overlappen met video's die al geüpload werden</numerusform>
+        <numerusform>Geselecteerde bestanden overlappen met video's die al geüpload werden</numerusform>
+      </translation>
     </message>
     <message>
-      <source>File &quot;%1&quot; cover periods for which video has already been uploaded.</source>
-      <translation>Bestand &quot;%1&quot; overlapt met video die al geüpload werd.</translation>
+      <source>Selected files will not be uploaded</source>
+      <translation>De geselecteerde bestanden worden niet geüpload</translation>
     </message>
     <message>
-      <source>There is no space on server for file &quot;%1&quot;.</source>
-      <translation>Er is geen ruimte op de server voor bestand &quot;%1&quot;.</translation>
+      <source>Some files will not be uploaded</source>
+      <translation>Sommige bestanden worden niet geüpload</translation>
+    </message>
+    <message>
+      <source>No new files to upload in selected folder</source>
+      <translation>Geen nieuwe bestanden om te uploaden naar de geselecteerde map</translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files are too old</source>
+      <translation>
+        <numerusform>Geselecteerde bestanden zijn te oud</numerusform>
+        <numerusform>Geselecteerde bestanden zijn te oud</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Het geselecteerde bestand is opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+        <numerusform>Het geselecteerde bestand is opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
+      <translation>
+        <numerusform>Geselecteerde bestanden zijn opgenomen tussen %1 en %2, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+        <numerusform>Geselecteerde bestanden zijn opgenomen tussen %1 en %2, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Some footage may be deleted after uploading these files</source>
+      <translation>
+        <numerusform>Sommige beelden kunnen worden verwijderd na het uploaden van deze bestanden</numerusform>
+        <numerusform>Sommige beelden kunnen worden verwijderd na het uploaden van deze bestanden</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
+      <translation>
+        <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Merk op dat als geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
+        <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Merk op dat als geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
+      <translation>Om dit te voorkomen, kunt u extra opslagruimte toevoegen. U kunt ook bepalen welk beeld eerst wordt verwijderd door de bewaartijd van het archief te wijzigen in camera-instellingen.</translation>
+    </message>
+    <message>
+      <source>Upload anyway?</source>
+      <translation>Toch uploaden?</translation>
+    </message>
+    <message>
+      <source>Could not finish upload to %1</source>
+      <translation>Kan de upload naar %1 niet voltooien</translation>
+    </message>
+    <message>
+      <source>Make sure there is enough space on server storage.</source>
+      <translation>Zorg dat er voldoende ruimte is op de serveropslag.</translation>
+    </message>
+    <message>
+      <source>%1 has unsupported format.</source>
+      <translation>%1 heeft een niet-ondersteund format.</translation>
+    </message>
+    <message>
+      <source>%1 does not have timestamp.</source>
+      <translation>%1 heeft geen tijdstempel.</translation>
+    </message>
+    <message>
+      <source>%1 is older than allowed in camera archive settings.</source>
+      <translation>%1 is ouder dan toegestaan ​​in de camera-archiefinstellingen.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video has already been uploaded.</source>
+      <translation>%1 bevat de periode waarvoor de video al is geüpload.</translation>
+    </message>
+    <message>
+      <source>%1 covers period for which video is being uploaded.</source>
+      <translation>%1 bevat de periode waarvoor de video wordt geüpload.</translation>
     </message>
   </context>
   <context>
@@ -7738,9 +7919,9 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruiker heeft nog toegang tot %n verwijderde bronnen:</numerusform>
-        <numerusform>User will still have access to %n removed resources:</numerusform>
+        <numerusform>Gebruiker heeft nog toegang tot %n verwijderde bronnen:</numerusform>
       </translation>
     </message>
     <message>
@@ -7749,9 +7930,9 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
-      <translation type="unfinished">
-        <numerusform>Alle gebruikers met dit profiel krijgen toegang tot %n apparaten:</numerusform>
-        <numerusform>All users with this role will get access to %n resources:</numerusform>
+      <translation>
+        <numerusform>Alle gebruikers met deze rol krijgen toegang tot %n apparaten:</numerusform>
+        <numerusform>Alle gebruikers met deze rol krijgen toegang tot %n apparaten:</numerusform>
       </translation>
     </message>
     <message>
@@ -7760,9 +7941,9 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
-      <translation type="unfinished">
-        <numerusform>Alle gebruikers met dit profiel hebben nog toegang tot %n verwijderde bronnen:</numerusform>
-        <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
+      <translation>
+        <numerusform>Alle gebruikers met deze rol hebben nog toegang tot %n verwijderde bronnen:</numerusform>
+        <numerusform>Alle gebruikers met deze rol hebben nog toegang tot %n verwijderde bronnen:</numerusform>
       </translation>
     </message>
     <message>
@@ -7775,37 +7956,37 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gebruiker verliest toegang tot %n bronnen:</numerusform>
-        <numerusform>User will lose access to %n resources:</numerusform>
+        <numerusform>Gebruiker verliest toegang tot %n bronnen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Alle gebruikers met deze rol verliezen toegang tot %n apparaten:</numerusform>
-        <numerusform>All users with this role will lose access to %n resources:</numerusform>
+        <numerusform>Alle gebruikers met deze rol verliezen toegang tot %n apparaten:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Verwijder %n gedeelde schermindelingen?</numerusform>
-        <numerusform>Delete %n shared layouts?</numerusform>
+      <translation>
+        <numerusform>Verwijder %n gedeelde layouts?</numerusform>
+        <numerusform>Verwijder %n gedeelde layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
-        <numerusform>Deze %n schermindelingen worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
-        <numerusform>These %n layouts are shared with other users, so you delete it for them too.</numerusform>
+      <translation>
+        <numerusform>Deze %n layouts worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
+        <numerusform>Deze %n layouts worden gedeeld met andere gebruikers, dus u verwijdert deze ook voor hen.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
-        <numerusform>Verwijder %n items uit de schermindeling?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
+      <translation>
+        <numerusform>Verwijder %n items uit layout?</numerusform>
+        <numerusform>Verwijder %n items uit layout?</numerusform>
       </translation>
     </message>
     <message>
@@ -7822,58 +8003,58 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n gebruikers?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
+        <numerusform>Verwijder %n gebruikers?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n apparaten?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
+        <numerusform>Verwijder %n apparaten?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n camera's?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
+        <numerusform>Verwijder %n camera's?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
+        <numerusform>Verwijder %n I/O Modules?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+        <numerusform>Verwijder %n items?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n daarvan worden automatisch ontdekt.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
+        <numerusform>%n daarvan worden automatisch ontdekt.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n camera's zijn automatisch ontdekt.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+        <numerusform>%n camera's zijn automatisch ontdekt.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I / O-modules zijn automatisch ontdekt.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+        <numerusform>%n I / O-modules zijn automatisch ontdekt.</numerusform>
       </translation>
     </message>
     <message>
@@ -7890,9 +8071,9 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Verwijder %n items van showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+        <numerusform>Verwijder %n items van showreel?</numerusform>
       </translation>
     </message>
     <message>
@@ -7915,9 +8096,9 @@ Vrije ruimte - %2</numerusform>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n gebruikers</numerusform>
-        <numerusform>%n users</numerusform>
+        <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>
   </context>
@@ -7978,12 +8159,12 @@ Vrije ruimte - %2</numerusform>
       <translation>Bestand schrijffout.</translation>
     </message>
     <message>
-      <source>Internal error</source>
-      <translation>Interne fout</translation>
+      <source>No data exported.</source>
+      <translation>Er zijn geen gegevens geëxporteerd.</translation>
     </message>
     <message>
-      <source>No data exported.</source>
-      <translation>Geen gegevens geëxporteerd.</translation>
+      <source>Internal error</source>
+      <translation>Interne fout</translation>
     </message>
   </context>
   <context>
@@ -7998,7 +8179,7 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Rapid Review</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -8077,6 +8258,13 @@ Vrije ruimte - %2</numerusform>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::HintButton</name>
+    <message>
+      <source>Click to read more</source>
+      <translation>Klik om meer te lezen</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ImageOverlaySettingsWidget</name>
     <message>
       <source>Select file...</source>
@@ -8088,7 +8276,7 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message>
       <source>Error</source>
-      <translation>Error</translation>
+      <translation>Fout</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
@@ -8114,7 +8302,7 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message>
       <source>Low</source>
-      <translation>Laag</translation>
+      <translation>Lage</translation>
     </message>
     <message>
       <source>High</source>
@@ -8157,11 +8345,11 @@ Vrije ruimte - %2</numerusform>
     <name>nx::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation>Kan bestand &quot;%1&quot; niet openen;</translation>
+      <translation>Kon bestand &quot;%1&quot; niet openen;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation>Kan md5 voor bestand &quot;%1&quot; niet berekenen;</translation>
+      <translation>Kon md5 voor bestand &quot;%1&quot; niet berekenen.</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
@@ -8184,14 +8372,14 @@ Vrije ruimte - %2</numerusform>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation>Kan geen verbinding maken met de server.</translation>
+      <translation>Mislukt om een ​​verzoek naar de server te verzenden.</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation type="unfinished">%1 Analytics</translation>
+      <translation>%1 Analytics</translation>
     </message>
   </context>
   <context>
@@ -8322,17 +8510,30 @@ Vrije ruimte - %2</numerusform>
     </message>
   </context>
   <context>
-    <name>nx::client::desktop::ui::AnalyticsSdkEventModel</name>
-    <message>
-      <source>No event types supported</source>
-      <translation>Geen gebeurtenistypen ondersteund</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
-      <source>Event will trigger only if Analytics Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Analytics Event contains any keyword.</source>
-      <translation>Evenement wordt alleen geactiveerd als Analytics-evenement aan alle bovenstaande voorwaarden voldoet. Als een trefwoordveld leeg is, is aan de voorwaarde altijd voldaan. Als dat niet het geval is, wordt aan de voorwaarde voldaan als het overeenkomstige veld van Analytics-evenement een zoekwoord bevat.</translation>
+      <source>Analytics events can be set up on a certain cameras.</source>
+      <translation>Analytics gebeurtenissen kunnen op bepaalde camera's worden ingesteld.</translation>
+    </message>
+    <message>
+      <source>Choose cameras using the button above to see the list of supported events.</source>
+      <translation>Kies camera's met de knop hierboven om de lijst met ondersteunde gebeurtenissen te bekijken.</translation>
+    </message>
+    <message>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>Als het veld leeg is, wordt de gebeurtenis altijd geactiveerd.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de Omschrijving met een van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>De gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn in de titel met één van de gekozen trefwoorden.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>Dit veld is hoofdlettergevoelig.</translation>
     </message>
   </context>
   <context>
@@ -8364,13 +8565,6 @@ Vrije ruimte - %2</numerusform>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
       <translation>Geplakt</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
-    <message>
-      <source>NO DATA</source>
-      <translation>GEEN GEGEVENS</translation>
     </message>
   </context>
   <context>
@@ -8418,11 +8612,11 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message>
       <source>Stop Tour</source>
-      <translation>Stop tour</translation>
+      <translation>Stop Tour</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation>Start tour</translation>
+      <translation>Start Tour</translation>
     </message>
   </context>
   <context>
@@ -8496,23 +8690,23 @@ Vrije ruimte - %2</numerusform>
     <name>nx::client::desktop::ui::workbench::ActionHandler</name>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kan %n apparaten niet verplaatsen</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
+        <numerusform>Kan %n apparaten niet verplaatsen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kan %n camera's niet verplaatsen</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
+        <numerusform>Kan %n camera's niet verplaatsen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kan %n I/O modules niet verplaatsen</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+        <numerusform>Kan %n I/O modules niet verplaatsen</numerusform>
       </translation>
     </message>
     <message>
@@ -8521,23 +8715,23 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n apparaten. Verplaats ze toch?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n apparaten. Verplaats ze toch?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Toch verplaatsen?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Verplaats ze toch?</numerusform>
+        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n camera's. Verplaats ze toch?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n I/O modules. Verplaats ze toch?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; kan geen toegang krijgen tot %n I/O modules. Verplaats ze toch?</numerusform>
       </translation>
     </message>
     <message>
@@ -8546,7 +8740,7 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message>
       <source>Layout is locked and cannot be changed.</source>
-      <translation>De schermindeling is vergrendeld en kan niet worden gewijzigd.</translation>
+      <translation>Layout is vergrendeld en kan niet worden gewijzigd.</translation>
     </message>
     <message>
       <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
@@ -8594,9 +8788,9 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Weet u zeker dat u deze %n bestanden permanent wilt verwijderen?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        <numerusform>Weet u zeker dat u deze %n bestanden permanent wilt verwijderen?</numerusform>
       </translation>
     </message>
     <message>
@@ -8660,10 +8854,6 @@ Vrije ruimte - %2</numerusform>
       <translation>Beta versie %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Sommige functies zijn mogelijk niet beschikbaar of werken niet goed.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>Systeem stuurt anonieme gebruiksstatistieken</translation>
     </message>
@@ -8680,6 +8870,10 @@ Vrije ruimte - %2</numerusform>
       <translation>Kan de webpagina van de server niet openen</translation>
     </message>
     <message>
+      <source>Wearable Cameras cannot be moved between servers</source>
+      <translation>Draagbare camera's kunnen niet tussen servers worden verplaatst</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>Wachtwoord wijzigen mislukt</translation>
     </message>
@@ -8688,8 +8882,8 @@ Vrije ruimte - %2</numerusform>
       <translation>Wijzigen van wachtwoorden op %1 van %2 camera's mislukt</translation>
     </message>
     <message>
-      <source>Wearable Cameras cannot be moved between servers</source>
-      <translation>Draagbare camera's kunnen niet van server worden verplaatst</translation>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Waarschuwing! Deze build is alleen voor testdoeleinden! Voer een upgrade uit naar een volgende beschikbare patch of release-versie zodra deze beschikbaar is.</translation>
     </message>
   </context>
   <context>
@@ -8730,30 +8924,30 @@ Vrije ruimte - %2</numerusform>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Showreel %1 verwijderen?</translation>
+      <translation>Show Voorbeeld %1 verwijderen?</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation>Schermindeling opslaan als</translation>
+      <translation>Layout opslaan als</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
-      <translation>Voer de naam voor de schermindeling in:</translation>
+      <translation>Voer layout naam in:</translation>
     </message>
     <message>
       <source>New Layout</source>
-      <translation>Nieuwe schermindeling</translation>
+      <translation>Nieuwe layout</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
-      <translation>Voer de naam van de schermindeling in om deze aan te maken:</translation>
+      <translation>Voer de naam van de layout in om deze aan te maken:</translation>
     </message>
     <message>
       <source>New Layout %1</source>
-      <translation>Nieuwe schermindeling %1</translation>
+      <translation>Nieuwe layout %1</translation>
     </message>
   </context>
 </TS>

@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QnPanel" name="dayWarningBanner" native="true">
+    <widget class="nx::client::desktop::Panel" name="dayWarningBanner" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <property name="leftMargin">
        <number>16</number>
@@ -52,7 +52,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QnPanel" name="controlsPanel" native="true">
+    <widget class="nx::client::desktop::Panel" name="controlsPanel" native="true">
      <layout class="QVBoxLayout" name="controlsVerticalLayout">
       <property name="leftMargin">
        <number>16</number>
@@ -192,7 +192,7 @@
         <widget class="QWidget" name="checkingPage">
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
-           <widget class="QnBusyIndicatorWidget" name="checkingProgress" native="true"/>
+           <widget class="nx::client::desktop::BusyIndicatorWidget" name="checkingProgress" native="true"/>
           </item>
           <item>
            <spacer name="horizontalSpacer">
@@ -422,15 +422,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnBusyIndicatorWidget</class>
+   <class>nx::client::desktop::BusyIndicatorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/busy_indicator.h</header>
+   <header location="global">nx/client/desktop/common/widgets/busy_indicator.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

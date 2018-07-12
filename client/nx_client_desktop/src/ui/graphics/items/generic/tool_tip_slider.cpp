@@ -12,6 +12,8 @@
 
 #include <nx/utils/math/fuzzy.h>
 
+using namespace nx::client::desktop;
+
 namespace {
 
 static constexpr int kAutoHideTimerIntervalMs = 100;
@@ -69,6 +71,7 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem* parent):
     setAcceptHoverEvents(true);
 
     setFlag(ItemSendsScenePositionChanges, true);
+    setTooltipMargin(QnSliderTooltipWidget::kToolTipMargin);
 }
 
 QnToolTipSlider::~QnToolTipSlider()

@@ -10,12 +10,12 @@
 
 namespace {
 
-const qreal kReserveFactor = 1.2;
-const qreal kWindowsReservedFreeSpace = 500 * 1024 * 1024;
-const QnSoftwareVersion kRequireFreeSpaceVersion(3, 0);
+constexpr qreal kReserveFactor = 1.2;
+constexpr qreal kWindowsReservedFreeSpace = 500 * 1024 * 1024;
+static const nx::utils::SoftwareVersion kRequireFreeSpaceVersion = {3, 0};
 
 qint64 spaceRequiredForUpdate(
-    const QnSystemInformation& systemInformation, const QString& fileName)
+    const nx::vms::api::SystemInformation& systemInformation, const QString& fileName)
 {
     QFile updateFile(fileName);
 
@@ -44,7 +44,7 @@ QnCheckFreeSpacePeerTask::QnCheckFreeSpacePeerTask(QObject* parent):
 }
 
 void QnCheckFreeSpacePeerTask::setUpdateFiles(
-    const QHash<QnSystemInformation, QString>& fileBySystemInformation)
+    const QHash<nx::vms::api::SystemInformation, QString>& fileBySystemInformation)
 {
     m_files = fileBySystemInformation;
 }

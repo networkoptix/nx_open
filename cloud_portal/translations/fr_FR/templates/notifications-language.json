@@ -6,10 +6,10 @@
     "emailSubject": "Réinitialisez votre mot de passe"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} vous invite à {{PRODUCT_NAME}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} vous invite à %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}Système Vidéo {{message.system_name}} a été partagé avec vous{{/message.sharer_name}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} vous invite à {{PRODUCT_NAME}}"
+    "emailSubject": "Système vidéo {{message.system_name}} a été partagé avec vous"
   },
   "review_version": {
     "emailSubject": "Version {{message.id}} est prête à être révisé"

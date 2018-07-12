@@ -5,351 +5,343 @@
 #include <QtCore/QByteArray>
 #include <nx/utils/thread/mutex.h>
 
-QMap<AVCodecID, QByteArray> codecToStringData()
+static const QMap<AVCodecID, QByteArray> kCodecToStringData =
 {
-    static QnMutex mutex;
-    QnMutexLocker lock(&mutex);
-
-    static QMap<AVCodecID, QByteArray> codecToStringData;
-    if (!codecToStringData.isEmpty())
-        return codecToStringData;
-
-    /* video codecs */
-    codecToStringData.insert(AV_CODEC_ID_MPEG1VIDEO, "MPEG1VIDEO");
-    codecToStringData.insert(AV_CODEC_ID_MPEG2VIDEO, "MPEG2VIDEO"); //< Preferred id for MPEG-1/2 video decoding.
-    codecToStringData.insert(AV_CODEC_ID_MPEG2VIDEO_XVMC, "MPEG2VIDEO-XVMC");
-    codecToStringData.insert(AV_CODEC_ID_H261, "H261");
-    codecToStringData.insert(AV_CODEC_ID_H263, "H263");
-    codecToStringData.insert(AV_CODEC_ID_RV10, "RV10");
-    codecToStringData.insert(AV_CODEC_ID_RV20, "RV20");
-    codecToStringData.insert(AV_CODEC_ID_MJPEG, "MJPEG");
-    codecToStringData.insert(AV_CODEC_ID_MJPEGB, "MJPEGB");
-    codecToStringData.insert(AV_CODEC_ID_LJPEG, "LJPEG");
-    codecToStringData.insert(AV_CODEC_ID_SP5X, "SP5X");
-    codecToStringData.insert(AV_CODEC_ID_JPEGLS, "JPEGLS");
-    codecToStringData.insert(AV_CODEC_ID_MPEG4, "MPEG4");
-    codecToStringData.insert(AV_CODEC_ID_RAWVIDEO, "RAWVIDEO");
-    codecToStringData.insert(AV_CODEC_ID_MSMPEG4V1, "MSMPEG4V1");
-    codecToStringData.insert(AV_CODEC_ID_MSMPEG4V2, "MSMPEG4V2");
-    codecToStringData.insert(AV_CODEC_ID_MSMPEG4V3, "MSMPEG4V3");
-    codecToStringData.insert(AV_CODEC_ID_WMV1, "WMV1");
-    codecToStringData.insert(AV_CODEC_ID_WMV2, "WMV2");
-    codecToStringData.insert(AV_CODEC_ID_H263P, "H263P");
-    codecToStringData.insert(AV_CODEC_ID_H263I, "H263I");
-    codecToStringData.insert(AV_CODEC_ID_FLV1, "FLV1");
-    codecToStringData.insert(AV_CODEC_ID_SVQ1, "SVQ1");
-    codecToStringData.insert(AV_CODEC_ID_SVQ3, "SVQ3");
-    codecToStringData.insert(AV_CODEC_ID_DVVIDEO, "DVVIDEO");
-    codecToStringData.insert(AV_CODEC_ID_HUFFYUV, "HUFFYUV");
-    codecToStringData.insert(AV_CODEC_ID_CYUV, "CYUV");
-    codecToStringData.insert(AV_CODEC_ID_H264, "H264");
-    codecToStringData.insert(AV_CODEC_ID_HEVC, "H265");
-    codecToStringData.insert(AV_CODEC_ID_INDEO3, "INDEO3");
-    codecToStringData.insert(AV_CODEC_ID_VP3, "VP3");
-    codecToStringData.insert(AV_CODEC_ID_THEORA, "THEORA");
-    codecToStringData.insert(AV_CODEC_ID_ASV1, "ASV1");
-    codecToStringData.insert(AV_CODEC_ID_ASV2, "ASV2");
-    codecToStringData.insert(AV_CODEC_ID_FFV1, "FFV1");
-    codecToStringData.insert(AV_CODEC_ID_4XM, "4XM");
-    codecToStringData.insert(AV_CODEC_ID_VCR1, "VCR1");
-    codecToStringData.insert(AV_CODEC_ID_CLJR, "CLJR");
-    codecToStringData.insert(AV_CODEC_ID_MDEC, "MDEC");
-    codecToStringData.insert(AV_CODEC_ID_ROQ, "ROQ");
-    codecToStringData.insert(AV_CODEC_ID_INTERPLAY_VIDEO, "INTERPLAY_VIDEO");
-    codecToStringData.insert(AV_CODEC_ID_XAN_WC3, "XAN_WC3");
-    codecToStringData.insert(AV_CODEC_ID_XAN_WC4, "XAN_WC4");
-    codecToStringData.insert(AV_CODEC_ID_RPZA, "RPZA");
-    codecToStringData.insert(AV_CODEC_ID_CINEPAK, "CINEPAK");
-    codecToStringData.insert(AV_CODEC_ID_WS_VQA, "WS_VQA");
-    codecToStringData.insert(AV_CODEC_ID_MSRLE, "MSRLE");
-    codecToStringData.insert(AV_CODEC_ID_MSVIDEO1, "MSVIDEO1");
-    codecToStringData.insert(AV_CODEC_ID_IDCIN, "IDCIN");
-    codecToStringData.insert(AV_CODEC_ID_8BPS, "8BPS");
-    codecToStringData.insert(AV_CODEC_ID_SMC, "SMC");
-    codecToStringData.insert(AV_CODEC_ID_FLIC, "FLIC");
-    codecToStringData.insert(AV_CODEC_ID_TRUEMOTION1, "TRUEMOTION1");
-    codecToStringData.insert(AV_CODEC_ID_VMDVIDEO, "VMDVIDEO");
-    codecToStringData.insert(AV_CODEC_ID_MSZH, "MSZH");
-    codecToStringData.insert(AV_CODEC_ID_ZLIB, "ZLIB");
-    codecToStringData.insert(AV_CODEC_ID_QTRLE, "QTRLE");
-    codecToStringData.insert(AV_CODEC_ID_SNOW, "SNOW");
-    codecToStringData.insert(AV_CODEC_ID_TSCC, "TSCC");
-    codecToStringData.insert(AV_CODEC_ID_ULTI, "ULTI");
-    codecToStringData.insert(AV_CODEC_ID_QDRAW, "QDRAW");
-    codecToStringData.insert(AV_CODEC_ID_VIXL, "VIXL");
-    codecToStringData.insert(AV_CODEC_ID_QPEG, "QPEG");
-    codecToStringData.insert(AV_CODEC_ID_PNG, "PNG");
-    codecToStringData.insert(AV_CODEC_ID_PPM, "PPM");
-    codecToStringData.insert(AV_CODEC_ID_PBM, "PBM");
-    codecToStringData.insert(AV_CODEC_ID_PGM, "PGM");
-    codecToStringData.insert(AV_CODEC_ID_PGMYUV, "PGMYUV");
-    codecToStringData.insert(AV_CODEC_ID_PAM, "PAM");
-    codecToStringData.insert(AV_CODEC_ID_FFVHUFF, "FFVHUFF");
-    codecToStringData.insert(AV_CODEC_ID_RV30, "RV30");
-    codecToStringData.insert(AV_CODEC_ID_RV40, "RV40");
-    codecToStringData.insert(AV_CODEC_ID_VC1, "VC1");
-    codecToStringData.insert(AV_CODEC_ID_WMV3, "WMV3");
-    codecToStringData.insert(AV_CODEC_ID_LOCO, "LOCO");
-    codecToStringData.insert(AV_CODEC_ID_WNV1, "WNV1");
-    codecToStringData.insert(AV_CODEC_ID_AASC, "AASC");
-    codecToStringData.insert(AV_CODEC_ID_INDEO2, "INDEO2");
-    codecToStringData.insert(AV_CODEC_ID_FRAPS, "FRAPS");
-    codecToStringData.insert(AV_CODEC_ID_TRUEMOTION2, "TRUEMOTION2");
-    codecToStringData.insert(AV_CODEC_ID_BMP, "BMP");
-    codecToStringData.insert(AV_CODEC_ID_CSCD, "CSCD");
-    codecToStringData.insert(AV_CODEC_ID_MMVIDEO, "MMVIDEO");
-    codecToStringData.insert(AV_CODEC_ID_ZMBV, "ZMBV");
-    codecToStringData.insert(AV_CODEC_ID_AVS, "AVS");
-    codecToStringData.insert(AV_CODEC_ID_SMACKVIDEO, "SMACKVIDEO");
-    codecToStringData.insert(AV_CODEC_ID_NUV, "NUV");
-    codecToStringData.insert(AV_CODEC_ID_KMVC, "KMVC");
-    codecToStringData.insert(AV_CODEC_ID_FLASHSV, "FLASHSV");
-    codecToStringData.insert(AV_CODEC_ID_CAVS, "CAVS");
-    codecToStringData.insert(AV_CODEC_ID_JPEG2000, "JPEG2000");
-    codecToStringData.insert(AV_CODEC_ID_VMNC, "VMNC");
-    codecToStringData.insert(AV_CODEC_ID_VP5, "VP5");
-    codecToStringData.insert(AV_CODEC_ID_VP6, "VP6");
-    codecToStringData.insert(AV_CODEC_ID_VP6F, "VP6F");
-    codecToStringData.insert(AV_CODEC_ID_TARGA, "TARGA");
-    codecToStringData.insert(AV_CODEC_ID_DSICINVIDEO, "DSICINVIDEO");
-    codecToStringData.insert(AV_CODEC_ID_TIERTEXSEQVIDEO, "TIERTEXSEQVIDEO");
-    codecToStringData.insert(AV_CODEC_ID_TIFF, "TIFF");
-    codecToStringData.insert(AV_CODEC_ID_GIF, "GIF");
-    //codecToStringData.insert(AV_CODEC_ID_FFH264,  "FFH264");
-    codecToStringData.insert(AV_CODEC_ID_DXA, "DXA");
-    codecToStringData.insert(AV_CODEC_ID_DNXHD, "DNXHD");
-    codecToStringData.insert(AV_CODEC_ID_THP, "THP");
-    codecToStringData.insert(AV_CODEC_ID_SGI, "SGI");
-    codecToStringData.insert(AV_CODEC_ID_C93, "C93");
-    codecToStringData.insert(AV_CODEC_ID_BETHSOFTVID, "BETHSOFTVID");
-    codecToStringData.insert(AV_CODEC_ID_PTX, "PTX");
-    codecToStringData.insert(AV_CODEC_ID_TXD, "TXD");
-    codecToStringData.insert(AV_CODEC_ID_VP6A, "VP6A");
-    codecToStringData.insert(AV_CODEC_ID_AMV, "AMV");
-    codecToStringData.insert(AV_CODEC_ID_VB, "VB");
-    codecToStringData.insert(AV_CODEC_ID_PCX, "PCX");
-    codecToStringData.insert(AV_CODEC_ID_SUNRAST, "SUNRAST");
-    codecToStringData.insert(AV_CODEC_ID_INDEO4, "INDEO4");
-    codecToStringData.insert(AV_CODEC_ID_INDEO5, "INDEO5");
-    codecToStringData.insert(AV_CODEC_ID_MIMIC, "MIMIC");
-    codecToStringData.insert(AV_CODEC_ID_RL2, "RL2");
-    codecToStringData.insert(AV_CODEC_ID_8SVX_EXP, "8SVX_EXP");
-    codecToStringData.insert(AV_CODEC_ID_8SVX_FIB, "8SVX_FIB");
-    codecToStringData.insert(AV_CODEC_ID_ESCAPE124, "ESCAPE124");
-    codecToStringData.insert(AV_CODEC_ID_DIRAC, "DIRAC");
-    codecToStringData.insert(AV_CODEC_ID_BFI, "BFI");
-    codecToStringData.insert(AV_CODEC_ID_CMV, "CMV");
-    codecToStringData.insert(AV_CODEC_ID_MOTIONPIXELS, "MOTIONPIXELS");
-    codecToStringData.insert(AV_CODEC_ID_TGV, "TGV");
-    codecToStringData.insert(AV_CODEC_ID_TGQ, "TGQ");
-    codecToStringData.insert(AV_CODEC_ID_TQI, "TQI");
-    codecToStringData.insert(AV_CODEC_ID_AURA, "AURA");
-    codecToStringData.insert(AV_CODEC_ID_AURA2, "AURA2");
-    codecToStringData.insert(AV_CODEC_ID_V210X, "V210X");
-    codecToStringData.insert(AV_CODEC_ID_TMV, "TMV");
-    codecToStringData.insert(AV_CODEC_ID_V210, "V210");
-    codecToStringData.insert(AV_CODEC_ID_DPX, "DPX");
-    codecToStringData.insert(AV_CODEC_ID_MAD, "MAD");
-    codecToStringData.insert(AV_CODEC_ID_FRWU, "FRWU");
-    codecToStringData.insert(AV_CODEC_ID_FLASHSV2, "FLASHSV2");
-    codecToStringData.insert(AV_CODEC_ID_CDGRAPHICS, "CDGRAPHICS");
-    codecToStringData.insert(AV_CODEC_ID_R210, "R210");
-    codecToStringData.insert(AV_CODEC_ID_ANM, "ANM");
-    codecToStringData.insert(AV_CODEC_ID_BINKVIDEO, "BINKVIDEO");
-    codecToStringData.insert(AV_CODEC_ID_IFF_ILBM, "IFF_ILBM");
-    // codecToStringData.insert(AV_CODEC_ID_IFF_BYTERUN1,  "BYTERUN1");
-    codecToStringData.insert(AV_CODEC_ID_KGV1, "KGV1");
-    codecToStringData.insert(AV_CODEC_ID_YOP, "YOP");
-    codecToStringData.insert(AV_CODEC_ID_VP8, "VP8");
-    codecToStringData.insert(AV_CODEC_ID_PICTOR, "PICTOR");
-    codecToStringData.insert(AV_CODEC_ID_ANSI, "ANSI");
-    codecToStringData.insert(AV_CODEC_ID_A64_MULTI, "A64_MULTI");
-    codecToStringData.insert(AV_CODEC_ID_A64_MULTI5, "A64_MULTI5");
-    codecToStringData.insert(AV_CODEC_ID_R10K, "R10K");
-    codecToStringData.insert(AV_CODEC_ID_MXPEG, "MXPEG");
-    codecToStringData.insert(AV_CODEC_ID_LAGARITH, "LAGARITH");
-    codecToStringData.insert(AV_CODEC_ID_PRORES, "PRORES");
-    codecToStringData.insert(AV_CODEC_ID_JV, "JV");
-    codecToStringData.insert(AV_CODEC_ID_DFA, "DFA");
-    // codecToStringData.insert(AV_CODEC_ID_8SVX_RAW,  "8SVX_RAW");
+    {AV_CODEC_ID_MPEG1VIDEO, "MPEG1VIDEO"},
+    {AV_CODEC_ID_MPEG2VIDEO, "MPEG2VIDEO"}, //< Preferred id for MPEG-1/2 video decoding.
+    {AV_CODEC_ID_MPEG2VIDEO_XVMC, "MPEG2VIDEO-XVMC"},
+    {AV_CODEC_ID_H261, "H261"},
+    {AV_CODEC_ID_H263, "H263"},
+    {AV_CODEC_ID_RV10, "RV10"},
+    {AV_CODEC_ID_RV20, "RV20"},
+    {AV_CODEC_ID_MJPEG, "MJPEG"},
+    {AV_CODEC_ID_MJPEGB, "MJPEGB"},
+    {AV_CODEC_ID_LJPEG, "LJPEG"},
+    {AV_CODEC_ID_SP5X, "SP5X"},
+    {AV_CODEC_ID_JPEGLS, "JPEGLS"},
+    {AV_CODEC_ID_MPEG4, "MPEG4"},
+    {AV_CODEC_ID_RAWVIDEO, "RAWVIDEO"},
+    {AV_CODEC_ID_MSMPEG4V1, "MSMPEG4V1"},
+    {AV_CODEC_ID_MSMPEG4V2, "MSMPEG4V2"},
+    {AV_CODEC_ID_MSMPEG4V3, "MSMPEG4V3"},
+    {AV_CODEC_ID_WMV1, "WMV1"},
+    {AV_CODEC_ID_WMV2, "WMV2"},
+    {AV_CODEC_ID_H263P, "H263P"},
+    {AV_CODEC_ID_H263I, "H263I"},
+    {AV_CODEC_ID_FLV1, "FLV1"},
+    {AV_CODEC_ID_SVQ1, "SVQ1"},
+    {AV_CODEC_ID_SVQ3, "SVQ3"},
+    {AV_CODEC_ID_DVVIDEO, "DVVIDEO"},
+    {AV_CODEC_ID_HUFFYUV, "HUFFYUV"},
+    {AV_CODEC_ID_CYUV, "CYUV"},
+    {AV_CODEC_ID_H264, "H264"},
+    {AV_CODEC_ID_HEVC, "H265"},
+    {AV_CODEC_ID_INDEO3, "INDEO3"},
+    {AV_CODEC_ID_VP3, "VP3"},
+    {AV_CODEC_ID_THEORA, "THEORA"},
+    {AV_CODEC_ID_ASV1, "ASV1"},
+    {AV_CODEC_ID_ASV2, "ASV2"},
+    {AV_CODEC_ID_FFV1, "FFV1"},
+    {AV_CODEC_ID_4XM, "4XM"},
+    {AV_CODEC_ID_VCR1, "VCR1"},
+    {AV_CODEC_ID_CLJR, "CLJR"},
+    {AV_CODEC_ID_MDEC, "MDEC"},
+    {AV_CODEC_ID_ROQ, "ROQ"},
+    {AV_CODEC_ID_INTERPLAY_VIDEO, "INTERPLAY_VIDEO"},
+    {AV_CODEC_ID_XAN_WC3, "XAN_WC3"},
+    {AV_CODEC_ID_XAN_WC4, "XAN_WC4"},
+    {AV_CODEC_ID_RPZA, "RPZA"},
+    {AV_CODEC_ID_CINEPAK, "CINEPAK"},
+    {AV_CODEC_ID_WS_VQA, "WS_VQA"},
+    {AV_CODEC_ID_MSRLE, "MSRLE"},
+    {AV_CODEC_ID_MSVIDEO1, "MSVIDEO1"},
+    {AV_CODEC_ID_IDCIN, "IDCIN"},
+    {AV_CODEC_ID_8BPS, "8BPS"},
+    {AV_CODEC_ID_SMC, "SMC"},
+    {AV_CODEC_ID_FLIC, "FLIC"},
+    {AV_CODEC_ID_TRUEMOTION1, "TRUEMOTION1"},
+    {AV_CODEC_ID_VMDVIDEO, "VMDVIDEO"},
+    {AV_CODEC_ID_MSZH, "MSZH"},
+    {AV_CODEC_ID_ZLIB, "ZLIB"},
+    {AV_CODEC_ID_QTRLE, "QTRLE"},
+    {AV_CODEC_ID_SNOW, "SNOW"},
+    {AV_CODEC_ID_TSCC, "TSCC"},
+    {AV_CODEC_ID_ULTI, "ULTI"},
+    {AV_CODEC_ID_QDRAW, "QDRAW"},
+    {AV_CODEC_ID_VIXL, "VIXL"},
+    {AV_CODEC_ID_QPEG, "QPEG"},
+    {AV_CODEC_ID_PNG, "PNG"},
+    {AV_CODEC_ID_PPM, "PPM"},
+    {AV_CODEC_ID_PBM, "PBM"},
+    {AV_CODEC_ID_PGM, "PGM"},
+    {AV_CODEC_ID_PGMYUV, "PGMYUV"},
+    {AV_CODEC_ID_PAM, "PAM"},
+    {AV_CODEC_ID_FFVHUFF, "FFVHUFF"},
+    {AV_CODEC_ID_RV30, "RV30"},
+    {AV_CODEC_ID_RV40, "RV40"},
+    {AV_CODEC_ID_VC1, "VC1"},
+    {AV_CODEC_ID_WMV3, "WMV3"},
+    {AV_CODEC_ID_LOCO, "LOCO"},
+    {AV_CODEC_ID_WNV1, "WNV1"},
+    {AV_CODEC_ID_AASC, "AASC"},
+    {AV_CODEC_ID_INDEO2, "INDEO2"},
+    {AV_CODEC_ID_FRAPS, "FRAPS"},
+    {AV_CODEC_ID_TRUEMOTION2, "TRUEMOTION2"},
+    {AV_CODEC_ID_BMP, "BMP"},
+    {AV_CODEC_ID_CSCD, "CSCD"},
+    {AV_CODEC_ID_MMVIDEO, "MMVIDEO"},
+    {AV_CODEC_ID_ZMBV, "ZMBV"},
+    {AV_CODEC_ID_AVS, "AVS"},
+    {AV_CODEC_ID_SMACKVIDEO, "SMACKVIDEO"},
+    {AV_CODEC_ID_NUV, "NUV"},
+    {AV_CODEC_ID_KMVC, "KMVC"},
+    {AV_CODEC_ID_FLASHSV, "FLASHSV"},
+    {AV_CODEC_ID_CAVS, "CAVS"},
+    {AV_CODEC_ID_JPEG2000, "JPEG2000"},
+    {AV_CODEC_ID_VMNC, "VMNC"},
+    {AV_CODEC_ID_VP5, "VP5"},
+    {AV_CODEC_ID_VP6, "VP6"},
+    {AV_CODEC_ID_VP6F, "VP6F"},
+    {AV_CODEC_ID_TARGA, "TARGA"},
+    {AV_CODEC_ID_DSICINVIDEO, "DSICINVIDEO"},
+    {AV_CODEC_ID_TIERTEXSEQVIDEO, "TIERTEXSEQVIDEO"},
+    {AV_CODEC_ID_TIFF, "TIFF"},
+    {AV_CODEC_ID_GIF, "GIF"},
+    //{AV_CODEC_ID_FFH264,  "FFH264"},
+    {AV_CODEC_ID_DXA, "DXA"},
+    {AV_CODEC_ID_DNXHD, "DNXHD"},
+    {AV_CODEC_ID_THP, "THP"},
+    {AV_CODEC_ID_SGI, "SGI"},
+    {AV_CODEC_ID_C93, "C93"},
+    {AV_CODEC_ID_BETHSOFTVID, "BETHSOFTVID"},
+    {AV_CODEC_ID_PTX, "PTX"},
+    {AV_CODEC_ID_TXD, "TXD"},
+    {AV_CODEC_ID_VP6A, "VP6A"},
+    {AV_CODEC_ID_AMV, "AMV"},
+    {AV_CODEC_ID_VB, "VB"},
+    {AV_CODEC_ID_PCX, "PCX"},
+    {AV_CODEC_ID_SUNRAST, "SUNRAST"},
+    {AV_CODEC_ID_INDEO4, "INDEO4"},
+    {AV_CODEC_ID_INDEO5, "INDEO5"},
+    {AV_CODEC_ID_MIMIC, "MIMIC"},
+    {AV_CODEC_ID_RL2, "RL2"},
+    {AV_CODEC_ID_8SVX_EXP, "8SVX_EXP"},
+    {AV_CODEC_ID_8SVX_FIB, "8SVX_FIB"},
+    {AV_CODEC_ID_ESCAPE124, "ESCAPE124"},
+    {AV_CODEC_ID_DIRAC, "DIRAC"},
+    {AV_CODEC_ID_BFI, "BFI"},
+    {AV_CODEC_ID_CMV, "CMV"},
+    {AV_CODEC_ID_MOTIONPIXELS, "MOTIONPIXELS"},
+    {AV_CODEC_ID_TGV, "TGV"},
+    {AV_CODEC_ID_TGQ, "TGQ"},
+    {AV_CODEC_ID_TQI, "TQI"},
+    {AV_CODEC_ID_AURA, "AURA"},
+    {AV_CODEC_ID_AURA2, "AURA2"},
+    {AV_CODEC_ID_V210X, "V210X"},
+    {AV_CODEC_ID_TMV, "TMV"},
+    {AV_CODEC_ID_V210, "V210"},
+    {AV_CODEC_ID_DPX, "DPX"},
+    {AV_CODEC_ID_MAD, "MAD"},
+    {AV_CODEC_ID_FRWU, "FRWU"},
+    {AV_CODEC_ID_FLASHSV2, "FLASHSV2"},
+    {AV_CODEC_ID_CDGRAPHICS, "CDGRAPHICS"},
+    {AV_CODEC_ID_R210, "R210"},
+    {AV_CODEC_ID_ANM, "ANM"},
+    {AV_CODEC_ID_BINKVIDEO, "BINKVIDEO"},
+    {AV_CODEC_ID_IFF_ILBM, "IFF_ILBM"},
+    // {AV_CODEC_ID_IFF_BYTERUN1,  "BYTERUN1"},
+    {AV_CODEC_ID_KGV1, "KGV1"},
+    {AV_CODEC_ID_YOP, "YOP"},
+    {AV_CODEC_ID_VP8, "VP8"},
+    {AV_CODEC_ID_PICTOR, "PICTOR"},
+    {AV_CODEC_ID_ANSI, "ANSI"},
+    {AV_CODEC_ID_A64_MULTI, "A64_MULTI"},
+    {AV_CODEC_ID_A64_MULTI5, "A64_MULTI5"},
+    {AV_CODEC_ID_R10K, "R10K"},
+    {AV_CODEC_ID_MXPEG, "MXPEG"},
+    {AV_CODEC_ID_LAGARITH, "LAGARITH"},
+    {AV_CODEC_ID_PRORES, "PRORES"},
+    {AV_CODEC_ID_JV, "JV"},
+    {AV_CODEC_ID_DFA, "DFA"},
+    // {AV_CODEC_ID_8SVX_RAW,  "8SVX_RAW"},
 
     /* various PCM "codecs" */
-    codecToStringData.insert(AV_CODEC_ID_PCM_S16LE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_S16BE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_U16LE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_U16BE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_S8, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_U8, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_MULAW, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_ALAW, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_S32LE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_S32BE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_U32LE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_U32BE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_S24LE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_S24BE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_U24LE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_U24BE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_S24DAUD, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_ZORK, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_S16LE_PLANAR, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_DVD, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_F32BE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_F32LE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_F64BE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_F64LE, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_BLURAY, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_PCM_LXF, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_S302M, "PCM");
+    {AV_CODEC_ID_PCM_S16LE, "PCM"},
+    {AV_CODEC_ID_PCM_S16BE, "PCM"},
+    {AV_CODEC_ID_PCM_U16LE, "PCM"},
+    {AV_CODEC_ID_PCM_U16BE, "PCM"},
+    {AV_CODEC_ID_PCM_S8, "PCM"},
+    {AV_CODEC_ID_PCM_U8, "PCM"},
+    {AV_CODEC_ID_PCM_MULAW, "PCM"},
+    {AV_CODEC_ID_PCM_ALAW, "PCM"},
+    {AV_CODEC_ID_PCM_S32LE, "PCM"},
+    {AV_CODEC_ID_PCM_S32BE, "PCM"},
+    {AV_CODEC_ID_PCM_U32LE, "PCM"},
+    {AV_CODEC_ID_PCM_U32BE, "PCM"},
+    {AV_CODEC_ID_PCM_S24LE, "PCM"},
+    {AV_CODEC_ID_PCM_S24BE, "PCM"},
+    {AV_CODEC_ID_PCM_U24LE, "PCM"},
+    {AV_CODEC_ID_PCM_U24BE, "PCM"},
+    {AV_CODEC_ID_PCM_S24DAUD, "PCM"},
+    {AV_CODEC_ID_PCM_ZORK, "PCM"},
+    {AV_CODEC_ID_PCM_S16LE_PLANAR, "PCM"},
+    {AV_CODEC_ID_PCM_DVD, "PCM"},
+    {AV_CODEC_ID_PCM_F32BE, "PCM"},
+    {AV_CODEC_ID_PCM_F32LE, "PCM"},
+    {AV_CODEC_ID_PCM_F64BE, "PCM"},
+    {AV_CODEC_ID_PCM_F64LE, "PCM"},
+    {AV_CODEC_ID_PCM_BLURAY, "PCM"},
+    {AV_CODEC_ID_PCM_LXF, "PCM"},
+    {AV_CODEC_ID_S302M, "PCM"},
 
     /* various ADPCM codecs */
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_QT, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_WAV, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_DK3, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_DK4, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_WS, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_SMJPEG, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_MS, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_4XM, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_XA, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_ADX, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_EA, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_G726, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_CT, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_SWF, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_YAMAHA, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_SBPRO_4, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_SBPRO_3, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_SBPRO_2, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_THP, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_AMV, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_EA_R1, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_EA_R3, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_EA_R2, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_EA_SEAD, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_EA_EACS, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_EA_XAS, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_EA_MAXIS_XA, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_IMA_ISS, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_ADPCM_G722, "PCM");
+    {AV_CODEC_ID_ADPCM_IMA_QT, "PCM"},
+    {AV_CODEC_ID_ADPCM_IMA_WAV, "PCM"},
+    {AV_CODEC_ID_ADPCM_IMA_DK3, "PCM"},
+    {AV_CODEC_ID_ADPCM_IMA_DK4, "PCM"},
+    {AV_CODEC_ID_ADPCM_IMA_WS, "PCM"},
+    {AV_CODEC_ID_ADPCM_IMA_SMJPEG, "PCM"},
+    {AV_CODEC_ID_ADPCM_MS, "PCM"},
+    {AV_CODEC_ID_ADPCM_4XM, "PCM"},
+    {AV_CODEC_ID_ADPCM_XA, "PCM"},
+    {AV_CODEC_ID_ADPCM_ADX, "PCM"},
+    {AV_CODEC_ID_ADPCM_EA, "PCM"},
+    {AV_CODEC_ID_ADPCM_G726, "PCM"},
+    {AV_CODEC_ID_ADPCM_CT, "PCM"},
+    {AV_CODEC_ID_ADPCM_SWF, "PCM"},
+    {AV_CODEC_ID_ADPCM_YAMAHA, "PCM"},
+    {AV_CODEC_ID_ADPCM_SBPRO_4, "PCM"},
+    {AV_CODEC_ID_ADPCM_SBPRO_3, "PCM"},
+    {AV_CODEC_ID_ADPCM_SBPRO_2, "PCM"},
+    {AV_CODEC_ID_ADPCM_THP, "PCM"},
+    {AV_CODEC_ID_ADPCM_IMA_AMV, "PCM"},
+    {AV_CODEC_ID_ADPCM_EA_R1, "PCM"},
+    {AV_CODEC_ID_ADPCM_EA_R3, "PCM"},
+    {AV_CODEC_ID_ADPCM_EA_R2, "PCM"},
+    {AV_CODEC_ID_ADPCM_IMA_EA_SEAD, "PCM"},
+    {AV_CODEC_ID_ADPCM_IMA_EA_EACS, "PCM"},
+    {AV_CODEC_ID_ADPCM_EA_XAS, "PCM"},
+    {AV_CODEC_ID_ADPCM_EA_MAXIS_XA, "PCM"},
+    {AV_CODEC_ID_ADPCM_IMA_ISS, "PCM"},
+    {AV_CODEC_ID_ADPCM_G722, "PCM"},
 
     /* AMR */
-    codecToStringData.insert(AV_CODEC_ID_AMR_NB, "AMR-NB");
-    codecToStringData.insert(AV_CODEC_ID_AMR_WB, "AMR-WB");
+    {AV_CODEC_ID_AMR_NB, "AMR-NB"},
+    {AV_CODEC_ID_AMR_WB, "AMR-WB"},
 
     /* RealAudio codecs*/
-    codecToStringData.insert(AV_CODEC_ID_RA_144, "RA-144");
-    codecToStringData.insert(AV_CODEC_ID_RA_288, "RA-288");
+    {AV_CODEC_ID_RA_144, "RA-144"},
+    {AV_CODEC_ID_RA_288, "RA-288"},
 
     /* various DPCM codecs */
-    codecToStringData.insert(AV_CODEC_ID_ROQ_DPCM, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_INTERPLAY_DPCM, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_XAN_DPCM, "PCM");
-    codecToStringData.insert(AV_CODEC_ID_SOL_DPCM, "PCM");
+    {AV_CODEC_ID_ROQ_DPCM, "PCM"},
+    {AV_CODEC_ID_INTERPLAY_DPCM, "PCM"},
+    {AV_CODEC_ID_XAN_DPCM, "PCM"},
+    {AV_CODEC_ID_SOL_DPCM, "PCM"},
 
     /* audio codecs */
-    codecToStringData.insert(AV_CODEC_ID_MP2, "MP2");
-    codecToStringData.insert(AV_CODEC_ID_MP3, "MP3"); //< Preferred id for decoding MPEG audio layer 1,  ""); 2 or 3.
-    codecToStringData.insert(AV_CODEC_ID_AAC, "AAC");
-    codecToStringData.insert(AV_CODEC_ID_AC3, "Dolby");
-    codecToStringData.insert(AV_CODEC_ID_DTS, "DTS");
-    codecToStringData.insert(AV_CODEC_ID_VORBIS, "VORBIS");
-    codecToStringData.insert(AV_CODEC_ID_DVAUDIO, "DVAUDIO");
-    codecToStringData.insert(AV_CODEC_ID_WMAV1, "WMAV1");
-    codecToStringData.insert(AV_CODEC_ID_WMAV2, "WMAV2");
-    codecToStringData.insert(AV_CODEC_ID_MACE3, "MACE3");
-    codecToStringData.insert(AV_CODEC_ID_MACE6, "MACE6");
-    codecToStringData.insert(AV_CODEC_ID_VMDAUDIO, "VMDAUDIO");
-    codecToStringData.insert(AV_CODEC_ID_SONIC, "SONIC");
-    codecToStringData.insert(AV_CODEC_ID_SONIC_LS, "SONIC_LC");
-    codecToStringData.insert(AV_CODEC_ID_FLAC, "FLAC");
-    codecToStringData.insert(AV_CODEC_ID_MP3ADU, "MP3");
-    codecToStringData.insert(AV_CODEC_ID_MP3ON4, "MP3");
-    codecToStringData.insert(AV_CODEC_ID_SHORTEN, "SHORTEN");
-    codecToStringData.insert(AV_CODEC_ID_ALAC, "ALAC");
-    codecToStringData.insert(AV_CODEC_ID_WESTWOOD_SND1, "WESTWOOD");
-    codecToStringData.insert(AV_CODEC_ID_GSM, "GSM"); //< As in Berlin toast format.
-    codecToStringData.insert(AV_CODEC_ID_QDM2, "QDM2");
-    codecToStringData.insert(AV_CODEC_ID_COOK, "COOK");
-    codecToStringData.insert(AV_CODEC_ID_TRUESPEECH, "TRUESPEECH");
-    codecToStringData.insert(AV_CODEC_ID_TTA, "TTA");
-    codecToStringData.insert(AV_CODEC_ID_SMACKAUDIO, "SMACKAUDIO");
-    codecToStringData.insert(AV_CODEC_ID_QCELP, "QCELP");
-    codecToStringData.insert(AV_CODEC_ID_WAVPACK, "WAVPACK");
-    codecToStringData.insert(AV_CODEC_ID_DSICINAUDIO, "DSICINAUDIO");
-    codecToStringData.insert(AV_CODEC_ID_IMC, "IMC");
-    codecToStringData.insert(AV_CODEC_ID_MUSEPACK7, "MUSEPACK7");
-    codecToStringData.insert(AV_CODEC_ID_MLP, "MLP");
-    codecToStringData.insert(AV_CODEC_ID_GSM_MS, "GSM_MS"); //< As found in WAV.
-    codecToStringData.insert(AV_CODEC_ID_ATRAC3, "ATRAC3");
-    codecToStringData.insert(AV_CODEC_ID_VOXWARE, "VOXWARE");
-    codecToStringData.insert(AV_CODEC_ID_APE, "APE");
-    codecToStringData.insert(AV_CODEC_ID_NELLYMOSER, "NELLYMOSER");
-    codecToStringData.insert(AV_CODEC_ID_MUSEPACK8, "MUSEPACK8");
-    codecToStringData.insert(AV_CODEC_ID_SPEEX, "SPEEX");
-    codecToStringData.insert(AV_CODEC_ID_WMAVOICE, "WMA VOICE");
-    codecToStringData.insert(AV_CODEC_ID_WMAPRO, "WMA PRO");
-    codecToStringData.insert(AV_CODEC_ID_WMALOSSLESS, "WMA LOSSLESS");
-    codecToStringData.insert(AV_CODEC_ID_ATRAC3P, "ATRAC3P");
-    codecToStringData.insert(AV_CODEC_ID_EAC3, "EAC3");
-    codecToStringData.insert(AV_CODEC_ID_SIPR, "SIPR");
-    codecToStringData.insert(AV_CODEC_ID_MP1, "MP1");
-    codecToStringData.insert(AV_CODEC_ID_TWINVQ, "TWINVQ");
-    codecToStringData.insert(AV_CODEC_ID_TRUEHD, "TRUE-HD");
-    codecToStringData.insert(AV_CODEC_ID_MP4ALS, "MP4ALS");
-    codecToStringData.insert(AV_CODEC_ID_ATRAC1, "ATRAC1");
-    codecToStringData.insert(AV_CODEC_ID_BINKAUDIO_RDFT, "BINKAUDIO RDFT");
-    codecToStringData.insert(AV_CODEC_ID_BINKAUDIO_DCT, "BINKAUDIO DCT");
-    codecToStringData.insert(AV_CODEC_ID_AAC_LATM, "AAC LATM");
-    codecToStringData.insert(AV_CODEC_ID_QDMC, "QDMC");
-    codecToStringData.insert(AV_CODEC_ID_CELT, "CELT");
+    {AV_CODEC_ID_MP2, "MP2"},
+    {AV_CODEC_ID_MP3, "MP3"}, //< Preferred id for decoding MPEG audio layer 1,  ""}, 2 or 3.
+    {AV_CODEC_ID_AAC, "AAC"},
+    {AV_CODEC_ID_AC3, "Dolby"},
+    {AV_CODEC_ID_DTS, "DTS"},
+    {AV_CODEC_ID_VORBIS, "VORBIS"},
+    {AV_CODEC_ID_DVAUDIO, "DVAUDIO"},
+    {AV_CODEC_ID_WMAV1, "WMAV1"},
+    {AV_CODEC_ID_WMAV2, "WMAV2"},
+    {AV_CODEC_ID_MACE3, "MACE3"},
+    {AV_CODEC_ID_MACE6, "MACE6"},
+    {AV_CODEC_ID_VMDAUDIO, "VMDAUDIO"},
+    {AV_CODEC_ID_SONIC, "SONIC"},
+    {AV_CODEC_ID_SONIC_LS, "SONIC_LC"},
+    {AV_CODEC_ID_FLAC, "FLAC"},
+    {AV_CODEC_ID_MP3ADU, "MP3"},
+    {AV_CODEC_ID_MP3ON4, "MP3"},
+    {AV_CODEC_ID_SHORTEN, "SHORTEN"},
+    {AV_CODEC_ID_ALAC, "ALAC"},
+    {AV_CODEC_ID_WESTWOOD_SND1, "WESTWOOD"},
+    {AV_CODEC_ID_GSM, "GSM"}, //< As in Berlin toast format.
+    {AV_CODEC_ID_QDM2, "QDM2"},
+    {AV_CODEC_ID_COOK, "COOK"},
+    {AV_CODEC_ID_TRUESPEECH, "TRUESPEECH"},
+    {AV_CODEC_ID_TTA, "TTA"},
+    {AV_CODEC_ID_SMACKAUDIO, "SMACKAUDIO"},
+    {AV_CODEC_ID_QCELP, "QCELP"},
+    {AV_CODEC_ID_WAVPACK, "WAVPACK"},
+    {AV_CODEC_ID_DSICINAUDIO, "DSICINAUDIO"},
+    {AV_CODEC_ID_IMC, "IMC"},
+    {AV_CODEC_ID_MUSEPACK7, "MUSEPACK7"},
+    {AV_CODEC_ID_MLP, "MLP"},
+    {AV_CODEC_ID_GSM_MS, "GSM_MS"}, //< As found in WAV.
+    {AV_CODEC_ID_ATRAC3, "ATRAC3"},
+    {AV_CODEC_ID_VOXWARE, "VOXWARE"},
+    {AV_CODEC_ID_APE, "APE"},
+    {AV_CODEC_ID_NELLYMOSER, "NELLYMOSER"},
+    {AV_CODEC_ID_MUSEPACK8, "MUSEPACK8"},
+    {AV_CODEC_ID_SPEEX, "SPEEX"},
+    {AV_CODEC_ID_WMAVOICE, "WMA VOICE"},
+    {AV_CODEC_ID_WMAPRO, "WMA PRO"},
+    {AV_CODEC_ID_WMALOSSLESS, "WMA LOSSLESS"},
+    {AV_CODEC_ID_ATRAC3P, "ATRAC3P"},
+    {AV_CODEC_ID_EAC3, "EAC3"},
+    {AV_CODEC_ID_SIPR, "SIPR"},
+    {AV_CODEC_ID_MP1, "MP1"},
+    {AV_CODEC_ID_TWINVQ, "TWINVQ"},
+    {AV_CODEC_ID_TRUEHD, "TRUE-HD"},
+    {AV_CODEC_ID_MP4ALS, "MP4ALS"},
+    {AV_CODEC_ID_ATRAC1, "ATRAC1"},
+    {AV_CODEC_ID_BINKAUDIO_RDFT, "BINKAUDIO RDFT"},
+    {AV_CODEC_ID_BINKAUDIO_DCT, "BINKAUDIO DCT"},
+    {AV_CODEC_ID_AAC_LATM, "AAC LATM"},
+    {AV_CODEC_ID_QDMC, "QDMC"},
+    {AV_CODEC_ID_CELT, "CELT"},
 
     /* subtitle codecs */
-    codecToStringData.insert(AV_CODEC_ID_DVD_SUBTITLE, "DVD_SUBTITLE");
-    codecToStringData.insert(AV_CODEC_ID_DVB_SUBTITLE, "DVB_SUBTITLE");
-    codecToStringData.insert(AV_CODEC_ID_TEXT, "TEXT"); //< Raw UTF-8 text.
-    codecToStringData.insert(AV_CODEC_ID_XSUB, "XSUB");
-    codecToStringData.insert(AV_CODEC_ID_SSA, "SSA");
-    codecToStringData.insert(AV_CODEC_ID_MOV_TEXT, "MOV_TEXT");
-    codecToStringData.insert(AV_CODEC_ID_HDMV_PGS_SUBTITLE, "HDMV_PGS_SUBTITLE");
-    codecToStringData.insert(AV_CODEC_ID_DVB_TELETEXT, "DVB_TELETEXT");
-    codecToStringData.insert(AV_CODEC_ID_SRT, "SRT");
-    codecToStringData.insert(AV_CODEC_ID_MICRODVD, "MICRODVD");
+    {AV_CODEC_ID_DVD_SUBTITLE, "DVD_SUBTITLE"},
+    {AV_CODEC_ID_DVB_SUBTITLE, "DVB_SUBTITLE"},
+    {AV_CODEC_ID_TEXT, "TEXT"}, //< Raw UTF-8 text.
+    {AV_CODEC_ID_XSUB, "XSUB"},
+    {AV_CODEC_ID_SSA, "SSA"},
+    {AV_CODEC_ID_MOV_TEXT, "MOV_TEXT"},
+    {AV_CODEC_ID_HDMV_PGS_SUBTITLE, "HDMV_PGS_SUBTITLE"},
+    {AV_CODEC_ID_DVB_TELETEXT, "DVB_TELETEXT"},
+    {AV_CODEC_ID_SRT, "SRT"},
+    {AV_CODEC_ID_MICRODVD, "MICRODVD"},
 
     /* other specific kind of codecs (generally used for attachments) */
-    codecToStringData.insert(AV_CODEC_ID_TTF, "TTF");
+    {AV_CODEC_ID_TTF, "TTF"},
 
     // codec_id is not known (like AV_CODEC_ID_NONE) but lavf should attempt to
     // identify it.
-    codecToStringData.insert(AV_CODEC_ID_PROBE, "PROBE");
+    {AV_CODEC_ID_PROBE, "PROBE"},
 
     // _FAKE_ codec to indicate a raw MPEG-2 TS stream (only used by
     // libavformat).
-    codecToStringData.insert(AV_CODEC_ID_MPEG2TS, "MPEG2TS");
+    {AV_CODEC_ID_MPEG2TS, "MPEG2TS"},
 
     // Dummy codec for streams containing only metadata information.
-    codecToStringData.insert(AV_CODEC_ID_FFMETADATA, "FFMETADATA");
+    {AV_CODEC_ID_FFMETADATA, "FFMETADATA"},
 
-    codecToStringData.insert(AV_CODEC_ID_NONE, "");
+    {AV_CODEC_ID_NONE, ""},
 
-    return codecToStringData;
-}
+    { AV_CODEC_ID_MPEG1VIDEO, "MPEG1VIDEO" }
+};
+
+static const QMap<QByteArray, AVCodecID> kStringToCodecData =
+    []()
+    {
+        QMap<QByteArray, AVCodecID> result;
+        for (auto itr = kCodecToStringData.begin(); itr != kCodecToStringData.end(); ++itr)
+            result.insert(itr.value(), itr.key());
+        return result;
+    }();
 
 QString QnAvCodecHelper::codecIdToString(AVCodecID codecId)
 {
-    return QString::fromLatin1(codecToStringData().value(codecId));
+    return QString::fromLatin1(kCodecToStringData.value(codecId));
 }
 
 AVCodecID QnAvCodecHelper::codecIdFromString(const QString& value)
 {
-    static QnMutex mutex;
-    QnMutexLocker lock(&mutex);
-
-    QMap<QByteArray, AVCodecID> stringToCodecData;
-    if (!stringToCodecData.isEmpty())
-        return stringToCodecData.value(value.toLatin1());
-    const auto codecData = codecToStringData();
-    for (auto itr = codecData.begin(); itr != codecData.end(); ++itr)
-        stringToCodecData.insert(itr.value(), itr.key());
-    return stringToCodecData.value(value.toLatin1());
+    return kStringToCodecData.value(value.toLatin1());
 }

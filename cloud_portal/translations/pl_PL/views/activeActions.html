@@ -1,7 +1,9 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
         <h1 class="process-success" ng-if="activate.success">
-            Twoje konto zostało aktywowane<br>
+            Twoje konto zostało poprawnie aktywowane.
+        </h1>
+        <h1 class="process-success" ng-if="activate.success">
             <a class="btn btn-default" href="/login">Zaloguj się</a>
         </h1>
 
@@ -12,14 +14,16 @@
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Twoje konto zostało aktywowane<br> <a href="/login">Zaloguj się</a>
-            <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
+            Twoje konto zostało poprawnie aktywowane.
+        </h1>
+        <h1 class="process-success">
+            <a class="btn btn-default" href="/login">Zaloguj się</a>
         </h1>
     </div>
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>Zarejestrowałeś się w {{PRODUCT_NAME}}</h1>
+            <h1>Zarejestrowałeś się w %PRODUCT_NAME%</h1>
             <p>Wysłaliśmy wiadomość z linkiem aktywacyjnym na adres {{data.email}}.<br>
             Proszę aktywować konto klikając na tym linku.</p>
         </div>
@@ -82,8 +86,11 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            Hasło zostało zapisane<br> <a href="/login">Zaloguj się </a>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            Hasło ustawione poprawnie
+        </h1>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            <a class="btn btn-default" href="/login">Zaloguj się</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>

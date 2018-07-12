@@ -6,6 +6,14 @@ namespace nx {
 namespace utils {
 namespace math {
 
+namespace detail {
+
+template<typename T> struct LongType { using type = T; };
+template<> struct LongType<int> { using type = long long; };
+template<> struct LongType<unsigned int> { using type = unsigned long long; };
+
+} // namespace detail
+
 template<typename Value>
 class AveragePerPeriod
 {
@@ -26,12 +34,12 @@ public:
     {
         const auto cumulativeValue = m_cumulativeValuePerPeriod.getSumPerLastPeriod();
         const auto valueCount = m_valueCountPerPeriod.getSumPerLastPeriod();
-        return valueCount == 0 ? 0 : cumulativeValue / valueCount;
+        return static_cast<Value>(valueCount == 0 ? 0 : cumulativeValue / valueCount);
     }
 
 private:
-    SumPerPeriod<Value> m_cumulativeValuePerPeriod;
-    SumPerPeriod<Value> m_valueCountPerPeriod;
+    SumPerPeriod<typename detail::LongType<Value>::type> m_cumulativeValuePerPeriod;
+    SumPerPeriod<typename detail::LongType<Value>::type> m_valueCountPerPeriod;
 };
 
 } // namespace math

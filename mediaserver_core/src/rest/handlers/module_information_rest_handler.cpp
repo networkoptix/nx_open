@@ -3,11 +3,11 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <network/module_information.h>
 #include <network/tcp_connection_priv.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/module_information.h>
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
@@ -76,7 +76,7 @@ JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestReques
         const auto allServers = request.owner->resourcePool()->getAllServers(Qn::AnyStatus);
         if (showAddressesMode(request.params))
         {
-            QList<QnModuleInformationWithAddresses> modules;
+            QList<nx::vms::api::ModuleInformationWithAddresses> modules;
             for (const QnMediaServerResourcePtr &server : allServers)
                 modules.append(std::move(server->getModuleInformationWithAddresses()));
 
@@ -84,7 +84,7 @@ JsonRestResponse QnModuleInformationRestHandler::executeGet(const JsonRestReques
         }
         else
         {
-            QList<QnModuleInformation> modules;
+            QList<nx::vms::api::ModuleInformation> modules;
             for (const QnMediaServerResourcePtr &server : allServers)
                 modules.append(server->getModuleInformation());
             response.json.setReply(modules);

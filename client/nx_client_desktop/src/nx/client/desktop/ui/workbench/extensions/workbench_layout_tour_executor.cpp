@@ -9,7 +9,7 @@
 
 #include <core/resource_management/resource_pool.h>
 
-#include <nx_ec/data/api_layout_tour_data.h>
+#include <nx/vms/api/data/layout_tour_data.h>
 
 #include <nx/client/desktop/radass/radass_resource_manager.h>
 #include <nx/client/desktop/radass/radass_types.h>
@@ -47,7 +47,7 @@ LayoutTourExecutor::~LayoutTourExecutor()
 {
 }
 
-void LayoutTourExecutor::startTour(const ec2::ApiLayoutTourData& tour)
+void LayoutTourExecutor::startTour(const nx::vms::api::LayoutTourData& tour)
 {
     if (m_mode != Mode::Stopped)
         stopCurrentTour();
@@ -70,7 +70,7 @@ void LayoutTourExecutor::startTour(const ec2::ApiLayoutTourData& tour)
         startTimer();
 }
 
-void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
+void LayoutTourExecutor::updateTour(const nx::vms::api::LayoutTourData& tour)
 {
     if (m_mode != Mode::MultipleLayouts)
         return;
@@ -170,7 +170,7 @@ void LayoutTourExecutor::stopCurrentTour()
     }
 }
 
-void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& items)
+void LayoutTourExecutor::resetTourItems(const nx::vms::api::LayoutTourItemDataList& items)
 {
     const auto radassManager = context()->instance<RadassResourceManager>();
 

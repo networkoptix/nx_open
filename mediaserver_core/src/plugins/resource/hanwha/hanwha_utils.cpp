@@ -78,7 +78,9 @@ boost::optional<QSize> toQSize(const boost::optional<QString>& str)
     return fromHanwhaString<QSize>(*str);
 }
 
-HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
+HanwhaChannelProfiles parseProfiles(
+    const HanwhaResponse& response,
+    const boost::optional<int>& forcedChannel)
 {
     NX_ASSERT(response.isSuccessful());
     if (!response.isSuccessful())
@@ -97,9 +99,17 @@ HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
             continue;
 
         bool success = false;
-        const auto profileChannel = split[1].toInt(&success);
-        if (!success)
-            continue;
+        auto profileChannel = kHanwhaInvalidChannel;
+        if (forcedChannel != boost::none)
+        {
+            profileChannel = *forcedChannel;
+        }
+        else
+        {
+            profileChannel = split[1].toInt(&success);
+            if (!success)
+                continue;
+        }
 
         if (split[2] != kHanwhaProfileNumberProperty)
             continue;
@@ -115,6 +125,109 @@ HanwhaChannelProfiles parseProfiles(const HanwhaResponse& response)
     }
 
     return profiles;
+}
+
+QString profileSuffixByRole(Qn::ConnectionRole role)
+{
+    return role == Qn::ConnectionRole::CR_LiveVideo
+        ? kHanwhaPrimaryNxProfileSuffix
+        : kHanwhaSecondaryNxProfileSuffix;
+}
+
+QString profileFullProductName(const QString& applicationName)
+{
+    return applicationName
+        .splitRef(' ')
+        .last()
+        .toString()
+        .remove(QRegExp("[^a-zA-Z]"));
+}
+
+boost::optional<HanwhaVideoProfile> findProfile(
+    const HanwhaProfileMap& profiles,
+    Qn::ConnectionRole role,
+    const QString& applicationName)
+{
+    const auto suffix = profileSuffixByRole(role);
+    const auto productName = profileFullProductName(applicationName);
+    boost::optional<HanwhaVideoProfile> result;
+
+    QString bestPrefix;
+    for (const auto& entry : profiles)
+    {
+        const auto& profile = entry.second;
+        if (profile.name.endsWith(suffix))
+        {
+            const auto prefix = profile.name.left(profile.name.lastIndexOf(suffix));
+            if (productName.startsWith(prefix) && prefix.length() > bestPrefix.length())
+            {
+                bestPrefix = prefix;
+                result = profile;
+            }
+        }
+    }
+
+    return result;
+};
+
+std::set<int> findProfilesToRemove(
+    const HanwhaProfileMap& profiles,
+    boost::optional<HanwhaVideoProfile> primaryProfile,
+    boost::optional<HanwhaVideoProfile> secondaryProfile)
+{
+    std::set<int> result;
+    auto isTheSameProfile =
+        [](const boost::optional<HanwhaVideoProfile> profile, int profileNumber)
+    {
+        return profile != boost::none && profileNumber == profile->number;
+    };
+
+    for (const auto& entry : profiles)
+    {
+        const auto profileNumber = entry.first;
+        const auto& profile = entry.second;
+
+        if (profile.isBuiltinProfile()
+            || isTheSameProfile(primaryProfile, profileNumber)
+            || isTheSameProfile(secondaryProfile, profileNumber))
+        {
+            continue;
+        }
+
+        result.insert(profileNumber);
+    }
+
+    return result;
+};
+
+bool isPropertyBelongsToChannel(const QString& fullPropertyName, int channel)
+{
+    const auto split = fullPropertyName.split(L'.', QString::SplitBehavior::SkipEmptyParts);
+    if (split.size() < 2 || split[0].trimmed() != kHanwhaChannelProperty)
+        return false;
+
+    bool success = false;
+    const auto propertyChannel = split[1].toInt(&success);
+    if (!success)
+        return false;
+
+    return propertyChannel == channel;
+}
+
+nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType)
+{
+    using namespace nx::core::resource;
+    switch (hanwhaDeviceType)
+    {
+        case HanwhaDeviceType::nvr:
+            return DeviceType::nvr;
+        case HanwhaDeviceType::encoder:
+            return DeviceType::encoder;
+        case HanwhaDeviceType::nwc:
+            return DeviceType::camera;
+        default:
+            return nx::core::resource::DeviceType::unknown;
+    }
 }
 
 template<>

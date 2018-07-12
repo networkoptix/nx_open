@@ -52,6 +52,8 @@ public:
 
     virtual void clear() override;
 
+    static constexpr int kMaximumItemCount = 1000;
+
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
     virtual bool commitPrefetch(const QnTimePeriod& periodToCommit, bool& fetchedAll) override;
@@ -59,7 +61,7 @@ protected:
     virtual bool hasAccessRights() const override;
 
 private:
-    void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
+    void processMetadata();
     media::SignalingMetadataConsumer* createMetadataSource();
 
     int indexOf(const QnUuid& objectId) const;
@@ -70,7 +72,7 @@ private:
     void emitDataChangedIfNeeded();
 
     void advanceObject(analytics::storage::DetectedObject& object,
-        analytics::storage::ObjectPosition&& position);
+        analytics::storage::ObjectPosition&& position, bool emitDataChanged = true);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
     rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback,
@@ -86,12 +88,22 @@ private:
         const api::AnalyticsManifestObjectAction& action,
         const analytics::storage::DetectedObject& object) const;
 
+    void constrainLength();
+
+    struct PreviewParams
+    {
+        qint64 timestampUs = 0;
+        QRectF boundingBox;
+    };
+
+    static PreviewParams previewParams(const analytics::storage::DetectedObject& object);
+
 private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;
     QString m_filterText;
     const QScopedPointer<QTimer> m_updateTimer;
-    const QScopedPointer<QTimer> m_dataChangedTimer;
+    const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
     const QScopedPointer<utils::PendingOperation> m_updateWorkbenchFilter;
     QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
     media::AbstractMetadataConsumerPtr m_metadataSource;
@@ -103,7 +115,11 @@ private:
     std::deque<analytics::storage::DetectedObject> m_data;
     bool m_success = true;
 
-    QHash<QnUuid, qint64> m_objectIdToTimestampMs;
+    QHash<QnUuid, qint64> m_objectIdToTimestampUs;
+
+    const QScopedPointer<QTimer> m_metadataProcessingTimer;
+    QVector<QnAbstractCompressedMetadataPtr> m_metadataPackets;
+    mutable QnMutex m_metadataMutex;
 };
 
 } // namespace desktop

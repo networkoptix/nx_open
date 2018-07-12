@@ -9,11 +9,14 @@
 
 #include "animated.h"
 
+#include <nx/client/desktop/common/utils/accessor.h>
+
 namespace {
 
-const auto opacityAnimatorPropertyName = "_qn_opacityAnimator";
+static constexpr auto kOpacityAnimatorPropertyName = "_qn_opacityAnimator";
+static constexpr auto kOpacityAnimatorTimeLimitMs = 200;
 
-class OpacityAccessor: public AbstractAccessor
+class OpacityAccessor: public nx::client::desktop::AbstractAccessor
 {
 public:
     virtual QVariant get(const QObject* object) const override
@@ -27,16 +30,14 @@ public:
     }
 };
 
-static const int kOpacityTimeLimitMs = 200;
-
-} // anonymous namespace
+} // namespace
 
 Q_GLOBAL_STATIC(VariantAnimator, staticVariantAnimator);
 
 bool hasOpacityAnimator(QGraphicsObject* item)
 {
     NX_ASSERT(item, "Item cannot be null here");
-    QVariant animatorProperty = item->property(opacityAnimatorPropertyName);
+    QVariant animatorProperty = item->property(kOpacityAnimatorPropertyName);
     return animatorProperty.isValid()
         && animatorProperty.canConvert<VariantAnimator *>()
         && animatorProperty.value<VariantAnimator *>() != nullptr;
@@ -48,9 +49,9 @@ VariantAnimator* takeOpacityAnimator(QGraphicsObject* item)
     if (!hasOpacityAnimator(item))
         return nullptr;
 
-    auto animator = item->property(opacityAnimatorPropertyName).value<VariantAnimator*>();
+    auto animator = item->property(kOpacityAnimatorPropertyName).value<VariantAnimator*>();
     NX_ASSERT(animator);
-    item->setProperty(opacityAnimatorPropertyName, {});
+    item->setProperty(kOpacityAnimatorPropertyName, {});
     return animator;
 }
 
@@ -60,7 +61,7 @@ VariantAnimator* opacityAnimator(QGraphicsObject* item, qreal speed)
     if (!item)
         return staticVariantAnimator();
 
-    if (auto animator = item->property(opacityAnimatorPropertyName).value<VariantAnimator*>())
+    if (auto animator = item->property(kOpacityAnimatorPropertyName).value<VariantAnimator*>())
     {
         animator->setSpeed(speed);
         return animator;
@@ -86,15 +87,12 @@ VariantAnimator* opacityAnimator(QGraphicsObject* item, qreal speed)
     animator->setTimer(animationTimer);
     animator->setAccessor(new OpacityAccessor());
     animator->setTargetObject(item);
-    animator->setTimeLimit(kOpacityTimeLimitMs);
+    animator->setTimeLimit(kOpacityAnimatorTimeLimitMs);
     animator->setSpeed(speed);
     if (animatedBase)
         animatedBase->registerAnimation(animator);
 
-    item->setProperty(opacityAnimatorPropertyName, qVariantFromValue(animator));
+    item->setProperty(kOpacityAnimatorPropertyName, qVariantFromValue(animator));
 
     return animator;
 }
-
-
-

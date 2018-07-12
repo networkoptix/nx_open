@@ -10,7 +10,7 @@
 
 class QnBusinessActionWidgetFactory {
 public:
-    static QnAbstractBusinessParamsWidget* createWidget(nx::vms::event::ActionType actionType, QWidget* parent = 0);
+    static QnAbstractBusinessParamsWidget* createWidget(nx::vms::api::ActionType actionType, QWidget* parent = 0);
 };
 
 #endif // BUSINESS_ACTION_WIDGET_FACTORY_H

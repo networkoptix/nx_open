@@ -176,7 +176,7 @@ QString ServerWriterHandler::groupId() const
 
 QString ServerWriterHandler::groupName() const
 {
-    return m_camera->getGroupName();
+    return m_camera->getUserDefinedGroupName();
 }
 
 QString ServerWriterHandler::url() const
@@ -227,7 +227,7 @@ void Reader::operator()(ArchiveCameraDataList* outArchiveCameraList)
 
 bool Reader::initArchiveCamData()
 {
-    ec2::ApiCameraData& coreData = m_archiveCamData.coreData;
+    nx::vms::api::CameraData& coreData = m_archiveCamData.coreData;
 
     coreData.physicalId = m_fileInfo->fileName();
     if (coreData.physicalId.isEmpty())
@@ -355,7 +355,7 @@ Reader::ParseResult Reader::parseLine(const QString& line) const
 
 void Reader::addProperty(const ParseResult& result)
 {
-    ec2::ApiCameraData& coreData = m_archiveCamData.coreData;
+    nx::vms::api::CameraData& coreData = m_archiveCamData.coreData;
 
     if (result.key().contains(kArchiveCameraNameKey))
         coreData.name = result.value();
@@ -366,7 +366,13 @@ void Reader::addProperty(const ParseResult& result)
     else if (result.key().contains(kArchiveCameraGroupNameKey))
         coreData.groupName = result.value();
     else if (result.key().contains(kArchiveCameraUrlKey))
+    {
         coreData.url = result.value();
+
+        // TODO: #wearable This is a hack, and I'm failing to see an easy workaround.
+        if (coreData.url.startsWith(lit("wearable://")))
+            coreData.typeId = nx::vms::api::CameraData::kWearableCameraTypeId;
+    }
     else
         m_archiveCamData.properties.emplace_back(result.key(), result.value());
 }

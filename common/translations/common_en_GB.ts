@@ -53,11 +53,6 @@
       <translation>The discovered System %1 has an incompatible version %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cannot connect to the other System because current System is already connected to %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>The discovered System %1 is in safe mode.</translation>
@@ -68,21 +63,6 @@
       <translation>Could not configure the remote System %1.</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Both Systems are connected to %1. Merge is not allowed.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>These Systems are built with different %1 URL. Merge is not allowed.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>New System</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>The discovered System %1 is incompatible with the current System.</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Cannot connect to the other System because current System is already connected to %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Both Systems are connected to %1. Merge is not allowed.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>These Systems are built with different %1 URL. Merge is not allowed.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>System Event</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation type="unfinished">System already bound to cloud (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation type="unfinished">Server is not connected to the Internet.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation type="unfinished">Failed to save cloud credentials to local DB</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation type="unfinished">Failed to save cloud owner to local DB</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation type="unfinished">Could not connect to cloud: %1</translation>
     </message>
   </context>
   <context>
@@ -314,6 +334,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Please update firmware. Minimal supported version is %1. Current version is %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -488,39 +512,39 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>Bridge Licenses</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %2 are used out of %1.</numerusform>
         <numerusform>%n %2 are used out of %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n %2 will be used out of %1.</numerusform>
         <numerusform>%n %2 will be used out of %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Activate %n more %1.</numerusform>
         <numerusform>Activate %n more %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n more %1 will be used.</numerusform>
         <numerusform>%n more %1 will be used.</numerusform>
       </translation>
@@ -557,8 +581,8 @@
       <translation>Unknown error</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Server with matching Hardware Id not found</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation type="unfinished">Server with matching Hardware ID not found</translation>
     </message>
   </context>
   <context>
@@ -572,28 +596,28 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Camera(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Camera(s)</numerusform>
         <numerusform>%n Camera(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n camera(s)</numerusform>
         <numerusform>%n camera(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Device(s)</numerusform>
         <numerusform>%n Device(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n device(s)</numerusform>
         <numerusform>%n device(s)</numerusform>
       </translation>
@@ -632,14 +656,14 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Module(s)</numerusform>
         <numerusform>%n I/O Module(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O module(s)</numerusform>
         <numerusform>%n I/O module(s)</numerusform>
       </translation>
@@ -680,12 +704,12 @@
       <translation>Watermark: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Hardware Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Time License</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation type="unfinished">Hardware ID: %1</translation>
     </message>
   </context>
   <context>
@@ -785,7 +809,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>No data exported.</translation>
     </message>
   </context>
   <context>
@@ -820,153 +844,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>Invalid Parameter</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>sec</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>hrs</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>days</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>wks</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>yrs</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>milliseconds</numerusform>
-        <numerusform>milliseconds</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>seconds</numerusform>
-        <numerusform>seconds</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>weeks</numerusform>
-        <numerusform>weeks</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>months</numerusform>
-        <numerusform>months</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>years</numerusform>
-        <numerusform>years</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1115,7 +992,7 @@
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Motion on Cameras</numerusform>
         <numerusform>Motion on Cameras</numerusform>
       </translation>
@@ -1158,42 +1035,42 @@
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Input Signal on Devices</numerusform>
         <numerusform>Input Signal on Devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Input Signal on Cameras</numerusform>
         <numerusform>Input Signal on Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Devices Disconnected</numerusform>
         <numerusform>Devices Disconnected</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Cameras Disconnected</numerusform>
         <numerusform>Cameras Disconnected</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Devices IP Conflict</numerusform>
         <numerusform>Devices IP Conflict</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Cameras IP Conflict</numerusform>
         <numerusform>Cameras IP Conflict</numerusform>
       </translation>
@@ -1330,7 +1207,7 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
@@ -1343,14 +1220,14 @@
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
         <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>No data received during last %n seconds.</numerusform>
         <numerusform>No data received during last %n seconds.</numerusform>
       </translation>
@@ -1473,14 +1350,14 @@
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Users</numerusform>
         <numerusform>%n Users</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Roles</numerusform>
         <numerusform>%n Roles</numerusform>
       </translation>
@@ -1519,12 +1396,16 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Analytics Event</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 at %2</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation type="unfinished">Open layout</translation>
     </message>
   </context>
   <context>

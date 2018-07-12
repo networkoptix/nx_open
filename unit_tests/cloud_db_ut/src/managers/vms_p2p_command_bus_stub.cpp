@@ -4,15 +4,15 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-nx::utils::db::DBResult VmsP2pCommandBusStub::saveResourceAttribute(
-    nx::utils::db::QueryContext* /*queryContext*/,
+nx::sql::DBResult VmsP2pCommandBusStub::saveResourceAttribute(
+    nx::sql::QueryContext* /*queryContext*/,
     const std::string& systemId,
-    ::ec2::ApiResourceParamWithRefData data)
+    nx::vms::api::ResourceParamWithRefData data)
 {
     if (m_onSaveResourceAttribute)
         return m_onSaveResourceAttribute(systemId, data);
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 void VmsP2pCommandBusStub::setOnSaveResourceAttribute(OnSaveResourceAttribute func)

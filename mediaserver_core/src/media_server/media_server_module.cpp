@@ -24,28 +24,34 @@
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
-#include "settings.h"
 
 #include <utils/common/delayed.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
 #include <recorder/file_deletor.h>
-#include <core/ptz/server_ptz_controller_pool.h>
+
+#include <core/resource/avi/avi_resource.h>
+#include <nx/mediaserver_core/ptz/server_ptz_controller_pool.h>
+#include <core/dataprovider/data_provider_factory.h>
+
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
 #include <recorder/archive_integrity_watcher.h>
 #include <recorder/wearable_archive_synchronizer.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
+
 #include <nx/mediaserver/event/event_message_bus.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 #include <nx/mediaserver/license_watcher.h>
 #include <nx/mediaserver/metadata/manager_pool.h>
 #include <nx/mediaserver/metadata/event_rule_watcher.h>
 #include <nx/mediaserver/resource/shared_context_pool.h>
+#include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_tool.h>
 
+#include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -57,6 +63,12 @@
 
 #include "wearable_lock_manager.h"
 #include "wearable_upload_manager.h"
+#include <core/resource/resource_command_processor.h>
+#include <nx/vms/network/reverse_connection_manager.h>
+#include <nx/vms/time_sync/server_time_sync_manager.h>
+
+using namespace nx;
+using namespace nx::mediaserver;
 
 namespace {
 
@@ -71,16 +83,8 @@ void installTranslations()
     QnTranslationManager::installTranslation(defaultTranslation);
 }
 
-QDir downloadsDirectory()
-{
-    const QDir dir(qnServerModule->settings()->getDataDirectory() + lit("/downloads"));
-    if (!dir.exists())
-        QDir().mkpath(dir.absolutePath());
-
-    return dir;
-}
-
 } // namespace
+
 
 QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
@@ -92,25 +96,19 @@ QnMediaServerModule::QnMediaServerModule(
     Q_INIT_RESOURCE(appserver2);
     nx::mediaserver::MetaTypes::initialize();
 
-    store(new QnStaticCommonModule(
-        Qn::PT_Server,
-        QnAppInfo::productNameShort(),
-        QnAppInfo::customizationName()));
-
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
 
-    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
-    store(new QnVMax480Server(commonModule()));
+    store(new QnVMax480Server());
 #endif
+    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
 
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
     store<PasswordHelper>(new PasswordHelper());
 
-    const bool isDiscoveryDisabled =
-        m_settings->roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+    const bool isDiscoveryDisabled = m_settings->settings().noResourceDiscovery();
     QnSoapServer* soapServer = nullptr;
     if (!isDiscoveryDisabled)
     {
@@ -123,7 +121,11 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
-        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(enforcedMediatorEndpoint);
+    {
+        nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+            enforcedMediatorEndpoint,
+            enforcedMediatorEndpoint);
+    }
     nx::network::SocketGlobals::cloud().mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
@@ -132,7 +134,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
-    store(new QnServerPtzControllerPool(commonModule()));
+    store(new nx::mediaserver_core::ptz::ServerPtzControllerPool(commonModule()));
 
     store(new QnStorageDbPool(commonModule()));
 
@@ -146,9 +148,7 @@ QnMediaServerModule::QnMediaServerModule(
         commonModule()->resourcePool(),
         streamingChunkTranscoder,
         std::chrono::seconds(
-            m_settings->roSettings()->value(
-                nx_ms_conf::HLS_CHUNK_CACHE_SIZE_SEC,
-                nx_ms_conf::DEFAULT_MAX_CACHE_COST_SEC).toUInt())));
+            m_settings->settings().hlsChunkCacheSizeSec())));
 
     // std::shared_pointer based singletones should be placed after InstanceStorage singletones
 
@@ -160,14 +160,14 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_context->normalStorageManager.reset(
         new QnStorageManager(
-            commonModule(),
+            this,
             m_analyticsEventsStorage.get(),
             QnServer::StoragePool::Normal
         ));
 
-    m_context->backupStorageManager.reset(
+   m_context->backupStorageManager.reset(
         new QnStorageManager(
-            commonModule(),
+            this,
             nullptr,
             QnServer::StoragePool::Backup
         ));
@@ -177,26 +177,25 @@ QnMediaServerModule::QnMediaServerModule(
     store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule(), nullptr, this));
 
-    m_pluginManager = store(new PluginManager(this, QString(), &m_pluginContainer));
+    m_pluginManager = store(new PluginManager(this, &m_pluginContainer));
     m_pluginManager->loadPlugins(roSettings());
 
     m_metadataRuleWatcher = store(
         new nx::mediaserver::metadata::EventRuleWatcher(
             commonModule()->eventRuleManager()));
 
-    m_metadataManagerPoolThread = new QThread(this);
-    m_metadataManagerPoolThread->setObjectName(lit("MetadataManagerPool"));
     m_metadataManagerPool = store(new nx::mediaserver::metadata::ManagerPool(this));
-    m_metadataManagerPool->moveToThread(m_metadataManagerPoolThread);
-    m_metadataManagerPoolThread->start();
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
     m_updates2Manager = store(
         new nx::mediaserver::updates2::ServerUpdates2Manager(this->commonModule()));
+    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
+    m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
+    registerResourceDataProviders();
+    m_resourceCommandProcessor.reset(new QnResourceCommandProcessor());
 
-	store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
-
+    store(new nx::mediaserver_core::recorder::WearableArchiveSynchronizer(this));
 
     store(new QnWearableLockManager(this));
 
@@ -206,12 +205,19 @@ QnMediaServerModule::QnMediaServerModule(
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 
+QDir QnMediaServerModule::downloadsDirectory() const
+{
+    const QDir dir(settings().dataDir() + lit("/downloads"));
+    if (!dir.exists())
+        QDir().mkpath(dir.absolutePath());
+
+    return dir;
+}
+
 QnMediaServerModule::~QnMediaServerModule()
 {
-    m_commonModule->resourcePool()->clear();
     m_context.reset();
-    m_metadataManagerPoolThread->exit();
-    m_metadataManagerPoolThread->wait();
+    m_commonModule->resourcePool()->clear();
     clear();
 }
 
@@ -230,9 +236,9 @@ QSettings* QnMediaServerModule::roSettings() const
     return m_settings->roSettings();
 }
 
-MSSettings* QnMediaServerModule::settings() const
+void QnMediaServerModule::syncRoSettings() const
 {
-    return m_settings;
+    m_settings->syncRoSettings();
 }
 
 QSettings* QnMediaServerModule::runTimeSettings() const
@@ -302,17 +308,53 @@ nx::analytics::storage::AbstractEventsStorage* QnMediaServerModule::analyticsEve
     return m_analyticsEventsStorage.get();
 }
 
-void QnMediaServerModule::initializeRootTool()
-{
-    m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
-}
-
 nx::mediaserver::RootTool* QnMediaServerModule::rootTool() const
 {
     return m_rootTool.get();
 }
 
+void QnMediaServerModule::registerResourceDataProviders()
+{
+    m_resourceDataProviderFactory->registerResourceType<QnAviResource>();
+    m_resourceDataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
+}
+
 nx::mediaserver::updates2::ServerUpdates2Manager* QnMediaServerModule::updates2Manager() const
 {
     return m_updates2Manager;
+}
+
+QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
+{
+    return m_resourceDataProviderFactory.data();
+}
+
+QnResourceCommandProcessor* QnMediaServerModule::resourceCommandProcessor() const
+{
+    return m_resourceCommandProcessor.data();
+}
+
+QnResourcePool* QnMediaServerModule::resourcePool() const
+{
+    return commonModule()->resourcePool();
+}
+
+QnResourcePropertyDictionary* QnMediaServerModule::propertyDictionary() const
+{
+    return commonModule()->propertyDictionary();
+}
+
+QnCameraHistoryPool* QnMediaServerModule::cameraHistoryPool() const
+{
+    return commonModule()->cameraHistoryPool();
+}
+
+QnStorageManager* QnMediaServerModule::normalStorageManager() const
+{
+    return m_context->normalStorageManager.get();
+}
+
+QnStorageManager* QnMediaServerModule::backupStorageManager() const
+{
+    return m_context->backupStorageManager.get();
 }

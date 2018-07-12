@@ -1,18 +1,29 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success"> 귀하의 계정이 성공적으로 활성화되었습니다 <br> <a class="btn btn-default" href="/login"> 로그인 </a></h1> <h1 class="process-success" ng-if="!activate.success"> 계정이 이미 활성화되었거나 확인 코드가 잘못되었습니다. </h1>
+        <h1 class="process-success" ng-if="activate.success">
+            당신의 계정이 성공적으로 활성화 되었습니다
+        </h1>
+        <h1 class="process-success" ng-if="activate.success">
+            <a class="btn btn-default" href="/login">로그인</a>
+        </h1>
+
+        <h1 class="process-success" ng-if="!activate.success">
+            계정이 이미 활성화되었거나 확인 코드가 잘못되었습니다.
+        </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            귀하의 계정이 성공적으로 활성화되었습니다. <br> <a href="/login"> 로그인 </a>
-            <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
+            당신의 계정이 성공적으로 활성화 되었습니다
+        </h1>
+        <h1 class="process-success">
+            <a class="btn btn-default" href="/login">로그인</a>
         </h1>
     </div>
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>{{PRODUCT_NAME}} 에 등록했습니다.</h1>
+            <h1>%PRODUCT_NAME% 에 등록했습니다.</h1>
             <p>우리는 다음과 같이 활성화 링크를 보내드렸습니다. {{data.email}}.<br>
             상기 링크를 방문 하셔서 활성화 하시기 바랍니다.</p>
         </div>
@@ -73,8 +84,11 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            패스워드가 성공적으로 저장 됨 <br> <a href="/login"> 로그인 </a>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            암호가 정상적으로 저장되었습니다
+        </h1>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            <a class="btn btn-default" href="/login">로그인</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>

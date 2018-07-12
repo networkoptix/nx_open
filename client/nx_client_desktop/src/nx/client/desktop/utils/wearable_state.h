@@ -24,6 +24,14 @@ struct WearableState
         Consuming,
     };
 
+    enum Error {
+        NoError,
+        LockRequestFailed,
+        CameraSnatched,
+        UploadFailed,
+        ConsumeRequestFailed,
+    };
+
     struct EnqueuedFile
     {
         QString path;
@@ -33,6 +41,9 @@ struct WearableState
 
     /** Current wearable status of the camera. */
     Status status = Unlocked;
+
+    /** Error, if any. */
+    Error error = NoError;
 
     /** Id of the camera. */
     QnUuid cameraId;
@@ -66,6 +77,11 @@ struct WearableState
      * @returns                         Whether this state represents a finished operation.
      */
     bool isDone() const;
+
+    /**
+     * @returns                         Whether this state represents a cancellable operation.
+     */
+    bool isCancellable() const;
 
     /**
      * @returns                         Progress the whole operation, a number in [0, 100] range.

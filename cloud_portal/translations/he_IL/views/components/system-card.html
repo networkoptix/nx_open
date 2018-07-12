@@ -6,10 +6,13 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">שינוי שם מערכת</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">התנתק מ <span class="product-name"> {{PRODUCT_NAME}} </span></button>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">מיזוג עם מערכת אחרת</button>
+        </p>
+        <hr></hr>
+        <button class="btn btn-default" ng-click="disconnect()">התנתק מ <span class="product-name"> %PRODUCT_NAME% </span></button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>בעלים</h2>
@@ -24,5 +27,21 @@
             <button class="btn btn-default" ng-click="rename()">שינוי שם מערכת</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">התנתק מהחשבון שלי</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong> ממוזגת למערכת זו</div>
+        <hr></hr>
+        <div class="merge-info-text">בהתאם לגודל של מסד הנתונים זה עלול לקחת עד כמה שעות</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>מערכת זו ממוזגת ל- <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>בהתאם לגודל של מסד הנתונים זה עלול לקחת עד כמה שעות.</p>
+            <p>עד לסיום המיזוג אתה יכול להיכנס למערכת זו ולצפות בוידאו, אבל לא יכול לשנות הגדרות.</p>
+            <p>כאשר המיזוג יסתיים, כל המשתמשים והמצלמות מהמערכת הזו יהיו זמינים ב <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. המערכת, ומערכת זו תימחק.</p>
+        </div>
     </div>
 </div>

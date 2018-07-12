@@ -1,53 +1,29 @@
 #include "message_bus_adapter.h"
 #include <nx/p2p/p2p_message_bus.h>
 #include "transaction_message_bus.h"
-#include <database/db_manager.h>
+
+using namespace nx::vms;
 
 namespace ec2 {
 
 TransactionMessageBusAdapter::TransactionMessageBusAdapter(
-    detail::QnDbManager* db,
-    Qn::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
     :
     AbstractTransactionMessageBus(commonModule),
-    m_db(db),
-    m_peerType(peerType),
     m_jsonTranSerializer(jsonTranSerializer),
-    m_ubjsonTranSerializer(ubjsonTranSerializer),
-    m_timeSyncManager(nullptr)
+    m_ubjsonTranSerializer(ubjsonTranSerializer)
 {
 }
 
-void TransactionMessageBusAdapter::init(MessageBusType value)
+void TransactionMessageBusAdapter::reset()
 {
     m_bus.reset();
+}
 
-    if (value == MessageBusType::None)
-        return;
-
-    if (value == MessageBusType::P2pMode)
-    {
-        m_bus.reset(new nx::p2p::MessageBus(
-            m_db,
-            m_peerType,
-            commonModule(),
-            m_jsonTranSerializer,
-            m_ubjsonTranSerializer));
-    }
-    else
-    {
-        m_bus.reset(new QnTransactionMessageBus(
-            m_db,
-            m_peerType,
-            commonModule(),
-            m_jsonTranSerializer,
-            m_ubjsonTranSerializer));
-    }
-
-    m_bus->setTimeSyncManager(m_timeSyncManager);
+void TransactionMessageBusAdapter::initInternal()
+{
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerFound,
         this, &AbstractTransactionMessageBus::peerFound, Qt::DirectConnection);
     connect(m_bus.get(), &AbstractTransactionMessageBus::peerLost,
@@ -78,9 +54,10 @@ QSet<QnUuid> TransactionMessageBusAdapter::directlyConnectedServerPeers() const
     return m_bus->directlyConnectedServerPeers();
 }
 
-QnUuid TransactionMessageBusAdapter::routeToPeerVia(const QnUuid& dstPeer, int* distance) const
+QnUuid TransactionMessageBusAdapter::routeToPeerVia(
+    const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
-    return m_bus->routeToPeerVia(dstPeer, distance);
+    return m_bus->routeToPeerVia(dstPeer, distance, knownPeerAddress);
 }
 
 int TransactionMessageBusAdapter::distanceToPeer(const QnUuid& dstPeer) const
@@ -133,16 +110,11 @@ ConnectionGuardSharedState* TransactionMessageBusAdapter::connectionGuardSharedS
     return m_bus->connectionGuardSharedState();
 }
 
+#if 0
 detail::QnDbManager* TransactionMessageBusAdapter::getDb() const
 {
     return m_bus->getDb();
 }
-
-void TransactionMessageBusAdapter::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
-{
-    m_timeSyncManager = timeSyncManager;
-    if (m_bus)
-        m_bus->setTimeSyncManager(m_timeSyncManager);
-}
+#endif
 
 } // namespace ec2

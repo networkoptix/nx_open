@@ -9,11 +9,9 @@ namespace cloud {
 namespace gateway {
 
 TargetPeerConnector::TargetPeerConnector(
-    relaying::AbstractListeningPeerPool* listeningPeerPool,
-    const network::SocketAddress& targetEndpoint)
+    relaying::AbstractListeningPeerPool* listeningPeerPool)
     :
-    m_listeningPeerPool(listeningPeerPool),
-    m_targetEndpoint(targetEndpoint)
+    m_listeningPeerPool(listeningPeerPool)
 {
     bindToAioThread(getAioThread());
 }
@@ -25,15 +23,16 @@ void TargetPeerConnector::bindToAioThread(network::aio::AbstractAioThread* aioTh
     if (m_targetPeerSocket)
         m_targetPeerSocket->bindToAioThread(aioThread);
     m_timer.bindToAioThread(aioThread);
+    if (m_relayConnector)
+        m_relayConnector->bindToAioThread(aioThread);
 }
 
-void TargetPeerConnector::setTimeout(std::chrono::milliseconds timeout)
+void TargetPeerConnector::connectAsync(
+    const network::SocketAddress& targetEndpoint,
+    ConnectHandler handler)
 {
-    m_timeout = timeout;
-}
+    m_targetEndpoint = targetEndpoint;
 
-void TargetPeerConnector::connectAsync(ConnectHandler handler)
-{
     post(
         [this, handler = std::move(handler)]() mutable
         {
@@ -53,6 +52,23 @@ void TargetPeerConnector::connectAsync(ConnectHandler handler)
         });
 }
 
+void TargetPeerConnector::setTimeout(std::chrono::milliseconds timeout)
+{
+    m_timeout = timeout;
+}
+
+void TargetPeerConnector::setTargetConnectionRecvTimeout(
+    std::optional<std::chrono::milliseconds> value)
+{
+    m_targetConnectionRecvTimeout = value;
+}
+
+void TargetPeerConnector::setTargetConnectionSendTimeout(
+    std::optional<std::chrono::milliseconds> value)
+{
+    m_targetConnectionSendTimeout = value;
+}
+
 void TargetPeerConnector::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
@@ -60,36 +76,37 @@ void TargetPeerConnector::stopWhileInAioThread()
     if (m_targetPeerSocket)
         m_targetPeerSocket.reset();
     m_timer.pleaseStopSync();
+    m_relayConnector.reset();
 }
 
 void TargetPeerConnector::takeConnectionFromListeningPeerPool()
 {
     using namespace std::placeholders;
 
-    m_listeningPeerPool->takeIdleConnection(
-        relaying::ClientInfo(), //< TODO: #ak
-        m_targetEndpoint.address.toString().toStdString(),
+    m_relayConnector = std::make_unique<relaying::ListeningPeerConnector>(
+        m_listeningPeerPool);
+    m_relayConnector->bindToAioThread(getAioThread());
+    m_relayConnector->connectAsync(
+        m_targetEndpoint,
         std::bind(&TargetPeerConnector::processTakeConnectionResult, this, _1, _2));
 }
 
 void TargetPeerConnector::processTakeConnectionResult(
-    cloud::relay::api::ResultCode resultCode,
+    SystemError::ErrorCode resultCode,
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
-    dispatch(
-        [this, resultCode, connection = std::move(connection)]() mutable
-        {
-            NX_VERBOSE(this, lm("Take connection to %1 finished with result %2")
-                .args(m_targetEndpoint.address, QnLexical::serialized(resultCode)));
+    NX_VERBOSE(this, lm("Take connection to %1 finished with result %2")
+        .args(m_targetEndpoint.address, SystemError::toString(resultCode)));
 
-            if (resultCode == cloud::relay::api::ResultCode::ok)
-            {
-                processConnectionResult(SystemError::noError, std::move(connection));
-                return;
-            }
+    m_relayConnector.reset();
 
-            initiateDirectConnection();
-        });
+    if (resultCode == SystemError::noError)
+    {
+        processConnectionResult(SystemError::noError, std::move(connection));
+        return;
+    }
+
+    initiateDirectConnection();
 }
 
 void TargetPeerConnector::initiateDirectConnection()
@@ -132,6 +149,22 @@ void TargetPeerConnector::processConnectionResult(
     std::unique_ptr<network::AbstractStreamSocket> connection)
 {
     m_timer.pleaseStopSync();
+
+    if (connection)
+    {
+        if ((m_targetConnectionRecvTimeout &&
+                !connection->setRecvTimeout(*m_targetConnectionRecvTimeout)) ||
+            (m_targetConnectionSendTimeout &&
+                !connection->setSendTimeout(*m_targetConnectionSendTimeout)))
+        {
+            systemErrorCode = SystemError::getLastOSErrorCode();
+            NX_INFO(this, lm("Failed to set socket options. %1")
+                .arg(SystemError::toString(systemErrorCode)));
+
+            connection.reset();
+        }
+    }
+
     nx::utils::swapAndCall(
         m_completionHandler,
         systemErrorCode,

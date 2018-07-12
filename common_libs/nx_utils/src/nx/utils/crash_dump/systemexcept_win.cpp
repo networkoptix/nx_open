@@ -8,11 +8,14 @@
 #include <Dbghelp.h>
 #include <Windows.h>
 #include <ShlObj.h>
+#include <signal.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
 
 #include "nx/utils/app_info.h"
+#include <nx/utils/log/assert.h>
+
 #include "../platform/win32_syscall_resolver.h"
 
 #define MAX_SYMBOL_SIZE 1024
@@ -44,18 +47,28 @@ typedef BOOL (WINAPI *pfMiniDumpWriteDump) (
 
 static void LegacyDump( HANDLE );
 
-static int GetBaseName( const char* name , DWORD len ) {
-    for( DWORD i = len-1 ; i >= 0 ; --i ) {
-        if( name[i] == '\\' || name[i] == '/' )
-            return i+1;
+static int GetBaseName(const char* name, DWORD len)
+{
+    NX_ASSERT(len > 0);
+    if (len == 0)
+        return 0;
+
+    do
+    {
+        --len;
+        if (name[len] == '\\' || name[len] == '/')
+            return len + 1;
     }
+    while (len > 0);
     return 0;
 }
 
 static bool GetProgramName( char* buffer ) {
     char sModuleName[MAX_SYMBOL_SIZE];
+
+    // If the function fails, the return value is 0.
     DWORD dwLen = ::GetModuleFileNameA( NULL, sModuleName, MAX_SYMBOL_SIZE );
-    if( dwLen == MAX_SYMBOL_SIZE || dwLen < 0 )
+    if (dwLen == MAX_SYMBOL_SIZE || dwLen == 0)
         return false;
 
     int iBaseNamePos = GetBaseName( sModuleName , dwLen );
@@ -222,14 +235,28 @@ static void myPurecallHandler()
     dumpCrtError();
 }
 
+static void abortHandler(int signal)
+{
+    if (signal == SIGABRT)
+    {
+        // Cause access violation so abort is handled the same way.
+        // if we call dumpCrtError() here instead minidump will not contain any exception code.
+        *static_cast<volatile int*>(0) = 7;
+    }
+}
+
 void win32_exception::installGlobalUnhandledExceptionHandler()
 {
      //_set_se_translator( &win32_exception::translate );
     SetUnhandledExceptionFilter( &unhandledSEHandler );
 
-    //installing CRT handlers (invalid parameter, purecall, etc.)
+    // installing CRT handlers (invalid parameter, purecall, etc.)
     _set_invalid_parameter_handler( invalidCrtCallParameterHandler );
     _set_purecall_handler( myPurecallHandler );
+
+    // unhandled c++ exceptions, abort(), etc.
+    signal( SIGABRT, abortHandler );
+    _set_abort_behavior( 0, _WRITE_ABORT_MSG );
 }
 
 void win32_exception::installThreadSpecificUnhandledExceptionHandler()

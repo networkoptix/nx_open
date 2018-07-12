@@ -72,6 +72,9 @@ void QnTestCameraProcessor::run()
             fps = m_fps;
 
         if (!isSecondary || !m_noSecondaryStream)
+        {
+            qDebug() << "Start" << (isSecondary ? "secondary" : "primary") << "stream";
             camera->startStreaming(d->socket.data(), isSecondary, fps);
+        }
     }
 }

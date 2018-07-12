@@ -8,7 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/style/skin.h>
 #include <ui/style/software_trigger_pixmaps.h>
@@ -18,6 +18,7 @@
 #include <nx/vms/event/strings_helper.h>
 
 using namespace nx;
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -31,7 +32,7 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidg
     ui(new Ui::SoftwareTriggerBusinessEventWidget),
     m_helper(new vms::event::StringsHelper(commonModule())),
     m_validationPolicy(new QnRequiredPermissionSubjectPolicy(
-        Qn::GlobalUserInputPermission,
+        GlobalPermission::userInput,
         tr("User Input")))
 {
     ui->setupUi(this);
@@ -61,7 +62,7 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidg
         QnSoftwareTriggerPixmaps::pixmapsPath(),
         QnSoftwareTriggerPixmaps::pixmapNames());
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidget(ui->nameLabel);
     aligner->addWidget(ui->iconLabel);
     aligner->addWidget(ui->usersLabel);

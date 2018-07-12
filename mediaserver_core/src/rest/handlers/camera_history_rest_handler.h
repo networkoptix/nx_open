@@ -3,7 +3,8 @@
 #include <rest/server/request_handler.h>
 #include <rest/server/fusion_rest_handler.h>
 #include <recording/time_period_list.h>
-#include <nx_ec/data/api_camera_history_data.h>
+
+#include <nx_ec/data/api_fwd.h>
 
 class QnCameraHistoryRestHandler: public QnFusionRestHandler
 {
@@ -14,5 +15,6 @@ public:
 
 private:
     friend struct BuildHistoryDataAccess;
-    ec2::ApiCameraHistoryItemDataList buildHistoryData(const MultiServerPeriodDataList& chunks);
+    nx::vms::api::CameraHistoryItemDataList buildHistoryData(
+        const MultiServerPeriodDataList& chunks);
 };

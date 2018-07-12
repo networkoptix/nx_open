@@ -77,7 +77,7 @@ void Timer::cancelSync()
 
 void Timer::stopWhileInAioThread()
 {
-    m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut, true);
+    m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut);
     m_handler = nullptr;
 }
 
@@ -100,7 +100,7 @@ void Timer::eventTriggered(Pollable* sock, aio::EventType eventType) throw()
 
     QnMutexLocker lock(&m_mutex);
     if (internalTimerId == m_internalTimerId)
-        m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut, true);
+        m_aioService.stopMonitoring(&pollable(), EventType::etTimedOut);
 }
 
 } // namespace aio

@@ -25,7 +25,7 @@ namespace rest
 #endif
 
     template<typename ResultType>
-    using Callback = std::function<void (bool, Handle, ResultType)>;
+    using Callback = std::function<void (bool success, Handle requestId, ResultType result)>;
 
     class ServerConnection;
     using QnConnectionPtr = QSharedPointer<ServerConnection>;

@@ -5,7 +5,7 @@
  * (C) viazenetti GmbH (Christian Ludwig)
  * http://jsfiddle.net/ChristianL/AVyND/
  */
-(function (window) {
+(function () {
     {
         var unknown = '-';
 
@@ -189,4 +189,4 @@
         cookies: cookieEnabled,
         flashVersion: flashVersion
     };
-}(this));
+}());

@@ -55,9 +55,9 @@ QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
     delete m_cameraDataHandler;
 }
 
-void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
+void QnAppserverResourceProcessor::processResources(const QnResourceList& resources)
 {
-    for (const QnVirtualCameraResourcePtr& camera : resources.filtered<QnVirtualCameraResource>())
+    for (const QnVirtualCameraResourcePtr& camera: resources.filtered<QnVirtualCameraResource>())
     {
         NX_ASSERT(camera->resourcePool() == nullptr);
         camera->setParentId(m_serverId);
@@ -91,7 +91,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferredServerId() == commonModule()->moduleGUID(); // return camera back without mutex
     QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     const bool takeCameraWithoutLock =
-        (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
+        (ownServer && ownServer->getServerFlags().testFlag(nx::vms::api::SF_Edge) && !ownServer->isRedundancy()) ||
         qnGlobalSettings->takeCameraOwnershipWithoutLock() ||
         cameraResource->hasFlags(Qn::desktop_camera);
     if (!m_distributedMutexManager || takeCameraWithoutLock || isOwnChangeParentId)
@@ -147,23 +147,23 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 
 void QnAppserverResourceProcessor::readDefaultUserAttrs()
 {
-    QString dir = qnServerModule->roSettings()->value("staticDataDir", getDataDirectory()).toString();
+    QString dir = qnServerModule->settings().staticDataDir();
     QFile f(closeDirPath(dir) + lit("default_rec.json"));
     if (!f.open(QFile::ReadOnly))
         return;
     QByteArray data = f.readAll();
-    ec2::ApiCameraAttributesData userAttrsData;
+    nx::vms::api::CameraAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return;
     userAttrsData.preferredServerId = commonModule()->moduleGUID();
     m_defaultUserAttrs = QnCameraUserAttributesPtr(new QnCameraUserAttributes());
-    fromApiToResource(userAttrsData, m_defaultUserAttrs);
+    ec2::fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }
 
 ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     QnCommonModule* commonModule,
-    const ec2::ApiCameraData& apiCameraData,
-    const ec2::ApiResourceParamDataList& properties)
+    const nx::vms::api::CameraData& apiCameraData,
+    const nx::vms::api::ResourceParamDataList& properties)
 {
     QnResourcePtr existCamRes = commonModule->resourcePool()->getResourceById(apiCameraData.id);
     if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
@@ -171,7 +171,7 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
 
     /**
      * Save properties before camera to avoid race condition.
-     * Camera will start initialization as soon as ApiCameraData object will appear
+     * Camera will start initialization as soon as nx::vms::api::CameraData object will appear
      */
 
     ec2::ErrorCode errorCode = commonModule->ec2Connection()
@@ -203,8 +203,8 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
 
-    ec2::ApiCameraData apiCameraData;
-    fromResourceToApi(cameraResource, apiCameraData);
+    nx::vms::api::CameraData apiCameraData;
+    ec2::fromResourceToApi(cameraResource, apiCameraData);
     apiCameraData.id = cameraResource->physicalIdToId(uniqueId);
 
     ec2::ErrorCode errCode = addAndPropagateCamResource(
@@ -217,16 +217,17 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     if (!resourceExists && m_defaultUserAttrs)
     {
         QnCameraUserAttributesPtr userAttrCopy(new QnCameraUserAttributes(*m_defaultUserAttrs.data()));
-        if (!userAttrCopy->scheduleDisabled) {
+        if (userAttrCopy->licenseUsed)
+        {
             QnCamLicenseUsageHelper helper(commonModule());
             helper.propose(QnVirtualCameraResourceList() << cameraResource, true);
             if (!helper.isValid())
-                userAttrCopy->scheduleDisabled = true;
+                userAttrCopy->licenseUsed = false;
         }
         userAttrCopy->cameraId = apiCameraData.id;
 
-        ec2::ApiCameraAttributesDataList attrsList;
-        fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
+        nx::vms::api::CameraAttributesDataList attrsList;
+        ec2::fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
 
         errCode =  commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
@@ -255,11 +256,16 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 void QnAppserverResourceProcessor::at_mutexTimeout()
 {
     QnMutexLocker lock( &m_mutex );
+    if (!sender())
+    {
+        NX_WARNING(this, lm("at_mutexTimeout: Sender is NULL"));
+        return;
+    }
+
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
     m_lockInProgress.remove(mutex->name());
     mutex->deleteLater();
 }
-
 
 bool QnAppserverResourceProcessor::isBusy() const
 {

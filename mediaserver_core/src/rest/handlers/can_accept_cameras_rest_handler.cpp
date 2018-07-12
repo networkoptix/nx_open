@@ -14,21 +14,17 @@
 #include "core/resource_management/resource_pool.h"
 #include <rest/server/rest_connection_processor.h>
 
-
 static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) {
     return input.checkHostAddr();
 }
 
 int QnCanAcceptCameraRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
-
     QnCameraListReply inCameras;
     QnCameraListReply outCameras;
     //QnSecurityCamResourceList manualCamList;

@@ -18,7 +18,10 @@ public:
 //-------------------------------------------------------------------------------------------------
 // JpegDecoder
 
-JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/):
+JpegDecoder::JpegDecoder(
+    const RenderContextSynchronizerPtr& /*synchronizer*/,
+    const QSize& /*resolution*/)
+    :
     d_ptr(new JpegDecoderPrivate())
 {
 }
@@ -45,6 +48,11 @@ int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFrameP
     result->reset(new QVideoFrame(image));
     (*result)->setStartTime(frame->timestamp / 1000); //< convert usec to msec
     return d->frameNumber++;
+}
+
+AbstractVideoDecoder::Capabilities JpegDecoder::capabilities() const
+{
+    return Capability::noCapability;
 }
 
 } // namespace media

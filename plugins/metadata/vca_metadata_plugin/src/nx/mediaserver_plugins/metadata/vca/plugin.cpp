@@ -1,27 +1,15 @@
 #include "plugin.h"
 
-#include <array>
-#include <fstream>
-#include <string>
-#include <memory>
-
 #include <QtCore/QString>
-#include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
+#include <QtCore/QFileInfo>
 
-#include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
-#include <plugins/plugin_internal_tools.h>
 
-#include <nx/network/deprecated/asynchttpclient.h>
-
-#include <nx/utils/log/log.h>
-// TODO: #szaitsev: Redirect NX_DEBUG_STREAM to NX_UTILS_LOG_STREAM_NO_SPACE.
-//#define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
-//    nx::utils::log::Level::debug, lm("vca_metadata_plugin")) << NX_PRINT_PREFIX
-#include <nx/kit/debug.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include "manager.h"
+#include "log.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -40,12 +28,23 @@ using namespace nx::sdk::metadata;
 
 Plugin::Plugin()
 {
-    static const char* const kResourceName=":/vca/manifest.json";
+    static const char* const kResourceName = ":/vca/manifest.json";
+    static const char* const kFileName = "plugins/vca/manifest.json";
+
     QFile f(kResourceName);
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
-    else
-        NX_PRINT << kPluginName << " can not open resource \"" << kResourceName << "\".";
+    {
+        QFile file(kFileName);
+        if (file.open(QFile::ReadOnly))
+        {
+
+            NX_PRINT << "Switch to external manifest file "
+                << QFileInfo(file).absoluteFilePath().toStdString();
+
+            m_manifest = file.readAll();
+        }
+    }
     m_typedManifest = QJson::deserialized<AnalyticsDriverManifest>(m_manifest);
 }
 
@@ -100,22 +99,14 @@ void Plugin::setLocale(const char* locale)
 {
 }
 
-CameraManager* Plugin::obtainCameraManager(
-    const CameraInfo& cameraInfo,
-    Error* outError)
+CameraManager* Plugin::obtainCameraManager(const CameraInfo& cameraInfo, Error* outError)
 {
     *outError = Error::noError;
     const auto vendor = QString(cameraInfo.vendor).toLower();
-    if (!vendor.startsWith(kVcaVendor))
-    {
-        NX_PRINT << kPluginName << " got unsupported resource. Manager can not be created.";
-        return nullptr;
-    }
-    else
-    {
-        NX_PRINT << kPluginName << " creates new manager.";
+    if (vendor.startsWith(kVcaVendor))
         return new Manager(this, cameraInfo, m_typedManifest);
-    }
+    else
+        return nullptr;
 }
 
 const char* Plugin::capabilitiesManifest(Error* error) const
@@ -124,25 +115,7 @@ const char* Plugin::capabilitiesManifest(Error* error) const
     return m_manifest.constData();
 }
 
-const AnalyticsEventType& Plugin::eventByInternalName(
-    const QString& internalName) const noexcept
-{
-    // There are only few elements, so linear search is the fastest and the most simple.
-    const auto it = std::find_if(
-        m_typedManifest.outputEventTypes.cbegin(),
-        m_typedManifest.outputEventTypes.cend(),
-        [&internalName](const AnalyticsEventType& event)
-        {
-            return event.internalName == internalName;
-        });
-
-    return
-        (it != m_typedManifest.outputEventTypes.cend())
-            ? *it
-            : m_emptyEvent;
-}
-
-const AnalyticsEventType& Plugin::eventByUuid(const QnUuid& uuid) const noexcept
+const AnalyticsEventType* Plugin::eventByUuid(const QnUuid& uuid) const noexcept
 {
     const auto it = std::find_if(
         m_typedManifest.outputEventTypes.cbegin(),
@@ -152,10 +125,7 @@ const AnalyticsEventType& Plugin::eventByUuid(const QnUuid& uuid) const noexcept
             return event.typeId == uuid;
         });
 
-    return
-        (it != m_typedManifest.outputEventTypes.cend())
-        ? *it
-        : m_emptyEvent;
+    return (it != m_typedManifest.outputEventTypes.cend()) ? &(*it) : nullptr;
 }
 
 void Plugin::executeAction(Action* /*action*/, Error* /*outError*/)

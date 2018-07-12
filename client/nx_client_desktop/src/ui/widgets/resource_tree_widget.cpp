@@ -21,6 +21,7 @@
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource/resource_compare_helper.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <ui/style/noptix_style.h>
 #include <ui/style/helper.h>
@@ -55,6 +56,22 @@ void setFlag(QWidget* widget, int flag, bool value)
 
     widget->setWindowFlags(flags);
 }
+
+// Must correlate with QnResourceTreeWidget::filterTags() method.
+static const auto kTagIndexToAllowedNodeMapping = QList<ResourceTreeNodeType>(
+    {
+        QnResourceSearchQuery::kAllowAllNodeTypes,
+        QnResourceSearchQuery::kAllowAllNodeTypes,
+        ResourceTreeNodeType::filteredServers,
+        ResourceTreeNodeType::filteredCameras,
+        ResourceTreeNodeType::filteredLayouts,
+        ResourceTreeNodeType::layoutTours,
+        ResourceTreeNodeType::filteredVideowalls,
+        ResourceTreeNodeType::webPages,
+        ResourceTreeNodeType::filteredUsers,
+        ResourceTreeNodeType::localResources
+    });
+
 
 } // namespace
 
@@ -94,26 +111,30 @@ private:
      * videowall nodes, which are pinned between Layouts and WebPages. Also if the system has one
      * server, ServersNode is not displayed, so server/edge node must be displayed on it's place.
      */
-    qreal nodeOrder(const QModelIndex &index) const
+    static qreal nodeOrder(const QModelIndex &index)
     {
-        Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        using NodeType = ResourceTreeNodeType;
 
-        if (nodeType == Qn::EdgeNode)
-            return Qn::ServersNode;
+        const auto order = [](NodeType t) { return static_cast<qreal>(t); };
 
-        if (nodeType != Qn::ResourceNode)
-            return nodeType;
+        const auto nodeType = index.data(Qn::NodeTypeRole).value<NodeType>();
 
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        if (nodeType == NodeType::edge)
+            return order(NodeType::servers);
+
+        if (nodeType != NodeType::resource)
+            return order(nodeType);
+
+        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         const bool isVideoWall = resource->hasFlags(Qn::videowall);
         if (isVideoWall)
-            return 0.5 * (Qn::LayoutsNode + Qn::WebPagesNode);
+            return 0.5 * (order(NodeType::layouts) + order(NodeType::webPages));
 
         const bool isServer = resource->hasFlags(Qn::server);
         if (isServer)
-            return Qn::ServersNode;
+            return order(NodeType::servers);
 
-        return nodeType;
+        return order(nodeType);
     }
 
 
@@ -153,6 +174,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     ui->resourcesTreeView->setItemDelegateForColumn(Qn::NameColumn, m_itemDelegate);
     ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation,
         QVariant::fromValue(QnIndents(0, 1)));
+    ui->resourcesTreeView->setIndentation(style::Metrics::kDefaultIconSize);
 
     ui->resourcesTreeView->setConfirmExpandDelegate(
         [](const QModelIndex& index) -> bool
@@ -162,16 +184,16 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
             return !resource || !resource->hasFlags(Qn::layout);
         });
 
-    connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
+    connect(ui->resourcesTreeView, &TreeView::enterPressed, this,
         [this](const QModelIndex& index){emit activated(index, false); });
-    connect(ui->resourcesTreeView, &QnTreeView::doubleClicked, this,
+    connect(ui->resourcesTreeView, &TreeView::doubleClicked, this,
         [this](const QModelIndex& index){emit activated(index, true); });
 
-    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this,
+    connect(ui->resourcesTreeView, &TreeView::spacePressed, this,
         &QnResourceTreeWidget::at_treeView_spacePressed);
-    connect(ui->resourcesTreeView, &QnTreeView::clicked, this,
+    connect(ui->resourcesTreeView, &TreeView::clicked, this,
         &QnResourceTreeWidget::at_treeView_clicked);
-    connect(ui->resourcesTreeView, &QnTreeView::verticalScrollbarVisibilityChanged,
+    connect(ui->resourcesTreeView, &TreeView::verticalScrollbarVisibilityChanged,
         this, &QnResourceTreeWidget::updateShortcutHintVisibility);
 
     ui->resourcesTreeView->installEventFilter(this);
@@ -223,7 +245,7 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model, NewSearchOption s
 
         static constexpr int kOldFilterPage = 0;
         static constexpr int kNewFilterPageIndex = 1;
-        if (ini().enableResourceFiltering && searchOption == allowNewSearch)
+        if (ini().enableResourceFilteringByDefault && searchOption == allowNewSearch)
         {
             ui->filter->setCurrentIndex(kNewFilterPageIndex);
             updateNewFilter();
@@ -477,7 +499,7 @@ void QnResourceTreeWidget::updateShortcutHintVisibility()
     const bool hasFilterText = !ui->newFilterLineEdit->text().trimmed().isEmpty();
     const bool hiddenScrollBar = !ui->resourcesTreeView->verticalScrollBarIsVisible();
 
-    const bool hintIsVisible = ini().enableResourceFiltering && hasFilterText && hiddenScrollBar;
+    const bool hintIsVisible = ini().enableResourceFilteringByDefault && hasFilterText && hiddenScrollBar;
     ui->shortcutHintWidget->setVisible(hintIsVisible);
 }
 
@@ -507,15 +529,16 @@ void QnResourceTreeWidget::updateNewFilter()
     if (trimmed.isEmpty())
         filterEdit->clear();
 
-    static const auto kMapping = filterTagIndexToNodeMapping();
     const auto index = filterEdit->selectedTagIndex();
-    if (index >= kMapping.size())
+    if (index >= kTagIndexToAllowedNodeMapping.size())
     {
         NX_EXPECT(false, "Wrong tag index");
         return;
     }
 
-    const auto allowedNode = index == -1 ? -1 : kMapping.at(index);
+    const auto allowedNode = index == -1
+        ? QnResourceSearchQuery::kAllowAllNodeTypes
+        : kTagIndexToAllowedNodeMapping.at(index);
     m_resourceProxyModel->setQuery(QnResourceSearchQuery(trimmed, allowedNode));
 }
 
@@ -595,7 +618,7 @@ void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 {
     bool needExpand = m_autoExpandPolicy
         ? m_autoExpandPolicy(index)
-        : true;
+        : false;
 
     if (needExpand)
         ui->resourcesTreeView->expand(index);
@@ -605,6 +628,7 @@ void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 
 QStringList QnResourceTreeWidget::filterTags()
 {
+    // Must correlate with kTagIndexToAllowedNodeMapping.
     static const auto kFilterCategories = QStringList({
         tr("All types"),
         QString(), // splitter
@@ -618,23 +642,6 @@ QStringList QnResourceTreeWidget::filterTags()
         tr("Local Files")});
 
     return kFilterCategories;
-}
-
-QList<int> QnResourceTreeWidget::filterTagIndexToNodeMapping()
-{
-    static const auto kTagIndexToAllowedNodeMapping = QList<int>({
-        -1,
-        -1,
-        Qn::FilteredServersNode,
-        Qn::FilteredCamerasNode,
-        Qn::FilteredLayoutsNode,
-        Qn::LayoutToursNode,
-        Qn::FilteredVideowallsNode,
-        Qn::WebPagesNode,
-        Qn::FilteredUsersNode,
-        Qn::LocalResourcesNode});
-
-    return kTagIndexToAllowedNodeMapping;
 }
 
 void QnResourceTreeWidget::initializeFilter()

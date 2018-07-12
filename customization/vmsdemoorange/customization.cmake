@@ -1,27 +1,27 @@
+set(build_mobile OFF)
+
 set(defaultSkin "dark_orange")
 
 # Components Namings
-set(parent.customization "digitalwatchdog")
 set(product.name "VMS Demonstration")
 set(display.product.name "VMS Demonstration")
 set(product.name.short "vmsdemoorange")
 set(product.appName "vmsdemo")
 set(company.name "Digital Watchdog")
-set(short.company.name "VMS")
 set(uri.protocol "demo-vms")
 set(cloudName "VMS Demo Cloud")
 set(installer.name "vmsdemo")
 
 # Support section
-set(companyUrl "http://completeipsolution.com")
-set(productUrl "http://dwspectrum.com")
-set(supportUrl "")
-set(supportEmail "dw-tech@dwcc.tv")
+set(companyUrl "http://networkoptix.com")
+set(productUrl "http://networkoptix.com/nxwitness-overview")
+set(supportUrl "http://support.networkoptix.com")
+set(supportEmail "")
 set(supportPhone "")
-set(licenseEmail "licenses@dwcc.tv")
+set(licenseEmail "support@networkoptix.com")
 # end of Support section
 
-set(defaultWebPages "{\"Home Page\": \"http://dwspectrum.com\"}")
+set(defaultWebPages "")
 
 # Custom Installer (if needed). If not leave "default"
 
@@ -31,7 +31,6 @@ set(customization.serverUpgradeCode "{d4bf70f6-cf23-4020-9266-db2eb4fc9bcf}")
 set(customization.clientBundleUpgradeCode "{e98dde15-4b2c-4012-8fd0-5a008b1b822f}")
 set(customization.serverBundleUpgradeCode "{54b76f2d-41eb-4144-8797-336866044901}")
 set(customization.fullBundleUpgradeCode "{0fc1d29f-10f7-4109-aa23-6664865b967d}")
-set(customization.nxtoolBundleUpgradeCode "{ec3f0ca7-adfd-4a54-8532-0dc6561366d9}")
 
 set(deb.customization.company.name "digitalwatchdog")
 
@@ -58,6 +57,7 @@ set(additionalTranslations
     de_DE
     ru_RU
     es_ES
+    it_IT
     ja_JP
     ko_KR
     tr_TR

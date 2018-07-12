@@ -2,8 +2,11 @@
 
 #include <QtCore/QFileInfo>
 
+#include <client_core/client_core_module.h>
+
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <nx/client/desktop/export/data/export_media_settings.h>
 #include <nx/client/desktop/export/tools/export_timelapse_recorder.h>
@@ -14,6 +17,7 @@
 
 #include <core/resource/avi/avi_archive_delegate.h>
 #include <core/resource/avi/thumbnails_stream_reader.h>
+#include <media/filters/h264_mp4_to_annexb.h>
 
 namespace nx {
 namespace client {
@@ -58,11 +62,11 @@ struct ExportMediaTool::Private
     {
         NX_ASSERT(status == ExportProcessStatus::initial);
         const auto timelapseFrameStepUs = settings.timelapseFrameStepMs * 1000ll;
-        const auto startTimeUs = settings.timePeriod.startTimeMs * 1000ll;
-        NX_ASSERT(settings.timePeriod.durationMs > 0,
+        const auto startTimeUs = settings.period.startTimeMs * 1000ll;
+        NX_ASSERT(settings.period.durationMs > 0,
             "Invalid time period, possibly LIVE is exported");
-        const auto endTimeUs = settings.timePeriod.durationMs > 0
-            ? settings.timePeriod.endTimeMs() * 1000ll
+        const auto endTimeUs = settings.period.durationMs > 0
+            ? settings.period.endTimeMs() * 1000ll
             : DATETIME_NOW;
 
         if (!initDataProvider(startTimeUs, endTimeUs, timelapseFrameStepUs))
@@ -103,13 +107,16 @@ struct ExportMediaTool::Private
                 emit q->valueChanged(100);
             });
 
-        if (settings.fileName.extension == FileExtension::avi)
-            exportRecorder->setAudioCodec(AV_CODEC_ID_MP3); // transcode audio to MP3
+        if (settings.fileName.extension == FileExtension::avi
+            || settings.fileName.extension == FileExtension::mp4)
+        {
+            exportRecorder->setAudioCodec(AV_CODEC_ID_MP2); //< Transcode audio to MP2.
+        }
 
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(dataProvider.data());
 
         exportRecorder->clearUnprocessedData();
-        exportRecorder->setEofDateTime(endTimeUs);
+        exportRecorder->setProgressBounds(startTimeUs, endTimeUs);
         exportRecorder->addRecordingContext(settings.fileName.completeFileName());
 
         exportRecorder->setRole(StreamRecorderRole::fileExport);
@@ -166,8 +173,9 @@ private:
             return true;
         }
 
-        const auto tmpReader = settings.mediaResource->toResource()->createDataProvider(
-            Qn::CR_Default);
+        const auto tmpReader = qnClientCoreModule->dataProviderFactory()->createDataProvider(
+                settings.mediaResource->toResourcePtr());
+
         auto archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(tmpReader);
         if (!archiveReader)
         {
@@ -178,6 +186,9 @@ private:
 
         archiveReader->setCycleMode(false);
         archiveReader->setQuality(MEDIA_Quality_ForceHigh, true);
+        // Additing filtering is required in case of.AVI export.
+        archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
+
         if (auto rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*>
             (archiveReader->getArchiveDelegate()))
         {

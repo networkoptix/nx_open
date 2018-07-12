@@ -23,13 +23,21 @@ using namespace nx::cdb;
 class CloudAuthentication:
     public MediaServerCloudIntegrationTest
 {
+    using base_type = MediaServerCloudIntegrationTest;
+
 public:
     CloudAuthentication()
     {
-        connectSystemToCloud();
     }
 
 protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        connectSystemToCloud();
+    }
+
     void givenCloudNonce()
     {
         getCloudNonce(&m_cloudNonceData);

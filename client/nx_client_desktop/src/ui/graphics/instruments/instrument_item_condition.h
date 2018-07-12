@@ -10,7 +10,8 @@ class Instrument;
  * Abstract functor class that is used to conditionally disable instruments for
  * some of the items on the scene.
  */
-class InstrumentItemCondition: public std::binary_function<QGraphicsItem *, Instrument *, bool> {
+class InstrumentItemCondition
+{
 public:
     virtual ~InstrumentItemCondition() {};
 

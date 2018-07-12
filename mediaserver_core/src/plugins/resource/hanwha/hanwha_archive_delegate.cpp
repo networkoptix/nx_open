@@ -7,6 +7,7 @@
 #include "hanwha_resource.h"
 #include "hanwha_shared_resource_context.h"
 #include "hanwha_chunk_reader.h"
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -50,6 +51,7 @@ bool HanwhaArchiveDelegate::open(const QnResourcePtr &/*resource*/,
 {
     m_streamReader->setRateControlEnabled(m_rateControlEnabled);
     m_lastOpenResult = m_streamReader->openStreamInternal(false, QnLiveStreamParams());
+    m_sessionContext = m_streamReader->sessionContext();
     if (!m_lastOpenResult && m_errorHandler)
         m_errorHandler(lit("Can not open stream"));
 
@@ -104,15 +106,16 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
 
     if (!m_streamReader->isStreamOpened())
     {
-        if (m_currentPositionUsec != AV_NOPTS_VALUE)
-            m_streamReader->setPositionUsec(m_currentPositionUsec);
+        const auto currentPosition = currentPositionUsec();
+        if (currentPosition != AV_NOPTS_VALUE)
+            m_streamReader->setPositionUsec(currentPosition);
         if (!open(m_streamReader->m_resource, /*archiveIntegrityWatcher*/ nullptr))
         {
-            if (m_lastOpenResult.errorCode == CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
+            if (auto mediaStreamEvent = m_lastOpenResult.toMediaStreamEvent())
             {
                 return QnCompressedMetadata::createMediaEventPacket(
                     isForwardDirection() ? DATETIME_NOW : 0,
-                    Qn::MediaStreamEvent::TooManyOpenedConnections);
+                    mediaStreamEvent);
             }
             if (m_errorHandler)
                 m_errorHandler(lit("Can not open stream."));
@@ -124,8 +127,9 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
     if (!result)
         return result;
 
-    m_currentPositionUsec = result->timestamp;
-    if (!isForwardDirection())
+    bool isForwardPlayback = isForwardDirection();
+    updateCurrentPositionUsec(result->timestamp, isForwardPlayback, /*force*/ false);
+    if (!isForwardPlayback)
     {
         result->flags |= QnAbstractMediaData::MediaFlags_ReverseBlockStart;
         result->flags |= QnAbstractMediaData::MediaFlags_Reverse;
@@ -141,6 +145,12 @@ QnAbstractMediaDataPtr HanwhaArchiveDelegate::getNextData()
         return rez;
     }
 
+    if (result && result->dataType == QnAbstractMediaData::EMPTY_DATA)
+    {
+        if (auto resource = m_streamReader->getResource())
+            NX_VERBOSE(this, lm("Send empty packet for camera %1").arg(resource->getUrl()));
+    }
+
     return result;
 }
 
@@ -150,8 +160,30 @@ bool HanwhaArchiveDelegate::isForwardDirection() const
     return rtspClient.getScale() >= 0;
 }
 
+qint64 HanwhaArchiveDelegate::currentPositionUsec() const
+{
+    qint64 currentPosition = AV_NOPTS_VALUE;
+    if (const auto sessionContext = m_sessionContext)
+        currentPosition = sessionContext->currentPositionUsec();
+
+    return currentPosition;
+}
+
+void HanwhaArchiveDelegate::updateCurrentPositionUsec(
+    qint64 positionUsec, bool isForwardPlayback, bool force)
+{
+    if (const auto sessionContext = m_sessionContext)
+        sessionContext->updateCurrentPositionUsec(positionUsec, isForwardPlayback, force);
+}
+
 qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
 {
+    makeScopeGuard(
+        [this, timeUsec]()
+        {
+            updateCurrentPositionUsec(timeUsec, isForwardDirection(), /*force*/ true);
+        });
+
     if (!m_isSeekAlignedByChunkBorder)
     {
         m_streamReader->setPositionUsec(timeUsec);
@@ -178,10 +210,10 @@ qint64 HanwhaArchiveDelegate::seek(qint64 timeUsec, bool /*findIFrame*/)
     else if (!itr->contains(timeMs))
         timeUsec = isForwardDirection() ? itr->startTimeMs * 1000 : itr->endTimeMs() * 1000 - BACKWARD_SEEK_STEP;
 
-    if (m_playbackMode == PlaybackMode::ThumbNails && m_currentPositionUsec == timeUsec)
+    if (m_playbackMode == PlaybackMode::ThumbNails && currentPositionUsec() == timeUsec)
         return timeUsec; //< Ignore two thumbnails in the row from the same position.
 
-    m_currentPositionUsec = timeUsec;
+    updateCurrentPositionUsec(timeUsec, isForwardDirection(), true);
     m_streamReader->setPositionUsec(timeUsec);
     return timeUsec;
 }
@@ -200,6 +232,7 @@ QnConstResourceAudioLayoutPtr HanwhaArchiveDelegate::getAudioLayout()
 
 void HanwhaArchiveDelegate::beforeClose()
 {
+    m_sessionContext.reset();
     m_streamReader->pleaseStop();
 }
 
@@ -237,8 +270,10 @@ void HanwhaArchiveDelegate::setOverlappedId(nx::core::resource::OverlappedId ove
 void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
 {
     m_playbackMode = mode;
-    m_isSeekAlignedByChunkBorder = true;
+    m_isSeekAlignedByChunkBorder = false; //< I expect this variable is not required any more since we can sends empty frames before first video packet.
     auto& rtspClient = m_streamReader->rtspClient();
+    rtspClient.setAdditionAttribute("Require", "onvif-replay");
+    rtspClient.setAdditionAttribute("Immediate", "yes");
     switch (mode)
     {
         case PlaybackMode::ThumbNails:
@@ -278,6 +313,11 @@ bool HanwhaArchiveDelegate::setQuality(
     const QSize& /*resolution*/)
 {
     return true;
+}
+
+CameraDiagnostics::Result HanwhaArchiveDelegate::lastError() const
+{
+    return m_lastOpenResult;
 }
 
 } // namespace plugins

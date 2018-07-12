@@ -47,14 +47,14 @@ Plugin::SharedResources::SharedResources(
     sharedContext(std::make_shared<mediaserver_core::plugins::HanwhaSharedResourceContext>(
         sharedId))
 {
-    sharedContext->setRecourceAccess(url, auth);
+    sharedContext->setResourceAccess(url, auth);
 }
 
 void Plugin::SharedResources::setResourceAccess(
     const nx::utils::Url& url,
     const QAuthenticator& auth)
 {
-    sharedContext->setRecourceAccess(url, auth);
+    sharedContext->setResourceAccess(url, auth);
     monitor->setResourceAccess(url, auth);
 }
 
@@ -164,6 +164,12 @@ const char* Plugin::capabilitiesManifest(Error* error) const
 
 void Plugin::setDeclaredSettings(const nxpl::Setting* settings, int count)
 {
+    // Do nothing.
+}
+
+void Plugin::executeAction(Action* action, Error* outError)
+{
+    // Do nothing.
 }
 
 boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
@@ -173,15 +179,18 @@ boost::optional<QList<QnUuid>> Plugin::fetchSupportedEvents(
 
     auto sharedRes = sharedResources(cameraInfo);
 
-    const auto& cgiParameters = sharedRes->sharedContext->cgiParameters();
-    if (!cgiParameters.diagnostics || !cgiParameters.value.isValid())
+    const auto& information = sharedRes->sharedContext->information();
+    if (!information)
+        return boost::none;
+    const auto& cgiParameters = information->cgiParameters;
+    if (!cgiParameters.isValid())
         return boost::none;
 
     const auto& eventStatuses = sharedRes->sharedContext->eventStatuses();
     if (!eventStatuses || !eventStatuses->isSuccessful())
         return boost::none;
 
-    return eventsFromParameters(cgiParameters.value, eventStatuses.value, cameraInfo.channel);
+    return eventsFromParameters(cgiParameters, eventStatuses.value, cameraInfo.channel);
 }
 
 boost::optional<QList<QnUuid>> Plugin::eventsFromParameters(

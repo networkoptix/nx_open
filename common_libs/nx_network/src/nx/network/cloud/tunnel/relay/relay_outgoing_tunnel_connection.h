@@ -24,8 +24,9 @@ class NX_NETWORK_API OutgoingTunnelConnection:
     using base_type = AbstractOutgoingTunnelConnection;
 
 public:
-    OutgoingTunnelConnection(utils::Url relayUrl,
-        nx::String relaySessionId,
+    OutgoingTunnelConnection(
+        utils::Url relayUrl,
+        std::string relaySessionId,
         std::unique_ptr<nx::cloud::relay::api::Client> relayApiClient);
 
     virtual void stopWhileInAioThread() override;
@@ -53,7 +54,7 @@ private:
     };
 
     const nx::utils::Url m_relayUrl;
-    const nx::String m_relaySessionId;
+    const std::string m_relaySessionId;
     std::unique_ptr<nx::cloud::relay::api::Client> m_relayApiClient;
     QnMutex m_mutex;
     std::list<std::unique_ptr<RequestContext>> m_activeRequests;
@@ -78,12 +79,12 @@ class OutgoingConnection:
 {
 public:
     OutgoingConnection(
-        std::unique_ptr<AbstractStreamSocket> delegatee,
+        std::unique_ptr<AbstractStreamSocket> delegate,
         std::shared_ptr<int> usageCounter);
     virtual ~OutgoingConnection() override;
 
 private:
-    std::unique_ptr<AbstractStreamSocket> m_delegatee;
+    std::unique_ptr<AbstractStreamSocket> m_delegate;
     std::shared_ptr<int> m_usageCounter;
 };
 

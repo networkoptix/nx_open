@@ -11,37 +11,31 @@
 #include <nx/vms/utils/app_info.h>
 #include <nx/utils/log/log.h>
 
-namespace
+namespace {
+
+template<typename ValueType>
+void addParserParam(QnCommandLineParser& parser, ValueType* valuePtr, const char* longName)
 {
-    template<typename ValueType>
-    void addParserParam(QnCommandLineParser &parser
-        , ValueType *valuePtr
-        , const char *longName)
-    {
-        parser.addParameter(valuePtr, longName, nullptr, QString());
-    };
-
-    template<typename ValueType>
-    void addParserParam(QnCommandLineParser &parser
-                        , ValueType *valuePtr
-                        , const QString& longName)
-    {
-        parser.addParameter(valuePtr, longName, QString(), QString());
-    };
-
-    template<typename ValueType, typename DefaultParamType>
-    void addParserParam(QnCommandLineParser &parser
-        , ValueType *valuePtr
-        , const char *longName
-        , const DefaultParamType &defaultParam)
-    {
-        parser.addParameter(valuePtr, longName, nullptr, QString(), defaultParam);
-    };
-
-    static const QString kEncodeAuthMagic = lit("@@");
-    static const QnSoftwareVersion kEncodeSupportVersion(3, 0, 0, 14350);
-
+    parser.addParameter(valuePtr, longName, nullptr, QString());
 }
+
+template<typename ValueType>
+void addParserParam(QnCommandLineParser& parser, ValueType* valuePtr, const QString& longName)
+{
+    parser.addParameter(valuePtr, longName, QString(), QString());
+}
+
+template<typename ValueType, typename DefaultParamType>
+void addParserParam(QnCommandLineParser& parser, ValueType* valuePtr, const char* longName,
+    const DefaultParamType& defaultParam)
+{
+    parser.addParameter(valuePtr, longName, nullptr, QString(), defaultParam);
+};
+
+static const QString kEncodeAuthMagic = lit("@@");
+static const nx::vms::api::SoftwareVersion kEncodeSupportVersion(3, 0, 0, 14350);
+
+} // namespace
 
 const QString QnStartupParameters::kScreenKey(lit("--screen"));
 const QString QnStartupParameters::kAllowMultipleClientInstancesKey(lit("--no-single-application"));
@@ -61,6 +55,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.screen, kScreenKey);
     addParserParam(commandLineParser, &result.delayedDrop, "--delayed-drop");
     addParserParam(commandLineParser, &result.instantDrop, "--instant-drop");
+    addParserParam(commandLineParser, &result.layoutName, "--layout-name");
 
     /* Development options */
     addParserParam(commandLineParser, &result.dynamicCustomizationPath,"--customization");
@@ -129,7 +124,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
 }
 
 QString QnStartupParameters::createAuthenticationString(const nx::utils::Url& url,
-    const QnSoftwareVersion& version)
+    const nx::vms::api::SoftwareVersion& version)
 {
     // For old clients use compatible format
     if (!version.isNull() && version < kEncodeSupportVersion)

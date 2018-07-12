@@ -1,13 +1,15 @@
 #include "workbench_screenshot_handler.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 #include <QtCore/QStack>
-
 #include <QtGui/QImageWriter>
 #include <QtGui/QPainter>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
+
+#include <translation/datetime_formatter.h>
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
@@ -32,7 +34,6 @@
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -42,7 +43,9 @@
 
 #include "transcoding/filters/filter_helper.h"
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -59,14 +62,20 @@ QnScreenshotParameters::QnScreenshotParameters()
     timestampParams.corner = Qt::BottomRightCorner;
 }
 
-QString QnScreenshotParameters::timeString() const {
-    if (utcTimestampMsec == latestScreenshotTime)
-        return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
+QString QnScreenshotParameters::timeString(bool forFilename) const
+{
+    datetime::Format timeFormat = forFilename
+        ? datetime::Format::filename_time
+        : datetime::Format::hh_mm_ss;
+    datetime::Format fullFormat = forFilename
+        ? datetime::Format::filename_date
+        : datetime::Format::yyyy_MM_dd_hh_mm_ss;
 
-    qint64 timeMSecs = displayTimeMsec;
+    if (utcTimestampMsec == latestScreenshotTime)
+        return datetime::toString(QTime::currentTime(), timeFormat);
     if (isUtc)
-        return nx::utils::datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
-    return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
+        return datetime::toString(displayTimeMsec, fullFormat);
+    return datetime::toString(displayTimeMsec, timeFormat);
 }
 
 
@@ -74,7 +83,7 @@ QString QnScreenshotParameters::timeString() const {
 // QnScreenshotLoader
 // -------------------------------------------------------------------------- //
 QnScreenshotLoader::QnScreenshotLoader(const QnScreenshotParameters& parameters, QObject *parent):
-    QnImageProvider(parent),
+    ImageProvider(parent),
     m_parameters(parameters),
     m_isReady(false)
 {
@@ -84,13 +93,13 @@ QnScreenshotLoader::~QnScreenshotLoader()
 {
 }
 
-void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider)
+void QnScreenshotLoader::setBaseProvider(ImageProvider *imageProvider)
 {
     m_baseProvider.reset(imageProvider);
     if (!imageProvider)
         return;
 
-    connect(imageProvider, &QnImageProvider::imageChanged, this, &QnScreenshotLoader::at_imageLoaded);
+    connect(imageProvider, &ImageProvider::imageChanged, this, &QnScreenshotLoader::at_imageLoaded);
     imageProvider->loadAsync();
 }
 
@@ -159,14 +168,14 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     connect(action(action::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
 
-QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced) const {
+ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced) const {
     QnResourceDisplayPtr display = widget->display();
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
     bool anyQuality = forced || layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
 
     const QnMediaServerResourcePtr server = display->resource()->getParentResource().dynamicCast<QnMediaServerResource>();
-    if (!server || (server->getServerFlags() & Qn::SF_Edge))
+    if (!server || server->getServerFlags().testFlag(nx::vms::api::SF_Edge))
         anyQuality = true; // local file or edge cameras will be done locally
 
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
@@ -183,7 +192,7 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
     if (screenshot.isNull())
         return NULL;
 
-    return new QnBasicImageProvider(screenshot);
+    return new BasicImageProvider(screenshot);
 }
 
 qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *widget, bool adjust) {
@@ -197,7 +206,8 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTimeMSec(QnMediaResourceWidget *w
     if (!adjust)
         return timeMSec;
 
-    qint64 localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
+    const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+    qint64 localOffset = timeWatcher->displayOffset(widget->resource());
 
     timeMSec += localOffset;
     return timeMSec;
@@ -242,11 +252,11 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
         formats << lit(".jpg");
     count *= formats.size();
 
-    typedef QPair<QString, float> ar_type;
+    typedef QPair<QString, QnAspectRatio> ar_type;
     QList<ar_type> ars;
-    ars << ar_type(QString(), 0.0);
+    ars << ar_type(QString(), QnAspectRatio());
     for (const QnAspectRatio &ar: QnAspectRatio::standardRatios())
-        ars << ar_type(ar.toString(lit("_%1x%2")), ar.toFloat());
+        ars << ar_type(ar.toString(lit("_%1x%2")), ar);
     count*= ars.size();
 
     QList<int> rotations;
@@ -379,8 +389,9 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     QString previousDir = qnSettings->lastScreenshotDir();
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename, QLatin1Char('_'))
-        + QLatin1Char('_') + parameters.timeString();
+    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename
+        + QLatin1Char('_') + parameters.timeString(true), QLatin1Char('_')).
+        replace(QChar::Space, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 
     QString filterSeparator = lit(";;");
@@ -607,13 +618,13 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     }
 
     QnResourceDisplayPtr display = widget->display();
-    QnImageProvider* imageProvider = getLocalScreenshotProvider(widget, localParameters);
+    ImageProvider* imageProvider = getLocalScreenshotProvider(widget, localParameters);
     if (imageProvider) {
         // avoiding post-processing duplication
         localParameters.imageCorrectionParams.enabled = false;
         localParameters.itemDewarpingParams.enabled = false;
         localParameters.zoomRect = QRectF();
-        localParameters.customAspectRatio = 0.0;
+        localParameters.customAspectRatio = QnAspectRatio();
         localParameters.rotationAngle = 0;
     } else {
         QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
@@ -622,7 +633,8 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         {
             nx::api::CameraImageRequest request;
             request.camera = camera;
-            request.msecSinceEpoch = localParameters.utcTimestampMsec;
+            request.usecSinceEpoch = std::chrono::microseconds(std::chrono::milliseconds(
+                localParameters.utcTimestampMsec)).count();
             request.roundMethod = nx::api::ImageRequest::RoundMethod::precise;
             request.rotation = 0;
 
@@ -639,7 +651,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     }
 
     QScopedPointer<QnScreenshotLoader> loader(new QnScreenshotLoader(localParameters, this));
-    connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
+    connect(loader, &ImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
     /* Check if name is already given - that usually means silent mode. */

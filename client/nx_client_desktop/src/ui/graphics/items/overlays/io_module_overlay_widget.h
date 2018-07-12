@@ -2,7 +2,6 @@
 
 #include <api/model/api_ioport_data.h>
 #include <core/resource/resource_fwd.h>
-#include <nx/fusion/model_functions_fwd.h>
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 
@@ -23,12 +22,7 @@ public:
 
     void setIOModule(const QnVirtualCameraResourcePtr& module);
 
-    enum class Style
-    {
-        Form,
-        Tile,
-        Default = Form
-    };
+    using Style = nx::vms::api::IoModuleVisualStyle;
 
     /** Overlay style set in accordance with resource settings: */
     Style overlayStyle() const;
@@ -62,5 +56,3 @@ public:
 signals:
     void userClicked(const QString& port);
 };
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnIoModuleOverlayWidget::Style), (lexical))

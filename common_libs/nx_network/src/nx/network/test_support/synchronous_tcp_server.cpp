@@ -1,63 +1,115 @@
 #include "synchronous_tcp_server.h"
 
+#include <nx/network/system_socket.h>
+
 namespace nx {
 namespace network {
 namespace test {
 
-SynchronousTcpServer::SynchronousTcpServer():
+SynchronousStreamSocketServer::SynchronousStreamSocketServer():
+    SynchronousStreamSocketServer(std::make_unique<nx::network::TCPServerSocket>(AF_INET))
+{
+}
+
+SynchronousStreamSocketServer::SynchronousStreamSocketServer(
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket)
+    :
+    m_serverSocket(std::move(serverSocket)),
     m_stopped(false)
 {
 }
 
-SynchronousTcpServer::~SynchronousTcpServer()
+SynchronousStreamSocketServer::~SynchronousStreamSocketServer()
 {
     stop();
 }
 
-bool SynchronousTcpServer::bindAndListen(const SocketAddress& endpoint)
+bool SynchronousStreamSocketServer::bindAndListen(const SocketAddress& endpoint)
 {
-    return m_serverSocket.setRecvTimeout(100)
-        && m_serverSocket.bind(endpoint)
-        && m_serverSocket.listen();
+    return m_serverSocket->setRecvTimeout(100)
+        && m_serverSocket->bind(endpoint)
+        && m_serverSocket->listen();
 }
 
-SocketAddress SynchronousTcpServer::endpoint() const
+SocketAddress SynchronousStreamSocketServer::endpoint() const
 {
-    return m_serverSocket.getLocalAddress();
+    return m_serverSocket->getLocalAddress();
 }
 
-void SynchronousTcpServer::start()
+void SynchronousStreamSocketServer::start()
 {
-    m_thread = nx::utils::thread(std::bind(&SynchronousTcpServer::threadMain, this));
+    m_thread = nx::utils::thread(std::bind(&SynchronousStreamSocketServer::threadMain, this));
 }
 
-void SynchronousTcpServer::stop()
+void SynchronousStreamSocketServer::stop()
 {
     m_stopped = true;
     if (m_thread.joinable())
         m_thread.join();
 }
 
-void SynchronousTcpServer::waitForAtLeastOneConnection()
+void SynchronousStreamSocketServer::waitForAtLeastOneConnection()
 {
     while (!m_connection)
         std::this_thread::yield();
 }
 
-AbstractStreamSocket* SynchronousTcpServer::anyConnection()
+AbstractStreamSocket* SynchronousStreamSocketServer::anyConnection()
 {
     return m_connection.get();
 }
 
-void SynchronousTcpServer::threadMain()
+bool SynchronousStreamSocketServer::isStopped() const
+{
+    return m_stopped;
+}
+
+void SynchronousStreamSocketServer::threadMain()
 {
     while (!m_stopped)
     {
-        m_connection.reset(m_serverSocket.accept());
+        m_connection = m_serverSocket->accept();
         if (!m_connection)
             continue;
         processConnection(m_connection.get());
         m_connection.reset();
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+SynchronousReceivingServer::SynchronousReceivingServer(
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket,
+    utils::bstream::AbstractOutput* synchronousServerReceivedData)
+    :
+    base_type(std::move(serverSocket)),
+    m_synchronousServerReceivedData(synchronousServerReceivedData)
+{
+}
+
+void SynchronousReceivingServer::processConnection(AbstractStreamSocket* connection)
+{
+    if (!connection->setRecvTimeout(std::chrono::milliseconds(1)))
+        return;
+
+    std::array<char, 256> readBuf;
+    while (!isStopped())
+    {
+        int bytesRead = connection->recv(readBuf.data(), (unsigned int)readBuf.size(), 0);
+        if (bytesRead > 0)
+        {
+            m_synchronousServerReceivedData->write(readBuf.data(), bytesRead);
+            continue;
+        }
+        else if (bytesRead == 0)
+        {
+            break;
+        }
+        else
+        {
+            if (nx::network::socketCannotRecoverFromError(SystemError::getLastOSErrorCode()))
+                break;
+        }
     }
 }
 

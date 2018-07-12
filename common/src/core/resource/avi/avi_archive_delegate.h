@@ -77,7 +77,7 @@ protected:
 private:
     QnConstMediaContextPtr getCodecContext(AVStream* stream);
     bool reopen();
-
+    void fixG726Bug();
 protected:
     AVFormatContext* m_formatContext = nullptr;
     AVIOContext* m_IOContext = nullptr;

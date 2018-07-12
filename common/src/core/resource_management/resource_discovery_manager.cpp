@@ -31,6 +31,7 @@
 #include <common/common_module.h>
 #include "core/resource/media_server_resource.h"
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/media_server_data.h>
 
 #ifdef __arm__
     static const int kThreadCount = 8;
@@ -158,7 +159,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
     if (resourceType.isNull())
         return result;
 
-    if (resourceTypeId == qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId))
+    if (resourceTypeId == nx::vms::api::StorageData::kResourceTypeId)
     {
         result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), params.url));
         NX_ASSERT(result); //storage can not be null
@@ -315,18 +316,20 @@ static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input)
     }
     catch (const std::exception& e)
     {
+        const auto resType = input.resType ? input.resType->getName() : lit("Unknown");
         qWarning()
             << "CheckHostAddrAsync exception ("<<e.what()<<") caught\n"
-            << "\t\tresource type:" << input.resType->getName() << "\n"
+            << "\t\tresource type:" << resType << "\n"
             << "\t\tresource url:" << input.url.toString() << "\n";
 
         return QnResourceList();
     }
     catch (...)
     {
+        const auto resType = input.resType ? input.resType->getName() : lit("Unknown");
         qWarning()
             << "CheckHostAddrAsync exception caught\n"
-            << "\t\tresource type:" << input.resType->getName() << "\n"
+            << "\t\tresource type:" << resType << "\n"
             << "\t\tresource url:" << input.url.toString() << "\n";
 
         return QnResourceList();
@@ -338,7 +341,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!camera)
         return false;
 
-    if (camera->failoverPriority() == Qn::FP_Never)
+    if (camera->failoverPriority() == Qn::FailoverPriority::never)
         return false;
 
     QnUuid ownGuid = commonModule()->moduleGUID();
@@ -363,7 +366,7 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
     }
 #endif
-    if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
+    if (mServer->getServerFlags().testFlag(nx::vms::api::SF_Edge) && !mServer->isRedundancy())
         return false; // do not transfer cameras from edge server
 
     if (camera->preferredServerId() == ownGuid)
@@ -439,17 +442,15 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             QElapsedTimer timer;
             timer.restart();
             QnResourceList lst = searcher->search();
-            NX_LOG(lit("Discovery----: searcher %1 took %2 ms to find new resources").
-                arg(searcher->manufacture()).
-                arg(timer.elapsed()), cl_logDEBUG1);
+            NX_DEBUG(this, lit("Searcher %1 took %2 ms to find %3 resources").
+                arg(searcher->manufacture())
+                .arg(timer.elapsed())
+                .arg(lst.size()));
 
             // resources can be searched by client in or server.
             // if this client in stand alone => lets add Qn::local
             // server does not care about flags
-            for( QnResourceList::iterator
-                it = lst.begin();
-                it != lst.end();
-                 )
+            for(QnResourceList::iterator it = lst.begin(); it != lst.end();)
             {
                 const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
                 //checking, if found resource is reserved by some other searcher
@@ -580,18 +581,14 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
     const auto& resPool = netRes->commonModule()->resourcePool();
     auto existResource = resPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
     if (existResource)
-    {
-        bool isSameIp = existResource->getHostAddress() == netRes->getHostAddress();
-        return isSameIp ? existResource : QnVirtualCameraResourcePtr();
-    }
+        return existResource;
 
-    for (const auto& existResource: resPool->getResources<QnVirtualCameraResource>())
+    for (const auto& existRes: resPool->getResources<QnVirtualCameraResource>())
     {
-        bool isSameChannels = netRes->getChannel() == existResource->getChannel();
-        bool isSameMACs = !existResource->getMAC().isNull() && existResource->getMAC() == netRes->getMAC();
-        bool isSameIp = existResource->getHostAddress() == netRes->getHostAddress();
-        if (isSameChannels && isSameMACs)
-            return isSameIp ? existResource : QnVirtualCameraResourcePtr();
+        bool sameChannels = netRes->getChannel() == existRes->getChannel();
+        bool sameMACs = !existRes->getMAC().isNull() && existRes->getMAC() == netRes->getMAC();
+        if (sameChannels && sameMACs)
+            return existRes;
     }
 
     return QnNetworkResourcePtr();
@@ -632,22 +629,28 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
 QnManualCameraInfo QnResourceDiscoveryManager::manualCameraInfo(const QnSecurityCamResourcePtr& camera)
 {
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(camera->getTypeId());
+    const auto resourceTypeId = camera->getTypeId();
+    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    NX_ASSERT(resourceType, lit("Resource type %1 was not found").arg(resourceTypeId.toString()));
+
+    const auto model = resourceType
+        ? resourceType->getName()
+        : camera->getModel();
     QnManualCameraInfo info(
-        nx::utils::Url(camera->getUrl()), camera->getAuth(), resourceType->getName(), camera->getUniqueId());
+        nx::utils::Url(camera->getUrl()), camera->getAuth(), model, camera->getUniqueId());
     for (const auto& searcher: m_searchersList)
     {
-        if (searcher->isResourceTypeSupported(resourceType->getId()))
+        if (searcher->isResourceTypeSupported(resourceTypeId))
             info.searcher = searcher;
     }
 
     return info;
 }
 
-int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManualCameraInfo>& cameras)
+QSet<QString> QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManualCameraInfo>& cameras)
 {
     QnMutexLocker lock(&m_searchersListMutex);
-    int addedCount = 0;
+    QSet<QString> registeredUniqueIds;
     for (const auto& camera: cameras)
     {
         // This is important to use reverse order of searchers as ONVIF resource type fits both
@@ -665,11 +668,11 @@ int QnResourceDiscoveryManager::registerManualCameras(const std::vector<QnManual
 
             const auto iterator = m_manualCameraByUniqueId.insert(camera.uniqueId, camera);
             iterator.value().searcher = searcher;
-            ++addedCount;
+            registeredUniqueIds << camera.uniqueId;
             break;
         }
     }
-    return addedCount;
+    return registeredUniqueIds;
 }
 
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)

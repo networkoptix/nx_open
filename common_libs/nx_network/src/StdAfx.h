@@ -1,5 +1,3 @@
-#include <nx/utils/compiler_options.h>
-
 /* Windows headers. */
 #ifdef _WIN32
 #   define FD_SETSIZE 2048
@@ -11,6 +9,3 @@
 #else
 #    include <arpa/inet.h>
 #endif
-
-#include <nx/utils/literal.h>
-#include <nx/utils/deprecation.h>

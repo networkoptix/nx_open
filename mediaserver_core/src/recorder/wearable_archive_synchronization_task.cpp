@@ -65,7 +65,7 @@ void WearableArchiveSynchronizationTask::cancel()
 
 bool WearableArchiveSynchronizationTask::execute()
 {
-    m_withMotion = m_resource->getMotionType() == Qn::MT_SoftwareGrid;
+    m_withMotion = m_resource->getMotionType() == Qn::MotionType::MT_SoftwareGrid;
 
     createArchiveReader(m_startTimeMs, &m_state.duration);
     createStreamRecorder(m_startTimeMs, m_state.duration);
@@ -175,7 +175,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
     // Make sure we get recordingProgress notifications.
     // Adding 100ms at end just to feel safe. We don't want to drop packets.
-    m_recorder->setEofDateTime((startTimeMs + durationMs + 100) * 1000);
+    m_recorder->setProgressBounds(startTimeMs * 1000, (startTimeMs + durationMs + 100) * 1000);
 
     // Note that direct connection is OK here as we control the
     // lifetimes of all the objects involved.

@@ -43,7 +43,6 @@ bool QnQtFileStorageResource::renameFile(const QString& oldName, const QString& 
     return QFile::rename(oldName, newName);
 }
 
-
 bool QnQtFileStorageResource::removeDir(const QString& url)
 {
     QDir dir(removeProtocolPrefix(url));
@@ -83,10 +82,9 @@ QnAbstractStorageResource::FileInfoList QnQtFileStorageResource::getFileList(con
         return QnAbstractStorageResource::FileInfoList();
 }
 
-qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
+qint64 QnQtFileStorageResource::getFileSize(const QString& /*url*/) const
 {
-    Q_UNUSED(url)
-	return 0; // not implemented
+	return 0; //< not implemented
 }
 
 Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate()

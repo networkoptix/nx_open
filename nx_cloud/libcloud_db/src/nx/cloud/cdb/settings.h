@@ -4,17 +4,19 @@
 #include <list>
 #include <map>
 
+#include <nx/network/connection_server/user_locker.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
-#include <nx/utils/settings.h>
+#include <nx/utils/deprecated_settings.h>
 #include <nx/utils/basic_service_settings.h>
+#include <nx/sql/types.h>
+#include <nx/utils/std/optional.h>
+
+#include <nx/data_sync_engine/p2p_sync_settings.h>
 
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/db/types.h>
 #include <utils/email/email.h>
-
-#include "ec2/p2p_sync_settings.h"
 
 namespace nx {
 namespace cdb {
@@ -26,7 +28,11 @@ public:
     QString rulesXmlPath;
     std::chrono::seconds nonceValidityPeriod;
     std::chrono::seconds intermediateResponseValidityPeriod;
-    std::chrono::minutes offlineUserHashValidityPeriod;
+    std::chrono::seconds offlineUserHashValidityPeriod;
+
+    std::chrono::milliseconds checkForExpiredAuthPeriod;
+    std::chrono::milliseconds continueUpdatingExpiredAuthPeriod;
+    int maxSystemsToUpdateAtATime;
 
     Auth();
 };
@@ -130,36 +136,41 @@ public:
     std::list<network::SocketAddress> endpointsToListen() const;
 
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
-    const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
+    const nx::sql::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
+    std::optional<network::server::UserLockerSettings> loginLockout() const;
     const Notification& notification() const;
     const AccountManager& accountManager() const;
     const SystemManager& systemManager() const;
     const EventManager& eventManager() const;
-    const ec2::Settings& p2pDb() const;
+    const data_sync_engine::Settings& p2pDb() const;
     const QString& changeUser() const;
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
     const VmsGateway& vmsGateway() const;
 
-    void setDbConnectionOptions(const nx::utils::db::ConnectionOptions& options);
+    void setDbConnectionOptions(const nx::sql::ConnectionOptions& options);
 
 private:
     nx::utils::log::Settings m_logging;
     nx::utils::log::Settings m_vmsSynchronizationLogging;
-    nx::utils::db::ConnectionOptions m_dbConnectionOptions;
+    nx::sql::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
+    std::optional<network::server::UserLockerSettings> m_loginLockout;
     Notification m_notification;
     AccountManager m_accountManager;
     SystemManager m_systemManager;
     EventManager m_eventManager;
-    ec2::Settings m_p2pDb;
+    data_sync_engine::Settings m_p2pDb;
     QString m_changeUser;
     ModuleFinder m_moduleFinder;
     Http m_http;
     VmsGateway m_vmsGateway;
 
     virtual void loadSettings() override;
+
+    void loadAuth();
+    void loadLoginLockout();
 };
 
 } // namespace conf

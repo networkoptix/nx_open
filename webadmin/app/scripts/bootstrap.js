@@ -4,9 +4,9 @@
     This module prepares to run a bootstrap application: detects language, requests language strings
 */
 
-var L = {};
+window.L = {};
 
-function setLanguage(lang){
+window.setLanguage = function(lang){
 
     function setCookie(cname, cvalue, exdays) {
         var d = new Date();
@@ -16,8 +16,8 @@ function setLanguage(lang){
     }
 
     setCookie("language", lang, 100); // Almost never expiring cookie
-}
-(function LanguageDetect(){
+};
+setTimeout(function LanguageDetect(){
 
     function getCookie(cname) {
         var name = cname + "=";
@@ -48,7 +48,8 @@ function setLanguage(lang){
             return supportedLanguage.indexOf(userLang) == 0;
         });
     }
-    if(!userLang){
+    if(!userLang || Config.supportedLanguages.indexOf(userLang)<0){
+        // We weren't able to detect language or detected language is not supported in this customization
         userLang = Config.defaultLanguage;
     }
 
@@ -112,4 +113,4 @@ function setLanguage(lang){
             });
         }
     });
-})();
+});

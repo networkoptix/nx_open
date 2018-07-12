@@ -140,7 +140,8 @@ void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
 }
 
 utils::ResultCounter<nx::hpm::api::ResultCode>
-    CrossNatConnector::s_mediatorResponseCounter(&nx::hpm::api::toString);
+    CrossNatConnector::s_mediatorResponseCounter(
+        static_cast<QString(*)(nx::hpm::api::ResultCode)>(&nx::hpm::api::toString));
 
 void CrossNatConnector::issueConnectRequestToMediator(
     std::chrono::milliseconds timeout,
@@ -274,7 +275,7 @@ void CrossNatConnector::onConnectorFinished(
 void CrossNatConnector::onTimeout()
 {
     NX_LOGX(lm("cross-nat %1 timed out. Result code %2")
-        .arg(QnLexical::serialized(m_connectResultReport.resultCode)),
+        .args(m_connectSessionId, QnLexical::serialized(m_connectResultReport.resultCode)),
         cl_logDEBUG1);
 
     m_done = true;

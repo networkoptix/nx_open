@@ -70,26 +70,26 @@ int QnBusinessTypesComparator::toLexActionType(ActionType actionType) const
 QList<EventType> QnBusinessTypesComparator::lexSortedEvents(EventSubType subtype) const
 {
     static const QList<EventType> userEvents{
-        cameraMotionEvent,
-        cameraInputEvent,
-        softwareTriggerEvent,
-        analyticsSdkEvent,
-        userDefinedEvent,
+        EventType::cameraMotionEvent,
+        EventType::cameraInputEvent,
+        EventType::softwareTriggerEvent,
+        EventType::analyticsSdkEvent,
+        EventType::userDefinedEvent,
     };
 
     static const QList<EventType> failureEvents{
-        cameraDisconnectEvent,
-        storageFailureEvent,
-        networkIssueEvent,
-        cameraIpConflictEvent,
-        serverFailureEvent,
-        serverConflictEvent,
-        licenseIssueEvent,
+        EventType::cameraDisconnectEvent,
+        EventType::storageFailureEvent,
+        EventType::networkIssueEvent,
+        EventType::cameraIpConflictEvent,
+        EventType::serverFailureEvent,
+        EventType::serverConflictEvent,
+        EventType::licenseIssueEvent,
     };
 
     static const QList<EventType> successEvents{
-        serverStartEvent,
-        backupFinishedEvent,
+        EventType::serverStartEvent,
+        EventType::backupFinishedEvent,
     };
 
     QList<EventType> events;
@@ -127,9 +127,28 @@ QList<ActionType> QnBusinessTypesComparator::getAllActions() const
         : allActions();
 }
 
-QList<ActionType> QnBusinessTypesComparator::lexSortedActions() const
+QList<ActionType> QnBusinessTypesComparator::lexSortedActions(ActionSubType subtype) const
 {
-    auto actions = getAllActions();
+    static QSet<ActionType> clientsideActions{
+        ActionType::showOnAlarmLayoutAction,
+        ActionType::fullscreenCameraAction,
+        ActionType::exitFullscreenAction
+    };
+
+    auto allowedActions = getAllActions().toSet();
+    switch (subtype)
+    {
+        case ActionSubType::server:
+            allowedActions.subtract(clientsideActions);
+            break;
+        case ActionSubType::client:
+            allowedActions.intersect(clientsideActions);
+            break;
+        default:
+            break;
+    }
+
+    QList<ActionType> actions = allowedActions.toList();
     std::sort(actions.begin(), actions.end(),
         [this](ActionType l, ActionType r)
         {

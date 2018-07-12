@@ -1,18 +1,21 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
-from notifications import api
+
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.conf import settings
-from django.contrib import messages
-
-from api.models import Account
-from notifications.models import *
 from django.utils import timezone
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import permission_required
+
+from api.helpers.exceptions import handle_exceptions, APIRequestException, api_success, ErrorCodes, APINotAuthorisedException
+from api.models import Account
+from notifications import api
+from notifications.models import *
+from notifications.tasks import send_to_all_users
+
 import re
 
 #Replaces </p> and <br> with \n and then remove all html tags
@@ -32,28 +35,6 @@ def format_message(notification):
     message['html_body'] = add_brs(notification.body)
     message['text_body'] = html_to_text(notification.body)
     return message
-
-
-#For testing we dont want to send emails to everyone so we need to set
-#"BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = true" in cloud.settings
-def send_to_all_users(sent_by, notification, force=False):
-    # if forced and not testing dont apply any filters to send to all users
-    users = Account.objects.all()
-
-    if not force:
-        users = users.filter(subscribe=True)
-
-    if settings.BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY:
-        users = users.filter(is_superuser=True)
-
-    message = format_message(notification)
-    
-    notification.sent_by = sent_by
-    notification.sent_date = timezone.now()
-    notification.save()
-    for user in users:
-        message['full_name'] = user.get_full_name()
-        api.send(user.email, 'cloud_notification', message, 'default')
 
 
 def update_or_create_notification(data):
@@ -133,15 +114,21 @@ def cloud_notification_action(request):
         notification_id = str(update_or_create_notification(request.data))
         message = format_message(CloudNotification.objects.get(id=notification_id))
         message['full_name'] = request.user.get_full_name()
-        api.send(request.user.email, 'cloud_notification', message, 'default')
+        api.send(request.user.email, 'cloud_notification', message, request.user.customization)
         messages.success(request._request, "Preview has been sent")
 
     elif can_send and 'Send' in request.data and notification_id:
         force = 'ignore_subscriptions' in request.data
         notification_id = str(update_or_create_notification(request.data))
         notification = CloudNotification.objects.get(id=notification_id)
-        send_to_all_users(request.user, notification, force)
-        messages.success(request._request, "Cloud notification has been sent")
+        message = format_message(notification)
+
+        notification.sent_by = request.user
+        notification.sent_date = timezone.now()
+        notification.save()
+        send_to_all_users.apply_async(args=[notification_id, message, force],
+                                      queue=settings.NOTIFICATIONS_CONFIG['cloud_notification']['queue'])
+        messages.success(request._request, "Sending cloud notifications")
 
     else:
         messages.error(request._request, "Insufficient permission or invalid action")

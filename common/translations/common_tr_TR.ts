@@ -53,11 +53,6 @@
       <translation>%1 sistemi %2 sistemi ile uyumsuzdur.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Sistem zaten %1 e bağlı olduğundan başka sisteme bağlanılamıyor.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>%1 güvenli modda çalışıyor.</translation>
@@ -68,21 +63,6 @@
       <translation>%1 sistemi yapılandırılamadı.</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Iki sistem birden %1 e bağlı. Birleştirme mümkün değil.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>%1 sisteminin URL i bu sistemlerden farklı. Birleştirme mümkün değil.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Bukut tabanlı sistemler ancak bulut olmatan bir sistem ile birleştirebilir. Sistem ismi ve şifre bulut sistemden alınacaktır.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Yeni sistem</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>Bulunan %1 Sistemi geçerli sistemi ile uyuşmuyor.</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Sistem zaten %1 e bağlı olduğundan başka sisteme bağlanılamıyor.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 Sistem yalnızca %1 olmayan biriyle birleştirilebilir. Sistem adı ve şifre %1 Sisteminden alınmıştır.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Iki sistem birden %1 e bağlı. Birleştirme mümkün değil.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 sisteminin URL i bu sistemlerden farklı. Birleştirme mümkün değil.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Sistem Olayı</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>Sistem (id %1) e çoktan bağlanmış</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>Sunucu internete bağlı değil.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Bulut kimlik bilgileri kaydedilemedi</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Sahiplik bilgileri kaydedilemedi</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Bulut Sunucuya bağlanılamadı: %1</translation>
     </message>
   </context>
   <context>
@@ -313,6 +333,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Öncelikle, kaydı başlatın(eğer kapalı ise) ve I/O modülünün Fps değerlerini düşürün (hata &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Lütfen firmware güncelleyiniz. Desteklenen minimum versiyon %1'dir. Şu anki versiyon %2</translation>
     </message>
   </context>
   <context>
@@ -557,8 +581,8 @@
       <translation>Bilinmeyen Hata</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Sunucu İle Eşleşen Donanım Id'si Bulunamadı</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Sunucu İle Eşleşen Donanım ID'si Bulunamadı</translation>
     </message>
   </context>
   <context>
@@ -595,7 +619,7 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n aygıt</numerusform>
-        <numerusform>%n aygıtlar</numerusform>
+        <numerusform>%n aygıt</numerusform>
       </translation>
     </message>
     <message>
@@ -634,14 +658,14 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n I/O Modül</numerusform>
-        <numerusform>%n I/O Modüller</numerusform>
+        <numerusform>%n I/O Modül</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n I/O modül</numerusform>
-        <numerusform>%n I/O modüller</numerusform>
+        <numerusform>%n I/O modül</numerusform>
       </translation>
     </message>
     <message>
@@ -680,12 +704,12 @@
       <translation>Watermark: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Donanım Kimliği: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Deneme Lisansı</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Donanım Kimliği: %1</translation>
     </message>
   </context>
   <context>
@@ -820,153 +844,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>Geçersiz Parametre</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>sn</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>sa</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>g</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>A</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>saniye</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>dk</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>saat</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>gün</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>hafta</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>ay</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>yıl</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>milisaniye</numerusform>
-        <numerusform>milisaniye</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>saniye</numerusform>
-        <numerusform>saniye</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>dakika</numerusform>
-        <numerusform>dakika</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>saat</numerusform>
-        <numerusform>saat</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>gün</numerusform>
-        <numerusform>gün</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>hafta</numerusform>
-        <numerusform>hafta</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>ay</numerusform>
-        <numerusform>ay</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>yıl</numerusform>
-        <numerusform>yıl</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1525,6 +1402,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%2 de %1</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Ekranı Aç</translation>
     </message>
   </context>
   <context>

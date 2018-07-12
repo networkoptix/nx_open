@@ -27,10 +27,15 @@ public:
     {
         if (m_resource && m_sourceSize != sourceSize)
         {
-            m_filters.reset();
-            // Image is already combined, so video layout must be ignored.
-            m_filters.prepareForImage(m_resource, sourceSize);
-            m_sourceSize = sourceSize;
+            // Additional check if the new state is less 'empty'.
+            // Sometimes we change sizes from (-1;-1) to (0;0).
+            if (!sourceSize.isEmpty())
+            {
+                m_filters.reset();
+                // Image is already combined, so video layout must be ignored.
+                m_filters.prepareForImage(m_resource, sourceSize);
+                m_sourceSize = sourceSize;
+            }
         }
 
         return m_filters;

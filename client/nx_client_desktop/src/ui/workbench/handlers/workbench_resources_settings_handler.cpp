@@ -14,10 +14,9 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 
-#include <nx/client/desktop/resource_properties/camera/legacy_camera_settings_dialog.h>
+#include <nx/client/desktop/resource_properties/camera/legacy/legacy_camera_settings_dialog.h>
 #include <nx/client/desktop/resource_properties/camera/camera_settings_dialog.h>
 
-#include <ui/dialogs/resource_properties/layout_settings_dialog.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
 #include <ui/dialogs/resource_properties/user_roles_dialog.h>
@@ -28,8 +27,10 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 
-#include <nx/utils/raii_guard.h>
+#include <nx/client/desktop/resource_properties/layout/layout_settings_dialog.h>
 #include <nx/client/desktop/utils/parameter_helper.h>
+
+#include <nx/utils/raii_guard.h>
 
 #include <common/common_module.h>
 #include <client/client_settings.h>
@@ -43,6 +44,8 @@ QnWorkbenchResourcesSettingsHandler::QnWorkbenchResourcesSettingsHandler(QObject
     QnWorkbenchContextAware(parent)
 {
     connect(action(action::CameraSettingsAction), &QAction::triggered, this,
+        &QnWorkbenchResourcesSettingsHandler::at_legacyCameraSettingsAction_triggered);
+    connect(action(action::CameraSettingsActionNew), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered);
     connect(action(action::ServerSettingsAction), &QAction::triggered, this,
         &QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered);
@@ -65,7 +68,7 @@ QnWorkbenchResourcesSettingsHandler::~QnWorkbenchResourcesSettingsHandler()
 {
 }
 
-void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
+void QnWorkbenchResourcesSettingsHandler::at_legacyCameraSettingsAction_triggered()
 {
     const auto parameters =  menu()->currentParameters(sender());
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
@@ -73,22 +76,6 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
         return;
 
     const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
-
-    if (ini().redesignedCameraSettingsDialog)
-    {
-        QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
-            m_cameraSettingsDialog, parent);
-        dialogConstructor.disableAutoFocus();
-
-        if (!m_cameraSettingsDialog->setCameras(cameras))
-            return;
-
-        if (parameters.hasArgument(Qn::FocusTabRole))
-        {
-            const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
-            m_cameraSettingsDialog->setCurrentPage(tab);
-        }
-    }
 
     QnNonModalDialogConstructor<LegacyCameraSettingsDialog> dialogConstructor(
         m_legacyCameraSettingsDialog,
@@ -103,7 +90,29 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
         const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
         m_legacyCameraSettingsDialog->setCurrentTab(static_cast<CameraSettingsTab>(tab));
     }
+}
 
+void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered()
+{
+    const auto parameters = menu()->currentParameters(sender());
+    auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
+    if (cameras.isEmpty())
+        return;
+
+    const auto parent = nx::utils::extractParentWidget(parameters, mainWindowWidget());
+
+    QnNonModalDialogConstructor<CameraSettingsDialog> dialogConstructor(
+        m_cameraSettingsDialog, parent);
+    dialogConstructor.disableAutoFocus();
+
+    if (!m_cameraSettingsDialog->setCameras(cameras))
+        return;
+
+    if (parameters.hasArgument(Qn::FocusTabRole))
+    {
+        const auto tab = parameters.argument(Qn::FocusTabRole).toInt();
+        m_cameraSettingsDialog->setCurrentPage(tab);
+    }
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
@@ -121,7 +130,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 
     QnMediaServerResourcePtr server = servers.first();
 
-    bool hasAccess = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    bool hasAccess = accessController()->hasGlobalPermission(GlobalPermission::admin);
     NX_ASSERT(hasAccess, Q_FUNC_INFO, "Invalid action condition"); /*< It must be checked on action level. */
     if (!hasAccess)
         return;
@@ -140,7 +149,7 @@ void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered()
 void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
 {
     QnUserResourcePtr user(new QnUserResource(QnUserType::Local));
-    user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
+    user->setRawPermissions(GlobalPermission::liveViewerPermissions);
 
     // Shows New User dialog as modal because we can't pick anothr user from resources tree anyway.
     const auto params = menu()->currentParameters(sender());
@@ -216,16 +225,14 @@ void QnWorkbenchResourcesSettingsHandler::at_updateLocalFilesAction_triggered()
 
     // We should update local media directories
     // Is there a better place for it?
-    auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>();
-    if (localFilesSearcher)
+    if (auto localFilesSearcher = commonModule()->instance<QnResourceDirectoryBrowser>())
     {
         QStringList dirs;
         dirs << qnSettings->mediaFolder();
         dirs << qnSettings->extraMediaFolders();
         localFilesSearcher->setPathCheckList(dirs);
+        emit localFilesSearcher->startLocalDiscovery();
     }
-
-    emit localFilesSearcher->startLocalDiscovery();
 }
 
 void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
@@ -237,15 +244,15 @@ void QnWorkbenchResourcesSettingsHandler::openLayoutSettingsDialog(
     if (!accessController()->hasPermissions(layout, Qn::EditLayoutSettingsPermission))
         return;
 
-    QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindowWidget()));
+    QScopedPointer<LayoutSettingsDialog> dialog(new LayoutSettingsDialog(mainWindowWidget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->readFromResource(layout);
+    dialog->setLayout(layout);
 
-    bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
-    if (!dialog->exec() || !dialog->submitToResource(layout))
+    const bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
+    if (!dialog->exec())
         return;
 
-    /* Move layout items to grid center to best fit the background */
+    // Move layout items to grid center to best fit the background.
     if (backgroundWasEmpty && !layout->backgroundImageFilename().isEmpty())
     {
         if (auto wlayout = QnWorkbenchLayout::instance(layout))

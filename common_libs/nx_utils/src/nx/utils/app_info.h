@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 namespace nx {
 namespace utils {
 
@@ -31,15 +33,15 @@ public:
         #endif
     }
 
-    static bool isBpi() { return armBox() == lit("bpi"); }
-    static bool isRaspberryPi() { return armBox() == lit("rpi"); }
-    static bool isNx1() { return armBox() == lit("nx1"); }
-    static bool isAndroid() { return applicationPlatform() == lit("android"); }
-    static bool isIos() { return applicationPlatform() == lit("ios"); }
+    static bool isBpi() { return armBox() == QStringLiteral("bpi"); }
+    static bool isRaspberryPi() { return armBox() == QStringLiteral("rpi"); }
+    static bool isNx1() { return armBox() == QStringLiteral("nx1"); }
+    static bool isAndroid() { return applicationPlatform() == QStringLiteral("android"); }
+    static bool isIos() { return applicationPlatform() == QStringLiteral("ios"); }
     static bool isMobile() { return isAndroid() || isIos(); }
-    static bool isLinux() { return applicationPlatform() == lit("linux"); }
-    static bool isWindows() { return applicationPlatform() == lit("windows"); }
-    static bool isMacOsX() { return applicationPlatform() == lit("macosx"); }
+    static bool isLinux() { return applicationPlatform() == QStringLiteral("linux"); }
+    static bool isWindows() { return applicationPlatform() == QStringLiteral("windows"); }
+    static bool isMacOsX() { return applicationPlatform() == QStringLiteral("macosx"); }
 
     static bool isWin64()
     {

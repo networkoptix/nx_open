@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Deshabilitar sólo si el cliente toma demasiado CPU</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Longitud máxima del búfer en vivo</translation>
     </message>
@@ -173,11 +168,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Forma</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Longitud de archivo fijo</translation>
     </message>
@@ -757,13 +747,28 @@
       <source>PTZ</source>
       <translation>PTZ</translation>
     </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Generar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Reiniciar</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>ID Lógico</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Entrada Id</translation>
+      <source>Input ID</source>
+      <translation>Entrada ID</translation>
     </message>
   </context>
   <context>
@@ -788,8 +793,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>Salida Id:</translation>
+      <source>Output ID:</source>
+      <translation>Salida ID:</translation>
     </message>
   </context>
   <context>
@@ -961,6 +966,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Categoría</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -1075,7 +1088,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Configuración de exportación</translation>
+      <translation>Exportar Configuración</translation>
     </message>
     <message>
       <location/>
@@ -1495,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Enlazado al Hardware Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Enlazado al Hardware ID:</translation>
     </message>
   </context>
   <context>
@@ -1594,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Hardware Id</translation>
+      <source>Hardware ID</source>
+      <translation>ID de hardware</translation>
     </message>
   </context>
   <context>
@@ -1722,7 +1735,12 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Ciclo de Gira</translation>
+      <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>Direcciones IP para cámaras y servidores, grupos para usuarios, etc.</translation>
     </message>
   </context>
   <context>
@@ -1785,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Cámara usable&quot; es un almacenamiento virtual para archivos de video, que podría cargarse en cualquier servidor de su Sistema y acceder a él cualquier usuario.</translation>
     </message>
   </context>
   <context>
@@ -1972,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation>Introduzca el nombre de usuario y contraseña...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>Forma</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>Nombre Del Archivo:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>Seleccione el archivo...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Examinar...</translation>
     </message>
   </context>
   <context>
@@ -2665,17 +2706,6 @@
       <source>Reset</source>
       <translation>Reiniciar</translation>
     </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>El archivo cargado se puede eliminar automáticamente, si no hay espacio libre en el almacenamiento del servidor. Primero se eliminará el metraje más antiguo entre todas las cámaras del servidor.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2947,7 +2977,7 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Tamaño de la fuente</translation>
+      <translation>Tamaño de la letra</translation>
     </message>
     <message>
       <location/>
@@ -3031,14 +3061,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Todavía no hay roles de usuario personalizados. Cliquee &quot;Nuevo rol&quot; para crear uno.</translation>
+      <source>New role</source>
+      <translation>Nuevo rol</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Nuevo rol</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Todavía no hay roles de usuario personalizados.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Haga clic en &quot;Botón de nueva función&quot; para crear uno.</translation>
     </message>
   </context>
   <context>
@@ -3063,18 +3097,13 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Forma</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Detección de movimiento</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Detectar movimiento en video cargado</translation>
     </message>
     <message>
       <location/>
@@ -3086,11 +3115,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Forma</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Cancelar</translation>
     </message>
@@ -3099,11 +3123,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Forma</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>Subir vídeo</translation>
     </message>

@@ -504,7 +504,8 @@ begin_label:
                     setNeedKeyData();
                 m_outOfPlaybackMask = false;
                 internalJumpTo(displayTime);
-                setSkipFramesToTime(displayTime, false);
+                if (displayTime != DATETIME_NOW)
+                    setSkipFramesToTime(displayTime, false);
 
                 emit jumpOccured(displayTime, m_delegate->getSequence());
                 m_BOF = true;
@@ -614,18 +615,8 @@ begin_label:
         return result;
     }
 
-    /*
-    if (reverseMode && m_topIFrameTime > 0 && m_topIFrameTime <= m_delegate->startTime() && !m_cycleMode)
-    {
-        // BOF reached in reverse mode
-        m_eof = true;
-        return createEmptyPacket(reverseMode);
-    }
-    */
-
     if (m_delegate->startTime() == qint64(AV_NOPTS_VALUE))
-        return createEmptyPacket(reverseMode); // no data at archive
-
+        return createEmptyPacket(reverseMode); //< No data at archive
     QnCompressedVideoDataPtr videoData;
 
     if (m_skipFramesToTime != 0)
@@ -1215,6 +1206,9 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         return m_navDelegate->jumpTo(mksec, skipTime);
     }
 
+    if (m_resource)
+        NX_VERBOSE(this, lm("Set position %1 for device %2").args(mksecToDateTime(mksec), m_resource->getUniqueId()));
+
     qint64 newTime = mksec;
     m_playbackMaskSync.lock();
     newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(mksec, m_speed >= 0);
@@ -1470,4 +1464,11 @@ bool QnArchiveStreamReader::needKeyData(int channel) const
     if (m_quality == MEDIA_Quality_LowIframesOnly)
         return true;
     return base_type::needKeyData(channel);
+}
+
+CameraDiagnostics::Result QnArchiveStreamReader::lastError() const
+{
+    if (!m_delegate)
+        return CameraDiagnostics::NoErrorResult();
+    return m_delegate->lastError();
 }

@@ -1,4 +1,4 @@
-#if !defined(EDGE_SERVER)
+#if !defined(EDGE_SERVER) && !defined(__arch64__)
 #include "speech_synthesis_data_provider.h"
 
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -108,10 +108,8 @@ QByteArray QnSpeechSynthesisDataProvider::doSynthesis(const QString &text, bool*
 
     *outStatus = true;
 
-#ifndef DISABLE_FESTIVAL
     auto ttvInstance = TextToWaveServer::instance();
     ttvInstance->generateSoundSync(text, &soundBuf, &waveFormat);
-#endif
 
     m_ctx = initializeAudioContext(waveFormat);
     if (!m_ctx)

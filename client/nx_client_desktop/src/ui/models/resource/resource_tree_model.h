@@ -21,12 +21,15 @@ class QnResourceTreeModelCustomColumnDelegate;
 class QnResourceTreeModelNodeManager;
 class QnResourceTreeModelLayoutNodeManager;
 namespace nx { namespace client { namespace desktop { struct WearableState; } } }
+namespace nx { namespace client { namespace desktop { enum class ResourceTreeNodeType; } } }
 
 class QnResourceTreeModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
     typedef Connective<QAbstractItemModel> base_type;
+    using NodeType = nx::client::desktop::ResourceTreeNodeType;
+
 public:
     /** Narrowed scope for the minor widgets and dialogs. */
     enum Scope
@@ -63,7 +66,7 @@ public:
 
     Scope scope() const;
 
-    QnResourceTreeModelNodePtr rootNode(Qn::NodeType nodeType) const;
+    QnResourceTreeModelNodePtr rootNode(NodeType nodeType) const;
 
     // TODO: #vkutin Shouldn't be public
     QnResourceTreeModelNodeManager* nodeManager() const;
@@ -76,20 +79,25 @@ private:
     QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
 
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
-    QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType);
-    QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
+    QnResourceTreeModelNodePtr ensureItemNode(
+        const QnResourceTreeModelNodePtr& parentNode,
+        const QnUuid& uuid,
+        NodeType nodeType);
+    QnResourceTreeModelNodePtr ensureRecorderNode(
+        const QnResourceTreeModelNodePtr& parentNode,
         const QnVirtualCameraResourcePtr& camera);
 
     QnResourceTreeModelNodePtr expectedParent(const QnResourceTreeModelNodePtr& node);
-    QnResourceTreeModelNodePtr expectedParentForResourceNode(const QnResourceTreeModelNodePtr& node);
+    QnResourceTreeModelNodePtr expectedParentForResourceNode(
+        const QnResourceTreeModelNodePtr& node);
 
     void updateNodeParent(const QnResourceTreeModelNodePtr& node);
     void updateNodeResource(const QnResourceTreeModelNodePtr& node, const QnResourcePtr& resource);
 
-    Qn::NodeType rootNodeTypeForScope() const;
+    NodeType rootNodeTypeForScope() const;
 
     /** Cleanup all node references. */
-    void removeNode(const QnResourceTreeModelNodePtr& node);
+    void removeNode(QnResourceTreeModelNodePtr node);
 
     /** Fully rebuild resources tree. */
     void rebuildTree();
@@ -131,8 +139,8 @@ private slots:
 private:
     friend class QnResourceTreeModelNode;
 
-    /** Root nodes array */
-    std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
+    /** Root nodes. */
+    QMap<NodeType, QnResourceTreeModelNodePtr> m_rootNodes;
 
     /** Mapping for resource nodes by resource. */
     // TODO: #vkutin #GDM Remove duplication with QnResourceTreeModelNodeManager
@@ -164,3 +172,5 @@ private:
     QnResourceTreeModelNodeManager* const m_nodeManager;
     QnResourceTreeModelLayoutNodeManager* const m_layoutNodeManager;
 };
+
+Q_DECLARE_METATYPE(QnResourceTreeModel::Scope)

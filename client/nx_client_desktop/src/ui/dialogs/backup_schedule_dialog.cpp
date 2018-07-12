@@ -6,23 +6,24 @@
 
 #include <QtWidgets/QComboBox>
 
+#include <translation/datetime_formatter.h>
+
 #include <core/resource/server_backup_schedule.h>
 
-#include <nx_ec/data/api_media_server_data.h>
+#include <nx/vms/api/types/days_of_week.h>
 
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
 #include <ui/style/custom_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+using namespace nx::vms;
+
 namespace {
     const int secsPerDay = 3600 * 24;
     const int daysPerWeek = 7;
     const int bitsPerMegabit = 1024*1024;
     const int bitsPerByte = 8;
-
-    /** Default format used all over the app. */
-    const QString defaultTimeFormat = lit("hh:mm");
 
     Qt::DayOfWeek nextDay(Qt::DayOfWeek day) {
         static_assert(Qt::Sunday == 7, "Make sure Sunday is the last day");
@@ -57,10 +58,11 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent):
     initDayOfWeekCheckboxes();
 
     ui->comboBoxTimeTo->addItem(tr("Until finished"), -1);
-    for (int i = 0; i < 24; ++i) {
-        QTime t(i, 0, 0);
-        ui->comboBoxTimeStart->addItem(t.toString(defaultTimeFormat), i * 3600);
-        ui->comboBoxTimeTo->addItem(t.toString(defaultTimeFormat), i * 3600);
+    for (int i = 0; i < 24; ++i)
+    {
+        QString hour = datetime::toString(QTime(i, 0, 0), datetime::Format::hh);
+        ui->comboBoxTimeStart->addItem(hour, i * 3600);
+        ui->comboBoxTimeTo->addItem(hour, i * 3600);
     }
 
     auto updateLimitControls = [this]
@@ -147,11 +149,12 @@ void QnBackupScheduleDialog::setNearestValue(QComboBox* combobox, int time)
 
 void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& value)
 {
-    ec2::backup::DaysOfWeek allowedDays = static_cast<ec2::backup::DaysOfWeek>(value.backupDaysOfTheWeek);
-    for (int i = 0; i < m_dowCheckboxes.size(); ++i) {
+    const auto allowedDays = value.backupDaysOfTheWeek;
+    for (int i = 0; i < m_dowCheckboxes.size(); ++i)
+    {
         Qt::DayOfWeek day = indexToDay(i);
         QCheckBox* checkbox = m_dowCheckboxes[i];
-        checkbox->setChecked(allowedDays.testFlag(ec2::backup::fromQtDOW(day)));
+        checkbox->setChecked(allowedDays.testFlag(api::dayOfWeek(day)));
     }
 
     setNearestValue(ui->comboBoxTimeStart, value.backupStartSec);
@@ -168,14 +171,15 @@ void QnBackupScheduleDialog::updateFromSettings(const QnServerBackupSchedule& va
 void QnBackupScheduleDialog::submitToSettings(QnServerBackupSchedule& value)
 {
     QList<Qt::DayOfWeek> days;
-    for (size_t i = 0; i < m_dowCheckboxes.size(); ++i) {
+    for (size_t i = 0; i < m_dowCheckboxes.size(); ++i)
+    {
         Qt::DayOfWeek day = indexToDay(i);
         QCheckBox* checkbox = m_dowCheckboxes[i];
         if (checkbox->isChecked())
             days << day;
     }
 
-    value.backupDaysOfTheWeek = ec2::backup::fromQtDOW(days);
+    value.backupDaysOfTheWeek = api::daysOfWeek(days);
 
     value.backupStartSec = ui->comboBoxTimeStart->itemData(ui->comboBoxTimeStart->currentIndex()).toInt();
     int backupEnd = ui->comboBoxTimeTo->itemData(ui->comboBoxTimeTo->currentIndex()).toInt();

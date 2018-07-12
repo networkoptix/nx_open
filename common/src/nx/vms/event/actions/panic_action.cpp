@@ -7,7 +7,7 @@ namespace vms {
 namespace event {
 
 PanicAction::PanicAction(const EventParameters& runtimeParams):
-    base_type(panicRecordingAction, runtimeParams)
+    base_type(ActionType::panicRecordingAction, runtimeParams)
 {
 }
 

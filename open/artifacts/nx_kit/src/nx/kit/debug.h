@@ -97,15 +97,15 @@ NX_KIT_API std::string fileBaseNameWithoutExt(const char* file);
 NX_KIT_API std::ostream*& stream();
 
 #if !defined(NX_PRINT)
-/**
-* Print the args to NX_DEBUG_STREAM, starting with NX_PRINT_PREFIX and ending with
-* NX_DEBUG_ENDL. Redefine if needed.
-*/
-#define NX_PRINT /* << args... */ \
-    /* Allocate a temp value, which prints endl in its destructor, in the "<<" expression. */ \
-    ( []() { struct Endl { ~Endl() { NX_DEBUG_STREAM NX_DEBUG_ENDL; } }; \
-        return std::make_shared<Endl>(); }() ) /*operator,*/, \
-    NX_DEBUG_STREAM << NX_PRINT_PREFIX
+    /**
+     * Print the args to NX_DEBUG_STREAM, starting with NX_PRINT_PREFIX and ending with
+     * NX_DEBUG_ENDL. Redefine if needed.
+     */
+    #define NX_PRINT /* << args... */ \
+        /* Allocate a temp value, which prints endl in its destructor, in the "<<" expression. */ \
+        ( []() { struct Endl { ~Endl() { NX_DEBUG_STREAM NX_DEBUG_ENDL; } }; \
+            return std::make_shared<Endl>(); }() ) /*operator,*/, \
+        NX_DEBUG_STREAM << NX_PRINT_PREFIX
 #endif
 
 /**

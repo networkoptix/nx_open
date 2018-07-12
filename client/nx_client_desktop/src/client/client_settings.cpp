@@ -30,6 +30,7 @@
 #include <nx/utils/url.h>
 
 #include <client_core/client_core_settings.h>
+#include <nx/network/http/http_types.h>
 
 namespace {
 
@@ -60,7 +61,7 @@ QnConnectionData readConnectionData(QSettings *settings)
 
     const bool useHttps = settings->value(lit("secureAppserverConnection"), true).toBool();
     connection.url = settings->value(kUrlTag).toString();
-    connection.url.setScheme(useHttps ? lit("https") : lit("http"));
+    connection.url.setScheme(nx::network::http::urlSheme(useHttps));
     connection.name = settings->value(kNameTag).toString();
     connection.localId = settings->value(kLocalId).toUuid();
     const auto password = settings->value(kPasswordTag).toString();
@@ -157,17 +158,22 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
         }
         case CUSTOM_CONNECTIONS:
         {
-            QnConnectionDataList result;
-            const int size = settings->beginReadArray(QLatin1String("AppServerConnections"));
-            for (int index = 0; index < size; ++index)
-            {
-                settings->setArrayIndex(index);
-                QnConnectionData connection = readConnectionData(settings);
-                if (connection.isValid())
-                    result.append(connection);
-            }
-            settings->endArray();
+            QMap<int, QnConnectionData> savedConnections;
 
+            settings->beginGroup(QLatin1String("AppServerConnections"));
+            for (const auto& group: settings->childGroups())
+            {
+                settings->beginGroup(group);
+                QnConnectionData connection = readConnectionData(settings);
+                settings->endGroup();
+
+                int index = group.toInt();
+                if (index > 0 && connection.isValid())
+                    savedConnections.insert(index, connection);
+            }
+            settings->endGroup();
+
+            const QnConnectionDataList result = savedConnections.values();
             return QVariant::fromValue<QnConnectionDataList>(result);
         }
         case AUDIO_VOLUME:

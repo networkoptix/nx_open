@@ -18,7 +18,10 @@ public:
     QnAviResource(const QString& file);
     ~QnAviResource();
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
+    static QnAbstractStreamDataProvider* createDataProvider(
+        const QnResourcePtr& resource,
+        Qn::ConnectionRole role);
+
     virtual QString toString() const;
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
@@ -35,7 +38,7 @@ public:
 
     /* Return item time zone offset in ms */
     qint64 timeZoneOffset() const;
-    QnAviArchiveDelegate* createArchiveDelegate() const;
+    virtual QnAviArchiveDelegate* createArchiveDelegate() const;
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     /**
@@ -51,7 +54,7 @@ public:
     virtual QnMediaDewarpingParams getDewarpingParams() const override;
     virtual void setDewarpingParams(const QnMediaDewarpingParams& params) override;
 
-    virtual qreal customAspectRatio() const override;
+    virtual QnAspectRatio customAspectRatio() const override;
 
 private:
     QnStorageResourcePtr m_storage;
@@ -59,6 +62,7 @@ private:
     qint64 m_timeZoneOffset;
     QnAspectRatio m_imageAspectRatio;
     boost::optional<QnAviArchiveMetadata> m_aviMetadata;
+    mutable boost::optional<bool> m_hasVideo;
 };
 
 #endif // QN_AVI_RESOURCE_H

@@ -1,10 +1,13 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QDir>
 
+#include <common/common_module.h>
 #include <nx/utils/singleton.h>
 #include <utils/common/instance_storage.h>
-#include <common/common_module.h>
+
+#include "settings.h"
 
 class QnCommonModule;
 class StreamingChunkCache;
@@ -16,18 +19,35 @@ class PluginManager;
 class CommonPluginContainer;
 class QThread;
 class AbstractArchiveIntegrityWatcher;
+class QnDataProviderFactory;
+class QnResourceCommandProcessor;
+class QnResourcePool;
+class QnResourcePropertyDictionary;
+class QnCameraHistoryPool;
 
 namespace nx {
 
-namespace analytics { namespace storage { class AbstractEventsStorage; } }
+namespace analytics {
+namespace storage {
+class AbstractEventsStorage;
+}
+} // namespace analytics
+
+namespace time_sync {
+class TimeSyncManager;
+} // namespace time_sync
 
 namespace mediaserver {
 
 class UnusedWallpapersWatcher;
 class LicenseWatcher;
 class RootTool;
+class Settings;
+class ServerTimeSyncManager;
 
-namespace updates2 { class ServerUpdates2Manager; }
+namespace updates2 {
+class ServerUpdates2Manager;
+}
 
 namespace metadata {
 
@@ -45,18 +65,17 @@ class SharedContextPool;
 } // namespace mediaserver
 } // namespace nx
 
-class QnMediaServerModule:
-    public QObject,
-    public QnInstanceStorage,
-    public Singleton<QnMediaServerModule>
+class QnMediaServerModule : public QObject,
+                            public QnInstanceStorage,
+                            public Singleton<QnMediaServerModule>
 {
     Q_OBJECT;
-public:
-    QnMediaServerModule(
-        const QString& enforcedMediatorEndpoint = QString(),
+
+  public:
+    QnMediaServerModule(const QString& enforcedMediatorEndpoint = QString(),
         const QString& roSettingsPath = QString(),
         const QString& rwSettingsPath = QString(),
-        QObject *parent = nullptr);
+        QObject* parent = nullptr);
     virtual ~QnMediaServerModule();
 
     using Singleton<QnMediaServerModule>::instance;
@@ -72,7 +91,10 @@ public:
     std::chrono::milliseconds lastRunningTimeBeforeRestart() const;
     void setLastRunningTime(std::chrono::milliseconds value) const;
 
-    MSSettings* settings() const;
+    const nx::mediaserver::Settings& settings() const { return m_settings->settings(); }
+    nx::mediaserver::Settings* mutableSettings() { return m_settings->mutableSettings(); }
+
+    void syncRoSettings() const;
     nx::mediaserver::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
     nx::mediaserver::LicenseWatcher* licenseWatcher() const;
     PluginManager* pluginManager() const;
@@ -82,11 +104,22 @@ public:
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
     nx::mediaserver::updates2::ServerUpdates2Manager* updates2Manager() const;
+    QnDataProviderFactory* dataProviderFactory() const;
+    QnResourceCommandProcessor* resourceCommandProcessor() const;
 
-    void initializeRootTool();
+    QnResourcePool* resourcePool() const;
+    QnResourcePropertyDictionary* propertyDictionary() const;
+    QnCameraHistoryPool* cameraHistoryPool() const;
+
     nx::mediaserver::RootTool* rootTool() const;
 
-private:
+    QnStorageManager* normalStorageManager() const;
+    QnStorageManager* backupStorageManager() const;
+
+  private:
+    void registerResourceDataProviders();
+    QDir downloadsDirectory() const;
+
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;
     StreamingChunkCache* m_streamingChunkCache;
@@ -104,14 +137,14 @@ private:
     nx::mediaserver::LicenseWatcher* m_licenseWatcher = nullptr;
     nx::mediaserver::metadata::ManagerPool* m_metadataManagerPool = nullptr;
     nx::mediaserver::metadata::EventRuleWatcher* m_metadataRuleWatcher = nullptr;
-    QThread* m_metadataManagerPoolThread = nullptr;
     nx::mediaserver::resource::SharedContextPool* m_sharedContextPool = nullptr;
     AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
-    std::unique_ptr<nx::analytics::storage::AbstractEventsStorage>
-        m_analyticsEventsStorage;
+    std::unique_ptr<nx::analytics::storage::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
     nx::mediaserver::updates2::ServerUpdates2Manager* m_updates2Manager;
+    QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
+    QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

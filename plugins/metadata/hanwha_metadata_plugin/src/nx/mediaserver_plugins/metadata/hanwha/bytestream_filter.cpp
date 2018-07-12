@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "string_helper.h"
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -83,10 +84,13 @@ boost::optional<Event> BytestreamFilter::createEvent(
     event.typeId = nxpt::NxGuidHelper::fromRawData(eventTypeId.toRfc4122());
     event.channel = eventChannel(eventSource);
     event.region = eventRegion(eventSource);
-    if (eventDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
-        event.isActive = isEventActive(eventState);  //< Event start/stop.
-    else
-        event.isActive = true; //< Event occurred.
+    event.isActive = isEventActive(eventState);  //< Event start/stop.
+    if (!event.isActive
+        && !eventDescriptor.flags.testFlag(Analytics::EventTypeFlag::stateDependent))
+    {
+        return {};
+    }
+
     event.itemType = eventItemType(eventSource, eventState);
     event.fullEventName = eventSource;
 
@@ -115,7 +119,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
     if (split.size() < 2)
         return boost::none;
 
-    if (split[0] != kChannelField)
+    if (split[0].toLower() != kChannelField)
         return boost::none;
 
     bool success = false;
@@ -137,7 +141,7 @@ boost::optional<Event> BytestreamFilter::createEvent(
 
     for (auto i = 0; i < splitSize; ++i)
     {
-        if (split[i] == kRegionField && i < splitSize - 1)
+        if (split[i].toLower() == kRegionField && i < splitSize - 1)
         {
             bool success = false;
             int region = split[i + 1].toInt(&success);
@@ -154,8 +158,9 @@ boost::optional<Event> BytestreamFilter::createEvent(
 
 /*static*/ bool BytestreamFilter::isEventActive(const QString& eventSourceState)
 {
-    qDebug() << "eventSourceState" << eventSourceState << (eventSourceState.toLower() == kActive);
-    return eventSourceState == kActive;
+    bool isActive = (eventSourceState == kActive);
+    NX_VERBOSE(typeid(BytestreamFilter), lm("eventSourceState = '%1' -> %2").args(eventSourceState, isActive));
+    return isActive;
 }
 
 /*static*/ Hanwha::EventItemType BytestreamFilter::eventItemType(

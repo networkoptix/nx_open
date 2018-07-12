@@ -31,7 +31,6 @@ public:
     virtual bool saveParams() override;
     virtual int saveParamsAsync() override;
     virtual int saveAsync() override;
-    virtual bool removeProperty(const QString& key) override;
 
 private:
     mutable QnMutex m_propertyMutex;

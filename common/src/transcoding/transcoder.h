@@ -26,16 +26,15 @@ class CLVideoDecoderOutput;
 */
 namespace QnCodecParams
 {
-    typedef QMap<QString, QVariant> Value;
+    typedef QMap<QByteArray, QVariant> Value;
 
-    static const QLatin1String quality( "quality" );
+    static const QByteArray quality( "quality" );
 
-    static const QLatin1String qmin( "qmin" );
-    static const QLatin1String qmax( "qmax" );
-    static const QLatin1String qscale( "qscale" );
-    static const QLatin1String global_quality( "global_quality" );
+    static const QByteArray qmin( "qmin" );
+    static const QByteArray qmax( "qmax" );
+    static const QByteArray qscale( "qscale" );
+    static const QByteArray global_quality( "global_quality" );
 }
-
 
 //!Base class for all raw media stream transcoders
 /*!
@@ -88,7 +87,6 @@ protected:
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
-
 //!Base class for all video transcoders
 class QnVideoTranscoder: public QnCodecTranscoder
 {
@@ -124,13 +122,12 @@ protected:
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 
-
 //!Base class for all audio transcoders
 class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
     QnAudioTranscoder(AVCodecID codecId): QnCodecTranscoder(codecId) {}
-    virtual bool open(const QnConstCompressedAudioDataPtr& video) { Q_UNUSED(video) return true; }
+    virtual bool open(const QnConstCompressedAudioDataPtr& /*video*/) { return true; }
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
@@ -161,7 +158,6 @@ public:
     */
     virtual int setContainer(const QString& value) = 0;
 
-
     /*
     * Set ffmpeg video codec and params
     * @return Returns OperationResult::Success if no error or error code otherwise
@@ -178,7 +174,6 @@ public:
         const QSize& resolution = QSize(1024,768),
         int bitrate = -1,
         QnCodecParams::Value params = QnCodecParams::Value());
-
 
     /*
     * Set ffmpeg audio codec and params
@@ -208,9 +203,9 @@ public:
     */
     virtual bool addTag( const QString& name, const QString& value );
 
-    /*
-    * Return description of the last error code
-    */
+    /**
+     * Return description of the last error code
+     */
     QString getLastErrorMessage() const;
 
     // for internal use only. move to protectd!
@@ -218,18 +213,21 @@ public:
     void setPacketizedMode(bool value);
     const QVector<int>& getPacketsSize();
 
-    //!Selects media stream parameters based on \a resolution and \a quality
-    /*!
-        Can add parameters to \a params
-        \parm codec
-        \return bitrate in kbps
-        \note Does not modify existing parameters in \a params
-    */
-    static int suggestMediaStreamParams(
+    /**
+     * Selects media stream parameters based on codec, resolution and quality
+     */
+    static QnCodecParams::Value suggestMediaStreamParams(
         AVCodecID codec,
         QSize resolution,
-        Qn::StreamQuality quality,
-        QnCodecParams::Value* const params = NULL );
+        Qn::StreamQuality quality);
+
+    /**
+     * Suggest media bitrate based on codec, resolution and quality
+     */
+    static int suggestBitrate(
+        AVCodecID codec,
+        QSize resolution,
+        Qn::StreamQuality quality);
 
     void setTranscodingSettings(const QnLegacyTranscodingSettings& settings);
 

@@ -6,11 +6,14 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">Cambiar Nombre del Sistema</button>
         </p>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Fusionar con otro sistema</button>
+        </p>
+        <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()">Desconectar de
-            <span class="product-name">{{PRODUCT_NAME}}</span></button>
+            <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>Dueño</h2>
@@ -26,5 +29,21 @@
             <button class="btn btn-default" ng-click="rename()">Cambiar Nombre del Sistema</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Desconecte de mi cuenta</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong> se fusiona con este sistema</div>
+        <hr></hr>
+        <div class="merge-info-text">Dependiendo del tamaño de la base de datos, puede tomar varias horas</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>Este sistema se está fusionando a <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>Dependiendo del tamaño de la base de datos, puede tomar varias horas.</p>
+            <p>Hasta que finalice la fusión, puede iniciar sesión en este sistema y ver el video, pero no puede cambiar ninguna configuración.</p>
+            <p>Cuando termine la fusión, todos los usuarios y cámaras de este sistema estarán disponibles en <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. El Sistema, y ​​este sistema será eliminado.</p>
+        </div>
     </div>
 </div>

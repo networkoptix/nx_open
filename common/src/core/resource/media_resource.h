@@ -3,24 +3,20 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QSize>
+
 #include "resource.h"
 #include "resource_media_layout.h"
-#include "utils/common/from_this_to_shared.h"
 
+#include <core/ptz/ptz_constants.h>
 #include <core/ptz/media_dewarping_params.h>
+
+#include <utils/common/aspect_ratio.h>
+#include <nx/core/ptz/type.h>
 
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 class QnCameraUserAttributePool;
-
-namespace Qn {
-
-    // TODO: #Elric move out!
-
-    QString toDisplayString(Qn::StreamQuality value);
-    QString toShortDisplayString(Qn::StreamQuality value);
-}
 
 /*!
     \note Derived class MUST call \a initMediaResource() just after object instantiation
@@ -32,7 +28,7 @@ public:
     virtual ~QnMediaResource();
 
     // size - is size of one channel; we assume all channels have the same size
-    virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const { return Qn::QualityNormal; }
+    virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const;
 
     // returns one image best for such time
     // in case of live video time should be ignored
@@ -51,10 +47,33 @@ public:
     virtual QnMediaDewarpingParams getDewarpingParams() const;
     virtual void setDewarpingParams(const QnMediaDewarpingParams& params);
 
-    // TODO: #dklychkov change to QnAspectRatio in 2.4
-    virtual qreal customAspectRatio() const;
-    void setCustomAspectRatio(qreal value);
+    virtual QnAspectRatio customAspectRatio() const;
+    void setCustomAspectRatio(const QnAspectRatio& value);
     void clearCustomAspectRatio();
+
+    /**
+        Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
+    */
+    Ptz::Capabilities getPtzCapabilities(
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational) const;
+
+    /** Check if camera has any of provided capabilities. */
+    bool hasAnyOfPtzCapabilities(
+        Ptz::Capabilities capabilities,
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational) const;
+    void setPtzCapabilities(
+        Ptz::Capabilities capabilities,
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational);
+    void setPtzCapability(
+        Ptz::Capabilities capability,
+        bool value,
+        nx::core::ptz::Type ptzType = nx::core::ptz::Type::operational);
+
+    Ptz::Capabilities operationalPtzCapabilities() const;
+    void setOperationalPtzCapabilities(Ptz::Capabilities capabilites);
+
+
+    bool canDisableNativePtzPresets() const;
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();

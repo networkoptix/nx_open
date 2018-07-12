@@ -39,7 +39,7 @@ public:
     virtual ~LayoutTourReviewController() override;
 
 private:
-    void handleTourChanged(const ec2::ApiLayoutTourData& tour);
+    void handleTourChanged(const nx::vms::api::LayoutTourData& tour);
     void handleTourRemoved(const QnUuid& tourId);
 
     /** Handle current layout changes to update the tour review. */
@@ -47,7 +47,7 @@ private:
     /** Stop handling current layout changes. */
     void stopListeningLayout();
 
-    void reviewLayoutTour(const ec2::ApiLayoutTourData& tour);
+    void reviewLayoutTour(const nx::vms::api::LayoutTourData& tour);
 
     QnUuid currentTourId() const;
     bool isLayoutTourReviewMode() const;
@@ -60,11 +60,11 @@ private:
     void updateItemsLayout();
 
     void resetReviewLayout(const QnLayoutResourcePtr& layout,
-        const ec2::ApiLayoutTourItemDataList& items);
+        const nx::vms::api::LayoutTourItemDataList& items);
 
     void addItemToReviewLayout(
         const QnLayoutResourcePtr& layout,
-        const ec2::ApiLayoutTourItemData& item,
+        const nx::vms::api::LayoutTourItemData& item,
         const QPointF& position,
         bool pinItem);
     void addResourcesToReviewLayout(
@@ -73,7 +73,7 @@ private:
         const QPointF& position);
 
     /** Calculate items from the review layout. */
-    bool fillTourItems(ec2::ApiLayoutTourItemDataList* items);
+    bool fillTourItems(nx::vms::api::LayoutTourItemDataList* items);
 
     void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
 

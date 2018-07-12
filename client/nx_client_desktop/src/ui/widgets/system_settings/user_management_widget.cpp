@@ -22,7 +22,7 @@
 
 #include <ui/common/palette.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/item_view_hover_tracker.h>
+#include <nx/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <ui/delegates/switch_item_delegate.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
@@ -35,7 +35,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/views/checkboxed_header_view.h>
+#include <nx/client/desktop/common/widgets/checkable_header_view.h>
 #include <ui/widgets/views/resource_list_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -45,6 +45,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -78,7 +79,7 @@ class QnUserListDelegate: public QStyledItemDelegate
     static constexpr int kLinkPadding = 0;
 
 public:
-    explicit QnUserListDelegate(QnItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
+    explicit QnUserListDelegate(ItemViewHoverTracker* hoverTracker, QObject* parent = nullptr) :
         base_type(parent),
         m_hoverTracker(hoverTracker),
         m_linkText(tr("Edit")),
@@ -177,7 +178,7 @@ public:
     }
 
 private:
-    QPointer<QnItemViewHoverTracker> m_hoverTracker;
+    QPointer<ItemViewHoverTracker> m_hoverTracker;
     const QString m_linkText;
     const QIcon m_editIcon;
 };
@@ -190,7 +191,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     ui(new Ui::QnUserManagementWidget),
     m_usersModel(new QnUserListModel(parent)),
     m_sortModel(new QnSortedUserListModel(parent)),
-    m_header(new QnCheckBoxedHeaderView(QnUserListModel::CheckBoxColumn, parent))
+    m_header(new CheckableHeaderView(QnUserListModel::CheckBoxColumn, parent))
 {
     ui->setupUi(this);
 
@@ -198,7 +199,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 
     m_sortModel->setSourceModel(m_usersModel);
 
-    auto hoverTracker = new QnItemViewHoverTracker(ui->usersTable);
+    auto hoverTracker = new ItemViewHoverTracker(ui->usersTable);
 
     auto switchItemDelegate = new QnSwitchItemDelegate(this);
     switchItemDelegate->setHideDisabledItems(true);
@@ -214,7 +215,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     m_header->setSectionResizeMode(QHeaderView::ResizeToContents);
     m_header->setSectionResizeMode(QnUserListModel::FullNameColumn, QHeaderView::Stretch);
     m_header->setSectionsClickable(true);
-    connect(m_header, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnUserManagementWidget::at_headerCheckStateChanged);
+    connect(m_header, &CheckableHeaderView::checkStateChanged, this, &QnUserManagementWidget::at_headerCheckStateChanged);
 
     ui->usersTable->sortByColumn(QnUserListModel::LoginColumn, Qt::AscendingOrder);
 
@@ -248,7 +249,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     connect(m_sortModel, &QAbstractItemModel::dataChanged,  this,   &QnUserManagementWidget::modelUpdated);
 
     /* By [Space] toggle checkbox: */
-    connect(ui->usersTable, &QnTreeView::spacePressed, this, [this](const QModelIndex& index)
+    connect(ui->usersTable, &TreeView::spacePressed, this, [this](const QModelIndex& index)
     {
         at_usersTable_clicked(index.sibling(index.row(), QnUserListModel::CheckBoxColumn));
     });
@@ -281,8 +282,11 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     setHelpTopic(ui->ldapSettingsButton,                                Qn::UserSettings_LdapIntegration_Help);
     setHelpTopic(ui->fetchButton,                                       Qn::UserSettings_LdapFetch_Help);
 
+    ui->ldapTooltip->setHint(tr("Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it."));
+    setHelpTopic(ui->ldapTooltip, Qn::UserSettings_LdapAdd_Help);
+
     /* Cursor changes with hover: */
-    connect(hoverTracker, &QnItemViewHoverTracker::itemEnter, this,
+    connect(hoverTracker, &ItemViewHoverTracker::itemEnter, this,
         [this](const QModelIndex& index)
         {
             if (!QnUserListModel::isInteractiveColumn(index.column()))
@@ -291,7 +295,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
                 ui->usersTable->unsetCursor();
         });
 
-    connect(hoverTracker, &QnItemViewHoverTracker::itemLeave, this,
+    connect(hoverTracker, &ItemViewHoverTracker::itemLeave, this,
         [this]()
         {
             ui->usersTable->unsetCursor();
@@ -313,11 +317,9 @@ void QnUserManagementWidget::loadDataToUi()
 
 void QnUserManagementWidget::updateLdapState()
 {
-    bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
-    ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
     ui->ldapSettingsButton->setEnabled(!commonModule()->isReadOnly());
-    ui->fetchButton->setVisible(!currentUserIsLdap);
-    ui->fetchButton->setEnabled(!commonModule()->isReadOnly() && qnGlobalSettings->ldapSettings().isValid());
+    ui->fetchButton->setEnabled(!commonModule()->isReadOnly()
+        && qnGlobalSettings->ldapSettings().isValid());
 }
 
 void QnUserManagementWidget::applyChanges()
@@ -441,7 +443,7 @@ void QnUserManagementWidget::updateSelection()
 
 void QnUserManagementWidget::openLdapSettings()
 {
-    if (!context()->user() || context()->user()->isLdap())
+    if (!context()->user())
         return;
 
     QScopedPointer<QnLdapSettingsDialog> dialog(new QnLdapSettingsDialog(this));
@@ -463,7 +465,7 @@ void QnUserManagementWidget::createUser()
 
 void QnUserManagementWidget::fetchUsers()
 {
-    if (!context()->user() || context()->user()->isLdap())
+    if (!context()->user())
         return;
 
     if (!qnGlobalSettings->ldapSettings().isValid())

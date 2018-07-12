@@ -8,6 +8,7 @@
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
+#include <nx/utils/unused.h>
 
 #ifdef _WIN32
 #  include <iphlpapi.h>
@@ -56,7 +57,6 @@ namespace network {
     static std::atomic<qint64> m_totalSocketBytesSent;
     qint64 totalSocketBytesSent() { return m_totalSocketBytesSent; }
 #endif
-
 
 //-------------------------------------------------------------------------------------------------
 // Socket implementation
@@ -129,8 +129,7 @@ SocketAddress Socket<SocketInterfaceToImplement>::getLocalAddress() const
         socklen_t addrLen = sizeof(addr);
         if (::getsockname(m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
-
-        return SocketAddress(addr.sin_addr, ntohs(addr.sin_port));
+        return SocketAddress(addr);
     }
     else if (m_ipVersion == AF_INET6)
     {
@@ -138,8 +137,7 @@ SocketAddress Socket<SocketInterfaceToImplement>::getLocalAddress() const
         socklen_t addrLen = sizeof(addr);
         if (::getsockname(m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
-
-        return SocketAddress(addr.sin6_addr, ntohs(addr.sin6_port));
+        return SocketAddress(addr);
     }
 
     return SocketAddress();
@@ -359,6 +357,15 @@ bool Socket<SocketInterfaceToImplement>::setSendTimeout(unsigned int ms)
 }
 
 template<typename SocketInterfaceToImplement>
+bool Socket<SocketInterfaceToImplement>::setIpv6Only(bool val)
+{
+    NX_ASSERT(this->m_ipVersion == AF_INET6);
+
+    const int on = val ? 1 : 0;
+    return ::setsockopt(this->m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&on, sizeof(on)) == 0;
+}
+
+template<typename SocketInterfaceToImplement>
 Pollable* Socket<SocketInterfaceToImplement>::pollable()
 {
     return this;
@@ -420,6 +427,7 @@ template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
 {
 #ifdef _WIN32
+    // TODO: #ak Remove it from here.
     if (!win32SocketsInitialized)
     {
         WORD wVersionRequested;
@@ -439,11 +447,11 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
         return false;
     }
 
-    int on = 1;
+    const int off = 0;
     if (m_ipVersion == AF_INET6
-        && ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&on, sizeof(on)))
+        && ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&off, sizeof(off)))
     {
-            return false;
+        return false;
     }
 
 #ifdef SO_NOSIGPIPE
@@ -475,8 +483,20 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
 namespace {
 
 template<class Func>
-int doInterruptableSystemCallWithTimeout(const Func& func, unsigned int timeout)
+int doInterruptableSystemCallWithTimeout(
+    AbstractCommunicatingSocket* socket,
+    const Func& func,
+    unsigned int timeout,
+    int flags)
 {
+    bool isNonBlocking = false;
+    if (flags & MSG_DONTWAIT)
+        isNonBlocking = true;
+    else if (flags & MSG_WAITALL)
+        isNonBlocking = false;
+    else if (!socket->getNonBlockingMode(&isNonBlocking))
+        return -1;
+
     QElapsedTimer et;
     et.start();
 
@@ -486,16 +506,24 @@ int doInterruptableSystemCallWithTimeout(const Func& func, unsigned int timeout)
     for (;; )
     {
         int result = func();
-        if (result == -1 && errno == EINTR)
+        if (result == -1)
         {
-            if (timeout == 0 ||  //< No timeout
-                !waitStartTimeActual)  //< Cannot check timeout expiration
+            if (errno == EINTR)
             {
-                continue;
+                if (timeout == 0 ||  //< No timeout
+                    !waitStartTimeActual)  //< Cannot check timeout expiration
+                {
+                    continue;
+                }
+                if (et.elapsed() < timeout)
+                    continue;
+                errno = ETIMEDOUT;
             }
-            if (et.elapsed() < timeout)
-                continue;
-            errno = ETIMEDOUT;
+            else if (!isNonBlocking && (errno == EWOULDBLOCK || errno == EAGAIN))
+            {
+                // Returning ETIMEDOUT on timeout to make error codes consistent across platforms.
+                errno = ETIMEDOUT;
+            }
         }
         return result;
     }
@@ -515,7 +543,7 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
         protocol,
         ipVersion,
         sockImpl),
-    m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
+    m_aioHelper(new aio::AsyncSocketImplHelper<self_type>(this, ipVersion)),
     m_connected(false)
 #ifdef WIN32
     , m_eventObject(::CreateEvent(0, false, false, nullptr))
@@ -533,7 +561,7 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
         newConnSD,
         ipVersion,
         sockImpl),
-    m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
+    m_aioHelper(new aio::AsyncSocketImplHelper<self_type>(this, ipVersion)),
     m_connected(true)   // This constructor is used by server socket.
 #ifdef WIN32
     , m_eventObject(::CreateEvent(0, false, false, nullptr))
@@ -577,6 +605,15 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connect(
     }
 
     return false; //< Could not connect by any of addresses.
+}
+
+template<typename SocketInterfaceToImplement>
+void CommunicatingSocket<SocketInterfaceToImplement>::bindToAioThread(
+    nx::network::aio::AbstractAioThread* aioThread)
+{
+    base_type::bindToAioThread(aioThread);
+
+    m_aioHelper->bindToAioThread(aioThread);
 }
 
 template<typename SocketInterfaceToImplement>
@@ -661,8 +698,10 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
         return -1;
 
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(&::recv, this->m_fd, (void*)buffer, (size_t)bufferLen, flags),
-        recvTimeout);
+        recvTimeout,
+        flags);
 #endif
     if (bytesRead < 0)
     {
@@ -689,6 +728,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
         return -1;
 
     int sended = doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(&::send, this->m_fd, (const void*)buffer, (size_t)bufferLen,
 #ifdef __linux
             MSG_NOSIGNAL
@@ -696,7 +736,8 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
             0
 #endif
         ),
-        sendTimeout);
+        sendTimeout,
+        0);
 #endif
 
     if (sended < 0)
@@ -724,8 +765,7 @@ SocketAddress CommunicatingSocket<SocketInterfaceToImplement>::getForeignAddress
         socklen_t addrLen = sizeof(addr);
         if (::getpeername(this->m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
-
-        return SocketAddress(addr.sin_addr, ntohs(addr.sin_port));
+        return SocketAddress(addr);
     }
     else if (this->m_ipVersion == AF_INET6)
     {
@@ -733,8 +773,7 @@ SocketAddress CommunicatingSocket<SocketInterfaceToImplement>::getForeignAddress
         socklen_t addrLen = sizeof(addr);
         if (::getpeername(this->m_fd, (sockaddr*)&addr, &addrLen) < 0)
             return SocketAddress();
-
-        return SocketAddress(addr.sin6_addr, ntohs(addr.sin6_port));
+        return SocketAddress(addr);
     }
 
     return SocketAddress();
@@ -762,20 +801,6 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::shutdown()
     ::SetEvent(m_eventObject); //< Terminate current wait call.
 #endif
     return result;
-}
-
-template<typename SocketInterfaceToImplement>
-void CommunicatingSocket<SocketInterfaceToImplement>::cancelIOAsync(
-    aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
-{
-    m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
-}
-
-template<typename SocketInterfaceToImplement>
-void CommunicatingSocket<SocketInterfaceToImplement>::cancelIOSync(aio::EventType eventType)
-{
-    m_aioHelper->cancelIOSync(eventType);
 }
 
 template<typename SocketInterfaceToImplement>
@@ -822,6 +847,13 @@ void CommunicatingSocket<SocketInterfaceToImplement>::registerTimer(
 }
 
 template<typename SocketInterfaceToImplement>
+void CommunicatingSocket<SocketInterfaceToImplement>::cancelIoInAioThread(
+    aio::EventType eventType)
+{
+    m_aioHelper->cancelIOSync(eventType);
+}
+
+template<typename SocketInterfaceToImplement>
 bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
     const SocketAddress& remoteAddress,
     std::chrono::milliseconds timeout)
@@ -840,6 +872,8 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
         return false;
     if (!isNonBlockingModeBak && !this->setNonBlockingMode(true))
         return false;
+
+    NX_ASSERT(addr.get()->sa_family == this->m_ipVersion);
 
     int connectResult = ::connect(this->m_fd, addr.get(), addr.length());
     if (connectResult != 0)
@@ -1053,7 +1087,6 @@ bool TCPSocket::toggleStatisticsCollection(bool val)
     if (SetPerTcpConnectionEStatsAddr == NULL)
         return false;
 
-
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(impl());
 
     if (GetTcpRow(
@@ -1088,10 +1121,10 @@ bool TCPSocket::toggleStatisticsCollection(bool val)
     }
     return true;
 #elif defined(__linux__)
-    Q_UNUSED(val);
+    nx::utils::unused(val);
     return true;
 #else
-    Q_UNUSED(val);
+    nx::utils::unused(val);
     return false;
 #endif
 }
@@ -1118,7 +1151,7 @@ bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;
 #else
-    Q_UNUSED(info);
+    nx::utils::unused(info);
     return false;
 #endif
 }
@@ -1351,12 +1384,12 @@ public:
     {
     }
 
-    AbstractStreamSocket* accept(unsigned int recvTimeoutMs, bool nonBlockingMode)
+    std::unique_ptr<AbstractStreamSocket> accept(unsigned int recvTimeoutMs, bool nonBlockingMode)
     {
         int newConnSD = acceptWithTimeout(socketHandle, recvTimeoutMs, nonBlockingMode);
         if (newConnSD >= 0)
         {
-            auto tcpSocket = new TCPSocket(newConnSD, ipVersion);
+            auto tcpSocket = std::unique_ptr<TCPSocket>(new TCPSocket(newConnSD, ipVersion));
             tcpSocket->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
             return tcpSocket;
         }
@@ -1428,13 +1461,7 @@ void TCPServerSocket::acceptAsync(AcceptCompletionHandler handler)
     return d->asyncServerSocketHelper.acceptAsync(std::move(handler));
 }
 
-void TCPServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
-    return d->asyncServerSocketHelper.cancelIOAsync(std::move(handler));
-}
-
-void TCPServerSocket::cancelIOSync()
+void TCPServerSocket::cancelIoInAioThread()
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
     return d->asyncServerSocketHelper.cancelIOSync();
@@ -1464,12 +1491,12 @@ void TCPServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
         QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
 }
 
-AbstractStreamSocket* TCPServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> TCPServerSocket::accept()
 {
     return systemAccept();
 }
 
-AbstractStreamSocket* TCPServerSocket::systemAccept()
+std::unique_ptr<AbstractStreamSocket> TCPServerSocket::systemAccept()
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
 
@@ -1481,8 +1508,7 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     if (!getNonBlockingMode(&nonBlockingMode))
         return nullptr;
 
-    std::unique_ptr<AbstractStreamSocket> acceptedSocket(
-        d->accept(recvTimeoutMs, nonBlockingMode));
+    auto acceptedSocket = d->accept(recvTimeoutMs, nonBlockingMode);
     if (!acceptedSocket)
         return nullptr;
 
@@ -1503,7 +1529,7 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
         return nullptr;
     }
 
-    return acceptedSocket.release();
+    return acceptedSocket;
 }
 
 bool TCPServerSocket::setListen(int queueLen)
@@ -1582,10 +1608,12 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 #endif
 
     return doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(
             &::sendto, handle(), (const void*)buffer, (size_t)bufferLen, flags,
             m_destAddr.get(), m_destAddr.length()),
-        sendTimeout) == bufferLen;
+        sendTimeout,
+        flags) == bufferLen;
 #endif
 }
 
@@ -1694,11 +1722,13 @@ int UDPSocket::send(const void* buffer, unsigned int bufferLen)
         return -1;
 
     return doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(
             &::sendto, handle(),
             (const void*)buffer, (size_t)bufferLen, 0,
             m_destAddr.get(), m_destAddr.length()),
-        sendTimeout);
+        sendTimeout,
+        0);
 #endif
 }
 
@@ -1744,13 +1774,30 @@ void UDPSocket::sendToAsync(
 {
     if (endpoint.address.isIpAddress())
     {
-        setDestAddr(endpoint);
+        SocketAddress resolvedEndpoint;
+        resolvedEndpoint.address = endpoint.address.toPureIpAddress(this->m_ipVersion);
+        resolvedEndpoint.port = endpoint.port;
+
+        // TODO: #ak In case of ipv6 we have to determine scope_id.
+
+        // It is possible that address still has to be resolved.
+        // E.g., if ipv6 address has been passed to ipv4 socket.
+        // In this case - returning an error.
+        if (!resolvedEndpoint.address.isIpAddress())
+        {
+            return post(std::bind(std::move(handler),
+                SystemError::addressNotAvailable,
+                SocketAddress(),
+                (size_t)-1));
+        }
+
+        setDestAddr(resolvedEndpoint);
         return sendAsync(
             buffer,
-            [endpoint, handler = std::move(handler)](
+            [resolvedEndpoint, handler = std::move(handler)](
                 SystemError::ErrorCode code, size_t size)
             {
-                handler(code, endpoint, size);
+                handler(code, resolvedEndpoint, size);
             });
     }
 
@@ -1762,9 +1809,23 @@ void UDPSocket::sendToAsync(
             if (code != SystemError::noError)
                 return handler(code, SocketAddress(), 0);
 
-            // TODO: Here we select first address with hope it is correct one. This will never work
-            // for NAT64, so we have to fix it somehow.
-            sendToAsync(buffer, SocketAddress(ips.front(), port), std::move(handler));
+            auto addressIter = std::find_if(
+                ips.begin(), ips.end(),
+                [this](const HostAddress& addr)
+                {
+                    if (m_ipVersion == AF_INET && addr.ipV4())
+                        return true;
+                    if (m_ipVersion == AF_INET6 && addr.isPureIpV6())
+                        return true;
+                    return false;
+                });
+            if (addressIter == ips.end())
+                addressIter = ips.begin();
+
+            sendToAsync(
+                buffer,
+                SocketAddress(*addressIter, port),
+                std::move(handler));
         });
 }
 
@@ -1862,8 +1923,10 @@ int UDPSocket::recvFrom(
         return -1;
 
     int rtn = doInterruptableSystemCallWithTimeout<>(
+        this,
         std::bind(&::recvfrom, handle(), (void*)buffer, (size_t)bufferLen, 0, address.get(), &address.length()),
-        recvTimeout);
+        recvTimeout,
+        0);
 #endif
 
     if (rtn >= 0)

@@ -35,7 +35,7 @@ static void down_mix_to_stereo(T *data, int channels, int len)
             /* Postings on Doom9 say that Dolby specifically says the LFE (.1)
              * channel should usually be ignored during downmixing to Dolby ProLogic II,
              * with quotes from official Dolby documentation. */
-            Q_UNUSED(lfe);
+            (void)lfe;
 
             output[0] = clip_short(fl + (0.5 * rl) + (0.7 * c));
             output[1] = clip_short(fr + (0.5 * rr) + (0.7 * c));
@@ -81,7 +81,7 @@ QnCodecAudioFormat QnAudioProcessor::float2int16(QnByteArray& audio, QnCodecAudi
     for (int i = 0; i < len; ++i)
     {
         float f = *((float*)inP);
-        *outP = (qint16)(f * (1 << 15));
+        *outP = clip_short((qint32)(f * (1 << 15)));
         ++inP;
         ++outP;
     }

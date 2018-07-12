@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <QtCore/QString>
 
 namespace nx {
 namespace update {
@@ -11,9 +12,11 @@ namespace test_support {
 
 struct UpdateTestData
 {
-    QString customization;
-    QString version;
+    QString updatePrefix;
+    QString build;
     QByteArray json;
+
+    QString customization() const { return updatePrefix.mid(updatePrefix.lastIndexOf("/") + 1);}
 };
 
 NX_UPDATE_API const QByteArray& metaDataJson();

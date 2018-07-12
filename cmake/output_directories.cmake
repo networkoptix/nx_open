@@ -27,10 +27,10 @@ function(set_output_directories)
 endfunction()
 
 function(nx_create_dev_qt_conf)
-    if(CMAKE_CROSSCOMPILING)
-        set(qt_prefix "..")
-    else()
+    if(arch MATCHES "x64|x86")
         set(qt_prefix "${QT_DIR}")
+    else()
+        set(qt_prefix "..")
     endif()
 
     nx_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qt.conf

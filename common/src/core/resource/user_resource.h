@@ -54,8 +54,8 @@ public:
 
     // Do not use this method directly.
     // Use resourceAccessManager()::globalPermissions(user) instead
-    Qn::GlobalPermissions getRawPermissions() const;
-    void setRawPermissions(Qn::GlobalPermissions permissions);
+    GlobalPermissions getRawPermissions() const;
+    void setRawPermissions(GlobalPermissions permissions);
 
     /**
      * Owner user has maxumum permissions. Could be local or cloud user
@@ -81,7 +81,7 @@ public:
     QString fullName() const;
     void setFullName(const QString& value);
 
-    ec2::ApiResourceParamWithRefDataList params() const;
+    nx::vms::api::ResourceParamWithRefDataList params() const;
 
     virtual Qn::ResourceStatus getStatus() const override;
 
@@ -97,6 +97,8 @@ public:
      * For regular users it is random value, for cloud users it's md5 hash from email address.
      */
     void fillId();
+
+    virtual QString idForToStringFromPtr() const; //< Used by toString(const T*).
 
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
@@ -132,7 +134,7 @@ private:
     QByteArray m_digest;
     QByteArray m_cryptSha512Hash;
     QString m_realm;
-    Qn::GlobalPermissions m_permissions;
+    GlobalPermissions m_permissions;
     QnUuid m_userRoleId;
     bool m_isOwner;
     bool m_isEnabled;

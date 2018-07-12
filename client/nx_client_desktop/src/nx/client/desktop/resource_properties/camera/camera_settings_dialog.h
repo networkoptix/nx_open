@@ -2,7 +2,9 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/common/session_aware_dialog.h>
+#include <nx/client/desktop/common/dialogs/generic_tabbed_dialog.h>
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 class QnUserProfileWidget;
 class QnUserSettingsWidget;
@@ -10,42 +12,47 @@ class QnPermissionsWidget;
 class QnAccessibleResourcesWidget;
 class QnAbstractPermissionsModel;
 class QnUserSettingsModel;
-class QnAlertBar;
+class AlertBar;
 
-namespace Ui {
-class CameraSettingsDialog;
-}
+namespace Ui { class CameraSettingsDialog; }
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraSettingsModel;
-class CameraScheduleWidget;
+struct CameraSettingsDialogState;
 
-class CameraSettingsDialog: public QnSessionAwareTabbedDialog
+class CameraSettingsDialog:
+    public GenericTabbedDialog,
+    public QnSessionAwareDelegate
 {
     Q_OBJECT
-    typedef QnSessionAwareTabbedDialog base_type;
+    using base_type = GenericTabbedDialog;
 
 public:
     explicit CameraSettingsDialog(QWidget *parent = NULL);
     virtual ~CameraSettingsDialog();
 
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
+
     bool setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
 
 protected:
-    virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
-    virtual void retranslateUi() override;
+    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 
 private:
-    void updateWindowTitle();
+    QDialogButtonBox::StandardButton showConfirmationDialog();
+
+    void loadState(const CameraSettingsDialogState& state);
+    static QString getAlertText(const CameraSettingsDialogState& state);
 
 private:
     Q_DISABLE_COPY(CameraSettingsDialog)
     QScopedPointer<Ui::CameraSettingsDialog> ui;
-    QScopedPointer<CameraSettingsModel> m_model;
-    CameraScheduleWidget* m_cameraScheduleWidget = nullptr;
+
+    struct Private;
+    QScopedPointer<Private> d;
 };
 
 } // namespace desktop

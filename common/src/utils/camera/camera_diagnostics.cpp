@@ -210,6 +210,13 @@ public:
                     << QnDeviceDependentStrings::getNameFromSet(resourcePool, details, device);
                 break;
             }
+            case cameraOldFirmwareError:
+            {
+                errorMessageParts <<
+                    tr("Please update firmware. "
+                       "Minimal supported version is %1. Current version is %2").arg(p1).arg(p2);
+                break;
+            }
             case badMediaStream:
             {
                 QnCameraDeviceStringSet details(
@@ -353,5 +360,17 @@ QString Result::toString(QnResourcePool* resourcePool) const
 {
     return ErrorCode::toString(errorCode, resourcePool, QnVirtualCameraResourcePtr(), errorParams);
 }
+
+Qn::MediaStreamEvent Result::toMediaStreamEvent() const
+{
+    switch (errorCode)
+    {
+        case ErrorCode::tooManyOpenedConnections:
+            return Qn::MediaStreamEvent::TooManyOpenedConnections;
+        default:
+            return Qn::MediaStreamEvent::NoEvent;
+    }
+}
+
 
 } // namespace CameraDiagnostics

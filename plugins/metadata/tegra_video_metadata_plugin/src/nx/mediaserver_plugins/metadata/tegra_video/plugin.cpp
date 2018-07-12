@@ -1,6 +1,8 @@
 #include "plugin.h"
 
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
+
 #include <plugins/plugin_tools.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
@@ -14,9 +16,9 @@ namespace tegra_video {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Plugin::Plugin(): CommonPlugin("Tegra Video metadata plugin")
+Plugin::Plugin(): CommonPlugin(
+    "Tegra Video metadata plugin", "tegra_video_metadata_plugin", NX_DEBUG_ENABLE_OUTPUT)
 {
-    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
 }
 
 nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
@@ -75,9 +77,7 @@ std::string Plugin::capabilitiesManifest() const
                         }
                     }
                 }
-            ],
-
-            "options": "needDeepCopyForMediaFrame"
+            ]
         }
     )json";
 }

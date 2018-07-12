@@ -27,8 +27,7 @@ QnWorkbenchPermissionsNotifier::QnWorkbenchPermissionsNotifier(QObject* parent) 
 
 QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
     base_type(parent),
-    m_user(),
-    m_globalPermissions(Qn::NoGlobalPermissions)
+    m_user()
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
@@ -47,7 +46,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
 
     connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
-        [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
+        [this](const QnResourceAccessSubject& subject, GlobalPermissions /*value*/)
         {
             if (!subject.user())
                 return;
@@ -100,12 +99,12 @@ bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr& resource, 
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
 
-Qn::GlobalPermissions QnWorkbenchAccessController::globalPermissions() const
+GlobalPermissions QnWorkbenchAccessController::globalPermissions() const
 {
     return m_globalPermissions;
 }
 
-bool QnWorkbenchAccessController::hasGlobalPermission(Qn::GlobalPermission requiredPermission) const
+bool QnWorkbenchAccessController::hasGlobalPermission(GlobalPermission requiredPermission) const
 {
     return m_globalPermissions.testFlag(requiredPermission);
 }
@@ -137,7 +136,7 @@ bool QnWorkbenchAccessController::canCreateLayout(const QnUuid& layoutParentId) 
     return resourceAccessManager()->canCreateLayout(m_user, layoutParentId);
 }
 
-bool QnWorkbenchAccessController::canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const
+bool QnWorkbenchAccessController::canCreateUser(GlobalPermissions targetPermissions, bool isOwner) const
 {
     if (!m_user)
         return false;
@@ -189,7 +188,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
         /* Check if we are creating new user */
         if (!user->resourcePool())
         {
-            return hasGlobalPermission(Qn::GlobalAdminPermission)
+            return hasGlobalPermission(GlobalPermission::admin)
                 ? Qn::FullUserPermissions
                 : Qn::NoPermissions;
         }
@@ -286,16 +285,16 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(
     return resourceAccessManager()->permissions(m_user, layout);
 }
 
-Qn::GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() const
+GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() const
 {
     if (qnRuntime->isVideoWallMode())
-        return Qn::GlobalVideoWallModePermissionSet;
+        return GlobalPermission::videowallModePermissions;
 
     if (qnRuntime->isActiveXMode())
-        return Qn::GlobalActiveXModePermissionSet;
+        return GlobalPermission::activeXModePermissions;
 
     if (!m_user)
-        return Qn::NoGlobalPermissions;
+        return {};
 
     return resourceAccessManager()->globalPermissions(m_user);
 }
@@ -343,12 +342,19 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
     connect(resource, &QnResource::flagsChanged, this,
         &QnWorkbenchAccessController::updatePermissions);
 
+
+    if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
+            &QnWorkbenchAccessController::updatePermissions);
+    }
+
     updatePermissions(resource);
 }
 
 void QnWorkbenchAccessController::at_resourcePool_resourceRemoved(const QnResourcePtr& resource)
 {
-    disconnect(resource, NULL, this, NULL);
+    resource->disconnect(this);
     m_dataByResource.remove(resource);
 }
 

@@ -13,7 +13,7 @@ SystemError::ErrorCode convertToSystemError(int udtErrorCode)
     else if (udtErrorCode == CUDTException::ECONNSETUP)
         return SystemError::connectionReset;
     else if (udtErrorCode == CUDTException::ENOSERVER)
-        return SystemError::hostUnreach;
+        return SystemError::hostUnreachable;
     else if (udtErrorCode == CUDTException::ECONNREJ)
         return SystemError::connectionRefused;
     else if (udtErrorCode == CUDTException::ECONNFAIL)
@@ -23,11 +23,11 @@ SystemError::ErrorCode convertToSystemError(int udtErrorCode)
     else if (udtErrorCode == CUDTException::ENOCONN)
         return SystemError::notConnected;
     else if (udtErrorCode == CUDTException::ERESOURCE)
-        return SystemError::nomem;
+        return SystemError::noMemory;
     else if (udtErrorCode == CUDTException::ETHREAD)
-        return SystemError::nomem;
+        return SystemError::noMemory;
     else if (udtErrorCode == CUDTException::ELARGEMSG)
-        return SystemError::msgTooLarge;
+        return SystemError::messageTooLarge;
     else if (udtErrorCode == CUDTException::ENOBUF)
         return SystemError::noBufferSpace;
     else if (udtErrorCode == CUDTException::ERDPERM ||

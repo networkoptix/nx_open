@@ -78,48 +78,48 @@ bool isAcceptableForModelVideowall(
 using namespace nx::client::desktop;
 
 QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
-    Qn::NodeType nodeType,
+    NodeType nodeType,
     QnResourceTreeModel* model,
     bool initialize)
 {
     QnResourceTreeModelNodePtr result;
     switch (nodeType)
     {
-        case Qn::FilteredCamerasNode:
+        case NodeType::filteredCameras:
             result.reset(new GenericResourceTreeModelNode(
-                model, isAcceptableForModelCamera, Qn::FilteredCamerasNode));
+                model, isAcceptableForModelCamera, nodeType));
             break;
 
-        case Qn::FilteredLayoutsNode:
+        case NodeType::filteredLayouts:
             result.reset(new GenericResourceTreeModelNode(
-                model, isAcceptableForModelLayout, Qn::FilteredLayoutsNode));
+                model, isAcceptableForModelLayout, nodeType));
             break;
 
-        case Qn::FilteredServersNode:
+        case NodeType::filteredServers:
             result.reset(new GenericResourceTreeModelNode(
-                model, isAcceptableForModelServer, Qn::FilteredServersNode));
+                model, isAcceptableForModelServer, nodeType));
             break;
 
-        case Qn::FilteredUsersNode:
+        case NodeType::filteredUsers:
             result.reset(new GenericResourceTreeModelNode(
-                model, isAcceptableForModelUser, Qn::FilteredUsersNode));
+                model, isAcceptableForModelUser, nodeType));
             break;
 
-        case Qn::FilteredVideowallsNode:
+        case NodeType::filteredVideowalls:
             result.reset(new GenericResourceTreeModelNode(
-                model, isAcceptableForModelVideowall, Qn::FilteredVideowallsNode));
+                model, isAcceptableForModelVideowall, nodeType));
             break;
 
-        case Qn::UserResourcesNode:
+        case NodeType::userResources:
             result.reset(new QnResourceTreeModelUserResourcesNode(model));
             break;
 
-        case Qn::OtherSystemsNode:
+        case NodeType::otherSystems:
             if (model->scope() == QnResourceTreeModel::FullScope)
                 result.reset(new QnResourceTreeModelOtherSystemsNode(model));
             break;
 
-        case Qn::LayoutToursNode:
+        case NodeType::layoutTours:
             if (model->scope() == QnResourceTreeModel::FullScope)
                 result.reset(new QnResourceTreeModelLayoutToursNode(model));
             break;
@@ -134,7 +134,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
-    Qn::NodeType nodeType,
+    NodeType nodeType,
     const QnUuid& id,
     QnResourceTreeModel* model,
     bool initialize)
@@ -149,7 +149,8 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createLocalSystemNode
     const QString& systemName,
     QnResourceTreeModel* model)
 {
-    QnResourceTreeModelNodePtr result(new QnResourceTreeModelNode(model, Qn::SystemNode, systemName));
+    QnResourceTreeModelNodePtr result(
+        new QnResourceTreeModelNode(model, NodeType::localSystem, systemName));
     result->initialize();
     return result;
 }
@@ -167,12 +168,12 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createResourceNode(
     const QnResourcePtr& resource,
     QnResourceTreeModel* model)
 {
-    Qn::NodeType nodeType = Qn::ResourceNode;
+    NodeType nodeType = NodeType::resource;
 
-    if (model->context()->accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+    if (model->context()->accessController()->hasGlobalPermission(GlobalPermission::admin)
         && QnMediaServerResource::isHiddenServer(resource->getParentResource()))
     {
-        nodeType = Qn::EdgeNode;
+        nodeType = NodeType::edge;
     }
 
     QnResourceTreeModelNodePtr result(resource->hasFlags(Qn::layout)

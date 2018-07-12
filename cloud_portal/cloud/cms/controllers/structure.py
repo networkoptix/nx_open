@@ -3,14 +3,17 @@ import json
 import codecs
 import os
 import re
+from cloud import settings
 from zipfile import ZipFile
-from ..models import Product, Context, DataStructure, Customization, DataRecord
+from ..models import Product, Context, ContextTemplate, DataStructure, Customization, DataRecord, Language
 
 
-def find_or_add_product(name):
+def find_or_add_product(name, can_preview):
     if Product.objects.filter(name=name).exists():
-        return Product.objects.get(name=name)
-    product = Product(name=name)
+        product = Product.objects.get(name=name)
+        product.can_preview = can_preview
+    else:
+        product = Product(name=name, can_preview=can_preview)
     product.save()
     return product
 
@@ -48,80 +51,82 @@ def find_or_add_data_structure(name, old_name, context_id, has_language):
 
 
 def update_from_object(cms_structure):
-    product_name = cms_structure['product']
+    for product in cms_structure:
+        product_name = product['product']
+        can_preview = product['canPreview']
+        product_id = find_or_add_product(product_name, can_preview).id
 
-    default_language = Customization.objects.get(name='default').default_language.code
-    product_id = find_or_add_product(product_name).id
-    order = 0
+        default_language = Customization.objects.get(name=settings.CUSTOMIZATION).default_language.code
+        order = 0
 
-    for context_data in cms_structure['contexts']:
-        has_language = context_data["translatable"]
-        is_global = context_data["is_global"] if "is_global" in context_data else False
-        old_name = context_data["old_name"] if "old_name" in context_data else None
-        context = find_or_add_context(
-            context_data["name"], old_name, product_id, has_language, is_global)
-        if "description" in context_data:
-            context.description = context_data["description"]
-        if "file_path" in context_data:
-            context.file_path = context_data["file_path"]
-        if "url" in context_data:
-            context.url = context_data["url"]
-        context.is_global = is_global
-        context.hidden = context_data["hidden"] if "hidden" in context_data else False
-        context.save()
+        for context_data in product['contexts']:
+            has_language = context_data["translatable"]
+            is_global = context_data["is_global"] if "is_global" in context_data else False
+            old_name = context_data["old_name"] if "old_name" in context_data else None
+            context = find_or_add_context(
+                context_data["name"], old_name, product_id, has_language, is_global)
+            if "description" in context_data:
+                context.description = context_data["description"]
+            if "file_path" in context_data:
+                context.file_path = context_data["file_path"]
+            if "url" in context_data:
+                context.url = context_data["url"]
+            context.is_global = is_global
+            context.hidden = context_data["hidden"] if "hidden" in context_data else False
+            context.save()
 
-        for record in context_data["values"]:
-            if not isinstance(record, dict):
-                old_name = None
-                description = None
-                record_type = "text"
-                meta = None
-                advanced = False
-                optional = False
-                label = None
-                value = None
-                if len(record) == 3:
-                    label, name, value = record
-                if len(record) == 4:
-                    label, name, value, description = record
-            else:
-                name = record['name']
-                value = record['value'] if 'value' in record else ""
-                label = record['label'] if 'label' in record else ""
-                old_name = record['old_name'] if 'old_name' in record else None
-                description = record['description'] if 'description' in record else None
-                record_type = record['type'] if 'type' in record else None
-                meta = record['meta'] if 'meta' in record else None
-                advanced = record['advanced'] if 'advanced' in record else False
-                optional = record['optional'] if 'optional' in record else False
+            for record in context_data["values"]:
+                if not isinstance(record, dict):
+                    old_name = None
+                    description = None
+                    record_type = "text"
+                    meta = None
+                    advanced = False
+                    optional = False
+                    label = None
+                    value = None
+                    if len(record) == 3:
+                        label, name, value = record
+                    if len(record) == 4:
+                        label, name, value, description = record
+                else:
+                    name = record['name']
+                    value = record['value'] if 'value' in record else ""
+                    label = record['label'] if 'label' in record else ""
+                    old_name = record['old_name'] if 'old_name' in record else None
+                    description = record['description'] if 'description' in record else None
+                    record_type = record['type'] if 'type' in record else None
+                    meta = record['meta'] if 'meta' in record else None
+                    advanced = record['advanced'] if 'advanced' in record else False
+                    optional = record['optional'] if 'optional' in record else False
 
-            data_structure = find_or_add_data_structure(name, old_name, context.id, has_language)
+                data_structure = find_or_add_data_structure(name, old_name, context.id, has_language)
 
-            data_structure.order = order
-            order += 1
-            data_structure.label = label
-            data_structure.advanced = advanced
-            data_structure.optional = optional
-            if description:
-                data_structure.description = description
-            if record_type:
-                data_structure.type = DataStructure.get_type(record_type)
+                data_structure.order = order
+                order += 1
+                data_structure.label = label
+                data_structure.advanced = advanced
+                data_structure.optional = optional
+                if description:
+                    data_structure.description = description
+                if record_type:
+                    data_structure.type = DataStructure.get_type(record_type)
 
-            if data_structure.type == DataStructure.DATA_TYPES.image:
-                data_structure.translatable = "{{language}}" in name
+                if data_structure.type == DataStructure.DATA_TYPES.image:
+                    data_structure.translatable = "{{language}}" in name
 
-                # this is used to convert source images into b64 strings
-                file_path = os.path.join('static', '_source', 'blue', name)
-                file_path = file_path.replace("{{language}}", default_language)
-                try:
-                    with open(file_path, 'r') as file:
-                        value = base64.b64encode(file.read())
-                except IOError:
-                    pass
+                    # this is used to convert source images into b64 strings
+                    file_path = os.path.join('static', '_source', 'blue', name)
+                    file_path = file_path.replace("{{language}}", default_language)
+                    try:
+                        with open(file_path, 'r') as file:
+                            value = base64.b64encode(file.read())
+                    except IOError:
+                        pass
 
-            data_structure.meta_settings = meta if meta else {}
-            data_structure.default = value
-            data_structure.save()
+                data_structure.meta_settings = meta if meta else {}
+                data_structure.default = value
+                data_structure.save()
 
 
 def read_structure_json(filename):
@@ -177,10 +182,18 @@ def process_zip(file_descriptor, user, update_structure, update_content):
 
             context = context.first()
             if update_structure:
-                if context.template != file_content:
-                    context.template = file_content
-                    context.save()
+                # Here we assume that there is only one template here
+
+                if context.contexttemplate_set.exists():
+                    context_template = context.contexttemplate_set.first()
+                else:
+                    context_template = ContextTemplate(context=context)
+
+                if context_template.template != file_content:
+                    context_template.template = file_content
+                    context_template.save()
                     log_messages.append(('success', 'Updated template for context %s using %s' % (context.name, name)))
+
             if update_content:
                 customization = Customization.objects.filter(name=customization_name)
                 if not customization.exists():
@@ -191,18 +204,19 @@ def process_zip(file_descriptor, user, update_structure, update_content):
                 customization = customization.first()
 
                 # try to parse datastructures from the file using template
-                if not context.template:  # no template - nothing we can do
+                if not context.contexttemplate_set.exists():  # no template - nothing we can do
                     log_messages.append(('error', 'Ignored: %s (context has to template)' % name))
                     continue
-                # here we have context.template and file_content - which are relatively close.
+                # here we have template for context and file_content - which are relatively close.
                 # Ideally, the only difference is specific data values
 
                 for structure in context.datastructure_set.all():
                     if structure.type in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
                         continue
 
+                    context_template = context.contexttemplate_set.first()
                     # find a line in template which has structure.name in it
-                    template_line = next((line for line in context.template.split("\n") if structure.name in line),
+                    template_line = next((line for line in context_template.split("\n") if structure.name in line),
                                          None)
                     if not template_line:
                         log_messages.append(('warning', 'No line in template %s for data structure %s' %

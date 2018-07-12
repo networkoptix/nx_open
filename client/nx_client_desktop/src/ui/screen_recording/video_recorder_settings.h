@@ -2,7 +2,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
-#include "qnaudio_device_info.h"
+
+#include <ui/screen_recording/audio_recorder_settings.h>
 
 namespace Qn {
 
@@ -36,22 +37,14 @@ Q_DECLARE_METATYPE(Qn::CaptureMode)
 Q_DECLARE_METATYPE(Qn::DecoderQuality)
 Q_DECLARE_METATYPE(Qn::Resolution)
 
-class QnVideoRecorderSettings : public QObject
+class QnVideoRecorderSettings: public QnAudioRecorderSettings
 {
     Q_OBJECT
+    using base_type = QnAudioRecorderSettings;
+
 public:
-    explicit QnVideoRecorderSettings(QObject *parent = 0);
-    ~QnVideoRecorderSettings();
-
-    QnAudioDeviceInfo primaryAudioDevice() const;
-
-    QString primaryAudioDeviceName() const;
-    void setPrimaryAudioDeviceByName(const QString &name);
-
-    QnAudioDeviceInfo secondaryAudioDevice() const;
-
-    QString secondaryAudioDeviceName() const;
-    void setSecondaryAudioDeviceByName(const QString &name);
+    explicit QnVideoRecorderSettings(QObject* parent = nullptr);
+    virtual ~QnVideoRecorderSettings() override;
 
     bool captureCursor() const;
     void setCaptureCursor(bool yes);
@@ -68,19 +61,13 @@ public:
     int screen() const;
     void setScreen(int screen);
 
-    QString recordingFolder() const;
-    void setRecordingFolder(QString folder);
-
-    static QString getFullDeviceName(const QString& shortName);
-    static QStringList availableDeviceNames(QAudio::Mode mode);
-    static void splitFullName(const QString& name, QString& shortName, int& index);
-
-
     static int screenToAdapter(int screen);
     static QSize resolutionToSize(Qn::Resolution resolution);
     static float qualityToNumeric(Qn::DecoderQuality quality);
+
 private:
     QnAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *isDefault = 0) const;
+
 private:
     QSettings settings;
 };

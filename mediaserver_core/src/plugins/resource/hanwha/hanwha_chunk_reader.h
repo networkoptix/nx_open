@@ -10,6 +10,8 @@
 #include <core/resource/abstract_remote_archive_manager.h>
 #include <recording/time_period_list.h>
 
+#include <plugins/resource/hanwha/hanwha_information.h>
+
 extern "C" {
 
 // For const AV_NOPTS_VALUE.
@@ -22,6 +24,17 @@ namespace mediaserver_core {
 namespace plugins {
 
 class HanwhaSharedResourceContext;
+
+struct HanwhaChunkLoaderSettings
+{
+    HanwhaChunkLoaderSettings() = default;
+    HanwhaChunkLoaderSettings(
+        const std::chrono::seconds& responseTimeout,
+        const std::chrono::seconds& messageBodyReadTimeout);
+
+    std::chrono::seconds responseTimeout = std::chrono::minutes(5);
+    std::chrono::seconds messageBodyReadTimeout = std::chrono::minutes(30);
+};
 
 class HanwhaChunkLoader: public QObject
 {
@@ -53,10 +66,13 @@ class HanwhaChunkLoader: public QObject
     using OverlappedChunks = std::map<int, ChunksByChannel>;
 
 public:
-    HanwhaChunkLoader(HanwhaSharedResourceContext* resourceContext);
+    HanwhaChunkLoader(
+        HanwhaSharedResourceContext* resourceContext,
+        const HanwhaChunkLoaderSettings& settings);
+
     virtual ~HanwhaChunkLoader();
 
-    void start(bool isNvr);
+    void start(const HanwhaInformation& information);
     bool isStarted() const;
 
     qint64 startTimeUsec(int channelNumber) const;
@@ -120,7 +136,7 @@ private:
 
     std::chrono::milliseconds timeSinceLastTimelineUpdate() const;
 
-    void setUpThreadUnsafe();
+    void setUpThreadUnsafe(const HanwhaInformation& information);
 
     void at_httpClientDone();
     void at_gotChunkData();
@@ -163,7 +179,9 @@ private:
     bool m_isSearchRecordingPeriodRetrievalEnabled = true;
     bool m_isUtcEnabled = true;
 
-    std::chrono::milliseconds m_lastTimelineUpdate;
+    std::chrono::milliseconds m_lastTimelineUpdate{0};
+
+    HanwhaChunkLoaderSettings m_settings;
 };
 
 } // namespace plugins

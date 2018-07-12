@@ -1,5 +1,7 @@
 #include "main_window_title_bar_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <QtGui/QDragMoveEvent>
 
 #include <QtWidgets/QBoxLayout>
@@ -24,7 +26,7 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/widgets/common/tool_button.h>
+#include <nx/client/desktop/common/widgets/tool_button.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -51,7 +53,7 @@ QFrame* newVLine()
     return line;
 }
 
-void executeButtonMenu(QnToolButton* invoker, QMenu* menu, const QPoint& offset = QPoint(0, 0))
+void executeButtonMenu(ToolButton* invoker, QMenu* menu, const QPoint& offset = QPoint(0, 0))
 {
     if (!menu || !invoker)
         return;
@@ -104,13 +106,17 @@ public:
     void setSkipDoubleClick();
 
 public:
-    QnToolButton* mainMenuButton;
-    QnLayoutTabBar* tabBar;
-    QnToolButton* newTabButton;
-    QnToolButton* currentLayoutsButton;
-    QnCloudStatusPanel* cloudPanel;
+    ToolButton* mainMenuButton = nullptr;
+    QnLayoutTabBar* tabBar = nullptr;
+    ToolButton* newTabButton = nullptr;
+    ToolButton* currentLayoutsButton = nullptr;
+    QnCloudStatusPanel* cloudPanel = nullptr;
     std::unique_ptr<MimeData> mimeData;
-    bool skipDoubleClickFlag;
+    bool skipDoubleClickFlag = false;
+
+    /** There are some rare scenarios with looping menus. */
+    bool isMenuOpened = false;
+
     QSharedPointer<QMenu> mainMenuHolder;
 };
 
@@ -118,14 +124,7 @@ QnMainWindowTitleBarWidgetPrivate::QnMainWindowTitleBarWidgetPrivate(
     QnMainWindowTitleBarWidget* parent)
     :
     QObject(parent),
-    q_ptr(parent),
-    mainMenuButton(nullptr),
-    tabBar(nullptr),
-    newTabButton(nullptr),
-    currentLayoutsButton(nullptr),
-    cloudPanel(nullptr),
-    skipDoubleClickFlag(false),
-    mainMenuHolder()
+    q_ptr(parent)
 {
 }
 
@@ -152,7 +151,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     d->mainMenuButton = newActionButton(
         action::MainMenuAction,
         Qn::MainWindow_TitleBar_MainMenu_Help);
-    connect(d->mainMenuButton, &QnToolButton::justPressed, this,
+    connect(d->mainMenuButton, &ToolButton::justPressed, this,
         [this]()
         {
             action(action::MainMenuAction)->trigger();
@@ -164,6 +163,11 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
             Q_D(QnMainWindowTitleBarWidget);
             if (!isWidgetVisible(d->mainMenuButton))
                 return;
+
+            if (d->isMenuOpened)
+                return;
+            QScopedValueRollback<bool> guard(d->isMenuOpened, true);
+
             static const QPoint kVerticalOffset(0, 2);
             d->mainMenuHolder.reset(menu()->newMenu(action::MainScope, nullptr));
             d->mainMenuButton->setDown(true);
@@ -204,14 +208,19 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     d->currentLayoutsButton = newActionButton(
         action::OpenCurrentUserLayoutMenu,
         kTabBarButtonSize);
-    connect(d->currentLayoutsButton, &QnToolButton::justPressed, this,
+    connect(d->currentLayoutsButton, &ToolButton::justPressed, this,
         [this]()
         {
+            Q_D(QnMainWindowTitleBarWidget);
+
+            if (d->isMenuOpened)
+                return;
+            QScopedValueRollback<bool> guard(d->isMenuOpened, true);
+
             QScopedPointer<QMenu> layoutsMenu(menu()->newMenu(
                 action::OpenCurrentUserLayoutMenu,
                 action::TitleBarScope));
 
-            Q_D(const QnMainWindowTitleBarWidget);
             executeButtonMenu(d->currentLayoutsButton, layoutsMenu.data());
         });
 
@@ -329,12 +338,12 @@ void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
     event->acceptProposedAction();
 }
 
-QnToolButton* QnMainWindowTitleBarWidget::newActionButton(
+ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     action::IDType actionId,
     int helpTopicId,
     const QSize& fixedSize)
 {
-    auto button = new QnToolButton(this);
+    auto button = new ToolButton(this);
 
     button->setDefaultAction(action(actionId));
     button->setFocusPolicy(Qt::NoFocus);
@@ -348,7 +357,7 @@ QnToolButton* QnMainWindowTitleBarWidget::newActionButton(
     return button;
 }
 
-QnToolButton* QnMainWindowTitleBarWidget::newActionButton(
+ToolButton* QnMainWindowTitleBarWidget::newActionButton(
     action::IDType actionId,
     const QSize& fixedSize)
 {

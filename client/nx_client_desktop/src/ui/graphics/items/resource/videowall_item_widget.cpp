@@ -28,6 +28,8 @@
 #include <nx/client/desktop/utils/mime_data.h>
 #include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
 
+#include <nx/utils/log/log.h>
+
 #include <ui/animation/variant_animator.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -409,15 +411,15 @@ void QnVideowallItemWidget::updateLayout()
 
     if (m_layout)
     {
+        // Right now this widget does not have any sort of proper size to calculate aspect ratio
         const QSize previewSize = kPreviewSize;
         m_layoutThumbnailProvider.reset(
             new LayoutThumbnailLoader(m_layout, previewSize, nx::api::ImageRequest::kLatestThumbnail));
 
-        connect(m_layoutThumbnailProvider.get(), &QnImageProvider::statusChanged,
+        connect(m_layoutThumbnailProvider.get(), &ImageProvider::statusChanged,
             this, &QnVideowallItemWidget::at_updateThumbnailStatus);
-        connect(m_layoutThumbnailProvider.get(), &QnImageProvider::imageChanged,
-            this, &QnVideowallItemWidget::at_updateThumbnailImage);
 
+        m_layoutThumbnailProvider->setResourcePool(resourcePool());
         m_layoutThumbnailProvider->loadAsync();
 
         connect(m_layout, &QnLayoutResource::itemAdded, this,
@@ -476,6 +478,9 @@ void QnVideowallItemWidget::at_updateThumbnailStatus(Qn::ThumbnailStatus status)
     {
         case Qn::ThumbnailStatus::Loaded:
             m_resourceStatus = Qn::EmptyOverlay;
+            m_layoutThumbnail = QPixmap::fromImage(m_layoutThumbnailProvider->image());
+            NX_VERBOSE(this) << "QnVideowallItemWidget got thumbs of size " << m_layoutThumbnail.size();
+            update();
             break;
 
         case Qn::ThumbnailStatus::Loading:
@@ -486,11 +491,4 @@ void QnVideowallItemWidget::at_updateThumbnailStatus(Qn::ThumbnailStatus status)
             m_resourceStatus = Qn::NoDataOverlay;
             break;
     }
-
-}
-
-void QnVideowallItemWidget::at_updateThumbnailImage(const QImage& image)
-{
-    m_layoutThumbnail = QPixmap::fromImage(image);
-    update();
 }

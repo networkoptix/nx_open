@@ -1,5 +1,9 @@
 #include "predefined_host_resolver.h"
 
+#include <boost/algorithm/string.hpp>
+
+#include <nx/utils/std/algorithm.h>
+
 namespace nx {
 namespace network {
 
@@ -8,11 +12,22 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
     int ipVersion,
     std::deque<AddressEntry>* resolvedAddresses)
 {
+    auto reversedName = nx::utils::reverseWords(name.toStdString(), ".");
+    nx::utils::to_lower(&reversedName);
+
     QnMutexLocker lock(&m_mutex);
 
-    const auto it = m_etcHosts.find(name);
-    if (it == m_etcHosts.end())
+    // Searching for a smallest string that has reversedName as a prefix.
+    const auto it = m_etcHosts.lower_bound(reversedName);
+    if (it == m_etcHosts.end() || !boost::starts_with(it->first, reversedName))
         return SystemError::hostNotFound;
+
+    if (reversedName != it->first &&
+        !(reversedName.size() < it->first.size() && it->first[reversedName.size()] == '.'))
+    {
+        // Suitable name must start with "originalName."
+        return SystemError::hostNotFound;
+    }
 
     for (const auto entry: it->second)
     {
@@ -21,29 +36,56 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
         resolvedAddresses->push_back(entry);
     }
 
-    return SystemError::noError;
+    return resolvedAddresses->empty()
+        ? SystemError::hostNotFound
+        : SystemError::noError;
 }
 
 void PredefinedHostResolver::addMapping(
-    const QString& name,
+    const std::string& name,
     std::deque<AddressEntry> entries)
 {
+    auto reversedName = nx::utils::reverseWords(name, ".");
+    nx::utils::to_lower(&reversedName);
+
     QnMutexLocker lock(&m_mutex);
-    m_etcHosts[name] = std::move(entries);
+    auto& existingEntries = m_etcHosts[reversedName];
+    for (auto& entry: entries)
+    {
+        if (!nx::utils::contains(existingEntries.begin(), existingEntries.end(), entry))
+            existingEntries.push_back(std::move(entry));
+    }
 }
 
-void PredefinedHostResolver::removeMapping(const QString& name)
+void PredefinedHostResolver::replaceMapping(
+    const std::string& name,
+    std::deque<AddressEntry> entries)
 {
+    auto reversedName = nx::utils::reverseWords(name, ".");
+    nx::utils::to_lower(&reversedName);
+
     QnMutexLocker lock(&m_mutex);
-    m_etcHosts.erase(name);
+    m_etcHosts[reversedName] = std::move(entries);
+}
+
+void PredefinedHostResolver::removeMapping(const std::string& name)
+{
+    auto reversedName = nx::utils::reverseWords(name, ".");
+    nx::utils::to_lower(&reversedName);
+
+    QnMutexLocker lock(&m_mutex);
+    m_etcHosts.erase(reversedName);
 }
 
 void PredefinedHostResolver::removeMapping(
-    const QString& name,
+    const std::string& name,
     const AddressEntry& entryToRemove)
 {
+    auto reversedName = nx::utils::reverseWords(name, ".");
+    nx::utils::to_lower(&reversedName);
+
     QnMutexLocker lock(&m_mutex);
-    auto it = m_etcHosts.find(name);
+    auto it = m_etcHosts.find(reversedName);
     if (it == m_etcHosts.end())
         return;
 

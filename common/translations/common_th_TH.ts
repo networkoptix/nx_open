@@ -53,11 +53,6 @@
       <translation>ระบบ %1 ที่ค้นพบมีเวอร์ชันที่เข้ากันไม่ได้ %2</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ไม่สามารถเชื่อมต่อกับระบบอื่นได้เนื่องจากระบบปัจจุบันได้เชื่อมต่อกับ %1 แล้ว</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>ระบบที่ค้นพบ %1 อยู่ในเซฟโหมด</translation>
@@ -68,21 +63,6 @@
       <translation>ไม่สามารถกำหนดค่าระบบจากระยะไกล %1</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ทั้งสองระบบเชื่อมต่อกับ %1 ไม่รวม Merge</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ระบบเหล่านี้สร้างขึ้นด้วย URL %1 ต่างกัน ไม่รวม Merge</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>ระบบคลาวด์สามารถเท่าผสานกัน ด้วยเลย ระบบชื่อและรหัสผ่านจะถูกนำจากระบบคลาวด์</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>ระบบใหม่</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>ระบบค้นพบ %1 ไม่สามารถทำงานร่วมกับระบบปัจจุบันได้</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>ไม่สามารถเชื่อมต่อกับระบบอื่นได้เนื่องจากระบบปัจจุบันได้เชื่อมต่อกับ %1 แล้ว</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 ระบบสามารถรวมเข้ากับ non-%1เท่านั้น ชื่อระบบและรหัสผ่านจะถูกนำมาจาก %1 ระบบ</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>ทั้งสองระบบเชื่อมต่อกับ %1 ไม่รวม Merge</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>ระบบเหล่านี้สร้างขึ้นด้วย URL %1 ต่างกัน ไม่รวม Merge</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>เหตุการณ์ของระบบ</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>ระบบผูกพันกับ cloud (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>เซิร์ฟเวอร์ไม่ได้เชื่อมต่อกับอินเทอร์เน็ต</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>ไม่สามารถบันทึกข้อมูลประจำตัวของระบบคลาวด์ไปยัง DB ในระบบ</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>ไม่สามารถบันทึกข้อมูลประจำตัวของระบบคลาวด์ไปยัง DB ในระบบ</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>ไม่สามารถเชื่อมต่อกับระบบคลาวด์: %1</translation>
     </message>
   </context>
   <context>
@@ -313,6 +333,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>ขั้นแรกลองเปิดการบันทึก (ถ้าปิด) และลด fps ในการตั้งค่าอุปกรณ์ (ข้อผิดพลาด &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>กรุณาอัพเดทเฟิร์มแวร์ เวอร์ชันที่สนับสนุนน้อยที่สุดคือ %1เวอร์ชันปัจจุบันคือ %2</translation>
     </message>
   </context>
   <context>
@@ -553,8 +577,8 @@
       <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>ไม่พบเซิร์ฟเวอร์ที่มี Id ฮาร์ดแวร์ที่ตรงกัน</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>ไม่พบเซิร์ฟเวอร์ที่มี ID ฮาร์ดแวร์ที่ตรงกัน</translation>
     </message>
   </context>
   <context>
@@ -670,12 +694,12 @@
       <translation>ลายน้ำ: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>รหัสฮาร์ดแวร์: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>เวลาใบอนุญาต</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>รหัสฮาร์ดแวร์: %1</translation>
     </message>
   </context>
   <context>
@@ -810,145 +834,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>พารามิเตอร์ไม่ถูกต้อง</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>วินาที</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>นาที</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>ชั่วโมง</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>วัน</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>สัปดาห์</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>ปี</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>มิลลิวินาที</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>วินาที</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>นาที</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>ชั่วโมง</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>วัน</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>สัปดาห์</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>เดือน</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>ปี</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1495,6 +1380,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 ที่ %2</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>เปิดในหน้าต่างใหม่</translation>
     </message>
   </context>
   <context>

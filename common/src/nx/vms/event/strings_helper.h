@@ -76,7 +76,7 @@ public:
 	QString eventTimestampTime(const EventParameters &params) const;
 	QString eventTimestampDate(const EventParameters &params) const;
 
-    QString eventTimestampShort(const EventParameters &params, int aggregationCount) const;
+    QString eventTimestampInHtml(const EventParameters &params, int aggregationCount) const;
 
 
 	QString getResoureNameFromParams(const EventParameters& params,
@@ -93,7 +93,7 @@ public:
     static QString needToSelectUserText();
 
     static QString defaultSoftwareTriggerName();
-    static QString getSoftwareTriggerName(const QString& id);
+    static QString getSoftwareTriggerName(const QString& name);
     static QString getSoftwareTriggerName(const EventParameters& params);
 
     QString getAnalyticsSdkEventName(const EventParameters& params,

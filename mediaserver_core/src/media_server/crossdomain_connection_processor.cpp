@@ -1,19 +1,23 @@
 #include "crossdomain_connection_processor.h"
 
-#include <network/tcp_connection_priv.h>
-#include <nx/network/http/http_types.h>
-#include <core/resource/media_server_resource.h>
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-#include <api/global_settings.h>
-#include <utils/common/app_info.h>
+#include <core/resource/media_server_resource.h>
+#include <network/tcp_connection_priv.h>
 #include <network/tcp_listener.h>
+#include <utils/common/app_info.h>
 
+#include <nx/network/app_info.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 
 namespace {
+
     static const QByteArray kContentType = "application/xml";
-    static const QByteArray kIfacePattern = "%SERVER_IF_LIST%";
-    static const QByteArray kCrossdomainPattern = "%CLOUD_PORTAL_URL%";
+static const QByteArray kIfacePattern = "%SERVER_IF_LIST%";
+static const QByteArray kCrossdomainPattern = "%CLOUD_PORTAL_URL%";
+
 } // namespace
 
 class QnCrossdomainConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
@@ -76,7 +80,9 @@ void QnCrossdomainConnectionProcessor::run()
         else if (lines[i].contains(kCrossdomainPattern))
         {
             lines.removeAt(i);
-            const QString portalUrl = QUrl(nx::network::AppInfo::defaultCloudModulesXmlUrl()).host();
+            const QString portalUrl =
+                QUrl(nx::network::AppInfo::defaultCloudModulesXmlUrl(
+                    nx::network::SocketGlobals::cloud().cloudHost())).host();
             if (!portalUrl.isEmpty())
                 lines.insert(i, pattern.replace(kCrossdomainPattern, portalUrl.toUtf8()));
         }

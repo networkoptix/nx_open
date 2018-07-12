@@ -12,7 +12,6 @@
 
 #include "core/resource/storage_resource.h"
 
-
 //!Provides externally-supplied QIODevice as resource
 class QnExtIODeviceStorageResource: public QnStorageResource
 {
@@ -42,15 +41,15 @@ public:
     //!Implementation of QnStorageResource::removeFile
     virtual bool removeFile( const QString& path ) override;
     //!Implementation of QnStorageResource::removeDir
-    virtual bool removeDir( const QString& path ) override { Q_UNUSED(path) return false; }
+    virtual bool removeDir( const QString& /*path*/ ) override { return false; }
     //!Implementation of QnStorageResource::renameFile
-    virtual bool renameFile( const QString& oldName, const QString& newName ) override { Q_UNUSED(oldName) Q_UNUSED(newName) return false; }
+    virtual bool renameFile( const QString& /*oldName*/, const QString& /*newName*/ ) override { return false; }
     //!Implementation of QnStorageResource::getFileList
     virtual QnAbstractStorageResource::FileInfoList getFileList( const QString& dirName );
     //!Implementation of QnStorageResource::isFileExists
     virtual bool isFileExists( const QString& path );
     //!Implementation of QnStorageResource::isDirExists
-    virtual bool isDirExists( const QString& path ) override { Q_UNUSED(path) return false; }
+    virtual bool isDirExists( const QString& /*path*/ ) override { return false; }
     //!Implementation of QnStorageResource::isRealFiles
     virtual bool isRealFiles() const{ return false; }
     //!Implementation of QnStorageResource::getFileSize

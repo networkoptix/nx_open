@@ -1,1 +1,3 @@
-nx_add_target(connection_mediator EXECUTABLE PUBLIC_LIBS libconnection_mediator)
+nx_add_target(connection_mediator EXECUTABLE NO_MOC
+    PUBLIC_LIBS libconnection_mediator
+)

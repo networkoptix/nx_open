@@ -16,7 +16,8 @@ namespace kit {
  * are defined in the code and lead to the nominal behavior, which can be overridden by creating
  * .ini files (with name=value lines) in the directory determined by the platform:
  * - Windows: "%NX_INI_DIR%\" (if env var defined), or "%LOCALAPPDATA%\nx_ini\" (otherwise).
- * - Unix-like: "$NX_INI_DIR/" (if env var defined), or "$HOME/.config/nx_ini/" (otherwise).
+ * - Unix-like: "$NX_INI_DIR/" (if env var defined), or "$HOME/.config/nx_ini/" (if $HOME defined),
+ *     "/etc/nx_ini/" (otherwise).
  * - Android: "/sdcard/".
  * - iOS: Not supported yet.
  *
@@ -37,6 +38,8 @@ namespace kit {
  *         NX_INI_FLAG(0, myFlag, "Here 0 stands for 'false' as the default value.");
  *         NX_INI_INT(7, myInt, "Here 7 is the default value.");
  *         NX_INI_STRING("Default value", myStr, "Description.");
+ *         NX_INI_FLOAT(1.0, myFloat, "Here 1.0 is the default value.");
+ *         NX_INI_DOUBLE(1.0, myDouble, "Here 1.0 is the default value.");
  *     };
  *
  *     inline Ini& ini()
@@ -68,8 +71,11 @@ public:
      */
     static void setOutput(std::ostream* output);
 
+    /** @return Currently used path to .ini files, including the trailing slash or backslash. */
+    static const char* iniFilesDir();
+
     /**
-     * Use the specified directory for .ini files. If iniFileDir is null or empty, and also before
+     * Use the specified directory for .ini files. If iniFilesDir is null or empty, and also before
      * this call, a platform-dependent system temp directory is used, which can be changed defining
      * a macro at compiling ini_config.cpp:
      * -DNX_INI_CONFIG_DEFAULT_INI_FILES_DIR=<enquoted-path-with-trailing-slash-or-backslash>
@@ -84,12 +90,11 @@ public:
     IniConfig(const IniConfig& /*other*/) = delete; //< Disable the copy constructor.
     IniConfig& operator=(const IniConfig& /*other*/) = delete; //< Disable the assignment operator.
 
+    const char* iniFile() const; /**< @return Stored copy of the string supplied to the ctor. */
+    const char* iniFilePath() const; /**< @return iniFilesDir() + iniFile(). */
+
     /** Reload values from .ini file, logging the values first time, or if changed. */
     void reload();
-
-    const char* iniFile() const; /**< @return Stored copy of the string supplied to the ctor. */
-    const char* iniFileDir() const; /**< @return Path including the trailing slash or backslash. */
-    const char* iniFilePath() const; /**< @return iniFileDir() + iniFile(). */
 
 protected:
     #define NX_INI_FLAG(DEFAULT, PARAM, DESCRIPTION) \
@@ -101,6 +106,12 @@ protected:
     #define NX_INI_STRING(DEFAULT, PARAM, DESCRIPTION) \
         const char* const PARAM = regStringParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
 
+    #define NX_INI_FLOAT(DEFAULT, PARAM, DESCRIPTION) \
+        const float PARAM = regFloatParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
+
+    #define NX_INI_DOUBLE(DEFAULT, PARAM, DESCRIPTION) \
+        const double PARAM = regDoubleParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
+
 protected: // Used by macros.
     bool regBoolParam(const bool* pValue, bool defaultValue,
         const char* paramName, const char* description);
@@ -111,8 +122,14 @@ protected: // Used by macros.
     const char* regStringParam(const char* const* pValue, const char* defaultValue,
         const char* paramName, const char* description);
 
+    float regFloatParam(const float* pValue, float defaultValue,
+        const char* paramName, const char* description);
+
+    double regDoubleParam(const double* pValue, double defaultValue,
+        const char* paramName, const char* description);
+
 private:
-    struct Impl;
+    class Impl;
     Impl* const d;
 };
 

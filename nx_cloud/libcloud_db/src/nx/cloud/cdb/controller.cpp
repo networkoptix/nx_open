@@ -14,10 +14,13 @@ namespace cdb {
 static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
 Controller::Controller(const conf::Settings& settings):
+    m_settings(settings),
     m_dbInstanceController(settings.dbConnectionOptions()),
     m_emailManager(EMailManagerFactory::create(settings)),
     m_streeManager(settings.auth().rulesXmlPath),
-    m_tempPasswordManager(&m_dbInstanceController.queryExecutor()),
+    m_tempPasswordManager(
+        m_streeManager.resourceNameSet(),
+        &m_dbInstanceController.queryExecutor()),
     m_accountManager(
         settings,
         m_streeManager,
@@ -42,6 +45,9 @@ Controller::Controller(const conf::Settings& settings):
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
         &m_ec2SyncronizationEngine),
+    m_systemCapabilitiesProvider(
+        &m_systemManager,
+        &m_ec2SyncronizationEngine.connectionManager()),
     m_vmsGateway(settings, m_accountManager),
     m_systemMergeManager(
         &m_systemManager,
@@ -102,7 +108,7 @@ EventManager& Controller::eventManager()
     return m_eventManager;
 }
 
-ec2::SyncronizationEngine& Controller::ec2SyncronizationEngine()
+data_sync_engine::SyncronizationEngine& Controller::ec2SyncronizationEngine()
 {
     return m_ec2SyncronizationEngine;
 }
@@ -172,7 +178,7 @@ void Controller::performDataMigrations()
     }
 }
 
-void Controller::generateUserAuthRecords(nx::utils::db::QueryContext* queryContext)
+void Controller::generateUserAuthRecords(nx::sql::QueryContext* queryContext)
 {
     const auto allSystemSharings = m_systemManager.fetchAllSharings();
     for (const auto& sharing: allSystemSharings)
@@ -188,6 +194,7 @@ void Controller::initializeSecurity()
 {
     // TODO: #ak Move following to stree xml.
     m_authRestrictionList = std::make_unique<nx::network::http::AuthMethodRestrictionList>();
+    m_authRestrictionList->allow(kAnotherDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx::network::http::AuthMethod::noAuth);
@@ -199,6 +206,7 @@ void Controller::initializeSecurity()
     authDataProviders.push_back(&m_accountManager);
     authDataProviders.push_back(&m_systemManager);
     m_authenticationManager = std::make_unique<AuthenticationManager>(
+        m_settings,
         std::move(authDataProviders),
         *m_authRestrictionList,
         m_streeManager);
@@ -207,7 +215,8 @@ void Controller::initializeSecurity()
         m_streeManager,
         m_accountManager,
         m_systemManager,
-        m_systemManager);
+        m_systemManager,
+        m_tempPasswordManager);
 }
 
 void Controller::initializeDataSynchronizationEngine()
@@ -216,17 +225,17 @@ void Controller::initializeDataSynchronizationEngine()
         m_systemManager.systemMarkedAsDeletedSubscription());
 
     m_ec2SyncronizationEngine.incomingTransactionDispatcher().registerTransactionHandler
-        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, ::ec2::ApiSystemMergeHistoryRecord, int>(
+        <::ec2::ApiCommand::saveSystemMergeHistoryRecord, nx::vms::api::SystemMergeHistoryRecord, int>(
             [this](
-                nx::utils::db::QueryContext* queryContext,
+                nx::sql::QueryContext* queryContext,
                 const nx::String& /*systemId*/,
-                ::ec2::QnTransaction<::ec2::ApiSystemMergeHistoryRecord> data,
+                data_sync_engine::Command<nx::vms::api::SystemMergeHistoryRecord> data,
                 int*)
             {
                 m_systemMergeManager.processMergeHistoryRecord(queryContext, data.params);
-                return nx::utils::db::DBResult::ok;
+                return nx::sql::DBResult::ok;
             },
-            [](nx::utils::db::QueryContext*, nx::utils::db::DBResult, int) {});
+            [](nx::sql::DBResult, int) {});
 }
 
 } // namespace cdb

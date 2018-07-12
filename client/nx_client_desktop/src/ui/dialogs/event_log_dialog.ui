@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1,0,0">
    <item>
-    <widget class="QnPanel" name="widget" native="true">
+    <widget class="nx::client::desktop::Panel" name="widget" native="true">
      <layout class="QHBoxLayout" name="panelLayout">
       <item>
        <widget class="QnDateRangeWidget" name="dateRangeWidget" native="true"/>
@@ -128,7 +128,7 @@
         <number>16</number>
        </property>
        <item>
-        <widget class="QnTableView" name="gridEvents">
+        <widget class="nx::client::desktop::TableView" name="gridEvents">
          <property name="mouseTracking">
           <bool>true</bool>
          </property>
@@ -253,14 +253,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTableView</class>
+   <class>nx::client::desktop::TableView</class>
    <extends>QTableView</extends>
-   <header location="global">ui/widgets/common/table_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/table_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -19,20 +19,27 @@ namespace {
 
 static const char* const kScriptName = "start_lite_client";
 
+static QString scriptFileName()
+{
+    return getDataDirectory() + "/scripts/" + kScriptName;
+}
+
 } // namespace
 
+/*static*/ bool QnStartLiteClientRestHandler::isLiteClientPresent()
+{
+    return QFile::exists(scriptFileName());
+}
+
 int QnStartLiteClientRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* connectionProcessor)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(connectionProcessor);
-
     const bool startCamerasMode = params.contains(lit("startCamerasMode"));
 
-    QString fileName = getDataDirectory() + "/scripts/" + kScriptName;
+    const QString fileName = scriptFileName();
     if (!QFile::exists(fileName))
     {
         result.setError(QnRestResult::InvalidParameter, lit(

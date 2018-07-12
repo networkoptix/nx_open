@@ -5,13 +5,17 @@
 
 #include <client/client_globals_fwd.h>
 
-class QnImageProvider: public QObject
+namespace nx {
+namespace client {
+namespace desktop {
+
+class ImageProvider: public QObject
 {
     Q_OBJECT
 
 public:
-    QnImageProvider(QObject* parent = nullptr);
-    virtual ~QnImageProvider() {}
+    ImageProvider(QObject* parent = nullptr);
+    virtual ~ImageProvider() override = default;
 
     virtual QImage image() const = 0;
     virtual QSize sizeHint() const = 0;
@@ -27,16 +31,14 @@ signals:
 
 protected:
     virtual void doLoadAsync() = 0;
-
 };
 
-class QnBasicImageProvider: public QnImageProvider
+class BasicImageProvider: public ImageProvider
 {
     Q_OBJECT
 public:
-    QnBasicImageProvider(const QImage& image, QObject* parent = nullptr);
-
-    virtual ~QnBasicImageProvider() {}
+    BasicImageProvider(const QImage& image, QObject* parent = nullptr);
+    virtual ~BasicImageProvider() override = default;
 
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
@@ -48,3 +50,7 @@ protected:
 private:
     QImage m_image;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

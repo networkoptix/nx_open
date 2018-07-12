@@ -21,7 +21,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOCAL_ENVIRONMENT = False
+LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
 
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
@@ -35,7 +35,7 @@ if not CUSTOMIZATION:
 SECRET_KEY = '03-b9bxxpjxsga(qln0@3szw3+xnu%6ph_l*sz-xr_4^xxrj!_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'debug' in conf and conf['debug']
+DEBUG = 'debug' in conf and conf['debug'] or LOCAL_ENVIRONMENT
 
 ALLOWED_HOSTS = ['*']
 
@@ -49,7 +49,6 @@ INSTALLED_APPS = (
     'admin_tools.dashboard',
 
     'django.contrib.admin',
-    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -160,9 +159,10 @@ CACHES = {
         }
     }
 }
+PRIMARY_PRODUCT = "cloud_portal"
 
 if LOCAL_ENVIRONMENT:
-    conf["cloud_db"]["url"] = 'https://cloud-dev.hdw.mx/cdb'
+    conf["cloud_db"]["url"] = 'https://cloud-dev2.hdw.mx/cdb'
     CACHES["global"] = {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'portal_cache',
@@ -281,15 +281,17 @@ BROKER_URL = os.getenv('QUEUE_BROKER_URL')
 BROKER_CONNECTION_MAX_RETRIES = 1
 if not BROKER_URL:
     BROKER_URL = 'sqs://AKIAIQVGGMML4WNBECRA:jmXYHNKOAL9gYYaxAVClgegzShjaPF27ycvBOV1s@'
-    BROKER_TRANSPORT_OPTIONS = {
-        'queue_name_prefix' : conf['queue_name'] + '-',
-        'region' : 'us-east-1'
-    }
+
+BROKER_TRANSPORT_OPTIONS = {
+    'queue_name_prefix' : conf['queue_name'] + '-',
+    'region' : 'us-east-1'
+}
 
 RESULT_PERSISTENT = True
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_SEND_EVENTS = False
-WORKER_PREFETCH_MULTIPLIER = 1
+CELERYD_PREFETCH_MULTIPLIER = 0  # Allows worker to consume as many messages it wants
+BROKER_HEARTBEAT = 10  # Supposed to check connection with broker
 
 # / End of Celery settings section
 
@@ -319,11 +321,11 @@ AUTH_USER_MODEL = 'api.Account'
 AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend', )
 
 
-CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
-CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = DEBUG
+CORS_ALLOW_CREDENTIALS = DEBUG
 
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = not LOCAL_ENVIRONMENT
+CSRF_COOKIE_SECURE = not LOCAL_ENVIRONMENT
 
 USE_ASYNC_QUEUE = True
 
@@ -366,13 +368,16 @@ NOTIFICATIONS_CONFIG = {
     'system_shared': {
         'engine': 'email'
     },
+    "review_version": {
+        'engine': 'email'
+    },
     'cloud_notification':{
         'engine': 'email',
         'queue': 'broadcast-notifications'
     }
 }
 
-BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = True
+BROADCAST_NOTIFICATIONS_SUPERUSERS_ONLY = DEBUG
 NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
 
@@ -381,6 +386,8 @@ DOWNLOADS_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}
 DOWNLOADS_VERSION_JSON = 'http://updates.hdwitness.com.s3.amazonaws.com/{{customization}}/{{build}}/downloads.json'
 
 MAX_RETRIES = conf['max_retries']
+CLEAR_HISTORY_RECORDS_OLDER_THAN_X_DAYS = 30
+CMS_MAX_FILE_SIZE = 9
 
 SUPERUSER_DOMAIN = '@networkoptix.com'  # Only user from this domain can have superuser permissions
 

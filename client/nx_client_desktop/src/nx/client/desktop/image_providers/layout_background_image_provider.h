@@ -10,10 +10,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class LayoutBackgroundImageProvider: public Connective<QnImageProvider>
+class LayoutBackgroundImageProvider: public Connective<ImageProvider>
 {
     Q_OBJECT
-    using base_type = Connective<QnImageProvider>;
+    using base_type = Connective<ImageProvider>;
 
 public:
     explicit LayoutBackgroundImageProvider(const QnLayoutResourcePtr& layout,

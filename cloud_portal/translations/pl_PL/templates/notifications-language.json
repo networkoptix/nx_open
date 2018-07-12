@@ -6,10 +6,10 @@
     "emailSubject": "Zresetuj swoje hasło"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} zaprasza Cię do {{PRODUCT_NAME}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} zaprasza Cię do %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}System wideo {{message.system_name}} został Ci udostępniony{{/message.sharer_name}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} zaprasza Cię do {{PRODUCT_NAME}}"
+    "emailSubject": "Udostępniono Ci system wideo {{message.system_name}}"
   },
   "review_version": {
     "emailSubject": "Wersja {{message.id}} jest gotowa do sprawdzenia"

@@ -53,11 +53,6 @@
       <translation>Het ontdekte systeem %1 heeft een incompatibele versie %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Kan niet verbinden met het andere systeem omdat het huidige systeem al is aangesloten op %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Het ontdekte systeem %1 staat in de veilige modus.</translation>
@@ -68,21 +63,6 @@
       <translation>Kon het externe systeem %1 niet configureren.</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Beide systemen zijn verbonden met %1. Samenvoegen is niet toegestaan.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Deze systemen zijn gebouwd met een andere %1 URL. Samenvoegen is niet toegestaan.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cloud Systeem kan alleen met non-cloud worden samengevoegd. Systeemnaam en wachtwoord worden afkomstig van Cloud Systeem.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Nieuw systeem</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>Het gevonden systeem %1 is niet samen te voegen met het huidige systeem.</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kan niet verbinden met het andere systeem omdat het huidige systeem al is aangesloten op %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 Systeem kan alleen worden samengevoegd met niet-%1. Systeemnaam en wachtwoord zijn overgenomen van %1 Systeem.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Beide systemen zijn verbonden met %1. Samenvoegen is niet toegestaan.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Deze systemen zijn gebouwd met een andere %1 URL. Samenvoegen is niet toegestaan.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Systeemgebeurtenis</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>Systeem al verbonden met cloud (Id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>De server is niet verbonden met het internet.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Het is niet gelukt om de cloud inloggegevens op te slaan in de lokale database</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Het is niet gelukt om de cloud eigenaar op te slaan in de lokale database</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Kan geen verbinding maken met cloud: %1</translation>
     </message>
   </context>
   <context>
@@ -313,6 +333,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Probeer eerst de opname aan te zetten (als deze uit staat) en verminder het aantal fps in I/O instellingen (fout &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Werk de firmware bij. Minimale ondersteunde versie is %1. De huidige versie is %2</translation>
     </message>
   </context>
   <context>
@@ -557,8 +581,8 @@
       <translation>Onbekende fout</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Server met bijpassende Hardware-Id niet gevonden</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Server met bijpassende Hardware-ID niet gevonden</translation>
     </message>
   </context>
   <context>
@@ -632,14 +656,14 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O Module(s)</numerusform>
         <numerusform>%n I/O Module(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n I/O module(s)</numerusform>
         <numerusform>%n I/O module(s)</numerusform>
       </translation>
@@ -680,12 +704,12 @@
       <translation>Watermerk: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Hardware Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Tijdlicentie</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Hardware ID: %1</translation>
     </message>
   </context>
   <context>
@@ -823,153 +847,6 @@
     </message>
   </context>
   <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>u</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>j</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>sec</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>uren</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>dagen</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>weken</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>maanden</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>jaren</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>milliseconden</numerusform>
-        <numerusform>milliseconden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>seconden</numerusform>
-        <numerusform>seconden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>minuten</numerusform>
-        <numerusform>minuten</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>uren</numerusform>
-        <numerusform>uren</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>dagen</numerusform>
-        <numerusform>dagen</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>weken</numerusform>
-        <numerusform>weken</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>maanden</numerusform>
-        <numerusform>maanden</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>jaren</numerusform>
-        <numerusform>jaren</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
@@ -1000,11 +877,11 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>Geavanceerde Kijker</translation>
+      <translation>Geavanceerde Viewer</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>Kijker</translation>
+      <translation>Viewer</translation>
     </message>
     <message>
       <source>Live Viewer</source>
@@ -1325,7 +1202,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1525,6 +1402,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 op %2</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Open schermindeling</translation>
     </message>
   </context>
   <context>

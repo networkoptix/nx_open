@@ -12,8 +12,9 @@
 #include <ws2tcpip.h>
 #endif
 
-#include <nx/utils/log/assert.h>
 #include <nx/network/nettools.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/scope_guard.h>
 
 namespace QnMulticast
 {
@@ -454,6 +455,8 @@ void Transport::eraseRequest(const QUuid& id)
 
 void Transport::at_socketReadyRead()
 {
+    std::vector<Guard> callbackGuards;
+
     QnMutexLocker lock(&m_mutex);
     while (m_recvSocket->hasPendingDatagrams())
     {
@@ -508,7 +511,14 @@ void Transport::at_socketReadyRead()
             {
                 Request request = parseRequest(transportData, &ok);
                 if (ok && m_requestCallback)
-                    m_requestCallback(transportData.requestId, packet.clientId, request);
+                {
+                    callbackGuards.emplace_back(
+                        [callback = m_requestCallback, requestId = transportData.requestId,
+                            packetId = packet.clientId, request = std::move(request)]()
+                        {
+                            callback(requestId, packetId, request);
+                        });
+                }
             }
             eraseRequest(packet.requestId);
         }

@@ -10,7 +10,7 @@ namespace vms {
 namespace event {
 
 EventParameters::EventParameters():
-    eventType(undefinedEvent),
+    eventType(EventType::undefinedEvent),
     eventTimestampUsec(0),
     reasonCode(EventReason::none)
 {
@@ -21,8 +21,8 @@ QnUuid EventParameters::getParamsHash() const
     QByteArray paramKey(QByteArray::number(eventType));
     switch (eventType)
     {
-        case serverFailureEvent:
-        case storageFailureEvent:
+        case EventType::serverFailureEvent:
+        case EventType::storageFailureEvent:
             paramKey += '_' + QByteArray::number(int(reasonCode));
             if (reasonCode == EventReason::storageIoError
                 || reasonCode == EventReason::storageTooSlow
@@ -34,19 +34,19 @@ QnUuid EventParameters::getParamsHash() const
             }
             break;
 
-        case softwareTriggerEvent:
+        case EventType::softwareTriggerEvent:
             return QnUuid::createUuid(); //< Warning: early return.
             break;
 
-        case cameraInputEvent:
+        case EventType::cameraInputEvent:
             paramKey += '_' + inputPortId.toUtf8();
             break;
 
-        case cameraDisconnectEvent:
+        case EventType::cameraDisconnectEvent:
             paramKey += '_' + eventResourceId.toByteArray();
             break;
 
-        case networkIssueEvent:
+        case EventType::networkIssueEvent:
             paramKey += '_' + eventResourceId.toByteArray();
             paramKey += '_' + QByteArray::number(int(reasonCode));
             break;

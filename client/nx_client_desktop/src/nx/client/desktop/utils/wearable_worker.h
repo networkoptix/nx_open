@@ -45,19 +45,12 @@ signals:
     void finished();
 
 private:
-    enum FailReason {
-        LockRequestFailed,
-        CameraSnatched,
-        UploadFailed,
-        ConsumeRequestFailed,
-    };
-
     void processCurrentFile();
     void processNextFile();
 
-    WearableState::Status calculateNewStatus(FailReason reason);
-    QString calculateErrorMessage(FailReason reason, const QString& errorMessage);
-    void handleFailure(FailReason reason, const QString& errorMessage = QString());
+    WearableState::Status calculateNewStatus(WearableState::Error error);
+    QString calculateErrorMessage(WearableState::Error error, const QString& errorMessage);
+    void handleFailure(WearableState::Error error, const QString& errorMessage = QString());
     void handleStop();
     void handleStatusFinished(bool success, const QnWearableStatusReply& result);
     void handleLockFinished(bool success, const QnWearableStatusReply& result);

@@ -10,3 +10,8 @@ function isChild(item, parent)
     }
     return false
 }
+
+function isRotated90(angle)
+{
+    return angle % 90 == 0 && angle % 180 != 0
+}

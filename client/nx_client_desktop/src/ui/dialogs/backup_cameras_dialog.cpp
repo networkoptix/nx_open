@@ -15,8 +15,10 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/alert_bar.h>
+#include <nx/client/desktop/common/widgets/message_bar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -36,7 +38,7 @@ namespace {
         if (!camera)
             return false;
 
-        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled
+        return camera->getActualBackupQualities() != Qn::CameraBackupQuality::CameraBackup_Disabled
             || isValidServer(camera->getParentServer());
     }
 
@@ -165,7 +167,7 @@ QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent) :
 
     setDelegate(new BackupCamerasDialogDelegate(this));
 
-    const auto alertBar = new QnPromoBar(this);
+    const auto alertBar = new PromoBar(this);
     alertBar->setText(tr("If the backup is not set up on the current server of the cameras, "
         "their archive will not be backed up."));
 

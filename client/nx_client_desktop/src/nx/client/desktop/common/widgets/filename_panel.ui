@@ -47,7 +47,7 @@
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="QnInputField" name="folderInputField" native="true">
+    <widget class="nx::client::desktop::InputField" name="folderInputField" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -57,7 +57,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QnInputField" name="nameInputField" native="true">
+    <widget class="nx::client::desktop::InputField" name="nameInputField" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -75,9 +75,9 @@
    <header location="global">nx/client/desktop/common/widgets/advanced_combo_box.h</header>
   </customwidget>
   <customwidget>
-   <class>QnInputField</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

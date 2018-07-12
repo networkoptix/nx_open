@@ -41,12 +41,8 @@ QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
     close();
 }
 
-bool QnVMax480ArchiveDelegate::open(
-    const QnResourcePtr &resource,
-    AbstractArchiveIntegrityWatcher* /*archiveIntegrityWatcher*/)
+bool QnVMax480ArchiveDelegate::open(const QnResourcePtr&, AbstractArchiveIntegrityWatcher*)
 {
-    Q_UNUSED(resource)
-
     if (m_isOpened)
         return true;
 
@@ -90,9 +86,8 @@ qint64 QnVMax480ArchiveDelegate::seek(qint64 time, bool findIFrame)
     return seekInternal(time, findIFrame);
 }
 
-qint64 QnVMax480ArchiveDelegate::seekInternal(qint64 time, bool findIFrame)
+qint64 QnVMax480ArchiveDelegate::seekInternal(qint64 time, bool /*findIFrame*/)
 {
-    Q_UNUSED(findIFrame)
     qDebug() << "QnVMax480ArchiveDelegate::seek";
 
     m_maxStream->vmaxArchivePlay(this, time, m_reverseMode ? -1 : 1);
@@ -134,7 +129,6 @@ void QnVMax480ArchiveDelegate::reconnect()
 QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result;
-
 
     if (!m_isOpened) {
         open(m_res, nullptr /*archiveIntegrityWatcher*/);
@@ -301,9 +295,8 @@ QnTimePeriodList QnVMax480ArchiveDelegate::chunks()
     return m_res->getChunks();
 }
 
-void QnVMax480ArchiveDelegate::beforeSeek(qint64 time)
+void QnVMax480ArchiveDelegate::beforeSeek(qint64 /*time*/)
 {
-    Q_UNUSED(time)
     m_beforeSeek = true;
 }
 

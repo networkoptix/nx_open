@@ -1,27 +1,28 @@
 #include "io_module_overlay_widget.h"
 
 #include <QtCore/QElapsedTimer>
-
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include "io_module_form_overlay_contents.h"
 #include "io_module_grid_overlay_contents.h"
 
-#include <client_core/connection_context_aware.h>
-
-#include <common/common_module.h>
-
 #include <api/app_server_connection.h>
-#include <core/resource/camera_resource.h>
+
+#include <nx_ec/data/api_conversion_functions.h>
+
 #include <camera/iomodule/iomodule_monitor.h>
+#include <client_core/connection_context_aware.h>
+#include <common/common_module.h>
+#include <core/resource/camera_resource.h>
+#include <utils/common/connective.h>
+#include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
+
 #include <nx/vms/event/event_parameters.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/actions_fwd.h>
 #include <nx/vms/event/actions/camera_output_action.h>
 #include <nx/fusion/model_functions.h>
-#include <utils/common/connective.h>
-#include <utils/common/delayed.h>
-#include <utils/common/synctime.h>
 
 using namespace nx;
 
@@ -37,6 +38,7 @@ class QnIoModuleOverlayWidgetPrivate: public Connective<QObject>,
     public QnConnectionContextAware
 {
     using base_type = Connective<QObject>;
+    using Style = QnIoModuleOverlayWidget::Style;
 
     Q_DISABLE_COPY(QnIoModuleOverlayWidgetPrivate)
     Q_DECLARE_PUBLIC(QnIoModuleOverlayWidget)
@@ -60,9 +62,9 @@ public:
 
     QnIOPortDataList ports;
     QMap<QString, StateData> states;
-    QTimer* const timer;
-    QGraphicsLinearLayout* const layout;
-    QnIoModuleOverlayWidget::Style overlayStyle;
+    QTimer* const timer = nullptr;
+    QGraphicsLinearLayout* const layout = nullptr;
+    QnIoModuleOverlayWidget::Style overlayStyle = QnIoModuleOverlayWidget::Style();
 
     QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget);
 
@@ -93,8 +95,7 @@ QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlay
     base_type(widget),
     q_ptr(widget),
     timer(new QTimer(this)),
-    layout(new QGraphicsLinearLayout(Qt::Vertical, widget)),
-    overlayStyle(QnIoModuleOverlayWidget::Style::Default)
+    layout(new QGraphicsLinearLayout(Qt::Vertical, widget))
 {
     widget->setAutoFillBackground(true);
 
@@ -123,8 +124,7 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
     if (module)
     {
         style = QnLexical::deserialized<QnIoModuleOverlayWidget::Style>(
-            module->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME),
-            QnIoModuleOverlayWidget::Style::Default);
+            module->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME), {});
     }
 
     bool needToCreateNewContents = style != overlayStyle || !contents;
@@ -135,11 +135,11 @@ void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
 
     switch (overlayStyle)
     {
-        case QnIoModuleOverlayWidget::Style::Tile:
+        case Style::tile:
             setContents(new QnIoModuleGridOverlayContents());
             break;
 
-        case QnIoModuleOverlayWidget::Style::Form:
+        case Style::form:
         default:
             setContents(new QnIoModuleFormOverlayContents());
             break;
@@ -307,12 +307,21 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     vms::event::CameraOutputActionPtr action(new vms::event::CameraOutputAction(eventParams));
     action->setParams(params);
     action->setResources({ module->getId() });
-    action->setToggleState(it->state.isActive ? vms::event::EventState::inactive : vms::event::EventState::active);
+    action->setToggleState(it->state.isActive ? vms::api::EventState::inactive : vms::api::EventState::active);
 
     ec2::AbstractECConnectionPtr connection = commonModule()->ec2Connection();
     // we are not interested in client->server transport error code because of real port checking by timer
     if (connection)
-        connection->getBusinessEventManager(Qn::kSystemAccess)->sendBusinessAction(action, module->getParentId(), this, [] {});
+    {
+        nx::vms::api::EventActionData actionData;
+        ec2::fromResourceToApi(action, actionData);
+
+        connection->getEventRulesManager(Qn::kSystemAccess)->sendEventAction(
+            actionData,
+            module->getParentId(),
+            this,
+            []{});
+    }
 
     it->stateChangeTimer.restart();
 }
@@ -405,8 +414,3 @@ QnIoModuleOverlayWidget* QnIoModuleOverlayContents::overlayWidget() const
 {
     return qgraphicsitem_cast<QnIoModuleOverlayWidget*>(parentItem());
 }
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnIoModuleOverlayWidget, Style,
-    (QnIoModuleOverlayWidget::Style::Form, "Form")
-    (QnIoModuleOverlayWidget::Style::Tile, "Tile")
-)

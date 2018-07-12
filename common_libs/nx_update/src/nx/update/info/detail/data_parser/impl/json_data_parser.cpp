@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/software_version.h>
+#include <nx/vms/api/data/software_version.h>
 
 #include "json_data_parser.h"
 #include "../update_data.h"
@@ -33,15 +33,19 @@ struct CustomizationInfo
     QString updates_prefix;
     QString release_notes;
     QString description;
-    QMap<QString, QnSoftwareVersion> releases;
+    QMap<QString, nx::vms::api::SoftwareVersion> releases;
 };
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    CustomizationInfo, (json),
+    CustomizationInfo,
+    (json),
     (current_release)(updates_prefix)(release_notes)(description)(releases))
 
 const static QString kAlternativesServersKey = "__info";
+const static QString kManifestVersionKey = "__version";
 const static QString kVersionKey = "version";
+const static QString kEulaVersionKey = "eulaVersion";
+const static QString kEulaLinkKey = "eulaLink";
 const static QString kCloudHostKey = "cloudHost";
 const static QString kServerPackagesKey = "packages";
 const static QString kClientPackagesKey = "clientPackages";
@@ -49,8 +53,7 @@ const static QString kClientPackagesKey = "clientPackages";
 class MetaDataParser
 {
 public:
-    MetaDataParser(const QJsonObject& topLevelObject):
-        m_topLevelObject(topLevelObject)
+    MetaDataParser(const QJsonObject& topLevelObject): m_topLevelObject(topLevelObject)
     {
         NX_ASSERT(!topLevelObject.isEmpty());
         if (topLevelObject.isEmpty())
@@ -60,9 +63,17 @@ public:
             return;
         }
 
-        // todo: implement parsing information about unsupported versions
+        // #TODO #akulikov: Implement parsing information about unsupported versions.
         parseAlternativesServerData();
         parseCustomizationData();
+
+        if (!QJson::deserialize(
+                topLevelObject,
+                kManifestVersionKey,
+                &m_updatesMetaData.updateManifestVersion))
+        {
+            m_ok = false;
+        }
     }
 
     bool ok() const
@@ -109,7 +120,7 @@ private:
         if (!m_ok)
             return;
 
-        if (key == kAlternativesServersKey)
+        if (key == kAlternativesServersKey || key == kManifestVersionKey)
             return;
 
         CustomizationInfo customizationInfo;
@@ -130,6 +141,8 @@ private:
     {
         CustomizationData customizationData;
         customizationData.name = customizationName;
+        customizationData.updatePrefix = customizationInfo.updates_prefix;
+        customizationData.releaseNotesUrl = customizationInfo.release_notes;
 
         for (auto releasesIt = customizationInfo.releases.constBegin();
              releasesIt != customizationInfo.releases.constEnd();
@@ -146,8 +159,7 @@ private:
 class UpdateDataParser
 {
 public:
-    UpdateDataParser(const QJsonObject& topLevelObject):
-        m_topLevelObject(topLevelObject)
+    UpdateDataParser(const QJsonObject& topLevelObject): m_topLevelObject(topLevelObject)
     {
         if (topLevelObject.isEmpty())
         {
@@ -157,6 +169,7 @@ public:
         }
 
         parseVersionAndCloudHost();
+        parseEula();
         parsePackages(kServerPackagesKey);
         parsePackages(kClientPackagesKey);
     }
@@ -244,6 +257,21 @@ private:
             return;
 
         m_updateData.cloudHost = parseString(kCloudHostKey);
+    }
+
+    void parseEula()
+    {
+        if (!m_ok)
+            return;
+
+        if (!QJson::deserialize(m_topLevelObject, kEulaVersionKey, &m_updateData.eulaVersion))
+        {
+            m_ok = false;
+            NX_ERROR(this, lm("%1 deserialization failed").args(kEulaVersionKey));
+            return;
+        }
+
+        m_updateData.eulaLink = parseString(kEulaLinkKey);
     }
 
     QString parseString(const QString& key)

@@ -1,11 +1,10 @@
-set(product.title "${nxtool.name}")
-
-nx_configure_file(maven/filter-resources/nxtool_app_info_impl.cpp
-    ${CMAKE_CURRENT_BINARY_DIR})
+nx_configure_file(nxtool_app_info_impl.cpp ${CMAKE_CURRENT_BINARY_DIR})
 
 file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml)
 
-nx_add_target(nxtool EXECUTABLE
+nx_add_target(nxtool EXECUTABLE SIGNED
+    RC_FILE
+        "nxtool.rc"
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/nxtool_app_info_impl.cpp"
     OTHER_SOURCES

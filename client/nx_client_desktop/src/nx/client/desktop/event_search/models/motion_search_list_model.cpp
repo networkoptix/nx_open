@@ -7,15 +7,30 @@
 #include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/event/event_fwd.h>
 
+#include <nx/client/core/watchers/server_time_watcher.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
+
+namespace {
+
+constexpr qreal kPreviewTimeFraction = 0.5;
+
+std::chrono::microseconds midTime(const QnTimePeriod& period, qreal fraction = kPreviewTimeFraction)
+{
+    using namespace std::chrono;
+    return period.isInfinite()
+        ? microseconds(DATETIME_NOW)
+        : microseconds(milliseconds(qint64(period.startTimeMs + period.durationMs * fraction)));
+}
+
+} // namespace
 
 MotionSearchListModel::MotionSearchListModel(QObject* parent):
     base_type(parent),
@@ -48,6 +63,7 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
     if (!isValid(index))
         return QVariant();
 
+    using namespace std::chrono;
     switch (role)
     {
         case Qt::DisplayRole:
@@ -57,11 +73,17 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
             return qnSkin->pixmap(lit("tree/camera.png"));
 
         case Qn::HelpTopicIdRole:
-            return QnBusiness::eventHelpId(vms::event::cameraMotionEvent);
+            return QnBusiness::eventHelpId(vms::api::EventType::cameraMotionEvent);
 
         case Qn::TimestampRole:
+            return QVariant::fromValue(microseconds(milliseconds(
+                d->period(index.row()).startTimeMs)).count());
+
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(d->period(index.row()).startTimeMs);
+            return QVariant::fromValue(midTime(d->period(index.row())).count());
+
+        case Qn::ForcePrecisePreviewRole:
+            return true;
 
         case Qn::DurationRole:
             return QVariant::fromValue(d->period(index.row()).durationMs);
@@ -75,13 +97,13 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
         case Qn::DescriptionTextRole:
         {
             const auto& period = d->period(index.row());
-            const auto timeWatcher = context()->instance<QnWorkbenchServerTimeWatcher>();
+            const auto timeWatcher = context()->instance<core::ServerTimeWatcher>();
             const auto start = timeWatcher->displayTime(period.startTimeMs);
             return lit("%1: %2<br>%3: %4")
                 .arg(tr("Start"))
                 .arg(start.toString(Qt::RFC2822Date))
                 .arg(tr("Duration"))
-                .arg(core::HumanReadable::timeSpan(std::chrono::milliseconds(period.durationMs)));
+                .arg(core::HumanReadable::timeSpan(milliseconds(period.durationMs)));
         }
 
         default:

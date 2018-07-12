@@ -63,8 +63,8 @@ QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
     QList<QnResourcePtr> result;
     nx::network::http::HttpClient httpClient;
 
-    httpClient.setSendTimeoutMs(kDeviceInfoRequestTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kDeviceInfoResponseTimeout.count());
+    httpClient.setSendTimeout(kDeviceInfoRequestTimeout);
+    httpClient.setResponseReadTimeout(kDeviceInfoResponseTimeout);
 
     auto deviceInfoUrl = url;
     deviceInfoUrl.setScheme("http");

@@ -9,8 +9,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 QnDefaultPasswordAlertBar::QnDefaultPasswordAlertBar(QWidget* parent):
-    QnAlertBar(parent),
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     m_setPasswordButton(new QPushButton(this))
 {
     m_setPasswordButton->setFlat(true);
@@ -70,7 +70,7 @@ void QnDefaultPasswordAlertBar::updateState()
     static const auto kAskAdministratorText = L' ' +
         tr("Ask your system administrator to do it.");
 
-    const bool hasAdminAccess = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+    const bool hasAdminAccess = accessController()->hasGlobalPermission(GlobalPermission::admin);
     const auto suffix = hasAdminAccess ? QString() : kAskAdministratorText;
     if (m_cameras.empty())
         setText(QString());
@@ -79,6 +79,6 @@ void QnDefaultPasswordAlertBar::updateState()
     else
         setText(kSingleCameraAlertText + suffix);
 
-    m_setPasswordButton->setText(tr("Set Password", "", m_cameras.size()));
+    m_setPasswordButton->setText(tr("Set Password"));
     m_setPasswordButton->setVisible(hasAdminAccess);
 }

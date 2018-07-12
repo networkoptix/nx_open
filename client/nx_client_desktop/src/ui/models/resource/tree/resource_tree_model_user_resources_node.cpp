@@ -15,7 +15,7 @@
 QnResourceTreeModelUserResourcesNode::QnResourceTreeModelUserResourcesNode(
     QnResourceTreeModel* model)
     :
-    base_type(model, Qn::UserResourcesNode)
+    base_type(model, NodeType::userResources)
 {
     connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModelUserResourcesNode::handleAccessChanged);
@@ -101,7 +101,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserResourcesNode::ensureResourceN
     }
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), resource,
-        Qn::SharedResourceNode));
+        NodeType::sharedResource));
     node->initialize();
 
     auto parent = toSharedPointer();
@@ -152,9 +152,9 @@ void QnResourceTreeModelUserResourcesNode::rebuild()
     }
 }
 
-void QnResourceTreeModelUserResourcesNode::removeNode(const QnResourceTreeModelNodePtr& node)
+void QnResourceTreeModelUserResourcesNode::removeNode(QnResourceTreeModelNodePtr node)
 {
-    if (node->type() == Qn::RecorderNode)
+    if (node->type() == NodeType::recorder)
     {
         /* Check if node was already removed. */
         auto key = m_recorders.key(node);

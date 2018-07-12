@@ -24,14 +24,12 @@ namespace vms {
 namespace cloud_integration {
 
 CdbNonceFetcher::CdbNonceFetcher(
-    nx::utils::StandaloneTimerManager* timerManager,
     AbstractCloudConnectionManager* const cloudConnectionManager,
     AbstractCloudUserInfoPool* cloudUserInfoPool,
     auth::AbstractNonceProvider* defaultGenerator)
 :
     m_cloudConnectionManager(cloudConnectionManager),
     m_defaultGenerator(defaultGenerator),
-    m_timerManager(timerManager),
     m_cloudUserInfoPool(cloudUserInfoPool)
 {
     m_monotonicClock.restart();
@@ -43,26 +41,19 @@ CdbNonceFetcher::CdbNonceFetcher(
         this, &CdbNonceFetcher::cloudBindingStatusChanged);
 
     if (m_cloudConnectionManager->boundToCloud())
-    {
-        m_timerID = nx::utils::TimerManager::TimerGuard(
-            m_timerManager,
-            m_timerManager->addTimer(
-                std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-                std::chrono::milliseconds::zero()));
-    }
+        m_timer.post(std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this));
 }
 
 CdbNonceFetcher::~CdbNonceFetcher()
 {
     directDisconnectAll();
 
-    QnMutexLocker lock(&m_mutex);
-    auto connection = std::move(m_connection);
-    auto timerID = std::move(m_timerID);
-    lock.unlock();
-
-    connection.reset();
-    timerID.reset();
+    m_timer.executeInAioThreadSync(
+        [this]()
+        {
+            m_timer.pleaseStopSync();
+            m_connection.reset();
+        });
 }
 
 nx::Buffer CdbNonceFetcher::generateNonceTrailer()
@@ -216,27 +207,28 @@ bool CdbNonceFetcher::parseCloudNonce(
 
 void CdbNonceFetcher::fetchCdbNonceAsync()
 {
+    NX_ASSERT(m_timer.isInSelfAioThread());
+    m_timer.cancelSync();
+
     NX_LOGX(lm("Trying to fetch new cloud nonce"), cl_logDEBUG2);
 
     std::unique_ptr<nx::cdb::api::Connection> newConnection;
 
     QnMutexLocker lock(&m_mutex);
-    m_timerID.release();
 
     newConnection = m_cloudConnectionManager->getCloudConnection();
     std::swap(m_connection, newConnection);
     if (!m_connection)
     {
         NX_LOG(lit("CdbNonceFetcher. Failed to get connection to cdb"), cl_logDEBUG1);
-        m_timerID = nx::utils::TimerManager::TimerGuard(
-            m_timerManager,
-            m_timerManager->addTimer(
-                std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-                kGetNonceRetryTimeout));
+        m_timer.start(
+            kGetNonceRetryTimeout,
+            std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this));
         return;
     }
 
     using namespace std::placeholders;
+    m_connection->bindToAioThread(m_timer.getAioThread());
     m_connection->authProvider()->getCdbNonce(
         std::bind(&CdbNonceFetcher::gotNonce, this, _1, _2));
 }
@@ -256,6 +248,8 @@ void CdbNonceFetcher::gotNonce(
     nx::cdb::api::ResultCode resCode,
     nx::cdb::api::NonceData nonce)
 {
+    NX_ASSERT(m_timer.isInSelfAioThread());
+
     if (!m_cloudConnectionManager->boundToCloud())
         return;
 
@@ -264,13 +258,9 @@ void CdbNonceFetcher::gotNonce(
         NX_LOGX(lit("Failed to fetch nonce from cdb: %1").
             arg(static_cast<int>(resCode)), cl_logWARNING);
         m_cloudConnectionManager->processCloudErrorCode(resCode);
-
-        QnMutexLocker lock(&m_mutex);
-        m_timerID = nx::utils::TimerManager::TimerGuard(
-            m_timerManager,
-            m_timerManager->addTimer(
-                std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-                kGetNonceRetryTimeout));
+        m_timer.start(
+            kGetNonceRetryTimeout,
+            std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this));
         return;
     }
 
@@ -278,11 +268,9 @@ void CdbNonceFetcher::gotNonce(
 
     saveCloudNonce(std::move(nonce));
 
-    m_timerID = nx::utils::TimerManager::TimerGuard(
-        m_timerManager,
-        m_timerManager->addTimer(
-            std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-            nonce.validPeriod/2));
+    m_timer.start(
+        nonce.validPeriod / 2,
+        std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this));
 }
 
 void CdbNonceFetcher::saveCloudNonce(nx::cdb::api::NonceData nonce)
@@ -318,20 +306,12 @@ void CdbNonceFetcher::cloudBindingStatusChangedUnsafe(
         return;
     }
 
-    if (m_timerID)
-    {
-        nx::utils::TimerManager::instance()->modifyTimerDelay(
-            m_timerID.get(),
-            std::chrono::milliseconds::zero());
-    }
-    else
-    {
-        m_timerID = nx::utils::TimerManager::TimerGuard(
-            m_timerManager,
-            m_timerManager->addTimer(
-                std::bind(&CdbNonceFetcher::fetchCdbNonceAsync, this),
-                std::chrono::milliseconds::zero()));
-    }
+    m_timer.post(
+        [this]()
+        {
+            m_timer.cancelSync();
+            fetchCdbNonceAsync();
+        });
 }
 
 void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)

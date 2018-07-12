@@ -35,7 +35,7 @@ public:
     * \returns                         Global permissions of the given user,
     *                                  adjusted to take dependencies and superuser status into account.
     */
-    Qn::GlobalPermissions globalPermissions(const QnResourceAccessSubject& subject) const;
+    GlobalPermissions globalPermissions(const QnResourceAccessSubject& subject) const;
 
     /**
     * \param user                      User to get global permissions for.
@@ -43,7 +43,7 @@ public:
     * \returns                         Whether actual global permissions include required permission.
     */
     bool hasGlobalPermission(const QnResourceAccessSubject& subject,
-        Qn::GlobalPermission requiredPermission) const;
+        GlobalPermission requiredPermission) const;
 
     /**
     * \param accessRights              Access rights descriptor
@@ -51,7 +51,7 @@ public:
     * \returns                         Whether actual global permissions include required permission.
     */
     bool hasGlobalPermission(const Qn::UserAccessData& accessRights,
-        Qn::GlobalPermission requiredPermission) const;
+        GlobalPermission requiredPermission) const;
 
     /**
     * \param user                      User that should have permissions.
@@ -83,7 +83,6 @@ public:
         const QnResourcePtr& resource,
         Qn::Permissions permissions) const;
 
-
     /**
     * \param user                      User that should have permissions for resource creating.
     * \param resource                  Resource to get permissions for.
@@ -94,40 +93,55 @@ public:
     template <typename ApiDataType>
     bool canCreateResource(const QnResourceAccessSubject& subject, const ApiDataType& /*data*/) const
     {
-        return hasGlobalPermission(subject, Qn::GlobalAdminPermission);
+        return hasGlobalPermission(subject, GlobalPermission::admin);
     }
 
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiStorageData& data) const;
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiLayoutData& data) const;
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiUserData& data) const;
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiVideowallData& data) const;
-    bool canCreateResource  (const QnResourceAccessSubject& subject, const ec2::ApiWebPageData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const nx::vms::api::StorageData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const nx::vms::api::LayoutData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const nx::vms::api::UserData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const nx::vms::api::VideowallData& data) const;
+    bool canCreateResource(
+        const QnResourceAccessSubject& subject,
+        const nx::vms::api::WebPageData& data) const;
 
-    bool canCreateStorage   (const QnResourceAccessSubject& subject, const QnUuid& storageParentId) const;
-    bool canCreateLayout    (const QnResourceAccessSubject& subject, const QnUuid& layoutParentId) const;
-    bool canCreateUser      (const QnResourceAccessSubject& subject,
-        Qn::GlobalPermissions targetPermissions, bool isOwner) const;
+    bool canCreateStorage(
+        const QnResourceAccessSubject& subject,
+        const QnUuid& storageParentId) const;
+    bool canCreateLayout(
+        const QnResourceAccessSubject& subject,
+        const QnUuid& layoutParentId) const;
+    bool canCreateUser(
+        const QnResourceAccessSubject& subject,
+        GlobalPermissions targetPermissions,
+        bool isOwner) const;
     bool canCreateUser(const QnResourceAccessSubject& subject, Qn::UserRole role) const;
-    bool canCreateVideoWall (const QnResourceAccessSubject& subject) const;
-    bool canCreateWebPage   (const QnResourceAccessSubject& subject) const;
+    bool canCreateVideoWall(const QnResourceAccessSubject& subject) const;
+    bool canCreateWebPage(const QnResourceAccessSubject& subject) const;
 
     template <typename ResourceSharedPointer, typename ApiDataType>
     bool canModifyResource(const QnResourceAccessSubject& subject,
-        const ResourceSharedPointer& target, const ApiDataType& update) const
+        const ResourceSharedPointer& target, const ApiDataType& /*update*/) const
     {
         /* By default we require only generic permissions to modify resource. */
-        Q_UNUSED(update);
         return hasPermission(subject, target, Qn::ReadWriteSavePermission);
     }
 
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
-        const ec2::ApiStorageData& update) const;
+        const nx::vms::api::StorageData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
-        const ec2::ApiLayoutData& update) const;
+        const nx::vms::api::LayoutData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
-        const ec2::ApiUserData& update) const;
+        const nx::vms::api::UserData& update) const;
     bool canModifyResource(const QnResourceAccessSubject& subject, const QnResourcePtr& target,
-        const ec2::ApiVideowallData& update) const;
+        const nx::vms::api::VideowallData& update) const;
 
 signals:
     void permissionsChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,

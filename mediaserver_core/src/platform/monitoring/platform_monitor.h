@@ -10,7 +10,6 @@
 #include <nx/network/mac_address.h>
 #include <nx/fusion/model_functions_fwd.h>
 
-
 /**
  * Interface for monitoring performance in a platform-independent way.
  */
@@ -178,7 +177,7 @@ public:
      * @returns                         Platform-specific string describing this logical partition,
      *                                  suitable to be shown to the user.
      */
-    virtual QString partitionByPath(const QString &path) { return QString(); Q_UNUSED(path); }
+    virtual QString partitionByPath(const QString& /*path*/) { return QString(); }
 
 private:
     Q_DISABLE_COPY(QnPlatformMonitor)

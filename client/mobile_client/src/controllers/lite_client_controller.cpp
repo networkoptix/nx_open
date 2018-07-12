@@ -15,6 +15,7 @@
 #include <managers/videowall_manager.h>
 #include <utils/common/id.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
+#include <nx/vms/api/types/connection_types.h>
 
 namespace {
 
@@ -103,7 +104,7 @@ void QnLiteClientController::setServerId(const QString& serverId)
             [d](const QnPeerRuntimeInfo& info)
             {
                 // Assuming a Mobile Client with proper videowallInstanceGuid is a Lite Client.
-                return info.data.peer.peerType == Qn::PT_MobileClient
+                return info.data.peer.peerType == nx::vms::api::PeerType::mobileClient
                     && info.data.videoWallInstanceGuid == d->serverId;
             });
         d->setClientState(it != items.end() ? State::Started : State::Stopped);
@@ -154,9 +155,12 @@ void QnLiteClientController::startLiteClient()
         return;
     }
 
-    auto handleReply = [this, d](bool success, rest::Handle handle, const QnJsonRestResult& result)
+    auto handleReply =
+        [this, d, guard = QPointer<QnLiteClientController>(this)](
+            bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            Q_UNUSED(result);
+            if (!guard)
+                return;
 
             if (d->clientStartHandle != handle)
                 return;
@@ -165,7 +169,7 @@ void QnLiteClientController::startLiteClient()
                 d->setClientStartResult(false);
         };
 
-    d->clientStartHandle = d->server->restConnection()->startLiteClient(handleReply);
+    d->clientStartHandle = d->server->restConnection()->startLiteClient(handleReply, thread());
     if (d->clientStartHandle <= 0)
         d->setClientStartResult(false);
 }
@@ -181,7 +185,7 @@ void QnLiteClientController::stopLiteClient()
 
     d->setClientState(State::Stopping);
 
-    ec2::ApiVideowallControlMessageData message;
+    nx::vms::api::VideowallControlMessageData message;
     message.operation = QnVideoWallControlMessage::Exit;
     message.videowallGuid = d->serverId;
 
@@ -287,7 +291,7 @@ void QnLiteClientControllerPrivate::at_runtimeInfoAdded(const QnPeerRuntimeInfo&
 
     // Assuming a Mobile Client with proper videowallInstanceGuid is a Lite Client.
 
-    if (data.data.peer.peerType != Qn::PT_MobileClient)
+    if (data.data.peer.peerType != nx::vms::api::PeerType::mobileClient)
         return;
 
     if (data.data.videoWallInstanceGuid != serverId)
@@ -302,7 +306,7 @@ void QnLiteClientControllerPrivate::at_runtimeInfoRemoved(const QnPeerRuntimeInf
     if (serverId.isNull())
         return;
 
-    if (data.data.peer.peerType != Qn::PT_MobileClient)
+    if (data.data.peer.peerType != nx::vms::api::PeerType::mobileClient)
         return;
 
     if (data.data.videoWallInstanceGuid != serverId)

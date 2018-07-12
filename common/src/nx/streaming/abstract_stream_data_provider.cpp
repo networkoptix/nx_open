@@ -77,11 +77,6 @@ void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)
     }
 }
 
-bool QnAbstractStreamDataProvider::isConnectedToTheResource() const
-{
-    return m_resource->hasConsumer(const_cast<QnAbstractStreamDataProvider*>(this));
-}
-
 void QnAbstractStreamDataProvider::disconnectFromResource()
 {
     stop();
@@ -96,5 +91,6 @@ void QnAbstractStreamDataProvider::beforeDisconnectFromResource()
 
 void QnAbstractStreamDataProvider::setRole(Qn::ConnectionRole role)
 {
+    NX_ASSERT(!isRunning());
     m_role = role;
 }

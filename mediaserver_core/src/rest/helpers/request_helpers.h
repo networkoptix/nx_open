@@ -49,6 +49,10 @@ void runMultiserverDownloadRequest(
     const CompletionFunc &requestCompletionFunc,
     Context *context)
 {
+    // template parameter CompletionFunc is a callable object with parameters:
+    // (SystemError::ErrorCode osStatus, int httpStatus, const nx::network::http::Response& response,
+    // nx::network::http::HttpHeaders httpResponseHeaders)
+
     const auto downloadRequest = [requestCompletionFunc]
         (const nx::utils::Url &url, const nx::network::http::HttpHeaders &headers, Context *context)
     {

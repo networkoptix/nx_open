@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>อัปเดตด้วยตนเอง</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">อัปโหลดโปรแกรมติดตั้ง</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">โปรดตรวจสอบว่าการกำหนดค่าถูกต้อง</p>
-            </div>
-        </div>
-    </form>
-
     <h1>การตั้งค่าระบบขั้นสูง</h1>
     <div class="alert alert-danger" role="alert">
         <b> คำเตือน! </b> การเปลี่ยนแปลงใด ๆ ในหน้านี้อาจทำให้เซิร์ฟเวอร์ทำงานไม่ถูกต้อง
@@ -193,7 +182,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] || 'ว่างเปล่า'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>คำเตือน!</b> การเปลี่ยนแปลงบางอย่างต้องเริ่มระบบใหม่ <b>ทั้งหมด</b> เซิร์ฟเวอร์ในระบบ<br><br>
+        <b>คำเตือน!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >รีสตาร์ทเซิร์ฟเวอร์ปัจจุบัน</button>
         </div>

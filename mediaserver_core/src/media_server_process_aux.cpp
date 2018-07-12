@@ -10,6 +10,10 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <nx/utils/log/log.h>
+#include <nx/mediaserver/fs/media_paths/media_paths.h>
+#include <nx/mediaserver/fs/media_paths/media_paths_filter_config.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/app_info.h>
 
 namespace nx {
 namespace mserver_aux {
@@ -62,6 +66,32 @@ QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
     return result;
 }
 
+bool isStorageUnmounted(const QnStorageResourcePtr& storage)
+{
+    return getUnmountedStorages(QnStorageResourceList() << storage).contains(storage);
+}
+
+QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allServerStorages)
+{
+    nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(
+        QnAppInfo::mediaFolderName());
+
+    using namespace nx::mediaserver::fs::media_paths;
+
+    auto mediaPathList = get(FilterConfig::createDefault(/*includeNonHdd*/ true));
+    NX_VERBOSE(
+        nx::utils::log::Tag(typeid(UnmountedLocalStoragesFilter)),
+        lm("Record folders: %1").container(mediaPathList));
+
+    QnStorageResourceList filteredStorages;
+    for (const auto& storage: allServerStorages)
+    {
+        if (!storage->isExternal())
+            filteredStorages.push_back(storage);
+    }
+
+    return unmountedLocalStoragesFilter.getUnmountedStorages(filteredStorages, mediaPathList);
+}
 
 LocalSystemIndentityHelper::LocalSystemIndentityHelper(
         const BeforeRestoreDbData& restoreData,
@@ -194,7 +224,7 @@ public:
     virtual bool isCloudInstanceChanged() const override
     {
         return !qnGlobalSettings->cloudHost().isEmpty() &&
-                qnGlobalSettings->cloudHost() != nx::network::AppInfo::defaultCloudHost();
+                qnGlobalSettings->cloudHost() != nx::network::SocketGlobals::cloud().cloudHost();
     }
 
     virtual bool isConnectedToCloud() const override
@@ -204,7 +234,7 @@ public:
 
     virtual bool isSystemIdFromSystemName() const override
     {
-        return qnServerModule->roSettings()->value("systemIdFromSystemName").toInt() > 0;
+        return qnServerModule->settings().systemIdFromSystemName() > 0;
     }
 
     virtual QString getMaxServerKey() const override
@@ -303,7 +333,7 @@ BeforeRestoreDbData savePersistentDataBeforeDbRestore(
     return data;
 }
 
-void makeFakeData(const QString& fakeDataString, 
+void makeFakeData(const QString& fakeDataString,
     const ec2::AbstractECConnectionPtr& connection, const QnUuid& serverId)
 {
     if (fakeDataString.isEmpty())
@@ -321,57 +351,58 @@ void makeFakeData(const QString& fakeDataString,
         << camerasCount << "cameras," << propertiesPerCamera << "properties per camera,"
         << camerasPerLayout << "cameras per layout," << storageCount << "storages";
 
-    std::vector<ec2::ApiUserData> users;
+    std::vector<nx::vms::api::UserData> users;
     for (int i = 0; i < userCount; ++i)
     {
-        ec2::ApiUserData userData;
+        nx::vms::api::UserData userData;
         userData.id = QnUuid::createUuid();
         userData.name = lm("user_%1").arg(i);
         userData.isEnabled = true;
         userData.isCloud = false;
+        userData.realm = nx::network::AppInfo::realm();
         users.push_back(userData);
     }
 
-    std::vector<ec2::ApiCameraData> cameras;
-    std::vector<ec2::ApiCameraAttributesData> userAttrs;
-    ec2::ApiResourceParamWithRefDataList cameraParams;
+    nx::vms::api::CameraDataList cameras;
+    nx::vms::api::CameraAttributesDataList userAttrs;
+    nx::vms::api::ResourceParamWithRefDataList cameraParams;
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
     NX_ASSERT(!resTypePtr.isNull());
     for (int i = 0; i < camerasCount; ++i)
     {
-        ec2::ApiCameraData cameraData;
+        nx::vms::api::CameraData cameraData;
         cameraData.typeId = resTypePtr->getId();
         cameraData.parentId = serverId;
         cameraData.vendor = "Invalid camera";
         cameraData.physicalId = QnUuid::createUuid().toString();
-        cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.id = nx::vms::api::CameraData::physicalIdToId(cameraData.physicalId);
         cameraData.name = lm("Camera %1").arg(cameraData.id);
         cameras.push_back(std::move(cameraData));
 
-        ec2::ApiCameraAttributesData userAttr;
+        nx::vms::api::CameraAttributesData userAttr;
         userAttr.cameraId = cameraData.id;
         userAttrs.push_back(userAttr);
 
         for (int j = 0; j < propertiesPerCamera; ++j)
         {
-            cameraParams.push_back(ec2::ApiResourceParamWithRefData(
-                cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
+            cameraParams.emplace_back(
+                cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j));
         }
     }
 
-    std::vector<ec2::ApiLayoutData> layouts;
+    std::vector<nx::vms::api::LayoutData> layouts;
     if (camerasPerLayout)
     {
         for (int minCameraOnLayout = 0; minCameraOnLayout < camerasCount;
              minCameraOnLayout += camerasPerLayout)
         {
-            ec2::ApiLayoutData layout;
+            nx::vms::api::LayoutData layout;
             layout.id = QnUuid::createUuid();
             for (int cameraIndex = minCameraOnLayout;
                  cameraIndex < minCameraOnLayout + camerasPerLayout && cameraIndex < camerasCount;
                  ++cameraIndex)
             {
-                ec2::ApiLayoutItemData item;
+                nx::vms::api::LayoutItemData item;
                 item.id = cameras[cameraIndex].id;
                 layout.items.push_back(item);
             }
@@ -380,10 +411,10 @@ void makeFakeData(const QString& fakeDataString,
         }
     }
 
-    std::vector<ec2::ApiStorageData> storages;
+    std::vector<nx::vms::api::StorageData> storages;
     for (int i = 0; i < storageCount; ++i)
     {
-        ec2::ApiStorageData storage;
+        nx::vms::api::StorageData storage;
         storage.id = QnUuid::createUuid();
         storage.parentId = serverId;
         storage.name = lm("Fake Storage/%1").arg(storage.id);

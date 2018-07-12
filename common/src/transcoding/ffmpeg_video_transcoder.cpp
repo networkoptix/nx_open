@@ -10,6 +10,7 @@
 #include "utils/common/util.h"
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/config.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
@@ -103,7 +104,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_encoderCtx->pix_fmt = m_codecId == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     if (m_bitrate == -1)
-        m_bitrate = QnTranscoder::suggestMediaStreamParams( m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality );
+        m_bitrate = QnTranscoder::suggestBitrate( m_codecId, QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality );
     m_encoderCtx->bit_rate = m_bitrate;
     m_encoderCtx->gop_size = 32;
     m_encoderCtx->time_base.num = 1;
@@ -112,7 +113,10 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     if (m_mtMode)
         m_encoderCtx->thread_count = qMin(2, QThread::idealThreadCount());
 
-    for( QMap<QString, QVariant>::const_iterator it = m_params.begin(); it != m_params.end(); ++it )
+    AVDictionary* options = nullptr;
+    makeScopeGuard([&]() { av_dict_free(&options); });
+
+    for (auto it = m_params.begin(); it != m_params.end(); ++it)
     {
         if( it.key() == QnCodecParams::global_quality )
         {
@@ -133,9 +137,13 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         {
             m_encoderCtx->qmax = it.value().toInt();
         }
+        else
+        {
+            av_dict_set(&options, it.key().constData(), it.value().toByteArray().constData(), 0);
+        }
     }
 
-    if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
+    if (avcodec_open2(m_encoderCtx, avCodec, &options) < 0)
     {
         m_lastErrMessage = tr("Could not initialize video encoder.");
         return false;

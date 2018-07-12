@@ -56,7 +56,7 @@ int QnRecordedChunksRestHandler::executeGet(
 
     QnTimePeriodList periods = QnChunksRequestHelper::load(request);
 
-    switch(request.format)
+    switch (static_cast<ChunkFormat>(request.format))
     {
         case ChunkFormat_Binary:
             result.append("BIN");

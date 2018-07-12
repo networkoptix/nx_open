@@ -6,9 +6,9 @@ angular.module('cloudApp')
         $http.get(Config.viewsDir + 'static/register-intro.html', {cache: $templateCache});
     }])
     .controller('RegisterCtrl', [
-        '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout',
+        '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout', 'dialogs',
         '$sessionStorage', '$routeParams', 'account', 'urlProtocol', '$base64',
-        function ($scope, cloudApi, process, $location, $localStorage, $timeout,
+        function ($scope, cloudApi, process, $location, $localStorage, $timeout, dialogs,
                   $sessionStorage, $routeParams, account, urlProtocol, $base64) {
 
         $scope.registerSuccess = $routeParams.registerSuccess;
@@ -55,6 +55,7 @@ angular.module('cloudApp')
         };
 
         $scope.register = process.init(function() {
+            account.setEmail($scope.account.email);
             return cloudApi.register(
                 $scope.account.email,
                 $scope.account.password,
@@ -67,7 +68,8 @@ angular.module('cloudApp')
                 alreadyExists: function(error){
                     $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',false);
                     return false;
-                }
+                },
+                portalError: L.errorCodes.brokenAccount
             },
             holdAlerts:true,
             errorPrefix:L.errorCodes.cantRegisterPrefix

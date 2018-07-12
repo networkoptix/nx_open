@@ -6,7 +6,6 @@
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QSettings>
 #include <QtCore/QStringList>
 #include <QtCore/QThreadPool>
 #include <QtCore/QTime>
@@ -116,7 +115,7 @@ QnInterfaceAndAddrList getAllIPv4Interfaces(InterfaceListPolicy policy)
 
 #if defined(Q_OS_LINUX) && defined(__arm__)
         /* skipping 1.2.3.4 address on ISD */
-        if (iface.name() == lit("usb0") && interfaces.size() > 1)
+        if (iface.name() == "usb0" && interfaces.size() > 1)
             continue;
 #endif
 
@@ -218,7 +217,6 @@ QList<HostAddress> allLocalAddresses(AddressFilters filter)
 
     return result;
 }
-
 
 QList<QHostAddress> allLocalIpV4Addresses()
 {
@@ -325,7 +323,6 @@ unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress)
     return pbyAddress;
 }
 
-
 QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
 {
     QList<QNetworkInterface> inter_list = QNetworkInterface::allInterfaces(); // all interfaces
@@ -411,13 +408,14 @@ struct PinagableT
 
 QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
 {
-    NX_LOG(QLatin1String("about to find all ip responded to ping...."), cl_logINFO);
+    static const nx::utils::log::Tag kTag(QLatin1String("pingableAddresses"));
+
+    NX_INFO(kTag, "About to find all ip responded to ping....");
     QTime time;
     time.restart();
 
     quint32 curr = startAddr.toIPv4Address();
     quint32 maxaddr = endAddr.toIPv4Address();
-
 
     QList<PinagableT> hostslist;
 
@@ -429,7 +427,6 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
         ++curr;
     }
-
 
     QThreadPool* global = QThreadPool::globalInstance();
     for (int i = 0; i < threads; ++i ) global->releaseThread();
@@ -444,12 +441,10 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
             result.push_back(QHostAddress(addr.addr));
     }
 
-    NX_LOG(lit("Done. time elapsed = %1").arg(time.elapsed()), cl_logINFO);
-    NX_LOG(lm("Ping results %1").container(result), cl_logINFO);
+    NX_INFO(kTag, lm("Done. time elapsed = %1").arg(time.elapsed()));
+    NX_INFO(kTag, lm("Ping results %1").container(result));
     return result;
 }
-
-
 
 //{ windows
 #if defined(Q_OS_WIN)
@@ -558,11 +553,12 @@ QHostAddress getGatewayOfIf( const QString& ip )
 #elif defined(Q_OS_MAC)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
-#ifdef Q_OS_IOS
-QString getMacByIP(const QHostAddress& ip, bool /*net*/) {
+#if defined(Q_OS_IOS)
+QString getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
+{
     return QString();
 }
-#else
+#else // defined(Q_OS_IOS)
 
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 
@@ -607,7 +603,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
         if (sdl->sdl_alen)
         {
             /* complete ARP entry */
-            NX_LOG(lit("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)), cl_logDEBUG1);
+            NX_LOG(lm("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)), cl_logDEBUG1);
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
                 return MACToString((unsigned char*)LLADDR(sdl));
@@ -632,12 +628,10 @@ QHostAddress getGatewayOfIf(const QString& ip)
 */
 
 #else // Linux
-void removeARPrecord(const QHostAddress& ip) {Q_UNUSED(ip)}
+void removeARPrecord(const QHostAddress& /*ip*/) {}
 
-QString getMacByIP(const QHostAddress& ip, bool net)
+QString getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 {
-    Q_UNUSED(ip)
-    Q_UNUSED(net)
     return QString();
 }
 
@@ -652,7 +646,7 @@ QHostAddress getGatewayOfIf(const QString& netIf)
     size_t len = 0;
     while (getline(&line, &len, fp) != -1)
     {
-        const auto info = QString(QLatin1String(line)).split(lit(" "), QString::SkipEmptyParts);
+        const auto info = QString(QLatin1String(line)).split(" ", QString::SkipEmptyParts);
         QHostAddress addr(info[1]);
         if (info.size() > 1 && info[1] != QLatin1String("0.0.0.0"))
         {
@@ -723,7 +717,6 @@ bool isNewDiscoveryAddressBetter(
     return eq1 > eq2;
 }
 
-
 int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
     memset(MAC_str, 0, MAC_ADDR_LEN);
@@ -741,7 +734,6 @@ int getFirstMacAddress(char  MAC_str[MAC_ADDR_LEN], char** host)
 
     return -1;
 }
-
 
 #ifdef _WIN32
 

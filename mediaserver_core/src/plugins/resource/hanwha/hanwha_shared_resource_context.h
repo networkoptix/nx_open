@@ -1,5 +1,7 @@
 #pragma once
 
+#include <atomic>
+
 #include <QtCore/QMap>
 #include <QtCore/QElapsedTimer>
 
@@ -8,10 +10,13 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/semaphore.h>
+#include <nx/utils/thread/rw_lock.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
 #include <plugins/resource/hanwha/hanwha_time_synchronizer.h>
 #include <plugins/resource/hanwha/hanwha_utils.h>
 #include <plugins/resource/hanwha/hanwha_codec_limits.h>
+#include <plugins/resource/hanwha/hanwha_chunk_reader.h>
+#include <plugins/resource/hanwha/hanwha_information.h>
 #include <recording/time_period_list.h>
 #include <core/resource/abstract_remote_archive_manager.h>
 
@@ -21,18 +26,6 @@ namespace plugins {
 
 static const std::chrono::seconds kUpdateCacheTimeout(30);
 static const std::chrono::seconds kUnsuccessfulUpdateCacheTimeout(10);
-
-class HanwhaChunkLoader;
-
-struct HanwhaInformation
-{
-    QString deviceType;
-    QString firmware;
-    QString macAddress;
-    QString model;
-    int channelCount = 0;
-    HanwhaAttributes attributes;
-};
 
 template<typename Value>
 struct HanwhaResult
@@ -52,7 +45,7 @@ public:
     HanwhaCachedData(
         std::function<HanwhaResult<Value>()> getter,
         std::chrono::milliseconds timeout)
-    :
+        :
         m_getter(std::move(getter)), m_timeout(timeout)
     {
     }
@@ -90,6 +83,17 @@ private:
 
 using ClientId = QnUuid;
 
+struct SeekPosition
+{
+    static const qint64 kInvalidPosition = std::numeric_limits<qint64>::min();
+
+    SeekPosition(qint64 value = kInvalidPosition);
+    bool canJoinPosition(const SeekPosition& position) const;
+
+    nx::utils::ElapsedTimer timer;
+    qint64 position = kInvalidPosition;
+};
+
 struct SessionContext
 {
     SessionContext(const QString& sessionId, const QnUuid& clientId):
@@ -99,6 +103,17 @@ struct SessionContext
 
     QString sessionId;
     ClientId clientId;
+    SeekPosition lastSeekPos;
+
+    qint64 currentPositionUsec() const;
+    void updateCurrentPositionUsec(
+        qint64 positionUsec,
+        bool isForwardPlayback,
+        bool force);
+
+private:
+    mutable QnMutex m_mutex;
+    qint64 m_lastPositionUsec = AV_NOPTS_VALUE;
 };
 
 using SessionContextPtr = QSharedPointer<SessionContext>;
@@ -108,20 +123,19 @@ class HanwhaSharedResourceContext:
     public nx::mediaserver::resource::AbstractSharedResourceContext,
     public std::enable_shared_from_this<HanwhaSharedResourceContext>
 {
-
 public:
     HanwhaSharedResourceContext(
         const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId& sharedId);
 
     // TODO: Better to make class HanwhaAccess and keep these fields separate from context.
-    void setRecourceAccess(const nx::utils::Url& url, const QAuthenticator& authenticator);
+    void setResourceAccess(const nx::utils::Url& url, const QAuthenticator& authenticator);
     void setLastSucessfulUrl(const nx::utils::Url& value);
 
     nx::utils::Url url() const;
     QAuthenticator authenticator() const;
-    QnSemaphore* requestSemaphore();
+    nx::utils::RwLock* requestLock();
 
-    void startServices(bool hasVideoArchive, bool isNvr);
+    void startServices(bool hasVideoArchive, const HanwhaInformation& information);
 
     SessionContextPtr session(
         HanwhaSessionType sessionType,
@@ -137,23 +151,29 @@ public:
     std::chrono::seconds timeZoneShift() const;
     void setDateTime(const QDateTime& dateTime);
 
+    void setChunkLoaderSettings(const HanwhaChunkLoaderSettings& settings);
+
     // NOTE: function objects return HanwhaResult<T>.
     HanwhaCachedData<HanwhaInformation> information;
-    HanwhaCachedData<HanwhaCgiParameters> cgiParameters;
     HanwhaCachedData<HanwhaResponse> eventStatuses;
     HanwhaCachedData<HanwhaResponse> videoSources;
     HanwhaCachedData<HanwhaResponse> videoProfiles;
     HanwhaCachedData<HanwhaCodecInfo> videoCodecInfo;
+    HanwhaCachedData<bool> isBypassSupported;
 
 private:
     HanwhaResult<HanwhaInformation> loadInformation();
-    HanwhaResult<HanwhaCgiParameters> loadCgiParameters();
     HanwhaResult<HanwhaResponse> loadEventStatuses();
     HanwhaResult<HanwhaResponse> loadVideoSources();
     HanwhaResult<HanwhaResponse> loadVideoProfiles();
     HanwhaResult<HanwhaCodecInfo> loadVideoCodecInfo();
+    HanwhaResult<bool> checkBypassSupport();
 
     void cleanupUnsafe();
+
+private:
+    static const int kDefaultNvrMaxLiveSessions = 10;
+    static const int kDefaultNvrMaxArchiveSessions = 3;
 
     const nx::mediaserver::resource::AbstractSharedResourceContext::SharedId m_sharedId;
 
@@ -165,13 +185,20 @@ private:
 
     mutable QnMutex m_sessionMutex;
 
-    QMap<HanwhaSessionType, QMap<ClientId, SessionContextWeakPtr>> m_sessions;
+    // key: live = true, archive = false
+    QMap<bool, QMap<ClientId, SessionContextWeakPtr>> m_sessions;
 
-    QnSemaphore m_requestSemaphore;
+    nx::utils::RwLock m_requestLock;
     std::shared_ptr<HanwhaChunkLoader> m_chunkLoader;
     std::unique_ptr<HanwhaTimeSyncronizer> m_timeSynchronizer;
 
+    HanwhaChunkLoaderSettings m_chunkLoaderSettings;
+
     std::atomic<std::chrono::seconds> m_timeZoneShift{std::chrono::seconds::zero()};
+
+    // We care only about archive sesions because normally we use only one
+    // live connection independently of the number of client connections.
+    std::atomic<int> m_maxArchiveSessions{kDefaultNvrMaxArchiveSessions};
 
     mutable QnMutex m_servicesMutex;
 };

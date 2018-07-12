@@ -44,24 +44,21 @@ QnConfigureRestHandler::QnConfigureRestHandler(ec2::AbstractTransactionMessageBu
 }
 
 int QnConfigureRestHandler::executeGet(
-    const QString &path,
-    const QnRequestParams &params,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
     return execute(ConfigureSystemData(params), result, owner);
 }
 
 int QnConfigureRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
     ConfigureSystemData data = QJson::deserialized<ConfigureSystemData>(body);
     return execute(std::move(data), result, owner);
 }
@@ -83,9 +80,28 @@ int QnConfigureRestHandler::execute(
     QString errStr;
     if (!nx::vms::utils::validatePasswordData(data, &errStr))
     {
-        NX_LOG(lit("QnConfigureRestHandler: invalid password provided"), cl_logWARNING);
+        NX_LOG(lit("QnConfigureRestHandler: %1").arg(errStr), cl_logWARNING);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx::network::http::StatusCode::ok;
+    }
+
+    if (data.hasPassword())
+    {
+        if (data.currentPassword.isEmpty())
+        {
+            result.setError(QnJsonRestResult::CantProcessRequest,
+                lit("currentPassword is required for password change"));
+            return nx::network::http::StatusCode::ok;
+        }
+
+        const auto user = owner->commonModule()->resourcePool()
+            ->getResourceById<QnUserResource>(owner->accessRights().userId);
+        if (!user->checkLocalUserPassword(data.currentPassword))
+        {
+            result.setError(QnJsonRestResult::CantProcessRequest,
+                lit("currentPassword is invalid"));
+            return nx::network::http::StatusCode::ok;
+        }
     }
 
     // Configure request must support systemName changes to maintain compatibility with NxTool
@@ -181,9 +197,7 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
 {
     const Qn::UserAccessData& accessRights = owner->accessRights();
 
-    int sPort = qnServerModule->roSettings()->value(
-        nx_ms_conf::SERVER_PORT,
-        nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
+    int sPort = qnServerModule->settings().port();
     if (port == 0 || port == sPort)
         return ResultSkip;
 
@@ -209,7 +223,7 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
     url.setPort(port);
     server->setUrl(url.toString());
 
-    ec2::ApiMediaServerData apiServer;
+    nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
     auto connection = owner->commonModule()->ec2Connection();
     auto manager = connection->getMediaServerManager(accessRights);
@@ -218,7 +232,6 @@ int QnConfigureRestHandler::changePort(const QnRestConnectionProcessor* owner, i
     if (errCode != ec2::ErrorCode::ok)
         return ResultFail;
 
-    qnServerModule->roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
-
+    qnServerModule->mutableSettings()->port.set(port);
     return ResultOk;
 }

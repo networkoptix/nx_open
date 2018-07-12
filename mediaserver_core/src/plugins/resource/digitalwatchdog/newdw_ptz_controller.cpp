@@ -2,7 +2,12 @@
 
 #include "newdw_ptz_controller.h"
 #include "plugins/resource/digitalwatchdog/digital_watchdog_resource.h"
-#include "nx/utils/math/fuzzy.h"
+
+#include <nx/utils/math/fuzzy.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/assert.h>
+
+using namespace nx::core;
 
 static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
@@ -19,8 +24,11 @@ QnNewDWPtzController::~QnNewDWPtzController()
 
 }
 
-Ptz::Capabilities QnNewDWPtzController::getCapabilities() const
+Ptz::Capabilities QnNewDWPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
     return Ptz::ContinuousZoomCapability | Ptz::ContinuousPanCapability
         | Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability;
 }
@@ -50,13 +58,31 @@ static QString panDirection(qreal speed)
         return lit("right");
 }
 
-bool QnNewDWPtzController::continuousMove(const QVector3D &speed)
+bool QnNewDWPtzController::continuousMove(
+    const nx::core::ptz::Vector& speedVector,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Continuous movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
     QString request;
-    if (!qFuzzyIsNull(speed.z()))
-        request = QString(lit("/cgi-bin/ptz.cgi?zoom=%1")).arg(zoomDirection(speed.z()));
+    if (!qFuzzyIsNull(speedVector.zoom))
+    {
+        request = lm("/cgi-bin/ptz.cgi?zoom=%1").arg(zoomDirection(speedVector.zoom));
+    }
     else
-        request = QString(lit("/cgi-bin/ptz.cgi?speed=%1&move=%2")).arg(toNativeSpeed(speed.x())).arg(panDirection(speed.x()));
+    {
+        request = lm("/cgi-bin/ptz.cgi?speed=%1&move=%2")
+            .args(toNativeSpeed(speedVector.pan), panDirection(speedVector.pan));
+    }
     return doQuery(request);
 }
 
@@ -141,9 +167,8 @@ QString QnNewDWPtzController::fromExtarnalID(const QString& externalId)
     return result.isEmpty() ? externalId : result;
 }
 
-bool QnNewDWPtzController::activatePreset(const QString &presetId, qreal speed)
+bool QnNewDWPtzController::activatePreset(const QString &presetId, qreal /*speed*/)
 {
-    Q_UNUSED(speed)
     return doQuery(lit("/cgi-bin/ptz.cgi?gotopreset=%1").arg(fromExtarnalID(presetId)));
 }
 
@@ -173,6 +198,5 @@ bool QnNewDWPtzController::removePreset(const QString &presetId)
     }
     return rez;
 }
-
 
 #endif // ENABLE_ONVIF

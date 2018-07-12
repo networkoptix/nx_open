@@ -19,12 +19,93 @@
 #include <api/helpers/camera_id_helper.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/async_operation_guard.h>
+#include <core/resource/resource_command.h>
+#include <media_server/media_server_module.h>
+#include <core/resource/resource_command_processor.h>
 
 static const QString kCameraIdParam = lit("cameraId");
 static const QString kDeprecatedResIdParam = lit("res_id");
 static const std::chrono::seconds kMaxWaitTimeout(20);
 
 using StatusCode = nx::network::http::StatusCode::Value;
+
+
+namespace {
+
+class GetAdvancedParametersCommand: public QnResourceCommand
+{
+public:
+    GetAdvancedParametersCommand(
+        const QnResourcePtr& resource,
+        const QSet<QString>& ids,
+        std::function<void(const QnCameraAdvancedParamValueMap&)> handler)
+    :
+        QnResourceCommand(resource),
+        m_ids(ids),
+        m_handler(std::move(handler))
+    {
+    }
+
+    bool execute() override
+    {
+        const auto camera = m_resource.dynamicCast<nx::mediaserver::resource::Camera>();
+        NX_CRITICAL(camera);
+
+        QnCameraAdvancedParamValueMap values;
+        if (isConnectedToTheResource())
+            values = camera->getAdvancedParameters(m_ids);
+
+        m_handler(values);
+        return true;
+    }
+
+    void beforeDisconnectFromResource() override
+    {
+    }
+
+private:
+    QSet<QString> m_ids;
+    std::function<void(const QnCameraAdvancedParamValueMap&)> m_handler;
+};
+
+class SetAdvancedParametersCommand: public QnResourceCommand
+{
+public:
+    SetAdvancedParametersCommand(
+        const QnResourcePtr& resource,
+        const QnCameraAdvancedParamValueMap& values,
+        std::function<void(const QSet<QString>&)> handler)
+    :
+        QnResourceCommand(resource),
+        m_values(values),
+        m_handler(std::move(handler))
+    {
+    }
+
+    bool execute() override
+    {
+        const auto camera = m_resource.dynamicCast<nx::mediaserver::resource::Camera>();
+        NX_CRITICAL(camera);
+
+        QSet<QString> ids;
+        if (isConnectedToTheResource())
+            ids = camera->setAdvancedParameters(m_values);
+
+        m_handler(ids);
+        return true;
+    }
+
+    void beforeDisconnectFromResource() override
+    {
+    }
+
+private:
+    QnCameraAdvancedParamValueMap m_values;
+    std::function<void(const QSet<QString>&)> m_handler;
+};
+
+} // namespace
+
 
 QnCameraSettingsRestHandler::QnCameraSettingsRestHandler():
     base_type(),
@@ -63,14 +144,6 @@ int QnCameraSettingsRestHandler::executeGet(
         }
     }
 
-    if (!owner->resourceAccessManager()->hasPermission(
-        owner->accessRights(),
-        camera,
-        Qn::Permission::ReadPermission))
-    {
-        return StatusCode::forbidden;
-    }
-
     // Clean params that are not keys.
     QnRequestParams locParams = params;
     locParams.remove(Qn::SERVER_GUID_HEADER_NAME);
@@ -105,36 +178,65 @@ int QnCameraSettingsRestHandler::executeGet(
     const auto action = extractAction(path);
     if (action == "getCameraParam")
     {
-        camera->getAdvancedParametersAsync(
-            values.ids(),
-            [&, guard = operationGuard.sharedGuard()](const QnCameraAdvancedParamValueMap& result)
-            {
-                if (const auto lock = guard->lock())
-                {
-                    values = result;
-                    operationPromise.set_value();
-                }
-            });
+
+        if (!owner->resourceAccessManager()->hasPermission(
+            owner->accessRights(),
+            camera,
+            Qn::Permission::ReadPermission))
+        {
+            return nx::network::http::StatusCode::forbidden;
+        }
+
+        qnServerModule->resourceCommandProcessor()->putData(
+                std::make_shared<GetAdvancedParametersCommand>(
+                    camera,
+                    values.ids(),
+                    [&, guard = operationGuard.sharedGuard()](
+                        const QnCameraAdvancedParamValueMap& resultParams)
+                    {
+                        if (const auto lock = guard->lock())
+                        {
+                            values = resultParams;
+                            operationPromise.set_value();
+                        }
+                    }));
     }
     else if (action == "setCameraParam")
     {
-        camera->setAdvancedParametersAsync(
-            values,
-            [&, guard = operationGuard.sharedGuard()](const QSet<QString>& result)
-            {
-                if (const auto lock = guard->lock())
-                {
-                    for (auto it = values.begin(); it != values.end(); )
-                    {
-                        if (result.contains(it.key()))
-                            ++it;
-                        else
-                            it = values.erase(it);
-                    }
+        if (!owner->resourceAccessManager()->hasGlobalPermission(
+            owner->accessRights(),
+            GlobalPermission::editCameras))
+        {
+            return nx::network::http::StatusCode::forbidden;
+        }
 
-                    operationPromise.set_value();
-                }
-            });
+        if (!owner->resourceAccessManager()->hasPermission(
+            owner->accessRights(),
+            camera,
+            Qn::Permission::WritePermission))
+        {
+            return nx::network::http::StatusCode::forbidden;
+        }
+
+        qnServerModule->resourceCommandProcessor()->putData(
+                std::make_shared<SetAdvancedParametersCommand>(
+                    camera,
+                    values,
+                    [&, guard = operationGuard.sharedGuard()](
+                        const QSet<QString>& resultNames)
+                    {
+                        if (const auto lock = guard->lock())
+                        {
+                            for (auto it = values.begin(); it != values.end();)
+                            {
+                                if (resultNames.contains(it.key()))
+                                    ++it;
+                                else
+                                    it = values.erase(it);
+                            }
+                            operationPromise.set_value();
+                        }
+                    }));
     }
     else
     {

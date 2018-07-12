@@ -80,8 +80,7 @@ void Logger::setDefaultLevel(Level level)
 {
     QnMutexLocker lock(&m_mutex);
     m_defaultLevel = level;
-    if (m_onLevelChanged)
-        m_onLevelChanged();
+    handleLevelChange(&lock);
 }
 
 LevelFilters Logger::levelFilters() const
@@ -94,8 +93,7 @@ void Logger::setLevelFilters(LevelFilters filters)
 {
     QnMutexLocker lock(&m_mutex);
     m_levelFilters = std::move(filters);
-    if (m_onLevelChanged)
-        m_onLevelChanged();
+    handleLevelChange(&lock);
 }
 
 Level Logger::maxLevel() const
@@ -130,6 +128,14 @@ boost::optional<QString> Logger::filePath() const
     }
 
     return boost::none;
+}
+
+void Logger::handleLevelChange(QnMutexLockerBase* lock) const
+{
+    decltype(m_onLevelChanged) onLevelChanged = m_onLevelChanged;
+    QnMutexUnlocker unlock(lock);
+    if (onLevelChanged)
+        onLevelChanged();
 }
 
 } // namespace log

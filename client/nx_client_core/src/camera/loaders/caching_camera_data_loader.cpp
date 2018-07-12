@@ -63,8 +63,10 @@ bool QnCachingCameraDataLoader::supportedResource(const QnMediaResourcePtr &reso
 
 void QnCachingCameraDataLoader::init() {
     // TODO: #GDM 2.4 move to camera history
-    if(m_resource.dynamicCast<QnNetworkResource>()) {
-        connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
+    if(m_resource.dynamicCast<QnNetworkResource>()) 
+    {
+        connect(qnSyncTime, &QnSyncTime::timeChanged,
+                this, &QnCachingCameraDataLoader::discardCachedData);
     }
 }
 
@@ -275,7 +277,15 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
         .arg(dt(startTimeMs)),
         dataType);
     emit periodsChanged(timePeriodType, startTimeMs);
+}
 
+void QnCachingCameraDataLoader::invalidateCachedData()
+{
+    NX_VERBOSE(this, "Chunks: mark local cache as dirty");
+
+    for (int i = 0; i < Qn::TimePeriodContentCount; i++)
+        if (m_loaders[i])
+            m_loaders[i]->discardCachedData();
 }
 
 void QnCachingCameraDataLoader::discardCachedData()

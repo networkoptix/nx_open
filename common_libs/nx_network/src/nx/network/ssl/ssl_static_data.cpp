@@ -12,14 +12,6 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/unused.h>
 
-#if !defined(SSL_OP_NO_TLSv1_1)
-    #define SSL_OP_NO_TLSv1_1 0
-#endif
-
-#if !defined(SSL_OP_NO_TLSv1_2)
-    #define SSL_OP_NO_TLSv1_2 0
-#endif
-
 namespace nx {
 namespace network {
 namespace ssl {
@@ -75,7 +67,7 @@ private:
             #if defined(USE_OWN_MUTEX)
                 mutex->lock(file, line);
             #else
-                QN_UNUSED(file, line);
+                nx::utils::unused(file, line);
                 mutex->lock();
             #endif
         }

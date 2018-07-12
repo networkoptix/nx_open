@@ -29,10 +29,8 @@
 #include "av_singesensor.h"
 #include <common/static_common_module.h>
 
-
 const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
-
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
     : m_totalMdZones(64),
@@ -93,40 +91,6 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
     CLHttpStatus result = http.doGET(req);
 
     return result;
-
-}
-
-class QnPlArecontResourceSetRegCommand : public QnResourceCommand
-{
-public:
-    QnPlArecontResourceSetRegCommand(const QnResourcePtr& res, int page, int reg, int val):
-      QnResourceCommand(res),
-          m_page(page),
-          m_reg(reg),
-          m_val(val)
-      {}
-
-
-      bool execute()
-      {
-          if (!isConnectedToTheResource())
-              return false;
-
-          return getResource().dynamicCast<QnPlAreconVisionResource>()->setRegister(m_page,m_reg,m_val);
-      }
-private:
-    int m_page;
-    int m_reg;
-    int m_val;
-};
-
-typedef std::shared_ptr<QnPlArecontResourceSetRegCommand> QnPlArecontResourceSetRegCommandPtr;
-
-CLHttpStatus QnPlAreconVisionResource::setRegister_asynch(int page, int num, int val)
-{
-    QnPlArecontResourceSetRegCommandPtr command ( new QnPlArecontResourceSetRegCommand(toSharedPointer(), page, num, val) );
-    addCommandToProc(command);
-    return CL_HTTP_SUCCESS;
 
 }
 
@@ -235,7 +199,6 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initializeCameraDriver()
 
     setRegister(3, 21, 20); // sets I frame frequency to 1/20
 
-
     if (!setApiParameter(lit("motiondetect"), lit("on"))) // enables motion detection;
         return CameraDiagnostics::RequestFailedResult(lit("Enable motion detection"), lit("unknown"));
 
@@ -291,7 +254,7 @@ QString QnPlAreconVisionResource::getDriverName() const
 
 Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const
 {
-    return Qn::QualityNormal;
+    return Qn::StreamQuality::normal;
 }
 
 QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
@@ -324,7 +287,8 @@ bool QnPlAreconVisionResource::setRelayOutputState(
         [autoResetTimeoutMS, url](
             SystemError::ErrorCode errorCode,
             int statusCode,
-            nx::network::http::BufferType)
+            nx::network::http::BufferType,
+            nx::network::http::HttpHeaders)
         {
             if (errorCode != SystemError::noError ||
                 statusCode != nx::network::http::StatusCode::ok)
@@ -340,12 +304,13 @@ bool QnPlAreconVisionResource::setRelayOutputState(
                     resetOutputUrl.setQuery(lit("auxout=off"));
                     nx::network::http::downloadFileAsync(
                         resetOutputUrl,
-                        [](SystemError::ErrorCode, int, nx::network::http::BufferType){});
+                        [](SystemError::ErrorCode, int, nx::network::http::BufferType, nx::network::http::HttpHeaders){});
                 },
                 std::chrono::milliseconds(autoResetTimeoutMS));
         };
 
-    const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx::network::http::BufferType) {};
+    const auto emptyOutputDoneHandler =
+        [](SystemError::ErrorCode, int, nx::network::http::BufferType, nx::network::http::HttpHeaders) {};
 
     if (activate && (autoResetTimeoutMS > 0))
         nx::network::http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
@@ -386,7 +351,6 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
     if (mdresult == lit("no motion"))
         return motion; // no motion detected
 
-
     int zones = totalMdZones() == 1024 ? 32 : 8;
 
     QStringList md = mdresult.split(L' ', QString::SkipEmptyParts);
@@ -409,7 +373,6 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
         {
             int index = y*zones + x;
             QString m = md.at(index);
-
 
             if (m == lit("00") || m == lit("0"))
                 continue;
@@ -543,7 +506,8 @@ QString QnPlAreconVisionResource::generateRequestString(
 }
 
 // ===============================================================================================================================
-bool QnPlAreconVisionResource::getApiParameter(const QString &id, QString &value) {
+bool QnPlAreconVisionResource::getApiParameter(const QString& id, QString& value)
+{
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -555,7 +519,6 @@ bool QnPlAreconVisionResource::getApiParameter(const QString &id, QString &value
 
     if (status != CL_HTTP_SUCCESS)
         return false;
-
 
     QByteArray response;
     connection.readAll(response);
@@ -570,7 +533,8 @@ bool QnPlAreconVisionResource::getApiParameter(const QString &id, QString &value
     return true;
 }
 
-bool QnPlAreconVisionResource::setApiParameter(const QString &id, const QString &value) {
+bool QnPlAreconVisionResource::setApiParameter(const QString& id, const QString& value)
+{
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -593,7 +557,7 @@ bool QnPlAreconVisionResource::setApiParameter(const QString &id, const QString 
     return false;
 }
 
-QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
+QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString& name)
 {
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
     if (rt.isNull())
@@ -679,7 +643,8 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     }
 }
 
-bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
+bool QnPlAreconVisionResource::startInputPortMonitoringAsync(
+    std::function<void(bool)>&& completionHandler)
 {
     nx::utils::Url url;
     url.setScheme(lit("http"));
@@ -713,7 +678,8 @@ void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
     m_relayInputClient.reset();
 }
 
-void QnPlAreconVisionResource::inputPortStateRequestDone(nx::network::http::AsyncHttpClientPtr client)
+void QnPlAreconVisionResource::inputPortStateRequestDone(
+    nx::network::http::AsyncHttpClientPtr client)
 {
     static const unsigned int INPUT_PORT_STATE_CHECK_TIMEOUT_MS = 1000;
 
@@ -766,7 +732,8 @@ QnCameraAdvancedParams QnPlAreconVisionResource::AvParametersProvider::descripti
     return {};
 }
 
-QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParametersProvider::get(const QSet<QString>& ids)
+QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParametersProvider::get(
+    const QSet<QString>& ids)
 {
     QnCameraAdvancedParamValueMap result;
     for (const auto id: ids)
@@ -779,7 +746,8 @@ QnCameraAdvancedParamValueMap QnPlAreconVisionResource::AvParametersProvider::ge
     return result;
 }
 
-QSet<QString> QnPlAreconVisionResource::AvParametersProvider::set(const QnCameraAdvancedParamValueMap& values)
+QSet<QString> QnPlAreconVisionResource::AvParametersProvider::set(
+    const QnCameraAdvancedParamValueMap& values)
 {
     QSet<QString> result;
     for (auto it = values.begin(); it != values.end(); ++it)
@@ -813,7 +781,6 @@ bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& nam
 
     if (status != CL_HTTP_SUCCESS)
         return false;
-
 
     QByteArray response;
     connection.readAll(response);

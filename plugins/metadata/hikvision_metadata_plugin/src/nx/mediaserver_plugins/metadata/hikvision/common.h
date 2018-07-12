@@ -29,7 +29,6 @@ public:
         QString negativeState;
         QString regionDescription;
         QString dependedEvent;
-        QString forcedEvent;
     };
     #define EventDescriptor_Fields AnalyticsEventType_Fields (internalName)\
         (internalMonitoringName)\
@@ -37,8 +36,7 @@ public:
         (positiveState)\
         (negativeState)\
         (regionDescription)\
-        (dependedEvent)\
-        (forcedEvent)
+        (dependedEvent)
 
     struct DriverManifest: public nx::api::AnalyticsDriverManifestBase
     {

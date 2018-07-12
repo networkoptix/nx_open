@@ -74,8 +74,14 @@ public:
     bool closingDown() const;
     void setClosingDown(bool value);
 
+    enum StartupParametersCode {
+        success,
+        wrongParameters,
+        forcedExit
+    };
+
     /** Process startup parameters and call related actions. Returns false if something goes critically wrong. */
-    bool handleStartupParameters(const QnStartupParameters& startupParams);
+    StartupParametersCode handleStartupParameters(const QnStartupParameters& startupParams);
 
 signals:
     /**
@@ -99,6 +105,7 @@ private:
     bool connectUsingCustomUri(const nx::vms::utils::SystemUri& uri);
 
     bool connectUsingCommandLineAuth(const QnStartupParameters& startupParams);
+    bool showEulaMessage() const;
 
 private:
     QScopedPointer<QnWorkbench> m_workbench;

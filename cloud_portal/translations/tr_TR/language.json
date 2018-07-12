@@ -1,19 +1,19 @@
 {
   "language_name": "Türk",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Tamam",
     "cancelButton": "İptal",
-    "loginTitle": "{{PRODUCT_NAME}}'e giriş yapın",
+    "loginTitle": "%PRODUCT_NAME%'e giriş yapın",
     "loginButton": "Giriş yap",
     "logoutAuthorisedTitle": "Zaten giriş yapılmış",
     "logoutAuthorisedContinueButton": "Devam et",
     "logoutAuthorisedLogoutButton": "Oturumu Kapat"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Hoş geldiniz",
     "register": "Hesap Oluştur",
     "changePassword": "Parola değiştir -",
@@ -31,8 +31,8 @@
     "view": "Kameraları görüntüle - ",
     "debug": "Hata ayıklama",
     "login": "Giriş yap -",
-    "download": "İndir {{VMS_NAME}}",
-    "downloadPlatform": "İndir {{VMS_NAME}} ",
+    "download": "İndir %VMS_NAME%",
+    "downloadPlatform": "İndir %VMS_NAME% ",
     "pageNotFound": "Sayfa bulunamadı"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Özel Ayarlar",
-      "description": "Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın"
+      "description": "Özel izinler ayarlamak için %PRODUCT_NAME% İstemci uygulamasını kullanın"
     },
     "cloudAdmin": {
       "label": "Yönetici",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Özel Ayarlar",
-      "description": "Özel izinler ayarlamak için {{PRODUCT_NAME}} İstemci uygulamasını kullanın"
+      "description": "Özel izinler ayarlamak için %VMS_NAME% İstemci uygulamasını kullanın"
     }
   },
   "errorCodes": {
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "Onay e-posta gönderemezsiniz",
     "cloudInvalidResponse": "Cloud DB, beklenmedik bir yanıt verdi",
     "notAuthorized": "Hatalı parola",
+    "brokenAccount": "Hesapla beklenmeyen bir problem. <a href=\"/restore_password\">Hesabı geri yükle</a>",
     "wrongParameters": "Formdaki bazı parametreler yanlış",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "Hesap zaten etkinleştirildi veya onay kodu yanlış",
     "wrongCodeRestore": "Onay kodu zaten kullanılmış veya yanlış",
     "forbidden": "Bu işlemi gerçekleştirecek izinlere sahip değilsiniz",
@@ -127,22 +127,24 @@
     "alreadyExists": "Bu hesap zaten mevcut",
     "unknownError": "Beklenmedik bir hata oluştu",
     "accountAlreadyActivated": "Bu hesap zaten etkinleştirildi",
-    "emailNotFound": "Hesap mevcut değil",
+    "emailNotFound": "Hesap mevcut değil.",
     "EmailAlreadyExists": "Bu e-posta adresi zaten kayıtlı",
-    "oldPasswordMistmatch": "Parola hatalı",
+    "oldPasswordMistmatch": "Parola hatalı.",
     "passwordMismatch": "Hatalı parola",
     "cantEditYourself": "Kendi izinlerini değiştirmeye izin verilmiyor",
     "cantEditAdmin": "Bu kullanıcının yönetici izinleri var",
-    "cantOpenClient": "{{VMS_NAME}} uygulama algılanmadı. <a href=\"/download\">İndir</a>",
+    "cantOpenClient": "%VMS_NAME% uygulama algılanmadı. <a href=\"/download\">İndir</a>",
     "lostConnection": "{{systemName}} ile bağlantı kayboldu",
-    "thisSystem": "sistem"
+    "thisSystem": "sistem",
+    "oldSafariNotSupported": "Safari 10'dan büyük sürümleri desteklenmez."
   },
   "passwordRequirements": {
-    "minLengthMessage": "Parola en az 8 karakterden oluşmalıdır",
+    "minLengthMessage": "Şifre en az 8 karakter içermelidir",
     "requiredMessage": "Sadece alfanümerik ve klavye karakterleri kullanın",
     "weakMessage": "Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
     "strongMessage": "Güçlü parola!",
-    "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz"
+    "commonMessage": "Dünyada en çok kullanılan parolayı seçtiniz",
+    "missingMessage": "Parola gerekmektedir"
   },
   "sharing": {
     "confirmOwner": "Sistem sahibini değiştirirseniz, hesabınızdaki yetkileri iptal edersiniz. Bu eylem geri döndürülemez. Emin misiniz?",
@@ -157,12 +159,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Sistem erişilebilir değil",
     "offline": "Sistem çevrimdışı",
-    "openClient": "{{VMS_NAME}} içinde aç",
-    "openClientNoSystem": "Aç{{VMS_NAME}}",
+    "openClient": "%VMS_NAME% içinde aç",
+    "openClientNoSystem": "Aç%VMS_NAME%",
+    "confirmMergeAction": "Birleştir",
+    "mergeSystemTitle": "Sistemleri Birleştir",
     "confirmRenameTitle": "Sistem Adı",
     "confirmRenameAction": "Kaydet",
     "successRename": "Sistem ismi kaydedildi",
-    "confirmDisconnectTitle": "{{PRODUCT_NAME}} çıkış yapılsın mı?",
+    "confirmDisconnectTitle": "%PRODUCT_NAME% çıkış yapılsın mı?",
     "confirmDisconnectAction": "Bağlantıyı kes",
     "confirmUnshareFromMe": "Hesabınızın bu sistemle bağlantısını kesmek üzeresiniz. Bundan sonra bu sisteme erişim sağlayamayacaksınız. Emin misiniz?",
     "confirmUnshareFromMeTitle": "Sistemle bağlantıyı kes?",
@@ -170,7 +174,7 @@
     "confirmUnshare": "Bu kullanıcı Sistem'e erişemez. Emin misiniz?",
     "confirmUnshareTitle": "Kullanıcıyı sil?",
     "confirmUnshareAction": "Sil",
-    "successDisconnected": "Sistem {{PRODUCT_NAME}}'den başarıyla çıkarıldı",
+    "successDisconnected": "Sistem %PRODUCT_NAME%'den başarıyla çıkarıldı",
     "successDeleted": "{{systemName}} sistemi hesabınızdan başarıyla silindi",
     "permissionsRemoved": "İzinler {{email}}'den kaldırıldı"
   },
@@ -183,14 +187,14 @@
     "saveChanges": "Kaydet"
   },
   "downloads": {
-    "noClientDetectedTitle": "Sisteminizi görüntülemek için {{VMS_NAME}}'i yükleyin",
-    "action": "İndir {{VMS_NAME}}",
+    "noClientDetectedTitle": "Sisteminizi görüntülemek için %VMS_NAME%'i yükleyin",
+    "action": "İndir %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {
@@ -200,12 +204,12 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "El Capitan, OSX 10.12 Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
         "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
       },
       "macos": {
         "label": "Mac OS",
@@ -222,7 +226,7 @@
       "arm": {
         "label": "ARM",
         "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS,  LTS"
+        "supported": "Ubuntu 14.04 LTS, 16.04 LTS, LTS"
       }
     },
     "platforms": {

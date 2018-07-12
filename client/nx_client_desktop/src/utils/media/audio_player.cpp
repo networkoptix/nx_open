@@ -17,31 +17,23 @@
 #include <nx/utils/random.h>
 
 
-class LocalAudioFileResource
-:
+class LocalAudioFileResource:
     public QnResource
 {
 public:
-    virtual QString getUniqueId() const { return QString(); }
+    virtual QString getUniqueId() const override { return QString(); }
     virtual void setStatus(Qn::ResourceStatus, Qn::StatusChangeReason /*reason*/) override {}
     virtual Qn::ResourceStatus getStatus() const override { return Qn::Online; }
 };
 
 
-AudioPlayer::AudioPlayer( const QString& filePath )
-:
-    m_mediaFileReader( NULL ),
-    m_adaptiveSleep( MAX_FRAME_DURATION_MS*1000 ),
-    m_renderer( NULL ),
-    m_rtStartTime( AV_NOPTS_VALUE ),
-    m_lastRtTime( 0 ),
-    m_state( sInit ),
-    m_storage( new QnExtIODeviceStorageResource(nullptr) ),
-    m_synthesizingTarget( NULL ),
-    m_resultCode( rcNoError )
+AudioPlayer::AudioPlayer(const QString& filePath):
+    m_adaptiveSleep(MAX_FRAME_DURATION_MS * 1000),
+    m_rtStartTime(AV_NOPTS_VALUE),
+    m_storage(new QnExtIODeviceStorageResource(nullptr))
 {
-    if( !filePath.isEmpty() )
-        open( filePath );
+    if (!filePath.isEmpty())
+        open(filePath);
 }
 
 AudioPlayer::~AudioPlayer()
@@ -215,17 +207,15 @@ void AudioPlayer::run()
             case sSynthesizing:
             case sSynthesizingAutoPlay:
             {
-                #ifndef DISABLE_FESTIVAL
-                    if (!m_synthesizingTarget->open(QIODevice::WriteOnly) ||
-                        !TextToWaveServer::instance()->generateSoundSync(
-                            m_textToPlay, m_synthesizingTarget.get()))
-                    {
-                        emit done();
-                        m_state = sReady;
-                        m_resultCode = rcSynthesizingError;
-                        continue;
-                    }
-                #endif
+                if (!m_synthesizingTarget->open(QIODevice::WriteOnly) ||
+                    !TextToWaveServer::instance()->generateSoundSync(
+                        m_textToPlay, m_synthesizingTarget.get()))
+                {
+                    emit done();
+                    m_state = sReady;
+                    m_resultCode = rcSynthesizingError;
+                    continue;
+                }
 
                 m_synthesizingTarget->close();
                 if (m_state == sSynthesizingAutoPlay)
@@ -283,13 +273,13 @@ void AudioPlayer::closeNonSafe()
     if( m_mediaFileReader )
     {
         delete m_mediaFileReader;
-        m_mediaFileReader = NULL;
+        m_mediaFileReader = nullptr;
     }
 
     if( m_renderer )
     {
         delete m_renderer;
-        m_renderer = NULL;
+        m_renderer = nullptr;
     }
 
     m_filePath.clear();
@@ -326,7 +316,7 @@ bool AudioPlayer::openNonSafe( QIODevice* dataSource )
 
 bool AudioPlayer::isOpenedNonSafe() const
 {
-    return m_state >= sReady || m_mediaFileReader != NULL;
+    return m_state >= sReady || m_mediaFileReader != nullptr;
 }
 
 static const int MS_PER_USEC = 1000;

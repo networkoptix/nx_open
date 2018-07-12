@@ -11,28 +11,23 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/busy_indicator_button.h>
+#include <nx/client/desktop/common/widgets/busy_indicator_button.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <ui/common/scoped_cursor_rollback.h>
+#include <nx/client/desktop/common/utils/scoped_cursor_rollback.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop;
 
 QnStorageUrlDialog::QnStorageUrlDialog(
-        const QnMediaServerResourcePtr& server,
-        QWidget* parent,
-        Qt::WindowFlags windowFlags) :
-
+    const QnMediaServerResourcePtr& server,
+    QWidget* parent,
+    Qt::WindowFlags windowFlags)
+    :
     base_type(parent, windowFlags),
     ui(new Ui::StorageUrlDialog()),
     m_server(server),
-    m_protocols(),
-    m_descriptions(),
-    m_urlByProtocol(),
-    m_lastProtocol(),
-    m_storage(),
-    m_currentServerStorages(),
-    m_okButton(new QnBusyIndicatorButton(this))
+    m_okButton(new BusyIndicatorButton(this))
 {
     ui->setupUi(this);
     ui->urlEdit->setFocus();
@@ -92,7 +87,7 @@ QnStorageModelInfo QnStorageUrlDialog::storage() const
 QString QnStorageUrlDialog::normalizePath(QString path)
 {
     QString separator = lit("/");
-    //ec2::ApiRuntimeData data = runtimeInfoManager()->item(m_server->getId()).data;
+    //const auto data = runtimeInfoManager()->item(m_server->getId()).data;
     //if (data.platform.toLower() == lit("windows"))
     //    separator = lit("\\");
     QString result = path.replace(L'/', separator);
@@ -187,13 +182,13 @@ void QnStorageUrlDialog::accept()
 
     // Scoped event loop:
     {
-        QnScopedCursorRollback cursorRollback(this, Qt::WaitCursor);
+        ScopedCursorRollback cursorRollback(this, Qt::WaitCursor);
         QnScopedTypedPropertyRollback<bool, QWidget> inputsEnabledRollback(ui->inputsWidget,
             &QWidget::setEnabled, &QWidget::isEnabled, false);
         QnScopedTypedPropertyRollback<bool, QWidget> buttonEnabledRollback(m_okButton,
             &QWidget::setEnabled, &QWidget::isEnabled, false);
-        QnScopedTypedPropertyRollback<bool, QnBusyIndicatorButton> buttonIndicatorRollback(m_okButton,
-            &QnBusyIndicatorButton::showIndicator, &QnBusyIndicatorButton::isIndicatorVisible, true);
+        QnScopedTypedPropertyRollback<bool, BusyIndicatorButton> buttonIndicatorRollback(m_okButton,
+            &BusyIndicatorButton::showIndicator, &BusyIndicatorButton::isIndicatorVisible, true);
 
         if (loop.exec() == kCancelled)
             return;

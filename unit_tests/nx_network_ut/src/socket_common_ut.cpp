@@ -76,7 +76,6 @@ static void testHostAddress(
 TEST(HostAddress, Base)
 {
     testHostAddress("0.0.0.0", "::", htonl(INADDR_ANY), in6addr_any);
-    testHostAddress("127.0.0.1", "::1", htonl(INADDR_LOOPBACK), in6addr_loopback);
 
     const auto kIpV4a = HostAddress::ipV4from(QString("12.34.56.78"));
     const auto kIpV6a = HostAddress::ipV6from(QString("::ffff:c22:384e")).first;
@@ -88,6 +87,20 @@ TEST(HostAddress, Base)
 
     testHostAddress("12.34.56.78", "::ffff:12.34.56.78", kIpV4a->s_addr, kIpV6a);
     testHostAddress(nullptr, "2001:db8:0:2::1", boost::none, kIpV6b);
+}
+
+TEST(HostAddress, localhost)
+{
+    ASSERT_EQ(HostAddress::ipV6from("::1"), HostAddress::localhost.ipV6());
+    ASSERT_EQ(in6addr_loopback, *HostAddress::localhost.ipV6().first);
+
+    ASSERT_EQ(*HostAddress::ipV4from("127.0.0.1"), *HostAddress::localhost.ipV4());
+    in_addr loopback;
+    memset(&loopback, 0, sizeof(loopback));
+    loopback.s_addr = htonl(INADDR_LOOPBACK);
+    ASSERT_EQ(loopback, *HostAddress::localhost.ipV4());
+
+    ASSERT_EQ("localhost", HostAddress::localhost.toString().toStdString());
 }
 
 TEST(HostAddress, IpV6FromString)
@@ -121,21 +134,36 @@ TEST(HostAddress, IpToStringV6)
     ASSERT_EQ("fd00::9465:d2ff:fe64:2772%1", addr.toString());
 }
 
-TEST(HostAddress, IsLocal)
+TEST(HostAddress, IsLocalHost)
 {
-    ASSERT_TRUE(HostAddress("127.0.0.1").isLocal());
-    ASSERT_TRUE(HostAddress("10.0.2.103").isLocal());
-    ASSERT_TRUE(HostAddress("172.17.0.2").isLocal());
-    ASSERT_TRUE(HostAddress("192.168.1.1").isLocal());
-    ASSERT_TRUE(HostAddress("fd00::9465:d2ff:fe64:2772%1").isLocal());
-    ASSERT_TRUE(HostAddress("fe80::d250:99ff:fe39:1d29%2").isLocal());
-    ASSERT_TRUE(HostAddress("::ffff:172.25.4.8").isLocal());
+    EXPECT_TRUE(HostAddress("localhost").isLocalHost());
+    EXPECT_TRUE(HostAddress("127.0.0.1").isLocalHost());
+    EXPECT_TRUE(HostAddress("::1").isLocalHost());
+    EXPECT_TRUE(HostAddress(*HostAddress::ipV4from("127.0.0.1")).isLocalHost());
+    EXPECT_TRUE(HostAddress(*HostAddress::ipV6from("::1").first).isLocalHost());
 
-    ASSERT_FALSE(HostAddress("12.34.56.78").isLocal());
-    ASSERT_FALSE(HostAddress("95.31.136.2").isLocal());
-    ASSERT_FALSE(HostAddress("172.8.0.2").isLocal());
-    ASSERT_FALSE(HostAddress("2001:db8:0:2::1").isLocal());
-    ASSERT_FALSE(HostAddress("::ffff:12.34.56.78").isLocal());
+    EXPECT_FALSE(HostAddress("12.34.56.78").isLocalHost());
+    EXPECT_FALSE(HostAddress("95.31.136.2").isLocalHost());
+    EXPECT_FALSE(HostAddress("172.8.0.2").isLocalHost());
+    EXPECT_FALSE(HostAddress("2001:db8:0:2::1").isLocalHost());
+    EXPECT_FALSE(HostAddress("::ffff:12.34.56.78").isLocalHost());
+}
+
+TEST(HostAddress, IsLocalNetwork)
+{
+    EXPECT_TRUE(HostAddress("127.0.0.1").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("10.0.2.103").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("172.17.0.2").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("192.168.1.1").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("fd00::9465:d2ff:fe64:2772%1").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("fe80::d250:99ff:fe39:1d29%2").isLocalNetwork());
+    EXPECT_TRUE(HostAddress("::ffff:172.25.4.8").isLocalNetwork());
+
+    EXPECT_FALSE(HostAddress("12.34.56.78").isLocalNetwork());
+    EXPECT_FALSE(HostAddress("95.31.136.2").isLocalNetwork());
+    EXPECT_FALSE(HostAddress("172.8.0.2").isLocalNetwork());
+    EXPECT_FALSE(HostAddress("2001:db8:0:2::1").isLocalNetwork());
+    EXPECT_FALSE(HostAddress("::ffff:12.34.56.78").isLocalNetwork());
 }
 
 TEST(HostAddress, isIpAddress)

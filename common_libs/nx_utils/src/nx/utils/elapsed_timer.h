@@ -13,7 +13,7 @@ public:
     ElapsedTimer();
 
     bool hasExpired(std::chrono::milliseconds value) const;
-    void restart();
+    std::chrono::milliseconds restart();
     void invalidate();
     bool isValid() const;
     std::chrono::milliseconds elapsed() const;

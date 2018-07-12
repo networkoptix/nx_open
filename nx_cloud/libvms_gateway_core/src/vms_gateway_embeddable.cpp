@@ -7,8 +7,9 @@ namespace cloud {
 namespace gateway {
 
 VmsGatewayEmbeddable::VmsGatewayEmbeddable(
-    bool isSslEnabled, const QString& certPath)
-:
+    bool isSslEnabled,
+    const QString& certPath)
+    :
     m_isSslEnabled(isSslEnabled)
 {
     addArg("/path/to/bin");
@@ -30,9 +31,6 @@ VmsGatewayEmbeddable::VmsGatewayEmbeddable(
     {
         addArg("-http/sslSupport", "false");
     }
-
-    // Do not allow VmsGateway to reinitialize log.
-    addArg("-log/logLevel", "notConfigured");
 
     if (startAndWaitUntilStarted())
     {
@@ -56,6 +54,11 @@ network::SocketAddress VmsGatewayEmbeddable::endpoint() const
 void VmsGatewayEmbeddable::enforceSslFor(const network::SocketAddress& targetAddress, bool enabled)
 {
     moduleInstance()->impl()->enforceSslFor(targetAddress, enabled);
+}
+
+void VmsGatewayEmbeddable::beforeModuleStart()
+{
+    moduleInstance()->impl()->setEnableLoggingInitialization(false);
 }
 
 } // namespace gateway

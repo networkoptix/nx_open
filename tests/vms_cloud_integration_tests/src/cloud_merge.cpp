@@ -2,19 +2,18 @@
 #include <vector>
 
 #include <gtest/gtest.h>
+#include <test_support/peer_wrapper.h>
+#include <test_support/merge_test_fixture.h>
 
-#include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
+#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/cdb/test_support/cdb_launcher.h>
+#include <nx/network/app_info.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
-
-#include <nx/cloud/cdb/ec2/data_conversion.h>
-#include <nx/cloud/cdb/test_support/cdb_launcher.h>
-
-#include <test_support/peer_wrapper.h>
-#include <test_support/merge_test_fixture.h>
 
 namespace test {
 
@@ -29,7 +28,7 @@ public:
     static void SetUpTestCase()
     {
         s_staticCommonModule =
-            std::make_unique<QnStaticCommonModule>(Qn::PeerType::PT_Server);
+            std::make_unique<QnStaticCommonModule>(nx::vms::api::PeerType::server);
     }
 
     static void TearDownTestCase()
@@ -81,12 +80,17 @@ protected:
         }
     }
 
+    nx::cdb::AccountWithPassword registerCloudUser()
+    {
+        return m_cdb.addActivatedAccount2();
+    }
+
     void addRandomCloudUserToEachSystem()
     {
         for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
         {
             const auto someCloudUser = m_cdb.addActivatedAccount2();
-            ::ec2::ApiUserData vmsUserData;
+            nx::vms::api::UserData vmsUserData;
 
             vmsUserData.id = guidFromArbitraryData(someCloudUser.email);
             vmsUserData.typeId = kUserResourceTypeGuid;
@@ -96,9 +100,9 @@ protected:
             vmsUserData.isCloud = true;
             vmsUserData.isEnabled = true;
             vmsUserData.realm = nx::network::AppInfo::realm();
-            vmsUserData.hash = "password_is_in_cloud";
-            vmsUserData.digest = "password_is_in_cloud";
-            vmsUserData.permissions = Qn::GlobalAdminPermissionSet;
+            vmsUserData.hash = nx::vms::api::UserData::kCloudPasswordStub;
+            vmsUserData.digest = nx::vms::api::UserData::kCloudPasswordStub;
+            vmsUserData.permissions = GlobalPermission::adminPermissions;
 
             auto mediaServerClient = m_systemMergeFixture.peer(i).mediaServerClient();
             ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2SaveUser(vmsUserData));
@@ -161,7 +165,7 @@ protected:
 
     void andMergeHistoryRecordIsAdded()
     {
-        const ::ec2::ApiSystemMergeHistoryRecordList systemMergeHistory =
+        const nx::vms::api::SystemMergeHistoryRecordList systemMergeHistory =
             m_systemMergeFixture.waitUntilMergeHistoryIsAdded();
         ASSERT_GE(systemMergeHistory.size(), 1U);
         if (!systemMergeHistory.front().mergedSystemCloudId.isEmpty())
@@ -228,7 +232,7 @@ protected:
         const nx::hpm::api::SystemCredentials& cloudCredentials)
     {
         auto mediaServerClient = m_systemMergeFixture.peer(0).mediaServerClient();
-        ::ec2::ApiUserDataList vmsUsers;
+        nx::vms::api::UserDataList vmsUsers;
         ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&vmsUsers));
 
         // Waiting until cloud has all that users vms has.
@@ -279,9 +283,9 @@ protected:
         andMergeHistoryRecordIsAdded();
     }
 
-    void andVmsTranscationLogMatchesCloudOne()
+    void waitUntilVmsTranscationLogMatchesCloudOne(int peerIndex = 0)
     {
-        auto mediaServerClient = m_systemMergeFixture.peer(0).mediaServerClient();
+        auto mediaServerClient = m_systemMergeFixture.peer(peerIndex).mediaServerClient();
 
         for (;;)
         {
@@ -292,11 +296,16 @@ protected:
                 ::ec2::ErrorCode::ok,
                 mediaServerClient->ec2GetTransactionLog(filter, &vmsTransactionLog));
 
+            ::ec2::ApiTransactionDataList fullVmsTransactionLog;
+            ASSERT_EQ(
+                ::ec2::ErrorCode::ok,
+                mediaServerClient->ec2GetTransactionLog(::ec2::ApiTranLogFilter(), &fullVmsTransactionLog));
+
             ::ec2::ApiTransactionDataList cloudTransactionLog;
             m_cdb.getTransactionLog(
-                m_cloudAccounts[0].email,
-                m_cloudAccounts[0].password,
-                m_systemMergeFixture.peer(0).getCloudCredentials().systemId.toStdString(),
+                m_cloudAccounts[peerIndex].email,
+                m_cloudAccounts[peerIndex].password,
+                m_systemMergeFixture.peer(peerIndex).getCloudCredentials().systemId.toStdString(),
                 &cloudTransactionLog);
 
             if (vmsTransactionLog == cloudTransactionLog)
@@ -304,6 +313,44 @@ protected:
 
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
+    }
+
+    void shareSystem(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    {
+        ASSERT_EQ(
+            nx::cdb::api::ResultCode::ok,
+            m_cdb.shareSystem(
+                m_cloudAccounts[index],
+                m_systemMergeFixture.peer(index).getCloudCredentials().systemId.toStdString(),
+                cloudUser.email,
+                nx::cdb::api::SystemAccessRole::cloudAdmin));
+    }
+
+    void disconnectFromCloud(int index)
+    {
+        ASSERT_TRUE(m_systemMergeFixture.peer(index).detachFromCloud());
+    }
+
+    void assertUserIsAbleToLogin(int peerIndex, const nx::cdb::AccountWithPassword& cloudUser)
+    {
+        ASSERT_TRUE(testUserLogin(peerIndex, cloudUser));
+    }
+
+    void assertUserIsNotAbleToLogin(int peerIndex, const nx::cdb::AccountWithPassword& cloudUser)
+    {
+        ASSERT_FALSE(testUserLogin(peerIndex, cloudUser));
+    }
+
+    bool testUserLogin(int index, const nx::cdb::AccountWithPassword& cloudUser)
+    {
+        using namespace nx::network::http;
+
+        auto mediaServerClient = m_systemMergeFixture.peer(index).mediaServerClient();
+        mediaServerClient->setUserCredentials(Credentials(
+            cloudUser.email.c_str(),
+            PasswordAuthToken(cloudUser.password.c_str())));
+        nx::vms::api::UserDataList users;
+        return mediaServerClient->ec2GetUsers(&users) == ::ec2::ErrorCode::ok;
     }
 
 private:
@@ -410,7 +457,32 @@ TEST_F(CloudMerge, merging_non_cloud_system_to_a_cloud_one_does_not_affect_data_
     whenMergeSystems();
 
     thenMergeFullyCompleted();
-    andVmsTranscationLogMatchesCloudOne();
+    waitUntilVmsTranscationLogMatchesCloudOne();
+}
+
+TEST_F(CloudMerge, system_disconnected_from_cloud_is_properly_merged_with_a_cloud_system)
+{
+    givenTwoCloudSystemsWithDifferentOwners();
+    const int newerSystemIndex = 1;
+    const int olderSystemIndex = 0;
+    const auto someCloudUser = registerCloudUser();
+
+    shareSystem(newerSystemIndex, someCloudUser);
+    waitUntilVmsTranscationLogMatchesCloudOne(newerSystemIndex);
+
+    disconnectFromCloud(newerSystemIndex); //< Every cloud user is removed from system.
+    assertUserIsNotAbleToLogin(newerSystemIndex, someCloudUser);
+
+    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+
+    whenMergeSystems();
+    thenMergeFullyCompleted();
+
+    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+
+    shareSystem(olderSystemIndex, someCloudUser);
+    waitUntilVmsTranscationLogMatchesCloudOne(olderSystemIndex);
+    assertUserIsAbleToLogin(olderSystemIndex, someCloudUser);
 }
 
 } // namespace test

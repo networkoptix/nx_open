@@ -6,17 +6,18 @@
 
 #define NX_PRINT_PREFIX "metadata::tegra_video::NaiveObjectTracker::"
 #include <nx/kit/debug.h>
+
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 #include <nx/utils/uuid.h>
 
 #include <plugins/plugin_tools.h>
-#include <plugins/plugin_internal_tools.h>
 #include <nx/sdk/metadata/common_object.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/sdk/metadata/common_attribute.h>
 
 #include "tegra_video_metadata_plugin_ini.h"
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -438,7 +439,7 @@ sdk::Rect NaiveObjectTracker::toSdkRect(const TegraVideo::Rect& rectangle)
 
 nxpl::NX_GUID NaiveObjectTracker::toSdkGuid(const QnUuid& id)
 {
-    return nxpt::fromQnUuidToPluginGuid(id);
+    return nx::mediaserver_plugins::utils::fromQnUuidToPluginGuid(id);
 }
 
 } // namespace tegra_video

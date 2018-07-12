@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
-
-#include "base_persistent_data_test.h"
+#include <nx/cloud/cdb/test_support/base_persistent_data_test.h>
 
 namespace nx {
 namespace cdb {
@@ -44,11 +43,11 @@ protected:
     {
         using namespace std::placeholders;
 
-        std::deque<api::SystemSharingEx> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         const auto dbResult = executeSelectQuerySync(
             std::bind(&dao::rdb::SystemSharingDataObject::fetchAllUserSharings,
                 systemSharingDao(), _1, &sharings));
-        ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
+        ASSERT_EQ(nx::sql::DBResult::ok, dbResult);
 
         ASSERT_EQ(1U, sharings.size());
         ASSERT_EQ(api::SystemAccessRole::advancedViewer, sharings[0].accessRole);

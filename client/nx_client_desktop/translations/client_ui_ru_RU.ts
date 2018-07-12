@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Отключайте только в случае слишком большой загрузки процессора</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Максимальный размер буфера живого видео</translation>
     </message>
@@ -173,11 +168,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Фиксированная длина архива</translation>
     </message>
@@ -366,7 +356,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунды</translation>
+      <translation>секунд</translation>
     </message>
     <message>
       <location/>
@@ -559,7 +549,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>Заканчивается</translation>
+      <translation>Остановить</translation>
     </message>
     <message>
       <location/>
@@ -665,7 +655,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Авто</translation>
     </message>
     <message>
       <location/>
@@ -680,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Сбросить настройки</translation>
+      <translation>По умолчанию</translation>
     </message>
     <message>
       <location/>
@@ -755,15 +745,30 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Сгенерировать</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Сброс</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>Логический ID</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Id тревожного входа</translation>
+      <source>Input ID</source>
+      <translation>ID тревожного входа</translation>
     </message>
   </context>
   <context>
@@ -784,12 +789,12 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунды</translation>
+      <translation>секунд</translation>
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>Id тревожного выхода:</translation>
+      <source>Output ID:</source>
+      <translation>ID тревожного выхода:</translation>
     </message>
   </context>
   <context>
@@ -958,6 +963,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>Описание содержит:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Категория</translation>
     </message>
   </context>
   <context>
@@ -1495,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Привязано к аппаратному Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Привязано к аппаратному ID:</translation>
     </message>
   </context>
   <context>
@@ -1594,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Аппаратный Id</translation>
+      <source>Hardware ID</source>
+      <translation>Аппаратный ID</translation>
     </message>
   </context>
   <context>
@@ -1692,7 +1705,7 @@
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>Режим времени</translation>
+      <translation>Шкала времени</translation>
     </message>
     <message>
       <location/>
@@ -1717,12 +1730,17 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунды</translation>
+      <translation>сек</translation>
     </message>
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Цикличность тура</translation>
+      <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>IP-адреса для камер и серверов, группы пользователей и т. д.</translation>
     </message>
   </context>
   <context>
@@ -1743,7 +1761,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>Аутентификация</translation>
+      <translation>Авторизация</translation>
     </message>
     <message>
       <location/>
@@ -1776,17 +1794,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Новая портативная камера...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>На серверу</translation>
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Портативная камера&quot; - это виртуальное хранилище для видеофайлов, которое может быть загружено на любой сервер вашей системы и доступно любому пользователю.</translation>
     </message>
   </context>
   <context>
@@ -1975,6 +1993,29 @@
     </message>
   </context>
   <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>Форма</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>Имя файла:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>Выбрать файл...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Обзор...</translation>
+    </message>
+  </context>
+  <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
@@ -2033,7 +2074,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Имя пользователя:</translation>
+      <translation>Логин:</translation>
     </message>
     <message>
       <location/>
@@ -2171,7 +2212,7 @@
     <message>
       <location/>
       <source>Options</source>
-      <translation>Параметры</translation>
+      <translation>Настройки</translation>
     </message>
     <message>
       <location/>
@@ -2219,7 +2260,7 @@
     <message>
       <location/>
       <source>Delete...</source>
-      <translation>Удалить...</translation>
+      <translation>&amp;Удалить...</translation>
     </message>
     <message>
       <location/>
@@ -2232,7 +2273,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
       <source>Video Wall Settings</source>
-      <translation>Настройки видеостены</translation>
+      <translation>Настройки видеостен</translation>
     </message>
     <message>
       <location/>
@@ -2331,7 +2372,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>секунды</translation>
+      <translation>секунд</translation>
     </message>
   </context>
   <context>
@@ -2497,7 +2538,7 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation>секунды</translation>
+      <translation>сек</translation>
     </message>
     <message>
       <location/>
@@ -2558,7 +2599,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>Аутентификация</translation>
+      <translation>Авторизация</translation>
     </message>
     <message>
       <location/>
@@ -2568,7 +2609,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>Движение</translation>
+      <translation>Детекция движения</translation>
     </message>
     <message>
       <location/>
@@ -2648,7 +2689,7 @@
     <message>
       <location/>
       <source>Web Page</source>
-      <translation>Web-страница</translation>
+      <translation>Web-интерфейс</translation>
     </message>
     <message>
       <location/>
@@ -2664,18 +2705,6 @@
       <location/>
       <source>Reset</source>
       <translation>Сброс</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -2739,7 +2768,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>User:</source>
-      <translation>Пользователь:</translation>
+      <translation>Имя пользователя:</translation>
     </message>
     <message>
       <location/>
@@ -2759,7 +2788,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>ОК</translation>
     </message>
     <message>
       <location/>
@@ -2879,7 +2908,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Имя пользователя:</translation>
+      <translation>Логин:</translation>
     </message>
     <message>
       <location/>
@@ -2892,7 +2921,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation>Role</translation>
+      <translation>Роли</translation>
     </message>
     <message>
       <location/>
@@ -3032,15 +3061,18 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>В системе ещё не созданы особые роли. 
-Для создания используйте кнопку &quot;Новая роль&quot;.</translation>
+      <source>New role</source>
+      <translation>Новая роль</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Новая роль</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Особых пользовательские роли еще не настроены.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Нажмите на кнопку &quot;Новая роль&quot; для создания.</translation>
     </message>
   </context>
   <context>
@@ -3065,18 +3097,13 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Детектор движения</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Обнаружение движения в загруженном видео</translation>
     </message>
     <message>
       <location/>
@@ -3088,36 +3115,26 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
   </context>
   <context>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Форма</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Загрузить видео</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Загрузить файл...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Загрузить папку...</translation>
     </message>
   </context>
   <context>
@@ -3125,7 +3142,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>Web Page</source>
-      <translation>Web-страница</translation>
+      <translation>Web-интерфейс</translation>
     </message>
   </context>
   <context>

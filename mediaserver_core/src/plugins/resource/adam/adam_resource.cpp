@@ -99,7 +99,6 @@ CameraDiagnostics::Result QnAdamResource::initializeCameraDriver()
 
 bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
 {
-    QN_UNUSED(completionHandler);
     if (!m_ioManager)
         return false;
 
@@ -136,7 +135,7 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
         emit networkIssue(
             toSharedPointer(this),
             qnSyncTime->currentUSecsSinceEpoch(),
-            nx::vms::event::EventReason::networkNoResponseFromDevice,
+            nx::vms::api::EventReason::networkNoResponseFromDevice,
             QString());
 
         if (isFatal)
@@ -305,7 +304,7 @@ bool QnAdamResource::setRelayOutputState(
     return m_ioManager->setOutputPortState(outputId, isActive);
 }
 
-void QnAdamResource::at_propertyChanged(const QnResourcePtr &res, const QString &key)
+void QnAdamResource::at_propertyChanged(const QnResourcePtr& res, const QString& key)
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {

@@ -43,9 +43,9 @@ TEST(ini_config_c_ut)
     ASSERT_TRUE(nx_ini_isEnabled());
     ASSERT_STREQ(NX_INI_FILE, nx_ini_iniFile());
 
-    // Test: iniFilePath() == iniFileDir() + iniFile().
+    // Test: iniFilePath() == iniFilesDir() + iniFile().
     char iniFilePath[1000] = "";
-    strncat(iniFilePath, nx_ini_iniFileDir(), sizeof(iniFilePath) - 1);
+    strncat(iniFilePath, nx_ini_iniFilesDir(), sizeof(iniFilePath) - 1);
     strncat(iniFilePath, nx_ini_iniFile(), sizeof(iniFilePath) - 1);
     ASSERT_STREQ(iniFilePath, nx_ini_iniFilePath());
 
@@ -58,7 +58,7 @@ TEST(ini_config_c_ut)
 
     // Create directory for ini files. Works for Windows as well.
     char mkdirCommand[1000] = "mkdir ";
-    strncat(mkdirCommand, nx_ini_iniFileDir(), sizeof(mkdirCommand) - 1);
+    strncat(mkdirCommand, nx_ini_iniFilesDir(), sizeof(mkdirCommand) - 1);
     system(mkdirCommand); //< Ignore possible errors.
 
     createFile(nx_ini_iniFilePath(),

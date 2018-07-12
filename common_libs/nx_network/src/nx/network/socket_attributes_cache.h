@@ -21,6 +21,7 @@ public:
     boost::optional<unsigned int> recvBufferSize;
     boost::optional<unsigned int> recvTimeout;
     boost::optional<unsigned int> sendTimeout;
+    boost::optional<bool> ipv6Only;
     boost::optional<aio::AbstractAioThread*> aioThread;
 
     bool applyTo(AbstractSocket* const socket) const
@@ -35,7 +36,8 @@ public:
             apply(socket, &AbstractSocket::setSendBufferSize, sendBufferSize) &&
             apply(socket, &AbstractSocket::setRecvBufferSize, recvBufferSize) &&
             apply(socket, &AbstractSocket::setRecvTimeout, recvTimeout) &&
-            apply(socket, &AbstractSocket::setSendTimeout, sendTimeout);
+            apply(socket, &AbstractSocket::setSendTimeout, sendTimeout) &&
+            apply(socket, &AbstractSocket::setIpv6Only, ipv6Only);
     }
 
 protected:
@@ -189,6 +191,13 @@ public:
             return false;
         }
         return m_delegate->getLastError(errorCode);
+    }
+    virtual bool setIpv6Only(bool val) override
+    {
+        return setAttributeValue(
+            &m_socketAttributes.ipv6Only,
+            static_cast<bool (AbstractSocket::*)(bool)>(&AbstractSocket::setIpv6Only),
+            val);
     }
     virtual AbstractSocket::SOCKET_HANDLE handle() const override
     {

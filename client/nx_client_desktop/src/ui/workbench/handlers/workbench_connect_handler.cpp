@@ -45,7 +45,6 @@
 
 #include <helpers/system_weight_helper.h>
 #include <nx_ec/ec_proto_version.h>
-#include <llutil/hardware_id.h>
 
 #include <platform/hardware_information.h>
 
@@ -82,21 +81,19 @@
 
 #include <nx/utils/collection.h>
 #include <utils/common/synctime.h>
-#include <utils/common/system_information.h>
-#include <utils/common/url.h>
 #include <utils/common/delayed.h>
 #include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
-#include <utils/reconnect_helper.h>
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
 #include <helpers/system_helpers.h>
+#include <nx/client/core/utils/reconnect_helper.h>
 
 #include <watchers/cloud_status_watcher.h>
 #include <nx_ec/dummy_handler.h>
-
+#include <nx/client/desktop/videowall/utils.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -216,13 +213,13 @@ void storeLocalSystemConnection(
     qnSettings->save();
 }
 
-ec2::ApiClientInfoData clientInfo()
+nx::vms::api::ClientInfoData clientInfo()
 {
-    ec2::ApiClientInfoData clientData;
+    nx::vms::api::ClientInfoData clientData;
     clientData.id = qnSettings->pcUuid();
     clientData.fullVersion = nx::utils::AppInfo::applicationFullVersion();
-    clientData.systemInfo = QnSystemInformation::currentSystemInformation().toString();
-    clientData.systemRuntime = QnSystemInformation::currentSystemRuntime();
+    clientData.systemInfo = QnAppInfo::currentSystemInformation().toString();
+    clientData.systemRuntime = nx::vms::api::SystemInformation::currentSystemRuntime();
 
     const auto& hw = HardwareInformation::instance();
     clientData.physicalMemory = hw.physicalMemory;
@@ -441,7 +438,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
         return;
     }
 
-    m_connecting.reset();
+    QnRaiiGuard connectingStateGuard([this]() { m_connecting.reset(); });
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
     NX_ASSERT(!context()->closingDown());
@@ -493,11 +490,23 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             menu()->trigger(action::DelayedForcedExitAction);
             break;
         default:    //error
-            if (!qnRuntime->isDesktopMode())
+            if (qnRuntime->isVideoWallMode())
             {
-                QnGraphicsMessageBox::information(
+
+                if (status == Qn::ForbiddenConnectionResult)
+                {
+                    QnGraphicsMessageBox::information(
+                        tr("Video Wall is removed on the server and will be closed."),
+                        kVideowallCloseTimeoutMSec);
+                    const QnUuid videoWallId(m_connecting.url.userName());
+                    setVideoWallAutorunEnabled(videoWallId, false);
+                }
+                else
+                {
+                    QnGraphicsMessageBox::information(
                         tr("Could not connect to server. Video Wall will be closed."),
                         kVideowallCloseTimeoutMSec);
+                }
                 executeDelayedParented(
                     [this]
                     {
@@ -584,7 +593,6 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
     qnClientMessageProcessor->init(connection);
 
     commonModule()->sessionManager()->start();
-    QnResource::startCommandProc();
 
     context()->setUserName(
         connectionInfo.effectiveUserName.isEmpty()
@@ -820,16 +828,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 
     auto connection = commonModule()->ec2Connection();
     NX_ASSERT(connection);
-    connect(connection->getTimeNotificationManager(),
-        &ec2::AbstractTimeNotificationManager::timeChanged,
-        this,
-        [](qint64 syncTime)
-        {
-            NX_ASSERT(qnSyncTime);
-            if (qnSyncTime)
-                qnSyncTime->updateTime(syncTime);
-        });
-
     commonModule()->setReadOnly(connection->connectionInfo().ecDbReadOnly);
 }
 
@@ -880,7 +878,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
     /* Avoid double reconnect when server is very slow or in debug. */
     m_connecting.reset();
 
-    NX_ASSERT(m_logicalState != LogicalState::disconnected);
+    // We can close client while connecting, and initial resources are queued now.
     if (m_logicalState == LogicalState::disconnected)
         return;
 
@@ -981,7 +979,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
 
     const auto servers = system->servers();
     auto reachableServer = std::find_if(servers.cbegin(), servers.cend(),
-        [system](const QnModuleInformation& server)
+        [system](const nx::vms::api::ModuleInformation& server)
         {
             return system->isReachableServer(server.id);
         });
@@ -1144,8 +1142,6 @@ void QnWorkbenchConnectHandler::clearConnection()
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
 
     commonModule()->sessionManager()->stop();
-    QnResource::stopCommandProc();
-
     context()->setUserName(QString());
 
     /* Get ready for the next connection. */
@@ -1211,7 +1207,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection()
         return false;
 
     if (!m_reconnectHelper)
-        m_reconnectHelper.reset(new QnReconnectHelper());
+        m_reconnectHelper.reset(new nx::client::core::ReconnectHelper());
 
     if (m_reconnectHelper->servers().isEmpty())
     {

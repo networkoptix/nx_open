@@ -1,9 +1,10 @@
 #include "plugin.h"
 
-#define NX_DEBUG_ENABLE_OUTPUT true //< Stub plugin is itself a debug feature, thus is verbose.
+#define NX_PRINT_PREFIX (this->utils.printPrefix)
 #include <nx/kit/debug.h>
 
 #include "camera_manager.h"
+#include "stub_metadata_plugin_ini.h"
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -13,9 +14,10 @@ namespace stub {
 using namespace nx::sdk;
 using namespace nx::sdk::metadata;
 
-Plugin::Plugin(): CommonPlugin("Stub metadata plugin")
+Plugin::Plugin():
+    CommonPlugin("Stub metadata plugin", "stub_metadata_plugin", NX_DEBUG_ENABLE_OUTPUT)
 {
-    setEnableOutput(NX_DEBUG_ENABLE_OUTPUT); //< Base class is verbose when this descendant is.
+    initCapabilities();
 }
 
 nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
@@ -24,23 +26,45 @@ nx::sdk::metadata::CameraManager* Plugin::obtainCameraManager(
     return new CameraManager(this);
 }
 
+void Plugin::initCapabilities()
+{
+    const std::string pixelFormatString = ini().needUncompressedVideoFrames;
+    if (!pixelFormatString.empty())
+    {
+        if (!pixelFormatFromStdString(pixelFormatString, &m_pixelFormat))
+        {
+            NX_PRINT << "ERROR: Invalid value of needUncompressedVideoFrames in "
+                << ini().iniFile() << ": [" << pixelFormatString << "].";
+        }
+        else
+        {
+            m_needUncompressedVideoFrames = true;
+            m_capabilities += std::string("|needUncompressedVideoFrames_") + pixelFormatString;
+        }
+    }
+
+    // Delete first '|', if any.
+    if (!m_capabilities.empty() && m_capabilities.at(0) == '|')
+        m_capabilities.erase(0, 1);
+}
+
 std::string Plugin::capabilitiesManifest() const
 {
     return R"json(
         {
-            "driverId": ")json" + nxpt::NxGuidHelper::toStdString(kDriverGuid) + R"json(",
+            "driverId": ")json" + nxpt::toStdString(kDriverGuid) + R"json(",
             "driverName": {
-                "value": "Stub Driver"
+                "value": "Stub Metadata Plugin"
             },
             "outputEventTypes": [
                 {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kLineCrossingEventGuid) + R"json(",
+                    "typeId": ")json" + nxpt::toStdString(kLineCrossingEventGuid) + R"json(",
                     "name": {
                         "value": "Line crossing"
                     }
                 },
                 {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kObjectInTheAreaEventGuid) + R"json(",
+                    "typeId": ")json" + nxpt::toStdString(kObjectInTheAreaEventGuid) + R"json(",
                     "name": {
                         "value": "Object in the area"
                     },
@@ -49,29 +73,29 @@ std::string Plugin::capabilitiesManifest() const
             ],
             "outputObjectTypes": [
                 {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json(",
+                    "typeId": ")json" + nxpt::toStdString(kCarObjectGuid) + R"json(",
                     "name": {
                         "value": "Car"
                     }
                 },
                 {
-                    "typeId": ")json" + nxpt::NxGuidHelper::toStdString(kHumanFaceObjectGuid) + R"json(",
+                    "typeId": ")json" + nxpt::toStdString(kHumanFaceObjectGuid) + R"json(",
                     "name": {
                         "value": "Human face"
                     }
                 }
             ],
-            "capabilities": "needDeepCopyForMediaFrame|needUncompressedVideoFrames",
+            "capabilities": ")json" + m_capabilities + R"json(",
             "settings": {
                 "params": [
                     {
-                        "id": "paramAId",
+                        "id": "paramA",
                         "dataType": "Number",
                         "name": "Param A",
                         "description": "Number A"
                     },
                     {
-                        "id": "paramBId",
+                        "id": "paramB",
                         "dataType": "Enumeration",
                         "range": "b1,b3",
                         "name": "Param B",
@@ -102,7 +126,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add to list"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
+                        ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
                     ],
                     "settings": {
                         "params": [
@@ -128,7 +152,7 @@ std::string Plugin::capabilitiesManifest() const
                         "value": "Add person (URL-based)"
                     },
                     "supportedObjectTypeIds": [
-                        ")json" + nxpt::NxGuidHelper::toStdString(kCarObjectGuid) + R"json("
+                        ")json" + nxpt::toStdString(kCarObjectGuid) + R"json("
                     ]
                 }
             ]
@@ -144,6 +168,8 @@ void Plugin::settingsChanged()
 void Plugin::executeAction(
     const std::string& actionId,
     nxpl::NX_GUID objectId,
+    nxpl::NX_GUID cameraId,
+    int64_t timestampUs,
     const std::map<std::string, std::string>& params,
     std::string* outActionUrl,
     std::string* outMessageToUser,
@@ -151,9 +177,6 @@ void Plugin::executeAction(
 {
     if (actionId == "nx.stub.addToList")
     {
-        NX_PRINT << __func__
-            << "(): id [nx.stub.addToList]; returning a message with param values.";
-
         std::string valueA;
         auto paramAIt = params.find("paramA");
         if (paramAIt != params.cend())
@@ -168,17 +191,16 @@ void Plugin::executeAction(
             + "paramA: [" + valueA + "], "
             + "paramB: [" + valueB + "]";
 
+        NX_PRINT << __func__ << "(): Returning a message: [" << *outMessageToUser << "]";
     }
     else if (actionId == "nx.stub.addPerson")
     {
-        *outActionUrl = "http://internal.server/addPerson?objectId=" +
-            nxpt::NxGuidHelper::toStdString(objectId);
-        NX_PRINT << __func__
-            << "(): id [nx.stub.addPerson]; returning URL: [" << *outActionUrl << "]";
+        *outActionUrl = "http://internal.server/addPerson?objectId=" + nxpt::toStdString(objectId);
+        NX_PRINT << __func__ << "(): Returning URL: [" << *outActionUrl << "]";
     }
     else
     {
-        NX_PRINT << __func__ << "(): ERROR: Unsupported action id: [" << actionId << "]";
+        NX_PRINT << __func__ << "(): ERROR: Unsupported actionId.";
         *error = Error::unknownError;
     }
 }

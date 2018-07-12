@@ -46,7 +46,7 @@ set(camera_vendors
     desktop_camera
 )
 
-if(NOT targetDevice MATCHES "android|ios|edge1")
+if(NOT targetDevice MATCHES "edge1")
     nx_enable_camera_vendor_old(onvif)
     nx_enable_camera_vendor_old(axis)
     nx_enable_camera_vendor_old(acti)
@@ -60,12 +60,14 @@ if(NOT targetDevice MATCHES "android|ios|edge1")
     nx_enable_camera_vendor_old(pulse_camera)
     nx_enable_camera_vendor_old(flir)
     nx_enable_camera_vendor_old(advantech)
-    nx_enable_camera_vendor_old(wearable)
+    nx_enable_camera_vendor_old(desktop_camera)
 
-    if(customization STREQUAL "hanwha")
+    if(enable_hanwha)
         nx_enable_camera_vendor(hanwha)
     endif()
 endif()
+
+nx_enable_camera_vendor(wearable)
 
 # TODO: mediaserver_core uses MDNS unconditionally, so disabling this macro always leads to build
 # failure.
@@ -76,7 +78,6 @@ endif()
 
 if(WINDOWS)
     nx_enable_camera_vendor_old(vmax)
-    nx_enable_camera_vendor_old(desktop_camera)
 endif()
 
 #--------------------------------------------------------------------------------------------------
@@ -91,7 +92,7 @@ foreach(vendor ${camera_vendors})
     elseif(vendor IN_LIST _enabled_camera_vendors_old)
         continue()
     else()
-        list(APPEND vendor_source_exclusions src/plugins/resource/${vendor}/)
+        list(APPEND vendor_source_exclusions plugins/resource/${vendor}/)
     endif()
 endforeach()
 

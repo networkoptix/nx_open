@@ -1,7 +1,7 @@
 #include "timestamp_overlay_settings_widget.h"
 #include "ui_timestamp_overlay_settings_widget.h"
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -21,7 +21,7 @@ TimestampOverlaySettingsWidget::TimestampOverlaySettingsWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({ui->fontSizeLabel, ui->formatLabel});
 
     ui->formatComboBox->addItem(tr("Long"), Qt::DefaultLocaleLongDate);
@@ -77,13 +77,13 @@ void TimestampOverlaySettingsWidget::setData(const ExportTimestampOverlayPersist
 
 bool TimestampOverlaySettingsWidget::formatEnabled() const
 {
-    return !ui->formatComboBox->isHidden();
+    return ui->formatComboBox->isEnabled();
 }
 
 void TimestampOverlaySettingsWidget::setFormatEnabled(bool value)
 {
-    ui->formatLabel->setVisible(value);
-    ui->formatComboBox->setVisible(value);
+    ui->formatLabel->setEnabled(value);
+    ui->formatComboBox->setEnabled(value);
 }
 
 } // namespace desktop

@@ -2,12 +2,12 @@
 @import '_theme_palette';
 @import '_theme_variables';
 
-@import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap';
 @import '_theme_override';
 
 * {
   @import '_theme_hint';
-  @import '../../bower_components/hint.css/src/hint';
+  @import '~hint.css/src/hint';
 }
 
 html {

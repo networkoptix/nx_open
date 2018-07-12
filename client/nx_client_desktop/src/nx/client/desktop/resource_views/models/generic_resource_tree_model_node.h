@@ -22,7 +22,7 @@ public:
     GenericResourceTreeModelNode(
         QnResourceTreeModel* model,
         const IsAcceptableResourceCheckFunction& checkFunction,
-        Qn::NodeType nodeType);
+        NodeType nodeType);
 
     virtual ~GenericResourceTreeModelNode() override;
 
@@ -43,7 +43,7 @@ private:
     void tryRemoveResource(const QnResourcePtr& resource);
 
     /** Cleanup all node references. */
-    void removeNode(const QnResourceTreeModelNodePtr& node);
+    void removeNode(QnResourceTreeModelNodePtr node);
 
     /** Remove all nodes. */
     void clean();
@@ -55,7 +55,6 @@ private:
     const IsAcceptableResourceCheckFunction m_isAcceptableCheck;
     NodeList m_items;
     RecorderHash m_recorders;
-    Qn::NodeType m_type;
 };
 
 } // namespace desktop

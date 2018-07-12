@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation>Nazwa systemu nie jest jeszcze skonfigurowana.</translation>
+      <translation>Nazwa Systemu nie jest jeszcze skonfigurowana.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -33,11 +33,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Zamierzasz złączyć systemy w wersjach licencyjnych Starter.</translation>
+      <translation>Zamierzasz złączyć Systemy w wersjach licencyjnych Starter.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>Tylko jedna licencja Starter jest dozwolona dla każdego systemu, więc druga licencja zostanie zdezaktywowana.</translation>
+      <translation>Tylko jedna licencja Starter jest dozwolona dla każdego Systemu, więc druga licencja zostanie zdezaktywowana.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
@@ -45,42 +45,22 @@
     </message>
     <message>
       <source>System was not found.</source>
-      <translation>Nie znaleziono systemu.</translation>
+      <translation>Nie znaleziono Systemu.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation>Wykryty system %1 ma niezgodną wersję %2.</translation>
-    </message>
-    <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Nie można połączyć bieżącego systemu z innym, ponieważ jest już połączony z %1.</translation>
+      <translation>Wykryty System %1 ma niezgodną wersję %2.</translation>
     </message>
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation>Wykryty system %1 działa w trybie awaryjnym.</translation>
+      <translation>Wykryty System %1 działa w trybie awaryjnym.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation>Nie można skonfigurować zdalnego systemu %1.</translation>
-    </message>
-    <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Oba systemy są połączone z %1. Operacja złączenia nie jest dozwolona.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Te systemy są zbudowane z różnych adresów URL %1. Operacja złączenia nie jest dozwolona.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>System w chmurze można złączyć tylko z systemem spoza chmury. Nazwa systemu i hasło zostaną pobrane z systemu w chmurze.</translation>
+      <translation>Nie można skonfigurować zdalnego Systemu %1.</translation>
     </message>
     <message>
       <source>New System</source>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>Wykryty system %1 jest niezgodny z bieżącym systemem.</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Nie można połączyć bieżącego Systemu z innym, ponieważ jest już połączony z %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>System w chmurze %1 można złączyć tylko z systemem spoza chmury %1. Nazwa systemu i hasło zostaną pobrane z systemu w chmurze %1.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Oba Systemy są połączone z %1. Operacja złączenia nie jest dozwolona.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Te Systemy są zbudowane z różnych adresów URL %1. Operacja złączenia nie jest dozwolona.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Zdarzenie systemowe</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>System jest już powiązany z chmurą (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>Serwer nie ma połączenia z Internetem.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Nie udało się zapisać danych logowania do chmury w lokalnej bazie danych</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Nie udało się zapisać danych o właścicielu chmury w lokalnej bazie danych</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Nie można połączyć się z chmurą: %1</translation>
     </message>
   </context>
   <context>
@@ -314,6 +334,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Najpierw spróbuj włączyć nagrywanie (jeśli jest wyłączone) i zmniejszyć liczbę klatek/s w ustawieniach modułu I/O (błąd &quot;%1&quot;).</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Proszę zaktualizować firmware. Minimalna obsługiwana wersja to %1. Obecna wersja to %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -500,7 +524,8 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
+        <numerusform>%2: %n jest wykorzystywana na %1.</numerusform>
+        <numerusform>%2: %n są wykorzystywane na %1.</numerusform>
         <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
         <numerusform>%2: %n jest wykorzystywanych na %1.</numerusform>
       </translation>
@@ -508,7 +533,8 @@
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
+        <numerusform>%2: %n zostanie wykorzystana na %1.</numerusform>
+        <numerusform>%2: %n zostaną wykorzystane na %1.</numerusform>
         <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
         <numerusform>%2: %n zostanie wykorzystanych na %1.</numerusform>
       </translation>
@@ -519,6 +545,7 @@
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
         <numerusform>%1: aktywuj jeszcze %n.</numerusform>
+        <numerusform>%1: aktywuj jeszcze %n.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -526,6 +553,7 @@
       <translation>
         <numerusform>%1: jeszcze %n zostanie wykorzystana.</numerusform>
         <numerusform>%1: jeszcze %n zostaną wykorzystane.</numerusform>
+        <numerusform>%1: jeszcze %n zostanie wykorzystana.</numerusform>
         <numerusform>%1: jeszcze %n zostanie wykorzystanych.</numerusform>
       </translation>
     </message>
@@ -561,8 +589,8 @@
       <translation>Nieznany błąd</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Nie znaleziono serwera o zgodnym Id sprzętu</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Nie znaleziono serwera o zgodnym ID sprzętu</translation>
     </message>
   </context>
   <context>
@@ -579,6 +607,7 @@
       <translation>
         <numerusform>%n Kamera</numerusform>
         <numerusform>%n Kamery</numerusform>
+        <numerusform>%n Kamery</numerusform>
         <numerusform>%n Kamer</numerusform>
       </translation>
     </message>
@@ -587,14 +616,16 @@
       <translation>
         <numerusform>%n kamera</numerusform>
         <numerusform>%n kamery</numerusform>
+        <numerusform>%n kamera</numerusform>
         <numerusform>%n kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Urządzenie</numerusform>
-        <numerusform>%n Urządzenia</numerusform>
+        <numerusform>%n urządzeń</numerusform>
+        <numerusform>%n Urządzeń</numerusform>
+        <numerusform>%n Urządzeń</numerusform>
         <numerusform>%n Urządzeń</numerusform>
       </translation>
     </message>
@@ -603,6 +634,7 @@
       <translation>
         <numerusform>%n urządzenie</numerusform>
         <numerusform>%n urządzenia</numerusform>
+        <numerusform>%n urządzenie</numerusform>
         <numerusform>%n urządzeń</numerusform>
       </translation>
     </message>
@@ -643,6 +675,7 @@
       <translation>
         <numerusform>%n Moduł I/O</numerusform>
         <numerusform>%n Moduły I/O</numerusform>
+        <numerusform>%n Moduł I/O</numerusform>
         <numerusform>%n Modułów I/O</numerusform>
       </translation>
     </message>
@@ -651,6 +684,7 @@
       <translation>
         <numerusform>%n moduł I/O</numerusform>
         <numerusform>%n moduły I/O</numerusform>
+        <numerusform>%n moduł I/O</numerusform>
         <numerusform>%n modułów I/O</numerusform>
       </translation>
     </message>
@@ -690,12 +724,12 @@
       <translation>Znak wodny: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ID sprzętu: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licencja okresowa</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID sprzętu: %1</translation>
     </message>
   </context>
   <context>
@@ -830,161 +864,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>Nieprawidłowy parametr</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>g</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>t</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>r</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>sek.</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>min.</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>godz.</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>dni</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>tyg.</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mies.</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>lat</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>milisekunda</numerusform>
-        <numerusform>milisekundy</numerusform>
-        <numerusform>milisekund</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>sekunda</numerusform>
-        <numerusform>sekundy</numerusform>
-        <numerusform>sekund</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>minuta</numerusform>
-        <numerusform>minuty</numerusform>
-        <numerusform>minut</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>godzina</numerusform>
-        <numerusform>godziny</numerusform>
-        <numerusform>godzin</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>dzień</numerusform>
-        <numerusform>dni</numerusform>
-        <numerusform>dni</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>tydzień</numerusform>
-        <numerusform>tygodnie</numerusform>
-        <numerusform>tygodni</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>miesiąc</numerusform>
-        <numerusform>miesiące</numerusform>
-        <numerusform>miesięcy</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>rok</numerusform>
-        <numerusform>lata</numerusform>
-        <numerusform>lat</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1137,6 +1016,7 @@
         <numerusform>Ruch na kamerze</numerusform>
         <numerusform>Ruch na kamerach</numerusform>
         <numerusform>Ruch na kamerach</numerusform>
+        <numerusform>Ruch na kamerach</numerusform>
       </translation>
     </message>
     <message>
@@ -1180,6 +1060,7 @@
       <translation>
         <numerusform>Sygnał na wejściu urządzenia</numerusform>
         <numerusform>Sygnały na wejściach urządzeń</numerusform>
+        <numerusform>Sygnał na wejściu urządzenia</numerusform>
         <numerusform>Sygnały na wejściach urządzeń</numerusform>
       </translation>
     </message>
@@ -1189,37 +1070,42 @@
         <numerusform>Sygnał na wejściu kamery</numerusform>
         <numerusform>Sygnały na wejściach kamer</numerusform>
         <numerusform>Sygnały na wejściach kamer</numerusform>
+        <numerusform>Sygnały na wejściach kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>Rozłączone urządzenie</numerusform>
+        <numerusform>Rozłączono urządzenie</numerusform>
+        <numerusform>Rozłączono urządzenia</numerusform>
         <numerusform>Rozłączone urządzenia</numerusform>
-        <numerusform>Rozłączone urządzenia</numerusform>
+        <numerusform>Rozłączono urządzenia</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>Rozłączona kamera</numerusform>
+        <numerusform>Rozłączenie kamery</numerusform>
+        <numerusform>Rozłączenie kamer</numerusform>
         <numerusform>Rozłączone kamery</numerusform>
-        <numerusform>Rozłączone kamery</numerusform>
+        <numerusform>Rozłączenie kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>Konflikt urządzeń IP</numerusform>
+        <numerusform>Konflikt urządzenia IP</numerusform>
         <numerusform>Konflikty urządzeń IP</numerusform>
+        <numerusform>Konflikt urządzeń IP</numerusform>
         <numerusform>Konflikty urządzeń IP</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
-        <numerusform>Konflikt kamer IP</numerusform>
+        <numerusform>Konflikt kamery IP</numerusform>
         <numerusform>Konflikty kamer IP</numerusform>
+        <numerusform>Konflikt kamer IP</numerusform>
         <numerusform>Konflikty kamer IP</numerusform>
       </translation>
     </message>
@@ -1359,6 +1245,7 @@
         <numerusform>%n raz: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n razy: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1373,13 +1260,15 @@
         <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n raz)</numerusform>
         <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
         <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
+        <numerusform>Pierwsze wystąpienie: %1 w dniu %2 (%n razy)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>Nie otrzymano żadnych danych w ciągu ostatniej %n sekundy.</numerusform>
+        <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich sekund.</numerusform>
         <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich %n sekund.</numerusform>
+        <numerusform>Nie otrzymano żadnych danych w ciągu ostatniej %n sekundy.</numerusform>
         <numerusform>Nie otrzymano żadnych danych w ciągu ostatnich %n sekund.</numerusform>
       </translation>
     </message>
@@ -1502,15 +1391,17 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n Użytkownik</numerusform>
         <numerusform>%n Użytkowników</numerusform>
-        <numerusform>%n Użytkowników</numerusform>
+        <numerusform>%n użytkowników</numerusform>
+        <numerusform>%n użytkownik</numerusform>
+        <numerusform>%n użytkowników</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
       <translation>
         <numerusform>%n Grupa</numerusform>
+        <numerusform>%n Grupy</numerusform>
         <numerusform>%n Grupy</numerusform>
         <numerusform>%n Grup</numerusform>
       </translation>
@@ -1555,6 +1446,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 na %2</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Otwórz układ</translation>
     </message>
   </context>
   <context>

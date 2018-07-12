@@ -3,7 +3,7 @@
 
 #include <limits>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -31,7 +31,7 @@ TextOverlaySettingsWidget::TextOverlaySettingsWidget(QWidget* parent):
 
     ui->widthSlider->setMaximum(std::numeric_limits<int>::max());
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({ui->widthLabel, ui->fontSizeLabel});
 
     // Synchronize slider with spin box.

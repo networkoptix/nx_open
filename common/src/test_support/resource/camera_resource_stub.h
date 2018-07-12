@@ -16,7 +16,7 @@ public:
     virtual QString getDriverName() const override;
     virtual Qn::ResourceStatus getStatus() const override;
 
-    virtual bool hasDualStreaming() const override;
+    virtual bool hasDualStreamingInternal() const override;
     void setHasDualStreaming(bool value);
 
     void markCameraAsNvr();

@@ -8,7 +8,9 @@ class QnWorkbenchState;
 class QnSessionAwareDelegate: public QnWorkbenchContextAware
 {
 public:
-    QnSessionAwareDelegate(QObject *parent = NULL);
+    QnSessionAwareDelegate(
+        QObject* parent = nullptr,
+        InitializationMode initMode = InitializationMode::instant);
     ~QnSessionAwareDelegate();
 
     virtual bool tryClose(bool force) = 0;

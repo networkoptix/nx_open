@@ -101,6 +101,9 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
+        <property name="topMargin">
+         <number>2</number>
+        </property>
         <property name="horizontalSpacing">
          <number>8</number>
         </property>
@@ -161,6 +164,9 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+          <property name="margin">
+           <number>1</number>
           </property>
          </widget>
         </item>
@@ -261,7 +267,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QnBusyIndicatorWidget" name="busyIndicator" native="true"/>
+    <widget class="nx::client::desktop::BusyIndicatorWidget" name="busyIndicator" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="progressHolder" native="true">
@@ -306,9 +312,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnBusyIndicatorWidget</class>
+   <class>nx::client::desktop::BusyIndicatorWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/busy_indicator.h</header>
+   <header location="global">nx/client/desktop/common/widgets/busy_indicator.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

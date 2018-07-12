@@ -2,13 +2,14 @@
 
 #include <QtGui/QOpenGLFunctions>
 
-#include <client/client_app_info.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/literal.h>
 
 #include <utils/common/warnings.h>
-#include <utils/common/software_version.h>
+#include <nx/utils/software_version.h>
 
-#include <nx/utils/log/log.h>
-
+#include <client/client_app_info.h>
+#include <ui/dialogs/common/message_box.h>
 
 bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings)
 {
@@ -25,9 +26,10 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings)
 
     bool contextIsValid = true;
 
-    if (!versionString.contains("ES 2.0")) { // TODO: #asinaisky more strict check required
-        QnSoftwareVersion version(versionString);
-        if (version < QnSoftwareVersion(2, 0, 0, 0)) {
+    if (!versionString.contains("ES 2.0"))
+    { // TODO: #asinaisky more strict check required
+        if (nx::utils::SoftwareVersion(versionString) < nx::utils::SoftwareVersion(2, 0, 0, 0))
+        {
             qnWarning("OpenGL version %1 is not supported.", versionString);
             contextIsValid = false;
         }
@@ -35,7 +37,7 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings)
 
     /* Note that message will be shown in destructor,
      * close to the event loop. */
-    if(displayWarnings && !contextIsValid)
+    if (displayWarnings && !contextIsValid)
     {
         QnMessageBox::warning(nullptr,
             tr("Video card drivers are outdated or not installed"),

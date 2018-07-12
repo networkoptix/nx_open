@@ -12,7 +12,8 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/search_line_edit.h>
+#include <nx/client/desktop/common/widgets/search_line_edit.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -21,7 +22,7 @@
 #include <nx/client/desktop/common/widgets/compact_tab_bar.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/common/selectable_text_button.h>
+#include <nx/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
@@ -41,7 +42,7 @@ namespace {
 
 static constexpr int kPermanentTabCount = 1;
 
-using ButtonState = ui::SelectableTextButton::State;
+using ButtonState = SelectableTextButton::State;
 
 } // namespace
 
@@ -66,6 +67,7 @@ EventPanel::Private::Private(EventPanel* q):
     layout->addWidget(m_tabs);
     m_tabs->addTab(m_notificationsTab, qnSkin->icon(lit("events/tabs/notifications.png")),
         tr("Notifications", "Notifications tab title"));
+    m_tabs->setTabToolTip(0, m_tabs->tabText(0));
 
     connect(m_notificationsTab, &NotificationListWidget::unreadCountChanged,
         this, &Private::updateUnreadCounter);
@@ -96,9 +98,9 @@ EventPanel::Private::Private(EventPanel* q):
     connect(q->context()->display(), &QnWorkbenchDisplay::widgetChanged,
         this, &Private::currentWorkbenchWidgetChanged, Qt::QueuedConnection);
 
-    setupEventSearch();
     setupMotionSearch();
     setupBookmarkSearch();
+    setupEventSearch();
     setupAnalyticsSearch();
 
     connect(m_notificationsTab, &NotificationListWidget::tileHovered, q, &EventPanel::tileHovered);
@@ -107,105 +109,64 @@ EventPanel::Private::Private(EventPanel* q):
         connect(tab, &UnifiedSearchWidget::tileHovered, q, &EventPanel::tileHovered);
 
     setupTabsSyncWithNavigator();
+
+    q->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(q, &EventPanel::customContextMenuRequested,
+        this, &EventPanel::Private::showContextMenu);
 }
 
 EventPanel::Private::~Private()
 {
 }
 
-void EventPanel::Private::addCameraTabs()
+void EventPanel::Private::updateTabs()
 {
-    NX_ASSERT(m_tabs->count() == kPermanentTabCount);
+    const bool hasVideo = m_camera && m_camera->hasVideo();
+    const bool hasMotion = hasVideo && m_camera->hasFlags(Qn::motion);
 
-    if (m_camera->hasFlags(Qn::motion))
-    {
-        m_tabs->addTab(m_motionTab, qnSkin->icon(lit("events/tabs/motion.png")),
-            tr("Motion", "Motion tab title"));
-    }
-    m_tabs->addTab(m_bookmarksTab, qnSkin->icon(lit("events/tabs/bookmarks.png")),
-        tr("Bookmarks", "Bookmarks tab title"));
-    m_tabs->addTab(m_eventsTab, qnSkin->icon(lit("events/tabs/events.png")),
-        tr("Events", "Events tab title"));
-    m_tabs->addTab(m_analyticsTab, qnSkin->icon(lit("events/tabs/analytics.png")),
-        tr("Objects", "Analytics tab title"));
-}
+    int nextTabIndex = kPermanentTabCount;
 
-void EventPanel::Private::removeCameraTabs()
-{
-    while (m_tabs->count() > kPermanentTabCount)
-        m_tabs->removeTab(kPermanentTabCount);
-}
-
-void EventPanel::Private::setupEventSearch()
-{
-    auto model = new UnifiedAsyncSearchListModel(m_eventsModel, this);
-    m_eventsTab->setModel(model);
-    m_eventsTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
-    m_eventsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/events.png")));
-
-    connect(m_eventsTab->filterEdit(), &QnSearchLineEdit::textChanged,
-        model, &UnifiedAsyncSearchListModel::setClientsideTextFilter);
-
-    auto button = m_eventsTab->typeButton();
-    button->setIcon(qnSkin->icon(lit("text_buttons/event_rules.png")));
-    button->show();
-
-    auto eventFilterMenu = new QMenu(q);
-    eventFilterMenu->setProperty(style::Properties::kMenuAsDropdown, true);
-    eventFilterMenu->setWindowFlags(eventFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
-    auto addMenuAction =
-        [this, eventFilterMenu](const QString& title, vms::event::EventType type)
+    const auto updateTab =
+        [this, &nextTabIndex](QWidget* tab, bool visible, const QIcon& icon, const QString& text)
         {
-            auto action = eventFilterMenu->addAction(title);
-            connect(action, &QAction::triggered, this,
-                [this, title, type]()
+            const int index = m_tabs->indexOf(tab);
+            if (visible)
+            {
+                if (index < 0)
+                    m_tabs->insertTab(nextTabIndex, tab, icon, text);
+                else
+                    NX_ASSERT(index == nextTabIndex);
+
+                m_tabs->setTabToolTip(nextTabIndex, text);
+                ++nextTabIndex;
+            }
+            else
+            {
+                if (index >= 0)
                 {
-                    m_eventsTab->typeButton()->setText(title);
-                    m_eventsTab->typeButton()->setState(type == vms::event::undefinedEvent
-                        ? ButtonState::deactivated
-                        : ButtonState::unselected);
-
-                    m_eventsModel->setSelectedEventType(type);
-                    m_eventsTab->requestFetch();
-                });
-
-            return action;
+                    NX_ASSERT(index == nextTabIndex);
+                    m_tabs->removeTab(index);
+                }
+            }
         };
 
-    auto defaultAction = addMenuAction(tr("Any type"), vms::event::undefinedEvent);
-    for (const auto type: vms::event::allEvents())
-    {
-        if (vms::event::isSourceCameraRequired(type))
-            addMenuAction(m_helper->eventName(type), type);
-    }
+    updateTab(m_motionTab, hasMotion, qnSkin->icon(lit("events/tabs/motion.png")),
+        tr("Motion", "Motion tab title"));
 
-    connect(m_eventsTab->typeButton(), &ui::SelectableTextButton::stateChanged, this,
-        [defaultAction](ButtonState state)
-        {
-            if (state == ButtonState::deactivated)
-                defaultAction->trigger();
-        });
+    updateTab(m_bookmarksTab, m_camera != nullptr, qnSkin->icon(lit("events/tabs/bookmarks.png")),
+        tr("Bookmarks", "Bookmarks tab title"));
 
-    defaultAction->trigger();
-    button->setMenu(eventFilterMenu);
+    updateTab(m_eventsTab, m_camera != nullptr, qnSkin->icon(lit("events/tabs/events.png")),
+        tr("Events", "Events tab title"));
 
-    m_eventsTab->counterLabel()->setText(QString());
-    connectToRowCountChanges(m_eventsModel,
-        [this]()
-        {
-            const auto count = m_eventsModel->rowCount();
-            m_eventsTab->counterLabel()->setText(count
-                ? (count > 99 ? tr(">99 events") : tr("%n events", "", count))
-                : QString());
-        });
+    updateTab(m_analyticsTab, hasVideo, qnSkin->icon(lit("events/tabs/analytics.png")),
+        tr("Objects", "Analytics tab title"));
 }
 
 void EventPanel::Private::setupMotionSearch()
 {
     auto model = new UnifiedAsyncSearchListModel(m_motionModel, this);
     m_motionTab->setModel(model);
-    //m_motionTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
     m_motionTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
 
     m_motionTab->filterEdit()->hide();
@@ -232,7 +193,7 @@ void EventPanel::Private::setupBookmarkSearch()
     m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
     m_bookmarksTab->showPreviewsButton()->show();
 
-    connect(m_bookmarksTab->filterEdit(), &QnSearchLineEdit::textChanged, m_bookmarksModel,
+    connect(m_bookmarksTab->filterEdit(), &SearchLineEdit::textChanged, m_bookmarksModel,
         [this](const QString& text)
         {
             m_bookmarksModel->setFilterText(text);
@@ -244,8 +205,73 @@ void EventPanel::Private::setupBookmarkSearch()
         [this]()
         {
             const auto count = m_bookmarksModel->rowCount();
-            m_bookmarksTab->counterLabel()->setText(count
+            m_bookmarksTab->counterLabel()->setText(count > 0
                 ? (count > 99 ? tr(">99 bookmarks") : tr("%n bookmarks", "", count))
+                : QString());
+        });
+}
+
+void EventPanel::Private::setupEventSearch()
+{
+    auto model = new UnifiedAsyncSearchListModel(m_eventsModel, this);
+    m_eventsTab->setModel(model);
+    m_eventsTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
+    m_eventsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/events.png")));
+
+    connect(m_eventsTab->filterEdit(), &SearchLineEdit::textChanged,
+        model, &UnifiedAsyncSearchListModel::setClientsideTextFilter);
+
+    auto button = m_eventsTab->typeButton();
+    button->setIcon(qnSkin->icon(lit("text_buttons/event_rules.png")));
+    button->show();
+
+    auto eventFilterMenu = new QMenu(q);
+    eventFilterMenu->setProperty(style::Properties::kMenuAsDropdown, true);
+    eventFilterMenu->setWindowFlags(eventFilterMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+    auto addMenuAction =
+        [this, eventFilterMenu](const QString& title, vms::api::EventType type)
+        {
+            auto action = eventFilterMenu->addAction(title);
+            connect(action, &QAction::triggered, this,
+                [this, title, type]()
+                {
+                    m_eventsTab->typeButton()->setText(title);
+                    m_eventsTab->typeButton()->setState(type == vms::api::EventType::undefinedEvent
+                        ? ButtonState::deactivated
+                        : ButtonState::unselected);
+
+                    m_eventsModel->setSelectedEventType(type);
+                    m_eventsTab->requestFetch();
+                });
+
+            return action;
+        };
+
+    auto defaultAction = addMenuAction(tr("Any type"), vms::api::EventType::undefinedEvent);
+    for (const auto type: vms::event::allEvents())
+    {
+        if (vms::event::isSourceCameraRequired(type))
+            addMenuAction(m_helper->eventName(type), type);
+    }
+
+    connect(m_eventsTab->typeButton(), &SelectableTextButton::stateChanged, this,
+        [defaultAction](ButtonState state)
+        {
+            if (state == ButtonState::deactivated)
+                defaultAction->trigger();
+        });
+
+    defaultAction->trigger();
+    button->setMenu(eventFilterMenu);
+
+    m_eventsTab->counterLabel()->setText(QString());
+    connectToRowCountChanges(m_eventsModel,
+        [this]()
+        {
+            const auto count = m_eventsModel->rowCount();
+            m_eventsTab->counterLabel()->setText(count
+                ? (count > 99 ? tr(">99 events") : tr("%n events", "", count))
                 : QString());
         });
 }
@@ -258,7 +284,7 @@ void EventPanel::Private::setupAnalyticsSearch()
     m_analyticsTab->showPreviewsButton()->show();
     m_analyticsTab->showInfoButton()->show();
 
-    connect(m_analyticsTab->filterEdit(), &QnSearchLineEdit::textChanged, m_analyticsModel,
+    connect(m_analyticsTab->filterEdit(), &SearchLineEdit::textChanged, m_analyticsModel,
         [this](const QString& text)
         {
             m_analyticsModel->setFilterText(text);
@@ -269,7 +295,7 @@ void EventPanel::Private::setupAnalyticsSearch()
     button->setDeactivatedText(tr("Anywhere on the video"));
     button->show();
 
-    connect(button, &ui::SelectableTextButton::stateChanged, this,
+    connect(button, &SelectableTextButton::stateChanged, this,
         [this, button](ButtonState state)
         {
             if (!m_currentMediaWidget)
@@ -315,15 +341,7 @@ void EventPanel::Private::setCamera(const QnVirtualCameraResourcePtr& camera)
     m_bookmarksModel->setCamera(camera);
     m_analyticsModel->setCamera(camera);
 
-    if (camera)
-    {
-        if (m_tabs->count() == kPermanentTabCount)
-            addCameraTabs();
-    }
-    else
-    {
-        removeCameraTabs();
-    }
+    updateTabs();
 }
 
 void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
@@ -367,6 +385,10 @@ void EventPanel::Private::currentWorkbenchWidgetChanged(Qn::ItemRole role)
 
     at_motionSelectionChanged();
     at_specialModeToggled(m_currentMediaWidget->isMotionSearchModeEnabled(), m_motionTab);
+
+    // This will reload tab content if the camera or resource was changed.
+    if (const auto searchWidget = qobject_cast<UnifiedSearchWidget*>(m_tabs->currentWidget()))
+        searchWidget->requestFetch();
 }
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
@@ -472,6 +494,17 @@ void EventPanel::Private::connectToRowCountChanges(QAbstractItemModel* model,
     connect(model, &QAbstractItemModel::modelReset, this, handler);
     connect(model, &QAbstractItemModel::rowsInserted, this, handler);
     connect(model, &QAbstractItemModel::rowsRemoved, this, handler);
+}
+
+void EventPanel::Private::showContextMenu(const QPoint& pos)
+{
+    QMenu contextMenu;
+    contextMenu.addAction(q->action(ui::action::OpenBusinessLogAction));
+    contextMenu.addAction(q->action(ui::action::BusinessEventsAction));
+    contextMenu.addAction(q->action(ui::action::PreferencesNotificationTabAction));
+    contextMenu.addSeparator();
+    contextMenu.addAction(q->action(ui::action::PinNotificationsAction));
+    contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
 } // namespace desktop

@@ -95,7 +95,8 @@ nx::network::upnp::DeviceInfo QnActiResourceSearcher::getDeviceInfoSync(const nx
     return deviceInfo;
 }
 
-QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid& resourceTypeId,
+    const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -113,8 +114,6 @@ QnResourcePtr QnActiResourceSearcher::createResource(const QnUuid &resourceTypeI
     result = QnVirtualCameraResourcePtr( new QnActiResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ACTI camera resource. TypeID" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
-
     return result;
 
 }
@@ -124,8 +123,8 @@ QString QnActiResourceSearcher::manufacture() const
     return QnActiResource::MANUFACTURE;
 }
 
-
-QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url& url,
+    const QAuthenticator& auth, bool doMultichannelCheck)
 {
     if (!url.scheme().isEmpty() && doMultichannelCheck)
         return QList<QnResourcePtr>();
@@ -189,7 +188,8 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const nx::utils::Url&
     return result;
 }
 
-boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiSystemInfo(const QnActiResourcePtr& actiResource)
+boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiSystemInfo(
+    const QnActiResourcePtr& actiResource)
 {
     CLHttpStatus status;
     auto response = actiResource->makeActiRequest(
@@ -252,7 +252,7 @@ QnResourceList QnActiResourceSearcher::findResources()
     QnMutexLocker lock(&m_mutex);
     QnResourceList result = std::move(m_foundUpnpResources);
     m_foundUpnpResources.clear();
-    m_alreadFoundMacAddresses.clear();
+    m_alreadyFoundMacAddresses.clear();
     return result;
 }
 
@@ -274,9 +274,9 @@ bool QnActiResourceSearcher::processPacket(
         devInfoCopy.friendlyName = NX_VENDOR;
 
     auto physicalId = stringToActiPhysicalID(devInfo.serialNumber);
-    if (m_alreadFoundMacAddresses.contains(physicalId))
+    if (m_alreadyFoundMacAddresses.contains(physicalId))
         return true;
-    m_alreadFoundMacAddresses.insert(physicalId);
+    m_alreadyFoundMacAddresses.insert(physicalId);
 
     auto existingRes = resourcePool()->getNetResourceByPhysicalId(physicalId);
 
@@ -306,7 +306,6 @@ bool QnActiResourceSearcher::processPacket(
             auto checker = std::make_shared<QnActiSystemInfoChecker>(nx::utils::Url(devInfo.presentationUrl));
             m_systemInfoCheckers[host] = checker;
         }
-
 
         // Possible auth = auth from resources with the same host address + default one.
         QSet<QAuthenticator> possibleAuth;

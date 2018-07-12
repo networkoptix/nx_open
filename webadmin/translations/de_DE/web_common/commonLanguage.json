@@ -4,9 +4,9 @@
     "lowStream": "Niedriger Stream",
     "transcoding": "Umkodierung",
     "unknown": "Unbekannt",
-    "copyToClipboard": "In Zwischenablage kopieren",
-    "copyDefaultText": "Kopieren",
-    "copyActiveText": "In die Zwischenablage kopiert"
+    "copyToClipboard": "in zwischenablage kopieren",
+    "copyDefaultText": "kopieren",
+    "copyActiveText": "in die zwischenablage kopiert"
   },
   "systemOffline": "System offline",
   "cameraStates": {
@@ -31,8 +31,8 @@
   },
   "chromeCastWarning": "Chromecast ist ressourcenintensiv und kann Probleme auf Ihrem Server verursachen.",
   "voiceCommands": {
-    "play": "abspielen",
-    "pause": "pause",
+    "play": "Abspielen",
+    "pause": "Pause",
     "live": "Live gehen | Live anzeigen",
     "view": "Ansicht + [Kameraname]",
     "search": "Finden + [Text für Suchleiste]",

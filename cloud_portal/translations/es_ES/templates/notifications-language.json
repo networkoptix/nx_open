@@ -6,10 +6,10 @@
     "emailSubject": "Reestablecer su contraseña"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} te invita a {{PRODUCT_NAME}}"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} lo invita a %PRODUCT_NAME%{{/message.sharer_name}}{{^message.sharer_name}}El Sistema de video {{message.system_name}} fue compartido con usted{{/message.sharer_name}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} te invita a {{PRODUCT_NAME}}"
+    "emailSubject": "El sistema de video {{message.system_name}} fue compartido contigo"
   },
   "review_version": {
     "emailSubject": "La versión {{message.id}} está lista para ser revisada"

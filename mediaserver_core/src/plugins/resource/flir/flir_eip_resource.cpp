@@ -69,7 +69,7 @@ CameraDiagnostics::Result QnFlirEIPResource::initializeCameraDriver()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnFlirEIPResource::hasDualStreaming() const
+bool QnFlirEIPResource::hasDualStreamingInternal() const
 {
     return false;
 }

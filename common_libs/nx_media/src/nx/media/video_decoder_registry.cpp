@@ -1,12 +1,13 @@
 #include "video_decoder_registry.h"
+#include "abstract_video_decoder.h"
 
 #include <unordered_map>
 
 #include <QtCore/QMutexLocker>
 
-#include <nx/utils/log/log.h>
+#include <utils/common/app_info.h>
 
-#include "abstract_video_decoder.h"
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace media {
@@ -23,8 +24,8 @@ VideoDecoderRegistry* VideoDecoderRegistry::instance()
     return &instance;
 }
 
-VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
-    const AVCodecID codec, const QSize& resolution, bool allowOverlay)
+VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(const AVCodecID codec,
+    const QSize& resolution, bool allowOverlay, RenderContextSynchronizerPtr renderContextSynchronizer)
 {
     QMutexLocker lock(&mutex);
 
@@ -35,7 +36,7 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
             && plugin.isCompatible(codec, resolution, allowOverlay))
         {
             auto videoDecoder = VideoDecoderPtr(
-                plugin.createVideoDecoder(plugin.allocator, resolution),
+                plugin.createVideoDecoder(renderContextSynchronizer, resolution),
                 [](AbstractVideoDecoder* decoder)
                 {
                     QMutexLocker lock(&mutex);
@@ -64,7 +65,10 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
     auto codecString =
         [codec, &resolution]()
         {
-            return lit("%1 [%2x%3]").arg(codec).arg(resolution.width()).arg(resolution.height());
+            return QString("%1 [%2x%3]")
+                .arg(codec)
+                .arg(resolution.width())
+                .arg(resolution.height());
         };
 
     NX_LOGX(lm("Checking for decoder compatible with codec %1.").arg(codecString()), cl_logDEBUG2);
@@ -127,10 +131,35 @@ void VideoDecoderRegistry::setTranscodingEnabled(bool transcodingEnabled)
     m_isTranscodingEnabled = transcodingEnabled;
 }
 
+RenderContextSynchronizerPtr VideoDecoderRegistry::defaultRenderContextSynchronizer() const
+{
+    return m_defaultRenderContextSynchronizer;
+}
+
+void VideoDecoderRegistry::setDefaultRenderContextSynchronizer(RenderContextSynchronizerPtr value)
+{
+    m_defaultRenderContextSynchronizer = value;
+}
+
 void VideoDecoderRegistry::reinitialize()
 {
     m_plugins.clear();
     m_isTranscodingEnabled = false;
+    m_defaultRenderContextSynchronizer = RenderContextSynchronizerPtr();
+}
+
+QSize VideoDecoderRegistry::platformMaxFfmpegResolution()
+{
+    if (QnAppInfo::isArm())
+    {
+        return QnAppInfo::isBpi()
+            ? QSize(1280, 720)
+            : QSize(1920, 1080);
+    }
+
+    return QnAppInfo::isMobile()
+        ? QSize(1920, 1080)
+        : QSize();
 }
 
 } // namespace media

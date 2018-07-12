@@ -1,4 +1,5 @@
 #include "legacy_transcoding_settings.h"
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include <core/resource/media_resource.h>
 
@@ -8,7 +9,7 @@ namespace transcoding {
 
 bool LegacyTranscodingSettings::isEmpty() const
 {
-    if (!qFuzzyIsNull(forcedAspectRatio))
+    if (forcedAspectRatio.isValid())
         return false;
 
     const auto layout = resource->getVideoLayout();
@@ -36,3 +37,5 @@ bool LegacyTranscodingSettings::isEmpty() const
 } // namespace transcoding
 } // namespace core
 } // namespace nx
+
+#endif // defined(ENABLE_DATA_PROVIDERS)

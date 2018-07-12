@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>Mise à jour manuelle</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">Envoyer l'installateur</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Veuillez vous assurer que la configuration est correcte.</p>
-            </div>
-        </div>
-    </form>
-
     <h1>Paramètres système avancés</h1>
     <div class="alert alert-danger" role="alert">
         <b>Attention!</b> Toutes modifications sur cette page peut provoquer un mauvais fonctionnement du serveur.
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Attention!</b> Certains changements nécessitent un redémarrage <b>tous</b> les serveurs dans le système.<br><br>
+        <b>Attention!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Redémarrer le serveur actuel</button>
         </div>

@@ -5,10 +5,9 @@
 
 const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 
-
 QnPlIqResource::QnPlIqResource()
 {
-    setVendor(lit("IqEye"));
+    setVendor(MANUFACTURE);
 }
 
 QString QnPlIqResource::getDriverName() const
@@ -18,24 +17,20 @@ QString QnPlIqResource::getDriverName() const
 
 void QnPlIqResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
-
+    // Do nothing.
 }
 
 QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
 {
-
-    //return new MJPEGStreamReader(toSharedPointer(), "mjpg/video.mjpg");
-
     if (isRtp())
-        return new QnRtpStreamReader(toSharedPointer());
-        /**/
+        return new QnRtpStreamReader(toSharedPointer(this));
 
-    return new MJPEGStreamReader(toSharedPointer(), QLatin1String("now.jpg?snap=spush"));
+    return new MJPEGStreamReader(toSharedPointer(this), QLatin1String("now.jpg?snap=spush"));
 }
 
 void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
 {
-
+    // Do nothing.
 }
 
 nx::mediaserver::resource::StreamCapabilityMap QnPlIqResource::getStreamCapabilityMapFromDrives(
@@ -74,14 +69,10 @@ CLHttpStatus QnPlIqResource::readOID(const QString& oid, QString& result)
     result = QLatin1String(downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth()));
 
     if (status == CL_HTTP_AUTH_REQUIRED)
-    {
         setStatus(Qn::Unauthorized);
-    }
 
     return status;
 }
-
-
 
 CLHttpStatus QnPlIqResource::readOID(const QString& oid, int& result)
 {
@@ -100,12 +91,9 @@ CLHttpStatus QnPlIqResource::setOID(const QString& oid, const QString& val)
     downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
-    {
         setStatus(Qn::Unauthorized);
-    }
 
     return status;
-
 }
 
 QSize QnPlIqResource::getMaxResolution() const
@@ -116,6 +104,7 @@ QSize QnPlIqResource::getMaxResolution() const
 
 bool QnPlIqResource::isRtp() const
 {
+    // TODO: #dmihsin determine a camera type via API.
     QString name = getModel().toUpper();
     return
 		name == QLatin1String("IQA35") ||

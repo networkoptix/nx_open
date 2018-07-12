@@ -69,7 +69,7 @@ void AsyncChannel::sendAsync(
     performAsyncSend(lock);
 }
 
-void AsyncChannel::cancelIOSync(EventType eventType)
+void AsyncChannel::cancelIoInAioThread(EventType eventType)
 {
     if (eventType == EventType::etRead ||
         eventType == EventType::etNone)
@@ -174,11 +174,13 @@ void AsyncChannel::waitForAnotherSendErrorReported()
 
 bool AsyncChannel::isReadScheduled() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_readScheduled;
 }
 
 bool AsyncChannel::isWriteScheduled() const
 {
+    QnMutexLocker lock(&m_mutex);
     return m_sendHandler != nullptr;
 }
 
@@ -275,14 +277,18 @@ void AsyncChannel::reportIoCompletion(
 
 void AsyncChannel::performAsyncSend(const QnMutexLockerBase&)
 {
-    decltype(m_sendHandler) handler;
-    m_sendHandler.swap(handler);
     auto buffer = m_sendBuffer;
     m_sendBuffer = nullptr;
 
     m_writer.post(
-        [this, buffer, handler = std::move(handler)]()
+        [this, buffer]()
         {
+            decltype(m_sendHandler) handler;
+            {
+                QnMutexLocker lock(&m_mutex);
+                m_sendHandler.swap(handler);
+            }
+
             boost::optional<SystemError::ErrorCode> sendErrorState;
             {
                 QnMutexLocker lock(&m_mutex);

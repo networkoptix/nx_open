@@ -9,17 +9,21 @@
 
 #include <ui/models/resource/resource_compare_helper.h>
 
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
 struct QnResourceSearchQuery
 {
+    using NodeType = nx::client::desktop::ResourceTreeNodeType;
+
+    static constexpr NodeType kAllowAllNodeTypes = NodeType::root;
+
     QString text;
     Qn::ResourceFlags flags = 0;
-    int allowedNode = -1;
+    NodeType allowedNode = kAllowAllNodeTypes;
 
-    QnResourceSearchQuery()
-    {
-    }
+    QnResourceSearchQuery() = default;
 
-    QnResourceSearchQuery(const QString& text, int allowedNode):
+    QnResourceSearchQuery(const QString& text, NodeType allowedNode):
         text(text),
         allowedNode(allowedNode)
     {

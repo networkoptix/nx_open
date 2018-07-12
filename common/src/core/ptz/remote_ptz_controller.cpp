@@ -4,12 +4,14 @@
 
 #include <boost/preprocessor/tuple/enum.hpp>
 
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr& resource):
-    base_type(resource),
-    m_resource(resource),
+using namespace nx::core;
+
+QnRemotePtzController::QnRemotePtzController(const QnVirtualCameraResourcePtr& camera):
+    base_type(camera),
+    m_camera(camera),
     m_sequenceId(QnUuid::createUuid()),
     m_sequenceNumber(1)
 {
@@ -19,9 +21,10 @@ QnRemotePtzController::~QnRemotePtzController()
 {
 }
 
-Ptz::Capabilities QnRemotePtzController::getCapabilities() const
+Ptz::Capabilities QnRemotePtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
-    Ptz::Capabilities result = m_resource->getPtzCapabilities();
+    Ptz::Capabilities result = m_camera->getPtzCapabilities(options.type);
     if (!result)
         return Ptz::NoPtzCapabilities;
 
@@ -35,19 +38,21 @@ Ptz::Capabilities QnRemotePtzController::getCapabilities() const
 
 QnMediaServerResourcePtr QnRemotePtzController::getMediaServer() const
 {
-    return m_resource->getParentResource().dynamicCast<QnMediaServerResource>();
+    return m_camera->getParentServer();
 }
 
-bool QnRemotePtzController::isPointless(Qn::PtzCommand command)
+bool QnRemotePtzController::isPointless(
+    Qn::PtzCommand command,
+    const nx::core::ptz::Options& options)
 {
     if (!getMediaServer())
         return true;
 
-    const Qn::ResourceStatus status = m_resource->getStatus();
+    const Qn::ResourceStatus status = m_camera->getStatus();
     if (status == Qn::Unauthorized || status == Qn::Offline)
         return true;
 
-    return !base_type::supports(command);
+    return !base_type::supports(command, options);
 }
 
 int QnRemotePtzController::nextSequenceNumber()
@@ -56,11 +61,12 @@ int QnRemotePtzController::nextSequenceNumber()
 }
 
 // TODO: #Elric get rid of this macro hell
-#define RUN_COMMAND(COMMAND, RETURN_VALUE, FUNCTION, ... /* PARAMS */)          \
+#define RUN_COMMAND(COMMAND, RETURN_VALUE, FUNCTION, OPTIONS, ... /* PARAMS */) \
     {                                                                           \
         const auto nonConstThis = const_cast<QnRemotePtzController*>(this);     \
         const Qn::PtzCommand command = COMMAND;                                 \
-        if (nonConstThis->isPointless(command))                                 \
+        const nx::core::ptz::Options internalOptions = OPTIONS;                 \
+        if (nonConstThis->isPointless(command, internalOptions))                \
             return false;                                                       \
                                                                                 \
         auto server = getMediaServer();                                         \
@@ -68,7 +74,7 @@ int QnRemotePtzController::nextSequenceNumber()
             return false;                                                       \
                                                                                 \
         int handle = server->apiConnection()->FUNCTION(                         \
-            m_resource, ##__VA_ARGS__, nonConstThis,                            \
+            m_camera, ##__VA_ARGS__, nonConstThis,                            \
                 SLOT(at_replyReceived(int, const QVariant &, int)));            \
                                                                                 \
         const QnMutexLocker locker(&m_mutex);                                   \
@@ -78,126 +84,284 @@ int QnRemotePtzController::nextSequenceNumber()
     }
 
 
-bool QnRemotePtzController::continuousMove(const QVector3D& speed)
+bool QnRemotePtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(Qn::ContinuousMovePtzCommand, speed, ptzContinuousMoveAsync, speed,
-        m_sequenceId, nextSequenceNumber());
+    RUN_COMMAND(
+        Qn::ContinuousMovePtzCommand,
+        speed,
+        ptzContinuousMoveAsync,
+        options,
+        speed,
+        options,
+        m_sequenceId,
+        nextSequenceNumber());
 }
 
-bool QnRemotePtzController::continuousFocus(qreal speed)
+bool QnRemotePtzController::continuousFocus(
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(Qn::ContinuousFocusPtzCommand, speed, ptzContinuousFocusAsync, speed);
+    RUN_COMMAND(
+        Qn::ContinuousFocusPtzCommand,
+        speed,
+        ptzContinuousFocusAsync,
+        options,
+        speed,
+        options);
 }
 
 bool QnRemotePtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const QVector3D& position,
-    qreal speed)
+    const nx::core::ptz::Vector& position,
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), position,
-        ptzAbsoluteMoveAsync, space, position, speed, m_sequenceId, nextSequenceNumber());
+    RUN_COMMAND(
+        spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space),
+        position,
+        ptzAbsoluteMoveAsync,
+        options,
+        space,
+        position,
+        speed,
+        options,
+        m_sequenceId,
+        nextSequenceNumber());
 }
 
-bool QnRemotePtzController::viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed)
+bool QnRemotePtzController::viewportMove(
+    qreal aspectRatio,
+    const QRectF& viewport,
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(Qn::ViewportMovePtzCommand, viewport, ptzViewportMoveAsync, aspectRatio,
-        viewport, speed, m_sequenceId, nextSequenceNumber());
+    RUN_COMMAND(
+        Qn::ViewportMovePtzCommand,
+        viewport,
+        ptzViewportMoveAsync,
+        options,
+        aspectRatio,
+        viewport,
+        speed,
+        options,
+        m_sequenceId,
+        nextSequenceNumber());
+}
+
+bool QnRemotePtzController::relativeMove(
+    const ptz::Vector& direction,
+    const ptz::Options& options)
+{
+    RUN_COMMAND(
+        Qn::RelativeMovePtzCommand,
+        direction,
+        ptzRelativeMoveAsync,
+        options,
+        direction,
+        options,
+        m_sequenceId,
+        nextSequenceNumber());
+}
+
+bool QnRemotePtzController::relativeFocus(qreal direction, const ptz::Options& options)
+{
+    RUN_COMMAND(
+        Qn::RelativeFocusPtzCommand,
+        direction,
+        ptzRelativeFocusAsync,
+        options,
+        direction,
+        options);
 }
 
 bool QnRemotePtzController::getPosition(
     Qn::PtzCoordinateSpace space,
-    QVector3D* /*position*/) const
+    nx::core::ptz::Vector* /*position*/,
+    const nx::core::ptz::Options& options) const
 {
-    RUN_COMMAND(spaceCommand(Qn::GetDevicePositionPtzCommand, space), QVariant(),
-        ptzGetPositionAsync, space);
+    RUN_COMMAND(
+        spaceCommand(Qn::GetDevicePositionPtzCommand, space),
+        QVariant(),
+        ptzGetPositionAsync,
+        options,
+        space,
+        options);
 }
 
-bool QnRemotePtzController::getLimits(Qn::PtzCoordinateSpace, QnPtzLimits* /*limits*/) const
+bool QnRemotePtzController::getLimits(
+    Qn::PtzCoordinateSpace,
+    QnPtzLimits* /*limits*/,
+    const nx::core::ptz::Options& options) const
 {
     return false;
 }
 
-bool QnRemotePtzController::getFlip(Qt::Orientations* /*flip*/) const
+bool QnRemotePtzController::getFlip(
+    Qt::Orientations* /*flip*/,
+    const nx::core::ptz::Options& options) const
 {
     return false;
 }
 
 bool QnRemotePtzController::createPreset(const QnPtzPreset& preset)
 {
-    RUN_COMMAND(Qn::CreatePresetPtzCommand, preset, ptzCreatePresetAsync, preset);
+    RUN_COMMAND(
+        Qn::CreatePresetPtzCommand,
+        preset,
+        ptzCreatePresetAsync,
+        {nx::core::ptz::Type::operational},
+        preset);
 }
 
 bool QnRemotePtzController::updatePreset(const QnPtzPreset& preset)
 {
-    RUN_COMMAND(Qn::UpdatePresetPtzCommand, preset, ptzUpdatePresetAsync, preset);
+    RUN_COMMAND(
+        Qn::UpdatePresetPtzCommand,
+        preset,
+        ptzUpdatePresetAsync,
+        {nx::core::ptz::Type::operational},
+        preset);
 }
 
 bool QnRemotePtzController::removePreset(const QString& presetId)
 {
-    RUN_COMMAND(Qn::RemovePresetPtzCommand, presetId, ptzRemovePresetAsync, presetId);
+    RUN_COMMAND(
+        Qn::RemovePresetPtzCommand,
+        presetId,
+        ptzRemovePresetAsync,
+        {nx::core::ptz::Type::operational},
+        presetId);
 }
 
 bool QnRemotePtzController::activatePreset(const QString& presetId, qreal speed)
 {
-    RUN_COMMAND(Qn::ActivatePresetPtzCommand, presetId, ptzActivatePresetAsync, presetId, speed);
+    RUN_COMMAND(
+        Qn::ActivatePresetPtzCommand,
+        presetId,
+        ptzActivatePresetAsync,
+        {nx::core::ptz::Type::operational},
+        presetId,
+        speed);
 }
 
 bool QnRemotePtzController::getPresets(QnPtzPresetList* /*presets*/) const
 {
-    RUN_COMMAND(Qn::GetPresetsPtzCommand, QVariant(), ptzGetPresetsAsync);
+    RUN_COMMAND(
+        Qn::GetPresetsPtzCommand,
+        QVariant(),
+        ptzGetPresetsAsync,
+        {nx::core::ptz::Type::operational});
 }
 
-bool QnRemotePtzController::createTour(const QnPtzTour& tour)
+bool QnRemotePtzController::createTour(
+    const QnPtzTour& tour)
 {
-    RUN_COMMAND(Qn::CreateTourPtzCommand, tour, ptzCreateTourAsync, tour);
+    RUN_COMMAND(
+        Qn::CreateTourPtzCommand,
+        tour,
+        ptzCreateTourAsync,
+        {nx::core::ptz::Type::operational},
+        tour);
 }
 
 bool QnRemotePtzController::removeTour(const QString& tourId)
 {
-    RUN_COMMAND(Qn::RemoveTourPtzCommand, tourId, ptzRemoveTourAsync, tourId);
+    RUN_COMMAND(
+        Qn::RemoveTourPtzCommand,
+        tourId,
+        ptzRemoveTourAsync,
+        {nx::core::ptz::Type::operational},
+        tourId);
 }
 
 bool QnRemotePtzController::activateTour(const QString& tourId)
 {
-    RUN_COMMAND(Qn::ActivateTourPtzCommand, tourId, ptzActivateTourAsync, tourId);
+    RUN_COMMAND(
+        Qn::ActivateTourPtzCommand,
+        tourId,
+        ptzActivateTourAsync,
+        {nx::core::ptz::Type::operational},
+        tourId);
 }
 
 bool QnRemotePtzController::getTours(QnPtzTourList* /*tours*/) const
 {
-    RUN_COMMAND(Qn::GetToursPtzCommand, QVariant(), ptzGetToursAsync);
+    RUN_COMMAND(
+        Qn::GetToursPtzCommand,
+        QVariant(),
+        ptzGetToursAsync,
+        {nx::core::ptz::Type::operational});
 }
 
 bool QnRemotePtzController::getActiveObject(QnPtzObject* /*object*/) const
 {
-    RUN_COMMAND(Qn::GetActiveObjectPtzCommand, QVariant(), ptzGetActiveObjectAsync);
+    RUN_COMMAND(
+        Qn::GetActiveObjectPtzCommand,
+        QVariant(),
+        ptzGetActiveObjectAsync,
+        {nx::core::ptz::Type::operational});
 }
 
 bool QnRemotePtzController::updateHomeObject(const QnPtzObject& homePosition)
 {
-    RUN_COMMAND(Qn::UpdateHomeObjectPtzCommand, homePosition,
-        ptzUpdateHomeObjectAsync, homePosition);
+    RUN_COMMAND(
+        Qn::UpdateHomeObjectPtzCommand,
+        homePosition,
+        ptzUpdateHomeObjectAsync,
+        {nx::core::ptz::Type::operational},
+        homePosition);
 }
 
 bool QnRemotePtzController::getHomeObject(QnPtzObject* /*object*/) const
 {
-    RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QVariant(), ptzGetHomeObjectAsync);
+    RUN_COMMAND(
+        Qn::GetHomeObjectPtzCommand,
+        QVariant(),
+        ptzGetHomeObjectAsync,
+        {nx::core::ptz::Type::operational});
 }
 
-bool QnRemotePtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* /*auxilaryTraits*/) const
+bool QnRemotePtzController::getAuxilaryTraits(
+    QnPtzAuxilaryTraitList* /*auxilaryTraits*/,
+    const nx::core::ptz::Options& options) const
 {
-    RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QVariant(), ptzGetAuxilaryTraitsAsync);
+    RUN_COMMAND(
+        Qn::GetAuxilaryTraitsPtzCommand,
+        QVariant(),
+        ptzGetAuxilaryTraitsAsync,
+        options,
+        options);
 }
 
 bool QnRemotePtzController::runAuxilaryCommand(
     const QnPtzAuxilaryTrait& trait,
-    const QString& data)
+    const QString& data,
+    const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(Qn::RunAuxilaryCommandPtzCommand, trait, ptzRunAuxilaryCommandAsync, trait, data);
+    RUN_COMMAND(
+        Qn::RunAuxilaryCommandPtzCommand,
+        trait,
+        ptzRunAuxilaryCommandAsync,
+        options,
+        trait,
+        data,
+        options);
 }
 
-bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData* /*data*/) const
+bool QnRemotePtzController::getData(
+    Qn::PtzDataFields query,
+    QnPtzData* /*data*/,
+    const nx::core::ptz::Options& options) const
 {
-    RUN_COMMAND(Qn::GetDataPtzCommand, QVariant(), ptzGetDataAsync, query);
+    RUN_COMMAND(
+        Qn::GetDataPtzCommand,
+        QVariant(),
+        ptzGetDataAsync,
+        options,
+        query,
+        options);
 }
 
 void QnRemotePtzController::at_replyReceived(int status, const QVariant& reply, int handle)

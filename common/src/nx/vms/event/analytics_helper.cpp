@@ -121,6 +121,33 @@ AnalyticsHelper::EventDescriptor AnalyticsHelper::eventDescriptor(const QnUuid& 
     return AnalyticsHelper::EventDescriptor();
 }
 
+nx::api::Analytics::Group AnalyticsHelper::groupDescriptor(const QnUuid& groupId) const
+{
+    static QnMutex mutex;
+    static QMap<QnUuid, nx::api::Analytics::Group> cachedData;
+
+    QnMutexLocker lock(&mutex);
+    auto itr = cachedData.find(groupId);
+    if (itr != cachedData.end())
+        return *itr;
+
+    for (const auto& server: resourcePool()->getAllServers(Qn::AnyStatus))
+    {
+        for (const auto& manifest: server->analyticsDrivers())
+        {
+            for (const auto& group: manifest.groups)
+            {
+                if (group.id == groupId)
+                {
+                    cachedData[groupId] = group;
+                    return group;
+                }
+            }
+        }
+    }
+    return nx::api::Analytics::Group();
+}
+
 QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::systemSupportedAnalyticsEvents() const
 {
     QList<EventDescriptor> result;
@@ -135,6 +162,12 @@ QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::systemSupportedAnalytic
         }
     }
     return result;
+}
+
+QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::systemCameraIndependentAnalyticsEvents()
+    const
+{
+    return cameraIndependentAnalyticsEvents(resourcePool()->getAllServers(Qn::AnyStatus));
 }
 
 QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::supportedAnalyticsEvents(
@@ -163,6 +196,28 @@ QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::supportedAnalyticsEvent
             }
         }
     }
+    return result;
+}
+
+QList<AnalyticsHelper::EventDescriptor> AnalyticsHelper::cameraIndependentAnalyticsEvents(
+    const QnMediaServerResourceList& servers)
+{
+    QList<EventDescriptor> result;
+    AnalyticsEventTypeWithRefStorage storage(&result);
+
+    for (const auto& server: servers)
+    {
+        for (const auto& manifest: server->analyticsDrivers())
+        {
+            if (manifest.capabilities.testFlag(
+                nx::api::AnalyticsDriverManifestBase::Capability::cameraModelIndependent))
+            {
+                for (const auto& eventType: manifest.outputEventTypes)
+                    storage.addUnique(manifest, eventType);
+            }
+        }
+    }
+
     return result;
 }
 

@@ -4,7 +4,9 @@
 
 #include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "seamless_video_decoder.h"
 #include "seamless_audio_decoder.h"
@@ -38,7 +40,8 @@ QSize qMax(const QSize& size1, const QSize& size2)
 } // namespace
 
 PlayerDataConsumer::PlayerDataConsumer(
-    const std::unique_ptr<QnArchiveStreamReader>& archiveReader)
+    const std::unique_ptr<QnArchiveStreamReader>& archiveReader,
+    RenderContextSynchronizerPtr renderContextSynchronizer)
     :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
     m_awaitingJumpCounter(0),
@@ -47,7 +50,8 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
     m_emptyPacketCounter(0),
     m_audioEnabled(true),
-    m_needToResetAudio(true)
+    m_needToResetAudio(true),
+    m_renderContextSynchronizer(renderContextSynchronizer)
 {
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump);
@@ -120,6 +124,33 @@ ConstAudioOutputPtr PlayerDataConsumer::audioOutput() const
     return m_audioOutput;
 }
 
+Qn::MediaStreamEvent PlayerDataConsumer::mediaEvent() const
+{
+    return m_mediaEvent;
+}
+
+void PlayerDataConsumer::updateMediaEvent(const QnAbstractMediaDataPtr& data)
+{
+    static const auto getMediaEvent =
+        [](const QnAbstractMediaDataPtr& data) -> Qn::MediaStreamEvent
+        {
+            const auto metadata = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
+            if (!metadata || metadata->metadataType != MetadataType::MediaStreamEvent)
+                return Qn::MediaStreamEvent::NoEvent;
+
+            const auto stringData = QString::fromLatin1(metadata->data(), int(metadata->dataSize()));
+            const auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(stringData);
+            return mediaEvent;
+        };
+
+    const auto mediaEvent = getMediaEvent(data);
+    if (mediaEvent == m_mediaEvent)
+        return;
+
+    m_mediaEvent = mediaEvent;
+    emit mediaEventChanged();
+}
+
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
     if (m_needToResetAudio)
@@ -144,13 +175,19 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
         return processEmptyFrame(emptyFrame);
     m_emptyPacketCounter = 0;
 
-    auto videoFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
+    updateMediaEvent(mediaData);
+
+    const auto videoFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (videoFrame)
         return processVideoFrame(videoFrame);
 
-    auto audioFrame = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
+    const auto audioFrame = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
     if (audioFrame && m_audioEnabled)
         return processAudioFrame(audioFrame);
+
+    auto metadataFrame = std::dynamic_pointer_cast<QnAbstractCompressedMetadata>(data);
+    if (metadataFrame)
+        emit gotMetadata(metadataFrame);
 
     return true; //< Just ignore unknown frame type.
 }
@@ -220,7 +257,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         QnMutexLocker lock(&m_decoderMutex);
         while (m_videoDecoders.size() <= videoChannel)
         {
-            auto videoDecoder = new SeamlessVideoDecoder();
+            auto videoDecoder = new SeamlessVideoDecoder(m_renderContextSynchronizer);
             videoDecoder->setAllowOverlay(m_allowOverlay);
             videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
             m_videoDecoders.push_back(SeamlessVideoDecoderPtr(videoDecoder));
@@ -231,26 +268,26 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
     if (!data)
     {
-        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): queueVideoFrame() -> null"), cl_logDEBUG2);
+        //NX_LOG(lm("PlayerDataConsumer::processVideoFrame(): queueVideoFrame() -> null"), cl_logDEBUG2);
         return true; //< The frame is processed.
     }
 
     QVideoFramePtr decodedFrame;
     if (!videoDecoder->decode(data, &decodedFrame))
     {
-        NX_LOG(lit("Cannot decode the video frame. The frame is skipped."), cl_logWARNING);
+        NX_LOG(lm("Cannot decode the video frame. The frame is skipped."), cl_logWARNING);
         // False result means we want to repeat this frame later, thus, returning true.
     }
     else
     {
         if (decodedFrame)
         {
-            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): enqueueVideoFrame()"), cl_logDEBUG2);
+            //NX_LOG(lm("PlayerDataConsumer::processVideoFrame(): enqueueVideoFrame()"), cl_logDEBUG2);
             enqueueVideoFrame(std::move(decodedFrame));
         }
         else
         {
-            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): decodedFrame is null"), cl_logDEBUG2);
+            //NX_LOG(lm("PlayerDataConsumer::processVideoFrame(): decodedFrame is null"), cl_logDEBUG2);
         }
     }
 
@@ -262,7 +299,7 @@ bool PlayerDataConsumer::checkSequence(int sequence)
     m_sequence = std::max(m_sequence, sequence);
     if (sequence && m_sequence && sequence != m_sequence)
     {
-        //NX_LOG(lit("PlayerDataConsumer::checkSequence(%1): expected %2").arg(sequence).arg(m_sequence), cl_logDEBUG2);
+        //NX_LOG(lm("PlayerDataConsumer::checkSequence(%1): expected %2").arg(sequence).arg(m_sequence), cl_logDEBUG2);
         return false;
     }
     return true;

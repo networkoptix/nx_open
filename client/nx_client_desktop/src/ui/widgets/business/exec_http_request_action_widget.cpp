@@ -17,7 +17,9 @@ static constexpr int kAutoRequestTypeItemIndex = 0;
 static const QStringList kAutoRequestTypes{
     QString(),
     lit("GET"),
-    lit("POST")
+    lit("POST"),
+    lit("PUT"),
+    lit("DELETE")
 };
 } // namespace
 
@@ -142,6 +144,9 @@ void QnExecHttpRequestActionWidget::paramsChanged()
     params.requestType = ui->requestTypeComboBox->currentText().toLatin1();
     if (params.requestType == ui->requestTypeComboBox->itemText(kAutoRequestTypeItemIndex).toLatin1())
         params.requestType.clear(); //< Auto value
+
+    ui->contentTextEdit->setEnabled(
+        params.requestType.isEmpty() || nx::network::http::Method::isMessageBodyAllowed(params.requestType));
 
     model()->setActionParams(params);
 }

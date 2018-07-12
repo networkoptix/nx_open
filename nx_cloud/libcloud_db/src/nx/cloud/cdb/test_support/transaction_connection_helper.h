@@ -32,7 +32,7 @@ class TransactionConnectionHelper
 public:
     struct ConnectionContext
     {
-        ::ec2::ApiPeerData peerInfo;
+        nx::vms::api::PeerData peerInfo;
         /**
          * Keeping separate instance with each connection to allow
          * multiple connections to same peer be created.
@@ -120,7 +120,7 @@ private:
     void startConnection(ConnectionContext* connectionContext,
         const utils::Url &appserver2BaseUrl);
 
-    ::ec2::ApiPeerData localPeer() const;
+    nx::vms::api::PeerData localPeer() const;
 
     void onTransactionConnectionStateChanged(
         ::ec2::QnTransactionTransportBase* /*connection*/,

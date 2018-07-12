@@ -88,6 +88,10 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
             return camera->getHostAddress();
         case MacColumn:
             return camera->getMAC().toString();
+        case LogicalIdColumn:
+            if (const int logicalId = camera->logicalId(); logicalId > 0)
+                return logicalId;
+            return QVariant();
         case ServerColumn:
             return server ? QnResourceDisplayInfo(server).toString(Qn::RI_WithUrl) : QVariant();
         default:
@@ -128,7 +132,8 @@ QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation,
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
     case IpColumn:        return tr("IP/Name");
-    case MacColumn:     return tr("MAC address");
+    case MacColumn:       return tr("MAC address");
+    case LogicalIdColumn: return tr("ID");
     case ServerColumn:    return tr("Server");
     default:
         break;
@@ -191,7 +196,7 @@ void QnCameraListModel::removeCamera(const QnResourcePtr &resource) {
     if(row < 0)
         return;
 
-    disconnect(camera, NULL, this, NULL);
+    camera->disconnect(this);
 
     beginRemoveRows(QModelIndex(), row, row);
     m_cameras.removeAt(row);

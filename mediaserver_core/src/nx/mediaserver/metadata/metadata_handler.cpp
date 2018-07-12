@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 
 #include <plugins/plugin_tools.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/events/events_fwd.h>
@@ -13,6 +13,7 @@
 #include <nx/mediaserver/event/event_connector.h>
 #include <analytics/common/object_detection_metadata.h>
 #include <nx/fusion/model_functions.h>
+#include <core/dataconsumer/abstract_data_receptor.h>
 
 namespace nx {
 namespace mediaserver {
@@ -43,30 +44,55 @@ void MetadataHandler::handleMetadata(
     MetadataPacket* metadata)
 {
     if (metadata == nullptr)
+	{
+	    NX_VERBOSE(this) << "WARNING: Received null metadata packet; ignoring";
         return;
+	}
 
     if (error != Error::noError)
+	{
+	    NX_VERBOSE(this) << "WARNING: Received metadata packet along with an error ccde "
+			<< (int) error << "; ignoring";
         return;
-
+	}
+    
+    bool handled = false;
+    
     nxpt::ScopedRef<EventsMetadataPacket> eventsPacket(
         metadata->queryInterface(IID_EventsMetadataPacket));
     if (eventsPacket)
+    {
         handleEventsPacket(std::move(eventsPacket));
-
+        handled = true;
+    }
+    
     nxpt::ScopedRef<ObjectsMetadataPacket> objectsPacket(
         metadata->queryInterface(IID_ObjectsMetadataPacket));
     if (objectsPacket)
+    {
         handleObjectsPacket(std::move(objectsPacket));
+        handled = true;
+    }           
+	
+	if (!handled)
+    {
+        NX_VERBOSE(this) << "WARNING: Received unsupported metadata packet with timestampUsec "
+            << metadata->timestampUsec() << ", durationUsec " << metadata->durationUsec() 
+            << "; ignoring";
+    }
 }
 
 void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> packet)
 {
+	int eventsCount = 0;
     while (true)
     {
         nxpt::ScopedRef<MetadataItem> item(packet->nextItem(), /*increaseRef*/ false);
         if (!item)
             break;
 
+		++eventsCount;
+		
         nxpt::ScopedRef<Event> eventData(item->queryInterface(IID_Event));
         if (eventData)
         {
@@ -75,13 +101,17 @@ void MetadataHandler::handleEventsPacket(nxpt::ScopedRef<EventsMetadataPacket> p
         }
         else
         {
-            NX_VERBOSE(this) << "ERROR: Received event does not implement Event";
+            NX_VERBOSE(this) << __func__ << "(): ERROR: Received event does not implement Event";
         }
     }
+	
+	if (eventsCount == 0)
+        NX_VERBOSE(this) << __func__ << "(): WARNING: Received empty event packet; ignoring";
 }
 
 void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket> packet)
 {
+    using namespace nx::mediaserver_plugins::utils;
     nx::common::metadata::DetectionMetadataPacket data;
     while (true)
     {
@@ -89,8 +119,8 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
         if (!item)
             break;
         nx::common::metadata::DetectedObject object;
-        object.objectTypeId = nxpt::fromPluginGuidToQnUuid(item->typeId());
-        object.objectId = nxpt::fromPluginGuidToQnUuid(item->id());
+        object.objectTypeId = fromPluginGuidToQnUuid(item->typeId());
+        object.objectId = fromPluginGuidToQnUuid(item->id());
         const auto box = item->boundingBox();
         object.boundingBox = QRectF(box.x, box.y, box.width, box.height);
 
@@ -104,43 +134,49 @@ void MetadataHandler::handleObjectsPacket(nxpt::ScopedRef<ObjectsMetadataPacket>
             attribute.value = QString::fromStdString(item->attribute(i)->value());
             object.labels.push_back(attribute);
 
-            NX_VERBOSE(this) << __func__ << "Attribute:" << attribute.name << attribute.value;
+            NX_VERBOSE(this) << __func__ << "(): Attribute:" << attribute.name << attribute.value;
         }
         data.objects.push_back(std::move(object));
     }
+	if (data.objects.empty())
+	    NX_VERBOSE(this) << __func__ << "(): WARNING: ObjectsMetadataPacket is empty";
     data.timestampUsec = packet->timestampUsec();
     data.durationUsec = packet->durationUsec();
     data.deviceId = m_resource->getId();
 
     if (m_dataReceptor)
         m_dataReceptor->putData(nx::common::metadata::toMetadataPacket(data));
+
+    if (m_visualDebugger)
+        m_visualDebugger->push(nx::common::metadata::toMetadataPacket(data));
 }
 
 void MetadataHandler::handleMetadataEvent(
     nxpt::ScopedRef<Event> eventData,
     qint64 timestampUsec)
 {
-auto eventState = nx::vms::event::EventState::undefined;
+    auto eventState = nx::vms::api::EventState::undefined;
 
-        const auto eventTypeId = nxpt::fromPluginGuidToQnUuid(eventData->typeId());
-        NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
+    const auto eventTypeId =
+        nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventData->typeId());
+    NX_VERBOSE(this) << __func__ << lm("(): typeId %1").args(eventTypeId);
 
-        auto descriptor = eventDescriptor(eventTypeId);
-        if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
+    auto descriptor = eventDescriptor(eventTypeId);
+    if (descriptor.flags.testFlag(nx::api::Analytics::EventTypeFlag::stateDependent))
+    {
+        eventState = eventData->isActive()
+            ? nx::vms::api::EventState::active
+            : nx::vms::api::EventState::inactive;
+
+        const bool isDublicate = eventState == nx::vms::api::EventState::inactive
+            && lastEventState(eventTypeId) == nx::vms::api::EventState::inactive;
+
+        if (isDublicate)
         {
-            eventState = eventData->isActive()
-                ? nx::vms::event::EventState::active
-                : nx::vms::event::EventState::inactive;
-
-            const bool isDublicate = eventState == nx::vms::event::EventState::inactive
-                && lastEventState(eventTypeId) == nx::vms::event::EventState::inactive;
-
-            if (isDublicate)
-            {
-                NX_VERBOSE(this) << __func__ << lm("(): Ignoring duplicate event");
-                return;
-            }
+            NX_VERBOSE(this) << __func__ << "(): Ignoring duplicate event";
+            return;
         }
+    }
 
     setLastEventState(eventTypeId, eventState);
 
@@ -160,7 +196,7 @@ auto eventState = nx::vms::event::EventState::undefined;
         return;
     }
 
-    qnEventRuleConnector->at_analyticsSdkEvent(sdkEvent);
+    emit sdkEventTriggered(sdkEvent);
 }
 
 void MetadataHandler::setResource(const QnSecurityCamResourcePtr& resource)
@@ -183,15 +219,21 @@ void MetadataHandler::removeDataReceptor(QnAbstractDataReceptor* dataReceptor)
     m_dataReceptor = nullptr;
 }
 
-nx::vms::event::EventState MetadataHandler::lastEventState(const QnUuid& eventId) const
+void MetadataHandler::setVisualDebugger(
+    nx::debugging::AbstractVisualMetadataDebugger* visualDebugger)
+{
+    m_visualDebugger = visualDebugger;
+}
+
+nx::vms::api::EventState MetadataHandler::lastEventState(const QnUuid& eventId) const
 {
     if (m_eventStateMap.contains(eventId))
         return m_eventStateMap[eventId];
 
-    return nx::vms::event::EventState::inactive;
+    return nx::vms::api::EventState::inactive;
 }
 
-void MetadataHandler::setLastEventState(const QnUuid& eventId, nx::vms::event::EventState eventState)
+void MetadataHandler::setLastEventState(const QnUuid& eventId, nx::vms::api::EventState eventState)
 {
     m_eventStateMap[eventId] = eventState;
 }

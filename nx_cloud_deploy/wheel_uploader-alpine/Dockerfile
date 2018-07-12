@@ -9,6 +9,9 @@ RUN set -ex \
             musl-dev \
             linux-headers \
             mariadb-dev \
+            libffi-dev \
+            yaml-dev \
+            curl-dev \
     && apk add --no-cache nodejs-npm mariadb-client \
     && npm install -g yarn \
     && pip install -U pip \

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/qglobal.h>
+
 namespace nx {
 namespace utils {
 

@@ -40,7 +40,8 @@
 #include <functional>
 #include "storage_db_pool.h"
 #include "health/system_health.h"
-#include <common/common_module_aware.h>
+#include "nx/mediaserver/server_module_aware.h"
+#include <media_server/media_server_module.h>
 
 extern "C" {
 
@@ -58,7 +59,7 @@ class QnScheduleSync;
 
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 
-class QnStorageManager: public QObject, public QnCommonModuleAware
+class QnStorageManager: public QObject, public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
     friend class TestHelper;
@@ -72,7 +73,7 @@ public:
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
     QnStorageManager(
-        QnCommonModule* commonModule,
+        QnMediaServerModule* serverModule,
         nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage,
         QnServer::StoragePool kind);
     virtual ~QnStorageManager();
@@ -116,6 +117,7 @@ public:
 
     bool checkIfMyStorage(const QnStorageResourcePtr &storage) const;
     QnStorageResourcePtr getStorageByUrlExact(const QString& storageUrl);
+    QnStorageResourcePtr getStorageByVolume(const QString& volumeRoot) const;
     QnStorageResourcePtr storageRoot(int storage_index) const { QnMutexLocker lock( &m_mutexStorages ); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const;
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const;
@@ -148,13 +150,15 @@ public:
     /*
      * Return all storages which can be used for writing
      */
-    QSet<QnStorageResourcePtr> getAllWritableStorages() const;
+    QSet<QnStorageResourcePtr> getAllWritableStorages(
+        const QnStorageResourceList* additionalStorages = nullptr) const;
 
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
     bool clearSpaceForFile(const QString& path, qint64 size);
+    bool canAddChunk(qint64 timeMs, qint64 size);
     void checkSystemStorageSpace();
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
 
@@ -190,14 +194,14 @@ public:
     QnScheduleSync* scheduleSync() const;
 signals:
     void noStoragesAvailable();
-    void storageFailure(const QnResourcePtr &storageRes, nx::vms::event::EventReason reason);
+    void storageFailure(const QnResourcePtr &storageRes, nx::vms::api::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
-    void backupFinished(qint64 backedUpToMs, nx::vms::event::EventReason);
+    void backupFinished(qint64 backedUpToMs, nx::vms::api::EventReason);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
-    void at_storageChanged(const QnResourcePtr &storage);
+    void at_storageRoleChanged(const QnResourcePtr &storage);
     void testOfflineStorages();
 private:
     friend class TestStorageThread;
@@ -218,7 +222,7 @@ private:
 
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
-	QSet<QnStorageResourcePtr> getWritableStorages(
+    QSet<QnStorageResourcePtr> getWritableStorages(
         std::function<bool (const QnStorageResourcePtr& storage)> filter) const;
 
     QnStorageResourcePtr getUsedWritableStorageByIndex(int storageIndex);
@@ -264,6 +268,7 @@ private:
     void updateCameraHistory() const;
     static std::vector<QnUuid> getCamerasWithArchive();
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
+    bool hasArchive(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
     void startAuxTimerTasks();

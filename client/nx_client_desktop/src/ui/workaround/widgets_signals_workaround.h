@@ -6,4 +6,5 @@
 #define QnSpinboxDoubleValueChanged     static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged)
 #define QnButtonGroupIdToggled          static_cast<void (QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled)
 #define QnDoubleSpinBoxValueChanged     static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged)
-#define QnCompleterActivated             static_cast<void (QCompleter::*)(const QString&)>(&QCompleter::activated)
+#define QnCompleterActivated            static_cast<void (QCompleter::*)(const QString&)>(&QCompleter::activated)
+#define QnButtonGroupIntButtonClicked   static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked)

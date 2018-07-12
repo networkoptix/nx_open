@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include <nx/mediaserver/resource/camera.h>
 
 namespace nx {
@@ -65,10 +67,14 @@ public:
  */
 class StreamCapabilityAdvancedParametersProvider: public Camera::AdvancedParametersProvider
 {
+    using CodecString = QString;
+    using ResolutionString = QString;
+
 public:
     StreamCapabilityAdvancedParametersProvider(
         Camera* camera,
-        const StreamCapabilityMap& capabilities,
+        const StreamCapabilityMaps& capabilities,
+        const nx::media::CameraTraits& traits,
         Qn::StreamIndex streamIndex,
         const QSize& baseResolution);
 
@@ -80,9 +86,11 @@ public:
     virtual QSet<QString> set(const QnCameraAdvancedParamValueMap& values) override;
 
 private:
+    const StreamCapabilityMap& currentStreamCapabilities() const;
+
     QnCameraAdvancedParams describeCapabilities() const;
     std::vector<QnCameraAdvancedParameter> describeCapabilities(
-        const QMap<QString, QMap<QString, nx::media::CameraStreamCapability>>&
+        const QMap<CodecString, QMap<ResolutionString, nx::media::CameraStreamCapability>>&
             codecResolutionCapabilities) const;
 
     QnLiveStreamParams bestParameters(
@@ -90,13 +98,24 @@ private:
 
     QString proprtyName() const;
     QString parameterName(const QString& baseName) const;
+    static QString streamParameterName(Qn::StreamIndex stream, const QString& baseName);
+
     boost::optional<QString> getValue(
         const QnCameraAdvancedParamValueMap& values,
         const QString& baseName);
     void updateMediaCapabilities();
+
+    QSet<QString> filterResolutions(
+        Qn::StreamIndex streamIndex,
+        std::function<bool(const QString&)> filterFunc) const;
+
+    boost::optional<nx::media::CameraTraitAttributes> trait(
+        nx::media::CameraTraitType trait) const;
+
 private:
     Camera* const m_camera;
-    const StreamCapabilityMap m_capabilities;
+    const StreamCapabilityMaps m_capabilities;
+    nx::media::CameraTraits m_traits;
     const Qn::StreamIndex m_streamIndex;
     const QnCameraAdvancedParams m_descriptions;
     const QnLiveStreamParams m_defaults;
@@ -187,3 +206,4 @@ QSet<QString> ApiSingleAdvancedParametersProvider<ApiProvider>::set(
 } // namespace resource
 } // namespace mediaserver
 } // namespace nx
+

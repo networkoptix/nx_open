@@ -3,6 +3,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource/media_stream_capability.h>
+#include <core/dataconsumer/audio_data_transmitter.h>
+
+#include "resource_fwd.h"
+
+typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
+class QnAbstractPtzController;
 
 namespace nx {
 namespace mediaserver {
@@ -14,6 +20,13 @@ struct StreamCapabilityKey
 {
     QString codec;
     QSize resolution;
+
+    StreamCapabilityKey() = default;
+    StreamCapabilityKey(const QString& codec, const QSize& resolution):
+        codec(codec),
+        resolution(resolution)
+    {
+    }
 
     bool operator<(const StreamCapabilityKey& other) const
     {
@@ -30,6 +43,7 @@ struct StreamCapabilityKey
     }
 };
 using StreamCapabilityMap = QMap<StreamCapabilityKey, nx::media::CameraStreamCapability>;
+using StreamCapabilityMaps = QMap<Qn::StreamIndex, StreamCapabilityMap>;
 
 class Camera: public QnVirtualCameraResource
 {
@@ -40,6 +54,11 @@ public:
 
     Camera(QnCommonModule* commonModule = nullptr);
     virtual ~Camera() override;
+
+    /*!
+        Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
+    */
+    void blockingInit();
 
     /**
      * The difference between desired and real is that camera can have multiple clients we do not
@@ -59,16 +78,6 @@ public:
     /** Returns ids of successfully set parameters. */
     QSet<QString> setAdvancedParameters(const QnCameraAdvancedParamValueMap& values);
     bool setAdvancedParameter(const QString& id, const QString& value);
-
-    /** Gets advanced parameters async, handler is called when it's done. */
-    void getAdvancedParametersAsync(
-        const QSet<QString>& ids,
-        std::function<void(const QnCameraAdvancedParamValueMap&)> handler = nullptr);
-
-    /** Sets advanced parameters async, handler is called when it's done. */
-    void setAdvancedParametersAsync(
-        const QnCameraAdvancedParamValueMap& values,
-        std::function<void(const QSet<QString>&)> handler = nullptr);
 
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const override;
 
@@ -123,6 +132,15 @@ public:
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
+    virtual QnAudioTransmitterPtr getAudioTransmitter();
+
+    void setLastMediaIssue(const CameraDiagnostics::Result& issue);
+    CameraDiagnostics::Result getLastMediaIssue() const;
+
+    static QnAbstractStreamDataProvider* createDataProvider(
+        const QnResourcePtr& resource,
+        Qn::ConnectionRole role);
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -132,22 +150,36 @@ protected:
     /** Override to add support for advanced parameters. */
     virtual std::vector<AdvancedParametersProvider*>  advancedParametersProviders();
 
-    /** Gets supported codecs and their resolution list. For each key optional CameraStreamCapability could be provided.
-    * CameraStreamCapability could be null. That case it is auto-filled with default values.
-    */
+    /**
+     * Gets supported codecs and their resolution list.
+     * For each key optional CameraStreamCapability could be provided.
+     * CameraStreamCapability could be null. That case it is auto-filled with default values.
+     */
     virtual StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) = 0;
+
+    /**
+     * @return stream capability traits
+     *  (e.g. availability of second stream resolution depending on primary stream resolution)
+     */
+    virtual nx::media::CameraTraits mediaTraits() const;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() const;
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
-
+protected:
+    QnAudioTransmitterPtr m_audioTransmitter;
 private:
+    using StreamCapabilityAdvancedParameterProviders
+        = std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>>;
+
     int m_channelNumber; // video/audio source number
     QElapsedTimer m_lastInitTime;
     QAuthenticator m_lastCredentials;
     AdvancedParametersProvider* m_defaultAdvancedParametersProvider = nullptr;
     std::map<QString, AdvancedParametersProvider*> m_advancedParametersProvidersByParameterId;
     std::map<Qn::StreamIndex, std::unique_ptr<StreamCapabilityAdvancedParametersProvider>> m_streamCapabilityAdvancedProviders;
+    CameraDiagnostics::Result m_lastMediaIssue = CameraDiagnostics::NoErrorResult();
+    nx::media::CameraTraits m_mediaTraits;
 };
 
 } // namespace resource

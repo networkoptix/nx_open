@@ -1,16 +1,19 @@
 #include "sign_dialog.h"
 #include "ui_sign_dialog.h"
 
+#include <QtOpenGL/QGLWidget>
+
+#include <client_core/client_core_module.h>
+
 #include "core/resource/avi/avi_resource.h"
+#include <core/dataprovider/data_provider_factory.h>
 #include "nx/streaming/abstract_archive_stream_reader.h"
 
 #include "camera/gl_renderer.h"
 #include "camera/cam_display.h"
 #include "camera/sync_dialog_display.h"
 
-#include "ui/workaround/gl_widget_factory.h"
 #include "ui/workaround/gl_native_painting.h"
-#include "ui/workaround/gl_widget_workaround.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/help/help_topic_accessor.h"
@@ -19,16 +22,15 @@
 #include "export/sign_helper.h"
 
 // TODO: #Elric replace with QnRenderingWidget
-class QnSignDialogGlWidget: public QnGLWidget
+class QnSignDialogGlWidget: public QGLWidget
 {
 public:
     QnSignDialogGlWidget(
-        const QGLFormat& format,
         QWidget* parent = nullptr,
         QGLWidget* shareWidget = nullptr,
         Qt::WindowFlags windowFlags = 0)
         :
-        QnGLWidget(format, parent, shareWidget, windowFlags)
+        QGLWidget(parent, shareWidget, windowFlags)
     {
         connect(&m_timer, &QTimer::timeout, this, [this]{ update(); });
         m_timer.start(16);
@@ -87,7 +89,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
     m_layout->setSpacing(0);
     m_layout->setContentsMargins(0, 0, 0, 0);
 
-    m_glWindow.reset(QnGlWidgetFactory::create<QnSignDialogGlWidget>());
+    m_glWindow.reset(new QnSignDialogGlWidget(this));
     m_layout->addWidget(m_glWindow.data());
     DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
         m_glWindow.data());
@@ -95,8 +97,10 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget* parent):
     m_srcVideoInfo = new QnSignInfo();
 
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
-    m_reader.reset(static_cast<QnAbstractArchiveStreamReader*> (
-        m_resource->createDataProvider(Qn::CR_Default)));
+
+    m_reader.reset(qobject_cast<QnAbstractArchiveStreamReader*>(
+        qnClientCoreModule->dataProviderFactory()->createDataProvider(m_resource)));
+
     m_reader->setCycleMode(false);
 
     m_camDispay.reset(new QnSignDialogDisplay(m_resource));

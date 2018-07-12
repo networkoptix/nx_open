@@ -1,4 +1,6 @@
 #include "cpull_media_stream_provider.h"
+#include <media_server/media_server_module.h>
+#include <core/resource/resource_command_processor.h>
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -29,8 +31,7 @@ void QnClientPullMediaStreamProvider::run()
 
     int numberOfChnnels = 1;
 
-    const QnResourcePtr& resource = getResource();
-    if (QnMediaResource* mr = dynamic_cast<QnMediaResource*>(resource.data()))
+    if (QnMediaResource* mr = dynamic_cast<QnMediaResource*>(m_resource.data()))
     {
         numberOfChnnels = mr->getVideoLayout()->channelCount();
     }
@@ -51,15 +52,15 @@ void QnClientPullMediaStreamProvider::run()
             continue;
         }
 
-
-        if (getResource()->hasUnprocessedCommands() || // if command processor has something in the queue for this resource let it go first
-            !m_resource->isInitialized())
+        // If command processor has something in the queue for this resource let it go first
+        if (qnServerModule->resourceCommandProcessor()->hasCommandsForResource(m_resource)
+            || !m_resource->isInitialized())
         {
             QnSleep::msleep(5);
             continue;
         }
 
-        const QnAbstractMediaDataPtr& data = getNextData();
+        QnAbstractMediaDataPtr data = getNextData();
 
         if (data==0)
         {
@@ -68,7 +69,7 @@ void QnClientPullMediaStreamProvider::run()
             m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-            if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure 
+            if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure
             {
                 if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
                     getResource()->setStatus(Qn::Offline);
@@ -82,9 +83,9 @@ void QnClientPullMediaStreamProvider::run()
             continue;
         }
 
-        
-        
-        if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
+
+
+        if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
         {
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         }

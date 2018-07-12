@@ -1,7 +1,5 @@
 #include "custom_gtest_printers.h"
 
-#include <nx/fusion/model_functions.h>
-
 namespace nx {
 
 namespace network {
@@ -21,6 +19,11 @@ void PrintTo(const SocketAddress& val, ::std::ostream* os)
     *os << val.toString().toStdString();
 }
 
+void PrintTo(const ProtocolMatchResult& val, ::std::ostream* os)
+{
+    *os << toString(val);
+}
+
 } // namespace network
 
 namespace cloud {
@@ -29,7 +32,7 @@ namespace api {
 
 void PrintTo(ResultCode val, ::std::ostream* os)
 {
-    *os << QnLexical::serialized(val).toStdString();
+    *os << toString(val);
 }
 
 } // namespace api

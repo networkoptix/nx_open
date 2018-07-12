@@ -1,5 +1,3 @@
-#include <nx/utils/compiler_options.h>
-
 /* Windows headers. */
 #ifdef _WIN32
 #   include <winsock2.h>
@@ -63,4 +61,3 @@ extern "C" {
 #endif
 
 #include <nx/utils/literal.h>
-#include <nx/utils/deprecation.h>

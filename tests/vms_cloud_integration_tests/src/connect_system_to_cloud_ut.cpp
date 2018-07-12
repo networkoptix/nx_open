@@ -10,10 +10,12 @@
 
 #include <api/global_settings.h>
 #include <core/resource/user_resource.h>
-#include <network/auth/time_based_nonce_provider.h>
+#include <nx/vms/auth/time_based_nonce_provider.h>
 #include <test_support/mediaserver_launcher.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
+
+using nx::vms::api::ServerFlag;
 
 namespace {
 
@@ -29,7 +31,7 @@ protected:
     {
         auto mediaServerClient = prepareMediaServerClient();
 
-        ec2::ApiResourceParamWithRefDataList params;
+        nx::vms::api::ResourceParamWithRefDataList params;
         params.resize(1);
         params.back().resourceId = QnUserResource::kAdminGuid;
         params.back().name = nx::settings_names::kNameCloudSystemId;
@@ -44,12 +46,12 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            QnModuleInformation moduleInformation;
+            nx::vms::api::ModuleInformation moduleInformation;
             QnJsonRestResult resultCode =
                 mediaServerClient->getModuleInformation(&moduleInformation);
             ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
 
-            if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
+            if (moduleInformation.serverFlags.testFlag(ServerFlag::SF_NewSystem))
                 break;
             std::this_thread::sleep_for(kRetryRequestDelay);
         }
@@ -60,7 +62,7 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            ec2::ApiUserDataList users;
+            nx::vms::api::UserDataList users;
             if (mediaServerClient->ec2GetUsers(&users) == ec2::ErrorCode::ok)
             {
                 bool foundCloudUser = false;
@@ -79,7 +81,7 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            ec2::ApiResourceParamDataList vmsSettings;
+            nx::vms::api::ResourceParamDataList vmsSettings;
             ec2::ErrorCode resultCode = mediaServerClient->ec2GetSettings(&vmsSettings);
             ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
 
@@ -95,7 +97,7 @@ protected:
     }
 
 private:
-    QString getValueByName(const ec2::ApiResourceParamDataList& values, const QString& name)
+    QString getValueByName(const nx::vms::api::ResourceParamDataList& values, const QString& name)
     {
         for (const auto& nameAndValue: values)
         {

@@ -15,6 +15,7 @@
 #include <nx/utils/uuid.h>
 
 #include "abstract_archive_integrity_watcher.h"
+#include <utils/camera/camera_diagnostics.h>
 
 enum class PlaybackMode
 {
@@ -79,13 +80,13 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() = 0;
     virtual bool hasVideo() const { return true; }
 
-    virtual AVCodecContext* setAudioChannel(int num) { Q_UNUSED(num); return 0; }
+    virtual AVCodecContext* setAudioChannel(int /*num*/) { return nullptr; }
 
     // this call inform delegate that reverse mode on/off
     virtual void setSpeed(qint64 /*displayTime*/, double /*value*/) { }
 
     // for optimization. Inform delegate to pause after sending 1 frame
-    virtual void setSingleshotMode(bool value) { Q_UNUSED(value); }
+    virtual void setSingleshotMode(bool /*value*/) {}
 
     // MediaStreamQuality. By default, this function is not implemented. Return: true if need seek for change quality
     /*!
@@ -100,13 +101,13 @@ public:
     virtual void beforeClose() {}
 
     /** This function calls from reader */
-    virtual void beforeSeek(qint64 time) { Q_UNUSED(time); }
+    virtual void beforeSeek(qint64 /*time*/) {}
 
     /** This function calls from reader */
     virtual void beforeChangeSpeed(double /*speed*/) {}
 
     /** This function used for thumbnails loader. Get data with specified media step from specified time interval*/
-    virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) { Q_UNUSED(startTime); Q_UNUSED(endTime); Q_UNUSED(frameStep); }
+    virtual void setRange(qint64 /*startTime*/, qint64 /*endTime*/, qint64 /*frameStep*/) {}
 
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int /*channel*/) { return nullptr; }
     virtual QnAbstractMotionArchiveConnectionPtr getAnalyticsConnection(int /*channel*/) { return nullptr; }
@@ -116,7 +117,7 @@ public:
     virtual void setMotionRegion(const QnMotionRegion& /*region*/) {};
 
     /** This function used for multi-view delegate to help connect different streams together (VMAX) */
-    virtual void setGroupId(const QByteArray& groupId) { Q_UNUSED(groupId); }
+    virtual void setGroupId(const QByteArray& /*groupId*/) {}
 
     //!Returns information of chunk, used by previous \a QnAbstractArchiveDelegate::seek or \a QnAbstractArchiveDelegate::getNextData call
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const { return ArchiveChunkInfo(); };
@@ -135,6 +136,16 @@ public:
         m_errorHandler = handler;
     };
 
+    virtual CameraDiagnostics::Result lastError() const
+    {
+        return CameraDiagnostics::NoErrorResult();
+    }
+
+    /**
+     * Stop consuming network resources e.t.c before long halt.
+     * Reader should be able to restore its state on getNextPacket again.
+     */
+    virtual void pleaseStop() {}
 protected:
     Flags m_flags;
     std::function<void()> m_endOfPlaybackHandler;

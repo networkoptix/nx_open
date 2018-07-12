@@ -34,11 +34,11 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("This account is not activated. Please check your email.");
 
         case ResultCode::accountBlocked:
-            return tr("This account is blocked.");
+            return tr("Too many attempts. Try again in a minute.");
 
         case ResultCode::dbError:
             return tr("Internal %1 error. Please contact support team.",
-                "%1 is the cloud name (like 'Nx Cloud')")
+                "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::network::AppInfo::cloudName());
 
         case ResultCode::networkError:
@@ -49,7 +49,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
 
         case ResultCode::serviceUnavailable:
             return tr("Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.",
-                "%1 is the cloud name (like 'Nx Cloud')")
+                "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::network::AppInfo::cloudName());
 
         case ResultCode::credentialsRemovedPermanently:
@@ -57,7 +57,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
 
         case ResultCode::retryLater:
             return tr("Sorry, %1 Service could not process your request. Please try again in a few moments.",
-                "%1 is the cloud name (like 'Nx Cloud')")
+                "%1 is the cloud name (like Nx Cloud)")
                 .arg(nx::network::AppInfo::cloudName());
 
         /* Internal result codes: */

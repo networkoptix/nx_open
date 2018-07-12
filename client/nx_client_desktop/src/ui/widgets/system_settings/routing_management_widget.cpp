@@ -1,6 +1,8 @@
 #include "routing_management_widget.h"
 #include "ui_routing_management_widget.h"
 
+#include <algorithm>
+
 #include <api/app_server_connection.h>
 
 #include <common/common_module.h>
@@ -29,6 +31,8 @@
 
 #include <utils/common/event_processors.h>
 #include <utils/common/util.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -222,7 +226,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->addressesView->header()->setSectionsMovable(false);
 
     ui->addressesView->setIgnoreDefaultSpace(true);
-    connect(ui->addressesView, &QnTreeView::spacePressed, this,
+    connect(ui->addressesView, &TreeView::spacePressed, this,
         [this](const QModelIndex& index)
         {
             auto checkIndex = index.sibling(index.row(), QnServerAddressesModel::InUseColumn);
@@ -323,13 +327,15 @@ void QnRoutingManagementWidget::applyChanges() {
     m_changes->changes.clear();
 }
 
-bool QnRoutingManagementWidget::hasChanges() const {
+bool QnRoutingManagementWidget::hasChanges() const
+{
     if (isReadOnly())
         return false;
 
-    return boost::algorithm::any_of(m_changes->changes, [](const RoutingChange &change) {
-        return !change.isEmpty();
-    });
+    return std::any_of(
+        m_changes->changes.cbegin(),
+        m_changes->changes.cend(),
+        [](const auto& change) { return !change.isEmpty(); });
 }
 
 void QnRoutingManagementWidget::setReadOnlyInternal(bool readOnly) {

@@ -21,7 +21,7 @@ class QnLiteClientHandlerPrivate: public QObject, public QnConnectionContextAwar
 public:
     QnLiteClientHandlerPrivate(QnLiteClientHandler* parent);
 
-    void at_videowallControlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
+    void at_videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
     void at_initialResourcesReceived();
     void at_resourceAdded(const QnResourcePtr& resource);
 
@@ -61,7 +61,7 @@ QnLiteClientHandlerPrivate::QnLiteClientHandlerPrivate(QnLiteClientHandler* pare
 }
 
 void QnLiteClientHandlerPrivate::at_videowallControlMessageReceived(
-    const ec2::ApiVideowallControlMessageData& message)
+    const nx::vms::api::VideowallControlMessageData& message)
 {
     if (message.videowallGuid != videowallGuid)
         return;

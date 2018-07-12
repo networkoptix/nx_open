@@ -1,6 +1,6 @@
 {
     "driverId": "{190ed57a-b435-a80b-1f7b-9f31c52ad63e}",
-    "driverName": 
+    "driverName":
     {
         "value": "Axis driver",
         "localization": { }
@@ -11,7 +11,11 @@
         "tns1:VideoSource",
         "tnsaxis:CameraApplicationPlatform"
     ],
-    "outputEventTypes": 
+    "forbiddenDescriptions":
+    [
+        "xinternal_data"
+    ],
+    "outputEventTypes":
     [
         {
             "eventTypeId": "f83daede-7fae-6a51-2e90-69017dadfd62",

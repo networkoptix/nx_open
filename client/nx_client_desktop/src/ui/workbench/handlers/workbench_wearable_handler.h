@@ -23,9 +23,11 @@ public:
 
 private:
     void maybeOpenCurrentSettings();
-    bool checkFileUpload(const nx::client::desktop::WearableUpload &upload);
-    bool checkFolderUpload(const QString& path, const nx::client::desktop::WearableUpload& upload);
-    void showNoSpaceOnServerWarning(const nx::client::desktop::WearableUpload& upload);
+    bool fixFileUpload(
+        const QnSecurityCamResourcePtr& camera,
+        nx::client::desktop::WearableUpload *upload);
+    bool fixFolderUpload(const QString& path, nx::client::desktop::WearableUpload* upload);
+    bool fixStorageCleanupUpload(nx::client::desktop::WearableUpload* upload);
     void uploadValidFiles(
         const QnSecurityCamResourcePtr& camera,
         const nx::client::desktop::WearablePayloadList& payloads);
@@ -34,14 +36,19 @@ private slots:
     void at_newWearableCameraAction_triggered();
     void at_uploadWearableCameraFileAction_triggered();
     void at_uploadWearableCameraFolderAction_triggered();
+    void at_cancelWearableCameraUploadsAction_triggered();
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_context_userChanged();
     void at_wearableManager_stateChanged(const nx::client::desktop::WearableState& state);
 
 private:
     QString calculateExtendedErrorMessage(const nx::client::desktop::WearablePayload& upload);
+    QnSecurityCamResourcePtr cameraByProgressId(const QnUuid& progressId) const;
+    QnUuid ensureProgress(const QnUuid& cameraId);
+    void removeProgress(const QnUuid& cameraId);
 
 private:
     QnUuid m_currentCameraUuid;
+    QHash<QnUuid, QnUuid> m_currentProgresses; //< Camera id -> progress id.
 };
 

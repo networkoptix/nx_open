@@ -25,9 +25,10 @@ public:
 
     virtual QString getDriverName() const override;
 
-    virtual void setIframeDistance(int frames, int timems) override { Q_UNUSED(frames) Q_UNUSED(timems) }
+    virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
 
-    virtual bool setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
+    virtual bool setRelayOutputState(const QString& outputID, bool activate,
+        unsigned int autoResetTimeoutMS = 0) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
@@ -39,6 +40,7 @@ public:
         Qn::StreamIndex streamIndex) override;
     virtual bool isInitialized() const override { return true; }
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
+    virtual bool needCheckIpConflicts() const override { return false; }
 };
 
 #endif //ENABLE_DESKTOP_CAMERA

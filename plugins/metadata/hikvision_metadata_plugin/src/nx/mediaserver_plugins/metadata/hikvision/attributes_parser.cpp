@@ -101,8 +101,8 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
         }
         else if (name == "detectionregionlist")
         {
-            const auto regionList = reader.readElementText().trimmed();
-            // TODO: Region number is empty. I haven't seen cameras with non empty region list so far.
+            // TODO: parse region number
+            reader.skipCurrentElement();
         }
         else
         {
@@ -110,11 +110,13 @@ boost::optional<HikvisionEvent> AttributesParser::parseEventXml(
         }
     }
 
-    result.caption = buildCaption(manifest, result);
     result.description = buildDescription(manifest, result);
 
     if (reader.error() != QXmlStreamReader::NoError)
+    {
+        NX_VERBOSE(typeid(AttributesParser), lm("XML parse error: %1").arg(reader.errorString()));
         return boost::optional<HikvisionEvent>();
+    }
     return result;
 }
 
@@ -127,11 +129,12 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
     std::vector<HikvisionEvent> result;
     QXmlStreamReader reader(content);
 
-    auto addEvent = [&](HikvisionEvent hikvisionEvent)
-    {
-        hikvisionEvent.isActive = true;
-        result.push_back(hikvisionEvent);
-    };
+    auto addEvent =
+        [&](HikvisionEvent hikvisionEvent)
+        {
+            hikvisionEvent.isActive = true;
+            result.push_back(hikvisionEvent);
+        };
 
     while (!reader.atEnd() && reader.readNextStartElement())
     {
@@ -143,12 +146,6 @@ std::vector<HikvisionEvent> AttributesParser::parseLprXml(
 
             addEvent(hikvisionEvent);
             const auto descriptor = manifest.eventDescriptorById(hikvisionEvent.typeId);
-            for (const auto& dependedName: descriptor.forcedEvent.split(','))
-            {
-                const auto childDescriptor = manifest.eventDescriptorByInternalName(dependedName);
-                hikvisionEvent.typeId = childDescriptor.typeId;
-                addEvent(hikvisionEvent);
-            }
         }
     }
     return result;

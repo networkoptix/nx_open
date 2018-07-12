@@ -23,7 +23,7 @@ public:
     }
 
 signals:
-    void panicModeChanged();
+    void panicModeChanged(bool value);
 
 private slots:
     void updatePanicMode();

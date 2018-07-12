@@ -46,10 +46,10 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(event.id);
 
         case Qn::TimestampRole:
-            return QVariant::fromValue(event.timestampMs);
+            return QVariant::fromValue(event.timestampUs);
 
         case Qn::PreviewTimeRole:
-            return QVariant::fromValue(event.previewTimeMs);
+            return QVariant::fromValue(event.previewTimeUs);
 
         case Qt::ToolTipRole:
             return QVariant::fromValue(event.toolTip);

@@ -74,9 +74,9 @@
         "emailFrom": "Nadawca e-mail",
         "emailSignature": "Podpis e-mail",
         "emailSupportEmail": "E-mail do supportu",
-        "enableEdgeRecording": "Enable edge recording",
+        "enableEdgeRecording": "Włącz nagrywanie brzegowe",
         "eventLogPeriodDays": "Okres dziennika zdarzeń (dni)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "W razie potrzeby usuń profile kamery przy inicjalizacji",
         "ldapAdminDn": "DN admina LDAP",
         "ldapSearchBase": "Podstawa wyszukiwania LDAP",
         "ldapSearchFilter": "Filtr wyszukiwania LDAP",
@@ -86,9 +86,9 @@
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max różnica między czasem zsynchronizowanym a lokalnym (ms)",
         "maxRecordQueueSizeBytes": "Max rozmiar kolejki rekordów (bajty)",
         "maxRecordQueueSizeElements": "Max rozmiar kolejki rekordów (elementy)",
-        "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
-        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
-        "maxSceneItems": "Max scene items (0 means default)",
+        "maxRemoteArchiveSynchronizationThreads": "Max liczba wątków synchronizacji zdalnej archiwizacji",
+        "maxRtspConnectDurationSeconds": "Limit czasu na połączenie RTSP",
+        "maxSceneItems": "Max liczba elementów sceny (0 oznacza domyślną)",
         "proxyConnectTimeoutSec": "Limit czasu połączenia proxy (sek.)",
         "rtpTimeoutMs": "Limit czasu RTP (ms)",
         "sequentialFlirOnvifSearcherEnabled": "Użyj wyszukiwarki sekwencyjnej Flir Onvif",
@@ -174,32 +174,5 @@
     },
     "pageTitles": {
         "default": "Interfejs WWW {{PRODUCT_NAME}}"
-    },
-    "common": {
-        "systemOffline": "Serwer jest odłączony",
-        "cameraLinks": {
-            "copyToClipboard": "kopiuj do schowka",
-            "highStream": "Wysoki strumień",
-            "copyDefaultText": "kopiuj",
-            "unknown": "Nieznany",
-            "lowStream": "Niski strumień",
-            "transcoding": "Transkodowanie",
-            "copyActiveText": "skopiowano do schowka"
-        },
-        "searchCamPlaceholder": "szukanie",
-        "cameraStates": {
-            "noFormat": "Ta przeglądarka lub system nie obsługują odtwarzania wideo z tej kamery.",
-            "ieWin10": "Proszę użyć przeglądarki Microsoft Edge lub Google Chrome.",
-            "iosVideoTooLarge": "iOS nie obsługuje wideo większego niż FullHD (2MP: 1920x1080).",
-            "unauthorized": "Wymagane uwierzytelnienie",
-            "ubuntuNX": "Ta przeglądarka nie obsługuje wideo z serwerów opartych na architekturze ARM. Proszę użyć przeglądarki Chromium.",
-            "ieNoWebm": "Proszę <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>zainstalować kodek WebM</a> do Internet Explorera.",
-            "flashOrWebmRequired": "Proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a> lub <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodek WebM</a> w celu odtwarzania wideo w przeglądarce Internet Explorer.",
-            "noArmSupport": "Ta przeglądarka lub system nie obsługują odtwarzania wideo na serwerze bazującym na architekturze ARM.",
-            "error": "Błąd",
-            "offline": "Offline",
-            "noData": "Brak danych",
-            "flashRequired": "Proszę <a href='https://get.adobe.com/flashplayer/' target='_blank'>zainstalować Adobe Flash</a> w celu odtwarzania wideo na serwerach bazujących na architekturze ARM."
-        }
     }
 }

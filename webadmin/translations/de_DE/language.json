@@ -71,9 +71,9 @@
         "ec2AliveUpdateIntervalSec": "Aktualisierungsintervall des Systems (Sekunden)",
         "ec2ConnectionKeepAliveTimeoutSec": "Verbindungstimeout (Sekunden)",
         "ec2KeepAliveProbeCount": "Verbindungsversuche (Sekunden)",
-        "emailFrom": "E-Mail von",
-        "emailSignature": "E-Mail-Signatur",
-        "emailSupportEmail": "E-Mail-Adresse Support",
+        "emailFrom": "Email von",
+        "emailSignature": "Email-Signatur",
+        "emailSupportEmail": "Email-Adresse Support",
         "enableEdgeRecording": "Edge-Aufzeichnung aktivieren",
         "eventLogPeriodDays": "Ereignisprotokollzeitraum (Tage)",
         "hanwhaDeleteProfilesOnInitIfNeeded": "Löschen von Kameraprofilen bei Bedarf bei der Initialisierung",
@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "Maximale Größe der Warteschlange für Datensätze (Bytes)",
         "maxRecordQueueSizeElements": "Maximale Größe der Warteschlange für Datensätze (Elemente)",
         "maxRemoteArchiveSynchronizationThreads": "Max Remote-Archivsynchronisation-Threads",
-        "maxRtspConnectDurationSeconds": "Max RTSP-Verbindungsdauer in Sekunden",
+        "maxRtspConnectDurationSeconds": "Max Rtsp-Verbindungsdauer in Sekunden",
         "maxSceneItems": "Max Szenenelemente (0 bedeutet Standard)",
         "proxyConnectTimeoutSec": "Proxy Verbindungstimeout (Sekunden)",
         "rtpTimeoutMs": "RTP-Zeitüberschreitung (Millisekunden)",
@@ -176,6 +176,20 @@
         "default": "{{PRODUCT_NAME}} Benutzeroberfläche"
     },
     "common": {
+        "voiceCommands": {
+            "search": "finden + [text für suchleiste]",
+            "pause": "pause",
+            "help": "hilfe | befehle anzeigen",
+            "collapse all servers": "alle server zusammenklappen",
+            "collapse server": "server zusammenklappen + [Servername]",
+            "play": "abspielen",
+            "clear search": "suche zurücksetzen",
+            "live": "live gehen | live anzeigen",
+            "expand all servers": "alle Server erweitern",
+            "stop listening": "abhören stoppen",
+            "expand server": "server erweitern + [Servername]",
+            "view": "ansicht + [kameraname]"
+        },
         "systemOffline": "System offline",
         "cameraLinks": {
             "copyToClipboard": "in zwischenablage kopieren",
@@ -186,9 +200,9 @@
             "transcoding": "Umkodierung",
             "copyActiveText": "in die zwischenablage kopiert"
         },
-        "searchCamPlaceholder": "suche",
+        "searchCamPlaceholder": "Suche",
         "cameraStates": {
-            "noFormat": "Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von dieser Kamera.",
+            "noFormat": "Dieser Browser unterstützt keine Videowiedergabe von dieser Kamera.",
             "ieWin10": "Bitte benutzen Sie Microsoft Edge oder Google Chrome Browser.",
             "iosVideoTooLarge": "iOS unterstützt Videos größer als FullHD (2MP: 1920 x 1080) nicht.",
             "unauthorized": "Authentifizierung erforderlich",
@@ -199,7 +213,13 @@
             "error": "Fehler",
             "offline": "Offline",
             "noData": "Keine Daten",
-            "flashRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos von ARM-basierten Servern abzuspielen."
+            "flashRequired": "Installieren Sie bitte <a href='https://get.adobe.com/flashplayer/' target='_blank'>Adobe Flash</a>, um Videos abzuspielen."
+        },
+        "chromeCastWarning": "Chromecast ist ressourcenintensiv und kann Probleme auf Ihrem Server verursachen.",
+        "resolution": {
+            "high": "Hoch",
+            "auto": "Auto",
+            "low": "Niedrig"
         }
     }
 }

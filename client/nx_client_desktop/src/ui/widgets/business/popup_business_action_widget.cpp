@@ -1,6 +1,9 @@
 #include "popup_business_action_widget.h"
 #include "ui_popup_business_action_widget.h"
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 #include <ui/workbench/workbench_context.h>
 
 #include <business/business_resource_validation.h>
@@ -21,8 +24,9 @@ QnPopupBusinessActionWidget::QnPopupBusinessActionWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    ui->hintLabel->setPixmap(qnSkin->pixmap("buttons/context_info.png"));
-    ui->hintLabel->setToolTip(tr("Notification will be shown until one of the users who see it "
+    setHelpTopic(this, Qn::EventsActions_ShowNotification_Help);
+
+    ui->hintLabel->setHint(tr("Notification will be shown until one of the users who see it "
         "creates bookmark with event description"));
 
     connect(ui->settingsButton, &QPushButton::clicked,
@@ -47,7 +51,7 @@ void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
         const auto sourceCameraRequired =
             nx::vms::event::isSourceCameraRequired(model()->eventType());
         const auto allowForceAcknoledgement = sourceCameraRequired
-            || model()->eventType() >= nx::vms::event::userDefinedEvent;
+            || model()->eventType() >= nx::vms::api::EventType::userDefinedEvent;
         ui->forceAcknoledgementCheckBox->setEnabled(allowForceAcknoledgement);
         ui->hintLabel->setEnabled(allowForceAcknoledgement);
     }
@@ -93,7 +97,7 @@ void QnPopupBusinessActionWidget::updateValidationPolicy()
     if (forceAcknowledgement)
     {
         setValidationPolicy(new QnRequiredPermissionSubjectPolicy(
-            Qn::GlobalManageBookmarksPermission, tr("Manage Bookmarks")));
+            GlobalPermission::manageBookmarks, tr("Manage Bookmarks")));
     }
     else
     {

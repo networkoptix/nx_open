@@ -5,6 +5,7 @@
 #include <nx/network/nettools.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/socket_factory.h>
+#include <nx/utils/log/log.h>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
@@ -49,7 +50,7 @@ void QnMdnsListener::registerConsumer(std::uintptr_t id)
     m_consumersData->registerConsumer(id);
 }
 
-const ConsumerData* QnMdnsListener::getData(std::uintptr_t id)
+std::shared_ptr<const ConsumerData> QnMdnsListener::getData(std::uintptr_t id)
 {
     auto data = m_consumersData->data(id);
     NX_ASSERT(
@@ -131,10 +132,14 @@ void QnMdnsListener::readSocketInternal(nx::network::AbstractDatagramSocket* soc
         if (m_localAddressList.contains(remoteEndpoint.address.toString()))
             continue; //< ignore own packets
 
-        const auto& laddr = localAddress.isEmpty()
+        const auto remoteIp = remoteEndpoint.address.toString();
+        const auto localIp = localAddress.isEmpty()
                 ? getBestLocalAddress(remoteEndpoint.address.toString())
                 : localAddress;
-        m_consumersData->addData(remoteEndpoint.address.toString(), laddr, responseData);
+
+        m_consumersData->addData(remoteIp, localIp, responseData);
+        NX_VERBOSE(this, lm("Add data %1 -> %2, size %3").args(
+            remoteIp, localIp, responseData.size()));
     }
 }
 

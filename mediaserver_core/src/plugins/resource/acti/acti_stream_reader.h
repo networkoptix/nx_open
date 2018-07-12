@@ -10,7 +10,7 @@
 class QnActiStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnActiStreamReader(const QnResourcePtr& res);
+    QnActiStreamReader(const QnActiResourcePtr& res);
     virtual ~QnActiStreamReader();
 
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const override;
@@ -23,7 +23,6 @@ protected:
     virtual void pleaseStop() override;
 private:
     int getActiChannelNum() const;
-    QString formatResolutionStr(const QSize& resolution) const;
     int toJpegQuality(const QnLiveStreamParams& params);
 private:
     QnMulticodecRtpReader m_multiCodec;

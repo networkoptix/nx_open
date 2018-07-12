@@ -7,6 +7,8 @@
 #include <camera/video_camera_mock.h>
 #include "camera_mock.h"
 
+#include <core/dataprovider/data_provider_factory.h>
+
 namespace nx {
 namespace mediaserver {
 namespace resource {
@@ -15,10 +17,14 @@ namespace test {
 class VideoCameraMock: public MediaServerVideoCameraMock
 {
 public:
-    VideoCameraMock(QnSharedResourcePointer<CameraMock> camera)
+    VideoCameraMock(
+        QnSharedResourcePointer<CameraMock> camera,
+        QnDataProviderFactory* factory)
     {
-        m_primaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(camera->createDataProvider(Qn::CR_LiveVideo)));
-        m_secondaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(camera->createDataProvider(Qn::CR_SecondaryLiveVideo)));
+        m_primaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(
+            factory->createDataProvider(camera, Qn::CR_LiveVideo)));
+        m_secondaryProvider.reset(dynamic_cast<QnLiveStreamProvider*>(
+            factory->createDataProvider(camera, Qn::CR_SecondaryLiveVideo)));
 
         NX_ASSERT(m_primaryProvider);
         NX_ASSERT(m_secondaryProvider);
@@ -51,17 +57,22 @@ private:
 class LiveStreamParametersWithoutAdvancedParams: public CameraTest
 {
 public:
-    LiveStreamParametersWithoutAdvancedParams()
+    virtual void SetUp() override
     {
-        m_camera = newCamera(
-            [](CameraMock* camera)
-            {
-            });
+        CameraTest::SetUp();
+        m_camera = newCamera([](CameraMock* camera) {});
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
-        m_videoCamera.reset(new VideoCameraMock(m_camera));
+        m_videoCamera.reset(new VideoCameraMock(m_camera, dataProviderFactory()));
         m_videoCamera->init();
+    }
+
+    virtual void TearDown() override
+    {
+        m_videoCamera.reset();
+        m_camera.reset();
+        CameraTest::TearDown();
     }
 
     QnSharedResourcePointer<CameraMock> m_camera;
@@ -71,35 +82,78 @@ public:
 class LiveStreamParameters: public CameraTest
 {
 public:
-    LiveStreamParameters()
+    virtual void SetUp() override
     {
+        CameraTest::SetUp();
         m_camera = newCamera(
             [](CameraMock* camera)
-        {
-            camera->setStreamCapabilityMaps({
-                { { "MJPEG", QSize(800, 600) },{ 128, 8192, 15 } },
-                { { "MJPEG", QSize(1920, 1080) },{ 128, 8192, 15 } },
-                { { "H264", QSize(800, 600) },{ 128, 8192, 15 } },
-                { { "H264", QSize(1920, 1080) },{ 128, 8192, 15 } },
-                { { "H265", QSize(800, 600) },{ 128, 8192, 15 } },
-                { { "H265", QSize(1920, 1080) },{ 128, 8192, 15 } },
-            }, {
-                { { "MJPEG", QSize(200, 150) },{ 128, 8192, 15 } },
-                { { "MJPEG", QSize(480, 270) },{ 128, 8192, 15 } },
-                { { "MJPEG", QSize(800, 600) },{ 128, 8192, 15 } },
+            {
+                camera->setStreamCapabilityMaps(
+                    {
+                        {{"MJPEG", QSize(800, 600)}, {128, 8192, 15}},
+                        {{"MJPEG", QSize(1920, 1080)}, {128, 8192, 15}},
+                        {{"H264", QSize(800, 600)}, {128, 8192, 15}},
+                        {{"H264", QSize(1920, 1080)}, {128, 8192, 15}},
+                        {{"H265", QSize(800, 600)}, {128, 8192, 15}},
+                        {{"H265", QSize(1920, 1080)}, {128, 8192, 15}},
+                    },
+                    {
+                        {{"MJPEG", QSize(200, 150)}, {128, 8192, 15}},
+                        {{"MJPEG", QSize(480, 270)}, {128, 8192, 15}},
+                        {{"MJPEG", QSize(800, 600)}, {128, 8192, 15}},
+                    });
             });
-        });
         NX_ASSERT(m_camera);
         m_camera->setId(QnUuid::createUuid());
 
-        m_videoCamera.reset(new VideoCameraMock(m_camera));
+        m_videoCamera.reset(new VideoCameraMock(m_camera, dataProviderFactory()));
         m_videoCamera->init();
+    }
+
+    virtual void TearDown() override
+    {
+        m_videoCamera.reset();
+        m_camera.reset();
+        CameraTest::TearDown();
     }
 
     QnSharedResourcePointer<CameraMock> m_camera;
     QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
 };
 
+class EmptyLiveStreamParameters: public CameraTest
+{
+public:
+    virtual void SetUp() override
+    {
+        CameraTest::SetUp();
+        m_camera = newCamera([](CameraMock* camera) { });
+        NX_ASSERT(m_camera);
+        m_camera->setId(QnUuid::createUuid());
+
+        m_videoCamera.reset(new VideoCameraMock(m_camera, dataProviderFactory()));
+        m_videoCamera->init();
+    }
+
+    virtual void TearDown() override
+    {
+        m_videoCamera.reset();
+        m_camera.reset();
+        CameraTest::TearDown();
+    }
+
+    QnSharedResourcePointer<CameraMock> m_camera;
+    QnSharedResourcePointer<VideoCameraMock> m_videoCamera;
+};
+
+TEST_F(EmptyLiveStreamParameters, checkDefaultQuality)
+{
+    auto primaryParams = m_videoCamera->getPrimaryReader()->getLiveParams();
+    EXPECT_EQ(Qn::StreamQuality::normal, primaryParams.quality);
+
+    auto secondaryParams = m_videoCamera->getSecondaryReader()->getLiveParams();
+    EXPECT_EQ(Qn::StreamQuality::low, secondaryParams.quality);
+}
 
 TEST_F(LiveStreamParameters, mergeWithEmptyParams)
 {
@@ -130,7 +184,7 @@ TEST_F(LiveStreamParameters, mergeWithNonEmptyParams)
     params.fps = 12;
     params.resolution = QSize(2536, 1080);
     params.codec = "H265";
-    params.quality = Qn::QualityHighest;
+    params.quality = Qn::StreamQuality::highest;
     m_videoCamera->getPrimaryReader()->setPrimaryStreamParams(params);
 
     auto updatedParams = m_videoCamera->getPrimaryReader()->getLiveParams();

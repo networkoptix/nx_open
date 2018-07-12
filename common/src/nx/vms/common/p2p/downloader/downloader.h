@@ -48,7 +48,6 @@ signals:
     void fileStatusChanged(
         const nx::vms::common::p2p::downloader::FileInformation& fileInformation);
     void chunkDownloadFailed(const QString& fileName);
-
 };
 
 class DownloaderPrivate;
@@ -92,6 +91,11 @@ public:
 
     virtual QVector<QByteArray> getChunkChecksums(const QString& fileName) override;
     void atServerStart();
+
+    static void validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
+        std::function<void(bool)> callback);
+
+    static bool validate(const QString& url, bool onlyConnectionCheck, int expectedSize);
 
 private:
     QScopedPointer<DownloaderPrivate> const d_ptr;

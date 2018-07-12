@@ -18,8 +18,8 @@
             </alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>端口</h3>
@@ -45,14 +45,8 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>从系统中分离服务器</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            视频存档将保持不变。 <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">从系统中分离</button></p>
-                    </div>
-                    <div>
-                        <h3>从系统中分离服务器</h3>
-                        <p>此操作将使服务器从系统中分离. 数据库, 本地用户和配置将被保留。
-                            视频存档将保持不变。<b>云端用户将被删除。</b></p>
+                        <p>此操作将从系统中分离服务器但保持数据库，本地用户和配置。
+                            视频存档将保持不变。 <b>云用户将被删除。</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">从系统中分离</button></p>
                     </div>
                     <div>
@@ -75,9 +69,9 @@
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>名称</h3>
                         <div class="row">
@@ -124,13 +118,13 @@
                                    target="_blank">创建 {{Config.cloud.productName}} 帐户</a></p>
                         </div>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Device Network Settings</h3>
+                        <h3>设备网络设置</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">保存设置并重新启动设备</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>日期和时间</h3>
@@ -155,7 +149,7 @@
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -168,7 +162,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -187,8 +181,8 @@
                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">停止客户端</button></p>
                         <p>使用键盘/鼠标或移动应用程序来控制它。</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

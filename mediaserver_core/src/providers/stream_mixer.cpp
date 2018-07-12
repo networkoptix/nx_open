@@ -15,7 +15,6 @@ namespace
 QnStreamMixer::QnStreamMixer() :
     m_queue(kDataQueueSize)
 {
-
 }
 
 QnStreamMixer::~QnStreamMixer()
@@ -55,7 +54,6 @@ void QnStreamMixer::removeDataSource(QnAbstractStreamDataProvider* source)
         lock.unlock();
         source->removeDataProcessor(this);
     }
-
 }
 
 void QnStreamMixer::setUser(QnAbstractStreamDataProvider* user)
@@ -63,7 +61,6 @@ void QnStreamMixer::setUser(QnAbstractStreamDataProvider* user)
     QnMutexLocker lock(&m_mutex);
     m_user = user;
 }
-
 
 void QnStreamMixer::makeChannelMappingOperation(
     MapType type,
@@ -86,18 +83,9 @@ void QnStreamMixer::makeChannelMappingOperation(
             sourceInfo.audioChannelMap;
 
     if (opType == OperationType::Insert)
-    {
-        channelMap[channelNumber]
-            .insert(mappedChannelNumber);
-
-
-    }
+        channelMap[channelNumber].insert(mappedChannelNumber);
     else if (opType == OperationType::Remove)
-    {
-        channelMap[channelNumber]
-            .erase(mappedChannelNumber);
-    }
-
+        channelMap[channelNumber].erase(mappedChannelNumber);
 }
 
 void QnStreamMixer::mapSourceVideoChannel(
@@ -152,8 +140,6 @@ void QnStreamMixer::unmapSourceAudioChannel(
         mappedAudioChannelNumber);
 }
 
-
-
 bool QnStreamMixer::canAcceptData() const
 {
     return m_queue.size() < (int)kDataQueueSize;
@@ -203,11 +189,9 @@ void QnStreamMixer::proxyOpenStream(
         }
         else
         {
-            NX_LOG(
-                lit("StreamMixer::proxyOpenStream(), sources have no correspondent provider"),
-                cl_logWARNING);
-
-            qDebug() << lit("Stream mixer, where is source's provider?");
+            NX_DEBUG(
+                this,
+                lit("StreamMixer::proxyOpenStream(), sources have no correspondent provider"));
         }
     }
 }
@@ -237,13 +221,11 @@ QnAbstractMediaDataPtr QnStreamMixer::retrieveData()
     while (!data && triesLeft--)
     {
         m_queue.pop(data, kWaitingTime);
-
         if (data)
             break;
     }
 
     return std::dynamic_pointer_cast<QnAbstractMediaData>(data);
-
 }
 
 bool QnStreamMixer::isStreamOpened() const
@@ -258,7 +240,7 @@ bool QnStreamMixer::isStreamOpened() const
     {
         if (!source.provider)
         {
-            qDebug() << "No source provider, where is it?";
+            NX_DEBUG(this, "No source provider");
             continue;
         }
 
@@ -266,7 +248,10 @@ bool QnStreamMixer::isStreamOpened() const
 
         if (!mediaStreamProvider)
         {
-            qDebug() << "StreamMixer::isStreamOpened(), couldn't cast to QnAbstractMediaStreamProvider";
+            NX_DEBUG(
+                this,
+                lit("StreamMixer::isStreamOpened(), "
+                    "couldn't cast to QnAbstractMediaStreamProvider"));
             continue;
         }
 

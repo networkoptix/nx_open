@@ -4,15 +4,15 @@
 #include "gsoap/generated_with_soapcpp2/soapActionBindingProxy.h"
 #include "gsoap/generated_with_soapcpp2/EventBinding.nsmap"
 
-#include <memory>
-#include <vector>
-#include <tuple>
-#include <utility>
 #include <algorithm>
-#include <sstream>
 #include <iomanip>
+#include <memory>
+#include <sstream>
+#include <tuple>
 
-#include "httpda.h"
+#include <nx/utils/thread/mutex.h>
+
+#include "httpda.h" //< gsoap header for digest authentication
 
 namespace nx {
 namespace axis {
@@ -57,6 +57,9 @@ bool makeSoapRequest(
     const char* password)
 {
     static const int kAuthenticationError = 401;
+
+    static QnMutex soapMutex;
+    QnMutexLocker locker(&soapMutex);
 
     // Plugin deregistering actions and memory deallocation run in ServiceGuard destructor.
     soap_register_plugin(service.soap, http_da);
@@ -308,6 +311,20 @@ void CameraController::filterSupportedEvents(const std::vector<std::string>& nee
     m_supportedEvents = std::move(events);
 }
 
+void CameraController::removeForbiddenEvents(const std::vector<std::string>& forbiddenDescriptions)
+{
+    if (forbiddenDescriptions.empty())
+        return;
+    std::vector<SupportedEvent> events;
+    std::copy_if(m_supportedEvents.cbegin(), m_supportedEvents.cend(), std::back_inserter(events),
+        [&forbiddenDescriptions](const auto& event)
+    {
+        return find(forbiddenDescriptions.cbegin(), forbiddenDescriptions.cend(),
+            event.description) == forbiddenDescriptions.cend();
+    });
+    m_supportedEvents = std::move(events);
+}
+
 void CameraController::filterSupportedEvents(std::initializer_list<const char*> neededTopics)
 {
     std::vector<std::string> filter;
@@ -460,7 +477,7 @@ int CameraController::addActiveAction(const ActiveAction& action)
     _ns5__AddActionConfiguration addCommand;
     _ns5__AddActionConfigurationResponse response;
 
-    ScopedGarbageCollector gc;
+    nx::utils::ScopedGarbageCollector gc;
     addCommand.NewActionConfiguration = gc.create<ns5__NewActionConfiguration>();
     addCommand.NewActionConfiguration->Name = gc.create<std::string>(action.name);
 
@@ -528,7 +545,7 @@ int CameraController::addActiveRecipient(const ActiveRecipient& recipient)
     _ns5__AddRecipientConfiguration addCommand;
     _ns5__AddRecipientConfigurationResponse response;
 
-    ScopedGarbageCollector gc;
+    nx::utils::ScopedGarbageCollector gc;
     addCommand.NewRecipientConfiguration = gc.create<ns5__NewRecipientConfiguration>();
     addCommand.NewRecipientConfiguration->Name = gc.create<std::string>(recipient.name);
     addCommand.NewRecipientConfiguration->TemplateToken = recipient.token;
@@ -580,7 +597,7 @@ int CameraController::addActiveRule(const ActiveRule& rule)
     </StartEvent>
     */
 
-    ScopedGarbageCollector gc;
+    nx::utils::ScopedGarbageCollector gc;
     addCommand.NewActionRule = gc.create<ns5__NewActionRule>();
     addCommand.NewActionRule->Name = gc.create<std::string>(rule.name);
     addCommand.NewActionRule->Enabled = true;

@@ -49,7 +49,8 @@ public:
 
     virtual bool waitUntilStarted() override;
 
-    network::SocketAddress stunEndpoint() const;
+    network::SocketAddress stunUdpEndpoint() const;
+    network::SocketAddress stunTcpEndpoint() const;
     network::SocketAddress httpEndpoint() const;
 
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
@@ -81,11 +82,11 @@ protected:
 
 private:
     const int m_testFlags;
-    int m_stunPort;
     int m_httpPort;
     LocalCloudDataProvider m_cloudDataProvider;
     boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
-    network::SocketAddress m_stunAddress;
+    network::SocketAddress m_stunTcpEndpoint;
+    network::SocketAddress m_stunUdpEndpoint;
 };
 
 } // namespace hpm

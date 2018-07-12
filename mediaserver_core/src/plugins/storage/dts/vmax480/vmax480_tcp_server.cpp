@@ -12,6 +12,7 @@
 #include "vmax480_stream_fetcher.h"
 #include <network/tcp_connection_priv.h>
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
+#include <nx/utils/log/log_main.h>
 
 static const int UUID_LEN = 38;
 
@@ -233,6 +234,12 @@ void QnVMax480ConnectionProcessor::run()
         quint64 timestamp = *(quint64*)(vMaxHeader+8);
         AVCodecID codecID = AV_CODEC_ID_NONE;
 
+        if (dataSize >= MAX_ALLOWED_FRAME_SIZE)
+        {
+            NX_WARNING(this, lm("Got malformed vmax packet. Too large size %1.").arg(dataSize));
+            break;
+        }
+
         if (dataType == VMAXDT_GotArchiveRange)
         {
             quint32 startDateTime = *(quint32*)(vMaxHeader+8);
@@ -354,9 +361,9 @@ void QnVMax480ConnectionProcessor::run()
 
 }
 
-QnVMax480Server::QnVMax480Server(QnCommonModule* commonModule):
+QnVMax480Server::QnVMax480Server():
     QnTcpListener(
-        commonModule,
+        nullptr,
         QHostAddress(QLatin1String("127.0.0.1")),
         0)
 {

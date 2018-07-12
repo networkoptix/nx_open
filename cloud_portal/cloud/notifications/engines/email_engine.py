@@ -1,15 +1,13 @@
-import codecs
 import pystache
 from django.core.mail import EmailMultiAlternatives
+from django.core.mail.backends.smtp import EmailBackend
 # from email.mime.image import MIMEImage  # python 3
 from email.MIMEImage import MIMEImage  # python 2
-from django.conf import settings
 import json
 import os
-from util.helpers import get_language_for_email
 from cms.models import customization_cache, check_update_cache
 from cms.controllers import filldata 
-from django.core.cache import cache, caches
+from django.core.cache import cache
 
 
 def email_cache(customization_name, cache_type, value=None, force=None):
@@ -40,12 +38,10 @@ def email_cache(customization_name, cache_type, value=None, force=None):
         data[customization_name][cache_type] = value
         cache.set('email_cache', data)
     else:
-        cache.set('email_cache', data)
         return data[customization_name][cache_type]
 
 
-def send(email, msg_type, message, customization_name):
-    language_code = get_language_for_email(email, customization_name)
+def send(email, msg_type, message, language_code, customization_name):
 
     config = {
         'portal_url': customization_cache(customization_name, "portal_url")
@@ -64,6 +60,14 @@ def send(email, msg_type, message, customization_name):
     email_from_email = customization_cache(customization_name, "mail_from_email")
     email_from = '%s <%s>' % (email_from_name, email_from_email)
 
+    mail_obj = EmailBackend(
+        host=customization_cache(customization_name, "smtp_host"),
+        port=int(customization_cache(customization_name, "smtp_port")),
+        password=str(customization_cache(customization_name, "smtp_password")),
+        username=str(customization_cache(customization_name, "smtp_user")),
+        use_tls=customization_cache(customization_name, "smtp_tls"),
+    )
+
     msg = EmailMultiAlternatives(
         subject, email_txt_body, email_from, to=(email,))
     msg.content_subtype = 'plain'  # Main content is now text/html
@@ -74,10 +78,13 @@ def send(email, msg_type, message, customization_name):
     # msg.attach_alternative(email_txt_body, "text/plain")
 
     msg.mixed_subtype = 'related'
-    msg_img = MIMEImage(read_file(customization_name, 'templates/email_logo.png'))
+    msg_img = MIMEImage(read_file(customization_name, 'templates/email_logo.png'), _subtype="png")
     msg_img.add_header('Content-ID', '<logo>')
     msg.attach(msg_img)
-    return msg.send()
+
+    mail_obj.send_messages([msg])
+    mail_obj.close()
+    return True
 
 
 def get_email_title(customization_name, language_code, event):
@@ -85,7 +92,7 @@ def get_email_title(customization_name, language_code, event):
     if language_code not in titles_cache:
         filename = "templates/lang_{{language}}/notifications-language.json"
         data = read_file(customization_name, filename, language_code)
-        titles_cache[language_code] = json.load(data)
+        titles_cache[language_code] = json.loads(data)
         email_cache(customization_name, 'email_titles', titles_cache)
     return titles_cache[language_code][event]["emailSubject"]
 
@@ -98,7 +105,7 @@ def read_template(customization_name, name, language_code, html):
     return read_file(customization_name, filename, language_code)
     
 
-def read_file(customization_name, filename, language_code=None):
+def read_file(customization_name, filename, language_code=""):
     files_cache = email_cache(customization_name, 'files')
     translated_name = filename.replace("{{language}}", language_code)
     if translated_name not in files_cache:

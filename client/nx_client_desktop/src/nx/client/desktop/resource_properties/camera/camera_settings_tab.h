@@ -12,6 +12,7 @@ enum class CameraSettingsTab
     motion,
     fisheye,
     advanced,
+    web,
     expert,
 };
 

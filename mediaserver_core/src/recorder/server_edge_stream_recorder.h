@@ -95,7 +95,7 @@ private:
     FileStartedInfo m_lastfileStartedInfo;
     FileWrittenHandler m_fileWrittenHandler;
     MotionHandler m_motionHandler;
-    std::chrono::microseconds m_threshold;
+    std::chrono::microseconds m_threshold{0};
     bool m_terminated = false;
     bool m_needSaveData = false;
 

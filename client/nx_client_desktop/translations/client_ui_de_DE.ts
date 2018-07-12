@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Nur deaktivieren, wenn der Client zu viel CPU verwendet</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Maximale Live-Pufferlänge</translation>
     </message>
@@ -173,11 +168,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Formular</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Feste Archivlänge</translation>
     </message>
@@ -757,12 +747,27 @@
       <source>PTZ</source>
       <translation>PTZ</translation>
     </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Erzeugen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Zurücksetzen</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>Logical-ID</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>Input-ID</translation>
     </message>
   </context>
@@ -788,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>Output-ID:</translation>
     </message>
   </context>
@@ -958,6 +963,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>Beschreibung enthält:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Kategorie</translation>
     </message>
   </context>
   <context>
@@ -1495,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Gebunden an Hardware-Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Gebunden an Hardware-ID:</translation>
     </message>
   </context>
   <context>
@@ -1594,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Hardware-Id</translation>
+      <source>Hardware ID</source>
+      <translation>Hardware-ID</translation>
     </message>
   </context>
   <context>
@@ -1724,6 +1737,11 @@
       <source>Tour cycle</source>
       <translation>Tourzyklus</translation>
     </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>IP-Adressen für Kameras und Server, Gruppen für Benutzer, etc.</translation>
+    </message>
   </context>
   <context>
     <name>MessageBox</name>
@@ -1785,7 +1803,7 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
       <translation>&quot;Tragbare Kamera&quot; ist ein virtueller Speicher für Videodateien, der auf jeden Server auf Ihrem System hochgeladen werden kann und von jedem Benutzer zugänglich ist.</translation>
     </message>
   </context>
@@ -1972,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation>Geben Sie Benutzername und Passwort an...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>Formular</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>Dateiname:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>Datei wählen...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Durchsuchen…</translation>
     </message>
   </context>
   <context>
@@ -2665,17 +2706,6 @@
       <source>Reset</source>
       <translation>Zurücksetzen</translation>
     </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>Hochgeladenes Archiv kann automatisch gelöscht werden, wenn auf einem Serverspeicher kein freier Speicherplatz vorhanden ist. Das älteste Material aller Kameras auf dem Server wird zuerst gelöscht.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3031,15 +3061,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Noch gibt es keine benutzerdefinierte Rollen. 
-Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
+      <source>New role</source>
+      <translation>Neue Rolle</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Neue Rolle</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Es gibt noch keine benutzerdefinierten Benutzerrollen.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Klicken Sie auf die Schaltfläche &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     </message>
   </context>
   <context>
@@ -3064,11 +3097,6 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Formular</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Bewegungserkennung</translation>
     </message>
@@ -3087,11 +3115,6 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Formular</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Abbrechen</translation>
     </message>
@@ -3100,11 +3123,6 @@ Klicken Sie auf &quot;Neue Rolle&quot;, um eine zu erstellen.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Formular</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>Video hochladen</translation>
     </message>

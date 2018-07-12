@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>クライアントの CPU 負荷が余りにも高い場合にのみ無効にします</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>最大ライブ バッファーの長さ</translation>
     </message>
@@ -173,11 +168,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>アーカイブ保持期間</translation>
     </message>
@@ -757,12 +747,27 @@
       <source>PTZ</source>
       <translation>PTZ</translation>
     </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>生成</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>リセット</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>論理ID</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>入力ID</translation>
     </message>
   </context>
@@ -788,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>出力ID：</translation>
     </message>
   </context>
@@ -958,6 +963,14 @@
       <location/>
       <source>Description contains:</source>
       <translation>説明に含まれる:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>カテゴリー</translation>
     </message>
   </context>
   <context>
@@ -1415,7 +1428,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>サーバーの URL</translation>
+      <translation>サーバー URL</translation>
     </message>
     <message>
       <location/>
@@ -1495,7 +1508,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>ハードウェアID:</translation>
     </message>
   </context>
@@ -1594,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>ハードウェア Id</translation>
+      <source>Hardware ID</source>
+      <translation>ハードウェア ID</translation>
     </message>
   </context>
   <context>
@@ -1722,7 +1735,12 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>ツアーサイクル</translation>
+      <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>カメラのIPアドレス、サーバー、ユーザーのグループなど</translation>
     </message>
   </context>
   <context>
@@ -1785,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;ウェアラブル カメラ&quot; はシステム上の任意のサーバーにビデオをアップロードして、すべてのユーザーがアクセスできるビデオ ファイルの仮想ストレージです</translation>
     </message>
   </context>
   <context>
@@ -1972,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation>名前とパスワード入力...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>フォーム</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>ファイル名:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>ファイル選択...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>参照...</translation>
     </message>
   </context>
   <context>
@@ -2369,7 +2410,7 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>解像度:</translation>
+      <translation>解像度</translation>
     </message>
     <message>
       <location/>
@@ -2664,17 +2705,6 @@
       <location/>
       <source>Reset</source>
       <translation>リセット</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>アップロードされたアーカイブは、サーバーストレージに空き容量がない場合、自動的に削除されます　サーバー上のすべてのカメラの中で最も古い映像が最初に削除されます</translation>
     </message>
   </context>
   <context>
@@ -3031,14 +3061,18 @@ The oldest footage among all cameras on the server will be deleted first.</sourc
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>カスタムユーザーの役割はまだありません　 &quot;新しい役割&quot;ボタンをクリックして作成してください</translation>
+      <source>New role</source>
+      <translation>新しい役割</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>新しい役割</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>カスタムユーザーの役割はまだありません</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>&quot;新しい役割&quot; ボタンをクリックして作成します</translation>
     </message>
   </context>
   <context>
@@ -3063,18 +3097,13 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>モーション検知</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>アップロード動画のモーション検出</translation>
     </message>
     <message>
       <location/>
@@ -3086,11 +3115,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>キャンセル</translation>
     </message>
@@ -3099,18 +3123,13 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>フォーム</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation>ビデオをアップロード</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>ファイルをアップロード</translation>
+      <translation>ファイルをアップロード...</translation>
     </message>
     <message>
       <location/>

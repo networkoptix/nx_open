@@ -67,7 +67,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QnTreeView" name="resourcesTreeView">
+    <widget class="nx::client::desktop::TreeView" name="resourcesTreeView">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -125,9 +125,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTreeView</class>
+   <class>nx::client::desktop::TreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">ui/widgets/common/tree_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tree_view.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::SearchEdit</class>

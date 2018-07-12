@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>Cập nhật thủ công</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">Tải lên trình cài đặt</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Hãy đảm bảo cấu hình là chính xác.</p>
-            </div>
-        </div>
-    </form>
-
     <h1>Thiết lập hệ thống nâng cao</h1>
     <div class="alert alert-danger" role="alert">
         <b> Cảnh báo! </b> Bất kỳ thay đổi nào trên trang này có thể khiến máy chủ hoạt động không chính xác.
@@ -193,7 +182,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{SystemSettings[setting] || 'trống'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Sự phản đối!</b> Một số thay đổi cần khởi động lại <b>tất cả</b> các máy chủ trong hệ thống.<br><br>
+        <b>Sự phản đối!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Khởi động lại máy chủ hiện tại</button>
         </div>

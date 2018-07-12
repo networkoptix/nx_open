@@ -18,7 +18,7 @@ class JpegDecoderPrivate;
 class JpegDecoder: public AbstractVideoDecoder
 {
 public:
-    JpegDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
+    JpegDecoder(const RenderContextSynchronizerPtr& synchronizer, const QSize& resolution);
 
     static bool isCompatible(
         const AVCodecID codec, const QSize& resolution, bool allowOverlay);
@@ -28,6 +28,7 @@ public:
     virtual int decode(
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
+    virtual Capabilities capabilities() const override;
 private:
     QScopedPointer<JpegDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(JpegDecoder);

@@ -81,7 +81,7 @@ namespace detail {
         bool m_overlayVisible;
 
         /** Fixed rotation angle in degrees. Used to rotate static text and images. */
-        Qn::FixedRotation m_overlayRotation;
+        nx::client::desktop::Rotation m_overlayRotation;
     };
 
     struct OverlayParams

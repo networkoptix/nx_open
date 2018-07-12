@@ -74,9 +74,9 @@
         "emailFrom": "E-mail küldő",
         "emailSignature": "E-mail aláírás",
         "emailSupportEmail": "Ügyfélszolgálati e-mail",
-        "enableEdgeRecording": "Enable edge recording",
+        "enableEdgeRecording": "Edge rögzítés engedélyezése",
         "eventLogPeriodDays": "Eseménynapló időszak (nap)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "Törölje a kameraprofilokat, ha szükséges",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP kereső bázis",
         "ldapSearchFilter": "LDAP kereső szűrő",
@@ -86,9 +86,9 @@
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Maximális különbség a szinkronizált és avhelyi idő között (milisec)",
         "maxRecordQueueSizeBytes": "Max. rekord sorméret (bájt)",
         "maxRecordQueueSizeElements": "Max. rekord sorméret (elem)",
-        "maxRemoteArchiveSynchronizationThreads": "Max remote archive synchronization threads",
-        "maxRtspConnectDurationSeconds": "Max Rtsp connect duration seconds",
-        "maxSceneItems": "Max scene items (0 means default)",
+        "maxRemoteArchiveSynchronizationThreads": "Rögzített videók távoli szinkronizálása max. szála",
+        "maxRtspConnectDurationSeconds": "Maximum Rtsp kapcsolat időtartama másodpercben",
+        "maxSceneItems": "Max. elemszám (0 alapértelmezett)",
         "proxyConnectTimeoutSec": "Proxy kapcsolat időtúllépés (másodperc)",
         "rtpTimeoutMs": "RTP időtúllépés (millisec)",
         "sequentialFlirOnvifSearcherEnabled": "Használjon szekvenciális Flir Onvif keresőt",
@@ -174,32 +174,5 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web interfész"
-    },
-    "common": {
-        "systemOffline": "A rendszer offline",
-        "cameraLinks": {
-            "copyToClipboard": "másolás vágólapra",
-            "highStream": "Elsődleges stream",
-            "copyDefaultText": "másolás",
-            "unknown": "Ismeretlen",
-            "lowStream": "Másodlagos stream",
-            "transcoding": "Transzkódolás",
-            "copyActiveText": "vágólapra másolva"
-        },
-        "searchCamPlaceholder": "keresés",
-        "cameraStates": {
-            "noFormat": "Ez a böngésző vagy eszköz nem támogatja erről a kameráról történő videofájl lejátszást.",
-            "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
-            "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
-            "unauthorized": "Hitelesítés szükséges",
-            "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt.",
-            "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
-            "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
-            "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
-            "error": "Hiba",
-            "offline": "Offline",
-            "noData": "Nincs adat",
-            "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videó ARM-alapú szerverről történő lejátszásához."
-        }
     }
 }

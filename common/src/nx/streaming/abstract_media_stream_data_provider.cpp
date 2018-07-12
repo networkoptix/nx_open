@@ -212,24 +212,29 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
         int channel = media->channelNumber;
         if (media->dataType == QnAbstractMediaData::AUDIO)
             channel = CL_MAX_CHANNELS; //< use last vector element for audio timings control
-        if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart))
-        {
-            resetTimeCheck();
-        }
-        else if (m_lastMediaTime[channel] != AV_NOPTS_VALUE)
-        {
-            qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
-            // if timeDiff < -N it may be time correction or dayling time change
-            if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION_USEC)
-            {
-                // Most likely, timestamps reported by the camera are not so good.
-                NX_LOG(lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
-                    arg(timeDiff).
-                    arg(m_mediaResource ? m_mediaResource->getName() : QString()).
-                    arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
-                    cl_logDEBUG2);
 
-                media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION_USEC;
+        if (nxStreamingIni().enableTimeCorrection)
+        {
+            if (media->flags & (QnAbstractMediaData::MediaFlags_BOF | QnAbstractMediaData::MediaFlags_ReverseBlockStart))
+            {
+                resetTimeCheck();
+            }
+            else if (m_lastMediaTime[channel] != AV_NOPTS_VALUE)
+            {
+                qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
+                // if timeDiff < -N it may be time correction or dayling time change
+                if (timeDiff >= -TIME_RESYNC_THRESHOLD && timeDiff < MIN_FRAME_DURATION_USEC)
+                {
+                    // Most likely, timestamps reported by the camera are not so good.
+                    NX_LOG(lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
+                        arg(timeDiff).
+                        arg(m_mediaResource ? m_mediaResource->getName() : QString()).
+                        arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
+                        cl_logDEBUG2);
+
+                    media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION_USEC;
+
+                }
             }
         }
         m_lastMediaTime[channel] = media->timestamp;

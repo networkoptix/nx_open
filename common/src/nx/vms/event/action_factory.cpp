@@ -71,28 +71,30 @@ AbstractActionPtr ActionFactory::createAction(
 {
     switch (actionType)
     {
-        case cameraOutputAction:
+        case ActionType::cameraOutputAction:
             return AbstractActionPtr(new CameraOutputAction(runtimeParams));
-        case cameraRecordingAction:
+        case ActionType::cameraRecordingAction:
             return AbstractActionPtr(new RecordingAction(runtimeParams));
-        case panicRecordingAction:
+        case ActionType::panicRecordingAction:
             return AbstractActionPtr(new PanicAction(runtimeParams));
-        case sendMailAction:
+        case ActionType::sendMailAction:
             return AbstractActionPtr(new SendMailAction(runtimeParams));
-        case bookmarkAction:
+        case ActionType::bookmarkAction:
             return AbstractActionPtr(new BookmarkAction(runtimeParams));
 
-        case undefinedAction:
-        case diagnosticsAction:
-        case showPopupAction:
-        case playSoundOnceAction:
-        case playSoundAction:
-        case sayTextAction:
-        case executePtzPresetAction:
-        case showTextOverlayAction:
-        case showOnAlarmLayoutAction:
-        case execHttpRequestAction:
-        case openLayoutAction:
+        case ActionType::undefinedAction:
+        case ActionType::diagnosticsAction:
+        case ActionType::showPopupAction:
+        case ActionType::playSoundOnceAction:
+        case ActionType::playSoundAction:
+        case ActionType::sayTextAction:
+        case ActionType::executePtzPresetAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::showOnAlarmLayoutAction:
+        case ActionType::execHttpRequestAction:
+        case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
 
         default:

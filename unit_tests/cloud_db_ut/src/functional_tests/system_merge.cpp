@@ -1,3 +1,4 @@
+#include <future>
 #include <set>
 
 #include <boost/optional.hpp>
@@ -6,7 +7,10 @@
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/utils/std/algorithm.h>
 
+#include <nx/cloud/cdb/cloud_db_service.h>
+#include <nx/cloud/cdb/controller.h>
 #include <nx/cloud/cdb/managers/system_health_info_provider.h>
 
 #include <rest/server/json_rest_result.h>
@@ -117,6 +121,20 @@ protected:
         m_systemHealthInfoProviderStub->forceSystemOnline(m_slaveSystem.id);
     }
 
+    void givenTwoOnlineSystemsBeingMerged()
+    {
+        givenTwoOnlineSystemsWithSameOwner();
+        whenMergeSystems();
+        thenMergeSucceeded();
+    }
+
+    void givenSystemAfterMerge()
+    {
+        givenTwoOnlineSystemsBeingMerged();
+        whenMergeIsCompleted();
+        waitUntilSlaveSystemIsRemoved();
+    }
+
     void whenMergeSystems()
     {
         m_prevResultCode = mergeSystems(m_ownerAccount, m_masterSystem.id, m_slaveSystem.id);
@@ -125,6 +143,19 @@ protected:
     void whenSlaveSystemFailsEveryRequest()
     {
         m_vmsApiResult = nx::network::http::StatusCode::internalServerError;
+    }
+
+    void whenMergeIsCompleted()
+    {
+        nx::vms::api::SystemMergeHistoryRecord mergeHistoryRecord;
+        mergeHistoryRecord.mergedSystemCloudId = m_slaveSystem.id.c_str();
+        mergeHistoryRecord.sign(m_slaveSystem.authKey.c_str());
+
+        std::promise<api::ResultCode> done;
+        moduleInstance()->impl()->controller().systemMergeManager().processMergeHistoryRecord(
+            mergeHistoryRecord,
+            [&done](api::ResultCode resultCode) { done.set_value(resultCode); });
+        ASSERT_EQ(api::ResultCode::ok, done.get_future().get());
     }
 
     void thenResultCodeIs(api::ResultCode resultCode)
@@ -170,6 +201,21 @@ protected:
         ASSERT_EQ(m_ownerAccount.email, authorization.userid().toStdString());
     }
 
+    void assertMasterSystemInfoDoesNotContainMergeInfo()
+    {
+        assertSystemMergeInfoIsNotAvailable(m_masterSystem.id);
+    }
+
+    void assertMasterSystemInfoContainsMergeInfo()
+    {
+        assertSystemMergeInfo(m_masterSystem.id, api::MergeRole::master, m_slaveSystem.id);
+    }
+
+    void assertSlaveSystemInfoContainsMergeInfo()
+    {
+        assertSystemMergeInfo(m_slaveSystem.id, api::MergeRole::slave, m_masterSystem.id);
+    }
+
     void assertAnyOfPermissionsIsNotEnoughToMergeSystems(
         std::vector<api::SystemAccessRole> accessRolesToCheck)
     {
@@ -182,6 +228,26 @@ protected:
             ASSERT_EQ(
                 api::ResultCode::forbidden,
                 mergeSystems(user, m_masterSystem.id, m_slaveSystem.id));
+        }
+    }
+
+    void waitUntilSlaveSystemIsRemoved()
+    {
+        for (;;)
+        {
+            std::vector<api::SystemDataEx> systems;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getSystems(m_ownerAccount.email, m_ownerAccount.password, &systems));
+
+            if (!nx::utils::contains_if(
+                    systems,
+                    [this](const auto& system) { return system.id == m_slaveSystem.id; }))
+            {
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 
@@ -198,8 +264,8 @@ private:
     boost::optional<nx::network::http::StatusCode::Value> m_vmsApiResult;
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
-        ec2::ConnectionManager*,
-        nx::utils::db::AsyncSqlQueryExecutor*)
+        data_sync_engine::ConnectionManager*,
+        nx::sql::AsyncSqlQueryExecutor*)
     {
         auto systemHealthInfoProvider = std::make_unique<SystemHealthInfoProviderStub>();
         m_systemHealthInfoProviderStub = systemHealthInfoProvider.get();
@@ -226,6 +292,30 @@ private:
 
         completionHandler(std::move(requestResult));
     }
+
+    void assertSystemMergeInfo(
+        const std::string& systemId,
+        api::MergeRole role,
+        const std::string& anotherSystemId)
+    {
+        api::SystemDataEx system;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystem(m_ownerAccount.email, m_ownerAccount.password, systemId, &system));
+        ASSERT_TRUE(static_cast<bool>(system.mergeInfo));
+        ASSERT_EQ(role, system.mergeInfo->role);
+        ASSERT_EQ(anotherSystemId, system.mergeInfo->anotherSystemId);
+    }
+
+    void assertSystemMergeInfoIsNotAvailable(
+        const std::string& systemId)
+    {
+        api::SystemDataEx system;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystem(m_ownerAccount.email, m_ownerAccount.password, systemId, &system));
+        ASSERT_FALSE(static_cast<bool>(system.mergeInfo));
+    }
 };
 
 TEST_F(SystemMerge, merge_request_moves_slave_system_to_beingMerged_state)
@@ -236,6 +326,30 @@ TEST_F(SystemMerge, merge_request_moves_slave_system_to_beingMerged_state)
 
     thenMergeSucceeded();
     andSlaveSystemIsMovedToBeingMergedState();
+}
+
+TEST_F(SystemMerge, merge_information_is_added_to_the_system)
+{
+    givenTwoOnlineSystemsBeingMerged();
+
+    assertMasterSystemInfoContainsMergeInfo();
+    assertSlaveSystemInfoContainsMergeInfo();
+}
+
+TEST_F(SystemMerge, merge_information_is_persistent)
+{
+    givenTwoOnlineSystemsBeingMerged();
+
+    ASSERT_TRUE(restart());
+
+    assertMasterSystemInfoContainsMergeInfo();
+    assertSlaveSystemInfoContainsMergeInfo();
+}
+
+TEST_F(SystemMerge, merge_information_is_removed_after_merge_completion)
+{
+    givenSystemAfterMerge();
+    assertMasterSystemInfoDoesNotContainMergeInfo();
 }
 
 TEST_F(SystemMerge, fails_if_either_system_is_offline)

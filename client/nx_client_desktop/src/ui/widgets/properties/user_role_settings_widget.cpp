@@ -21,6 +21,8 @@
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 
+using namespace nx::client::desktop;
+
 class QnUserRoleSettingsWidgetPrivate: public Connective<QObject>, public QnConnectionContextAware
 {
     using base_type = Connective<QObject>;
@@ -185,12 +187,12 @@ public:
 
         auto roles = model->userRoles();
         auto selectedRole = std::find_if(roles.begin(), roles.end(),
-            [selectedId = model->selectedUserRoleId()](const ec2::ApiUserRoleData& userRole)
+            [selectedId = model->selectedUserRoleId()](const nx::vms::api::UserRoleData& userRole)
             {
                 return userRole.id == selectedId;
             });
 
-        Qn::GlobalPermissions oldPermissions = Qn::NoGlobalPermissions;
+        GlobalPermissions oldPermissions;
         if (selectedRole != roles.end())
         {
             oldPermissions = selectedRole->permissions;
@@ -200,9 +202,9 @@ public:
         replacementRolesModel->setUserRoles(roles);
 
         Qn::UserRole defaultReplacementRole =
-            oldPermissions.testFlag(Qn::GlobalAccessAllMediaPermission)
-                ? Qn::UserRole::LiveViewer
-                : Qn::UserRole::CustomPermissions;
+            oldPermissions.testFlag(GlobalPermission::accessAllMedia)
+                ? Qn::UserRole::liveViewer
+                : Qn::UserRole::customPermissions;
 
         auto indices = replacementRolesModel->match(replacementRolesModel->index(0, 0),
             Qn::UserRoleRole,
@@ -227,7 +229,7 @@ public:
 
         replacement = QnUserRolesSettingsModel::UserRoleReplacement(
             index.data(Qn::UuidRole).value<QnUuid>(),
-            index.data(Qn::GlobalPermissionsRole).value<Qn::GlobalPermissions>());
+            index.data(Qn::GlobalPermissionsRole).value<GlobalPermissions>());
 
         return true;
     }
@@ -320,7 +322,7 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
         {
             auto name = text.trimmed().toLower();
             if (name.isEmpty())
-                return Qn::ValidationResult(tr("Role name cannot be empty."));
+                return ValidationResult(tr("Role name cannot be empty."));
 
             auto model = d_ptr->model;
             for (const auto& userRole: model->userRoles())
@@ -331,23 +333,23 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
                 if (userRole.name.trimmed().toLower() != name)
                     continue;
 
-                return Qn::ValidationResult(tr("Role with same name already exists."));
+                return ValidationResult(tr("Role with same name already exists."));
             }
 
             auto predefined = userRolesManager()->predefinedRoles();
-            predefined << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserRole;
+            predefined << Qn::UserRole::customPermissions << Qn::UserRole::customUserRole;
             for (auto role: predefined)
             {
                 if (userRolesManager()->userRoleName(role).trimmed().toLower() != name)
                     continue;
 
-                return Qn::ValidationResult(tr("Role with same name already exists."));
+                return ValidationResult(tr("Role with same name already exists."));
             }
 
-            return Qn::kValidResult;
+            return ValidationResult::kValid;
         });
 
-    connect(ui->nameInputField, &QnInputField::textChanged, this,
+    connect(ui->nameInputField, &InputField::textChanged, this,
         [this]
         {
             ui->nameInputField->validate();

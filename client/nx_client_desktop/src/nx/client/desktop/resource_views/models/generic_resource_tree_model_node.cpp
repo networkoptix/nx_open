@@ -7,6 +7,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
 #include <ui/workbench/workbench_context.h>
@@ -18,11 +20,10 @@ namespace desktop {
 GenericResourceTreeModelNode::GenericResourceTreeModelNode(
     QnResourceTreeModel* model,
     const IsAcceptableResourceCheckFunction& checkFunction,
-    Qn::NodeType nodeType)
+    NodeType nodeType)
     :
     base_type(model, nodeType),
-    m_isAcceptableCheck(checkFunction),
-    m_type(nodeType)
+    m_isAcceptableCheck(checkFunction)
 {
     connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         &GenericResourceTreeModelNode::handleAccessChanged);
@@ -109,7 +110,7 @@ QnResourceTreeModelNodePtr GenericResourceTreeModelNode::tryEnsureResourceNode(
     }
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), resource,
-        Qn::SharedResourceNode));
+        NodeType::sharedResource));
     node->initialize();
 
     auto parent = toSharedPointer();
@@ -157,9 +158,9 @@ void GenericResourceTreeModelNode::rebuild()
         tryEnsureResourceNode(resource);
 }
 
-void GenericResourceTreeModelNode::removeNode(const QnResourceTreeModelNodePtr& node)
+void GenericResourceTreeModelNode::removeNode(QnResourceTreeModelNodePtr node)
 {
-    if (node->type() == Qn::RecorderNode)
+    if (node->type() == NodeType::recorder)
     {
         /* Check if node was already removed. */
         auto key = m_recorders.key(node);

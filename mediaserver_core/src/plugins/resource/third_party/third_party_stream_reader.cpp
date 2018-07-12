@@ -12,6 +12,7 @@
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <plugins/resource/third_party/motion_data_picture.h>
 #include <streaming/mjpeg_stream_reader.h>
 #include <network/multicodec_rtp_reader.h>
@@ -25,6 +26,7 @@
 
 #include <motion/motion_detection.h>
 #include <utils/common/synctime.h>
+#include <core/resource/param.h>
 
 namespace
 {
@@ -64,23 +66,37 @@ namespace
 
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
-    QnResourcePtr res,
+    QnThirdPartyResourcePtr res,
     nxcip::BaseCameraManager* camManager )
 :
     CLServerPushStreamReader( res ),
-    m_camManager( camManager ),
-    m_cameraCapabilities( 0 )
+    m_thirdPartyRes(res),
+    m_camManager(camManager)
 {
-    m_thirdPartyRes = getResource().dynamicCast<QnThirdPartyResource>();
     NX_ASSERT( m_thirdPartyRes );
 
     m_audioLayout.reset( new QnResourceCustomAudioLayout() );
 
     m_camManager.getCameraCapabilities( &m_cameraCapabilities );
+
+    Qn::directConnect(
+        res.data(), &QnResource::propertyChanged,
+        this,
+        [this](const QnResourcePtr& resource, const QString& propertyName)
+        {
+            if (propertyName == Qn::CAMERA_STREAM_URLS)
+            {
+                // Reinitialize camera driver. hasDualStreaming may be changed.
+                m_resource->setStatus(Qn::Offline);
+                m_isMediaUrlValid.clear();
+            }
+        });
+    m_isMediaUrlValid.test_and_set();
 }
 
 ThirdPartyStreamReader::~ThirdPartyStreamReader()
 {
+    directDisconnectAll();
     stop();
 }
 
@@ -100,7 +116,7 @@ static int sensitivityToMask[10] =
 
 void ThirdPartyStreamReader::updateSoftwareMotion()
 {
-    if( m_thirdPartyRes->getMotionType() != Qn::MT_HardwareGrid )
+    if( m_thirdPartyRes->getMotionType() != Qn::MotionType::MT_HardwareGrid )
         return base_type::updateSoftwareMotion();
 
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
@@ -159,6 +175,19 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
+    if (auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        if (camera->getCameraCapabilities().testFlag(Qn::CustomMediaUrlCapability))
+        {
+            const auto mediaUrl = camera->sourceUrl(getRole());
+            nxpt::ScopedRef<nxcip::CameraMediaEncoder4> mediaEncoder4(
+                (nxcip::CameraMediaEncoder4*)intf->queryInterface(nxcip::IID_CameraMediaEncoder4),
+                false);
+            if (mediaEncoder4.get())
+                mediaEncoder4->setMediaUrl(mediaUrl.toUtf8().constData());
+        }
+    }
+
     QAuthenticator auth = m_thirdPartyRes->getAuth();
     m_camManager.setCredentials( auth.user(), auth.password() );
 
@@ -184,7 +213,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             config.height = resolution.height;
             config.framerate = params.fps;
             config.bitrateKbps = bitrateKbps;
-            config.quality = params.quality;
+            config.quality = (int16_t)params.quality;
             if( (m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability) && m_thirdPartyRes->isAudioEnabled() )
                 config.flags |= nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED;
 
@@ -290,7 +319,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         //checking url type and creating corresponding data provider
 
         QUrl mediaUrl( mediaUrlStr );
-        if( mediaUrl.scheme().toLower() == lit("rtsp") )
+        if( nx_rtsp::isUrlSheme(mediaUrl.scheme().toLower()) )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
             rtspStreamReader->setUserAgent(nx::utils::AppInfo::productName());
@@ -300,11 +329,11 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset( rtspStreamReader );
         }
-        else if( mediaUrl.scheme().toLower() == lit("http") )
+        else if( nx::network::http::isUrlSheme(mediaUrl.scheme().toLower()) )
         {
             QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset(new MJPEGStreamReader(
-                m_resource,
+                m_thirdPartyRes,
                 mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString())));
         }
         else
@@ -418,6 +447,12 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 {
     if( !isStreamOpened() )
         return QnAbstractMediaDataPtr(0);
+
+    if (!m_isMediaUrlValid.test_and_set())
+    {
+        closeStream();
+        return QnAbstractMediaDataPtr(); //< Reopen stream.
+    }
 
     if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetadata() )
         return getMetadata();

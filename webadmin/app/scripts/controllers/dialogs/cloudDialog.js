@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('CloudDialogCtrl', ['$scope', '$modalInstance', 'mediaserver', 'cloudAPI', 'connect',
+    .controller('CloudDialogCtrl', ['$scope', '$uibModalInstance', 'mediaserver', 'cloudAPI', 'connect',
                                     'systemName', 'cloudSystemID', 'cloudAccountName',
-    function ($scope, $modalInstance, mediaserver, cloudAPI, connect, systemName, cloudSystemID, cloudAccountName) {
+    function ($scope, $uibModalInstance, mediaserver, cloudAPI, connect, systemName, cloudSystemID, cloudAccountName) {
         //1. Detect action: connect or disconnect
         $scope.connect = connect;
         $scope.Config = Config;
@@ -31,7 +31,7 @@ angular.module('webadminApp')
                 $scope.errorMessage += ': ' + result.data.errorString;
                 $scope.succeed = false;
             }else {
-                $modalInstance.close('success');
+                $uibModalInstance.close('success');
             }
         }
         function errorHandler(result){
@@ -46,7 +46,7 @@ angular.module('webadminApp')
         }
 
         $scope.cancel = function(){
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
 
 

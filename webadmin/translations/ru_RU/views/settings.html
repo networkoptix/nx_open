@@ -15,8 +15,8 @@
             </alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Порт</h3>
@@ -42,14 +42,8 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Отсоединить сервер от системы</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            Видео архив останется без изменений. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Отсоединить от системы</button></p>
-                    </div>
-                    <div>
-                        <h3>Отсоединить сервер от системы</h3>
-                        <p>Это действие отделит сервер от системы, но база данных, локальных пользователей и конфигурация будет сохранена. 
-Видеоархив затронут не будет. <b>Облачные пользователи будут удалены.</b></p>
+                        <p>Это действие отключит сервер от системы с сохранением базы данных, локальных пользователей и конфигурации.
+                            Видео архив останется без изменений. <b>Облачные пользователи будут удалены.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Отсоединить от системы</button></p>
                     </div>
                     <div>
@@ -70,9 +64,9 @@
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>Имя</h3>
                         <div class="row">
@@ -117,13 +111,13 @@
                                    target="_blank">Создать учётную запись {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Device Network Settings</h3>
+                        <h3>Настройки мобильной сети</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Сохранить настройки и перезагрузить устройство</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Дата и время</h3>
@@ -148,7 +142,7 @@
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -161,7 +155,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -178,8 +172,8 @@
                         <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">Запутить клиент</button>                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Остановить клиент</button></p>
                         <p>Управлять клиентом можно с помощью клавиатуры/мыши или мобильного приложения.</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

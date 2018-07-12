@@ -15,11 +15,9 @@ QnAviBlurayResource::~QnAviBlurayResource()
 {
 }
 
-QnAbstractStreamDataProvider* QnAviBlurayResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
+QnAviArchiveDelegate* QnAviBlurayResource::createArchiveDelegate() const
 {
-    QnArchiveStreamReader* result = new QnArchiveStreamReader(toSharedPointer());
-    result->setArchiveDelegate(new QnAVIBlurayArchiveDelegate());
-    return result;
+    return new QnAVIBlurayArchiveDelegate();
 }
 
 bool QnAviBlurayResource::isAcceptedUrl(const QString& url)

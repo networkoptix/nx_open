@@ -36,15 +36,28 @@ static const QDateTime kMaxDateTime = QDateTime::fromString(
     lit("2037-12-31 00:00:00"),
     kDateTimeFormat);
 
-static const std::chrono::milliseconds kHttpTimeout(10000);
-static const std::chrono::milliseconds kTimelineCacheTime(10000);
+static const std::chrono::seconds kSendTimeout(10);
+static const std::chrono::milliseconds kTimelineCacheTime(10000); //< Only for sync mode.
 
 } // namespace
 
+HanwhaChunkLoaderSettings::HanwhaChunkLoaderSettings(
+    const std::chrono::seconds& responseTimeout,
+    const std::chrono::seconds& messageBodyReadTimeout)
+    :
+    responseTimeout(responseTimeout),
+    messageBodyReadTimeout(messageBodyReadTimeout)
+{
+}
+
 using namespace nx::core::resource;
 
-HanwhaChunkLoader::HanwhaChunkLoader(HanwhaSharedResourceContext* resourceContext):
-    m_resourceContext(resourceContext)
+HanwhaChunkLoader::HanwhaChunkLoader(
+    HanwhaSharedResourceContext* resourceContext,
+    const HanwhaChunkLoaderSettings& settings)
+    :
+    m_resourceContext(resourceContext),
+    m_settings(settings)
 {
 }
 
@@ -62,12 +75,12 @@ HanwhaChunkLoader::~HanwhaChunkLoader()
         m_httpClient->pleaseStopSync();
 }
 
-void HanwhaChunkLoader::start(bool isNvr)
+void HanwhaChunkLoader::start(const HanwhaInformation& information)
 {
     QnMutexLocker lock(&m_mutex);
-    setUpThreadUnsafe();
+    setUpThreadUnsafe(information);
 
-    if (isNvr)
+    if (m_isNvr)
     {
         m_state = nextState(m_state);
         m_started = true;
@@ -182,7 +195,7 @@ boost::optional<int> HanwhaChunkLoader::overlappedId() const
 {
     QnMutexLocker lock(&m_mutex);
     NX_ASSERT(m_isNvr, lit("Method should be called only for NVRs"));
-    if (m_isNvr)
+    if (m_isNvr && !m_overlappedIds.empty())
         return m_overlappedIds.back();
 
     // For cameras we should import all chunks from all overlapped IDs.
@@ -637,8 +650,9 @@ void HanwhaChunkLoader::prepareHttpClient()
     m_httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_httpClient->setUserName(authenticator.user());
     m_httpClient->setUserPassword(authenticator.password());
-    m_httpClient->setSendTimeout(kHttpTimeout);
-    m_httpClient->setResponseReadTimeout(kHttpTimeout);
+    m_httpClient->setSendTimeout(kSendTimeout);
+    m_httpClient->setResponseReadTimeout(m_settings.responseTimeout);
+    m_httpClient->setMessageBodyReadTimeout(m_settings.messageBodyReadTimeout);
     m_httpClient->setOnDone([this](){ at_httpClientDone(); });
 }
 
@@ -783,24 +797,20 @@ std::chrono::milliseconds HanwhaChunkLoader::timeSinceLastTimelineUpdate() const
         - m_lastTimelineUpdate;
 }
 
-void HanwhaChunkLoader::setUpThreadUnsafe()
+void HanwhaChunkLoader::setUpThreadUnsafe(const HanwhaInformation& information)
 {
     if (m_state != State::initial)
         return; //< Already started
 
-    const auto information = m_resourceContext->information();
-    if (!information)
-        return; //< Unable to start without channel number.
-
     m_hasSearchRecordingPeriodSubmenu = false;
-    const auto searchRecordingPeriodAttribute = information->attributes.attribute<bool>(
+    const auto searchRecordingPeriodAttribute = information.attributes.attribute<bool>(
         lit("Recording/SearchPeriod"));
 
     if (searchRecordingPeriodAttribute != boost::none)
         m_hasSearchRecordingPeriodSubmenu = searchRecordingPeriodAttribute.get();
 
-    m_isNvr = information->deviceType == kHanwhaNvrDeviceType;
-    m_maxChannels = information->channelCount;
+    m_isNvr = information.deviceType == HanwhaDeviceType::nvr;
+    m_maxChannels = information.channelCount;
 }
 
 OverlappedTimePeriods HanwhaChunkLoader::overlappedTimelineThreadUnsafe(

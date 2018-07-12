@@ -1,8 +1,10 @@
 #include "http_client.h"
 
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/type_utils.h>
+
+#include "buffer_source.h"
 
 namespace {
 
@@ -20,13 +22,19 @@ HttpClient::HttpClient():
     m_terminated(false),
     m_maxInternalBufferSize(kDefaultMaxInternalBufferSize)
 {
-    instantiateHttpClient();
+}
+
+HttpClient::HttpClient(std::unique_ptr<nx::network::AbstractStreamSocket> socket):
+    HttpClient()
+{
+    m_socket = std::move(socket);
 }
 
 HttpClient::~HttpClient()
 {
     pleaseStop();
-    m_asyncHttpClient->pleaseStopSync(false);
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->pleaseStopSync(false);
 }
 
 void HttpClient::pleaseStop()
@@ -40,8 +48,8 @@ bool HttpClient::doGet(const nx::utils::Url& url)
 {
     using namespace std::placeholders;
     return doRequest(std::bind(
-        static_cast<void(AsyncHttpClient::*)(const nx::utils::Url&)>(
-            &nx::network::http::AsyncHttpClient::doGet), _1, url));
+        static_cast<void(AsyncClient::*)(const nx::utils::Url&)>(
+            &nx::network::http::AsyncClient::doGet), _1, url));
 }
 
 bool HttpClient::doUpgrade(
@@ -50,8 +58,8 @@ bool HttpClient::doUpgrade(
 {
     using namespace std::placeholders;
     return doRequest(std::bind(
-        static_cast<void(AsyncHttpClient::*)(const nx::utils::Url&, const StringType&)>(
-            &nx::network::http::AsyncHttpClient::doUpgrade), _1, url, protocolToUpgradeTo));
+        static_cast<void(AsyncClient::*)(const nx::utils::Url&, const StringType&)>(
+            &nx::network::http::AsyncClient::doUpgrade), _1, url, protocolToUpgradeTo));
 }
 
 bool HttpClient::doPost(
@@ -59,21 +67,17 @@ bool HttpClient::doPost(
     const nx::network::http::StringType& contentType,
     nx::network::http::StringType messageBody)
 {
-    using namespace std::placeholders;
+    auto body = std::make_unique<BufferSource>(
+        contentType, std::move(messageBody));
 
-    typedef void(AsyncHttpClient::*FuncType)(
-        const nx::utils::Url& /*url*/,
-        const nx::network::http::StringType& /*contentType*/,
-        nx::network::http::StringType /*messageBody*/,
-        bool /*includeContentLength*/);
-
-    return doRequest(std::bind(
-        static_cast<FuncType>(&nx::network::http::AsyncHttpClient::doPost),
-        _1,
-        url,
-        contentType,
-        std::move(messageBody),
-        true));
+    return doRequest(
+        [url, body = std::move(body)](
+            nx::network::http::AsyncClient* client) mutable
+        {
+            client->doPost(
+                url,
+                nx::utils::static_unique_ptr_cast<AbstractMsgBodySource>(std::move(body)));
+        });
 }
 
 bool HttpClient::doPut(
@@ -81,25 +85,25 @@ bool HttpClient::doPut(
     const nx::network::http::StringType& contentType,
     nx::network::http::StringType messageBody)
 {
-    typedef void(AsyncHttpClient::*FuncType)(
-        const nx::utils::Url& /*url*/,
-        const nx::network::http::StringType& /*contentType*/,
-        nx::network::http::StringType /*messageBody*/);
+    auto body = std::make_unique<BufferSource>(
+        contentType, std::move(messageBody));
 
-    return doRequest(std::bind(
-        static_cast<FuncType>(&nx::network::http::AsyncHttpClient::doPut),
-        std::placeholders::_1,
-        url,
-        contentType,
-        std::move(messageBody)));
+    return doRequest(
+        [url, body = std::move(body)](
+            nx::network::http::AsyncClient* client) mutable
+        {
+            client->doPut(
+                url,
+                nx::utils::static_unique_ptr_cast<AbstractMsgBodySource>(std::move(body)));
+        });
 }
 
 bool HttpClient::doDelete(const nx::utils::Url& url)
 {
     using namespace std::placeholders;
     return doRequest(std::bind(
-        static_cast<void(AsyncHttpClient::*)(const nx::utils::Url&)>(
-            &nx::network::http::AsyncHttpClient::doDelete), _1, url));
+        static_cast<void(AsyncClient::*)(const nx::utils::Url&)>(
+            &nx::network::http::AsyncClient::doDelete), _1, url));
 }
 
 const Response* HttpClient::response() const
@@ -139,14 +143,14 @@ BufferType HttpClient::fetchMessageBodyBuffer()
     return result;
 }
 
-boost::optional<BufferType> HttpClient::fetchEntireMessageBody()
+std::optional<BufferType> HttpClient::fetchEntireMessageBody()
 {
     QByteArray buffer;
     while (!eof())
         buffer += fetchMessageBodyBuffer();
 
     if (m_error)
-        return boost::none;
+        return std::nullopt;
 
     return buffer;
 }
@@ -181,19 +185,22 @@ void HttpClient::setTotalReconnectTries(int reconnectTries)
     m_reconnectTries = reconnectTries;
 }
 
-void HttpClient::setSendTimeoutMs(unsigned int sendTimeoutMs)
+void HttpClient::setSendTimeout(
+    std::chrono::milliseconds sendTimeout)
 {
-    m_sendTimeoutMs = sendTimeoutMs;
+    m_sendTimeout = sendTimeout;
 }
 
-void HttpClient::setResponseReadTimeoutMs(unsigned int responseReadTimeoutMs)
+void HttpClient::setResponseReadTimeout(
+    std::chrono::milliseconds responseReadTimeout)
 {
-    m_responseReadTimeoutMs = responseReadTimeoutMs;
+    m_responseReadTimeout = responseReadTimeout;
 }
 
-void HttpClient::setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs)
+void HttpClient::setMessageBodyReadTimeout(
+    std::chrono::milliseconds messageBodyReadTimeout)
 {
-    m_messageBodyReadTimeoutMs = messageBodyReadTimeoutMs;
+    m_messageBodyReadTimeout = messageBodyReadTimeout;
 }
 
 void HttpClient::setUserAgent(const QString& userAgent)
@@ -222,9 +229,10 @@ void HttpClient::setAuthType(AuthType value)
         m_asyncHttpClient->setAuthType(value);
 }
 
-void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
+void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure)
 {
     m_proxyEndpoint = proxyEndpoint;
+    m_isProxySecure = isSecure;
 }
 
 void HttpClient::setDisablePrecalculatedAuthorization(bool value)
@@ -275,11 +283,11 @@ bool HttpClient::fetchResource(
     const nx::utils::Url& url,
     BufferType* msgBody,
     StringType* contentType,
-    boost::optional<std::chrono::milliseconds> customResponseReadTimeout)
+    std::optional<std::chrono::milliseconds> customResponseReadTimeout)
 {
     nx::network::http::HttpClient client;
     if (customResponseReadTimeout)
-        client.setResponseReadTimeoutMs(customResponseReadTimeout->count());
+        client.setResponseReadTimeout(*customResponseReadTimeout);
     if (!client.doGet(url))
         return false;
 
@@ -292,19 +300,14 @@ bool HttpClient::fetchResource(
 
 void HttpClient::instantiateHttpClient()
 {
-    m_asyncHttpClient = nx::network::http::AsyncHttpClient::create();
-    connect(
-        m_asyncHttpClient.get(), &AsyncHttpClient::responseReceived,
-        this, &HttpClient::onResponseReceived,
-        Qt::DirectConnection);
-    connect(
-        m_asyncHttpClient.get(), &AsyncHttpClient::someMessageBodyAvailable,
-        this, &HttpClient::onSomeMessageBodyAvailable,
-        Qt::DirectConnection);
-    connect(
-        m_asyncHttpClient.get(), &AsyncHttpClient::done,
-        this, &HttpClient::onDone,
-        Qt::DirectConnection);
+    m_asyncHttpClient = std::make_unique<nx::network::http::AsyncClient>(std::move(m_socket));
+
+    m_asyncHttpClient->setOnResponseReceived(
+        std::bind(&HttpClient::onResponseReceived, this));
+    m_asyncHttpClient->setOnSomeMessageBodyAvailable(
+        std::bind(&HttpClient::onSomeMessageBodyAvailable, this));
+    m_asyncHttpClient->setOnDone(
+        std::bind(&HttpClient::onDone, this));
 }
 
 template<typename AsyncClientFunc>
@@ -328,25 +331,25 @@ bool HttpClient::doRequest(AsyncClientFunc func)
         for (const auto& keyValue : m_additionalHeaders)
             m_asyncHttpClient->addAdditionalHeader(keyValue.first, keyValue.second);
         if (m_subsequentReconnectTries)
-            m_asyncHttpClient->setSubsequentReconnectTries(m_subsequentReconnectTries.get());
+            m_asyncHttpClient->setSubsequentReconnectTries(*m_subsequentReconnectTries);
         if (m_reconnectTries)
-            m_asyncHttpClient->setTotalReconnectTries(m_reconnectTries.get());
-        if (m_sendTimeoutMs)
-            m_asyncHttpClient->setSendTimeoutMs(m_sendTimeoutMs.get());
-        if (m_responseReadTimeoutMs)
-            m_asyncHttpClient->setResponseReadTimeoutMs(m_responseReadTimeoutMs.get());
-        if (m_messageBodyReadTimeoutMs)
-            m_asyncHttpClient->setMessageBodyReadTimeoutMs(m_messageBodyReadTimeoutMs.get());
+            m_asyncHttpClient->setTotalReconnectTries(*m_reconnectTries);
+        if (m_sendTimeout)
+            m_asyncHttpClient->setSendTimeout(*m_sendTimeout);
+        if (m_responseReadTimeout)
+            m_asyncHttpClient->setResponseReadTimeout(*m_responseReadTimeout);
+        if (m_messageBodyReadTimeout)
+            m_asyncHttpClient->setMessageBodyReadTimeout(*m_messageBodyReadTimeout);
         if (m_userAgent)
-            m_asyncHttpClient->setUserAgent(m_userAgent.get());
+            m_asyncHttpClient->setUserAgent(*m_userAgent);
         if (m_userName)
-            m_asyncHttpClient->setUserName(m_userName.get());
+            m_asyncHttpClient->setUserName(*m_userName);
         if (m_userPassword)
-            m_asyncHttpClient->setUserPassword(m_userPassword.get());
+            m_asyncHttpClient->setUserPassword(*m_userPassword);
         if (m_authType)
-            m_asyncHttpClient->setAuthType(m_authType.get());
+            m_asyncHttpClient->setAuthType(*m_authType);
         if (m_proxyEndpoint)
-            m_asyncHttpClient->setProxyVia(m_proxyEndpoint.get());
+            m_asyncHttpClient->setProxyVia(*m_proxyEndpoint, m_isProxySecure);
 
         m_asyncHttpClient->setDisablePrecalculatedAuthorization(m_precalculatedAuthorizationDisabled);
         m_asyncHttpClient->setExpectOnlyMessageBodyWithoutHeaders(m_expectOnlyBody);
@@ -372,10 +375,10 @@ void HttpClient::onResponseReceived()
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
     if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
     {
-        NX_LOG(
-            lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
-                .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
-            cl_logWARNING);
+        NX_WARNING(this,
+            lm("Internal buffer overflow. "
+                "Max buffer size: %1, current buffer size: %2, requested url: %3.")
+                    .args(m_maxInternalBufferSize, m_msgBodyBuffer.size(), url()));
         m_done = true;
         m_error = true;
         m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);
@@ -389,10 +392,10 @@ void HttpClient::onSomeMessageBodyAvailable()
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
     if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
     {
-        NX_LOG(
-            lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
-                .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
-            cl_logWARNING);
+        NX_WARNING(this,
+            lm("Internal buffer overflow. "
+                "Max buffer size: %1, current buffer size: %2, requested url: %3.")
+                    .args(m_maxInternalBufferSize, m_msgBodyBuffer.size(), url()));
         m_done = true;
         m_error = true;
         m_asyncHttpClient->pleaseStopSync(!m_ignoreMutexAnalyzer);
@@ -405,11 +408,6 @@ void HttpClient::onDone()
     QnMutexLocker lk(&m_mutex);
     m_done = true;
     m_cond.wakeAll();
-}
-
-void HttpClient::onReconnected()
-{
-    // TODO: #ak
 }
 
 } // namespace nx

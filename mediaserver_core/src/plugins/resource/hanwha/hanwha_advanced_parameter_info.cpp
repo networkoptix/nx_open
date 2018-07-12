@@ -1,6 +1,8 @@
 #include "hanwha_advanced_parameter_info.h"
 #include "hanwha_utils.h"
 
+#include <nx/fusion/serialization/lexical.h>
+
 namespace nx {
 namespace mediaserver_core {
 namespace plugins {
@@ -20,6 +22,10 @@ static const QString kGroupLeadAux = lit("groupLead");
 static const QString kGropupIncludeAux = lit("groupInclude");
 static const QString kStreamsToReopenAux = lit("streamsToReopen");
 static const QString kShouldAffectAllChannels = lit("shouldAffectAllChannels");
+static const QString kDeviceTypesAux = lit("deviceTypes");
+static const QString kAssociatedParametersAux = lit("associatedWith");
+static const QString kPtzTraitsAux = lit("ptzTraits");
+static const QString kPtzCapabilitiesAux = lit("ptzCapabilities");
 
 static const QString kPrimaryProfile = lit("primary");
 static const QString kSecondaryProfile = lit("secondary");
@@ -38,6 +44,12 @@ bool fromString<bool>(const QString& str)
 }
 
 template<>
+QSet<QString> fromString<QSet<QString>>(const QString& str)
+{
+    return str.split(L',', QString::SplitBehavior::SkipEmptyParts).toSet();
+}
+
+template<>
 Qn::ConnectionRole fromString<Qn::ConnectionRole>(const QString& str)
 {
     if (str == kPrimaryProfile)
@@ -52,7 +64,7 @@ Qn::ConnectionRole fromString<Qn::ConnectionRole>(const QString& str)
 } // namespace
 
 const std::map<QString, QString HanwhaAdavancedParameterInfo::*>
-HanwhaAdavancedParameterInfo::m_stringAuxes = {
+HanwhaAdavancedParameterInfo::kStringAuxes = {
     {kSupportAux, &HanwhaAdavancedParameterInfo::m_supportAttribute},
     {kRangeAux, &HanwhaAdavancedParameterInfo::m_rangeParameter},
     {kResourceProperty, &HanwhaAdavancedParameterInfo::m_resourceProperty},
@@ -63,12 +75,19 @@ HanwhaAdavancedParameterInfo::m_stringAuxes = {
 };
 
 const std::map<QString, bool HanwhaAdavancedParameterInfo::*>
-HanwhaAdavancedParameterInfo::m_boolAuxes = {
+HanwhaAdavancedParameterInfo::kBoolAuxes = {
     {kSpecificAux, &HanwhaAdavancedParameterInfo::m_isSpecific},
     {kNoChannelAux, &HanwhaAdavancedParameterInfo::m_channelIndependent},
     {kCodecAux, &HanwhaAdavancedParameterInfo::m_isCodecDependent},
     {kShouldAffectAllChannels, &HanwhaAdavancedParameterInfo::m_shouldAffectAllChannels}
 };
+
+const std::map<QString, QSet<QString> HanwhaAdavancedParameterInfo::*>
+HanwhaAdavancedParameterInfo::kStringSetAuxes = {
+    {kAssociatedParametersAux, &HanwhaAdavancedParameterInfo::m_associatedParameters},
+    {kPtzTraitsAux, &HanwhaAdavancedParameterInfo::m_ptzTraits},
+};
+
 
 HanwhaAdavancedParameterInfo::HanwhaAdavancedParameterInfo(
     const QnCameraAdvancedParameter& parameter)
@@ -173,6 +192,11 @@ QString HanwhaAdavancedParameterInfo::submenu() const
     return m_submenu;
 }
 
+bool HanwhaAdavancedParameterInfo::hasParameter() const
+{
+    return !m_parameterName.isEmpty();
+}
+
 QString HanwhaAdavancedParameterInfo::parameterName() const
 {
     return m_parameterName;
@@ -188,11 +212,33 @@ bool HanwhaAdavancedParameterInfo::shouldAffectAllChannels() const
     return m_shouldAffectAllChannels;
 }
 
+bool HanwhaAdavancedParameterInfo::isDeviceTypeSupported(HanwhaDeviceType deviceType) const
+{
+    if (m_deviceTypes.empty())
+        return true;
+
+    return m_deviceTypes.find(deviceType) != m_deviceTypes.cend();
+}
+
+QSet<QString> HanwhaAdavancedParameterInfo::associatedParameters() const
+{
+    return m_associatedParameters;
+}
+
+QSet<QString> HanwhaAdavancedParameterInfo::ptzTraits() const
+{
+    return m_ptzTraits;
+}
+
+Ptz::Capabilities HanwhaAdavancedParameterInfo::ptzCapabilities() const
+{
+    return m_ptzCapabilities;
+}
+
 bool HanwhaAdavancedParameterInfo::isValid() const
 {
     return (!m_cgi.isEmpty()
-        && !m_submenu.isEmpty()
-        && !m_parameterName.isEmpty())
+        && !m_submenu.isEmpty())
         || m_isService;
 }
 
@@ -217,7 +263,7 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
 {
     const auto auxParts = auxString.split(L';');
 
-    for (const auto& auxPart : auxParts)
+    for (const auto& auxPart: auxParts)
     {
         const auto split = auxPart.trimmed().split(L'=');
         if (split.size() != 2)
@@ -226,11 +272,14 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
         const auto auxName = split[0].trimmed();
         const auto auxValue = split[1].trimmed();
 
-        if (m_stringAuxes.find(auxName) != m_stringAuxes.cend())
-            this->*m_stringAuxes.at(auxName) = auxValue;
+        if (kStringAuxes.find(auxName) != kStringAuxes.cend())
+            this->*kStringAuxes.at(auxName) = auxValue;
 
-        if (m_boolAuxes.find(auxName) != m_boolAuxes.cend())
-            this->*m_boolAuxes.at(auxName) = fromString<bool>(auxValue);
+        if (kBoolAuxes.find(auxName) != kBoolAuxes.cend())
+            this->*kBoolAuxes.at(auxName) = fromString<bool>(auxValue);
+
+        if (kStringSetAuxes.find(auxName) != kStringSetAuxes.cend())
+            this->*kStringSetAuxes.at(auxName) = fromString<QSet<QString>>(auxValue);
 
         if (auxName == kProfileAux)
             m_profile = fromString<Qn::ConnectionRole>(auxValue);
@@ -249,13 +298,32 @@ void HanwhaAdavancedParameterInfo::parseAux(const QString& auxString)
                     m_streamsToReopen.insert(role);
             }
         }
+        if (auxName == kDeviceTypesAux)
+        {
+            m_deviceTypes.clear();
+            const auto split = auxValue.split(L',');
+            for (const auto& deviceTypeString: split)
+            {
+                const auto deviceType = QnLexical::deserialized<HanwhaDeviceType>(
+                    deviceTypeString.trimmed(),
+                    HanwhaDeviceType::unknown);
+
+                m_deviceTypes.insert(deviceType);
+            }
+        }
+
+        if (auxName == kPtzCapabilitiesAux)
+        {
+            m_ptzCapabilities = QnLexical::deserialized<Ptz::Capabilities>(
+                auxValue,
+                Ptz::NoPtzCapabilities);
+        }
     }
 }
 
 void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
 {
     m_id = idString;
-
     if (m_id.contains(lit("SERVICE%")))
     {
         m_isService = true;
@@ -270,19 +338,25 @@ void HanwhaAdavancedParameterInfo::parseId(const QString& idString)
         idInfoPart = split[0];
 
     split = idInfoPart.split(L'/');
-    if (split.size() != 3)
+    if (split.size() != 2 && split.size() != 3)
+    {
+        NX_ASSERT(false, lm("Wrong parameter id: %1").args(idString));
         return;
+    }
 
     m_cgi = split[0];
     m_submenu = split[1];
 
-    const auto nameAndValue = split[2].split(L'=');
-    if (nameAndValue.isEmpty())
-        return;
+    if (split.size() == 3)
+    {
+        const auto nameAndValue = split[2].split(L'=');
+        if (nameAndValue.isEmpty())
+            return;
 
-    m_parameterName = nameAndValue[0];
-    if (nameAndValue.size() == 2)
-        m_parameterValue = nameAndValue[1];
+        m_parameterName = nameAndValue[0];
+        if (nameAndValue.size() == 2)
+            m_parameterValue = nameAndValue[1];
+    }
 }
 
 } // namespace plugins

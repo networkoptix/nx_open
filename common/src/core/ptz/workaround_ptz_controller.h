@@ -1,27 +1,28 @@
-#ifndef QN_WORKAROUND_PTZ_CONTROLLER_H
-#define QN_WORKAROUND_PTZ_CONTROLLER_H
+#pragma once
 
-#include "proxy_ptz_controller.h"
+#include <core/ptz/proxy_ptz_controller.h>
+#include <nx/core/ptz/override.h>
+#include <nx/core/ptz/type.h>
 
-class QnWorkaroundPtzController: public QnProxyPtzController {
-    Q_OBJECT
-    typedef QnProxyPtzController base_type;
+static const QString kPtzOverride("ptzOverride");
+static const QString kOperationalPtzCapabilitiesOverride("operationalPtzCapabilities");
+static const QString kConfigurationalPtzCapabilitiesOverride("configurationalPtzCapabilities");
+
+class QnWorkaroundPtzController: public QnProxyPtzController
+{
+    using base_type = QnProxyPtzController;
 
 public:
     QnWorkaroundPtzController(const QnPtzControllerPtr &baseController);
 
     static bool extends(Ptz::Capabilities capabilities);
 
-    virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speed,
+        const nx::core::ptz::Options& options) override;
 
 private:
-    bool m_overrideContinuousMove;
-    Qt::Orientations m_flip;
-    Ptz::Traits m_traits;
-
-    bool m_overrideCapabilities;
-    Ptz::Capabilities m_capabilities;
+    nx::core::ptz::Override m_override;
 };
 
-#endif // QN_WORKAROUND_PTZ_CONTROLLER_H

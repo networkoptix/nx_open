@@ -6,10 +6,9 @@
 #include <api/server_rest_connection_fwd.h>
 #include <common/common_module_aware.h>
 #include <nx/vms/common/p2p/downloader/private/peer_selection/abstract_peer_selector.h>
-#include <nx/network/http/http_async_client.h>
+#include <nx/network/deprecated/asynchttpclient.h>
 
 class QnResourcePool;
-class QnAsyncHttpClientReply;
 
 namespace nx {
 namespace vms {
@@ -56,9 +55,12 @@ public:
         ChunkCallback callback) override;
 
     virtual rest::Handle validateFileInformation(
-        const FileInformation& fileInformation, ValidateCallback callback) override;
+        const QnUuid& peerId,
+        const FileInformation& fileInformation,
+        ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+    virtual bool hasAccessToTheUrl(const QString& url) const override;
 
 private:
     QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;
@@ -75,8 +77,12 @@ class ResourcePoolPeerManagerFactory:
 {
 public:
     ResourcePoolPeerManagerFactory(QnCommonModule* commonModule);
-    virtual AbstractPeerManager* createPeerManager(FileInformation::PeerSelectionPolicy peerPolicy) override;
+    virtual AbstractPeerManager* createPeerManager(
+        FileInformation::PeerSelectionPolicy peerPolicy,
+        const QList<QnUuid>& additionalPeers) override;
 };
+
+nx::network::http::AsyncHttpClientPtr createHttpClient();
 
 } // namespace downloader
 } // namespace p2p

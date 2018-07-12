@@ -1,5 +1,8 @@
 #include "workbench_context.h"
 
+#include <QtWidgets/QApplication>
+#include <QtWebKitWidgets/QWebView>
+
 #include <common/common_module.h>
 
 #include <client/client_settings.h>
@@ -27,6 +30,7 @@
 #include <ui/statistics/modules/durations_statistics_module.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 
+#include <ui/style/webview_style.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workaround/fglrx_full_screen.h>
 #ifdef Q_OS_LINUX
@@ -39,6 +43,8 @@
 
 #include <nx/utils/log/log.h>
 #include <client/client_module.h>
+#include <nx/client/core/watchers/user_watcher.h>
+#include <client/client_app_info.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -56,6 +62,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_workbench.reset(new QnWorkbench(this));
 
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
+
+    // We need to instantiate core user watcher for two way audio availability watcher.
+    const auto coreUserWatcher = instance<nx::client::core::UserWatcher>();
 
     instance<QnWorkbenchDesktopCameraWatcher>();
 
@@ -258,6 +267,54 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     return false;
 }
 
+bool QnWorkbenchContext::showEulaMessage() const
+{
+    const bool acceptedEula =
+        [this]()
+        {
+            const QString eulaHtmlStyle = QString::fromLatin1(R"(
+            <style media="screen" type="text/css">
+            * {
+                color: %1;
+                font-family: 'Roboto-Regular', 'Roboto';
+                font-weight: 400;
+                font-style: normal;
+                font-size: 13px;
+                line-height: 16px;
+            }
+            </style>)").arg(qApp->palette().color(QPalette::WindowText).name());
+
+            QFile eula(lit(":/license.html"));
+            eula.open(QIODevice::ReadOnly);
+            QString eulaText = QString::fromUtf8(eula.readAll());
+            eulaText = eulaText.replace(
+                lit("<head>"),
+                lit("<head>%1").arg(eulaHtmlStyle)
+            );
+
+            QnMessageBox eulaDialog(workbench()->context()->mainWindow());
+            eulaDialog.setIcon(QnMessageBoxIcon::Warning);
+            eulaDialog.setText(tr("To use the software you must accept the end user license agreement"));
+
+            auto view = new QWebView(&eulaDialog);
+            NxUi::setupWebViewStyle(view, NxUi::WebViewStyle::eula);
+            view->setHtml(eulaText);
+            view->setFixedSize(740, 560);
+            view->show();
+            eulaDialog.addCustomWidget(view);
+
+            eulaDialog.addButton(tr("Accept"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
+            eulaDialog.addButton(tr("Decline"), QDialogButtonBox::RejectRole);
+            return eulaDialog.exec() == QDialogButtonBox::AcceptRole;
+        }();
+
+    if (!acceptedEula)
+        return false;
+
+    qnSettings->setAcceptedEulaVersion(QnClientAppInfo::eulaVersion());
+    return true;
+}
+
 bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)
 {
     /* Set authentication parameters from command line. */
@@ -283,8 +340,15 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
     return true;
 }
 
-bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
+QnWorkbenchContext::StartupParametersCode
+    QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& startupParams)
 {
+    const bool showEula = qnRuntime->isDesktopMode()
+        && qnSettings->acceptedEulaVersion() < QnClientAppInfo::eulaVersion();
+
+    if (showEula && !showEulaMessage())
+        return forcedExit;
+
     /* Process input files. */
     bool haveInputFiles = false;
     {
@@ -295,7 +359,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         for (const auto& arg : qApp->arguments())
         {
             if (!skipArg)
-                haveInputFiles |= window && window->handleMessage(arg);
+                haveInputFiles |= window && window->handleOpenFile(arg);
             skipArg = false;
         }
     }
@@ -315,7 +379,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         && !connectUsingCommandLineAuth(startupParams)
         )
     {
-        return false;
+        return wrongParameters;
     }
 
     if (!startupParams.videoWallGuid.isNull())
@@ -336,9 +400,14 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         QByteArray data = QByteArray::fromBase64(startupParams.instantDrop.toLatin1());
         menu()->trigger(action::InstantDropResourcesAction, {Qn::SerializedDataRole, data});
     }
+    else if (!startupParams.layoutName.isEmpty())
+    {
+        const auto parameters = action::Parameters(Qn::LayoutNameRole, startupParams.layoutName);
+        menu()->trigger(action::DelayedDropResourcesAction, parameters);
+    }
 
     /* Show beta version warning message for the main instance only */
-    bool showBetaWarning = QnAppInfo::beta()
+    const bool showBetaWarning = QnAppInfo::beta()
         && !startupParams.allowMultipleClientInstances
         && qnRuntime->isDesktopMode()
         && !qnRuntime->isDevMode()
@@ -352,7 +421,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     menu()->trigger(action::ShowFpsAction);
 #endif
 
-    return true;
+    return success;
 }
 
 void QnWorkbenchContext::initWorkarounds()

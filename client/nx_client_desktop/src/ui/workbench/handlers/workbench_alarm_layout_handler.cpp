@@ -81,7 +81,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const vms::event::AbstractActionPtr& action)
         {
-            if (action->actionType() != vms::event::showOnAlarmLayoutAction)
+            if (action->actionType() != vms::api::ActionType::showOnAlarmLayoutAction)
                 return;
 
             if (!context()->user())
@@ -90,7 +90,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             const auto params = action->getParams();
 
             /* Skip action if it contains list of users and we are not on the list. */
-            if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
+            if (!QnBusiness::actionAllowedForUser(action, context()->user()))
                 return;
 
             auto targetCameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(

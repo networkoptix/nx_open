@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation type="unfinished">Disable only if the client takes too much CPU</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation type="unfinished">Maximum Live Buffer Length</translation>
     </message>
@@ -173,11 +168,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation type="unfinished">Fixed Archive Length</translation>
     </message>
@@ -757,13 +747,28 @@
       <source>PTZ</source>
       <translation type="unfinished">PTZ</translation>
     </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation type="unfinished">Generate</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation type="unfinished">Reset</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation type="unfinished">Logical ID</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation type="unfinished">Input Id</translation>
+      <source>Input ID</source>
+      <translation type="unfinished">Input ID</translation>
     </message>
   </context>
   <context>
@@ -788,8 +793,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation type="unfinished">Output Id:</translation>
+      <source>Output ID:</source>
+      <translation type="unfinished">Output ID:</translation>
     </message>
   </context>
   <context>
@@ -958,6 +963,14 @@
       <location/>
       <source>Description contains:</source>
       <translation type="unfinished">Description contains:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation type="unfinished">Category</translation>
     </message>
   </context>
   <context>
@@ -1495,8 +1508,8 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation type="unfinished">Locked to Hardware Id:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation type="unfinished">Locked to Hardware ID:</translation>
     </message>
   </context>
   <context>
@@ -1594,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation type="unfinished">Hardware Id</translation>
+      <source>Hardware ID</source>
+      <translation type="unfinished">Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -1724,6 +1737,11 @@
       <source>Tour cycle</source>
       <translation type="unfinished">Tour cycle</translation>
     </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+    </message>
   </context>
   <context>
     <name>MessageBox</name>
@@ -1785,8 +1803,8 @@
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -1972,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation type="unfinished">Enter a valid username and password...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation type="unfinished">Filename:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation type="unfinished">Select file...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>
@@ -2665,18 +2706,6 @@
       <source>Reset</source>
       <translation type="unfinished">Reset</translation>
     </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -3032,15 +3061,18 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <source>New role</source>
+      <translation type="unfinished">New role</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation type="unfinished">New role</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>
@@ -3065,11 +3097,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation type="unfinished">Motion Detection</translation>
     </message>
@@ -3088,11 +3115,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation type="unfinished">Cancel</translation>
     </message>
@@ -3101,11 +3123,6 @@ Click &quot;New role&quot; button to create one.</translation>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
       <translation type="unfinished">Upload Video</translation>
     </message>

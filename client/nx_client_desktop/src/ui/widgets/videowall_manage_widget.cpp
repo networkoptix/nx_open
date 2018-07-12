@@ -150,6 +150,17 @@ void QnVideowallManageWidget::setColors(const QnVideowallManageWidgetColors &col
     update();
 }
 
+QList<QRect> QnVideowallManageWidget::screenGeometries() const
+{
+    return m_screenGeometries;
+}
+
+void QnVideowallManageWidget::setScreenGeometries(const QList<QRect>& value)
+{
+    m_screenGeometries = value;
+    d_ptr->initScreenGeometries();
+}
+
 int QnVideowallManageWidget::proposedItemsCount() const {
     Q_D(const QnVideowallManageWidget);
     return d->proposedItemsCount();

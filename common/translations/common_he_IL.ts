@@ -53,11 +53,6 @@
       <translation>למערכת %1 שהתגלתה יש גרסה שאינה תואמת %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>אין אפשרות להתחבר למערכת השנייה מפני שהמערכת הנוכחית כבר מחוברת ל- %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>המערכת %1 שהתגלתה נמצאת במצב בטוח.</translation>
@@ -68,21 +63,6 @@
       <translation>לא ניתן להגדיר את המערכת מרחוק %1.</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>שתי המערכות מחוברות ל- %1. המיזוג אסור.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>מערכות אלה בנויות עם כתובת אתר שונה של %1. המיזוג אסור.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>מערכת ענן מאפשרת למזג רק עם שאינה בענן. שם המערכת והסיסמה נלקחים מהמערכת שבענן.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>מערכת חדשה</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>מערכת %1 שהתגלתה אינה תואמת למערכת הנוכחית.</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>אין אפשרות להתחבר למערכת השנייה מפני שהמערכת הנוכחית כבר מחוברת ל- %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1 המערכת יכולה להיות ממוזגת רק עם לא%1. שם המערכת והסיסמה נלקחים מתוך %1 מערכת.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>שתי המערכות מחוברות ל- %1. המיזוג אסור.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>מערכות אלה בנויות עם כתובת אתר שונה של %1. המיזוג אסור.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>אירוע מערכת</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>המערכת כבר קשורה לענן (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>השרת אינו מחובר לאינטרנט.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>נכשלה שמירת אישורי ענן ל- DB המקומי</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>שמירת הענן בעלים ל- DB המקומי נכשלה</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>לא ניתן להתחבר לענן: %1</translation>
     </message>
   </context>
   <context>
@@ -314,6 +334,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>ראשית, נסה להפעיל את ההקלטה (אם היא כבויה) ולהקטין את ה fps בהגדרות התקן הקלט/פלט (שגיאה &quot;%1&quot;).</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>אנא עדכן קושחה. הגירסה הנתמכת המינימלית היא %1. גרסת הקושחה הגרסה הנוכחית היא %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -488,7 +512,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Bridge</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
@@ -565,7 +589,7 @@
       <translation>שגיאה לא מוכרת</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
     </message>
   </context>
@@ -608,10 +632,10 @@
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>מכשיר %n</numerusform>
         <numerusform>%n מכשירים</numerusform>
-        <numerusform>%n התקנים</numerusform>
-        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n מכשירים</numerusform>
+        <numerusform>%n מכשירים</numerusform>
+        <numerusform>%n מכשירים</numerusform>
       </translation>
     </message>
     <message>
@@ -650,18 +674,18 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n מודול קלט/פלט אחד</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
+        <numerusform>%n מודול קלט/פלט אחד</numerusform>
+        <numerusform>%n מודול קלט/פלט אחד</numerusform>
+        <numerusform>%n מודול קלט/פלט אחד</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
-        <numerusform>%n מודולי קלט/פלט</numerusform>
+        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
+        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
+        <numerusform>%n שגיאה בכתיבת קובץ. אין מספיק מקום פנוי</numerusform>
       </translation>
     </message>
     <message>
@@ -700,12 +724,12 @@
       <translation>סימן מים: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>מזהה חומרה: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>רישיון זמני</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>מזהה חומרה: %1</translation>
     </message>
   </context>
   <context>
@@ -840,169 +864,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>פרמטר לא תקין</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>שניות</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>דקות</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>שעות</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>ימים</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>wks</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>yrs</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>שניות</numerusform>
-        <numerusform>שניות</numerusform>
-        <numerusform>שניות</numerusform>
-        <numerusform>שניות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>שעות</numerusform>
-        <numerusform>שעות</numerusform>
-        <numerusform>שעות</numerusform>
-        <numerusform>שעות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>שבועות</numerusform>
-        <numerusform>שבועות</numerusform>
-        <numerusform>שבועות</numerusform>
-        <numerusform>שבועות</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>שנים</numerusform>
-        <numerusform>שנים</numerusform>
-        <numerusform>שנים</numerusform>
-        <numerusform>שנים</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1585,6 +1446,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 ב%2</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>פתח את הפריסה</translation>
     </message>
   </context>
   <context>

@@ -61,6 +61,12 @@ namespace ec2
             return m_ecURL;
         }
 
+        void setUrl(const nx::utils::Url& url)
+        {
+            QnMutexLocker lk( &m_mutex );
+            m_ecURL = url;
+        }
+
         QnUuid getId() const
         {
             QnMutexLocker lk(&m_mutex);
@@ -88,5 +94,6 @@ namespace ec2
 
     typedef std::shared_ptr<FixedUrlClientQueryProcessor> FixedUrlClientQueryProcessorPtr;
 }
+
 
 #endif  //FIXED_URL_CLIENT_QUERY_PROCESSOR_H

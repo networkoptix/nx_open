@@ -12,6 +12,7 @@ class AbstractAccountManager;
 class StreeManager;
 class AbstractSystemManager;
 class AbstractSystemSharingManager;
+class AbstractTemporaryAccountPasswordManager;
 
 /**
  * Performs request authorization based on authentication info,
@@ -29,7 +30,8 @@ public:
         const StreeManager& stree,
         const AbstractAccountManager& accountManager,
         const AbstractSystemManager& systemManager,
-        const AbstractSystemSharingManager& systemSharingManager);
+        const AbstractSystemSharingManager& systemSharingManager,
+        const AbstractTemporaryAccountPasswordManager& temporaryAccountPasswordManager);
 
     /**
      * @param dataToAuthorize Authorization information can
@@ -49,6 +51,7 @@ private:
     const AbstractAccountManager& m_accountManager;
     const AbstractSystemManager& m_systemManager;
     const AbstractSystemSharingManager& m_systemSharingManager;
+    const AbstractTemporaryAccountPasswordManager& m_temporaryAccountPasswordManager;
 
     nx::utils::stree::ResourceContainer addHelperAttributes(
         const nx::utils::stree::AbstractResourceReader& authenticationProperties,
@@ -59,6 +62,15 @@ private:
         DataActionType requestedAction,
         const nx::utils::stree::AbstractResourceReader& inputData,
         nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const;
+
+    bool authorizeRequestToSystemBeingMerged(
+        EntityType requestedEntity,
+        DataActionType requestedAction,
+        const nx::utils::stree::AbstractResourceReader& inputData,
+        nx::utils::stree::AbstractResourceWriter* outAuthzInfo) const;
+
+    bool authorizeTemporaryCredentials(
+        const nx::utils::stree::AbstractResourceReader& inputData) const;
 
     bool checkDynamicRules(
         const nx::utils::stree::AbstractResourceReader& inputData,

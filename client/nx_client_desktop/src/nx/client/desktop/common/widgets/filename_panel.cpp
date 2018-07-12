@@ -1,10 +1,12 @@
 #include "filename_panel.h"
 #include "ui_filename_panel.h"
 
+#include <QtWidgets/QFileDialog>
+
 #include <client/client_settings.h>
 
-#include <ui/common/aligner.h>
-#include <ui/dialogs/common/file_dialog.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -35,14 +37,14 @@ FilenamePanel::FilenamePanel(QWidget* parent):
     ui->extensionsComboBox->setMaximumWidth(kFilterComboBoxWidth);
     ui->extensionsComboBox->setCustomTextRole(Qn::ShortTextRole);
 
-    const auto aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    const auto aligner = new Aligner(this);
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ui->folderInputField, ui->nameInputField});
 
     ui->folderInputField->setTitle(tr("Folder"));
     ui->folderInputField->setReadOnly(true);
     ui->nameInputField->setTitle(tr("Name"));
-    ui->nameInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Name cannot be empty.")));
+    ui->nameInputField->setValidator(defaultNonEmptyValidator(tr("Name cannot be empty.")));
 
     connect(this, &FilenamePanel::filenameChanged, this,
         [this](const Filename& filename)
@@ -50,7 +52,7 @@ FilenamePanel::FilenamePanel(QWidget* parent):
             ui->nameInputField->setToolTip(filename.completeFileName());
         });
 
-    connect(ui->nameInputField, &QnInputField::textChanged, this,
+    connect(ui->nameInputField, &InputField::textChanged, this,
         [this](const QString& text)
         {
             d->filename.name = text;
@@ -60,10 +62,10 @@ FilenamePanel::FilenamePanel(QWidget* parent):
     connect(ui->browsePushButton, &QPushButton::clicked, this,
         [this]
         {
-            const auto folder = QnFileDialog::getExistingDirectory(this,
+            const auto folder = QFileDialog::getExistingDirectory(this,
                 tr("Select folder..."),
                 d->filename.path,
-                QFileDialog::ShowDirsOnly);
+                QnCustomFileDialog::directoryDialogOptions());
 
             // Workaround for bug QTBUG-34767
             if (nx::utils::AppInfo::isMacOsX())

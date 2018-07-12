@@ -1,19 +1,15 @@
+#include <common/common_module.h>
 #include <core/resource_access/providers/cached_base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/videowall_item_access_provider.h>
-
 #include <core/resource_access/resource_access_manager.h>
-
 #include <core/resource_management/resource_pool.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 
-#include <common/common_module.h>
-
-#include <nx_ec/data/api_user_role_data.h>
+#include <nx/vms/api/data/user_role_data.h>
 
 using namespace nx::core::access;
 
@@ -30,7 +26,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkSource)
 {
     auto videoWall = addVideoWall();
     auto target = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
 
     ASSERT_EQ(accessProvider()->accessibleVia(user, target), Source::videowall);
 }
@@ -39,7 +35,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
-    ec2::ApiUserRoleData userRole;
+    nx::vms::api::UserRoleData userRole;
     QnResourceAccessSubject subject(userRole);
     ASSERT_FALSE(subject.isValid());
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
@@ -47,14 +43,14 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkInvalidAccess)
 
 TEST_F(QnCachedVideoWallItemAccessProviderTest, checkAccessToInvalidResource)
 {
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     ASSERT_FALSE(accessProvider()->hasAccess(user, QnResourcePtr()));
 }
 
 TEST_F(QnCachedVideoWallItemAccessProviderTest, checkDefaultCamera)
 {
     auto target = addCamera();
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
@@ -62,7 +58,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkByAccessRights)
 {
     auto target = addLayout();
     auto videoWall = addVideoWall();
-    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    auto user = addUser(GlobalPermission::accessAllMedia);
 
     QnVideoWallItem item;
     item.layout = target->getId();
@@ -77,10 +73,10 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkAccessRightsChange)
     auto videoWall = addVideoWall();
     auto target = addLayoutForVideoWall(videoWall);
 
-    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    auto user = addUser(GlobalPermission::accessAllMedia);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 
-    user->setRawPermissions(Qn::GlobalControlVideoWallPermission);
+    user->setRawPermissions(GlobalPermission::controlVideowall);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -88,14 +84,14 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutOnVideoWall)
 {
     auto videoWall = addVideoWall();
     auto target = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutAddedBeforeVideowall)
 {
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     auto videoWall = createVideoWall();
 
@@ -109,7 +105,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutAddedBeforeVideowall)
 
 TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutAddedBeforeVideowallItem)
 {
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     auto videoWall = addVideoWall();
 
@@ -128,7 +124,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutAddedBeforeVideowallI
 
 TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutAddedAfterVideowallItem)
 {
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     auto videoWall = addVideoWall();
 
@@ -149,7 +145,22 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraOnVideoWall)
     auto target = addCamera();
     auto videoWall = addVideoWall();
     auto layout = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
+
+    QnLayoutItemData layoutItem;
+    layoutItem.resource.id = target->getId();
+    layout->addItem(layoutItem);
+
+    ASSERT_TRUE(accessProvider()->hasAccess(user, target));
+}
+
+TEST_F(QnCachedVideoWallItemAccessProviderTest, checkPushMyScreen)
+{
+    auto target = addCamera();
+    target->addFlags(Qn::desktop_camera);
+    auto videoWall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videoWall);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = target->getId();
@@ -162,7 +173,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoW
 {
     auto target = addCamera();
     auto videoWall = addVideoWall();
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
     auto layout = createLayout();
     layout->addFlags(Qn::remote);
     layout->setParentId(videoWall->getId());
@@ -186,7 +197,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall_3_
 {
     auto target = addCamera();
     auto videoWall = addVideoWall();
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     /* What's going on on drop. */
     auto layout = createLayout();
@@ -215,7 +226,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall_3_
     vwitem.uuid = QnUuid::createUuid();
     videoWall->items()->addItem(vwitem);
 
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     /* What's going on on drop. */
     auto layout = createLayout();
@@ -241,7 +252,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkLayoutRemoved)
     auto videoWall = addVideoWall();
     auto layout = addLayoutForVideoWall(videoWall);
 
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = target->getId();
@@ -259,7 +270,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraAddedOnVideoWall)
     auto target = addCamera();
     auto videoWall = addVideoWall();
     auto layout = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = target->getId();
@@ -273,7 +284,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkVideoWallAdded)
     auto camera = addCamera();
     auto videoWall = createVideoWall();
     auto layout = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = camera->getId();
@@ -291,7 +302,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkVideoWallRemoved)
     auto camera = addCamera();
     auto videoWall = addVideoWall();
     auto layout = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalAdminPermission);
+    auto user = addUser(GlobalPermission::admin);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = camera->getId();
@@ -309,7 +320,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, accessProviders)
     auto camera = addCamera();
     auto videoWall = addVideoWall();
     auto layout = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = camera->getId();
@@ -326,10 +337,10 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkByLayoutParentId)
 {
     auto videoWall = addVideoWall();
     auto target = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalAccessAllMediaPermission);
+    auto user = addUser(GlobalPermission::accessAllMedia);
 
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
-    user->setRawPermissions(Qn::GlobalControlVideoWallPermission);
+    user->setRawPermissions(GlobalPermission::controlVideowall);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -338,7 +349,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraOnVideoWallByParentId
     auto target = addCamera();
     auto videoWall = addVideoWall();
     auto layout = addLayoutForVideoWall(videoWall);
-    auto user = addUser(Qn::GlobalControlVideoWallPermission);
+    auto user = addUser(GlobalPermission::controlVideowall);
 
     QnLayoutItemData layoutItem;
     layoutItem.resource.id = target->getId();

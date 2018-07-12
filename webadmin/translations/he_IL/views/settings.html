@@ -15,8 +15,8 @@
             </alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>פורט</h3>
@@ -42,13 +42,8 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>נתק את השרת מן המערכת</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            ארכיון הווידאו יישאר שלם. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">נתק את השרת מן המערכת</button></p>
-                    </div>
-                    <div>
-                        <h3>נתק את השרת מן המערכת</h3>
-                        <p>פעולה זו תנתק שרת מהמערכת תוך שמירה על מסד נתונים, משתמשים מקומיים והגדרות. ארכיון הווידאו יישאר שלם. <b> משתמשי ענן יימחקו. </b></p>
+                        <p>פעולה זו תנתק שרת מהמערכת תוך שמירה על מסד הנתונים, משתמשים מקומיים ותצורה.
+                            ארכיון הווידאו יישאר שלם. כל משתמשי הענן יימחקו.</p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">נתק את השרת מן המערכת</button></p>
                     </div>
                     <div>
@@ -58,7 +53,7 @@
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
                             <h3>שנה סיסמת מנהל מערכת</h3>
-                            <p>אם המערכת היא מקומית (לא מחוברת אל הענן) פעולה זו תשנה את הסיסמה עבור המשתמש "admin" ואת סיסמת השחזור (root) בשרתים מסוימים. <br>אחרת פעולה זו תשנה את סיסמת השחזור בלבד.</p>
+                            <p>אם המערכת היא מקומית (לא מחוברת אל הענן) פעולה זו תשנה את הסיסמא עבור המשתמש "admin" ואת סיסמת השחזור (root) בשרתים מסוימים. <br>אחרת פעולה זו תשנה את סיסמת השחזור בלבד.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
@@ -69,9 +64,9 @@
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>שם</h3>
                         <div class="row">
@@ -116,13 +111,13 @@
                                    target="_blank">צור חשבון {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Device Network Settings</h3>
+                        <h3>הגדרות רשת להתקן.</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">שמור הגדרות ואתחל את ההתקן</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>תאריך ושעה</h3>
@@ -147,7 +142,7 @@
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -160,7 +155,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -177,8 +172,8 @@
                         <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">הפעל לקוח</button>                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">עצור לקוח</button></p>
                         <p>השתמש במקלדת/עכבר או יישום נייד כדי לשלוט בו.</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

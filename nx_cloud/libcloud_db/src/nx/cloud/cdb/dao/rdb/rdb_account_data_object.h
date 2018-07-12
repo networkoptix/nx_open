@@ -2,9 +2,9 @@
 
 #include <chrono>
 
-#include <nx/utils/db/filter.h>
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/filter.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include "../account_data_object.h"
 
@@ -17,62 +17,59 @@ class AccountDataObject:
     public AbstractAccountDataObject
 {
 public:
-    virtual nx::utils::db::DBResult insert(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult insert(
+        nx::sql::QueryContext* queryContext,
         const api::AccountData& account) override;
 
-    virtual nx::utils::db::DBResult update(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult update(
+        nx::sql::QueryContext* queryContext,
         const api::AccountData& account) override;
 
-    virtual nx::utils::db::DBResult fetchAccountByEmail(
-        nx::utils::db::QueryContext* queryContext,
-        const std::string& accountEmail,
-        data::AccountData* const accountData) override;
+    virtual std::optional<api::AccountData> fetchAccountByEmail(
+        nx::sql::QueryContext* queryContext,
+        const std::string& accountEmail) override;
 
-    virtual nx::utils::db::DBResult fetchAccounts(
-        nx::utils::db::QueryContext* queryContext,
-        std::vector<data::AccountData>* accounts) override;
+    virtual nx::sql::DBResult fetchAccounts(
+        nx::sql::QueryContext* queryContext,
+        std::vector<api::AccountData>* accounts) override;
 
     virtual void insertEmailVerificationCode(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const std::string& accountEmail,
         const std::string& emailVerificationCode,
         const QDateTime& codeExpirationTime) override;
 
-    virtual boost::optional<std::string> getVerificationCodeByAccountEmail(
-        nx::utils::db::QueryContext* queryContext,
+    virtual std::optional<std::string> getVerificationCodeByAccountEmail(
+        nx::sql::QueryContext* queryContext,
         const std::string& accountEmail) override;
 
-    virtual nx::utils::db::DBResult getAccountEmailByVerificationCode(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult getAccountEmailByVerificationCode(
+        nx::sql::QueryContext* queryContext,
         const data::AccountConfirmationCode& verificationCode,
         std::string* accountEmail) override;
 
-    virtual nx::utils::db::DBResult removeVerificationCode(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult removeVerificationCode(
+        nx::sql::QueryContext* queryContext,
         const data::AccountConfirmationCode& verificationCode) override;
 
-    virtual nx::utils::db::DBResult updateAccountToActiveStatus(
-        nx::utils::db::QueryContext* queryContext,
+    virtual nx::sql::DBResult updateAccountToActiveStatus(
+        nx::sql::QueryContext* queryContext,
         const std::string& accountEmail,
         std::chrono::system_clock::time_point activationTime) override;
 
     virtual void updateAccount(
-        nx::utils::db::QueryContext* queryContext,
+        nx::sql::QueryContext* queryContext,
         const std::string& accountEmail,
-        const api::AccountUpdateData& accountUpdateData,
-        bool activateAccountIfNotActive) override;
+        const api::AccountUpdateData& accountUpdateData) override;
 
 private:
-    std::vector<nx::utils::db::SqlFilterField> prepareAccountFieldsToUpdate(
-        const api::AccountUpdateData& accountData,
-        bool activateAccountIfNotActive);
+    std::vector<nx::sql::SqlFilterField> prepareAccountFieldsToUpdate(
+        const api::AccountUpdateData& accountData);
 
     void executeUpdateAccountQuery(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& accountEmail,
-        std::vector<nx::utils::db::SqlFilterField> fieldsToSet);
+        std::vector<nx::sql::SqlFilterField> fieldsToSet);
 };
 
 } // namespace rdb

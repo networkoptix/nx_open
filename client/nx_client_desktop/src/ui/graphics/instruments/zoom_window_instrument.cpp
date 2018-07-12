@@ -7,6 +7,8 @@
 #include <nx/utils/random.h>
 
 #include <nx/client/core/utils/geometry.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/layout_item_data.h>
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/animation/opacity_animator.h>
@@ -24,6 +26,7 @@
 #include <ui/help/help_topics.h>
 
 #include <core/resource_management/resource_runtime_data.h>
+#include <ini.h>
 
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
@@ -38,6 +41,7 @@ static constexpr qreal kZoomWindowMinSize = 0.1;
 static constexpr qreal kZoomWindowMaxSize = 0.9;
 static constexpr qreal kZoomWindowMinAspectRatio = kZoomWindowMinSize / kZoomWindowMaxSize;
 static constexpr qreal kZoomWindowMaxAspectRatio = kZoomWindowMaxSize / kZoomWindowMinSize;
+static constexpr qreal kVerySmall = 0.00001;
 static constexpr qreal kMaxZoomWindowAr = 21.0 / 9.0;
 static constexpr int kZoomLineWidth = 2;
 static constexpr int kFrameWidth = 1;
@@ -124,6 +128,8 @@ Direction inversed(Direction value)
             return Direction::Left;
         case Direction::TopRight:
             return Direction::BottomLeft;
+        case Direction::NoDirection:
+            break;
     }
 
     return NoDirection;
@@ -166,6 +172,8 @@ QPointF sourceDirectionPoint(const QRectF& from, Direction direction)
             return QPointF(from.right(), center.y());
         case Direction::TopRight:
             return from.topRight();
+        case Direction::NoDirection:
+            break;
     }
 
     return center;
@@ -495,7 +503,11 @@ private:
     {
         NX_EXPECT(widget);
         if (widget)
-            widget->setGeometry(Geometry::subRect(rect(), m_rectByWidget.value(widget)));
+        {
+            auto widgetRect = m_rectByWidget.value(widget);
+            auto fitted = Geometry::subRect(rect(), widgetRect);
+            widget->setGeometry(fitted);
+        }
     }
 
 private:
@@ -522,13 +534,17 @@ QRectF ZoomWindowWidget::constrainedGeometry(
     auto overlayWidget = this->overlay();
     QRectF result = geometry;
 
+    const bool ignoreSizeConstrains = nx::client::desktop::ini().ignoreZoomWindowConstraints;
+    const qreal kMinSize = ignoreSizeConstrains ? kVerySmall : kZoomWindowMinSize;
+    const qreal kMaxSize = ignoreSizeConstrains ? 1.0 : kZoomWindowMaxSize;
+
     /* Size constraints go first. */
     QSizeF maxSize = geometry.size();
     if (overlayWidget)
     {
         maxSize = Geometry::cwiseMax(
-            Geometry::cwiseMin(maxSize, overlayWidget->size() * kZoomWindowMaxSize),
-            overlayWidget->size() * kZoomWindowMinSize);
+            Geometry::cwiseMin(maxSize, overlayWidget->size() * kMaxSize),
+            overlayWidget->size() * kMinSize);
     }
 
     result = ConstrainedResizable::constrainedGeometry(
@@ -1057,6 +1073,10 @@ void ZoomWindowInstrument::dragMove(DragInfo* info)
 
 void ZoomWindowInstrument::finishDrag(DragInfo* /*info*/)
 {
+    const bool ignoreSizeConstrains = nx::client::desktop::ini().ignoreZoomWindowConstraints;
+    const qreal kMinSize = ignoreSizeConstrains ? kVerySmall : kZoomWindowMinSize;
+    const qreal kMaxSize = ignoreSizeConstrains ? 1.0 : kZoomWindowMaxSize;
+
     if (target())
     {
         ensureSelectionItem();
@@ -1064,21 +1084,21 @@ void ZoomWindowInstrument::finishDrag(DragInfo* /*info*/)
 
         QRectF zoomRect = Geometry::cwiseDiv(selectionItem()->rect(), target()->size());
         if (qFuzzyIsNull(zoomRect.width()))
-            zoomRect.setWidth(kZoomWindowMinSize);
+            zoomRect.setWidth(kMinSize);
         if (qFuzzyIsNull(zoomRect.height()))
-            zoomRect.setHeight(kZoomWindowMinSize);
+            zoomRect.setHeight(kMinSize);
 
         qreal ar = Geometry::aspectRatio(zoomRect);
         ar = qBound(kZoomWindowMinAspectRatio, ar, kZoomWindowMaxAspectRatio);
 
-        if (zoomRect.width() < kZoomWindowMinSize || zoomRect.height() < kZoomWindowMinSize)
+        if (zoomRect.width() < kMinSize || zoomRect.height() < kMinSize)
         {
-            const QSizeF minSize(kZoomWindowMinSize, kZoomWindowMinSize);
+            const QSizeF minSize(kMinSize, kMinSize);
             zoomRect = Geometry::expanded(ar, minSize, zoomRect.center(), Qt::KeepAspectRatioByExpanding);
         }
-        else if (zoomRect.width() > kZoomWindowMaxSize || zoomRect.height() > kZoomWindowMaxSize)
+        else if (zoomRect.width() > kMaxSize || zoomRect.height() > kMaxSize)
         {
-            const QSizeF maxSize(kZoomWindowMaxSize, kZoomWindowMaxSize);
+            const QSizeF maxSize(kMaxSize, kMaxSize);
             zoomRect = Geometry::expanded(ar, maxSize, zoomRect.center(), Qt::KeepAspectRatio);
         }
 
@@ -1204,15 +1224,17 @@ void ZoomWindowInstrument::at_resizing(
 
     QRectF zoomRect = widget->zoomRect();
     NX_EXPECT(oldTargetWidget);
-    QSizeF oldLayoutSize = oldTargetWidget->channelLayout()->size();
-    QSizeF newLayoutSize = newTargetWidget->channelLayout()->size();
-    if (oldLayoutSize != newLayoutSize)
-    {
-        QSizeF zoomSize = Geometry::cwiseDiv(
-            Geometry::cwiseMul(zoomRect.size(), oldLayoutSize), newLayoutSize);
-        zoomRect = Geometry::movedInto(
-            QRectF(zoomRect.topLeft(), zoomSize), QRectF(0.0, 0.0, 1.0, 1.0));
-    }
+    QnLayoutItemData oldLayoutData = oldTargetWidget->item()->data();
+    QnLayoutItemData newLayoutData = newTargetWidget->item()->data();
+    auto oldAbsoluteSize = oldTargetWidget->rect();
+    auto newAbsoluteSize = newTargetWidget->rect();
+
+    // This variant tries to keep real AR of a zoom window.
+    // Calculating real scene width of zoom window.
+    qreal realWidth = oldAbsoluteSize.width() * zoomRect.width();
+    qreal realHeight = oldAbsoluteSize.height() * zoomRect.height();
+    QSizeF newZoomSize(realWidth / newAbsoluteSize.width(), realHeight / newAbsoluteSize.height());
+    zoomRect.setSize(newZoomSize);
 
     emit zoomTargetChanged(widget, zoomRect, newTargetWidget);
     m_resizingInstrument->rehandle();

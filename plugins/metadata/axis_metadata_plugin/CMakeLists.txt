@@ -2,11 +2,10 @@ nx_add_server_plugin(axis_metadata_plugin
     PRIVATE_LIBS
         openssl
         Qt5::Core
-        common
+        nx_plugin_utils
         nx_network
         nx_utils
         nx_fusion
-        mediaserver_core
         nx_kit
 )
 
@@ -17,3 +16,4 @@ include_directories(
 )
 
 add_definitions(-DWITH_OPENSSL)
+add_definitions(-DNX_PRINT_TO_LOG)

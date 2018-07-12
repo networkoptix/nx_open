@@ -29,17 +29,23 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_settings.h>
 #include <nx/vms/discovery/manager.h>
+#include <common/static_common_module.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
-struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
-class QnLdapManager;
 struct BeforeRestoreDbData;
-namespace ec2 { class CrashReporter; }
+class TimeBasedNonceProvider;
 
-namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
+namespace ec2 {
+
+class CrashReporter;
+class LocalConnectionFactory;
+
+} // namespace ec2
+
+namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
 
 void restartServer(int restartTimeout);
 
@@ -48,12 +54,11 @@ class CmdLineArguments
 public:
     QString logLevel;
     QString httpLogLevel;
-    QString hwLogLevel;
+    QString systemLogLevel;
     QString ec2TranLogLevel;
     QString permissionsLogLevel;
 
     QString rebuildArchive;
-    QString devModeKey;
     QString allowedDiscoveryPeers;
     QString ifListFilter;
     bool cleanupDb;
@@ -71,13 +76,6 @@ public:
     QString crashDirectory;
 
     CmdLineArguments():
-        logLevel(
-            #if defined(_DEBUG)
-                lit("DEBUG")
-            #else
-                lit("INFO")
-            #endif
-        ),
         cleanupDb(false),
         moveHandlingCameras(false),
         showVersion(false),
@@ -114,7 +112,16 @@ public:
             return nullptr;
     }
 
+    QnMediaServerModule* serverModule() const
+    {
+        if (const auto& module = m_serverModule.lock())
+            return module.get();
+        else
+            return nullptr;
+    }
+
     MSSettings* serverSettings() const { return m_settings.get(); }
+    nx::mediaserver::Authenticator* authenticator() const { return m_universalTcpListener->authenticator(); }
 
     static void configureApiRestrictions(nx::network::http::AuthMethodRestrictionList* restrictions);
 
@@ -131,16 +138,15 @@ private slots:
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage,
-        nx::vms::event::EventReason reason);
+        nx::vms::api::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
-    void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::event::EventReason code);
+    void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::api::EventReason code);
     void at_timer();
     void at_connectionOpened();
     void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
-    void at_timeChanged(qint64 time);
     void at_emptyDigestDetected(
         const QnUserResourcePtr& user, const QString& login, const QString& password);
     void at_databaseDumped();
@@ -162,13 +168,14 @@ private:
     void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
 
     bool initTcpListener(
+        TimeBasedNonceProvider* timeBasedNonceProvider,
         nx::vms::cloud_integration::CloudManagerGroup* const cloudManagerGroup,
-        ec2::TransactionMessageBusAdapter* messageBus);
+        ec2::LocalConnectionFactory* ec2ConnectionFactory);
     void initializeCloudConnect();
-    void changeSystemUser(const QString& userName);
+    void prepareOsResources();
 
     std::unique_ptr<nx::network::upnp::PortMapper> initializeUpnpPortMapper();
-    Qn::ServerFlags calcServerFlags();
+    nx::vms::api::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     void initPublicIpDiscoveryUpdate();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
@@ -190,6 +197,11 @@ private:
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
     void connectArchiveIntegrityWatcher();
+    QnMediaServerResourcePtr registerServer(
+        ec2::AbstractECConnectionPtr ec2Connection,
+        const QnMediaServerResourcePtr &server,
+        bool isNewServerInstance);
+    nx::utils::Url appServerConnectionUrl() const;
 
 private:
     int m_argc;
@@ -197,7 +209,6 @@ private:
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
-    std::vector<std::unique_ptr<nx::network::AbstractStreamServerSocket>> m_preparedTcpServerSockets;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
@@ -217,6 +228,7 @@ private:
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
+    static std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
     const bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
     bool m_stopObjectsCalled = false;

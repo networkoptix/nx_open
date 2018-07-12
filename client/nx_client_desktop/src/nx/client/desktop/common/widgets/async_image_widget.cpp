@@ -14,10 +14,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/style/helper.h>
-#include <ui/widgets/common/autoscaled_plain_text.h>
-#include <ui/widgets/common/busy_indicator.h>
+#include <nx/client/desktop/common/widgets/autoscaled_plain_text.h>
+#include <nx/client/desktop/common/widgets/busy_indicator.h>
 
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -33,11 +33,11 @@ namespace
     static const QSize kDefaultThumbnailSize(1920, 1080);
 }
 
-/* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
+/* BusyIndicatorWidget draws dots snapped to the pixel grid.
  * This descendant when it is downscaled draws dots generally not snapped. */
-class QnAutoscaledBusyIndicatorWidget: public QnBusyIndicatorWidget
+class QnAutoscaledBusyIndicatorWidget: public BusyIndicatorWidget
 {
-    using base_type = QnBusyIndicatorWidget;
+    using base_type = BusyIndicatorWidget;
 
 public:
     QnAutoscaledBusyIndicatorWidget(QWidget* parent = nullptr):
@@ -67,7 +67,7 @@ public:
 
 AsyncImageWidget::AsyncImageWidget(QWidget* parent):
     base_type(parent),
-    m_placeholder(new QnAutoscaledPlainText(this)),
+    m_placeholder(new AutoscaledPlainText(this)),
     m_indicator(new QnAutoscaledBusyIndicatorWidget(this))
 {
     retranslateUi();
@@ -80,23 +80,23 @@ AsyncImageWidget::AsyncImageWidget(QWidget* parent):
     m_placeholder->setAlignment(Qt::AlignCenter);
     m_placeholder->setContentsMargins(kMinIndicationMargins);
     m_placeholder->setHidden(true);
-    new QnWidgetAnchor(m_placeholder);
+    new WidgetAnchor(m_placeholder);
 
     m_indicator->setContentsMargins(kMinIndicationMargins);
     m_indicator->setBorderRole(QPalette::Window);
-    new QnWidgetAnchor(m_indicator);
+    new WidgetAnchor(m_indicator);
 }
 
 AsyncImageWidget::~AsyncImageWidget()
 {
 }
 
-QnImageProvider* AsyncImageWidget::imageProvider() const
+ImageProvider* AsyncImageWidget::imageProvider() const
 {
     return m_imageProvider.data();
 }
 
-void AsyncImageWidget::setImageProvider(QnImageProvider* provider)
+void AsyncImageWidget::setImageProvider(ImageProvider* provider)
 {
     if (m_imageProvider == provider)
         return;
@@ -105,16 +105,17 @@ void AsyncImageWidget::setImageProvider(QnImageProvider* provider)
         m_imageProvider->disconnect(this);
 
     m_imageProvider = provider;
+    m_previousStatus = Qn::ThumbnailStatus::Invalid;
 
     if (m_imageProvider)
     {
-        connect(m_imageProvider, &QnImageProvider::imageChanged, this,
+        connect(m_imageProvider, &ImageProvider::imageChanged, this,
             &AsyncImageWidget::updateThumbnailImage);
 
-        connect(m_imageProvider, &QnImageProvider::statusChanged, this,
+        connect(m_imageProvider, &ImageProvider::statusChanged, this,
             &AsyncImageWidget::updateThumbnailStatus);
 
-        connect(m_imageProvider, &QnImageProvider::sizeHintChanged, this,
+        connect(m_imageProvider, &ImageProvider::sizeHintChanged, this,
             &AsyncImageWidget::invalidateGeometry);
 
         connect(m_imageProvider, &QObject::destroyed, this,
@@ -129,7 +130,7 @@ void AsyncImageWidget::setImageProvider(QnImageProvider* provider)
     invalidateGeometry();
 }
 
-QnBusyIndicatorWidget* AsyncImageWidget::busyIndicator() const
+BusyIndicatorWidget* AsyncImageWidget::busyIndicator() const
 {
     return m_indicator;
 }
@@ -155,10 +156,11 @@ QRectF AsyncImageWidget::highlightRect() const
 
 void AsyncImageWidget::setHighlightRect(const QRectF& relativeRect)
 {
-    if (m_highlightRect == relativeRect)
+    const auto newRect = relativeRect.intersected(QRectF(0, 0, 1, 1));
+    if (m_highlightRect == newRect)
         return;
 
-    m_highlightRect = relativeRect;
+    m_highlightRect = newRect;
     update();
 }
 
@@ -360,25 +362,54 @@ bool AsyncImageWidget::autoScaleUp() const
     return m_autoScaleUp;
 }
 
+AsyncImageWidget::ReloadMode AsyncImageWidget::reloadMode() const
+{
+    return m_reloadMode;
+}
+
+void AsyncImageWidget::setReloadMode(ReloadMode value)
+{
+    m_reloadMode = value;
+}
+
+void AsyncImageWidget::setNoDataMode(bool noData)
+{
+    m_noDataMode = noData;
+    updateThumbnailStatus(m_previousStatus);
+}
+
 void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 {
-    switch (status)
+    if(m_noDataMode)
     {
+        m_placeholder->show();
+        m_indicator->hide();
+    }
+    else
+    {
+        switch (status)
+        {
         case Qn::ThumbnailStatus::Loaded:
-            m_placeholder->setHidden(true);
-            m_indicator->setHidden(true);
+            m_placeholder->hide();
+            m_indicator->hide();
             break;
 
         case Qn::ThumbnailStatus::Loading:
-            m_placeholder->setHidden(true);
-            m_indicator->setHidden(false);
+            if (m_reloadMode == ReloadMode::showLoadingIndicator
+                || m_previousStatus == Qn::ThumbnailStatus::Invalid)
+            {
+                m_placeholder->hide();
+                m_indicator->show();
+            }
             break;
 
         default:
-            m_placeholder->setHidden(false);
-            m_indicator->setHidden(true);
+            m_placeholder->show();
+            m_indicator->hide();
             break;
+        }
     }
+    m_previousStatus = status;
 }
 
 void AsyncImageWidget::updateThumbnailImage(const QImage& image)

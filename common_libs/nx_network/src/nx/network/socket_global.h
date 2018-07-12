@@ -27,6 +27,7 @@ struct NX_NETWORK_API Ini:
 
     NX_INI_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
+    NX_INI_FLAG(1, enableNewSslSocket, "Enable new SSL socket implementation");
 
     bool isHostDisabled(const HostAddress& address) const;
 };
@@ -43,7 +44,9 @@ public:
     static cloud::CloudConnectController& cloud();
     static int initializationFlags();
 
-    static void init(int initializationFlags = 0); /**< Should be called before any socket use. */
+    static void init(
+        int initializationFlags = 0,
+        const QString& customCloudHost = QString()); /**< Should be called before any socket use. */
     static void deinit(); /**< Should be called when sockets are not needed any more. */
     static void verifyInitialization();
     static bool isInitialized();
@@ -82,7 +85,7 @@ private:
 
     void initializeNetworking();
 
-    void initializeCloudConnectivity();
+    void initializeCloudConnectivity(const QString& customCloudHost);
     void deinitializeCloudConnectivity();
 };
 

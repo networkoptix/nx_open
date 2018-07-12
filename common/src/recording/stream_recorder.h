@@ -40,6 +40,11 @@ class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
 class QnFfmpegVideoTranscoder;
 
+extern "C"
+{
+    typedef int (*FfmpegWriteFrame) (AVFormatContext *s, AVPacket *pkt);
+}
+
 class QnStreamRecorder:
     public QnAbstractDataConsumer,
     public QnResourceConsumer,
@@ -78,10 +83,8 @@ public:
 
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
-    QnResourcePtr getResource() const { return m_device; }
-
     QString fixedFileName() const;
-    void setEofDateTime(qint64 value);
+    void setProgressBounds(qint64 bof, qint64 eof);
 
     /*
     * Calc hash for writing file
@@ -114,7 +117,6 @@ public:
     */
     void setAudioCodec(AVCodecID codec);
 
-
     /*
     * Server time zone. Used for export to avi/mkv files
     */
@@ -140,13 +142,12 @@ protected:
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
 
     virtual void fileFinished(
-        qint64 durationMs,
-        const QString& fileName,
-        QnAbstractMediaStreamDataProvider *provider,
-        qint64 fileSize,
+        qint64 /*durationMs*/,
+        const QString& /*fileName*/,
+        QnAbstractMediaStreamDataProvider* /*provider*/,
+        qint64 /*fileSize*/,
         qint64 startTimeMs = AV_NOPTS_VALUE)
     {
-        Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
     }
     virtual void fileStarted(
         qint64 startTimeMs,
@@ -170,7 +171,7 @@ protected:
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
     virtual bool isUtcOffsetAllowed() const { return true; }
     virtual void updateContainerMetadata(QnAviArchiveMetadata* metadata) const {}
-
+    virtual bool forceDefaultContext(const QnConstAbstractMediaDataPtr& mediaData) const;
 private:
     struct StreamRecorderContext
     {
@@ -192,8 +193,12 @@ private:
     qint64 findNextIFrame(qint64 baseTime);
     void cleanFfmpegContexts();
 
+    /**
+     * Ffmpeg sometimes doesn't tell error for some codecs which are incompatible with container.
+     * This function does addition manual checks.
+     */
+    bool isCodecsCompatible(const StreamRecorderContext& context) const;
 protected:
-    QnResourcePtr m_device;
     bool m_firstTime;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
     qint64 m_truncateInterval;
@@ -206,7 +211,6 @@ protected:
 private:
     bool m_waitEOF;
 
-    bool m_forceDefaultCtx;
     bool m_packetWrited;
     StreamRecorderErrorStruct m_lastError;
     qint64 m_currentChunkLen;
@@ -214,6 +218,7 @@ private:
     int m_prebufferingUsec;
     QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
 
+    qint64 m_bofDateTimeUs;
     qint64 m_eofDateTimeUs;
     bool m_endOfData;
     int m_lastProgress;
@@ -250,6 +255,7 @@ private:
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
     int64_t m_lastFileSize = 0;
+    FfmpegWriteFrame m_writeFrameFunc = nullptr;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

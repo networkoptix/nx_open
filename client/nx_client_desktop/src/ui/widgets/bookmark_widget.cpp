@@ -1,18 +1,23 @@
 #include "bookmark_widget.h"
 #include "ui_bookmark_widget.h"
 
+#include <chrono>
+
 #include <QtCore/QDateTime>
 
 #include <core/resource/camera_bookmark.h>
 
 #include <ui/style/custom_style.h>
-#include <ui/utils/validators.h>
+#include <nx/client/desktop/common/utils/validators.h>
+
+using std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
 
 namespace {
     const int defaultTimeoutIdx = 0;
 }
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
     QWidget(parent),
@@ -39,10 +44,10 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
         updateTagsList();
     });
 
-    const auto validator = Qn::defaultNonEmptyValidator(tr("Name cannot be empty."));
+    const auto validator = defaultNonEmptyValidator(tr("Name cannot be empty."));
     ui->nameInputField->setValidator(validator);
 
-    connect(ui->nameInputField, &QnInputField::isValidChanged,
+    connect(ui->nameInputField, &InputField::isValidChanged,
         this, &QnBookmarkWidget::validChanged);
     connect(ui->descriptionTextEdit, &TextEditField::isValidChanged,
         this, &QnBookmarkWidget::validChanged);
@@ -64,19 +69,25 @@ void QnBookmarkWidget::setTags(const QnCameraBookmarkTagList &tags) {
     updateTagsList();
 }
 
-void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
+void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark)
+{
     ui->nameInputField->setText(bookmark.name);
     ui->descriptionTextEdit->setText(bookmark.description);
 
-    QDateTime start = QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs);
+    // All this date game is probably to account for variable month or year length.
+    QDateTime start = QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs.count());
     ui->timeoutComboBox->clear();
     ui->timeoutComboBox->addItem(tr("Do not lock archive"), 0);
-    ui->timeoutComboBox->addItem(tr("1 month"), start.addMonths(1).toMSecsSinceEpoch() - bookmark.startTimeMs);
-    ui->timeoutComboBox->addItem(tr("3 month"), start.addMonths(3).toMSecsSinceEpoch() - bookmark.startTimeMs);
-    ui->timeoutComboBox->addItem(tr("6 month"), start.addMonths(6).toMSecsSinceEpoch() - bookmark.startTimeMs);
-    ui->timeoutComboBox->addItem(tr("year"), start.addYears(1).toMSecsSinceEpoch() - bookmark.startTimeMs);
+    ui->timeoutComboBox->addItem(tr("1 month"), start.addMonths(1).toMSecsSinceEpoch()
+        - bookmark.startTimeMs.count());
+    ui->timeoutComboBox->addItem(tr("3 month"), start.addMonths(3).toMSecsSinceEpoch()
+        - bookmark.startTimeMs.count());
+    ui->timeoutComboBox->addItem(tr("6 month"), start.addMonths(6).toMSecsSinceEpoch()
+        - bookmark.startTimeMs.count());
+    ui->timeoutComboBox->addItem(tr("year"), start.addYears(1).toMSecsSinceEpoch()
+        - bookmark.startTimeMs.count());
 
-    int timeoutIdx = ui->timeoutComboBox->findData(bookmark.timeout);
+    int timeoutIdx = ui->timeoutComboBox->findData((qint64) bookmark.timeout.count());
     ui->timeoutComboBox->setCurrentIndex(timeoutIdx < 0 ? defaultTimeoutIdx : timeoutIdx);
 
     m_selectedTags = bookmark.tags;
@@ -94,7 +105,7 @@ void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const
 {
     bookmark.name = ui->nameInputField->text().trimmed();
     bookmark.description = ui->descriptionTextEdit->text().trimmed();
-    bookmark.timeout = ui->timeoutComboBox->currentData().toLongLong();
+    bookmark.timeout = milliseconds(ui->timeoutComboBox->currentData().toLongLong());
     bookmark.tags = m_selectedTags;
 }
 
@@ -124,8 +135,8 @@ void QnBookmarkWidget::updateTagsList() {
 void QnBookmarkWidget::setDescriptionMandatory(bool mandatory)
 {
     const auto validator = mandatory
-        ? Qn::defaultNonEmptyValidator(tr("Description cannot be empty"))
-        : Qn::TextValidateFunction();
+        ? defaultNonEmptyValidator(tr("Description cannot be empty"))
+        : TextValidateFunction();
 
     ui->descriptionTextEdit->setValidator(validator);
 }

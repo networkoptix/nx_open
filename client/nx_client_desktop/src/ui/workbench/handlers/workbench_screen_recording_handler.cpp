@@ -6,8 +6,12 @@
 
 #include <QtOpenGL/QGLWidget>
 
+#include <client_core/client_core_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+
+#include <translation/datetime_formatter.h>
 
 #include <ui/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -26,6 +30,7 @@
 #include <recording/stream_recorder.h>
 #include <core/resource/file_processor.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/dataprovider/data_provider_factory.h>
 
 #include <utils/common/delayed.h>
 
@@ -196,9 +201,9 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
 
     QDateTime dt = QDateTime::currentDateTime();
     QString filePath = recorderSettings.recordingFolder() + QString(lit("/")) +
-                       nx::utils::replaceNonFileNameCharacters(
-                           QString(lit("video_recording_%1.avi"))
-                           .arg(nx::utils::datetimeSaveDialogSuggestion(dt)), QLatin1Char('_'));
+        nx::utils::replaceNonFileNameCharacters(
+            QString(lit("video_recording_%1.avi"))
+                .arg(datetime::toString(dt, datetime::Format::filename_date)), QLatin1Char('_'));
     QnAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
     QnAudioDeviceInfo secondAudioDevice;
     if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())
@@ -218,7 +223,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     }
 
     m_dataProvider.reset(dynamic_cast<QnDesktopDataProviderWrapper*>(
-        res->createDataProvider(Qn::CR_Default)));
+        qnClientCoreModule->dataProviderFactory()->createDataProvider(res)));
     m_recorder.reset(new QnStreamRecorder(res->toResourcePtr()));
     m_dataProvider->addDataProcessor(m_recorder.data());
     m_recorder->addRecordingContext(filePath);

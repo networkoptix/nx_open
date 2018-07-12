@@ -6,7 +6,8 @@ class QLabel;
 class QPushButton;
 class QGraphicsPixmapItem;
 class QnWordWrappedLabel;
-class QnBusyIndicatorGraphicsWidget;
+
+namespace nx { namespace client { namespace desktop { class BusyIndicatorGraphicsWidget; }}}
 
 class QnStatusOverlayWidget: public GraphicsWidget
 {
@@ -72,7 +73,7 @@ private:
     QWidget* const m_extrasContainer;
 
     // Preloader
-    QnBusyIndicatorGraphicsWidget* m_preloader;
+    nx::client::desktop::BusyIndicatorGraphicsWidget* m_preloader;
 
     // Icon overlay
     QGraphicsPixmapItem m_imageItem;

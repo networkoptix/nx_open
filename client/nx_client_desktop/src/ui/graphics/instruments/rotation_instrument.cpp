@@ -88,8 +88,10 @@ namespace {
         return calculateItemAngle(widget, widget->mapFromScene(scenePoint), widget->mapFromScene(sceneOrigin));
     }
 
-    struct ItemAcceptsLeftMouseButton: public std::unary_function<QGraphicsItem *, bool> {
-        bool operator()(QGraphicsItem *item) const {
+    struct ItemAcceptsLeftMouseButton
+    {
+        bool operator()(QGraphicsItem *item) const
+        {
             return item->acceptedMouseButtons() & Qt::LeftButton;
         }
     };

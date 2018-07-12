@@ -9,12 +9,12 @@ constexpr static const int kKeepAliveProbeCount = 3;
 
 TransactionTransport::TransactionTransport(
     ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
-    ec2::ApiPeerData localPeer,
+    nx::vms::api::PeerData localPeer,
     const std::string& systemId,
     const std::string& systemAuthKey,
     int protocolVersion,
     int connectionId)
-:
+    :
     ec2::QnTransactionTransportBase(
         QnUuid(), //< localSystemId. Not used here
         connectionGuardSharedState,

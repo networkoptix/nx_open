@@ -5,19 +5,21 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <nx/utils/password_analyzer.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
-void setupPasswordField(QnInputField& field)
+void setupPasswordField(InputField& field)
 {
     field.setPasswordIndicatorEnabled(true, true, false, nx::utils::cameraPasswordStrength);
     field.setEchoMode(QLineEdit::Password);
     field.reset();
 }
 
-Qn::TextValidateFunction makeNonCameraUserNameValidator(const QnVirtualCameraResourceList& cameras)
+TextValidateFunction makeNonCameraUserNameValidator(const QnVirtualCameraResourceList& cameras)
 {
     const auto userNames =
         [cameras]()
@@ -32,10 +34,10 @@ Qn::TextValidateFunction makeNonCameraUserNameValidator(const QnVirtualCameraRes
         [userNames](const QString& text)
         {
             static const auto kErrorMessage = QnCameraPasswordChangeDialog::tr(
-                "Password shouldn't be equal to camera's user name");
+                "Password should not be equal to camera's user name");
             return userNames.contains(text)
-                ? Qn::ValidationResult(QValidator::Invalid, kErrorMessage)
-                : Qn::kValidResult;
+                ? ValidationResult(QValidator::Invalid, kErrorMessage)
+                : ValidationResult::kValid;
         };
 }
 
@@ -64,11 +66,11 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
     ui->passwordEdit->setTitle(tr("New Password"));
     ui->confirmPasswordEdit->setTitle(tr("Repeat Password"));
 
-    ui->passwordEdit->setValidator(Qn::validatorsConcatenator(
-        { Qn::defaultPasswordValidator(false), makeNonCameraUserNameValidator(cameras) }));
+    ui->passwordEdit->setValidator(validatorsConcatenator(
+        { defaultPasswordValidator(false), makeNonCameraUserNameValidator(cameras) }));
     setupPasswordField(*ui->passwordEdit);
 
-    ui->confirmPasswordEdit->setValidator(Qn::defaultConfirmationValidator(
+    ui->confirmPasswordEdit->setValidator(defaultConfirmationValidator(
         [this](){ return ui->passwordEdit->text(); }, tr("Passwords do not match.")));
     ui->confirmPasswordEdit->setEchoMode(QLineEdit::Password);
 
@@ -83,14 +85,14 @@ QnCameraPasswordChangeDialog::QnCameraPasswordChangeDialog(
             ui->confirmPasswordEdit->setCustomHint(showHint ? kHintText : QString());
         };
 
-    connect(ui->passwordEdit, &QnInputField::textChanged, this, updateHint);
-    connect(ui->confirmPasswordEdit, &QnInputField::textChanged, this, updateHint);
+    connect(ui->passwordEdit, &InputField::textChanged, this, updateHint);
+    connect(ui->confirmPasswordEdit, &InputField::textChanged, this, updateHint);
     ui->passwordEdit->setText(password);
     ui->confirmPasswordEdit->setText(password);
     updateHint();
 
-    QnAligner* aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    Aligner* aligner = new Aligner(this);
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
     aligner->addWidgets({ ui->passwordEdit, ui->confirmPasswordEdit });
 
     setResizeToContentsMode(Qt::Vertical);

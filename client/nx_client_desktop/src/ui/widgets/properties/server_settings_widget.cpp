@@ -25,6 +25,7 @@
 
 #include <network/cloud_url_validator.h>
 
+#include <nx/client/desktop/common/widgets/hint_button.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -43,6 +44,7 @@
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
 
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -74,6 +76,10 @@ QnServerSettingsWidget::QnServerSettingsWidget(QWidget* parent /* = 0*/) :
     setHelpTopic(ui->ipAddressLabel, ui->ipAddressLineEdit, Qn::ServerSettings_General_Help);
     setHelpTopic(ui->portLabel, ui->portLineEdit, Qn::ServerSettings_General_Help);
     setHelpTopic(ui->failoverGroupBox, Qn::ServerSettings_Failover_Help);
+
+    auto failoverHint = nx::client::desktop::HintButton::hintThat(ui->failoverGroupBox);
+    // Notice: this hint button uses help topic from the parent class.
+    failoverHint->addHintLine(tr("Servers with failover enabled will automatically take cameras from offline servers."));
 
     connect(ui->pingButton, &QPushButton::clicked, this, &QnServerSettingsWidget::at_pingButton_clicked);
 
@@ -186,12 +192,7 @@ bool QnServerSettingsWidget::hasChanges() const
 
 void QnServerSettingsWidget::retranslateUi()
 {
-    QString failoverText = QnDeviceDependentStrings::getDefaultNameFromSet(
-        resourcePool(),
-        tr("server will take devices automatically from offline servers"),
-        tr("server will take cameras automatically from offline servers"));
-
-    ui->failoverGroupBox->setTitle(tr("Failover") + lit("\t(%1)").arg(failoverText));
+    ui->failoverGroupBox->setTitle(tr("Failover"));
 
     ui->maxCamerasLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         resourcePool(),
@@ -215,9 +216,9 @@ void QnServerSettingsWidget::loadDataToUi()
     m_initServerName = m_server->getName();
     ui->nameLineEdit->setText(m_initServerName);
     int maxCameras;
-    if (m_server->getServerFlags().testFlag(Qn::SF_Edge))
+    if (m_server->getServerFlags().testFlag(vms::api::SF_Edge))
         maxCameras = EDGE_SERVER_MAX_CAMERAS;   //edge server
-    else if (m_server->getServerFlags().testFlag(Qn::SF_ArmServer))
+    else if (m_server->getServerFlags().testFlag(vms::api::SF_ArmServer))
         maxCameras = ARM_SERVER_MAX_CAMERAS;   //generic ARM based servre
     else
         maxCameras = PC_SERVER_MAX_CAMERAS;    //PC server

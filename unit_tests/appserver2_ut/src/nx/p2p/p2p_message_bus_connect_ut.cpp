@@ -2,7 +2,7 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 #include <core/resource_access/user_access_data.h>
 
 #include <nx/p2p/p2p_message_bus.h>
@@ -33,11 +33,9 @@ static const char kUserCountParamName[] = "userCount";
 static const char kServerPortParamName[] = "tcpPort";
 static const char kStandaloneModeParamName[] = "standaloneMode";
 
-static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
-
 int getIntParam(const nx::utils::ArgumentParser& args, const QString& name, int defaultValue = 0)
 {
-    auto result = args.get(name);
+    auto result = args.get<QString>(name);
     return result ? result->toInt() : defaultValue;
 }
 
@@ -45,81 +43,11 @@ class P2pMessageBusTest: public P2pMessageBusTestBase
 {
 protected:
 
-    static bool checkSubscription(const MessageBus* bus, const ApiPersistentIdData& peer)
-    {
-        return bus->isSubscribedTo(peer);
-    }
-
-    static bool checkDistance(const MessageBus* bus, const ApiPersistentIdData& peer)
-    {
-        return bus->distanceTo(peer) <= kMaxOnlineDistance;
-    }
-
-    bool checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& /*peer*/)
-    {
-        return bus->runtimeInfo().size() == m_servers.size();
-    }
-
-    void checkMessageBus(
-        std::function<bool(MessageBus*, const ApiPersistentIdData&)> checkFunction,
-        const QString& errorMessage)
-    {
-        int syncDoneCounter = 0;
-        // Wait until done
-        checkMessageBusInternal(checkFunction, errorMessage, true, syncDoneCounter);
-        // Report error
-        if (syncDoneCounter != m_servers.size() * m_servers.size())
-            checkMessageBusInternal(checkFunction, errorMessage, false, syncDoneCounter);
-    }
-
-    void checkMessageBusInternal(
-        std::function<bool (MessageBus*, const ApiPersistentIdData&)> checkFunction,
-        const QString& errorMessage,
-        bool waitForSync,
-        int& syncDoneCounter)
-    {
-        QElapsedTimer timer;
-        timer.restart();
-        do
-        {
-            syncDoneCounter = 0;
-            for (const auto& server: m_servers)
-            {
-                const auto& connection = server->moduleInstance()->ecConnection();
-                const auto& bus = connection->messageBus()->dynamicCast<MessageBus*>();
-                const auto& commonModule = server->moduleInstance()->commonModule();
-                for (const auto& serverTo: m_servers)
-                {
-                    const auto& commonModuleTo = serverTo->moduleInstance()->commonModule();
-                    ec2::ApiPersistentIdData peer(commonModuleTo->moduleGUID(), commonModuleTo->dbId());
-                    bool result = checkFunction(bus, peer);
-                    if (!result)
-                    {
-                        if (!waitForSync)
-                            NX_DEBUG(
-                                this,
-                                lit("Peer %1 %2 to peer %3")
-                                .arg(qnStaticCommon->moduleDisplayName(commonModule->moduleGUID()))
-                                .arg(errorMessage)
-                                .arg(qnStaticCommon->moduleDisplayName(commonModuleTo->moduleGUID())));
-                    }
-                    else
-                    {
-                        ++syncDoneCounter;
-                    }
-                    if (!waitForSync)
-                        ASSERT_TRUE(bus->isSubscribedTo(peer));
-                }
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        } while (waitForSync && syncDoneCounter != m_servers.size()*m_servers.size() && timer.elapsed() < kMaxSyncTimeoutMs);
-    }
-
     void printReport()
     {
         ec2::Ec2DirectConnection* connection =
             dynamic_cast<ec2::Ec2DirectConnection*> (m_servers[0]->moduleInstance()->ecConnection());
-        ec2::detail::QnDbManager* db = connection->messageBus()->getDb();
+        ec2::detail::QnDbManager* db = connection->queryProcessor()->getDb();
         ec2::ApiTransactionDataList tranList;
         db->doQuery(ec2::ApiTranLogFilter(), tranList);
         qint64 totalDbData = 0;
@@ -183,11 +111,11 @@ protected:
     {
         auto commonModule = server->moduleInstance()->commonModule();
         auto connection = server->moduleInstance()->ecConnection();
-        ApiRuntimeData runtimeData;
+        nx::vms::api::RuntimeData runtimeData;
         runtimeData.peer.id = commonModule->moduleGUID();
         runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
         runtimeData.peer.persistentId = commonModule->dbId();
-        runtimeData.peer.peerType = Qn::PT_Server;
+        runtimeData.peer.peerType = nx::vms::api::PeerType::server;
 
         connection->getMiscManager(Qn::kSystemAccess)
             ->saveRuntimeInfo(
@@ -201,7 +129,7 @@ protected:
         nx::utils::ArgumentParser args(QCoreApplication::instance()->arguments());
 
         m_servers.clear();
-        m_instanceCounter = 0;
+        ec2::Appserver2Process::resetInstanceCounter();
 
         const int instanceCount = getIntParam(args, kServerCountParamName, kDefaultInstanceCount);
         const int serverPort = getIntParam(args, kServerPortParamName);
@@ -223,42 +151,8 @@ protected:
 
         serverConnectFunc(m_servers);
 
-        QElapsedTimer timer;
-        timer.restart();
+        waitForSync(keepDbAtServerIndex >= 0 ? cameraCount * 2 : cameraCount);
 
-        // Check all peers have subscribed to each other
-        checkMessageBus(&checkSubscription, lm("is not subscribed"));
-
-        // Check all peers is able to see each other
-        checkMessageBus(&checkDistance, lm("has not online distance"));
-
-        // Check all runtime data are received
-        using namespace std::placeholders;
-        checkMessageBus(std::bind(&P2pMessageBusTest::checkRuntimeInfo, this, _1, _2), lm("missing runtime info"));
-
-        int expectedCamerasCount = instanceCount;
-        expectedCamerasCount *= cameraCount;
-        if (keepDbAtServerIndex >= 0)
-            expectedCamerasCount *= 2;
-        // wait for data sync
-        int syncDoneCounter = 0;
-        do
-        {
-            syncDoneCounter = 0;
-            for (const auto& server: m_servers)
-            {
-                const auto& resPool = server->moduleInstance()->commonModule()->resourcePool();
-                const auto& cameraList = resPool->getAllCameras(QnResourcePtr());
-                if (cameraList.size() == expectedCamerasCount)
-                    ++syncDoneCounter;
-                else
-                    break;
-            }
-            ASSERT_TRUE(timer.elapsed() < kMaxSyncTimeoutMs);
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        } while (syncDoneCounter != instanceCount && timer.elapsed() < kMaxSyncTimeoutMs);
-
-        NX_LOG(lit("Sync data time: %1 ms").arg(timer.elapsed()), cl_logINFO);
         printReport();
 
         for (auto& server: m_servers)
@@ -267,12 +161,12 @@ protected:
             auto serverRes = commonModule->resourcePool()->
                 getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
             auto flags = serverRes->getServerFlags();
-            flags |= Qn::SF_P2pSyncDone;
+            flags |= nx::vms::api::SF_P2pSyncDone;
             serverRes->setServerFlags(flags);
             commonModule->bindModuleInformation(serverRes);
         }
 
-        while (args.get(kStandaloneModeParamName))
+        while (args.get<QString>(kStandaloneModeParamName))
             std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 };

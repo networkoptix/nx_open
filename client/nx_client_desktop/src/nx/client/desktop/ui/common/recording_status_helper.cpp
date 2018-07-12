@@ -6,11 +6,12 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/misc/schedule_task.h>
 
 #include <ui/style/skin.h>
 #include <utils/common/synctime.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace nx {
 namespace client {
@@ -65,8 +66,8 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
         return;
 
     connect(
-        context()->instance<QnWorkbenchServerTimeWatcher>(),
-        &QnWorkbenchServerTimeWatcher::displayOffsetsChanged,
+        context()->instance<core::ServerTimeWatcher>(),
+        &core::ServerTimeWatcher::displayOffsetsChanged,
         this,
         &RecordingStatusHelper::updateRecordingMode);
     connect(m_camera.data(), &QnVirtualCameraResource::statusChanged, this,
@@ -107,8 +108,8 @@ QIcon RecordingStatusHelper::icon() const
 // TODO: #Elric this should be a resource parameter that is updated from the server.
 int RecordingStatusHelper::currentRecordingMode(const QnVirtualCameraResourcePtr& camera)
 {
-    if (!camera || camera->isScheduleDisabled())
-        return Qn::RT_Never;
+    if (!camera || !camera->isLicenseUsed())
+        return (int)Qn::RecordingType::never;
 
     const auto dateTime = qnSyncTime->currentDateTime();
     const int dayOfWeek = dateTime.date().dayOfWeek();
@@ -116,27 +117,27 @@ int RecordingStatusHelper::currentRecordingMode(const QnVirtualCameraResourcePtr
 
     for (const auto& task: camera->getScheduleTasks())
     {
-        if (task.getDayOfWeek() == dayOfWeek
-            && qBetween(task.getStartTime(), seconds, task.getEndTime() + 1))
+        if (task.dayOfWeek == dayOfWeek
+            && qBetween(task.startTime, seconds, task.endTime + 1))
         {
-            return task.getRecordingType();
+            return (int)task.recordingType;
         }
     }
 
-    return Qn::RT_Never;
+    return (int)Qn::RecordingType::never;
 }
 
 QString RecordingStatusHelper::tooltip(int recordingMode)
 {
-    switch (recordingMode)
+    switch (Qn::RecordingType(recordingMode))
     {
-        case Qn::RT_Never:
+        case Qn::RecordingType::never:
             return tr("Not recording");
-        case Qn::RT_Always:
+        case Qn::RecordingType::always:
             return tr("Recording everything");
-        case Qn::RT_MotionOnly:
+        case Qn::RecordingType::motionOnly:
             return tr("Recording motion only");
-        case Qn::RT_MotionAndLowQuality:
+        case Qn::RecordingType::motionAndLow:
             return tr("Recording motion and low quality");
     }
     return QString();
@@ -144,15 +145,15 @@ QString RecordingStatusHelper::tooltip(int recordingMode)
 
 QString RecordingStatusHelper::shortTooltip(int recordingMode)
 {
-    switch (recordingMode)
+    switch (Qn::RecordingType(recordingMode))
     {
-        case Qn::RT_Never:
+        case Qn::RecordingType::never:
             return tr("Not recording");
-        case Qn::RT_Always:
+        case Qn::RecordingType::always:
             return tr("Continuous");
-        case Qn::RT_MotionOnly:
+        case Qn::RecordingType::motionOnly:
             return tr("Motion only");
-        case Qn::RT_MotionAndLowQuality:
+        case Qn::RecordingType::motionAndLow:
             return tr("Motion + Lo-Res");
     }
     return QString();
@@ -160,15 +161,15 @@ QString RecordingStatusHelper::shortTooltip(int recordingMode)
 
 QString RecordingStatusHelper::qmlIconName(int recordingMode)
 {
-    switch (recordingMode)
+    switch (Qn::RecordingType(recordingMode))
     {
-        case Qn::RT_Never:
+        case Qn::RecordingType::never:
             return lit("qrc:/skin/item/recording_off.png");
-        case Qn::RT_Always:
+        case Qn::RecordingType::always:
             return lit("qrc:/skin/item/recording.png");
-        case Qn::RT_MotionOnly:
+        case Qn::RecordingType::motionOnly:
             return lit("qrc:/skin/item/recording_motion.png");
-        case Qn::RT_MotionAndLowQuality:
+        case Qn::RecordingType::motionAndLow:
             return lit("qrc:/skin/item/recording_motion_lq.png");
     }
     return QString();
@@ -176,15 +177,15 @@ QString RecordingStatusHelper::qmlIconName(int recordingMode)
 
 QIcon RecordingStatusHelper::icon(int recordingMode)
 {
-    switch (recordingMode)
+    switch (Qn::RecordingType(recordingMode))
     {
-        case Qn::RT_Never:
+        case Qn::RecordingType::never:
             return qnSkin->icon("item/recording_off.png");
-        case Qn::RT_Always:
+        case Qn::RecordingType::always:
             return qnSkin->icon("item/recording.png");
-        case Qn::RT_MotionOnly:
+        case Qn::RecordingType::motionOnly:
             return qnSkin->icon("item/recording_motion.png");
-        case Qn::RT_MotionAndLowQuality:
+        case Qn::RecordingType::motionAndLow:
             return qnSkin->icon("item/recording_motion_lq.png");
     }
     return QIcon();

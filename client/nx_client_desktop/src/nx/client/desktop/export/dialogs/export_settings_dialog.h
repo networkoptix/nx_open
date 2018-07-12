@@ -21,8 +21,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace ui { class SelectableTextButton; }
-
+class SelectableTextButton;
 struct ExportMediaSettings;
 struct ExportLayoutSettings;
 
@@ -67,7 +66,7 @@ public:
     void setMediaParams(const QnMediaResourcePtr& mediaResource, const QnLayoutItemData& itemData,
         QnWorkbenchContext* context);
 private:
-    ui::SelectableTextButton* buttonForOverlayType(ExportOverlayType type);
+    SelectableTextButton* buttonForOverlayType(ExportOverlayType type);
     void setupSettingsButtons();
     void updateSettingsWidgets();
     void updateMode();

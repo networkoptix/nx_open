@@ -172,8 +172,11 @@ void QnWorkbenchStateManager::forcedUpdate()
         d->forcedUpdate();
 }
 
-QnSessionAwareDelegate::QnSessionAwareDelegate(QObject *parent /* = NULL*/) :
-    QnWorkbenchContextAware(parent)
+QnSessionAwareDelegate::QnSessionAwareDelegate(
+    QObject* parent,
+    InitializationMode initMode)
+    :
+    QnWorkbenchContextAware(parent, initMode)
 {
     context()->instance<QnWorkbenchStateManager>()->registerDelegate(this);
 }

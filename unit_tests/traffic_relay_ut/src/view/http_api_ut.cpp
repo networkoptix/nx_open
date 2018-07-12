@@ -1,14 +1,13 @@
 #include <memory>
 
-#include <boost/optional.hpp>
-
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_factory.h>
 #include <nx/network/cloud/tunnel/relay/api/relay_api_http_paths.h>
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/optional.h>
 #include <nx/utils/thread/sync_queue.h>
 #include <nx/utils/random.h>
 
@@ -19,6 +18,7 @@
 #include "connect_session_manager_mock.h"
 #include "listening_peer_manager_mock.h"
 #include "../basic_component_test.h"
+#include "../statistics_provider_ut.h"
 
 namespace nx {
 namespace cloud {
@@ -42,19 +42,13 @@ protected:
     api::Client& relayClient()
     {
         if (!m_relayClient)
-            m_relayClient = api::ClientFactory::create(basicUrl());
+            m_relayClient = api::ClientFactory::instance().create(relay().basicUrl());
         return *m_relayClient;
     }
 
     void onRequestCompletion(api::ResultCode resultCode)
     {
         m_apiResponse.push(resultCode);
-    }
-
-    nx::utils::Url basicUrl() const
-    {
-        return nx::network::url::Builder().setScheme("http").setHost("127.0.0.1")
-            .setPort(moduleInstance()->httpEndpoints()[0].port).toUrl();
     }
 
 private:
@@ -79,14 +73,14 @@ private:
                 std::bind(&HttpApi::createListeningPeerManager, this,
                     _1, _2));
 
-        ASSERT_TRUE(startAndWaitUntilStarted());
+        addRelayInstance();
     }
 
     virtual void TearDown() override
     {
         if (m_relayClient)
             m_relayClient->pleaseStopSync();
-        stop();
+        stopAllInstances();
 
         relaying::ListeningPeerManagerFactory::instance().setCustomFunc(
             std::move(m_listeningPeerManagerFactoryFuncBak));
@@ -265,7 +259,7 @@ protected:
         using namespace std::placeholders;
 
         m_httpClient = std::make_unique<GetStatisticsHttpClient>(
-            nx::network::url::Builder(basicUrl())
+            nx::network::url::Builder(relay().basicUrl())
                 .setPath(api::kRelayStatisticsMetricsPath).toUrl(),
             nx::network::http::AuthInfo());
         m_httpClient->execute(
@@ -284,7 +278,7 @@ private:
 
     std::unique_ptr<GetStatisticsHttpClient> m_httpClient;
     nx::utils::SyncQueue<nx::cloud::relay::Statistics> m_receivedStatistics;
-    boost::optional<StatisticsProviderFactory::Function> m_statisticsProviderFactoryBak;
+    std::optional<StatisticsProviderFactory::Function> m_statisticsProviderFactoryBak;
     Statistics m_expectedStatistics;
 
     std::unique_ptr<AbstractStatisticsProvider> createStatisticsProviderStub()
@@ -299,16 +293,9 @@ private:
     {
         Statistics statistics;
 
-        statistics.relaying.connectionsAcceptedPerMinute =
-            nx::utils::random::number<>(1, 20);
-        statistics.relaying.connectionCount = nx::utils::random::number<>(1, 20);
-        statistics.relaying.connectionsAveragePerServerCount = nx::utils::random::number<>(1, 20);
-        statistics.relaying.listeningServerCount = nx::utils::random::number<>(1, 20);
-
-        statistics.http.connectionCount = nx::utils::random::number<>(1, 20);
-        statistics.http.connectionsAcceptedPerMinute = nx::utils::random::number<>(1, 20);
-        statistics.http.requestsAveragePerConnection = nx::utils::random::number<>(1, 20);
-        statistics.http.requestsServedPerMinute = nx::utils::random::number<>(1, 20);
+        statistics.relaying = generateRelayingStatistics();
+        statistics.relaySessions = generateRelaySessionStatistics();
+        statistics.http = generateHttpServerStatistics();
 
         return statistics;
     }

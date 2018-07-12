@@ -45,8 +45,11 @@
 
 #include <nx/utils/log/log.h>
 
+#include <ini.h>
+
 #include <helpers/system_helpers.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -349,8 +352,22 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
 
     const auto callback = [localId, userName]()
         {
-            nx::client::core::helpers::storeCredentials(
-                localId, QnEncodedCredentials(userName, QString()));
+            auto authData = qnClientCoreSettings->systemAuthenticationData();
+            auto& credentialsList = authData[localId];
+            const auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
+                [userName](const QnEncodedCredentials& other)
+                {
+                    return other.user == userName;
+                });
+
+            if (it == credentialsList.end())
+                return;
+
+            const auto insertionIndex = it - credentialsList.begin();
+            credentialsList.erase(it);
+            credentialsList.insert(insertionIndex, QnEncodedCredentials(userName, QString()));
+
+            qnClientCoreSettings->setSystemAuthenticationData(authData);
         };
 
     executeDelayedParented(callback, 0, this);
@@ -424,37 +441,49 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()
         {
             /* We are receiving string with port but without protocol, so we must parse it. */
-            const QScopedPointer<QnSetupWizardDialog> dialog(new QnSetupWizardDialog(mainWindowWidget()));
+            const auto dialog = new QnSetupWizardDialog(mainWindowWidget());
+            dialog->setAttribute(Qt::WA_DeleteOnClose);
 
             dialog->setUrl(QUrl(serverUrl));
             if (isLoggedInToCloud())
                 dialog->setCloudCredentials(qnCloudStatusWatcher->credentials());
 
-            if (dialog->exec() != QDialog::Accepted)
-                return;
-
-            static constexpr bool kNoAutoLogin = false;
-            if (dialog->localCredentials().isValid())
-            {
-                connectToSystemInternal(QString(), serverUrl, dialog->localCredentials(),
-                    dialog->savePassword(), kNoAutoLogin, controlsGuard);
-            }
-            else if (dialog->cloudCredentials().isValid())
-            {
-                const auto cloudCredentials = dialog->cloudCredentials();
-
-                if (dialog->savePassword())
+            connect(dialog, &QDialog::accepted, this,
+                [this, dialog, serverUrl, controlsGuard]()
                 {
-                    qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
-                    qnClientCoreSettings->setCloudPassword(cloudCredentials.password.value());
-                    qnClientCoreSettings->save();
-                }
+                    static constexpr bool kNoAutoLogin = false;
+                    if (dialog->localCredentials().isValid())
+                    {
+                        connectToSystemInternal(QString(), serverUrl, dialog->localCredentials(),
+                            dialog->savePassword(), kNoAutoLogin, controlsGuard);
+                    }
+                    else if (dialog->cloudCredentials().isValid())
+                    {
+                        const auto cloudCredentials = dialog->cloudCredentials();
 
-                qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
-                connectToSystemInternal(QString(), serverUrl, cloudCredentials,
-                    dialog->savePassword(), kNoAutoLogin, controlsGuard);
+                        if (dialog->savePassword())
+                        {
+                            qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
+                            qnClientCoreSettings->setCloudPassword(
+                                cloudCredentials.password.value());
+                            qnClientCoreSettings->save();
+                        }
+
+                        qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
+                        connectToSystemInternal(QString(), serverUrl, cloudCredentials,
+                            dialog->savePassword(), kNoAutoLogin, controlsGuard);
+                    }
+                });
+
+            if (!ini().modalServerSetupWizard)
+            {
+                dialog->loadPage();
+                dialog->show();
             }
-
+            else
+            {
+                dialog->exec();
+            }
         };
 
     // Use delayed handling for proper animation

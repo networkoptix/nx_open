@@ -87,15 +87,13 @@ void WebSocket::reportErrorIfAny(
     m_lastError = ecode;
     if (m_lastError != SystemError::noError || bytesRead == 0)
     {
-        NX_LOG(lit("[WebSocket] Reporting error %1, read queue empty: %2")
-            .arg(m_lastError)
-            .arg((bool)m_readQueue.empty()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Reporting error %1, read queue empty: %2").args(
+            m_lastError, m_readQueue.empty()));
 
         if (!m_readQueue.empty())
         {
             auto readData = m_readQueue.pop();
             readData.handler(ecode, bytesRead);
-            NX_LOG(lit("[WebSocket] Reporting error, user handler completed"), cl_logDEBUG2);
         }
         continueHandler(true);
         return;
@@ -109,13 +107,10 @@ void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
     reportErrorIfAny(
         ecode,
         bytesRead,
-        [this, bytesRead, ecode](bool errorOccured)
+        [this, bytesRead](bool errorOccured)
         {
             if (errorOccured)
-            {
-                NX_LOG(lit("[WebSocket] Handle read error: %1").arg(ecode), cl_logDEBUG1);
                 return;
-            }
 
             restartTimers();
             m_parser.consume(m_readBuffer.data(), (int)bytesRead);
@@ -127,11 +122,7 @@ void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
                 [this](bool errorOccured)
                 {
                     if (errorOccured)
-                    {
-                        NX_LOG(lit("[WebSocket] Handle while parsing read data error: %1")
-                            .arg(m_lastError), cl_logDEBUG1);
                         return;
-                    }
 
                     processReadData();
                 });
@@ -142,7 +133,7 @@ void WebSocket::processReadData()
 {
     if (m_userDataBuffer.readySize() == 0)
     {
-        NX_LOG("[WebSocket] User buffer is not ready. Continue reading.", cl_logDEBUG2);
+        NX_VERBOSE(this, "User buffer is not ready. Continue reading.");
         m_socket->readSomeAsync(
             &m_readBuffer,
             [this](SystemError::ErrorCode ecode, size_t bytesRead)
@@ -157,7 +148,7 @@ void WebSocket::processReadData()
     bool queueEmpty = m_readQueue.empty();
     auto handoutBuffer = m_userDataBuffer.popFront();
 
-    NX_LOG(lit("[WebSocket] handleRead(): user data size: %1").arg(handoutBuffer.size()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("processReadData(): user data size: %1").arg(handoutBuffer.size()));
 
     readData.buffer->append(handoutBuffer);
     readData.handler(SystemError::noError, handoutBuffer.size());
@@ -195,7 +186,8 @@ void WebSocket::readSomeAsync(nx::Buffer* const buffer, IoCompletionHandler hand
         {
             if (socketCannotRecoverFromError(m_lastError))
             {
-                NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
+                NX_DEBUG(this,
+                    "readSomeAsync called after connection has been terminated. Ignoring.");
                 handler(m_lastError, 0);
                 return;
             }
@@ -216,7 +208,8 @@ void WebSocket::sendAsync(const nx::Buffer& buffer, IoCompletionHandler handler)
         {
             if (socketCannotRecoverFromError(m_lastError))
             {
-                NX_LOG("[WebSocket] readSomeAsync called after connection has been terminated. Ignoring.", cl_logDEBUG1);
+                NX_DEBUG(this,
+                    "sendAsync called after connection has been terminated. Ignoring.");
                 handler(m_lastError, 0);
                 return;
             }
@@ -306,7 +299,7 @@ void WebSocket::sendPreparedMessage(nx::Buffer* buffer, int writeSize, IoComplet
             });
 }
 
-void WebSocket::cancelIOSync(nx::network::aio::EventType eventType)
+void WebSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     nx::utils::promise<void> p;
     auto f = p.get_future();
@@ -332,9 +325,8 @@ bool WebSocket::isDataFrame() const
 
 void WebSocket::frameStarted(FrameType /*type*/, bool /*fin*/)
 {
-    NX_LOG(lit("[WebSocket] frame started. type: %1, size from header: %2")
-        .arg(m_parser.frameType())
-        .arg(m_parser.frameSize()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Frame started. Type: %1, size from header: %2").args(
+        m_parser.frameType(), m_parser.frameSize()));
 }
 
 void WebSocket::framePayload(const char* data, int len)
@@ -353,20 +345,20 @@ void WebSocket::framePayload(const char* data, int len)
 
 void WebSocket::frameEnded()
 {
-    NX_LOG(lit("[WebSocket] frame ended. type: %1, size from header: %2")
-        .arg(m_parser.frameType())
-        .arg(m_parser.frameSize()), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("Frame ended. Type: %1, size from header: %2").args(
+        m_parser.frameType(),
+        m_parser.frameSize()));
 
     if (m_parser.frameType() == FrameType::ping)
     {
-        NX_LOG("[WebSocket] ping received.", cl_logDEBUG2);
+        NX_VERBOSE(this, "Ping received.");
         sendControlResponse(FrameType::ping, FrameType::pong);
         return;
     }
 
     if (m_parser.frameType() == FrameType::pong)
     {
-        NX_LOG("[WebSocket] pong received.", cl_logDEBUG2);
+        NX_VERBOSE(this, "Pong received.");
         NX_ASSERT(m_controlBuffer.isEmpty());
         return;
     }
@@ -375,14 +367,14 @@ void WebSocket::frameEnded()
     {
         if (m_lastError == SystemError::noError)
         {
-            NX_LOG("[WebSocket] Received close request, responding and terminating", cl_logDEBUG1);
+            NX_DEBUG(this, "Received close request, responding and terminating.");
             sendControlResponse(FrameType::close, FrameType::close);
             m_lastError = SystemError::connectionAbort;
             return;
         }
         else
         {
-            NX_LOG("[WebSocket] Received close response, terminating", cl_logDEBUG1);
+            NX_DEBUG(this, "Received close response, terminating.");
             NX_ASSERT(m_controlBuffer.isEmpty());
         }
 
@@ -391,7 +383,7 @@ void WebSocket::frameEnded()
 
     if (!isDataFrame())
     {
-        NX_LOG(lit("[WebSocket] Unknown frame %1").arg(m_parser.frameType()), cl_logWARNING);
+        NX_WARNING(this, lm("Unknown frame %1").arg(m_parser.frameType()));
         m_controlBuffer.resize(0);
         return;
     }
@@ -421,13 +413,13 @@ void WebSocket::sendControlResponse(FrameType requestType, FrameType responseTyp
                 {
                     if (errorOccured)
                     {
-                        NX_LOG(lit("[WebSocket] control response for %1 failed")
-                            .arg(frameTypeString(requestType)), cl_logDEBUG2);
+                        NX_VERBOSE(this, lm("Control response for %1 failed.").arg(
+                            frameTypeString(requestType)));
                         return;
                     }
 
-                    NX_LOG(lit("[WebSocket] control response for %1 successfully sent")
-                        .arg(frameTypeString(requestType)), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("Control response for %1 successfully sent.").arg(
+                        frameTypeString(requestType)));
                 });
         });
 }
@@ -449,13 +441,13 @@ void WebSocket::sendControlRequest(FrameType type)
                 {
                     if (errorOccured)
                     {
-                        NX_LOG(lit("[WebSocket] control request for %1 failed")
-                            .arg(frameTypeString(type)), cl_logDEBUG2);
+                        NX_VERBOSE(this, lm("Control request for %1 failed.").arg(
+                            frameTypeString(type)));
                         return;
                     }
 
-                    NX_LOG(lit("[WebSocket] control request for %1 successfully sent")
-                        .arg(frameTypeString(type)), cl_logDEBUG2);
+                    NX_VERBOSE(this, lm("Control request for %1 successfully sent.").arg(
+                        frameTypeString(type)));
                 });
         });
 }
@@ -464,24 +456,23 @@ void WebSocket::messageEnded()
 {
     if (!isDataFrame())
     {
-        NX_LOG(lit("[WebSocket] message ended, not data frame, type: %1")
-            .arg(m_parser.frameType()), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("Message ended, not data frame, type: %1").arg(m_parser.frameType()));
         return;
     }
 
     if (m_receiveMode != ReceiveMode::message)
     {
-        NX_LOG(lit("[WebSocket] message ended, wrong receive mode"), cl_logDEBUG2);
+        NX_VERBOSE(this, "Message ended, wrong receive mode.");
         return;
     }
 
-    NX_LOG(lit("[WebSocket] message ended, LOCKING user data"), cl_logDEBUG2);
+    NX_VERBOSE(this, "Message ended, LOCKING user data.");
     m_userDataBuffer.lock();
 }
 
 void WebSocket::handleError(Error err)
 {
-    NX_LOG(lit("[WebSocket] Parse error %1. Closing connection").arg((int)err), cl_logDEBUG1);
+    NX_DEBUG(this, lm("Parse error %1. Closing connection.").arg((int) err));
     sendControlRequest(FrameType::close);
     m_lastError = SystemError::connectionAbort;
 }
@@ -490,15 +481,15 @@ QString frameTypeString(FrameType type)
 {
     switch (type)
     {
-    case FrameType::continuation: return lit("continuation");
-    case FrameType::text: return lit("text");
-    case FrameType::binary: return lit("binary");
-    case FrameType::close: return lit("close");
-    case FrameType::ping: return lit("ping");
-    case FrameType::pong: return lit("pong");
+        case FrameType::continuation: return "continuation";
+        case FrameType::text: return "text";
+        case FrameType::binary: return "binary";
+        case FrameType::close: return "close";
+        case FrameType::ping: return "ping";
+        case FrameType::pong: return "pong";
     }
 
-    return lit("");
+    return "";
 }
 
 } // namespace websocket

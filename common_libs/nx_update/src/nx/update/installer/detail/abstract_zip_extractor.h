@@ -7,9 +7,10 @@
 
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 
-using ExtractHandler = std::function<void(QnZipExtractor::Error)>;
+using ExtractHandler = std::function<void(QnZipExtractor::Error, const QString& /*outputPath*/)>;
 
 class NX_UPDATE_API AbstractZipExtractor
 {
@@ -24,5 +25,6 @@ public:
 using AbstractZipExtractorPtr = std::shared_ptr<AbstractZipExtractor>;
 
 } // namespace detail
+} // namespace installer
 } // namespace update
 } // namespace nx

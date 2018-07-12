@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>Actualización manual</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">Subir el instalador</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Por favor, asegúrese de que la configuración sea correcta.</p>
-            </div>
-        </div>
-    </form>
-
     <h1>Configuración avanzada del sistema</h1>
     <div class="alert alert-danger" role="alert">
         <b>Advertencia</b> Cualquier cambio en esta página puede hacer que el servidor funcione incorrectamente.
@@ -193,7 +182,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{AjustesDelSistema[setting]||'vacío'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>¡Aviso!</b> Algunos cambios requieren reiniciar <b>todos</b> los servidores en Sistema.<br><br>
+        <b>¡Aviso!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Reiniciar servidor actual</button>
         </div>

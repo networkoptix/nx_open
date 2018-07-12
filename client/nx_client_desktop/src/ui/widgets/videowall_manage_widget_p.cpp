@@ -1,10 +1,7 @@
 #include "videowall_manage_widget_p.h"
 
 #include <QtGui/QIcon>
-#include <QtGui/QScreen>
-
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
 
 #include <client/client_settings.h>
 
@@ -21,8 +18,10 @@
 #include <utils/math/linear_combination.h>
 #include <nx/client/core/utils/geometry.h>
 #include <nx/utils/app_info.h>
+#include <utils/screen_utils.h>
 
 using nx::client::core::Geometry;
+using nx::gui::Screens;
 
 namespace {
 
@@ -63,42 +62,17 @@ int pixelRatio()
         : qApp->devicePixelRatio();
 }
 
-QList<QRect> screenGeometries()
-{
-    QList<QRect> result;
-
-    if (nx::utils::AppInfo::isMacOsX())
-    {
-        for (const auto screen: QGuiApplication::screens())
-            result.append(screen->geometry());
-    }
-    else
-    {
-        const auto desktop = qApp->desktop();
-        for (int screenNumber = 0; screenNumber < desktop->screenCount(); ++screenNumber)
-        {
-            if (const auto screen = desktop->screen(screenNumber))
-            {
-                const auto rect = screen->geometry();
-                auto pixelRatio = screen->devicePixelRatio();
-                result.append(QRect(rect.topLeft(), rect.size() * pixelRatio));
-            }
-            else
-            {
-                NX_ASSERT(false, "Invalid screen.");
-            }
-        }
-    }
-    return result;
-}
-
 } // namespace
 
 /************************************************************************/
 /* BaseModelItem                                                        */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &geometry, ItemType itemType, const QnUuid &id, QnVideowallManageWidget* q):
+QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(
+    const QRect& geometry,
+    ItemType itemType,
+    const QnUuid& id,
+    QnVideowallManageWidget* q):
     id(id),
     itemType(itemType),
     geometry(geometry),
@@ -106,27 +80,34 @@ QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &geomet
     opacity(minOpacity),
     deleteButtonOpacity(0.0),
     editable(false),
-    q_ptr(q)
-{}
+    q(q)
+{
+}
 
-QnVideowallManageWidgetPrivate::BaseModelItem::~BaseModelItem() {}
+QnVideowallManageWidgetPrivate::BaseModelItem::~BaseModelItem()
+{
+}
 
-
-bool QnVideowallManageWidgetPrivate::BaseModelItem::hasFlag(StateFlags flag) const {
+bool QnVideowallManageWidgetPrivate::BaseModelItem::hasFlag(StateFlags flag) const
+{
     return (flags & flag) == flag;
 }
 
-QRect QnVideowallManageWidgetPrivate::BaseModelItem::bodyRect() const {
+QRect QnVideowallManageWidgetPrivate::BaseModelItem::bodyRect() const
+{
     QRect body = Geometry::eroded(geometry, bodyMargin);
     if (!isPartOfScreen())
         return body;
     int offset = bodyMargin * partScreenCoeff;
 
-    if (snaps.left().snapIndex == 0) {
-        if (snaps.right().snapIndex != 0) {
+    if (snaps.left().snapIndex == 0)
+    {
+        if (snaps.right().snapIndex != 0)
+        {
             body.translate(offset, 0);
         }
-        else {
+        else
+        {
             body.setLeft(body.left() + offset);
             body.setRight(body.right() - offset);
         }
@@ -134,11 +115,14 @@ QRect QnVideowallManageWidgetPrivate::BaseModelItem::bodyRect() const {
     else if (snaps.right().snapIndex == 0)
         body.translate(-offset, 0);
 
-    if (snaps.top().snapIndex == 0) {
-        if (snaps.bottom().snapIndex != 0) {
+    if (snaps.top().snapIndex == 0)
+    {
+        if (snaps.bottom().snapIndex != 0)
+        {
             body.translate(0, offset);
         }
-        else {
+        else
+        {
             body.setTop(body.top() + offset);
             body.setBottom(body.bottom() - offset);
         }
@@ -149,19 +133,21 @@ QRect QnVideowallManageWidgetPrivate::BaseModelItem::bodyRect() const {
     return body;
 }
 
-QRect QnVideowallManageWidgetPrivate::BaseModelItem::deleteButtonRect() const {
-    QRect iconRect(0, 0, iconSize()*0.7, iconSize()*0.7);
+QRect QnVideowallManageWidgetPrivate::BaseModelItem::deleteButtonRect() const
+{
+    QRect iconRect(0, 0, iconSize() * 0.7, iconSize() * 0.7);
 
     QPoint p = bodyRect().topRight();
-    p.setX(p.x() - transformationOffset* partScreenCoeff);
-    p.setY(p.y() + transformationOffset* partScreenCoeff);
+    p.setX(p.x() - transformationOffset * partScreenCoeff);
+    p.setY(p.y() + transformationOffset * partScreenCoeff);
 
     iconRect.moveTopRight(p);
 
     return iconRect;
 }
 
-QPainterPath QnVideowallManageWidgetPrivate::BaseModelItem::bodyPath() const {
+QPainterPath QnVideowallManageWidgetPrivate::BaseModelItem::bodyPath() const
+{
     QPainterPath path;
     path.addRoundRect(bodyRect(), roundness);
     return path;
@@ -181,7 +167,10 @@ int QnVideowallManageWidgetPrivate::BaseModelItem::iconSize() const
         : baseIconSize * pixelRatio();
 }
 
-void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, const TransformationProcess &process) const {
+void QnVideowallManageWidgetPrivate::BaseModelItem::paint(
+    QPainter* painter,
+    const TransformationProcess& process) const
+{
     QRect body = bodyRect();
 
     QPen borderPen(baseColor());
@@ -193,10 +182,10 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
 
     painter->drawPath(bodyPath());
 
-    if (!name.isEmpty()) {
-        Q_Q(const QnVideowallManageWidget);
+    if (!name.isEmpty())
+    {
         QPen textPen(q->colors().text);
-        QnScopedPainterPenRollback penRollback(painter, textPen);
+        QnScopedPainterPenRollback namePenRollback(painter, textPen);
 
         QFont font(painter->font());
         font.setPixelSize(fontSize());
@@ -210,8 +199,9 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
         painter->drawText(textRect, Qt::TextDontClip, name);
     }
 
-    if (editable && hasFlag(StateFlag::Hovered)) {
-#ifdef DEBUG_RESIZE_ANCHORS
+    if (editable && hasFlag(StateFlag::Hovered))
+    {
+        #ifdef DEBUG_RESIZE_ANCHORS
         {
             QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
             QnScopedPainterBrushRollback brushRollback(painter, Qt::red);
@@ -226,7 +216,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
             painter->drawRect(dilated(QRect(innerRect.left(), innerRect.center().y(), innerRect.width(), 0), transformationOffset));
             painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top() + innerRect.height(), innerRect.width(), 0), transformationOffset));
         }
-#endif
+        #endif
         paintPixmap(painter, body, qnSkin->pixmap("videowall_settings/move.png"));
         paintDeleteButton(painter);
 
@@ -235,12 +225,15 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
         paintDashBorder(painter, anchorPath);
         paintResizeAnchors(painter, body);
     }
-    else if (process.isRunning() && geometry.intersects(process.geometry) && !hasFlag(StateFlag::Pressed))
+    else if (process.isRunning() && geometry.intersects(process.geometry) && !hasFlag(
+        StateFlag::Pressed))
         paintProposed(painter, process.geometry);
 }
 
-void QnVideowallManageWidgetPrivate::BaseModelItem::paintDashBorder(QPainter *painter, const QPainterPath &path) const {
-    Q_Q(const QnVideowallManageWidget);
+void QnVideowallManageWidgetPrivate::BaseModelItem::paintDashBorder(
+    QPainter* painter,
+    const QPainterPath& path) const
+{
     QPen pen(q->colors().text);
     pen.setWidth(borderWidth);
     pen.setDashPattern(dashPattern);
@@ -250,18 +243,25 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintDashBorder(QPainter *pa
     painter->drawPath(path);
 }
 
-
-void QnVideowallManageWidgetPrivate::BaseModelItem::paintPixmap(QPainter *painter, const QRect &rect, const QPixmap &pixmap) const {
+void QnVideowallManageWidgetPrivate::BaseModelItem::paintPixmap(
+    QPainter* painter,
+    const QRect& rect,
+    const QPixmap& pixmap) const
+{
     QRect iconRect(0, 0, iconSize(), iconSize());
     iconRect.moveCenter(rect.center());
     painter->drawPixmap(iconRect, pixmap);
 }
 
-void QnVideowallManageWidgetPrivate::BaseModelItem::paintDeleteButton(QPainter *painter) const {
-    Q_Q(const QnVideowallManageWidget);
+void QnVideowallManageWidgetPrivate::BaseModelItem::paintDeleteButton(QPainter* painter) const
+{
     QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
 
-    QColor color = linearCombine(deleteButtonOpacity, q->colors().error, 1.0 - deleteButtonOpacity, q->colors().text);
+    QColor color = linearCombine(
+        deleteButtonOpacity,
+        q->colors().error,
+        1.0 - deleteButtonOpacity,
+        q->colors().text);
     QnScopedPainterBrushRollback brushRollback(painter, color);
 
     QRect rect = deleteButtonRect();
@@ -288,11 +288,12 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintDeleteButton(QPainter *
         path.translate(rect.topLeft());
         painter->drawPath(path);
     }
-
 }
 
-void QnVideowallManageWidgetPrivate::BaseModelItem::paintResizeAnchors(QPainter *painter, const QRect &rect) const {
-    Q_Q(const QnVideowallManageWidget);
+void QnVideowallManageWidgetPrivate::BaseModelItem::paintResizeAnchors(
+    QPainter* painter,
+    const QRect& rect) const
+{
     QPen resizeBorderPen(q->colors().text);
     resizeBorderPen.setWidth(resizeBorderWidth);
 
@@ -326,12 +327,18 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintResizeAnchors(QPainter 
     painter->drawRect(resizeRect);
 }
 
-bool QnVideowallManageWidgetPrivate::BaseModelItem::isPartOfScreen() const {
-    return std::any_of(snaps.values.cbegin(), snaps.values.cend(), [](const QnScreenSnap &snap) {return snap.snapIndex > 0;});
+bool QnVideowallManageWidgetPrivate::BaseModelItem::isPartOfScreen() const
+{
+    return std::any_of(
+        snaps.values.cbegin(),
+        snaps.values.cend(),
+        [](const QnScreenSnap& snap) { return snap.snapIndex > 0; });
 }
 
-void QnVideowallManageWidgetPrivate::BaseModelItem::paintProposed(QPainter* painter, const QRect &proposedGeometry) const {
-    Q_UNUSED(proposedGeometry)
+void QnVideowallManageWidgetPrivate::BaseModelItem::paintProposed(
+    QPainter* painter,
+    const QRect& /*proposedGeometry*/) const
+{
     paintDashBorder(painter, bodyPath());
 }
 
@@ -339,11 +346,18 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintProposed(QPainter* pain
 /* FreeSpaceItem                                                        */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::FreeSpaceItem::FreeSpaceItem(const QRect &rect, ItemType itemType, QnVideowallManageWidget* q):
+QnVideowallManageWidgetPrivate::FreeSpaceItem::FreeSpaceItem(
+    const QRect& rect,
+    ItemType itemType,
+    QnVideowallManageWidget* q):
     base_type(rect, itemType, QnUuid::createUuid(), q)
-{}
+{
+}
 
-void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter, const TransformationProcess &process) const {
+void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(
+    QPainter* painter,
+    const TransformationProcess& process) const
+{
     if (!free())
         return;
     base_type::paint(painter, process);
@@ -351,8 +365,8 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter, con
         paintPixmap(painter, bodyRect(), qnSkin->pixmap("buttons/plus.png"));
 }
 
-QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const {
-    Q_Q(const QnVideowallManageWidget);
+QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const
+{
     return q->colors().freeSpace;
 }
 
@@ -360,12 +374,18 @@ QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const {
 /* ModelScreenPart                                                      */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::ModelScreenPart::ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect, QnVideowallManageWidget* q) :
+QnVideowallManageWidgetPrivate::ModelScreenPart::ModelScreenPart(
+    int screenIdx,
+    int xIndex,
+    int yIndex,
+    const QRect& rect,
+    QnVideowallManageWidget* q) :
     base_type(rect, ItemType::ScreenPart, q),
     m_free(true)
 {
-    for (auto snap = snaps.values.begin(); snap != snaps.values.end(); ++snap) {
-        snap->screenIndex = screenIdx;
+    for (auto& value: snaps.values)
+    {
+        value.screenIndex = screenIdx;
     }
     snaps.left().snapIndex = xIndex;
     snaps.top().snapIndex = yIndex;
@@ -373,11 +393,13 @@ QnVideowallManageWidgetPrivate::ModelScreenPart::ModelScreenPart(int screenIdx, 
     snaps.bottom().snapIndex = QnScreenSnap::snapsPerScreen() - yIndex - 1;
 }
 
-bool QnVideowallManageWidgetPrivate::ModelScreenPart::free() const {
+bool QnVideowallManageWidgetPrivate::ModelScreenPart::free() const
+{
     return m_free;
 }
 
-void QnVideowallManageWidgetPrivate::ModelScreenPart::setFree(bool value) {
+void QnVideowallManageWidgetPrivate::ModelScreenPart::setFree(bool value)
+{
     m_free = value;
 }
 
@@ -385,21 +407,27 @@ void QnVideowallManageWidgetPrivate::ModelScreenPart::setFree(bool value) {
 /* ModelScreen                                                          */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::ModelScreen::ModelScreen(int idx, const QRect &rect, QnVideowallManageWidget* q) :
+QnVideowallManageWidgetPrivate::ModelScreen::ModelScreen(
+    int idx,
+    const QRect& rect,
+    QnVideowallManageWidget* q) :
     base_type(rect, ItemType::Screen, q)
 {
     name = tr("Display %1").arg(idx + 1);
 
-    for (auto snap = snaps.values.begin(); snap != snaps.values.end(); ++snap) {
-        snap->screenIndex = idx;
-        snap->snapIndex = 0;
+    for (auto& value: snaps.values)
+    {
+        value.screenIndex = idx;
+        value.snapIndex = 0;
     }
 
     int width = rect.width() / QnScreenSnap::snapsPerScreen();
     int height = rect.height() / QnScreenSnap::snapsPerScreen();
 
-    for (int j = 0; j < QnScreenSnap::snapsPerScreen(); ++j) {
-        for (int k = 0; k < QnScreenSnap::snapsPerScreen(); ++k) {
+    for (int j = 0; j < QnScreenSnap::snapsPerScreen(); ++j)
+    {
+        for (int k = 0; k < QnScreenSnap::snapsPerScreen(); ++k)
+        {
             QRect partRect(rect.x() + width * j, rect.y() + height * k, width, height);
             ModelScreenPart part(idx, j, k, partRect, q);
             parts << part;
@@ -407,18 +435,25 @@ QnVideowallManageWidgetPrivate::ModelScreen::ModelScreen(int idx, const QRect &r
     }
 }
 
-bool QnVideowallManageWidgetPrivate::ModelScreen::free() const {
-    return std::all_of(parts.cbegin(), parts.cend(), [](const ModelScreenPart &part) {return part.free();});
+bool QnVideowallManageWidgetPrivate::ModelScreen::free() const
+{
+    return std::all_of(
+        parts.cbegin(),
+        parts.cend(),
+        [](const ModelScreenPart& part) { return part.free(); });
 }
 
-void QnVideowallManageWidgetPrivate::ModelScreen::setFree(bool value) {
-    for (auto part = parts.begin(); part != parts.end(); ++part)
-        part->setFree(value);
+void QnVideowallManageWidgetPrivate::ModelScreen::setFree(bool value)
+{
+    for (auto& part: parts)
+        part.setFree(value);
 }
 
-void QnVideowallManageWidgetPrivate::ModelScreen::paint(QPainter* painter, const TransformationProcess &process) const {
+void QnVideowallManageWidgetPrivate::ModelScreen::paint(
+    QPainter* painter,
+    const TransformationProcess& process) const
+{
     {
-        Q_Q(const QnVideowallManageWidget);
         QRect targetRect = Geometry::eroded(geometry, frameMargin);
 
         QPainterPath path;
@@ -428,23 +463,29 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paint(QPainter* painter, const
         borderPen.setWidth(screenBorderWidth);
 
         QnScopedPainterPenRollback penRollback(painter, borderPen);
-        QnScopedPainterBrushRollback brushRollback(painter, withAlpha(q->colors().desktop, screenBackgroundAlpha));
+        QnScopedPainterBrushRollback brushRollback(
+            painter,
+            withAlpha(q->colors().desktop, screenBackgroundAlpha));
 
         QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
 
         painter->drawPath(path);
     }
     base_type::paint(painter, process);
-
 }
 
-void QnVideowallManageWidgetPrivate::ModelScreen::paintProposed(QPainter* painter, const QRect &proposedGeometry) const {
-    if (free()) {
+void QnVideowallManageWidgetPrivate::ModelScreen::paintProposed(
+    QPainter* painter,
+    const QRect& proposedGeometry) const
+{
+    if (free())
+    {
         QRect intersection = geometry.intersected(proposedGeometry);
         if (!intersection.isValid())
             return;
 
-        if (intersection == geometry) {
+        if (intersection == geometry)
+        {
             base_type::paintProposed(painter, proposedGeometry);
             return;
         }
@@ -459,32 +500,38 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paintProposed(QPainter* painte
 /* ModelItem                                                            */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::ModelItem::ModelItem(ItemType itemType, const QnUuid &id, QnVideowallManageWidget* q):
+QnVideowallManageWidgetPrivate::ModelItem::ModelItem(
+    ItemType itemType,
+    const QnUuid& id,
+    QnVideowallManageWidget* q):
     BaseModelItem(QRect(), itemType, id, q)
 {
     editable = true;
 }
 
-bool QnVideowallManageWidgetPrivate::ModelItem::free() const {
+bool QnVideowallManageWidgetPrivate::ModelItem::free() const
+{
     return false;
 }
 
-void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool value) {
-    Q_UNUSED(value);
+void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool /*value*/)
+{
     NX_ASSERT(false, "Should never get here");
 }
 
-void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(QPainter* painter, const QRect &proposedGeometry) const {
+void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(
+    QPainter* painter,
+    const QRect& proposedGeometry) const
+{
     base_type::paintProposed(painter, proposedGeometry);
 
-    Q_Q(const QnVideowallManageWidget);
     QnScopedPainterPenRollback pen(painter, Qt::NoPen);
     QnScopedPainterBrushRollback brush(painter, q->colors().error);
     painter->drawPath(bodyPath());
 }
 
-QColor QnVideowallManageWidgetPrivate::ModelItem::baseColor() const {
-    Q_Q(const QnVideowallManageWidget);
+QColor QnVideowallManageWidgetPrivate::ModelItem::baseColor() const
+{
     return q->colors().item;
 }
 
@@ -496,84 +543,91 @@ QnVideowallManageWidgetPrivate::TransformationProcess::TransformationProcess():
 {
 }
 
-
 /************************************************************************/
 /* QnVideowallManageWidgetPrivate                                       */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManageWidget* q):
-    QObject(),
-    q_ptr(q)
+QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(
+    QnVideowallManageWidget* q,
+    QObject* parent)
+    :
+    base_type(parent),
+    q(q)
 {
-    int screenNumber = 0;
-    for (const auto rect: screenGeometries())
-    {
-        m_unitedGeometry = m_unitedGeometry.united(rect);
-        m_screens.append({screenNumber++, rect, q});
-    }
 }
 
 // TODO: #GDM #VW create iterators
-void QnVideowallManageWidgetPrivate::foreachItem(std::function<void(BaseModelItem& /*item*/, bool& /*abort*/)> handler) {
-    bool abort = false;
-    for (auto screen = m_screens.begin(); screen != m_screens.end(); ++screen) {
-        handler(*screen, abort);
-        if (abort)
-            return;
-
-        // do not iterate over an empty screen parts
-        if (screen->free())
-            continue;
-
-        for (auto part = screen->parts.begin(); part != screen->parts.end(); ++part) {
-            handler(*part, abort);
-            if (abort)
-                return;
-        }
-    }
-
-    for (auto item = m_items.begin(); item != m_items.end(); ++item) {
-        handler(*item, abort);
-        if (abort)
-            return;
-    }
-}
-
-void QnVideowallManageWidgetPrivate::foreachItemConst(std::function<void(const BaseModelItem& /*item*/, bool& /*abort*/)> handler) {
-    bool abort = false;
-    for (auto screen = m_screens.cbegin(); screen != m_screens.cend(); ++screen) {
-        handler(*screen, abort);
-        if (abort)
-            return;
-
-        // do not iterate over an empty screen parts
-        if (screen->free())
-            continue;
-
-        for (auto part = screen->parts.cbegin(); part != screen->parts.cend(); ++part) {
-            handler(*part, abort);
-            if (abort)
-                return;
-        }
-    }
-
-    for (auto item = m_items.cbegin(); item != m_items.cend(); ++item) {
-        handler(*item, abort);
-        if (abort)
-            return;
-    }
-}
-
-void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourcePtr &videowall)
+void QnVideowallManageWidgetPrivate::foreachItem(
+    std::function<void(BaseModelItem& /*item*/, bool& /*abort*/)> handler)
 {
-    QList<QRect> screens = screenGeometries();
+    bool abort = false;
+    for (auto& m_screen: m_screens)
+    {
+        handler(m_screen, abort);
+        if (abort)
+            return;
+
+        // do not iterate over an empty screen parts
+        if (m_screen.free())
+            continue;
+
+        for (auto& part: m_screen.parts)
+        {
+            handler(part, abort);
+            if (abort)
+                return;
+        }
+    }
+
+    for (auto& m_item: m_items)
+    {
+        handler(m_item, abort);
+        if (abort)
+            return;
+    }
+}
+
+void QnVideowallManageWidgetPrivate::foreachItemConst(
+    std::function<void(const BaseModelItem& /*item*/, bool& /*abort*/)> handler)
+{
+    bool abort = false;
+    for (const auto& m_screen: m_screens)
+    {
+        handler(m_screen, abort);
+        if (abort)
+            return;
+
+        // do not iterate over an empty screen parts
+        if (m_screen.free())
+            continue;
+
+        for (const auto& part: m_screen.parts)
+        {
+            handler(part, abort);
+            if (abort)
+                return;
+        }
+    }
+
+    for (const auto& m_item: m_items)
+    {
+        handler(m_item, abort);
+        if (abort)
+            return;
+    }
+}
+
+void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourcePtr& videowall)
+{
+    QList<QRect> screens = q->screenGeometries();
     QnUuid pcUuid = qnSettings->pcUuid();
 
-    foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
+    for (const QnVideoWallItem& item: videowall->items()->getItems())
+    {
         if (item.pcUuid != pcUuid)
             continue;
 
-        ModelItem modelItem(ItemType::Existing, item.uuid, q_ptr);
+        ModelItem modelItem(ItemType::Existing, item.uuid, q);
         modelItem.name = item.name;
         modelItem.snaps = item.screenSnaps;
         modelItem.geometry = item.screenSnaps.geometry(screens);
@@ -582,12 +636,13 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
     }
 }
 
-void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourcePtr &videowall) {
-
+void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourcePtr& videowall)
+{
     QnUuid pcUuid = qnSettings->pcUuid();
 
     QList<QnVideoWallPcData::PcScreen> localScreens;
-    for (int i = 0; i < m_screens.size(); i++) {
+    for (int i = 0; i < m_screens.size(); i++)
+    {
         QnVideoWallPcData::PcScreen screen;
         screen.index = i;
         screen.desktopGeometry = m_screens[i].geometry;
@@ -606,20 +661,28 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
             existingIds << item.uuid;
 
     /* Remove from the list items that will be updated. */
-    foreach (const ModelItem &modelItem, m_items) {
+    for (const ModelItem& modelItem: m_items)
+    {
         existingIds.remove(modelItem.id);
 
         QnVideoWallItem item;
-        if (modelItem.itemType == ItemType::Added || !videowall->items()->hasItem(modelItem.id)) {
-            item.name = nx::utils::generateUniqueString([&videowall] () {
-                QStringList used;
-                foreach (const QnVideoWallItem &item, videowall->items()->getItems())
-                    used << item.name;
-                return used;
-            }(), tr("Screen"), tr("Screen %1") );
+        if (modelItem.itemType == ItemType::Added || !videowall->items()->hasItem(modelItem.id))
+        {
+            item.name = nx::utils::generateUniqueString(
+                [&videowall]()
+                {
+                    QStringList used;
+                    for (const QnVideoWallItem& item: videowall->items()->getItems())
+                        used << item.name;
+                    return used;
+                }(),
+                tr("Screen"),
+                tr("Screen %1"));
             item.pcUuid = pcUuid;
             item.uuid = modelItem.id;
-        } else {
+        }
+        else
+        {
             item = videowall->items()->getItem(modelItem.id);
         }
         item.screenSnaps = modelItem.snaps;
@@ -629,10 +692,9 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
     /* Delete other items. */
     foreach (const QnUuid &toDelete, existingIds)
         videowall->items()->removeItem(toDelete);
-
 }
 
-QTransform QnVideowallManageWidgetPrivate::getTransform(const QRect &rect)
+QTransform QnVideowallManageWidgetPrivate::getTransform(const QRect& rect)
 {
     if (m_widgetRect == rect)
         return m_transform;
@@ -640,8 +702,8 @@ QTransform QnVideowallManageWidgetPrivate::getTransform(const QRect &rect)
     m_transform.reset();
     m_transform.translate(rect.left(), rect.top());
     m_transform.scale(
-        static_cast<qreal> (rect.width()) /  m_unitedGeometry.width(),
-        static_cast<qreal> (rect.height()) /  m_unitedGeometry.height());
+        static_cast<qreal>(rect.width()) / m_unitedGeometry.width(),
+        static_cast<qreal>(rect.height()) / m_unitedGeometry.height());
     m_transform.translate(-m_unitedGeometry.left(), -m_unitedGeometry.top());
     m_invertedTransform = m_transform.inverted();
 
@@ -649,41 +711,50 @@ QTransform QnVideowallManageWidgetPrivate::getTransform(const QRect &rect)
     return m_transform;
 }
 
-QTransform QnVideowallManageWidgetPrivate::getInvertedTransform(const QRect &rect)
+QTransform QnVideowallManageWidgetPrivate::getInvertedTransform(const QRect& rect)
 {
     if (m_widgetRect != rect)
         getTransform(rect);
     return m_invertedTransform;
 }
 
-QRect QnVideowallManageWidgetPrivate::targetRect(const QRect &rect) const
+QRect QnVideowallManageWidgetPrivate::targetRect(const QRect& rect) const
 {
-    if (m_unitedGeometry.isNull())    // TODO: #GDM #VW replace by model.Valid
+    if (m_unitedGeometry.isNull()) // TODO: #GDM #VW replace by model.Valid
         return QRect();
 
     return Geometry::expanded(Geometry::aspectRatio(m_unitedGeometry), rect, Qt::KeepAspectRatio).toRect();
 }
 
-void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps &snaps, bool value)
+void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps& snaps, bool value)
 {
-    QSet<int> screenIdxs = snaps.screens();
+    QSet<int> screenIdxs = Screens::coveredBy(snaps, q->screenGeometries());
     // if the item takes some screens, it should take them fully
-    if (screenIdxs.size() > 1) {
-        for (int idx: screenIdxs) {
+    if (screenIdxs.size() > 1)
+    {
+        for (int idx: screenIdxs)
+        {
             if (idx >= m_screens.size())
-                continue;   // we can lose one screen after snaps have been set
+                continue; // we can lose one screen after snaps have been set
             NX_ASSERT(m_screens[idx].free() != value);
             m_screens[idx].setFree(value);
         }
-    } else if (!screenIdxs.isEmpty()) { //otherwise looking at the screen parts
+    }
+    else if (!screenIdxs.isEmpty())
+    {
+        //otherwise looking at the screen parts
         int screenIdx = screenIdxs.toList().first();
         if (screenIdx >= m_screens.size())
             return;
-        ModelScreen &screen = m_screens[screenIdx];
+        ModelScreen& screen = m_screens[screenIdx];
 
-        for (int i = snaps.left().snapIndex; i < QnScreenSnap::snapsPerScreen() - snaps.right().snapIndex; ++i) {
-            for (int j = snaps.top().snapIndex; j < QnScreenSnap::snapsPerScreen() - snaps.bottom().snapIndex; ++j) {
-                int idx = i* QnScreenSnap::snapsPerScreen() + j;
+        for (int i = snaps.left().snapIndex; i < QnScreenSnap::snapsPerScreen() - snaps.right().
+             snapIndex; ++i)
+        {
+            for (int j = snaps.top().snapIndex; j < QnScreenSnap::snapsPerScreen() - snaps.bottom()
+                 .snapIndex; ++j)
+            {
+                int idx = i * QnScreenSnap::snapsPerScreen() + j;
                 NX_ASSERT(idx < screen.parts.size());
                 NX_ASSERT(screen.parts[idx].free() != value);
                 screen.parts[idx].setFree(value);
@@ -692,7 +763,8 @@ void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps &snaps, bool va
     }
 }
 
-void QnVideowallManageWidgetPrivate::paint(QPainter* painter, const QRect &rect) {
+void QnVideowallManageWidgetPrivate::paint(QPainter* painter, const QRect& rect)
+{
     QRect targetRect = this->targetRect(rect);
     if (targetRect.isEmpty())
         return;
@@ -702,89 +774,111 @@ void QnVideowallManageWidgetPrivate::paint(QPainter* painter, const QRect &rect)
 
     QnScopedPainterTransformRollback transformRollback(painter, transform);
 
-    foreachItemConst([this, painter](const BaseModelItem &item, bool &) {
-        QnScopedPainterOpacityRollback opacityRollback(painter, item.opacity);
-        item.paint(painter, m_process);
-    });
+    foreachItemConst(
+        [this, painter](const BaseModelItem& item, bool&)
+        {
+            QnScopedPainterOpacityRollback opacityRollback(painter, item.opacity);
+            item.paint(painter, m_process);
+        });
 }
 
-void QnVideowallManageWidgetPrivate::mouseEnter() {
+void QnVideowallManageWidgetPrivate::mouseEnter()
+{
     //do nothing for now
 }
 
-void QnVideowallManageWidgetPrivate::mouseLeave() {
+void QnVideowallManageWidgetPrivate::mouseLeave()
+{
     if (m_process.isRunning())
         return;
 
-    foreachItem([this](BaseModelItem &item, bool &) {
-        item.flags &= ~(StateFlag::Hovered | StateFlag::DeleteHovered);
-    });
+    foreachItem(
+        [](BaseModelItem& item, bool&)
+        {
+            item.flags &= ~(StateFlag::Hovered | StateFlag::DeleteHovered);
+        });
     QCursor cursor(transformationsCursor(ItemTransformation::None));
-    q_ptr->setCursor(cursor);
+    q->setCursor(cursor);
 }
 
-void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint &pos) {
+void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint& pos)
+{
     if (m_process.isRunning())
         return;
 
     ItemTransformations proposed = ItemTransformation::None;
-    foreachItem([this, pos, &proposed](BaseModelItem &item, bool &) {
-        if (item.geometry.contains(pos)) {
-            item.flags |= StateFlag::Hovered;
-            if (item.editable && m_process == ItemTransformation::None) {
-                if (item.deleteButtonRect().contains(pos))
-                    item.flags |= StateFlag::DeleteHovered;
-                else
-                    item.flags &= ~StateFlag::DeleteHovered;
+    foreachItem(
+        [this, pos, &proposed](BaseModelItem& item, bool&)
+        {
+            if (item.geometry.contains(pos))
+            {
+                item.flags |= StateFlag::Hovered;
+                if (item.editable && m_process == ItemTransformation::None)
+                {
+                    if (item.deleteButtonRect().contains(pos))
+                        item.flags |= StateFlag::DeleteHovered;
+                    else
+                        item.flags &= ~StateFlag::DeleteHovered;
 
-                proposed = transformationsAnchor(item.bodyRect(), pos);
+                    proposed = transformationsAnchor(item.bodyRect(), pos);
+                }
             }
-        }
-        else
-            item.flags &= ~(StateFlag::Hovered | StateFlag::DeleteHovered);
-    });
+            else
+            {
+                item.flags &= ~(StateFlag::Hovered | StateFlag::DeleteHovered);
+            }
+        });
 
     QCursor cursor(transformationsCursor(proposed));
-    q_ptr->setCursor(cursor);
+    q->setCursor(cursor);
 }
 
-void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseButtons buttons) {
+void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint& pos, Qt::MouseButtons buttons)
+{
     if ((buttons & Qt::LeftButton) != Qt::LeftButton)
         return;
     if (m_process.isRunning())
         return;
 
-    foreachItem([this, pos](BaseModelItem &item, bool &abort) {
-        if (!item.geometry.contains(pos) || !item.free())
-            return;
+    foreachItem(
+        [this, pos](BaseModelItem& item, bool& abort)
+        {
+            if (!item.geometry.contains(pos) || !item.free())
+                return;
 
-        ModelItem added(ItemType::Added, QnUuid::createUuid(), q_ptr);
-        added.name = tr("New Item");
-        added.geometry = item.geometry;
-        added.snaps = item.snaps;
-        added.flags |= StateFlag::Hovered;   //mouse cursor is over it
-        added.opacity = 1.0;
-        m_items << added;
-        emit itemsChanged();
+            ModelItem added(ItemType::Added, QnUuid::createUuid(), q);
+            added.name = tr("New Item");
+            added.geometry = item.geometry;
+            added.snaps = item.snaps;
+            added.flags |= StateFlag::Hovered; //mouse cursor is over it
+            added.opacity = 1.0;
+            m_items << added;
+            emit itemsChanged();
 
-        item.setFree(false);
+            item.setFree(false);
 
-        abort = true;
-    });
+            abort = true;
+        });
 
-    for (auto item = m_items.begin(); item != m_items.end(); ++item) {
+    for (auto item = m_items.begin(); item != m_items.end(); ++item)
+    {
         if (!item->editable || !item->deleteButtonRect().contains(pos))
             continue;;
 
         if (item->itemType == ItemType::Existing)
         {
-            QnMessageBox dialog(QnMessageBoxIcon::Question,
-                tr("Delete \"%1\"?").arg(item->name), QString(),
-                QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-                q_ptr);
+            QnMessageBox dialog(
+                QnMessageBoxIcon::Question,
+                tr("Delete \"%1\"?").arg(item->name),
+                QString(),
+                QDialogButtonBox::Cancel,
+                QDialogButtonBox::NoButton,
+                q);
 
-            dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
-                QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+            dialog.addCustomButton(
+                QnMessageBoxCustomButton::Delete,
+                QDialogButtonBox::AcceptRole,
+                Qn::ButtonAccent::Warning);
             if (dialog.exec() == QDialogButtonBox::Cancel)
                 return;
         }
@@ -797,91 +891,119 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
     }
 }
 
-void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos) {
+void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint& pos)
+{
     NX_ASSERT(!m_process.isRunning());
-    foreachItem([this, pos](BaseModelItem &item, bool &abort) {
-        if (!item.editable || !item.geometry.contains(pos))
-            return;
-        abort = true;   //no more than one such item must exist
+    foreachItem(
+        [this, pos](BaseModelItem& item, bool& abort)
+        {
+            if (!item.editable || !item.geometry.contains(pos))
+                return;
+            abort = true; //no more than one such item must exist
 
-        m_process.value = transformationsAnchor(item.bodyRect(), pos);
-        if (m_process == ItemTransformation::None)
-            return;
+            m_process.value = transformationsAnchor(item.bodyRect(), pos);
+            if (m_process == ItemTransformation::None)
+                return;
 
-        calculateProposedGeometryFunction func = [this](const BaseModelItem &item, bool *valid, bool *multiScreen) {
+            calculateProposedGeometryFunction func =
+                [this](
+                    const BaseModelItem& item,
+                    bool* valid,
+                    bool* multiScreen)
+                {
+                    if (m_process == ItemTransformation::Move)
+                        return calculateProposedMoveGeometry(item, valid, multiScreen);
+                    return calculateProposedResizeGeometry(item, valid, multiScreen);
+                };
+            processItemStart(item, func);
+            m_process.geometry = item.geometry;
+            m_process.oldGeometry = item.geometry;
+        });
+}
+
+void QnVideowallManageWidgetPrivate::dragMoveAt(const QPoint& pos, const QPoint& oldPos)
+{
+    if (!m_process.isRunning())
+        return;
+
+    foreachItem(
+        [this, &pos, &oldPos](BaseModelItem& item, bool& abort)
+        {
+            if (!item.hasFlag(StateFlag::Pressed))
+                return;
+            QPoint offset = pos - oldPos;
             if (m_process == ItemTransformation::Move)
-                return calculateProposedMoveGeometry(item, valid, multiScreen);
-            return calculateProposedResizeGeometry(item, valid, multiScreen);
-        };
-        processItemStart(item, func);
-        m_process.geometry = item.geometry;
-        m_process.oldGeometry = item.geometry;
-    });
+                moveItem(item, offset);
+            else
+                resizeItem(item, offset);
+            abort = true;
+        });
 }
 
-void QnVideowallManageWidgetPrivate::dragMoveAt(const QPoint &pos, const QPoint &oldPos) {
+void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint& pos)
+{
     if (!m_process.isRunning())
         return;
 
-    foreachItem([this, &pos, &oldPos](BaseModelItem &item, bool &abort) {
-        if (!item.hasFlag(StateFlag::Pressed))
-            return;
-        QPoint offset = pos - oldPos;
-        if (m_process == ItemTransformation::Move)
-            moveItem(item, offset);
-        else
-            resizeItem(item, offset);
-        abort = true;
-    });
-}
-
-void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint &pos) {
-    if (!m_process.isRunning())
-        return;
-
-    foreachItem([this, pos](BaseModelItem &item, bool &abort) {
-        Q_UNUSED(abort)	//we should remove Hovered flag from all items
+    foreachItem(
+        [this](BaseModelItem& item, bool& /*abort*/)
+        {
             item.flags &= ~StateFlags(StateFlag::Hovered);
-        if (!item.hasFlag(StateFlag::Pressed))
-            return;
+            if (!item.hasFlag(StateFlag::Pressed))
+                return;
 
-        calculateProposedGeometryFunction func = [this](const BaseModelItem &item, bool *valid, bool *multiScreen) {
-            if (m_process == ItemTransformation::Move)
-                return calculateProposedMoveGeometry(item, valid, multiScreen);
-            return calculateProposedResizeGeometry(item, valid, multiScreen);
-        };
-        processItemEnd(item, func);
-    });
+            calculateProposedGeometryFunction func =
+                [this](const BaseModelItem& item,
+                    bool* valid,
+                    bool* multiScreen)
+                {
+                    if (m_process == ItemTransformation::Move)
+                        return calculateProposedMoveGeometry(item, valid, multiScreen);
+                    return calculateProposedResizeGeometry(item, valid, multiScreen);
+                };
+            processItemEnd(item, func);
+        });
 
     m_process.clear();
 }
 
-void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
+void QnVideowallManageWidgetPrivate::tick(int deltaMSecs)
+{
     qreal opacityDelta = opacityChangeSpeed * deltaMSecs;
 
-    foreachItem([this, opacityDelta](BaseModelItem &item, bool &) {
-        if (item.hasFlag(StateFlag::Pressed)) {
-            item.opacity = qMax(item.opacity - opacityDelta, draggedOpacity);
-        } else {
-            if (item.hasFlag(StateFlag::Hovered) && (m_process == ItemTransformation::None))
-                item.opacity = qMin(item.opacity + opacityDelta, 1.0);
+    foreachItem(
+        [this, opacityDelta](BaseModelItem& item, bool&)
+        {
+            if (item.hasFlag(StateFlag::Pressed))
+            {
+                item.opacity = qMax(item.opacity - opacityDelta, draggedOpacity);
+            }
             else
-                item.opacity = qMax(item.opacity - opacityDelta, minOpacity);
-        }
-        if (item.hasFlag(StateFlag::DeleteHovered)) {
-            item.deleteButtonOpacity = qMin(item.deleteButtonOpacity + opacityDelta, 1.0);
-        } else {
-            item.deleteButtonOpacity = qMax(item.deleteButtonOpacity - opacityDelta, 0.0);
-        }
-    });
+            {
+                if (item.hasFlag(StateFlag::Hovered) && (m_process == ItemTransformation::None))
+                    item.opacity = qMin(item.opacity + opacityDelta, 1.0);
+                else
+                    item.opacity = qMax(item.opacity - opacityDelta, minOpacity);
+            }
+            if (item.hasFlag(StateFlag::DeleteHovered))
+            {
+                item.deleteButtonOpacity = qMin(item.deleteButtonOpacity + opacityDelta, 1.0);
+            }
+            else
+            {
+                item.deleteButtonOpacity = qMax(item.deleteButtonOpacity - opacityDelta, 0.0);
+            }
+        });
 }
 
-void QnVideowallManageWidgetPrivate::moveItem(BaseModelItem &item, const QPoint &offset) {
+void QnVideowallManageWidgetPrivate::moveItem(BaseModelItem& item, const QPoint& offset)
+{
     item.geometry.translate(offset);
     m_process.geometry = calculateProposedMoveGeometry(item, NULL, NULL);
 }
 
-void QnVideowallManageWidgetPrivate::resizeItem(BaseModelItem &item, const QPoint &offset) {
+void QnVideowallManageWidgetPrivate::resizeItem(BaseModelItem& item, const QPoint& offset)
+{
     if (m_process.value & ItemTransformation::ResizeLeft)
         item.geometry.adjust(offset.x(), 0, 0, 0);
     else if (m_process.value & ItemTransformation::ResizeRight)
@@ -895,7 +1017,10 @@ void QnVideowallManageWidgetPrivate::resizeItem(BaseModelItem &item, const QPoin
     m_process.geometry = calculateProposedResizeGeometry(item, NULL, NULL);
 }
 
-QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPrivate::transformationsAnchor(const QRect &geometry, const QPoint &pos) const {
+QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPrivate::transformationsAnchor(
+    const QRect& geometry,
+    const QPoint& pos) const
+{
     QRect leftAnchor    (Geometry::dilated(QRect(geometry.left(), geometry.top(), 0, geometry.height()), transformationOffset));
     QRect centerXAnchor (Geometry::dilated(QRect(geometry.center().x(), geometry.top(), 0, geometry.height()), transformationOffset));
     QRect rightAnchor   (Geometry::dilated(QRect(geometry.left() + geometry.width(), geometry.top(), 0, geometry.height()), transformationOffset));
@@ -904,9 +1029,11 @@ QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPriva
     QRect centerYAnchor (Geometry::dilated(QRect(geometry.left(), geometry.center().y(), geometry.width(), 0), transformationOffset));
     QRect bottomAnchor  (Geometry::dilated(QRect(geometry.left(), geometry.top() + geometry.height(), geometry.width(), 0), transformationOffset));
 
-    auto in = [pos](const QRect &first, const QRect &second) {
-        return first.contains(pos) && second.contains(pos);
-    };
+    auto in =
+        [pos](const QRect& first, const QRect& second)
+        {
+            return first.contains(pos) && second.contains(pos);
+        };
 
     if (in(centerXAnchor, centerYAnchor))
         return ItemTransformation::Move;
@@ -930,43 +1057,55 @@ QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPriva
     return ItemTransformation::None;
 }
 
-Qt::CursorShape QnVideowallManageWidgetPrivate::transformationsCursor(ItemTransformations value) const {
-    switch (value) {
-    case ItemTransformation::ResizeLeft | ItemTransformation::ResizeTop:
-    case ItemTransformation::ResizeRight | ItemTransformation::ResizeBottom:
-        return Qt::SizeFDiagCursor;
-    case ItemTransformation::ResizeRight | ItemTransformation::ResizeTop:
-    case ItemTransformation::ResizeLeft | ItemTransformation::ResizeBottom:
-        return Qt::SizeBDiagCursor;
-    case ItemTransformation::ResizeLeft:
-    case ItemTransformation::ResizeRight:
-        return Qt::SizeHorCursor;
-    case ItemTransformation::ResizeTop:
-    case ItemTransformation::ResizeBottom:
-        return Qt::SizeVerCursor;
-    case ItemTransformation::Move:
-        return Qt::SizeAllCursor;
-    case ItemTransformation::None:
-        return Qt::ArrowCursor;
-    default:
-        qWarning() << "Invalid transformation" << value;
-        return Qt::ArrowCursor;
+Qt::CursorShape QnVideowallManageWidgetPrivate::transformationsCursor(
+    ItemTransformations value) const
+{
+    switch (value)
+    {
+        case ItemTransformation::ResizeLeft | ItemTransformation::ResizeTop:
+        case ItemTransformation::ResizeRight | ItemTransformation::ResizeBottom:
+            return Qt::SizeFDiagCursor;
+        case ItemTransformation::ResizeRight | ItemTransformation::ResizeTop:
+        case ItemTransformation::ResizeLeft | ItemTransformation::ResizeBottom:
+            return Qt::SizeBDiagCursor;
+        case ItemTransformation::ResizeLeft:
+        case ItemTransformation::ResizeRight:
+            return Qt::SizeHorCursor;
+        case ItemTransformation::ResizeTop:
+        case ItemTransformation::ResizeBottom:
+            return Qt::SizeVerCursor;
+        case ItemTransformation::Move:
+            return Qt::SizeAllCursor;
+        case ItemTransformation::None:
+            return Qt::ArrowCursor;
+        default:
+            qWarning() << "Invalid transformation" << value;
+            return Qt::ArrowCursor;
     }
 }
 
-QRect QnVideowallManageWidgetPrivate::calculateProposedResizeGeometry(const BaseModelItem &item, bool *valid, bool *multiScreen) const {
+QRect QnVideowallManageWidgetPrivate::calculateProposedResizeGeometry(
+    const BaseModelItem& item,
+    bool* valid,
+    bool* multiScreen) const
+{
     QRect geometry = item.geometry;
     QRect result;
 
     int screenCount = 0;
-    for(auto screen = m_screens.cbegin(); screen != m_screens.cend(); ++screen) {
+    for (const auto& m_screen: m_screens)
+    {
         bool intersectsPartOf = false;
-        for(auto part = screen->parts.cbegin(); part != screen->parts.cend(); part++) {
-            QRect intersected = part->geometry.intersected(geometry);
-            if (1.0 * Geometry::area(intersected) / Geometry::area(part->geometry) > minAreaOverlapping) {
+        for (const auto& part: m_screen.parts)
+        {
+            QRect intersected = part.geometry.intersected(geometry);
+            const auto overlapping = 1.0 * Geometry::area(intersected)
+                / Geometry::area(part.geometry);
+            if (overlapping > minAreaOverlapping)
+            {
                 if (valid)
-                    *valid &= part->free();
-                result = result.united(part->geometry);
+                    *valid &= part.free();
+                result = result.united(part.geometry);
                 intersectsPartOf = true;
             }
         }
@@ -974,12 +1113,15 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedResizeGeometry(const Base
             ++screenCount;
     }
 
-    if (screenCount > 1) {
-        for(auto screen = m_screens.cbegin(); screen != m_screens.cend(); ++screen) {
-            if (result.intersects(screen->geometry)) {
-                result = result.united(screen->geometry);
+    if (screenCount > 1)
+    {
+        for (const auto& m_screen: m_screens)
+        {
+            if (result.intersects(m_screen.geometry))
+            {
+                result = result.united(m_screen.geometry);
                 if (valid)
-                    *valid &= screen->free();
+                    *valid &= m_screen.free();
             }
         }
     }
@@ -993,22 +1135,32 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedResizeGeometry(const Base
 }
 
 template<typename T>
-QList<T> bestMatchingGeometry(const QList<T> &source, const QRect &geometry, int count) {
+QList<T> bestMatchingGeometry(const QList<T>& source, const QRect& geometry, int count)
+{
     QList<T> result;
     result.reserve(count);
-    for(int i = 0; i < count; ++i)
+    for (int i = 0; i < count; ++i)
         result << source[0];
 
-    std::partial_sort_copy(source.cbegin(), source.cend(), result.begin(), result.end(), [&geometry](const T& left, const T& right) {
-        return Geometry::area(left.geometry.intersected(geometry)) > Geometry::area(right.geometry.intersected(geometry));
-    });
+    std::partial_sort_copy(
+        source.cbegin(),
+        source.cend(),
+        result.begin(),
+        result.end(),
+        [&geometry](const T& left, const T& right)
+        {
+            return Geometry::area(left.geometry.intersected(geometry)) > Geometry::area(
+                right.geometry.intersected(geometry));
+        });
     return result;
 }
 
 template<typename T>
-QRect unitedGeometry(const QList<T> source, bool *valid) {
+QRect unitedGeometry(const QList<T> source, bool* valid)
+{
     QRect result;
-    for(const T &item: source) {
+    for (const T& item: source)
+    {
         result = result.united(item.geometry);
         if (valid)
             *valid &= item.free();
@@ -1016,11 +1168,14 @@ QRect unitedGeometry(const QList<T> source, bool *valid) {
     return result;
 }
 
-
-QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(const BaseModelItem &item, bool *valid, bool *multiScreen) const {
+QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(
+    const BaseModelItem& item,
+    bool* valid,
+    bool* multiScreen) const
+{
     QRect geometry = item.geometry;
 
-    const int screenCount = item.snaps.screens().size();
+    const int screenCount = Screens::coveredBy(item.snaps, q->screenGeometries()).size();
     if (multiScreen)
         *multiScreen = screenCount > 1;
 
@@ -1029,31 +1184,42 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(const BaseMo
         return unitedGeometry(bestScreens, valid);
 
     int screenIdx = bestScreens[0].snaps.left().screenIndex;
-    int partCount = [](const QnScreenSnaps &snaps) {
-        int x = QnScreenSnap::snapsPerScreen() - snaps.right().snapIndex - snaps.left().snapIndex;
-        int y = QnScreenSnap::snapsPerScreen() - snaps.bottom().snapIndex - snaps.top().snapIndex;
-        return x * y;
-    }(item.snaps);
+    int partCount =
+        [](const QnScreenSnaps& snaps)
+        {
+            int x = QnScreenSnap::snapsPerScreen() - snaps.right().snapIndex - snaps.left().snapIndex;
+            int y = QnScreenSnap::snapsPerScreen() - snaps.bottom().snapIndex - snaps.top().snapIndex;
+            return x * y;
+        }(item.snaps);
 
-    QList<ModelScreenPart> bestParts = bestMatchingGeometry(m_screens[screenIdx].parts, geometry, partCount);
+    QList<ModelScreenPart> bestParts = bestMatchingGeometry(
+        m_screens[screenIdx].parts,
+        geometry,
+        partCount);
     return unitedGeometry(bestParts, valid);
 }
 
-void QnVideowallManageWidgetPrivate::processItemStart(BaseModelItem &item, calculateProposedGeometryFunction proposedGeometry) {
+void QnVideowallManageWidgetPrivate::processItemStart(
+    BaseModelItem& item,
+    calculateProposedGeometryFunction proposedGeometry)
+{
     item.flags |= StateFlag::Pressed;
     setFree(item.snaps, true);
     m_process.geometry = proposedGeometry(item, NULL, NULL);
 }
 
 template<typename T>
-QnScreenSnaps snapsFromGeometry(const QList<T> items, const QRect &geometry) {
+QnScreenSnaps snapsFromGeometry(const QList<T> items, const QRect& geometry)
+{
     QRect united;
     QnScreenSnaps result;
-    foreach(const T &item, items) {
+    for(const T &item: items)
+    {
         if (!item.geometry.intersects(geometry))
             continue;
 
-        if (!united.isValid()) {
+        if (!united.isValid())
+        {
             united = item.geometry;
             result = item.snaps;
             continue;
@@ -1072,22 +1238,32 @@ QnScreenSnaps snapsFromGeometry(const QList<T> items, const QRect &geometry) {
     return result;
 }
 
-void QnVideowallManageWidgetPrivate::processItemEnd(BaseModelItem &item, calculateProposedGeometryFunction proposedGeometry) {
+void QnVideowallManageWidgetPrivate::processItemEnd(
+    BaseModelItem& item,
+    calculateProposedGeometryFunction proposedGeometry)
+{
     item.flags &= ~StateFlags(StateFlag::Pressed);
 
     bool valid = true;
     bool multiscreen = false;
     QRect newGeometry = proposedGeometry(item, &valid, &multiscreen);
 
-    if (!valid) {
+    if (!valid)
+    {
         item.geometry = m_process.oldGeometry;
-    } else {
+    }
+    else
+    {
         item.geometry = newGeometry;
 
-        if (multiscreen) {
+        if (multiscreen)
+        {
             item.snaps = snapsFromGeometry(m_screens, newGeometry);
-        } else {
-            foreach(const ModelScreen &screen, m_screens) {
+        }
+        else
+        {
+            foreach(const ModelScreen &screen, m_screens)
+            {
                 if (!screen.geometry.intersects(newGeometry))
                     continue;
                 if (screen.geometry == newGeometry)
@@ -1104,6 +1280,17 @@ void QnVideowallManageWidgetPrivate::processItemEnd(BaseModelItem &item, calcula
     item.flags |= StateFlags(StateFlag::Hovered);
 }
 
-int QnVideowallManageWidgetPrivate::proposedItemsCount() const {
+int QnVideowallManageWidgetPrivate::proposedItemsCount() const
+{
     return m_items.size();
+}
+
+void QnVideowallManageWidgetPrivate::initScreenGeometries()
+{
+    int screenNumber = 0;
+    for (const auto rect: q->screenGeometries())
+    {
+        m_unitedGeometry = m_unitedGeometry.united(rect);
+        m_screens.append({screenNumber++, rect, q});
+    }
 }

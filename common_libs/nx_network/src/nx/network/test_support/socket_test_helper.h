@@ -194,7 +194,7 @@ private:
     size_t m_totalConnectionsAccepted;
     uint64_t m_totalBytesReceivedByClosedConnections;
     uint64_t m_totalBytesSentByClosedConnections;
-    std::chrono::milliseconds m_rwTimeout;
+    std::chrono::milliseconds m_rwTimeout{0};
     bool m_doNotBind;
 
     void onNewConnection(
@@ -280,7 +280,7 @@ private:
     int m_errorEmulationPercent;
     boost::optional<SocketAddress> m_localAddress;
     nx::utils::MoveOnlyFunc<void()> m_onFinishedHandler;
-    std::chrono::milliseconds m_rwTimeout;
+    std::chrono::milliseconds m_rwTimeout{0};
 
     void onConnectionFinished(
         int id,

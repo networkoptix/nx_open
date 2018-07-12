@@ -28,7 +28,7 @@ public:
     int videoPort() const;
     int eventPort() const;
 
-    virtual bool hasDualStreaming() const override { return false; }
+    virtual bool hasDualStreamingInternal() const override { return false; }
 
     void setStartTime(qint64 valueUsec);
     qint64 startTime() const;
@@ -69,7 +69,5 @@ private:
     static QnMutex m_chunkReaderMutex;
     static QMap<QString, QnVMax480ChunkReader*> m_chunkReaderMap;
 };
-
-typedef QnSharedResourcePointer<QnPlVmax480Resource> QnPlVmax480ResourcePtr;
 
 #endif // #ifdef ENABLE_VMAX

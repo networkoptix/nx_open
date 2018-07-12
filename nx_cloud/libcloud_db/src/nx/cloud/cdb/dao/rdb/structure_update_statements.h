@@ -833,6 +833,33 @@ INSERT INTO system_status VALUES(4, 'beingMerged');
 
 )sql";
 
+/**
+ * CLOUD-1642. Adding merge information.
+ */
+static const char kAddMergeInformation[] =
+R"sql(
+
+CREATE TABLE system_merge_info(
+    master_system_id    VARCHAR(64),
+    slave_system_id     VARCHAR(64),
+    start_time_utc      BIGINT
+);
+
+)sql";
+
+/**
+ * CLOUD-587. Moving data syncronization logic to a separate module.
+ * cloud_db already has all necessary structure.
+ * Skipping structure update .
+ */
+static const char kSetDataSyncModuleDbStructureVersion[] =
+R"sql(
+
+INSERT INTO db_version_data(schema_name, db_version)
+VALUES ('cloud_sync_engine_{C4105732-0097-48FB-AB9B-039A3C057F57}', 2);
+
+)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx

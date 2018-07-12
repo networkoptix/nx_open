@@ -138,7 +138,7 @@ protected:
         {
             api::AccountData accountData;
             ASSERT_EQ(
-                api::ResultCode::notAuthorized,
+                api::ResultCode::badUsername,
                 getAccount(
                     credentials.login,
                     credentials.password,
@@ -157,6 +157,38 @@ protected:
 
             assertTemporaryCredentialsCannotBeUsedToAuthenticateToVms();
         }
+    }
+
+    void assertAccountNameUpdateIsAllowed()
+    {
+        api::AccountUpdateData accountUpdate;
+        accountUpdate.fullName = m_account.fullName + "new";
+        accountUpdate.customization = m_account.customization + "new";
+
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            updateAccount(
+                m_temporaryCredentials.back().login,
+                m_temporaryCredentials.back().password,
+                accountUpdate));
+    }
+
+    void assertAccountPasswordUpdateIsForbidden()
+    {
+        api::AccountUpdateData accountUpdate;
+        accountUpdate.passwordHa1 = nx::network::http::calcHa1(
+            m_account.email.c_str(),
+            moduleInfo().realm.c_str(),
+            (nx::utils::generateRandomName(7) + "new").constData()).constData();
+        accountUpdate.fullName = m_account.fullName + "new";
+        accountUpdate.customization = m_account.customization + "new";
+
+        ASSERT_EQ(
+            api::ResultCode::forbidden,
+            updateAccount(
+                m_temporaryCredentials.back().login,
+                m_temporaryCredentials.back().password,
+                accountUpdate));
     }
 
 private:
@@ -235,23 +267,19 @@ TEST_F(AccountTemporaryCredentials, verify_temporary_credentials_are_accepted_by
             ASSERT_EQ(api::ResultCode::ok, result);
             ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
         }
-
-        //checking that account update is forbidden
-        std::string account1NewPassword = account1Password + "new";
-        api::AccountUpdateData update;
-        update.passwordHa1 = nx::network::http::calcHa1(
-            account1.email.c_str(),
-            moduleInfo().realm.c_str(),
-            account1NewPassword.c_str()).constData();
-        update.fullName = account1.fullName + "new";
-        update.customization = account1.customization + "new";
-
-        result = updateAccount(
-            temporaryCredentials.login,
-            temporaryCredentials.password,
-            update);
-        ASSERT_EQ(result, api::ResultCode::forbidden);
     }
+}
+
+TEST_F(AccountTemporaryCredentials, can_be_used_to_update_account)
+{
+    allocateAccountTemporaryCredentials();
+    assertAccountNameUpdateIsAllowed();
+}
+
+TEST_F(AccountTemporaryCredentials, cannot_be_used_to_change_password)
+{
+    allocateAccountTemporaryCredentials();
+    assertAccountPasswordUpdateIsForbidden();
 }
 
 TEST_F(AccountTemporaryCredentials, temporary_credentials_expiration)

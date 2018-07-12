@@ -6,9 +6,13 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/checked_cast.h>
+
+using namespace nx::client::desktop;
 
 QnResourceListModel::QnResourceListModel(QObject *parent) :
     base_type(parent)
@@ -51,6 +55,11 @@ bool QnResourceListModel::userCheckable() const
 void QnResourceListModel::setUserCheckable(bool value)
 {
     m_userCheckable = value;
+}
+
+void QnResourceListModel::setSinglePick(bool value)
+{
+    m_singlePick = value;
 }
 
 bool QnResourceListModel::hasStatus() const
@@ -141,23 +150,40 @@ void QnResourceListModel::setCheckedResources(const QSet<QnUuid>& ids)
         return;
 
     ScopedReset resetModel(this);
-    m_checkedResources = ids;
+
+    m_checkedResources.clear();
+
+    // Need to filter out IDs that are not in this resource list.
+    // We will gather all resource ids to a separate set, and then check ids
+    // from selection with this set. O(NlogM) is here.
+    QSet<QnUuid> contained_ids;
+    for (const auto& resource: m_resources)
+    {
+        auto id = resource->getId();
+        contained_ids.insert(id);
+    }
+
+    for (const auto& id: ids)
+    {
+        if (contained_ids.contains(id))
+            m_checkedResources.insert(id);
+    }
 }
 
-int QnResourceListModel::columnCount(const QModelIndex &parent) const
+int QnResourceListModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    Q_UNUSED(parent);
-
     int result = 1;     //< Added name column by default.
-    result += m_hasCheckboxes;
-    result += m_hasStatus;
+    if (m_hasCheckboxes)
+        ++result;
+    if (m_hasStatus)
+        ++result;
     return result;
 }
 
 
 int QnResourceListModel::rowCount(const QModelIndex &parent) const
 {
-    if(!parent.isValid())
+    if (!parent.isValid())
         return m_resources.size();
 
     return 0;
@@ -175,7 +201,7 @@ Qt::ItemFlags QnResourceListModel::flags(const QModelIndex &index) const
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable | userCheckableFlag;
 
     Qt::ItemFlags result = base_type::flags(index);
-    if(m_readOnly)
+    if (m_readOnly)
         return result;
 
     const QnResourcePtr &resource = m_resources[index.row()];
@@ -193,7 +219,7 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
     int column = index.column();
 
     const QnResourcePtr &resource = m_resources[index.row()];
-    if(!resource)
+    if (!resource)
         return QVariant();
 
     if (m_customAccessors.contains(column))
@@ -238,8 +264,8 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
             return static_cast<int>(resource->getStatus());
         case Qn::NodeTypeRole:
             return m_options.testFlag(ServerAsHealthMonitorOption)
-                ? qVariantFromValue(Qn::LayoutItemNode)
-                : qVariantFromValue(Qn::ResourceNode);
+                ? qVariantFromValue(ResourceTreeNodeType::layoutItem)
+                : qVariantFromValue(ResourceTreeNodeType::resource);
 
         default:
             break;
@@ -265,14 +291,39 @@ bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &valu
             return false;
 
         bool checked = value.toInt() == Qt::Checked;
-        if (checked)
-            m_checkedResources.insert(resource->getId());
+        bool changed = false;
+
+        auto id = resource->getId();
+
+        // Making a conservative changes. Do not raise event if nothing has changed
+        if (m_singlePick)
+        {
+            bool wasChecked = m_checkedResources.contains(id);
+            changed = (checked != wasChecked);
+            if (changed)
+            {
+                ScopedReset resetModel(this);
+                // TODO: Notify all other elements about the changes
+                m_checkedResources = checked ? QSet<QnUuid>{id} : QSet<QnUuid>{};
+            }
+        }
         else
-            m_checkedResources.remove(resource->getId());
+        {
+            if (checked)
+                m_checkedResources.insert(id);
+            else
+                m_checkedResources.remove(id);
+            changed = true;
+        }
+
+        if (changed)
+        {
+            emit selectionChanged();
+        }
 
         emit dataChanged(index.sibling(index.row(), 0),
-                         index.sibling(index.row(), ColumnCount - 1),
-                         { Qt::CheckStateRole });
+            index.sibling(index.row(), ColumnCount - 1),
+            { Qt::CheckStateRole });
         return true;
     }
 
@@ -297,7 +348,7 @@ QModelIndex QnResourceListModel::parent(const QModelIndex& child) const
 void QnResourceListModel::at_resource_resourceChanged(const QnResourcePtr &resource)
 {
     int row = m_resources.indexOf(resource);
-    if(row == -1)
+    if (row == -1)
         return;
 
     QModelIndex index = this->index(row, 0);

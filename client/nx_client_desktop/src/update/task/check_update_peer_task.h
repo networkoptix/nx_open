@@ -4,19 +4,22 @@
 #include <update/task/network_peer_task.h>
 #include <update/updates_common.h>
 
-#include <utils/common/system_information.h>
 #include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/utils/software_version.h>
+
+#include <nx/vms/api/data/system_information.h>
 
 class QnAsyncHttpClientReply;
 
-class QnCheckForUpdatesPeerTask : public QnNetworkPeerTask {
+class QnCheckForUpdatesPeerTask: public QnNetworkPeerTask
+{
     Q_OBJECT
+    using base_type = QnNetworkPeerTask;
 
-    typedef QnNetworkPeerTask base_type;
 public:
     explicit QnCheckForUpdatesPeerTask(const QnUpdateTarget &target, QObject *parent = 0);
 
-    QHash<QnSystemInformation, QnUpdateFileInformationPtr> updateFiles() const;
+    QHash<nx::vms::api::SystemInformation, QnUpdateFileInformationPtr> updateFiles() const;
     QnUpdateFileInformationPtr clientUpdateFile() const;
 
     void start();
@@ -31,9 +34,9 @@ protected:
     virtual void doCancel() override;
 
 private:
-    bool isUpdateNeed(
-        const QnSoftwareVersion& version,
-        const QnSoftwareVersion& updateVersion) const;
+    bool isUpdateNeeded(
+        const nx::utils::SoftwareVersion& version,
+        const nx::utils::SoftwareVersion& updateVersion) const;
 
     void checkUpdate();
     bool checkCloudHost();
@@ -71,7 +74,7 @@ private:
     bool m_targetMustBeNewer;
     bool m_checkLatestVersion;
 
-    QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
+    QHash<nx::vms::api::SystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
     QnUpdateFileInformationPtr m_clientUpdateFile;
     bool m_clientRequiresInstaller;
 

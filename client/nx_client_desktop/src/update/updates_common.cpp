@@ -7,6 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <client/client_settings.h>
+
 #include <nx/vms/discovery/manager.h>
 
 namespace {

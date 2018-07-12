@@ -1,12 +1,13 @@
 #include "license_validator.h"
 
 #include <api/runtime_info_manager.h>
-
 #include <common/common_module.h>
-
 #include <licensing/license.h>
-
 #include <utils/common/synctime.h>
+
+#include <nx/vms/api/types/connection_types.h>
+
+using namespace nx;
 
 namespace {
 
@@ -96,7 +97,7 @@ QString QnLicenseValidator::errorMessage(QnLicenseErrorCode errCode)
         case QnLicenseErrorCode::InvalidSignature:
             return tr("Invalid signature");
         case QnLicenseErrorCode::InvalidHardwareID:
-            return tr("Server with matching Hardware Id not found");
+            return tr("Server with matching Hardware ID not found");
         case QnLicenseErrorCode::InvalidBrand:
             return tr("Invalid customization");
         case QnLicenseErrorCode::Expired:
@@ -118,7 +119,7 @@ QnUuid QnLicenseValidator::serverId(const QnLicensePtr& license) const
 {
     for (const QnPeerRuntimeInfo& info: runtimeInfoManager()->items()->getItems())
     {
-        if (info.data.peer.peerType != Qn::PT_Server)
+        if (info.data.peer.peerType != vms::api::PeerType::server)
             continue;
 
         bool hwKeyOK = info.data.hardwareIds.contains(license->hardwareId());

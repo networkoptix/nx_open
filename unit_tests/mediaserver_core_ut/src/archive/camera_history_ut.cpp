@@ -5,10 +5,14 @@
 #include <gtest/gtest.h>
 
 #include <rest/handlers/camera_history_rest_handler.h>
+#include <nx_ec/data/api_fwd.h>
+#include <nx/vms/api/data/camera_history_data.h>
 
 struct BuildHistoryDataAccess
 {
-    static ec2::ApiCameraHistoryItemDataList buildHistoryData(QnCameraHistoryRestHandler* handler, const MultiServerPeriodDataList& chunkPeriods)
+    static nx::vms::api::CameraHistoryItemDataList buildHistoryData(
+        QnCameraHistoryRestHandler* handler,
+        const MultiServerPeriodDataList& chunkPeriods)
     {
         return handler->buildHistoryData(chunkPeriods);
     }
@@ -57,7 +61,7 @@ TEST(CameraHistory, BuildHistoryData)
         ASSERT_EQ(result[0].serverGuid, server2Data.guid);
         ASSERT_EQ(result[0].timestampMs, 1470709151655);
     }
-    
+
     {
         // s1:                 |----|      |--------- this chunk is being recorded
         // s2: |---------| |-------------| |--------|
@@ -86,7 +90,7 @@ TEST(CameraHistory, BuildHistoryData)
 
     {
         // s1:                 |----|
-        // s2: |---------| |-------------| 
+        // s2: |---------| |-------------|
         MultiServerPeriodDataList chunkPeriods;
         MultiServerPeriodData server1Data;
         server1Data.guid = QnUuid::createUuid();

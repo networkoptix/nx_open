@@ -7,7 +7,7 @@
 #include <QtWidgets/QApplication>
 
 #include <client/client_settings.h>
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
@@ -31,7 +31,7 @@ ImageOverlaySettingsWidget::ImageOverlaySettingsWidget(QWidget* parent):
 
     ui->sizeSlider->setMaximum(std::numeric_limits<int>::max());
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({ ui->sizeLabel, ui->opacityLabel });
 
     static const auto kDefaultMaximumWidth = 1000;

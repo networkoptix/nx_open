@@ -1,4 +1,4 @@
-<div class="container" >
+<div class="container auth-visible">
     <h1>Download</h1>
 
     <div class="col-md-8">
@@ -31,8 +31,8 @@
                                       </div>
                                       <div class="media-body text-left">
                                             <h2><b>Download %VMS_NAME%</b></h2>
-                                            <span class="installer-name">{{$root.L.downloads.groups[platform.name].shortLabel ||
-                                                $root.L.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</span>
+                                            <div class="installer-name">{{$root.L.downloads.groups[platform.name].shortLabel ||
+                                                $root.L.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</div>
                                       </div>
                                 </a>
                                 <p class="small" ng-if="$root.L.downloads.groups[platform.name].supported"

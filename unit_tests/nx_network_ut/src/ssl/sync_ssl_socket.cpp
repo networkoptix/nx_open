@@ -122,12 +122,12 @@ static BIO_METHOD Proxy_server_socket =
 // SyncSslSocket
 
 SyncSslSocket::SyncSslSocket(
-    std::unique_ptr<AbstractStreamSocket> delegatee,
+    std::unique_ptr<AbstractStreamSocket> delegate,
     bool isServerSide)
     :
-    base_type(delegatee.get()),
+    base_type(delegate.get()),
     m_extraBufferLen(0),
-    m_delegatee(std::move(delegatee)),
+    m_delegate(std::move(delegate)),
     m_ssl(nullptr),
     m_isServerSide(isServerSide)
 {

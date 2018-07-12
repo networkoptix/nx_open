@@ -7,6 +7,8 @@
 #include "synctime.h"
 #include "api/app_server_connection.h"
 #include "api/session_manager.h"
+//#include <nx/vms/time_sync/time_sync_manager.h>
+#include <nx_ec/ec_api.h>
 
 enum {
     EcTimeUpdatePeriod = 1000 * 60 * 5, /* 5 minutes. */
@@ -17,50 +19,16 @@ enum {
 // -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
-QnSyncTime::QnSyncTime(QObject *parent)
-:
-    QObject(parent),
-    m_lastReceivedTime( 0 ),
-    m_lastWarnTime( 0 ),
-    m_lastLocalTime( 0 ),
-    m_syncTimeRequestIssued( false ),
-    m_refCounter( 1 )
+QnSyncTime::QnSyncTime(QObject *parent): QObject(parent)
 {
-    reset();
-    m_timer.invalidate();
 }
 
-QnSyncTime::~QnSyncTime() {}
-
-
-void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newTime)
-{
-    if( errorCode != ec2::ErrorCode::ok )
-    {
-        NX_LOG( lit("Failed to receive synchronized time: %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-        return;
-    }
-
-    QnMutexLocker lock( &m_mutex );
-    qint64 oldTime = m_timer.isValid() ? m_lastReceivedTime + m_timer.elapsed() : newTime;
-
-    m_lastReceivedTime = newTime;
-    m_timer.restart();
-    m_syncTimeRequestIssued = false;
-
-    if(qAbs(oldTime - newTime) > TimeChangeThreshold)
-    {
-        lock.unlock();  //to avoid deadlock: in case if timeChanged signal handler will call thread-safe method of this class
-        emit timeChanged();
-    }
-}
-
-QDateTime QnSyncTime::currentDateTime()
+QDateTime QnSyncTime::currentDateTime() const
 {
     return QDateTime::fromMSecsSinceEpoch(currentMSecsSinceEpoch());
 }
 
-qint64 QnSyncTime::currentUSecsSinceEpoch()
+qint64 QnSyncTime::currentUSecsSinceEpoch() const
 {
     return currentMSecsSinceEpoch() * 1000;
 }
@@ -68,12 +36,6 @@ qint64 QnSyncTime::currentUSecsSinceEpoch()
 std::chrono::microseconds QnSyncTime::currentTimePoint()
 {
     return std::chrono::microseconds(currentUSecsSinceEpoch());
-}
-
-void QnSyncTime::reset()
-{
-    m_lastWarnTime = 0;
-    m_lastLocalTime = 0;
 }
 
 unsigned int QnSyncTime::addRef()
@@ -106,46 +68,28 @@ uint64_t QnSyncTime::millisSinceEpoch() const
     return const_cast<QnSyncTime*>(this)->currentMSecsSinceEpoch();
 }
 
-void QnSyncTime::updateTime(qint64 newTime)
+qint64 QnSyncTime::currentMSecsSinceEpoch() const
 {
-    updateTime( 0, ec2::ErrorCode::ok, newTime );
+    QnMutexLocker lock(&m_mutex);
+
+    ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::ec2Connection();
+    return appServerConnection
+        ? appServerConnection->timeSyncManager()->getSyncTime().count()
+        : QDateTime::currentMSecsSinceEpoch();
 }
 
-qint64 QnSyncTime::currentMSecsSinceEpoch()
+void QnSyncTime::setTimeNotificationManager(ec2::AbstractTimeNotificationManagerPtr timeNotificationManager)
 {
-    const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
-    if (
-        (
-            m_lastReceivedTime == 0
-        ||  m_timer.elapsed() > EcTimeUpdatePeriod
-        || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod
-        )
-        && !m_syncTimeRequestIssued)
+    if (m_timeNotificationManager)
+        m_timeNotificationManager->disconnect(this);
+
+    m_timeNotificationManager = timeNotificationManager;
+    if (m_timeNotificationManager)
     {
-        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::ec2Connection();
-        if( appServerConnection )
-        {
-            appServerConnection->getTimeManager(Qn::kSystemAccess)->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
-            m_syncTimeRequestIssued = true;
-        }
+        connect(
+            m_timeNotificationManager.get(), &ec2::AbstractTimeNotificationManager::timeChanged,
+            this, &QnSyncTime::timeChanged);
     }
-    m_lastLocalTime = localTime;
-
-    if (m_lastReceivedTime) {
-        qint64 time = m_lastReceivedTime + m_timer.elapsed();
-        if (qAbs(time - localTime) > 1000 * 10 && localTime - m_lastWarnTime > 1000 * 10)
-        {
-            m_lastWarnTime = localTime;
-            if (m_lastWarnTime == 0)
-            {
-                NX_LOG( lit("Local time differs from server's! local time %1, server time %2").
-                    arg(QDateTime::fromMSecsSinceEpoch(localTime).toString()).arg(QDateTime::fromMSecsSinceEpoch(time).toString()), cl_logWARNING );
-            }
-        }
-        return time;
-    }
-    else
-        return localTime;
 }

@@ -11,7 +11,7 @@
 
 static const int TESTCAM_TIMEOUT = 5 * 1000;
 
-QnTestCameraStreamReader::QnTestCameraStreamReader(const QnResourcePtr& res):
+QnTestCameraStreamReader::QnTestCameraStreamReader(const QnTestCameraResourcePtr& res):
     CLServerPushStreamReader(res)
 {
     m_tcpSock = nx::network::SocketFactory::createStreamSocket();
@@ -137,9 +137,9 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     return rez;
 }
 
-CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
+CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(
+    bool /*isCameraControlRequired*/, const QnLiveStreamParams& params)
 {
-    Q_UNUSED(isCameraControlRequired);
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
@@ -148,7 +148,6 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCa
 
     urlStr += QString(QLatin1String("?primary=%1&fps=%2")).arg(getRole() == Qn::CR_LiveVideo).arg(params.fps);
     QUrl url(urlStr);
-
 
     if (m_tcpSock->isClosed())
     {

@@ -24,7 +24,7 @@ struct QnWearableUploadManager::Private
 };
 
 QnWearableUploadManager::QnWearableUploadManager(QObject* parent):
-    base_type(parent),
+    nx::mediaserver::ServerModuleAware(parent),
     d(new Private())
 {
 }
@@ -33,38 +33,56 @@ QnWearableUploadManager::~QnWearableUploadManager()
 {
 }
 
-bool QnWearableUploadManager::clearSpace(qint64 requestedSpace, qint64* availableSpace)
+qint64 QnWearableUploadManager::downloadBytesAvailable() const
 {
-    Downloader* downloader = qnServerModule->findInstance<Downloader>();
+    Downloader* downloader = serverModule()->findInstance<Downloader>();
     NX_ASSERT(downloader);
 
-    QString path = QDir::cleanPath(downloader->filePath(lit(".")));
-    qnNormalStorageMan->clearSpaceForFile(path, requestedSpace);
+    QStorageInfo info(downloader->filePath(lit(".")));
 
-    *availableSpace = QStorageInfo(path).bytesAvailable();
-    return requestedSpace <= *availableSpace;
+    QString volumeRoot = info.rootPath();
+    QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByVolume(volumeRoot);
+    qint64 spaceLimit = storage ? storage->getSpaceLimit() : 0;
+
+    return std::max(0ll, info.bytesAvailable() - spaceLimit);
+}
+
+qint64 QnWearableUploadManager::totalBytesAvailable() const
+{
+    qint64 result = 0;
+
+    for (const QnStorageResourcePtr& storage : qnNormalStorageMan->getUsedWritableStorages())
+    {
+        qint64 free = storage->getFreeSpace();
+        qint64 spaceLimit = storage->getSpaceLimit();
+        qint64 available = std::max(0ll, free - spaceLimit);
+
+        result += available;
+    }
+
+    return result;
 }
 
 bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs)
 {
     WearableArchiveSynchronizer* synchronizer =
-        qnServerModule->findInstance<WearableArchiveSynchronizer>();
+        serverModule()->findInstance<WearableArchiveSynchronizer>();
     NX_ASSERT(synchronizer);
 
-    Downloader* downloader = qnServerModule->findInstance<Downloader>();
+    Downloader* downloader = serverModule()->findInstance<Downloader>();
     NX_ASSERT(downloader);
 
     std::unique_ptr<QFile> file = std::make_unique<QFile>(downloader->filePath(uploadId));
     if (!file->open(QIODevice::ReadOnly))
         return false;
 
-    QnSecurityCamResourcePtr camera = qnServerModule->commonModule()->resourcePool()->
+    QnSecurityCamResourcePtr camera = serverModule()->commonModule()->resourcePool()->
         getResourceById(cameraId).dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return false;
 
     WearableArchiveTaskPtr task(new WearableArchiveSynchronizationTask(
-        qnServerModule,
+        serverModule(),
         camera,
         std::move(file),
         startTimeMs));
@@ -80,7 +98,7 @@ bool QnWearableUploadManager::consume(const QnUuid& cameraId, const QnUuid& toke
     {
         if (state.status == WearableArchiveSynchronizationState::Finished)
         {
-            if (auto downloader = qnServerModule->findInstance<Downloader>())
+            if (auto downloader = serverModule()->findInstance<Downloader>())
                 downloader->deleteFile(uploadId);
 
             QnMutexLocker locker(&d->mutex);

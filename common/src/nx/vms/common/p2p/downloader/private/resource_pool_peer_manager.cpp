@@ -1,7 +1,4 @@
-#include "resource_pool_peer_manager.h"
-
 #include <nx/utils/log/assert.h>
-#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -9,6 +6,9 @@
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
 #include "peer_selection/peer_selector_factory.h"
+#include "../validate_result.h"
+#include "../downloader.h"
+#include "resource_pool_peer_manager.h"
 
 namespace nx {
 namespace vms {
@@ -57,17 +57,17 @@ private:
     }
 };
 
+} // namespace
+
 nx::network::http::AsyncHttpClientPtr createHttpClient()
 {
     auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient->setMessageBodyReadTimeoutMs(5);
 
     return httpClient;
 }
-
-} // namespace
 
 ResourcePoolPeerManager::ResourcePoolPeerManager(
     QnCommonModule* commonModule,
@@ -118,7 +118,7 @@ int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
         return -1;
 
     int distance = std::numeric_limits<int>::max();
-    connection->routeToPeerVia(peerId, &distance);
+    connection->routeToPeerVia(peerId, &distance, /*address*/ nullptr);
     return distance;
 }
 
@@ -129,7 +129,15 @@ bool ResourcePoolPeerManager::hasInternetConnection(const QnUuid& peerId) const
     if (!server)
         return false;
 
-    return server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    return server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
+}
+
+bool ResourcePoolPeerManager::hasAccessToTheUrl(const QString& url) const
+{
+    if (url.isEmpty())
+        return false;
+
+    return Downloader::validate(url, /* onlyConnectionCheck */ true, /* expectedSize */ 0);
 }
 
 rest::Handle ResourcePoolPeerManager::requestFileInfo(
@@ -143,7 +151,7 @@ rest::Handle ResourcePoolPeerManager::requestFileInfo(
         [this, callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!success)
-                callback(success, handle, FileInformation());
+                return callback(success, handle, FileInformation());
 
             const auto& fileInfo = result.deserialized<FileInformation>();
             callback(success, handle, fileInfo);
@@ -165,7 +173,7 @@ rest::Handle ResourcePoolPeerManager::requestChecksums(
         [this, callback](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             if (!success)
-                callback(success, handle, QVector<QByteArray>());
+                return callback(success, handle, QVector<QByteArray>());
 
             const auto& checksums = result.deserialized<QVector<QByteArray>>();
             callback(success, handle, checksums);
@@ -184,33 +192,83 @@ rest::Handle ResourcePoolPeerManager::downloadChunk(
     if (!connection)
         return -1;
 
-    return connection->downloadFileChunk(fileName, chunkIndex, callback, thread());
+    const auto internalCallback =
+        [callback = std::move(callback)](
+            bool success,
+            rest::Handle requestId,
+            QByteArray result,
+            const nx::network::http::HttpHeaders& /*headers*/)
+        {
+            return callback(success, requestId, result);
+        };
+
+    return connection->downloadFileChunk(fileName, chunkIndex, std::move(internalCallback),
+        thread());
 }
 
 rest::Handle ResourcePoolPeerManager::validateFileInformation(
-    const FileInformation& fileInformation, AbstractPeerManager::ValidateCallback callback)
+    const QnUuid& peerId,
+    const FileInformation& fileInformation,
+    AbstractPeerManager::ValidateCallback callback)
 {
-    const auto handle = ++m_currentSelfRequestHandle;
-    auto httpClient = createHttpClient();
-    httpClient->doHead(fileInformation.url,
-        [this, &fileInformation, callback, handle, httpClient](
-            network::http::AsyncHttpClientPtr asyncClient) mutable
+    if (peerId != selfId())
+    {
+        NX_VERBOSE(
+            this,
+            lm("[Downloader, validate] File %1 via other peer %2")
+                .args(fileInformation.name, peerId));
+
+        const auto& connection = getConnection(peerId);
+        if (!connection)
         {
-            if (asyncClient->failed()
-                || asyncClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
-            {
-                return callback(false, handle);
-            }
+            NX_WARNING(this, lm("[Downloader, validate] File %1. No rest connection for %2")
+                .args(fileInformation.name, peerId));
+            return -1;
+        }
 
-            auto& responseHeaders = asyncClient->response()->headers;
-            auto contentLengthItr = responseHeaders.find("Content-Length");
-            if (contentLengthItr == responseHeaders.cend()
-                || contentLengthItr->second.toInt() != fileInformation.size)
+        auto handleReply =
+            [this, callback, fileInformation, peerId](
+                bool success,
+                rest::Handle handle,
+                const QnJsonRestResult& result)
             {
-                return callback(false, handle);
-            }
+                if (!success)
+                {
+                    NX_WARNING(this, lm("[Downloader, validate] File %1. Rest connection to %2 response error")
+                        .args(fileInformation.name, peerId));
+                    return callback(success, handle);
+                }
 
-            callback(false, handle);
+                const auto validateResult = result.deserialized<ValidateResult>();
+                if (!validateResult.success)
+                {
+                    NX_WARNING(this, lm("[Downloader, validate] File %1. peer %2 responded that validation had failed")
+                        .args(fileInformation.name, peerId));
+                    return callback(false, handle);
+                }
+
+                NX_VERBOSE(this, lm("[Downloader, validate] File %1. peer %2 validation successful")
+                    .args(fileInformation.name, peerId));
+
+                callback(success, handle);
+            };
+
+        return connection->validateFileInformation(
+            QString::fromLatin1(fileInformation.url.toString().toLocal8Bit().toBase64()),
+            fileInformation.size, handleReply, thread());
+    }
+
+    NX_VERBOSE(
+        this,
+        lm("[Downloader, validate] Trying to validate %1 directly")
+            .args(fileInformation.name));
+
+    const auto handle = ++m_currentSelfRequestHandle;
+    Downloader::validateAsync(
+        fileInformation.url.toString(), /* onlyConnectionCheck */ false, fileInformation.size,
+        [this, callback, handle](bool success)
+        {
+            callback(success, handle);
         });
 
     return handle;
@@ -230,17 +288,22 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
         if (!connection)
             return -1;
 
-        auto handleReply =
-            [this, callback](bool success, rest::Handle handle, const QByteArray& result)
+        const auto handleReply =
+            [this, callback = std::move(callback)](
+                bool success,
+                rest::Handle requestId,
+                QByteArray result,
+                const nx::network::http::HttpHeaders& /*headers*/)
             {
                 if (!success)
-                    callback(success, handle, QByteArray());
+                    return callback(success, requestId, QByteArray());
 
-                callback(success, handle, result);
+                // TODO: #vkutin #common Is double call intended?
+                return callback(success, requestId, result);
             };
 
         return connection->downloadFileChunkFromInternet(
-            fileName, url, chunkIndex, chunkSize, handleReply, thread());
+            fileName, url, chunkIndex, chunkSize, std::move(handleReply), thread());
     }
 
     const qint64 pos = chunkIndex * chunkSize;
@@ -250,20 +313,23 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
 
     const auto handle = ++m_currentSelfRequestHandle;
     m_httpClientByHandle[handle] = httpClient;
+
+    qWarning() << "Starting http client" << url.toString() << handle;
     httpClient->doGet(url,
-        [this, handle, callback, httpClient](network::http::AsyncHttpClientPtr client)
+        [this, handle, callback, httpClient, url](network::http::AsyncHttpClientPtr client)
         {
             if (!m_httpClientByHandle.remove(handle))
                 return;
-
+            qWarning() << "http client done" << url.toString() << handle;
+            using namespace network;
             QByteArray result;
 
-            if (!client->failed()
-                && client->response()
-                && client->response()->statusLine.statusCode == network::http::StatusCode::ok)
-            {
+            auto okResponse = client->response() &&
+                (client->response()->statusLine.statusCode == http::StatusCode::partialContent
+                || client->response()->statusLine.statusCode == http::StatusCode::ok);
+
+            if (!client->failed() && okResponse)
                 result = client->fetchMessageBodyBuffer();
-            }
 
             callback(!result.isNull(), handle, result);
         });
@@ -316,11 +382,12 @@ ResourcePoolPeerManagerFactory::ResourcePoolPeerManagerFactory(QnCommonModule* c
 }
 
 AbstractPeerManager* ResourcePoolPeerManagerFactory::createPeerManager(
-    FileInformation::PeerSelectionPolicy peerPolicy)
+    FileInformation::PeerSelectionPolicy peerPolicy,
+    const QList<QnUuid>& additionalPeers)
 {
     return new ResourcePoolPeerManager(
         commonModule(),
-        PeerSelectorFactory::create(peerPolicy, commonModule()));
+        PeerSelectorFactory::create(peerPolicy, additionalPeers, commonModule()));
 }
 
 } // namespace downloader

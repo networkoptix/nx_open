@@ -2,6 +2,7 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/string.h>
+#include <QByteArrayList>
 
 namespace nx {
 namespace network {
@@ -426,26 +427,56 @@ TEST(HttpRequestTest, RequestLine_parse)
 //-------------------------------------------------------------------------------------------------
 // nx::network::http::Request.
 
-static const nx::Buffer HTTP_REQUEST(
-    "PLAY rtsp://192.168.0.25:7001/00-1A-07-0A-3A-88 RTSP/1.0\r\n"
-    "CSeq: 2\r\n"
-    "Range: npt=1423440107300000-1423682432925000\r\n"
-    "Scale: 1\r\n"
-    "x-guid: {ff69b2e0-1f1e-4512-8eb9-4d20b33587dc}\r\n"
-    "Session: \r\n"
-    "User-Agent: Network Optix\r\n"
-    "x-play-now: true\r\n"
-    "x-media-step: 9693025000\r\n"
-    "Authorization: Basic YWRtaW46MTIz\r\n"
-    "x-server-guid: {d1a49afe-a2a2-990a-2c54-b77e768e6ad2}\r\n"
-    "x-media-quality: low\r\n"
-    "\r\n");
+static const auto kTestRequest = QByteArrayList({
+    "PLAY rtsp://192.168.0.25:7001/00-1A-07-0A-3A-88 RTSP/1.0",
+    "CSeq: 2",
+    "Range: npt=1423440107300000-1423682432925000",
+    "Scale: 1",
+    "x-guid: {ff69b2e0-1f1e-4512-8eb9-4d20b33587dc}",
+    "Session: ",
+    "User-Agent: Network Optix",
+    "x-play-now: true",
+    "x-media-step: 9693025000",
+    "Authorization: Basic YWRtaW46MTIz",
+    "x-server-guid: {d1a49afe-a2a2-990a-2c54-b77e768e6ad2}",
+    "x-media-quality: low",
+""}).join("\r\n");
 
 TEST(HttpRequestTest, Request_parse)
 {
     nx::network::http::Request request;
-    ASSERT_TRUE(request.parse(HTTP_REQUEST));
-    ASSERT_EQ(nx::network::http::getHeaderValue(request.headers, "x-media-step").toLongLong(), 9693025000LL);
+    ASSERT_TRUE(request.parse(kTestRequest));
+    ASSERT_EQ(9693025000LL,
+        nx::network::http::getHeaderValue(request.headers, "x-media-step").toLongLong());
+}
+
+//-------------------------------------------------------------------------------------------------
+// nx::network::http::Response.
+
+static const auto kTestResponse = QByteArrayList({
+    "HTTP/1.1 200 OK",
+    "Date: Wed, 06 Jun 2018 17:28:48 +0300",
+    "Connection: Keep-Alive",
+    "Keep-Alive: timeout=5",
+    "X-Runtime-Guid: {d1a49afe-a2a2-990a-2c54-b77e768e6ad2}",
+    "Set-Cookie: username=admin; Path=/",
+    "Set-Cookie: authorizationKey=88d13fb76ea9; Path=/; HttpOnly",
+    "Set-Cookie: orderId=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT",
+""}).join("\r\n");
+
+static const std::map<nx::String, nx::String> kTestCookie{
+    {"username", "admin"},
+    {"authorizationKey", "88d13fb76ea9"},
+};
+
+TEST(HttpResponseTest, Request_parse)
+{
+    nx::network::http::Response request;
+    ASSERT_TRUE(request.parse(kTestResponse));
+    ASSERT_EQ(kTestCookie, request.getCookies());
+    ASSERT_EQ(nx::String("{d1a49afe-a2a2-990a-2c54-b77e768e6ad2}"),
+        nx::network::http::getHeaderValue(request.headers, "X-Runtime-Guid"));
+
 }
 
 //-------------------------------------------------------------------------------------------------

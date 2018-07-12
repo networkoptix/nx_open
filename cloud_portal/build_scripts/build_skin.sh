@@ -21,17 +21,17 @@ dir=../skins/$SKIN
     echo "------------------------------"
     echo "Building front_end"
 
-    echo "Copy custom styles"
-    mkdir -p ../front_end/app/styles/custom
-    cp -rf $dir/front_end/styles/* ../front_end/app/styles/custom
 
     echo "Build statics"
     pushd ../front_end
-    grunt setskin:$SKIN
-    grunt build
+        npm run setSkin $SKIN
+        npm run build
+        # Save the repository info.
+        echo "Create version.txt"
+        hg log -r . --repository "$2" | head -n 7 > dist/version.txt
+        cat dist/version.txt
     popd
 
-    cp -rf $dir/front_end/styles/* ../front_end/app/styles/custom
 
     if [ "$SKIN" = "blue" ]
     then
@@ -44,12 +44,6 @@ dir=../skins/$SKIN
 
     echo "Move front_end to destination"
     mv ../front_end/dist $TARGET_DIR/$SKIN/static
-
-    echo "Overwrite images"
-    cp -rf $dir/front_end/images/* $TARGET_DIR/$SKIN/static/images
-
-    echo "Overwrite static"
-    cp -rf $dir/front_end/views/* $TARGET_DIR/$SKIN/static/views || true
 
     echo "Building front_end finished"
 

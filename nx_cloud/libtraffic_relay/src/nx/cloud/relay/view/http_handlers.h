@@ -18,7 +18,7 @@ class CreateClientSessionHandler:
         api::CreateClientSessionResponse>
 {
     using self_type = CreateClientSessionHandler;
-    using base_type = 
+    using base_type =
         relaying::BasicHandlerWithRequestBody<
             controller::AbstractConnectSessionManager,
             api::CreateClientSessionRequest,
@@ -40,13 +40,13 @@ protected:
 
 //-------------------------------------------------------------------------------------------------
 
-class ConnectToPeerHandler:
+class ConnectToListeningPeerWithHttpUpgradeHandler:
     public relaying::BasicHandlerWithoutRequestBody<
         controller::AbstractConnectSessionManager,
         controller::ConnectToPeerRequestEx,
         controller::AbstractConnectSessionManager::ConnectToPeerHandler>
 {
-    using self_type = ConnectToPeerHandler;
+    using self_type = ConnectToListeningPeerWithHttpUpgradeHandler;
     using base_type =
         relaying::BasicHandlerWithoutRequestBody<
             controller::AbstractConnectSessionManager,
@@ -56,7 +56,7 @@ class ConnectToPeerHandler:
 public:
     static const char* kPath;
 
-    ConnectToPeerHandler(
+    ConnectToListeningPeerWithHttpUpgradeHandler(
         controller::AbstractConnectSessionManager* connectSessionManager);
 
 protected:

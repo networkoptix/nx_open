@@ -40,10 +40,9 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::network::http::AuthType)
  * State is changed just before delivering event.
  * This class methods are not thread-safe.
  * NOTE: This class is a replacement for nx::network::http::AsyncHttpClient.
- *   As soon as it becomes ready, nx::network::http::AsyncHttpClient will be declared as deprecated.
  * WARNING: It is strongly recommended to listen for someMessageBodyAvailable() event and
  *   read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
- *   to avoid internal message body buffer to consume too much memory.
+ *   to avoid internal message body buffer consuming too much memory.
  */
 class NX_NETWORK_API AsyncClient:
     public nx::network::aio::BasicPollable
@@ -91,6 +90,12 @@ public:
     static const int UNLIMITED_RECONNECT_TRIES = -1;
 
     AsyncClient();
+
+    /**
+     * Set already connected socket to force it for the very first request.
+     */
+    AsyncClient(std::unique_ptr<AbstractStreamSocket> socket);
+
     virtual ~AsyncClient();
 
     AsyncClient(const AsyncClient&) = delete;
@@ -162,12 +167,18 @@ public:
      * Start POST request to url.
      * @return true, if socket is created and async connect is started. false otherwise
      */
-    void doPost(const nx::utils::Url &url);
+    void doPost(const nx::utils::Url& url);
+    void doPost(
+        const nx::utils::Url& url,
+        std::unique_ptr<AbstractMsgBodySource> body);
     void doPost(
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void doPut(const nx::utils::Url& url);
+    void doPut(
+        const nx::utils::Url& url,
+        std::unique_ptr<AbstractMsgBodySource> body);
     void doPut(
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
@@ -179,6 +190,14 @@ public:
 
     void doUpgrade(
         const nx::utils::Url& url,
+        const StringType& protocolToUpgradeTo);
+    void doUpgrade(
+        const nx::utils::Url& url,
+        nx::network::http::Method::ValueType method,
+        const StringType& protocolToUpgradeTo);
+
+    void doUpgrade(
+        const nx::utils::Url& url,
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
     void doUpgrade(
@@ -187,8 +206,17 @@ public:
         const StringType& protocolToUpgradeTo,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
-    void doRequest(nx::network::http::Method::ValueType method,
-        const nx::utils::Url &url);
+    void doConnect(
+        const nx::utils::Url& proxyUrl,
+        const StringType& targetHost);
+    void doConnect(
+        const nx::utils::Url& proxyUrl,
+        const StringType& targetHost,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+
+    void doRequest(
+        nx::network::http::Method::ValueType method,
+        const nx::utils::Url& url);
     void doRequest(
         nx::network::http::Method::ValueType method,
         const nx::utils::Url& url,
@@ -237,7 +265,7 @@ public:
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
 
-    void setProxyVia(const SocketAddress& proxyEndpoint);
+    void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure);
 
     /** If set to true client will not try to add Authorization header to the first request. false by default. */
     void setDisablePrecalculatedAuthorization(bool val);
@@ -281,6 +309,7 @@ public:
 
     static QString endpointWithProtocol(const nx::utils::Url& url);
 
+    void setMaxNumberOfRedirects(int maxNumberOfRedirects);
 private:
     enum class Result
     {
@@ -308,12 +337,14 @@ private:
     Credentials m_user;
     Credentials m_proxyUser;
     boost::optional<SocketAddress> m_proxyEndpoint;
+    bool m_isProxySecure = false;
     bool m_authorizationTried;
     bool m_proxyAuthorizationTried;
     bool m_ha1RecalcTried;
     bool m_terminated;
     quint64 m_totalBytesReadPerRequest; //< total read bytes per request
     int m_totalRequestsSentViaCurrentConnection; //< total sent requests via single connection
+    int m_totalRequestsSent; //< total sent requests
     bool m_contentEncodingUsed;
     std::chrono::milliseconds m_sendTimeout;
     std::chrono::milliseconds m_responseReadTimeout;
@@ -331,6 +362,7 @@ private:
     nx::utils::ObjectDestructionFlag m_objectDestructionFlag;
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_expectOnlyBody = false;
+    int m_maxNumberOfRedirects = 5;
 
     virtual void stopWhileInAioThread() override;
 

@@ -49,7 +49,7 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    virtual bool hasDualStreaming() const override;
+    virtual bool hasDualStreamingInternal() const override;
     virtual int getMaxFps() const override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
@@ -103,7 +103,7 @@ public:
     bool SetupAudioInput();
 
     static QString toActiEncoderString(const QString& value);
-
+    static QString formatResolutionStr(const QSize& resolution);
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
@@ -118,6 +118,12 @@ protected:
     virtual bool isInputPortMonitored() const override;
 
 private:
+    struct CameraAdvancedParamQueryInfo
+    {
+        QString group;
+        QString cmd;
+    };
+
     QSize extractResolution(const QByteArray& resolutionStr) const;
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
     QMap<int, QString> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
@@ -154,7 +160,7 @@ private:
         const QList<QnCameraAdvancedParameter>& params,
         QnCameraAdvancedParamValueList& result) const;
 
-    QMap<QString, QString> resolveQueries(QMap<QString, QnCameraAdvancedParamQueryInfo>& queries) const;
+    QMap<QString, QString> resolveQueries(QMap<QString, CameraAdvancedParamQueryInfo>& queries) const;
 
     void extractParamValues(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
     QString fillMissingParams(const QString& unresolvedTemplate, const QString& valueFromCamera) const;
@@ -162,7 +168,10 @@ private:
     boost::optional<QString> tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const;
 
     virtual std::vector<Camera::AdvancedParametersProvider*> advancedParametersProviders() override;
-
+    CameraDiagnostics::Result maxFpsForSecondaryResolution(
+        const QString& secondaryCodec, const QSize& secondaryResolution, int* outFps);
+    QString bestPrimaryCodec() const;
+    CameraDiagnostics::Result detectMaxFpsForSecondaryCodec();
 private:
     class TriggerOutputTask
     {
@@ -199,10 +208,23 @@ private:
         std::map<QByteArray, std::vector<QByteArray> > params;
     };
 
+    struct ComparableSize: public QSize
+    {
+    public:
+        ComparableSize(const QSize& value = QSize()): QSize(value) {}
+        bool operator<(const QSize& other) const
+        {
+            if (width() != other.width())
+                return width() < other.width();
+            return height() < other.height();
+        }
+    };
+
 
     QList<QSize> m_resolutionList[MAX_STREAMS];
     QList<int> m_availFps[MAX_STREAMS];
     QMap<int, QString> m_availableBitrates;
+    QMap<ComparableSize, int> m_maxSecondaryFps;
     QSet<QString> m_availableEncoders;
     RtpTransport::Value m_desiredTransport;
 

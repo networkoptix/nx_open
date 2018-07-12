@@ -12,10 +12,14 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class CameraThumbnailProvider: public QnImageProvider, public QnConnectionContextAware
+/**
+* This class allows receiving of thumbnails via http request to server.
+* Every setRequest() call will bring a new screenshot.
+*/
+class CameraThumbnailProvider: public ImageProvider, public QnConnectionContextAware
 {
     Q_OBJECT
-    using base_type = QnImageProvider;
+    using base_type = ImageProvider;
 
 public:
     explicit CameraThumbnailProvider(const api::CameraImageRequest& request,
@@ -28,9 +32,12 @@ public:
     api::CameraImageRequest requestData() const;
     void setRequestData(const api::CameraImageRequest& data);
 
+    qint64 timestampUs() const;
+
 signals:
     /** Internal signal to implement thread-safety. */
-    void imageDataLoadedInternal(const QByteArray &data);
+    void imageDataLoadedInternal(const QByteArray &data, Qn::ThumbnailStatus nextStatus,
+        qint64 timestampMs);
 
 protected:
     virtual void doLoadAsync() override;
@@ -42,6 +49,7 @@ private:
     api::CameraImageRequest m_request;
     QImage m_image;
     Qn::ThumbnailStatus m_status;
+    qint64 m_timestampUs = 0;
 };
 
 } // namespace desktop

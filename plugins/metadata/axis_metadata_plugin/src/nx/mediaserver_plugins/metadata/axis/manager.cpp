@@ -7,9 +7,10 @@
 #include <nx/sdk/metadata/common_event.h>
 #include <nx/sdk/metadata/common_metadata_packet.h>
 #include <nx/api/analytics/device_manifest.h>
-#include <nx/kit/debug.h>
-
 #include <nx/fusion/serialization/json.h>
+
+#define NX_PRINT_PREFIX "[metadata::axis::Manager] "
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -30,11 +31,13 @@ Manager::Manager(
     nx::api::AnalyticsDeviceManifest deviceManifest;
     for (const auto& event: typedManifest.outputEventTypes)
         deviceManifest.supportedEventTypes.push_back(event.typeId);
+    NX_PRINT << "Axis metadata manager created";
 }
 
 Manager::~Manager()
 {
     stopFetchingMetadata();
+    NX_PRINT << "Axis metadata manager destroyed";
 }
 
 void* Manager::queryInterface(const nxpl::NX_GUID& interfaceId)

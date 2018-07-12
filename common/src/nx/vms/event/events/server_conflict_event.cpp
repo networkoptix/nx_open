@@ -1,10 +1,11 @@
 #include "server_conflict_event.h"
 
 #include <core/resource/resource.h>
-#include <network/module_information.h>
 
 namespace {
+
 static const QChar kDelimiter(L'\n');
+
 } // namespace
 
 QString QnCameraConflictList::encode() const
@@ -76,7 +77,7 @@ ServerConflictEvent::ServerConflictEvent(
     qint64 timeStamp,
     const QnCameraConflictList& conflictList)
     :
-    base_type(serverConflictEvent, server, timeStamp),
+    base_type(EventType::serverConflictEvent, server, timeStamp),
     m_cameraConflicts(conflictList)
 {
     m_caption = m_cameraConflicts.sourceServer;
@@ -86,12 +87,11 @@ ServerConflictEvent::ServerConflictEvent(
 ServerConflictEvent::ServerConflictEvent(
     const QnResourcePtr& server,
     qint64 timeStamp,
-    const QnModuleInformation& conflictModule,
+    const nx::vms::api::ModuleInformation& /*conflictModule*/,
     const QUrl& conflictUrl)
     :
-    base_type(serverConflictEvent, server, timeStamp)
+    base_type(EventType::serverConflictEvent, server, timeStamp)
 {
-    Q_UNUSED(conflictModule)
     m_caption = lit("%1:%2").arg(conflictUrl.host()).arg(conflictUrl.port());
 }
 

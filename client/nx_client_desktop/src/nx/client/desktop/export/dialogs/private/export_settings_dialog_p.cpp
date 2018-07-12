@@ -1,5 +1,7 @@
 #include "export_settings_dialog_p.h"
 
+#include <chrono>
+
 #include <QtCore/QFileInfo>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QStandardPaths>
@@ -77,7 +79,7 @@ ExportSettingsDialog::Private::~Private()
 
 void ExportSettingsDialog::Private::updateOverlaysVisibility()
 {
-    if (m_exportMediaPersistentSettings.shouldExportOverlays())
+    if (m_exportMediaPersistentSettings.canExportOverlays())
     {
         for (const auto overlayType: m_exportMediaPersistentSettings.usedOverlays)
         {
@@ -112,8 +114,8 @@ void ExportSettingsDialog::Private::loadSettings()
     m_exportMediaSettings.fileName.extension = FileSystemStrings::extension(
         m_exportMediaPersistentSettings.fileFormat, FileExtension::mkv);
 
-    m_exportLayoutSettings.filename.path = lastExportDir;
-    m_exportLayoutSettings.filename.extension = FileSystemStrings::extension(
+    m_exportLayoutSettings.fileName.path = lastExportDir;
+    m_exportLayoutSettings.fileName.extension = FileSystemStrings::extension(
         m_exportLayoutPersistentSettings.fileFormat, FileExtension::nov);
 
     auto& imageOverlay = m_exportMediaPersistentSettings.imageOverlay;
@@ -132,7 +134,7 @@ void ExportSettingsDialog::Private::loadSettings()
     refreshMediaPreview();
     updateOverlaysVisibility();
 
-    if (m_exportMediaPersistentSettings.shouldExportOverlays())
+    if (m_exportMediaPersistentSettings.canExportOverlays())
     {
         const auto& used = m_exportMediaPersistentSettings.usedOverlays;
         for (const auto type : used)
@@ -165,7 +167,7 @@ void ExportSettingsDialog::Private::saveSettings()
         case Mode::Layout:
         {
             qnSettings->setExportLayoutSettings(m_exportLayoutPersistentSettings);
-            qnSettings->setLastExportDir(m_exportLayoutSettings.filename.path);
+            qnSettings->setLastExportDir(m_exportLayoutSettings.fileName.path);
             break;
         }
     }
@@ -218,8 +220,9 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
         // We do have our own image processor, so we do not bother server with transcoding.
         api::ResourceImageRequest request;
         request.resource = m_exportMediaSettings.mediaResource->toResourcePtr();
-        request.msecSinceEpoch = m_exportMediaSettings.timePeriod.startTimeMs;
-        request.roundMethod = api::ImageRequest::RoundMethod::precise;
+        request.usecSinceEpoch = std::chrono::microseconds(std::chrono::milliseconds(
+            m_exportMediaSettings.period.startTimeMs)).count();
+        request.roundMethod = api::ImageRequest::RoundMethod::iFrameBefore;
         request.rotation = 0;
         request.aspectRatio = api::ImageRequest::AspectRatio::source;
 
@@ -233,7 +236,7 @@ void ExportSettingsDialog::Private::refreshMediaPreview()
             new ProxyImageProvider(m_mediaRawImageProvider.get()));
         provider->setImageProcessor(m_mediaPreviewProcessor.data());
         m_mediaPreviewProvider = std::move(provider);
-        connect(m_mediaPreviewProvider.get(), &QnImageProvider::sizeHintChanged, this, &Private::setFrameSize);
+        connect(m_mediaPreviewProvider.get(), &ImageProvider::sizeHintChanged, this, &Private::setFrameSize);
     }
 
     m_mediaPreviewProcessor->setTranscodingSettings(settings, m_exportMediaSettings.mediaResource);
@@ -280,6 +283,8 @@ void ExportSettingsDialog::Private::setMediaResource(const QnMediaResourcePtr& m
     // We land here once, when ExportSettingsDialog is constructed
     m_availableTranscodingSettings = settings;
     m_exportMediaSettings.mediaResource = media;
+    if (!media->hasVideo())
+        m_exportMediaPersistentSettings.hasVideo = false;
 
     refreshMediaPreview();
     updateOverlays();
@@ -331,6 +336,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
 
     provider->setItemBackgroundColor(palette.color(QPalette::Window));
     provider->setFontColor(palette.color(QPalette::WindowText));
+    provider->setRequestRoundMethod(api::ResourceImageRequest::RoundMethod::iFrameBefore);
     provider->loadAsync();
 
     m_layoutPreviewProvider = std::move(provider);
@@ -339,7 +345,7 @@ void ExportSettingsDialog::Private::setLayout(const QnLayoutResourcePtr& layout,
 
 void ExportSettingsDialog::Private::setTimePeriod(const QnTimePeriod& period, bool forceValidate)
 {
-    m_exportMediaSettings.timePeriod = period;
+    m_exportMediaSettings.period = period;
     m_exportLayoutSettings.period = period;
     m_needValidateMedia = true;
     m_needValidateLayout = true;
@@ -365,12 +371,15 @@ void ExportSettingsDialog::Private::setMediaFilename(const Filename& filename)
     {
         refreshMediaPreview();
     }
+
+    validateSettings(Mode::Media);
+
     emit transcodingModeChanged();
 }
 
 void ExportSettingsDialog::Private::setLayoutFilename(const Filename& filename)
 {
-    m_exportLayoutSettings.filename = filename;
+    m_exportLayoutSettings.fileName = filename;
     m_exportLayoutPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
     validateSettings(Mode::Layout);
 }
@@ -746,7 +755,7 @@ QString ExportSettingsDialog::Private::timestampText(qint64 timeMs) const
 void ExportSettingsDialog::Private::updateTimestampText()
 {
     overlay(ExportOverlayType::timestamp)->setText(timestampText(
-        m_exportMediaSettings.timePeriod.startTimeMs));
+        m_exportMediaSettings.period.startTimeMs));
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)
@@ -780,7 +789,7 @@ Filename ExportSettingsDialog::Private::selectedFileName(Mode mode) const
 {
     return mode == Mode::Media
         ? m_exportMediaSettings.fileName
-        : m_exportLayoutSettings.filename;
+        : m_exportLayoutSettings.fileName;
 }
 
 bool ExportSettingsDialog::Private::mediaSupportsUtc() const

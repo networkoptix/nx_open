@@ -13,7 +13,10 @@ if(withDesktopClient)
     endif()
 
     if(WINDOWS)
-        add_subdirectory(minilauncher)
+        if(withMiniLauncher)
+            add_subdirectory(minilauncher)
+        endif()
+        add_subdirectory(nov_file_launcher)
     endif()
 
     add_subdirectory(nx_client_desktop)
@@ -23,4 +26,8 @@ endif()
 
 if(withMobileClient)
     add_subdirectory(mobile_client)
+endif()
+
+if(withScreenChecker)
+    add_subdirectory(screen_checker)
 endif()

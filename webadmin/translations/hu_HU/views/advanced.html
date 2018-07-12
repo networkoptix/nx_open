@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>Manuális frissítés</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">Telepítő feltöltése</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Győződjön meg róla, hogy a konfiguráció megfelelő.</p>
-            </div>
-        </div>
-    </form>
-
     <h1>Haladó rendszerbeállítások</h1>
     <div class="alert alert-danger" role="alert">
         <b>Figyelem!</b> Bármilyen változtatás ezen az oldalon a szerver hibás működéséhez vezethet.
@@ -193,7 +182,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'üres'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Figyelem!</b> Egyes változások miatt újraindítást szükséges <b>mind</b> szerverek a rendszerben.<br><br>
+        <b>Figyelem!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Jelenlegi szerver újraindítása</button>
         </div>

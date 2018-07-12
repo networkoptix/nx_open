@@ -3,14 +3,12 @@
 #include <chrono>
 #include <algorithm>
 
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/utils/std/cpp14.h>
-#include <network/tcp_connection_priv.h>
 #include <nx/network/system_socket.h>
-#include <api/http_client_pool.h>
-#include <nx/kit/debug.h>
 
 #include "manager.h"
+#include <nx/kit/debug.h>
 
 namespace nx {
 namespace mediaserver_plugins {
@@ -29,11 +27,10 @@ nx::sdk::metadata::CommonEvent* createCommonEvent(const AnalyticsEventType& even
 {
     auto commonEvent = new nx::sdk::metadata::CommonEvent();
     commonEvent->setTypeId(event.eventTypeIdExternal);
-    commonEvent->setCaption(event.caption.toUtf8().constData());
-    commonEvent->setDescription(event.name.value.toUtf8().constData());
+    commonEvent->setDescription(event.name.value.toStdString());
     commonEvent->setIsActive(active);
     commonEvent->setConfidence(1.0);
-    commonEvent->setAuxilaryData(event.topic.toUtf8().constData());
+    commonEvent->setAuxilaryData(event.topic.toStdString());
     return commonEvent;
 }
 
@@ -51,30 +48,6 @@ nx::sdk::metadata::CommonEventsMetadataPacket* createCommonEventsMetadataPacket(
 }
 
 } // namespace
-
-void ElapsedTimerThreadSafe::start()
-{
-    std::lock_guard<mutex_type> lock(m_mutex);
-    m_timer.start();
-}
-
-void ElapsedTimerThreadSafe::stop()
-{
-    std::lock_guard<mutex_type> lock(m_mutex);
-    m_timer.invalidate();
-}
-
-std::chrono::milliseconds ElapsedTimerThreadSafe::elapsedSinceStart() const
-{
-    std::shared_lock<mutex_type> lock(m_mutex);
-    return std::chrono::milliseconds(m_timer.isValid() ? m_timer.elapsed() : 0);
-}
-
-bool ElapsedTimerThreadSafe::hasExpiredSinceStart(std::chrono::milliseconds ms) const
-{
-    std::shared_lock<mutex_type> lock(m_mutex);
-    return m_timer.isValid() && m_timer.hasExpired(ms.count());
-}
 
 #if 0
 // Further methods may be useful, but their usage was excised out the code after refactoring
@@ -112,7 +85,7 @@ void axisHandler::processRequest(
     QnUuid uuid(uuidString);
 
     ElapsedEvents& m_events = m_monitor->eventsToCatch();
-    auto it = std::find_if(m_events.begin(), m_events.end(),
+    const auto it = std::find_if(m_events.begin(), m_events.end(),
         [&uuid](ElapsedEvent& event) { return event.type.typeId == uuid; });
     if (it != m_events.end())
     {
@@ -123,7 +96,7 @@ void axisHandler::processRequest(
     else
     {
         NX_PRINT << "Received packed with undefined event type. Uuid = "
-            << uuidString.toUtf8().constData();
+            << uuidString.toStdString();
     }
     completionHandler(nx::network::http::StatusCode::ok);
 }
@@ -241,11 +214,12 @@ nx::sdk::Error Monitor::startMonitoring(nxpl::NX_GUID* eventTypeList,
 {
     for (int i = 0; i < eventTypeListSize; ++i)
     {
-        QnUuid id = nxpt::fromPluginGuidToQnUuid(eventTypeList[i]);
+        QnUuid id = nx::mediaserver_plugins::utils::fromPluginGuidToQnUuid(eventTypeList[i]);
         const AnalyticsEventType* eventType = m_manager->eventByUuid(id);
         if (!eventType)
             NX_PRINT << "Unknown event type. TypeId = " << id.toStdString();
-        m_eventsToCatch.emplace_back(*eventType);
+        else
+            m_eventsToCatch.emplace_back(*eventType);
     }
 
     const int kSchemePrefixLength = sizeof("http://") - 1;

@@ -1,31 +1,33 @@
 #include "p2p_message_bus.h"
 
-#include <nx/utils/std/cmath.h>
 #include <common/common_module.h>
 #include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
-#include <database/db_manager.h>
 #include "ec_connection_notification_manager.h"
 #include <transaction/transaction_message_bus_priv.h>
-#include <nx/utils/random.h>
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
 #include <api/global_settings.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/math/math.h>
-#include <http/p2p_connection_listener.h>
 #include <api/runtime_info_manager.h>
-#include <managers/time_manager.h>
 
-namespace {
-    int commitIntervalMs = 1000;
-    static const int kMaxSelectDataSize = 1024 * 32;
-} // namespace
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/std/cmath.h>
+#include <nx/utils/random.h>
+#include <nx/vms/api/data/update_sequence_data.h>
 
 namespace nx {
 namespace p2p {
 
+const QString MessageBus::kUrlPath(lit("/ec2/messageBus"));
+const QString MessageBus::kCloudPathPrefix(lit("/cdb"));
+
 using namespace ec2;
+using namespace vms::api;
 
 struct GotTransactionFuction
 {
@@ -60,13 +62,12 @@ struct GotUnicastTransactionFuction
 // ---------------------- P2pMessageBus --------------
 
 MessageBus::MessageBus(
-    ec2::detail::QnDbManager* db,
-    Qn::PeerType peerType,
+    vms::api::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
 :
-    TransactionMessageBusBase(db, peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
+    TransactionMessageBusBase(peerType, commonModule, jsonTranSerializer, ubjsonTranSerializer),
     m_miscData(this)
 {
     qRegisterMetaType<MessageType>();
@@ -81,15 +82,11 @@ MessageBus::MessageBus(
             if (!m_timer)
             {
                 m_timer = new QTimer(this);
-                if (ApiPeerData::isServer(peerType))
-                    connect(m_timer, &QTimer::timeout, this, &MessageBus::doPeriodicTasksForServer);
-                else
-                    connect(m_timer, &QTimer::timeout, this, &MessageBus::doPeriodicTasksForClient);
+				connect(m_timer, &QTimer::timeout, this, [this]() { doPeriodicTasks(); });
             }
             m_timer->start(500);
         });
     connect(m_thread, &QThread::finished, [this]() { m_timer->stop(); });
-    m_dbCommitTimer.restart();
 }
 
 MessageBus::~MessageBus()
@@ -116,32 +113,29 @@ void MessageBus::printTran(
     const ec2::QnAbstractTransaction& tran,
     Connection::Direction direction) const
 {
-
     auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
     auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
     QString msgName;
     QString directionName;
     if (direction == Connection::Direction::outgoing)
     {
-        msgName = lm("Send");
-        directionName = lm("--->");
+        msgName = lit("Send");
+        directionName = lit("--->");
     }
     else
     {
-        msgName = lm("Got");
-        directionName = lm("<---");
+        msgName = lit("Got");
+        directionName = lit("<---");
     }
 
-    NX_DEBUG(
-        this,
-        lit("%1 tran:\t %2 %3 %4. Command: %5. Seq=%6. Created by %7")
-        .arg(msgName)
-        .arg(localPeerName)
-        .arg(directionName)
-        .arg(remotePeerName)
-        .arg(toString(tran.command))
-        .arg(tran.persistentInfo.sequence)
-        .arg(qnStaticCommon->moduleDisplayName(tran.peerID)));
+    NX_VERBOSE(this, lm("%1 tran:\t %2 %3 %4. Command: %5. Seq=%6. Created by %7").args(
+        msgName,
+        localPeerName,
+        directionName,
+        remotePeerName,
+        toString(tran.command),
+        tran.persistentInfo.sequence,
+        qnStaticCommon->moduleDisplayName(tran.peerID)));
 }
 
 void MessageBus::start()
@@ -154,15 +148,9 @@ void MessageBus::start()
 }
 
 void MessageBus::stop()
-
 {
     {
         QnMutexLocker lock(&m_mutex);
-        if (m_db)
-        {
-            ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
-            dbTran.commit();
-        }
         m_remoteUrls.clear();
     }
 
@@ -170,18 +158,21 @@ void MessageBus::stop()
     base_type::stop();
 }
 
-// P2pMessageBus
-
 void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const utils::Url &_url)
 {
     QnMutexLocker lock(&m_mutex);
     deleteRemoveUrlById(peer);
 
     nx::utils::Url url(_url);
-    if (peer == kCloudPeerId)
-        url.setPath(ConnectionProcessor::kCloudPathPrefix + ConnectionProcessor::kUrlPath);
+    if (peer == ::ec2::kCloudPeerId)
+    {
+        url.setPath(nx::network::url::joinPath(
+            kCloudPathPrefix.toStdString(), kUrlPath.toStdString()).c_str());
+    }
     else
-        url.setPath(ConnectionProcessor::kUrlPath);
+    {
+        url.setPath(kUrlPath);
+    }
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
@@ -210,67 +201,6 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
         itr.value()->setState(Connection::State::Error);
 }
 
-void MessageBus::gotConnectionFromRemotePeer(
-    const ec2::ApiPeerDataEx& remotePeer,
-    ec2::ConnectionLockGuard connectionLockGuard,
-    nx::network::WebSocketPtr webSocket,
-    const Qn::UserAccessData& userAccessData,
-    std::function<void()> onConnectionClosedCallback)
-{
-    P2pConnectionPtr connection(new Connection(
-        commonModule(),
-        remotePeer,
-        localPeerEx(),
-        std::move(webSocket),
-        userAccessData,
-        std::make_unique<nx::p2p::ConnectionContext>(),
-        std::move(connectionLockGuard)));
-
-    QnMutexLocker lock(&m_mutex);
-    const auto remoteId = connection->remotePeer().id;
-    m_peers->removePeer(connection->remotePeer());
-    m_connections[remoteId] = connection;
-    emitPeerFoundLostSignals();
-    connectSignals(connection);
-    startReading(connection);
-
-    if (remotePeer.isClient())
-    {
-        // Clients use simplified logic. They are started and subscribed to all updates immediately.
-        context(connection)->isLocalStarted = true;
-        m_peers->addRecord(remotePeer, remotePeer, nx::p2p::RoutingRecord(1));
-        sendInitialDataToClient(connection);
-    }
-    context(connection)->onConnectionClosedCallback = onConnectionClosedCallback;
-}
-
-void MessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
-{
-    sendRuntimeData(connection, m_lastRuntimeInfo.keys());
-
-    {
-        QnTransaction<ApiFullInfoData> tran(commonModule()->moduleGUID());
-        tran.command = ApiCommand::getFullInfo;
-        if (!readApiFullInfoData(connection.staticCast<Connection>()->userAccessData(),
-            connection->remotePeer(), &tran.params))
-        {
-            connection->setState(Connection::State::Error);
-            return;
-        }
-        sendTransactionImpl(connection, tran, TransportHeader());
-    }
-}
-
-void MessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
-{
-    if (!m_db)
-        return;
-    auto data = serializeSubscribeAllRequest(m_db->transactionLog()->getTransactionsState());
-    data.data()[0] = (quint8) MessageType::subscribeAll;
-    connection->sendMessage(data);
-    context(connection)->isLocalStarted = true;
-}
-
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
 {
     QnMutexLocker lock(&m_mutex);
@@ -280,7 +210,7 @@ void MessageBus::connectSignals(const P2pConnectionPtr& connection)
 }
 
 void MessageBus::createOutgoingConnections(
-    const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
+    const QMap<PersistentIdData, P2pConnectionPtr>& currentSubscription)
 {
     if (hasStartingConnections())
         return;
@@ -337,26 +267,6 @@ void MessageBus::createOutgoingConnections(
     }
 }
 
-void MessageBus::addOfflinePeersFromDb()
-{
-    if (!m_db)
-        return;
-    const auto localPeer = this->localPeer();
-
-    auto persistentState = m_db->transactionLog()->getTransactionsState().values;
-    for (auto itr = persistentState.cbegin(); itr != persistentState.cend(); ++itr)
-    {
-        const auto& peer = itr.key();
-        if (peer == localPeer)
-            continue;
-
-        const qint32 sequence = itr.value();
-        const qint32 localOfflineDistance = kMaxDistance - sequence;
-        nx::p2p::RoutingRecord record(localOfflineDistance);
-        m_peers->addRecord(localPeer, peer, record);
-    }
-}
-
 void MessageBus::printPeersMessage()
 {
     QList<QString> records;
@@ -365,126 +275,43 @@ void MessageBus::printPeersMessage()
     {
         const auto& peer = itr.value();
 
-        qint32 minDistance = peer.minDistance();
+        RoutingInfo outViaList;
+        qint32 minDistance = peer.minDistance(&outViaList);
         if (minDistance == kMaxDistance)
             continue;
         m_localShortPeerInfo.encode(itr.key());
 
-        records << lit("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3")
+        QStringList outViaListStr;
+        for (const auto& peer: outViaList.keys())
+            outViaListStr << qnStaticCommon->moduleDisplayName(peer.id);
+
+        records << lit("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3 (via %4)")
             .arg(qnStaticCommon->moduleDisplayName(itr.key().id))
             .arg(itr.key().persistentId.toString())
-            .arg(minDistance);
+            .arg(minDistance)
+            .arg(outViaListStr.join(","));
     }
 
-    NX_DEBUG(
+    NX_VERBOSE(
         this,
         lit("Peer %1 records:\n%3")
         .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
         .arg(records.join("\n")));
 }
 
-void MessageBus::printSubscribeMessage(
-    const QnUuid& remoteId,
-    const QVector<ApiPersistentIdData>& subscribedTo,
-    const QVector<qint32>& sequences) const
+bool MessageBus::isLocalConnection(const PersistentIdData& peer) const
 {
-    QList<QString> records;
-    int index = 0;
-    for (const auto& peer: subscribedTo)
-    {
-        records << lit("\t\t\t\t\t To:  %1(dbId=%2) from: %3")
-            .arg(qnStaticCommon->moduleDisplayName(peer.id))
-            .arg(peer.persistentId.toString())
-            .arg(sequences[index++]);
-    }
-
-    NX_DEBUG(
-        this,
-        lit("Subscribe:\t %1 ---> %2:\n%3")
-        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-        .arg(qnStaticCommon->moduleDisplayName(remoteId))
-        .arg(records.join("\n")));
-}
-
-bool MessageBus::isLocalConnection(const ApiPersistentIdData& peer) const
-{
-    auto connection = m_connections.value(peer.id);
+    const auto connection = m_connections.value(peer.id);
     if (!connection)
         return false;
-    auto peerType = connection->remotePeer().peerType;
-    return ec2::ApiPeerData::isClient(peerType) && peerType != Qn::PT_VideowallClient;
+    const auto peerType = connection->remotePeer().peerType;
+    return vms::api::PeerData::isClient(peerType)
+        && peerType != vms::api::PeerType::videowallClient;
 }
 
-void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
+QMap<PersistentIdData, P2pConnectionPtr> MessageBus::getCurrentSubscription() const
 {
-    auto serializeMessage = [this](const P2pConnectionPtr& connection)
-    {
-        QVector<PeerDistanceRecord> records;
-        records.reserve(m_peers->allPeerDistances.size());
-        const auto localPeer = ApiPersistentIdData(this->localPeer());
-        for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
-        {
-            if (isLocalConnection(itr.key()))
-                continue; //< don't show this connection to other servers
-
-            // Don't send longer route than this peer already has.
-            // Otherwise it could generate route loop.
-            qint32 minDistance = itr->minDistance();
-
-            if (itr->distanceVia(connection->remotePeer()) == minDistance)
-                continue;
-
-            // Don't broadcast foreign offline distances
-            if (minDistance < kMaxDistance && minDistance > kMaxOnlineDistance)
-                minDistance = itr->distanceVia(localPeer);
-
-            if (minDistance == kMaxDistance)
-                continue;
-            const qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
-            records.push_back(PeerDistanceRecord(peerNumber, minDistance));
-        }
-        NX_ASSERT(!records.isEmpty());
-        QByteArray data = serializePeersMessage(records, 1);
-        data.data()[0] = (quint8)MessageType::alivePeers;
-        return data;
-    };
-
-    auto sendAlivePeersMessage = [this](const P2pConnectionPtr& connection, const QByteArray& data)
-    {
-        int peersIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-            m_intervals.sendPeersInfoInterval).count();
-        auto connectionContext = context(connection);
-        if (connectionContext->localPeersTimer.isValid() && !connectionContext->localPeersTimer.hasExpired(peersIntervalMs))
-            return;
-        if (data != connectionContext->localPeersMessage)
-        {
-            connectionContext->localPeersMessage = data;
-            connectionContext->localPeersTimer.restart();
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
-                printPeersMessage();
-            connection->sendMessage(data);
-        }
-    };
-
-    if (connection)
-    {
-        sendAlivePeersMessage(connection, serializeMessage(connection));
-        return;
-    }
-
-    for (const auto& connection: m_connections)
-    {
-        if (connection->state() != Connection::State::Connected)
-            continue;
-        if (!context(connection)->isRemoteStarted)
-            continue;
-        sendAlivePeersMessage(connection, serializeMessage(connection));
-    }
-}
-
-QMap<ApiPersistentIdData, P2pConnectionPtr> MessageBus::getCurrentSubscription() const
-{
-    QMap<ApiPersistentIdData, P2pConnectionPtr> result;
+    QMap<PersistentIdData, P2pConnectionPtr> result;
     for (auto itr = m_connections.cbegin(); itr != m_connections.cend(); ++itr)
     {
         auto context = this->context(itr.value());
@@ -494,74 +321,15 @@ QMap<ApiPersistentIdData, P2pConnectionPtr> MessageBus::getCurrentSubscription()
     return result;
 }
 
-void MessageBus::resubscribePeers(
-    QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription)
-{
-    QMap<P2pConnectionPtr, QVector<ApiPersistentIdData>> updatedSubscription;
-    for (auto itr = newSubscription.begin(); itr != newSubscription.end(); ++itr)
-        updatedSubscription[itr.value()].push_back(itr.key());
-    for (auto& value: updatedSubscription)
-        std::sort(value.begin(), value.end());
-    for (auto connection: m_connections.values())
-    {
-        const auto& newValue = updatedSubscription.value(connection);
-        auto connectionContext = context(connection);
-        if (connectionContext->localSubscription != newValue)
-        {
-            connectionContext->localSubscription = newValue;
-            QVector<PeerNumberType> shortValues;
-            for (const auto& id: newValue)
-                shortValues.push_back(connectionContext->encode(id));
-
-            NX_ASSERT(newValue.contains(connection->remotePeer()));
-            auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
-
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
-                printSubscribeMessage(connection->remotePeer().id, newValue, sequences);
-
-            QVector<SubscribeRecord> request;
-            request.reserve(shortValues.size());
-            for (int i = 0; i < shortValues.size(); ++i)
-                request.push_back(SubscribeRecord(shortValues[i], sequences[i]));
-            auto serializedData = serializeSubscribeRequest(request);
-            serializedData.data()[0] = (quint8) (MessageType::subscribeForDataUpdates);
-            connection->sendMessage(serializedData);
-
-            connectionContext->recvDataInProgress = true;
-        }
-    }
-}
-
-P2pConnectionPtr MessageBus::findConnectionById(const ApiPersistentIdData& id) const
+P2pConnectionPtr MessageBus::findConnectionById(const PersistentIdData& id) const
 {
     P2pConnectionPtr result =  m_connections.value(id.id);
     return result && result->remotePeer().persistentId == id.persistentId ? result : P2pConnectionPtr();
 }
 
-bool MessageBus::needSubscribeDelay()
-{
-    // If alive peers has been recently received, postpone subscription for some time.
-    // This peer could be found via another neighbor.
-    if (m_lastPeerInfoTimer.isValid())
-    {
-        std::chrono::milliseconds lastPeerInfoElapsed(m_lastPeerInfoTimer.elapsed());
-
-        if (lastPeerInfoElapsed < m_intervals.subscribeIntervalLow)
-        {
-            if (!m_wantToSubscribeTimer.isValid())
-                m_wantToSubscribeTimer.restart();
-            std::chrono::milliseconds wantToSubscribeElapsed(m_wantToSubscribeTimer.elapsed());
-            if (wantToSubscribeElapsed < m_intervals.subscribeIntervalHigh)
-                return true;
-        }
-    }
-    m_wantToSubscribeTimer.invalidate();
-    return false;
-}
-
 bool MessageBus::needStartConnection(
-    const ApiPersistentIdData& peer,
-    const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const
+    const PersistentIdData& peer,
+    const QMap<PersistentIdData, P2pConnectionPtr>& currentSubscription) const
 {
     const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
     qint32 currentDistance = allPeerDistances.value(peer).minDistance();
@@ -572,12 +340,12 @@ bool MessageBus::needStartConnection(
 
 bool MessageBus::needStartConnection(
     const QnUuid& peerId,
-    const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const
+    const QMap<PersistentIdData, P2pConnectionPtr>& currentSubscription) const
 {
     const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
 
     bool result = true;
-    auto itr = allPeerDistances.lowerBound(ApiPersistentIdData(peerId, QnUuid()));
+    auto itr = allPeerDistances.lowerBound(PersistentIdData(peerId, QnUuid()));
     for (; itr != allPeerDistances.end() && itr.key().id == peerId; ++itr)
     {
         result &= needStartConnection(itr.key(), currentSubscription);
@@ -599,153 +367,6 @@ bool MessageBus::hasStartingConnections() const
     return false;
 }
 
-void MessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
-{
-    if (hasStartingConnections())
-        return;
-
-    // start using connection if need
-    int maxStartsAtOnce = m_miscData.newConnectionsAtOnce;
-
-    for (auto& connection: m_connections)
-    {
-        auto context = this->context(connection);
-        if (connection->state() != Connection::State::Connected || context->isLocalStarted)
-            continue; //< already in use or not ready yet
-
-        ApiPersistentIdData peer = connection->remotePeer();
-        if (needStartConnection(peer, currentSubscription))
-        {
-            context->isLocalStarted = true;
-            connection->sendMessage(MessageType::start, QByteArray());
-            if (--maxStartsAtOnce == 0)
-                return; //< limit start requests at once
-        }
-    }
-}
-
-P2pConnectionPtr MessageBus::findBestConnectionToSubscribe(
-    const QVector<ApiPersistentIdData>& viaList,
-    QMap<P2pConnectionPtr, int> newSubscriptions) const
-{
-    P2pConnectionPtr result;
-    int minSubscriptions = std::numeric_limits<int>::max();
-    for (const auto& via: viaList)
-    {
-        auto connection = findConnectionById(via);
-        NX_ASSERT(connection);
-        if (!connection)
-            continue;
-        int subscriptions = context(connection)->localSubscription.size() + newSubscriptions.value(connection);
-        if (subscriptions < minSubscriptions)
-        {
-            minSubscriptions = subscriptions;
-            result = connection;
-        }
-    }
-
-    return result;
-}
-
-void MessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
-{
-    if (hasStartingConnections())
-        return;
-
-    for (const auto& connection: m_connections)
-    {
-        const auto& data = context(connection);
-        if (data->recvDataInProgress)
-            return;
-    }
-
-
-    const bool needDelay = needSubscribeDelay();
-
-    QMap<ApiPersistentIdData, P2pConnectionPtr> newSubscription = currentSubscription;
-    QMap<P2pConnectionPtr, int> tmpNewSubscription; //< this connections will get N new subscriptions soon
-    const auto localPeer = this->localPeer();
-    bool isUpdated = false;
-
-    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
-    const auto& alivePeers =  m_peers->alivePeers;
-    auto currentSubscriptionItr = currentSubscription.cbegin();
-    for (auto itr = allPeerDistances.constBegin(); itr != allPeerDistances.constEnd(); ++itr)
-    {
-        const ApiPersistentIdData& peer = itr.key();
-        if (peer == localPeer)
-            continue;
-
-        //auto subscribedVia = currentSubscription.value(peer);
-        while (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() < peer)
-            ++currentSubscriptionItr;
-        P2pConnectionPtr subscribedVia;
-        if (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() == peer)
-            subscribedVia = currentSubscriptionItr.value();
-
-        qint32 subscribedDistance =
-            alivePeers[subscribedVia ? subscribedVia->remotePeer() : localPeer].distanceTo(peer);
-
-        const auto& info = itr.value();
-        qint32 minDistance = info.minDistance();
-        if (minDistance < subscribedDistance)
-        {
-            if (minDistance > 1)
-            {
-                if (needDelay)
-                    continue; //< allow only direct subscription if network configuration are still changing
-            }
-            QVector<ApiPersistentIdData> viaList;
-            info.minDistance(&viaList);
-
-            NX_ASSERT(!viaList.empty());
-            // If any of connections with min distance subscribed to us then postpone our subscription.
-            // It could happen if neighbor(or closer) peer just goes offline
-            if (std::any_of(viaList.begin(), viaList.end(),
-                [this, &peer, &localPeer](const ApiPersistentIdData& via)
-            {
-                if (via == localPeer)
-                    return true; //< 'subscribedVia' has lost 'peer'. Update subscription later as soon as new minDistance will be discovered.
-                auto connection = findConnectionById(via);
-                NX_ASSERT(connection);
-                if (!connection)
-                    return true; //< It shouldn't be.
-                return context(connection)->isRemotePeerSubscribedTo(peer);
-            }))
-            {
-                continue;
-            }
-
-            auto connection = findBestConnectionToSubscribe(viaList, tmpNewSubscription);
-            if (subscribedVia)
-            {
-                NX_DEBUG(
-                    this,
-                    lit("Peer %1 is changing subscription to %2. subscribed via %3. new subscribe via %4")
-                    .arg(qnStaticCommon->moduleDisplayName(localPeer.id))
-                    .arg(qnStaticCommon->moduleDisplayName(peer.id))
-                    .arg(qnStaticCommon->moduleDisplayName(subscribedVia->remotePeer().id))
-                    .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)));
-            }
-            newSubscription[peer] = connection;
-            ++tmpNewSubscription[connection];
-            isUpdated = true;
-        }
-    }
-    if (isUpdated)
-        resubscribePeers(newSubscription);
-}
-
-void MessageBus::commitLazyData()
-{
-    if (m_dbCommitTimer.hasExpired(commitIntervalMs))
-    {
-        ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
-        dbTran.commit();
-        m_dbCommitTimer.restart();
-    }
-}
-
 void MessageBus::MiscData::update()
 {
     expectedConnections = std::max(1, std::max(owner->m_connections.size(), (int) owner->m_remoteUrls.size()));
@@ -754,46 +375,30 @@ void MessageBus::MiscData::update()
     newConnectionsAtOnce = std::max(1, int(qRound(std::sqrt(expectedConnections))) / 2);
 }
 
-void MessageBus::doPeriodicTasksForServer()
-{
-    QnMutexLocker lock(&m_mutex);
-
-    m_miscData.update();
-
-    const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription = getCurrentSubscription();
-    createOutgoingConnections(currentSubscription); //< open new connections
-
-    sendAlivePeersMessage();
-    startStopConnections(currentSubscription);
-    doSubscribe(currentSubscription);
-    commitLazyData();
-}
-
-void MessageBus::doPeriodicTasksForClient()
+void MessageBus::doPeriodicTasks()
 {
     QnMutexLocker lock(&m_mutex);
     createOutgoingConnections(getCurrentSubscription()); //< Open new connections.
 }
 
-ApiPeerData MessageBus::localPeer() const
+vms::api::PeerData MessageBus::localPeer() const
 {
-    return ApiPeerData(
+    return vms::api::PeerData(
         commonModule()->moduleGUID(),
         commonModule()->runningInstanceGUID(),
         commonModule()->dbId(),
         m_localPeerType);
 }
 
-ApiPeerDataEx MessageBus::localPeerEx() const
+vms::api::PeerDataEx MessageBus::localPeerEx() const
 {
-    ApiPeerDataEx result;
-
+    vms::api::PeerDataEx result;
     result.id = commonModule()->moduleGUID();
     result.persistentId = commonModule()->dbId();
     result.instanceId = commonModule()->runningInstanceGUID();
     result.systemId = commonModule()->globalSettings()->localSystemId();
     result.peerType = m_localPeerType;
-    result.cloudHost = nx::network::AppInfo::defaultCloudHost();
+    result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     result.identityTime = commonModule()->systemIdentityTime();
     result.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>
         (commonModule()->globalSettings()->aliveUpdateInterval()).count();
@@ -804,7 +409,7 @@ ApiPeerDataEx MessageBus::localPeerEx() const
 
 void MessageBus::startReading(P2pConnectionPtr connection)
 {
-    context(connection)->encode(ApiPersistentIdData(connection->remotePeer()), 0);
+    context(connection)->encode(PersistentIdData(connection->remotePeer()), 0);
     connection->startReading();
 }
 
@@ -830,7 +435,7 @@ void MessageBus::at_stateChanged(
                 startReading(connection);
             }
             emit newDirectConnectionEstablished(connection.data());
-            if (connection->remotePeer().peerType == Qn::PT_CloudServer)
+            if (connection->remotePeer().peerType == PeerType::cloudServer)
                 sendInitialDataToCloud(connection);
 
             break;
@@ -878,11 +483,23 @@ void MessageBus::at_allDataSent(QWeakPointer<ConnectionBase> weakRef)
     QnMutexLocker lock(&m_mutex);
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
-    if (context(connection)->sendDataInProgress)
-        selectAndSendTransactions(
-            connection,
-            context(connection)->remoteSubscription,
-            context(connection)->remoteAddImplicitData);
+	if (context(connection)->sendDataInProgress)
+	{
+		selectAndSendTransactions(
+			connection,
+			context(connection)->remoteSubscription,
+			context(connection)->remoteAddImplicitData);
+	}
+}
+
+bool MessageBus::selectAndSendTransactions(
+	const P2pConnectionPtr& connection,
+	vms::api::TranState newSubscription,
+	bool addImplicitData)
+{
+	context(connection)->sendDataInProgress = false;
+	context(connection)->remoteSubscription = newSubscription;
+	return true;
 }
 
 void MessageBus::at_gotMessage(
@@ -901,14 +518,14 @@ void MessageBus::at_gotMessage(
 
     if (connection->state() == Connection::State::Error)
         return; //< Connection has been closed
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this) &&
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this) &&
         messageType != MessageType::pushTransactionData &&
         messageType != MessageType::pushTransactionList)
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
         auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
 
-        NX_DEBUG(
+        NX_VERBOSE(
             this,
             lit("Got message:\t %1 <--- %2. Type: %3. Size=%4")
             .arg(localPeerName)
@@ -954,15 +571,13 @@ void MessageBus::at_gotMessage(
         break;
     case MessageType::pushImpersistentUnicastTransaction:
         result = handleTransactionWithHeader(
+            this,
             connection,
             payload,
             GotUnicastTransactionFuction());
         break;
     case MessageType::pushImpersistentBroadcastTransaction:
-        result = handleTransactionWithHeader(
-            connection,
-            payload,
-            GotTransactionFuction());
+		result = handlePushImpersistentBroadcastTransaction(connection, payload);
         break;
     default:
         NX_ASSERT(0, lm("Unknown message type").arg((int)messageType));
@@ -970,6 +585,17 @@ void MessageBus::at_gotMessage(
     }
     if (!result)
         connection->setState(Connection::State::Error);
+}
+
+bool MessageBus::handlePushImpersistentBroadcastTransaction(
+	const P2pConnectionPtr& connection,
+	const QByteArray& payload)
+{
+	return handleTransactionWithHeader(
+        this,
+        connection,
+		payload,
+		GotTransactionFuction());
 }
 
 bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connection, const QByteArray& data)
@@ -981,8 +607,12 @@ bool MessageBus::handleResolvePeerNumberRequest(const P2pConnectionPtr& connecti
 
     QVector<PeerNumberResponseRecord> response;
     response.reserve(request.size());
-    for (const auto& peer : request)
-        response.push_back(PeerNumberResponseRecord(peer, m_localShortPeerInfo.decode(peer)));
+    for (const auto& peer: request)
+    {
+        const auto fullPeerId = m_localShortPeerInfo.decode(peer);
+        NX_ASSERT(!fullPeerId.isNull());
+        response.push_back(PeerNumberResponseRecord(peer, fullPeerId));
+    }
 
     auto responseData = serializeResolvePeerNumberResponse(response, 1);
     responseData.data()[0] = (quint8) MessageType::resolvePeerNumberResponse;
@@ -1027,12 +657,17 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
 
     m_lastPeerInfoTimer.restart();
 
-    QVector<PeerNumberType> numbersToResolve;
+    std::set<PeerNumberType> numbersToResolve;
     BitStreamReader reader((const quint8*)data.data(), data.size());
     for (const auto& peer: peers)
     {
         if (context(connection)->decode(peer.peerNumber).isNull())
-            numbersToResolve.push_back(peer.peerNumber);
+            numbersToResolve.insert(peer.peerNumber);
+        if (peer.firstVia != kUnknownPeerNumnber)
+        {
+            if (context(connection)->decode(peer.firstVia).isNull())
+                numbersToResolve.insert(peer.firstVia);
+        }
     }
     context(connection)->remotePeersMessage = data;
 
@@ -1048,17 +683,42 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
                 ++distance;
                 NX_ASSERT(distance != kMaxOnlineDistance);
             }
+
+            auto firstVia = shortPeers.decode(peer.firstVia);
+            if (firstVia.isNull())
+            {
+                // Direct connection to the target peer.
+                firstVia = connection->localPeer();
+            }
+            else if (distance <= kMaxOnlineDistance)
+            {
+                const auto gatewayDistance = distanceTo(firstVia);
+                if (gatewayDistance > kMaxOnlineDistance)
+                    continue; //< Gateway is offline now.
+                if (gatewayDistance < distance - 1)
+                {
+                    NX_VERBOSE(
+                        this,
+                        lm("Peer %1 ignores alivePeers record due to route loop. Distance to %2 is %3. Distance to gateway %4 is %5")
+                        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+                        .arg(qnStaticCommon->moduleDisplayName(shortPeers.decode(peer.peerNumber).id))
+                        .arg(distance)
+                        .arg(qnStaticCommon->moduleDisplayName(firstVia.id))
+                        .arg(gatewayDistance));
+                    continue; //< Route loop detected.
+                }
+            }
+
             m_peers->addRecord(
                 connection->remotePeer(),
                 shortPeers.decode(peer.peerNumber),
-                nx::p2p::RoutingRecord(distance));
+                nx::p2p::RoutingRecord(distance, firstVia));
         }
         emitPeerFoundLostSignals();
         return true;
     }
 
     auto connectionContext = context(connection);
-    std::sort(numbersToResolve.begin(), numbersToResolve.end());
     QVector<PeerNumberType> moreNumbersToResolve;
 
     std::set_difference(
@@ -1081,70 +741,16 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
     return true;
 }
 
-struct SendTransactionToTransportFuction
-{
-    typedef void result_type;
-
-    template<class T>
-    void operator()(
-        MessageBus* bus,
-        const QnTransaction<T>& transaction,
-        const P2pConnectionPtr& connection) const
-    {
-        ApiPersistentIdData tranId(transaction.peerID, transaction.persistentInfo.dbID);
-        NX_ASSERT(bus->context(connection)->isRemotePeerSubscribedTo(tranId));
-        NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == tranId, "Loop detected"));
-
-        switch (connection->remotePeer().dataFormat)
-        {
-            case Qn::JsonFormat:
-                connection->sendMessage(
-                    bus->jsonTranSerializer()->serializedTransactionWithoutHeader(transaction) + QByteArray("\r\n"));
-                break;
-            case Qn::UbjsonFormat:
-                connection->sendMessage(MessageType::pushTransactionData,
-                    bus->ubjsonTranSerializer()->serializedTransactionWithoutHeader(transaction));
-                break;
-            default:
-                qWarning() << "Client has requested data in an unsupported format"
-                    << connection->remotePeer().dataFormat;
-                break;
-        }
-    }
-};
-
-struct SendTransactionToTransportFastFuction
-{
-    bool operator()(
-        MessageBus* /*bus*/,
-        Qn::SerializationFormat /* srcFormat */,
-        const QByteArray& serializedTran,
-        const P2pConnectionPtr& connection) const
-    {
-        if (connection.staticCast<Connection>()->userAccessData().userId != Qn::kSystemAccess.userId)
-        {
-            NX_VERBOSE(
-                this,
-                lit("Permission check failed while sending SERIALIZED transaction to peer %1")
-                .arg(connection->remotePeer().id.toString()));
-            return false;
-        }
-
-        connection->sendMessage(MessageType::pushTransactionData, serializedTran);
-        return true;
-    }
-};
-
 void MessageBus::sendRuntimeData(
     const P2pConnectionPtr& connection,
-    const QList<ApiPersistentIdData>& peers)
+    const QList<PersistentIdData>& peers)
 {
     for (const auto& peer: peers)
     {
         auto runtimeInfoItr = m_lastRuntimeInfo.find(peer);
         if (runtimeInfoItr != m_lastRuntimeInfo.end())
         {
-            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
+            QnTransaction<RuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
             tran.params = runtimeInfoItr.value();
             sendTransactionImpl(connection, tran, TransportHeader());
         }
@@ -1157,7 +763,7 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
     QVector<SubscribeRecord> request = deserializeSubscribeRequest(data, &success);
     if (!success)
         return false;
-    QnTranState newSubscription;
+    vms::api::TranState newSubscription;
     for (const auto& shortPeer : request)
     {
         const auto& id = m_localShortPeerInfo.decode(shortPeer.peer);
@@ -1167,7 +773,7 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
     context(connection)->remoteAddImplicitData = false;
 
     // merge current and new subscription
-    QnTranState& oldSubscription = context(connection)->remoteSubscription;
+    auto& oldSubscription = context(connection)->remoteSubscription;
     auto itrOldSubscription = oldSubscription.values.begin();
     for (auto itr = newSubscription.values.begin(); itr != newSubscription.values.end(); ++itr)
     {
@@ -1199,10 +805,10 @@ bool MessageBus::handleSubscribeForAllDataUpdates(
     const P2pConnectionPtr& connection,
     const QByteArray& data)
 {
-    NX_ASSERT(connection->remotePeer().peerType == Qn::PT_CloudServer);
+    NX_ASSERT(connection->remotePeer().peerType == PeerType::cloudServer);
     context(connection)->remoteAddImplicitData = true;
     bool success = false;
-    QnTranState newSubscription = deserializeSubscribeAllRequest(data, &success);
+    auto newSubscription = deserializeSubscribeAllRequest(data, &success);
 
     if (context(connection)->sendDataInProgress)
     {
@@ -1216,127 +822,15 @@ bool MessageBus::handleSubscribeForAllDataUpdates(
     return true;
 }
 
-bool MessageBus::pushTransactionList(
-    const P2pConnectionPtr& connection,
-    const QList<QByteArray>& tranList)
-{
-    auto message = serializeTransactionList(tranList, 1);
-    message.data()[0] = (quint8)MessageType::pushTransactionList;
-    connection->sendMessage(message);
-    return true;
-}
-
-bool MessageBus::selectAndSendTransactions(
-    const P2pConnectionPtr& connection,
-    QnTranState newSubscription,
-    bool addImplicitData)
-{
-
-    QList<QByteArray> serializedTransactions;
-    bool isFinished = true;
-    if (addImplicitData)
-    {
-        // Add all implicit records from 0 sequence.
-        for (const auto& key: m_db->transactionLog()->getTransactionsState().values.keys())
-        {
-            if (!newSubscription.values.contains(key))
-                newSubscription.values.insert(key, 0);
-        }
-    }
-
-    if (m_db)
-    {
-        const bool isCloudServer = connection->remotePeer().peerType == Qn::PeerType::PT_CloudServer;
-        const ErrorCode errorCode = m_db->transactionLog()->getExactTransactionsAfter(
-            &newSubscription,
-            isCloudServer,
-            serializedTransactions,
-            kMaxSelectDataSize,
-            &isFinished);
-        if (errorCode != ErrorCode::ok)
-        {
-            NX_WARNING(
-                this,
-                lit("P2P message bus failure. Can't select transaction list from database"));
-            return false;
-        }
-    }
-    context(connection)->sendDataInProgress = !isFinished;
-    context(connection)->remoteSubscription = newSubscription;
-
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
-    {
-        for (const auto& serializedTran: serializedTransactions)
-        {
-            ec2::QnAbstractTransaction transaction;
-            QnUbjsonReader<QByteArray> stream(&serializedTran);
-            if (QnUbjson::deserialize(&stream, &transaction))
-                printTran(connection, transaction, Connection::Direction::outgoing);
-        }
-    }
-
-#if 1
-    if (connection->remotePeer().peerType == Qn::PT_Server &&
-        connection->remotePeer().dataFormat == Qn::UbjsonFormat)
-    {
-        pushTransactionList(connection, serializedTransactions);
-        if (!serializedTransactions.isEmpty() && isFinished)
-            pushTransactionList(connection, QList<QByteArray>());
-        return true;
-    }
-#endif
-
-    using namespace std::placeholders;
-    for (const auto& serializedTran: serializedTransactions)
-    {
-        if (!handleTransaction(
-            this,
-            connection->remotePeer().dataFormat,
-            serializedTran,
-            std::bind(
-                SendTransactionToTransportFuction(),
-                this, _1, connection),
-            std::bind(
-                SendTransactionToTransportFastFuction(),
-                this, _1, _2, connection)))
-        {
-            connection->setState(Connection::State::Error);
-        }
-    }
-    return true;
-}
-
-void MessageBus::proxyFillerTransaction(
-    const ec2::QnAbstractTransaction& tran,
-    const TransportHeader& transportHeader)
-{
-    // proxy filler transaction to avoid gaps in the persistent sequence
-    ec2::QnTransaction<ApiUpdateSequenceData> fillerTran(tran);
-    fillerTran.command = ApiCommand::updatePersistentSequence;
-
-    auto errCode = m_db->transactionLog()->updateSequence(fillerTran, TransactionLockType::Lazy);
-    switch (errCode)
-    {
-        case ErrorCode::containsBecauseSequence:
-            break;
-        case ec2::ErrorCode::ok:
-            sendTransaction(fillerTran, transportHeader);
-            break;
-        default:
-            resotreAfterDbError();
-            break;
-    }
-}
-
 void MessageBus::updateOfflineDistance(
     const P2pConnectionPtr& connection,
-    const ApiPersistentIdData& to,
+    const PersistentIdData& to,
     int sequence)
 {
     const qint32 offlineDistance = kMaxDistance - sequence;
 
     const auto updateDistance =
-        [&](const ApiPeerData& via)
+        [&](const vms::api::PeerData& via)
         {
             const qint32 toDistance = m_peers->alivePeers[via].distanceTo(to);
             if (offlineDistance < toDistance)
@@ -1349,52 +843,19 @@ void MessageBus::updateOfflineDistance(
     updateDistance(localPeer());
 }
 
-void MessageBus::gotTransaction(
-    const QnTransaction<ApiUpdateSequenceData> &tran,
-    const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader)
-{
-    ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-    //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
-    //NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
-
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
-        printTran(connection, tran, Connection::Direction::incoming);
-
-    updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
-
-    if (!m_db)
-        return;
-    auto errCode = m_db->transactionLog()->updateSequence(tran, TransactionLockType::Lazy);
-    switch (errCode)
-    {
-        case ErrorCode::containsBecauseSequence:
-            break;
-        case ErrorCode::ok:
-            // Proxy transaction to subscribed peers
-            m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
-            sendTransaction(tran, transportHeader);
-            break;
-        default:
-            connection->setState(Connection::State::Error);
-            resotreAfterDbError();
-            break;
-    }
-}
-
-void MessageBus::cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer)
+void MessageBus::cleanupRuntimeInfo(const PersistentIdData& peer)
 {
     // If media server was restarted it could get new DB.
     // At this case we would have two records in m_lastRuntimeInfo list.
     // As soon as 'old' record will be removed resend runtime notification
     // to make sure we emit later runtime version.
     m_lastRuntimeInfo.remove(peer);
-    auto itr = m_lastRuntimeInfo.lowerBound(ApiPersistentIdData(peer.id, QnUuid()));
+    auto itr = m_lastRuntimeInfo.lowerBound(PersistentIdData(peer.id, QnUuid()));
     if (itr != m_lastRuntimeInfo.end() && itr.key().id == peer.id)
     {
         if (m_handler)
         {
-            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
+            QnTransaction<RuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
             tran.params = itr.value();
             m_handler->triggerNotification(tran, NotificationSource::Remote);
         }
@@ -1402,14 +863,28 @@ void MessageBus::cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer)
 }
 
 void MessageBus::gotTransaction(
-    const QnTransaction<ApiRuntimeData> &tran,
+    const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,
+    const P2pConnectionPtr& connection,
+    const TransportHeader& transportHeader)
+{
+    PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
+
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+        printTran(connection, tran, Connection::Direction::incoming);
+
+    updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
+}
+
+
+void MessageBus::processRuntimeInfo(
+    const QnTransaction<RuntimeData> &tran,
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {
     if (localPeer().isServer() && !isSubscribedTo(connection->remotePeer()))
         return; // Ignore deprecated transaction.
 
-    ApiPersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
+    PersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
 
     if (m_lastRuntimeInfo[peerId] == tran.params)
         return; //< Already processed. Ignore same transaction.
@@ -1429,73 +904,8 @@ void MessageBus::gotTransaction(
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
-        printTran(connection, tran, Connection::Direction::incoming);
-
-    ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
-
-    //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
-    //NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
-    auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
-
-    // process special cases
-    switch (tran.command)
-    {
-        // TODO: move it to the global setting param or emit this data via NotificationManager
-        case ApiCommand::forcePrimaryTimeServer:
-            m_timeSyncManager->onGotPrimariTimeServerTran(tran);
-            if (localPeer().isServer())
-                sendTransaction(tran, transportHeader); //< Proxy
-            return;
-        case ApiCommand::broadcastPeerSyncTime:
-            m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
-            return; // do not proxy.
-        default:
-            break; //< Not a special case
-    }
-
-    if (m_db)
-    {
-        if (transactionDescriptor->isPersistent)
-        {
-            updateOfflineDistance(connection, peerId, tran.persistentInfo.sequence);
-            std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
-            dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(m_db->getTransaction()));
-
-            QByteArray serializedTran =
-                m_ubjsonTranSerializer->serializedTransaction(tran);
-            ErrorCode errorCode = dbManager(m_db, connection.staticCast<Connection>()->userAccessData())
-                .executeTransactionNoLock(tran, serializedTran);
-            switch (errorCode)
-            {
-            case ErrorCode::ok:
-                dbTran->commit();
-                m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
-                break;
-            case ErrorCode::containsBecauseTimestamp:
-                dbTran->commit();
-                m_peers->updateLocalDistance(peerId, tran.persistentInfo.sequence);
-                proxyFillerTransaction(tran, transportHeader);
-                return;
-            case ErrorCode::containsBecauseSequence:
-                dbTran->commit();
-                return; // do not proxy if transaction already exists
-            default:
-                NX_WARNING(
-                    this,
-                    lit("Can't handle transaction %1: %2. Reopening connection...")
-                    .arg(ApiCommand::toString(tran.command))
-                    .arg(ec2::toString(errorCode)));
-                dbTran.reset(); //< rollback db data
-                connection->setState(Connection::State::Error);
-                resotreAfterDbError();
-                return;
-            }
-        }
-
-        // Proxy transaction to subscribed peers
-        sendTransaction(tran, transportHeader);
-    }
+    if (processSpecialTransaction(tran, connection, transportHeader))
+        return;
 
     if (m_handler)
         m_handler->triggerNotification(tran, NotificationSource::Remote);
@@ -1507,7 +917,7 @@ void MessageBus::gotUnicastTransaction(
     const P2pConnectionPtr& connection,
     const TransportHeader& header)
 {
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
         printTran(connection, tran, Connection::Direction::incoming);
 
     std::set<QnUuid> unprocessedPeers;
@@ -1526,9 +936,9 @@ void MessageBus::gotUnicastTransaction(
     QMap<P2pConnectionPtr, TransportHeader> dstByConnection;
     for (const auto& dstPeer: unprocessedPeers)
     {
-        QVector<ApiPersistentIdData> via;
+        QVector<PersistentIdData> via;
         int distance = kMaxDistance;
-        QnUuid dstPeerId = routeToPeerVia(dstPeer, &distance);
+        QnUuid dstPeerId = routeToPeerVia(dstPeer, &distance, /*address*/ nullptr);
         if (distance > kMaxOnlineDistance || dstPeerId.isNull())
         {
             NX_WARNING(this, lm("Drop unicast transaction because no route found"));
@@ -1542,14 +952,6 @@ void MessageBus::gotUnicastTransaction(
     for (TransportHeader& newHeader: dstByConnection)
         newHeader.via = header.via;
     sendUnicastTransactionImpl(tran, dstByConnection);
-}
-
-void MessageBus::resotreAfterDbError()
-{
-    // p2pMessageBus uses lazy transactions. It means it does 1 commit per time.
-    // In case of DB error transactionLog state is invalid because part of data was rolled back.
-    m_db->transactionLog()->init();
-    dropConnections();
 }
 
 bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& data)
@@ -1571,29 +973,6 @@ bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, c
     return true;
 }
 
-template <typename Function>
-bool MessageBus::handleTransactionWithHeader(
-    const P2pConnectionPtr& connection,
-    const QByteArray& data,
-    Function function)
-{
-    int headerSize = 0;
-    TransportHeader header;
-    if (connection->remotePeer().dataFormat == Qn::UbjsonFormat)
-        header = deserializeTransportHeader(data, &headerSize);
-    else
-        header.dstPeers.push_back(localPeer().id);
-    using namespace std::placeholders;
-    return handleTransaction(
-        this,
-        connection->remotePeer().dataFormat,
-        data.mid(headerSize),
-        std::bind(function, this, _1, connection, header),
-        [](Qn::SerializationFormat, const QByteArray&) { return false; });
-
-    return true;
-}
-
 bool MessageBus::handlePushTransactionData(
     const P2pConnectionPtr& connection,
     const QByteArray& serializedTran,
@@ -1608,10 +987,10 @@ bool MessageBus::handlePushTransactionData(
         [](Qn::SerializationFormat, const QByteArray&) { return false; });
 }
 
-bool MessageBus::isSubscribedTo(const ApiPersistentIdData& peer) const
+bool MessageBus::isSubscribedTo(const PersistentIdData& peer) const
 {
     QnMutexLocker lock(&m_mutex);
-    if (ApiPersistentIdData(localPeer()) == peer)
+    if (PersistentIdData(localPeer()) == peer)
         return true;
     for (const auto& connection: m_connections)
     {
@@ -1623,10 +1002,10 @@ bool MessageBus::isSubscribedTo(const ApiPersistentIdData& peer) const
     return false;
 }
 
-qint32 MessageBus::distanceTo(const ApiPersistentIdData& peer) const
+qint32 MessageBus::distanceTo(const PersistentIdData& peer) const
 {
     QnMutexLocker lock(&m_mutex);
-    if (ApiPersistentIdData(localPeer()) == peer)
+    if (PersistentIdData(localPeer()) == peer)
         return 0;
     return m_peers->distanceTo(peer);
 }
@@ -1645,6 +1024,7 @@ int MessageBus::connectionTries() const
 
 QSet<QnUuid> MessageBus::directlyConnectedClientPeers() const
 {
+    QnMutexLocker lock(&m_mutex);
     QSet<QnUuid> result;
     for (const auto& connection: m_connections)
     {
@@ -1660,17 +1040,32 @@ QSet<QnUuid> MessageBus::directlyConnectedServerPeers() const
     return m_connections.keys().toSet();
 }
 
-QnUuid MessageBus::routeToPeerVia(const QnUuid& peerId, int* distance) const
+QnUuid MessageBus::routeToPeerVia(
+    const QnUuid& peerId, int* distance, nx::network::SocketAddress* knownPeerAddress) const
 {
+    QnMutexLocker lock(&m_mutex);
+    if (knownPeerAddress)
+    {
+        *knownPeerAddress = nx::network::SocketAddress();
+        for (const auto& peer: m_remoteUrls)
+        {
+            if (peerId == peer.peerId)
+            {
+                *knownPeerAddress = nx::network::SocketAddress(peer.url.host(), peer.url.port());
+                break;
+            }
+        }
+    }
+
     if (localPeer().id == peerId)
     {
         *distance = 0;
         return QnUuid();
     }
 
-    QVector<ApiPersistentIdData> via;
+    RoutingInfo via;
     *distance = m_peers->distanceTo(peerId, &via);
-    return via.isEmpty() ? QnUuid() : via[0].id;
+    return via.isEmpty() ? QnUuid() : via.begin().key().id;
 }
 
 int MessageBus::distanceToPeer(const QnUuid& peerId) const
@@ -1726,7 +1121,7 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
 
 void MessageBus::emitPeerFoundLostSignals()
 {
-    std::set<ApiPeerData> newAlivePeers;
+    std::set<vms::api::PeerData> newAlivePeers;
 
     for (const auto& connection: m_connections)
         newAlivePeers.insert(connection->remotePeer());
@@ -1734,7 +1129,7 @@ void MessageBus::emitPeerFoundLostSignals()
     for (auto itr = m_peers->allPeerDistances.constBegin(); itr != m_peers->allPeerDistances.constEnd(); ++itr)
     {
         const auto& peer = itr.key();
-        if (peer == ApiPersistentIdData(localPeer()))
+        if (peer == PersistentIdData(localPeer()))
             continue;
         if (itr->minDistance() < kMaxOnlineDistance)
         {
@@ -1744,7 +1139,7 @@ void MessageBus::emitPeerFoundLostSignals()
         }
     }
 
-    std::vector<ApiPeerData> newPeers;
+    std::vector<vms::api::PeerData> newPeers;
     std::set_difference(
         newAlivePeers.begin(),
         newAlivePeers.end(),
@@ -1752,7 +1147,7 @@ void MessageBus::emitPeerFoundLostSignals()
         m_lastAlivePeers.end(),
         std::inserter(newPeers, newPeers.begin()));
 
-    std::vector<ApiPeerData> lostPeers;
+    std::vector<vms::api::PeerData> lostPeers;
     std::set_difference(
         m_lastAlivePeers.begin(),
         m_lastAlivePeers.end(),
@@ -1773,7 +1168,7 @@ void MessageBus::emitPeerFoundLostSignals()
     {
         cleanupRuntimeInfo(peer);
 
-        ApiPeerData samePeer(ApiPersistentIdData(peer.id, QnUuid()), peer.peerType);
+        vms::api::PeerData samePeer(PersistentIdData(peer.id, QnUuid()), peer.peerType);
         auto samePeerItr = newAlivePeers.lower_bound(samePeer);
         bool hasSimilarPeer = samePeerItr != newAlivePeers.end() && samePeerItr->id == peer.id;
         if (!hasSimilarPeer)
@@ -1801,10 +1196,15 @@ MessageBus::DelayIntervals MessageBus::delayIntervals() const
     return m_intervals;
 }
 
-QMap<ApiPersistentIdData, ApiRuntimeData> MessageBus::runtimeInfo() const
+QMap<PersistentIdData, RuntimeData> MessageBus::runtimeInfo() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_lastRuntimeInfo;
+}
+
+void MessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
+{
+	NX_ASSERT(0, "Not implemented");
 }
 
 } // namespace p2p

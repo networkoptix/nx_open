@@ -24,14 +24,13 @@ TEST(MediaServerProcess, ApiRestrictions)
         {"/api/camera_event", AuthMethod::noAuth},
         {"/api/camera_event_what/ever", AuthMethod::noAuth},
 
-        {"/api/showLog", AuthMethod::urlQueryParam},
-        {"/api/showLogAnd/more", AuthMethod::urlQueryParam},
+        {"/api/showLog", AuthMethod::urlQueryDigest | AuthMethod::allowWithourCsrf},
+        {"/api/showLogAnd/more", AuthMethod::urlQueryDigest | AuthMethod::allowWithourCsrf},
 
         {"/api/moduleInformation", AuthMethod::noAuth},
         {"/web/api/moduleInformation", AuthMethod::noAuth},
 
         {"/static/index.html", AuthMethod::noAuth},
-        {"/static/script.js", AuthMethod::noAuth},
         {"/static/script.js", AuthMethod::noAuth},
 
         {"/api/installUpdateUnauthenticated", AuthMethod::noAuth},

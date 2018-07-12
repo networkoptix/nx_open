@@ -4,6 +4,7 @@
 
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 
 class NX_UPDATE_API ZipExtractor: public AbstractZipExtractor
@@ -16,5 +17,6 @@ public:
 };
 
 } // namespace detail
+} // namespace installer
 } // namespace update
 } // namespace nx

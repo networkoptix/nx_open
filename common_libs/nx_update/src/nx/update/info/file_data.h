@@ -1,11 +1,15 @@
 #pragma once
 
 #include <QtCore>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace update {
 namespace info {
 
+/**
+ * Update file information mapped from update.json.
+ */
 struct FileData
 {
     QString file;
@@ -14,12 +18,18 @@ struct FileData
     QByteArray md5;
 
     FileData() = default;
-    FileData(const QString& file, const QString& url, qint64 size, const QByteArray& md5):
+    FileData(const QString& file, const QString& url, qint64 size, const QByteArray& md5)
+        :
         file(file),
         url(url),
         size(size),
         md5(md5)
     {}
+
+    bool isNull() const
+    {
+        return file.isNull();
+    }
 
     FileData(FileData&&) = default;
     FileData(const FileData&) = default;
@@ -27,9 +37,10 @@ struct FileData
     FileData& operator = (const FileData&) = default;
 };
 
-inline bool operator == (const FileData& lhs, const FileData& rhs)
+inline bool operator==(const FileData& lhs, const FileData& rhs)
 {
-    return lhs.file == rhs.file && lhs.url == rhs.url && lhs.size == rhs.size && lhs.md5 == rhs.md5;
+    return lhs.file == rhs.file && lhs.url == rhs.url && lhs.size == rhs.size
+        && lhs.md5 == rhs.md5;
 }
 
 } // namespace info

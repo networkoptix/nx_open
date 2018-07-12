@@ -19,6 +19,10 @@ public:
         const std::string& accountEmail,
         const std::string& systemId) const override;
 
+    virtual std::vector<api::SystemSharingEx> fetchSystemUsers(
+        sql::QueryContext* queryContext,
+        const std::string& systemId) override;
+
     virtual void addSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
     virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
 

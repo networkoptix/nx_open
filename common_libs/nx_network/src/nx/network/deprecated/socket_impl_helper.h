@@ -40,6 +40,7 @@ public:
     virtual bool setSendTimeout(unsigned int ms) override { return m_abstractSocketProvider()->setSendTimeout(ms); }
     virtual bool getSendTimeout(unsigned int* millis) const override { return m_abstractSocketProvider()->getSendTimeout(millis); }
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override { return m_abstractSocketProvider()->getLastError(errorCode); }
+    virtual bool setIpv6Only(bool val) override { return m_abstractSocketProvider()->setIpv6Only(val); }
     virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_abstractSocketProvider()->handle(); }
     virtual Pollable* pollable() override { return m_abstractSocketProvider()->pollable(); }
     virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override { m_abstractSocketProvider()->post( std::move(handler) ); }

@@ -21,13 +21,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QnPanel" name="panelWidget" native="true">
+    <widget class="nx::client::desktop::Panel" name="panelWidget" native="true">
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
        <widget class="QnDateRangeWidget" name="dateRangeWidget" native="true"/>
       </item>
       <item row="0" column="1">
-       <widget class="QnSearchLineEdit" name="filterLineEdit" native="true">
+       <widget class="nx::client::desktop::SearchLineEdit" name="filterLineEdit" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -426,7 +426,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QnCheckableTableView" name="gridMaster">
+            <widget class="nx::client::desktop::CheckableTableView" name="gridMaster">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -494,7 +494,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QnCheckableTableView" name="gridCameras">
+            <widget class="nx::client::desktop::CheckableTableView" name="gridCameras">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -600,7 +600,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QnTableView" name="gridDetails">
+            <widget class="nx::client::desktop::TableView" name="gridDetails">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -692,20 +692,20 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTableView</class>
+   <class>nx::client::desktop::TableView</class>
    <extends>QTableView</extends>
-   <header location="global">ui/widgets/common/table_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/table_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnSearchLineEdit</class>
+   <class>nx::client::desktop::SearchLineEdit</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/search_line_edit.h</header>
+   <header location="global">nx/client/desktop/common/widgets/search_line_edit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -715,9 +715,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnCheckableTableView</class>
+   <class>nx::client::desktop::CheckableTableView</class>
    <extends>QTableView</extends>
-   <header location="global">ui/widgets/common/checkable_table_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/checkable_table_view.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

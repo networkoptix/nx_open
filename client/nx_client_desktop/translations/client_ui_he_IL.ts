@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>שירותים</translation>
+      <translation>אודות</translation>
     </message>
     <message>
       <location/>
@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation>תודות</translation>
+      <translation>קרדיטים</translation>
     </message>
     <message>
       <location/>
@@ -47,7 +47,7 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation>שיפורי תמונה</translation>
+      <translation>שיפור תמונה</translation>
     </message>
     <message>
       <location/>
@@ -62,7 +62,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>אוטומטי</translation>
+      <translation>אוטו'</translation>
     </message>
     <message>
       <location/>
@@ -72,7 +72,7 @@
     <message>
       <location/>
       <source>White level</source>
-      <translation>רמת לובן</translation>
+      <translation>רמת לבן</translation>
     </message>
   </context>
   <context>
@@ -86,11 +86,6 @@
       <location/>
       <source>Double Buffering</source>
       <translation>אגירה כפולה</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>בטל רק אם הלקוח לוקח יותר מדי CPU</translation>
     </message>
     <message>
       <location/>
@@ -173,13 +168,8 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>טופס</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
-      <translation>מספר הימים לשמירה בארכיון</translation>
+      <translation>אורך ארכיון קבוע</translation>
     </message>
     <message>
       <location/>
@@ -242,7 +232,7 @@
     <message>
       <location/>
       <source>System actions</source>
-      <translation>פעולות המערכת</translation>
+      <translation>פעולות מערכת</translation>
     </message>
     <message>
       <location/>
@@ -272,7 +262,7 @@
     <message>
       <location/>
       <source>Email settings</source>
-      <translation>הגדרות דוא"ל</translation>
+      <translation>הגדרות דואר אלקטרוני</translation>
     </message>
     <message>
       <location/>
@@ -399,7 +389,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>רוחב שטח</translation>
+      <translation>רוחב אזור</translation>
     </message>
     <message>
       <location/>
@@ -559,7 +549,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>עצור</translation>
+      <translation>עצירה</translation>
     </message>
     <message>
       <location/>
@@ -665,7 +655,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>אוטומטי</translation>
+      <translation>אוטומטית</translation>
     </message>
     <message>
       <location/>
@@ -680,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>שחזר ברירות מחדל</translation>
+      <translation>שחזר לברירת המחדל</translation>
     </message>
     <message>
       <location/>
@@ -757,12 +747,27 @@
       <source>PTZ</source>
       <translation>מצלמה ממונעת</translation>
     </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>חולל</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>אפס</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>זיהוי ID לוגי</translation>
+    </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
+      <source>Input ID</source>
       <translation>מזהה קלט</translation>
     </message>
   </context>
@@ -788,7 +793,7 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
+      <source>Output ID:</source>
       <translation>מזהה פלט:</translation>
     </message>
   </context>
@@ -797,7 +802,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>הגדרות לוח הזמנים</translation>
+      <translation>הגדרות לוח זמנים</translation>
     </message>
     <message>
       <location/>
@@ -895,7 +900,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>שנה סיסמא</translation>
+      <translation>שינוי סיסמה</translation>
     </message>
   </context>
   <context>
@@ -961,6 +966,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>קטגוריה</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -978,7 +991,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>יומן אירועים</translation>
+      <translation>רשימת אירועים</translation>
     </message>
     <message>
       <location/>
@@ -1182,7 +1195,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation>שונות</translation>
+      <translation>הגדרות שונות</translation>
     </message>
     <message>
       <location/>
@@ -1263,7 +1276,7 @@
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation>יחס גובה-רוחב</translation>
+      <translation>יחס רוחב גובה</translation>
     </message>
     <message>
       <location/>
@@ -1410,7 +1423,7 @@
     <message>
       <location/>
       <source>LDAP Settings</source>
-      <translation>LDAP</translation>
+      <translation>הגדרות LDAP</translation>
     </message>
     <message>
       <location/>
@@ -1443,7 +1456,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>רענן נתוני LDAP...</translation>
+      <translation>יבא משתמשים מLDAP...</translation>
     </message>
     <message>
       <location/>
@@ -1495,7 +1508,7 @@
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
+      <source>Locked to Hardware ID:</source>
       <translation>נעול למזהה-חומרה:</translation>
     </message>
   </context>
@@ -1594,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>מזהה חומרה</translation>
+      <source>Hardware ID</source>
+      <translation>מזהה-חומרה</translation>
     </message>
   </context>
   <context>
@@ -1722,7 +1735,12 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>מחזור סיור</translation>
+      <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>כתובות IP עבור מצלמות, שרתים, קבוצות משתמשים וכו '.</translation>
     </message>
   </context>
   <context>
@@ -1748,7 +1766,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמה:</translation>
+      <translation>סיסמא:</translation>
     </message>
     <message>
       <location/>
@@ -1776,17 +1794,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>מצלמה לבישה חדשה...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>לשרת</translation>
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&amp;;quot;מצלמה לבישה&amp;;quot; היא אחסון וירטואלי עבור קובצי וידאו, שניתן להעלותם לכל שרת במערכת ולהיכנס אליו על ידי כל משתמש.</translation>
     </message>
   </context>
   <context>
@@ -1804,7 +1822,7 @@
     <message>
       <location/>
       <source>Test...</source>
-      <translation>בדיקה...</translation>
+      <translation>בדוק...</translation>
     </message>
     <message>
       <location/>
@@ -1966,12 +1984,35 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמא:</translation>
+      <translation>סיסמה:</translation>
     </message>
     <message>
       <location/>
       <source>Enter a valid username and password...</source>
-      <translation>הכנס שם משתמש וסיסמה תקינים...</translation>
+      <translation>הכנס שם משתמש וסיסמא תקינים...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>טופס</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>שם קובץ:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>בחר קובץ...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>סייר...</translation>
     </message>
   </context>
   <context>
@@ -2023,7 +2064,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמא:</translation>
+      <translation>סיסמה:</translation>
     </message>
     <message>
       <location/>
@@ -2038,7 +2079,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>המערכת החדשה תקבל שם וסיסמה ממערכת:</translation>
+      <translation>המערכת החדשה תקבל שם וסיסמא ממערכת:</translation>
     </message>
   </context>
   <context>
@@ -2301,12 +2342,12 @@
     <message>
       <location/>
       <source>FPS</source>
-      <translation>FPS</translation>
+      <translation>פריימים לשניה</translation>
     </message>
     <message>
       <location/>
       <source>s</source>
-      <translation>s</translation>
+      <translation>ש</translation>
     </message>
     <message>
       <location/>
@@ -2451,7 +2492,7 @@
     <message>
       <location/>
       <source>Failover</source>
-      <translation>גיבוי חם</translation>
+      <translation>מעבר בזמן כשל</translation>
     </message>
     <message>
       <location/>
@@ -2665,18 +2706,6 @@
       <source>Reset</source>
       <translation>אפס</translation>
     </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
-    </message>
   </context>
   <context>
     <name>SmtpAdvancedSettingsWidget</name>
@@ -2884,7 +2913,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמא:</translation>
+      <translation>סיסמה:</translation>
     </message>
   </context>
   <context>
@@ -3002,7 +3031,7 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation>שינוי סיסמא...</translation>
+      <translation>שינוי סיסמה...</translation>
     </message>
   </context>
   <context>
@@ -3032,14 +3061,18 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>אין עדיין תפקידי משתמש מותאמים אישית. לחץ על &quot;תפקיד חדש&quot; כדי ליצור אחד.</translation>
+      <source>New role</source>
+      <translation>תפקיד חדש</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>תפקיד חדש</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>אין עדיין תפקידי הרשאות משתמש מותאמים אישית.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>לחץ על לחצן &amp;;quot;תפקיד הרשאות חדש&amp;;quot; כדי ליצור אחד.</translation>
     </message>
   </context>
   <context>
@@ -3064,18 +3097,13 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>טופס</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>זיהוי תנועה</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>זיהוי תנועה בסרטון שהועלה</translation>
     </message>
     <message>
       <location/>
@@ -3087,11 +3115,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>טופס</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>ביטול</translation>
     </message>
@@ -3100,23 +3123,18 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>טופס</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>העלאת סרטון</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>העלה קובץ...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>תיקיה להעלאה...</translation>
     </message>
   </context>
   <context>

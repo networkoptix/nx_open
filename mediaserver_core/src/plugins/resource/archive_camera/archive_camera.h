@@ -16,11 +16,13 @@ public:
 
     virtual QnResourceList findResources() override;
 
-    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId,
+        const QnResourceParams& params) override;
 
     virtual QString manufacture() const override;
 
-    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+    virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url,
+        const QAuthenticator& auth, bool doMultichannelCheck) override;
 };
 
 class QnArchiveCamResource:
@@ -28,7 +30,7 @@ class QnArchiveCamResource:
 {
     Q_OBJECT
 public:
-    QnArchiveCamResource(const QnResourceParams &params);
+    QnArchiveCamResource(const QnResourceParams& params);
 
 public:
     virtual void checkIfOnlineAsync(std::function<void(bool)> completionHandler) override;
@@ -40,7 +42,8 @@ public:
     static QString cameraName();
 
 protected:
-    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex) override;
+    virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
+        Qn::StreamIndex streamIndex) override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 };

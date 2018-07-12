@@ -1,7 +1,7 @@
 'use strict';
 /*exported TimelineConfig */
 
-var TimelineConfig = {
+window.TimelineConfig = {
     initialInterval: 1000 * 60 * 60 /* *24*365*/, // no records - show small interval
     stickToLiveMs: 5 * 1000, // Value to stick viewpoert to Live - 5 seconds
     maxMsPerPixel: 1000 * 60 * 60 * 24 * 365,   // one year per pixel - maximum view

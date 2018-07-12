@@ -23,6 +23,7 @@
 
 #include <nx/fusion/model_functions.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -127,7 +128,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 {
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
 
-    const auto closeButtonIcon = qnSkin->icon(lit("events/notification_close.png"));
+    const auto closeButtonIcon = qnSkin->icon(lit("text_buttons/selectable_button_close.png"));
     const auto closeButtonSize = QnSkin::maximumSize(closeButtonIcon);
     m_closeButton->setIcon(closeButtonIcon);
     m_closeButton->setFixedSize(closeButtonSize);
@@ -235,7 +236,7 @@ void QnNotificationWidget::setNotificationLevel(QnNotificationLevel::Value notif
     emit notificationLevelChanged();
 }
 
-void QnNotificationWidget::setImageProvider(QnImageProvider* provider)
+void QnNotificationWidget::setImageProvider(ImageProvider* provider)
 {
     m_imageProvider = provider;
     m_tooltipWidget->setImageProvider(provider);

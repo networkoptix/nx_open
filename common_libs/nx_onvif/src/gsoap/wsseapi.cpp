@@ -2375,7 +2375,7 @@ soap_wsse_verify_SignatureValue(struct soap *soap, int alg, const void *key, int
           err = soap_smd_begin(soap, alg, key, keylen);
 	  /* emit all xmlns attributes of ancestors */
           while (soap->nlist)
-          { register struct soap_nlist *np = soap->nlist->next;
+          { struct soap_nlist *np = soap->nlist->next;
             SOAP_FREE(soap, soap->nlist);
             soap->nlist = np;
           }
@@ -2563,7 +2563,7 @@ soap_wsse_verify_digest(struct soap *soap, int alg, int canonical, const char *i
       err = soap_smd_begin(soap, alg, NULL, 0);
       /* emit all xmlns attributes of ancestors */
       while (soap->nlist)
-      { register struct soap_nlist *np = soap->nlist->next;
+      { struct soap_nlist *np = soap->nlist->next;
         SOAP_FREE(soap, soap->nlist);
         soap->nlist = np;
       }

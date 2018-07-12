@@ -31,9 +31,21 @@ public:
         m_manager(manager),
         m_managerFunc(managerFunc)
     {
+        m_resultCodeToHttpStatusCode.emplace(
+            relay::api::ResultCode::needRedirect,
+            nx::network::http::StatusCode::found);
+    }
+
+    void addResultCodeToHttpStatusConversion(
+        relay::api::ResultCode resultCode,
+        nx::network::http::StatusCode::Value httpStatusCode)
+    {
+        m_resultCodeToHttpStatusCode.emplace(resultCode, httpStatusCode);
     }
 
 protected:
+    std::map<relay::api::ResultCode, nx::network::http::StatusCode::Value>
+        m_resultCodeToHttpStatusCode;
     Manager* m_manager;
     ManagerFunc m_managerFunc;
 
@@ -58,8 +70,10 @@ private:
         Response ... response)
     {
         auto requestResult = relay::api::resultCodeToFusionRequestResult(resultCode);
-        if (resultCode == relay::api::ResultCode::needRedirect)
-            requestResult.setHttpStatusCode(nx::network::http::StatusCode::found);
+
+        auto it = m_resultCodeToHttpStatusCode.find(resultCode);
+        if (it != m_resultCodeToHttpStatusCode.end())
+            requestResult.setHttpStatusCode(it->second);
 
         this->requestCompleted(requestResult, std::move(response)...);
     }
@@ -70,14 +84,25 @@ private:
         nx::network::http::ConnectionEvents connectionEvents)
     {
         this->setConnectionEvents(std::move(connectionEvents));
+        onRequestProcessed(resultCode, std::move(response)...);
+    }
 
-        auto requestResult = relay::api::resultCodeToFusionRequestResult(resultCode);
-        if (resultCode == relay::api::ResultCode::ok)
-            requestResult.setHttpStatusCode(nx::network::http::StatusCode::switchingProtocols);
+    void onRequestProcessed(
+        relay::api::ResultCode resultCode,
+        Response ... response,
+        nx::utils::MoveOnlyFunc<
+            void(std::unique_ptr<network::AbstractStreamSocket>)> handler)
+    {
+        network::http::ConnectionEvents connectionEvents;
 
-        this->requestCompleted(
-            std::move(requestResult),
-            std::move(response)...);
+        connectionEvents.onResponseHasBeenSent =
+            [handler = std::move(handler)](
+                network::http::HttpServerConnection* httpConnection)
+            {
+                handler(httpConnection->takeSocket());
+            };
+        this->setConnectionEvents(std::move(connectionEvents));
+        onRequestProcessed(resultCode, std::move(response)...);
     }
 };
 

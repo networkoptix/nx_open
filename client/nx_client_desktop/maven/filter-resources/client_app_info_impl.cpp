@@ -3,7 +3,7 @@
 //
 #include <client/client_app_info.h>
 
-#include "app_icons.h"
+#include <app_icons.h>
 
 QString QnClientAppInfo::applicationName()
 {
@@ -40,16 +40,6 @@ int QnClientAppInfo::videoWallIconId()
     return IDI_ICON_VIDEOWALL;
 }
 
-QString QnClientAppInfo::protocolHandlerBundleName()
-{
-    return QStringLiteral("${protocol_handler_app_name}");
-}
-
-QString QnClientAppInfo::protocolHandlerBundleIdBase()
-{
-    return QStringLiteral("${mac.protocol_handler_bundle.identifier}");
-}
-
 QString QnClientAppInfo::launcherVersionFile()
 {
     return QStringLiteral("${launcher.version.file}");
@@ -75,4 +65,9 @@ QString QnClientAppInfo::libDirSuffix()
     #else
         return QString();
     #endif
+}
+
+int QnClientAppInfo::eulaVersion()
+{
+    return ${eulaVersion};
 }

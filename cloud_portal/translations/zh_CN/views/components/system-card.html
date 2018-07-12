@@ -6,10 +6,13 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">重命名系统</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">断开与 <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">与其他系统合并</button>
+        </p>
+        <hr></hr>
+        <button class="btn btn-default" ng-click="disconnect()">断开与 <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>所有者</h2>
@@ -17,13 +20,32 @@
         <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
         <hr>
         <p>
-            您的权限︰ 
-<b>{{$root.L.accessRoles[system.accessRole].label | | system.accessRole}}</b>
+            您的权限︰
+            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
         </p>
 
         <p ng-if="system.permissions.isAdmin">
             <button class="btn btn-default" ng-click="rename()">重命名系统</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">断开连接从我的账户</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            正被合并到此系统中</div>
+        <hr></hr>
+        <div class="merge-info-text">根据录影资料的大小，可能会花费数小时</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>这个系统正被合并到
+            <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>根据录影资料的大小，可能会花费数小时</p>
+            <p>在合并完成前，您可以登录到此系统并观看视频，但无法更改任何配置</p>
+            <p>合併完成後, 此系統中的所有用戶和攝像機都將可用於
+                <span class="merge-system-name">{{mergeTargetSystem.name}}</span> 系统和此系统将被删除</p>
+        </div>
     </div>
 </div>

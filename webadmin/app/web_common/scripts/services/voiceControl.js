@@ -20,7 +20,7 @@ angular.module('nxCommon')
         	}
         };
     }])
-    .service('voiceControl', function () {
+    .service('voiceControl', ['$window', function ($window) {
         if(jscd.browser.toLowerCase() != 'chrome'){
             return;
         }
@@ -34,6 +34,7 @@ angular.module('nxCommon')
 	    recognition.lang = 'en-US';
 
 	    this.startListening = function(pushToTalk) {
+	        recognition.stop();
 	        if(pushToTalk){
 	            recognition.continuous = false;
 	            self.viewScope.voiceControls.enabled = false;
@@ -157,7 +158,21 @@ angular.module('nxCommon')
             recognition.stop();
         };
         recognition.onerror = function(event) {
-            self.viewScope.voiceControls.enabled = false;
             console.log('Error occurred in recognition: %s', event.error);
+            if(self.viewScope.voiceControls.enabled){
+                self.stopListening();
+                self.startListening();
+            }
         };
-    });
+
+        $window.onfocus = function(){
+            if(self.viewScope && self.viewScope.voiceControls.enabled){
+                self.startListening();
+            }
+        }
+        $window.onblur = function(){
+            if(self.viewScope) {
+                self.stopListening();
+            }
+        }
+    }]);

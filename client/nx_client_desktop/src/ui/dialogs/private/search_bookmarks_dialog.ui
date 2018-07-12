@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QnPanel" name="panelWidget" native="true">
+    <widget class="nx::client::desktop::Panel" name="panelWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QnDateRangeWidget" name="dateRangeWidget" native="true"/>
@@ -37,7 +37,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QnSearchLineEdit" name="filterLineEdit" native="true">
+       <widget class="nx::client::desktop::SearchLineEdit" name="filterLineEdit" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -108,7 +108,7 @@
         <number>16</number>
        </property>
        <item>
-        <widget class="QnTableView" name="gridBookmarks">
+        <widget class="nx::client::desktop::TableView" name="gridBookmarks">
          <property name="mouseTracking">
           <bool>true</bool>
          </property>
@@ -202,20 +202,20 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTableView</class>
+   <class>nx::client::desktop::TableView</class>
    <extends>QTableView</extends>
-   <header location="global">ui/widgets/common/table_view.h</header>
+   <header location="global">nx/client/desktop/common/widgets/table_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnSearchLineEdit</class>
+   <class>nx::client::desktop::SearchLineEdit</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/search_line_edit.h</header>
+   <header location="global">nx/client/desktop/common/widgets/search_line_edit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

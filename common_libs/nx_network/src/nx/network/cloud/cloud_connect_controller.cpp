@@ -1,6 +1,9 @@
 #include "cloud_connect_controller.h"
 
 #include <nx/network/address_resolver.h>
+#include <nx/network/app_info.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/kit/ini_config.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
@@ -17,8 +20,25 @@ namespace nx {
 namespace network {
 namespace cloud {
 
+struct Ini:
+    nx::kit::IniConfig
+{
+    Ini():
+        IniConfig("nx_cloud_connect.ini")
+    {
+        reload();
+    }
+
+    NX_INI_FLAG(0, useHttpConnectToListenOnRelay,
+        "Use HTTP CONNECT method to open server-side connection to the relay service");
+};
+
+//-------------------------------------------------------------------------------------------------
+
 struct CloudConnectControllerImpl
 {
+    Ini ini;
+    QString cloudHost;
     aio::AIOService* aioService;
     AddressResolver* addressResolver;
     hpm::api::MediatorConnector mediatorConnector;
@@ -26,12 +46,13 @@ struct CloudConnectControllerImpl
     OutgoingTunnelPool outgoingTunnelPool;
     CloudConnectSettings settings;
     tcp::ReverseConnectionPool tcpReversePool;
-    Ini ini;
 
     CloudConnectControllerImpl(
+        const QString& customCloudHost,
         aio::AIOService* aioService,
         AddressResolver* addressResolver)
         :
+        cloudHost(!customCloudHost.isEmpty() ? customCloudHost : AppInfo::defaultCloudHostName()),
         aioService(aioService),
         addressResolver(addressResolver),
         addressPublisher(mediatorConnector.systemConnection()),
@@ -65,20 +86,15 @@ struct CloudConnectControllerImpl
 
 //-------------------------------------------------------------------------------------------------
 
-Ini::Ini():
-    IniConfig("nx_cloud_connect.ini")
-{
-    reload();
-}
-
-//-------------------------------------------------------------------------------------------------
-
 CloudConnectController::CloudConnectController(
+    const QString& customCloudHost,
     aio::AIOService* aioService,
     AddressResolver* addressResolver)
     :
-    m_impl(std::make_unique<CloudConnectControllerImpl>(aioService, addressResolver))
+    m_impl(std::make_unique<CloudConnectControllerImpl>(
+        customCloudHost, aioService, addressResolver))
 {
+    readSettingsFromIni();
 }
 
 CloudConnectController::~CloudConnectController()
@@ -89,6 +105,11 @@ void CloudConnectController::applyArguments(const utils::ArgumentParser& argumen
 {
     loadSettings(arguments);
     applySettings();
+}
+
+const QString& CloudConnectController::cloudHost() const
+{
+    return m_impl->cloudHost;
 }
 
 hpm::api::MediatorConnector& CloudConnectController::mediatorConnector()
@@ -116,20 +137,19 @@ tcp::ReverseConnectionPool& CloudConnectController::tcpReversePool()
     return m_impl->tcpReversePool;
 }
 
-const Ini& CloudConnectController::ini() const
-{
-    return m_impl->ini;
-}
-
 void CloudConnectController::reinitialize()
 {
+    auto cloudHost = m_impl->cloudHost;
     auto aioService = m_impl->aioService;
     auto addressResolver = m_impl->addressResolver;
+    auto settings = m_impl->settings;
     const auto ownPeerId = outgoingTunnelPool().ownPeerId();
 
     m_impl.reset();
 
-    m_impl = std::make_unique<CloudConnectControllerImpl>(aioService, addressResolver);
+    m_impl = std::make_unique<CloudConnectControllerImpl>(
+        cloudHost, aioService, addressResolver);
+    m_impl->settings = settings;
     applySettings();
     outgoingTunnelPool().setOwnPeerId(ownPeerId);
 }
@@ -142,33 +162,48 @@ void CloudConnectController::printArgumentsHelp(std::ostream* outputStream)
         "  --cloud-connect-enable-proxy-only" << std::endl;
 }
 
+void CloudConnectController::readSettingsFromIni()
+{
+    m_impl->ini.reload();
+
+    m_impl->settings.useHttpConnectToListenOnRelay =
+        m_impl->ini.useHttpConnectToListenOnRelay;
+}
+
 void CloudConnectController::loadSettings(const utils::ArgumentParser& arguments)
 {
     if (const auto value = arguments.get("enforce-mediator", "mediator"))
-        m_settings.forcedMediatorUrl = value->toStdString();
+        m_impl->settings.forcedMediatorUrl = value->toStdString();
+
+    if (const auto value = arguments.get<int>("use-http-connect-to-listen-on-relay"))
+        m_impl->settings.useHttpConnectToListenOnRelay = *value > 0;
 
     // TODO: #ak Following parameters are redundant and contradicting.
 
     if (arguments.get("cloud-connect-disable-udp"))
-        m_settings.isUdpHpDisabled = true;
+        m_impl->settings.isUdpHpDisabled = true;
 
     if (arguments.get("cloud-connect-enable-proxy-only"))
-        m_settings.isOnlyCloudProxyEnabled = true;
+        m_impl->settings.isOnlyCloudProxyEnabled = true;
 }
 
 void CloudConnectController::applySettings()
 {
-    if (!m_settings.forcedMediatorUrl.empty())
-        mediatorConnector().mockupMediatorUrl(QString::fromStdString(m_settings.forcedMediatorUrl));
+    if (!m_impl->settings.forcedMediatorUrl.empty())
+    {
+        mediatorConnector().mockupMediatorUrl(
+            QString::fromStdString(m_impl->settings.forcedMediatorUrl),
+            url::getEndpoint(utils::Url(m_impl->settings.forcedMediatorUrl)));
+    }
 
-    if (m_settings.isUdpHpDisabled)
+    if (m_impl->settings.isUdpHpDisabled)
     {
         cloud::ConnectorFactory::setEnabledCloudConnectMask(
             cloud::ConnectorFactory::getEnabledCloudConnectMask() &
             ~((int)cloud::ConnectType::udpHp));
     }
 
-    if (m_settings.isOnlyCloudProxyEnabled)
+    if (m_impl->settings.isOnlyCloudProxyEnabled)
     {
         cloud::ConnectorFactory::setEnabledCloudConnectMask(
             (int)cloud::ConnectType::proxy);

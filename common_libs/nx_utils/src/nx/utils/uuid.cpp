@@ -2,6 +2,7 @@
 
 #include <type_traits>
 #include <nx/utils/log/assert.h>
+#include <QCryptographicHash>
 
 QnUuid::QnUuid()
 {
@@ -160,6 +161,24 @@ QnUuid QnUuid::fromStringSafe(const char* uuid)
 QnUuid QnUuid::fromStringSafe(const std::string& uuid)
 {
     return QnUuid(QUuid(QByteArray::fromRawData(uuid.c_str(), (int)uuid.size())));
+}
+
+QnUuid QnUuid::fromArbitraryData(const QByteArray& data)
+{
+    QCryptographicHash md5Hash(QCryptographicHash::Md5);
+    md5Hash.addData(data);
+    QByteArray bytes = md5Hash.result();
+    return fromRfc4122(bytes);
+}
+
+QnUuid QnUuid::fromArbitraryData(const QString& data)
+{
+    return fromArbitraryData(data.toUtf8());
+}
+
+QnUuid QnUuid::fromArbitraryData(const std::string& data)
+{
+    return fromArbitraryData(QByteArray::fromRawData(data.data(), (int)data.size()));
 }
 
 QnUuid QnUuid::createUuidFromPool(const QUuid &baseId, uint offset)

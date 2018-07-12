@@ -24,7 +24,6 @@ namespace ec2
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
             QnMutexLocker lock( &m_mutex );
-            Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
             if (!tran.persistentInfo.isNull() && m_cache.contains(tran.persistentInfo))

@@ -21,6 +21,17 @@ namespace http {
 const char* const kUrlSchemeName = "http";
 const char* const kSecureUrlSchemeName = "https";
 
+QString urlSheme(bool isSecure)
+{
+    return QString::fromUtf8(isSecure ? kSecureUrlSchemeName : kUrlSchemeName);
+}
+
+bool isUrlSheme(const QString& scheme)
+{
+    const auto schemeUtf8 = scheme.toUtf8();
+    return schemeUtf8 == kUrlSchemeName || schemeUtf8 == kSecureUrlSchemeName;
+}
+
 int strcasecmp(const StringType& one, const StringType& two)
 {
     if (one.size() < two.size())
@@ -43,10 +54,17 @@ int defaultPortForScheme(const StringType& scheme)
     return -1;
 }
 
+int defaultPort(bool isSecure)
+{
+    return isSecure ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
+}
+
 StringType getHeaderValue(const HttpHeaders& headers, const StringType& headerName)
 {
-    HttpHeaders::const_iterator it = headers.find(headerName);
-    return it == headers.end() ? StringType() : it->second;
+    HttpHeaders::const_iterator it = headers.lower_bound(headerName);
+    return it == headers.end() || strcasecmp(it->first, headerName) != 0
+        ? StringType()
+        : it->second;
 }
 
 bool readHeader(
@@ -54,18 +72,21 @@ bool readHeader(
     const StringType& headerName,
     int* value)
 {
-    auto it = headers.find(headerName);
-    if (it == headers.end())
+    auto it = headers.lower_bound(headerName);
+    if (it == headers.end() || strcasecmp(it->first, headerName) != 0)
         return false;
+
     *value = it->second.toInt();
     return true;
 }
 
 HttpHeaders::iterator insertOrReplaceHeader(HttpHeaders* const headers, const HttpHeader& newHeader)
 {
-    HttpHeaders::iterator existingHeaderIter = headers->lower_bound(newHeader.first);
+    const auto name = newHeader.first.toLower();
+
+    HttpHeaders::iterator existingHeaderIter = headers->lower_bound(name);
     if ((existingHeaderIter != headers->end()) &&
-        (strcasecmp(existingHeaderIter->first, newHeader.first) == 0))
+        (strcasecmp(existingHeaderIter->first, name) == 0))
     {
         existingHeaderIter->second = newHeader.second;  //replacing header
         return existingHeaderIter;
@@ -85,7 +106,7 @@ HttpHeaders::iterator insertHeader(HttpHeaders* const headers, const HttpHeader&
 void removeHeader(HttpHeaders* const headers, const StringType& headerName)
 {
     HttpHeaders::iterator itr = headers->lower_bound(headerName);
-    while (itr != headers->end() && itr->first == headerName)
+    while (itr != headers->end() && strcasecmp(itr->first, headerName) == 0)
         itr = headers->erase(itr);
 }
 
@@ -230,6 +251,8 @@ StringType toString(Value val)
             return StringType("Internal Server Error");
         case notImplemented:
             return StringType("Not Implemented");
+        case badGateway:
+            return StringType("Bad Gateway");
         case serviceUnavailable:
             return StringType("Service Unavailable");
         default:
@@ -273,10 +296,20 @@ const StringType Method::post("POST");
 const StringType Method::put("PUT");
 const StringType Method::delete_("DELETE");
 const StringType Method::options("OPTIONS");
+const StringType Method::connect("CONNECT");
 
 bool Method::isMessageBodyAllowed(ValueType method)
 {
-    return method != get && method != head && method != delete_;
+    return method != get && method != head && method != delete_ && method != connect;
+}
+
+bool Method::isMessageBodyAllowedInResponse(
+    ValueType method,
+    StatusCode::Value statusCode)
+{
+    return method != connect
+        && method != head
+        && StatusCode::isMessageBodyAllowed(statusCode);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -662,6 +695,44 @@ StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
     return buf;
 }
 
+static StringType kSetCookieHeaderName("Set-Cookie");
+
+void Response::setCookie(const StringType& name, const StringType& value, const StringType& path)
+{
+    insertHeader(&headers,
+        {kSetCookieHeaderName, name + "=" + value + "; Path=" + path});
+}
+
+void Response::setDeletedCookie(const StringType& name)
+{
+    insertHeader(&headers,
+        {kSetCookieHeaderName,name + "=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
+}
+
+std::map<StringType, StringType> Response::getCookies() const
+{
+    std::map<StringType, StringType> cookies;
+    const auto setCookieHeaders = headers.equal_range("Set-Cookie");
+    for (auto it = setCookieHeaders.first; it != setCookieHeaders.second; ++it)
+    {
+        const auto data = it->second;
+        if (data.contains("=deleted"))
+            continue;
+
+        const auto nameEnd = data.indexOf('=');
+        if (nameEnd == -1)
+            continue;
+
+        const auto valueBegin = nameEnd + 1;
+        auto valueEnd = data.indexOf("; ", valueBegin);
+        if (valueEnd == -1)
+            valueEnd = data.length();
+
+        cookies.emplace(data.left(nameEnd), data.mid(valueBegin, valueEnd - valueBegin));
+    }
+
+    return cookies;
+}
 
 namespace MessageType {
 
@@ -1707,6 +1778,82 @@ StringType StrictTransportSecurity::toString() const
     return result;
 }
 
+//-------------------------------------------------------------------------------------------------
+
+const StringType XForwardedFor::NAME("X-Forwarded-For");
+
+bool XForwardedFor::parse(const StringType& str)
+{
+    auto tokens = str.split(',');
+    if (tokens.empty())
+        return false;
+
+    client = tokens[0].trimmed();
+    for (int i = 1; i < tokens.size(); ++i)
+        proxies.push_back(tokens[i].trimmed());
+
+    return true;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool ForwardedElement::parse(const StringType& str)
+{
+    const auto params = nx::utils::parseNameValuePairs(str, ';');
+    if (params.empty())
+        return false;
+
+    for (auto it = params.begin(); it != params.end(); ++it)
+    {
+        if (it.key().toLower() == "by")
+            by = it.value();
+        else if (it.key().toLower() == "for")
+            for_ = it.value();
+        else if (it.key().toLower() == "host")
+            host = it.value();
+        else if (it.key().toLower() == "proto")
+            proto = it.value();
+    }
+
+    return true;
+}
+
+bool ForwardedElement::operator==(const ForwardedElement& right) const
+{
+    return by == right.by
+        && for_ == right.for_
+        && host == right.host
+        && proto == right.proto;
+}
+
+const StringType Forwarded::NAME("Forwarded");
+
+Forwarded::Forwarded(std::vector<ForwardedElement> elements):
+    elements(std::move(elements))
+{
+}
+
+bool Forwarded::parse(const StringType& str)
+{
+    auto serializedElements = str.split(',');
+    for (const auto& serializedElement: serializedElements)
+    {
+        if (serializedElement.isEmpty())
+            continue;
+
+        ForwardedElement element;
+        if (element.parse(serializedElement.trimmed()))
+            elements.push_back(std::move(element));
+    }
+
+    return !elements.empty();
+}
+
+bool Forwarded::operator==(const Forwarded& right) const
+{
+    return elements == right.elements;
+}
+
 } // namespace header
 
 //-------------------------------------------------------------------------------------------------
@@ -1843,7 +1990,7 @@ int ChunkHeader::serialize(BufferType* const /*dstBuffer*/) const
 }
 
 
-static const StringType defaultUserAgentString = lit("%1%2/%3 (%4) %5").arg(
+static const StringType defaultUserAgentString = QString("%1%2/%3 (%4) %5").arg(
     nx::utils::AppInfo::productNameLong(),
     PRODUCT_NAME_SUFFIX,
     nx::utils::AppInfo::applicationVersion(),
@@ -1856,7 +2003,7 @@ StringType userAgentString()
     return defaultUserAgentString;
 }
 
-static const StringType defaultServerString = lit("%1/%2 (%3) %4").arg(
+static const StringType defaultServerString = QString("%1/%2 (%3) %4").arg(
     nx::utils::AppInfo::productNameLong(),
     nx::utils::AppInfo::applicationVersion(),
     nx::utils::AppInfo::organizationName(),

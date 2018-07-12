@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        A fiók létrehozva.. <br>A megerősítéshez szükséges üzenetet elküldtük <br>{{account.email}} címre
+        Fiók létrehozva. <br>Megerősítő üzenetet a megadott címre elküldtük <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -24,7 +24,7 @@
  name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Utónév megadása szükséges.</span>
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Utónév megadása szükséges</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -35,11 +35,11 @@
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Vezetéknév megadása szükséges.</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Vezetéknév megadása szükséges</span>
             </div>
         </div>
         <div class="form-group" validate-field>
-            <label for="registerEmail"  class="col-sm-4 control-label">E-mail</label>
+            <label for="registerEmail"  class="col-sm-4 control-label">Email</label>
             <div class="col-sm-4">
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  validate-email
@@ -49,18 +49,24 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">E-mail megadása szükséges.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email megadása kötelező</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Valós e-mail címet adjon meg.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Adj meg egy érvényes Email-t</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Ez az e-mail cím már regisztrálva van a {{PRODUCT_NAME}} rendszerben.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Ez az e-mail már regisztrálva van %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Feliratkozás e-mail hírlevelekre</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        Elfogadom az <a href="/content/eula" target="_blank"> Általános Szerződési Feltételeket </a> és <a href="%PRIVACY_LINK%" target="_blank"> Adatvédelmi irányelveket </a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        Kérem olvassa el és fogadja el az Általános Szerződési Feltételeket és az Adatvédelmi Irányelveket
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,7 +76,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note">"Fiók létrehozása" gombra kattintva<br>elfogadja<a href="/content/eula" target="_blank"> A szerződési feltételeket</a></small>
             </div>
         </div>
     </form>

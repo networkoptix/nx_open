@@ -35,7 +35,8 @@ ReverseConnectionPool::ReverseConnectionPool(
         }),
     m_isReconnectHandlerSet(false),
     m_startTime(std::chrono::steady_clock::now()),
-    m_startTimeout(0)
+    m_startTimeout(0),
+    m_prevConnectionDebugPrintTime(std::chrono::steady_clock::now())
 {
     bindToAioThread(getAioThread());
 }
@@ -58,7 +59,8 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
     SocketAddress serverAddress(HostAddress::anyHost, port);
     if (!m_acceptor.start(
             m_outgoingTunnelPool.ownPeerId(),
-            serverAddress, m_mediatorConnection->getAioThread()))
+            serverAddress,
+            m_mediatorConnection->getAioThread()))
     {
         NX_LOGX(lm("Could not start acceptor on %1: %2")
             .args(serverAddress, SystemError::getLastOSErrorText()), cl_logWARNING);
@@ -69,9 +71,9 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
     return registerOnMediator(waitForRegistration);
 }
 
-uint16_t ReverseConnectionPool::port() const
+nx::network::SocketAddress ReverseConnectionPool::address() const
 {
-    return m_acceptor.address().port;
+    return m_acceptor.address();
 }
 
 std::shared_ptr<ReverseConnectionSource>
@@ -139,6 +141,12 @@ void ReverseConnectionPool::setPoolSize(boost::optional<size_t> value)
     // TODO: also need to close extra connections in m_connectionHolders
 }
 
+void ReverseConnectionPool::setHttpConnectionInactivityTimeout(
+    std::chrono::milliseconds inactivityTimeout)
+{
+    m_acceptor.setHttpConnectionInactivityTimeout(inactivityTimeout);
+}
+
 void ReverseConnectionPool::setKeepAliveOptions(boost::optional<KeepAliveOptions> value)
 {
     m_acceptor.setKeepAliveOptions(std::move(value));
@@ -181,7 +189,7 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
         {
             if (code == nx::hpm::api::ResultCode::ok)
             {
-                NX_LOGX(lm("Registred on mediator by %1 with %2")
+                NX_LOGX(lm("Registered on mediator by %1 with %2")
                     .args(m_acceptor.selfHostName(), m_acceptor.address()), cl_logINFO);
 
                 if (auto& options = responce.tcpConnectionKeepAlive)
@@ -215,15 +223,36 @@ std::shared_ptr<ReverseConnectionHolder>
     ReverseConnectionPool::getOrCreateHolder(const String& hostName)
 {
     QnMutexLocker lk(&m_mutex);
+
     auto& holdersInSuffix = m_connectionHolders[getHostSuffix(hostName)];
     auto it = holdersInSuffix.find(hostName);
     if (it == holdersInSuffix.end())
     {
+        NX_DEBUG(this, lm("Peer %1 registered. There are total %2 known peer domains")
+            .args(hostName, m_connectionHolders.size()));
+
         it = holdersInSuffix.emplace(
             std::move(hostName),
             std::make_shared<ReverseConnectionHolder>(
                 m_mediatorConnection->getAioThread(),
                 hostName)).first;
+    }
+
+    constexpr auto connectionDebugPrintPeriod = std::chrono::seconds(10);
+    if (std::chrono::steady_clock::now() - m_prevConnectionDebugPrintTime > connectionDebugPrintPeriod)
+    {
+        int totalPeerCount = 0;
+        int totalSocketCount = 0;
+        for (const auto& holders: m_connectionHolders)
+        {
+            totalPeerCount += holders.second.size();
+            for (const auto& holder: holders.second)
+                totalSocketCount += holder.second->socketCount();
+        }
+
+        NX_DEBUG(this, lm("There are total %1 peers and %2 connections")
+            .args(totalPeerCount, totalSocketCount));
+        m_prevConnectionDebugPrintTime = std::chrono::steady_clock::now();
     }
 
     return it->second;

@@ -108,25 +108,13 @@ public:
     QColor gridLabel;
     QColor allLabel;
 
-    QColor recordNever;
-    QColor recordAlways;
-    QColor recordMotion;
-
-    QColor recordNeverHovered;
-    QColor recordAlwaysHovered;
-    QColor recordMotionHovered;
-
     QColor hoveredBackground;
     QColor pressedBackground;
 
     QColor gridLine;
-
-    QColor border;
 };
 #define QnScheduleGridColors_Fields (normalLabel)(weekendLabel)(gridLabel)(allLabel) \
-    (recordNever)(recordAlways)(recordMotion) \
-    (recordNeverHovered)(recordAlwaysHovered)(recordMotionHovered) \
-    (hoveredBackground)(pressedBackground)(gridLine)(border)
+    (hoveredBackground)(pressedBackground)(gridLine)
 
 
 struct QnGridColors {

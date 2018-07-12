@@ -1,6 +1,12 @@
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(MSVC)
+    # Visual Studio 2017 currently (15.5.x) ignores "set(CMAKE_CXX_STANDARD 17)".
+    # So we need to set c++17 support explicitly.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+endif(MSVC)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -22,6 +28,16 @@ if(MSVC)
     endif()
 endif()
 
+if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
+    # TODO: Use CMake defaults in the next release version (remove the following two lines).
+    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(-fno-devirtualize)
+    endif()
+endif()
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -29,22 +45,20 @@ add_definitions(
     -DENABLE_SENDMAIL
     -DENABLE_DATA_PROVIDERS
     -DENABLE_SOFTWARE_MOTION_DETECTION
+
+    -DBOOST_BIND_NO_PLACEHOLDERS
 )
 
 if(WINDOWS)
     add_definitions(
+        -D_CRT_RAND_S
         -D_WINSOCKAPI_=
     )
-endif()
-
-if(UNIX)
-    add_definitions(-DQN_EXPORT=)
 endif()
 
 if(ANDROID OR IOS)
     remove_definitions(
         -DENABLE_SENDMAIL
-        -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
     )
 endif()
@@ -73,26 +87,45 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_definitions(-D_DEBUG)
     endif()
     add_definitions(-DUSE_OWN_MUTEX)
-    if(analyzeMutexLocksForDeadlock)
-        add_definitions(-DANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
-    endif()
+endif()
+
+if(analyzeMutexLocksForDeadlock)
+    add_definitions(-DUSE_OWN_MUTEX)
+    add_definitions(-DANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
 endif()
 
 if(WINDOWS)
     add_definitions(
         -DNOMINMAX=
         -DUNICODE)
-    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
-        $<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>:QN_EXPORT=>
-        $<$<NOT:$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>>:QN_EXPORT=Q_DECL_EXPORT>)
 
     add_compile_options(
         /MP
         /bigobj
+
         /wd4290
         /wd4661
         /wd4100
+
         /we4717
+        # Deletion of pointer to incomplete type 'X'; no destructor called.
+        /we4150
+        # Not all control paths return a value.
+        /we4715
+        # Macro redefinition.
+        /we4005
+        # Unsafe operation: no value of type 'INTEGRAL' promoted to type 'ENUM' can equal the given
+        # constant.
+        /we4806
+    )
+    add_definitions(-D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING)
+    add_definitions(-D_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING)
+
+    # Get rid of useless MSVC warnings.
+    add_definitions(
+        -D_CRT_SECURE_NO_WARNINGS #< Don't warn for deprecated 'unsecure' CRT functions.
+        -D_CRT_NONSTDC_NO_DEPRECATE #< Don't warn for deprecated POSIX functions.
+        -D_SCL_SECURE_NO_WARNINGS #< Don't warn for 'unsafe' STL functions.
     )
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -108,8 +141,8 @@ if(WINDOWS)
     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /DEBUG")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /DEBUG")
 
-    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /DEBUG:FASTLINK")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG:FASTLINK")
+    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /DEBUG")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /DEBUG")
     if(NOT developerBuild)
         set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /SUBSYSTEM:WINDOWS /entry:mainCRTStartup")
     endif()
@@ -127,7 +160,12 @@ if(UNIX)
         -Wno-error=unused-function
     )
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(
+            -Wno-error=dangling-else
+            -Wno-psabi
+        )
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         add_compile_options(
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override
@@ -136,10 +174,6 @@ if(UNIX)
 endif()
 
 if(LINUX)
-    # TODO: Use CMake defaults in the next release version (remove the following two lines).
-    string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
-    string(REPLACE "-O3" "-O2" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-
     if(NOT "${arch}" MATCHES "arm|aarch64")
         add_compile_options(-msse2)
     endif()
@@ -150,16 +184,12 @@ if(LINUX)
     )
     set(CMAKE_SKIP_BUILD_RPATH ON)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 
-    # TODO: #dmishin ask #dklychkov about this condition.
-    if(LINUX)
-        set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
-    endif()
-
-    set(CMAKE_EXE_LINKER_FLAGS
-        "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
-    set(CMAKE_SHARED_LINKER_FLAGS
-        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--no-undefined")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--disable-new-dtags")
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -rdynamic -Wl,--no-undefined")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--as-needed")
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--as-needed")
 
     if(NOT ANDROID AND CMAKE_BUILD_TYPE STREQUAL "Release")
         add_compile_options(-ggdb1 -fno-omit-frame-pointer)

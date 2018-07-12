@@ -17,18 +17,12 @@ nx_configure_file(
 nx_configure_file(
     maven/filter-resources/client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
-nx_configure_file(
-    maven/filter-resources/version.h
-    ${CMAKE_CURRENT_BINARY_DIR})
-nx_configure_file(
-    ${PROJECT_SOURCE_DIR}/cpp/maven/bin-resources/app_icons.h
-    ${CMAKE_CURRENT_BINARY_DIR})
 
 if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)
 endif()
 
-file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml static-resources/src/qml/*.js)
+file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
 nx_add_target(nx_client_desktop LIBRARY
     ADDITIONAL_SOURCES
@@ -39,6 +33,7 @@ nx_add_target(nx_client_desktop LIBRARY
         "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
+        "${customization_dir}/license.html"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
     OTHER_SOURCES
@@ -50,14 +45,6 @@ nx_add_target(nx_client_desktop LIBRARY
 )
 
 if(WINDOWS)
-    ExternalProject_Add(
-        nov_file_launcher
-        SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/launcher"
-        CMAKE_ARGS
-            -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
-            -DCONFIG_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}
-        BUILD_BYPRODUCTS "${nov_file_launcher_executable}"
-    )
     add_dependencies(nx_client_desktop nov_file_launcher)
 endif()
 

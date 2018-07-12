@@ -1,10 +1,11 @@
 #pragma once
 
+#include <array>
+#include <chrono>
+
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 #include <QtCore/QTime>
-
-#include <array>
 
 #include <nx/utils/uuid.h>
 
@@ -18,6 +19,7 @@
 
 #include <recording/time_period.h>
 
+#include <nx/client/desktop/camera/camera_fwd.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -45,8 +47,6 @@ class QnCameraDataManager;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
-class QnResourceDisplay;
-typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class QnSearchQueryStrategy;
 class VariantAnimator;
 
@@ -60,6 +60,8 @@ class QnWorkbenchNavigator:
     Q_OBJECT;
 
     typedef Connective<QObject> base_type;
+
+    using milliseconds = std::chrono::milliseconds;
 
     Q_PROPERTY(bool hasArchive READ hasArchive NOTIFY hasArchiveChanged)
 public:
@@ -235,7 +237,7 @@ protected slots:
 
     void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
 
-    void at_timeSlider_valueChanged(qint64 value);
+    void at_timeSlider_valueChanged(milliseconds value);
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
     void at_timeSlider_selectionPressed();
@@ -284,51 +286,51 @@ private:
     void updatePlaybackMask();
 
 private:
-    QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
+    QPointer<QnWorkbenchStreamSynchronizer> m_streamSynchronizer;
     QTime m_updateSliderTimer;
-    QnTimeSlider *m_timeSlider;
-    QnTimeScrollBar *m_timeScrollBar;
-    QnCalendarWidget *m_calendar;
-    QnDayTimeWidget *m_dayTimeWidget;
+    QPointer<QnTimeSlider> m_timeSlider;
+    QPointer<QnTimeScrollBar> m_timeScrollBar;
+    QPointer<QnCalendarWidget> m_calendar;
+    QPointer<QnDayTimeWidget> m_dayTimeWidget;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QHash<QnMediaResourcePtr, int> m_syncedResources;
 
     QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
-    QnResourceWidget *m_centralWidget;
-    QnResourceWidget *m_currentWidget;
-    QnMediaResourceWidget *m_currentMediaWidget;
-    WidgetFlags m_currentWidgetFlags;
-    bool m_currentWidgetLoaded;
-    bool m_sliderDataInvalid;
-    bool m_sliderWindowInvalid;
+    QPointer<QnResourceWidget> m_centralWidget;
+    QPointer<QnResourceWidget> m_currentWidget;
+    QPointer<QnMediaResourceWidget> m_currentMediaWidget;
+    WidgetFlags m_currentWidgetFlags = 0;
+    bool m_currentWidgetLoaded = false;
+    bool m_sliderDataInvalid = false;
+    bool m_sliderWindowInvalid = false;
 
-    bool m_updatingSliderFromReader;
-    bool m_updatingSliderFromScrollBar;
-    bool m_updatingScrollBarFromSlider;
+    bool m_updatingSliderFromReader = false;
+    bool m_updatingSliderFromScrollBar = false;
+    bool m_updatingScrollBarFromSlider = false;
 
-    bool m_lastLive;
-    bool m_lastLiveSupported;
-    bool m_lastPlaying;
-    bool m_lastPlayingSupported;
-    bool m_pausedOverride;
-    bool m_preciseNextSeek;
+    bool m_lastLive = false;
+    bool m_lastLiveSupported = false;
+    bool m_lastPlaying = false;
+    bool m_lastPlayingSupported = false;
+    bool m_pausedOverride = false;
+    bool m_preciseNextSeek = false;
 
     bool m_ignoreScrollBarDblClick = false;
 
     /** This flag says that video was paused automatically due to user inactivity.
      *  It's used to make it possible to unpause video only in the user inactivity state handler.
      */
-    bool m_autoPaused;
+    bool m_autoPaused = false;
     QHash<QnResourceDisplayPtr, bool> m_autoPausedResourceDisplays;
 
-    qreal m_lastSpeed;
+    qreal m_lastSpeed = 0.0;
     QnSpeedRange m_lastSpeedRange;
 
-    bool m_lastAdjustTimelineToPosition;
+    bool m_lastAdjustTimelineToPosition = false;
 
-    bool m_timelineRelevant;
+    bool m_timelineRelevant = false;
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
@@ -338,9 +340,9 @@ private:
 
     nx::utils::PendingOperation *m_sliderBookmarksRefreshOperation;
 
-    QnCameraDataManager* m_cameraDataManager;
+    QPointer<QnCameraDataManager> m_cameraDataManager;
 
-    int m_chunkMergingProcessHandle;
+    int m_chunkMergingProcessHandle = 0;
     std::array<std::unique_ptr<QnThreadedChunksMergeTool>, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnSecurityCamResourcePtr> m_updateHistoryQueue;
@@ -349,21 +351,22 @@ private:
     bool m_syncIsForced = false;
 
     /** At least one of the synced widgets has archive. */
-    bool m_hasArchive;
+    bool m_hasArchive = false;
 
     /** At least one of the synced widgets is recording. */
-    bool m_isRecording;
+    bool m_isRecording = false;
+
     /** When recording was started, 0 if there's no recording in progress. */
-    qint64 m_recordingStartUtcMs;
+    qint64 m_recordingStartUtcMs = 0;
 
     /** Animated timeline position. */
-    qint64 m_animatedPosition;
+    qint64 m_animatedPosition = 0;
 
     /** Previous media position. */
-    qint64 m_previousMediaPosition;
+    qint64 m_previousMediaPosition = 0;
 
     /** Timeline position animator. */
-    VariantAnimator* m_positionAnimator;
+    QPointer<VariantAnimator> m_positionAnimator;
 
     QnDisconnectHelperPtr m_currentWidgetConnections;
     QnDisconnectHelperPtr m_centralWidgetConnections;

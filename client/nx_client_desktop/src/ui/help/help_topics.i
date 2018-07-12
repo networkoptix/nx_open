@@ -118,6 +118,7 @@ QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_
 QN_HELP_TOPIC(UserSettings_DisableUser_Help,                    "disabling_user.htm")
 QN_HELP_TOPIC(UserSettings_LdapIntegration_Help,                "setting_up_ldap_integration.htm")
 QN_HELP_TOPIC(UserSettings_LdapFetch_Help,                      "importing_users_from_ldap_serv.htm")
+QN_HELP_TOPIC(UserSettings_LdapAdd_Help,                        "Adding_Users_from_LDAP_Server.htm")
 
 QN_HELP_TOPIC(UserRoles_Help,                                   "roles_management.htm")
 
@@ -141,8 +142,10 @@ QN_HELP_TOPIC(CameraSettings_Dewarping_Help,                    "setting_up_fish
 QN_HELP_TOPIC(CameraSettings_AspectRatio_Help,                  "forcing_aspect_ratio_for_camer.htm")
 QN_HELP_TOPIC(CameraSettings_Rotation_Help,                     "setting_up_camera_orientation.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_SettingsControl_Help,       "preventing_VMS_from_C.htm")
+QN_HELP_TOPIC(CameraSettings_Expert_CalculateBitratePerGop,       "adjustiung_average_bitrate_on_.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_DisableArchivePrimary_Help, "disabling_recording_of_primary.htm")
 QN_HELP_TOPIC(CameraSettings_Expert_Rtp_Help,                   "setting_up_camera_transport_pr.htm")
+QN_HELP_TOPIC(CameraSettings_Expert_LogicalId_Help,             "assigning_logical_id.htm")
 
 QN_HELP_TOPIC(EventsActions_Help,                               "configuring_events_and_actions.htm")
 QN_HELP_TOPIC(EventsActions_Schedule_Help,						"setting_up_schedule_for_tracki.htm")

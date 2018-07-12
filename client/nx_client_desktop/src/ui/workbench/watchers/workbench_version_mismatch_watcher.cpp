@@ -13,51 +13,63 @@
 
 #include <utils/common/app_info.h>
 
-QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject *parent):
+QnWorkbenchVersionMismatchWatcher::QnWorkbenchVersionMismatchWatcher(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(context(),  SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateMismatchData()));
+    connect(context(), &QnWorkbenchContext::userChanged,
+        this, &QnWorkbenchVersionMismatchWatcher::updateMismatchData);
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded,  this, [this] (const QnResourcePtr &resource) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server)
-            return;
-        connect(server, &QnMediaServerResource::versionChanged, this, &QnWorkbenchVersionMismatchWatcher::updateMismatchData);
-        updateMismatchData();
-    });
+    connect(resourcePool(), &QnResourcePool::resourceAdded,  this,
+        [this](const QnResourcePtr&resource)
+        {
+            const auto server = resource.dynamicCast<QnMediaServerResource>();
+            if (!server)
+                return;
+            connect(server, &QnMediaServerResource::versionChanged,
+                this, &QnWorkbenchVersionMismatchWatcher::updateMismatchData);
+            updateMismatchData();
+        });
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,  this, [this] (const QnResourcePtr &resource) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server)
-            return;
-        disconnect(server, NULL, this, NULL);
-        updateMismatchData();
-    });
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,  this,
+        [this](const QnResourcePtr& resource)
+        {
+            const auto server = resource.dynamicCast<QnMediaServerResource>();
+            if (!server)
+                return;
+            server->disconnect(this);
+            updateMismatchData();
+        });
 
-    for(const QnMediaServerResourcePtr& server: resourcePool()->getAllServers(Qn::AnyStatus))
+    for (const auto& server: resourcePool()->getAllServers(Qn::AnyStatus))
     {
-        connect(server, &QnMediaServerResource::versionChanged, this, &QnWorkbenchVersionMismatchWatcher::updateMismatchData);
+        connect(server, &QnMediaServerResource::versionChanged,
+            this, &QnWorkbenchVersionMismatchWatcher::updateMismatchData);
     }
 
     updateMismatchData();
 }
 
-QnWorkbenchVersionMismatchWatcher::~QnWorkbenchVersionMismatchWatcher() {
-    return;
+QnWorkbenchVersionMismatchWatcher::~QnWorkbenchVersionMismatchWatcher()
+{
 }
 
-bool QnWorkbenchVersionMismatchWatcher::hasMismatches() const {
+bool QnWorkbenchVersionMismatchWatcher::hasMismatches() const
+{
     return m_hasMismatches;
 }
 
-QList<QnAppInfoMismatchData> QnWorkbenchVersionMismatchWatcher::mismatchData() const {
+QList<QnAppInfoMismatchData> QnWorkbenchVersionMismatchWatcher::mismatchData() const
+{
     return m_mismatchData;
 }
 
-QnSoftwareVersion QnWorkbenchVersionMismatchWatcher::latestVersion(Qn::SystemComponent component) const {
-    QnSoftwareVersion result;
-    foreach(const QnAppInfoMismatchData &data, m_mismatchData) {
+nx::utils::SoftwareVersion QnWorkbenchVersionMismatchWatcher::latestVersion(
+    Qn::SystemComponent component) const
+{
+    nx::utils::SoftwareVersion result;
+    for (const auto& data: m_mismatchData)
+    {
         if (component != Qn::AnyComponent && component != data.component)
             continue;
         result = qMax(data.version, result);
@@ -65,48 +77,54 @@ QnSoftwareVersion QnWorkbenchVersionMismatchWatcher::latestVersion(Qn::SystemCom
     return result;
 }
 
-bool QnWorkbenchVersionMismatchWatcher::versionMismatches(QnSoftwareVersion left, QnSoftwareVersion right, bool concernBuild) {
-    return (left.major() != right.major() ||
-            left.minor() != right.minor() ||
-            left.bugfix() != right.bugfix() ||
-            (concernBuild &&
-             (left.build() != right.build())
-             )
-            );
+bool QnWorkbenchVersionMismatchWatcher::versionMismatches(const nx::utils::SoftwareVersion& left,
+    const nx::utils::SoftwareVersion& right, bool concernBuild)
+{
+    return (left.major() != right.major() || left.minor() != right.minor()
+        || left.bugfix() != right.bugfix() || (concernBuild && (left.build() != right.build())));
 }
 
-void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
+void QnWorkbenchVersionMismatchWatcher::updateHasMismatches()
+{
     m_hasMismatches = false;
 
-    if(m_mismatchData.isEmpty())
+    if (m_mismatchData.isEmpty())
         return;
 
-    QnSoftwareVersion latest;
-    QnSoftwareVersion latestMs;
-    foreach(const QnAppInfoMismatchData &data, m_mismatchData) {
+    nx::utils::SoftwareVersion latest;
+    nx::utils::SoftwareVersion latestMs;
+
+    for (const auto& data: m_mismatchData)
+    {
         latest = qMax(data.version, latest);
         if (data.component != Qn::ServerComponent)
             continue;
         latestMs = qMax(data.version, latestMs);
     }
+
     if (versionMismatches(latest, latestMs))
         latestMs = latest;
 
-    foreach(const QnAppInfoMismatchData &data, m_mismatchData) {
-        switch (data.component) {
-        case Qn::ServerComponent:
-            m_hasMismatches |= QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMs, true);
-            break;
-        default:
-            break;
+    for (const auto& data: m_mismatchData)
+    {
+        switch (data.component)
+        {
+            case Qn::ServerComponent:
+                m_hasMismatches |= QnWorkbenchVersionMismatchWatcher::versionMismatches(
+                    data.version, latestMs, true);
+                break;
+            default:
+                break;
         }
+
         if (m_hasMismatches)
             break;
     }
 
 }
 
-void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {
+void QnWorkbenchVersionMismatchWatcher::updateMismatchData()
+{
     m_mismatchData.clear();
 
     QnAppInfoMismatchData clientData(Qn::ClientComponent, qnStaticCommon->engineVersion());

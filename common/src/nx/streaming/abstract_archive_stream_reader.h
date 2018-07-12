@@ -10,6 +10,7 @@
 class QnTimePeriod;
 class QnTimePeriodList;
 class AbstractArchiveIntegrityWatcher;
+class AbstractMediaDataFilter;
 
 class QnAbstractArchiveStreamReader: public QnAbstractMediaStreamDataProvider, public QnAbstractNavigator
 {
@@ -100,6 +101,8 @@ public:
     virtual void setEndOfPlaybackHandler(std::function<void()> /*handler*/) {}
     virtual void setErrorHandler(std::function<void(const QString& errorString)> /*handler*/) {}
     void setNoDataHandler(nx::utils::MoveOnlyFunc<void()> noDataHandler);
+
+    void addMediaFilter(const std::shared_ptr<AbstractMediaDataFilter>& filter);
 protected:
 
     /**
@@ -130,6 +133,7 @@ protected:
     nx::utils::MoveOnlyFunc<void()> m_noDataHandler;
 private:
     bool m_enabled;
+    std::vector<std::shared_ptr<AbstractMediaDataFilter>> m_filters;
 };
 
 #endif // ABSTRACT_ARCHIVE_STREAM_READER_H

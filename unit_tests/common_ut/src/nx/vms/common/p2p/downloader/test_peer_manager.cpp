@@ -265,7 +265,8 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(const QnUuid& peerId,
 }
 
 rest::Handle TestPeerManager::validateFileInformation(
-    const downloader::FileInformation& fileInformation,
+    const QnUuid& /*peerId*/,
+    const downloader::FileInformation& /*fileInformation*/,
     AbstractPeerManager::ValidateCallback callback)
 {
     return enqueueRequest(selfId(), kDefaultRequestTime,
@@ -515,10 +516,10 @@ rest::Handle ProxyTestPeerManager::downloadChunkFromInternet(const QnUuid& peerI
 }
 
 rest::Handle ProxyTestPeerManager::validateFileInformation(
-    const FileInformation& fileInformation, ValidateCallback callback)
+    const QnUuid& peerId, const FileInformation& fileInformation, ValidateCallback callback)
 {
     m_requestCounter.incrementCounters(selfId(), RequestCounter::DownloadChunkFromInternetRequest);
-    return m_peerManager->validateFileInformation(fileInformation, callback);
+    return m_peerManager->validateFileInformation(peerId, fileInformation, callback);
 }
 
 

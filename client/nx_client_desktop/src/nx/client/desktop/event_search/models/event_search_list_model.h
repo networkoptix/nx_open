@@ -16,8 +16,8 @@ public:
     explicit EventSearchListModel(QObject* parent = nullptr);
     virtual ~EventSearchListModel() override = default;
 
-    vms::event::EventType selectedEventType() const;
-    void setSelectedEventType(vms::event::EventType value);
+    vms::api::EventType selectedEventType() const;
+    void setSelectedEventType(vms::api::EventType value);
 
     virtual bool isConstrained() const override;
 

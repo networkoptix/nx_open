@@ -30,6 +30,11 @@ QnMServerAuditManager::QnMServerAuditManager(
 QnMServerAuditManager::~QnMServerAuditManager()
 {
     m_timer.stop();
+}
+
+void QnMServerAuditManager::stop()
+{
+    m_timer.stop();
     flushRecords();
     qnServerDb->closeUnclosedAuditRecords((int) (qnSyncTime->currentMSecsSinceEpoch() / 1000));
 }

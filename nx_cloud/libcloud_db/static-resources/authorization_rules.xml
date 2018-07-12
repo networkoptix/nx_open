@@ -13,7 +13,7 @@
             <!-- TODO cloud modules authentication rules should be added here -->
             <!-- TODO this section should be suitable for authentication by ip address and for password check -->
             <set resName="authenticated" resValue="false"/>
-        
+
             <condition resName="user.name">
                 <set value="connection_mediator" resName="user.password" resValue="123456"/>
                 <!-- <sequence value="connection_mediator">
@@ -21,7 +21,7 @@
                     <set resName="user.ha1" resValue="111111111111111"/>
                 </sequence> -->
             </condition>
-            
+
             <condition resName="request.path">
                 <set value="/cdb/account/resetPassword" resName="authenticated" resValue="true"/>
                 <condition value="/cdb/maintenance/vmsConnections" resName="secureSource">
@@ -90,8 +90,8 @@
                                     <set value="maintenance" resName="authorized" resValue="true"/>
                                 </condition>
                             </sequence>
-                        </condition>
-                    </condition>
+                         </condition>
+                     </condition>
                     <condition value="/cdb/system/getAccessRoleList" resName="systemId" matchType="presence">
                         <sequence value="false">
                             <set resName="authorized" resValue="false"/>

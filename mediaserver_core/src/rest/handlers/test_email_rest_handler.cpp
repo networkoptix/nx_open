@@ -5,26 +5,23 @@
 #include <nx/email/email_manager_impl.h>
 #include <network/tcp_connection_priv.h>
 #include <utils/email/email.h>
-#include <nx/email/email_manager_impl.h>
 
 #include "nx_ec/data/api_conversion_functions.h"
-#include "nx_ec/data/api_email_data.h"
+#include <nx/vms/api/data/email_settings_data.h>
+
 #include <rest/server/rest_connection_processor.h>
 
 int QnTestEmailSettingsHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(params);
-
     QnTestEmailSettingsReply reply;
-    ec2::ApiEmailSettingsData apiData = QJson::deserialized(body, ec2::ApiEmailSettingsData());
+    const auto apiData = QJson::deserialized<nx::vms::api::EmailSettingsData>(body);
     QnEmailSettings settings;
-    fromApiToResource(apiData, settings);
+    ec2::fromApiToResource(apiData, settings);
     EmailManagerImpl emailManagerImpl(owner->commonModule());
 
     SmtpOperationResult smtpResult = emailManagerImpl.testConnection(settings);

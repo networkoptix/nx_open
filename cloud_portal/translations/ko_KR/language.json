@@ -1,19 +1,19 @@
 {
-  "language_name": "언어",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "language_name": "한국어",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "승인",
     "cancelButton": "취소",
-    "loginTitle": "{{PRODUCT_NAME}} 에 로그인",
+    "loginTitle": "%PRODUCT_NAME%에 로그인",
     "loginButton": "로그인",
     "logoutAuthorisedTitle": "이미 로그인 되어 있습니다",
     "logoutAuthorisedContinueButton": "계속",
     "logoutAuthorisedLogoutButton": "로그 아웃"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "에 오신 것을 환영합니다",
     "register": "에 계정 만들기",
     "changePassword": "패스워드 변경 -",
@@ -31,8 +31,8 @@
     "view": "카메라 보기 - ",
     "debug": "디버그",
     "login": "로그인 -",
-    "download": "{{VMS_NAME}} 다운로드",
-    "downloadPlatform": "에 대한 {{VMS_NAME}} 다운로드 ",
+    "download": "%VMS_NAME% 다운로드",
+    "downloadPlatform": "에 대한 %VMS_NAME% 다운로드 ",
     "pageNotFound": "페이지를 찾을 수 없음"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "사용자 정의",
-      "description": "{{PRODUCT_NAME}} 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
+      "description": "%PRODUCT_NAME% 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
     },
     "cloudAdmin": {
       "label": "관리자",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "사용자 정의",
-      "description": "{{PRODUCT_NAME}} 클라이언트 프로그램을 사용하여 사용자 정의 권한 설정"
+      "description": "%VMS_NAME% 클라이언트을 사용하여 권한 설정"
     }
   },
   "errorCodes": {
@@ -115,9 +115,9 @@
     "cantActivatePrefix": "계정을 활성화 할 수 없습니다.",
     "cantSendConfirmationPrefix": "확인 이메일을 보낼 수 없습니다.",
     "cloudInvalidResponse": "Cloud DB에서 예기치 않은 응답을 반환했습니다.",
-    "notAuthorized": "패스워드가 틀립니다.",
+    "notAuthorized": "잘못된 암호",
+    "brokenAccount": "계정에 예기치 않은 문제가 있습니다. <a href=\"/restore_password\">계정 복원</a>",
     "wrongParameters": "양식의 일부 매개 변수가 잘못되었습니다.",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "계정이 이미 활성화되었거나 확인 코드가 잘못되었습니다.",
     "wrongCodeRestore": "확인 코드가 이미 사용되었거나 잘못되었습니다.",
     "forbidden": "이 작업을 수행 할 수있는 권한이 없습니다.",
@@ -129,20 +129,22 @@
     "accountAlreadyActivated": "이 계정은 이미 활성화되었습니다.",
     "emailNotFound": "계정이 존재하지 않습니다.",
     "EmailAlreadyExists": "이 전자 메일은 이미 등록되었습니다.",
-    "oldPasswordMistmatch": "현재 패스워드가 잘못되었습니다",
+    "oldPasswordMistmatch": "현재 패스워드가 잘못되었습니다.",
     "passwordMismatch": "패스워드가 틀립니다.",
     "cantEditYourself": "자신의 사용 권한 변경은 허용 되지 않습니다.",
     "cantEditAdmin": "이 사용자는 관리자 권한이 있습니다.",
-    "cantOpenClient": "{{VMS_NAME}} 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
+    "cantOpenClient": "%VMS_NAME% 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
     "lostConnection": "{{systemName}} 연결이 끊어졌습니다.",
-    "thisSystem": "시스템"
+    "thisSystem": "시스템",
+    "oldSafariNotSupported": "10 이전의 Safari 버전은 지원되지 않습니다."
   },
   "passwordRequirements": {
-    "minLengthMessage": "패스워드는 8 자 이상이어야합니다.",
+    "minLengthMessage": "비밀번호는 최소 8자 이상 포함되어야 합니다.",
     "requiredMessage": "라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",
     "weakMessage": "숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다.",
-    "strongMessage": "강력한 패스워드!",
-    "commonMessage": "현재 암호는 가능 많이 사용되는 암호입니다."
+    "strongMessage": "강력한 암호!",
+    "commonMessage": "현재 암호는 가능 많이 사용되는 암호입니다.",
+    "missingMessage": "패스워드가 필요합니다."
   },
   "sharing": {
     "confirmOwner": "시스템 소유자를 변경하면 현재 계정에서 소유권이 박탈 됩니다. 이 작업은 되돌릴 수 없습니다. 확실합니까?",
@@ -157,12 +159,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "시스템에 연결할 수 없습니다.",
     "offline": "시스템이 오프라인 상태입니다.",
-    "openClient": "{{VMS_NAME}} 에서 열기",
-    "openClientNoSystem": "Open {{VMS_NAME}}",
+    "openClient": "%VMS_NAME%에서 열기",
+    "openClientNoSystem": "Open %VMS_NAME%",
+    "confirmMergeAction": "병합",
+    "mergeSystemTitle": "병합 시스템",
     "confirmRenameTitle": "시스템 이름",
     "confirmRenameAction": "저장",
     "successRename": "시스템 이름 저장",
-    "confirmDisconnectTitle": "{{PRODUCT_NAME}} 에서 시스템 연결을 끊으시겠습니까?",
+    "confirmDisconnectTitle": "%PRODUCT_NAME%에서 시스템 연결을 끊으시겠습니까?",
     "confirmDisconnectAction": "연결 끊기",
     "confirmUnshareFromMe": "이 시스템을 당신의 계정과의 연결을 해제하려고합니다. 더 이상이 시스템에 액세스 할 수 없습니다. 확실합니까?",
     "confirmUnshareFromMeTitle": "시스템 연결을 끊으시겠습니까?",
@@ -170,7 +174,7 @@
     "confirmUnshare": "이 사용자는 시스템에 액세스 할 수 없게 됩니다. 확실합니까?",
     "confirmUnshareTitle": "사용자 삭제?",
     "confirmUnshareAction": "삭제",
-    "successDisconnected": "시스템이 성공적으로 {{PRODUCT_NAME}} 에서 분리 되었습니다.",
+    "successDisconnected": "시스템이 성공적으로 %PRODUCT_NAME%에서 분리 되었습니다.",
     "successDeleted": "시스템 {{systemName}} 이 (가) 귀하의 계정에서 성공적으로 삭제되었습니다.",
     "permissionsRemoved": "권한이 {{email}} 에서 제거 되었습니다."
   },
@@ -183,14 +187,14 @@
     "saveChanges": "저장"
   },
   "downloads": {
-    "noClientDetectedTitle": "시스템이 성공적으로 {{VMS_NAME}} 에서 분리 되었습니다",
-    "action": "{{VMS_NAME}} 다운로드",
+    "noClientDetectedTitle": "시스템이 성공적으로 %VMS_NAME% 에서 분리 되었습니다",
+    "action": "%VMS_NAME% 다운로드",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

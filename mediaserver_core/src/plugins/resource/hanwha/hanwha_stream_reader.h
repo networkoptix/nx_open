@@ -27,6 +27,7 @@ public:
     void setPlaybackRange(int64_t startTimeUsec, int64_t endTimeUsec);
     void setOverlappedId(nx::core::resource::OverlappedId overlappedId);
 
+    SessionContextPtr sessionContext();
 protected:
     virtual CameraDiagnostics::Result openStreamInternal(
         bool isCameraControlRequired,
@@ -37,25 +38,18 @@ protected:
 
     friend class HanwhaArchiveDelegate;
 private:
-    HanwhaProfileParameters makeProfileParameters(
-        int profileNumber,
-        const QnLiveStreamParams& parameters) const;
+    CameraDiagnostics::Result updateProfile(const QnLiveStreamParams& parameters);
 
-    CameraDiagnostics::Result updateProfile(
-        int profileNumber,
-        const QnLiveStreamParams& parameters);
-
-    QSet<int> availableProfiles(int channel) const;
-    int chooseNvrChannelProfile(Qn::ConnectionRole role) const;
     bool isCorrectProfile(int profileNumber) const;
 
-    CameraDiagnostics::Result streamUri(int profileNumber, QString* outUrl);
+    CameraDiagnostics::Result streamUri(QString* outUrl);
 
     QString rtpTransport() const;
     QnRtspClient& rtspClient();
 
     QString toHanwhaPlaybackTime(int64_t timestamp) const;
     QnAbstractMediaDataPtr createEmptyPacket();
+    QString forcedUrl(Qn::ConnectionRole role) const;
 private:
     HanwhaResourcePtr m_hanwhaResource;
     bool m_rateControlEnabled = true;

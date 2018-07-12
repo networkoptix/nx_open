@@ -22,7 +22,7 @@ int main(int argc, char** argv)
             }
             else
             {
-                nx::ut::cfg::configInstance().tmpDir = 
+                nx::ut::cfg::configInstance().tmpDir =
                     QDir(QDir::tempPath()).absoluteFilePath("vms_cloud_integration_tests");
             }
 

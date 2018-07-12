@@ -54,7 +54,8 @@ void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHa
 
     QString resourceMac = getMAC().toString();
     auto requestCompletionFunc = [resourceMac, completionHandler]
-        ( SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody ) mutable
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx::network::http::BufferType msgBody,
+        nx::network::http::HttpHeaders /*httpResponseHeaders*/) mutable
     {
         if( osErrorCode != SystemError::noError ||
             statusCode != nx::network::http::StatusCode::ok )
@@ -229,7 +230,7 @@ CameraDiagnostics::Result QnPlIsdResource::initializeCameraDriver()
     setFirmware( QLatin1String( sepPos != -1 ? cameraFirmwareVersion.mid( sepPos+1 ) : cameraFirmwareVersion ) );
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
-    //setMotionType( Qn::MT_SoftwareGrid );
+    //setMotionType( Qn::MotionType::MT_SoftwareGrid );
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -250,7 +251,7 @@ QSize QnPlIsdResource::getSecondaryResolution() const
 
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
-    return new QnISDStreamReader(toSharedPointer());
+    return new QnISDStreamReader(toSharedPointer(this));
 }
 
 void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)

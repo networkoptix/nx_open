@@ -5,12 +5,11 @@
 #include <QtCore/QHash>
 #include <QtCore/QMap>
 #include <QtCore/QSet>
-#include <nx/utils/thread/mutex.h>
 
-#include <utils/common/system_information.h>
-#include <utils/common/software_version.h>
-#include <nx/utils/singleton.h>
 #include <common/common_module_aware.h>
+
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/singleton.h>
 
 class QFile;
 class QIODevice;
@@ -42,18 +41,18 @@ public:
     QnServerUpdateTool(QnCommonModule* commonModule);
     ~QnServerUpdateTool();
 
-    bool addUpdateFile(const QString &updateId, const QByteArray &data);
-    qint64 addUpdateFileChunkSync(const QString &updateId, const QByteArray &data, qint64 offset);
-    void addUpdateFileChunkAsync(const QString &updateId, const QByteArray &data, qint64 offset);
-    bool installUpdate(const QString &updateId, UpdateType updateType = UpdateType::Instant);
+    bool addUpdateFile(const QString& updateId, const QByteArray& data);
+    qint64 addUpdateFileChunkSync(const QString& updateId, const QByteArray& data, qint64 offset);
+    void addUpdateFileChunkAsync(const QString& updateId, const QByteArray& data, qint64 offset);
+    bool installUpdate(const QString& updateId, UpdateType updateType = UpdateType::Instant);
 
     void removeUpdateFiles(const QString& updateId);
 
 private:
-    qint64 addUpdateFileChunkInternal(const QString &updateId, const QByteArray &data, qint64 offset);
-    ReplyCode processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync);
+    qint64 addUpdateFileChunkInternal(const QString& updateId, const QByteArray& data, qint64 offset);
+    ReplyCode processUpdate(const QString& updateId, QIODevice* ioDevice, bool sync);
     void sendReply(int code);
-    void clearUpdatesLocation(const QString &idToLeave = QString());
+    void clearUpdatesLocation(const QString& idToLeave = QString());
     bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const;
 private slots:
     void at_zipExtractor_extractionFinished(int error);

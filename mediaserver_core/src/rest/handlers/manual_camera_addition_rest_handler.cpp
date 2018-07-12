@@ -1,6 +1,6 @@
 #include "manual_camera_addition_rest_handler.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 
 #include <QtCore/QThreadPool>
 #include <QtNetwork/QAuthenticator>
@@ -15,6 +15,8 @@
 
 #include <nx/fusion/serialization/json_functions.h>
 #include <common/common_module.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
 {
@@ -71,7 +73,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         // number of arguments.
         const auto threadPool = owner->commonModule()->resourceDiscoveryManager()->threadPool();
         m_searchProcessRuns.insert(processUuid,
-            nx::utils::concurrent::run(threadPool, boost::bind(
+            nx::utils::concurrent::run(threadPool, std::bind(
                 &QnManualCameraSearcher::run, searcher, threadPool, addr1, addr2, auth, port)));
     }
 
@@ -138,7 +140,6 @@ int QnManualCameraAdditionRestHandler::searchStopAction(
     return CODE_OK;
 }
 
-
 int QnManualCameraAdditionRestHandler::addCamerasAction(
     const QnRequestParams& params,
     QnJsonRestResult& result,
@@ -198,8 +199,18 @@ int QnManualCameraAdditionRestHandler::addCameras(
         cameraList.push_back(info);
     }
 
-    int registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(cameraList);
-    if (registered > 0)
+    auto registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(cameraList);
+    auto resPool = owner->commonModule()->resourcePool();
+    for (const auto& id: registered)
+    {
+        if (auto camera = resPool->getResourceByUniqueId<QnSecurityCamResource>(id))
+        {
+            camera->setAuth(auth);
+            camera->saveParams();
+        }
+
+    }
+    if (!registered.isEmpty())
     {
         QnAuditRecord auditRecord =
             qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
@@ -211,7 +222,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
-    return registered > 0 ? CODE_OK : CODE_INTERNAL_ERROR;
+    return registered.size() > 0 ? CODE_OK : CODE_INTERNAL_ERROR;
 }
 
 int QnManualCameraAdditionRestHandler::executeGet(

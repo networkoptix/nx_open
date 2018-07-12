@@ -83,7 +83,7 @@ private:
     QnUuid m_resTypeId;
     QMap<QString, std::shared_ptr<QnActiSystemInfoChecker>> m_systemInfoCheckers;
     QnResourceList m_foundUpnpResources;
-    QSet<QString> m_alreadFoundMacAddresses;
+    QSet<QString> m_alreadyFoundMacAddresses;
 };
 
 #endif // #ifdef ENABLE_ACTI

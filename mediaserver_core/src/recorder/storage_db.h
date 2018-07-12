@@ -23,7 +23,7 @@
 #include "device_file_catalog.h"
 
 
-class QnStorageDb: public nx::media_db::DbHelperHandler 
+class QnStorageDb: public nx::media_db::DbHelperHandler
 {
 public:
     typedef boost::bimap<QString, uint16_t> UuidToHash;
@@ -38,7 +38,7 @@ public:
     bool open(const QString& fileName);
 
     bool deleteRecords(const QString& cameraUniqueId,
-                       QnServer::ChunksCatalog catalog, 
+                       QnServer::ChunksCatalog catalog,
                        qint64 startTimeMs = -1);
     /*!
         \return \a false if failed to save record to DB
@@ -57,7 +57,7 @@ public:
                        const std::deque<DeviceFileCatalog::Chunk>& chunks);
 
 private: // nx::media_db::DbHelperHandler implementation
-    void handleCameraOp(const nx::media_db::CameraOperation &cameraOp, 
+    void handleCameraOp(const nx::media_db::CameraOperation &cameraOp,
                         nx::media_db::Error error) override;
 
     void handleMediaFileOp(const nx::media_db::MediaFileOperation &mediaFileOp,
@@ -70,7 +70,7 @@ private:
     bool createDatabase(const QString &fileName);
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
 
-    void addCatalogFromMediaFolder(const QString& postfix, 
+    void addCatalogFromMediaFolder(const QString& postfix,
                                    QnServer::ChunksCatalog catalog,
                                    QVector<DeviceFileCatalogPtr>& result);
 
@@ -83,6 +83,8 @@ private:
     int getCameraIdHash(const QString &cameraUniqueId);
     bool vacuumInternal();
     bool vacuum(QVector<DeviceFileCatalogPtr> *data = nullptr);
+    bool parseDbContent(QByteArray fileContent);
+    QByteArray dbFileContent();
 
     template<typename Callback>
     void startVacuumAsync(Callback callback);
@@ -104,7 +106,7 @@ private:
 
     nx::media_db::Error m_lastReadError;
     nx::media_db::Error m_lastWriteError;
-	int m_readErrorCount;
+    int m_readErrorCount;
 
     std::random_device m_rd;
     std::mt19937 m_gen;

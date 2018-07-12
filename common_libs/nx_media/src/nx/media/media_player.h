@@ -1,12 +1,14 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QRect>
+#include <QtCore/QSize>
 #include <QtCore/QUrl>
 #include <QtMultimedia/QMediaPlayer>
-#include <QtCore/QSize>
-#include <QtCore/QRect>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/media/abstract_metadata_consumer.h>
+#include <nx/media/media_fwd.h>
 
 class QAbstractVideoSurface;
 
@@ -27,11 +29,12 @@ private:
     Q_PROPERTY(qreal framerate MEMBER framerate CONSTANT)
     Q_PROPERTY(qreal bitrate MEMBER bitrate CONSTANT)
     Q_PROPERTY(QString codec MEMBER codec CONSTANT)
-
+    Q_PROPERTY(bool isHwAccelerated MEMBER isHwAccelerated CONSTANT)
 public:
     qreal framerate = 0.0;
     qreal bitrate = 0.0;
     QString codec;
+    bool isHwAccelerated = false;
 };
 
 class PlayerPrivate;
@@ -100,6 +103,9 @@ class Player: public QObject
      * Enable or disable audio playback. It has no effect if audio track is missing in source media.
      */
     Q_PROPERTY(bool audioEnabled READ isAudioEnabled WRITE setAudioEnabled NOTIFY audioEnabledChanged)
+
+    Q_PROPERTY(bool tooManyConnectionsError READ tooManyConnectionsError
+        NOTIFY tooManyConnectionsErrorChanged)
 
 public:
     enum class State
@@ -222,6 +228,23 @@ public:
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
 
+    RenderContextSynchronizerPtr renderContextSynchronizer() const;
+    void setRenderContextSynchronizer(RenderContextSynchronizerPtr value);
+
+    /**
+     * Add new metadata consumer.
+     * @return True if success, false if specified consumer already exists.
+     */
+    bool addMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
+
+    /**
+     * Remove metadata consumer.
+     * @return True if success, false if specified consumer is not found.
+     */
+    bool removeMetadataConsumer(const AbstractMetadataConsumerPtr& metadataConsumer);
+
+    bool tooManyConnectionsError() const;
+
 public slots:
     void play();
     void pause();
@@ -247,6 +270,7 @@ signals:
     void videoGeometryChanged();
     void currentResolutionChanged();
     void audioEnabledChanged();
+    void tooManyConnectionsErrorChanged();
 
 protected: //< for tests
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);

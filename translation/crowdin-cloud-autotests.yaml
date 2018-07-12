@@ -6,4 +6,4 @@ preserve_hierarchy: true
 files:
   -
     source: '/cloud_portal/robot_tests/variables_language.json'
-    translation: '/cloud_portal/robot_tests/variables_language_%locale_with_underscore%.json'
+    translation: '/cloud_portal/robot_tests/translations/variables_language_%locale_with_underscore%.json'

@@ -7,14 +7,11 @@
 #include <QtCore/QFile>
 #include <QtCore/QCryptographicHash>
 
+#include <api/common_message_processor.h>
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
-#include <api/common_message_processor.h>
-
-#include <nx/vms/event/rule_manager.h>
-
+#include <api/session_manager.h>
 #include <common/common_meta_types.h>
-
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/global_permissions_manager.h>
@@ -24,7 +21,6 @@
 #include <core/resource_access/providers/shared_resource_access_provider.h>
 #include <core/resource_access/providers/shared_layout_item_access_provider.h>
 #include <core/resource_access/providers/videowall_item_access_provider.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_management/resource_properties.h>
@@ -32,22 +28,20 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/layout_tour_manager.h>
-
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
-
 #include <licensing/license.h>
-
+#include <network/router.h>
+#include <nx_ec/ec_proto_version.h>
 #include <utils/common/app_info.h>
 
+#include <nx/network/app_info.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/discovery/manager.h>
-
-#include <api/session_manager.h>
-#include <network/router.h>
+#include <nx/vms/event/rule_manager.h>
 
 using namespace nx;
 
@@ -186,12 +180,13 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_startupTime = QDateTime::currentDateTime();
 
     m_moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    m_moduleInformation.systemInformation = QnSystemInformation::currentSystemInformation();
+    m_moduleInformation.systemInformation = QnAppInfo::currentSystemInformation();
     m_moduleInformation.brand = QnAppInfo::productNameShort();
     m_moduleInformation.customization = QnAppInfo::customizationName();
-    m_moduleInformation.version = QnSoftwareVersion(QnAppInfo::engineVersion());
-    m_moduleInformation.type = clientMode ?
-        QnModuleInformation::nxClientId() : QnModuleInformation::nxMediaServerId();
+    m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::engineVersion());
+    m_moduleInformation.type = clientMode
+        ? nx::vms::api::ModuleInformation::nxClientId()
+        : nx::vms::api::ModuleInformation::nxMediaServerId();
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)
@@ -282,7 +277,7 @@ bool QnCommonModule::isReadOnly() const
     return m_moduleInformation.ecDbReadOnly;
 }
 
-void QnCommonModule::setModuleInformation(const QnModuleInformation& moduleInformation)
+void QnCommonModule::setModuleInformation(const nx::vms::api::ModuleInformation& moduleInformation)
 {
     bool isReadOnlyChanged = false;
     {
@@ -302,7 +297,7 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation& moduleInfor
     emit moduleInformationChanged();
 }
 
-QnModuleInformation QnCommonModule::moduleInformation()
+nx::vms::api::ModuleInformation QnCommonModule::moduleInformation()
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -480,4 +475,20 @@ void QnCommonModule::setResourceDiscoveryManager(QnResourceDiscoveryManager* dis
     if (m_resourceDiscoveryManager)
         delete m_resourceDiscoveryManager;
     m_resourceDiscoveryManager = discoveryManager;
+}
+
+void QnCommonModule::setStandAloneMode(bool value)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_standaloneMode != value)
+    {
+        m_standaloneMode = value;
+        lock.unlock();
+        emit standAloneModeChanged(value);
+    }
+}
+
+bool QnCommonModule::isStandAloneMode() const
+{
+    return m_standaloneMode;
 }

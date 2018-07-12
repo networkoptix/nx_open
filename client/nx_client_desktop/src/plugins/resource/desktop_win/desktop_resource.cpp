@@ -27,13 +27,13 @@ QnWinDesktopResource::~QnWinDesktopResource()
     delete m_desktopDataProvider;
 }
 
-QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProviderInternal(Qn::ConnectionRole /*role*/)
+QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProviderInternal()
 {
     QnMutexLocker lock( &m_dpMutex );
 
     createSharedDataProvider();
-    if (m_desktopDataProvider == 0)
-        return 0;
+    if (!m_desktopDataProvider)
+        return nullptr;
 
     QnDesktopDataProviderWrapper* p = new QnDesktopDataProviderWrapper(toSharedPointer(), m_desktopDataProvider);
     m_desktopDataProvider->addDataProcessor(p);
@@ -97,8 +97,20 @@ QnConstResourceAudioLayoutPtr QnWinDesktopResource::getAudioLayout(const QnAbstr
     return m_desktopDataProvider->getAudioLayout();
 }
 
-QString QnWinDesktopResource::toSearchString() const
+QStringList QnWinDesktopResource::searchFilters() const
 {
     // Desktop cameras are not to be found by search
-    return QString();
+    return QStringList();
+}
+
+QnAbstractStreamDataProvider* QnWinDesktopResource::createDataProvider(
+    const QnResourcePtr& resource,
+    Qn::ConnectionRole role)
+{
+    const auto desktopResource = resource.dynamicCast<QnWinDesktopResource>();
+    NX_EXPECT(desktopResource);
+    if (!desktopResource)
+        return nullptr;
+
+    return desktopResource->createDataProviderInternal();
 }

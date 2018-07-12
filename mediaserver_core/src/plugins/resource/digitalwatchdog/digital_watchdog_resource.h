@@ -46,7 +46,7 @@ protected:
     virtual nx::mediaserver::resource::StreamCapabilityMap getStreamCapabilityMapFromDrives(
         Qn::StreamIndex streamIndex) override;
 
-    virtual void updateVideoEncoder(
+    virtual CameraDiagnostics::Result sendVideoEncoderToCameraEx(
         VideoEncoder& encoder,
         Qn::StreamIndex streamIndex,
         const QnLiveStreamParams& streamParams) override;

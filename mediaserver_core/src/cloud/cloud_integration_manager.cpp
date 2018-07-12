@@ -4,7 +4,8 @@
 
 #include "media_server/media_server_module.h"
 #include "media_server/settings.h"
-#include "network/auth/generic_user_data_provider.h"
+#include <nx/vms/auth/generic_user_data_provider.h>
+#include <nx/utils/timer_manager.h>
 #include "server/server_globals.h"
 
 CloudIntegrationManager::CloudIntegrationManager(
@@ -18,11 +19,9 @@ CloudIntegrationManager::CloudIntegrationManager(
         defaultNonceFetcher,
         &m_cloudConnector,
         std::make_unique<GenericUserDataProvider>(commonModule),
-        qnServerModule->settings()->delayBeforeSettingMasterFlag())
+        nx::utils::parseTimerDuration(qnServerModule->settings().delayBeforeSettingMasterFlag()))
 {
-    const auto cdbEndpoint = qnServerModule->roSettings()->value(
-        nx_ms_conf::CDB_ENDPOINT,
-        "").toString();
+    const auto cdbEndpoint = qnServerModule->settings().cdbEndpoint();
     if (!cdbEndpoint.isEmpty())
     {
         m_cloudManagerGroup.setCloudDbUrl(

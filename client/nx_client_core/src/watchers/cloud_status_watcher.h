@@ -32,7 +32,9 @@ public:
     enum ErrorCode
     {
         NoError,
-        InvalidCredentials,
+        InvalidEmail,
+        InvalidPassword,
+        UserTemporaryLockedOut,
         AccountNotActivated,
         UnknownError
     };
@@ -52,7 +54,7 @@ public:
 
     QnEncodedCredentials credentials() const;
     void resetCredentials();
-    void setCredentials(const QnEncodedCredentials& credentials, bool initial = false);
+    bool setCredentials(const QnEncodedCredentials& credentials, bool initial = false);
 
     // These getters are for qml
     Q_INVOKABLE QString cloudLogin() const;
@@ -83,7 +85,10 @@ public:
 
     QnCloudSystemList recentCloudSystems() const;
 
+    Q_INVOKABLE void resendActivationEmail(const QString& email);
+
 signals:
+    void activationEmailResent(bool success);
     void credentialsChanged();
     void loginChanged();
     void passwordChanged();

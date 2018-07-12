@@ -77,7 +77,6 @@ soap_smd_update(soap, &context, password, strlen(password));
 soap_smd_final(soap, &context, hash, NULL);
 }
 
-
 /**
 @fn int soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char *username, const char *password)
 @brief Adds UsernameToken element for digest authentication.
@@ -117,11 +116,10 @@ soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char 
   return SOAP_OK;
 }
 
-const int kSoapDefaultSendTimeoutSeconds = 10;
-const int kSoapDefaultRecvTimeoutSeconds = 10;
-const int kSoapDefaultConnectTimeoutSeconds = 5;
-const int kSoapDefaultAcceptTimeoutSeconds = 5;
-
+const int kSoapDefaultSendTimeoutSeconds = 5 * 10;
+const int kSoapDefaultRecvTimeoutSeconds = 5 * 10;
+const int kSoapDefaultConnectTimeoutSeconds = 5 * 5;
+const int kSoapDefaultAcceptTimeoutSeconds = 5 * 5;
 
 struct SoapTimeouts
 {
@@ -193,10 +191,7 @@ struct SoapTimeouts
 
 SoapTimeouts getSoapTimeouts()
 {
-    auto serializedTimeouts = qnServerModule->roSettings()
-        ->value( nx_ms_conf::ONVIF_TIMEOUTS, QString()).toString();
-
-    return SoapTimeouts(serializedTimeouts);
+    return SoapTimeouts(qnServerModule->settings().onvifTimeouts());
 }
 
 /*
@@ -211,10 +206,8 @@ int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *u
 
 } // anonymous namespace
 
-
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");
-
 
 SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
 {
@@ -254,7 +247,6 @@ SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
     { NULL, NULL, NULL, NULL }
 };
 
-
 // -------------------------------------------------------------------------- //
 // SoapWrapper
 // -------------------------------------------------------------------------- //
@@ -273,10 +265,10 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
     strcpy(m_endpoint, endpoint.c_str());
     m_endpoint[endpoint.size()] = '\0';
 
-    if( !tcpKeepAlive )
+    if(!tcpKeepAlive)
         m_soapProxy = new T();
     else
-        m_soapProxy = new T( SOAP_IO_KEEPALIVE, SOAP_IO_KEEPALIVE );
+        m_soapProxy = new T(SOAP_IO_KEEPALIVE, SOAP_IO_KEEPALIVE);
 
     auto timeouts = getSoapTimeouts();
 
@@ -378,7 +370,6 @@ bool SoapWrapper<T>::isConflictError()
 {
     return PasswordHelper::isConflictError(m_soapProxy->soap_fault());
 }
-
 
 // -------------------------------------------------------------------------- //
 // DeviceSoapWrapper
@@ -547,24 +538,24 @@ int DeviceSoapWrapper::getDeviceInformation(DeviceInfoReq& request, DeviceInfoRe
     return m_soapProxy->GetDeviceInformation(m_endpoint, NULL, &request, &response);
 }
 
-int DeviceSoapWrapper::getServiceCapabilities( _onvifDevice__GetServiceCapabilities& request, _onvifDevice__GetServiceCapabilitiesResponse& response )
+int DeviceSoapWrapper::getServiceCapabilities(_onvifDevice__GetServiceCapabilities& request, _onvifDevice__GetServiceCapabilitiesResponse& response)
 {
-    return invokeMethod( &DeviceBindingProxy::GetServiceCapabilities, &request, &response );
+    return invokeMethod(&DeviceBindingProxy::GetServiceCapabilities, &request, &response);
 }
 
-int DeviceSoapWrapper::getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response )
+int DeviceSoapWrapper::getRelayOutputs(_onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response)
 {
-    return invokeMethod( &DeviceBindingProxy::GetRelayOutputs, &request, &response );
+    return invokeMethod(&DeviceBindingProxy::GetRelayOutputs, &request, &response);
 }
 
-int DeviceSoapWrapper::setRelayOutputState( _onvifDevice__SetRelayOutputState& request, _onvifDevice__SetRelayOutputStateResponse& response )
+int DeviceSoapWrapper::setRelayOutputState(_onvifDevice__SetRelayOutputState& request, _onvifDevice__SetRelayOutputStateResponse& response)
 {
-    return invokeMethod( &DeviceBindingProxy::SetRelayOutputState, &request, &response );
+    return invokeMethod(&DeviceBindingProxy::SetRelayOutputState, &request, &response);
 }
 
-int DeviceSoapWrapper::setRelayOutputSettings( _onvifDevice__SetRelayOutputSettings& request, _onvifDevice__SetRelayOutputSettingsResponse& response )
+int DeviceSoapWrapper::setRelayOutputSettings(_onvifDevice__SetRelayOutputSettings& request, _onvifDevice__SetRelayOutputSettingsResponse& response)
 {
-    return invokeMethod( &DeviceBindingProxy::SetRelayOutputSettings, &request, &response );
+    return invokeMethod(&DeviceBindingProxy::SetRelayOutputSettings, &request, &response);
 }
 
 int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response)
@@ -579,7 +570,6 @@ int DeviceSoapWrapper::GetSystemDateAndTime(_onvifDevice__GetSystemDateAndTime& 
     beforeMethodInvocation();
     return m_soapProxy->GetSystemDateAndTime(m_endpoint, NULL, &request, &response);
 }
-
 
 int DeviceSoapWrapper::systemReboot(RebootReq& request, RebootResp& response)
 {
@@ -601,8 +591,6 @@ int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, Fact
     return m_soapProxy->SetSystemFactoryDefault(m_endpoint, NULL, &request, &response);
 }
 
-
-
 // -------------------------------------------------------------------------- //
 // DeviceIOWrapper
 // -------------------------------------------------------------------------- //
@@ -615,26 +603,25 @@ DeviceIOWrapper::~DeviceIOWrapper()
 {
 }
 
-int DeviceIOWrapper::getDigitalInputs( _onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response )
+int DeviceIOWrapper::getDigitalInputs(_onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response)
 {
-    return invokeMethod( &DeviceIOBindingProxy::GetDigitalInputs, &request, &response );
+    return invokeMethod(&DeviceIOBindingProxy::GetDigitalInputs, &request, &response);
 }
 
-int DeviceIOWrapper::getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response )
+int DeviceIOWrapper::getRelayOutputs(_onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response)
 {
-    return invokeMethod( &DeviceIOBindingProxy::GetRelayOutputs, &request, &response );
+    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputs, &request, &response);
 }
 
-int DeviceIOWrapper::getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response )
+int DeviceIOWrapper::getRelayOutputOptions(_onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response)
 {
-    return invokeMethod( &DeviceIOBindingProxy::GetRelayOutputOptions, &request, &response );
+    return invokeMethod(&DeviceIOBindingProxy::GetRelayOutputOptions, &request, &response);
 }
 
-int DeviceIOWrapper::setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response )
+int DeviceIOWrapper::setRelayOutputSettings(_onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response)
 {
-    return invokeMethod( &DeviceIOBindingProxy::SetRelayOutputSettings, &request, &response );
+    return invokeMethod(&DeviceIOBindingProxy::SetRelayOutputSettings, &request, &response);
 }
-
 
 // -------------------------------------------------------------------------- //
 // MediaSoapWrapper
@@ -656,6 +643,34 @@ int MediaSoapWrapper::getVideoEncoderConfigurationOptions(VideoOptionsReq& reque
     return m_soapProxy->GetVideoEncoderConfigurationOptions(m_endpoint, NULL, &request, &response);
 }
 
+int MediaSoapWrapper::getAudioOutputConfigurations(GetAudioOutputConfigurationsReq& request, GetAudioOutputConfigurationsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetAudioOutputConfigurations(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::addAudioOutputConfiguration(AddAudioOutputConfigurationReq& request, AddAudioOutputConfigurationResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AddAudioOutputConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::addAudioDecoderConfiguration(
+    AddAudioDecoderConfigurationReq& request,
+    AddAudioDecoderConfigurationResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AddAudioDecoderConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getCompatibleAudioDecoderConfigurations(
+    GetCompatibleAudioDecoderConfigurationsReq& request,
+    GetCompatibleAudioDecoderConfigurationsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetCompatibleAudioDecoderConfigurations(m_endpoint, NULL, &request, &response);
+}
+
 int MediaSoapWrapper::getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response)
 {
     beforeMethodInvocation();
@@ -668,7 +683,7 @@ int MediaSoapWrapper::getVideoSourceConfigurations(VideoSrcConfigsReq& request, 
     return m_soapProxy->GetVideoSourceConfigurations(m_endpoint, NULL, &request, &response);
 }
 
-int MediaSoapWrapper::getAudioOutputs( _onvifMedia__GetAudioOutputs& request, _onvifMedia__GetAudioOutputsResponse& response )
+int MediaSoapWrapper::getAudioOutputs(_onvifMedia__GetAudioOutputs& request, _onvifMedia__GetAudioOutputsResponse& response)
 {
     beforeMethodInvocation();
     return m_soapProxy->GetAudioOutputs(m_endpoint, NULL, &request, &response);
@@ -794,7 +809,6 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
     return m_soapProxy->GetVideoEncoderConfiguration(m_endpoint, NULL, &request, &response);
 }
 
-
 // -------------------------------------------------------------------------- //
 // ImagingSoapWrapper
 // -------------------------------------------------------------------------- //
@@ -835,7 +849,6 @@ int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &
     return invokeMethod(&ImagingBindingProxy::Move, &request, &response);
 }
 
-
 // -------------------------------------------------------------------------- //
 // PtzSoapWrapper
 // -------------------------------------------------------------------------- //
@@ -852,6 +865,12 @@ int PtzSoapWrapper::doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& r
 {
     beforeMethodInvocation();
     return m_soapProxy->AbsoluteMove(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::doRelativeMove(RelativeMoveReq& request, RelativeMoveResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->RelativeMove(m_endpoint, NULL, &request, &response);
 }
 
 int PtzSoapWrapper::gotoPreset(GotoPresetReq& request, GotoPresetResp& response)
@@ -928,7 +947,6 @@ int PtzSoapWrapper::doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& reque
     return rez;
 }
 
-
 // -------------------------------------------------------------------------- //
 // NotificationProducerSoapWrapper
 // -------------------------------------------------------------------------- //
@@ -937,11 +955,10 @@ NotificationProducerSoapWrapper::NotificationProducerSoapWrapper(const std::stri
 {
 }
 
-int NotificationProducerSoapWrapper::Subscribe( _oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response )
+int NotificationProducerSoapWrapper::Subscribe(_oasisWsnB2__Subscribe* const request, _oasisWsnB2__SubscribeResponse* const response)
 {
-    return invokeMethod( &NotificationProducerBindingProxy::Subscribe, request, response );
+    return invokeMethod(&NotificationProducerBindingProxy::Subscribe, request, response);
 }
-
 
 // -------------------------------------------------------------------------- //
 // CreatePullPointSoapWrapper
@@ -951,11 +968,10 @@ CreatePullPointSoapWrapper::CreatePullPointSoapWrapper(const std::string& endpoi
 {
 }
 
-int CreatePullPointSoapWrapper::createPullPoint( _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response )
+int CreatePullPointSoapWrapper::createPullPoint(_oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response)
 {
-    return invokeMethod( &CreatePullPointBindingProxy::CreatePullPoint, &request, &response );
+    return invokeMethod(&CreatePullPointBindingProxy::CreatePullPoint, &request, &response);
 }
-
 
 // -------------------------------------------------------------------------- //
 // CreatePullPointSoapWrapper
@@ -965,11 +981,10 @@ PullPointSubscriptionWrapper::PullPointSubscriptionWrapper(const std::string& en
 {
 }
 
-int PullPointSubscriptionWrapper::pullMessages( _onvifEvents__PullMessages& request, _onvifEvents__PullMessagesResponse& response )
+int PullPointSubscriptionWrapper::pullMessages(_onvifEvents__PullMessages& request, _onvifEvents__PullMessagesResponse& response)
 {
-    return invokeMethod( &PullPointSubscriptionBindingProxy::PullMessages, &request, &response );
+    return invokeMethod(&PullPointSubscriptionBindingProxy::PullMessages, &request, &response);
 }
-
 
 // -------------------------------------------------------------------------- //
 // EventSoapWrapper
@@ -981,11 +996,10 @@ EventSoapWrapper::EventSoapWrapper(const std::string& endpoint, const QString &l
 
 int EventSoapWrapper::createPullPointSubscription(
     _onvifEvents__CreatePullPointSubscription& request,
-    _onvifEvents__CreatePullPointSubscriptionResponse& response )
+    _onvifEvents__CreatePullPointSubscriptionResponse& response)
 {
-    return invokeMethod( &EventBindingProxy::CreatePullPointSubscription, &request, &response );
+    return invokeMethod(&EventBindingProxy::CreatePullPointSubscription, &request, &response);
 }
-
 
 // -------------------------------------------------------------------------- //
 // SubscriptionManagerSoapWrapper
@@ -995,20 +1009,18 @@ SubscriptionManagerSoapWrapper::SubscriptionManagerSoapWrapper(const std::string
 {
 }
 
-int SubscriptionManagerSoapWrapper::renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response )
+int SubscriptionManagerSoapWrapper::renew(_oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response)
 {
-    return invokeMethod( &SubscriptionManagerBindingProxy::Renew, &request, &response );
+    return invokeMethod(&SubscriptionManagerBindingProxy::Renew, &request, &response);
 }
 
-int SubscriptionManagerSoapWrapper::unsubscribe( _oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response )
+int SubscriptionManagerSoapWrapper::unsubscribe(_oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response)
 {
-    return invokeMethod( &SubscriptionManagerBindingProxy::Unsubscribe, &request, &response );
+    return invokeMethod(&SubscriptionManagerBindingProxy::Unsubscribe, &request, &response);
 }
-
-
 
 //
-// Explicit instantiating
+// Explicit instantiating.
 //
 template QString SoapWrapper<DeviceBindingProxy>::getLogin();
 template QString SoapWrapper<DeviceBindingProxy>::getPassword();

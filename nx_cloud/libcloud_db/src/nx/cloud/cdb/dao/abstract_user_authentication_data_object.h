@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include <nx/utils/db/types.h>
-#include <nx/utils/db/query_context.h>
+#include <nx/sql/types.h>
+#include <nx/sql/query_context.h>
 
 #include <nx/cloud/cdb/api/auth_provider.h>
 
@@ -27,32 +27,43 @@ public:
     virtual ~AbstractUserAuthentication() = default;
 
     virtual boost::optional<std::string> fetchSystemNonce(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId) = 0;
 
     virtual void insertOrReplaceSystemNonce(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& nonce) = 0;
 
     virtual api::AuthInfo fetchUserAuthRecords(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& accountId) = 0;
 
+    /**
+     * @return System id list.
+     */
+    virtual std::vector<std::string> fetchSystemsWithExpiredAuthRecords(
+        nx::sql::QueryContext* const queryContext,
+        int systemCountLimit) = 0;
+
     virtual void insertUserAuthRecords(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& accountId,
         const api::AuthInfo& userAuthRecords) = 0;
 
     virtual std::vector<SystemInfo> fetchAccountSystems(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& accountId) = 0;
 
     virtual void deleteAccountAuthRecords(
-        nx::utils::db::QueryContext* const queryContext,
+        nx::sql::QueryContext* const queryContext,
         const std::string& accountId) = 0;
+
+    virtual void deleteSystemAuthRecords(
+        nx::sql::QueryContext* const queryContext,
+        const std::string& systemId) = 0;
 };
 
 } // namespace dao

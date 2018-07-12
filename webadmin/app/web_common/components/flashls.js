@@ -1,4 +1,4 @@
-function FlashlsAPI (flashObject) {
+window.FlashlsAPI = function(flashObject) {
     function genCallback(flo, p){
         window[p] = function(eventName, args) {
             flo.embedHandler();

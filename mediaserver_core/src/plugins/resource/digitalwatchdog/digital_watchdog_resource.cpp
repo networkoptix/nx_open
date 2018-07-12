@@ -306,7 +306,8 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
     return result.take();
 }
 
-bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const
+bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(
+    QnCameraAdvancedParams& params) const
 {
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (useOnvifAdvancedParameterProviders())
@@ -361,7 +362,8 @@ QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() 
     return result;
 }
 
-void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters() {
+void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters()
+{
     base_type::fetchAndSetAdvancedParameters();
     if (useOnvifAdvancedParameterProviders())
         return;
@@ -370,7 +372,8 @@ void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters() {
     m_hasZoom = modelHasZoom(cameraModel);
 }
 
-QString QnDigitalWatchdogResource::fetchCameraModel() {
+QString QnDigitalWatchdogResource::fetchCameraModel()
+{
     QAuthenticator auth = getAuth();
     // TODO: #vasilenko UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
@@ -391,8 +394,7 @@ QString QnDigitalWatchdogResource::fetchCameraModel() {
     return QString::fromUtf8(response.Model.c_str());
 }
 
-
-bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values)
+bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap& values)
 {
     bool baseResult = base_type::loadAdvancedParamsUnderLock(values);
     if (!m_cameraProxy)
@@ -403,7 +405,7 @@ bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedPara
 }
 
 bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(
-    const QnCameraAdvancedParameter &parameter, const QString &value)
+    const QnCameraAdvancedParameter& parameter, const QString& value)
 {
     if (base_type::setAdvancedParameterUnderLock(parameter, value))
         return true;
@@ -418,7 +420,7 @@ bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(
 }
 
 bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
-    const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
+    const QnCameraAdvancedParamValueList& values, QnCameraAdvancedParamValueList& result)
 {
     if (useOnvifAdvancedParameterProviders())
         return base_type::setAdvancedParametersUnderLock(values, result);
@@ -457,12 +459,11 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(
     return success && m_cameraProxy->setParams(moreParamsToProcess, &result);
 }
 
-nx::mediaserver::resource::StreamCapabilityMap QnDigitalWatchdogResource::getStreamCapabilityMapFromDrives(
-    Qn::StreamIndex streamIndex)
+nx::mediaserver::resource::StreamCapabilityMap
+    QnDigitalWatchdogResource::getStreamCapabilityMapFromDrives(Qn::StreamIndex streamIndex)
 {
     using namespace nx::mediaserver::resource;
     auto onvifResult = base_type::getStreamCapabilityMapFromDrives(streamIndex);
-    QnMutexLocker lock(&m_mutex);
     const auto codecs = m_cproApiClient->getSupportedVideoCodecs(streamIndex);
     if (!codecs)
         return onvifResult;
@@ -480,14 +481,17 @@ nx::mediaserver::resource::StreamCapabilityMap QnDigitalWatchdogResource::getStr
     return result;
 }
 
-void QnDigitalWatchdogResource::updateVideoEncoder(
+CameraDiagnostics::Result QnDigitalWatchdogResource::sendVideoEncoderToCameraEx(
     VideoEncoder& encoder,
     Qn::StreamIndex streamIndex,
     const QnLiveStreamParams& streamParams)
 {
+    auto result = base_type::sendVideoEncoderToCameraEx(encoder, streamIndex, streamParams);
+    if (!result)
+        return result;
     if (!m_cproApiClient->setVideoCodec(streamIndex, streamParams.codec))
         NX_WARNING(this, lm("Failed to configure codec %1 for resource %2").args(streamParams.codec, getUrl()));
-    base_type::updateVideoEncoder(encoder, streamIndex, streamParams);
+    return CameraDiagnostics::NoErrorResult();
 }
 
 #endif //ENABLE_ONVIF

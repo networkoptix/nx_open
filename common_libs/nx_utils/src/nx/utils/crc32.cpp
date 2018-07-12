@@ -1,10 +1,6 @@
 #include "crc32.h"
 
-#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS) || defined(__aarch64__)
-    #include <zlib.h>
-#else
-    #include <QtZlib/zlib.h>
-#endif
+#include <nx/utils/zlib.h>
 
 static inline uLong zlib_crc32(uLong crc, const Bytef *buf, uInt len)
 {
@@ -15,17 +11,27 @@ namespace nx {
 namespace utils {
 
 #if defined(crc32)
-    #undef crc32
+    #undef crc32 //< crc32 can be a macro.
 #endif
 
 std::uint32_t crc32(const char* data, std::size_t size)
 {
-    return zlib_crc32(0, (const Bytef*) data, (unsigned long) size);
+    return (std::uint32_t) zlib_crc32(0, (const Bytef*) data, (uInt) size);
 }
 
 std::uint32_t crc32(const std::string& str)
 {
     return crc32(str.data(), str.size());
+}
+
+uint32_t crc32(const QByteArray& data)
+{
+    return crc32(data.data(), (size_t) data.size());
+}
+
+uint32_t crc32(const QLatin1String& str)
+{
+    return crc32(str.data(), (size_t) str.size());
 }
 
 } // namespace utils

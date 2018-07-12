@@ -6,11 +6,14 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">重命名系統</button>
         </p>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">與其他系統合併</button>
+        </p>
+        <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()">脫離 
-            <span class="product-name">{{PRODUCT_NAME}}</span></button>
+            <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>擁有者</h2>
@@ -19,12 +22,28 @@
         <hr>
         <p>
             您的權限: 
-            <b>{{$root.L.accessRoles[system.accessRole].label | | system.accessRole}}</b>
+            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
         </p>
 
         <p ng-if="system.permissions.isAdmin">
             <button class="btn btn-default" ng-click="rename()">重命名系統</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">從我的帳號斷線</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong> 正被合併到此系統中</div>
+        <hr></hr>
+        <div class="merge-info-text">根據資料庫的大小, 可能會花上數小時</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>此系統正在合併到 <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>根據錄影資料的大小, 可能會花費數小時</p>
+            <p>在合併完成前, 您可以登入到此系統並觀看影片, 但不能更改任何設定。</p>
+            <p>合併完成後, 此系統中的所有使用者和攝影機都將可用於 <span class="merge-system-name">{{mergeTargetSystem.name}}</span> 中 系統, 和此系統將被刪除</p>
+        </div>
     </div>
 </div>

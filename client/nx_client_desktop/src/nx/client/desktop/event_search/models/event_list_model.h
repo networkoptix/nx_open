@@ -29,7 +29,7 @@ public:
         QString title;
         QString description;
         QString toolTip;
-        qint64 timestampMs = 0;
+        qint64 timestampUs = 0;
         QPixmap icon;
         QColor titleColor;
         bool removable = false;
@@ -38,7 +38,7 @@ public:
         QnNotificationLevel::Value level = QnNotificationLevel::Value::NoNotification;
         QnVirtualCameraResourcePtr previewCamera;
         QnVirtualCameraResourceList cameras;
-        qint64 previewTimeMs = 0; //< The latest thumbnail is used if previewTimeMs <= 0.
+        qint64 previewTimeUs = 0; //< The latest thumbnail is used if previewTimeUs <= 0.
         ui::action::IDType actionId = ui::action::NoAction;
         ui::action::Parameters actionParameters;
         CommandActionPtr extraAction;

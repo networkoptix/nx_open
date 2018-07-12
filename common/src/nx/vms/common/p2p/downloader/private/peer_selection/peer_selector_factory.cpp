@@ -17,6 +17,7 @@ using namespace impl;
 
 static AbstractPeerSelectorPtr createPeerSelector(
     FileInformation::PeerSelectionPolicy peerPolicy,
+    const QList<QnUuid>& additionalPeers,
     QnCommonModule* commonModule)
 {
     switch (peerPolicy)
@@ -25,7 +26,8 @@ static AbstractPeerSelectorPtr createPeerSelector(
             return EmptyPeerSelector::create();
         case FileInformation::PeerSelectionPolicy::byPlatform:
             return ByPlatformPeerSelector::create(
-                commonModule->moduleInformation().systemInformation);
+                commonModule->moduleInformation().systemInformation,
+                additionalPeers);
         case FileInformation::PeerSelectionPolicy::all:
             return AllPeerSelector::create();
         default:
@@ -39,12 +41,13 @@ PeerSelectorFactoryFactoryFunc PeerSelectorFactory::m_peerSelectorFactoryFactory
 
 AbstractPeerSelectorPtr PeerSelectorFactory::create(
     FileInformation::PeerSelectionPolicy peerPolicy,
+    const QList<QnUuid>& additionalPeers,
     QnCommonModule* commonModule)
 {
     if (m_peerSelectorFactoryFactoryFunc != nullptr)
-        return m_peerSelectorFactoryFactoryFunc(peerPolicy, commonModule);
+        return m_peerSelectorFactoryFactoryFunc(peerPolicy, additionalPeers, commonModule);
 
-    return createPeerSelector(peerPolicy, commonModule);
+    return createPeerSelector(peerPolicy, additionalPeers, commonModule);
 }
 
 void PeerSelectorFactory::setFactoryFunc(

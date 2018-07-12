@@ -24,7 +24,6 @@
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
 
-#include <network/authenticate_helper.h>
 #include <network/system_helpers.h>
 
 #include <nx/network/nettools.h>
@@ -74,7 +73,7 @@ QnUuid serverGuid()
     if (!guid.isNull())
         return guid;
 
-    guid = QnUuid(qnServerModule->roSettings()->value(lit("serverGuid")).toString());
+    guid = QnUuid(qnServerModule->settings().serverGuid());
 
     return guid;
 }
@@ -85,7 +84,7 @@ bool isLocalAppServer(const QString &host) {
 
 QString getDataDirectory()
 {
-    return qnServerModule->settings()->getDataDirectory();
+    return qnServerModule->settings().dataDir();
 }
 
 bool updateUserCredentials(
@@ -119,16 +118,13 @@ bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
 
 void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
-    if (QnServerConnector::instance())
-        QnServerConnector::instance()->stop();
-
+    messageBus->commonModule()->setStandAloneMode(true);
     messageBus->dropConnections();
 }
 
-void resumeConnectionsToRemotePeers()
+void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus)
 {
-    if (QnServerConnector::instance())
-        QnServerConnector::instance()->start();
+    messageBus->commonModule()->setStandAloneMode(false);
 }
 
 bool configureLocalSystem(
@@ -145,7 +141,7 @@ bool configureLocalSystem(
     if (!data.wholeSystem)
     {
         dropConnectionsToRemotePeers(messageBus);
-        guard = Guard([&data]() { resumeConnectionsToRemotePeers(); });
+        guard = Guard([&data, messageBus]() { resumeConnectionsToRemotePeers(messageBus); });
     }
 
     if (!nx::vms::utils::configureLocalPeerAsPartOfASystem(commonModule, data))
@@ -166,13 +162,12 @@ bool configureLocalSystem(
 
 qint64 nx::ServerSetting::getSysIdTime()
 {
-    return qnServerModule->roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
+    return qnServerModule->settings().sysIdTime();
 }
 
 void nx::ServerSetting::setSysIdTime(qint64 value)
 {
-    auto settings = qnServerModule->roSettings();
-    settings->setValue(SYSTEM_IDENTITY_TIME, value);
+    qnServerModule->mutableSettings()->sysIdTime.set(value);
 }
 
 QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
@@ -191,8 +186,7 @@ QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
 
 QByteArray nx::ServerSetting::getAuthKey()
 {
-    QByteArray authKey = qnServerModule->roSettings()->value(AUTH_KEY).toByteArray();
-    QString appserverHostString = qnServerModule->roSettings()->value("appserverHost").toString();
+    QByteArray authKey = qnServerModule->settings().authKey();
     if (!authKey.isEmpty())
     {
         // convert from v2.2 format and encode value
@@ -210,7 +204,9 @@ void nx::ServerSetting::setAuthKey(const QByteArray& authKey)
     QByteArray prefix("SK_");
     QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
     QByteArray authKeyEncoded = nx::utils::encodeSimple(authKeyBin).toHex();
-    qnServerModule->roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
+
+    // Encode and update in settings.
+    qnServerModule->mutableSettings()->authKey.set(prefix + authKeyEncoded);
 }
 
 

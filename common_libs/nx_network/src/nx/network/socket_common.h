@@ -28,6 +28,13 @@
 
 #include <nx/utils/system_error.h>
 
+NX_NETWORK_API bool operator==(const in_addr& left, const in_addr& right);
+NX_NETWORK_API bool operator==(const in6_addr& left, const in6_addr& right);
+
+#if !defined(_WIN32)
+    NX_NETWORK_API extern const in_addr in4addr_loopback;
+#endif
+
 namespace nx {
 namespace network {
 
@@ -66,6 +73,8 @@ enum InitializationFlags
 
 NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode);
 
+using IpV6WithScope = std::pair<boost::optional<in6_addr>, boost::optional<uint32_t>>;
+
 /**
  * Represents ipv4 address. Supports conversion to QString and to uint32.
  * NOTE: Not using QHostAddress because QHostAddress can trigger dns name
@@ -93,22 +102,29 @@ public:
      * Domain name or IP v4 (if can be converted) or IP v6.
      */
     const QString& toString() const;
+    std::string toStdString() const;
 
     /**
      * IP v4 if address is v4 or v6 which can be converted to v4.
      */
     boost::optional<in_addr> ipV4() const;
 
-    using IpV6WithScope = std::pair<boost::optional<in6_addr>, boost::optional<uint32_t>>;
     /**
      * IP v6 if address is v6 or v4 converted to v6.
      */
     IpV6WithScope ipV6() const;
     boost::optional<uint32_t> scopeId() const;
 
-    bool isLocal() const;
+    bool isLocalHost() const;
+    bool isLocalNetwork() const;
     bool isIpAddress() const;
     bool isPureIpV6() const;
+
+    /**
+     * @return Address similar to result of getForeignAddress function.
+     * Removes string representation, making address explicit ipv4 / ipv6.
+     */
+    HostAddress toPureIpAddress(int desiredIpVersion) const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;
@@ -131,6 +147,11 @@ private:
     boost::optional<in_addr> m_ipV4;
     boost::optional<in6_addr> m_ipV6;
     boost::optional<uint32_t> m_scopeId;
+
+    HostAddress(
+        boost::optional<QString> addressString,
+        boost::optional<in_addr> ipV4,
+        boost::optional<in6_addr> ipV6);
 };
 
 NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
@@ -147,7 +168,10 @@ public:
     SocketAddress(const HostAddress& _address = HostAddress::anyHost, quint16 _port = 0);
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
+    SocketAddress(const std::string& str);
     SocketAddress(const char* utf8Str);
+    SocketAddress(const sockaddr_in& ipv4Endpoint);
+    SocketAddress(const sockaddr_in6& ipv6Endpoint);
     ~SocketAddress();
 
     bool operator==(const SocketAddress& rhs) const;
@@ -160,6 +184,8 @@ public:
 
     static const SocketAddress anyAddress;
     static const SocketAddress anyPrivateAddress;
+    static const SocketAddress anyPrivateAddressV4;
+    static const SocketAddress anyPrivateAddressV6;
     static QString trimIpV6(const QString& ip);
 };
 
@@ -173,9 +199,9 @@ struct NX_NETWORK_API KeepAliveOptions
     std::chrono::seconds inactivityPeriodBeforeFirstProbe;
     std::chrono::seconds probeSendPeriod;
     /**
-    * The number of unacknowledged probes to send before considering the connection dead and
-    * notifying the application layer.
-    */
+     * The number of unacknowledged probes to send before considering the connection dead and
+     * notifying the application layer.
+     */
     size_t probeCount;
 
     KeepAliveOptions(

@@ -7,17 +7,19 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/connective.h>
 #include <recorder/wearable_archive_synchronization_state.h>
+#include <nx/mediaserver/server_module_aware.h>
 
-class QnWearableUploadManager: public Connective<QObject>
+class QnWearableUploadManager: 
+    public Connective<QObject>, 
+    public nx::mediaserver::ServerModuleAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
-
 public:
-    QnWearableUploadManager(QObject* parent = nullptr);
+    QnWearableUploadManager(QObject* parent);
     virtual ~QnWearableUploadManager() override;
 
-    bool clearSpace(qint64 requestedSpace, qint64* availableSpace);
+    qint64 downloadBytesAvailable() const;
+    qint64 totalBytesAvailable() const;
 
     bool consume(const QnUuid& cameraId, const QnUuid& token, const QString& uploadId, qint64 startTimeMs);
 

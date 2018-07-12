@@ -19,6 +19,10 @@ ConsumingMotionMetadataProvider::Private::Private():
 {
 }
 
+ConsumingMotionMetadataProvider::~ConsumingMotionMetadataProvider()
+{
+}
+
 ConsumingMotionMetadataProvider::ConsumingMotionMetadataProvider():
     d(new Private())
 {

@@ -196,8 +196,13 @@ nx::network::http::StatusCode::Value
 
     std::vector<std::unique_ptr<rest::ServerConnection>> serverConnections;
     const auto onlineServers = resourcePool->getAllServers(Qn::ResourceStatus::Online);
+
+    int requestCount = 0;
     for (auto server: onlineServers)
     {
+        if (server->getId() == m_commonModule->moduleGUID())
+            continue;
+
         serverConnections.push_back(
             std::make_unique<rest::ServerConnection>(m_commonModule, server->getId()));
         serverConnections.back()->lookupDetectedObjects(
@@ -211,9 +216,11 @@ nx::network::http::StatusCode::Value
                 requestResultQueue.push(
                     std::make_tuple(hasSucceded, std::move(lookupResult)));
             });
+
+        ++requestCount;
     }
 
-    for (auto server: onlineServers)
+    for (int i = 0; i != requestCount; ++i)
     {
         const auto requestResult = requestResultQueue.pop();
         if (!std::get<0>(requestResult))

@@ -19,6 +19,8 @@ Connection::Connection(
     m_authProvider = std::make_unique<AuthProvider>(endPointFetcher);
     m_maintenanceManager = std::make_unique<MaintenanceManager>(endPointFetcher);
 
+    bindToAioThread(m_requestExecutor.getAioThread());
+
     setRequestTimeout(m_requestExecutor.requestTimeout());
 }
 
@@ -40,6 +42,17 @@ api::AuthProvider* Connection::authProvider()
 api::MaintenanceManager* Connection::maintenanceManager()
 {
     return m_maintenanceManager.get();
+}
+
+void Connection::bindToAioThread(
+    nx::network::aio::AbstractAioThread* aioThread)
+{
+    m_requestExecutor.bindToAioThread(aioThread);
+
+    m_accountManager->bindToAioThread(aioThread);
+    m_systemManager->bindToAioThread(aioThread);
+    m_authProvider->bindToAioThread(aioThread);
+    m_maintenanceManager->bindToAioThread(aioThread);
 }
 
 void Connection::setCredentials(
@@ -65,9 +78,9 @@ void Connection::setProxyVia(
     std::uint16_t proxyPort)
 {
     const nx::network::SocketAddress proxyEndpoint(proxyHost.c_str(), proxyPort);
-    m_accountManager->setProxyVia(proxyEndpoint);
-    m_systemManager->setProxyVia(proxyEndpoint);
-    m_authProvider->setProxyVia(proxyEndpoint);
+    m_accountManager->setProxyVia(proxyEndpoint, /*isSecure*/ true);
+    m_systemManager->setProxyVia(proxyEndpoint, /*isSecure*/ true);
+    m_authProvider->setProxyVia(proxyEndpoint, /*isSecure*/ true);
 }
 
 void Connection::setRequestTimeout(std::chrono::milliseconds timeout)

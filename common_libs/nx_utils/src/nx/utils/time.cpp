@@ -39,13 +39,13 @@ static milliseconds monotonicTimeShift(0);
 static QString getTimeZoneFile(const QString& timeZoneId)
 {
     #if defined(Q_OS_LINUX)
-        QString timeZoneFile = lit("/usr/share/zoneinfo/%1").arg(timeZoneId);
+        QString timeZoneFile = QString("/usr/share/zoneinfo/%1").arg(timeZoneId);
         if (!QFile::exists(timeZoneFile))
             return QString();
         return timeZoneFile;
     #else
-        QN_UNUSED(timeZoneId);
-        return lit("");
+        nx::utils::unused(timeZoneId);
+        return "";
     #endif
 }
 
@@ -77,37 +77,37 @@ bool setTimeZone(const QString& timeZoneId)
         const QString& timeZoneFile = getTimeZoneFile(timeZoneId);
         if (timeZoneFile.isNull())
         {
-            NX_LOG(lit("setTimeZone(): Unsupported time zone id %1").arg(timeZoneId), cl_logERROR);
+            NX_LOG(lm("setTimeZone(): Unsupported time zone id %1").arg(timeZoneId), cl_logERROR);
             return false;
         }
 
         if (unlink("/etc/localtime") != 0)
         {
-            NX_LOG(lit("setTimeZone(): Unable to delete /etc/localtime"), cl_logERROR);
+            NX_LOG(lm("setTimeZone(): Unable to delete /etc/localtime"), cl_logERROR);
             return false;
         }
         if (symlink(timeZoneFile.toLatin1().data(), "/etc/localtime") != 0)
         {
-            NX_LOG(lit("setTimeZone(): Unable to create symlink /etc/localtime"), cl_logERROR);
+            NX_LOG(lm("setTimeZone(): Unable to create symlink /etc/localtime"), cl_logERROR);
             return false;
         }
-        QFile tzFile(lit("/etc/timezone"));
+        QFile tzFile("/etc/timezone");
         if (!tzFile.open(QFile::WriteOnly | QFile::Truncate))
         {
-            NX_LOG(lit("setTimeZone(): Unable to rewrite /etc/timezone"), cl_logERROR);
+            NX_LOG(lm("setTimeZone(): Unable to rewrite /etc/timezone"), cl_logERROR);
             return false;
         }
         if (tzFile.write(timeZoneId.toLatin1()) <= 0)
         {
-            NX_LOG(lit("setTimeZone(): Unable to write time zone id to /etc/localtime"),
+            NX_LOG(lm("setTimeZone(): Unable to write time zone id to /etc/localtime"),
                 cl_logERROR);
             return false;
         }
 
         return true;
     #else
-        NX_LOG(lit("setTimeZone(): Unsupported platform"), cl_logERROR);
-        QN_UNUSED(timeZoneId);
+        NX_LOG(lm("setTimeZone(): Unsupported platform"), cl_logERROR);
+        nx::utils::unused(timeZoneId);
         return false;
     #endif
 }
@@ -135,7 +135,7 @@ QString getCurrentTimeZoneId()
         if (id.isEmpty())
         {
             // Obtain time zone via POSIX functions (thread-safe).
-            NX_LOG(lit(
+            NX_LOG(lm(
                 "getCurrentTimeZoneId(): QDateTime time zone id is empty, trying localtime_r()"),
                 cl_logDEBUG1);
             constexpr int kMaxTimeZoneSize = 32;
@@ -160,7 +160,7 @@ QString getCurrentTimeZoneId()
         id == "Etc/Universal" ||
         id == "Etc/Zulu")
     {
-        NX_LOG(lit("getCurrentTimeZoneId(): Converting %1 -> UTC").arg(id), cl_logDEBUG1);
+        NX_LOG(lm("getCurrentTimeZoneId(): Converting %1 -> UTC").arg(id), cl_logDEBUG1);
         return "UTC";
     }
 
@@ -175,7 +175,7 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
         tv.tv_usec = (millisecondsSinceEpoch % 1000) * 1000;
         if (settimeofday(&tv, 0) != 0)
         {
-            NX_LOG(lit("setDateTime(): settimeofday() failed"), cl_logERROR);
+            NX_LOG(lm("setDateTime(): settimeofday() failed"), cl_logERROR);
             return false;
         }
 
@@ -185,17 +185,17 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
             // failes, hence several attempts.
             for (int i = 0; i < 3; ++i)
             {
-                if (QProcess::execute(lit("hwclock -w")) == 0)
+                if (QProcess::execute("hwclock -w") == 0)
                     return true;
             }
-            NX_LOG(lit("setDateTime(): \"hwclock -w\" fails"), cl_logERROR);
+            NX_LOG(lm("setDateTime(): \"hwclock -w\" fails"), cl_logERROR);
             return false;
         }
 
         return true;
     #else
-        QN_UNUSED(millisecondsSinceEpoch);
-        NX_LOG(lit("setDateTime(): unsupported platform"), cl_logERROR);
+        nx::utils::unused(millisecondsSinceEpoch);
+        NX_LOG(lm("setDateTime(): unsupported platform"), cl_logERROR);
     #endif
 
     return true;

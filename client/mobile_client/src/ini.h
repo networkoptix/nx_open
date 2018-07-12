@@ -18,6 +18,7 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_STRING("", logLevel, "Overrides (if defined) log level passed via command line.");
     NX_INI_FLAG(0, execAtGlThreadOnBeforeSynchronizing, "Connect lambda execution to the event.");
     NX_INI_FLAG(1, execAtGlThreadOnFrameSwapped, "Connect lambda execution to the event.");
+    NX_INI_STRING("", tcpLogAddress, "Write log to specified IP:port as raw TCP stream");
 };
 
 inline Ini& ini()

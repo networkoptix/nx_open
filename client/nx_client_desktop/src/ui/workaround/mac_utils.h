@@ -15,19 +15,6 @@ bool mac_isSandboxed();
 
 void mac_setLimits();
 
-QString mac_getExistingDirectory(const QString &caption,
-                                    const QString &dir);
-
-QString mac_getOpenFileName(const QString &caption,
-                                 const QString &dir,
-                                 const QStringList &extensions);
-
-QStringList mac_getOpenFileNames(const QString &caption,
-                                 const QString &dir,
-                                 const QStringList &extensions);
-
-QString mac_getSaveFileName(const QString &caption,
-                            const QString &dir,
-                            const QStringList &extensions);
+void setHidesOnDeactivate(WId windowId, bool value);
 
 #endif // _HDWITNESS_MAC_UTILS_H_

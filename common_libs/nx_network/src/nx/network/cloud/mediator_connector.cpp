@@ -35,7 +35,7 @@ MediatorConnector::MediatorConnector():
 
 MediatorConnector::~MediatorConnector()
 {
-    NX_ASSERT((m_stunClient == nullptr) || m_stunClient.unique());
+    NX_ASSERT((m_stunClient == nullptr) || m_stunClient.use_count() == 1);
     pleaseStopSync(false);
 }
 
@@ -84,7 +84,9 @@ void MediatorConnector::mockupCloudModulesXmlUrl(const nx::utils::Url& cloudModu
     m_cloudModulesXmlUrl = cloudModulesXmlUrl;
 }
 
-void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
+void MediatorConnector::mockupMediatorUrl(
+    const nx::utils::Url& mediatorUrl,
+    const network::SocketAddress stunUdpEndpoint)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -102,7 +104,7 @@ void MediatorConnector::mockupMediatorUrl(const nx::utils::Url& mediatorUrl)
 
     m_mediatorUrl = mediatorUrl;
     m_mockedUpMediatorUrl = mediatorUrl;
-    m_mediatorUdpEndpoint = nx::network::url::getEndpoint(mediatorUrl);
+    m_mediatorUdpEndpoint = stunUdpEndpoint;
     m_promise->set_value(true);
     connectToMediatorAsync();
     if (m_mediatorAvailabilityChangedHandler)
@@ -182,8 +184,7 @@ void MediatorConnector::fetchEndpoint()
 
             if (status != nx::network::http::StatusCode::ok)
             {
-                NX_LOGX(lit("Can not fetch mediator address: HTTP %1")
-                    .arg(status), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Can not fetch mediator address: HTTP %1").arg((int) status));
 
                 if (!isReady(*m_future))
                     m_promise->set_value(false);

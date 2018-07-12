@@ -76,13 +76,13 @@ public:
     /**
      * Returns painter path for the motion mask region.
      */
-    QPainterPath getMotionMaskPath();
+    QPainterPath getMotionMaskPath() const;
 
     /**
      * Returns painter path for the given sensitivity region.
      * \param value                 Target sensitivity level.
      */
-    QPainterPath getRegionBySensPath(int value);
+    QPainterPath getRegionBySensPath(int value) const;
 
     /**
      * Returns simplified version of region's rects
@@ -97,11 +97,11 @@ public:
 
     void removeDefaultMotion();
 private:
-    void updatePathCache();
+    void updatePathCache() const;
 private:
     QnRegion m_data[kSensitivityLevelCount];
-    QPainterPath m_pathCache[kSensitivityLevelCount];
-    bool m_dirty;
+    mutable QPainterPath m_pathCache[kSensitivityLevelCount];
+    mutable bool m_dirty = false;
 };
 
 Q_DECLARE_METATYPE(QnMotionRegion);

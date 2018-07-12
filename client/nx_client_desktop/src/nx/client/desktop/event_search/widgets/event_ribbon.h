@@ -36,6 +36,11 @@ public:
     bool footersEnabled() const;
     void setFootersEnabled(bool value);
 
+    Qt::ScrollBarPolicy scrollBarPolicy() const;
+    void setScrollBarPolicy(Qt::ScrollBarPolicy value);
+
+    void setViewportMargins(int top, int bottom);
+
     virtual QSize sizeHint() const override;
 
     QScrollBar* scrollBar() const;
@@ -44,7 +49,7 @@ public:
     int unreadCount() const;
 
 signals:
-    void countChanged(int count, QPrivateSignal);
+    void countChanged(int count);
     void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance, QPrivateSignal);
     void tileHovered(const QModelIndex& index, const EventTile* tile);
 

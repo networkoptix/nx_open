@@ -28,11 +28,10 @@ static const int kHeightRoundingFactor = 4;
 QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
 :
     m_bitrate(-1),
-    m_quality(Qn::QualityNormal)
+    m_quality(Qn::StreamQuality::normal)
 {
     m_codecId = codecId;
 }
-
 
 void QnCodecTranscoder::setParams(const QnCodecParams::Value& params)
 {
@@ -158,7 +157,6 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         if (srcResolution.isEmpty())
             srcResolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
 
-
         m_resolution.setHeight(qMin(srcResolution.height(), m_resolution.height())); // strict to source frame height
         // Round resolution height.
         m_resolution.setHeight(
@@ -184,7 +182,6 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 // ---------------------- QnTranscoder -------------------------
 
-
 QnTranscoder::QnTranscoder():
     m_videoCodec(AV_CODEC_ID_NONE),
     m_audioCodec(AV_CODEC_ID_NONE),
@@ -207,77 +204,129 @@ QnTranscoder::~QnTranscoder()
 
 }
 
-int QnTranscoder::suggestMediaStreamParams(
+int QnTranscoder::suggestBitrate(
     AVCodecID codec,
     QSize resolution,
-    Qn::StreamQuality quality,
-    QnCodecParams::Value* const params )
+    Qn::StreamQuality quality)
 {
-    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
+    // I assume for a Qn::StreamQuality::highest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a Qn::StreamQuality::lowest quality 30 fps for 1080 we need 1 mbps
 
     if (resolution.width() == 0)
-        resolution.setWidth(resolution.height()*4/3);
+        resolution.setWidth(resolution.height() * 4 / 3);
 
     int hiEnd;
-    switch(quality)
+    switch (quality)
     {
-        case Qn::QualityLowest:
+        case Qn::StreamQuality::lowest:
             hiEnd = 1024;
             break;
-        case Qn::QualityLow:
+        case Qn::StreamQuality::low:
             hiEnd = 1024 + 512;
             break;
-        case Qn::QualityNormal:
-            hiEnd = 1024*2;
+        case Qn::StreamQuality::normal:
+            hiEnd = 1024 * 2;
             break;
-        case Qn::QualityHigh:
-            hiEnd = 1024*3;
+        case Qn::StreamQuality::high:
+            hiEnd = 1024 * 3;
             break;
-        case Qn::QualityHighest:
+        case Qn::StreamQuality::highest:
         default:
-            hiEnd = 1024*5;
+            hiEnd = 1024 * 5;
             break;
     }
 
-    float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
+    float resolutionFactor = resolution.width()*resolution.height() / 1920.0 / 1080;
     resolutionFactor = pow(resolutionFactor, (float)0.63); // 256kbps for 320x240 for Mq quality
 
     int result = hiEnd * resolutionFactor;
+    return qMax(128, result) * 1024;
+}
 
-    if( codec == AV_CODEC_ID_MJPEG )
+QnCodecParams::Value QnTranscoder::suggestMediaStreamParams(
+    AVCodecID codec,
+    QSize resolution,
+    Qn::StreamQuality quality)
+{
+    QnCodecParams::Value params;
+
+    switch (codec)
     {
-        //setting qmin and qmax, since mjpeg encoder uses only these
-        if( params && !params->contains(QnCodecParams::qmin) && !params->contains(QnCodecParams::qmax) )
+        case AV_CODEC_ID_MJPEG:
         {
             int qVal = 1;
             switch( quality )
             {
-                case Qn::QualityLowest:
+                case Qn::StreamQuality::lowest:
                     qVal = 100;
                     break;
-                case Qn::QualityLow:
+                case Qn::StreamQuality::low:
                     qVal = 50;
                     break;
-                case Qn::QualityNormal:
+                case Qn::StreamQuality::normal:
                     qVal = 20;
                     break;
-                case Qn::QualityHigh:
+                case Qn::StreamQuality::high:
                     qVal = 5;
                     break;
-                case Qn::QualityHighest:
+                case Qn::StreamQuality::highest:
                     qVal = 1;
                     break;
                 default:
                     break;
             }
 
-            params->insert( QnCodecParams::qmin, qVal );
-            params->insert( QnCodecParams::qmax, qVal );
+            params.insert( QnCodecParams::qmin, qVal );
+            params.insert( QnCodecParams::qmax, qVal );
+        }
+        break;
+        case AV_CODEC_ID_VP8:
+        {
+            int cpuUsed = 0;
+            int staticThreshold = 0;
+
+            switch (quality)
+            {
+                case Qn::StreamQuality::lowest:
+                    cpuUsed = 5;
+                    break;
+                case Qn::StreamQuality::low:
+                    cpuUsed = 4;
+                    break;
+                case Qn::StreamQuality::normal:
+                    cpuUsed = 3;
+                    break;
+                case Qn::StreamQuality::high:
+                    cpuUsed = 1;
+                    break;
+                case Qn::StreamQuality::highest:
+                    cpuUsed = 0;
+                    break;
+                default:
+                    break;
+            }
+
+            if (quality <= Qn::StreamQuality::normal)
+            {
+                params.insert("profile", 1); //< [0..3] Bigger numbers mean less posibilities for encoder.
+                staticThreshold = 1000;
+            }
+
+            // Options are taken from https://www.webmproject.org/docs/encoder-parameters/
+
+            params.insert("good", QString());
+            params.insert("cpu-used", cpuUsed);
+            params.insert("kf-min-dist", 0);
+            params.insert("kf-max-dist", 360);
+            params.insert("token-parts", 2);
+            params.insert("static-thresh", staticThreshold);
+            params.insert("min-q", 0);
+            params.insert("max-q", 63);
+            break;
         }
     }
 
-    return qMax(128,result)*1024;
+    return params;
 }
 
 int QnTranscoder::setVideoCodec(
@@ -288,11 +337,12 @@ int QnTranscoder::setVideoCodec(
     int bitrate,
     QnCodecParams::Value params )
 {
-    Q_UNUSED(params)
-    if (bitrate == -1) {
-        //bitrate = resolution.width() * resolution.height() * 5;
-        bitrate = suggestMediaStreamParams( codec, resolution, quality, &params );
-    }
+    if (params.isEmpty())
+        params = suggestMediaStreamParams(codec, resolution, quality);
+
+    if (bitrate == -1)
+        bitrate = suggestBitrate(codec, resolution, quality);
+
     QnFfmpegVideoTranscoder* ffmpegTranscoder;
     m_videoCodec = codec;
     switch (method)

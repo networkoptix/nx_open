@@ -6,10 +6,13 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">Renommer système</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Déconnecter de             <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <p>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Fusionner avec un autre système</button>
+        </p>
+        <hr></hr>
+        <button class="btn btn-default" ng-click="disconnect()">Déconnecter de             <span class="product-name">%PRODUCT_NAME%</span></button>
     </div>
 </div>
-
 <div class="panel panel-default" ng-if="!system.isMine">
     <div class="panel-body">
         <h2>Propriétaire</h2>
@@ -24,5 +27,23 @@
             <button class="btn btn-default" ng-click="rename()">Renommer système</button>
         </p>
         <button class="btn btn-default" ng-click="delete()">Déconnecter de mon compte</button>
+    </div>
+</div>
+<div class="panel panel-default" ng-if="currentlyMerging">
+    <div class="panel-body" ng-if="isMaster && system.isMine">
+        <div><strong>{{mergeTargetSystem.name}}</strong>
+            est en cours de fusion à ce système</div>
+        <hr></hr>
+        <div class="merge-info-text">Selon la taille de la base de données, cela peut prendre plusieurs heures</div>
+    </div>
+    <div class="panel-body" ng-if="!isMaster || !system.isMine">
+        <div>Ce système est en cours de fusion à
+            <strong>{{mergeTargetSystem.name}}</strong></div>
+        <hr></hr>
+        <div class="merge-info-text">
+            <p>Selon la taille de la base de données, cela peut prendre plusieurs heures.</p>
+            <p>Tant que la fusion n'est pas terminée, vous pouvez vous connecter à ce système et regarder le vidéo, mais vous ne pouvez modifier aucun paramètre.</p>
+            <p>Lorsque la fusion sera terminée, tous les utilisateurs et caméras de ce système seront disponibles dans <span class="merge-system-name">{{mergeTargetSystem.name}}</span> . Système et ce système seront supprimé.</p>
+        </div>
     </div>
 </div>

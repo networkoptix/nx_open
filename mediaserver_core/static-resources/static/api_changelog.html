@@ -13,11 +13,11 @@ Use the following tags for markup, among others:
     One or more lines of code, indented as needed. Rendered in monospace.
 </pre>
 <em>Comment or note. Rendered in italics and gray.</em>
-<strong>Most significant part ot the text. Rendered in bold.</strong>
+<strong>Most significant part of the text. Rendered in bold.</strong>
 <i>Old chars in the renamed symbol. Rendered in red, non-italics.</i>
 <b>New chars in the renamed symbol. Rendered in blue, non-bold.</b>
 -->
-<style type="text/css" scoped="scoped" >
+<style type="text/css" scoped="scoped">
     code { color: inherit; }
     em { color: gray; font-family: inherit; }
     i { color: red; /* non-italics */ font-style: inherit; font-family: inherit; }
@@ -33,15 +33,99 @@ supported for a while, when noted below.
 
 <!--============================================================================================-->
 <hr/>
+<h2>VMS <b>4.0</b> relative to <i>3.2</i></h2>
+
+<!--============================================================================================-->
+<h3>Breaking compatibility</h3>
+
+Params <strong><code><i>scheduleTask.beforeThreshold</i></code></strong> and <strong><code><i>
+scheduleTask.afterThreshold</i></code></strong> were removed in favor of the new <strong><code><b>
+recordBeforeMotionSec</b></code></strong> and <strong><code><b>recordAfterMotionSec</b></code>
+</strong> params in methods:
+<pre>
+    /ec2/saveCameraUserAttributesList
+    /ec2/saveCameraUserAttributes
+    /ec2/getCameraUserAttributesList
+    /ec2/getCamerasEx
+</pre>
+
+
+<!--============================================================================================-->
+<h3>Retaining compatibility</h3>
+
+Removed param <strong><code><i>scheduleTask.recordAudio</i></code></strong>
+(was not used) in methods:
+<pre>
+    /ec2/saveCameraUserAttributesList
+    /ec2/saveCameraUserAttributes
+    /ec2/getCameraUserAttributesList
+    /ec2/getCamerasEx
+</pre>
+
+<!--============================================================================================-->
+<hr/>
+<h2>VMS <b>3.2</b> relative to <i>3.1</i></h2>
+
+<!--............................................................................................-->
+<h3>Breaking compatibility</h3>
+
+Deleted deprecated method <strong><code><i>/api/image</i></code></strong>.
+
+<!--............................................................................................-->
+<h3>Retaining compatibility until expired</h3>
+
+Made <strong><i>GET</i></strong> deprecated in favor of <strong><b>POST</b></strong> in method
+<strong><code>/api/detachFromCloud</code></strong>
+(deprecated method support expires after 3.2).
+<p/>
+
+Renamed certain param values in method <strong><code>/ec2/cameraThumbnail</code></strong>
+(deprecated values support expires after 3.2):
+<pre>
+    Param <strong><code>imageFormat</code></strong> values:
+        <i>jpeg</i> -> <b>jpg</b>
+        <i>tiff</i> -> <b>tif</b>
+
+    Param <strong><code>roundMethod</code></strong> values:
+        <i>exact</i> -> <b>precise</b>
+</pre>
+
+<!--............................................................................................-->
+<h3>Errata fixed in the API documentation (not changing API behavior)</h3>
+
+Fixed param and value names in method <strong><code>/ec2/cameraThumbnail</code></strong>:
+<pre>
+    Param <strong><code>imageFormat</code></strong> values:
+        <i>PngFormat</i> -> <b>png</b>
+        <i>JpgFormat</i> -> <b>jpg</b>
+        <i>TiffFormat</i> -> <b>tif</b>
+        <i>RawFormat</i> -> <b>raw</b>
+
+    Param <strong><code><i>method</i> -> <b>roundMethod</b></code></strong> values:
+        <i>KeyFrameBeforeMethod</i> -> <b>before</b>
+        <i>PreciseMethod</i> -> <b>precise</b>
+        <i>KeyFrameAfterMethod</i> -> <b>after</b>
+</pre>
+
+Fixed method URL prefix:
+<strong><code><i>/api</i>/execAction -> <b>/ec2</b>/execAction</code></strong>.
+
+<!--============================================================================================-->
+<hr/>
 <h2>VMS <b>3.1</b> relative to <i>3.0</i></h2>
 
-No breaking changes were introduced; no features became deprecated.
+<!--............................................................................................-->
+<h3>Retaining compatibility until expired</h3>
+
+Changed <strong><i>GET</i> -> <b>POST</b></strong> in method
+<strong><code>/api/mergeSystems</code></strong>
+(deprecated method support expires after 3.2). Check changed params in the API documentation.
 
 <!--============================================================================================-->
 <hr/>
 <h2>VMS <b>3.0</b> relative to <i>2.6</i></h2>
 
-<!--============================================================================================-->
+<!--............................................................................................-->
 <h3>Breaking compatibility</h3>
 
 Renamed methods:
@@ -71,15 +155,16 @@ Changed <strong>reply</strong> format <strong><i>XML</i> -> <b>JSON</b></strong>
     /api/storageStatus
 </pre>
 
-<!--============================================================================================-->
+<!--............................................................................................-->
 <h3>Retaining compatibility until expired</h3>
 
-<p>Replaced method <strong><code>/api/image -> /ec2/cameraThumbnail</code></strong>
-Deprecated method support expires by 3.2. The new method can get thumbnails from cameras
-located on other servers (the old one can't).
-</p>
+Replaced method <strong><code><i>/api/image</i> -> <b>/ec2/cameraThumbnail</b></code></strong>
+(deprecated method support expires after 3.1). The new method can get thumbnails from cameras
+located on other servers (the old one can not).
+<p/>
+
 Renamed param <strong><code>cameraI<i>D</i> -> cameraI<b>d</b></code></strong>
-(deprecated name support expires by 3.2) in methods:
+(deprecated name support expires after 3.2) in methods:
 <pre>
     /ec2/getCamerasEx
     /ec2/getCameraUserAttributesList
@@ -88,7 +173,7 @@ Renamed param <strong><code>cameraI<i>D</i> -> cameraI<b>d</b></code></strong>
 </pre>
 
 Renamed param <strong><code>serverI<i>D</i> -> serverI<b>d</b></code></strong>
-(deprecated name support expires by 3.2) in methods:
+(deprecated name support expires after 3.2) in methods:
 <pre>
     /ec2/getMediaServerUserAttributesList
     /ec2/saveMediaServerUserAttributesList
@@ -96,14 +181,14 @@ Renamed param <strong><code>serverI<i>D</i> -> serverI<b>d</b></code></strong>
 </pre>
 
 Renamed param <strong><code>ph<i>i</i>sicalMemory -> ph<b>y</b>sicalMemory</code></strong>
-(deprecated name support expires by 3.2) in methods:
+(deprecated name support expires after 3.2) in methods:
 <pre>
     /ec2/saveClientInfo
     /ec2/getClientInfoList
 </pre>
 
 Renamed param <strong><code>prefe<i>r</i>edServerId -> prefe<b>rr</b>edServerId</code></strong>
-(deprecated name support expires by 3.2) in methods:
+(deprecated name support expires after 3.2) in methods:
 <pre>
     /ec2/saveCameraUserAttributesList
     /ec2/saveCameraUserAttributes
@@ -112,7 +197,7 @@ Renamed param <strong><code>prefe<i>r</i>edServerId -> prefe<b>rr</b>edServerId<
 </pre>
 
 Renamed param <strong><code><i>res_id </i>-> <b>cameraId</b></code></strong>
-(deprecated name support expires by 3.2) in methods:
+(deprecated name support expires after 3.2) in methods:
 <pre>
     /api/doCameraDiagnosticsStep
     /api/setCameraParam
@@ -120,48 +205,28 @@ Renamed param <strong><code><i>res_id </i>-> <b>cameraId</b></code></strong>
 </pre>
 
 Renamed param <strong><code><i>resource</i>Id -> <b>camera</b>Id</code></strong>
-(deprecated name support expires by 3.2) in methods:
+(deprecated name support expires after 3.2) in methods:
 <pre>
     /api/ptz
 </pre>
 
 Renamed and merged together params
 <strong><code><i>mac</i> + <i>physicalId</i> -> <b>cameraId</b></code></strong>
-(deprecated names support expires by 3.2) in methods:
-<pre>
-    /ec2/bookmarks
-</pre>
+in method <strong><code>/ec2/bookmarks</code></strong>
+(deprecated names support expires after 3.2).
+<p/>
 
 Renamed param <strong><code><i>physical</i>Id -> <b>camera</b>Id</code></strong>
-(deprecated name support expires by 3.2) in methods:
+(deprecated name support expires after 3.2) in methods:
 <pre>
     /api/image
     /api/getEvents
     /ec2/recordedTimePeriods
 </pre>
 
-Changed <strong><i>GET</i> -> <b>POST</b></strong>
-(deprecated method support expires by 3.2, check extra details in documentation) in methods:
-<pre>
-    /api/manualCamera/add
-</pre>
-
-Changed <strong>RTSP</strong> Streaming <strong>URL</strong>
-(deprecated URL support expires by 3.2):
-<pre>
-    /&lt;<i>physicalId</i>&gt; -> /&lt;<b>cameraId</b>&gt;
-</pre>
-
-Changed <strong>HTTP</strong> Streaming <strong>URL</strong>
-(deprecated URL support expires by 3.2):
-<pre>
-    /media/&lt;<i>physicalId</i>&gt;.&lt;format&gt; -> /media/&lt;<b>cameraId</b>&gt;.&lt;format&gt;
-</pre>
-
-Changed <strong>HLS</strong> Streaming/Download <strong>URL</strong>
-(deprecated URL support expires by 3.2):
-<pre>
-    /hls/&lt;<i>physicalid</i>&gt;.&lt;format&gt; -> /hls/&lt;<b>cameraId</b>&gt;.&lt;format&gt;
-</pre>
+Changed <strong><i>GET</i> -> <b>POST</b></strong> in method
+<strong><code>/api/manualCamera/add</code></strong>
+(deprecated method support expires after 3.2). Check changed params in the API documentation.
+<p/>
 
 </div>

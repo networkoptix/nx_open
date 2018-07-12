@@ -35,7 +35,7 @@ nx::utils::Url getServerApiUrl(
 
 qint64 freeSpaceForUpdate()
 {
-    auto updatesDir = qnServerModule->roSettings()->value("dataDir").toString();
+    auto updatesDir = qnServerModule->settings().dataDir();
     if (updatesDir.isEmpty())
         updatesDir = QDir::tempPath();
 
@@ -73,7 +73,8 @@ void requestRemotePeers(
             [&outputReply, context, serverId = server->getId(), &mergeFunction](
                 SystemError::ErrorCode /*osErrorCode*/,
                 int statusCode,
-                nx::network::http::BufferType body)
+                nx::network::http::BufferType body,
+                nx::network::http::HttpHeaders /*httpHeaders*/)
             {
                 ReplyType reply;
                 bool success = false;

@@ -1,8 +1,11 @@
 add_subdirectory(nx_utils)
+add_subdirectory(nx_sql)
 add_subdirectory(nx_fusion)
 add_subdirectory(nx_network)
 add_subdirectory(nx_update)
 add_subdirectory(udt)
+add_subdirectory(nx_sdk)
+add_subdirectory(nx_plugin_utils)
 
 #if(((LINUX AND arch STREQUAL "x64") OR (WINDOWS AND arch STREQUAL "x64")) AND withClouds)
 if(arch STREQUAL "x64" AND withClouds)
@@ -15,7 +18,7 @@ if(withDesktopClient OR withMobileClient)
     add_subdirectory(nx_vms_utils)
 endif()
 
-if(withMediaServer OR withDesktopClient)
+if((withMediaServer OR withDesktopClient) AND NOT targetDevice STREQUAL edge1)
     add_subdirectory(nx_speech_synthesizer)
 endif()
 

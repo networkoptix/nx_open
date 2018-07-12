@@ -16,12 +16,12 @@ nx::network::http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resul
         case ResultCode::partialContent: //< Mapping to "200 OK" because request is not Partial Content from Http point of view.
             return nx::network::http::StatusCode::ok;
 
-        case ResultCode::badUsername:
         case ResultCode::badRequest:
         case ResultCode::mergedSystemIsOffline:
         case ResultCode::invalidFormat:
             return nx::network::http::StatusCode::badRequest;
 
+        case ResultCode::badUsername:
         case ResultCode::notAuthorized:
         case ResultCode::credentialsRemovedPermanently:
             return nx::network::http::StatusCode::unauthorized;

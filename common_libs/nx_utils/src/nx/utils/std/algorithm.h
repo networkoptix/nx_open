@@ -1,5 +1,7 @@
 #include <algorithm>
+#include <cctype>
 #include <map>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -152,10 +154,29 @@ bool contains(InputIt first, InputIt last, const T& value)
         });
 }
 
+template<typename Container, typename T>
+bool contains(const Container& container, const T& value)
+{
+    return contains(container.begin(), container.end(), value);
+}
+
 template<typename InputIt, typename UnaryPredicate>
 bool contains_if(InputIt first, InputIt last, UnaryPredicate p)
 {
     return std::any_of(first, last, p);
+}
+
+template<typename Container, typename UnaryPredicate>
+bool contains_if(const Container& container, UnaryPredicate p)
+{
+    return contains_if(container.begin(), container.end(), p);
+}
+
+template<typename StringType>
+// requires String<StringType>
+void to_lower(StringType* str)
+{
+    std::transform(str->begin(), str->end(), str->begin(), &tolower);
 }
 
 } // namespace utils

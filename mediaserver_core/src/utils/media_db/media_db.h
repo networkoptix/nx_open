@@ -200,6 +200,8 @@ public:
         return -1;
     }
 
+    QDataStream& stream() { return m_stream; }
+
 private:
     QDataStream m_stream;
 };
@@ -226,10 +228,10 @@ public:
 
     QIODevice *getDevice() const;
     void setDevice(QIODevice *device);
+    QDataStream& stream() { return m_stream.stream(); }
 
 public:
     virtual void run() override;
-    virtual void stop() override;
 
 private:
     Error getError() const;
@@ -243,7 +245,6 @@ private:
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
     QnWaitCondition m_writerDoneCond;
-    bool m_needStop;
     Mode m_mode;
 };
 

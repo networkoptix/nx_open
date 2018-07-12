@@ -56,15 +56,17 @@ QnJsonRestResult MediaServerClient::saveCloudSystemCredentials(
 }
 
 void MediaServerClient::getModuleInformation(
-    std::function<void(QnJsonRestResult, QnModuleInformation)> completionHandler)
+    std::function<void(QnJsonRestResult, nx::vms::api::ModuleInformation)> completionHandler)
 {
     performApiRequest("api/moduleInformation", std::move(completionHandler));
 }
 
-QnJsonRestResult MediaServerClient::getModuleInformation(QnModuleInformation* moduleInformation)
+QnJsonRestResult MediaServerClient::getModuleInformation(
+    nx::vms::api::ModuleInformation* moduleInformation)
 {
     using GetModuleInformationAsyncFuncPointer =
-        void(MediaServerClient::*)(std::function<void(QnJsonRestResult, QnModuleInformation)>);
+        void(MediaServerClient::*)(
+            std::function<void(QnJsonRestResult, nx::vms::api::ModuleInformation)>);
 
     return syncCallWrapper(
         this,
@@ -116,6 +118,7 @@ void MediaServerClient::detachFromCloud(
     const DetachFromCloudData& request,
     std::function<void(QnJsonRestResult)> completionHandler)
 {
+    // TODO: Use POST instead of GET for this API function.
     performApiRequest("api/detachFromCloud", request, std::move(completionHandler));
 }
 
@@ -155,16 +158,16 @@ QnJsonRestResult MediaServerClient::mergeSystems(const MergeSystemData& request)
 // /ec2/ requests
 
 void MediaServerClient::ec2GetUsers(
-    std::function<void(ec2::ErrorCode, ec2::ApiUserDataList)> completionHandler)
+    std::function<void(ec2::ErrorCode, nx::vms::api::UserDataList)> completionHandler)
 {
     performAsyncEc2Call("ec2/getUsers", std::move(completionHandler));
 }
 
-ec2::ErrorCode MediaServerClient::ec2GetUsers(ec2::ApiUserDataList* result)
+ec2::ErrorCode MediaServerClient::ec2GetUsers(nx::vms::api::UserDataList* result)
 {
     using Ec2GetUsersAsyncFuncPointer =
         void(MediaServerClient::*)(
-            std::function<void(ec2::ErrorCode, ec2::ApiUserDataList)>);
+            std::function<void(ec2::ErrorCode, nx::vms::api::UserDataList)>);
 
     return syncCallWrapper(
         this,
@@ -173,17 +176,17 @@ ec2::ErrorCode MediaServerClient::ec2GetUsers(ec2::ApiUserDataList* result)
 }
 
 void MediaServerClient::ec2SaveUser(
-    const ec2::ApiUserData& request,
+    const nx::vms::api::UserData& request,
     std::function<void(ec2::ErrorCode)> completionHandler)
 {
     performAsyncEc2Call("ec2/saveUser", request, std::move(completionHandler));
 }
 
-ec2::ErrorCode MediaServerClient::ec2SaveUser(const ec2::ApiUserData& request)
+ec2::ErrorCode MediaServerClient::ec2SaveUser(const nx::vms::api::UserData& request)
 {
     using Ec2SaveUserAsyncFuncPointer =
         void(MediaServerClient::*)(
-            const ec2::ApiUserData& request,
+            const nx::vms::api::UserData& request,
             std::function<void(ec2::ErrorCode)>);
 
     return syncCallWrapper(
@@ -193,16 +196,16 @@ ec2::ErrorCode MediaServerClient::ec2SaveUser(const ec2::ApiUserData& request)
 }
 
 void MediaServerClient::ec2GetSettings(
-    std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler)
+    std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)> completionHandler)
 {
     performAsyncEc2Call("ec2/getSettings", std::move(completionHandler));
 }
 
-ec2::ErrorCode MediaServerClient::ec2GetSettings(ec2::ApiResourceParamDataList* result)
+ec2::ErrorCode MediaServerClient::ec2GetSettings(nx::vms::api::ResourceParamDataList* result)
 {
     using Ec2GetSettingsAsyncFuncPointer =
         void(MediaServerClient::*)(
-            std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)>);
+            std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)>);
 
     return syncCallWrapper(
         this,
@@ -211,18 +214,18 @@ ec2::ErrorCode MediaServerClient::ec2GetSettings(ec2::ApiResourceParamDataList* 
 }
 
 void MediaServerClient::ec2SetResourceParams(
-    const ec2::ApiResourceParamWithRefDataList& inputData,
+    const nx::vms::api::ResourceParamWithRefDataList& inputData,
     std::function<void(ec2::ErrorCode)> completionHandler)
 {
     performAsyncEc2Call("ec2/setResourceParams", inputData, std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2SetResourceParams(
-    const ec2::ApiResourceParamWithRefDataList& request)
+    const nx::vms::api::ResourceParamWithRefDataList& request)
 {
     using Ec2SetResourceParamsAsyncFuncPointer =
         void(MediaServerClient::*)(
-            const ec2::ApiResourceParamWithRefDataList&,
+            const nx::vms::api::ResourceParamWithRefDataList&,
             std::function<void(ec2::ErrorCode)>);
 
     return syncCallWrapper(
@@ -234,7 +237,7 @@ ec2::ErrorCode MediaServerClient::ec2SetResourceParams(
 
 void MediaServerClient::ec2GetResourceParams(
     const QnUuid& resourceId,
-    std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler)
+    std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)> completionHandler)
 {
     performAsyncEc2Call(
         lm("ec2/getResourceParams?id=%1")
@@ -244,12 +247,12 @@ void MediaServerClient::ec2GetResourceParams(
 
 ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
     const QnUuid& resourceId,
-    ec2::ApiResourceParamDataList* result)
+    nx::vms::api::ResourceParamDataList* result)
 {
     using Ec2GetResourceParamsAsyncFuncPointer =
         void(MediaServerClient::*)(
             const QnUuid&,
-            std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)>);
+            std::function<void(ec2::ErrorCode, nx::vms::api::ResourceParamDataList)>);
 
     return syncCallWrapper(
         this,
@@ -259,18 +262,18 @@ ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
         result);
 }
 
-void MediaServerClient::ec2GetSystemMergeHistory(
-    std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)> completionHandler)
+void MediaServerClient::ec2GetSystemMergeHistory(std::function<
+    void(ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)> completionHandler)
 {
     performAsyncEc2Call("ec2/getSystemMergeHistory", std::move(completionHandler));
 }
 
 ec2::ErrorCode MediaServerClient::ec2GetSystemMergeHistory(
-    ec2::ApiSystemMergeHistoryRecordList* result)
+    nx::vms::api::SystemMergeHistoryRecordList* result)
 {
     using Ec2GetSystemMergeHistoryAsyncFuncPointer =
         void(MediaServerClient::*)(
-            std::function<void(ec2::ErrorCode, ec2::ApiSystemMergeHistoryRecordList)>);
+            std::function<void(ec2::ErrorCode, nx::vms::api::SystemMergeHistoryRecordList)>);
 
     return syncCallWrapper(
         this,

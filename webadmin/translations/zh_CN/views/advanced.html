@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>手動更新</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">上传安装程序</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">请确保配置是正确的。</p>
-            </div>
-        </div>
-    </form>
-
     <h1>高级的系统设置</h1>
     <div class="alert alert-danger" role="alert">
         <b>警告 ！</b>此页上的任何更改可能会导致服务器无法正常工作。
@@ -193,7 +182,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] | | '空 '}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>警告!</b> 某些更改需要重新启动 <b>全部</b> 系统中的服务器。<br><br>
+        <b>警告!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >重新启动当前服务器</button>
         </div>

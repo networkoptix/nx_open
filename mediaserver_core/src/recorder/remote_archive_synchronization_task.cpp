@@ -14,6 +14,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
+#include <thread>
 
 namespace nx {
 namespace mediaserver_core {
@@ -100,7 +101,15 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
 
             NX_ASSERT(m_recorder, lit("Recorder should exist."));
             if (m_recorder)
+            {
+                static const std::chrono::milliseconds kFlushQueueWaitDelay(50);
+                while (m_recorder->queueSize() > 0 && m_recorder->isRunning()
+                       && !QnResource::isStopping())
+                {
+                    std::this_thread::sleep_for(kFlushQueueWaitDelay);
+                }
                 m_recorder->pleaseStop();
+            }
         });
 }
 

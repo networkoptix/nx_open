@@ -25,13 +25,14 @@ public:
         Model* model);
     virtual ~Controller();
 
+    controller::AbstractTrafficRelay& trafficRelay();
     controller::AbstractConnectSessionManager& connectSessionManager();
     relaying::AbstractListeningPeerManager& listeningPeerManager();
 
-    bool discoverPublicAddress();
+    std::optional<network::HostAddress> discoverPublicAddress();
 
 private:
-    controller::TrafficRelay m_trafficRelay;
+    std::unique_ptr<controller::AbstractTrafficRelay> m_trafficRelay;
     std::unique_ptr<controller::AbstractConnectSessionManager> m_connectSessionManager;
     std::unique_ptr<relaying::AbstractListeningPeerManager> m_listeningPeerManager;
     Model* m_model;

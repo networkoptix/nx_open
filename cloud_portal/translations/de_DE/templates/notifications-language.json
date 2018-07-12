@@ -6,10 +6,10 @@
     "emailSubject": "Passwort zurücksetzen"
   },
   "system_invite": {
-    "emailSubject": "{{message.sharer_name}} lädt Sie zu {{PRODUCT_NAME}} ein"
+    "emailSubject": "{{#message.sharer_name}}{{message.sharer_name}} lädt Sie zu %PRODUCT_NAME%{{/message.sharer_name}} ein {{^message.sharer_name}}Videosystem {{message.system_name}} wurde mit Ihnen geteilt{{/message.sharer_name}}"
   },
   "system_shared": {
-    "emailSubject": "{{message.sharer_name}} lädt Sie zu {{PRODUCT_NAME}} ein"
+    "emailSubject": "Videosystem {{message.system_name}} wurde mit Ihnen geteilt"
   },
   "review_version": {
     "emailSubject": "Version {{message.id}} ist bereit, überprüft zu werden"

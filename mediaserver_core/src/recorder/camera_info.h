@@ -8,7 +8,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/abstract_storage_resource.h>
 #include <server/server_globals.h>
-#include <nx_ec/data/api_camera_data.h>
+#include <nx/vms/api/data/camera_data.h>
 
 class QnStorageManager;
 
@@ -101,8 +101,8 @@ private:
 
 struct ArchiveCameraData
 {
-    ec2::ApiCameraData coreData;
-    ec2::ApiResourceParamDataList properties;
+    nx::vms::api::CameraData coreData;
+    nx::vms::api::ResourceParamDataList properties;
 };
 
 typedef std::vector<ArchiveCameraData> ArchiveCameraDataList;

@@ -53,11 +53,6 @@
       <translation>发现的系统 %1 有不兼容的版本 %2。</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>无法连接到另一个系统，因为当前的系统已连接到 %1。</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>发现的系统 %1 是在安全模式下。</translation>
@@ -68,21 +63,6 @@
       <translation>不能配置远程系统 %1。</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>这两个系统连接到 %1。合并不是允许的。</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>这些系统都采用了不同的 %1 URL。合并不是允许的。</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>云系统只可以与非云合并。系统名称和密码取自云系统。</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>新系统</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>发现的系统%1与当前系统不兼容。</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>无法连接到另一个系统，因为当前的系统已连接到 %1。</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1系统只能与非%1系统合并. 系统名称和密码将取自%1系统.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>这两个系统连接到 %1。合并不是允许的。</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>这些系统都采用了不同的 %1 URL。合并不是允许的。</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>系统事件</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>系统已绑定到云 (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>服务器未连接到Internet。</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>无法将云帐密保存到本地资料库</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>无法将云持有人保存到本地资料库</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>无法连接到云: %1</translation>
     </message>
   </context>
   <context>
@@ -313,6 +333,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>首先，试着打开记录 （如果它是关闭的） 和减少 fps 在 I/O 模块设置 (错误&quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>请更新固件。最小支持版本是 %1。当前版本是 %2</translation>
     </message>
   </context>
   <context>
@@ -553,8 +577,8 @@
       <translation>未知的错误</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>找不到匹配硬件 Id 的服务器</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>找不到匹配硬件 ID 的服务器</translation>
     </message>
   </context>
   <context>
@@ -670,12 +694,12 @@
       <translation>水印︰ %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>硬件 Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>时效性授权</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>硬件 ID: %1</translation>
     </message>
   </context>
   <context>
@@ -813,145 +837,6 @@
     </message>
   </context>
   <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>毫秒</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>分</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>时</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>日</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>周</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>分</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>年</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>毫秒</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>秒</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>分</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>时</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>天</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>周</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>月</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>年</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>毫秒</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>秒</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>分</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>时</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>天</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>周</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>月</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>年</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
@@ -982,15 +867,15 @@
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>高级操作员</translation>
+      <translation>高级浏览者</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>操作员</translation>
+      <translation>浏览者</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>实时操作员</translation>
+      <translation>实时浏览者</translation>
     </message>
     <message>
       <source>Custom Role</source>
@@ -1495,6 +1380,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 在 %2</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>打开视窗</translation>
     </message>
   </context>
   <context>

@@ -49,8 +49,11 @@ public:
     void changeCloudOwnerAccountPassword();
     void switchToDefaultCredentials();
     void waitForCloudDataSynchronizedToTheMediaServer();
-    ::ec2::ApiUserData inviteRandomCloudUser();
+    nx::vms::api::UserData inviteRandomCloudUser();
     void waitForUserToAppearInCloud(const std::string& email);
+
+protected:
+    virtual void SetUp() override;
 
 private:
     nx::cdb::CdbLauncher m_cdb;
@@ -64,6 +67,5 @@ private:
     std::string m_cloudSystemId;
     std::string m_cloudSystemAuthKey;
 
-    void init();
     std::unique_ptr<MediaServerClient> allocateMediaServerClient();
 };

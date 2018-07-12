@@ -17,6 +17,7 @@
 #include <nx/utils/std/future.h>
 
 #include "aio_event_handler.h"
+#include "basic_pollable.h"
 #include "../abstract_socket.h"
 #include "../address_resolver.h"
 #include "../socket_global.h"
@@ -95,7 +96,8 @@ public:
         m_registerTimerCallCounter(0),
         m_asyncSendIssued(false),
         m_addressResolverIsInUse(false),
-        m_ipVersion(_ipVersion)
+        m_ipVersion(_ipVersion),
+        m_resolveResultScheduler(_socket->getAioThread())
     {
         NX_ASSERT(this->m_socket);
     }
@@ -117,6 +119,7 @@ public:
         if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
         {
             stopPollingSocket(aio::etNone);
+            this->m_aioService->cancelPostedCalls(this->m_socket);
         }
         else
         {
@@ -139,6 +142,11 @@ public:
         }
     }
 
+    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    {
+        m_resolveResultScheduler.bindToAioThread(aioThread);
+    }
+
     void resolve(
         const HostAddress& address,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> handler)
@@ -147,7 +155,7 @@ public:
         m_addressResolver->resolveAsync(
             address.toString(),
             [this, handler = std::move(handler)](
-                SystemError::ErrorCode code, std::deque<AddressEntry> addresses)
+                SystemError::ErrorCode code, std::deque<AddressEntry> addresses) mutable
             {
                 std::deque<HostAddress> ips;
                 std::transform(
@@ -155,7 +163,12 @@ public:
                     std::back_inserter(ips),
                     [](AddressEntry& addressEntry) { return std::move(addressEntry.host); });
                 m_addressResolverIsInUse = false;
-                handler(code, std::move(ips));
+
+                this->m_resolveResultScheduler.dispatch(
+                    [handler = std::move(handler), code, ips = std::move(ips)]() mutable
+                    {
+                        handler(code, std::move(ips));
+                    });
             },
             NatTraversalSupport::disabled,
             m_ipVersion,
@@ -176,7 +189,10 @@ public:
                 SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
             {
                 if (code != SystemError::noError)
-                    return this->post([h = std::move(handler), code]() { h(code); });
+                {
+                    return this->m_resolveResultScheduler.post(
+                        [h = std::move(handler), code]() { h(code); });
+                }
 
                 connectToIpsAsync(std::move(ips), port, std::move(handler));
             });
@@ -223,7 +239,7 @@ public:
 #endif
             )
         {
-            this->post(
+            this->m_resolveResultScheduler.post(
                 [handler = std::move(handler),
                     errorCode = SystemError::getLastOSErrorCode()]() mutable
                 {
@@ -238,7 +254,7 @@ public:
         m_connectHandler = std::move(handler);
         if (!startAsyncConnect(addr))
         {
-            this->post(
+            this->m_resolveResultScheduler.post(
                 [handler = std::move(m_connectHandler),
                     code = SystemError::getLastOSErrorCode()]() mutable
                 {
@@ -312,29 +328,6 @@ public:
             timeoutMs);
     }
 
-    void cancelIOAsync(
-        const aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> handler )
-    {
-        auto cancelImpl =
-            [this, eventType, handler = move(handler)]() mutable
-            {
-                // cancelIOSync will be instant from socket's IO thread.
-                this->m_aioService->dispatch(
-                    this->m_socket,
-                    [this, eventType, handler = move(handler)]() mutable
-                    {
-                        cancelAsyncIOWhileInAioThread(eventType);
-                        handler();
-                    });
-            };
-
-        if (eventType == aio::etWrite || eventType == aio::etNone)
-            m_addressResolver->cancel(this);
-
-        cancelImpl();
-    }
-
     void cancelIOSync(aio::EventType eventType)
     {
         if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
@@ -345,8 +338,15 @@ public:
         else
         {
             NX_EXPECT(!this->m_aioService->isInAnyAioThread());
-            nx::utils::promise< bool > promise;
-            cancelIOAsync(eventType, [&]() { promise.set_value(true); });
+
+            nx::utils::promise<void> promise;
+            this->m_aioService->post(
+                this->m_socket,
+                [this, eventType, &promise]()
+                {
+                    cancelAsyncIOWhileInAioThread(eventType);
+                    promise.set_value();
+                });
             promise.get_future().wait();
         }
     }
@@ -392,6 +392,8 @@ private:
     nx::utils::ObjectDestructionFlag m_socketDestroyedDuringEventHandlingFlag;
     nx::utils::ObjectDestructionFlag m_socketDestroyedInUserHandlerFlag;
 
+    BasicPollable m_resolveResultScheduler;
+
     bool isNonBlockingMode() const
     {
         bool value;
@@ -435,7 +437,7 @@ private:
             }
             else
             {
-                NX_CRITICAL(false);
+                NX_CRITICAL(false, lm("Unexpected value: 0b%1").arg(static_cast<int>(eventType), 0, 2));
             }
         }
         catch (const std::exception& e)
@@ -715,20 +717,17 @@ private:
     {
         m_addressResolver->cancel(this); //< TODO: #ak Must not block here!
 
-        if (eventType == aio::etNone)
-            this->m_aioService->cancelPostedCalls(this->m_socket, true);
-
         if (eventType == aio::etNone || eventType == aio::etRead)
         {
-            this->m_aioService->stopMonitoring(
-                this->m_socket, aio::etRead, true);
+            this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
             m_recvHandler = nullptr;
         }
 
         if (eventType == aio::etNone || eventType == aio::etWrite)
         {
-            this->m_aioService->stopMonitoring(
-                this->m_socket, aio::etWrite, true);
+            // Cancelling dispatch call in resolve handler.
+            this->m_resolveResultScheduler.cancelPostedCallsSync();
+            this->m_aioService->stopMonitoring(this->m_socket, aio::etWrite);
             m_connectHandler = nullptr;
             m_sendHandler = nullptr;
             m_asyncSendIssued = false;
@@ -736,8 +735,7 @@ private:
 
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
         {
-            this->m_aioService->stopMonitoring(
-                this->m_socket, aio::etTimedOut, true);
+            this->m_aioService->stopMonitoring(this->m_socket, aio::etTimedOut);
             m_timerHandler = nullptr;
         }
     }
@@ -790,7 +788,9 @@ public:
                 {
                     SystemError::ErrorCode errorCode = SystemError::noError;
                     sock->getLastError(&errorCode);
-                    reportAcceptResult(errorCode, nullptr);
+                    reportAcceptResult(
+                        errorCode != SystemError::noError ? errorCode : SystemError::invalidData,
+                        nullptr);
                     break;
                 }
 
@@ -825,33 +825,30 @@ public:
             this->m_socket, aio::etRead, this);
     }
 
-    void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
-    {
-        this->m_aioService->dispatch(
-            this->m_socket,
-            [this, handler = move(handler)]() mutable
-            {
-                this->m_aioService->stopMonitoring(
-                    this->m_socket, aio::etRead, true);
-
-                ++m_acceptAsyncCallCount;
-                handler();
-            });
-    }
-
     void cancelIOSync()
     {
-        // TODO: #ak Promise is not needed if we are already in aio thread.
-        nx::utils::promise< bool > promise;
-        cancelIOAsync([&promise]() { promise.set_value(true); });
-        promise.get_future().wait();
+        if (this->m_socket->impl()->aioThread.load() == QThread::currentThread())
+        {
+            this->cancelIoWhileInAioThread();
+        }
+        else
+        {
+            nx::utils::promise<void> promise;
+            this->post(
+                [this, &promise]()
+                {
+                    this->cancelIoWhileInAioThread();
+                    promise.set_value();
+                });
+            promise.get_future().wait();
+        }
     }
 
     void stopPolling()
     {
-        this->m_aioService->cancelPostedCalls(this->m_socket, true);
-        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead, true);
-        this->m_aioService->stopMonitoring(this->m_socket, aio::etTimedOut, true);
+        this->m_aioService->cancelPostedCalls(this->m_socket);
+        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
+        this->m_aioService->stopMonitoring(this->m_socket, aio::etTimedOut);
     }
 
 private:
@@ -859,6 +856,12 @@ private:
     std::atomic<int> m_acceptAsyncCallCount;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     QnMutex m_mutex;
+
+    void cancelIoWhileInAioThread()
+    {
+        this->m_aioService->stopMonitoring(this->m_socket, aio::etRead);
+        ++m_acceptAsyncCallCount;
+    }
 
     void reportAcceptResult(
         SystemError::ErrorCode errorCode,

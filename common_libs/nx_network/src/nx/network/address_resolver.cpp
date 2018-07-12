@@ -1,6 +1,5 @@
 #include "address_resolver.h"
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/utils/std/future.h>
@@ -38,24 +37,7 @@ void AddressResolver::addFixedAddress(
     NX_VERBOSE(this, lm("Added fixed address for %1: %2").args(hostName, endpoint));
 
     const AddressEntry entry(endpoint);
-    m_predefinedHostResolver->addMapping(hostName.toString(), {endpoint});
-
-    QnMutexLocker lk(&m_mutex);
-    auto& entries = m_info.emplace(
-        hostName,
-        HostAddressInfo(isCloudHostName(&lk, hostName.toString())))
-            .first->second.fixedEntries;
-
-    const auto it = std::find(entries.begin(), entries.end(), entry);
-    if (it == entries.end())
-    {
-        NX_LOGX(lm("New fixed address for %1: %2").args(hostName, endpoint), cl_logDEBUG1);
-        entries.push_back(std::move(entry));
-
-        // we possibly could also grabHandlers() to bring the result before DNS
-        // is resolved (if in progress), but it does not cause a serious delay
-        // so far
-    }
+    m_predefinedHostResolver->addMapping(hostName.toStdString(), {endpoint});
 }
 
 void AddressResolver::removeFixedAddress(
@@ -63,29 +45,10 @@ void AddressResolver::removeFixedAddress(
 {
     NX_VERBOSE(this, lm("Removed fixed address for %1: %2").args(hostName, endpoint));
 
-    m_predefinedHostResolver->removeMapping(hostName.toString());
-
-    QnMutexLocker lk(&m_mutex);
-    const auto record = m_info.find(hostName);
-    if (record == m_info.end())
-        return;
-
-    auto& entries = record->second.fixedEntries;
     if (endpoint)
-    {
-        AddressEntry entry(*endpoint);
-        const auto it = std::find(entries.begin(), entries.end(), entry);
-        if (it != entries.end())
-        {
-            NX_LOGX(lm("Removed fixed address for %1: %2").args(hostName, endpoint), cl_logDEBUG1);
-            entries.erase(it);
-        }
-    }
+        m_predefinedHostResolver->removeMapping(hostName.toStdString(), {*endpoint});
     else
-    {
-        NX_LOGX(lm("Removed all fixed address for %1").args(hostName), cl_logDEBUG1);
-        entries.clear();
-    }
+        m_predefinedHostResolver->removeMapping(hostName.toStdString());
 }
 
 void AddressResolver::resolveAsync(
@@ -97,9 +60,9 @@ void AddressResolver::resolveAsync(
 {
     if (hostName.isIpAddress())
     {
-        return handler(
-            SystemError::noError,
-            std::deque<AddressEntry>({{ AddressEntry(AddressType::direct, hostName) }}));
+        std::deque<AddressEntry> result;
+        result.push_back(AddressEntry(AddressType::direct, hostName));
+        return handler(SystemError::noError, std::move(result));
     }
 
     if (SocketGlobals::ini().isHostDisabled(hostName))
@@ -111,10 +74,9 @@ void AddressResolver::resolveAsync(
 
     QnMutexLocker lk(&m_mutex);
     auto info = m_info.emplace(
-        hostName,
+        std::make_tuple(ipVersion, hostName),
         HostAddressInfo(isCloudHostName(&lk, hostName.toString()))).first;
     info->second.checkExpirations();
-    tryFastDomainResolve(info);
     if (info->second.isResolved(natTraversalSupport))
     {
         auto entries = info->second.getAll();
@@ -141,7 +103,7 @@ void AddressResolver::resolveAsync(
     m_requests.insert(
         std::make_pair(
             requestId,
-            RequestInfo(info->first, natTraversalSupport, std::move(handler))));
+            RequestInfo(std::get<1>(info->first), natTraversalSupport, std::move(handler))));
 
     NX_VERBOSE(this, lm("Address %1 will be resolved later by request %2").args(hostName, requestId));
     if (info->second.isLikelyCloudAddress && natTraversalSupport == NatTraversalSupport::enabled)
@@ -351,24 +313,11 @@ bool AddressResolver::resolveNonBlocking(
     return false;
 }
 
-void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
-{
-    const auto domain = info->first.toString();
-    if (domain.indexOf(lit(".")) != -1)
-        return; // only top level domains might be fast resolved
-
-    iterateSubdomains(
-        domain, [&](HaInfoIterator other)
-        {
-            info->second.fixedEntries = other->second.fixedEntries;
-            return true; // just resolve to first avaliable
-        });
-}
-
 void AddressResolver::dnsResolve(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion)
 {
-    NX_LOGX(lm("dnsResolve. %1. %2").arg(info->first).arg((int)info->second.dnsState()), cl_logDEBUG2);
+    NX_LOGX(lm("dnsResolve. %1. %2")
+        .arg(std::get<1>(info->first)).arg((int)info->second.dnsState()), cl_logDEBUG2);
 
     switch (info->second.dnsState())
     {
@@ -381,12 +330,12 @@ void AddressResolver::dnsResolve(
             break; // continue
     }
 
-    NX_LOGX(lm("dnsResolve async. %1").arg(info->first), cl_logDEBUG2);
+    NX_LOGX(lm("dnsResolve async. %1").arg(std::get<1>(info->first)), cl_logDEBUG2);
 
     info->second.dnsProgress();
     QnMutexUnlocker ulk(lk);
     m_dnsResolver.resolveAsync(
-        info->first.toString(),
+        std::get<1>(info->first).toString(),
         [this, info, needMediator, ipVersion](
             SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
@@ -403,7 +352,7 @@ void AddressResolver::dnsResolve(
             }
 
             NX_VERBOSE(this, lm("Address %1 is resolved by DNS to %2")
-                .arg(info->first).container(entries));
+                .arg(std::get<1>(info->first)).container(entries));
 
             info->second.setDnsEntries(std::move(entries));
             guards = grabHandlers(code, info);
@@ -432,7 +381,7 @@ void AddressResolver::mediatorResolve(
     SystemError::ErrorCode resolveResult = SystemError::notImplemented;
     if (info->second.isLikelyCloudAddress && isCloudResolveEnabled())
     {
-        info->second.setMediatorEntries({AddressEntry(AddressType::cloud, info->first)});
+        info->second.setMediatorEntries({AddressEntry(AddressType::cloud, std::get<1>(info->first))});
         resolveResult = SystemError::noError;
     }
     else
@@ -466,7 +415,7 @@ std::vector<Guard> AddressResolver::grabHandlers(
         bool noPending = (range.first == range.second);
         for (auto it = range.first; it != range.second; ++it)
         {
-            if (it->second.address != info->first ||
+            if (it->second.address != std::get<1>(info->first) ||
                 it->second.inProgress ||
                 !info->second.isResolved(it->second.natTraversalSupport))
             {
@@ -484,7 +433,7 @@ std::vector<Guard> AddressResolver::grabHandlers(
 
                     QnMutexLocker lk(&m_mutex);
                     NX_VERBOSE(this, lm("Address %1 is resolved by request %2 to %3")
-                        .args(info->first, it->first).container(entries));
+                        .args(std::get<1>(info->first), it->first).container(entries));
 
                     guard = std::move(it->second.guard);
                     m_requests.erase(it);
@@ -501,7 +450,7 @@ std::vector<Guard> AddressResolver::grabHandlers(
     if (guards.size())
     {
         NX_VERBOSE(this, lm("There is(are) %1 about to be notified: %2 is resolved to %3")
-            .args(guards.size(), info->first).container(entries));
+            .args(guards.size(), std::get<1>(info->first)).container(entries));
     }
 
     return guards;

@@ -9,13 +9,13 @@
 
     <alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></alert>
 
-    <alert type="info" ng-if="connecting">Connecting system to... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
-        This may last about a minute.</alert>
+    <alert type="info" ng-if="connecting">Подключение системы к... <span class="product-name">{{Config.cloud.productName}}</span> ... <br>
+        Это может занять около минуты.</alert>
 
     <form name="cloudForm" disable-autocomplete>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control" ng-readonly="!connect"
-                   type="email" placeholder="Email для облака" required auto-focus autocomplete="new-password">
+                   type="email" placeholder="Email для облака" required auto-focus autocomplete="new-password" validate-email>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"

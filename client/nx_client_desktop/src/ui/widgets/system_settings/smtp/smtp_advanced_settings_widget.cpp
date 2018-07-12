@@ -4,23 +4,25 @@
 #include <QtCore/QScopedValueRollback>
 
 #include <ui/common/read_only.h>
-#include <ui/common/aligner.h>
-#include <ui/utils/validators.h>
+#include <nx/client/desktop/common/utils/aligner.h>
+#include <nx/client/desktop/common/utils/validators.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 
+using namespace nx::client::desktop;
+
 namespace {
+
 QList<QnEmail::ConnectionType> connectionTypesAllowed()
 {
     return QList<QnEmail::ConnectionType>()
-        << QnEmail::Unsecure
-        << QnEmail::Ssl
-        << QnEmail::Tls;
+        << QnEmail::ConnectionType::unsecure
+        << QnEmail::ConnectionType::ssl
+        << QnEmail::ConnectionType::tls;
 }
-
 
 class QnPortNumberValidator : public QIntValidator
 {
@@ -66,10 +68,10 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
     ui->setupUi(this);
 
     ui->emailInputField->setTitle(tr("Email"));
-    ui->emailInputField->setValidator(Qn::defaultEmailValidator());
+    ui->emailInputField->setValidator(defaultEmailValidator());
 
     ui->serverInputField->setTitle(tr("SMTP Server"));
-    ui->serverInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Server cannot be empty.")));
+    ui->serverInputField->setValidator(defaultNonEmptyValidator(tr("Server cannot be empty.")));
 
     ui->userInputField->setTitle(tr("User"));
     ui->passwordInputField->setTitle(tr("Password"));
@@ -90,8 +92,8 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
     }
     ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
 
-    QnAligner* aligner = new QnAligner(this);
-    aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    Aligner* aligner = new Aligner(this);
+    aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());
 
     for (auto field : {
         ui->emailInputField,
@@ -101,7 +103,7 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
         ui->signatureInputField,
         ui->supportInputField })
     {
-        connect(field, &QnInputField::textChanged, this, &QnSmtpAdvancedSettingsWidget::settingsChanged);
+        connect(field, &InputField::textChanged, this, &QnSmtpAdvancedSettingsWidget::settingsChanged);
         aligner->addWidget(field);
     }
 
@@ -125,10 +127,10 @@ QnEmailSettings QnSmtpAdvancedSettingsWidget::settings() const
     result.user = ui->userInputField->text();
     result.password = ui->passwordInputField->text();
     result.connectionType = ui->tlsRadioButton->isChecked()
-        ? QnEmail::Tls
+        ? QnEmail::ConnectionType::tls
         : ui->sslRadioButton->isChecked()
-        ? QnEmail::Ssl
-        : QnEmail::Unsecure;
+        ? QnEmail::ConnectionType::ssl
+        : QnEmail::ConnectionType::unsecure;
     result.simple = false;
     result.signature = ui->signatureInputField->text();
     result.supportEmail = ui->supportInputField->text();
@@ -189,10 +191,10 @@ void QnSmtpAdvancedSettingsWidget::setConnectionType(QnEmail::ConnectionType con
 
     switch (connectionType)
     {
-        case QnEmail::Tls:
+        case QnEmail::ConnectionType::tls:
             ui->tlsRadioButton->setChecked(true);
             break;
-        case QnEmail::Ssl:
+        case QnEmail::ConnectionType::ssl:
             ui->sslRadioButton->setChecked(true);
             break;
         default:
@@ -207,7 +209,7 @@ void QnSmtpAdvancedSettingsWidget::at_portComboBox_currentIndexChanged(int index
         return;
 
     int port = ui->portComboBox->itemData(index).toInt();
-    if (port == QnEmailSettings::defaultPort(QnEmail::Ssl))
+    if (port == QnEmailSettings::defaultPort(QnEmail::ConnectionType::ssl))
     {
         ui->tlsRecommendedLabel->hide();
         ui->sslRecommendedLabel->show();

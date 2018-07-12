@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>Tên ngôn ngữ</translation>
+      <translation>Tiếng Việt</translation>
     </message>
   </context>
   <context>
@@ -53,11 +53,6 @@
       <translation>Hệ thống đã phát hiện %1 có phiên bản không tương thích %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Không thể kết nối với Hệ thống khác vì hiện tại Hệ thống đã được kết nối với %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Hệ thống đã phát hiện %1 đang ở chế độ an toàn.</translation>
@@ -68,21 +63,6 @@
       <translation>Không thể định cấu hình Hệ thống từ xa %1.</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cả hai Hệ thống đều được kết nối với %1. Hợp nhất không được phép.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Các Hệ thống này được xây dựng với URL %1 khác nhau. Hợp nhất không được phép.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Hệ thống điện toán đám mây chỉ có thể được hợp nhất với hệ thống không sử dụng điện toán đám mây. Tên và mật khẩu hệ thống được lấy từ hệ thống điện toán đám mây.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Hệ thống mới</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>Phát hiện %1 lỗi không tương thích với hệ thống hiện tại.</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Không thể kết nối với Hệ thống khác vì hiện tại Hệ thống đã được kết nối với %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Hệ thống điện toán %1 chỉ có thể được hợp nhất với hệ thống không sử dụng điện toán %1. Tên và mật khẩu hệ thống được lấy từ hệ thống điện toán %1.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Cả hai Hệ thống đều được kết nối với %1. Hợp nhất không được phép.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Các Hệ thống này được xây dựng với URL %1 khác nhau. Hợp nhất không được phép.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Sự kiện hệ thống</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation type="unfinished">System already bound to cloud (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation type="unfinished">Server is not connected to the Internet.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation type="unfinished">Failed to save cloud credentials to local DB</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation type="unfinished">Failed to save cloud owner to local DB</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation type="unfinished">Could not connect to cloud: %1</translation>
     </message>
   </context>
   <context>
@@ -313,6 +333,10 @@
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của module I/O (lỗi &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Vui lòng cập nhật firmware. Phiên bản được hỗ trợ tối thiểu là %1. Phiên bản hiện tại là %2</translation>
     </message>
   </context>
   <context>
@@ -553,8 +577,8 @@
       <translation>Lỗi không xác định</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Không tìm thấy Máy chủ với Id phần cứng phù hợp</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Không tìm thấy Máy chủ với ID phần cứng phù hợp</translation>
     </message>
   </context>
   <context>
@@ -670,12 +694,12 @@
       <translation>Hình mờ: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>Id Phần cứng: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Bản quyền theo thời gian</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID Phần cứng: %1</translation>
     </message>
   </context>
   <context>
@@ -810,145 +834,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>Lập luận không hợp lệ</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>giây</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>phút</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>giờ</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>ngày</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>tuần</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>tháng</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>năm</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>mili giây</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>giây</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>phút</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>giờ</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>ngày</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>tuần</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>tháng</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>năm</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1495,6 +1380,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 đến %2</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation type="unfinished">Open layout</translation>
     </message>
   </context>
   <context>

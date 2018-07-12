@@ -24,6 +24,8 @@ public:
 
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
 
+    virtual CameraDiagnostics::Result lastError() const override;
+
 private:
     qint64 m_currentPos;
     qint64 m_rangeStart;

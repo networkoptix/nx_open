@@ -6,6 +6,7 @@
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include <core/resource/test_camera/testcamera_const.h>
+#include <nx/utils/log/log.h>
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 
@@ -60,7 +61,6 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
         sendBroadcast();
         QnSleep::msleep(1000);
     }
-
 
     QSet<QHostAddress> foundDevSet; // to avoid duplicates
     QMap<QString, QnResourcePtr> resources;
@@ -126,8 +126,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourc
 
     if (resourceType.isNull())
     {
-        qDebug() << "No resource type for ID = " << resourceTypeId;
-
+        NX_WARNING(this, lm("No resource type for id: %1").arg(resourceTypeId));
         return result;
     }
 
@@ -140,9 +139,7 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnUuid &resourc
     result = QnVirtualCameraResourcePtr( new QnTestCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create test camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
-    //result->deserialize(parameters);
-
+    NX_DEBUG(this, lm("Create test camera resource, type id: %1").arg(resourceTypeId));
     return result;
 
 }
@@ -152,13 +149,12 @@ QString QnTestCameraResourceSearcher::manufacture() const
     return QLatin1String(QnTestCameraResource::kManufacturer);
 }
 
-QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool isSearchAction)
+QList<QnResourcePtr> QnTestCameraResourceSearcher::checkHostAddr(const nx::utils::Url& url,
+    const QAuthenticator& /*auth*/, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
-    Q_UNUSED(url)
-    Q_UNUSED(auth)
     return QList<QnResourcePtr>();
 }
 

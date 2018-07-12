@@ -61,26 +61,32 @@ The included `Stub Metadata Plugin` source files can be compiled and linked usin
 Prerequisites:
 ```
 CMake >= 3.3.2
-Windows: Microsoft Visual Studio >= 12
-Linux: gcc >= 4.8.4, make or Ninja (recommended)
+Windows: Microsoft Visual Studio >= 2015
+Linux (including Nvidia Tegra native compiling): gcc >= 7.3, make or Ninja (recommended)
+Nvidia Tegra cross-compiling: sysroot, arm-64 gcc >= 7.3 (e.g. Linaro), make or Ninja (recommended)
 ```
 
 First, create a build directory at any convenient location:
 ```
-mkdir .../build
-cd .../build
+mkdir .../metadata_sdk-build
+cd .../metadata_sdk-build
 ```
 
 Then, generate build system files (they depend on the platform and chosen build tool) via CMake:
 ```
 # Windows - generating .vcxproj and .sln:
-cmake ...\nx_metadata_sdk\samples\stub_metadata_plugin -Ax64
+cmake ...\metadata_sdk\samples\stub_metadata_plugin -Ax64
 
 # Linux - generating Ninja files:
-cmake .../nx_metadata_sdk/samples/stub_metadata_plugin -GNinja
+cmake .../metadata_sdk/samples/stub_metadata_plugin -GNinja
 
 # Linux - generating makefiles:
-cmake .../nx_metadata_sdk/samples/stub_metadata_plugin
+cmake .../metadata_sdk/samples/stub_metadata_plugin
+
+# Nvidia Tegra cross-compiling (64-bit ARM) - generating Ninja files:
+# NOTE: Specify SYSROOT_DIR and TOOLCHAIN_DIR (e.g. Linaro 7) in nvidia_tegra_toolchain.cmake.
+cmake .../metadata_sdk/samples/stub_metadata_plugin -GNinja \
+    -DCMAKE_TOOLCHAIN_FILE=.../nvidia_tegra_toolchain.cmake
 ```
 
 Finally, compile and link the library:
@@ -95,19 +101,23 @@ cmake --build .
 Locate the main built artifact:
 ```
 # Windows:
-...\build\Debug\stub_metadata_plugin.dll
+...\metadata_sdk-build\Debug\stub_metadata_plugin.dll
 
 # Linux:
-.../build/libstub_metadata_plugin.so
+.../metadata_sdk-build/libstub_metadata_plugin.so
 ```
 
 The above steps are automated in the provided scripts:
 ```
 # Windows:
-...\nx_metadata_sdk\build_sample.bat
+...\metadata_sdk\build_sample.bat
 
 # Linux or Windows with Cygwin:
-.../nx_metadata_sdk/build_sample.sh
+.../metadata_sdk/build_sample.sh
+
+# Nvidia Tegra cross-compiling (64-bit ARM):
+# NOTE: Specify SYSROOT_DIR and TOOLCHAIN_DIR (e.g. Linaro 7) in nvidia_tegra_toolchain.cmake.
+.../metadata_sdk/build_sample_nvidia_tegra.sh
 ```
 
 To install the plugin, just copy its library file to the dedicated folder in the Nx Witness

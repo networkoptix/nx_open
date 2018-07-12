@@ -17,33 +17,38 @@ struct ImageRequest
      */
     enum class RoundMethod
     {
-        iFrameBefore,   //< Get the thumbnail from the nearest keyframe before the given time.
-        precise,        //< Get the thumbnail as near to given time as possible.
-        iFrameAfter,    //< Get the thumbnail from the nearest keyframe after the given time.
+        /** Get the thumbnail from the nearest keyframe before the given time. */
+        iFrameBefore,
+
+        /** Get the thumbnail as near to given time as possible. */
+        precise,
+
+        /** Get the thumbnail from the nearest keyframe after the given time. */
+        iFrameAfter,
     };
 
     enum class ThumbnailFormat
     {
         png,
         jpg,
-        tiff,
-        raw, //< Raw video frame. Makes the request much more lightweight for Edge servers.
+        tif,
+        raw, /**< Raw video frame. Makes the request much more lightweight for Edge servers. */
     };
 
     enum class AspectRatio
     {
-        custom, //< Resize to camera's custom aspect ratio (if set).
-        source, //< Use actual image aspect ratio.
+        auto_, /**< Use aspect ratio from camera settings (if any). */
+        source, /**< Use actual image aspect ratio. */
     };
 
     static const qint64 kLatestThumbnail = -1;
     static const int kDefaultRotation = -1;
 
     /**
-     * Timestamp of the image. A negative value means "latest" Can have the special value
+     * Timestamp of the image. A negative value means "latest". Can have the special value
      * DATETIME_NOW.
      */
-    qint64 msecSinceEpoch = kLatestThumbnail;
+    qint64 usecSinceEpoch = kLatestThumbnail;
 
     /** Forced rotation. Negative value means take default rotation from the camera settings. */
     int rotation = kDefaultRotation;
@@ -60,7 +65,7 @@ struct ImageRequest
     /** Method of rounding, influences the precision. Round after is better for most situations. */
     RoundMethod roundMethod = RoundMethod::iFrameAfter;
 
-    AspectRatio aspectRatio = AspectRatio::custom;
+    AspectRatio aspectRatio = AspectRatio::auto_;
 };
 
 struct ResourceImageRequest: ImageRequest
@@ -87,12 +92,23 @@ struct CameraImageRequest: ImageRequest
     static const int kMaximumSize = 4096;
 };
 
+inline QString toString(ImageRequest::RoundMethod value)
+{
+    switch (value)
+    {
+        case ImageRequest::RoundMethod::iFrameBefore: return lit("iFrameBefore");
+        case ImageRequest::RoundMethod::precise: return lit("precise");
+        case ImageRequest::RoundMethod::iFrameAfter: return lit("iFrameAfter");
+        default: return lit("RoundMethod::UNKNOWN");
+    }
+}
+
 } // namespace api
 } // namespace nx
 
 #define QN_THUMBNAIL_ENUM_TYPES \
-    (nx::api::ImageRequest::RoundMethod)\
-    (nx::api::ImageRequest::ThumbnailFormat)\
-    (nx::api::ImageRequest::AspectRatio)\
+    (nx::api::ImageRequest::RoundMethod) \
+    (nx::api::ImageRequest::ThumbnailFormat) \
+    (nx::api::ImageRequest::AspectRatio) \
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_THUMBNAIL_ENUM_TYPES, (lexical))

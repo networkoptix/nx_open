@@ -55,6 +55,7 @@ protected:
 
 private:
     void setShowButtonUsed(bool used);
+    void setShowButtonIcon();
     void updateResizerGeometry();
     void updateControlsGeometry();
     void updatePaneWidth(qreal desiredWidth);
@@ -65,12 +66,12 @@ private:
     void at_selectNewItemAction_triggered();
 
 private:
-    bool m_ignoreClickEvent;
-    bool m_visible;
+    bool m_visible = false;
+    bool m_opened = false;
 
     /** We are currently in the resize process. */
-    bool m_resizing;
-    bool m_updateResizerGeometryLater;
+    bool m_resizing = false;
+    bool m_updateResizerGeometryLater = false;
 
     bool m_inSelection = false;
 
@@ -81,9 +82,6 @@ private:
 
     /** Button to show/hide the tree. */
     QnImageButtonWidget* m_showButton;
-
-    /** Button to pin the tree. */
-    QnImageButtonWidget* m_pinButton;
 
     /** Hover processor that is used to hide the panel when the mouse leaves it. */
     HoverFocusProcessor* m_hidingProcessor;

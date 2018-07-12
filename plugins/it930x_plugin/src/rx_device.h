@@ -8,7 +8,7 @@
 
 #include "it930x.h"
 #include "dev_reader.h"
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 namespace nxcip
 {

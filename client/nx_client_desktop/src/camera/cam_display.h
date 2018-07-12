@@ -119,8 +119,8 @@ public:
     int getAvarageFps() const;
     virtual bool isBuffering() const override;
 
-    qreal overridenAspectRatio() const;
-    void setOverridenAspectRatio(qreal aspectRatio);
+    QnAspectRatio overridenAspectRatio() const;
+    void setOverridenAspectRatio(QnAspectRatio aspectRatio);
 
     const QSize& getRawDataSize() const {
         return m_display[0]->getRawDataSize();
@@ -194,8 +194,15 @@ private:
     bool needBuffering(qint64 vTime) const;
     void processSkippingFramesTime();
     qint64 doSmartSleep(const qint64 needToSleep, float speed);
-    bool fillDataQueue();
-    bool isDataQueueFilled() const;
+
+    bool isDataQueueFull() const;
+
+    enum class QueueSizeType
+    {
+        normalStream,
+        slowStream
+    };
+    int maxDataQueueSize(QueueSizeType type) const;
 
     static qint64 initialLiveBufferMkSecs();
     static qint64 maximumLiveBufferMkSecs();
@@ -205,7 +212,7 @@ private:
         qint64 timestampUs,
         QnAbstractStreamDataProvider* dataProvider,
         QnAbstractMediaData::MediaFlags flags);
-
+    bool useRealTimeHurryUp() const;
     void processMetadata(const QnAbstractCompressedMetadataPtr& metadata);
 
 protected:
@@ -286,7 +293,7 @@ protected:
     bool m_fisheyeEnabled;
     int m_channelsCount;
 
-    std::chrono::milliseconds m_forcedVideoBufferLength = std::chrono::milliseconds::zero();
+    std::chrono::microseconds m_forcedVideoBufferLength = std::chrono::microseconds::zero();
     qint64 m_lastQueuedVideoTime;
     int m_liveBufferSize;
     bool m_liveMaxLenReached;

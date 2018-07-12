@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include <nx/utils/log/log.h>
+
 #include <common/static_common_module.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -12,7 +14,6 @@
 #include <network/system_helpers.h>
 
 #include <utils/merge_systems_tool.h>
-#include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 
@@ -20,20 +21,33 @@
 
 namespace {
 
-    using namespace std::chrono;
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
-    static const int kEmptyProgress = 0;
-    static const int kUpdateProgress = 50;
-    static const int kCompleteProgress = 100;
-    static const milliseconds kWaitTimeout = seconds(2);
+static const int kEmptyProgress = 0;
+static const int kUpdateProgress = 50;
+static const milliseconds kWaitTimeout = 2min;
+
+QnFakeMediaServerResourcePtr incompatibleServerForOriginalId(
+    const QnUuid& id, const QnResourcePool* resourcePool)
+{
+    for (const auto& server: resourcePool->getIncompatibleServers())
+    {
+        if (const auto& fakeServer = server.dynamicCast<QnFakeMediaServerResource>())
+        {
+            if (fakeServer->getOriginalGuid() == id)
+                return fakeServer;
+        }
+    }
+
+    return {};
+}
 
 } // namespace
 
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject* parent):
     base_type(parent),
-    QnSessionAwareDelegate(parent),
-    m_mergeTool(nullptr),
-    m_updateTool(nullptr)
+    QnSessionAwareDelegate(parent)
 {
 }
 
@@ -64,13 +78,8 @@ void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& 
     m_adminPassword = password;
     m_originalTargetId = server->getOriginalGuid();
 
-    if (auto fakeServer = server.dynamicCast<QnFakeMediaServerResource>())
-    {
-        QAuthenticator authenticator;
-        authenticator.setUser(helpers::kFactorySystemUser);
-        authenticator.setPassword(m_adminPassword);
-        fakeServer->setAuthenticator(authenticator);
-    }
+    NX_INFO(this, lm("Start connecting server %1 (id=%2, url=%3").args(
+        server->getName(), m_originalTargetId, server->getApiUrl()));
 
     updateServer();
 }
@@ -102,11 +111,16 @@ void QnConnectToCurrentSystemTool::cancel()
     }
 
     if (m_mergeTool || m_updateTool)
-        emit finished(Canceled);
+        finish(Canceled);
 }
 
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode)
 {
+    using nx::utils::log::Level;
+
+    NX_LOG(this, lm("Finished: %1").arg(errorCode),
+        errorCode == NoError ? Level::info : Level::error);
+
     emit finished(errorCode);
 }
 
@@ -117,7 +131,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
     m_mergeError = utils::MergeSystemsStatus::ok;
     m_mergeErrorMessage.clear();
 
-    const auto server = resourcePool()->getIncompatibleServerById(m_targetId, true);
+    const auto server = incompatibleServerForOriginalId(m_originalTargetId, resourcePool());
     if (!server)
     {
         const auto compatibleServer =
@@ -141,6 +155,8 @@ void QnConnectToCurrentSystemTool::mergeServer()
     auth.setUser(helpers::kFactorySystemUser);
     auth.setPassword(m_adminPassword);
 
+    NX_INFO(this, "Start server configuration.");
+
     emit progressChanged(0);
     emit stateChanged(tr("Configuring Server"));
 
@@ -149,7 +165,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
     connect(m_mergeTool, &QnMergeSystemsTool::mergeFinished, this,
         [this](
             utils::MergeSystemsStatus::Value mergeStatus,
-            const QnModuleInformation& moduleInformation)
+            const nx::vms::api::ModuleInformation& moduleInformation)
         {
             if (mergeStatus != utils::MergeSystemsStatus::ok)
             {
@@ -157,9 +173,14 @@ void QnConnectToCurrentSystemTool::mergeServer()
                 m_mergeError = mergeStatus;
                 m_mergeErrorMessage =
                     utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation);
+
+                NX_ERROR(this, lm("Server configuration failed: %1.").arg(m_mergeErrorMessage));
+
                 finish(MergeFailed);
                 return;
             }
+
+            NX_INFO(this, "Server configuration finished.");
 
             waitServer();
         });
@@ -190,13 +211,15 @@ void QnConnectToCurrentSystemTool::waitServer()
                 finishMerge(true);
         };
 
+    NX_INFO(this, "Start waiting server.");
+
     // Receiver object is m_mergeTool.
     // This helps us to break the connection when m_mergeTool is deleted in the cancel() method.
     connect(resourcePool(), &QnResourcePool::resourceAdded, m_mergeTool, handleResourceChanged);
     connect(resourcePool(), &QnResourcePool::statusChanged, m_mergeTool, handleResourceChanged);
 
     executeDelayedParented(
-        [this, finishMerge]()
+        [finishMerge]()
         {
             finishMerge(false);
         }, kWaitTimeout.count(), m_mergeTool);
@@ -217,6 +240,8 @@ void QnConnectToCurrentSystemTool::updateServer()
         return;
     }
 
+    NX_INFO(this, "Start server update.");
+
     emit stateChanged(tr("Updating Server"));
     emit progressChanged(kEmptyProgress);
 
@@ -228,13 +253,22 @@ void QnConnectToCurrentSystemTool::updateServer()
             m_updateTool->deleteLater();
             m_updateTool.clear();
 
+            if (const auto fakeServer = resourcePool()->getIncompatibleServerById(m_targetId)
+                .dynamicCast<QnFakeMediaServerResource>())
+            {
+                fakeServer->setAuthenticator(QAuthenticator());
+            }
+
             m_updateResult = result;
 
             if (result.result != QnUpdateResult::Successful)
             {
+                NX_ERROR(this, lm("Server update failed: %1.").arg(result.result));
                 finish(UpdateFailed);
                 return;
             }
+
+            NX_INFO(this, "Server update finished.");
 
             emit progressChanged(kUpdateProgress);
             mergeServer();
@@ -251,6 +285,14 @@ void QnConnectToCurrentSystemTool::updateServer()
     auto targetVersion = qnStaticCommon->engineVersion();
     if (const auto ecServer = commonModule()->currentServer())
         targetVersion = ecServer->getVersion();
+
+    if (auto fakeServer = server.dynamicCast<QnFakeMediaServerResource>())
+    {
+        QAuthenticator authenticator;
+        authenticator.setUser(helpers::kFactorySystemUser);
+        authenticator.setPassword(m_adminPassword);
+        fakeServer->setAuthenticator(authenticator);
+    }
 
     m_updateTool->setTargets({m_targetId});
     m_updateTool->startUpdate(targetVersion);

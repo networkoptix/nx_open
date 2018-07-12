@@ -225,7 +225,7 @@ QVariant FoundDevicesModel::headerData(
         case Columns::addressColumn:
             return tr("Address");
         case Columns::presentedStateColumn:
-            return tr("%1 devices total, %2 new ").arg(rowCount()).arg(newDevicesCount());
+            return tr("%1 devices total, %2 new").arg(rowCount()).arg(newDevicesCount());
         default:
             return QVariant();
     }

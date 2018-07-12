@@ -3,7 +3,7 @@
 
 #include <mutex>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 #include "ref_counter.h"
 

@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        帳號已建立. <br>確認訊息已傳送至 <br>{{account.email}}
+        帳號已新增. <br>確認訊息已發送至電子郵件 <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -9,7 +9,7 @@
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
-        <h1 ng-if="!session.fromClient">建立帳號</h1>
+        <h1 ng-if="!session.fromClient">新建帳號</h1>
 
         <!-- special hack to prevent autocompletion -->
         <input type="text" style="display:none">
@@ -49,18 +49,25 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">電子郵件是必需的</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">電子郵件為必填欄位</span></div>
 
-                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">請輸入有效的電子郵件.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">請輸入有效的 Email</span></div>
 
-                 <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">此電子郵件已註冊在 {{PRODUCT_NAME}}.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">此電子郵件已在 %PRODUCT_NAME% 中註冊</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> 訂閱電子郵件新聞</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        我同意<a href="/content/eula" target="_blank">條款和條件</a>和
+            <a href="%PRIVACY_LINK%" target="_blank">隱私政策</a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        請審閱並同意條款及條件和隱私政策, 以便繼續進行
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,7 +77,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note">透過點擊 "新建帳戶", 您將同意 <br> 至 <a href="/content/eula" target="_blank">條款及條件</a></small>
             </div>
         </div>
     </form>

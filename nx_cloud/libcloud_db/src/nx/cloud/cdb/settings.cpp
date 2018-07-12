@@ -67,6 +67,17 @@ const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chr
 const QLatin1String kOfflineUserHashValidityPeriod("auth/offlineUserHashValidityPeriod");
 const std::chrono::minutes kDefaultOfflineUserHashValidityPeriod = 14 * std::chrono::hours(24);
 
+const QLatin1String kCheckForExpiredAuthPeriod("auth/checkForExpiredAuthPeriod");
+constexpr std::chrono::milliseconds kDefaultCheckForExpiredAuthPeriod =
+    std::chrono::minutes(10);
+
+const QLatin1String kContinueUpdatingExpiredAuthPeriod("auth/continueUpdatingExpiredAuthPeriod");
+constexpr std::chrono::milliseconds kDefaultContinueUpdatingExpiredAuthPeriod =
+    std::chrono::minutes(1);
+
+const QLatin1String kMaxSystemsToUpdateAtATime("auth/maxSystemsToUpdateAtATime");
+constexpr int kDefaultMaxSystemsToUpdateAtATime = 11;
+
 //-------------------------------------------------------------------------------------------------
 // Event manager settings
 const QLatin1String kMediaServerConnectionIdlePeriod("eventManager/mediaServerConnectionIdlePeriod");
@@ -95,8 +106,25 @@ const QLatin1String kVmsGatewayUrl("vmsGateway/url");
 const QLatin1String kVmsGatewayRequestTimeout("vmsGateway/requestTimeout");
 const std::chrono::milliseconds kDefaultVmsGatewayRequestTimeout(std::chrono::seconds(21));
 
-} // namespace
+//-------------------------------------------------------------------------------------------------
+// LoginLockout
 
+const QLatin1String kLoginLockoutEnabled("loginLockout/enabled");
+constexpr bool kDefaultLoginLockoutEnabled = false;
+
+const QLatin1String kLoginLockoutCheckPeriod("loginLockout/checkPeriod");
+const std::chrono::milliseconds kDefaultLoginLockoutCheckPeriod =
+    nx::network::server::UserLockerSettings().checkPeriod;
+
+const QLatin1String kLoginLockoutAuthFailureCount("loginLockout/authFailureCount");
+constexpr int kDefaultLoginLockoutAuthFailureCount =
+    nx::network::server::UserLockerSettings().authFailureCount;
+
+const QLatin1String kLoginLockoutLockPeriod("loginLockout/lockPeriod");
+constexpr std::chrono::milliseconds kDefaultLoginLockoutLockPeriod =
+    nx::network::server::UserLockerSettings().lockPeriod;
+
+} // namespace
 
 namespace nx {
 namespace cdb {
@@ -106,7 +134,10 @@ Auth::Auth():
     rulesXmlPath(kDefaultAuthXmlPath),
     nonceValidityPeriod(kDefaultNonceValidityPeriod),
     intermediateResponseValidityPeriod(kDefaultIntermediateResponseValidityPeriod),
-    offlineUserHashValidityPeriod(kDefaultOfflineUserHashValidityPeriod)
+    offlineUserHashValidityPeriod(kDefaultOfflineUserHashValidityPeriod),
+    checkForExpiredAuthPeriod(),
+    continueUpdatingExpiredAuthPeriod(),
+    maxSystemsToUpdateAtATime()
 {
 }
 
@@ -156,7 +187,7 @@ Settings::Settings():
         QnLibCloudDbAppInfo::applicationName(),
         kModuleName)
 {
-    m_dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::mysql;
+    m_dbConnectionOptions.driverType = nx::sql::RdbmsDriverType::mysql;
     m_dbConnectionOptions.hostName = "127.0.0.1";
     m_dbConnectionOptions.port = 3306;
     m_dbConnectionOptions.dbName = "nx_cloud";
@@ -194,7 +225,7 @@ const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
     return m_vmsSynchronizationLogging;
 }
 
-const nx::utils::db::ConnectionOptions& Settings::dbConnectionOptions() const
+const nx::sql::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
 }
@@ -202,6 +233,11 @@ const nx::utils::db::ConnectionOptions& Settings::dbConnectionOptions() const
 const Auth& Settings::auth() const
 {
     return m_auth;
+}
+
+std::optional<network::server::UserLockerSettings> Settings::loginLockout() const
+{
+    return m_loginLockout;
 }
 
 const Notification& Settings::notification() const
@@ -224,7 +260,7 @@ const EventManager& Settings::eventManager() const
     return m_eventManager;
 }
 
-const ec2::Settings& Settings::p2pDb() const
+const data_sync_engine::Settings& Settings::p2pDb() const
 {
     return m_p2pDb;
 }
@@ -250,7 +286,7 @@ const VmsGateway& Settings::vmsGateway() const
 }
 
 void Settings::setDbConnectionOptions(
-    const nx::utils::db::ConnectionOptions& options)
+    const nx::sql::ConnectionOptions& options)
 {
     m_dbConnectionOptions = options;
 }
@@ -322,20 +358,9 @@ void Settings::loadSettings()
             kControlSystemStatusByDb,
             kDefaultControlSystemStatusByDb ? "true" : "false").toString() == "true";
 
-    //auth
-    m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
-    m_auth.nonceValidityPeriod = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings().value(kNonceValidityPeriod).toString(),
-            kDefaultNonceValidityPeriod));
-    m_auth.intermediateResponseValidityPeriod = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings().value(kIntermediateResponseValidityPeriod).toString(),
-            kDefaultIntermediateResponseValidityPeriod));
-    m_auth.offlineUserHashValidityPeriod = duration_cast<minutes>(
-        nx::utils::parseTimerDuration(
-            settings().value(kOfflineUserHashValidityPeriod).toString(),
-            kDefaultOfflineUserHashValidityPeriod));
+    loadAuth();
+
+    loadLoginLockout();
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
@@ -366,6 +391,63 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kVmsGatewayRequestTimeout).toString(),
             kDefaultVmsGatewayRequestTimeout);
+}
+
+void Settings::loadAuth()
+{
+    using namespace std::chrono;
+
+    m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
+
+    m_auth.nonceValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kNonceValidityPeriod).toString(),
+            kDefaultNonceValidityPeriod));
+
+    m_auth.intermediateResponseValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kIntermediateResponseValidityPeriod).toString(),
+            kDefaultIntermediateResponseValidityPeriod));
+
+    m_auth.offlineUserHashValidityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kOfflineUserHashValidityPeriod).toString(),
+            kDefaultOfflineUserHashValidityPeriod));
+
+    m_auth.checkForExpiredAuthPeriod = nx::utils::parseTimerDuration(
+        settings().value(kCheckForExpiredAuthPeriod).toString(),
+        kDefaultCheckForExpiredAuthPeriod);
+
+    m_auth.continueUpdatingExpiredAuthPeriod = nx::utils::parseTimerDuration(
+        settings().value(kContinueUpdatingExpiredAuthPeriod).toString(),
+        kDefaultContinueUpdatingExpiredAuthPeriod);
+
+    m_auth.maxSystemsToUpdateAtATime = settings().value(
+        kMaxSystemsToUpdateAtATime, kDefaultMaxSystemsToUpdateAtATime).toInt();
+}
+
+void Settings::loadLoginLockout()
+{
+    const auto loginLockoutEnabled = settings().value(
+        kLoginLockoutEnabled,
+        kDefaultLoginLockoutEnabled ? "true" : "false").toString() == "true";
+
+    if (!loginLockoutEnabled)
+        return;
+
+    m_loginLockout.emplace(network::server::UserLockerSettings());
+
+    m_loginLockout->checkPeriod = nx::utils::parseTimerDuration(
+        settings().value(kLoginLockoutCheckPeriod).toString(),
+        kDefaultLoginLockoutCheckPeriod);
+
+    m_loginLockout->authFailureCount = settings().value(
+        kLoginLockoutAuthFailureCount,
+        kDefaultLoginLockoutAuthFailureCount).toInt();
+
+    m_loginLockout->lockPeriod = nx::utils::parseTimerDuration(
+        settings().value(kLoginLockoutLockPeriod).toString(),
+        kDefaultLoginLockoutLockPeriod);
 }
 
 } // namespace conf

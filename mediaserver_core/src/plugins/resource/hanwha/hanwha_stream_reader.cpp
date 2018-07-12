@@ -8,10 +8,12 @@
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 #include "hanwha_chunk_reader.h"
+#include "hanwha_ini_config.h"
 
 #include <utils/common/sleep.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/util.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -21,8 +23,8 @@ namespace {
 
 static const QString kLive4NvrProfileName = lit("Live4NVR");
 static const int kHanwhaDefaultPrimaryStreamProfile = 2;
-static const int kNvrSocketReadTimeoutMs = 500;
-static const std::chrono::milliseconds kTimeoutToExtrapolateTimeMs(1000 * 3);
+static const std::chrono::milliseconds kNvrSocketReadTimeout(500);
+static const std::chrono::milliseconds kTimeoutToExtrapolateTime(1000 * 5);
 
 } // namespace
 
@@ -40,32 +42,15 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     bool isCameraControlRequired,
     const QnLiveStreamParams& params)
 {
-    const auto role = getRole();
-    QString streamUrlString;
-
-    int profileToOpen = kHanwhaInvalidProfile;
-    if (m_hanwhaResource->isConnectedViaSunapi())
-        profileToOpen = m_hanwhaResource->profileByRole(role);
-    else
-        profileToOpen = chooseNvrChannelProfile(role);
-
-    if (!isCorrectProfile(profileToOpen))
+    if (isCameraControlRequired && !m_hanwhaResource->isNvr())
     {
-        return CameraDiagnostics::CameraInvalidParams(
-            lit("No profile for %1 stream").arg(
-                role == Qn::ConnectionRole::CR_LiveVideo
-                ? lit("primary")
-                : lit("secondary")));
-    }
-
-    if (isCameraControlRequired)
-    {
-        auto result = updateProfile(profileToOpen, params);
+        auto result = updateProfile(params);
         if (!result)
             return result;
     }
 
-    auto result = streamUri(profileToOpen, &streamUrlString);
+    QString streamUrlString;
+    auto result = streamUri(&streamUrlString);
     if (!result)
         return result;
 
@@ -78,21 +63,23 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
         if (m_sessionContext.isNull())
             return CameraDiagnostics::TooManyOpenedConnectionsResult();
 
+        // QUrl isn't used here intentionally, since session parameter works correct
+        // if it added to the end of URL only.
         streamUrlString.append(lit("&session=%1").arg(m_sessionContext->sessionId));
     }
 
-    m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);
+    const auto role = getRole();
     m_rtpReader.setRole(role);
+    m_rtpReader.setDateTimeFormat(QnRtspClient::DateTimeFormat::ISO);
     if (m_hanwhaResource->isNvr() && m_sessionType == HanwhaSessionType::archive)
     {
-        m_rtpReader.rtspClient().setTCPTimeout(kNvrSocketReadTimeoutMs);
-        m_rtpReader.setOnSocketReadTimeoutCallback([this](){ return createEmptyPacket(); });
+        m_rtpReader.setOnSocketReadTimeoutCallback(
+            kNvrSocketReadTimeout,
+            [this](){ return createEmptyPacket(); });
         m_rtpReader.setRtpFrameTimeoutMs(std::numeric_limits<int>::max()); //< Media frame timeout
     }
 
-    if (m_hanwhaResource->isNvr())
-        m_rtpReader.setTimePolicy(TimePolicy::forceCameraTime);
-    else if (role == Qn::ConnectionRole::CR_Archive)
+    if (role == Qn::ConnectionRole::CR_Archive)
         m_rtpReader.setTimePolicy(TimePolicy::onvifExtension);
     else
         m_rtpReader.setTimePolicy(TimePolicy::ignoreCameraTimeIfBigJitter);
@@ -104,8 +91,8 @@ CameraDiagnostics::Result HanwhaStreamReader::openStreamInternal(
     m_hanwhaResource->updateSourceUrl(streamUrlString, role);
 
     const auto openResult = m_rtpReader.openStream();
-    NX_VERBOSE(this, lm("RTP open %1 -> %2 (client id %3)").args(
-        streamUrlString, openResult.toString(nullptr), m_clientId));
+    NX_DEBUG(this, lm("Open RTSP %1 for device %2").args(
+        streamUrlString, m_resource->getUniqueId()));
 
     return openResult;
 }
@@ -116,172 +103,61 @@ void HanwhaStreamReader::closeStream()
     m_sessionContext.reset();
 }
 
-HanwhaProfileParameters HanwhaStreamReader::makeProfileParameters(
-    int profileNumber,
-    const QnLiveStreamParams& parameters) const
-{
-    const auto role = getRole();
-    const auto codec = m_hanwhaResource->streamCodec(role);
-    const auto codecProfile = m_hanwhaResource->streamCodecProfile(codec, role);
-    const auto resolution = m_hanwhaResource->streamResolution(role);
-    const auto frameRate = m_hanwhaResource->streamFrameRate(role, parameters.fps);
-    const auto govLength = m_hanwhaResource->streamGovLength(role);
-    const auto bitrateControl = m_hanwhaResource->streamBitrateControl(role); //< cbr/vbr
-    const auto bitrate = m_hanwhaResource->streamBitrate(role, parameters);
-
-    const auto govLengthParameterName =
-        lit("%1.GOVLength").arg(toHanwhaString(codec));
-
-    const auto bitrateControlParameterName =
-        lit("%1.BitrateControlType").arg(toHanwhaString(codec));
-
-    const bool isH26x = codec == AVCodecID::AV_CODEC_ID_H264
-        || codec == AVCodecID::AV_CODEC_ID_HEVC;
-
-    HanwhaProfileParameters result =
-    {
-        {kHanwhaChannelProperty, QString::number(m_hanwhaResource->getChannel())},
-        {kHanwhaProfileNumberProperty, QString::number(profileNumber)},
-        {kHanwhaEncodingTypeProperty, toHanwhaString(codec)},
-        {kHanwhaResolutionProperty, toHanwhaString(resolution)}
-    };
-
-    if (m_hanwhaResource->isAudioSupported())
-    {
-        result.emplace(kHanwhaAudioInputEnableProperty, toHanwhaString(
-            m_hanwhaResource->isAudioEnabled()));
-    }
-
-    if (isH26x)
-    {
-        if (govLength != kHanwhaInvalidGovLength)
-            result.emplace(govLengthParameterName, QString::number(govLength));
-        if (!codecProfile.isEmpty())
-            result.emplace(lit("%1.Profile").arg(toHanwhaString(codec)), codecProfile);
-    }
-
-    if (isH26x && bitrateControl != Qn::BitrateControl::undefined)
-        result.emplace(bitrateControlParameterName, toHanwhaString(bitrateControl));
-
-    if (bitrate != kHanwhaInvalidBitrate)
-        result.emplace(kHanwhaBitrateProperty, QString::number(bitrate));
-
-    if (frameRate != kHanwhaInvalidFps)
-        result.emplace(kHanwhaFrameRatePriority, QString::number(frameRate));
-
-    return result;
-}
-
-CameraDiagnostics::Result HanwhaStreamReader::updateProfile(
-    int profileNumber,
-    const QnLiveStreamParams& parameters)
+CameraDiagnostics::Result HanwhaStreamReader::updateProfile(const QnLiveStreamParams& parameters)
 {
     if (!m_hanwhaResource->isConnectedViaSunapi())
         return CameraDiagnostics::NoErrorResult();
 
-    if (profileNumber == kHanwhaInvalidProfile)
+    const auto role = getRole();
+    NX_ASSERT(role != Qn::ConnectionRole::CR_Archive);
+    if (role == Qn::ConnectionRole::CR_Archive)
+        return CameraDiagnostics::NoErrorResult();
+
+    const auto profileNumber = m_hanwhaResource->profileByRole(role);
+    if (!isCorrectProfile(profileNumber))
     {
         return CameraDiagnostics::CameraPluginErrorResult(
             lit("Update profile: invalid profile number is given"));
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
-    const auto profileParameters = makeProfileParameters(profileNumber, parameters);
+    HanwhaProfileParameterFlags profileParameterFlags;
+    if (m_hanwhaResource->isAudioSupported())
+        profileParameterFlags |= HanwhaProfileParameterFlag::audioSupported;
+
+    const auto profileParameters = m_hanwhaResource->makeProfileParameters(
+        getRole(),
+        parameters,
+        profileParameterFlags);
+
     // Some cameras have bug: they could close connection with delay.
     // It affects newly opened connections. Don't change parameters to prevent it.
     if (m_prevProfileParameters == profileParameters)
         return CameraDiagnostics::NoErrorResult();
 
     m_hanwhaResource->beforeConfigureStream(getRole());
-    const auto response = helper.update(lit("media/videoprofile"), profileParameters);
+    auto response = helper.update(lit("media/videoprofile"), profileParameters);
+    if (!response.isSuccessful() && response.errorCode() == kHanwhaInvalidParameterHttpCode)
+    {
+        // It is a camera bug workaround.
+        // We have at least 1 camera that report supported audio but it is really not.
+        const auto profileParameters = m_hanwhaResource->makeProfileParameters(
+            getRole(),
+            parameters,
+            HanwhaProfileParameterFlags());
+        response = helper.update(lit("media/videoprofile"), profileParameters);
+    }
+
     m_hanwhaResource->afterConfigureStream(getRole());
     if (!response.isSuccessful())
     {
         return error(
             response,
-            CameraDiagnostics::RequestFailedResult(
-                response.requestUrl(),
-                response.errorString()));
+            CameraDiagnostics::RequestFailedResult(response.requestUrl(), response.errorString()));
     }
 
     m_prevProfileParameters = profileParameters;
     return CameraDiagnostics::NoErrorResult();
-}
-
-QSet<int> HanwhaStreamReader::availableProfiles(int channel) const
-{
-    QSet<int> result;
-    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
-    const auto response = helper.view(
-        lit("media/videoprofilepolicy"),
-        {{ kHanwhaChannelProperty, QString::number(channel) }});
-
-    if (!response.isSuccessful())
-        return result;
-
-    for (const auto& entry: response.response())
-    {
-        if (entry.first.endsWith("Profile"))
-            result << entry.second.toInt();
-    }
-    return result;
-}
-
-int HanwhaStreamReader::chooseNvrChannelProfile(Qn::ConnectionRole role) const
-{
-    const auto channel = m_hanwhaResource->getChannel();
-
-    HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
-    const auto response = helper.view(
-        lit("media/videoprofile"),
-        {{kHanwhaChannelProperty, QString::number(channel)}});
-
-    if (!response.isSuccessful())
-        return kHanwhaInvalidProfile;
-
-    const auto profiles = parseProfiles(response);
-    if (profiles.empty())
-        return kHanwhaInvalidProfile;
-
-    if (profiles.find(channel) == profiles.cend())
-        return kHanwhaInvalidProfile;
-
-    const auto& channelProfiles = profiles.at(channel);
-
-    if (channelProfiles.empty())
-        return kHanwhaInvalidProfile;
-
-    int bestProfile = kHanwhaInvalidProfile;
-    int bestScore = 0;
-    const auto profileFilter = availableProfiles(channel);
-
-    for (const auto& profileEntry: channelProfiles)
-    {
-        const auto profile = profileEntry.second;
-        const auto codecCoefficient =
-            kHanwhaCodecCoefficients.find(profile.codec) != kHanwhaCodecCoefficients.cend()
-            ? kHanwhaCodecCoefficients.at(profile.codec)
-            : -1;
-
-        if (!profileFilter.contains(profile.number))
-            continue;
-
-        const auto score = profile.resolution.width()
-            * profile.resolution.height()
-            * codecCoefficient
-            + profile.frameRate;
-
-        if (score > bestScore)
-        {
-            bestScore = score;
-            bestProfile = profile.number;
-        }
-    }
-
-    return bestProfile;
 }
 
 bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
@@ -290,8 +166,15 @@ bool HanwhaStreamReader::isCorrectProfile(int profileNumber) const
         || getRole() == Qn::CR_Archive;
 }
 
-CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QString* outUrl)
+CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
 {
+    const auto forcedUrlString = forcedUrl(getRole());
+    if (!forcedUrlString.isEmpty())
+    {
+        *outUrl = forcedUrlString;
+        return CameraDiagnostics::NoErrorResult();
+    }
+
     using ParameterMap = std::map<QString, QString>;
     ParameterMap params =
     {
@@ -323,8 +206,6 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
         }
 
         params.emplace(kHanwhaMediaTypeProperty, mediaType);
-        if (profileNumber == kHanwhaInvalidProfile && !m_hanwhaResource->isNvr())
-            profileNumber = 2; //< The actual number doesn't matter.
     }
     else
     {
@@ -334,13 +215,12 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(int profileNumber, QStri
     if (m_hanwhaResource->isNvr())
         params.emplace(kHanwhaClientTypeProperty, "PC");
 
+    const auto profileNumber = m_hanwhaResource->profileByRole(role);
     if (profileNumber != kHanwhaInvalidProfile)
         params.emplace(kHanwhaProfileNumberProperty, QString::number(profileNumber));
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());
-    helper.setIgnoreMutexAnalyzer(true);
     const auto response = helper.view(lit("media/streamuri"), params);
-
     if (!response.isSuccessful())
     {
         return error(
@@ -391,6 +271,28 @@ QString HanwhaStreamReader::rtpTransport() const
 
 void HanwhaStreamReader::setPositionUsec(qint64 value)
 {
+    m_lastTimestampUsec = value;
+    m_timeSinceLastFrame.invalidate();
+
+    if (ini().enableSingleSeekPerGroup)
+    {
+        // Send single seek for all channels
+        static QnMutex sessionMutex;
+        QnMutexLocker lock(&sessionMutex);
+        if (m_sessionContext)
+        {
+            SeekPosition newPosition(value);
+            if (m_rtpReader.isStreamOpened()
+                && m_sessionContext->lastSeekPos.canJoinPosition(newPosition))
+            {
+                return;
+            }
+            m_sessionContext->lastSeekPos = newPosition;
+        }
+    }
+
+    NX_ASSERT(value != AV_NOPTS_VALUE && value != DATETIME_NOW);
+    NX_DEBUG(this, lm("Set position %1 for device %2").args(mksecToDateTime(value), m_resource->getUniqueId()));
     m_rtpReader.setPositionUsec(value);
 }
 
@@ -408,6 +310,11 @@ void HanwhaStreamReader::setPlaybackRange(int64_t startTimeUsec, int64_t endTime
 void HanwhaStreamReader::setOverlappedId(nx::core::resource::OverlappedId overlappedId)
 {
     m_overlappedId = overlappedId;
+}
+
+SessionContextPtr HanwhaStreamReader::sessionContext()
+{
+    return m_sessionContext;
 }
 
 QnRtspClient& HanwhaStreamReader::rtspClient()
@@ -441,38 +348,66 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     if (!m_hanwhaResource->isNvr())
         return QnAbstractMediaDataPtr();
 
-    if (!m_timeSinceLastFrame.isValid())
-        return QnAbstractMediaDataPtr();
 
     const auto context = m_hanwhaResource->sharedContext();
     const int speed = m_rtpReader.rtspClient().getScale();
-    qint64 currentTimeMs = m_lastTimestampUsec / 1000 + m_timeSinceLastFrame.elapsedMs() * speed;
-    const bool isForwardSearch = speed >= 0;
-    const auto timeline = context->overlappedTimeline(m_hanwhaResource->getChannel());
-    NX_ASSERT(timeline.size() <= 1, lit("There should be only one overlapped ID for NVRs"));
-    if (timeline.size() != 1)
-        return QnAbstractMediaDataPtr();
+    qint64 currentTimeMs = m_lastTimestampUsec / 1000;
 
-    const auto chunks = timeline.cbegin()->second;
-    if (chunks.containTime(currentTimeMs))
+    if (ini().enableArchivePositionExtrapolation)
     {
-        if (m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTimeMs)
-            return QnAbstractMediaDataPtr(); //< Don't forecast position too fast.
-    }
-    else
-    {
-        auto itr = chunks.findNearestPeriod(currentTimeMs, isForwardSearch);
-        if (itr == chunks.end())
-            currentTimeMs = isForwardSearch ? DATETIME_NOW : 0;
+        // Extrapolate current position if NVR doesn't send packets during some period.
+        // It is needed for sync play mode.
+        if (m_timeSinceLastFrame.isValid())
+            currentTimeMs += m_timeSinceLastFrame.elapsedMs() * speed;
+        const bool isForwardSearch = speed >= 0;
+        const auto timeline = context->overlappedTimeline(m_hanwhaResource->getChannel());
+        NX_ASSERT(timeline.size() <= 1, lit("There should be only one overlapped ID for NVRs"));
+        if (timeline.size() != 1)
+            return QnAbstractMediaDataPtr();
+
+        const auto chunks = timeline.cbegin()->second;
+        if (chunks.containTime(currentTimeMs))
+        {
+            if (m_timeSinceLastFrame.isValid()
+                && m_timeSinceLastFrame.elapsed() < kTimeoutToExtrapolateTime)
+            {
+                return QnAbstractMediaDataPtr(); //< Don't forecast position too fast.
+            }
+        }
         else
-            currentTimeMs = isForwardSearch ? itr->startTimeMs : itr->endTimeMs();
+        {
+            auto itr = chunks.findNearestPeriod(currentTimeMs, isForwardSearch);
+            if (itr == chunks.end())
+                currentTimeMs = isForwardSearch ? DATETIME_NOW : 0;
+            else
+                currentTimeMs = isForwardSearch ? itr->startTimeMs : itr->endTimeMs();
+        }
     }
 
     QnAbstractMediaDataPtr rez(new QnEmptyMediaData());
     rez->timestamp = currentTimeMs * 1000;
     if (speed < 0)
         rez->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+
+    NX_VERBOSE(this, lm("Create extrapolation packet with time %1 (base time %2) for device %3").args(
+        mksecToDateTime(rez->timestamp),
+        mksecToDateTime(m_lastTimestampUsec),
+        m_resource->getUniqueId()));
+
     return rez;
+}
+
+QString HanwhaStreamReader::forcedUrl(Qn::ConnectionRole role) const
+{
+    switch (role)
+    {
+        case Qn::ConnectionRole::CR_LiveVideo:
+            return QString::fromUtf8(ini().forcedPrimaryStreamUrl).trimmed();
+        case Qn::ConnectionRole::CR_SecondaryLiveVideo:
+            return QString::fromUtf8(ini().forcedSecondaryStreamUrl).trimmed();
+        default:
+            return QString();
+    }
 }
 
 QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
@@ -482,6 +417,9 @@ QnAbstractMediaDataPtr HanwhaStreamReader::getNextData()
     {
         m_lastTimestampUsec = result->timestamp;
         m_timeSinceLastFrame.restart();
+
+        NX_VERBOSE(this, lm("GOT RTSP packet with time %1 for device %2").args(
+            mksecToDateTime(result->timestamp), m_resource->getUniqueId()));
     }
 
     return result;

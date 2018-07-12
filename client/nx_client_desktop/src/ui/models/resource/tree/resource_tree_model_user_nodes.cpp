@@ -3,23 +3,20 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-
-#include <nx_ec/data/api_user_role_data.h>
-
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/models/resource/tree/resource_tree_model_layout_node.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
-
 #include <ui/workbench/workbench_context.h>
 
+#include <nx/vms/api/data/user_role_data.h>
+
+using namespace nx::client::desktop;
 
 QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     QObject* parent)
@@ -58,13 +55,13 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
         });
 
     connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-        [this](const ec2::ApiUserRoleData& role)
+        [this](const nx::vms::api::UserRoleData& role)
         {
             ensureRoleNode(role)->update();
         });
 
     connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-        [this](const ec2::ApiUserRoleData& role)
+        [this](const nx::vms::api::UserRoleData& role)
         {
             if (m_roles.contains(role.id))
                 removeNode(m_roles.take(role.id));
@@ -140,21 +137,21 @@ QList<QnResourceTreeModelNodePtr> QnResourceTreeModelUserNodes::children(
     return result;
 }
 
-QList<Qn::NodeType> QnResourceTreeModelUserNodes::allPlaceholders() const
+QList<ResourceTreeNodeType> QnResourceTreeModelUserNodes::allPlaceholders() const
 {
-    static QList<Qn::NodeType> placeholders
+    static QList<NodeType> placeholders
     {
-        Qn::AllCamerasAccessNode,
-        Qn::AllLayoutsAccessNode,
-        Qn::SharedResourcesNode,
-        Qn::SharedLayoutsNode,
-        Qn::RoleUsersNode
+        NodeType::allCamerasAccess,
+        NodeType::allLayoutsAccess,
+        NodeType::sharedResources,
+        NodeType::sharedLayouts,
+        NodeType::roleUsers
     };
     return placeholders;
 }
 
 bool QnResourceTreeModelUserNodes::placeholderAllowedForSubject(
-    const QnResourceAccessSubject& subject, Qn::NodeType nodeType) const
+    const QnResourceAccessSubject& subject, NodeType nodeType) const
 {
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
@@ -164,34 +161,34 @@ bool QnResourceTreeModelUserNodes::placeholderAllowedForSubject(
         return false;
 
     /* Do not show user placeholders under roles. */
-    if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
+    if (subject.user() && subject.user()->userRole() == Qn::UserRole::customUserRole)
         return false;
 
     bool isRole = !subject.user();
     bool hasAllMedia = globalPermissionsManager()->hasGlobalPermission(subject,
-        Qn::GlobalAccessAllMediaPermission);
+        GlobalPermission::accessAllMedia);
     bool isAdmin = globalPermissionsManager()->hasGlobalPermission(subject,
-        Qn::GlobalAdminPermission);
+        GlobalPermission::admin);
 
     switch (nodeType)
     {
         /* 'All Cameras and Resources' visible to users with all media access. */
-        case Qn::AllCamerasAccessNode:
+        case NodeType::allCamerasAccess:
             return hasAllMedia;
 
         /* 'All Shared Layouts' visible to admin only and never visible to roles. */
-        case Qn::AllLayoutsAccessNode:
+        case NodeType::allLayoutsAccess:
             return !isRole && isAdmin;
 
         /* If cameras set is limited, show 'Cameras' node and 'Layouts' node. */
-        case Qn::SharedResourcesNode:
+        case NodeType::sharedResources:
             return !hasAllMedia;
 
         /* 'Layouts' node also always visible to roles. */
-        case Qn::SharedLayoutsNode:
+        case NodeType::sharedLayouts:
             return isRole || !hasAllMedia;
 
-        case Qn::RoleUsersNode:
+        case NodeType::roleUsers:
             return isRole;
 
         default:
@@ -223,7 +220,7 @@ bool QnResourceTreeModelUserNodes::showLayoutForSubject(const QnResourceAccessSu
     if (layout->isShared())
     {
         /* Admins see all shared layouts. */
-        if (globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+        if (globalPermissionsManager()->hasGlobalPermission(subject, GlobalPermission::admin))
         {
             NX_ASSERT(subject.user());
             if (subject.user())
@@ -231,7 +228,7 @@ bool QnResourceTreeModelUserNodes::showLayoutForSubject(const QnResourceAccessSu
         }
 
         /* Shared layouts are displayed under role node. */
-        if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
+        if (subject.user() && subject.user()->userRole() == Qn::UserRole::customUserRole)
             return false;
 
         return resourceAccessProvider()->hasAccess(subject, layout);
@@ -253,11 +250,11 @@ bool QnResourceTreeModelUserNodes::showMediaForSubject(const QnResourceAccessSub
 
     /* Hide media for users who has access to all media. */
     if (globalPermissionsManager()->hasGlobalPermission(subject,
-        Qn::GlobalAccessAllMediaPermission))
+        GlobalPermission::accessAllMedia))
             return false;
 
     /* Shared resources are displayed under role node. */
-    if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
+    if (subject.user() && subject.user()->userRole() == Qn::UserRole::customUserRole)
         return false;
 
     return resourceAccessProvider()->hasAccess(subject, media);
@@ -275,7 +272,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureSubjectNode(
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRoleNode(
-    const ec2::ApiUserRoleData& role)
+    const nx::vms::api::UserRoleData& role)
 {
     auto pos = m_roles.find(role.id);
     if (pos == m_roles.end())
@@ -283,7 +280,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRoleNode(
         NX_ASSERT(!role.isNull());
 
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, role.id,
-            Qn::RoleNode));
+            NodeType::role));
         node->initialize();
         node->setParent(m_rootNode);
         m_allNodes.append(node);
@@ -303,10 +300,10 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
     if (pos == m_users.end())
     {
         QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, user,
-            Qn::ResourceNode));
+            NodeType::resource));
         node->initialize();
         auto parent = m_rootNode;
-        if (user->userRole() == Qn::UserRole::CustomUserRole)
+        if (user->userRole() == Qn::UserRole::customUserRole)
         {
             auto role = userRolesManager()->userRole(user->userRoleId());
             if (!role.isNull())
@@ -351,14 +348,14 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureLayoutNode(
     }
 
     auto nodeType = layout->isShared()
-        ? Qn::SharedLayoutNode
-        : Qn::ResourceNode;
+        ? NodeType::sharedLayout
+        : NodeType::resource;
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelLayoutNode(m_model, layout, nodeType));
     node->initialize();
     auto parent = ensureSubjectNode(subject);
-    if (placeholderAllowedForSubject(subject, Qn::SharedLayoutsNode))
-        parent = ensurePlaceholderNode(subject, Qn::SharedLayoutsNode);
+    if (placeholderAllowedForSubject(subject, NodeType::sharedLayouts))
+        parent = ensurePlaceholderNode(subject, NodeType::sharedLayouts);
 
     node->setParent(parent);
     node->update();
@@ -379,11 +376,11 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureMediaNode(
     }
 
     QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(m_model, media,
-        Qn::SharedResourceNode));
+        NodeType::sharedResource));
     node->initialize();
     auto parent = ensureSubjectNode(subject);
-    if (placeholderAllowedForSubject(subject, Qn::SharedResourcesNode))
-        parent = ensurePlaceholderNode(subject, Qn::SharedResourcesNode);
+    if (placeholderAllowedForSubject(subject, NodeType::sharedResources))
+        parent = ensurePlaceholderNode(subject, NodeType::sharedResources);
 
     /* Create recorder nodes for cameras. */
     if (auto camera = media.dynamicCast<QnVirtualCameraResource>())
@@ -400,7 +397,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureMediaNode(
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensurePlaceholderNode(
-    const QnResourceAccessSubject& subject, Qn::NodeType nodeType)
+    const QnResourceAccessSubject& subject, NodeType nodeType)
 {
     NX_ASSERT(subject.isValid());
     NX_ASSERT(placeholderAllowedForSubject(subject, nodeType));
@@ -451,7 +448,7 @@ void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubj
     {
         bool skipUser = !user->isEnabled()
             || (m_model->scope() != QnResourceTreeModel::FullScope
-                && user->userRole() == Qn::UserRole::CustomUserRole);
+                && user->userRole() == Qn::UserRole::customUserRole);
 
         if (skipUser)
         {
@@ -478,7 +475,7 @@ void QnResourceTreeModelUserNodes::removeUserNode(const QnUserResourcePtr& user)
         removeNode(m_users.take(id));
 }
 
-void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& node)
+void QnResourceTreeModelUserNodes::removeNode(QnResourceTreeModelNodePtr node)
 {
     /* Node was already removed. */
     if (!m_allNodes.contains(node))
@@ -494,34 +491,34 @@ void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& 
 
     switch (node->type())
     {
-        case Qn::ResourceNode:
+        case NodeType::resource:
         {
             NX_ASSERT(node->resource());
             if (node->resource())
                 m_users.remove(node->resource()->getId());
             break;
         }
-        case Qn::AllCamerasAccessNode:
-        case Qn::AllLayoutsAccessNode:
-        case Qn::SharedResourcesNode:
-        case Qn::SharedLayoutsNode:
-        case Qn::RoleUsersNode:
+        case NodeType::allCamerasAccess:
+        case NodeType::allLayoutsAccess:
+        case NodeType::sharedResources:
+        case NodeType::sharedLayouts:
+        case NodeType::roleUsers:
             for (NodeList& nodes : m_placeholders)
                 nodes.removeOne(node);
             break;
-        case Qn::SharedLayoutNode:
-        case Qn::SharedResourceNode:
+        case NodeType::sharedLayout:
+        case NodeType::sharedResource:
             for (NodeList& nodes : m_shared)
                 nodes.removeOne(node);
             break;
-        case Qn::RecorderNode:
+        case NodeType::recorder:
             if (m_recorders.contains(node->parent()))
             {
                 RecorderHash& hash = m_recorders[node->parent()];
                 hash.remove(hash.key(node));
             }
             break;
-        case Qn::RoleNode:
+        case NodeType::role:
             m_roles.remove(node->uuid());
             break;
         default:
@@ -548,7 +545,7 @@ void QnResourceTreeModelUserNodes::cleanupRecorders()
     QList<QnResourceTreeModelNodePtr> nodesToDelete;
     for (auto node : m_allNodes)
     {
-        if (node->type() != Qn::RecorderNode)
+        if (node->type() != NodeType::recorder)
             continue;
 
         if (node->children().isEmpty())
@@ -597,7 +594,7 @@ void QnResourceTreeModelUserNodes::handleResourceAdded(const QnResourcePtr& reso
 void QnResourceTreeModelUserNodes::handleUserChanged(const QnUserResourcePtr& user)
 {
     m_valid = !user.isNull()
-        && globalPermissionsManager()->hasGlobalPermission(user, Qn::GlobalAdminPermission);
+        && globalPermissionsManager()->hasGlobalPermission(user, GlobalPermission::admin);
 
     clean();
     if (m_valid)

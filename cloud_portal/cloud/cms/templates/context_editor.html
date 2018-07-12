@@ -30,12 +30,11 @@
         <div class="form-row">
             {% is_optional field.name context as optional %}
             {% has_value field.name context customization language as record_exists %}
-            {% if not optional and not record_exists %}
-            <label class="text-danger" for="id_{{ field.name }}">{{ field.label }}</label>
-            {% else %}
-            <label for="id_{{ field.name }}">{{ field.label }}</label>
-            {% endif %}
-            <div id="{{field.name}}" style="display:inline-block;">
+            <label {% if not optional and not record_exists %} class="text-danger" {% endif %}
+                   for="id_{{ field.name }}">{{ field.label }}<p class="help">{{field.name}}</p>
+                    {% if not optional %} <p class="help">required</p> {% endif %}
+            </label>
+            <div id="{{field.name}}" style="width: 100%">
                 {% if field|is_ImageField and field.value %}
                     <div>
                         {% if optional and record_exists %}
@@ -68,7 +67,11 @@
                         </a>
                     </div>
                 {% endif %}
-                {{ field }}
+                {% if not field.field.disabled %}
+                    {{ field }}
+                {% elif not field|is_FileField and not field|is_ImageField %}
+                    <div class="show-html">{{field.value|safe}}</div>
+                {% endif %}
                 
                 {% if field.help_text %}
                 <p class="help">{{ field.help_text|safe }}</p>
@@ -88,7 +91,9 @@
                download>Download Draft</a>
         </button>
         {% endif %}
+        {% if context.product.can_preview %}
         <button class="btn btn-sm btn-default" type="submit" name="Preview">Save and Preview</button>
+        {% endif %}
         <button class="btn btn-sm btn-info" type="submit" name="SaveDraft">Save Draft</button>
         <button class="btn btn-sm btn-success" type="submit" name="SendReview">Send for Review</button>
         <button class="btn btn-sm btn-danger" type="reset"  name="Reset">Reset</button>
@@ -148,7 +153,7 @@
         resize: 'both',
         theme:'advanced',
         plugins: 'preview,-visualblocks,-advcode,paste',
-        theme_advanced_buttons1: 'undo,redo,separator,formatselect,insert,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent,separator,code,removeformat,pasteword',
+        theme_advanced_buttons1: 'undo,redo,separator,formatselect,link,bold,italic,underline,separator,bullist,numlist,separator,outdent,indent,separator,code,removeformat,pasteword,preview',
         theme_advanced_toolbar_location: 'top',
         theme_advanced_toolbar_align: 'left',
         theme_advanced_resizing: true

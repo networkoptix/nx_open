@@ -15,15 +15,17 @@
 
 #include <nx_ec/ec_api.h>
 
-#include <network/module_information.h>
-
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/compatibility_version_installation_dialog.h>
 #include <ui/help/help_topics.h>
 
 #include <utils/applauncher_utils.h>
-#include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
+#include <nx/network/http/http_types.h>
+
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
@@ -40,6 +42,7 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
         case Qn::IncompatibleInternalConnectionResult:
         case Qn::ForbiddenConnectionResult:
         case Qn::DisabledUserConnectionResult:
+        case Qn::UserTemporaryLockedOut:
             return Qn::Login_Help;
         case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::IncompatibleVersionConnectionResult:
@@ -76,7 +79,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     {
         addRow(lit("Protocol: %1, Cloud: %2")
             .arg(QnAppInfo::ec2ProtoVersion())
-            .arg(nx::network::AppInfo::defaultCloudHost()));
+            .arg(nx::network::SocketGlobals::cloud().cloudHost()));
     }
 
     addRow(tr("Server version: %1.").arg(connectionInfo.version.toString()));
@@ -232,6 +235,12 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
                     + L'\n' + tr("Restart %1 in compatibility mode "
                         "will be required.").arg(QnClientAppInfo::applicationDisplayName()));
             break;
+        case Qn::UserTemporaryLockedOut:
+        {
+            QString message = tr("Too many attempts. Try again in a minute.");
+            QnMessageBox::critical(parentWidget, message);
+            break;
+        }
         default:
             break;
     }
@@ -256,7 +265,7 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
 }
 
 bool QnConnectionDiagnosticsHelper::getInstalledVersions(
-    QList<QnSoftwareVersion>* versions)
+    QList<nx::utils::SoftwareVersion>* versions)
 {
     /* Try to run applauncher if it is not running. */
     if (!applauncher::checkOnline())
@@ -295,15 +304,15 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionFullExtras(
     const QString clientVersion = qnStaticCommon->engineVersion().toString();
     const QString serverVersion = serverInfo.version.toString(
         CompatibilityVersionInstallationDialog::useUpdate(serverInfo.version)
-        ? QnSoftwareVersion::FullFormat
-        : QnSoftwareVersion::MinorFormat);
+        ? nx::utils::SoftwareVersion::FullFormat
+        : nx::utils::SoftwareVersion::MinorFormat);
 
     QString devModeText;
     if (qnRuntime->isDevMode())
     {
         devModeText += L'\n' + lit("Client Protocol: %1").arg(QnAppInfo::ec2ProtoVersion());
         devModeText += L'\n' + lit("Server Protocol: %1").arg(serverInfo.nxClusterProtoVersion);
-        devModeText += L'\n' + lit("Client Cloud Host: %1").arg(nx::network::AppInfo::defaultCloudHost());
+        devModeText += L'\n' + lit("Client Cloud Host: %1").arg(nx::network::SocketGlobals::cloud().cloudHost());
         devModeText += L'\n' + lit("Server Cloud Host: %1").arg(serverInfo.cloudHost);
     }
 
@@ -338,7 +347,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 {
     using namespace Qn;
 
-    QList<QnSoftwareVersion> versions;
+    QList<nx::utils::SoftwareVersion> versions;
     if (!getInstalledVersions(&versions))
         return handleApplauncherError(parentWidget);
     bool isInstalled = versions.contains(connectionInfo.version);
@@ -349,8 +358,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         {
             QString versionString = connectionInfo.version.toString(
                 CompatibilityVersionInstallationDialog::useUpdate(connectionInfo.version)
-                ? QnSoftwareVersion::FullFormat
-                : QnSoftwareVersion::MinorFormat);
+                ? nx::utils::SoftwareVersion::FullFormat
+                : nx::utils::SoftwareVersion::MinorFormat);
 
             auto extras = getDiffVersionFullExtras(connectionInfo,
                 tr("You have to download another version of %1 to "
@@ -392,11 +401,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 
         nx::utils::Url serverUrl = connectionInfo.ecUrl;
         if (serverUrl.scheme().isEmpty())
-        {
-            serverUrl.setScheme(connectionInfo.allowSslConnections
-                ? lit("https")
-                : lit("http"));
-        }
+            serverUrl.setScheme(nx::network::http::urlSheme(connectionInfo.allowSslConnections));
 
         QString authString = QnStartupParameters::createAuthenticationString(serverUrl,
             connectionInfo.version);
@@ -412,7 +417,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
             default:
             {
                 // trying to restore installation
-                const auto version = connectionInfo.version.toString(QnSoftwareVersion::MinorFormat);
+                const auto version = connectionInfo.version.toString(
+                    nx::utils::SoftwareVersion::MinorFormat);
                 QnMessageBox dialog(QnMessageBoxIcon::Critical,
                     tr("Failed to download and launch version %1").arg(version),
                     QString(),
@@ -452,7 +458,7 @@ QString QnConnectionDiagnosticsHelper::getErrorString(ErrorStrings id)
         case ErrorStrings::CloudIsNotReady:
             return tr("Connection to %1 is not ready yet. "
                 "Check server Internet connection or try again later.",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(nx::network::AppInfo::cloudName());
+                "%1 is the cloud name (like Nx Cloud)").arg(nx::network::AppInfo::cloudName());
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
             break;

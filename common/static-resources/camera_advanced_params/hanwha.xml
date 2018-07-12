@@ -65,6 +65,7 @@
 
                 <param id="PRIMARY%media/videoprofile/EncodingType"
                         name="Codec"
+                        group="primaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/EncodingType;profile=primary;resourceProperty=primaryStreamCodec;groupLead=primaryCodec">
@@ -72,17 +73,41 @@
 
                 <param id="PRIMARY%media/videoprofile/Resolution"
                         name="Resolution"
+                        group="primaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/Resolution;profile=primary;resourceProperty=primaryStreamResolution;">
                 </param>
+                
+                <!-- NVR only properties -->
+                <param id="PRIMARY%media/videoprofile/FrameRate"
+                    name="Frame Rate"
+                    group="primaryStream"
+                    dataType="Number"
+                    writeCmd="update"
+                    keepInitialValue="true"
+                    aux="range=media/videoprofile/add_update/FrameRate;profile=primary;resourceProperty=primaryStreamFps;specific=true;deviceTypes=nvr">
+                </param>
+
+                <param id="PRIMARY%media/videoprofile/Bitrate"
+                        name="Bitrate"
+                        group="primaryStream"
+                        dataType="Number"
+                        writeCmd="update"
+                        unit="Kbit/s"
+                        aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate;specific=true;deviceTypes=nvr"
+                        keepInitialValue="true"
+                        bindDefaultToMinimum="true">
+                </param>
+                <!-- NVR only properties -->
 
                 <param id="PRIMARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"
+                        group="primaryStream"
                         dataType="Enumeration"
                         range="CBR,VBR"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl;group=primaryCodec;groupInclude=H264">
+                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=primary;resourceProperty=primaryStreamBitrateControl;group=primaryCodec;groupInclude=H264;associatedWith=PRIMARY%media/videoprofile/Bitrate">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -96,6 +121,7 @@
 
                 <param id="PRIMARY%media/videoprofile/H265.BitrateControlType"
                         name="Bitrate Control Type"
+                        group="primaryStream"
                         dataType="Enumeration"
                         range="CBR,VBR"
                         writeCmd="update"
@@ -113,6 +139,7 @@
 
                 <param id="PRIMARY%media/videoprofile/H264.PriorityType"
                         name="Encoding Priority"
+                        group="primaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.PriorityType;profile=primary;group=primaryCodec;groupInclude=H264">
@@ -132,6 +159,7 @@
 
                 <param id="PRIMARY%media/videoprofile/H265.PriorityType"
                         name="Encoding Priority"
+                        group="primaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.PriorityType;profile=primary;group=primaryCodec;groupInclude=H265">
@@ -151,6 +179,7 @@
 
                 <param id="PRIMARY%media/videoprofile/H264.GOVLength"
                         name="GOV Length"
+                        group="primaryStream"
                         dataType="Number"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength;group=primaryCodec;groupInclude=H264">
@@ -167,6 +196,7 @@
 
                 <param id="PRIMARY%media/videoprofile/H265.GOVLength"
                         name="GOV Length"
+                        group="primaryStream"
                         dataType="Number"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.GOVLength;profile=primary;resourceProperty=primaryStreamGovLength;group=primaryCodec;groupInclude=H265">
@@ -183,6 +213,7 @@
 
                 <param id="PRIMARY%media/videoprofile/H265.Profile"
                         name="Profile"
+                        group="primaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.Profile;profile=primary;group=primaryCodec;groupInclude=H265;resourceProperty=primaryStreamCodecProfile">
@@ -199,6 +230,7 @@
 
                 <param id="PRIMARY%media/videoprofile/H264.Profile"
                         name="Profile"
+                        group="primaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.Profile;profile=primary;default=High;group=primaryCodec;groupInclude=H264;resourceProperty=primaryStreamCodecProfile">
@@ -215,6 +247,7 @@
 
                 <param id="PRIMARY%media/videoprofile/H264.EntropyCoding"
                         name="Entropy Coding"
+                        group="primaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=primary;default=CABAC;group=primaryCodec;groupInclude=H264">
@@ -231,6 +264,7 @@
 
                 <param id="PRIMARY%media/videoprofile/H265.EntropyCoding"
                         name="Entropy Coding"
+                        group="primaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=primary;default=CABAC;group=primaryCodec;groupInclude=H265">
@@ -261,6 +295,7 @@
 
                 <param id="SECONDARY%media/videoprofile/EncodingType"
                         name="Codec"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/EncodingType;profile=secondary;resourceProperty=secondaryStreamCodec;groupLead=secondaryCodec">
@@ -268,33 +303,38 @@
 
                 <param id="SECONDARY%media/videoprofile/Resolution"
                         name="Resolution"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/Resolution;profile=secondary;resourceProperty=secondaryStreamResolution;">
                 </param>
 
                 <param id="SECONDARY%media/videoprofile/FrameRate"
-                    name="Frame Rate"
-                    dataType="Number"
-                    writeCmd="update"
-                    aux="range=media/videoprofile/add_update/FrameRate;profile=secondary;resourceProperty=secondaryStreamFps;specific=true">
+                        name="Frame Rate"
+                        group="secondaryStream"
+                        dataType="Number"
+                        writeCmd="update"
+                        keepInitialValue="true"
+                        aux="range=media/videoprofile/add_update/FrameRate;profile=secondary;resourceProperty=secondaryStreamFps;specific=true">
                 </param>
 
                 <param id="SECONDARY%media/videoprofile/Bitrate"
                         name="Bitrate"
+                        group="secondaryStream"
                         dataType="Number"
                         writeCmd="update"
                         unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true"
-                        shouldKeepInitialValue="true"
+                        keepInitialValue="true"
                         bindDefaultToMinimum="true">
                 </param>
 
                 <param id="SECONDARY%media/videoprofile/H264.BitrateControlType"
                         name="Bitrate Control Type"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
-                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl;group=secondaryCodec;groupInclude=H264">
+                        aux="range=media/videoprofile/add_update/H264.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl;group=secondaryCodec;groupInclude=H264;associatedWith=SECONDARY%media/videoprofile/Bitrate">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
@@ -308,6 +348,7 @@
 
                 <param id="SECONDARY%media/videoprofile/H265.BitrateControlType"
                         name="Bitrate Control Type"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.BitrateControlType;profile=secondary;resourceProperty=secondaryStreamBitrateControl;group=secondaryCodec;groupInclude=H265">
@@ -324,6 +365,7 @@
 
                 <param id="SECONDARY%media/videoprofile/H264.PriorityType"
                         name="Encoding Priority"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.PriorityType;profile=secondary;group=secondaryCodec;groupInclude=H264">
@@ -343,6 +385,7 @@
 
                 <param id="SECONDARY%media/videoprofile/H265.PriorityType"
                         name="Encoding Priority"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.PriorityType;profile=secondary;group=secondaryCodec;groupInclude=H265">
@@ -362,6 +405,7 @@
 
                 <param id="SECONDARY%media/videoprofile/H264.GOVLength"
                         name="GOV Length"
+                        group="secondaryStream"
                         dataType="Number"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength;group=secondaryCodec;groupInclude=H264">
@@ -378,6 +422,7 @@
 
                 <param id="SECONDARY%media/videoprofile/H265.GOVLength"
                         name="GOV Length"
+                        group="secondaryStream"
                         dataType="Number"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.GOVLength;profile=secondary;resourceProperty=secondaryStreamGovLength;group=secondaryCodec;groupInclude=H265">
@@ -394,6 +439,7 @@
 
                 <param id="SECONDARY%media/videoprofile/H265.Profile"
                         name="Profile"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.Profile;profile=secondary;group=secondaryCodec;groupInclude=H265;resourceProperty=secondaryStreamCodecProfile">
@@ -410,6 +456,7 @@
 
                 <param id="SECONDARY%media/videoprofile/H264.Profile"
                         name="Profile"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.Profile;profile=secondary;group=secondaryCodec;groupInclude=H264;resourceProperty=secondaryStreamCodecProfile">
@@ -426,6 +473,7 @@
 
                 <param id="SECONDARY%media/videoprofile/H264.EntropyCoding"
                         name="Entropy Coding"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H264.EntropyCoding;profile=secondary;group=secondaryCodec;groupInclude=H264">
@@ -442,6 +490,7 @@
 
                 <param id="SECONDARY%media/videoprofile/H265.EntropyCoding"
                         name="Entropy Coding"
+                        group="secondaryStream"
                         dataType="Enumeration"
                         writeCmd="update"
                         aux="range=media/videoprofile/add_update/H265.EntropyCoding;profile=secondary;group=secondaryCodec;groupInclude=H265">
@@ -476,6 +525,26 @@
             </group>
         </group>
         <group name="Image">
+            <group name="AGC">
+                <param id="image/camera/AGCMode"
+                        name="AGC Mode"
+                        dataType="Enumeration"
+                        aux="groupLead=agc"/>
+                <param id="image/camera/AGCLevel"
+                        name="AGC Level"
+                        dataType="Number"
+                        aux="group=agc;groupInclude=Manual">
+                    <dependencies>
+                        <dependencies-show>
+                            <conditional-show>
+                                <condition
+                                    watch="image/camera/AGCMode"
+                                    condition="value=Manual"/>
+                            </conditional-show>
+                        </dependencies-show>
+                    </dependencies>
+                </param>
+            </group>
             <group name="SSDR">
                 <param id="image/ssdr/Enable"
                         name="SSDR Enabled"
@@ -791,16 +860,27 @@
                         </dependencies-show>
                     </dependencies>
                 </param>
-                <param id="image/camera/AGCMode"
-                        name="AGC"
-                        dataType="Enumeration"
-                        range="Off,Low,Middle,High"/>
             </group>
             <group name="Day/Night">
                 <param id="image/camera/DayNightMode"
                         name="Mode"
                         dataType="Enumeration"
-                        aux="groupLead=dn"/>
+                        aux="groupLead=dn">
+                        <dependencies>
+                            <dependencies-ranges>
+                                <conditional-range id="dnRemoveAutoFromRange" remove-values-from-range="Auto">
+                                    <condition
+                                        watch="image/camera/AGCMode"
+                                        condition="value=Off"/>
+                                </conditional-range>
+                                <conditional-range id="dnAddAutoFromRange" add-values-to-range="Auto">
+                                    <condition
+                                        watch="image/camera/AGCMode"
+                                        condition="valueNe=Off"/>
+                                </conditional-range>
+                            </dependencies-ranges>
+                        </dependencies>
+                </param>
                 <param id="image/camera/DayNightSwitchingMode"
                         name="Duration"
                         dataType="Enumeration"
@@ -882,6 +962,32 @@
                         dataType="Enumeration"/>
             </group>
         </group>
+        <group name="Lens Control">
+            <param id="image/lens_control/zoom"
+                name="Zoom"
+                description="Zoom adjustment"
+                dataType="SliderControl"
+                range="-1,1"
+                compact="true"
+                aux="ptzCapabilities=ContinuousZoomCapability"
+                writeCmd="custom_zoom"/>
+            <param id="image/lens_control/ptr"
+                name=""
+                description="PTR adjustment"
+                dataType="PtrControl"
+                range="-1,1,-1,1,-1,1"
+                compact="true"
+                aux="ptzCapabilities=ContinuousPanCapability|ContinuousTiltCapability|ContinuousRotationCapability"
+                writeCmd="custom_ptr"/>
+            <param id="image/lens_control/focus"
+                name="Focus"
+                description="Focus adjustment"
+                dataType="SliderControl"
+                range="-1,1"
+                compact="true"
+                aux="ptzCapabilities=ContinuousFocusCapability"
+                writeCmd="custom_focus"/>
+        </group>
         <group name="Maintenance">
             <param id="image/focus/Mode=SimpleFocus"
                     name="Simple Focus"
@@ -893,8 +999,7 @@
                     name="Initialize Focus"
                     dataType="Button"
                     writeCmd="control"
-                    description="Restores the focus adjustment to the default flange back position"
-                    aux="support=Image/ResetFocus"/>
+                    description="Restores the focus adjustment to the default flange back position"/>
             <param id="image/focus/Mode=AutoFocus"
                     name="Simple Focus"
                     dataType="Button"
@@ -932,7 +1037,7 @@
                     confirmation="Are you sure you want to reset all settings (except network) to default?"
                     description="Resets all camera parameters to defaults except for network settings"
                     aux="noChannel=true"/>
-            <param id="system/factoryreset/ExcludeSettings=None"
+            <param id="system/factoryreset"
                     name="Reset to Factory Defaults"
                     dataType="Button"
                     writeCmd="control"

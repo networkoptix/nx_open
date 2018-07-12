@@ -4,7 +4,7 @@
 
 #include <common/common_module.h>
 
-#include <nx_ec/data/api_camera_history_data.h>
+#include <nx/vms/api/data/camera_history_data.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/network_resource.h>
@@ -25,28 +25,35 @@
 using namespace nx;
 
 namespace {
-    static const int kDefaultHistoryCheckDelay = 1000 * 15;
+static const int kDefaultHistoryCheckDelay = 1000 * 15;
 
-    ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& data, qint64 timestamp) {
-        /* Find first data with timestamp not less than given. */
-        auto iter = std::lower_bound(data.cbegin(), data.cend(), timestamp, [](const ec2::ApiCameraHistoryItemData& data, qint64 timestamp) {
+nx::vms::api::CameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(
+    const nx::vms::api::CameraHistoryItemDataList& data,
+    qint64 timestamp)
+{
+    /* Find first data with timestamp not less than given. */
+    auto iter = std::lower_bound(
+        data.cbegin(),
+        data.cend(),
+        timestamp,
+        [](const auto& data, qint64 timestamp)
+        {
             return data.timestampMs < timestamp;
         });
 
-        /* Check exact match. */
-        if (iter != data.cend() && iter->timestampMs == timestamp)
-            return iter;
-
-        /* get previous server. */
-        if (data.cbegin() != iter)
-            --iter;
-
+    /* Check exact match. */
+    if (iter != data.cend() && iter->timestampMs == timestamp)
         return iter;
-    }
+
+    /* get previous server. */
+    if (data.cbegin() != iter)
+        --iter;
+
+    return iter;
+}
 }
 
 // ------------------- CameraHistory Pool ------------------------
-
 
 void QnCameraHistoryPool::setHistoryCheckDelay(int value)
 {
@@ -141,10 +148,12 @@ void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* me
         connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
             [this](const vms::event::AbstractActionPtr& businessAction)
             {
-                vms::event::EventType eventType = businessAction->getRuntimeParams().eventType;
-                if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent)
+                vms::api::EventType eventType = businessAction->getRuntimeParams().eventType;
+                if (eventType >= vms::api::EventType::systemHealthEvent
+                    && eventType <= vms::api::EventType::maxSystemHealthEvent)
                 {
-                    QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - vms::event::systemHealthEvent);
+                    QnSystemHealth::MessageType healthMessage =
+                        QnSystemHealth::MessageType(eventType - vms::api::EventType::systemHealthEvent);
                     if (healthMessage == QnSystemHealth::ArchiveRebuildFinished
                         || healthMessage == QnSystemHealth::ArchiveFastScanFinished
                         || healthMessage == QnSystemHealth::RemoteArchiveSyncFinished
@@ -213,12 +222,10 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
     if (requestToTerminate > 0)
         server->restConnection()->cancelRequest(requestToTerminate);
 
-
     if (notify)
         if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
             emit cameraHistoryInvalidated(camera);
 }
-
 
 QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(const QnSecurityCamResourcePtr &camera, callbackFunction callback)
 {
@@ -237,9 +244,9 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
     QnMediaServerResourceList serverList = getCameraFootageData(camera->getId(), true);
     if (serverList.size() <= 1)
     {
-        ec2::ApiCameraHistoryItemDataList items;
+        nx::vms::api::CameraHistoryItemDataList items;
         if (serverList.size() == 1)
-            items.push_back(ec2::ApiCameraHistoryItemData(serverList.front()->getId(), 0));
+            items.emplace_back(serverList.front()->getId(), 0);
 
         if (testAndSetHistoryDetails(camera->getId(), items))
             return StartResult::ommited;
@@ -255,7 +262,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
 
         auto handle = server->restConnection()->cameraHistoryAsync(request,
             [this, callback, guard = QPointer<QnCameraHistoryPool>(this), thread = this->thread()]
-            (bool success, rest::Handle id, ec2::ApiCameraHistoryDataList periods)
+            (bool success, rest::Handle id, nx::vms::api::CameraHistoryDataList periods)
             {
                 if (!guard)
                     return;
@@ -278,9 +285,12 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
     }
 }
 
-void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback)
+void QnCameraHistoryPool::at_cameraPrepared(
+    bool success,
+    const rest::Handle& requestId,
+    const nx::vms::api::CameraHistoryDataList& periods,
+    callbackFunction callback)
 {
-    Q_UNUSED(requestId);
     QnMutexLocker lock(&m_mutex);
     bool requestFound = false;
     for (auto itr = m_asyncRunningRequests.begin(); itr != m_asyncRunningRequests.end(); ++itr) {
@@ -391,13 +401,19 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnSecu
     return result.toList();
 }
 
-ec2::ApiCameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers(const ec2::ApiCameraHistoryItemDataList& dataList) const {
-    ec2::ApiCameraHistoryItemDataList result;
-    std::copy_if(dataList.cbegin(), dataList.cend(), std::back_inserter(result), [this](const ec2::ApiCameraHistoryItemData &data)
-    {
-        QnMediaServerResourcePtr res = toMediaServer(data.serverGuid);
-        return res && res->getStatus() == Qn::Online;
-    });
+nx::vms::api::CameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers(
+    const nx::vms::api::CameraHistoryItemDataList& dataList) const
+{
+    nx::vms::api::CameraHistoryItemDataList result;
+    std::copy_if(
+        dataList.cbegin(),
+        dataList.cend(),
+        std::back_inserter(result),
+        [this](const auto& data)
+        {
+            QnMediaServerResourcePtr res = toMediaServer(data.serverGuid);
+            return res && res->getStatus() == Qn::Online;
+        });
     return result;
 }
 
@@ -495,17 +511,17 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
     return toMediaServer(detailItr->serverGuid);
 }
 
-ec2::ApiCameraHistoryItemDataList QnCameraHistoryPool::getHistoryDetails(const QnUuid& cameraId, bool* isValid)
+nx::vms::api::CameraHistoryItemDataList QnCameraHistoryPool::getHistoryDetails(const QnUuid& cameraId, bool* isValid)
 {
     QnMutexLocker lock(&m_mutex);
     *isValid = m_historyValidCameras.contains(cameraId) &&
         isValidHistoryDetails(cameraId, m_historyDetail.value(cameraId));
-    return *isValid ? m_historyDetail.value(cameraId) : ec2::ApiCameraHistoryItemDataList();
+    return *isValid ? m_historyDetail.value(cameraId) : nx::vms::api::CameraHistoryItemDataList();
 }
 
 bool QnCameraHistoryPool::isValidHistoryDetails(
     const QnUuid& cameraId,
-    const ec2::ApiCameraHistoryItemDataList& historyDetails) const
+    const nx::vms::api::CameraHistoryItemDataList& historyDetails) const
 {
     QnSecurityCamResourcePtr camera = toCamera(cameraId);
     if (!camera || camera->getStatus() != Qn::Recording)
@@ -522,7 +538,7 @@ bool QnCameraHistoryPool::isValidHistoryDetails(
 
 bool QnCameraHistoryPool::testAndSetHistoryDetails(
     const QnUuid& cameraId,
-    const ec2::ApiCameraHistoryItemDataList& historyDetails)
+    const nx::vms::api::CameraHistoryItemDataList& historyDetails)
 {
     QSet<QnUuid> serverList;
     for (const auto& value: historyDetails)
@@ -548,28 +564,32 @@ bool QnCameraHistoryPool::testAndSetHistoryDetails(
     return true;
 }
 
-void QnCameraHistoryPool::resetServerFootageData(const ec2::ApiServerFootageDataList& cameraHistoryList)
+void QnCameraHistoryPool::resetServerFootageData(
+    const nx::vms::api::ServerFootageDataList& cameraHistoryList)
 {
     QSet<QnUuid> localHistoryValidCameras;
     QSet<QnUuid> allCameras;
     {
-        QnMutexLocker lock( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         m_archivedCamerasByServer.clear();
         m_historyDetail.clear();
         localHistoryValidCameras = m_historyValidCameras;
-        for(const ec2::ApiServerFootageData& item: cameraHistoryList) {
+        for (const auto& item: cameraHistoryList)
+        {
             m_archivedCamerasByServer.insert(item.serverGuid, item.archivedCameras);
-            for (const auto &cameraId: item.archivedCameras)
+            for (const auto& cameraId: item.archivedCameras)
                 allCameras.insert(cameraId);
         }
     }
 
-    for (const QnUuid &cameraId: localHistoryValidCameras)
+    for (const QnUuid& cameraId: localHistoryValidCameras)
         invalidateCameraHistory(cameraId);
 
-    for (const QnUuid &cameraId: allCameras)
+    for (const QnUuid& cameraId: allCameras)
+    {
         if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
             emit cameraFootageChanged(camera);
+    }
 }
 
 void QnCameraHistoryPool::setServerFootageData(const QnUuid& serverGuid, const std::vector<QnUuid>& cameras) {
@@ -584,7 +604,9 @@ void QnCameraHistoryPool::setServerFootageData(const QnUuid& serverGuid, const s
     }
 }
 
-void QnCameraHistoryPool::setServerFootageData(const ec2::ApiServerFootageData &serverFootageData) {
+void QnCameraHistoryPool::setServerFootageData(
+    const nx::vms::api::ServerFootageData& serverFootageData)
+{
     setServerFootageData(serverFootageData.serverGuid, serverFootageData.archivedCameras);
 }
 
@@ -605,7 +627,6 @@ QnSecurityCamResourceList QnCameraHistoryPool::getServerFootageCameras( const Qn
 
     return result;
 }
-
 
 bool QnCameraHistoryPool::updateCameraHistorySync(const QnSecurityCamResourcePtr &camera)
 {

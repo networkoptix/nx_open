@@ -1,17 +1,11 @@
 #pragma once
 
-#include <vector>
-
-#include <boost/optional/optional.hpp>
-
 #include <QtCore/QByteArray>
-#include <QtCore/QUrl>
-#include <QtNetwork/QAuthenticator>
 
 #include <plugins/plugin_tools.h>
+
 #include <nx/sdk/metadata/plugin.h>
 #include <nx/sdk/metadata/camera_manager.h>
-#include <nx/network/socket_global.h>
 
 #include "common.h"
 
@@ -48,10 +42,7 @@ public:
 
     virtual void setDeclaredSettings(const nxpl::Setting* settings, int count) override {}
 
-    // Managers can safely ask plugin about events. If no event found, m_emptyEvent is returned.
-    const AnalyticsEventType& eventByInternalName(const QString& internalName) const noexcept;
-
-    const AnalyticsEventType& eventByUuid(const QnUuid& uuid) const noexcept;
+    const AnalyticsEventType* eventByUuid(const QnUuid& uuid) const noexcept;
 
     virtual void executeAction(
         nx::sdk::metadata::Action* action, nx::sdk::Error* outError) override;
@@ -59,8 +50,6 @@ public:
 private:
     QByteArray m_manifest;
     AnalyticsDriverManifest m_typedManifest;
-    AnalyticsEventType m_emptyEvent;
-
 };
 
 } // namespace vca

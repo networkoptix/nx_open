@@ -3,11 +3,18 @@
 set -e
 
 SOURCE_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-BRANCH_FILE="$SOURCE_DIR"/../.hg/branch
-RDEP="$SOURCE_DIR"/../build_utils/python/rdep.py
+ROOT_DIR="$SOURCE_DIR/.."
+BRANCH_FILE="$ROOT_DIR"/.hg/branch
+RDEP="$ROOT_DIR"/build_utils/python/rdep.py
 WEBADMIN_FILE="$PWD"/server-external/bin/external.dat
 PACKAGES_DIR="$environment"/packages
 PACKAGE_BASE_NAME=server-external
+DEPLOY_RELEASE_VERSION=0
+
+if [ "$1" = "--deploy-release-version" ]
+then
+    DEPLOY_RELEASE_VERSION=1
+fi
 
 function deploy_package()
 {
@@ -48,8 +55,11 @@ check_file "$PACKAGES_DIR"/.rdep \
 
 BRANCH=$(cat $BRANCH_FILE)
 
-deploy_package "$PACKAGES_DIR/any/${PACKAGE_BASE_NAME}-${BRANCH}"
-if [[ $BRANCH =~ [0-9]\.[0-9]_web$ ]]
+deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$BRANCH"
+if [ $DEPLOY_RELEASE_VERSION = 1 ]
 then
-    deploy_package "$PACKAGES_DIR/any/${PACKAGE_BASE_NAME}-${BRANCH%_web}"
+    VMS_VERSION=$(grep 'set(releaseVersion .*)' "$ROOT_DIR/CMakeLists.txt" \
+        | sed -E 's/.*releaseVersion ([0-9.]+)+\)/\1/')
+
+    deploy_package "$PACKAGES_DIR/any/$PACKAGE_BASE_NAME-$VMS_VERSION"
 fi

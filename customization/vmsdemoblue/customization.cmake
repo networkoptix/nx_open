@@ -1,11 +1,11 @@
+set(build_mobile OFF)
+
 # Components Namings
-set(parent.customization "default")
 set(product.name "VMS Demonstration")
 set(display.product.name "VMS Demonstration")
 set(product.name.short "vmsdemoblue")
 set(product.appName "vmsdemo")
 set(company.name "Network Optix")
-set(short.company.name "VMS")
 set(uri.protocol "demo-vms")
 set(cloudName "VMS Demo Cloud")
 
@@ -13,7 +13,7 @@ set(cloudName "VMS Demo Cloud")
 set(companyUrl "http://networkoptix.com")
 set(productUrl "http://networkoptix.com/nxwitness-overview")
 set(supportUrl "http://support.networkoptix.com")
-set(supportEmail "support@networkoptix.com")
+set(supportEmail "")
 set(supportPhone "")
 set(licenseEmail "support@networkoptix.com")
 # end of Support section
@@ -31,7 +31,6 @@ set(customization.serverUpgradeCode "{7281bfb3-7724-40a9-a5f0-982abb051c4f}")
 set(customization.clientBundleUpgradeCode "{68c9797b-083c-412e-9fb1-2473ecfbef3b}")
 set(customization.serverBundleUpgradeCode "{ba74bf7e-a258-4fbd-a1a0-59e2d945c129}")
 set(customization.fullBundleUpgradeCode "{4855d804-8e44-44d5-99eb-807a28556273}")
-set(customization.nxtoolBundleUpgradeCode "{66364d74-2da9-4547-aaca-8a8af4fdc79f}")
 
 set(deb.customization.company.name "networkoptix")
 
@@ -58,6 +57,7 @@ set(additionalTranslations
     de_DE
     ru_RU
     es_ES
+    it_IT
     ja_JP
     ko_KR
     tr_TR

@@ -1,19 +1,19 @@
 {
   "language_name": "Français",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
     "cancelButton": "Annuler",
-    "loginTitle": "Connexion à {{PRODUCT_NAME}}",
+    "loginTitle": "Connexion à %PRODUCT_NAME%",
     "loginButton": "Connexion",
     "logoutAuthorisedTitle": "Vous êtes déjà connecté",
     "logoutAuthorisedContinueButton": "Continuer",
     "logoutAuthorisedLogoutButton": "Déconnecter"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
+    "template": "{{title}}%PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
     "registerSuccess": "Bienvenue sur",
     "register": "Créer compte dans",
     "changePassword": "Changer mot de passe -",
@@ -31,8 +31,8 @@
     "view": "Voir les caméras - ",
     "debug": "Débogage",
     "login": "Connexion -",
-    "download": "Télécharger {{VMS_NAME}}",
-    "downloadPlatform": "Télécharger {{VMS_NAME}} pour ",
+    "download": "Télécharger %VMS_NAME%",
+    "downloadPlatform": "Télécharger %VMS_NAME% pour ",
     "pageNotFound": "Page non trouvée"
   },
   "systemStatuses": {
@@ -69,7 +69,7 @@
     },
     "Custom": {
       "label": "Personnalisé",
-      "description": "Utiliser l'application client {{PRODUCT_NAME}} pour configurer des autorisations personnalisées"
+      "description": "Utiliser l'application client %PRODUCT_NAME% pour configurer des autorisations personnalisées"
     },
     "cloudAdmin": {
       "label": "Administrateur",
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Personnalisé",
-      "description": "Utiliser l'application client {{PRODUCT_NAME}} pour configurer des autorisations personnalisées"
+      "description": "Utiliser l'application client %VMS_NAME% pour configurer des autorisations personnalisées"
     }
   },
   "errorCodes": {
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "Impossible d’envoyer courriel de confirmation",
     "cloudInvalidResponse": "BD Nuage a retourné une réponse inattendue",
     "notAuthorized": "Mot de passe incorrect",
-    "wrongParameters": "Certains paramètres dans le formulaire sont incorrects",
     "brokenAccount": "Problème inattendu avec le compte. <a href=\"/restore_password\">Restaurer le compte</a>",
+    "wrongParameters": "Certains paramètres dans le formulaire sont incorrects",
     "wrongCode": "Compte déjà activé ou le code de confirmation est incorrect",
     "wrongCodeRestore": "Code de confirmation est déjà utilisé ou incorrecte",
     "forbidden": "Vous n’avez pas l'autorisation nécessaire pour effectuer cette action",
@@ -127,22 +127,24 @@
     "alreadyExists": "Ce compte existe déjà",
     "unknownError": "Erreur inattendue survenue",
     "accountAlreadyActivated": "Ce compte est déjà activé",
-    "emailNotFound": "Compte n’existe pas",
+    "emailNotFound": "Compte n’existe pas.",
     "EmailAlreadyExists": "Courriel déjà enregistré",
-    "oldPasswordMistmatch": "Mot de passe actuel incorrect",
+    "oldPasswordMistmatch": "Mot de passe actuel incorrect.",
     "passwordMismatch": "Mot de passe incorrect",
     "cantEditYourself": "Modification des propres autorisations n’est pas autorisée",
     "cantEditAdmin": "Cet usager dispose d’autorisations administrateur",
-    "cantOpenClient": "{{VMS_NAME}} application non détectée. <a href=\"/download\"> Télécharger</a>",
+    "cantOpenClient": "%VMS_NAME% application non détectée. <a href=\"/download\"> Télécharger</a>",
     "lostConnection": "Connexion à {{systemName}} perdu",
-    "thisSystem": "le système"
+    "thisSystem": "le système",
+    "oldSafariNotSupported": "Les versions de Safari antérieures à 10 ne sont pas supportées"
   },
   "passwordRequirements": {
     "minLengthMessage": "Mot de passe doit contenir au moins 8 caractères",
     "requiredMessage": "Utilisez uniquement les lettres latines, les chiffres et les symboles du clavier, éviter les espaces de début et de fin",
     "weakMessage": "Utiliser des nombres, majuscules et minuscules et caractères spéciaux pour rendre votre mot de passe plus fort",
     "strongMessage": "Mot de passe fort!",
-    "commonMessage": "Ce mot de passe est en haut de la liste des plus populaires dans le monde"
+    "commonMessage": "Ce mot de passe est en haut de la liste des plus populaires dans le monde",
+    "missingMessage": "Mot de passe requis"
   },
   "sharing": {
     "confirmOwner": "Si vous modifiez le propriétaire du système, vous révoquez la propriété sur le compte courant. Cette action est irréversible. Êtes-vous sûr ?",
@@ -157,12 +159,14 @@
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Le système est inaccessible",
     "offline": "System Hors ligne",
-    "openClient": "Ouvert à {{VMS_NAME}}",
-    "openClientNoSystem": "Ouvrir {{VMS_NAME}}",
+    "openClient": "Ouvert à %VMS_NAME%",
+    "openClientNoSystem": "Ouvrir %VMS_NAME%",
+    "confirmMergeAction": "Fusionner",
+    "mergeSystemTitle": "Fusionner systèmes",
     "confirmRenameTitle": "Nom système",
     "confirmRenameAction": "Enregistrer",
     "successRename": "Nom du système sauvegardé",
-    "confirmDisconnectTitle": "Déconnecter le système de {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Déconnecter le système de %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Déconnecter",
     "confirmUnshareFromMe": "Vous êtes sur le point de déconnecter ce système de votre compte. Vous ne serez plus en mesure d’accéder à ce système. Êtes-Vous sûr ?",
     "confirmUnshareFromMeTitle": "Déconnecter système?",
@@ -170,7 +174,7 @@
     "confirmUnshare": "Cet usager ne sera pas en mesure d’accéder au système. Êtes-vous sûr?",
     "confirmUnshareTitle": "Supprimer usager?",
     "confirmUnshareAction": "Supprimer",
-    "successDisconnected": "Système correctement déconnecté de {{PRODUCT_NAME}}",
+    "successDisconnected": "Système correctement déconnecté de %PRODUCT_NAME%",
     "successDeleted": "Système {{systemName}} a correctement été supprimé de votre compte",
     "permissionsRemoved": "Autorisations retirées de {{email}}"
   },
@@ -183,14 +187,14 @@
     "saveChanges": "Enregistrer"
   },
   "downloads": {
-    "noClientDetectedTitle": "Installer {{VMS_NAME}} pour visionner votre Système",
-    "action": "Télécharger {{VMS_NAME}}",
+    "noClientDetectedTitle": "Installer %VMS_NAME% pour visionner votre Système",
+    "action": "Télécharger %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

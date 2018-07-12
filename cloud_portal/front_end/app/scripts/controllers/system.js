@@ -7,12 +7,18 @@ angular.module('cloudApp')
     account, $q, system, $poll, page, $timeout, systemsProvider) {
 
         var systemId = $routeParams.systemId;
+        $scope.debugMode = Config.allowDebugMode;
 
 
         account.requireLogin().then(function(account){
             $scope.account = account;
             $scope.system = system(systemId, account.email);
             $scope.gettingSystem.run();
+
+            $scope.$watch('system.info.name',function(value){
+                page.title(value ? value + ' -' : '');
+                systemsProvider.forceUpdateSystems();
+            });
         });
 
         function getMergeTarget(targetSystemId){
@@ -57,8 +63,10 @@ angular.module('cloudApp')
             }
         });
 
+
+        var pollingSystemUpdate = null;
         function delayedUpdateSystemInfo(){
-            var pollingSystemUpdate = $poll(function(){
+            pollingSystemUpdate = $poll(function(){
                 return $scope.system.update().catch(function(error){
                     if(error.data.resultCode == 'forbidden' || error.data.resultCode == 'notFound'){
                         connectionLost();
@@ -90,16 +98,16 @@ angular.module('cloudApp')
             $location.path('/systems/' + systemId, false);
         }
 
-        function reloadSystems(){
-            systemsProvider.forceUpdateSystems();
-            $location.path('/systems');
+        function updateAndGoToSystems(){
+            $scope.userDisconnectSystem = true;
+            systemsProvider.forceUpdateSystems().then(function(){$location.path('/systems')});
         }
 
         $scope.disconnect = function(){
             if($scope.system.isMine){
                 // User is the owner. Deleting system means unbinding it and disconnecting all accounts
                 // dialogs.confirm(L.system.confirmDisconnect, L.system.confirmDisconnectTitle, L.system.confirmDisconnectAction, 'danger').
-                dialogs.disconnect(systemId).then(reloadSystems);
+                dialogs.disconnect(systemId).then(updateAndGoToSystems);
             }
         };
 
@@ -113,7 +121,7 @@ angular.module('cloudApp')
                         },{
                             successMessage: L.system.successDeleted.replace('{{systemName}}', $scope.system.info.name),
                             errorPrefix: L.errorCodes.cantUnshareWithMeSystemPrefix
-                        }).then(reloadSystems);
+                        }).then(updateAndGoToSystems);
                         $scope.deletingSystem.run();
                     });
             }
@@ -159,6 +167,7 @@ angular.module('cloudApp')
             dialogs.confirm(L.system.confirmUnshare, L.system.confirmUnshareTitle, L.system.confirmUnshareAction, 'danger').
                 then(function(){
                     // Run a process of sharing
+                    $poll.cancel(pollingSystemUpdate);
                     $scope.unsharing = process.init(function(){
                         return $scope.system.deleteUser(user);
                     },{
@@ -166,24 +175,18 @@ angular.module('cloudApp')
                         errorPrefix: L.errorCodes.cantSharePrefix
                     }).then(function(){
                         $scope.locked[user.email] = false;
-                        var userId = user.id;
-                        $scope.system.users = _.filter($scope.system.users, function(user){
-                            return user.id != userId;
-                        });
-
+                        $scope.system.getUsers()
+                        delayedUpdateSystemInfo();
                     },function(){
                         $scope.locked[user.email] = false;
                     });
                     $scope.unsharing.run();
                 }, function(){
                     $scope.locked[user.email] = false;
+                    $scope.system.getUsers()
+                    delayedUpdateSystemInfo();
                 });
         };
-
-        $scope.$watch('system.info.name',function(value){
-            page.title(value ? value + ' -' : '');
-            systemsProvider.forceUpdateSystems();
-        });
 
         function normalizePermissionString(permissions){
             return permissions.split('|').sort().join('|');
@@ -201,9 +204,11 @@ angular.module('cloudApp')
         }
         var cancelSubscription = $scope.$on("unauthorized_" + $routeParams.systemId, connectionLost);
 
-        $scope.$on('$destroy', function( event ) {
+        $scope.$on('$destroy', function() {
             cancelSubscription();
-            dialogs.dismissNotifications();
+           if( typeof($scope.userDisconnectSystem) === 'undefined'){
+               dialogs.dismissNotifications();
+           }
         });
 
 

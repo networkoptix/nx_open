@@ -32,7 +32,7 @@ void loadResourcesFromEcs(
     ec2::ErrorCode rez;
     {
         //reading servers list
-        ec2::ApiMediaServerDataList mediaServerList;
+        api::MediaServerDataList mediaServerList;
         while (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(). Can't get servers."), cl_logERROR);
@@ -41,7 +41,7 @@ void loadResourcesFromEcs(
                 return;
         }
 
-        ec2::ApiDiscoveryDataList discoveryDataList;
+        api::DiscoveryDataList discoveryDataList;
         while (ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(). Can't get discovery data."), cl_logERROR);
@@ -52,7 +52,7 @@ void loadResourcesFromEcs(
 
         QMultiHash<QnUuid, nx::utils::Url> additionalAddressesById;
         QMultiHash<QnUuid, nx::utils::Url> ignoredAddressesById;
-        for (const ec2::ApiDiscoveryData &data : discoveryDataList)
+        for (const api::DiscoveryData &data : discoveryDataList)
         {
             additionalAddressesById.insert(data.id, data.url);
             if (data.ignore)
@@ -90,10 +90,13 @@ void loadResourcesFromEcs(
         }
 
         // read resource status
-        ec2::ApiResourceStatusDataList statusList;
-        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
+        nx::vms::api::ResourceStatusDataList statusList;
+        while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getStatusListSync(
+            QnUuid(),
+            &statusList)) != ec2::ErrorCode::ok)
         {
-            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
+            NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::
+                toString(rez)), cl_logDEBUG1);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;
@@ -101,7 +104,7 @@ void loadResourcesFromEcs(
         messageProcessor->resetStatusList(statusList);
 
         //reading server attributes
-        ec2::ApiMediaServerUserAttributesDataList mediaServerUserAttributesList;
+        api::MediaServerUserAttributesDataList mediaServerUserAttributesList;
         while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getUserAttributesSync(QnUuid(), &mediaServerUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get server user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
@@ -116,7 +119,7 @@ void loadResourcesFromEcs(
 
     {
         // read camera list
-        ec2::ApiCameraDataList cameras;
+        nx::vms::api::CameraDataList cameras;
         while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameras)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get cameras. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
@@ -126,7 +129,7 @@ void loadResourcesFromEcs(
         }
 
         //reading camera attributes
-        ec2::ApiCameraAttributesDataList cameraUserAttributesList;
+        nx::vms::api::CameraAttributesDataList cameraUserAttributesList;
         while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getUserAttributesSync(&cameraUserAttributesList)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get camera user attributes list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
@@ -137,7 +140,7 @@ void loadResourcesFromEcs(
         messageProcessor->resetCameraUserAttributesList(cameraUserAttributesList);
 
         // read properties dictionary
-        ec2::ApiResourceParamWithRefDataList kvPairs;
+        nx::vms::api::ResourceParamWithRefDataList kvPairs;
         while ((rez = ec2Connection->getResourceManager(Qn::kSystemAccess)->getKvPairsSync(QnUuid(), &kvPairs)) != ec2::ErrorCode::ok)
         {
             NX_LOG(lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1);
@@ -175,7 +178,7 @@ void loadResourcesFromEcs(
     }
 
     {
-        ec2::ApiServerFootageDataList serverFootageData;
+        nx::vms::api::ServerFootageDataList serverFootageData;
         while ((rez = ec2Connection->getCameraManager(Qn::kSystemAccess)->getServerFootageDataSync(&serverFootageData)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
@@ -188,8 +191,8 @@ void loadResourcesFromEcs(
     }
 
     {
-        //loading users
-        ec2::ApiUserDataList users;
+        // Loading users.
+        nx::vms::api::UserDataList users;
         while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
@@ -204,7 +207,7 @@ void loadResourcesFromEcs(
 
     {
         //loading videowalls
-        ec2::ApiVideowallDataList videowalls;
+        nx::vms::api::VideowallDataList videowalls;
         while ((rez = ec2Connection->getVideowallManager(Qn::kSystemAccess)->getVideowallsSync(&videowalls)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
@@ -213,13 +216,13 @@ void loadResourcesFromEcs(
                 return;
         }
 
-        for (const ec2::ApiVideowallData& videowall : videowalls)
+        for (const auto& videowall: videowalls)
             messageProcessor->updateResource(videowall, ec2::NotificationSource::Local);
     }
 
     {
         //loading layouts
-        ec2::ApiLayoutDataList layouts;
+        nx::vms::api::LayoutDataList layouts;
         while ((rez = ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&layouts)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get layouts. Reason: " << ec2::toString(rez);
@@ -234,7 +237,7 @@ void loadResourcesFromEcs(
 
     {
         //loading webpages
-        ec2::ApiWebPageDataList webpages;
+        nx::vms::api::WebPageDataList webpages;
         while ((rez = ec2Connection->getWebPageManager(Qn::kSystemAccess)->getWebPagesSync(&webpages)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get webpages. Reason: " << ec2::toString(rez);
@@ -249,7 +252,7 @@ void loadResourcesFromEcs(
 
     {
         //loading accessible resources
-        ec2::ApiAccessRightsDataList accessRights;
+        nx::vms::api::AccessRightsDataList accessRights;
         while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getAccessRightsSync(&accessRights)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get accessRights. Reason: " << ec2::toString(rez);
@@ -261,8 +264,8 @@ void loadResourcesFromEcs(
     }
 
     {
-        //loading user roles
-        ec2::ApiUserRoleDataList userRoles;
+        // Loading user roles.
+        api::UserRoleDataList userRoles;
         while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserRolesSync(&userRoles)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);
@@ -274,18 +277,17 @@ void loadResourcesFromEcs(
     }
 
     {
-        //loading business rules
-        nx::vms::event::RuleList rules;
-        while ((rez = ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok)
+        //Loading event rules.
+        nx::vms::api::EventRuleDataList rules;
+        while ((rez = ec2Connection->getEventRulesManager(Qn::kSystemAccess)->getEventRulesSync(
+            &rules)) != ec2::ErrorCode::ok)
         {
-            qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
+            qDebug() << "QnMain::run(): Can't get event rules. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
                 return;
         }
-
-        for (const auto& rule : rules)
-            messageProcessor->on_businessEventAddedOrUpdated(rule);
+        messageProcessor->resetEventRules(rules);
     }
 
     {

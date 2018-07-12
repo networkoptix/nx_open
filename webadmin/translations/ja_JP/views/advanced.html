@@ -106,7 +106,7 @@
             書き込みのための主記憶装置ドライブが選択されていません - ビデオはこのサーバーに記録されません。
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            予約済み領域の容量が空き領域を超えています 現在のビデオ映像は、領域を確保する為に削除される可能性があります
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">すべての強調表示されている設定を修正して保存します</div>
 
@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>手動更新</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">インストーラーをアップロード</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">正しく構成されているか確認してください</p>
-            </div>
-        </div>
-    </form>
-
     <h1>詳細設定</h1>
     <div class="alert alert-danger" role="alert">
         <b>警告!</b>このページのすべての変更は、サーバーが正しく動作しなくなる可能性があります
@@ -193,7 +182,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] | | '空 '}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>警告 ！</b> いくつかの変更は、再起動を必要とします <b>すべて</b> システム内のサーバー<br><br>
+        <b>警告 ！</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >現在のサーバーを再起動</button>
         </div>

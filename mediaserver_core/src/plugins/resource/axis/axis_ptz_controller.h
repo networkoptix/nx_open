@@ -8,6 +8,7 @@
 
 #include <core/ptz/basic_ptz_controller.h>
 #include <utils/math/functors.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 class CLSimpleHTTPClient;
 class QnAxisParameterMap;
@@ -20,20 +21,46 @@ public:
     QnAxisPtzController(const QnPlAxisResourcePtr &resource);
     virtual ~QnAxisPtzController();
 
-    virtual Ptz::Capabilities getCapabilities() const override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
 
-    virtual bool continuousMove(const QVector3D &speed) override;
-    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const override;
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const override;
-    virtual bool getFlip(Qt::Orientations *flip) const override;
+    virtual bool absoluteMove(
+        Qn::PtzCoordinateSpace space,
+        const nx::core::ptz::Vector& position,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool relativeMove(
+        const nx::core::ptz::Vector& relativeMovementVector,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool relativeFocus(
+        qreal relativeFocusMovement,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool getPosition(
+        Qn::PtzCoordinateSpace space,
+        nx::core::ptz::Vector* position,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getLimits(
+        Qn::PtzCoordinateSpace space,
+        QnPtzLimits *limits,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getFlip(
+        Qt::Orientations *flip,
+        const nx::core::ptz::Options& options) const override;
 
     virtual bool getPresets(QnPtzPresetList *presets) const override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
     virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;
     virtual bool removePreset(const QString &presetId) override;
+
 private:
     void updateState();
     void updateState(const QnAxisParameterMap &params);
@@ -53,6 +80,7 @@ private:
     Ptz::Capabilities m_capabilities;
     Qt::Orientations m_flip;
     QnPtzLimits m_limits;
+    QnPtzLimits m_rawLimits;
     QnLinearFunction m_35mmEquivToCameraZoom, m_cameraTo35mmEquivZoom;
     QVector3D m_maxDeviceSpeed;
 

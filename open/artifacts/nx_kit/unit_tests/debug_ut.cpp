@@ -13,7 +13,7 @@ using namespace nx::kit;
 
 static std::string thisFileFolder()
 {
-    ASSERT_TRUE(debug::pathSeparator());
+    ASSERT_TRUE(debug::pathSeparator() != '\0');
     const char* const file = __FILE__;
     const char* const separator2 = strrchr(file, debug::pathSeparator());
     ASSERT_TRUE(separator2 != nullptr);
@@ -201,7 +201,7 @@ TEST(debug, toString_char)
 TEST(debug, toString_char_ptr)
 {
     ASSERT_STREQ("\"str\"", nx::kit::debug::toString("str"));
-    ASSERT_STREQ(R"("str\"with_quote")", nx::kit::debug::toString("str\"with_quote"));
+    ASSERT_STREQ("\"str\\\"with_quote\"", nx::kit::debug::toString("str\"with_quote"));
     ASSERT_STREQ(R"("str\\with_backslash")", nx::kit::debug::toString("str\\with_backslash"));
     ASSERT_STREQ(R"("str\twith_tab")", nx::kit::debug::toString("str\twith_tab"));
     ASSERT_STREQ(R"("str\nwith_newline")", nx::kit::debug::toString("str\nwith_newline"));
@@ -217,7 +217,7 @@ TEST(debug, toString_char_ptr)
  */
 static std::string relativeSrcFilename(const std::string& file)
 {
-    ASSERT_TRUE(debug::pathSeparator());
+    ASSERT_TRUE(debug::pathSeparator() != '\0');
 
     std::string platformDependentFile = file;
     std::replace(platformDependentFile.begin(), platformDependentFile.end(),

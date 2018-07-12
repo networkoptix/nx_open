@@ -1,0 +1,64 @@
+<!doctype html>
+<html class="no-js" ng-app="cloudApp">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+
+    <base href="/">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <link rel="icon" href="static/images/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="static/images/favicon.ico" type="image/x-icon">
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <link rel="stylesheet" href="fonts/roboto/roboto_bold/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_light/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_regular/stylesheet.css" />
+    <link rel="stylesheet" href="fonts/roboto/roboto_medium/stylesheet.css" />
+    <% for (key in htmlWebpackPlugin.files.css) { %>
+    <link rel="stylesheet" href="/static<%= htmlWebpackPlugin.files.css[key] %>" />
+    <% } %>
+
+
+</head>
+<body class="loading">
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an outdated browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<noscript>
+    Please, turn on JavaScript in your browser
+</noscript>
+
+<header></header>
+
+<div ng-view="">
+</div>
+
+<footer></footer>
+
+<% for (key in htmlWebpackPlugin.files.chunks) { %>
+<script type="text/javascript" src="/static<%= htmlWebpackPlugin.files.chunks[key].entry %>"></script>
+<% } %>
+<!-- Google Tag Manager -->
+<script async>(function (w, d, s, l, i) {
+    w[l] = w[l] || [];
+    w[l].push({
+        'gtm.start':
+            new Date().getTime(), event: 'gtm.js'
+    });
+    var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+    j.async = true;
+    j.src =
+        '//www.googletagmanager.com/gtm.js?id=' + i + dl;
+    f.parentNode.insertBefore(j, f);
+})(window, document, 'script', 'dataLayer', Config.googleTagsCode);</script>
+<!-- End Google Tag Manager -->
+
+</body>
+</html>

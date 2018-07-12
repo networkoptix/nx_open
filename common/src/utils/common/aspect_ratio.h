@@ -25,7 +25,8 @@ public:
 
     static bool isRotated90(qreal angle);
 
-    bool operator ==(const QnAspectRatio &other) const;
+    bool operator==(const QnAspectRatio& other) const;
+    bool operator!=(const QnAspectRatio& other) const;
 
 private:
     int m_width = 0;

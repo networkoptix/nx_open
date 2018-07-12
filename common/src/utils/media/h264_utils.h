@@ -1,6 +1,4 @@
-#ifndef NX_H264_UTILS_H
-#define NX_H264_UTILS_H
-
+#pragma once
 
 #include <map>
 
@@ -9,6 +7,15 @@
 
 #include "nx/streaming/video_data_packet.h"
 
+namespace nx {
+namespace media_utils {
+
+
+void readNALUsFromAnnexBStream(
+    const QnConstCompressedVideoDataPtr& data,
+    std::vector<std::pair<const quint8*, size_t>>* const nalUnits);
+
+namespace h264 {
 
 /*!
     Adds \a Qn::PROFILE_LEVEL_ID_PARAM_NAME and \a Qn::SPROP_PARAMETER_SETS_PARAM_NAME parameters to \a customStreamParams.
@@ -19,4 +26,8 @@ void extractSpsPps(
     QSize* const newResolution,
     std::map<QString, QString>* const customStreamParams);
 
-#endif  //NX_H264_UTILS_H
+std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(const QnConstCompressedVideoDataPtr& videoData);
+
+} // namespace h264
+} // namespace media_utils
+} // namespace nx

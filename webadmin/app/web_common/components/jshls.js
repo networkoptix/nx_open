@@ -1,6 +1,6 @@
 'use strict';
 
-function JsHlsAPI(){
+window.JsHlsAPI = function(){
     var events, stats, fmp4Data,
     debugMode, //Create the jshls player in debug mode
     enableWorker = true,
@@ -466,13 +466,16 @@ JsHlsAPI.prototype.kill = function(){
 };
 
 JsHlsAPI.prototype.play = function(offset){
-    this.video.play().catch(function(error){
-        var errorString = error.toString();
-        //We use a string because chrome does not return an object with things such as code and name
-        if(errorString.indexOf('pause') < 0 && errorString.indexOf('load') < 0){
-            throw error;
-        }
-    });
+    var playPromise = this.video.play();
+    if(playPromise) {
+        playPromise.catch(function (error) {
+            var errorString = error.toString();
+            //We use a string because chrome does not return an object with things such as code and name
+            if (errorString.indexOf('pause') < 0 && errorString.indexOf('load') < 0) {
+                throw error;
+            }
+        });
+    }
 };
 
 JsHlsAPI.prototype.pause = function(){

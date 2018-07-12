@@ -128,7 +128,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="nx::client::desktop::ui::SelectableTextButton" name="cameraExportSettingsButton">
+              <widget class="nx::client::desktop::SelectableTextButton" name="cameraExportSettingsButton">
                <property name="text">
                 <string>Export Settings</string>
                </property>
@@ -153,35 +153,35 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="nx::client::desktop::ui::SelectableTextButton" name="bookmarkButton">
+                 <widget class="nx::client::desktop::SelectableTextButton" name="bookmarkButton">
                   <property name="text">
                    <string notr="true">&lt;Bookmark Info&gt;</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="nx::client::desktop::ui::SelectableTextButton" name="timestampButton">
+                 <widget class="nx::client::desktop::SelectableTextButton" name="timestampButton">
                   <property name="text">
                    <string notr="true">&lt;Timestamp&gt;</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="nx::client::desktop::ui::SelectableTextButton" name="imageButton">
+                 <widget class="nx::client::desktop::SelectableTextButton" name="imageButton">
                   <property name="text">
                    <string notr="true">&lt;Image&gt;</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="nx::client::desktop::ui::SelectableTextButton" name="textButton">
+                 <widget class="nx::client::desktop::SelectableTextButton" name="textButton">
                   <property name="text">
                    <string notr="true">&lt;Text&gt;</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="nx::client::desktop::ui::SelectableTextButton" name="speedButton">
+                 <widget class="nx::client::desktop::SelectableTextButton" name="speedButton">
                   <property name="text">
                    <string notr="true">&lt;Speed&gt;</string>
                   </property>
@@ -501,7 +501,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="nx::client::desktop::ui::SelectableTextButton" name="layoutExportSettingsButton">
+              <widget class="nx::client::desktop::SelectableTextButton" name="layoutExportSettingsButton">
                <property name="text">
                 <string>Export Settings</string>
                </property>
@@ -601,9 +601,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::SelectableTextButton</class>
+   <class>nx::client::desktop::SelectableTextButton</class>
    <extends>QPushButton</extends>
-   <header location="global">nx/client/desktop/ui/common/selectable_text_button.h</header>
+   <header location="global">nx/client/desktop/common/widgets/selectable_text_button.h</header>
   </customwidget>
   <customwidget>
    <class>nx::client::desktop::TimestampOverlaySettingsWidget</class>

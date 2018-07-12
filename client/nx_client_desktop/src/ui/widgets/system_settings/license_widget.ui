@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>776</width>
-    <height>150</height>
+    <height>185</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -79,7 +79,7 @@
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QnBusyIndicatorButton" name="activateLicenseButton">
+        <widget class="nx::client::desktop::BusyIndicatorButton" name="activateLicenseButton">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -104,7 +104,7 @@
           <number>8</number>
          </property>
          <item>
-          <widget class="QnBusyIndicatorButton" name="activateFreeLicenseButton">
+          <widget class="nx::client::desktop::BusyIndicatorButton" name="activateFreeLicenseButton">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -179,7 +179,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="hardwareIdLabel">
          <property name="text">
-          <string>Hardware Id</string>
+          <string>Hardware ID</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -217,7 +217,7 @@
         </widget>
        </item>
        <item row="3" column="3">
-        <widget class="QnBusyIndicatorButton" name="activateLicenseButtonCopy">
+        <widget class="nx::client::desktop::BusyIndicatorButton" name="activateLicenseButtonCopy">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -253,9 +253,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnBusyIndicatorButton</class>
+   <class>nx::client::desktop::BusyIndicatorButton</class>
    <extends>QPushButton</extends>
-   <header location="global">ui/widgets/common/busy_indicator_button.h</header>
+   <header location="global">nx/client/desktop/common/widgets/busy_indicator_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

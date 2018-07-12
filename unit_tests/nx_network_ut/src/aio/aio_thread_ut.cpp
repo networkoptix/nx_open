@@ -76,7 +76,7 @@ protected:
 
     void whenStopPollingSocket()
     {
-        m_aioThread.stopMonitoring(m_tcpSocket.get(), aio::EventType::etRead, false, nullptr);
+        m_aioThread.stopMonitoring(m_tcpSocket.get(), aio::EventType::etRead);
     }
 
     std::unique_ptr<TCPSocket> m_tcpSocket;
@@ -133,7 +133,7 @@ TEST_F(AIOThread, socket_polled_notification)
     started.get_future().wait();
     ASSERT_FALSE(handlerCalledFlag);
 
-    m_aioThread.stopMonitoring(&socket, aio::etRead, true, nullptr);
+    m_aioThread.stopMonitoring(&socket, aio::etRead);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -184,12 +184,11 @@ protected:
     void whenInvokedStopMonitoring()
     {
         nx::utils::promise<void> stopped;
-        m_aioThread.stopMonitoring(
+        m_aioThread.post(
             m_tcpSocket.get(),
-            aio::etRead,
-            true,
-            [&stopped]()
+            [this, &stopped]()
             {
+                m_aioThread.stopMonitoring(m_tcpSocket.get(), aio::etRead);
                 stopped.set_value();
             });
         stopped.get_future().wait();

@@ -4,12 +4,13 @@
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
 
+#include <api/model/getnonce_reply.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <network/module_information.h>
-#include <api/model/getnonce_reply.h>
 #include <utils/merge_systems_common.h>
+
 #include <nx/utils/url.h>
+#include <nx/vms/api/data/module_information.h>
 
 class QnMergeSystemsTool: public QObject, public QnWorkbenchContextAware
 {
@@ -31,22 +32,22 @@ public:
   signals:
     void systemFound(
         utils::MergeSystemsStatus::Value mergeStatus,
-        const QnModuleInformation& moduleInformation,
+        const nx::vms::api::ModuleInformation& moduleInformation,
         const QnMediaServerResourcePtr& discoverer);
     void mergeFinished(
         utils::MergeSystemsStatus::Value mergeStatus,
-        const QnModuleInformation& moduleInformation,
+        const nx::vms::api::ModuleInformation& moduleInformation,
         int requestHandle);
 
 private slots:
     void at_pingSystem_finished(
         int status,
-        const QnModuleInformation& moduleInformation,
+        const nx::vms::api::ModuleInformation& moduleInformation,
         int handle,
         const QString& errorString);
     void at_mergeSystem_finished(
         int status,
-        const QnModuleInformation& moduleInformation,
+        const nx::vms::api::ModuleInformation& moduleInformation,
         int handle,
         const QString& errorString);
     void at_getNonceForMergeFinished(
@@ -71,8 +72,10 @@ private:
         bool ignoreIncompatible = false;
         int nonceRequestHandle = -1;
         int mainRequestHandle = -1;
+
+        QString peerString() const;
     };
 
     QHash<int, TwoStepRequestCtx> m_twoStepRequests; //< getnonce/ping, getnonce/merge
-    QPair<utils::MergeSystemsStatus::Value, QnModuleInformation> m_foundModule;
+    QPair<utils::MergeSystemsStatus::Value, nx::vms::api::ModuleInformation> m_foundModule;
 };

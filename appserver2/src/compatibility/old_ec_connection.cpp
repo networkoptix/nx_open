@@ -11,6 +11,7 @@
 #include "ec2_thread_pool.h"
 #include "transaction/transaction.h"
 
+#include <nx/vms/api/data/database_dump_data.h>
 
 namespace ec2
 {
@@ -50,9 +51,9 @@ namespace ec2
         return AbstractLicenseManagerPtr();
     }
 
-    AbstractBusinessEventManagerPtr OldEcConnection::getBusinessEventManager(const Qn::UserAccessData &)
+    AbstractEventRulesManagerPtr OldEcConnection::getEventRulesManager(const Qn::UserAccessData &)
     {
-        return AbstractBusinessEventManagerPtr();
+        return {};
     }
 
     AbstractUserManagerPtr OldEcConnection::getUserManager(const Qn::UserAccessData &)
@@ -100,12 +101,7 @@ namespace ec2
         return AbstractDiscoveryManagerPtr();
     }
 
-    AbstractTimeManagerPtr OldEcConnection::getTimeManager(const Qn::UserAccessData &)
-    {
-        return AbstractTimeManagerPtr();
-    }
-
-    AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
+        AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
     {
         return AbstractLicenseNotificationManagerPtr();
     }
@@ -180,12 +176,19 @@ namespace ec2
         return AbstractVideowallNotificationManagerPtr();
     }
 
-    int OldEcConnection::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
-        nx::utils::concurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::DumpDatabaseHandler::done, handler, reqID, ec2::ErrorCode::notImplemented, ec2::ApiDatabaseDumpData()));
-        return reqID;
-    }
+int OldEcConnection::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    nx::utils::concurrent::run(
+        Ec2ThreadPool::instance(),
+        std::bind(
+            &impl::DumpDatabaseHandler::done,
+            handler,
+            reqID,
+            ec2::ErrorCode::notImplemented,
+            nx::vms::api::DatabaseDumpData()));
+    return reqID;
+}
 
     int OldEcConnection::dumpDatabaseToFileAsync( const QString& /*dumpFilePath*/, ec2::impl::SimpleHandlerPtr handler)
     {
@@ -194,12 +197,16 @@ namespace ec2
         return reqID;
     }
 
-    int OldEcConnection::restoreDatabaseAsync(const ApiDatabaseDumpData& /*dbFile*/, impl::SimpleHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
-        nx::utils::concurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
-        return reqID;
-    }
+int OldEcConnection::restoreDatabaseAsync(
+    const nx::vms::api::DatabaseDumpData& /*dbFile*/,
+    impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    nx::utils::concurrent::run(
+        Ec2ThreadPool::instance(),
+        std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
+    return reqID;
+}
 
     void OldEcConnection::addRemotePeer(const QnUuid& /*id*/, const nx::utils::Url & /*url*/)
     {
@@ -209,15 +216,14 @@ namespace ec2
     {
     }
 
-    Timestamp OldEcConnection::getTransactionLogTime() const {
-        return Timestamp();
+    nx::vms::api::Timestamp OldEcConnection::getTransactionLogTime() const {
+        return {};
     }
 
-    void OldEcConnection::setTransactionLogTime(Timestamp /* value */)
+    void OldEcConnection::setTransactionLogTime(nx::vms::api::Timestamp /*value*/)
     {
 
     }
-
 
     void OldEcConnection::startReceivingNotifications()
     {
@@ -227,9 +233,8 @@ namespace ec2
     {
     }
 
-    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& uuid, int* ) const
+    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& /*uuid*/, int*, nx::network::SocketAddress*) const
     {
-        Q_UNUSED(uuid);
         return QnUuid();
     }
 

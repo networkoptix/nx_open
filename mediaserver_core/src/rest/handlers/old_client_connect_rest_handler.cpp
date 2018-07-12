@@ -8,11 +8,10 @@ namespace {
     const int productOffset = 0x47d;
 }
 
-int QnOldClientConnectRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &responseMessageBody, QByteArray &contentType, const QnRestConnectionProcessor*) 
+int QnOldClientConnectRestHandler::executeGet(const QString& /*path*/,
+    const QnRequestParamList& /*params*/, QByteArray& responseMessageBody, QByteArray& contentType,
+    const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
-
     QFile f(":/pb_connect.bin");
     if (!f.open(QFile::ReadOnly))
         return nx::network::http::StatusCode::notFound;
@@ -39,7 +38,9 @@ int QnOldClientConnectRestHandler::executeGet(const QString &path, const QnReque
     return nx::network::http::StatusCode::ok;
 }
 
-int QnOldClientConnectRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, const QByteArray &, QByteArray &, QByteArray &, const QnRestConnectionProcessor*) 
+int QnOldClientConnectRestHandler::executePost(const QString&, const QnRequestParamList&,
+    const QByteArray&, const QByteArray&, QByteArray&, QByteArray&,
+    const QnRestConnectionProcessor*)
 {
     return nx::network::http::StatusCode::notImplemented;
 }

@@ -80,6 +80,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_videoChannels(1)
 {
     m_timer.start();
+    m_keepAliveTimer.restart();
     m_needKeyData.fill(false);
 }
 
@@ -255,7 +256,6 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         bool clearHiQ = !needSecondaryStream(m_liveQuality); // remove LQ packets, keep HQ
 
         // try to reduce queue by removed packets in specified quality
-        bool somethingDeleted = false;
         for (quint32 ch = 0; ch < m_videoChannels; ++ch)
         {
             for (int i = unsafeQueue.size() - 1; i >=0; --i)
@@ -274,7 +274,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         }
 
         // try to reduce queue by removed video packets at any quality
-        if (!somethingDeleted)
+        if (!m_someDataIsDropped)
         {
             for (quint32 ch = 0; ch < m_videoChannels; ++ch)
             {
@@ -702,12 +702,6 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         {
             RtpHeader* packet = (RtpHeader*) (rtpHeaderPtr);
             isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
-            if (isRtcp && m_owner->getTracksCount() == 1)
-            {
-                // skip RTCP packets is no audio. some clients have problem with it. I don't know why.
-                m_sendBuffer.resize(dataStartIndex);
-                continue;
-            }
         }
         else {
             const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
@@ -732,6 +726,19 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             nx::network::AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
             mediaSocket->send(m_sendBuffer.data(), m_sendBuffer.size());
             m_sendBuffer.clear();
+
+            // get rtcp report to check keepalive timeout
+            int bytesRead = 0;
+            uint8_t buffer[1024];
+            do
+            {
+                bytesRead = trackInfo->rtcpSocket->recv(buffer, sizeof(buffer));
+                if (bytesRead > 0)
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    m_keepAliveTimer.restart();
+                }
+            } while(bytesRead > 0 && !m_needStop);
         }
     }
 
@@ -752,6 +759,13 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         m_lastLiveTime = media->timestamp;
 
     return true;
+}
+
+
+std::chrono::milliseconds QnRtspDataConsumer::timeFromLastReceiverReport()
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_keepAliveTimer.elapsed();
 }
 
 QnMutex* QnRtspDataConsumer::dataQueueMutex()

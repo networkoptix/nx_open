@@ -80,7 +80,7 @@ Source QnVideoWallItemAccessProvider::baseSource() const
 bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    if (!globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!globalPermissionsManager()->hasGlobalPermission(subject, GlobalPermission::controlVideowall))
         return false;
 
     if (mode() == Mode::direct)
@@ -88,7 +88,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
         if (resource->hasFlags(Qn::layout))
             return layoutBelongsToVideoWall(resource);
 
-        if (!QnResourceAccessFilter::isShareableMedia(resource))
+        if (!QnResourceAccessFilter::isShareableViaVideowall(resource))
             return false;
 
         // TODO: #GDM here resource splitting may help a lot: take all videowalls before, then
@@ -123,7 +123,7 @@ bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubjec
         return layout && m_itemAggregator->hasLayout(layout); /*< This method is called under mutex. */
     }
 
-    if (!QnResourceAccessFilter::isShareableMedia(resource))
+    if (!QnResourceAccessFilter::isShareableViaVideowall(resource))
         return false;
 
     return m_itemAggregator->hasItem(resource->getId());
@@ -134,7 +134,7 @@ void QnVideoWallItemAccessProvider::fillProviders(
     const QnResourcePtr& resource,
     QnResourceList& providers) const
 {
-    if (!globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!globalPermissionsManager()->hasGlobalPermission(subject, GlobalPermission::controlVideowall))
         return;
 
     if (resource->hasFlags(Qn::layout))

@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace network {
@@ -18,7 +19,7 @@ static const nx::network::http::StringType kUpgradeTo("NXRELAY/0.1");
 static const nx::Buffer kNewProtocolMessage("Hello, Http Client!");
 
 class UpgradableHttpServer:
-    public nx::network::test::SynchronousTcpServer
+    public nx::network::test::SynchronousStreamSocketServer
 {
 protected:
     virtual void processConnection(AbstractStreamSocket* connection) override
@@ -53,13 +54,45 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class HttpAsyncClient:
     public ::testing::Test
 {
-protected:
-    void initializeServerThatDoesNotSendUpgradeHeaderInResponse()
+public:
+    HttpAsyncClient():
+        m_proxyHost(lm("%1.com").args(QnUuid::createUuid().toSimpleString()).toStdString())
     {
-        m_serverSendUpgradeHeaderInResponse = false;
+    }
+
+    ~HttpAsyncClient()
+    {
+        m_httpClient.pleaseStopSync();
+    }
+
+protected:
+    TestHttpServer m_httpServer;
+    AsyncClient m_httpClient;
+    nx::utils::SyncQueue<nx::network::http::Request> m_receivedRequests;
+
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        m_httpServer.registerRequestProcessorFunc(
+            "",
+            std::bind(&HttpAsyncClient::processHttpRequest, this, _1, _2, _3, _4, _5));
+
+        ASSERT_TRUE(m_httpServer.bindAndListen());
+    }
+
+    nx::utils::Url prepareUrl()
+    {
+        const auto serverAddress = m_synchronousServer
+            ? m_synchronousServer->endpoint()
+            : m_httpServer.serverAddress();
+        return nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
+            .setEndpoint(serverAddress).setPath(kTestPath);
     }
 
     void givenSynchronousServer()
@@ -69,12 +102,69 @@ protected:
         m_synchronousServer->start();
     }
 
+    void whenSendConnectRequest()
+    {
+        m_httpClient.doConnect(
+            prepareUrl(),
+            m_proxyHost.c_str(),
+            std::bind(&HttpAsyncClient::saveResponse, this));
+    }
+
+    void thenCorrectConnectRequestIsReceived()
+    {
+        const auto requestReceived = m_receivedRequests.pop();
+
+        ASSERT_EQ(nx::network::http::Method::connect, requestReceived.requestLine.method);
+        ASSERT_EQ(m_proxyHost, requestReceived.requestLine.url.path().toStdString());
+        ASSERT_EQ(m_proxyHost, requestReceived.requestLine.url.toString().toStdString());
+    }
+
+private:
+    std::unique_ptr<UpgradableHttpServer> m_synchronousServer;
+    std::string m_proxyHost;
+
+    void processHttpRequest(
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx::network::http::Request request,
+        nx::network::http::Response* const /*response*/,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        m_receivedRequests.push(std::move(request));
+        completionHandler(nx::network::http::StatusCode::ok);
+    }
+
+    void saveResponse()
+    {
+        // TODO
+    }
+};
+
+TEST_F(HttpAsyncClient, connect_method)
+{
+    whenSendConnectRequest();
+    thenCorrectConnectRequestIsReceived();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpAsyncClientConnectionUpgrade:
+    public HttpAsyncClient
+{
+    using base_type = HttpAsyncClient;
+
+protected:
+    void initializeServerThatDoesNotSendUpgradeHeaderInResponse()
+    {
+        m_serverSendUpgradeHeaderInResponse = false;
+    }
+
     void whenPerformedUpgrade()
     {
         m_httpClient.doUpgrade(
             prepareUrl(),
             kUpgradeTo,
-            std::bind(&HttpAsyncClient::onUpgradeDone, this));
+            std::bind(&HttpAsyncClientConnectionUpgrade::onUpgradeDone, this));
     }
 
     void whenPerformedSuccessfulUpgrade()
@@ -87,7 +177,7 @@ protected:
 
     void thenUpgradeRequestIsCorrect()
     {
-        const auto httpRequest = m_upgradeRequests.pop();
+        const auto httpRequest = m_receivedRequests.pop();
         ASSERT_EQ(nx::network::http::Method::options, httpRequest.requestLine.method);
         ASSERT_EQ("Upgrade", nx::network::http::getHeaderValue(httpRequest.headers, "Connection"));
         ASSERT_EQ(kUpgradeTo, nx::network::http::getHeaderValue(httpRequest.headers, "Upgrade"));
@@ -124,13 +214,9 @@ private:
         std::unique_ptr<AbstractStreamSocket> connection;
     };
 
-    TestHttpServer m_httpServer;
-    AsyncClient m_httpClient;
-    nx::utils::SyncQueue<nx::network::http::Request> m_upgradeRequests;
     nx::utils::SyncQueue<ResponseContext> m_upgradeResponses;
     bool m_serverSendUpgradeHeaderInResponse = true;
     std::unique_ptr<AbstractStreamSocket> m_upgradedConnection;
-    std::unique_ptr<UpgradableHttpServer> m_synchronousServer;
 
     virtual void SetUp() override
     {
@@ -138,13 +224,9 @@ private:
 
         m_httpServer.registerRequestProcessorFunc(
             kTestPath,
-            std::bind(&HttpAsyncClient::processHttpRequest, this, _1, _2, _3, _4, _5));
-        ASSERT_TRUE(m_httpServer.bindAndListen());
-    }
+            std::bind(&HttpAsyncClientConnectionUpgrade::processHttpRequest, this, _1, _2, _3, _4, _5));
 
-    virtual void TearDown() override
-    {
-        m_httpClient.pleaseStopSync();
+        base_type::SetUp();
     }
 
     void processHttpRequest(
@@ -154,7 +236,7 @@ private:
         nx::network::http::Response* const response,
         nx::network::http::RequestProcessedHandler completionHandler)
     {
-        m_upgradeRequests.push(std::move(request));
+        m_receivedRequests.push(std::move(request));
 
         if (m_serverSendUpgradeHeaderInResponse)
             response->headers.emplace("Upgrade", kUpgradeTo);
@@ -163,15 +245,6 @@ private:
         response->headers.emplace("Connection", "Upgrade");
 
         completionHandler(nx::network::http::StatusCode::switchingProtocols);
-    }
-
-    nx::utils::Url prepareUrl()
-    {
-        const auto serverAddress = m_synchronousServer
-            ? m_synchronousServer->endpoint()
-            : m_httpServer.serverAddress();
-        return nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
-            .setEndpoint(serverAddress).setPath(kTestPath);
     }
 
     void onUpgradeDone()
@@ -194,14 +267,14 @@ private:
     }
 };
 
-TEST_F(HttpAsyncClient, upgrade_successful)
+TEST_F(HttpAsyncClientConnectionUpgrade, upgrade_successful)
 {
     whenPerformedUpgrade();
     thenUpgradeRequestIsCorrect();
     thenConnectionHasBeenUpgraded();
 }
 
-TEST_F(HttpAsyncClient, upgrade_missing_protocol_in_response)
+TEST_F(HttpAsyncClientConnectionUpgrade, upgrade_missing_protocol_in_response)
 {
     initializeServerThatDoesNotSendUpgradeHeaderInResponse();
 
@@ -209,12 +282,14 @@ TEST_F(HttpAsyncClient, upgrade_missing_protocol_in_response)
     thenRequestHasFailed();
 }
 
-TEST_F(HttpAsyncClient, data_after_successfull_upgrade_is_not_lost)
+TEST_F(HttpAsyncClientConnectionUpgrade, data_after_successfull_upgrade_is_not_lost)
 {
     givenSynchronousServer();
     whenPerformedSuccessfulUpgrade();
     thenTrafficSentByServerAfterResponseIsAvailableOnSocket();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 TEST(HttpAsyncClientTypes, lexicalSerialization)
 {

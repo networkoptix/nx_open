@@ -11,11 +11,11 @@
 #include "acti_resource.h"
 #include "acti_stream_reader.h"
 
-QnActiStreamReader::QnActiStreamReader(const QnResourcePtr& res):
+QnActiStreamReader::QnActiStreamReader(const QnActiResourcePtr& res):
     CLServerPushStreamReader(res),
-    m_multiCodec(res)
+    m_multiCodec(res),
+    m_actiRes(res)
 {
-    m_actiRes = res.dynamicCast<QnActiResource>();
 }
 
 QnActiStreamReader::~QnActiStreamReader()
@@ -28,19 +28,14 @@ int QnActiStreamReader::getActiChannelNum() const
     return m_role == Qn::CR_LiveVideo ? 1 : 2;
 }
 
-QString QnActiStreamReader::formatResolutionStr(const QSize& resolution) const
-{
-    return QString(QLatin1String("N%1x%2")).arg(resolution.width()).arg(resolution.height());
-}
-
 int QnActiStreamReader::toJpegQuality(const QnLiveStreamParams& params)
 {
     auto quality = params.quality;
-    if (quality == Qn::StreamQuality::QualityNotDefined)
+    if (quality == Qn::StreamQuality::undefined)
     {
         int srcBitrate = params.bitrateKbps;
         int bitrateDelta = std::numeric_limits<int>::max();
-        for (int i = Qn::StreamQuality::QualityLowest; i <= Qn::StreamQuality::QualityHighest; ++i)
+        for (int i = (int)Qn::StreamQuality::lowest; i <= (int)Qn::StreamQuality::highest; ++i)
         {
             QnLiveStreamParams p(params);
             p.quality = (Qn::StreamQuality) i;
@@ -54,15 +49,15 @@ int QnActiStreamReader::toJpegQuality(const QnLiveStreamParams& params)
     }
     switch (quality)
     {
-        case Qn::QualityLowest:
+        case Qn::StreamQuality::lowest:
             return 15;
-        case Qn::QualityLow:
+        case Qn::StreamQuality::low:
             return 30;
-        case Qn::QualityNormal:
+        case Qn::StreamQuality::normal:
             return 50;
-        case Qn::QualityHigh:
+        case Qn::StreamQuality::high:
             return 70;
-        case Qn::QualityHighest:
+        case Qn::StreamQuality::highest:
             return 80;
         default:
             return 50;
@@ -92,7 +87,7 @@ CameraDiagnostics::Result QnActiStreamReader::openStreamInternal(
     params.fps = m_actiRes->roundFps(params.fps, m_role);
     int ch = getActiChannelNum();
 
-    QString resolutionStr = formatResolutionStr(params.resolution);
+    QString resolutionStr = QnActiResource::formatResolutionStr(params.resolution);
 
     int bitrate = m_actiRes->suggestBitrateKbps(params, getRole());
     bitrate = m_actiRes->roundBitrate(bitrate);

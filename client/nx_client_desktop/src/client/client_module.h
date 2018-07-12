@@ -53,6 +53,7 @@ private:
     void initApplication();
     void initThread();
     void initMetaInfo();
+    void initSurfaceFormat();
     void initSingletons     (const QnStartupParameters& startupParams);
     void initRuntimeParams  (const QnStartupParameters& startupParams);
     void initLog            (const QnStartupParameters& startupParams);
@@ -60,6 +61,7 @@ private:
     void initSkin           (const QnStartupParameters& startupParams);
     void initLocalResources (const QnStartupParameters& startupParams);
     void initLocalInfo(const QnStartupParameters& startupParams);
+    void registerResourceDataProviders();
 
 private:
     QnStartupParameters m_startupParameters;
@@ -67,12 +69,12 @@ private:
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QScopedPointer<nx::client::desktop::AnalyticsMetadataProviderFactory>
         m_analyticsMetadataProviderFactory;
-    QnNetworkProxyFactory* m_networkProxyFactory;
-    QnCloudStatusWatcher* m_cloudStatusWatcher;
-    QnCameraDataManager* m_cameraDataManager;
-    nx::client::desktop::RadassController* m_radassController;
-    nx::client::desktop::UploadManager* m_uploadManager;
-    nx::client::desktop::WearableManager* m_wearableManager;
+    QnNetworkProxyFactory* m_networkProxyFactory = nullptr;
+    QnCloudStatusWatcher* m_cloudStatusWatcher = nullptr;
+    QnCameraDataManager* m_cameraDataManager = nullptr;
+    nx::client::desktop::RadassController* m_radassController = nullptr;
+    nx::client::desktop::UploadManager* m_uploadManager = nullptr;
+    nx::client::desktop::WearableManager* m_wearableManager = nullptr;
 };
 
 #define qnClientModule QnClientModule::instance()

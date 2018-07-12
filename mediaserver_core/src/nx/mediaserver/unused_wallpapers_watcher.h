@@ -4,7 +4,6 @@
 #include <QtCore/QTimer>
 
 #include <common/common_module_aware.h>
-#include <nx_ec/data/api_stored_file_data.h>
 
 class QnCommonModule;
 

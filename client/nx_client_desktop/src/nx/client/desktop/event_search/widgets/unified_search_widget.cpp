@@ -6,18 +6,19 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
 
-#include <ui/common/custom_painted.h>
 #include <ui/common/palette.h>
-#include <ui/common/widget_anchor.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/search_line_edit.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/event_processors.h>
-#include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
+#include <nx/client/desktop/common/utils/custom_painted.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
+#include <nx/client/desktop/common/widgets/search_line_edit.h>
 #include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
+
 #include <nx/utils/disconnect_helper.h>
 #include <nx/utils/pending_operation.h>
 
@@ -32,7 +33,7 @@ static constexpr int kQueuedFetchMoreDelayMs = 50;
 static constexpr int kTimeSelectionDelayMs = 250;
 static constexpr int kTextFilterDelayMs = 250;
 
-QnSearchLineEdit* createSearchLineEdit(QWidget* parent)
+SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
     const auto paintFunction =
         [](QPainter* painter, const QStyleOption* option, const QWidget* widget) -> bool
@@ -47,7 +48,8 @@ QnSearchLineEdit* createSearchLineEdit(QWidget* parent)
             return false;
         };
 
-    auto result = new CustomPainted<QnSearchLineEdit>(parent);
+    auto result = new CustomPainted<SearchLineEdit>(parent);
+    result->setGlassVisible(false);
     result->setCustomPaintFunction(paintFunction);
     result->setAttribute(Qt::WA_TranslucentBackground);
     result->setAttribute(Qt::WA_Hover);
@@ -75,7 +77,7 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
 
     ui->placeholder->setParent(ui->ribbonContainer);
     ui->placeholder->hide();
-    new QnWidgetAnchor(ui->placeholder);
+    new WidgetAnchor(ui->placeholder);
 
     QFont font;
     font.setPixelSize(kPlaceholderFontPixelSize);
@@ -83,14 +85,23 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->placeholderText->setFont(font);
     ui->placeholderText->setForegroundRole(QPalette::Mid);
 
+    ui->counterLabel->setForegroundRole(QPalette::Mid);
+
     ui->typeButton->hide();
     ui->areaButton->hide();
     ui->cameraButton->hide();
+
+    ui->timeButton->setSelectable(false);
+    ui->typeButton->setSelectable(false);
+    ui->areaButton->setSelectable(false);
+    ui->cameraButton->setSelectable(false);
 
     ui->timeButton->setDeactivatable(true);
     ui->typeButton->setDeactivatable(true);
     ui->areaButton->setDeactivatable(true);
     ui->cameraButton->setDeactivatable(true);
+
+    setPaletteColor(ui->filterLine, QPalette::Shadow, colorTheme()->color("dark6"));
 
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
         this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
@@ -132,15 +143,46 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui->showPreviewsButton->hide();
     ui->showInfoButton->setChecked(ui->ribbon->footersEnabled());
     ui->showPreviewsButton->setChecked(ui->ribbon->previewsEnabled());
-    ui->showInfoButton->setDrawnBackgrounds(QnToolButton::ActiveBackgrounds);
-    ui->showPreviewsButton->setDrawnBackgrounds(QnToolButton::ActiveBackgrounds);
-    ui->showInfoButton->setIcon(qnSkin->icon(lit("events/show_information.png")));
-    ui->showPreviewsButton->setIcon(qnSkin->icon(lit("events/show_preview.png")));
+    ui->showInfoButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
+    ui->showPreviewsButton->setDrawnBackgrounds(ToolButton::ActiveBackgrounds);
+    ui->showInfoButton->setIcon(qnSkin->icon(
+        "text_buttons/text.png", "text_buttons/text_selected.png"));
+    ui->showPreviewsButton->setIcon(qnSkin->icon(
+        "text_buttons/image.png", "text_buttons/image_selected.png"));
+
+    const auto updateInformationToolTip =
+        [this]()
+        {
+            ui->showInfoButton->setToolTip(ui->showInfoButton->isChecked()
+                ? tr("Hide information")
+                : tr("Show information"));
+        };
+
+    const auto updateThumbnailsToolTip =
+        [this]()
+        {
+            ui->showPreviewsButton->setToolTip(ui->showPreviewsButton->isChecked()
+                ? tr("Hide thumbnails")
+                : tr("Show thumbnails"));
+        };
+
+    updateInformationToolTip();
+    updateThumbnailsToolTip();
 
     connect(ui->showInfoButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setFootersEnabled);
+    connect(ui->showInfoButton, &QToolButton::toggled,
+        this, updateInformationToolTip);
     connect(ui->showPreviewsButton, &QToolButton::toggled,
         ui->ribbon, &EventRibbon::setPreviewsEnabled);
+    connect(ui->showPreviewsButton, &QToolButton::toggled,
+        this, updateThumbnailsToolTip);
+
+    ui->ribbon->setViewportMargins(0, style::Metrics::kStandardPadding);
+
+    ui->ribbon->scrollBar()->ensurePolished();
+    setPaletteColor(ui->ribbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
+        colorTheme()->color("dark5"));
 }
 
 UnifiedSearchWidget::~UnifiedSearchWidget()
@@ -187,27 +229,27 @@ void UnifiedSearchWidget::setModel(UnifiedAsyncSearchListModel* value)
     fetchMoreIfNeeded();
 }
 
-QnSearchLineEdit* UnifiedSearchWidget::filterEdit() const
+SearchLineEdit* UnifiedSearchWidget::filterEdit() const
 {
     return m_searchLineEdit;
 }
 
-ui::SelectableTextButton* UnifiedSearchWidget::typeButton() const
+SelectableTextButton* UnifiedSearchWidget::typeButton() const
 {
     return ui->typeButton;
 }
 
-ui::SelectableTextButton* UnifiedSearchWidget::areaButton() const
+SelectableTextButton* UnifiedSearchWidget::areaButton() const
 {
     return ui->areaButton;
 }
 
-ui::SelectableTextButton* UnifiedSearchWidget::timeButton() const
+SelectableTextButton* UnifiedSearchWidget::timeButton() const
 {
     return ui->timeButton;
 }
 
-ui::SelectableTextButton* UnifiedSearchWidget::cameraButton() const
+SelectableTextButton* UnifiedSearchWidget::cameraButton() const
 {
     return ui->cameraButton;
 }
@@ -324,8 +366,8 @@ void UnifiedSearchWidget::setupTimeSelection()
                 {
                     ui->timeButton->setText(action->text());
                     ui->timeButton->setState(period == UnifiedSearchWidget::Period::all
-                        ? ui::SelectableTextButton::State::deactivated
-                        : ui::SelectableTextButton::State::unselected);
+                        ? SelectableTextButton::State::deactivated
+                        : SelectableTextButton::State::unselected);
 
                     setSelectedPeriod(period);
                 });
@@ -339,10 +381,10 @@ void UnifiedSearchWidget::setupTimeSelection()
     addMenuAction(tr("Last 30 days"), UnifiedSearchWidget::Period::month);
     addMenuAction(tr("Selected on Timeline"), UnifiedSearchWidget::Period::selection);
 
-    connect(ui->timeButton, &ui::SelectableTextButton::stateChanged, this,
-        [defaultAction](ui::SelectableTextButton::State state)
+    connect(ui->timeButton, &SelectableTextButton::stateChanged, this,
+        [defaultAction](SelectableTextButton::State state)
         {
-            if (state == ui::SelectableTextButton::State::deactivated)
+            if (state == SelectableTextButton::State::deactivated)
                 defaultAction->trigger();
         });
 

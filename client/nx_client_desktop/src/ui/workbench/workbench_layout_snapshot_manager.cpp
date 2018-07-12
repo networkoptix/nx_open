@@ -9,7 +9,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx_ec/data/api_layout_data.h>
+#include <nx/vms/api/data/layout_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
 
@@ -122,7 +122,7 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     if (QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout))
         synchronizer->submit();
 
-    ec2::ApiLayoutData apiLayout;
+    nx::vms::api::LayoutData apiLayout;
     ec2::fromResourceToApi(layout, apiLayout);
 
     int reqID = commonModule()->ec2Connection()->getLayoutManager(Qn::kSystemAccess)->save(
@@ -147,7 +147,8 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     return success;
 }
 
-QnWorkbenchLayoutSnapshot QnWorkbenchLayoutSnapshotManager::snapshot(const QnLayoutResourcePtr &layout) const
+QnWorkbenchLayoutSnapshot QnWorkbenchLayoutSnapshotManager::snapshot(
+    const QnLayoutResourcePtr& layout) const
 {
     NX_ASSERT(layout);
     if (!layout)
@@ -201,6 +202,8 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
         resource->setBackgroundSize(snapshot.backgroundSize);
         resource->setBackgroundImageFilename(snapshot.backgroundImageFilename);
         resource->setBackgroundOpacity(snapshot.backgroundOpacity);
+        resource->setFixedSize(snapshot.fixedSize);
+        resource->setLogicalId(snapshot.logicalId);
         resource->setLocked(snapshot.locked);
     }
     connectTo(resource);
@@ -213,21 +216,38 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
 
 void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource)
 {
-    connect(resource, &QnResource::nameChanged, this, &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
-    connect(resource, &QnResource::parentIdChanged, this, &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
-    connect(resource, &QnLayoutResource::itemAdded, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource, &QnLayoutResource::itemRemoved, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource, &QnLayoutResource::lockedChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource, &QnLayoutResource::cellAspectRatioChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource, &QnLayoutResource::cellSpacingChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource, &QnLayoutResource::backgroundImageChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource, &QnLayoutResource::backgroundSizeChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource, &QnLayoutResource::backgroundOpacityChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnResource::nameChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
+    connect(resource, &QnResource::parentIdChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
+    connect(resource, &QnResource::logicalIdChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
+    connect(resource, &QnLayoutResource::itemAdded, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::itemRemoved, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::lockedChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::cellAspectRatioChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::cellSpacingChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::backgroundImageChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::backgroundSizeChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::backgroundOpacityChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::fixedSizeChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
 
-    /* This one is handled separately because it should not lead to marking layout as modified if layout is not opened right now. */
-    connect(resource, &QnLayoutResource::itemChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_itemChanged);
+    // This one is handled separately because it should not lead to marking layout as modified if
+    // layout is not opened right now.
+    connect(resource, &QnLayoutResource::itemChanged, this,
+        &QnWorkbenchLayoutSnapshotManager::at_layout_itemChanged);
 
-    connect(resource, &QnLayoutResource::storeRequested, this, &QnWorkbenchLayoutSnapshotManager::store);
+    connect(resource, &QnLayoutResource::storeRequested, this,
+        &QnWorkbenchLayoutSnapshotManager::store);
 }
 
 void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource)

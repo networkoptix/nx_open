@@ -1,6 +1,7 @@
 #include "analytics_sdk_event.h"
 
 #include <nx/utils/uuid.h>
+#include <core/resource/resource.h>
 
 namespace nx {
 namespace vms {
@@ -16,7 +17,7 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     const QString& auxiliaryData,
     qint64 timeStampUsec)
     :
-    base_type(analyticsSdkEvent, resource, toggleState, timeStampUsec),
+    base_type(EventType::analyticsSdkEvent, resource, toggleState, timeStampUsec),
     m_driverId(driverId),
     m_eventId(eventId),
     m_caption(caption),
@@ -54,8 +55,14 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
 
 bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 {
-    return m_driverId == params.analyticsDriverId()
-        && m_eventId == params.analyticsEventId()
+    if (!getResource() || m_driverId != params.analyticsDriverId())
+        return false;
+    const auto descriptor = nx::vms::event::AnalyticsHelper(getResource()->commonModule())
+        .eventDescriptor(m_eventId);
+
+    const bool isEventTypeMatched = m_eventId == params.analyticsEventId()
+        || descriptor.groupId == params.analyticsEventId();
+    return isEventTypeMatched
         && checkForKeywords(m_caption, params.caption)
         && checkForKeywords(m_description, params.description);
 }

@@ -14,7 +14,6 @@
 QnMutex QnPlVmax480Resource::m_chunkReaderMutex;
 QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
 
-
 const QString QnPlVmax480Resource::MANUFACTURE(lit("VMAX"));
 
 QnPlVmax480Resource::QnPlVmax480Resource():
@@ -44,10 +43,8 @@ QString QnPlVmax480Resource::getDriverName() const
     return MANUFACTURE;
 }
 
-void QnPlVmax480Resource::setIframeDistance(int frames, int timems)
+void QnPlVmax480Resource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
-    Q_UNUSED(frames)
-    Q_UNUSED(timems)
 }
 
 void QnPlVmax480Resource::setHostAddress(const QString &ip)
@@ -111,7 +108,7 @@ int QnPlVmax480Resource::eventPort() const
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()
 {
-    return new QnVMax480LiveProvider(toSharedPointer());
+    return new QnVMax480LiveProvider(toSharedPointer(this));
 }
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createArchiveDataProvider()
@@ -247,9 +244,8 @@ void QnPlVmax480Resource::setChunks(const QnTimePeriodList& chunks)
     //m_chunksCond.wakeAll();
 }
 
-QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel)
+QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int /*detailLevel*/)
 {
-    Q_UNUSED(detailLevel)
     QnMutexLocker lock( &m_mutexChunks );
     if (!m_chunks.empty())
         startTimeMs = qMin(startTimeMs, m_chunks.last().startTimeMs);
@@ -267,6 +263,4 @@ Qn::LicenseType QnPlVmax480Resource::calculateLicenseType() const
     return Qn::LC_VMAX;
 }
 
-
 #endif // #ifdef ENABLE_VMAX
-

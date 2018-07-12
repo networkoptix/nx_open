@@ -1,5 +1,7 @@
 #include "entropix_image_enhancer.h"
 
+#include <chrono>
+
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 #include <QtNetwork/QNetworkAccessManager>
@@ -255,7 +257,7 @@ EntropixImageEnhancer::~EntropixImageEnhancer()
 {
 }
 
-void EntropixImageEnhancer::requestScreenshot(qint64 timestamp, const QRectF& zoomRect)
+void EntropixImageEnhancer::requestScreenshot(qint64 timestampMs, const QRectF& zoomRect)
 {
     d->setProgress(Private::Step::gettingScreenshot);
 
@@ -263,9 +265,10 @@ void EntropixImageEnhancer::requestScreenshot(qint64 timestamp, const QRectF& zo
 
     if (!d->thumbnailLoader)
     {
+        using namespace std::chrono;
         api::CameraImageRequest request;
         request.camera = d->camera;
-        request.msecSinceEpoch = timestamp;
+        request.usecSinceEpoch = microseconds(milliseconds(timestampMs)).count();
         d->thumbnailLoader.reset(new CameraThumbnailProvider(request));
     }
 
@@ -274,7 +277,7 @@ void EntropixImageEnhancer::requestScreenshot(qint64 timestamp, const QRectF& zo
 
     NX_DEBUG(this,
         lm("Requesting screenshot from server for camera %2 at %1")
-            .arg(timestamp).arg(d->camera->getName()));
+            .arg(timestampMs).arg(d->camera->getName()));
     d->thumbnailLoader->loadAsync();
 }
 

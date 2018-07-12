@@ -1,20 +1,20 @@
 {
   "language_name": "Tiếng Việt",
-  "productName": "{{PRODUCT_NAME}}",
-  "clientProtocol": "{{CLIENT_PROTOCOL}}:",
+  "productName": "%PRODUCT_NAME%",
+  "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "Ok",
-    "cancelButton": "Hủy",
-    "loginTitle": "Đăng nhập vào {{PRODUCT_NAME}}",
+    "cancelButton": "Hủy bỏ",
+    "loginTitle": "Đăng nhập vào %PRODUCT_NAME%",
     "loginButton": "Đăng nhập",
     "logoutAuthorisedTitle": "Bạn đã đăng nhập",
     "logoutAuthorisedContinueButton": "Tiếp tục",
-    "logoutAuthorisedLogoutButton": "Đăng Xuất"
+    "logoutAuthorisedLogoutButton": "Đăng xuất"
   },
   "pageTitles": {
-    "template": "{{title}} {{PRODUCT_NAME}}",
-    "default": "{{PRODUCT_NAME}}",
-    "registerSuccess": "Chào mừng bạn đến với",
+    "template": "{{title}} %PRODUCT_NAME%",
+    "default": "%PRODUCT_NAME%",
+    "registerSuccess": "Chào mừng bạn đến",
     "register": "Tạo tài khoản tại",
     "changePassword": "Đổi mật khẩu -",
     "account": "Cài đặt tài khoản -",
@@ -31,8 +31,8 @@
     "view": "Xem camera ",
     "debug": "Gỡ rối",
     "login": "Đăng nhập -",
-    "download": "Tải xuống {{VMS_NAME}}",
-    "downloadPlatform": "Tải xuống {{VMS_NAME}} cho ",
+    "download": "Tải xuống %VMS_NAME%",
+    "downloadPlatform": "Tải xuống %VMS_NAME% cho ",
     "pageNotFound": "Không tìm thấy trang"
   },
   "systemStatuses": {
@@ -48,7 +48,7 @@
       "description": "Người dùng bị vô hiệu và không thể đăng nhập vào Hệ thống"
     },
     "Owner": {
-      "label": "Người sở hữu",
+      "label": "Chủ nhân",
       "description": "Truy cập không giới hạn bao gồm khả năng chia sẻ và kết nối / ngắt kết nối Hệ thống từ đám mây"
     },
     "Viewer": {
@@ -64,15 +64,15 @@
       "description": "Có thể xem video trực tiếp, duyệt các kho lưu trữ, cấu hình máy ảnh, điều khiển PTZ vv"
     },
     "Administrator": {
-      "label": "Quản trị hệ thống",
+      "label": "Giám sát viên",
       "description": "Truy cập không giới hạn bao gồm khả năng chia sẻ"
     },
     "Custom": {
       "label": "Tùy chỉnh",
-      "description": "Sử dụng ứng dụng Khách hàng {{PRODUCT_NAME}} để thiết lập quyền tùy chỉnh"
+      "description": "Sử dụng ứng dụng Khách hàng %PRODUCT_NAME% để thiết lập quyền tùy chỉnh"
     },
     "cloudAdmin": {
-      "label": "Quản trị hệ thống",
+      "label": "Giám sát viên",
       "description": "Có thể cấu hình Hệ thống và chia sẻ nó"
     },
     "customRole": {
@@ -85,26 +85,26 @@
     },
     "viewer": {
       "label": "Người xem",
-      "description": "Có thể xem video trực tuyến và video trong lưu trữ"
+      "description": "Có thể xem video trực tuyến và duyệt qua kho lưu trữ"
     },
     "liveViewer": {
-      "label": "Live Viewer",
+      "label": "Xem trực tiếp",
       "description": "Chỉ có thể xem video trực tiếp"
     },
     "advancedViewer": {
       "label": "Trình xem nâng cao",
-      "description": "Có thể xem video trực tiếp, duyệt các kho lưu trữ, cấu hình camera, điều khiển PTZ"
+      "description": "Có thể xem video trực tiếp, duyệt các kho lưu trữ, cấu hình máy ảnh, điều khiển PTZ vv"
     },
     "custom": {
       "label": "Tùy chỉnh",
-      "description": "Sử dụng các ứng dụng tại máy tramk {{PRODUCT_NAME}} để thiết lập quyền tùy chỉnh"
+      "description": "Sử dụng ứng dụng Khách hàng %VMS_NAME% để thiết lập quyền tùy chỉnh"
     }
   },
   "errorCodes": {
     "ok": "ok",
     "cantSendActivationPrefix": "Không thể gửi Email xác nhận",
     "cantDisconnectSystemPrefix": "Không thể xóa bỏ hệ thống",
-    "cantUnshareWithMeSystemPrefix": "Không thể xóa Hệ thống",
+    "cantUnshareWithMeSystemPrefix": "Không thể xóa bỏ hệ thống",
     "cantSharePrefix": "Không thể chia sẻ Hệ thống",
     "cantGetUsersListPrefix": "Danh sách người dùng không khả dụng",
     "cantGetSystemsListPrefix": "Danh sách hệ thống không khả dụng",
@@ -116,8 +116,8 @@
     "cantSendConfirmationPrefix": "Không thể gửi Email xác nhận",
     "cloudInvalidResponse": "Có thể DB đã trả một phản hồi bất ngờ",
     "notAuthorized": "Sai mật khẩu",
+    "brokenAccount": "Vấn đề không mong muốn với tài khoản. <a href=\"/restore_password\">Khôi phục tài khoản</a>",
     "wrongParameters": "Một số thông số trên biểu mẫu không chính xác",
-    "brokenAccount": "Unexpected problem with account. <a href=\"/restore_password\">Restore account</a>",
     "wrongCode": "Tài khoản đã được kích hoạt hoặc mã xác nhận không chính xác",
     "wrongCodeRestore": "Mã xác nhận đã được sử dụng hoặc không chính xác",
     "forbidden": "Bạn không có quyền thực hiện công việc này",
@@ -127,50 +127,54 @@
     "alreadyExists": "Tài khoản này đã tồn tại",
     "unknownError": "Đã xảy ra lỗi không mong muốn",
     "accountAlreadyActivated": "Tài khoản này đã được kích hoạt",
-    "emailNotFound": "Tài khoản không tồn tại",
+    "emailNotFound": "Tài khoản không tồn tại.",
     "EmailAlreadyExists": "Email này đã được đăng ký",
-    "oldPasswordMistmatch": "Mật khẩu hiện tại không đúng",
+    "oldPasswordMistmatch": "Mật khẩu hiện tại không đúng.",
     "passwordMismatch": "Sai mật khẩu",
     "cantEditYourself": "Không cho phép thay đổi quyền riêng tư",
     "cantEditAdmin": "Người dùng này có quyền quản trị viên",
-    "cantOpenClient": "Ứng dụng {{VMS_NAME}} ứng dụng không tìm thấy. <a href=\"/download\">Tải xuống</a>",
+    "cantOpenClient": "Ứng dụng %VMS_NAME% ứng dụng không tìm thấy. <a href=\"/download\">Tải xuống</a>",
     "lostConnection": "Kết nối với {{systemName}} bị mất",
-    "thisSystem": "hệ thống"
+    "thisSystem": "hệ thống",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "Mật khẩu phải chứa ít nhất 8 ký tự",
     "requiredMessage": "Chỉ sử dụng chữ cái Latin, số và ký hiệu bàn phím, tránh các khoảng trống đầu và cuối",
     "weakMessage": "Sử dụng số, chữ hoa và chữ thường và ký tự đặc biệt để làm cho mật khẩu của bạn mạnh mẽ hơn",
     "strongMessage": "Mật khẩu mạnh!",
-    "commonMessage": "Mật khẩu này nằm trong mật khẩu phổ biến nhất trên thế giới"
+    "commonMessage": "Mật khẩu này nằm trong mật khẩu phổ biến nhất trên thế giới",
+    "missingMessage": "Mật khẩu là bắt buộc"
   },
   "sharing": {
     "confirmOwner": "Nếu bạn thay sở hữu hệ thống, bạn sẽ thu hồi quyền sở hữu hiện tại của mình. Không thể phục hồi sở hữu cũ. Bạn có chắc không?",
     "shareTitle": "Chia sẻ",
     "shareConfirmButton": "Chia sẻ",
     "editShareTitle": "Quyền chỉnh sửa",
-    "editShareConfirmButton": "Lưu",
+    "editShareConfirmButton": "Tiết kiệm",
     "permissionsSaved": "Cấp phép mới được lưu"
   },
   "system": {
-    "yourSystem": "Tên hệ thống của bạn",
+    "yourSystem": "Hệ thống của bạn",
     "mySystemSearch": "IMeMyMine",
     "unavailable": "Hệ thống không thể truy cập được",
     "offline": "Hệ thống offline",
-    "openClient": "Mở trong {{VMS_NAME}}",
-    "openClientNoSystem": "Mở {{VMS_NAME}}",
+    "openClient": "Mở trong %VMS_NAME%",
+    "openClientNoSystem": "Mở %VMS_NAME%",
+    "confirmMergeAction": "Gộp lại",
+    "mergeSystemTitle": "Hợp nhất hệ thống",
     "confirmRenameTitle": "Tên hệ thống",
-    "confirmRenameAction": "Lưu",
+    "confirmRenameAction": "Tiết kiệm",
     "successRename": "Đã lưu tên hệ thống",
-    "confirmDisconnectTitle": "Hệ thống đã ngắt kết nối từ {{PRODUCT_NAME}}?",
+    "confirmDisconnectTitle": "Ngắt kết nối Hệ thống từ %PRODUCT_NAME%?",
     "confirmDisconnectAction": "Ngắt kết nối",
     "confirmUnshareFromMe": "Bạn sẽ ngắt kết nối Hệ thống này khỏi tài khoản của bạn. Bạn sẽ không thể truy cập Hệ thống này nữa. Bạn có chắc không?",
     "confirmUnshareFromMeTitle": "Ngắt kết nối hệ thống?",
     "confirmUnshareFromMeAction": "Ngắt kết nối",
     "confirmUnshare": "Người dùng này sẽ không thể truy cập vào Hệ thống. Bạn có chắc không?",
     "confirmUnshareTitle": "Xóa người dùng?",
-    "confirmUnshareAction": "xóa bỏ",
-    "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ {{PRODUCT_NAME}}",
+    "confirmUnshareAction": "Xóa bỏ",
+    "successDisconnected": "Hệ thống đã bị ngắt kết nối thành công từ %PRODUCT_NAME%",
     "successDeleted": "Tài khoản {{systemName}} đã xóa thành công từ hệ thống của bạn",
     "permissionsRemoved": "Các quyền đã bị xóa khỏi {{email}}"
   },
@@ -180,17 +184,17 @@
     "passwordChangedSuccess": "Tài khoản của bạn đã được lưu thành công",
     "changePassword": "Đổi mật khẩu",
     "newPasswordLabel": "Mật khẩu mới",
-    "saveChanges": "Lưu"
+    "saveChanges": "Tiết kiệm"
   },
   "downloads": {
-    "noClientDetectedTitle": "Cài đặt {{VMS_NAME}} để xem Hệ thống của bạn",
-    "action": "Tải xuống {{VMS_NAME}}",
+    "noClientDetectedTitle": "Cài đặt %VMS_NAME% để xem Hệ thống của bạn",
+    "action": "Tải xuống %VMS_NAME%",
     "mobile": {
       "ios": {
-        "link": "{{IOS_APP_LINK}}"
+        "link": "%IOS_APPLICATION_LINK%"
       },
       "android": {
-        "link": "{{ANDROID_APP_LINK}}"
+        "link": "%ANDROID_APPLICATION_LINK%"
       }
     },
     "groups": {

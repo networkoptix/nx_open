@@ -2,8 +2,8 @@ set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 set(box "edge1")
 
-set(CMAKE_C_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-7.2.0/bin/arm-unknown-linux-gnueabihf-gcc")
-set(CMAKE_CXX_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-7.2.0/bin/arm-unknown-linux-gnueabihf-g++")
+set(CMAKE_C_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-linaro-7.2.1/bin/arm-linux-gnueabihf-gcc")
+set(CMAKE_CXX_COMPILER "${PACKAGES_DIR}/linux-arm/gcc-linaro-7.2.1/bin/arm-linux-gnueabihf-g++")
 
 set(glib_dir "${PACKAGES_DIR}/linux-arm/glib-2.0")
 set(zlib_dir "${PACKAGES_DIR}/linux-arm/zlib-1.2")

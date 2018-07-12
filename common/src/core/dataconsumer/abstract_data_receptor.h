@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QSharedPointer>
+
 #include <nx/streaming/media_data_packet.h>
 
 /**

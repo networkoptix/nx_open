@@ -341,10 +341,9 @@ QnAbstractStorageResource::FileInfoList QnLayoutFileStorageResource::getFileList
     return QnAbstractStorageResource::FIListFromQFIList(dir.entryInfoList(QDir::Files));
 }
 
-qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
+qint64 QnLayoutFileStorageResource::getFileSize(const QString& /*url*/) const
 {
-    Q_UNUSED(url)
-    return 0; // not implemented
+    return 0; //< not implemented
 }
 
 Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()

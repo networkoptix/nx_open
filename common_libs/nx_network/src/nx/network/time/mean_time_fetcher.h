@@ -36,6 +36,7 @@ private:
         std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher;
         qint64 utcMillis;
         SystemError::ErrorCode errorCode;
+        std::chrono::milliseconds rtt;
 
         TimeFetcherContext();
     };
@@ -49,7 +50,8 @@ private:
     void timeFetchingDone(
         TimeFetcherContext* ctx,
         qint64 utcMillis,
-        SystemError::ErrorCode errorCode);
+        SystemError::ErrorCode errorCode,
+        std::chrono::milliseconds rtt);
 };
 
 } // namespace network

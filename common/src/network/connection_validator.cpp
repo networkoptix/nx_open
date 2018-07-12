@@ -1,33 +1,32 @@
 #include "connection_validator.h"
 
 #include <api/model/connection_info.h>
-#include <api/runtime_info_manager.h>
-
-#include <nx_ec/impl/ec_api_impl.h>
-
-#include <common/common_module.h>
-#include <common/static_common_module.h>
-
-#include <network/module_information.h>
-
-#include <utils/common/software_version.h>
-#include <utils/common/app_info.h>
 #include <api/global_settings.h>
-#include <network/system_helpers.h>
+#include <api/runtime_info_manager.h>
+#include <common/common_module.h>
 #include <common/common_module_aware.h>
+#include <common/static_common_module.h>
+#include <network/system_helpers.h>
+#include <nx_ec/impl/ec_api_impl.h>
+#include <nx/utils/software_version.h>
+#include <utils/common/app_info.h>
+
 #include <nx/network/app_info.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace {
 
-QnSoftwareVersion minSupportedVersion(Qn::PeerType localPeerType)
+nx::utils::SoftwareVersion minSupportedVersion(nx::vms::api::PeerType localPeerType)
 {
-    if (ec2::ApiPeerData::isMobileClient(localPeerType))
-        return QnSoftwareVersion("2.5");
+    if (nx::vms::api::PeerData::isMobileClient(localPeerType))
+        return nx::utils::SoftwareVersion("2.5");
 
     if (QnAppInfo::applicationPlatform() == lit("macosx"))
-        return QnSoftwareVersion("3.0");
+        return nx::utils::SoftwareVersion("3.0");
 
-    return QnSoftwareVersion("1.4");
+    return nx::utils::SoftwareVersion("1.4");
 }
 
 /* For mobile clients country-local customizations must be compatible with base, e.g.
@@ -50,19 +49,19 @@ bool compatibleCloudHost(const QString& cloudHost, bool isMobile)
     if (cloudHost.isEmpty())
         return true;
 
-    return cloudHost == nx::network::AppInfo::defaultCloudHost()
+    return cloudHost == nx::network::SocketGlobals::cloud().cloudHost()
         || (isMobile && nx::network::AppInfo::compatibleCloudHosts().contains(cloudHost));
 }
 
 } // namespace
 
-QnSoftwareVersion QnConnectionValidator::minSupportedVersion()
+nx::vms::api::SoftwareVersion QnConnectionValidator::minSupportedVersion()
 {
     return ::minSupportedVersion(qnStaticCommon->localPeerType());
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnection(
-    const QnModuleInformation& info)
+    const nx::vms::api::ModuleInformation& info)
 {
     return validateConnectionInternal(
         info.brand,
@@ -88,6 +87,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         return Qn::DisabledUserConnectionResult;
     else if (networkError == ec2::ErrorCode::forbidden)
         return Qn::ForbiddenConnectionResult;
+    else if (networkError == ec2::ErrorCode::userLockedOut)
+        return Qn::UserTemporaryLockedOut;
 
     if (networkError != ec2::ErrorCode::ok)
         return Qn::NetworkErrorConnectionResult;
@@ -100,7 +101,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         connectionInfo.cloudHost);
 }
 
-bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info,
+bool QnConnectionValidator::isCompatibleToCurrentSystem(const nx::vms::api::ModuleInformation& info,
     const QnCommonModule* commonModule)
 {
     return !info.localSystemId.isNull()
@@ -112,10 +113,10 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QString& brand,
     const QString& customization,
     int protoVersion,
-    const QnSoftwareVersion& version,
+    const nx::vms::api::SoftwareVersion& version,
     const QString& cloudHost)
 {
-    bool isMobile = ec2::ApiPeerData::isMobileClient(qnStaticCommon->localPeerType());
+    bool isMobile = nx::vms::api::PeerData::isMobileClient(qnStaticCommon->localPeerType());
 
     if (!compatibleCustomization(brand, qnStaticCommon->brand(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;

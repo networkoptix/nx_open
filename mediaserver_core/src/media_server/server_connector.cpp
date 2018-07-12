@@ -3,34 +3,29 @@
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "nx/vms/discovery/manager.h"
-#include "network/module_information.h"
 #include <network/connection_validator.h>
 #include <nx/utils/log/log.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 
-#if 0
-namespace {
-    QUrl trimmedUrl(const QUrl &url) {
-        QUrl newUrl;
-        newUrl.setScheme(lit("http"));
-        newUrl.setHost(url.host());
-        newUrl.setPort(url.port());
-        return newUrl;
-    }
-}
-#endif
-
 QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
     QObject(),
     QnCommonModuleAware(commonModule)
 {
+    connect(commonModule, &QnCommonModule::standAloneModeChanged, this,
+        [this](bool value)
+        {
+            if (value)
+                stop();
+            else
+                start();
+        }, Qt::DirectConnection);
 }
 
 static QString makeModuleUrl(const nx::vms::discovery::ModuleEndpoint& module)
 {
     QUrl moduleUrl;
-    moduleUrl.setScheme(module.sslAllowed ? lit("https") : lit("http"));
+    moduleUrl.setScheme(nx::network::http::urlSheme(module.sslAllowed));
     moduleUrl.setHost(module.endpoint.address.toString());
     moduleUrl.setPort(module.endpoint.port);
     return moduleUrl.toString();

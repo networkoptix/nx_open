@@ -30,4 +30,5 @@ protected:
 
 private:
     void processNativePacket(QnResourceList& result, const QByteArray& responseData);
+    QnUuid resourceType(const QString& model) const;
 };

@@ -4,7 +4,7 @@
 #include <rest/server/json_rest_handler.h>
 
 struct DetachFromCloudData;
-namespace nx { namespace vms { namespace cloud_integration { struct CloudManagerGroup; } } }
+namespace nx { namespace vms { namespace cloud_integration { class CloudManagerGroup; } } }
 
 class QnDetachFromCloudRestHandler:
     public QnJsonRestHandler

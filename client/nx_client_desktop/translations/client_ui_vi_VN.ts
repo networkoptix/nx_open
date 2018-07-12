@@ -89,11 +89,6 @@
     </message>
     <message>
       <location/>
-      <source>Disable only if the client takes too much CPU</source>
-      <translation>Chỉ vô hiệu hoá khi máy trạm dùng quá nhiều CPU</translation>
-    </message>
-    <message>
-      <location/>
       <source>Maximum Live Buffer Length</source>
       <translation>Độ dài lớn nhất của bộ đệm khi xem trực tuyến</translation>
     </message>
@@ -173,11 +168,6 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fixed Archive Length</source>
       <translation>Cố định Archive Length</translation>
     </message>
@@ -300,7 +290,7 @@
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
+      <translation>Mbit / s</translation>
     </message>
     <message>
       <location/>
@@ -399,7 +389,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Kích thước hình ảnh</translation>
+      <translation>Chiều rộng diện tích</translation>
     </message>
     <message>
       <location/>
@@ -427,7 +417,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>Miêu tả</translation>
+      <translation>&amp;miêu tả</translation>
     </message>
     <message>
       <location/>
@@ -498,7 +488,7 @@
     <message>
       <location/>
       <source>At</source>
-      <translation>於</translation>
+      <translation>Tại camera</translation>
     </message>
   </context>
   <context>
@@ -526,7 +516,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Thử</translation>
+      <translation>Kiểm tra</translation>
     </message>
   </context>
   <context>
@@ -680,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Khôi phục mặc định</translation>
+      <translation>khôi phục mặc định</translation>
     </message>
     <message>
       <location/>
@@ -725,7 +715,7 @@
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>Nó sẽ tăng bitrate cho camera</translation>
+      <translation>Nó sẽ tăng bitrate cho camera.</translation>
     </message>
     <message>
       <location/>
@@ -755,15 +745,30 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Generate</source>
+      <translation>Tạo</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset</source>
+      <translation>Thiết lập lại</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Logical ID</source>
+      <translation>ID hợp lý</translation>
     </message>
   </context>
   <context>
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input Id</source>
-      <translation>Id đầu vào</translation>
+      <source>Input ID</source>
+      <translation>ID đầu vào</translation>
     </message>
   </context>
   <context>
@@ -788,8 +793,8 @@
     </message>
     <message>
       <location/>
-      <source>Output Id:</source>
-      <translation>Id đầu ra:</translation>
+      <source>Output ID:</source>
+      <translation>ID đầu ra:</translation>
     </message>
   </context>
   <context>
@@ -832,7 +837,7 @@
     <message>
       <location/>
       <source>Pre-Recording</source>
-      <translation>Pre-recording</translation>
+      <translation>Trước khi ghi</translation>
     </message>
     <message>
       <location/>
@@ -877,7 +882,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation>Chế độ panic:</translation>
+      <translation>Chế độ pnic:</translation>
     </message>
     <message>
       <location/>
@@ -903,7 +908,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>Duy trì đăng nhập</translation>
+      <translation>Giữ trạng thái đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -961,6 +966,14 @@
     </message>
   </context>
   <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
+      <source>Category</source>
+      <translation>Loài</translation>
+    </message>
+  </context>
+  <context>
     <name>DatabaseManagementWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
@@ -998,7 +1011,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Quy tắc sự kiện...</translation>
+      <translation>Event Rules...</translation>
     </message>
   </context>
   <context>
@@ -1075,7 +1088,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Xuất cài đặt</translation>
+      <translation>Lưu cầu hình cài đặt</translation>
     </message>
     <message>
       <location/>
@@ -1085,7 +1098,7 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Rotation, Dewarping, Image Enhancement vv</translation>
+      <translation>Rotation, Dewarping, Image Enhancement vv.</translation>
     </message>
     <message>
       <location/>
@@ -1108,7 +1121,7 @@
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>Xuất cài đặt</translation>
+      <translation>Lưu cầu hình cài đặt</translation>
     </message>
     <message>
       <location/>
@@ -1415,7 +1428,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>URL máy chủ</translation>
+      <translation>URL Máy chủ</translation>
     </message>
     <message>
       <location/>
@@ -1486,17 +1499,17 @@
     <message>
       <location/>
       <source>License Key:</source>
-      <translation>Key bản quyền:</translation>
+      <translation>Mã bản quyền:</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation>Các tính năng</translation>
+      <translation>Tính năng</translation>
     </message>
     <message>
       <location/>
-      <source>Locked to Hardware Id:</source>
-      <translation>Khóa Id phần cứng:</translation>
+      <source>Locked to Hardware ID:</source>
+      <translation>Khóa ID phần cứng:</translation>
     </message>
   </context>
   <context>
@@ -1585,7 +1598,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>Key bản quyền Không hợp lệ</translation>
+      <translation>Khóa bản quyền không hợp lệ</translation>
     </message>
     <message>
       <location/>
@@ -1594,8 +1607,8 @@
     </message>
     <message>
       <location/>
-      <source>Hardware Id</source>
-      <translation>Id Phần cứng</translation>
+      <source>Hardware ID</source>
+      <translation>ID phần cứng</translation>
     </message>
   </context>
   <context>
@@ -1639,7 +1652,7 @@
     <message>
       <location/>
       <source>Host</source>
-      <translation>Host</translation>
+      <translation>Máy chủ</translation>
     </message>
     <message>
       <location/>
@@ -1722,7 +1735,12 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Chu kỳ Tour</translation>
+      <translation>Tour cycle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>Địa chỉ IP cho các máy ảnh và máy chủ, nhóm người sử dụng, vv.</translation>
     </message>
   </context>
   <context>
@@ -1776,17 +1794,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Camera đeo người mới...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Đến máy chủ</translation>
     </message>
     <message>
       <location/>
-      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</translation>
+      <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Máy ảnh Wearable&quot; là một lưu trữ ảo cho các tệp video, có thể được tải lên bất kỳ máy chủ nào trong hệ thống của bạn và được truy cập bởi bất kỳ người dùng nào.</translation>
     </message>
   </context>
   <context>
@@ -1845,7 +1863,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation>Những sự kiện</translation>
+      <translation>Sự kiện</translation>
     </message>
   </context>
   <context>
@@ -1916,7 +1934,7 @@
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation>Hotkeys:</translation>
+      <translation>Phím nóng:</translation>
     </message>
   </context>
   <context>
@@ -1975,6 +1993,29 @@
     </message>
   </context>
   <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>Hình thức</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>Tên tập tin:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>Chọn File...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Duyệt...</translation>
+    </message>
+  </context>
+  <context>
     <name>QnIOPortSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
@@ -1997,7 +2038,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>Giữ trạng thái đăng nhập</translation>
+      <translation>Duy trì đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -2578,7 +2619,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>Xuất khẩu</translation>
+      <translation>Chế độ Expert</translation>
     </message>
     <message>
       <location/>
@@ -2664,18 +2705,6 @@
       <location/>
       <source>Reset</source>
       <translation>Thiết lập lại</translation>
-    </message>
-    <message>
-      <location/>
-      <source>TextLabel</source>
-      <translation type="unfinished">TextLabel</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage.
-The oldest footage among all cameras on the server will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -3032,14 +3061,18 @@ The oldest footage among all cameras on the server will be deleted first.</trans
     </message>
     <message>
       <location/>
-      <source>There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</source>
-      <translation>Chưa có vai trò người dùng tùy chỉnh nào được nêu ra. Nhấp vào nút &quot;Nhiệm vụ mới&quot; để tạo một role mới.</translation>
+      <source>New role</source>
+      <translation>Vai trò mới</translation>
     </message>
     <message>
       <location/>
-      <source>New role</source>
-      <translation>Vai trò mới</translation>
+      <source>There are no custom user roles yet.</source>
+      <translation>Vẫn chưa có người dùng nào dùng role này.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Nhấp vào nút &quot;Vai trò mới&quot; để tạo.</translation>
     </message>
   </context>
   <context>
@@ -3047,7 +3080,7 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation>Kiểu người dùng</translation>
+      <translation>Nhóm người dùng</translation>
     </message>
     <message>
       <location/>
@@ -3064,18 +3097,13 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableMotionWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <location/>
       <source>Motion Detection</source>
       <translation>Phát hiện chuyển động</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Phát hiện chuyển động trong video đã tải lên</translation>
     </message>
     <message>
       <location/>
@@ -3087,11 +3115,6 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableProgressWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <location/>
       <source>Cancel</source>
       <translation>Hủy bỏ</translation>
     </message>
@@ -3100,23 +3123,18 @@ Click &quot;New role&quot; button to create one.</source>
     <name>WearableUploadWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
-      <source>Form</source>
-      <translation>Hình thức</translation>
-    </message>
-    <message>
-      <location/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Tải video lên</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Tải lên tập tin...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Tải lên tập tin...</translation>
     </message>
   </context>
   <context>

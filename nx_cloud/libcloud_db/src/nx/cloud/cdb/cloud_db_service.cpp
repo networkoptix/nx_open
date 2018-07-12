@@ -1,21 +1,7 @@
 #include "cloud_db_service.h"
 
-#include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <list>
-#include <thread>
-#include <type_traits>
-
-#include <QtCore/QDir>
-
-#include <nx/network/http/auth_tools.h>
-#include <nx/network/socket_global.h>
-#include <nx/utils/db/db_structure_updater.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/current_process.h>
-#include <nx/utils/std/cpp14.h>
-#include <nx/utils/system_error.h>
 #include <nx/utils/type_utils.h>
 
 #include "controller.h"
@@ -44,6 +30,11 @@ std::vector<network::SocketAddress> CloudDbService::httpEndpoints() const
     return m_view->endpoints();
 }
 
+Controller& CloudDbService::controller()
+{
+    return *m_controller;
+}
+
 std::unique_ptr<utils::AbstractServiceSettings> CloudDbService::createSettings()
 {
     return std::make_unique<conf::Settings>();
@@ -54,14 +45,16 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     auto logSettings = settings.vmsSynchronizationLogging();
+    logSettings.logBaseName = "sync_log";
     logSettings.updateDirectoryIfEmpty(settings.dataDir());
     nx::utils::log::initialize(
         logSettings, QnLibCloudDbAppInfo::applicationDisplayName(), QString(),
-        "sync_log", nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
+        nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     m_settings = &settings;
 
     Controller controller(settings);
+    m_controller = &controller;
 
     HttpView view(settings, &controller);
     m_view = &view;

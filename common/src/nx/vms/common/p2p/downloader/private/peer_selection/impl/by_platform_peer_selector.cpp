@@ -9,53 +9,31 @@ namespace downloader {
 namespace peer_selection {
 namespace impl {
 
-namespace {
-
-class SimilarPeersSelector
-{
-public:
-    SimilarPeersSelector(
-        const QnSystemInformation& systemInformation,
-        const PeerInformationList& otherPeerInfos)
-        :
-        m_selfInformation(systemInformation)
-    {
-        for (const auto& peerInfo: otherPeerInfos)
-            addId(peerInfo);
-    }
-
-    QList<QnUuid> take() { return std::move(m_result); }
-private:
-    const QnSystemInformation& m_selfInformation;
-    QList<QnUuid> m_result;
-
-    void addId(const PeerInformation& peerInfo)
-    {
-        const bool isInfoSuitable = peerInfo.systemInformation.arch == m_selfInformation.arch
-            && peerInfo.systemInformation.platform == m_selfInformation.platform
-            && peerInfo.systemInformation.modification == m_selfInformation.modification;
-
-        if (!isInfoSuitable)
-            return;
-
-        m_result.append(peerInfo.id);
-    }
-};
-} // namespace
-
-ByPlatformPeerSelector::ByPlatformPeerSelector(const QnSystemInformation& selfInformation):
-    m_selfInformation(selfInformation)
+ByPlatformPeerSelector::ByPlatformPeerSelector(
+    const api::SystemInformation& selfInformation,
+    const QList<QnUuid>& additionalPeers)
+    :
+    m_selfInformation(selfInformation),
+    m_additionalPeers(additionalPeers)
 {}
 
 QList<QnUuid> ByPlatformPeerSelector::peers(const PeerInformationList& allOtherPeers) const
 {
-    return SimilarPeersSelector(m_selfInformation, allOtherPeers).take();
+    QList<QnUuid> result = m_additionalPeers;
+    for (const auto& peerInfo: allOtherPeers)
+    {
+        if (peerInfo.systemInformation == m_selfInformation && !result.contains(peerInfo.id))
+            result.append(peerInfo.id);
+    }
+
+    return result;
 }
 
 AbstractPeerSelectorPtr ByPlatformPeerSelector::create(
-    const QnSystemInformation& systemInformation)
+    const api::SystemInformation& systemInformation,
+    const QList<QnUuid>& additionalPeers)
 {
-    return std::make_unique<ByPlatformPeerSelector>(systemInformation);
+    return std::make_unique<ByPlatformPeerSelector>(systemInformation, additionalPeers);
 }
 
 } // namespace impl

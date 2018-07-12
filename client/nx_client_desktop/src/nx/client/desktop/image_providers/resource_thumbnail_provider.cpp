@@ -58,7 +58,7 @@ struct ResourceThumbnailProvider::Private
         }
         else if (const auto aviResource = resource.dynamicCast<QnAviResource>())
         {
-            baseProvider.reset(new FfmpegImageProvider(resource));
+            baseProvider.reset(new FfmpegImageProvider(resource, request.usecSinceEpoch));
         }
         else
         {
@@ -71,7 +71,7 @@ struct ResourceThumbnailProvider::Private
             QPixmap pixmap = qnSkin->pixmap(placeholderIconPath, true);
             // TODO: vms 4.0 has a new way to get preset colors
             const auto& palette = QnNxStyle::instance()->genericPalette();
-            const auto& backgroundColor = palette.color(lit("dark"), 4);
+            const auto& backgroundColor = palette.color(lit("dark"), 3);
             const auto& frameColor = palette.color(lit("dark"), 6);
             QSize size = pixmap.size();
             QPixmap dst(size);
@@ -83,13 +83,13 @@ struct ResourceThumbnailProvider::Private
             painter.drawPixmap(0, 0, pixmap);
             painter.setOpacity(1.0);
 
-            baseProvider.reset(new QnBasicImageProvider(dst.toImage()));
+            baseProvider.reset(new BasicImageProvider(dst.toImage()));
         }
 
         return true;
     }
 
-    QScopedPointer<QnImageProvider> baseProvider;
+    QScopedPointer<ImageProvider> baseProvider;
     api::ResourceImageRequest request;
 };
 
@@ -126,9 +126,9 @@ void ResourceThumbnailProvider::setRequestData(const api::ResourceImageRequest& 
     }
     else if (auto p = d->baseProvider.data())
     {
-        connect(p, &QnImageProvider::imageChanged, this, &QnImageProvider::imageChanged);
-        connect(p, &QnImageProvider::statusChanged, this, &QnImageProvider::statusChanged);
-        connect(p, &QnImageProvider::sizeHintChanged, this, &QnImageProvider::sizeHintChanged);
+        connect(p, &ImageProvider::imageChanged, this, &ImageProvider::imageChanged);
+        connect(p, &ImageProvider::statusChanged, this, &ImageProvider::statusChanged);
+        connect(p, &ImageProvider::sizeHintChanged, this, &ImageProvider::sizeHintChanged);
     }
 }
 

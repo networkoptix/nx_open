@@ -1,26 +1,29 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
         <h1 class="process-success" ng-if="activate.success">
-            Ваша учетная запись успешно активирована<br>
+            Ваша учетная запись успешно активирована
+        </h1>
+        <h1 class="process-success" ng-if="activate.success">
             <a class="btn btn-default" href="/login">Войти</a>
-        </h1> 
+        </h1>
 
         <h1 class="process-success" ng-if="!activate.success">
-            Учетная запись уже активирована или введен неверный код подтверждения
+            Учетная запись уже активирована или неверный код подтверждения
         </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Ваша учетная запись успешно активирована<br>
-            <a href="/login">Войти</a>
-            <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
+            Ваша учетная запись успешно активирована
+        </h1>
+        <h1 class="process-success">
+            <a class="btn btn-default" href="/login">Войти</a>
         </h1>
     </div>
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>Вы зарегистрировались в {{PRODUCT_NAME}}</h1>
+            <h1>Вы зарегистрировались в %PRODUCT_NAME%</h1>
             <p>Мы отправили вам письмо с ссылкой активации на адрес {{data.email}}.<br>
             Пожалуйста, активируйте свою учетную запись, перейдя по этой ссылке.</p>
         </div>
@@ -37,7 +40,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Требуется Email</span>
-                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Пожалуйста, введите действительный адрес электронной почты</span>
+                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Пожалуйста, введите действительный Email</span>
                 </div>
             </div>
             <div class="form-group">
@@ -70,7 +73,7 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email обязателен для заполнения</span>
-                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Пожалуйста введите действительный адрес электронной почты</span>
+                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Пожалуйста введите действительный Email</span>
                 </div>
             </div>
             <div class="form-group">
@@ -83,9 +86,11 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            Пароль успешно изменен<br>
-            <a href="/login">Войти</a>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            Пароль успешно сохранен
+        </h1>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            <a class="btn btn-default" href="/login">Войти</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>

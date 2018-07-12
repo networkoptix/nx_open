@@ -28,6 +28,7 @@ protected:
         const QHostAddress& foundHostAddress ) override;
 
 private:
+    void setChannelToResource(const QnPlAxisResourcePtr& resource, int value);
     bool testCredentials(const QUrl& url, const QAuthenticator& auth) const;
 
     QAuthenticator determineResourceCredentials(const QnSecurityCamResourcePtr& resource) const;

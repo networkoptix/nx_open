@@ -1,5 +1,4 @@
 #include "monitor_linux.h"
-
 #include <iostream>
 #include <map>
 #include <memory>
@@ -25,6 +24,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/concurrent.h>
 #include <utils/fs/dir.h>
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/root_tool.h>
 
 static const int BYTES_PER_MB = 1024*1024;
 //static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
@@ -552,23 +553,105 @@ static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
         return QnPlatformMonitor::UnknownPartition;
 }
 
+class ServerSystemInfoProvider: public AbstractSystemInfoProvider
+{
+public:
+    virtual QByteArray fileContent() const override
+    {
+        QFile mountsFile(m_commonSystemInfoProvider.fileName());
+        int fd = qnServerModule->rootTool()->open(
+            m_commonSystemInfoProvider.fileName(), QIODevice::ReadOnly);
+
+        if (fd > 0) //< Root tool has successfully opened file
+            mountsFile.open(fd, QIODevice::ReadOnly, QFileDevice::AutoCloseHandle);
+        else
+            mountsFile.open(QIODevice::ReadOnly);
+
+        if (!mountsFile.isOpen())
+            return QByteArray();
+
+        return mountsFile.readAll();
+    }
+
+    virtual bool scanfLongPattern() const override
+    {
+        return m_commonSystemInfoProvider.scanfLongPattern();
+    }
+
+    virtual qint64 totalSpace(const QByteArray& fsPath) const override
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_deviceSpacesCache[fsPath].totalSpace == kUnknownValue)
+        {
+            m_deviceSpacesCache[fsPath].totalSpace =
+                qnServerModule->rootTool()->totalSpace(QString::fromLatin1(fsPath));
+        }
+        return m_deviceSpacesCache[fsPath].totalSpace;
+    }
+
+    virtual qint64 freeSpace(const QByteArray& fsPath) const override
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_deviceSpacesCache[fsPath].freeSpace == kUnknownValue)
+        {
+            m_deviceSpacesCache[fsPath].freeSpace =
+                qnServerModule->rootTool()->freeSpace(QString::fromLatin1(fsPath));
+        }
+
+        bool freeSpaceIsInvalid = m_deviceSpacesCache[fsPath].freeSpace <= 0;
+        if (m_tries++ % 10 == 0 || !freeSpaceIsInvalid)
+        {
+            m_deviceSpacesCache[fsPath].freeSpace =
+                qnServerModule->rootTool()->freeSpace(QString::fromLatin1(fsPath));
+        }
+
+        // If free space becomes available and total space is invalid let's reset totalSpace to the
+        // initial value to let it be checked next iteration.
+        if (m_deviceSpacesCache[fsPath].freeSpace > 0
+            && freeSpaceIsInvalid
+            && m_deviceSpacesCache[fsPath].totalSpace != kUnknownValue
+            && m_deviceSpacesCache[fsPath].totalSpace <= 0)
+        {
+            m_deviceSpacesCache[fsPath].totalSpace = kUnknownValue;
+        }
+
+        return m_deviceSpacesCache[fsPath].freeSpace;
+    }
+
+private:
+    static const qint64 kUnknownValue = std::numeric_limits<qint64>::min();
+    struct DeviceSpaces
+    {
+        qint64 freeSpace = kUnknownValue;
+        qint64 totalSpace = kUnknownValue;
+    };
+
+    CommonSystemInfoProvider m_commonSystemInfoProvider;
+    mutable QMap<QString, DeviceSpaces> m_deviceSpacesCache;
+    mutable QnMutex m_mutex;
+    mutable int m_tries;
+};
+
 /*!
     \note If same device mounted to multiple points, returns mount point with shortest name
 */
 static QList<QnPlatformMonitor::PartitionSpace> readPartitionsAndSizes()
 {
+    static ServerSystemInfoProvider serverSystemInfoProvider;
     std::list<PartitionInfo> partitions;
     QList<QnPlatformMonitor::PartitionSpace> result;
-    const auto errCode = readPartitions(&partitions);
 
+    const auto errCode = readPartitions(&serverSystemInfoProvider, &partitions);
     if (errCode != SystemError::noError)
         return result;
+
     for (const auto& data: partitions)
     {
         QnPlatformMonitor::PartitionSpace partitionInfo;
         partitionInfo.devName = data.devName;
         partitionInfo.path = data.path;
-        partitionInfo.type = data.isUsb ? QnPlatformMonitor::RemovableDiskPartition : fsNameToType(data.fsName);
+        partitionInfo.type = data.isUsb
+            ? QnPlatformMonitor::RemovableDiskPartition : fsNameToType(data.fsName);
         partitionInfo.sizeBytes = data.sizeBytes;
         partitionInfo.freeBytes = data.freeBytes;
         result.push_back(partitionInfo);

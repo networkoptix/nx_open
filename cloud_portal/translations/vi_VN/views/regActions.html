@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        Tài khoản được tạo. <br> Thông báo xác nhận được gửi đến <br> {{account.email}}
+        Tài khoản được tạo. <br>Thông báo xác nhận được gửi tới Email <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -24,7 +24,7 @@
  name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Họ là bắt buộc.</span>
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">Họ là bắt buộc</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -35,7 +35,7 @@
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Tên là bắt buộc.</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Họ là bắt buộc</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -49,14 +49,25 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required"> Email là bắt buộc. </span> <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email"> Vui lòng nhập một Email hợp lệ. </span> <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists"> Email này đã được đăng ký trong {{PRODUCT_NAME}}. </span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email là bắt buộc</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Vui lòng nhập Email hợp lệ</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Email này đã được đăng ký trong %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Đăng ký nhận bản tin qua email</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        Tôi đồng ý với <a href="/content/eula" target="_blank"> Điều khoản và Điều kiện </a> và
+                          <a href="%PRIVACY_LINK%" target="_blank"> Chính sách bảo mật </a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        Vui lòng xem và đồng ý với các điều khoản và điều kiện và quyền riêng tư chính sách để tiếp tục
+                    </p>
                 </div>
             </div>
         </div>
@@ -66,7 +77,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note"> Bằng cách nhấp vào "Tạo Tài khoản", bạn đồng ý <br> đến <a href="/content/eula" target="_blank"> Điều khoản và Điều kiện </a></small>
             </div>
         </div>
     </form>

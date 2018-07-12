@@ -6,7 +6,7 @@
 #ifndef ELP_EMPTY_PACKET_H
 #define ELP_EMPTY_PACKET_H
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
 

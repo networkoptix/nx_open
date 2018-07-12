@@ -17,7 +17,7 @@ class QnAbstractMediaDataReceptor;
 
 struct AVCodecContext;
 
-class QN_EXPORT QnAbstractStreamDataProvider : public QnLongRunnable, public QnResourceConsumer
+class QnAbstractStreamDataProvider : public QnLongRunnable, public QnResourceConsumer
 {
     Q_OBJECT
 public:
@@ -31,8 +31,6 @@ public:
     void removeDataProcessor(QnAbstractMediaDataReceptor* dp);
 
     virtual bool isReverseMode() const { return false;}
-
-    bool isConnectedToTheResource() const;
 
     void setNeedSleep(bool sleep);
 
@@ -55,12 +53,11 @@ signals:
     void videoLayoutChanged();
 protected:
     virtual void putData(const QnAbstractDataPacketPtr& data);
-    void beforeDisconnectFromResource();
+    virtual void beforeDisconnectFromResource() override;
 
 protected:
     QList<QnAbstractMediaDataReceptor*> m_dataprocessors;
     mutable QnMutex m_mutex;
-    QHash<QByteArray, QVariant> m_streamParam;
     Qn::ConnectionRole m_role;
 };
 

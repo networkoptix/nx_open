@@ -70,7 +70,7 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QnSoftwareVersion &version,
+    const nx::utils::SoftwareVersion& version,
     const QString& module,
     const QString& installationPath);
 
@@ -159,9 +159,10 @@ int main(int argc, char* argv[])
         settings.level.parse(logLevel);
         settings.maxFileSize = 1024 * 1024 * 10;
         settings.maxBackupCount = 5;
+        settings.logBaseName = logFilePath;
 
         nx::utils::log::initialize(
-            settings, QnApplauncherAppInfo::applicationName(), QString(), logFilePath);
+            settings, QnApplauncherAppInfo::applicationName());
     }
 
     InstallationManager installationManager;
@@ -176,7 +177,7 @@ int main(int argc, char* argv[])
             mirrorListUrl,
             productNameToInstall,
             customizationToInstall,
-            QnSoftwareVersion(versionToInstall),
+            nx::utils::SoftwareVersion(versionToInstall),
             moduleToInstall,
             installationPath);
 
@@ -273,7 +274,7 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QnSoftwareVersion& version,
+    const nx::utils::SoftwareVersion& version,
     const QString& module,
     const QString& installationPath)
 {

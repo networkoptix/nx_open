@@ -32,11 +32,12 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &filterText
@@ -82,10 +83,10 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     enum { kUpdateFilterDelayMs = 200 };
     m_ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
 
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilterText);
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::textChanged, this, updateFilterText);
+    connect(m_ui->filterLineEdit, &SearchLineEdit::enterKeyPressed, this, updateFilterText);
+    connect(m_ui->filterLineEdit, &SearchLineEdit::textChanged, this, updateFilterText);
 
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::escKeyPressed, this, [this]()
+    connect(m_ui->filterLineEdit, &SearchLineEdit::escKeyPressed, this, [this]()
     {
         m_ui->filterLineEdit->lineEdit()->setText(QString());
         m_model->setFilterText(QString());
@@ -374,7 +375,7 @@ void QnSearchBookmarksDialogPrivate::chooseCamera()
 
 bool QnSearchBookmarksDialogPrivate::currentUserHasAllCameras()
 {
-    return accessController()->hasGlobalPermission(Qn::GlobalAccessAllMediaPermission);
+    return accessController()->hasGlobalPermission(GlobalPermission::accessAllMedia);
 }
 
 void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
@@ -398,7 +399,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
 
     addActionToMenu(action::OpenInNewTabAction, m_openInNewTabAction);
     addActionToMenu(action::EditCameraBookmarkAction, m_editBookmarkAction);
-    addActionToMenu(action::ExportVideoAction, m_exportBookmarkAction);
+    addActionToMenu(action::ExportBookmarkAction, m_exportBookmarkAction);
     addActionToMenu(action::RemoveBookmarksAction, m_removeBookmarksAction);
 
     /* Connect action signal handlers: */
@@ -425,7 +426,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     connect(m_exportBookmarkAction, &QAction::triggered, this,
         [this, params]
         {
-            menu()->triggerIfPossible(action::ExportVideoAction, params);
+            menu()->triggerIfPossible(action::ExportBookmarkAction, params);
         });
 
     /* Execute popup menu: */

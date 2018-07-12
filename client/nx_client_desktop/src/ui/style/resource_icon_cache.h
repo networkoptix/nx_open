@@ -39,6 +39,8 @@ public:
         Cameras,
 
         Recorder,
+        MultisensorCamera,
+
         Image,
         Media,
         User,
@@ -51,6 +53,8 @@ public:
         IOModule,
         WebPage,
         WebPages,
+
+        C2P,
 
         TypeMask        = 0xFF,
 

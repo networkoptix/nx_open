@@ -13,7 +13,7 @@
 class QnTestCameraStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnTestCameraStreamReader(const QnResourcePtr& res);
+    QnTestCameraStreamReader(const QnTestCameraResourcePtr& res);
     virtual ~QnTestCameraStreamReader();
 
 protected:

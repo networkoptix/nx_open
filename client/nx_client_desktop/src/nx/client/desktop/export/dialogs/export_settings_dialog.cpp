@@ -4,6 +4,7 @@
 
 #include <limits>
 
+#include <translation/datetime_formatter.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
@@ -16,17 +17,17 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/common/busy_indicator.h>
-#include <ui/widgets/common/alert_bar.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <utils/common/event_processors.h>
 #include <utils/math/math.h>
-#include <nx/client/desktop/ui/common/selectable_text_button_group.h>
+#include <nx/client/desktop/common/widgets/busy_indicator.h>
+#include <nx/client/desktop/common/widgets/message_bar.h>
+#include <nx/client/desktop/common/widgets/selectable_text_button_group.h>
 #include <nx/client/desktop/image_providers/layout_thumbnail_loader.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 namespace nx {
 namespace client {
@@ -148,11 +149,11 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     ui->bookmarkButton->setVisible(bookmark.isValid());
     if (!bookmark.isValid()) // Just in case...
-        ui->bookmarkButton->setState(ui::SelectableTextButton::State::deactivated);
+        ui->bookmarkButton->setState(SelectableTextButton::State::deactivated);
 
     ui->speedButton->setState(d->storedRapidReviewSettings().enabled
-        ? ui::SelectableTextButton::State::unselected
-        : ui::SelectableTextButton::State::deactivated);
+        ? SelectableTextButton::State::unselected
+        : SelectableTextButton::State::deactivated);
 
     const auto updateRapidReviewData =
         [this](int absoluteSpeed, qint64 frameStepMs)
@@ -160,7 +161,7 @@ ExportSettingsDialog::ExportSettingsDialog(
             ui->speedButton->setText(lit("%1 %3 %2x").arg(tr("Rapid Review")).arg(absoluteSpeed).
                 arg(QChar(L'\x2013'))); //< N-dash
 
-            if (ui->speedButton->state() == ui::SelectableTextButton::State::deactivated)
+            if (ui->speedButton->state() == SelectableTextButton::State::deactivated)
                 return;
 
             d->setRapidReviewFrameStep(frameStepMs);
@@ -179,19 +180,19 @@ ExportSettingsDialog::ExportSettingsDialog(
         ui->rapidReviewSettingsPage->frameStepMs());
 
     connect(ui->timestampSettingsPage, &TimestampOverlaySettingsWidget::deleteClicked,
-        ui->timestampButton, &ui::SelectableTextButton::deactivate);
+        ui->timestampButton, &SelectableTextButton::deactivate);
 
     connect(ui->imageSettingsPage, &ImageOverlaySettingsWidget::deleteClicked,
-        ui->imageButton, &ui::SelectableTextButton::deactivate);
+        ui->imageButton, &SelectableTextButton::deactivate);
 
     connect(ui->textSettingsPage, &TextOverlaySettingsWidget::deleteClicked,
-        ui->textButton, &ui::SelectableTextButton::deactivate);
+        ui->textButton, &SelectableTextButton::deactivate);
 
     connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::deleteClicked,
-        ui->bookmarkButton, &ui::SelectableTextButton::deactivate);
+        ui->bookmarkButton, &SelectableTextButton::deactivate);
 
     connect(ui->rapidReviewSettingsPage, &RapidReviewSettingsWidget::deleteClicked,
-        ui->speedButton, &ui::SelectableTextButton::deactivate);
+        ui->speedButton, &SelectableTextButton::deactivate);
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &ExportSettingsDialog::updateMode);
 
@@ -206,7 +207,7 @@ ExportSettingsDialog::ExportSettingsDialog(
             setMaxOverlayWidth(ui->textSettingsPage, size.width());
         });
 
-    if (ui->bookmarkButton->state() != ui::SelectableTextButton::State::deactivated)
+    if (ui->bookmarkButton->state() != SelectableTextButton::State::deactivated)
         ui->bookmarkButton->click(); //< Set current page to bookmark info.
     else
         ui->cameraExportSettingsButton->click(); //< Set current page to settings
@@ -223,7 +224,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->cameraExportSettingsButton->setIcon(qnSkin->icon(
         lit("text_buttons/settings_hovered.png"),
         lit("text_buttons/settings_selected.png")));
-    ui->cameraExportSettingsButton->setState(ui::SelectableTextButton::State::selected);
+    ui->cameraExportSettingsButton->setState(SelectableTextButton::State::selected);
     ui->cameraExportSettingsButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->exportMediaSettingsPage));
 
@@ -231,7 +232,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->layoutExportSettingsButton->setIcon(qnSkin->icon(
         lit("text_buttons/settings_hovered.png"),
         lit("text_buttons/settings_selected.png")));
-    ui->layoutExportSettingsButton->setState(ui::SelectableTextButton::State::selected);
+    ui->layoutExportSettingsButton->setState(SelectableTextButton::State::selected);
 
     ui->timestampButton->setDeactivatable(true);
     ui->timestampButton->setDeactivatedText(tr("Add Timestamp"));
@@ -281,10 +282,10 @@ void ExportSettingsDialog::setupSettingsButtons()
         lit("text_buttons/rapid_review_selected.png")));
     ui->speedButton->setProperty(kPagePropertyName,
         qVariantFromValue(ui->rapidReviewSettingsPage));
-    connect(ui->speedButton, &ui::SelectableTextButton::stateChanged, this,
-        [this](ui::SelectableTextButton::State state)
+    connect(ui->speedButton, &SelectableTextButton::stateChanged, this,
+        [this](SelectableTextButton::State state)
         {
-            const bool enabled = state != ui::SelectableTextButton::State::deactivated;
+            const bool enabled = state != SelectableTextButton::State::deactivated;
             d->setRapidReviewFrameStep(enabled ? ui->rapidReviewSettingsPage->frameStepMs() : 0);
             d->setStoredRapidReviewSettings({enabled, d->storedRapidReviewSettings().speed});
             ui->transcodingButtonsWidget->layout()->activate();
@@ -307,11 +308,11 @@ void ExportSettingsDialog::setupSettingsButtons()
         [this](ExportOverlayType type)
         {
             auto button = buttonForOverlayType(type);
-            if (button && button->state() != ui::SelectableTextButton::State::selected)
+            if (button && button->state() != SelectableTextButton::State::selected)
                 button->click();
         });
 
-    auto group = new ui::SelectableTextButtonGroup(this);
+    auto group = new SelectableTextButtonGroup(this);
     group->add(ui->cameraExportSettingsButton);
     group->add(ui->bookmarkButton);
     group->add(ui->timestampButton);
@@ -320,8 +321,8 @@ void ExportSettingsDialog::setupSettingsButtons()
     group->add(ui->speedButton);
     group->setSelectionFallback(ui->cameraExportSettingsButton);
 
-    connect(group, &ui::SelectableTextButtonGroup::selectionChanged, this,
-        [this](ui::SelectableTextButton* /*old*/, ui::SelectableTextButton* selected)
+    connect(group, &SelectableTextButtonGroup::selectionChanged, this,
+        [this](SelectableTextButton* /*old*/, SelectableTextButton* selected)
         {
             if (!selected)
                 return;
@@ -330,8 +331,8 @@ void ExportSettingsDialog::setupSettingsButtons()
             ui->mediaExportSettingsWidget->setCurrentWidget(page);
         });
 
-    connect(group, &ui::SelectableTextButtonGroup::buttonStateChanged, this,
-        [this](ui::SelectableTextButton* button)
+    connect(group, &SelectableTextButtonGroup::buttonStateChanged, this,
+        [this](SelectableTextButton* button)
         {
             NX_EXPECT(button);
             const auto overlayTypeVariant = button->property(kOverlayPropertyName);
@@ -341,11 +342,11 @@ void ExportSettingsDialog::setupSettingsButtons()
 
             switch (button->state())
             {
-                case ui::SelectableTextButton::State::deactivated:
+                case SelectableTextButton::State::deactivated:
                     d->hideOverlay(overlayType);
                     break;
 
-                case ui::SelectableTextButton::State::selected:
+                case SelectableTextButton::State::selected:
                     d->selectOverlay(overlayType);
                     break;
 
@@ -367,7 +368,7 @@ ExportSettingsDialog::~ExportSettingsDialog()
 }
 
 
-ui::SelectableTextButton* ExportSettingsDialog::buttonForOverlayType(ExportOverlayType type)
+SelectableTextButton* ExportSettingsDialog::buttonForOverlayType(ExportOverlayType type)
 {
     switch (type)
     {
@@ -380,7 +381,7 @@ ui::SelectableTextButton* ExportSettingsDialog::buttonForOverlayType(ExportOverl
     case ExportOverlayType::bookmark:
         return ui->bookmarkButton;
     default:
-        return static_cast<ui::SelectableTextButton*>(nullptr);
+        return static_cast<SelectableTextButton*>(nullptr);
     }
 };
 
@@ -402,16 +403,23 @@ ExportLayoutSettings ExportSettingsDialog::exportLayoutSettings() const
 void ExportSettingsDialog::updateSettingsWidgets()
 {
     const auto& mediaPersistentSettings = d->exportMediaPersistentSettings();
+    if (mediaPersistentSettings.canExportOverlays())
+    {
+        ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
+        ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
 
-    ui->exportLayoutSettingsPage->setLayoutReadOnly(d->exportLayoutPersistentSettings().readOnly);
-    ui->exportMediaSettingsPage->setApplyFilters(mediaPersistentSettings.applyFilters);
+        if(mediaPersistentSettings.rapidReview.enabled)
+        {
+            int speed = d->storedRapidReviewSettings().speed;
+            ui->rapidReviewSettingsPage->setSpeed(speed);
+        }
+    }
+
     ui->timestampSettingsPage->setData(mediaPersistentSettings.timestampOverlay);
-    ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
     ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
     ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
     ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
 
-    ui->rapidReviewSettingsPage->setSpeed(d->storedRapidReviewSettings().speed);
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
 }
@@ -434,6 +442,7 @@ void ExportSettingsDialog::updateMode()
 
     const auto currentMode = isCameraMode ? Mode::Media : Mode::Layout;
     d->setMode(currentMode);
+    updateWidgetsState();
 }
 
 void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts,
@@ -458,9 +467,6 @@ void ExportSettingsDialog::updateAlerts(Mode mode, const QStringList& weakAlerts
 void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
     const QStringList& texts, bool severe)
 {
-    // TODO: #vkutin #gdm Properly separate in the future.
-    using QnMessageBar = QnPromoBar;
-
     const auto newCount = texts.count();
     const auto oldCount = layout->count();
 
@@ -468,9 +474,9 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
         [layout](int index, const QString& text)
         {
             auto item = layout->itemAt(index);
-            auto bar = item ? qobject_cast<QnAlertBar*>(item->widget()) : nullptr;
-            NX_EXPECT(bar);
-            if (bar)
+            // Notice: notifications are added at the runtime. It is possible to have no
+            // widget so far, especially when dialog is only initialized.
+            if (auto bar = item ? qobject_cast<MessageBar*>(item->widget()) : nullptr)
                 bar->setText(text);
         };
 
@@ -478,7 +484,7 @@ void ExportSettingsDialog::updateAlertsInternal(QLayout* layout,
     {
         // Add new alert bars.
         for (int i = oldCount; i < newCount; ++i)
-            layout->addWidget(severe ? new QnAlertBar() : new QnMessageBar());
+            layout->addWidget(severe ? new AlertBar() : new MessageBar());
     }
     else
     {
@@ -498,18 +504,13 @@ void ExportSettingsDialog::updateWidgetsState()
     const auto& settings = d->exportMediaPersistentSettings();
     bool transcodingLocked = settings.areFiltersForced();
     bool transcodingChecked = settings.applyFilters;
-    bool overlayOptionsAvailable = d->mode() == Mode::Media;
+    auto mode = d->mode();
+    bool overlayOptionsAvailable = mode == Mode::Media && settings.canExportOverlays();
 
-    if (d->mode() == Mode::Media && !d->hasVideo())
+    if (mode == Mode::Media && !d->hasVideo())
     {
         transcodingLocked = true;
         transcodingChecked = false;
-    }
-
-    // Should hide additional overlay buttons of transcoding is disabled.
-    if (!transcodingChecked || transcodingLocked)
-    {
-        overlayOptionsAvailable = false;
     }
 
     // Applying data to UI.
@@ -517,7 +518,7 @@ void ExportSettingsDialog::updateWidgetsState()
     ui->exportMediaSettingsPage->setTranscodingAllowed(!transcodingLocked);
     ui->exportMediaSettingsPage->setApplyFilters(transcodingChecked, true);
 
-    if (transcodingChecked && overlayOptionsAvailable)
+    if (overlayOptionsAvailable)
         ui->cameraExportSettingsButton->click();
 
     // Yep, we need exactly this condition.
@@ -526,15 +527,20 @@ void ExportSettingsDialog::updateWidgetsState()
         ui->transcodingButtonsWidget->setHidden(!overlayOptionsAvailable);
     }
 
+    if (settings.canExportOverlays())
+    {
+        ui->timestampSettingsPage->setFormatEnabled(d->mediaSupportsUtc());
+    }
+
     // Update button state for used overlays.
     for (auto overlay: settings.usedOverlays)
     {
-        ui::SelectableTextButton* button = buttonForOverlayType(overlay);
+        SelectableTextButton* button = buttonForOverlayType(overlay);
         if (!button)
             continue;
-        if (button->state() == ui::SelectableTextButton::State::deactivated)
+        if (button->state() == SelectableTextButton::State::deactivated)
         {
-            button->setState(ui::SelectableTextButton::State::unselected);
+            button->setState(SelectableTextButton::State::unselected);
         }
     }
 }
@@ -544,7 +550,7 @@ void ExportSettingsDialog::setMediaParams(
     const QnLayoutItemData& itemData,
     QnWorkbenchContext* context)
 {
-    const auto timeWatcher = context->instance<QnWorkbenchServerTimeWatcher>();
+    const auto timeWatcher = context->instance<core::ServerTimeWatcher>();
     d->setServerTimeZoneOffsetMs(timeWatcher->utcOffset(mediaResource, Qn::InvalidUtcOffset));
 
     const auto timestampOffsetMs = timeWatcher->displayOffset(mediaResource);
@@ -552,18 +558,17 @@ void ExportSettingsDialog::setMediaParams(
 
     const auto resource = mediaResource->toResourcePtr();
     const auto currentSettings = d->exportMediaSettings();
-    const auto startTimeMs = currentSettings.timePeriod.startTimeMs;
+    const auto startTimeMs = currentSettings.period.startTimeMs;
 
     QString timePart;
     if (resource->hasFlags(Qn::utc))
     {
-        QDateTime time = QDateTime::fromMSecsSinceEpoch(startTimeMs + timestampOffsetMs);
-        timePart = time.toString(lit("yyyy_MMM_dd_hh_mm_ss"));
+        timePart = datetime::toString(startTimeMs + timestampOffsetMs,
+            datetime::Format::filename_date);
     }
     else
     {
-        QTime time = QTime(0, 0, 0, 0).addMSecs(startTimeMs);
-        timePart = time.toString(lit("hh_mm_ss"));
+        timePart = datetime::toString(startTimeMs, datetime::Format::filename_time);
     }
 
     Filename baseFileName = currentSettings.fileName;
@@ -574,9 +579,7 @@ void ExportSettingsDialog::setMediaParams(
     const auto customAr = mediaResource->customAspectRatio();
 
     nx::core::transcoding::Settings settings;
-    settings.aspectRatio = qFuzzyIsNull(customAr)
-        ? QnAspectRatio()
-        : QnAspectRatio::closestStandardRatio(customAr);
+    settings.aspectRatio = mediaResource->customAspectRatio();
     settings.enhancement = itemData.contrastParams;
     settings.dewarping = itemData.dewarpingParams;
     settings.zoomWindow = itemData.zoomRect;
@@ -608,7 +611,7 @@ void ExportSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
     auto baseName = nx::utils::replaceNonFileNameCharacters(layout->getName(), L' ');
     if (qnRuntime->isActiveXMode() || baseName.isEmpty())
         baseName = tr("exported");
-    Filename baseFileName = d->exportLayoutSettings().filename;
+    Filename baseFileName = d->exportLayoutSettings().fileName;
     baseFileName.name = baseName;
     ui->layoutFilenamePanel->setFilename(suggestedFileName(baseFileName));
 }

@@ -6,8 +6,8 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#ifdef Q_OS_WIN
-#   include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
+#if defined(Q_OS_WIN)
+    #include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
 #endif
 
 #include "video_camera.h"
@@ -28,21 +28,20 @@ VideoCameraLocker::~VideoCameraLocker()
 //-------------------------------------------------------------------------------------------------
 // QnVideoCameraPool
 
-
 void QnVideoCameraPool::stop()
 {
     for( const QnVideoCameraPtr& camera: m_cameras.values())
         camera->beforeStop();
 
-#if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
-        VMaxStreamFetcher::pleaseStopAll(); // increase stop time
-#endif
+    #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
+        VMaxStreamFetcher::pleaseStopAll(); //< increase stop time
+    #endif
 
     m_cameras.clear();
 }
 
 QnVideoCameraPool::QnVideoCameraPool(
-    const MSSettings& settings,
+    const nx::mediaserver::Settings& settings,
     QnResourcePool* resourcePool)
     :
     m_settings(settings),
@@ -76,7 +75,8 @@ QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return QnVideoCameraPtr();
     QnMutexLocker lock(&m_mutex);
-    return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(m_settings, res))).value();
+    return m_cameras.insert(
+        res, QnVideoCameraPtr(new QnVideoCamera(m_settings, res))).value();
 }
 
 bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPtr camera)

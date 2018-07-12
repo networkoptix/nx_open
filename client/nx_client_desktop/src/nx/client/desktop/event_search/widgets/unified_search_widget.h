@@ -9,7 +9,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QAbstractListModel;
-class QnSearchLineEdit;
 class QLabel;
 class QMenu;
 class QToolButton;
@@ -24,10 +23,10 @@ namespace utils { class PendingOperation; }
 namespace client {
 namespace desktop {
 
-namespace ui { class SelectableTextButton; }
-
-class UnifiedAsyncSearchListModel;
 class EventTile;
+class SearchLineEdit;
+class SelectableTextButton;
+class UnifiedAsyncSearchListModel;
 
 class UnifiedSearchWidget:
     public QWidget,
@@ -43,11 +42,11 @@ public:
     UnifiedAsyncSearchListModel* model() const;
     void setModel(UnifiedAsyncSearchListModel* value);
 
-    QnSearchLineEdit* filterEdit() const;
-    ui::SelectableTextButton* typeButton() const;
-    ui::SelectableTextButton* areaButton() const;
-    ui::SelectableTextButton* timeButton() const;
-    ui::SelectableTextButton* cameraButton() const;
+    SearchLineEdit* filterEdit() const;
+    SelectableTextButton* typeButton() const;
+    SelectableTextButton* areaButton() const;
+    SelectableTextButton* timeButton() const;
+    SelectableTextButton* cameraButton() const;
 
     QToolButton* showInfoButton() const;
     QToolButton* showPreviewsButton() const;
@@ -88,7 +87,7 @@ private:
 
 private:
     QScopedPointer<Ui::UnifiedSearchWidget> ui;
-    QnSearchLineEdit* m_searchLineEdit;
+    SearchLineEdit* m_searchLineEdit;
     QTimer* const m_dayChangeTimer = nullptr;
     nx::utils::PendingOperation* m_fetchMoreOperation;
     QnTimePeriod m_timelineSelection;

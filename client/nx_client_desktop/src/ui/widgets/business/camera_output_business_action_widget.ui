@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>531</width>
-    <height>38</height>
+    <height>51</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Output Id:</string>
+      <string>Output ID:</string>
      </property>
      <property name="buddy">
       <cstring>relayComboBox</cstring>

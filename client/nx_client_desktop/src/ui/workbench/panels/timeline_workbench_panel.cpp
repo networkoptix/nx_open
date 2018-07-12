@@ -40,6 +40,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -204,6 +205,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     item->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     item->timeSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->timeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
+    item->timeSlider()->screenshotCursor()->setZValue(NxUi::CursorTooltipItemZOrder);
     item->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     item->speedSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->speedSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);

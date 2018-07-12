@@ -3,13 +3,15 @@ import json
 import re
 
 def get_variables(lang="en_US"):
-    with codecs.open("customizations/variables_customization.json", 'r') as customization_variables:
+    with codecs.open("customizations/variables_customization.json", 'r', encoding='utf-8-sig') as customization_variables:
         customization_json = json.load(customization_variables)
         
-        with codecs.open("translations/variables_"+lang+".json", 'r') as translation_variables:
+        with codecs.open("translations/variables_language_"+lang+".json", 'r', encoding='utf-8-sig') as translation_variables:
             translation_variables = translation_variables.read()
             for x in customization_json:
                 p = re.compile(x)
-                target_content = p.sub(customization_json[x], translation_variables)
-                target_content =  json.loads(target_content)
-            return target_content
+                translation_variables = p.sub(customization_json[x], translation_variables)
+
+            translation_variables =  json.loads(translation_variables, encoding='utf-8-sig')
+            translation_variables['LANGUAGE']=lang
+            return translation_variables

@@ -130,9 +130,10 @@ protected:
     void whenEstablishReverseConnection()
     {
         using namespace std::placeholders;
+        using namespace nx::network;
 
         m_reverseConnector.connect(
-            nx::network::SocketAddress(nx::network::HostAddress::localhost, m_reverseConnectionPool.port()),
+            SocketAddress(HostAddress::localhost, m_reverseConnectionPool.address().port),
             std::bind(&ReverseConnectionPool::saveReverseConnectorResult, this, _1));
     }
 

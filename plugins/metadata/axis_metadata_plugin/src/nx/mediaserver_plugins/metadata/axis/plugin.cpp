@@ -11,7 +11,7 @@
 
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
-#include <plugins/plugin_internal_tools.h>
+#include <nx/mediaserver_plugins/utils/uuid.h>
 #include <nx/kit/debug.h>
 
 #include "manager.h"
@@ -141,6 +141,12 @@ AnalyticsDriverManifest Plugin::fetchSupportedEvents(const CameraInfo& cameraInf
     for (const auto& topic: m_typedManifest.allowedTopics)
         allowedTopics.push_back(topic.toStdString());
     axisCameraController.filterSupportedEvents(allowedTopics);
+
+    std::vector<std::string> forbiddenDescriptions;
+    for (const auto& description: m_typedManifest.forbiddenDescriptions)
+        forbiddenDescriptions.push_back(description.toStdString());
+    axisCameraController.removeForbiddenEvents(forbiddenDescriptions);
+
     const auto& src = axisCameraController.suppotedEvents();
     std::transform(src.begin(), src.end(), std::back_inserter(result.outputEventTypes),
         [](const nx::axis::SupportedEvent& event) {return AnalyticsEventType(event); });

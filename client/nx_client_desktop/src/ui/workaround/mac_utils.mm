@@ -4,6 +4,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QDebug>
 #include <QtCore/QtMath>
+#include <QtCore/QEventLoop>
 
 #include <sys/resource.h>
 
@@ -12,54 +13,37 @@
 
 #import "mac_utils.h"
 
-static NSString* fromQString(const QString &string)
+namespace {
+
+NSString* fromQString(const QString& string)
 {
-    const QByteArray utf8 = string.toUtf8();
-    const char* cString = utf8.constData();
+    const auto utf8 = string.toUtf8();
+    const auto cString = utf8.constData();
     return [[NSString alloc] initWithUTF8String:cString];
 }
 
-static NSArray *fromQStringList(const QStringList &strings) {
-    NSMutableArray *array = [NSMutableArray array];
-
-    foreach (const QString& item, strings) {
-        [array addObject:fromQString(item)];
-    }
-
-    return array;
-}
-
-static QString toQString(NSString *string)
+void saveFileBookmark(NSString* path)
 {
-    if (!string)
-        return QString();
-
-    return QString::fromUtf8([string UTF8String]);
-}
-
-bool mac_isSandboxed() {
-    NSDictionary* environ = [[NSProcessInfo processInfo] environment];
-    return (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
-}
-
-void saveFileBookmark(NSString *path) {
     NSLog(@"saveFileBookmark(): %@", path);
 
-    NSURL *url = [NSURL fileURLWithPath:path];
+    NSURL* url = [NSURL fileURLWithPath:path];
 
-    NSError *error = nil;
-    NSData *data = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
-    if (error) {
+    NSError* error = nil;
+    auto data = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
+        includingResourceValuesForKeys:nil relativeToURL:nil error:&error];
+    if (error)
+    {
         NSLog(@"Error securing bookmark for url %@ %@", url, error);
         return;
     }
 
     NSLog(@"Data length: %d", data.length);
-    NSUserDefaults* prefs = [NSUserDefaults standardUserDefaults];
-    NSDictionary *savedEntitlements = [prefs dictionaryForKey:@"directoryEntitlements"];
+    const auto prefs = [NSUserDefaults standardUserDefaults];
+    const auto savedEntitlements = [prefs dictionaryForKey:@"directoryEntitlements"];
 
-    NSMutableDictionary *entitlements = [NSMutableDictionary dictionary];
-    if (savedEntitlements) {
+    const auto entitlements = [NSMutableDictionary dictionary];
+    if (savedEntitlements)
+    {
         NSLog(@"saveFileBookmark(): existing keys %@", entitlements.allKeys);
         [entitlements addEntriesFromDictionary:savedEntitlements];
     }
@@ -67,6 +51,15 @@ void saveFileBookmark(NSString *path) {
     [entitlements setObject:data forKey:path];
     [prefs setObject:entitlements forKey:@"directoryEntitlements"];
     [prefs synchronize];
+}
+
+
+} // namespace
+
+bool mac_isSandboxed()
+{
+    NSDictionary* environ = [[NSProcessInfo processInfo] environment];
+    return (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
 }
 
 void mac_saveFileBookmark(const QString& qpath) {
@@ -117,128 +110,6 @@ void mac_stopFileAccess() {
         [url stopAccessingSecurityScopedResource];
         NSLog(@"mac_stopFileAccess(): Stopped access for %@", url.path);
     }
-}
-
-QString mac_getExistingDirectory(const QString &caption, const QString &dir) {
-    bool sandboxed = mac_isSandboxed();
-
-    NSOpenPanel *panel = [NSOpenPanel openPanel];
-    [panel setTitle:fromQString(caption)];
-    [panel setCanChooseDirectories:YES];
-    [panel setCanCreateDirectories:YES];
-    [panel setAllowsMultipleSelection:NO];
-    [panel setCanChooseFiles:NO];
-    if (!sandboxed && !dir.isEmpty())
-        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
-
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
-    bool ok = ([panel runModal] == NSOKButton);
-    QAbstractEventDispatcher::instance()->interrupt();
-
-    if (ok) {
-        if (sandboxed)
-            saveFileBookmark(panel.URL.path);
-
-        return toQString(panel.URL.path);
-    }
-
-    return QString();
-}
-
-QString mac_getOpenFileName(const QString &caption, const QString &dir, const QStringList &extensions) {
-    bool sandboxed = mac_isSandboxed();
-
-    NSOpenPanel *panel = [NSOpenPanel openPanel];
-    [panel setTitle:fromQString(caption)];
-    [panel setCanChooseDirectories:NO];
-    [panel setCanCreateDirectories:YES];
-    [panel setAllowsMultipleSelection:NO];
-    [panel setCanChooseFiles:YES];
-    if (extensions.size() != 0)
-        [panel setAllowedFileTypes:fromQStringList(extensions)];
-    if (!sandboxed && !dir.isEmpty())
-        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
-
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
-    bool ok = ([panel runModal] == NSOKButton);
-    QAbstractEventDispatcher::instance()->interrupt();
-
-    if (ok) {
-        if (sandboxed)
-            saveFileBookmark(panel.URL.path);
-
-        return toQString(panel.URL.path);
-    }
-
-    return QString();
-}
-
-QStringList mac_getOpenFileNames(const QString &caption, const QString &dir, const QStringList &extensions) {
-    bool sandboxed = mac_isSandboxed();
-
-    NSOpenPanel *panel = [NSOpenPanel openPanel];
-    [panel setTitle:fromQString(caption)];
-    [panel setCanChooseDirectories:NO];
-    [panel setCanCreateDirectories:YES];
-    [panel setAllowsMultipleSelection:YES];
-    [panel setCanChooseFiles:YES];
-    if (extensions.size() != 0)
-        [panel setAllowedFileTypes:fromQStringList(extensions)];
-    if (!sandboxed && !dir.isEmpty())
-        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
-
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
-    bool ok = ([panel runModal] == NSOKButton);
-    QAbstractEventDispatcher::instance()->interrupt();
-
-    if (ok) {
-        QStringList urls;
-        for (size_t i = 0; i < panel.URLs.count; ++i)
-            urls.append(toQString([[[panel URLs] objectAtIndex:i] path]));
-
-        if (sandboxed)
-            saveFileBookmark(panel.URL.path);
-
-        return urls;
-    }
-
-    return QStringList();
-}
-
-
-QString mac_getSaveFileName(const QString &caption, const QString &dir, const QStringList &extensions) {
-    bool sandboxed = mac_isSandboxed();
-
-    NSSavePanel *panel = [NSSavePanel savePanel];
-    [panel setTitle:fromQString(caption)];
-    [panel setCanCreateDirectories:YES];
-    if (extensions.size() != 0)
-        [panel setAllowedFileTypes:fromQStringList(extensions)];
-    [panel setAllowsOtherFileTypes:YES];
-    if (!sandboxed && !dir.isEmpty())
-        [panel setDirectoryURL:[NSURL fileURLWithPath:fromQString(dir)]];
-
-    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
-    bool ok = ([panel runModal] == NSOKButton);
-    QAbstractEventDispatcher::instance()->interrupt();
-
-    if (ok) {
-        if (sandboxed) {
-            // This is a hack! We cannot save bookmark for an inexistent file. So we create it before bookmark saving...
-            QFile file(toQString(panel.URL.path));
-            file.open(QFile::WriteOnly);
-            file.close();
-
-            saveFileBookmark(panel.URL.path);
-
-            // ... and remove after
-            file.remove();
-        }
-
-        return toQString(panel.URL.path);
-    }
-
-    return QString();
 }
 
 extern "C" {
@@ -347,4 +218,17 @@ void mac_disableFullscreenButton(void *winId) {
         [button setHidden:YES];
         [button setEnabled:NO];
     }
+}
+
+void setHidesOnDeactivate(WId windowId, bool value)
+{
+    NSView* nativeView = reinterpret_cast<NSView*>(windowId);
+    if (!nativeView)
+        return;
+
+    NSWindow* nativeWindow = [nativeView window];
+    if (!nativeWindow)
+        return;
+
+    [nativeWindow setHidesOnDeactivate: value ? YES : NO];
 }

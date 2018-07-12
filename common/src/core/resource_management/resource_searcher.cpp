@@ -5,17 +5,12 @@
 #include <common/common_module.h>
 #include <core/resource/resource.h>
 
-QnAbstractResourceSearcher::QnAbstractResourceSearcher(QnCommonModule* commonModule):
+QnAbstractResourceSearcher::QnAbstractResourceSearcher(QnCommonModule* commonModule) noexcept:
     QnCommonModuleAware(commonModule),
     m_discoveryMode(DiscoveryMode::fullyEnabled),
     m_localResources(false),
     m_shouldStop(false)
 {
-}
-
-QnAbstractResourceSearcher::~QnAbstractResourceSearcher()
-{
-    return;
 }
 
 QnResourceList QnAbstractResourceSearcher::search()
@@ -28,12 +23,12 @@ QnResourceList QnAbstractResourceSearcher::search()
     return result;
 }
 
-void QnAbstractResourceSearcher::setDiscoveryMode( DiscoveryMode mode )
+void QnAbstractResourceSearcher::setDiscoveryMode(DiscoveryMode mode) noexcept
 {
     m_discoveryMode = mode;
 }
 
-DiscoveryMode QnAbstractResourceSearcher::discoveryMode() const
+DiscoveryMode QnAbstractResourceSearcher::discoveryMode() const noexcept
 {
     const auto& settings = commonModule()->globalSettings();
     if (settings->isInitialized() && settings->isNewSystem())
@@ -46,17 +41,17 @@ void QnAbstractResourceSearcher::pleaseStop()
     m_shouldStop = true;
 }
 
-bool QnAbstractResourceSearcher::shouldStop() const
+bool QnAbstractResourceSearcher::shouldStop() const noexcept
 {
     return m_shouldStop;
 }
 
-bool QnAbstractResourceSearcher::isLocal() const
+bool QnAbstractResourceSearcher::isLocal() const noexcept
 {
     return m_localResources;
 }
 
-void QnAbstractResourceSearcher::setLocal(bool l)
+void QnAbstractResourceSearcher::setLocal(bool l) noexcept
 {
     m_localResources = l;
 }
@@ -69,7 +64,6 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) 
 
     return resourceType->getManufacture() == manufacture();
 }
-
 
 QnAbstractFileResourceSearcher::QnAbstractFileResourceSearcher(QnCommonModule* commonModule):
     QnAbstractResourceSearcher(commonModule)

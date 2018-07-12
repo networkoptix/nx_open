@@ -244,7 +244,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
     if (!conn)
         return;
 
-    ec2::ApiStorageDataList apiStorages;
+    nx::vms::api::StorageDataList apiStorages;
     ec2::fromResourceListToApi(storages, apiStorages);
 
     conn->getMediaServerManager(Qn::kSystemAccess)->saveStorages(apiStorages, this, [storages](int reqID, ec2::ErrorCode error)
@@ -261,7 +261,7 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
 }
 
 // TODO: #GDM SafeMode
-void QnServerStorageManager::deleteStorages(const ec2::ApiIdDataList &ids )
+void QnServerStorageManager::deleteStorages(const nx::vms::api::IdDataList& ids )
 {
     ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     if (!conn)

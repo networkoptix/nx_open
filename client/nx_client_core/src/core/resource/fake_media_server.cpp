@@ -15,9 +15,10 @@ QnUuid QnFakeMediaServerResource::getOriginalGuid() const
     return m_serverData.id;
 }
 
-void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData)
+void QnFakeMediaServerResource::setFakeServerModuleInformation(
+    const nx::vms::api::DiscoveredServerData& serverData)
 {
-    ec2::ApiDiscoveredServerData oldData;
+    nx::vms::api::DiscoveredServerData oldData;
     {
         QnMutexLocker lock(&m_mutex);
         if (m_serverData == serverData)
@@ -38,7 +39,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     {
         const nx::network::SocketAddress endpoint(addressList.first().toString(), serverData.port);
         const auto url = nx::network::url::Builder()
-            .setScheme(apiUrlScheme(serverData.sslAllowed))
+            .setScheme(nx::network::http::urlSheme(serverData.sslAllowed))
             .setEndpoint(endpoint);
         setUrl(url.toString());
     }
@@ -58,7 +59,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     emit moduleInformationChanged(::toSharedPointer(this));
 }
 
-QnModuleInformation QnFakeMediaServerResource::getModuleInformation() const
+nx::vms::api::ModuleInformation QnFakeMediaServerResource::getModuleInformation() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_serverData;
@@ -73,7 +74,7 @@ QString QnFakeMediaServerResource::getName() const
 Qn::ResourceStatus QnFakeMediaServerResource::getStatus() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_serverData.status;
+    return static_cast<Qn::ResourceStatus>(m_serverData.status);
 }
 
 nx::utils::Url QnFakeMediaServerResource::getApiUrl() const

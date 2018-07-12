@@ -251,24 +251,27 @@
         "palette": {
             "default": {
                 "midlight":         "dark13"
+            },
+            "disabled": {
+                "midlight":         "dark13.setAlpha(77)"
             }
         }
     },
 
-    "QnAlertBar": {
-        "palette": {
-            "default": {
-                "window": "#61282b"
-            }
-        }
-    },
-
-    "QnPromoBar": {
+    "nx::client::desktop::MessageBar": {
         "palette": {
             "default": {
                 "window": "brand_d5",
                 "link": "light4",
                 "linkVisited": "light1"
+            }
+        }
+    },
+
+    "nx::client::desktop::AlertBar": {
+        "palette": {
+            "default": {
+                "window": "#61282b"
             }
         }
     },
@@ -325,7 +328,7 @@
         }
     },
 
-    "QnPasswordStrengthIndicator": {
+    "nx::client::desktop::PasswordStrengthIndicator": {
         "colors": {
             "inacceptable":      "red_core",
             "acceptable":        "yellow_core",
@@ -334,7 +337,7 @@
         }
     },
 
-    "QnPanel": {
+    "nx::client::desktop::Panel": {
         "palette": {
             "default": {
                 "window": "dark8",
@@ -343,7 +346,7 @@
         }
     },
 
-    "QnMainWindow": {
+    "nx::client::desktop::ui::MainWindow": {
         "palette": { "default": {
             "window": "dark4"
         }}
@@ -378,6 +381,14 @@
             "window": "light4",
             "windowText": "dark5",
             "highlight": "light4.setAlpha(0)"
+        }}
+    },
+
+    "nx::client::desktop::TimelineScreenshotCursor": {
+        "palette": { "default": {
+            "window": "dark13",
+            "windowText": "light3",
+            "mid": "dark15"
         }}
     },
 
@@ -518,6 +529,14 @@
     },
 
     "QnServerUpdatesModel": {
+        "colors": {
+            "latest": "green_l2",
+            "target": "yellow_core",
+            "error": "red_l2"
+        }
+    },
+
+    "nx::client::desktop::ServerUpdatesModel": {
         "colors": {
             "latest": "green_l2",
             "target": "yellow_core",
@@ -753,22 +772,15 @@
         }
     },
 
-    "QnScheduleGridWidget": {
+    "nx::client::desktop::ScheduleGridWidget": {
         "colors": {
             "normalLabel": "light10",
             "weekendLabel": "red_core",
+            "gridLabel": "light4",
             "allLabel": "light16",
-            "recordNever": "dark5",
-            "recordAlways": "green_core",
-            "recordMotion": "red_d1",
-            "recordNeverHovered": "dark6",
-            "recordAlwaysHovered": "green_l1",
-            "recordMotionHovered": "red_core",
             "hoveredBackground": "dark9",
             "pressedBackground": "dark6",
-            "gridLine": "dark7",
-            "gridLabel": "light4",
-            "border": "dark4"
+            "gridLine": "dark7"
         }
     },
 
@@ -806,6 +818,21 @@
         ]
     },
 
+    "nx::client::desktop::CameraMotionSettingsWidget": {
+        "sensitivityColors": [
+            "light16",
+            "#627cd6",
+            "#23a4cb",
+            "#31baa2",
+            "#79bc66",
+            "#b8bc37",
+            "#fba405",
+            "#e97119",
+            "#d24729",
+            "#c22626"
+        ]
+    },
+
     "QnTimeServerSelectionModel": {
         "colors": [
             "light12",
@@ -820,7 +847,7 @@
         ]
     },
 
-    "QnFisheyeCalibrationWidget": {
+    "nx::client::desktop::FisheyeCalibrationWidget": {
         "palette": { "default": { "window": "dark4" } }
     },
 
@@ -828,25 +855,24 @@
         "palette": { "default": { "window": "dark8" } }
     },
 
-    "nx::client::desktop::ui::SelectableTextButton": {
+    "nx::client::desktop::SelectableTextButton": {
         "palette": {
             "_1": "selected",
             "active": {
-                "window": "dark5",
                 "dark": "dark5",
-                "midlight": "dark5",
                 "shadow": "dark4",
-                "windowText": "light10",
-                "text": "light10"
+                "windowText": "light10"
             },
             "_2": "not selected",
             "inactive": {
                 "window": "dark10",
-                "dark": "dark6",
                 "shadow": "transparent",
                 "midlight": "dark11",
                 "windowText": "light14",
-                "text": "light16"
+                "text": "light16",
+                "highlightedText": "light10",
+                "highlight": "brand_core.setAlpha(102)",
+                "light": "brand_l1.setAlpha(102)"
             }
         }
     },
@@ -873,8 +899,7 @@
     "nx::client::desktop::EventTile": {
         "palette": {
             "default": {
-                "window": "dark7",
-                "midlight": "dark8",
+                "base": "dark7",
                 "light": "light10",
                 "windowText": "light16",
                 "text": "light4",
@@ -907,6 +932,14 @@
             "eventRules": "#9c6b50",
             "emailSettings": "#cbcbcb",
             "chartColor": "brand_d3"
+        }
+    },
+
+    "nx::client::desktop::HintButton": {
+        "palette": {
+            "default": {
+                "text": "light16"
+            }
         }
     },
 

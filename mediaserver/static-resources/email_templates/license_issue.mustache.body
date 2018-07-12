@@ -4,6 +4,9 @@
 <table class="description">
     <thead>
         <tr>
+            {{#sourceIcon}}
+                <th/>
+            {{/sourceIcon}}
             <th>Camera</th>
             <th>Time</th>
         </tr>
@@ -12,6 +15,11 @@
         {{#reasonContext}}
             {{#disabledCameras}}
                 <tr>
+                    {{#sourceIcon}}
+                    <td>
+                        <img src="{{sourceIcon}}">
+                    </td>
+                    {{/sourceIcon}}
                     <td>{{.}}</td>
                     <td>{{{timestamp}}}</td>
                 </tr>

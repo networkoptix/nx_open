@@ -57,8 +57,12 @@ class ErrorCodes(Enum):
                     ErrorCodes.wrong_old_password,
                     ErrorCodes.account_not_activated):
             return logging.INFO
-        if self in (ErrorCodes.forbidden,
-                    ErrorCodes.wrong_code):
+        if self in (ErrorCodes.account_blocked,
+                    ErrorCodes.bad_username,
+                    ErrorCodes.forbidden,
+                    ErrorCodes.invalid_nonce,
+                    ErrorCodes.wrong_code,
+                    ErrorCodes.wrong_parameters):
             return logging.WARNING
         return logging.ERROR
 

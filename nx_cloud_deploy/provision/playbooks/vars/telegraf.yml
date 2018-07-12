@@ -1,8 +1,12 @@
+telegraf_agent_version: 1.6.3
+telegraf_agent_logfile: "/var/log/telegraf/telegraf.log"
+
 telegraf_agent_output:
   - type: influxdb
     config:
       - urls = ["http://localhost:8086"]
       - database = "telegraf"
+
 telegraf_plugins_default:
   - plugin: cpu
     config:
@@ -14,3 +18,6 @@ telegraf_plugins_default:
     config:
       - interfaces = ["{{ ansible_default_ipv4.interface }}"]
   - plugin: system
+  - plugin: docker
+    config:
+      - name_suffix: _local

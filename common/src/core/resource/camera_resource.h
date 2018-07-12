@@ -1,5 +1,4 @@
-#ifndef QN_CAMERA_RESOURCE_H
-#define QN_CAMERA_RESOURCE_H
+#pragma once
 
 #include <deque>
 
@@ -19,11 +18,15 @@ class CameraMediaStreams;
 class CameraBitrates;
 class CameraBitrateInfo;
 
-class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
+class QnVirtualCameraResource : public QnSecurityCamResource
 {
     Q_OBJECT
     Q_FLAGS(Qn::CameraCapabilities)
-    Q_PROPERTY(Qn::CameraCapabilities cameraCapabilities READ getCameraCapabilities WRITE setCameraCapabilities)
+    Q_FLAGS(Ptz::Capabilities)
+    Q_PROPERTY(Qn::CameraCapabilities cameraCapabilities
+        READ getCameraCapabilities WRITE setCameraCapabilities)
+    Q_PROPERTY(Ptz::Capabilities ptzCapabilities
+        READ getPtzCapabilities WRITE setPtzCapabilities NOTIFY ptzCapabilitiesChanged)
     using base_type = QnSecurityCamResource;
 
 public:
@@ -31,7 +34,7 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    virtual QString toSearchString() const override;
+    virtual QStringList searchFilters() const override;
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
@@ -40,7 +43,7 @@ public:
 
     //! Camera source URL, commonly - rtsp link.
     QString sourceUrl(Qn::ConnectionRole role) const;
-    void updateSourceUrl(const QString& url, Qn::ConnectionRole role);
+    void updateSourceUrl(const QString& url, Qn::ConnectionRole role, bool save = true);
 
     static int issuesTimeoutMs();
 
@@ -48,7 +51,7 @@ public:
     void cleanCameraIssues();
 
     CameraMediaStreams mediaStreams() const;
-    CameraMediaStreamInfo defaultStream() const;
+    CameraMediaStreamInfo streamInfo(Qn::StreamIndex index = Qn::StreamIndex::primary) const;
 
     QnAspectRatio aspectRatio() const;
 
@@ -69,6 +72,12 @@ public:
      */
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const;
 
+signals:
+    void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
+
+protected:
+    virtual void emitPropertyChanged(const QString& key) override;
+
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 
@@ -86,5 +95,3 @@ const QSize UNLIMITED_RESOLUTION(INT_MAX, INT_MAX);
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
 Q_DECLARE_METATYPE(QnVirtualCameraResourceList);
-
-#endif // QN_CAMERA_RESOURCE_H

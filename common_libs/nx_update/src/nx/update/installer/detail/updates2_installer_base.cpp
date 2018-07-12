@@ -6,6 +6,7 @@
 
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 
 void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompletionHandler handler)
@@ -15,6 +16,7 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
         if (!m_extractor)
             m_extractor = createZipExtractor();
 
+        NX_ASSERT(handler, "PrepareUpdateCompletionHandler should not be NULL");
         if (m_running)
             return handler(PrepareResult::alreadyStarted);
 
@@ -30,7 +32,7 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
     m_extractor->extractAsync(
         path,
         installerWorkDir(),
-        [self = this, handler](QnZipExtractor::Error errorCode)
+        [self = this, handler](QnZipExtractor::Error errorCode, const QString& outputPath)
         {
             auto cleanupGuard = QnRaiiGuard::createDestructible(
                 [self, errorCode]()
@@ -46,7 +48,7 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
             switch (errorCode)
             {
                 case QnZipExtractor::Error::Ok:
-                    return handler(self->checkContents());
+                    return handler(self->checkContents(outputPath));
                 case QnZipExtractor::Error::NoFreeSpace:
                     return handler(PrepareResult::noFreeSpace);
                 default:
@@ -58,26 +60,26 @@ void Updates2InstallerBase::prepareAsync(const QString& path, PrepareUpdateCompl
         });
 }
 
-PrepareResult Updates2InstallerBase::checkContents() const
+PrepareResult Updates2InstallerBase::checkContents(const QString& outputPath) const
 {
-    QVariantMap infoMap = updateInformation();
+    QVariantMap infoMap = updateInformation(outputPath);
     if (infoMap.isEmpty())
         return PrepareResult::updateContentsError;
 
-    m_executable = infoMap.value("executable").toString();
-    if (m_executable.isEmpty())
+    if (infoMap.value("executable").toString().isEmpty())
     {
         NX_ERROR(this, "No executable specified in the update information file");
         return PrepareResult::updateContentsError;
     }
 
+    m_executable = outputPath + QDir::separator() + infoMap.value("executable").toString();
     if (!checkExecutable(m_executable))
     {
         NX_ERROR(this, "Update executable file is invalid");
         return PrepareResult::updateContentsError;
     }
 
-    QnSystemInformation systemInfo = systemInformation();
+    const auto systemInfo = systemInformation();
 
     QString platform = infoMap.value("platform").toString();
     if (platform != systemInfo.platform)
@@ -100,7 +102,7 @@ PrepareResult Updates2InstallerBase::checkContents() const
         return PrepareResult::updateContentsError;
     }
 
-    m_version = infoMap.value(lit("version")).toString();
+    m_version = infoMap.value(QStringLiteral("version")).toString();
 
     return PrepareResult::ok;
 }
@@ -123,8 +125,8 @@ bool Updates2InstallerBase::install()
         QString argumentsStr(
             " APPSERVER_PASSWORD=\"\" APPSERVER_PASSWORD_CONFIRM=\"\" SERVER_PASSWORD=\"\"\
              SERVER_PASSWORD_CONFIRM=\"\"");
-        for (const QString& arg : arguments)
-            argumentsStr += lit(" ") + arg;
+        for (const QString& arg: arguments)
+            argumentsStr += " " + arg;
 
         NX_INFO(this, lm("Launching %1 %2").arg(m_executable).args(argumentsStr));
     }
@@ -167,5 +169,6 @@ Updates2InstallerBase::~Updates2InstallerBase()
 }
 
 } // namespace detail
+} // namespace installer
 } // namespace update
 } // namespace nx

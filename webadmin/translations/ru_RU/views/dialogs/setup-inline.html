@@ -187,7 +187,7 @@
         <div class="form-group has-error"
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
             <div class="help-block">
-                Действительный Email
+                Пожалуйста, введите действительный Email
             </div>
         </div>
 
@@ -282,14 +282,15 @@
         <div class="form-group" validate-field>
 
             <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
-                   typeahead="system as system.visibleName for system in discoveredUrls | filter: {isNew:false, visibleName: $viewValue} | limitTo:8"
-                   typeahead-input-formatter="getSystemName($model)"
-                   typeahead-focus-on-select="false"
-                   typeahead-min-length="0"
-                   typeahead-show-hint="true"
-                   typeahead-focus-first="false"
-                   typeahead-focus
+                   uib-typeahead="system as system.visibleName for system in discoveredUrls | filter: {isNew:false, visibleName: $viewValue} | limitTo:8"
+                   uib-typeahead-input-formatter="getSystemName($model)"
+                   uib-typeahead-focus-on-select="false"
+                   uib-typeahead-min-length="0"
+                   uib-typeahead-show-hint="true"
+                   uib-typeahead-focus-first="false"
+                   uib-typeahead-focus
  placeholder="URL существующей системы (https://host:port)"
+                   ng-change="clearRemoteError()"
                    required
  class="form-control">
 
@@ -445,8 +446,8 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Не удаётся настроить систему</h2>
-    <p class="master-description">Something went totally wrong. <br>
-        Error description: {{settings.localError}}
+    <p class="master-description">Что-то пошло не так. <br>
+        Описание ошибки: {{settings.localError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Повторить</button>

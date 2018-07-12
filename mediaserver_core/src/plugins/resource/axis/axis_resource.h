@@ -47,8 +47,6 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    AxisResolution getMaxResolution() const;
-    AxisResolution getNearestResolution(const QSize& resolution, float aspectRatio) const;
     float getResolutionAspectRatio(const AxisResolution& resolution) const;
 
     QRect getMotionWindow(int num) const;
@@ -70,7 +68,6 @@ public:
     QSet<QString> setApiParameters(const QnCameraAdvancedParamValueMap& values);
 
     virtual QnIOStateDataList ioStates() const override;
-
 
     QString resolutionToString(const QSize& resolution);
     static QString toAxisCodecString(AVCodecID codecId);
@@ -234,7 +231,6 @@ private:
     QString getAdvancedParametersTemplate() const;
     bool loadAdvancedParametersTemplateFromFile(QnCameraAdvancedParams& params, const QString& filename);
     QSet<QString> calculateSupportedAdvancedParameters(const QnCameraAdvancedParams& allParams);
-
 
     QString getParamCmd(const QnCameraAdvancedParameter& param) const;
     QSet<QString> buildGetParamsQueries(const QList<QnCameraAdvancedParameter>& params) const;

@@ -11,11 +11,8 @@
 
 static const int IO_BLOCK_SIZE = 1024*16;
 
-static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
+static qint32 ffmpegReadPacket(void* /*opaque*/, quint8* /*buf*/, int /*size*/)
 {
-    Q_UNUSED(opaque)
-    Q_UNUSED(buf)
-    Q_UNUSED(size)
     NX_ASSERT(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     return 0;
 }
@@ -27,10 +24,8 @@ bool QnFfmpegTranscoder::isCodecSupported(AVCodecID id) const
     return avformat_query_codec(m_formatCtx->oformat, id, FF_COMPLIANCE_NORMAL) == 1;
 }
 
-static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
+static qint32 ffmpegWritePacket(void* opaque, quint8* buf, int size)
 {
-    Q_UNUSED(opaque)
-
     QnFfmpegTranscoder* transcoder = reinterpret_cast<QnFfmpegTranscoder*> (opaque);
     if (!transcoder || transcoder->inMiddleOfStream())
         return size; // ignore write
@@ -40,9 +35,6 @@ static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
 
 static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 {
-    Q_UNUSED(opaque)
-    Q_UNUSED(pos)
-    Q_UNUSED(whence)
     //NX_ASSERT(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     QnFfmpegTranscoder* transcoder = reinterpret_cast<QnFfmpegTranscoder*> (opaque);
     transcoder->setInMiddleOfStream(!(pos == 0 && whence == SEEK_END));
@@ -124,7 +116,6 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
     }
     if (container == QLatin1String("rtp"))
         m_formatCtx->packet_size = MTU_SIZE;
-
 
     return 0;
 }
@@ -287,7 +278,6 @@ bool QnFfmpegTranscoder::addTag( const QString& name, const QString& value )
 
 int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
 {
-    Q_UNUSED(result)
     if (m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - m_startTimeOffset;
 
@@ -298,8 +288,11 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 
     AVRational srcRate = {1, 1000000};
     int streamIndex = 0;
-    if (m_vTranscoder && m_aTranscoder && media->dataType == QnAbstractMediaData::AUDIO)
+    if (m_videoCodec != AV_CODEC_ID_NONE &&
+        media->dataType == QnAbstractMediaData::AUDIO)
+    {
         streamIndex = 1;
+    }
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
     QnFfmpegAvPacket packet;

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/qt_enums.h>
 
 #include <nx/fusion/nx_fusion_test_fixture.h>
 
@@ -108,6 +109,13 @@ TEST_F(QnJsonTextFixture, integralTypes)
     ASSERT_EQ(-12, QJson::deserialized<int>("-12"));
 }
 
+TEST_F(QnJsonTextFixture, chronoTypes)
+{
+    // Chrono types are 64-bit and so serialized as strings with extra quotes
+    ASSERT_EQ("\"7\"", QJson::serialized(std::chrono::milliseconds(7)));
+    ASSERT_EQ(std::chrono::milliseconds(50), QJson::deserialized<std::chrono::milliseconds>("\"50\""));
+}
+
 TEST_F(QnJsonTextFixture, QtStringTypes)
 {
     //ASSERT_EQ(kHelloWorld, QJson::serialized(kHelloWorld.toUtf8())); -- not supported, returns base64
@@ -142,6 +150,14 @@ TEST_F(QnJsonTextFixture, flagsValue)
     nx::TestFlags flags = nx::Flag1 | nx::Flag2;
     ASSERT_EQ(value, QJson::serialized(flags));
     ASSERT_EQ(flags, QJson::deserialized<nx::TestFlags>(value));
+}
+
+TEST_F(QnJsonTextFixture, qtEnums)
+{
+    const auto value = str("Horizontal|Vertical");
+    Qt::Orientations flags = Qt::Horizontal | Qt::Vertical;
+    ASSERT_EQ(value, QJson::serialized(flags));
+    ASSERT_EQ(flags, QJson::deserialized<Qt::Orientations>(value));
 }
 
 TEST_F(QnJsonTextFixture, invalidFlagsLexical)
@@ -290,4 +306,57 @@ TEST_F(QnJsonTextFixture, serializeEmptyQListBrief)
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
     ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithQList>(jsonStr));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+struct TestDataWithOptionalField
+{
+    boost::optional<BriefMockData> optionalField;
+};
+
+#define TestDataWithOptionalField_Fields (optionalField)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (TestDataWithOptionalField), (json), _Fields)
+
+} // namespace
+
+class QnJsonBoostOptionalField:
+    public QnJsonTextFixture
+{
+};
+
+TEST_F(QnJsonBoostOptionalField, serialize_optional_field_present)
+{
+    TestDataWithOptionalField test;
+    test.optionalField = BriefMockData{QnUuid(), "test"};
+
+    ASSERT_EQ(
+        "{\"optionalField\":{\"str\":\"test\"}}",
+        QJson::serialized(test));
+}
+
+TEST_F(QnJsonBoostOptionalField, serialize_optional_field_not_present)
+{
+    ASSERT_EQ("{}", QJson::serialized(TestDataWithOptionalField()));
+}
+
+TEST_F(QnJsonBoostOptionalField, deserialize_optional_field_present)
+{
+    const auto json = "{\"optionalField\":{\"str\":\"test\"}}";
+    const auto deserializedValue = QJson::deserialized<TestDataWithOptionalField>(json);
+
+    ASSERT_TRUE(static_cast<bool>(deserializedValue.optionalField));
+    ASSERT_EQ("test", deserializedValue.optionalField->str);
+}
+
+TEST_F(QnJsonBoostOptionalField, deserialize_optional_field_not_present)
+{
+    const auto json = "{}";
+    const auto deserializedValue = QJson::deserialized<TestDataWithOptionalField>(json);
+
+    ASSERT_FALSE(static_cast<bool>(deserializedValue.optionalField));
 }

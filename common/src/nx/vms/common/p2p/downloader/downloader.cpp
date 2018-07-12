@@ -2,8 +2,11 @@
 
 #include <QtCore/QHash>
 
+#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/future.h>
 #include <utils/common/delayed.h>
 
 #include "private/storage.h"
@@ -55,11 +58,11 @@ void DownloaderPrivate::createWorker(const QString& fileName)
     if (status != FileInformation::Status::downloaded
         && status != FileInformation::Status::uploading)
     {
-        auto peerPolicy = storage->fileInformation(fileName).peerPolicy;
+        const auto fi = storage->fileInformation(fileName);
         auto worker = std::make_shared<Worker>(
             fileName,
             storage.data(),
-            peerManagerFactory->createPeerManager(peerPolicy));
+            peerManagerFactory->createPeerManager(fi.peerPolicy, fi.additionalPeers));
         workers[fileName] = worker;
 
         connect(worker.get(), &Worker::finished, this, &DownloaderPrivate::at_workerFinished);
@@ -72,19 +75,23 @@ void DownloaderPrivate::createWorker(const QString& fileName)
 
 void DownloaderPrivate::at_workerFinished(const QString& fileName)
 {
-    auto worker = workers.take(fileName);
-    if (!worker)
-        return;
+    Worker::State state;
+    {
+        QnMutexLocker lock(&mutex);
+        auto worker = workers.take(fileName);
+        if (!worker)
+            return;
+
+        state = worker->state();
+        worker->stop();
+    }
 
     Q_Q(Downloader);
 
-    const auto state = worker->state();
     if (state == Worker::State::finished)
         emit q->downloadFinished(fileName);
     else
         emit q->downloadFailed(fileName);
-
-    worker->stop();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -199,11 +206,16 @@ ResultCode Downloader::writeFileChunk(
     return d->storage->writeFileChunk(fileName, chunkIndex, buffer);
 }
 
-ResultCode Downloader::deleteFile(
-    const QString& fileName,
-    bool deleteData)
+ResultCode Downloader::deleteFile(const QString& fileName, bool deleteData)
 {
     Q_D(Downloader);
+    {
+        QnMutexLocker lock(&d->mutex);
+        auto worker = d->workers.take(fileName);
+        if (worker)
+            worker->stop();
+    }
+
     return d->storage->deleteFile(fileName, deleteData);
 }
 
@@ -211,6 +223,72 @@ QVector<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
 {
     Q_D(Downloader);
     return d->storage->getChunkChecksums(fileName);
+}
+
+void Downloader::validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
+    std::function<void(bool)> callback)
+{
+    auto httpClient = createHttpClient();
+    httpClient->doHead(url,
+        [httpClient, url, callback, expectedSize, onlyConnectionCheck](
+            network::http::AsyncHttpClientPtr asyncClient) mutable
+        {
+            if (asyncClient->failed()
+                || !asyncClient->response()
+                || asyncClient->response()->statusLine.statusCode != network::http::StatusCode::ok)
+            {
+                auto response = asyncClient->response();
+                NX_WARNING(
+                    typeid(Downloader),
+                    lm("[Downloader, validate] Validate %1 http request failed. "
+                       "Http client failed: %2, has response: %3, status code: %4")
+                        .args(url, asyncClient->failed(), (bool) response,
+                            !response ? -1 : response->statusLine.statusCode));
+
+                return callback(false);
+            }
+
+            if (onlyConnectionCheck)
+            {
+                NX_VERBOSE(
+                    typeid(Downloader),
+                    lm("[Downloader, validate] %1. Success (only connection check)").args(url));
+                callback(true);
+            }
+
+            auto& responseHeaders = asyncClient->response()->headers;
+            auto contentLengthItr = responseHeaders.find("Content-Length");
+            const bool hasHeader = contentLengthItr != responseHeaders.cend();
+
+            if (!hasHeader || contentLengthItr->second.toInt() != expectedSize)
+            {
+                NX_WARNING(
+                    typeid(Downloader),
+                    lm("[Downloader, validate] %1. Content-Length: %2, fileInformation.size: %3")
+                    .args(url,
+                        hasHeader ? contentLengthItr->second.toInt() : -1,
+                        expectedSize));
+
+                return callback(false);
+            }
+
+            NX_VERBOSE(typeid(Downloader), lm("[Downloader, validate] %1. Success").args(url));
+            callback(true);
+        });
+}
+
+bool Downloader::validate(const QString& url, bool onlyConnectionCheck, int expectedSize)
+{
+    nx::utils::promise<bool> readyPromise;
+    auto readyFuture = readyPromise.get_future();
+
+    validateAsync(url, onlyConnectionCheck, expectedSize,
+        [&readyPromise](bool success) mutable
+        {
+            readyPromise.set_value(success);
+        });
+
+    return readyFuture.get();
 }
 
 } // namespace downloader

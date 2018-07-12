@@ -94,7 +94,7 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
     const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr &server: onlineServers)
     {
-        if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
+        if (!server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP))
             continue;
 
         serverConnection = server->apiConnection();
@@ -120,9 +120,9 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
         ? QnEmailSettings::defaultPort(result.connectionType)
         : result.port));
     ui->testUserLabel->setText(result.user);
-    ui->testSecurityLabel->setText(result.connectionType == QnEmail::Tls
+    ui->testSecurityLabel->setText(result.connectionType == QnEmail::ConnectionType::tls
         ? tr("TLS")
-        : result.connectionType == QnEmail::Ssl
+        : result.connectionType == QnEmail::ConnectionType::ssl
         ? tr("SSL")
         : tr("Unsecured"));
 

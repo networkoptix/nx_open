@@ -12,7 +12,7 @@ namespace
 
 int QnExecScript::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
-    if (!nx::utils::file_system::isRelativePathSafe(path)) {
+    if (path.contains(lit("..")) || path.contains('\\')) {
         result.setError(QnRestResult::InvalidParameter, "Path contains forbidden characters");
         return nx::network::http::StatusCode::ok;
     }
@@ -23,13 +23,13 @@ int QnExecScript::executeGet(const QString &path, const QnRequestParams &params,
         result.setError(QnRestResult::InvalidParameter, lit( "Script '%1' is missing at the server").arg(scriptName));
         return nx::network::http::StatusCode::ok;
     }
-    
+
     QStringList args;
     for (auto itr = params.begin(); itr != params.end(); ++itr)
         args << lit("%1=%2").arg(itr.key()).arg(itr.value());
-    
+
     QRegExp regExpr(allowedParamChars);
-    for (const auto& arg: args) 
+    for (const auto& arg: args)
     {
         if (!regExpr.exactMatch(arg)) {
             result.setError(QnRestResult::InvalidParameter, "Script params contain forbidden characters");
@@ -40,9 +40,9 @@ int QnExecScript::executeGet(const QString &path, const QnRequestParams &params,
     return nx::network::http::StatusCode::ok;
 }
 
-void QnExecScript::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
+void QnExecScript::afterExecute(const QString& path, const QnRequestParamList& params,
+    const QByteArray& body, const QnRestConnectionProcessor*)
 {
-    Q_UNUSED(owner);
     QnJsonRestResult reply;
     if (!QJson::deserialize(body, &reply) || reply.error !=  QnJsonRestResult::NoError)
         return;

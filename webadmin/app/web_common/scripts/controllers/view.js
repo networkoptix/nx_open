@@ -250,7 +250,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.preview = _.find($scope.activeVideoSource,function(src){return src.type == 'image/jpeg';}).src;
 
-            if((Config.allowBetaMode && window.chrome) || $scope.debugMode){
+            if((Config.allowBetaMode || $scope.debugMode) && jscd.browser.toLowerCase() == 'chrome'){
                 var streamInfo = {};
                 var streamType = "webm";
 
@@ -322,17 +322,12 @@ angular.module('nxCommon').controller('ViewCtrl',
             }*/
         };
 
-        if($scope.betaMode && jscd.browser.toLowerCase() == 'chrome'){
-            $scope.voiceControls = {enabled:true,showCommands:true};
-            voiceControl.initControls($scope);
-        }
-
         //On player error update source to cause player to restart
         $scope.crashCount = 0;
 
         function handleVideoError(forceLive){
-            var showError = $scope.crashCount < Config.webclient.maxCrashCount;
-            if(showError){
+            var tryToReload = $scope.crashCount < Config.webclient.maxCrashCount;
+            if(tryToReload){
                 updateVideoSource($scope.positionProvider.liveMode || forceLive
                                                                     ? null : $scope.positionProvider.playedPosition);
                 $scope.crashCount += 1;
@@ -340,20 +335,19 @@ angular.module('nxCommon').controller('ViewCtrl',
             else{
                 $scope.crashCount = 0;
             }
-            return !showError;
+            return !tryToReload;
         }
 
         $scope.playerHandler = function(error){
             if(error){
                 return $scope.positionProvider.checkEndOfArchive().then(function(jumpToLive){
-                   return handleVideoError(jumpToLive);
+                    return handleVideoError(jumpToLive);  // Check crash count to reload media
                 },function(){
-                    return true;
+                    return true; // Return true to show error to user
                 });
             }
-
             $scope.crashCount = 0;
-            return $q.resolve(false);
+            return false;  // Return false to not show error to user
         };
 
         $scope.selectFormat = function(format){
@@ -477,6 +471,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.ready = true;
             $timeout(updateHeights);
             $scope.camerasProvider.startPoll();
+            if(($scope.betaMode || $scope.debugMode) && jscd.browser.toLowerCase() == 'chrome'){
+                $scope.voiceControls = {enabled:true,showCommands:true};
+                voiceControl.initControls($scope);
+            }
         });
 
         // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%

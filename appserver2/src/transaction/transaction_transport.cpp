@@ -7,8 +7,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <database/db_manager.h>
 #include <nx/network/http/custom_headers.h>
+#include <core/resource/user_resource.h>
+
+using namespace nx::vms;
 
 namespace ec2 {
 
@@ -16,8 +18,8 @@ QnTransactionTransport::QnTransactionTransport(
     TransactionMessageBusBase* bus,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
-    const ApiPeerData& localPeer,
-    const ApiPeerData& remotePeer,
+    const api::PeerData& localPeer,
+    const api::PeerData& remotePeer,
     QSharedPointer<nx::network::AbstractStreamSocket> socket,
     ConnectionType::Type connectionType,
     const nx::network::http::Request& request,
@@ -44,7 +46,7 @@ QnTransactionTransport::QnTransactionTransport(
 QnTransactionTransport::QnTransactionTransport(
     TransactionMessageBusBase* bus,
     ConnectionGuardSharedState* const connectionGuardSharedState,
-    const ApiPeerData& localPeer)
+    const api::PeerData& localPeer)
 :
     QnTransactionTransportBase(
         bus->commonModule()->globalSettings()->localSystemId(),
@@ -100,7 +102,7 @@ void QnTransactionTransport::fillAuthInfo(const nx::network::http::AsyncHttpClie
         if (const auto& connection = m_bus->commonModule()->ec2Connection())
             url = connection->connectionInfo().ecUrl;
         httpClient->setUserName(url.userName().toLower());
-        if (ApiPeerData::isServer(localPeer().peerType))
+        if (api::PeerData::isServer(localPeer().peerType))
         {
             // try auth by admin user if allowed
             QnUserResourcePtr adminUser = resPool->getAdministrator();

@@ -1,7 +1,7 @@
 <form class="form" role="form" novalidate name="form" id="mergeDialog">
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h3 class="modal-title">Merge Systems</h3>
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span> <span class="sr-only"> Kapat </span></button>
+        <h3 class="modal-title">Sistemleri Birleştir</h3>
     </div>
 
     <div class="col-sm-12">
@@ -9,10 +9,10 @@
             <div class="form-group">
                 <label for="otherSystemUrl" class="control-label">Diğer Sistem URL'si</label>
                 <div class="">
-                    <div class="input-group" dropdown>
+                    <div class="input-group" uib-dropdown>
                         <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:port" required />
 
-                        <ul class="dropdown-menu" role="menu" id="discoveredUrls">
+                        <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
                             <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Hiçbir sistem bulunamadı</a></li>
                             <li ng-repeat="system in systems.discoveredUrls"
                                 ng-class="{disabled:!system.compatible}">
@@ -20,7 +20,7 @@
                             </li>
                         </ul>
 
-                        <span type="button" class="input-group-addon dropdown-toggle">
+                        <span type="button" class="input-group-addon dropdown-toggle" uib-dropdown-toggle>
                             <span class="caret"></span>
                         </span>
                     </div>

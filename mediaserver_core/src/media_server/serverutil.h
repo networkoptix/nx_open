@@ -7,9 +7,9 @@
 //#include <nx/fusion/fusion/fusion_fwd.h>
 #include <core/resource_access/user_access_data.h>
 #include <utils/common/optional.h>
-#include <nx_ec/data/api_media_server_data.h>
-#include <nx_ec/data/api_user_data.h>
-#include <nx_ec/transaction_timestamp.h>
+#include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/data/timestamp.h>
 #include <api/model/configure_system_data.h>
 
 // TODO: #Elric this belongs together with server_settings
@@ -25,7 +25,7 @@ namespace ec2 {
 }
 
 QString getDataDirectory();
-void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
+void syncStoragesToSettings(const QnMediaServerResourcePtr& server);
 bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection);
 
 namespace nx
@@ -68,7 +68,6 @@ namespace nx
     };
 }
 
-
 bool updateUserCredentials(
     std::shared_ptr<ec2::AbstractECConnection> connection,
     PasswordData data,
@@ -76,9 +75,7 @@ bool updateUserCredentials(
     const QnUserResourcePtr& userRes,
     QString* errString = nullptr);
 
-
-bool isLocalAppServer(const QString &host);
-
+bool isLocalAppServer(const QString& host);
 
 /*
 * @param localSystemId - new local system id
@@ -102,4 +99,4 @@ void dropConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus
 /**
  * Resume connection listening
  */
-void resumeConnectionsToRemotePeers();
+void resumeConnectionsToRemotePeers(ec2::AbstractTransactionMessageBus* messageBus);

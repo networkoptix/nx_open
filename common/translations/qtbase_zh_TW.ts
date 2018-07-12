@@ -662,7 +662,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1 Gb</translation>
     </message>
     <message>
       <source>%1 MB</source>

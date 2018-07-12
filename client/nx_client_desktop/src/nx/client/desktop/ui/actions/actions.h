@@ -193,7 +193,7 @@ enum IDType
      * Opens the Business Events Log dialog.
      * Supports cameras list in the resources field as a cameras filter.
      * Parameters:
-     * <tt>nx::vms::event::EventType EventTypeRole</tt> --- filter by event type.
+     * <tt>nx::vms::api::EventType EventTypeRole</tt> --- filter by event type.
      */
     OpenBusinessLogAction,
 
@@ -222,6 +222,11 @@ enum IDType
      * Sets up desktop camera as a layout for all items in the provided QnVideoWallItemIndexList.
      */
     PushMyScreenToVideowallAction,
+
+    /**
+     * Open Video Wall Screen Settings dialog.
+     */
+    VideoWallScreenSettingsAction,
 
     /**
      * Saves videowall review layout.
@@ -476,7 +481,6 @@ enum IDType
      * Saves selected local layout.
      */
     SaveLocalLayoutAction,
-    SaveLocalLayoutAsAction,
 
     /**
      * Saves selected layout under another name.
@@ -940,6 +944,7 @@ enum IDType
     NewWearableCameraAction,
     UploadWearableCameraFileAction,
     UploadWearableCameraFolderAction,
+    CancelWearableCameraUploadsAction,
 
     /* Timeline actions. */
 
@@ -964,9 +969,19 @@ enum IDType
     ZoomToTimeSelectionAction,
 
     /**
+     * Exports standalone exe client.
+     */
+    ExportStandaloneClientAction,
+
+    /**
      * Exports selected range.
      */
     ExportVideoAction,
+
+    /**
+     * Exports selected bookmark.
+     */
+    ExportBookmarkAction,
 
     /**
      * Bookmark selected range.
@@ -1020,11 +1035,6 @@ enum IDType
     ToggleTitleBarAction,
 
     /**
-     * Shows/hides tree.
-     */
-    ToggleTreeAction,
-
-    /**
      * Pins/unpins tree.
      */
     PinTreeAction,
@@ -1043,8 +1053,6 @@ enum IDType
      * Shows/hides timeline.
      */
     ToggleTimelineAction,
-
-    ToggleNotificationsAction,
 
     PinNotificationsAction,
 
@@ -1149,6 +1157,12 @@ enum IDType
 
     // TODO: #dklychkov Remove when the new scene engine becomes default.
     OpenNewSceneAction,
+
+    /**
+    * Opens legacy camera settings dialog.
+    */
+    // TODO: #vkutin #gdm Remove when the legacy dialog is completely removed.
+    CameraSettingsActionNew,
 
     ActionCount,
 

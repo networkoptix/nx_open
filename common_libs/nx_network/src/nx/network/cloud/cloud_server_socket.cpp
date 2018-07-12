@@ -1,6 +1,5 @@
 #include "cloud_server_socket.h"
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/scope_guard.h>
@@ -102,7 +101,7 @@ bool CloudServerSocket::listen(int queueLen)
     return true;
 }
 
-AbstractStreamSocket* CloudServerSocket::accept()
+std::unique_ptr<AbstractStreamSocket> CloudServerSocket::accept()
 {
     NX_CRITICAL(!SocketGlobals::aioService().isInAnyAioThread());
 
@@ -194,34 +193,10 @@ void CloudServerSocket::acceptAsync(AcceptCompletionHandler handler)
         });
 }
 
-void CloudServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+void CloudServerSocket::cancelIoInAioThread()
 {
-    // Doing post to avoid calling handler within this call.
-    m_mediatorRegistrationRetryTimer.post(
-        [this, handler = std::move(handler)]() mutable
-        {
-            cancelAccept();
-            handler();
-        });
-}
-
-void CloudServerSocket::cancelIOSync()
-{
-    if (m_mediatorRegistrationRetryTimer.isInSelfAioThread())
-    {
-        cancelAccept();
-    }
-    else
-    {
-        // We need dispatch here to avoid blocking if called within aio thread.
-        nx::utils::promise<void> cancelledPromise;
-        cancelIOAsync(
-            [this, &cancelledPromise]
-            {
-                cancelledPromise.set_value();
-            });
-        cancelledPromise.get_future().wait();
-    }
+    m_aggregateAcceptor.cancelIOSync();
+    m_savedAcceptHandler = nullptr;
 }
 
 bool CloudServerSocket::isInSelfAioThread() const
@@ -443,21 +418,21 @@ void CloudServerSocket::acceptAsyncInternal(AcceptCompletionHandler handler)
         std::bind(&CloudServerSocket::onNewConnectionHasBeenAccepted, this, _1, _2));
 }
 
-AbstractStreamSocket* CloudServerSocket::acceptNonBlocking()
+std::unique_ptr<AbstractStreamSocket> CloudServerSocket::acceptNonBlocking()
 {
     if (auto socket = m_tunnelPool->getNextSocketIfAny())
-        return socket.release();
+        return socket;
     for (auto& acceptor: m_customConnectionAcceptors)
     {
         if (auto socket = acceptor->getNextSocketIfAny())
-            return socket.release();
+            return socket;
     }
 
     SystemError::setLastErrorCode(SystemError::wouldBlock);
     return nullptr;
 }
 
-AbstractStreamSocket* CloudServerSocket::acceptBlocking()
+std::unique_ptr<AbstractStreamSocket> CloudServerSocket::acceptBlocking()
 {
     nx::utils::promise<SystemError::ErrorCode> promise;
     std::unique_ptr<AbstractStreamSocket> acceptedSocket;
@@ -475,7 +450,7 @@ AbstractStreamSocket* CloudServerSocket::acceptBlocking()
         return nullptr;
     }
 
-    return acceptedSocket.release();
+    return acceptedSocket;
 }
 
 void CloudServerSocket::onNewConnectionHasBeenAccepted(
@@ -491,12 +466,6 @@ void CloudServerSocket::onNewConnectionHasBeenAccepted(
     NX_LOGX(lm("Returning socket from tunnel pool. Result code %1")
         .arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
     handler(sysErrorCode, std::move(socket));
-}
-
-void CloudServerSocket::cancelAccept()
-{
-    m_aggregateAcceptor.cancelIOSync();
-    m_savedAcceptHandler = nullptr;
 }
 
 void CloudServerSocket::issueRegistrationRequest()

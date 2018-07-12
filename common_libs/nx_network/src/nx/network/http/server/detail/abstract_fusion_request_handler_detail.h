@@ -148,7 +148,8 @@ public:
         }
 
         if (result.errorClass != FusionRequestErrorClass::noError &&
-            nx::network::http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
+            nx::network::http::Method::isMessageBodyAllowedInResponse(
+                m_requestMethod, result.httpStatusCode()))
         {
             outputMsgBody = std::make_unique<nx::network::http::BufferSource>(
                 Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
@@ -166,10 +167,15 @@ private:
         const Output& output,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource>* outputMsgBody)
     {
-        if (nx::network::http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
+        if (nx::network::http::Method::isMessageBodyAllowedInResponse(
+                m_requestMethod, result.httpStatusCode()))
+        {
             return serializeOutputAsMessageBody(output, outputMsgBody);
+        }
         else
+        {
             return serializeToHeaders(&response()->headers, output);
+        }
     }
 
     bool serializeOutputAsMessageBody(
@@ -234,8 +240,8 @@ private:
                 FusionRequestErrorClass::badRequest,
                 QnLexical::serialized(FusionRequestErrorDetail::deserializationError),
                 FusionRequestErrorDetail::deserializationError,
-                lit("Error deserializing input of type %1").
-                arg(Qn::serializationFormatToHttpContentType(inputDataFormat)));
+                QStringLiteral("Error deserializing input of type %1").
+                    arg(Qn::serializationFormatToHttpContentType(inputDataFormat)));
             this->requestCompleted(std::move(result));
             return;
         }

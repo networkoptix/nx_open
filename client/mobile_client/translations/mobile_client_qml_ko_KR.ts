@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko" sourcelanguage="en">
   <context>
+    <name>ActionButtonsPanel</name>
+    <message>
+      <source>Press and hold to</source>
+      <translation type="unfinished">Press and hold to</translation>
+    </message>
+  </context>
+  <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
@@ -15,6 +22,14 @@
       <source>Offline</source>
       <translation>오프라인</translation>
     </message>
+    <message>
+      <source>Password required</source>
+      <translation type="unfinished">Password required</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation type="unfinished">Unsupported firmware version</translation>
+    </message>
   </context>
   <context>
     <name>CloudPanel</name>
@@ -26,8 +41,9 @@
   <context>
     <name>CloudScreen</name>
     <message>
-      <source>Cloud Account</source>
-      <translation>클라우드 계정</translation>
+      <source>%1 Account</source>
+      <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
+      <translation>%1 계정</translation>
     </message>
   </context>
   <context>
@@ -49,7 +65,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀번호:</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
@@ -57,7 +73,7 @@
     </message>
     <message>
       <source>Create account</source>
-      <translation>계정을 만듭니다</translation>
+      <translation>계정 만들기</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
@@ -68,16 +84,48 @@
       <translation>%1에 연결할 수 없습니다.</translation>
     </message>
     <message>
-      <source>Email and password cannot be empty</source>
-      <translation>이메일과 비밀 번호는 비어 있을 수 없습니다.</translation>
-    </message>
-    <message>
       <source>Log in</source>
       <translation>로그인</translation>
     </message>
     <message>
-      <source>Incorrect email or password</source>
-      <translation type="unfinished">Incorrect email or password</translation>
+      <source>Resend activation email</source>
+      <translation type="unfinished">Resend activation email</translation>
+    </message>
+    <message>
+      <source>Activation email sent</source>
+      <translation type="unfinished">Activation email sent</translation>
+    </message>
+    <message>
+      <source>Cannot send activation email</source>
+      <translation type="unfinished">Cannot send activation email</translation>
+    </message>
+    <message>
+      <source>Check your inbox and visit provided link to activate account</source>
+      <translation type="unfinished">Check your inbox and visit provided link to activate account</translation>
+    </message>
+    <message>
+      <source>Check your internet connection or try again later</source>
+      <translation type="unfinished">Check your internet connection or try again later</translation>
+    </message>
+    <message>
+      <source>Account not found</source>
+      <translation>계정을 찾을 수 없습니다</translation>
+    </message>
+    <message>
+      <source>Wrong password</source>
+      <translation>패스워드가 틀립니다.</translation>
+    </message>
+    <message>
+      <source>Account not activated</source>
+      <translation type="unfinished">Account not activated</translation>
+    </message>
+    <message>
+      <source>Email cannot be empty</source>
+      <translation>이메일은 비워둘 수 없습니다</translation>
+    </message>
+    <message>
+      <source>Password cannot be empty</source>
+      <translation>비밀번호를 입력해야 합니다</translation>
     </message>
   </context>
   <context>
@@ -96,7 +144,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>로그인 &quot;%1&quot; 을 삭제 하시겠습니까?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -146,7 +194,7 @@
     </message>
     <message>
       <source>No</source>
-      <translation>아니오</translation>
+      <translation>아니요</translation>
     </message>
     <message>
       <source>Abort</source>
@@ -154,7 +202,7 @@
     </message>
     <message>
       <source>Retry</source>
-      <translation>재시도 하기</translation>
+      <translation>다시 시도</translation>
     </message>
   </context>
   <context>
@@ -212,7 +260,7 @@
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>알수 없음</translation>
+      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>%1 fps</source>
@@ -266,7 +314,7 @@
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>소프트웨어 이미지 회전은 전체 화면 모드에서 지원되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -284,14 +332,37 @@
     </message>
   </context>
   <context>
+    <name>LoginUtils</name>
+    <message>
+      <source>Invalid login or password</source>
+      <translation type="unfinished">Invalid login or password</translation>
+    </message>
+    <message>
+      <source>LDAP Server connection timed out</source>
+      <translation>LDAP 서버 연결 타임아웃</translation>
+    </message>
+    <message>
+      <source>Server or network is not available</source>
+      <translation type="unfinished">Server or network is not available</translation>
+    </message>
+    <message>
+      <source>Incompatible server</source>
+      <translation type="unfinished">Incompatible server</translation>
+    </message>
+    <message>
+      <source>Incompatible server version %1</source>
+      <translation type="unfinished">Incompatible server version %1</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>이미지를 눌러 카메라를 배치하십시오.</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>취소</translation>
     </message>
   </context>
   <context>
@@ -319,14 +390,14 @@
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>프리셋</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ 프리셋</translation>
     </message>
   </context>
   <context>
@@ -337,7 +408,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation>알수 없음</translation>
+      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -346,6 +417,22 @@
     <message>
       <source>Best quality</source>
       <translation>최고의 품질</translation>
+    </message>
+    <message>
+      <source>Transcoding is disabled.</source>
+      <translation>트랜스 코딩이 비활성화되었습니다.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for this camera.</source>
+      <translation>이 카메라에서는 트랜스 코딩이 지원되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for servers with version lower than 3.0.</source>
+      <translation>3.0버전 이하의 서버에서는 트랜스 코딩이 지원되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Transcoding is not supported for ARM servers.</source>
+      <translation>ARM계열 시스템에서는 트랜스 코딩이 지원되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -394,11 +481,11 @@
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>카메라 선택</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Ctrl + 화살표를 누르거나 마우스 휠을 사용 하십시요</translation>
     </message>
   </context>
   <context>
@@ -416,11 +503,11 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>비밀 번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <source>Hosts</source>
@@ -447,11 +534,11 @@
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>연결할 수 없는</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>웹 브라우저 또는 데스크톱 클라이언트를 통해 이 서버에 연결하여 설정하십시오.</translation>
     </message>
   </context>
   <context>
@@ -461,12 +548,8 @@
       <translation>%1에 로그인</translation>
     </message>
     <message>
-      <source>Cannot connect to %1</source>
-      <translation>%1에 연결할 수 없습니다.</translation>
-    </message>
-    <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>네트워크 연결을 확인하거나 &quot;%1&quot; 버튼을 눌러 알려진 서버 주소를 입력하십시오.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -486,7 +569,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>&quot;%1&quot; 시스템에 연결할 수 없습니다.</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
@@ -506,6 +589,14 @@
     <message>
       <source>Save passwords for servers</source>
       <translation>서버에 대 한 암호를 저장</translation>
+    </message>
+    <message>
+      <source>What to do with currently saved passwords?</source>
+      <translation type="unfinished">What to do with currently saved passwords?</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>삭제</translation>
     </message>
   </context>
   <context>
@@ -549,11 +640,11 @@
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation>알수 없음</translation>
+      <translation>알 수 없음</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>새 서버</translation>
     </message>
   </context>
   <context>
@@ -579,22 +670,22 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>전체 선택</translation>
+      <translation>모두 선택</translation>
     </message>
   </context>
   <context>
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>소프트웨어 이미지 회전은 전체 화면 모드에서 지원되지 않습니다.</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>현재 상태로 표시</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(여유공간)</translation>
     </message>
   </context>
   <context>
@@ -624,15 +715,47 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>오프라인</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>허용되지 않음</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>비디오 스트림을 재생할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses</source>
+      <translation type="unfinished">Not enough licenses</translation>
+    </message>
+    <message>
+      <source>Password required</source>
+      <translation type="unfinished">Password required</translation>
+    </message>
+    <message>
+      <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
+      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+    </message>
+    <message>
+      <source>Unsupported firmware version</source>
+      <translation type="unfinished">Unsupported firmware version</translation>
+    </message>
+    <message>
+      <source>Please update firmware</source>
+      <translation type="unfinished">Please update firmware</translation>
+    </message>
+    <message>
+      <source>Too many connections</source>
+      <translation type="unfinished">Too many connections</translation>
+    </message>
+    <message>
+      <source>I/O interface not supported yet</source>
+      <translation type="unfinished">I/O interface not supported yet</translation>
+    </message>
+    <message>
+      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
+      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
     </message>
   </context>
   <context>
@@ -644,11 +767,6 @@
     <message>
       <source>LIVE</source>
       <translation>실시간 뷰</translation>
-    </message>
-    <message>
-      <source>d MMMM yyyy</source>
-      <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -667,6 +785,17 @@
     <message>
       <source>Skip</source>
       <translation>건너 뛰기</translation>
+    </message>
+  </context>
+  <context>
+    <name>main</name>
+    <message>
+      <source>Server offline. Reconnecting...</source>
+      <translation type="unfinished">Server offline. Reconnecting...</translation>
+    </message>
+    <message>
+      <source>Cannot connect to %1</source>
+      <translation>%1에 연결할 수 없습니다.</translation>
     </message>
   </context>
 </TS>

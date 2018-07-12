@@ -53,11 +53,6 @@
       <translation>Le système %1 découvert a une version %2 incompatible.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Impossible de se connecter à l’autre système, parce que le système actuel est déjà connecté à %1.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>Système découvert %1 est en mode sans échec.</translation>
@@ -68,21 +63,6 @@
       <translation>Ne peut pas configurer le système distant %1.</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Les deux systèmes sont connectés au %1. Fusion non autorisée.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Ces systèmes sont construits avec différents %1 URL. Fusion non autorisée.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Système Nuage peut seulement être fusionné avec un non-nuage. Nom Système et mot de passe sont pris du Système Nuage.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>Nouveau Système</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>Le système découvert %1 est incompatible avec le système actuel.</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Impossible de se connecter à l’autre système, parce que le système actuel est déjà connecté à %1.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Système %1 peut seulement être fusionné avec non-%1. Nom Système et mot de passe sont pris du Système %1.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Les deux systèmes sont connectés au %1. Fusion non autorisée.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Ces systèmes sont construits avec différents %1 URL. Fusion non autorisée.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>Événement système</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>Système déjà lié au nuage (id %1)</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>Serveur n’est pas connecté à Internet.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>Échec enregistrement d'informations d'ID du nuage dans la BD locale</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>Échec enregistrement du propriétaire du nuage dans la BD locale</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>Échec de connexion au nuage: %1</translation>
     </message>
   </context>
   <context>
@@ -314,6 +334,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>Premièrement, essayez d'activer l'enregistrement (si désactivé) et diminuer ips dans les paramètres module I/O (erreur &quot;%1&quot;).</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Veuillez mettre à jour le firmware. La version minimale prise en charge est %1. La version actuelle est %2</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -508,7 +532,7 @@
       <source>%n %2 will be used out of %1.</source>
       <translation>
         <numerusform>%n %2 sera utilisée sur %1.</numerusform>
-        <numerusform>%n %2 seront utilisées sur %1.</numerusform>
+        <numerusform>%n %2 sera utilisée sur %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -522,7 +546,7 @@
       <source>%n more %1 will be used.</source>
       <translation>
         <numerusform>%n plus %1 sera utilisée.</numerusform>
-        <numerusform>%n plus %1 seront utilisées.</numerusform>
+        <numerusform>%n plus %1 sera utilisée.</numerusform>
       </translation>
     </message>
   </context>
@@ -557,8 +581,8 @@
       <translation>Erreur inconnue</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
-      <translation>Aucun Serveur avec ID matériel correspondant trouvé</translation>
+      <source>Server with matching Hardware ID not found</source>
+      <translation>Aucun Serveur avec ID Matériel correspondant trouvé</translation>
     </message>
   </context>
   <context>
@@ -581,7 +605,7 @@
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n caméra</numerusform>
-        <numerusform>%n caméras</numerusform>
+        <numerusform>%n caméra</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -595,7 +619,7 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n périphérique</numerusform>
-        <numerusform>%n périphériques</numerusform>
+        <numerusform>%n périphérique</numerusform>
       </translation>
     </message>
     <message>
@@ -634,14 +658,14 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n Module I/O</numerusform>
-        <numerusform>%n Modules I/O</numerusform>
+        <numerusform>%n Module I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n module I/O</numerusform>
-        <numerusform>%n modules I/O</numerusform>
+        <numerusform>%n module I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -680,12 +704,12 @@
       <translation>Filigrane: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>ID Matériel: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Licence Temps</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>ID Matériel: %1</translation>
     </message>
   </context>
   <context>
@@ -820,153 +844,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>Paramètre invalide</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>j</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>S</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>A</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>sec</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>hrs</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>jours</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>sem</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mois</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>ans</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>milliseconde</numerusform>
-        <numerusform>millisecondes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>seconde</numerusform>
-        <numerusform>secondes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minute</numerusform>
-        <numerusform>minutes</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>heure</numerusform>
-        <numerusform>heures</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>jour</numerusform>
-        <numerusform>jours</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>semaine</numerusform>
-        <numerusform>semaines</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>mois</numerusform>
-        <numerusform>mois</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>année</numerusform>
-        <numerusform>années</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1525,6 +1402,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 à %2</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Ouvrir mise en page</translation>
     </message>
   </context>
   <context>

@@ -9,7 +9,7 @@
             </alert>
             <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
                 Dit apparaat heeft een netwerkverbinding nodig om te functioneren.<br>
-                Sluit het apparaat aanop het  lokale netwerk of het internet
+                Sluit het apparaat aan op het  lokale netwerk of het internet
             </alert>
             <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
                 Dit apparaat heeft de verkeerde netwerkconfiguratie.<br>
@@ -17,8 +17,8 @@
             </alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Poort</h3>
@@ -39,14 +39,14 @@
                     <div>
                         <h3>Reset server</h3>
                         <p>Met deze actie wordt deze server teruggezet naar de standaardinstellingen (de database en de configuratie zullen worden gewist).
-                            De server zal worden losgemaakt van het huidige systeem. Het videoarchief zal intact blijven.</p>
+                            De server zal worden losgekoppeld van het huidige systeem. Het videoarchief zal intact blijven.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrieksinstellingen herstellen</button></p>
                     </div>
                     <div ng-if="user.isOwner">
-                        <h3>Maak de server los van het systeem</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            Het videoarchief zal intact blijven. <b>Cloud users will be deleted.</b></p>
-                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Maak los van het systeem</button></p>
+                        <h3>Koppel de server los van het huidige systeem</h3>
+                        <p>Met deze actie wordt de server losgekoppeld van de systeemdatabase met behoud van lokale gebruikers en configuratie.
+                            Het videoarchief zal intact blijven. <b>Alle cloud gebruikers zullen worden verwijderd.</b></p>
+                        <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Loskoppelen van het systeem</button></p>
                     </div>
                     <div>
                         <h3>Maak de server los van het systeem</h3>
@@ -72,9 +72,9 @@
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>Naam</h3>
                         <div class="row">
@@ -100,7 +100,7 @@
 
                         <div ng-if="cloudSystemID">
                             <p>Dit systeem is gekoppeld aan {{Config.cloud.productName}}, eigenaar: <b>{{cloudAccountName}}</b></p>
-                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Losmaken van {{Config.cloud.productName}}</button></p>
+                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Koppel het systeem los van {{Config.cloud.productName}}</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
                                   target="_blank">Ga naar {{Config.cloud.productName}} Portaal</a></p>
@@ -121,13 +121,13 @@
                                    target="_blank">Maak {{Config.cloud.productName}} Account aan</a></p>
                         </div>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Device Network Settings</h3>
+                        <h3>Apparaat netwerkinstellingen</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Sla instellingen op en start het apparaat opnieuw op</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>Datum en tijd</h3>
@@ -152,7 +152,7 @@
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -165,7 +165,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -184,8 +184,8 @@
                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">Stop client</button></p>
                         <p>Gebruik een toetsenbord en muis of de mobiele app voor de bediening.</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

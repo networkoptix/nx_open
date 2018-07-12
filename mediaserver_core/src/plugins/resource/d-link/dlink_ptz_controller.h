@@ -5,6 +5,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <core/ptz/basic_ptz_controller.h>
+#include <nx/mediaserver/resource/resource_fwd.h>
 
 class QnPlOnvifResource;
 class QnDlinkPtzRepeatCommand;
@@ -17,8 +18,10 @@ public:
     QnDlinkPtzController(const QnPlOnvifResourcePtr &resource);
     virtual ~QnDlinkPtzController();
 
-    virtual Ptz::Capabilities getCapabilities() const override;
-    virtual bool continuousMove(const QVector3D &speed) override;
+    virtual Ptz::Capabilities getCapabilities(const nx::core::ptz::Options& options) const override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
 
 private:
     friend class QnDlinkPtzRepeatCommand;

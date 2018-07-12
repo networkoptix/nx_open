@@ -2,17 +2,25 @@
 <ui version="4.0">
  <class>NewWearableCameraDialog</class>
  <widget class="QDialog" name="NewWearableCameraDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>328</width>
+    <height>276</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>New Wearable Camera...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QnPanel" name="topPanel" native="true">
+    <widget class="nx::client::desktop::Panel" name="topPanel" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <widget class="QLabel" name="headerLabel">
         <property name="text">
-         <string>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your system and be accessed by any user.</string>
+         <string>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -59,7 +67,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QnInputField" name="nameField" native="true"/>
+       <widget class="nx::client::desktop::InputField" name="nameField" native="true"/>
       </item>
      </layout>
     </widget>
@@ -85,15 +93,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnPanel</class>
+   <class>nx::client::desktop::Panel</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/panel.h</header>
+   <header location="global">nx/client/desktop/common/widgets/panel.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnInputField</class>
+   <class>nx::client::desktop::InputField</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/input_field.h</header>
+   <header location="global">nx/client/desktop/common/widgets/input_field.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -1,18 +1,29 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
-        <h1 class="process-success" ng-if="activate.success"> Tài khoản của bạn đã được kích hoạt thành công <br> <a class="btn btn-default" href="/login"> Đăng nhập </a></h1> <h1 class="process-success" ng-if="!activate.success"> Tài khoản đã  sãn sàng sử dụng hãy kích hoạt hoặckích hoạt bằng mã </h1>
+        <h1 class="process-success" ng-if="activate.success">
+            Tài khoản của bạn đã được kích hoạt thành công
+        </h1>
+        <h1 class="process-success" ng-if="activate.success">
+            <a class="btn btn-default" href="/login">Đăng nhập</a>
+        </h1>
+
+        <h1 class="process-success" ng-if="!activate.success">
+            Tài khoản đã được kích hoạt hoặc mã xác nhận không chính xác
+        </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Tài khoản của bạn đã được kích hoạt thành công <br> <a href="/login"> Đăng nhập </a>
-            <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
+            Tài khoản của bạn đã được kích hoạt thành công
+        </h1>
+        <h1 class="process-success">
+            <a class="btn btn-default" href="/login">Đăng nhập</a>
         </h1>
     </div>
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>You have registered in {{PRODUCT_NAME}}</h1>
+            <h1>Bạn đã đăng ký tại %PRODUCT_NAME%</h1>
             <p>Chúng tôi đã gửi thư đính kèm link kích hoạt đến  {{data.email}}.<br>. Vui lòng kích hoạt tài khoản của bạn bằng cách click vào link này.</p>
         </div>
         <h1 ng-if="!data.email">Kích hoạt tài khoản của bạn</h1>
@@ -72,12 +83,15 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            Đã lưu thành công mật khẩu <br> <a href="/login"> Đăng nhập </a>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            Thay đổi mật khẩu thành công
+        </h1>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            <a class="btn btn-default" href="/login">Đăng nhập</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
-            <h1> Đặt mật khẩu mới </h1>
+            <h1>Đặt mật khẩu mới</h1>
             <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">

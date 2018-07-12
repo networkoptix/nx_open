@@ -83,7 +83,8 @@ private:
     {
         auto requestCompletionFunc =
             [context, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode,
-                nx::network::http::BufferType msgBody )
+                nx::network::http::BufferType msgBody,
+                nx::network::http::HttpHeaders /*responseHeaders*/)
             {
                 vms::event::ActionDataList remoteData;
                 bool success = false;

@@ -77,15 +77,15 @@ void QnUserSettingsModel::updatePermissions()
         : QSet<QnUuid>();
 }
 
-Qn::GlobalPermissions QnUserSettingsModel::rawPermissions() const
+GlobalPermissions QnUserSettingsModel::rawPermissions() const
 {
     if (!m_user)
-        return Qn::NoGlobalPermissions;
+        return {};
 
     return m_user->getRawPermissions();
 }
 
-void QnUserSettingsModel::setRawPermissions(Qn::GlobalPermissions value)
+void QnUserSettingsModel::setRawPermissions(GlobalPermissions value)
 {
     if (!m_user)
         return;

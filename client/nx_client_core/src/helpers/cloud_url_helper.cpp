@@ -1,16 +1,15 @@
 #include "cloud_url_helper.h"
 
-#include <common/common_module.h>
-
-#include <client_core/client_core_module.h>
-
-#include <nx/network/app_info.h>
-#include <nx/vms/utils/system_uri.h>
-
 #include <api/global_settings.h>
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
 #include <utils/common/app_info.h>
 #include <watchers/cloud_status_watcher.h>
 
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
+#include <nx/vms/utils/system_uri.h>
 #include <nx/utils/log/log.h>
 
 using namespace nx::vms::utils;
@@ -26,37 +25,37 @@ QnCloudUrlHelper::QnCloudUrlHelper(
 {
 }
 
-nx::utils::Url QnCloudUrlHelper::mainUrl() const
+QUrl QnCloudUrlHelper::mainUrl() const
 {
     return makeUrl();
 }
 
-nx::utils::Url QnCloudUrlHelper::aboutUrl() const
+QUrl QnCloudUrlHelper::aboutUrl() const
 {
     return makeUrl(lit("/content/about"), false);
 }
 
-nx::utils::Url QnCloudUrlHelper::accountManagementUrl() const
+QUrl QnCloudUrlHelper::accountManagementUrl() const
 {
     return makeUrl(lit("/account"));
 }
 
-nx::utils::Url QnCloudUrlHelper::createAccountUrl() const
+QUrl QnCloudUrlHelper::createAccountUrl() const
 {
     return makeUrl(lit("/register"), false);
 }
 
-nx::utils::Url QnCloudUrlHelper::restorePasswordUrl() const
+QUrl QnCloudUrlHelper::restorePasswordUrl() const
 {
     return makeUrl(lit("/restore_password"), false);
 }
 
-nx::utils::Url QnCloudUrlHelper::faqUrl() const
+QUrl QnCloudUrlHelper::faqUrl() const
 {
     return makeUrl(lit("/content/faq"), false);
 }
 
-nx::utils::Url QnCloudUrlHelper::viewSystemUrl() const
+QUrl QnCloudUrlHelper::viewSystemUrl() const
 {
     const auto systemId = qnClientCoreModule->commonModule()->globalSettings()->cloudSystemId();
     if (systemId.isEmpty())
@@ -65,11 +64,12 @@ nx::utils::Url QnCloudUrlHelper::viewSystemUrl() const
     return makeUrl(lit("/systems/%1/view").arg(systemId));
 }
 
-nx::utils::Url QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
+QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 {
-    SystemUri uri(nx::network::AppInfo::defaultCloudPortalUrl());
+    SystemUri uri(nx::network::AppInfo::defaultCloudPortalUrl(
+        nx::network::SocketGlobals::cloud().cloudHost()));
 
-    if (auth)
+    if (auth && qnCloudStatusWatcher->status() == QnCloudStatusWatcher::Status::Online)
     {
         auto credentials = qnCloudStatusWatcher->createTemporaryCredentials();
         uri.setAuthenticator(credentials.user, credentials.password.value());
@@ -77,7 +77,7 @@ nx::utils::Url QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 
     uri.setReferral(m_source, m_context);
 
-    nx::utils::Url result = uri.toUrl();
+    QUrl result(uri.toString());
     result.setPath(path);
     NX_DEBUG(typeid(QnCloudUrlHelper), result.toString());
     return result;

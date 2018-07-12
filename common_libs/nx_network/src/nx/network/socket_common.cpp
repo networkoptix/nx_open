@@ -4,6 +4,24 @@
 
 #include "socket_global.h"
 
+bool operator==(const in_addr& left, const in_addr& right)
+{
+    return memcmp(&left, &right, sizeof(left)) == 0;
+}
+
+bool operator==(const in6_addr& left, const in6_addr& right)
+{
+    return memcmp(&left, &right, sizeof(left)) == 0;
+}
+
+#if !defined(_WIN32)
+#   if defined(__arm__) && !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+#       undef htonl
+#   endif
+
+    const in_addr in4addr_loopback{ htonl(INADDR_LOOPBACK) };
+#endif
+
 namespace nx {
 namespace network {
 
@@ -20,8 +38,21 @@ bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode)
 //-------------------------------------------------------------------------------------------------
 // HostAddress
 
-const HostAddress HostAddress::localhost(*ipV4from(lit("127.0.0.1")));
-const HostAddress HostAddress::anyHost(*ipV4from(lit("0.0.0.0")));
+HostAddress::HostAddress(
+    boost::optional<QString> addressString,
+    boost::optional<in_addr> ipV4,
+    boost::optional<in6_addr> ipV6)
+    :
+    m_string(std::move(addressString)),
+    m_ipV4(ipV4),
+    m_ipV6(ipV6)
+{
+}
+
+const HostAddress HostAddress::localhost(
+    QString("localhost"), in4addr_loopback, in6addr_loopback);
+
+const HostAddress HostAddress::anyHost(*ipV4from("0.0.0.0"));
 
 HostAddress::HostAddress(const in_addr& addr):
     m_ipV4(addr)
@@ -109,6 +140,11 @@ const QString& HostAddress::toString() const
     return *m_string;
 }
 
+std::string HostAddress::toStdString() const
+{
+    return toString().toStdString();
+}
+
 boost::optional<in_addr> HostAddress::ipV4() const
 {
     if (m_ipV4)
@@ -138,7 +174,7 @@ boost::optional<in_addr> HostAddress::ipV4() const
     return boost::none;
 }
 
-HostAddress::IpV6WithScope HostAddress::ipV6() const
+IpV6WithScope HostAddress::ipV6() const
 {
     if (m_ipV6)
         return IpV6WithScope(m_ipV6, m_scopeId);
@@ -156,7 +192,14 @@ HostAddress::IpV6WithScope HostAddress::ipV6() const
     return IpV6WithScope();
 }
 
-bool HostAddress::isLocal() const
+bool HostAddress::isLocalHost() const
+{
+    return (m_string == localhost.m_string)
+        || (ipV4() == localhost.m_ipV4)
+        || (ipV6().first == localhost.m_ipV6);
+}
+
+bool HostAddress::isLocalNetwork() const
 {
     if (const auto& ip = ipV4())
     {
@@ -190,6 +233,23 @@ bool HostAddress::isPureIpV6() const
     return (bool) ipV6().first && !(bool) ipV4();
 }
 
+HostAddress HostAddress::toPureIpAddress(int desiredIpVersion) const
+{
+    if (desiredIpVersion == AF_INET6)
+    {
+        const auto ipv6WithScope = ipV6();
+        if (ipv6WithScope.first)
+            return HostAddress(*ipv6WithScope.first, ipv6WithScope.second);
+    }
+    else
+    {
+        if (ipV4())
+            return HostAddress(*ipV4());
+    }
+
+    return HostAddress();
+}
+
 boost::optional<uint32_t> HostAddress::scopeId() const
 {
     return m_scopeId;
@@ -218,7 +278,7 @@ boost::optional<QString> HostAddress::ipToString(
     else
         return boost::none;
 
-    if ((bool) scopeId)
+    if ((bool) scopeId && *scopeId != 0)
     {
         result += '%';
         result += QString::number(scopeId.get());
@@ -236,7 +296,7 @@ boost::optional<in_addr> HostAddress::ipV4from(const QString& ip)
     return boost::none;
 }
 
-HostAddress::IpV6WithScope HostAddress::ipV6from(const QString& ip)
+IpV6WithScope HostAddress::ipV6from(const QString& ip)
 {
     IpV6WithScope result;
     QString ipString = ip;
@@ -263,7 +323,6 @@ HostAddress::IpV6WithScope HostAddress::ipV6from(const QString& ip)
         }
     }
 
-
     struct in6_addr addr6;
     if (inet_pton(AF_INET6, ipString.toLatin1().data(), &addr6))
     {
@@ -289,11 +348,6 @@ boost::optional<in_addr> HostAddress::ipV4from(const in6_addr& v6)
         v4.s_addr = htonl(INADDR_ANY);
         return v4;
     }
-    if (std::memcmp(&v6, &in6addr_loopback, sizeof(v6)) == 0)
-    {
-        v4.s_addr = htonl(INADDR_LOOPBACK);
-        return v4;
-    }
 
     if (std::memcmp(kIpVersionMapPrefix.data(), &v6.s6_addr[0], kIpVersionMapPrefix.size()) != 0)
         return boost::none;
@@ -302,14 +356,12 @@ boost::optional<in_addr> HostAddress::ipV4from(const in6_addr& v6)
     return v4;
 }
 
-HostAddress::IpV6WithScope HostAddress::ipV6from(const in_addr& v4)
+IpV6WithScope HostAddress::ipV6from(const in_addr& v4)
 {
     // TODO: Remove this hack when IPv6 is properly supported!
     //  Try to map it from IPv4 as v4 format is preferable
     if (v4.s_addr == htonl(INADDR_ANY))
         return IpV6WithScope(in6addr_any, boost::none);
-    if (v4.s_addr == htonl(INADDR_LOOPBACK))
-        return IpV6WithScope(in6addr_loopback, boost::none);
 
     in6_addr v6;
     std::memcpy(&v6.s6_addr[0], kIpVersionMapPrefix.data(), kIpVersionMapPrefix.size());
@@ -362,8 +414,25 @@ SocketAddress::SocketAddress(const QByteArray& utf8Str):
 {
 }
 
+SocketAddress::SocketAddress(const std::string& str):
+    SocketAddress(QString::fromStdString(str))
+{
+}
+
 SocketAddress::SocketAddress(const char* utf8Str):
     SocketAddress(QByteArray(utf8Str))
+{
+}
+
+SocketAddress::SocketAddress(const sockaddr_in& ipv4Endpoint):
+    address(ipv4Endpoint.sin_addr),
+    port(ntohs(ipv4Endpoint.sin_port))
+{
+}
+
+SocketAddress::SocketAddress(const sockaddr_in6& ipv6Endpoint):
+    address(ipv6Endpoint.sin6_addr, ipv6Endpoint.sin6_scope_id),
+    port(ntohs(ipv6Endpoint.sin6_port))
 {
 }
 
@@ -412,7 +481,15 @@ bool SocketAddress::isNull() const
 }
 
 const SocketAddress SocketAddress::anyAddress(HostAddress::anyHost, 0);
-const SocketAddress SocketAddress::anyPrivateAddress(HostAddress::localhost, 0);
+
+const SocketAddress SocketAddress::anyPrivateAddress(
+    HostAddress::localhost, 0);
+
+const SocketAddress SocketAddress::anyPrivateAddressV4(
+    HostAddress::localhost.toPureIpAddress(AF_INET), 0);
+
+const SocketAddress SocketAddress::anyPrivateAddressV6(
+    HostAddress::localhost.toPureIpAddress(AF_INET6), 0);
 
 QString SocketAddress::trimIpV6(const QString& ip)
 {

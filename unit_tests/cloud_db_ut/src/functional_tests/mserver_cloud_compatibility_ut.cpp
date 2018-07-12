@@ -2,7 +2,7 @@
 
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/cdb/ec2/compatible_ec2_protocol_version.h>
+#include <nx/data_sync_engine/compatible_ec2_protocol_version.h>
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 
@@ -82,14 +82,16 @@ private:
 
 TEST_F(Ec2MserverCloudCompatibility, compatible_protocol_range_is_meaningful)
 {
-    ASSERT_LE(ec2::kMinSupportedProtocolVersion, ec2::kMaxSupportedProtocolVersion);
+    ASSERT_LE(
+        data_sync_engine::kMinSupportedProtocolVersion,
+        data_sync_engine::kMaxSupportedProtocolVersion);
 }
 
 TEST_F(Ec2MserverCloudCompatibility, any_compatible_proto_version_is_accepted_by_cloud)
 {
     for (int
-        version = ec2::kMinSupportedProtocolVersion;
-        version <= ec2::kMaxSupportedProtocolVersion;
+        version = data_sync_engine::kMinSupportedProtocolVersion;
+        version <= data_sync_engine::kMaxSupportedProtocolVersion;
         ++version)
     {
         assertCdbAcceptsConnectionOfVersion(version);
@@ -99,12 +101,14 @@ TEST_F(Ec2MserverCloudCompatibility, any_compatible_proto_version_is_accepted_by
 
 TEST_F(Ec2MserverCloudCompatibility, version_left_of_compatibility_range_is_rejected)
 {
-    assertCdbDoesNotAcceptConnectionOfVersion(ec2::kMinSupportedProtocolVersion - 1);
+    assertCdbDoesNotAcceptConnectionOfVersion(
+        data_sync_engine::kMinSupportedProtocolVersion - 1);
 }
 
 TEST_F(Ec2MserverCloudCompatibility, version_right_of_compatibility_range_is_rejected)
 {
-    assertCdbDoesNotAcceptConnectionOfVersion(ec2::kMaxSupportedProtocolVersion + 1);
+    assertCdbDoesNotAcceptConnectionOfVersion(
+        data_sync_engine::kMaxSupportedProtocolVersion + 1);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -112,18 +116,20 @@ TEST_F(Ec2MserverCloudCompatibility, version_right_of_compatibility_range_is_rej
 TEST(Ec2MserverCloudCompabilityCheckRoutine, compatible_versions)
 {
     for (int
-        version = ec2::kMinSupportedProtocolVersion;
-        version <= ec2::kMaxSupportedProtocolVersion;
+        version = data_sync_engine::kMinSupportedProtocolVersion;
+        version <= data_sync_engine::kMaxSupportedProtocolVersion;
         ++version)
     {
-        ASSERT_TRUE(ec2::isProtocolVersionCompatible(version));
+        ASSERT_TRUE(data_sync_engine::isProtocolVersionCompatible(version));
     }
 }
 
 TEST(Ec2MserverCloudCompabilityCheckRoutine, incompatible_versions)
 {
-    ASSERT_FALSE(ec2::isProtocolVersionCompatible(ec2::kMinSupportedProtocolVersion - 1));
-    ASSERT_FALSE(ec2::isProtocolVersionCompatible(ec2::kMaxSupportedProtocolVersion + 1));
+    ASSERT_FALSE(data_sync_engine::isProtocolVersionCompatible(
+        data_sync_engine::kMinSupportedProtocolVersion - 1));
+    ASSERT_FALSE(data_sync_engine::isProtocolVersionCompatible(
+        data_sync_engine::kMaxSupportedProtocolVersion + 1));
 }
 
 } // namespace test

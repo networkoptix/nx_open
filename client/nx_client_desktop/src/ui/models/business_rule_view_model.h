@@ -61,10 +61,10 @@ public:
     QVariant data(Column column, const int role = Qt::DisplayRole) const;
     bool setData(Column column, const QVariant& value, int role);
 
-    void loadFromRule(nx::vms::event::RulePtr businessRule);
+    void loadFromRule(const nx::vms::event::RulePtr& businessRule);
     nx::vms::event::RulePtr createRule() const;
 
-    QString getText(Column column, const bool detailed = true) const;
+    QString getText(Column column, bool detailed = true) const;
     QString getToolTip(Column column) const;
     QIcon getIcon(Column column) const;
     int getHelpTopic(Column column) const;
@@ -77,8 +77,8 @@ public:
     bool isModified() const;
     void setModified(bool value);
 
-    nx::vms::event::EventType eventType() const;
-    void setEventType(const nx::vms::event::EventType value);
+    nx::vms::api::EventType eventType() const;
+    void setEventType(const nx::vms::api::EventType value);
 
     QSet<QnUuid> eventResources() const;
     void setEventResources(const QSet<QnUuid>& value);
@@ -86,14 +86,17 @@ public:
     nx::vms::event::EventParameters eventParams() const;
     void setEventParams(const nx::vms::event::EventParameters& params);
 
-    nx::vms::event::EventState eventState() const;
-    void setEventState(nx::vms::event::EventState state);
+    nx::vms::api::EventState eventState() const;
+    void setEventState(nx::vms::api::EventState state);
 
-    nx::vms::event::ActionType actionType() const;
-    void setActionType(const nx::vms::event::ActionType value);
+    nx::vms::api::ActionType actionType() const;
+    void setActionType(const nx::vms::api::ActionType value);
 
     QSet<QnUuid> actionResources() const;
     void setActionResources(const QSet<QnUuid>& value);
+
+    QSet<QnUuid> actionResourcesRaw() const;
+    void setActionResourcesRaw(const QSet<QnUuid>& value);
 
     bool isActionProlonged() const;
 
@@ -104,18 +107,33 @@ public:
     void setAggregationPeriod(int seconds);
 
     bool disabled() const;
-    void setDisabled(const bool value);
+    void setDisabled(bool value);
+
+    bool canUseSourceCamera() const;
+    bool isUsingSourceCamera() const;
+
+    QIcon iconForAction() const;
+
+    /**
+     * Get text for the Source field.
+     * @param detailed Detailed text is used in the table cell.
+     *   Not detailed - as the button caption and in the advanced view.
+     * @return Formatted text.
+     */
+    QString getSourceText(bool detailed) const;
+    QString getTargetText(bool detailed) const;
 
     QString schedule() const;
 
     /**
-    * param value binary string encoded as HEX. Each bit represent 1 hour of week schedule. First 24*7 bits is used. Rest of the string is ignored.
-    * First day of week is Monday independent of system settings
+    * @param value Binary string encoded as HEX. Each bit represent 1 hour of week schedule.
+    * First 24*7 bits is used. Rest of the string is ignored.
+    * First day of week is Monday independent of system settings.
     */
-    void setSchedule(const QString value);
+    void setSchedule(const QString& value);
 
     QString comments() const;
-    void setComments(const QString value);
+    void setComments(const QString& value);
 
     QStandardItemModel* eventTypesModel();
     QStandardItemModel* eventStatesModel();
@@ -132,29 +150,23 @@ private:
     void updateActionTypesModel();
     void updateEventStateModel();
 
-    /**
-     * @brief getSourceText     Get text for the Source field.
-     * @param detailed          Detailed text is used in the table cell.
-     *                          Not detailed - as the button caption and in the advanced view.
-     * @return                  Formatted text.
-     */
-    QString getSourceText(const bool detailed) const;
-    QString getTargetText(const bool detailed) const;
+
 
     QString getAggregationText() const;
 
-    static QString toggleStateToModelString(nx::vms::event::EventState value);
+    static QString toggleStateToModelString(nx::vms::api::EventState value);
     Fields updateEventClassRelatedParams();
+
 private:
     QnUuid m_id;
     bool m_modified;
 
-    nx::vms::event::EventType m_eventType;
+    nx::vms::api::EventType m_eventType;
     QSet<QnUuid> m_eventResources;
     nx::vms::event::EventParameters m_eventParams;
-    nx::vms::event::EventState m_eventState;
+    nx::vms::api::EventState m_eventState;
 
-    nx::vms::event::ActionType m_actionType;
+    nx::vms::api::ActionType m_actionType;
     QSet<QnUuid> m_actionResources;
     nx::vms::event::ActionParameters m_actionParams;
 

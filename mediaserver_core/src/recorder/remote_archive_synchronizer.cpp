@@ -89,7 +89,7 @@ void RemoteArchiveSynchronizer::at_resourceAdded(const QnResourcePtr& resource)
 
     connect(
         rawPtr,
-        &QnSecurityCamResource::scheduleDisabledChanged,
+        &QnSecurityCamResource::licenseUsedChanged,
         this,
         &RemoteArchiveSynchronizer::at_resourceStateChanged);
 
@@ -131,7 +131,6 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
         (status == Qn::Online || status == Qn::Recording)
         && camera->hasCameraCapabilities(Qn::RemoteArchiveCapability)
         && camera->isLicenseUsed()
-        && !camera->isScheduleDisabled()
         && !camera->hasFlags(Qn::foreigner);
 
     if (!canArchiveBeSynchronized)
@@ -141,15 +140,13 @@ void RemoteArchiveSynchronizer::at_resourceStateChanged(const QnResourcePtr& res
             "Resource belongs to this server %2"
             "Resource status: %3, "
             "Resource has remote archive capability: %4, "
-            "License is used for resource: %5, "
-            "Schedule is enabled for resource: %6")
+            "License is used for resource: %5")
                 .args(
                     camera->getUserDefinedName(),
                     !camera->hasFlags(Qn::foreigner),
                     status,
                     camera->hasCameraCapabilities(Qn::RemoteArchiveCapability),
-                    camera->isLicenseUsed(),
-                    !camera->isScheduleDisabled()));
+                    camera->isLicenseUsed()));
     }
 
     const auto id = camera->getId();

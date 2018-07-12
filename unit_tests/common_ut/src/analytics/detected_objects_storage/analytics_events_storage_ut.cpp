@@ -31,7 +31,7 @@ public:
     {
         m_settings.dbConnectionOptions.dbName =
             nx::utils::test::TestWithTemporaryDirectory::testDataDir() + "/events.sqlite";
-        m_settings.dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::sqlite;
+        m_settings.dbConnectionOptions.driverType = nx::sql::RdbmsDriverType::sqlite;
         m_settings.dbConnectionOptions.maxConnectionCount = 17;
 
         m_attributeDictionary.initialize(5, 2);

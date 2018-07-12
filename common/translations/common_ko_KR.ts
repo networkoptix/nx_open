@@ -53,11 +53,6 @@
       <translation>검색 된 시스템 %1는 호환 되지 않는 버전 %2.</translation>
     </message>
     <message>
-      <source>Cannot connect to the other System because current System is already connected to %1.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>현재 시스템 %1에 이미 연결 되어 있기 때문에 다른 시스템에 연결할 수 없습니다.</translation>
-    </message>
-    <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
       <translation>검색 된 시스템 %1 안전 모드입니다.</translation>
@@ -68,21 +63,6 @@
       <translation>원격 시스템 %1를 구성할 수 없습니다.</translation>
     </message>
     <message>
-      <source>Both Systems are connected to %1. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>두 시스템은 %1에 연결 됩니다. 병합 허용 되지 않습니다.</translation>
-    </message>
-    <message>
-      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>이러한 시스템은 다른 %1 URL로 연결됩니다. 병합할 수 없습니다.</translation>
-    </message>
-    <message>
-      <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
-    </message>
-    <message>
       <source>New System</source>
       <translation>새로운 시스템</translation>
     </message>
@@ -91,6 +71,26 @@
       <comment>%1 is name of System</comment>
       <translation>발견 된 시스템 %1이 (가) 현재 시스템과 호환되지 않습니다.</translation>
     </message>
+    <message>
+      <source>Cannot connect to the other System because current System is already connected to %1.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>현재 시스템 %1에 이미 연결 되어 있기 때문에 다른 시스템에 연결할 수 없습니다.</translation>
+    </message>
+    <message>
+      <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>%1시스템은 %1이외의 항목과 만 병합 할 수 있습니다. 시스템 이름과 암호는 %1 시스템에서 가져옵니다.</translation>
+    </message>
+    <message>
+      <source>Both Systems are connected to %1. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>두 시스템은 %1에 연결 됩니다. 병합 허용 되지 않습니다.</translation>
+    </message>
+    <message>
+      <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>이러한 시스템은 다른 %1 URL로 연결됩니다. 병합할 수 없습니다.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -98,6 +98,26 @@
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>시스템 이벤트</translation>
+    </message>
+    <message>
+      <source>System already bound to cloud (id %1)</source>
+      <translation>이미 클라우드 (id %1) 에 바인딩된 시스템</translation>
+    </message>
+    <message>
+      <source>Server is not connected to the Internet.</source>
+      <translation>서버가 인터넷에 연결되어 있지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud credentials to local DB</source>
+      <translation>로컬 DB에 클라우드 인증정보를 저장하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Failed to save cloud owner to local DB</source>
+      <translation>클라우드 소유자를 로컬 DB에 저장하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Could not connect to cloud: %1</source>
+      <translation>클라우드: %1 에 연결할 수 없습니다</translation>
     </message>
   </context>
   <context>
@@ -314,6 +334,10 @@
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
       <translation>장치 설정에서 우선 녹화모드 On하고 Fps를 줄이세요 (오류 &quot;%1&quot;).</translation>
     </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>펌웨어를 업데이트하십시오. 최소 지원 버전은 %1입니다. 현재 버전은 %2입니다</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -500,13 +524,13 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%n %2 는(은) %1에서 사용됩니다.</numerusform>
+        <numerusform>%n %2은 %1에 사용됩니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 는(은) %1에서 사용될 것입니다.</numerusform>
+        <numerusform>%n %2 은 %1에서 사용될 것입니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -553,7 +577,7 @@
       <translation>알 수 없는 오류</translation>
     </message>
     <message>
-      <source>Server with matching Hardware Id not found</source>
+      <source>Server with matching Hardware ID not found</source>
       <translation>HWID와 일치하는 서버를 찾지 못했습니다</translation>
     </message>
   </context>
@@ -569,13 +593,13 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n 카메라(들)</numerusform>
+        <numerusform>%n 카메라 (들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n 카메라 (들)</numerusform>
+        <numerusform>%n 카메라(들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -587,7 +611,7 @@
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n 장치</numerusform>
+        <numerusform>%n 장치(들)</numerusform>
       </translation>
     </message>
     <message>
@@ -625,13 +649,13 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n I/O 모듈</numerusform>
+        <numerusform>%n I/O 장치(들)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O 모듈</numerusform>
+        <numerusform>%n I/O 장치(들)</numerusform>
       </translation>
     </message>
     <message>
@@ -670,12 +694,12 @@
       <translation>워터 마크: %1</translation>
     </message>
     <message>
-      <source>Hardware Id: %1</source>
-      <translation>하드웨어 Id: %1</translation>
-    </message>
-    <message>
       <source>Time License</source>
       <translation>Time Licenses</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>하드웨어 ID: %1</translation>
     </message>
   </context>
   <context>
@@ -810,145 +834,6 @@
     <message>
       <source>Invalid Parameter</source>
       <translation>유효하지 않은 변수</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeStrings</name>
-    <message>
-      <source>ms</source>
-      <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
-    </message>
-    <message>
-      <source>s</source>
-      <comment>Suffix for displaying seconds</comment>
-      <translation>초</translation>
-    </message>
-    <message>
-      <source>m</source>
-      <comment>Suffix for displaying minutes</comment>
-      <translation>분</translation>
-    </message>
-    <message>
-      <source>h</source>
-      <comment>Suffix for displaying hours</comment>
-      <translation>시간</translation>
-    </message>
-    <message>
-      <source>d</source>
-      <comment>Suffix for displaying days</comment>
-      <translation>일</translation>
-    </message>
-    <message>
-      <source>w</source>
-      <comment>Suffix for displaying weeks</comment>
-      <translation>주</translation>
-    </message>
-    <message>
-      <source>M</source>
-      <comment>Suffix for displaying months</comment>
-      <translation>분</translation>
-    </message>
-    <message>
-      <source>y</source>
-      <comment>Suffix for displaying years</comment>
-      <translation>년</translation>
-    </message>
-    <message>
-      <source>msec</source>
-      <comment>Long suffix for displaying milliseconds</comment>
-      <translation>밀리초</translation>
-    </message>
-    <message>
-      <source>sec</source>
-      <comment>Long suffix for displaying seconds</comment>
-      <translation>초</translation>
-    </message>
-    <message>
-      <source>min</source>
-      <comment>Long suffix for displaying minutes</comment>
-      <translation>분</translation>
-    </message>
-    <message>
-      <source>hrs</source>
-      <comment>Long suffix for displaying hours</comment>
-      <translation>시간</translation>
-    </message>
-    <message>
-      <source>days</source>
-      <comment>Long suffix for displaying days</comment>
-      <translation>일</translation>
-    </message>
-    <message>
-      <source>wks</source>
-      <comment>Long suffix for displaying weeks</comment>
-      <translation>wks</translation>
-    </message>
-    <message>
-      <source>mos</source>
-      <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
-    </message>
-    <message>
-      <source>yrs</source>
-      <comment>Long suffix for displaying years</comment>
-      <translation>년</translation>
-    </message>
-    <message numerus="yes">
-      <source>milliseconds</source>
-      <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
-        <numerusform>밀리초</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>seconds</source>
-      <comment>Full suffix for displaying seconds</comment>
-      <translation>
-        <numerusform>초</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>minutes</source>
-      <comment>Full suffix for displaying minutes</comment>
-      <translation>
-        <numerusform>분</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>hours</source>
-      <comment>Full suffix for displaying hours</comment>
-      <translation>
-        <numerusform>시간</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>days</source>
-      <comment>Full suffix for displaying days</comment>
-      <translation>
-        <numerusform>일</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>weeks</source>
-      <comment>Full suffix for displaying weeks</comment>
-      <translation>
-        <numerusform>주</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>months</source>
-      <comment>Full suffix for displaying months</comment>
-      <translation>
-        <numerusform>개월</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>years</source>
-      <comment>Full suffix for displaying years</comment>
-      <translation>
-        <numerusform>년</numerusform>
-      </translation>
     </message>
   </context>
   <context>
@@ -1495,6 +1380,10 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%2 에서 %1</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>레이아웃 열기...</translation>
     </message>
   </context>
   <context>

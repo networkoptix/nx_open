@@ -78,16 +78,10 @@ qint64 estimatedExportVideoSizeMb(const QnMediaResourcePtr& mediaResource, qint6
     return maxBitrateMBps * durationMs / (kMsPerSecond * kBitsPerByte);
 }
 
-bool exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, qint64 durationMs)
-{
-    const auto videoSizeMb = estimatedExportVideoSizeMb(mediaResource, durationMs);
-    return (videoSizeMb + kReservedClientSizeMb > kMaximimumExeFileSizeMb);
-}
-
 QSize estimatedResolution(const QnMediaResourcePtr& mediaResource)
 {
     if (const auto camera = mediaResource.dynamicCast<QnVirtualCameraResource>())
-        return camera->defaultStream().getResolution();
+        return camera->streamInfo().getResolution();
     return QSize();
 }
 
@@ -101,10 +95,10 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 {
     const auto loader = qnClientModule->cameraDataManager()->loader(settings.mediaResource, false);
     const auto periods = loader
-        ? loader->periods(Qn::RecordingContent).intersected(settings.timePeriod)
+        ? loader->periods(Qn::RecordingContent).intersected(settings.period)
         : QnTimePeriodList();
     const auto durationMs = periods.isEmpty()
-        ? settings.timePeriod.durationMs
+        ? settings.period.durationMs
         : periods.duration();
 
     Results results;
@@ -148,7 +142,7 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
 {
     Results results;
 
-    const auto isExecutable = FileExtensionUtils::isExecutable(settings.filename.extension);
+    const auto isExecutable = FileExtensionUtils::isExecutable(settings.fileName.extension);
     qint64 totalDurationMs = 0;
     qint64 estimatedTotalSizeMb = 0;
 
@@ -189,6 +183,25 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
         results.set(int(Result::tooBigExeFile));
 
     return results;
+}
+
+bool ExportMediaValidator::exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, qint64 durationMs)
+{
+    const auto videoSizeMb = estimatedExportVideoSizeMb(mediaResource, durationMs);
+    return (videoSizeMb + kReservedClientSizeMb > kMaximimumExeFileSizeMb);
+}
+
+bool ExportMediaValidator::exeFileIsTooBig(
+    const QnLayoutResourcePtr& layout,
+    qint64 durationMs)
+{
+    qint64 videoSizeMb = 0;
+    for (const auto& resource : layout->layoutResources())
+    {
+        if (const QnMediaResourcePtr& media = resource.dynamicCast<QnMediaResource>())
+            videoSizeMb += estimatedExportVideoSizeMb(media, durationMs);
+    }
+    return (videoSizeMb + kReservedClientSizeMb > kMaximimumExeFileSizeMb);
 }
 
 } // namespace desktop

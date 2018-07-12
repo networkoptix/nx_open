@@ -1,26 +1,27 @@
 #include "test_ldap_rest_handler.h"
 
 #include <network/tcp_connection_priv.h>
-#include "utils/common/ldap.h"
-#include "nx_ec/data/api_conversion_functions.h"
-#include "ldap/ldap_manager.h"
-#include <network/authenticate_helper.h>
+#include <network/universal_tcp_listener.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx/mediaserver/ldap_manager.h>
+#include <utils/common/ldap.h>
 
 int QnTestLdapSettingsHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
-    const QnRestConnectionProcessor*)
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray& body,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
 {
-    QN_UNUSED(path, params);
 
     QnLdapSettings settings = QJson::deserialized(body, QnLdapSettings());
 
     QnLdapUsers ldapUsers;
-    Qn::LdapResult ldapResult = qnAuthHelper->ldapManager()->fetchUsers(ldapUsers, settings);
-    if (ldapResult != Qn::Ldap_NoError) {
-        result.setError(QnRestResult::CantProcessRequest, QnLdapManager::errorMessage(ldapResult));
+    const auto ldapResult = QnUniversalTcpListener::authenticator(owner->owner())->ldapManager()
+        ->fetchUsers(ldapUsers, settings);
+    if (ldapResult != nx::mediaserver::LdapResult::NoError)
+    {
+        result.setError(QnRestResult::CantProcessRequest, toString(ldapResult));
         return nx::network::http::StatusCode::ok;
     }
 

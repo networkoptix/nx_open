@@ -120,8 +120,12 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     while (1)
     {
         result = m_baseDelegate->getNextData();
-        if (!result || result->dataType == QnAbstractMediaData::EMPTY_DATA)
+        if (!result
+            || result->dataType == QnAbstractMediaData::EMPTY_DATA
+            || result->dataType == QnAbstractMediaData::GENERIC_METADATA)
+        {
             break;
+        }
         if (result->dataType == QnAbstractMediaData::VIDEO &&
             result->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey) &&
             (int)result->channelNumber == m_nextChannelNum)
@@ -158,4 +162,9 @@ void QnThumbnailsArchiveDelegate::setGroupId(const QByteArray& groupId)
 QnAbstractArchiveDelegate::ArchiveChunkInfo QnThumbnailsArchiveDelegate::getLastUsedChunkInfo() const
 {
     return m_baseDelegate->getLastUsedChunkInfo();
+}
+
+CameraDiagnostics::Result QnThumbnailsArchiveDelegate::lastError() const
+{
+    return m_baseDelegate->lastError();
 }

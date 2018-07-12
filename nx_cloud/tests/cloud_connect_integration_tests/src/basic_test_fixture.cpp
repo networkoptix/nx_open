@@ -47,6 +47,11 @@ bool MemoryRemoteRelayPeerPool::connectToDb()
     return false;
 }
 
+bool MemoryRemoteRelayPeerPool::isConnected() const
+{
+    return false;
+}
+
 cf::future<bool> MemoryRemoteRelayPeerPool::removePeer(const std::string& domainName)
 {
     m_relayTest->peerRemoved(domainName);
@@ -59,6 +64,8 @@ cf::future<std::string> MemoryRemoteRelayPeerPool::findRelayByDomain(
     auto redirectToEndpoint = m_relayTest->relayInstanceEndpoint(0).toStdString();
     return cf::make_ready_future<std::string>(std::move(redirectToEndpoint));
 }
+
+//-------------------------------------------------------------------------------------------------
 
 BasicTestFixture::BasicTestFixture(
     int relayCount,
@@ -88,7 +95,7 @@ void BasicTestFixture::setUpRemoteRelayPeerPoolFactoryFunc()
         {
             return std::make_unique<MemoryRemoteRelayPeerPool>(this);
         };
-    RemoteRelayPeerPoolFactory::setFactoryFunc(createRemoteRelayPeerPoolFunc);
+    RemoteRelayPeerPoolFactory::instance().setCustomFunc(createRemoteRelayPeerPoolFunc);
 }
 
 BasicTestFixture::~BasicTestFixture()
@@ -218,7 +225,7 @@ void BasicTestFixture::assertConnectionCanBeEstablished()
     auto clientSocketGuard = makeScopeGuard([this]() { m_clientSocket->pleaseStopSync(); });
     ASSERT_TRUE(m_clientSocket->setNonBlockingMode(true));
 
-    nx::String targetAddress =
+    std::string targetAddress =
         m_remotePeerName
         ? *m_remotePeerName
         : serverSocketCloudAddress();
@@ -271,9 +278,9 @@ nx::cloud::relay::test::Launcher& BasicTestFixture::trafficRelay()
     return *m_relays[0];
 }
 
-nx::String BasicTestFixture::serverSocketCloudAddress() const
+std::string BasicTestFixture::serverSocketCloudAddress() const
 {
-    return m_cloudSystemCredentials.systemId;
+    return m_cloudSystemCredentials.systemId.toStdString();
 }
 
 const hpm::api::SystemCredentials& BasicTestFixture::cloudSystemCredentials() const
@@ -323,7 +330,7 @@ void BasicTestFixture::waitForServerStatusOnRelay(ServerRelayStatus status)
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
-void BasicTestFixture::setRemotePeerName(const nx::String& remotePeerName)
+void BasicTestFixture::setRemotePeerName(const std::string& remotePeerName)
 {
     m_remotePeerName = remotePeerName;
 }
@@ -342,13 +349,15 @@ void BasicTestFixture::initializeCloudModulesXmlWithDirectStunPort()
 {
     static const char* const kCloudModulesXmlTemplate = R"xml(
         <sequence>
-            <set resName="hpm" resValue="stun://%1"/>
+            <set resName="hpm.tcpUrl" resValue="stun://%1"/>
+            <set resName="hpm.udpUrl" resValue="stun://%2"/>
         </sequence>
     )xml";
 
     m_cloudModulesXmlProvider.registerStaticProcessor(
         kCloudModulesXmlPath,
-        lm(kCloudModulesXmlTemplate).arg(m_mediator.stunEndpoint()).toUtf8(),
+        lm(kCloudModulesXmlTemplate).args(
+            m_mediator.stunTcpEndpoint(), m_mediator.stunUdpEndpoint()).toUtf8(),
         "application/xml");
 }
 
@@ -356,10 +365,8 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
 {
     static const char* kCloudModulesXmlTemplate = R"xml(
         <sequence>
-            <sequence>
-                <set resName="hpm.tcpUrl" resValue="http://%1%2"/>
-                <set resName="hpm.udpUrl" resValue="stun://%3"/>
-            </sequence>
+            <set resName="hpm.tcpUrl" resValue="http://%1%2"/>
+            <set resName="hpm.udpUrl" resValue="stun://%3"/>
         </sequence>
     )xml";
 
@@ -367,7 +374,7 @@ void BasicTestFixture::initializeCloudModulesXmlWithStunOverHttp()
         kCloudModulesXmlPath,
         lm(kCloudModulesXmlTemplate)
             .arg(m_mediator.httpEndpoint()).arg(nx::hpm::api::kMediatorApiPrefix)
-            .arg(m_mediator.stunEndpoint()).toUtf8(),
+            .arg(m_mediator.stunUdpEndpoint()).toUtf8(),
         "application/xml");
 }
 

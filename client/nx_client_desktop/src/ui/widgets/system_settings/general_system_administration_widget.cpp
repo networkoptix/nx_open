@@ -2,6 +2,7 @@
 #include "ui_general_system_administration_widget.h"
 
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QAction>
 
 #include <api/runtime_info_manager.h>
 
@@ -11,12 +12,10 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx_ec/data/api_runtime_data.h>
-
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/custom_painted.h>
+#include <nx/client/desktop/common/utils/custom_painted.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -28,9 +27,10 @@
 
 #include <nx/utils/string.h>
 
+#include <nx/client/desktop/common/widgets/hint_button.h>
 #include <utils/common/event_processors.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -40,7 +40,7 @@ static const int kMaxSystemNameLength = 64;
 static const int kPreferencesButtonSize = 104;
 static const QMargins kPreferencesButtonMargins(8, 4, 8, 4);
 
-} // unnamed namespace
+} // namespace
 
 QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget *parent /* = nullptr*/) :
     base_type(parent),
@@ -48,6 +48,8 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     ui(new Ui::GeneralSystemAdministrationWidget)
 {
     ui->setupUi(this);
+
+    ui->forceVideoEncryptionWarning->setVisible(false);
 
     ui->systemNameLabel->setMaximumWidth(kMaxSystemNameLabelWidth);
     ui->systemNameLabel->setValidator(
@@ -57,9 +59,9 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
             return !text.isEmpty();
         });
 
-    connect(ui->systemNameLabel, &QnEditableLabel::textChanging,
+    connect(ui->systemNameLabel, &EditableLabel::textChanging,
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
-    connect(ui->systemNameLabel, &QnEditableLabel::editingFinished,
+    connect(ui->systemNameLabel, &EditableLabel::editingFinished,
         this, &QnGeneralSystemAdministrationWidget::hasChangesChanged);
 
     auto buttonLayout = new QHBoxLayout(ui->buttonWidget);
@@ -127,26 +129,34 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(m_buttons[kHealthMonitorButton], Qn::Administration_General_HealthMonitoring_Help);
     setHelpTopic(m_buttons[kBookmarksButton    ], Qn::Bookmarks_Usage_Help);
 
+    auto backupHint = nx::client::desktop::HintButton::hintThat(ui->backupGroupBox);
+    backupHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
+    backupHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
+    setHelpTopic(backupHint, Qn::SystemSettings_Server_Backup_Help);
+
     connect(m_buttons[kBusinessRulesButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(action::OpenBusinessRulesAction); });
+        [this] { menu()->trigger(ui::action::OpenBusinessRulesAction); });
 
     connect(m_buttons[kCameraListButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(action::CameraListAction); });
+        [this] { menu()->trigger(ui::action::CameraListAction); });
 
     connect(m_buttons[kAuditLogButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(action::OpenAuditLogAction); });
+        [this] { menu()->trigger(ui::action::OpenAuditLogAction); });
 
     connect(m_buttons[kEventLogButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(action::OpenBusinessLogAction); });
+        [this] { menu()->trigger(ui::action::OpenBusinessLogAction); });
 
     connect(m_buttons[kHealthMonitorButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(action::OpenInNewTabAction, resourcePool()->getResourcesWithFlag(Qn::server)); });
+        [this] { menu()->trigger(ui::action::OpenInNewTabAction, resourcePool()->getResourcesWithFlag(Qn::server)); });
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(action::OpenBookmarksSearchAction); });
+        [this] { menu()->trigger(ui::action::OpenBookmarksSearchAction); });
 
     connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->systemSettingsWidget, &QnSystemSettingsWidget::forceVideoTrafficEncryptionChanged,
+        ui->forceVideoEncryptionWarning, &QWidget::setVisible);
 }
 
 void QnGeneralSystemAdministrationWidget::loadDataToUi()
@@ -154,12 +164,16 @@ void QnGeneralSystemAdministrationWidget::loadDataToUi()
     ui->systemNameLabel->setText(qnGlobalSettings->systemName());
     ui->systemSettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
+    if(!qnGlobalSettings->isVideoTrafficEncriptionForced())
+        ui->forceVideoEncryptionWarning->hide();
 }
 
 void QnGeneralSystemAdministrationWidget::applyChanges()
 {
     ui->systemSettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
+    ui->forceVideoEncryptionWarning->hide();
+
     qnGlobalSettings->setSystemName(ui->systemNameLabel->text().trimmed());
     qnGlobalSettings->synchronizeNow();
 }
@@ -182,7 +196,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     m_buttons[kCameraListButton   ]->setText(
         QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(), tr("Device List"), tr("Camera List")));
 
-    auto shortcutString = [this](const action::IDType actionId, const QString &baseString) -> QString
+    auto shortcutString = [this](const ui::action::IDType actionId, const QString &baseString) -> QString
     {
         auto shortcut = action(actionId)->shortcut();
         if (shortcut.isEmpty())
@@ -192,28 +206,33 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
 
-    m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(action::BusinessEventsAction,
+    m_buttons[kBusinessRulesButton]->setToolTip(shortcutString(ui::action::BusinessEventsAction,
         tr("Open Event Rules Management")));
 
-    m_buttons[kEventLogButton]->setToolTip(shortcutString(action::OpenBusinessLogAction,
+    m_buttons[kEventLogButton]->setToolTip(shortcutString(ui::action::OpenBusinessLogAction,
         tr("Open Event Log")));
 
-    m_buttons[kAuditLogButton]->setToolTip(shortcutString(action::OpenAuditLogAction,
+    m_buttons[kAuditLogButton]->setToolTip(shortcutString(ui::action::OpenAuditLogAction,
         tr("Open Audit Trail Log")));
 
-    m_buttons[kBookmarksButton]->setToolTip(shortcutString(action::OpenBookmarksSearchAction,
+    m_buttons[kBookmarksButton]->setToolTip(shortcutString(ui::action::OpenBookmarksSearchAction,
         tr("Open Bookmarks List")));
 
     m_buttons[kHealthMonitorButton]->setToolTip(
         tr("Monitor All Servers on a Single Layout"));
 
-    m_buttons[kCameraListButton]->setToolTip(shortcutString(action::CameraListAction,
+    m_buttons[kCameraListButton]->setToolTip(shortcutString(ui::action::CameraListAction,
         QnDeviceDependentStrings::getDefaultNameFromSet(
             resourcePool(),
             tr("Open Device List"),
             tr("Open Camera List"))));
 
     ui->systemSettingsWidget->retranslateUi();
+}
+
+void QnGeneralSystemAdministrationWidget::resetWarnings()
+{
+    ui->forceVideoEncryptionWarning->hide();
 }
 
 bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const

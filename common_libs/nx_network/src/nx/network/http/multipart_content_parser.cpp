@@ -132,26 +132,26 @@ bool MultipartContentParser::setContentType(const StringType& contentType)
 {
     static const char multipartContentType[] = "multipart/";
 
-    // Analyzing response headers (if needed).
-    const nx::network::http::StringType::value_type* sepPos =
-        std::find(contentType.constData(), contentType.constData() + contentType.size(), ';');
-    if (sepPos == contentType.constData() + contentType.size())
-        return false;   //< Unexpected content type.
+    //analyzing response headers (if needed)
+    const nx::network::http::StringType::value_type* sepPos = 
+        std::find( contentType.constData(), contentType.constData()+contentType.size(), ';' );
+    if( sepPos == contentType.constData()+contentType.size() )
+        return false;   //unexpected content type
 
-    if (nx::network::http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType) - 1)
+    if( nx::network::http::ConstBufferRefType(contentType, 0, sizeof(multipartContentType)-1) 
         != multipartContentType)
     {
-        return false; //< Unexpected content type.
+        return false;   //unexpected content type
     }
 
-    // Searching first not-space.
+    // Searching first non-space.
     const nx::network::http::StringType::value_type* boundaryStart = std::find_if(
-        sepPos + 1,
-        contentType.constData() + contentType.size(),
-        std::not1(std::bind1st(std::equal_to<nx::network::http::StringType::value_type>(), ' ')));
-    if (boundaryStart == contentType.constData() + contentType.size())
+        sepPos+1,
+        contentType.constData()+contentType.size(),
+        [](const auto& val) { return val != ' ';  });
+    if( boundaryStart == contentType.constData()+contentType.size() )
     {
-        // Failed to read boundary marker.
+        //failed to read boundary marker
         return false;
     }
     if (!nx::network::http::ConstBufferRefType(contentType, boundaryStart - contentType.constData())

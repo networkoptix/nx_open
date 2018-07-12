@@ -34,6 +34,7 @@ public:
     ~VmsGatewayProcess();
 
     const std::vector<network::SocketAddress>& httpEndpoints() const;
+    network::SocketAddress reverseConnectionServerHttpEndpoint() const;
 
     relaying::RelayEngine& relayEngine();
     const relaying::RelayEngine& relayEngine() const;

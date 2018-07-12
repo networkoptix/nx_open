@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>Ручное обновление</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">Загрузить установщик</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Пожалуйста, убедитесь, в правильности конфигурации.</p>
-            </div>
-        </div>
-    </form>
-
     <h1>Дополнительные настройки системы</h1>
     <div class="alert alert-danger" role="alert">
         <b>Предупреждение!</b> Любые изменения на этой странице могут привести к неправильной работе сервера.
@@ -193,7 +182,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] ||'пусто'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Предупреждение!</b> Некоторые изменения требуют перезапуска всех серверов в системе <b>всех</b> серверов в системе.<br><br>
+        <b>Предупреждение!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Перезапуск текущего сервера</button>
         </div>

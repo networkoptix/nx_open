@@ -15,20 +15,18 @@
 
 #include <client_core/client_core_settings.h>
 #include <client_core/connection_context_aware.h>
-
 #include <cloud/cloud_connection.h>
-
-#include <utils/common/delayed.h>
+#include <network/cloud_system_data.h>
 #include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
+#include <utils/common/guarded_callback.h>
+#include <utils/common/id.h>
 
-#include <nx_ec/data/api_cloud_system_data.h>
-
-#include <nx/utils/string.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/fusion/model_functions.h>
-
-#include <network/cloud_system_data.h>
+#include <nx/utils/string.h>
+#include <nx/vms/api/data/cloud_system_data.h>
 
 using namespace nx::cdb;
 
@@ -71,7 +69,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
         if (!isCustomizationCompatible(customization, isMobile))
             continue;
 
-        auto data = QJson::deserialized<ec2::ApiCloudSystemData>(
+        auto data = QJson::deserialized<nx::vms::api::CloudSystemData>(
             QByteArray::fromStdString(systemData.opaque));
 
         QnCloudSystem system;
@@ -116,6 +114,7 @@ public:
 
     std::unique_ptr<api::Connection> cloudConnection;
     std::unique_ptr<api::Connection> temporaryConnection;
+    std::unique_ptr<api::Connection> resendActivationConnection;
 
     QnCloudStatusWatcher::Status status;
 
@@ -276,7 +275,7 @@ void QnCloudStatusWatcher::resetCredentials()
     setCredentials(QnEncodedCredentials());
 }
 
-void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
+bool QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
@@ -284,7 +283,7 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         QnEncodedCredentials(credentials.user.toLower(), credentials.password.value());
 
     if (d->credentials == loweredCredentials)
-        return;
+        return false;
 
     const bool userChanged = (d->credentials.user != loweredCredentials.user);
     const bool passwordChanged = (d->credentials.password != loweredCredentials.password);
@@ -299,6 +298,8 @@ void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credential
         emit this->loginChanged();
     if (passwordChanged)
         emit this->passwordChanged();
+
+    return true;
 }
 
 QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials()
@@ -369,14 +370,21 @@ void QnCloudStatusWatcher::updateSystems()
                             d->setStatus(QnCloudStatusWatcher::Online,
                                 QnCloudStatusWatcher::NoError);
                             break;
+                        case api::ResultCode::badUsername:
+                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
+                                QnCloudStatusWatcher::InvalidEmail);
+                            break;
                         case api::ResultCode::notAuthorized:
                             d->setStatus(QnCloudStatusWatcher::LoggedOut,
-                                QnCloudStatusWatcher::InvalidCredentials);
+                                QnCloudStatusWatcher::InvalidPassword);
                             break;
                         case api::ResultCode::accountNotActivated:
                             d->setStatus(QnCloudStatusWatcher::LoggedOut,
                                 QnCloudStatusWatcher::AccountNotActivated);
                             break;
+                        case api::ResultCode::accountBlocked:
+                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
+                                QnCloudStatusWatcher::UserTemporaryLockedOut);
                         default:
                             d->setStatus(QnCloudStatusWatcher::Offline,
                                 QnCloudStatusWatcher::UnknownError);
@@ -387,6 +395,26 @@ void QnCloudStatusWatcher::updateSystems()
             executeDelayed(handler, 0, guard->thread());
         }
     );
+}
+
+void QnCloudStatusWatcher::resendActivationEmail(const QString& email)
+{
+    Q_D(QnCloudStatusWatcher);
+    if (!d->resendActivationConnection)
+        d->resendActivationConnection = qnCloudConnectionProvider->createConnection();
+
+    const auto callback =
+        [this](api::ResultCode result, api::AccountConfirmationCode code)
+        {
+            const bool success =
+                result == api::ResultCode::ok || result == api::ResultCode::partialContent;
+
+            emit activationEmailResent(success);
+        };
+
+    const api::AccountEmail account{email.toStdString()};
+    const auto accountManager = d->resendActivationConnection->accountManager();
+    accountManager->reactivateAccount(account, guarded(this, callback));
 }
 
 QnCloudSystemList QnCloudStatusWatcher::cloudSystems() const
@@ -462,7 +490,9 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
     {
         const auto error = (initial || credentials.isEmpty())
             ? QnCloudStatusWatcher::NoError
-            : QnCloudStatusWatcher::InvalidCredentials;
+            : credentials.user.isEmpty()
+              ? QnCloudStatusWatcher::InvalidEmail
+              : QnCloudStatusWatcher::InvalidPassword;
         setStatus(QnCloudStatusWatcher::LoggedOut, error);
         setCloudSystems(QnCloudSystemList());
         q->setEffectiveUserName(QString());
@@ -690,3 +720,4 @@ void QnCloudStatusWatcherPrivate::prolongTemporaryCredentials()
 
     temporaryConnection->ping(completionHandler);
 }
+

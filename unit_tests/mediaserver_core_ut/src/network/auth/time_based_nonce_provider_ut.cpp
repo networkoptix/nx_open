@@ -2,7 +2,7 @@
 
 #include <thread>
 
-#include <network/auth/time_based_nonce_provider.h>
+#include <nx/vms/auth/time_based_nonce_provider.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 

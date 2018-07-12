@@ -12,9 +12,8 @@
 
 #include <translation/translation_manager.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -61,7 +60,12 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
     setHelpTopic(ui->showIpInTreeCheckBox,                                    Qn::SystemSettings_General_ShowIpInTree_Help);
 
-    auto aligner = new QnAligner(this);
+    ui->showIpInTreeCheckBoxHint->setHint(tr("Displays IP addresses for cameras and servers and roles for users."));
+    ui->timeModeLabel->setHint(tr("Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones."));
+    ui->tourCycleTimeLabel->setHint(tr("Length of time each camera on layout will be displayed if you start a Tour."));
+    setHelpTopic(ui->tourCycleTimeLabel, Qn::SystemSettings_General_TourCycleTime_Help);
+
+    auto aligner = new Aligner(this);
     aligner->addWidgets({
         ui->languageLabel,
         ui->timeModeLabel,

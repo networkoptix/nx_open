@@ -8,9 +8,13 @@
 #include <QtGui/QColor>
 #include <QtCore/QDebug>
 
+#include <nx/network/socket_common.h>
+
 #include <utils/media/sse_helper.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
+
+#include <nx/utils/log/log.h>
 
 // TODO: #Elric move to config?
 // see https://code.google.com/p/arxlib/source/browse/include/arx/Utility.h
@@ -1019,12 +1023,19 @@ CLConstVideoDecoderOutputPtr QnMotionEstimation::decodeFrame(const QnCompressedV
     QnMutexLocker lock(&m_mutex);
     CLVideoDecoderOutputPtr videoDecoderOutput(new CLVideoDecoderOutput());
 
+    // TODO: This always makes a deep copy of the frame, which is helpful to supply the frame to
+    // metadata plugins. To optimize, rewrite video decoding via AbstractVideoDecoder: the frame
+    // will use its internal reference counting.
+    videoDecoderOutput->setUseExternalData(true);
+
     if (!m_decoder && !(frame->flags & AV_PKT_FLAG_KEY))
         return CLConstVideoDecoderOutputPtr{nullptr};
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
+        NX_VERBOSE(this) << lm("Recreating decoder, old codec_id: %1")
+            .arg(!m_decoder ? -1 : m_decoder->getContext()->codec_id);
         delete m_decoder;
-        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, false);
+        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, /*mtDecoding*/ false);
     }
 
     m_decoder->getContext()->flags &= ~CODEC_FLAG_GRAY; //< Turn off Y-only mode.
@@ -1047,7 +1058,7 @@ bool QnMotionEstimation::analyzeFrame(const QnCompressedVideoDataPtr& frame,
     if (!m_decoder || m_decoder->getContext()->codec_id != frame->compressionType)
     {
         delete m_decoder;
-        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, false);
+        m_decoder = new QnFfmpegVideoDecoder(frame->compressionType, frame, /*mtDecoding*/ false);
     }
 
     // Turn on Y-only mode if the decoded frame was not requested from this function.

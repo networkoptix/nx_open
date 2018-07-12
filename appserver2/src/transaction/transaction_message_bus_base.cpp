@@ -2,26 +2,25 @@
 #include <common/common_module.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 #include <ec_connection_notification_manager.h>
-#include <database/db_manager.h>
+
+using namespace nx::vms;
 
 namespace ec2 {
 
 TransactionMessageBusBase::TransactionMessageBusBase(
-    detail::QnDbManager* db,
-    Qn::PeerType peerType,
+    api::PeerType peerType,
     QnCommonModule* commonModule,
     QnJsonTransactionSerializer* jsonTranSerializer,
     QnUbjsonTransactionSerializer* ubjsonTranSerializer)
-:
+    :
     AbstractTransactionMessageBus(commonModule),
-    m_db(db),
     m_thread(new QThread()),
     m_jsonTranSerializer(jsonTranSerializer),
     m_ubjsonTranSerializer(ubjsonTranSerializer),
     m_localPeerType(peerType),
     m_mutex(QnMutex::Recursive)
 {
-    qRegisterMetaType<Qn::PeerType>();
+    qRegisterMetaType<api::PeerType>();
     moveToThread(m_thread);
 }
 
@@ -85,11 +84,5 @@ ConnectionGuardSharedState* TransactionMessageBusBase::connectionGuardSharedStat
 {
     return &m_connectionGuardSharedState;
 }
-
-void TransactionMessageBusBase::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
-{
-    m_timeSyncManager = timeSyncManager;
-}
-
 
 } // namespace ec2

@@ -23,6 +23,8 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace nx::vms;
+
 QnClientMessageProcessor::QnClientMessageProcessor(QObject* parent):
     base_type(parent),
     m_status(),
@@ -79,7 +81,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
     else if (m_connected)
     { // double init by null is allowed
         NX_ASSERT(!commonModule()->remoteGUID().isNull());
-        ec2::ApiPeerAliveData data;
+        api::PeerAliveData data;
         data.peer.id = commonModule()->remoteGUID();
         commonModule()->setRemoteGUID(QnUuid());
         m_connected = false;
@@ -114,6 +116,11 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
     }
 }
 
+Qt::ConnectionType QnClientMessageProcessor::handlerConnectionType() const
+{
+    return Qt::QueuedConnection;
+}
+
 void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
     base_type::connectToConnection(connection);
@@ -125,7 +132,7 @@ void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnClientMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+void QnClientMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
     if (qnClientCoreModule->layoutTourStateManager()->isChanged(tour.id))
         return;
@@ -185,7 +192,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
     }
 }
 
-void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType)
+void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, api::PeerType peerType)
 {
     base_type::handleRemotePeerFound(peer, peerType);
 
@@ -212,7 +219,7 @@ void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType p
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType)
+void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, api::PeerType peerType)
 {
     base_type::handleRemotePeerLost(peer, peerType);
 
@@ -253,7 +260,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType pe
     }
 }
 
-void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
+void QnClientMessageProcessor::onGotInitialNotification(const api::FullInfoData& fullData)
 {
     NX_DEBUG(this, lit("resources received, state -> Ready"));
     QnCommonMessageProcessor::onGotInitialNotification(fullData);

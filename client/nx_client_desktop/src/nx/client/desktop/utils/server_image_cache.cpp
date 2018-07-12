@@ -27,9 +27,12 @@ QSize ServerImageCache::getMaxImageSize() const {
 }
 
 
-QString ServerImageCache::cachedImageFilename(const QString &sourcePath) {
+QString ServerImageCache::cachedImageFilename(const QString &sourcePath)
+{
+    static const QSet<QString> kAllowedExtensions{lit("png"), lit("jpg"), lit("jpeg")};
+
     QString ext = QFileInfo(sourcePath).suffix();
-    if (ext.isEmpty())
+    if (!kAllowedExtensions.contains(ext))
         ext = lit("png");
 
     QString uuid = guidFromArbitraryData(sourcePath.toUtf8()).toString();

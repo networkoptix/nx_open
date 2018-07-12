@@ -29,8 +29,8 @@ angular.module('cloudApp')
         $scope.openSystem = function(system){
             $location.path('/systems/' + system.id);
         };
-        $scope.getSystemOwnerName = function(system){
-            return systemsProvider.getSystemOwnerName(system);
+        $scope.getSystemOwnerName = function(system, currentEmail){
+            return systemsProvider.getSystemOwnerName(system, currentEmail);
         };
 
         $scope.search = {value:''};
@@ -45,8 +45,4 @@ angular.module('cloudApp')
                     hasMatch(system.ownerFullName, search) ||
                     hasMatch(system.ownerAccountEmail, search);
         };
-
-        $scope.$on('$destroy', function(){
-            dialogs.dismissNotifications();
-        });
     }]);

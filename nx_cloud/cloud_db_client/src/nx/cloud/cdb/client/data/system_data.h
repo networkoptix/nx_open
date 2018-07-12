@@ -86,7 +86,11 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const system
 #define SystemAccessRoleData_Fields (accessRole)
 #define SystemAccessRoleList_Fields (accessRoles)
 
-#define SystemDataEx_Fields SystemData_Fields(ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth)(usageFrequency)(lastLoginTime)
+#define SystemMergeInfo_Fields (role)(startTime)(anotherSystemId)
+
+#define SystemDataEx_Fields SystemData_Fields \
+    (ownerFullName)(accessRole)(sharingPermissions)(stateOfHealth) \
+    (usageFrequency)(lastLoginTime)(mergeInfo)(capabilities)
 #define SystemDataExList_Fields (systems)
 
 
@@ -107,8 +111,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
-        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList) \
+    (SystemMergeInfo)(SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList) \
+        (SystemSharingEx)(SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList) \
         (SystemHealthHistoryItem)(SystemHealthHistory),
     (json));
 
@@ -116,6 +120,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemStatus)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemHealth)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::FilterField)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::MergeRole)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemCapabilityFlag)
 
 } // namespace api
 } // namespace cdb
@@ -125,3 +131,5 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemStatus), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemHealth), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemAccessRole), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::FilterField), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::MergeRole), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemCapabilityFlag), (lexical))

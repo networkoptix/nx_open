@@ -1,14 +1,15 @@
 #include <cassert>
 #include <algorithm>
 #include <string>
-#include "storage_db.h"
 #include <boost/scope_exit.hpp>
 
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
+#include <nx/utils/raii_guard.h>
 #include "utils/common/util.h"
+#include "storage_db.h"
 
 const uint8_t kDbVersion = 1;
 
@@ -17,14 +18,16 @@ const uint8_t kDbVersion = 1;
 */
 const int kMaxReadErrorCount = 2;
 
-namespace
-{
+namespace {
+
 const std::chrono::seconds kVacuumInterval(3600 * 24);
 
 class VacuumHandler : public nx::media_db::DbHelperHandler
 {
 public:
-    VacuumHandler(QnStorageDb::UuidToCatalogs &readData) : m_readData(readData) {}
+    VacuumHandler(QnStorageDb::UuidToCatalogs &readData):
+        m_readData(readData)
+    {}
 
 public:
     void handleCameraOp(const nx::media_db::CameraOperation &/*cameraOp*/,
@@ -50,6 +53,10 @@ public:
     {
         if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
             NX_LOG(lit("%1 temporary DB file write error: %2").arg(Q_FUNC_INFO).arg((int)error), cl_logWARNING);
+
+        if (++m_recordCount % 1000 == 0)
+            NX_VERBOSE(this, lm("[vacuum] %1 records written").args(m_recordCount));
+
         m_error = error;
     }
 
@@ -58,6 +65,7 @@ public:
 private:
     QnStorageDb::UuidToCatalogs &m_readData;
     nx::media_db::Error m_error = nx::media_db::Error::NoError;
+    int64_t m_recordCount = 0;
 };
 
 } // namespace <anonynous>
@@ -69,7 +77,7 @@ QnStorageDb::QnStorageDb(const QnStorageResourcePtr& s, int storageIndex):
     m_ioDevice(nullptr),
     m_lastReadError(nx::media_db::Error::NoError),
     m_lastWriteError(nx::media_db::Error::NoError),
-	m_readErrorCount(0),
+    m_readErrorCount(0),
     m_gen(m_rd()),
     m_vacuumTimePoint(std::chrono::system_clock::now()),
     m_vacuumThreadRunning(false)
@@ -403,77 +411,95 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
     return result;
 }
 
-bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
+QByteArray QnStorageDb::dbFileContent()
 {
-    QnMutexLocker lk(&m_readMutex);
-
-    BOOST_SCOPE_EXIT(this_)
+    std::unique_ptr<QIODevice> file(m_storage->open(m_dbFileName, QIODevice::ReadOnly));
+    if (!file)
     {
-        this_->m_dbHelper.setMode(nx::media_db::Mode::Write);
-        {
-            QnMutexLocker lock(&this_->m_syncMutex);
-            for (const auto& uth : this_->m_readUuidToHash)
-                this_->m_uuidToHash.insert(uth);
-        }
-    }
-    BOOST_SCOPE_EXIT_END
-
-    m_readData.clear();
-    m_dbHelper.setMode(nx::media_db::Mode::Read);
-
-    if (!resetIoDevice())
-    {
-        startDbFile();
-        return false;
+        NX_DEBUG(this, lm("Failed to open DB file %1").args(m_dbFileName));
+        return QByteArray();
     }
 
-    if (m_dbHelper.readFileHeader(&m_dbVersion) != nx::media_db::Error::NoError)
+    return file->readAll();
+}
+
+bool QnStorageDb::parseDbContent(QByteArray fileContent)
+{
+    QBuffer fileBuffer(&fileContent);
+    fileBuffer.open(QIODevice::ReadOnly);
+    m_dbHelper.setDevice(&fileBuffer);
+
+    auto err = m_dbHelper.readFileHeader(&m_dbVersion);
+    if (err != nx::media_db::Error::NoError)
     {
         NX_LOG(lit("%1 read DB header failed").arg(Q_FUNC_INFO), cl_logWARNING);
-        startDbFile();
-        return false;
-    }
-
-    NX_ASSERT(m_dbHelper.getDevice());
-
-    if ((!m_dbHelper.getDevice() || !m_ioDevice->isOpen()))
-    {
-        NX_LOG(lit("%1 DB file open error").arg(Q_FUNC_INFO), cl_logWARNING);
-        startDbFile();
         return false;
     }
 
     nx::media_db::Error error;
+    int64_t recordCount = 0;
     while ((error = m_dbHelper.readRecord()) == nx::media_db::Error::NoError)
     {
+        if (++recordCount % 1000 == 0)
+            NX_VERBOSE(this, lm("[vacuum] %1 records read from %2").args(recordCount, m_dbFileName));
+
         QnMutexLocker lk(&m_errorMutex);
         m_lastReadError = error;
     }
 
-    if (!vacuumInternal() && !startDbFile())
-        return false;
-
-    if (data)
-        *data = buildReadResult();
-
     return true;
+}
+
+bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
+{
+    QnMutexLocker lk(&m_readMutex);
+    auto resetModeGuard = QnRaiiGuard::createDestructible(
+        [this]()
+        {
+            m_dbHelper.setMode(nx::media_db::Mode::Write);
+            {
+                QnMutexLocker lock(&m_syncMutex);
+                for (const auto& uth : m_readUuidToHash)
+                    m_uuidToHash.insert(uth);
+            }
+        });
+
+    m_dbHelper.setMode(nx::media_db::Mode::Read);
+    m_ioDevice.reset();
+    m_readData.clear();
+
+    auto currentFileContent = dbFileContent();
+    bool res = m_storage->removeFile(m_dbFileName);
+    NX_ASSERT(res);
+    if (res)
+    {
+        if (parseDbContent(std::move(currentFileContent)) && vacuumInternal())
+        {
+            if (data)
+                *data = buildReadResult();
+            return true;
+        }
+    }
+    else
+    {
+        NX_LOG(lit("%1 DB remove file error").arg(Q_FUNC_INFO), cl_logWARNING);
+    }
+
+    startDbFile();
+    return false;
 }
 
 bool QnStorageDb::vacuumInternal()
 {
     NX_LOG("QnStorageDb::vacuumInternal begin", cl_logDEBUG1);
 
-    QString tmpDbFileName = m_dbFileName + ".tmp";
-    std::unique_ptr<QIODevice> tmpFile(m_storage->open(tmpDbFileName, QIODevice::ReadWrite | QIODevice::Unbuffered));
-    if (!tmpFile)
-    {
-        NX_LOG(lit("%1 temporary DB file open error").arg(Q_FUNC_INFO), cl_logWARNING);
-        return false;
-    }
+    QByteArray writeBuf;
+    QBuffer writeDevice(&writeBuf);
+    writeDevice.open(QIODevice::WriteOnly);
 
     VacuumHandler vh(m_readData);
     nx::media_db::DbHelper tmpDbHelper(&vh);
-    tmpDbHelper.setDevice(tmpFile.get());
+    tmpDbHelper.setDevice(&writeDevice);
     tmpDbHelper.setMode(nx::media_db::Mode::Write);
 
     nx::media_db::Error error = tmpDbHelper.writeFileHeader(m_dbVersion);
@@ -526,47 +552,23 @@ bool QnStorageDb::vacuumInternal()
             }
         }
     }
+
     if (vh.getError() == nx::media_db::Error::WriteError)
         return false;
+
     tmpDbHelper.setMode(nx::media_db::Mode::Read); // flush
 
-    m_ioDevice.reset();
-    bool res = m_storage->removeFile(m_dbFileName);
-    NX_ASSERT(res);
-    if (!res)
-        NX_LOG(lit("%1 temporary DB remove file error").arg(Q_FUNC_INFO), cl_logWARNING);
+    auto readDataCopy = m_readData;
+    uint8_t dbVersion = m_dbVersion;
 
-    tmpFile.reset();
-    res = m_storage->renameFile(tmpDbFileName, m_dbFileName);
-    NX_ASSERT(res);
-    if (!res)
-        NX_LOG(lit("%1 temporary DB rename file error").arg(Q_FUNC_INFO), cl_logWARNING);
-
-    res = resetIoDevice();
-    NX_ASSERT(res);
-    if (!res)
+    if (!parseDbContent(writeBuf))
         return false;
 
-    auto readDataCopy = m_readData;
-    uint8_t dbVersion;
-
-    m_readData.clear();
-    m_dbHelper.setMode(nx::media_db::Mode::Read);
-    NX_ASSERT(m_dbHelper.getDevice());
-
-    error = m_dbHelper.readFileHeader(&dbVersion);
-    NX_ASSERT(error == nx::media_db::Error::NoError);
     NX_ASSERT(dbVersion == m_dbVersion);
     if (error == nx::media_db::Error::ReadError || dbVersion != m_dbVersion)
     {
         NX_LOG(lit("%1 DB file read header error after vacuum").arg(Q_FUNC_INFO), cl_logWARNING);
         return false;
-    }
-
-    while ((error= m_dbHelper.readRecord()) == nx::media_db::Error::NoError)
-    {
-        QnMutexLocker lk(&m_errorMutex);
-        m_lastReadError = error;
     }
 
     bool isDataConsistent = checkDataConsistency(readDataCopy);
@@ -579,6 +581,10 @@ bool QnStorageDb::vacuumInternal()
 
     NX_LOG("QnStorageDb::vacuumInternal completed successfully", cl_logDEBUG1);
 
+    if (!resetIoDevice())
+        return false;
+
+    m_dbHelper.stream().writeRawData(writeBuf.constData(), writeBuf.size());
     return true;
 }
 
@@ -708,17 +714,17 @@ void QnStorageDb::handleError(nx::media_db::Error error)
 {
     QnMutexLocker lk(&m_errorMutex);
     if (error != nx::media_db::Error::NoError && error != nx::media_db::Error::Eof)
-	{
-		if (error == nx::media_db::Error::ReadError && m_readErrorCount >= kMaxReadErrorCount)
-		{
-			NX_LOG(lit("%1 DB read error %2. Read errors count = %3")
-					   .arg(Q_FUNC_INFO)
-					   .arg((int)error)
-					   .arg(m_readErrorCount),
-				   cl_logWARNING);
-			++m_readErrorCount;
-		}
-	}
+    {
+        if (error == nx::media_db::Error::ReadError && m_readErrorCount >= kMaxReadErrorCount)
+        {
+            NX_LOG(lit("%1 DB read error %2. Read errors count = %3")
+                       .arg(Q_FUNC_INFO)
+                       .arg((int)error)
+                       .arg(m_readErrorCount),
+                   cl_logWARNING);
+            ++m_readErrorCount;
+        }
+    }
     m_lastReadError = error;
 }
 

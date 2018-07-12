@@ -59,7 +59,7 @@
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation>Các máy chủ đã ngừng hoạt động</translation>
+      <translation>Máy chủ đã bị dừng</translation>
     </message>
     <message>
       <source>Server has been started</source>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>paused</source>
-      <translation>giờ nghĩ giảo lao</translation>
+      <translation>đã tạm dừng</translation>
     </message>
     <message>
       <source>pausing</source>

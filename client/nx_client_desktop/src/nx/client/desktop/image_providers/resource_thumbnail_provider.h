@@ -13,10 +13,14 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class ResourceThumbnailProvider: public QnImageProvider
+/**
+* This class allows receiving of thumbnails via http request to server or from local files.
+* Every setRequest() call will bring a new screenshot.
+*/
+class ResourceThumbnailProvider: public ImageProvider
 {
     Q_OBJECT
-    using base_type = QnImageProvider;
+    using base_type = ImageProvider;
 
 public:
     explicit ResourceThumbnailProvider(const api::ResourceImageRequest& request,

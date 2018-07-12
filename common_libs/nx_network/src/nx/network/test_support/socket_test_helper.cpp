@@ -30,9 +30,9 @@ QString NX_NETWORK_API toString(TestTrafficLimitType type)
 {
     switch (type)
     {
-        case TestTrafficLimitType::none: return lit("none");
-        case TestTrafficLimitType::incoming: return lit("incoming");
-        case TestTrafficLimitType::outgoing: return lit("outgoing");
+        case TestTrafficLimitType::none: return "none";
+        case TestTrafficLimitType::incoming: return "incoming";
+        case TestTrafficLimitType::outgoing: return "outgoing";
     }
 
     NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
@@ -43,10 +43,10 @@ QString NX_NETWORK_API toString(TestTransmissionMode type)
 {
     switch (type)
     {
-        case TestTransmissionMode::spam: return lit("spam");
-        case TestTransmissionMode::ping: return lit("ping");
-        case TestTransmissionMode::pong: return lit("pong");
-        case TestTransmissionMode::receiveOnly: return lit("receiveOnly");
+        case TestTransmissionMode::spam: return "spam";
+        case TestTransmissionMode::ping: return "ping";
+        case TestTransmissionMode::pong: return "pong";
+        case TestTransmissionMode::receiveOnly: return "receiveOnly";
     }
 
     NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
@@ -1012,7 +1012,6 @@ void MultipleClientSocketTester::connectAsync(
 
 SocketAddress MultipleClientSocketTester::modifyAddress(const SocketAddress& address)
 {
-    static std::atomic<size_t> enumirator(0);
     if (m_address == SocketAddress())
     {
         auto addressOpt = m_addressBinder->random(address);

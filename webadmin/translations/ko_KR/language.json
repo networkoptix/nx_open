@@ -1,5 +1,5 @@
 {
-    "language_name": "언어",
+    "language_name": "한국어",
     "dialogs": {
         "okButton": "Ok",
         "openLink": "이 링크를 방문",
@@ -14,7 +14,7 @@
         "minLengthMessage": "비밀번호는 8자 이상이어야 합니다",
         "requiredMessage": "라틴 문자, 숫자 및 키보드 기호만 사용할 수 있습니다.",
         "weakMessage": "암호는 다양한 유형의 기호를 포함 해야 합니다.",
-        "strongMessage": "강력한 패스워드!",
+        "strongMessage": "강력한 암호!",
         "commonMessage": "이 비밀번호는 매우 흔한 비밀번호입니다."
     },
     "settings": {
@@ -74,9 +74,9 @@
         "emailFrom": "전자 우편에서",
         "emailSignature": "이메일 서명",
         "emailSupportEmail": "지원 이메일",
-        "enableEdgeRecording": "엣지 녹화 활성화",
+        "enableEdgeRecording": "오디오 녹음을 사용",
         "eventLogPeriodDays": "이벤트 로그 기간(일)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "필요에 따라 init에서 카메라정보 삭제",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "필요에 따라 init값에서 카메라정보 삭제",
         "ldapAdminDn": "LDAP 관리자 DN",
         "ldapSearchBase": "LDAP 검색 기준",
         "ldapSearchFilter": "LDAP 검색 필터",
@@ -87,7 +87,7 @@
         "maxRecordQueueSizeBytes": "최대 기록 용량 (byte)",
         "maxRecordQueueSizeElements": "최대 기록 용량 (elements)",
         "maxRemoteArchiveSynchronizationThreads": "최대 원격 보관 동기화 스레드",
-        "maxRtspConnectDurationSeconds": "최대 Rtsp 연결 지속 시간",
+        "maxRtspConnectDurationSeconds": "최대 Rtsp 연결 지속 시간 (초)",
         "maxSceneItems": "최대 장면수(기본값 0)",
         "proxyConnectTimeoutSec": "프록시 연결 시간 초과 (초)",
         "rtpTimeoutMs": "RTP 휴식시간 (1/1000초)",
@@ -174,32 +174,5 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} 웹 인터페이스"
-    },
-    "common": {
-        "systemOffline": "시스템 오프라인",
-        "cameraLinks": {
-            "copyToClipboard": "클립보드에 복사",
-            "highStream": "고해상도 스트림",
-            "copyDefaultText": "복사",
-            "unknown": "알 수 없음",
-            "lowStream": "낮은 스트림",
-            "transcoding": "트랜스코딩",
-            "copyActiveText": "클립보드에 복사됨"
-        },
-        "searchCamPlaceholder": "검색",
-        "cameraStates": {
-            "noFormat": "이 브라우저 또는 장치는이 카메라의 비디오 재생을 지원하지 않습니다.",
-            "ieWin10": "Microsoft Edge 또는 Google 크롬 브라우저를 사용하십시오.",
-            "iosVideoTooLarge": "iOS는 fullHD (2MP: 1920x1080) 보다 큰 비디오를 지원하지 않습니다.",
-            "unauthorized": "인증이 필요합니다",
-            "ubuntuNX": "이 브라우저는 ARM 기반 서버의 비디오를 지원하지 않습니다. 대신 Chromium 브라우저를 사용하십시오.",
-            "ieNoWebm": "Internet Explorer에 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> WebM 코덱</a>를 설치 하십시요.",
-            "flashOrWebmRequired": "Internet Explorer에서 비디오를 재생하려면 <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> 또는 <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a>을 설치하십시오.",
-            "noArmSupport": "이 브라우저 또는 장치는 ARM 기반 서버의 비디오 재생을 지원하지 않습니다.",
-            "error": "오류",
-            "offline": "오프라인",
-            "noData": "데이터 없음",
-            "flashRequired": "ARM 기반 서버에서 비디오를 재생하려면 <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a>을 설치하십시오."
-        }
     }
 }

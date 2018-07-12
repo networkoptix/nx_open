@@ -2,7 +2,23 @@
 
 #include "nx_ec/ec_api.h"
 
-#include <transaction/transaction_log.h>
+#include <managers/license_notification_manager.h>
+#include <managers/resource_notification_manager.h>
+#include <managers/media_server_notification_manager.h>
+#include <managers/camera_notification_manager.h>
+#include <managers/user_notification_manager.h>
+#include <managers/event_rules_notification_manager.h>
+#include <managers/layout_notification_manager.h>
+#include <managers/layout_tour_notification_manager.h>
+#include <managers/videowall_notification_manager.h>
+#include <managers/webpage_notification_manager.h>
+#include <managers/stored_file_notification_manager.h>
+#include <managers/updates_notification_manager.h>
+#include <managers/misc_notification_manager.h>
+#include <managers/discovery_notification_manager.h>
+#include <managers/time_notification_manager.h>
+
+#include <transaction/transaction_descriptor.h>
 
 namespace ec2 {
 
@@ -18,6 +34,7 @@ public:
         QnMediaServerNotificationManager* mediaServerManager,
         QnCameraNotificationManager* cameraManager,
         QnUserNotificationManager* userManager,
+        QnTimeNotificationManager* timeManager,
         QnBusinessEventNotificationManager* businessEventManager,
         QnLayoutNotificationManager* layoutManager,
         QnLayoutTourNotificationManager* layoutTourManager,
@@ -29,7 +46,7 @@ public:
         QnDiscoveryNotificationManager* discoveryManager);
 
     template<typename T>
-    void triggerNotification(const QnTransaction<T> &tran, NotificationSource source)
+    void triggerNotification(const QnTransaction<T> &tran, ec2::NotificationSource source)
     {
         ec2::detail::NotificationParams notificationParams = {
             m_ecConnection,
@@ -38,6 +55,7 @@ public:
             m_mediaServerManager,
             m_cameraManager,
             m_userManager,
+            m_timeManager,
             m_businessEventManager,
             m_layoutManager,
             m_layoutTourManager,
@@ -65,6 +83,7 @@ private:
     QnMediaServerNotificationManager* m_mediaServerManager;
     QnCameraNotificationManager* m_cameraManager;
     QnUserNotificationManager* m_userManager;
+    QnTimeNotificationManager* m_timeManager;
     QnBusinessEventNotificationManager* m_businessEventManager;
     QnLayoutNotificationManager* m_layoutManager;
     QnLayoutTourNotificationManager* m_layoutTourManager;

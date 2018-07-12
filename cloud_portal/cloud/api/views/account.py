@@ -6,7 +6,6 @@ from rest_framework.serializers import ValidationError
 import django
 import base64
 from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist
 import api
 from api.controllers.cloud_api import Account
 from api.account_backend import AccountBackend
@@ -44,10 +43,7 @@ def login(request):
     if 'login' in request.session and 'password' in request.session:
         email = request.session['login']
         password = request.session['password']
-        try:
-            user = django.contrib.auth.authenticate(username=email, password=password)
-        except APINotAuthorisedException:  # old credentials expired - try new one
-            pass
+        user = django.contrib.auth.authenticate(username=email, password=password)
 
     if user is None:
         # authorize user here
@@ -55,21 +51,28 @@ def login(request):
         require_params(request, ('email', 'password'))
         email = request.data['email'].lower()
         password = request.data['password']
-        try:
-            user = django.contrib.auth.authenticate(username=email, password=password)
-        except APINotAuthorisedException:  # two possible reasons here - user not found or password incorrect
-            # try to find user in the DB
-            if not AccountBackend.is_email_in_portal(email):
-                raise APINotFoundException("User not in cloud portal") # user not found here
-            raise  # wrong password - just - re-raise the exception
+        user = django.contrib.auth.authenticate(request=request, username=email, password=password)
 
     if user is None:
-        raise APINotAuthorisedException('Username or password are invalid')
+        account_blocked = request.session['account_blocked'] if 'account_blocked' in request.session else None
+        if account_blocked:
+            request.session.pop('account_blocked', None)
+            raise APINotAuthorisedException("Account is blocked", ErrorCodes.account_blocked)
+        # try to find user in the DB
+        if not AccountBackend.is_email_in_portal(email):
+            raise APINotFoundException("User not in cloud portal", )  # user not found here
+        raise APINotAuthorisedException("Password is invalid")
 
     if 'remember' not in request.data or not request.data['remember']:
         request.session.set_expiry(0)
 
     django.contrib.auth.login(request, user)
+
+    #If the user does not have an activated_date set it to the current time
+    if not user.activated_date:
+        user.activated_date = timezone.now()
+        user.save()
+
     request.session['login'] = email
     request.session['password'] = password
     if 'timezone' in request.data:
@@ -163,12 +166,12 @@ def activate(request):
             raise APIInternalException('No email from cloud_db', ErrorCodes.cloud_invalid_response)
 
         email = user_data['email'].lower()
-        try:
-            user = api.models.Account.objects.get(email=email)
-            user.activated_date = timezone.now()
-            user.save(update_fields=['activated_date'])
-        except ObjectDoesNotExist:
+        if not AccountBackend.is_email_in_portal(email):
             raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
+
+        user = api.models.Account.objects.get(email=email)
+        user.activated_date = timezone.now()
+        user.save(update_fields=['activated_date'])
         return api_success()
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
@@ -194,7 +197,13 @@ def restore_password(request):
             raise APIRequestException('Wrong new password', ErrorCodes.wrong_parameters,
                                       error_data={'new_password': error.detail})
 
+        email = Account.extract_temp_credentials(code)[1]
         Account.restore_password(code, new_password)
+
+        account = api.models.Account.objects.get(email=email)
+        if not account.activated_date:
+            account.activated_date = timezone.now()
+            account.save()
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
         Account.reset_password(user_email)

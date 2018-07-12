@@ -151,17 +151,6 @@
         </div>
     </form>
 
-    <h2>"수동 업데이트"</h2>
-    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
-        <div class="form-group">
-            <label class="col-sm-4">설치 프로그램을 업로드</label>
-            <div class="col-sm-8">
-                <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">구성이 올바른지 확인 하십시오.</p>
-            </div>
-        </div>
-    </form>
-
     <h1>고급 시스템 설정</h1>
     <div class="alert alert-danger" role="alert">
         <b>경고!</b> 변경사항으로 인해 시스템 오동작 될 수있습니다.
@@ -210,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>주의!</b> 일부 변경 내용은 시스템을 재시작 해야합니다. <b>모든</b> 서버가 시스템에 존재 합니다.<br><br>
+        <b>주의!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >현재 서버 다시 시작</button>
         </div>

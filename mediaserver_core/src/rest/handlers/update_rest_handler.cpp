@@ -3,19 +3,21 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QCoreApplication>
 
-#include <managers/updates_manager.h>
-#include <network/tcp_connection_priv.h>
-#include <media_server/server_update_tool.h>
-#include <utils/update/update_utils.h>
-#include <nx/utils/log/log.h>
-#include <common/common_module.h>
 #include <api/model/upload_update_reply.h>
-#include "core/resource_access/resource_access_manager.h"
-#include "rest/server/rest_connection_processor.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/user_resource.h"
+#include <common/common_module.h>
 #include <common/static_common_module.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include <managers/updates_manager.h>
+#include <media_server/server_update_tool.h>
+#include <network/tcp_connection_priv.h>
+#include <rest/server/rest_connection_processor.h>
+#include <utils/common/app_info.h>
+#include <utils/update/update_utils.h>
+
 #include <nx/utils/file_system.h>
+#include <nx/utils/log/log.h>
 
 int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor)
 {
@@ -23,17 +25,15 @@ int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &
 }
 
 int QnUpdateRestHandler::executePost(
-    const QString &path,
-    const QnRequestParams &params,
-    const QByteArray &body,
-    QnJsonRestResult &result,
+    const QString& /*path*/,
+    const QnRequestParams& params,
+    const QByteArray& body,
+    QnJsonRestResult& result,
     const QnRestConnectionProcessor* processor)
 {
-    Q_UNUSED(path)
-
     bool remotePeerHasAdminRights = processor->resourceAccessManager()->hasGlobalPermission(
         processor->accessRights(),
-        Qn::GlobalAdminPermission);
+        GlobalPermission::admin);
 
     if (!remotePeerHasAdminRights)
     {
@@ -43,7 +43,6 @@ int QnUpdateRestHandler::executePost(
         result.setReply(reply);
         return nx::network::http::StatusCode::forbidden;
     }
-
 
     qint64 offset = params.value(lit("offset")).toLongLong();
     QString updateId = params.value(lit("updateId"));
@@ -76,8 +75,8 @@ int QnUpdateRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
-    QnSoftwareVersion version;
-    QnSystemInformation sysInfo;
+    nx::utils::SoftwareVersion version;
+    nx::vms::api::SystemInformation sysInfo;
 
     {
         QBuffer buffer(const_cast<QByteArray*>(&body)); // we're going to read data, so const_cast is safe
@@ -88,22 +87,26 @@ int QnUpdateRestHandler::executePost(
         }
     }
 
-    if (version == qnStaticCommon->engineVersion()) {
+    if (version == qnStaticCommon->engineVersion())
+    {
         result.setError(QnJsonRestResult::NoError, lit("UP_TO_DATE"));
         return nx::network::http::StatusCode::ok;
     }
 
-    if (sysInfo != QnSystemInformation::currentSystemInformation()) {
+    if (sysInfo != QnAppInfo::currentSystemInformation())
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE_SYSTEM"));
         return nx::network::http::StatusCode::ok;
     }
 
-    if (!QnServerUpdateTool::instance()->addUpdateFile(version.toString(), body)) {
+    if (!QnServerUpdateTool::instance()->addUpdateFile(version.toString(), body))
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("EXTRACTION_ERROR"));
         return nx::network::http::StatusCode::internalServerError;
     }
 
-    if (!QnServerUpdateTool::instance()->installUpdate(version.toString())) {
+    if (!QnServerUpdateTool::instance()->installUpdate(version.toString()))
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INSTALLATION_ERROR"));
         return nx::network::http::StatusCode::ok;
     }

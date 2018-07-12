@@ -24,7 +24,7 @@
  name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">First name is required.</span>
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">First name is required</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -35,7 +35,7 @@
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Last name is required.</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">Last name is required</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -49,18 +49,25 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please, enter a valid Email.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">Please enter a valid Email</span></div>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in %PRODUCT_NAME%.</span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">This Email has been already registered in %PRODUCT_NAME%</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Subscribe to email newsletters</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        I agree to the <a href="/content/eula" target="_blank">Terms and Conditions</a> and
+                        <a href="%PRIVACY_LINK%" target="_blank">Privacy policy</a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        Please review and agree to the Terms and Conditions and Privacy policy in order to proceed
+                    </p>
                 </div>
             </div>
         </div>
@@ -70,10 +77,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <div class="small conditions-note">
-                    By clicking "Create Account", you agree to
-                    <div><a href="/content/eula" target="_blank">Terms and Conditions</a></div>
-                </div>
             </div>
         </div>
     </form>

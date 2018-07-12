@@ -146,7 +146,14 @@ edge_firmware/isd/*.tar.gz
 .vagrant
 **/Makefile
 
+nx_cloud/cloud_tests/health_site/dist
+nx_cloud/cloud_tests/health_site/node_modules
+
 cloud_portal/front_end/node_modules
+cloud_portal/front_end/app/images/promo
+cloud_portal/front_end/app/images/favicon.ico
+cloud_portal/front_end/app/images/logo.png
+cloud_portal/front_end/app/images/logo_small.png
 cloud_portal/front_end/app/styles/custom
 cloud_portal/front_end/dist
 cloud_portal/front_end/config.json
@@ -183,6 +190,7 @@ plugins/NxControl/NxControl.cs
 
 mobile_client/build-*
 build/*
+build-*/*
 
 statserver/.venv
 statserver/build
@@ -190,9 +198,6 @@ statserver/dist
 
 *test-tmp.cfg
 func_tests_old/ssh.*.conf
-func_tests/test_utils/updates2/test_updates_server/data/*.json
-func_tests/test_utils/updates2/test_updates_server/data/*/*/*.json
-func_tests/test_utils/updates2/test_updates_server/data/*.raw
 
 statserver/statserver.egg-info
 
@@ -221,6 +226,11 @@ cloud_portal/robot_tests/Screenshots
 cloud_portal/robot_tests/log*.html
 cloud_portal/robot_tests/output*.xml
 cloud_portal/robot_tests/report*.html
+cloud_portal/robot_tests/MicrosoftWebDriver.exe
+cloud_portal/robot_tests/geckodriver.exe
+cloud_portal/robot_tests/test-cases/outputs/*
+cloud_portal/robot_tests/outputs/
+cloud_portal/robot_tests/IEDriverServer.exe
 syntax: regexp
 ^core$
 ^Makefile$
@@ -234,3 +244,4 @@ nx_cloud_deploy/log_alarm_dispatcher/env
 nx_cloud_deploy/log_alarm_dispatcher/dist/log_alarm_dispatcher.zip
 nx_cloud_deploy/log_alarm_dispatcher/event.json
 nx_cloud_deploy/log_alarm_dispatcher/message.json
+tags

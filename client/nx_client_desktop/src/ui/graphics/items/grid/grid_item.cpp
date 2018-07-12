@@ -19,6 +19,7 @@
 #include "grid_highlight_item.h"
 
 using nx::client::core::Geometry;
+using namespace nx::client::desktop;
 
 namespace {
     const char *pointPropertyName = "_qn_itemPoint";

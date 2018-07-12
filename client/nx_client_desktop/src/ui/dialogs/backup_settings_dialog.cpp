@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
-#include <ui/common/aligner.h>
+#include <nx/client/desktop/common/utils/aligner.h>
 #include <ui/common/read_only.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/dialogs/backup_schedule_dialog.h>
@@ -15,8 +15,10 @@
 #include <ui/style/skin.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+using namespace nx;
+using namespace nx::client::desktop;
 
-QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
+QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent):
     base_type(parent),
     ui(new Ui::BackupSettingsDialog),
     m_backupNewCameras(false)
@@ -29,23 +31,27 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
 
     ui->globalSettingsGroupBox->setTitle(title);
 
-    ui->comboBoxBackupType->addItem(tr("By Schedule"), Qn::Backup_Schedule);
-    ui->comboBoxBackupType->addItem(tr("Realtime"), Qn::Backup_RealTime);
-    ui->comboBoxBackupType->addItem(tr("On Demand"), Qn::Backup_Manual);
+    ui->comboBoxBackupType->addItem(tr("By Schedule"),
+        QVariant::fromValue(vms::api::BackupType::scheduled));
+    ui->comboBoxBackupType->addItem(tr("Realtime"),
+        QVariant::fromValue(vms::api::BackupType::realtime));
+    ui->comboBoxBackupType->addItem(tr("On Demand"),
+        QVariant::fromValue(vms::api::BackupType::manual));
 
-    auto updatePage = [this]
+    const auto updatePage =
+        [this]()
         {
-            m_schedule.backupType = static_cast<Qn::BackupType>(
-                ui->comboBoxBackupType->currentData().toInt());
+            m_schedule.backupType =
+                ui->comboBoxBackupType->currentData().value<vms::api::BackupType>();
             switch (m_schedule.backupType)
             {
-                case Qn::Backup_Manual:
+                case vms::api::BackupType::manual:
                     ui->stackedWidget->setCurrentWidget(ui->onDemandPage);
                     break;
-                case Qn::Backup_Schedule:
+                case vms::api::BackupType::scheduled:
                     ui->stackedWidget->setCurrentWidget(ui->bySchedulePage);
                     break;
-                case Qn::Backup_RealTime:
+                case vms::api::BackupType::realtime:
                     ui->stackedWidget->setCurrentWidget(ui->realtimePage);
                     break;
             }
@@ -89,17 +95,17 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
         });
 
     ui->qualityComboBox->addItem(tr("Lo-Res Streams", "Cameras Backup"),
-        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_LowQuality));
+        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackupQuality::CameraBackup_LowQuality));
     ui->qualityComboBox->addItem(tr("Hi-Res Streams", "Cameras Backup"),
-        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_HighQuality));
+        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackupQuality::CameraBackup_HighQuality));
     ui->qualityComboBox->addItem(tr("All Streams", "Cameras Backup"),
-        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_Both));
+        QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackupQuality::CameraBackup_Both));
 
     setHelpTopic(this, Qn::ServerSettings_StoragesBackup_Help);
 
     setResizeToContentsMode(Qt::Vertical | Qt::Horizontal);
 
-    auto aligner = new QnAligner(this);
+    auto aligner = new Aligner(this);
     aligner->addWidgets({
         ui->whenToBackupLabel,
         ui->camerasLabel,
@@ -132,7 +138,7 @@ void QnBackupSettingsDialog::setSchedule(const QnServerBackupSchedule& schedule)
     m_schedule = schedule;
 
     ui->comboBoxBackupType->setCurrentIndex(
-        ui->comboBoxBackupType->findData(m_schedule.backupType));
+        ui->comboBoxBackupType->findData(QVariant::fromValue(m_schedule.backupType)));
 }
 
 const QnVirtualCameraResourceList& QnBackupSettingsDialog::camerasToBackup() const

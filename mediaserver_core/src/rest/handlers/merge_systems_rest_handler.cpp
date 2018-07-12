@@ -26,24 +26,21 @@ QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::AbstractTransactionMes
 {}
 
 int QnMergeSystemsRestHandler::executeGet(
-    const QString& path,
+    const QString& /*path*/,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
     return execute(std::move(MergeSystemData(params)), owner, result);
 }
 
 int QnMergeSystemsRestHandler::executePost(
-    const QString& path,
-    const QnRequestParams& params,
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
     const QByteArray& body,
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(params);
     MergeSystemData data = QJson::deserialized<MergeSystemData>(body);
     return execute(std::move(data), owner, result);
 }
@@ -99,7 +96,7 @@ void QnMergeSystemsRestHandler::updateLocalServerAuthKeyInConfig(
 void QnMergeSystemsRestHandler::initiateConnectionToRemoteServer(
     QnCommonModule* commonModule,
     const QUrl& remoteModuleUrl,
-    const QnModuleInformationWithAddresses& remoteModuleInformation)
+    const nx::vms::api::ModuleInformationWithAddresses& remoteModuleInformation)
 {
     nx::vms::discovery::ModuleEndpoint module(
         remoteModuleInformation,

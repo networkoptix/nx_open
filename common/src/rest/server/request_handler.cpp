@@ -23,16 +23,15 @@ RestResponse::RestResponse(
 {
 }
 
-QnRestRequestHandler::QnRestRequestHandler():
-    m_permissions(Qn::NoGlobalPermissions)
+QnRestRequestHandler::QnRestRequestHandler()
 {
 }
 
 RestResponse QnRestRequestHandler::executeGet(const RestRequest& request)
 {
     RestResponse result;
-    result.statusCode = (nx::network::http::StatusCode::Value) executeGet(
-        request.path, request.params, result.content.body, result.content.type, request.owner);
+    result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executeGet(
+        request.path, request.params, result.content.body, result.content.type, request.owner));
 
     return result;
 }
@@ -40,8 +39,8 @@ RestResponse QnRestRequestHandler::executeGet(const RestRequest& request)
 RestResponse QnRestRequestHandler::executeDelete(const RestRequest& request)
 {
     RestResponse result;
-    result.statusCode = (nx::network::http::StatusCode::Value) executeDelete(
-        request.path, request.params, result.content.body, result.content.type, request.owner);
+    result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executeDelete(
+        request.path, request.params, result.content.body, result.content.type, request.owner));
 
     return result;
 }
@@ -50,9 +49,9 @@ RestResponse QnRestRequestHandler::executePost(
     const RestRequest& request, const RestContent& content)
 {
     RestResponse result;
-    result.statusCode = (nx::network::http::StatusCode::Value) executePost(
+    result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executePost(
         request.path, request.params, content.body, content.type,
-        result.content.body, result.content.type, request.owner);
+        result.content.body, result.content.type, request.owner));
 
     return result;
 }
@@ -61,9 +60,9 @@ RestResponse QnRestRequestHandler::executePut(
     const RestRequest& request, const RestContent& content)
 {
     RestResponse result;
-    result.statusCode = (nx::network::http::StatusCode::Value) executePost(
+    result.statusCode = static_cast<nx::network::http::StatusCode::Value>(executePost(
         request.path, request.params, content.body, content.type,
-        result.content.body, result.content.type, request.owner);
+        result.content.body, result.content.type, request.owner));
 
     return result;
 }

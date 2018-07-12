@@ -39,7 +39,7 @@ static int checkPermissions(
 {
     const auto& commonModule = processor->commonModule();
 
-    Qn::GlobalPermission requiredPermission = Qn::GlobalViewBookmarksPermission;
+    GlobalPermission requiredPermission = GlobalPermission::viewBookmarks;
     if (isModifyingOperation(op))
     {
         if (QnPermissionsHelper::isSafeMode(commonModule))
@@ -48,7 +48,7 @@ static int checkPermissions(
             return QnPermissionsHelper::safeModeError(
                 *outBody, *outContentType, request.format, request.extraFormatting);
         }
-        requiredPermission = Qn::GlobalManageBookmarksPermission;
+        requiredPermission = GlobalPermission::manageBookmarks;
     }
     if (!commonModule->resourceAccessManager()->hasGlobalPermission(
         processor->accessRights(), requiredPermission))

@@ -33,6 +33,11 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ObjectDisplaySettingsItem, AttributeVi
     (ObjectDisplaySettingsItem::AttributeVisibilityPolicy::hover, "hover")
     (ObjectDisplaySettingsItem::AttributeVisibilityPolicy::never, "never"))
 
+bool systemAttribute(const QString& name)
+{
+    return name.startsWith(lit("nx.sys."));
+}
+
 } // namespace
 
 class ObjectDisplaySettings::Private
@@ -88,7 +93,7 @@ std::vector<common::metadata::Attribute> ObjectDisplaySettings::briefAttributes(
 
     for (const auto& attribute: object.labels)
     {
-        if (settings.attributeVisibility.value(attribute.name)
+        if (!systemAttribute(attribute.name) && settings.attributeVisibility.value(attribute.name)
             == ObjectDisplaySettingsItem::AttributeVisibilityPolicy::always)
         {
             result.push_back(attribute);
@@ -107,7 +112,7 @@ std::vector<common::metadata::Attribute> ObjectDisplaySettings::visibleAttribute
 
     for (const auto& attribute: object.labels)
     {
-        if (settings.attributeVisibility.value(attribute.name)
+        if (!systemAttribute(attribute.name) && settings.attributeVisibility.value(attribute.name)
             != ObjectDisplaySettingsItem::AttributeVisibilityPolicy::never)
         {
             result.push_back(attribute);

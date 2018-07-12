@@ -3,7 +3,7 @@
 
 #include <QtCore/QThread>
 
-class QN_EXPORT QnSleep : public QThread
+class QnSleep : public QThread
 {
 public:
 

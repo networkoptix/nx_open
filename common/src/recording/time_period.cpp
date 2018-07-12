@@ -157,6 +157,16 @@ std::chrono::milliseconds QnTimePeriod::startTime() const
     return std::chrono::milliseconds(startTimeMs);
 }
 
+void QnTimePeriod::setEndTime(std::chrono::milliseconds value)
+{
+    setEndTimeMs(value.count());
+}
+
+std::chrono::milliseconds QnTimePeriod::endTime() const
+{
+    return std::chrono::milliseconds(endTimeMs());
+}
+
 void QnTimePeriod::setDuration(std::chrono::milliseconds value)
 {
     durationMs = value.count();

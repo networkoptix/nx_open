@@ -1,7 +1,7 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="container auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        החשבון נוצר. <br> הודעת האישור נשלחת אל <br> {{account.email}}
+        חשבון נוצר. <br>הודעת האישור נשלחת לדוא אל <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
@@ -24,7 +24,7 @@
  name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">נדרש שם פרטי.</span>
+                <span class="help-block" ng-if="registerForm.firstName.$touched && registerForm.firstName.$error.required">נדרש שם פרטי</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -35,7 +35,7 @@
  name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">נדרש שם משפחה.</span>
+                <span class="help-block" ng-if="registerForm.lastName.$touched && registerForm.lastName.$error.required">נדרש שם משפחה</span>
             </div>
         </div>
         <div class="form-group" validate-field>
@@ -49,14 +49,24 @@
                        class="form-control" ng-model="account.email" readonly>
             </div>
             <div class="col-sm-4">
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required"> נדרש דוא"ל. </span> <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email"> יש להזין כתובת דוא"ל חוקית. </span> <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists"> כתובת זו כבר רשומה ב- {{PRODUCT_NAME}}. </span>
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">נדרש דוא"; ל</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email">אנא הקלד כתובת אימייל תקפה</span></div>
+
+                <div><span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">האימייל הזה כבר נרשם ב- {{PRODUCT_NAME}}</span></div>
             </div>
         </div>
         <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
-        <div class="form-group" >
-            <div class="col-sm-offset-4 col-sm-8">
+        <div class="form-group" validate-field>
+            <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> הרשמה לדיוור ישיר</label>
+                    <label>
+                        <input type="checkbox" ng-model="account.accept" name="accept" id="accept" required>
+                        אני מסכים ל <a href="/content/eula" target="_blank"> התנאים וההגבלות </a> ו <a href="%PRIVACY_LINK%" target="_blank"> מדיניות פרטיות </a>
+                    </label>
+                    <p class="form-control-static" ng-if="registerForm.accept.$touched && registerForm.accept.$error.required">
+                        נא לעיין ולהסכים לתנאים וההגבלות ולפרטיות המדיניות כדי להמשיך
+                    </p>
                 </div>
             </div>
         </div>
@@ -66,7 +76,6 @@
                                 form="registerForm"
                                 class="pull-left"
                                 button-text="$root.L.regActions.createAccount"></process-button>
-                <small class="conditions-note"> על ידי לחיצה על 'צור חשבון', אתה מסכים <br> ל <a href="/content/eula" target="_blank"> תנאים והגבלות </a></small>
             </div>
         </div>
     </form>

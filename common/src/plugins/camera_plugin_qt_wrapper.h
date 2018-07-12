@@ -13,7 +13,7 @@
 #include <QtCore/QStringList>
 #include <nx/utils/thread/mutex.h>
 
-#include "camera_plugin.h"
+#include <camera/camera_plugin.h>
 
 
 //!Contains wrappers for convenient use of \a nxcip classes
@@ -73,9 +73,9 @@ namespace nxcip_qt
         //!See nxcip::CameraDiscoveryManager::getVendorName
         QString getVendorName() const;
         //!See nxcip::CameraDiscoveryManager::findCameras
-        int findCameras( QVector<nxcip::CameraInfo>* const cameras, const QString& localInterfaceIPAddr );
+        int findCameras( QVector<nxcip::CameraInfo2>* const cameras, const QString& localInterfaceIPAddr );
         //!See nxcip::CameraDiscoveryManager::checkHostAddress
-        int checkHostAddress( QVector<nxcip::CameraInfo>* const cameras, const QString& url, const QString* login, const QString* password );
+        int checkHostAddress( QVector<nxcip::CameraInfo2>* const cameras, const QString& url, const QString* login, const QString* password );
         //!See nxcip::CameraDiscoveryManager::fromMDNSData
         int fromMDNSData( const QByteArray& mdnsResponsePacket, const QHostAddress& discoveredAddress, nxcip::CameraInfo* cameraInfo );
         //!See nxcip::CameraDiscoveryManager::fromUpnpData

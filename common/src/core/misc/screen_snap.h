@@ -1,17 +1,15 @@
 #pragma once
 
-#include <QtCore/QMetaType>
-
 #include <array>
 
-#ifndef Q_MOC_RUN
-#include <boost/operators.hpp>
-#endif
+#include <QtCore/QSet>
+#include <QtCore/QRect>
+#include <QtCore/QDebug>
 
-struct QnScreenSnap: public boost::equality_comparable1<QnScreenSnap>
+struct QnScreenSnap
 {
-    int screenIndex;    /**< Index of the screen. */
-    int snapIndex;      /**< Index of the snap on the screen. */
+    int screenIndex = -1;   /**< Index of the screen. */
+    int snapIndex = 0;      /**< Index of the snap on the screen. */
 
     QnScreenSnap();
     QnScreenSnap(int screenIndex, int snapIndex);
@@ -21,37 +19,45 @@ struct QnScreenSnap: public boost::equality_comparable1<QnScreenSnap>
     static QnScreenSnap decode(int encoded);
     static int snapsPerScreen();
 
-    friend bool operator==(const QnScreenSnap& l, const QnScreenSnap& r)
+    bool operator==(const QnScreenSnap& other) const
     {
-        return (l.screenIndex == r.screenIndex && l.snapIndex == r.snapIndex);
+        return (screenIndex == other.screenIndex && snapIndex == other.snapIndex);
+    }
+
+    bool operator!=(const QnScreenSnap& other) const
+    {
+        return !(*this == other);
     }
 };
 
-struct QnScreenSnaps: public boost::equality_comparable1<QnScreenSnaps>
+struct QnScreenSnaps
 {
-    inline QnScreenSnap& left() { return values[0]; }
-    inline const QnScreenSnap& left() const { return values[0]; }
+    QnScreenSnap& left() { return values[0]; }
+    const QnScreenSnap& left() const { return values[0]; }
 
-    inline QnScreenSnap& right() { return values[1]; }
-    inline const QnScreenSnap& right() const { return values[1]; }
+    QnScreenSnap& right() { return values[1]; }
+    const QnScreenSnap& right() const { return values[1]; }
 
-    inline QnScreenSnap& top() { return values[2]; }
-    inline const QnScreenSnap& top() const { return values[2]; }
+    QnScreenSnap& top() { return values[2]; }
+    const QnScreenSnap& top() const { return values[2]; }
 
-    inline QnScreenSnap& bottom() { return values[3]; }
-    inline const QnScreenSnap& bottom() const { return values[3]; }
+    QnScreenSnap& bottom() { return values[3]; }
+    const QnScreenSnap& bottom() const { return values[3]; }
 
     std::array<QnScreenSnap, 4> values;
 
     bool isValid() const;
 
-    QSet<int> screens() const;
+    QRect geometry(const QList<QRect>& screenGeometries) const;
 
-    QRect geometry(const QList<QRect>& screens) const;
-
-    friend bool operator==(const QnScreenSnaps& l, const QnScreenSnaps& r)
+    bool operator==(const QnScreenSnaps& other) const
     {
-        return l.values == r.values;
+        return values == other.values;
+    }
+
+    bool operator!=(const QnScreenSnaps& other) const
+    {
+        return !(*this == other);
     }
 };
 

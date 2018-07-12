@@ -6,7 +6,6 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "audit/audit_manager.h"
-#include "nx_ec/data/api_peer_alive_data.h"
 
 class QnMServerAuditManager: public QnAuditManager
 {
@@ -14,12 +13,11 @@ public:
     QnMServerAuditManager(std::chrono::milliseconds lastRunningTime, QObject* parent);
     ~QnMServerAuditManager();
 
+    void flushRecords();
+    void stop();
 protected:
     virtual int addAuditRecordInternal(const QnAuditRecord& record) override;
     virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) override;
-
-private:
-    void flushRecords();
 
 private:
     QTimer m_timer;

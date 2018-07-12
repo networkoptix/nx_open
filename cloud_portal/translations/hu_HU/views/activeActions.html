@@ -1,33 +1,36 @@
 <div class="container" >
     <div ng-if="data.activateCode" process-loading="activate">
         <h1 class="process-success" ng-if="activate.success">
-            Fiókját sikeresen aktiváltuk<br>
+            A felhasználói fiókot sikeresen aktiválta
+        </h1>
+        <h1 class="process-success" ng-if="activate.success">
             <a class="btn btn-default" href="/login">Bejelentkezés</a>
         </h1>
 
         <h1 class="process-success" ng-if="!activate.success">
-            Fiókja már aktiválva van, hibás megerősítő kód
+            A fiók van már aktiválva van, vagy a megerősítési kód hibás
         </h1>
     </div>
 
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
-            Fiókját sikeresen aktiváltuk<br>
-            <a href="/login">Bejelentkezés</a>
-            <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open {{VMS_NAME}}</button> -->
+            A felhasználói fiókot sikeresen aktiválta
+        </h1>
+        <h1 class="process-success">
+            <a class="btn btn-default" href="/login">Bejelentkezés</a>
         </h1>
     </div>
     
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>Regisztráltáltál a {{PRODUCT_NAME}} szofverben</h1>
+            <h1>Regisztráltáltál a %PRODUCT_NAME% szofverben</h1>
             <p>Az aktiváláshoz szükséges linket {{data.email}} címre elküldtük.<br>
             Kérjük ennek segítségével aktiválja fiókját.</p>
         </div>
         <h1 ng-if="!data.email">Aktiváld a fiókod</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">E-mail</label>
+                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -52,7 +55,7 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            Jelszóvisszaállítási teendők megadását e-mailen megküldtük <br>{{data.email}}
+            Jelszó visszaállítási teendők megadását e-mailen megküldtük <br>{{data.email}}
         </h1>
     </div>
 
@@ -60,7 +63,7 @@
         <h1>Jelszó visszaállítása</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">E-mail</label>
+                <label for="email"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
  ng-model="data.email"
@@ -83,9 +86,11 @@
         </form>
     </div>
     <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess ">
-            A jelszó sikeresen elmentve<br>
-            <a href="/login">Bejelentkezés</a>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            Jelszó sikeresen frissítve
+        </h1>
+        <h1 class="process-success" ng-if="change.success || changeSuccess">
+            <a class="btn btn-default" href="/login">Bejelentkezés</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>

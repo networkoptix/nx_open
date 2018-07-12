@@ -21,9 +21,12 @@
     This project demonstrates usage of camera integration plugin API to add AXIS camera support to mediaserver. Overrides built-in AXIS camera driver.\n
 
     \par Build how-to
-    It is Qt 4.7 project. Compiles to dynamic library. Tested on MS Windows 7 and Ubuntu 12.04.\n
-    To build You MUST have Qt 4.7.4+ installed.\n
-    \warning Qt is used here to simplify this sample only! It is not required to use Qt in real production plugin. Provided API uses c++ only (even STL is not required)
+    Use provided CMakeLists.txt project file to generate solution for your favorite build tool or IDE.
+    It is Qt 5 project. Compiles to dynamic library. Tested on MS Windows 10 and Ubuntu 16.04.LTS\n
+    To build You MUST have Qt 5.0+ installed.\n
+    \warning To build plugin using cmake on Ubuntu you need to install qtbase5-dev:\n
+	$sudo apt-get install qtbase5-dev
+	\warning Qt is used here to simplify this sample only! It is not required to use Qt in real production plugin. Provided API uses c++ only (even STL is not required)
 
     To build:
     \code

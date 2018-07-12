@@ -50,6 +50,12 @@ ProxyWorker::ProxyWorker(
     m_translatedRequest = std::move(translatedRequest);
 }
 
+void ProxyWorker::setTargetHostConnectionInactivityTimeout(
+    std::chrono::milliseconds timeout)
+{
+    m_targetHostPipeline->setInactivityTimeout(timeout);
+}
+
 void ProxyWorker::start()
 {
     // Making sure sending & receiving is started atomically.

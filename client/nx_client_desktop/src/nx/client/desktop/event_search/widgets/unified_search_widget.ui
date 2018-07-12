@@ -69,7 +69,7 @@
           <number>8</number>
          </property>
          <item alignment="Qt::AlignLeft">
-          <widget class="nx::client::desktop::ui::SelectableTextButton" name="timeButton">
+          <widget class="nx::client::desktop::SelectableTextButton" name="timeButton">
            <property name="text">
             <string notr="true">&lt;time filter&gt;</string>
            </property>
@@ -79,7 +79,7 @@
           </widget>
          </item>
          <item alignment="Qt::AlignLeft">
-          <widget class="nx::client::desktop::ui::SelectableTextButton" name="cameraButton">
+          <widget class="nx::client::desktop::SelectableTextButton" name="cameraButton">
            <property name="text">
             <string notr="true">&lt;camera filter&gt;</string>
            </property>
@@ -89,7 +89,7 @@
           </widget>
          </item>
          <item alignment="Qt::AlignLeft">
-          <widget class="nx::client::desktop::ui::SelectableTextButton" name="areaButton">
+          <widget class="nx::client::desktop::SelectableTextButton" name="areaButton">
            <property name="text">
             <string notr="true">&lt;area filter&gt;</string>
            </property>
@@ -99,7 +99,7 @@
           </widget>
          </item>
          <item alignment="Qt::AlignLeft">
-          <widget class="nx::client::desktop::ui::SelectableTextButton" name="typeButton">
+          <widget class="nx::client::desktop::SelectableTextButton" name="typeButton">
            <property name="text">
             <string notr="true">&lt;type filter&gt;</string>
            </property>
@@ -109,6 +109,28 @@
           </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="filterLine">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>1</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>1</height>
+         </size>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
        </widget>
       </item>
      </layout>
@@ -182,10 +204,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QnToolButton" name="showInfoButton">
-           <property name="toolTip">
-            <string>Show/hide information</string>
-           </property>
+          <widget class="nx::client::desktop::ToolButton" name="showInfoButton">
            <property name="text">
             <string notr="true"/>
            </property>
@@ -195,10 +214,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QnToolButton" name="showPreviewsButton">
-           <property name="toolTip">
-            <string>Show/hide thumbnails</string>
-           </property>
+          <widget class="nx::client::desktop::ToolButton" name="showPreviewsButton">
            <property name="text">
             <string notr="true"/>
            </property>
@@ -315,6 +331,9 @@
        <height>1</height>
       </size>
      </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -330,14 +349,14 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::client::desktop::ui::SelectableTextButton</class>
+   <class>nx::client::desktop::SelectableTextButton</class>
    <extends>QPushButton</extends>
-   <header location="global">nx/client/desktop/ui/common/selectable_text_button.h</header>
+   <header location="global">nx/client/desktop/common/widgets/selectable_text_button.h</header>
   </customwidget>
   <customwidget>
-   <class>QnToolButton</class>
+   <class>nx::client::desktop::ToolButton</class>
    <extends>QToolButton</extends>
-   <header location="global">ui/widgets/common/tool_button.h</header>
+   <header location="global">nx/client/desktop/common/widgets/tool_button.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -20,16 +20,16 @@ public:
     virtual void deinitialize() override;
 
 private:
-    void handleTourAdded(const ec2::ApiLayoutTourData& tour);
-    void handleTourChanged(const ec2::ApiLayoutTourData& tour);
+    void handleTourAdded(const nx::vms::api::LayoutTourData& tour);
+    void handleTourChanged(const nx::vms::api::LayoutTourData& tour);
     void handleTourRemoved(const QnUuid& tourId);
 
-    QnResourceTreeModelNodePtr ensureLayoutTourNode(const ec2::ApiLayoutTourData& tour);
+    QnResourceTreeModelNodePtr ensureLayoutTourNode(const nx::vms::api::LayoutTourData& tour);
 
     void rebuild();
 
     /** Cleanup all node references. */
-    void removeNode(const QnResourceTreeModelNodePtr& node);
+    void removeNode(QnResourceTreeModelNodePtr node);
 
     /** Remove all nodes. */
     void clean();

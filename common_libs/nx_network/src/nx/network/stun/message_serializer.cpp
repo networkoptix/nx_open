@@ -194,12 +194,11 @@ nx::network::server::SerializerState MessageSerializer::serializeAttributeValue_
 
 nx::network::server::SerializerState MessageSerializer::serializeAttributeValue_Fingerprint(
     MessageSerializerBuffer* buffer,
-    const attrs::FingerPrint& attribute,
+    const attrs::FingerPrint& /*attribute*/,
     std::size_t* value)
 {
     NX_ASSERT(buffer->size() >= 24); // Header + FingerprintHeader
                                      // Ignore original FingerPrint message
-    Q_UNUSED(attribute);
     boost::crc_32_type crc32;
     // The RFC says that we MUST set the length field in header correctly so it means
     // The length should cover the CRC32 attributes, the length is 4+4 = 8, and the

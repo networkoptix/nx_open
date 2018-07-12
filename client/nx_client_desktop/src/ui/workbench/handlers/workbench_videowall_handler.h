@@ -99,6 +99,7 @@ private:
 
 private slots:
     void at_newVideoWallAction_triggered();
+    void at_deleteVideoWallAction_triggered();
     void at_attachToVideoWallAction_triggered();
     void at_detachFromVideoWallAction_triggered();
     void at_deleteVideoWallItemAction_triggered();
@@ -117,6 +118,7 @@ private slots:
     void at_saveVideowallMatrixAction_triggered();
     void at_loadVideowallMatrixAction_triggered();
     void at_deleteVideowallMatrixAction_triggered();
+    void at_videoWallScreenSettingsAction_triggered();
     void at_radassAction_triggered();
 
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
@@ -135,7 +137,8 @@ private slots:
         const QnVideoWallItem& item);
     void at_videoWall_itemRemoved_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
-    void at_eventManager_controlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
+    void at_eventManager_controlMessageReceived(
+        const nx::vms::api::VideowallControlMessageData& message);
 
     void at_display_widgetAdded(QnResourceWidget* widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget* widget);

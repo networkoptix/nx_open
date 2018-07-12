@@ -64,18 +64,20 @@ class CustomContextForm(forms.Form):
             record_value = latest_record.latest('created_date').value\
                 if latest_record.exists() else data_structure.default
 
-            widget_type = forms.TextInput(attrs={'size': 80})
+            widget_type = forms.TextInput(attrs={'size': 80, 'placeholder': data_structure.default})
 
             disabled = data_structure.advanced and not (user.is_superuser or user.has_perm('cms.edit_advanced'))
 
             if data_structure.type == DataStructure.DATA_TYPES.long_text:
-                widget_type = forms.Textarea
+                widget_type = forms.Textarea(attrs={'placeholder': data_structure.default})
 
             if data_structure.type == DataStructure.DATA_TYPES.html:
                 widget_type = forms.Textarea(
                     attrs={'cols': 120, 'rows': 25, 'class': 'tinymce'})
 
             if data_structure.type == DataStructure.DATA_TYPES.image:
+                if not record_value:
+                    record_value = data_structure.default
                 self.fields[data_structure.name] = forms.ImageField(label=ds_label,
                                                                     help_text=ds_description,
                                                                     initial=record_value,
@@ -84,6 +86,8 @@ class CustomContextForm(forms.Form):
                 continue
 
             elif data_structure.type == DataStructure.DATA_TYPES.file:
+                if not record_value:
+                    record_value = data_structure.default
                 self.fields[data_structure.name] = forms.FileField(label=ds_label,
                                                                    help_text=ds_description,
                                                                    initial=record_value,

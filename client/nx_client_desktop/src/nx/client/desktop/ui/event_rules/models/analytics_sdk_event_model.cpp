@@ -13,15 +13,9 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-struct AnalyticsSdkEventModel::Private
-{
-    QList<nx::vms::event::AnalyticsHelper::EventDescriptor> items;
-    bool valid = false;
-};
-
 AnalyticsSdkEventModel::AnalyticsSdkEventModel(QObject* parent):
-    base_type(parent),
-    d(new Private())
+    QnCommonModuleAware(parent),
+    QStandardItemModel(parent)
 {
 }
 
@@ -29,67 +23,65 @@ AnalyticsSdkEventModel::~AnalyticsSdkEventModel()
 {
 }
 
-int AnalyticsSdkEventModel::rowCount(const QModelIndex& parent) const
-{
-    return parent.isValid()
-        ? 0
-        : d->items.size();
-}
-
-QVariant AnalyticsSdkEventModel::data(const QModelIndex& index, int role) const
-{
-    if (index.row() < 0 || index.row() > d->items.size())
-        return QVariant();
-
-    const auto& item = d->items[index.row()];
-
-    switch (role)
-    {
-        case Qt::DisplayRole:
-        case Qt::StatusTipRole:
-        case Qt::WhatsThisRole:
-        case Qt::AccessibleTextRole:
-        case Qt::AccessibleDescriptionRole:
-        {
-            const bool useDriverName = d->valid
-                && nx::vms::event::AnalyticsHelper::hasDifferentDrivers(d->items);
-            return useDriverName
-                ? lit("%1 - %2")
-                    .arg(item.driverName.text(qnRuntime->locale()))
-                    .arg(item.name.text(qnRuntime->locale()))
-                : item.name.text(qnRuntime->locale());
-        }
-
-        case EventTypeIdRole:
-            return qVariantFromValue(item.typeId);
-
-        case DriverIdRole:
-            return qVariantFromValue(item.driverId);
-
-        default:
-            break;
-    }
-
-    return QVariant();
-}
-
 void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& cameras)
 {
     beginResetModel();
-    d->items = nx::vms::event::AnalyticsHelper::supportedAnalyticsEvents(cameras);
-    d->valid = !d->items.empty();
-    if (!d->valid)
+
+    auto addItem = [this](
+        QStandardItem* parent,
+        const nx::api::TranslatableString& name,
+        const QnUuid& driverId,
+        const QnUuid& id)
     {
-        nx::vms::event::AnalyticsHelper::EventDescriptor dummy;
-        dummy.name.value = tr("No event types supported");
-        d->items.push_back(dummy);
+        auto item = new QStandardItem(name.text(qnRuntime->locale()));
+        item->setData(qVariantFromValue(id), EventTypeIdRole);
+        item->setData(qVariantFromValue(driverId), DriverIdRole);
+        if (parent)
+            parent->appendRow(item);
+        else
+            appendRow(item);
+        return item;
+    };
+
+    using namespace nx::vms::event;
+    AnalyticsHelper helper(commonModule());
+    clear();
+
+    const auto items = cameras.empty()
+        ? helper.systemCameraIndependentAnalyticsEvents()
+        : helper.supportedAnalyticsEvents(cameras);
+
+    const bool useDriverName = nx::vms::event::AnalyticsHelper::hasDifferentDrivers(items);
+
+    QMap<QnUuid, QStandardItem*> groups;
+    QMap<QnUuid, QStandardItem*> drivers;
+    for (const auto& descriptor : items)
+    {
+        if (useDriverName && !drivers.contains(descriptor.driverId))
+        {
+            auto item = addItem(nullptr, descriptor.driverName, descriptor.driverId, QnUuid());
+            item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+            drivers.insert(descriptor.driverId, item);
+        }
+
+        QStandardItem* driver = drivers.value(descriptor.driverId);
+        if (!descriptor.groupId.isNull() && !groups.contains(descriptor.groupId))
+        {
+            auto group = AnalyticsHelper(commonModule()).groupDescriptor(descriptor.groupId);
+            auto item = addItem(driver, group.name, descriptor.driverId, descriptor.groupId);
+            groups.insert(descriptor.groupId, item);
+        }
+
+        addItem(descriptor.groupId.isNull() ? driver : groups[descriptor.groupId],
+            descriptor.name, descriptor.driverId, descriptor.typeId);
     }
+
     endResetModel();
 }
 
 bool AnalyticsSdkEventModel::isValid() const
 {
-    return d->valid;
+    return rowCount() > 0;
 }
 
 } // namespace ui

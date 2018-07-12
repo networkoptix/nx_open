@@ -5,7 +5,7 @@
 #include <type_traits>
 
 #include "../abstract_service_settings.h"
-#include "../settings.h"
+#include "../deprecated_settings.h"
 
 namespace nx {
 namespace utils {
@@ -15,7 +15,9 @@ template<typename SettingsType>
 class SettingsLoader
 {
 public:
-    void addArg(const std::string& name, const std::string& value)
+    void addArg(
+        const std::string& name,
+        const std::string& value = std::string())
     {
         m_args[name] = value;
     }
@@ -31,7 +33,8 @@ public:
         for (const auto& nameAndValue: m_args)
         {
             args.push_back(nameAndValue.first.c_str());
-            args.push_back(nameAndValue.second.c_str());
+            if (!nameAndValue.second.empty())
+                args.push_back(nameAndValue.second.c_str());
         }
 
         m_settings.load((int)args.size(), args.data());

@@ -8,15 +8,16 @@
 #include <QtGui/QImage>
 #include <QtGui/QImageWriter>
 
-#include <QtWidgets/qgroupbox.h>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWhatsThis>
-#include <QtWidgets/QHeaderView>
 
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
@@ -69,6 +70,7 @@
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/client/desktop/ui/messages/local_files_messages.h>
 #include <nx/client/desktop/resource_views/functional_delegate_utilities.h>
+#include <nx/client/desktop/resource_views/data/node_type.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
@@ -96,7 +98,6 @@
 #include <ui/dialogs/failover_priority_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
@@ -143,7 +144,7 @@
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/watchers/workbench_update_watcher.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <nx/client/desktop/utils/server_image_cache.h>
@@ -155,10 +156,8 @@
 #include <utils/common/event_processors.h>
 #include <nx/utils/string.h>
 #include <utils/common/delayed.h>
-#include <utils/common/time.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <utils/common/url.h>
 #include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <nx/utils/std/cpp14.h>
@@ -184,19 +183,18 @@
 #include <ui/delegates/resource_item_delegate.h>
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
-#include "ui/widgets/palette_widget.h"
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
+#include <client/client_app_info.h>
+#include <ini.h>
 
 #include <nx/client/desktop/ui/main_window.h>
 #include <ui/models/resource/resource_list_model.h>
+#include <QtWidgets/QTableView>
 
 using nx::client::core::Geometry;
 
 namespace {
-
-/* Beta version message. */
-static const QString kBetaVersionShowOnceKey(lit("BetaVersion"));
 
 /* Asking for update all outdated servers to the last version. */
 static const QString kVersionMismatchShowOnceKey(lit("VersionMismatch"));
@@ -205,6 +203,17 @@ const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 
 static constexpr int kSectionHeight = 20;
 
+QnResourcePtr getLayoutByName(const QString& layoutName, QnResourcePool* pool)
+{
+    const auto layouts = pool->getResources<QnLayoutResource>();
+    const auto trimmed = layoutName.trimmed();
+    for (const auto layout: layouts)
+    {
+        if (layout->getName().trimmed() == trimmed)
+            return layout;
+    }
+    return QnResourcePtr();
+}
 } // namespace
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
@@ -582,7 +591,17 @@ void ActionHandler::submitDelayedDrops()
     QScopedValueRollback<bool> guard(m_delayedDropGuard, true);
 
     QnResourceList resources;
-    ec2::ApiLayoutTourDataList tours;
+    nx::vms::api::LayoutTourDataList tours;
+
+    if (!m_delayedDropLayoutName.isEmpty())
+    {
+        if (const auto resource = getLayoutByName(m_delayedDropLayoutName, resourcePool()))
+            resources.append(resource);
+        else
+            NX_EXPECT(false, "Wrong layout name");
+
+        m_delayedDropLayoutName.clear();
+    }
 
     for (const auto& data: m_delayedDrops)
     {
@@ -599,7 +618,8 @@ void ActionHandler::submitDelayedDrops()
     if (resources.empty() && tours.empty())
         return;
 
-    resourcePool()->addNewResources(resources);
+    if (!resources.isEmpty())
+        resourcePool()->addNewResources(resources);
 
     workbench()->clear();
     if (!resources.empty())
@@ -669,6 +689,9 @@ void ActionHandler::at_nextLayoutAction_triggered()
         return;
 
     const auto total = workbench()->layouts().size();
+    if (total == 0)
+        return;
+
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() + 1) % total);
 }
 
@@ -678,6 +701,9 @@ void ActionHandler::at_previousLayoutAction_triggered()
         return;
 
     const auto total = workbench()->layouts().size();
+    if (total == 0)
+        return;
+
     workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + total) % total);
 }
 
@@ -902,7 +928,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
             addParams.position = position;
 
             // Live viewers must not open items on archive position
-            if (accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission))
+            if (accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
                 addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
             addToLayout(layout, resources, addParams);
         }
@@ -1290,9 +1316,21 @@ void ActionHandler::at_dropResourcesAction_triggered()
 
 void ActionHandler::at_delayedDropResourcesAction_triggered()
 {
-    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(
-        Qn::SerializedDataRole);
-    m_delayedDrops.push_back(data);
+    const auto params = menu()->currentParameters(sender());
+    if (params.hasArgument(Qn::SerializedDataRole))
+    {
+        const auto data = params.argument<QByteArray>(Qn::SerializedDataRole);
+        m_delayedDrops.push_back(data);
+    }
+    else if (params.hasArgument(Qn::LayoutNameRole))
+    {
+        m_delayedDropLayoutName = params.argument<QString>(Qn::LayoutNameRole);
+    }
+    else
+    {
+        NX_EXPECT(false, "Wrong delayed drop action paramenters");
+        return;
+    }
 
     submitDelayedDrops();
 }
@@ -1325,7 +1363,7 @@ void ActionHandler::at_openFileAction_triggered() {
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
     filters << tr("All files (*.*)");
 
-    QStringList files = QnFileDialog::getOpenFileNames(mainWindowWidget(),
+    QStringList files = QFileDialog::getOpenFileNames(mainWindowWidget(),
         tr("Open File"),
         QString(),
         filters.join(lit(";;")),
@@ -1337,7 +1375,7 @@ void ActionHandler::at_openFileAction_triggered() {
 }
 
 void ActionHandler::at_openFolderAction_triggered() {
-    QString dirName = QnFileDialog::getExistingDirectory(mainWindowWidget(),
+    QString dirName = QFileDialog::getExistingDirectory(mainWindowWidget(),
         tr("Select folder..."),
         QString(),
         QnCustomFileDialog::directoryDialogOptions());
@@ -1444,9 +1482,9 @@ qint64 ActionHandler::getFirstBookmarkTimeMs()
     static const qint64 kOneYearOffsetMs = kOneDayOffsetMs * 365;
     const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
-    const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
-    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == QnWorkbenchBookmarksWatcher::kUndefinedTime);
-    return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
+    const auto firstBookmarkUtcTime = bookmarksWatcher->firstBookmarkUtcTime();
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTime == QnWorkbenchBookmarksWatcher::kUndefinedTime);
+    return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTime.count());
 }
 
 void ActionHandler::renameLocalFile(const QnResourcePtr& resource, const QString& newName)
@@ -1567,18 +1605,18 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 
     const auto parameters = menu()->currentParameters(sender());
 
-    vms::event::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::event::anyEvent);
+    vms::api::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::api::EventType::anyEvent);
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     QSet<QnUuid> ids;
     for (auto camera: cameras)
         ids << camera->getId();
 
     // show diagnostics if Issues action was triggered
-    if (eventType != vms::event::anyEvent || !ids.isEmpty())
+    if (eventType != vms::api::EventType::anyEvent || !ids.isEmpty())
     {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
-        businessEventsLogDialog()->setActionType(vms::event::diagnosticsAction);
+        businessEventsLogDialog()->setActionType(vms::api::ActionType::diagnosticsAction);
         auto now = QDateTime::currentMSecsSinceEpoch();
         businessEventsLogDialog()->setDateRange(now, now);
         businessEventsLogDialog()->setCameraList(ids);
@@ -1854,7 +1892,7 @@ void ActionHandler::at_cameraIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
         menu()->currentParameters(sender())
-        .withArgument(Qn::EventTypeRole, vms::event::anyCameraEvent));
+        .withArgument(Qn::EventTypeRole, vms::api::EventType::anyCameraEvent));
 }
 
 void ActionHandler::at_cameraBusinessRulesAction_triggered() {
@@ -1912,7 +1950,7 @@ void ActionHandler::at_serverLogsAction_triggered()
 void ActionHandler::at_serverIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
-        {Qn::EventTypeRole, vms::event::anyServerEvent});
+        {Qn::EventTypeRole, vms::api::EventType::anyServerEvent});
 }
 
 void ActionHandler::at_pingAction_triggered()
@@ -2014,18 +2052,21 @@ bool ActionHandler::validateResourceName(const QnResourcePtr& resource, const QS
 
 void ActionHandler::at_renameAction_triggered()
 {
+    using NodeType = ResourceTreeNodeType;
+
     const auto parameters = menu()->currentParameters(sender());
+
+    const auto nodeType = parameters.argument<NodeType>(Qn::NodeTypeRole, NodeType::resource);
 
     QnResourcePtr resource;
 
-    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     switch (nodeType)
     {
-        case Qn::ResourceNode:
-        case Qn::EdgeNode:
-        case Qn::RecorderNode:
-        case Qn::SharedLayoutNode:
-        case Qn::SharedResourceNode:
+        case NodeType::resource:
+        case NodeType::edge:
+        case NodeType::recorder:
+        case NodeType::sharedLayout:
+        case NodeType::sharedResource:
             resource = parameters.resource();
             break;
         default:
@@ -2035,7 +2076,7 @@ void ActionHandler::at_renameAction_triggered()
         return;
 
     QnVirtualCameraResourcePtr camera;
-    if (nodeType == Qn::RecorderNode)
+    if (nodeType == NodeType::recorder)
     {
         camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (!camera)
@@ -2043,8 +2084,8 @@ void ActionHandler::at_renameAction_triggered()
     }
 
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
-    QString oldName = nodeType == Qn::RecorderNode
-        ? camera->getGroupName()
+    QString oldName = nodeType == NodeType::recorder
+        ? camera->getUserDefinedGroupName()
         : resource->getName();
 
     // TODO: #vkutin #gdm Is the following block of code still in use?
@@ -2077,7 +2118,7 @@ void ActionHandler::at_renameAction_triggered()
         else
             context()->instance<LayoutsHandler>()->renameLayout(layout, name);
     }
-    else if (nodeType == Qn::RecorderNode)
+    else if (nodeType == NodeType::recorder)
     {
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();
@@ -2129,12 +2170,14 @@ void ActionHandler::at_removeFromServerAction_triggered()
 {
     QnResourceList resources = menu()->currentParameters(sender()).resources();
 
-    /* Layouts will be removed in their own handler. Also separately check each resource. */
+    // Layouts and videowalls will be removed in their own handlers.
+    // Also separately check each resource.
     resources = resources.filtered(
         [this](const QnResourcePtr& resource)
         {
             return menu()->canTrigger(action::RemoveFromServerAction, resource)
-                && !resource->hasFlags(Qn::layout);
+                && !resource->hasFlags(Qn::layout)
+                && !resource->hasFlags(Qn::videowall);
         });
 
     if (ui::messages::Resources::deleteResources(mainWindowWidget(), resources))
@@ -2148,6 +2191,7 @@ void ActionHandler::closeApplication(bool force) {
 
     menu()->trigger(action::BeforeExitAction);
     context()->setClosingDown(true);
+    mainWindowWidget()->hide();
     qApp->exit(0);
     applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT);
 }
@@ -2303,7 +2347,7 @@ void ActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
     // TODO: #Elric totally evil copypasta and hacky workaround.
     bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+        accessController()->hasGlobalPermission(GlobalPermission::admin);
 
     action(action::TogglePanicModeAction)->setEnabled(enabled);
     if (!enabled)
@@ -2374,8 +2418,8 @@ void ActionHandler::at_versionMismatchMessageAction_triggered()
     if (!watcher->hasMismatches())
         return;
 
-    QnSoftwareVersion latestVersion = watcher->latestVersion();
-    QnSoftwareVersion latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
+    const auto latestVersion = watcher->latestVersion();
+    auto latestMsVersion = watcher->latestVersion(Qn::ServerComponent);
 
     // if some component is newer than the newest mediaserver, focus on its version
     if (QnWorkbenchVersionMismatchWatcher::versionMismatches(latestVersion, latestMsVersion))
@@ -2452,19 +2496,16 @@ void ActionHandler::at_betaVersionMessageAction_triggered()
     if (context()->closingDown())
         return;
 
-    if (qnClientShowOnce->testFlag(kBetaVersionShowOnceKey))
+    if (ini().ignoreBetaWarning)
         return;
 
-    QnMessageBox dialog(QnMessageBoxIcon::Information,
+    QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
-        tr("Some functionality may be unavailable or not working properly."),
+        tr("Warning! This build is for testing purposes only! "
+            "Please upgrade to a next available patch or release version once available."),
         QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindowWidget());
 
-    dialog.setCheckBoxEnabled();
     dialog.exec();
-
-    if (dialog.isChecked())
-        qnClientShowOnce->setFlag(kBetaVersionShowOnceKey);
 }
 
 void ActionHandler::checkIfStatisticsReportAllowed() {
@@ -2484,9 +2525,11 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
         return;
 
     /* Suppress notification if no server has internet access. */
-    bool atLeastOneServerHasInternetAccess = boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr &server) {
-        return (server->getServerFlags() & Qn::SF_HasPublicIP);
-    });
+    const bool atLeastOneServerHasInternetAccess = boost::algorithm::any_of(servers,
+        [](const QnMediaServerResourcePtr &server)
+        {
+            return server->getServerFlags().testFlag(vms::api::SF_HasPublicIP);
+        });
     if (!atLeastOneServerHasInternetAccess)
         return;
 
@@ -2549,7 +2592,6 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     nx::utils::Url url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
-    url.setScheme(lit("http"));
     url.setPath(path);
     url.setFragment(fragment);
     url = qnClientModule->networkProxyFactory()->urlToResource(url, server, lit("proxy"));

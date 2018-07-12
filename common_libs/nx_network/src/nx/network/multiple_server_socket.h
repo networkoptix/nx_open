@@ -51,6 +51,7 @@ public:
     virtual bool setSendTimeout(unsigned int ms) override;
     virtual bool getSendTimeout(unsigned int* millis) const override;
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
+    virtual bool setIpv6Only(bool val) override;
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
@@ -64,10 +65,8 @@ public:
     //---------------------------------------------------------------------------------------------
     // Implementation of AbstractStreamServerSocket::*
     virtual bool listen(int queueLen) override;
-    virtual AbstractStreamSocket* accept() override;
+    virtual std::unique_ptr<AbstractStreamSocket> accept() override;
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
-    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void cancelIOSync() override;
 
     /**
      * These methods can be called concurrently with MultipleServerSocket::accept.
@@ -87,7 +86,7 @@ protected:
     AcceptCompletionHandler m_acceptHandler;
     AggregateAcceptor m_aggregateAcceptor;
 
-    void cancelIoFromAioThread();
+    virtual void cancelIoInAioThread() override;
 
 private:
     void stopWhileInAioThread();

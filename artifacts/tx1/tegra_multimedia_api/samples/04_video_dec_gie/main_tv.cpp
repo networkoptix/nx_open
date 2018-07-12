@@ -14,8 +14,9 @@
 #include "video_dec_gie_ini.h"
 #include "tegra_video_ini.h"
 
-#define NX_PRINT_PREFIX "[video_dec_gie main_tv] "
 #include <nx/kit/debug.h>
+
+#define NX_PRINT_PREFIX "[video_dec_gie main_tv] "
 
 namespace {
 

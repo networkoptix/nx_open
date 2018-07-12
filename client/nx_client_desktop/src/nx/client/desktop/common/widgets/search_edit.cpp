@@ -15,7 +15,7 @@
 #include <ui/common/palette.h>
 
 #include <utils/common/scoped_value_rollback.h>
-#include <nx/client/desktop/ui/common/selectable_text_button.h>
+#include <nx/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 
 namespace {
@@ -47,7 +47,7 @@ SearchEdit::SearchEdit(QWidget* parent):
     m_lineEdit(new QLineEdit(this)),
     m_menuButton(new QPushButton(this)),
     m_menu(new QMenu(this)),
-    m_tagButton(new ui::SelectableTextButton(this))
+    m_tagButton(new SelectableTextButton(this))
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
     setSizePolicy(m_lineEdit->sizePolicy());
@@ -84,8 +84,8 @@ SearchEdit::SearchEdit(QWidget* parent):
     m_tagButton->setFixedHeight(24);
     m_tagButton->setDeactivatable(true);
     m_tagButton->setSelectable(false);
-    m_tagButton->setState(ui::SelectableTextButton::State::unselected);
-    connect(m_tagButton, &ui::SelectableTextButton::stateChanged,
+    m_tagButton->setState(SelectableTextButton::State::unselected);
+    connect(m_tagButton, &SelectableTextButton::stateChanged,
         this, &SearchEdit::handleTagButtonStateChanged);
     connect(this, &SearchEdit::selectedTagIndexChanged, this, &SearchEdit::updateTagButton);
 
@@ -197,7 +197,7 @@ void SearchEdit::setTags(const QStringList& value)
 
 void SearchEdit::handleTagButtonStateChanged()
 {
-    if (m_tagButton->state() == ui::SelectableTextButton::State::deactivated)
+    if (m_tagButton->state() == SelectableTextButton::State::deactivated)
         setSelectedTagIndex(-1);
 }
 
@@ -234,7 +234,7 @@ void SearchEdit::updateTagButton()
     if (m_selectedTagIndex != -1)
     {
         m_tagButton->setText(m_tags.at(m_selectedTagIndex));
-        m_tagButton->setState(ui::SelectableTextButton::State::unselected);
+        m_tagButton->setState(SelectableTextButton::State::unselected);
     }
 
     m_tagButton->parentWidget()->setVisible(m_selectedTagIndex != -1);

@@ -1,12 +1,19 @@
 #pragma once
 
+#include <map>
+
 #include <plugins/resource/hanwha/hanwha_mapped_preset_manager.h>
-#include <plugins/resource/hanwha/hanwha_ptz_executor.h>
+#include <plugins/resource/hanwha/hanwha_ptz_command_streamer.h>
 #include <plugins/resource/hanwha/hanwha_common.h>
+#include <plugins/resource/hanwha/hanwha_ptz_common.h>
+#include <plugins/resource/hanwha/hanwha_range.h>
+#include <plugins/resource/hanwha/hanwha_ptz_common.h>
 
 #include <core/ptz/basic_ptz_controller.h>
 #include <core/resource/resource_fwd.h>
 #include <core/ptz/ptz_preset.h>
+
+#include <nx/utils/std/optional.h>
 
 namespace nx {
 namespace mediaserver_core {
@@ -18,30 +25,58 @@ class HanwhaPtzController: public QnBasicPtzController
     using base_type = QnAbstractPtzController;
 
 public:
-    using DevicePresetId = QString;
-    using NxPresetId = QString;
-
-public:
     HanwhaPtzController(const HanwhaResourcePtr& resource);
-    virtual ~HanwhaPtzController() override;
+    virtual ~HanwhaPtzController() = default;
 
-    virtual Ptz::Capabilities getCapabilities() const override;
-    void setPtzCapabilities(Ptz::Capabilities capabilities);
+    virtual Ptz::Capabilities getCapabilities(
+        const nx::core::ptz::Options& options) const override;
+
+    void setPtzCapabilities(const HanwhaPtzCapabilitiesMap& capabilities);
     void setPtzLimits(const QnPtzLimits& limits);
     void setPtzTraits(const QnPtzAuxilaryTraitList& traits);
-    void setAlternativePtzRanges(const std::map<QString, std::set<int>>& ranges);
+    void setPtzRanges(const HanwhaPtzRangeMap& ranges);
 
-    virtual bool continuousMove(const QVector3D& speed) override;
-    virtual bool continuousFocus(qreal speed) override;
+    virtual bool continuousMove(
+        const nx::core::ptz::Vector& speedVector,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool continuousFocus(
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
+
     virtual bool absoluteMove(
         Qn::PtzCoordinateSpace space,
-        const QVector3D& position,
-        qreal speed) override;
-    virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
+        const nx::core::ptz::Vector& position,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
-    virtual bool getFlip(Qt::Orientations* flip) const override;
+    virtual bool relativeMove(
+        const nx::core::ptz::Vector& relativeMovementVector,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool relativeFocus(
+        qreal relativeMovement,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool viewportMove(
+        qreal aspectRatio,
+        const QRectF& viewport,
+        qreal speed,
+        const nx::core::ptz::Options& options) override;
+
+    virtual bool getPosition(
+        Qn::PtzCoordinateSpace space,
+        nx::core::ptz::Vector* outPosition,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getLimits(
+        Qn::PtzCoordinateSpace space,
+        QnPtzLimits* limits,
+        const nx::core::ptz::Options& options) const override;
+
+    virtual bool getFlip(
+        Qt::Orientations* flip,
+        const nx::core::ptz::Options& options) const override;
 
     virtual bool createPreset(const QnPtzPreset& preset) override;
     virtual bool updatePreset(const QnPtzPreset& preset) override;
@@ -49,35 +84,43 @@ public:
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
     virtual bool getPresets(QnPtzPresetList* presets) const override;
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const override;
+    virtual bool getAuxilaryTraits(
+        QnPtzAuxilaryTraitList* auxilaryTraits,
+        const nx::core::ptz::Options& options) const override;
+
     virtual bool runAuxilaryCommand(
         const QnPtzAuxilaryTrait& trait,
-        const QString& data) override;
+        const QString& data,
+        const nx::core::ptz::Options& options) override;
 
 private:
     QString channel() const;
-    QVector3D toHanwhaSpeed(const QVector3D& speed) const;
-    QVector3D toHanwhaPosition(const QVector3D& position) const;
+    std::optional<HanwhaRange> range(
+        nx::core::ptz::Type ptzType,
+        const HanwhaPtzParameterName& parameterName) const;
+
+    nx::core::ptz::Vector toHanwhaSpeed(const nx::core::ptz::Vector& speed) const;
+    nx::core::ptz::Vector toHanwhaPosition(const nx::core::ptz::Vector& position) const;
+    std::optional<nx::core::ptz::Vector> toHanwhaRelativeMovement(
+        const nx::core::ptz::Vector& relativeMovement) const;
+
     QString toHanwhaFocusCommand(qreal speed) const;
     std::map<QString, QString> makeViewPortParameters(
         qreal aspectRatio,
         const QRectF rect) const;
 
-    bool alternativeContinuousMove(const QString& parameterName, qreal speed);
+    bool hasAnyCapability(Ptz::Capabilities capabilities, nx::core::ptz::Type ptzType) const;
 
 private:
-    using PresetNumber = QString;
-    using PresetId = QString;
-
     mutable QnMutex m_mutex;
     HanwhaResourcePtr m_hanwhaResource;
-    Ptz::Capabilities m_ptzCapabilities = Ptz::NoPtzCapabilities;
+    HanwhaPtzCapabilitiesMap m_ptzCapabilities;
     QnPtzLimits m_ptzLimits;
     QnPtzAuxilaryTraitList m_ptzTraits;
+    HanwhaPtzRangeMap m_ptzRanges;
     mutable std::unique_ptr<HanwhaMappedPresetManager> m_presetManager;
     QMap<QString, float> m_lastParamValue;
-    std::unique_ptr<HanwhaPtzExecutor> m_alternativePtzExecutor;
-
+    std::unique_ptr<HanwhaPtzCommandStreamer> m_commandStreamer;
 };
 
 } // namespace plugins

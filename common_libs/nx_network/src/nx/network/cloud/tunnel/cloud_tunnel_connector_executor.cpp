@@ -1,6 +1,5 @@
 #include "cloud_tunnel_connector_executor.h"
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -53,36 +52,28 @@ void ConnectorExecutor::setTimeout(std::chrono::milliseconds timeout)
 
 void ConnectorExecutor::start(CompletionHandler handler)
 {
-    m_handler = std::move(handler);
-
-    if (m_connectors.empty())
-        return reportNoSuitableConnectMethod();
-
-    NX_LOGX(lm("cross-nat %1. Starting %2 connector(s)")
-        .arg(m_connectSessionId).arg(m_connectors.size()),
-        cl_logDEBUG2);
-
-    auto connectorWithMinDelayIter = std::min_element(
-        m_connectors.begin(), m_connectors.end(),
-        [](const ConnectorContext& left, const ConnectorContext& right)
+    dispatch(
+        [this, handler = std::move(handler)]() mutable
         {
-            return left.startDelay < right.startDelay;
+            m_handler = std::move(handler);
+
+            if (m_connectors.empty())
+                return reportNoSuitableConnectMethod();
+
+            NX_LOGX(lm("cross-nat %1. Starting %2 connector(s)")
+                .arg(m_connectSessionId).arg(m_connectors.size()),
+                cl_logDEBUG2);
+
+            auto connectorWithMinDelayIter = std::min_element(
+                m_connectors.begin(), m_connectors.end(),
+                [](const ConnectorContext& left, const ConnectorContext& right)
+                {
+                    return left.startDelay < right.startDelay;
+                });
+            const auto delayOffset = connectorWithMinDelayIter->startDelay;
+
+            startConnectors(delayOffset);
         });
-    const auto delayOffset = connectorWithMinDelayIter->startDelay;
-
-    for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
-    {
-        if (it->startDelay > std::chrono::milliseconds::zero())
-        {
-            it->timer->start(
-                it->startDelay - delayOffset,
-                std::bind(&ConnectorExecutor::startConnector, this, it));
-        }
-        else
-        {
-            startConnector(it);
-        }
-    }
 }
 
 void ConnectorExecutor::stopWhileInAioThread()
@@ -98,9 +89,26 @@ void ConnectorExecutor::reportNoSuitableConnectMethod()
             nx::utils::swapAndCall(
                 m_handler,
                 nx::hpm::api::NatTraversalResultCode::noSuitableMethod,
-                SystemError::hostUnreach,
+                SystemError::hostUnreachable,
                 nullptr);
         });
+}
+
+void ConnectorExecutor::startConnectors(std::chrono::milliseconds delayOffset)
+{
+    for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
+    {
+        if (it->startDelay > std::chrono::milliseconds::zero())
+        {
+            it->timer->start(
+                it->startDelay - delayOffset,
+                std::bind(&ConnectorExecutor::startConnector, this, it));
+        }
+        else
+        {
+            startConnector(it);
+        }
+    }
 }
 
 void ConnectorExecutor::startConnector(
@@ -122,7 +130,7 @@ void ConnectorExecutor::onConnectorFinished(
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
     NX_LOGX(lm("cross-nat %1. Connector has finished with result: %2, %3")
-        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
+        .arg(m_connectSessionId).arg(api::toString(resultCode))
         .arg(SystemError::toString(sysErrorCode)),
         cl_logDEBUG2);
 

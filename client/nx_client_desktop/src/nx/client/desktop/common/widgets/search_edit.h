@@ -10,12 +10,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-namespace ui {
-
 class SelectableTextButton;
-
-} // namespace ui
-
 class CheckableMenu;
 
 class SearchEdit: public QWidget
@@ -83,7 +78,7 @@ private:
     QLineEdit* const m_lineEdit = nullptr;
     QPushButton* const m_menuButton = nullptr;
     QMenu* const m_menu = nullptr;
-    ui::SelectableTextButton* const m_tagButton = nullptr;
+    SelectableTextButton* const m_tagButton = nullptr;
 
     bool m_hightlighted = false;
     int m_selectedTagIndex = -1;

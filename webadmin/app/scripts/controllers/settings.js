@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', ['$scope', '$rootScope', '$modal', '$log', 'mediaserver', '$poll', '$localStorage',
+    .controller('SettingsCtrl', ['$scope', '$rootScope', '$uibModal', '$log', 'mediaserver', '$poll', '$localStorage',
                                  'cloudAPI', '$location', '$timeout', 'dialogs', 'nativeClient',
-    function ($scope, $rootScope, $modal, $log, mediaserver, $poll, $localStorage, cloudAPI, $location,
+    function ($scope, $rootScope, $uibModal, $log, mediaserver, $poll, $localStorage, cloudAPI, $location,
               $timeout, dialogs, nativeClient) {
 
         if(mediaserver.hasProxy()){
@@ -103,7 +103,7 @@ angular.module('webadminApp')
         $scope.confirmPassword = '';
 
         $scope.openJoinDialog = function () {
-            $modal.open({
+            $uibModal.open({
                 templateUrl: Config.viewsDir + 'join.html',
                 controller: 'JoinCtrl',
                 resolve: {
@@ -120,7 +120,7 @@ angular.module('webadminApp')
             dialogs.confirmWithPassword(null, L.settings.confirmRestoreDefault, L.settings.confirmRestoreDefaultTitle).then(function(oldPassword){
 
                 mediaserver.checkCurrentPassword(oldPassword).then(function() {
-                    mediaserver.restoreFactoryDefaults().then(function (data) {
+                    mediaserver.restoreFactoryDefaults(oldPassword).then(function (data) {
                         if (data.data.error !== '0' && data.data.error !== 0) {
                             // Some Error has happened
                             dialogs.alert(data.data.errorString);
@@ -140,7 +140,7 @@ angular.module('webadminApp')
         };
 
         function restartServer(passPort){
-            $modal.open({
+            $uibModal.open({
                 templateUrl: Config.viewsDir + 'restart.html',
                 controller: 'RestartCtrl',
                 resolve:{
@@ -283,7 +283,7 @@ angular.module('webadminApp')
         }
 
         function openCloudDialog(){
-            $modal.open({
+            $uibModal.open({
                 templateUrl: Config.viewsDir + 'dialogs/cloudDialog.html',
                 controller: 'CloudDialogCtrl',
                 backdrop:'static',
@@ -319,7 +319,7 @@ angular.module('webadminApp')
                     //1. Check password
                     return mediaserver.checkCurrentPassword(oldPassword).then(function() {
                         // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
-                        mediaserver.changeAdminPassword($scope.settings.rootPassword).then(function(result){
+                        mediaserver.changeAdminPassword($scope.settings.rootPassword, oldPassword).then(function(result){
                             resultHandler(result);
                             if($localStorage.login == Config.defaultLogin){
                                 mediaserver.login($localStorage.login, $scope.settings.rootPassword);

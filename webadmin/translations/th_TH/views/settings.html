@@ -15,8 +15,8 @@
             </alert>
 
 
-            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+            <uib-tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>พอร์ท</h3>
@@ -42,8 +42,8 @@
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>แยกออกจากระบบเซิร์ฟเวอร์</h3>
-                        <p>This action will detach server from the system keeping database, local users and configuration.
-                            ที่เก็บวิดีโอจะยังคงเดิม <b>Cloud users will be deleted.</b></p>
+                        <p>การดำเนินการนี้จะแยกเซิร์ฟเวอร์จากระบบที่เก็บรักษาฐานข้อมูลผู้ใช้ภายในและการกำหนดค่า
+                            ที่เก็บวิดีโอจะยังคงเดิม <b> ผู้ใช้ระบบคลาวด์จะถูกลบ </b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">แยกออกจากระบบ</button></p>
                     </div>
                     <div>
@@ -64,9 +64,9 @@
                             </div>
                         </form>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                <uib-tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>ชื่อ</h3>
                         <div class="row">
@@ -111,13 +111,13 @@
                                    target="_blank">สร้างบัญชี {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
-                </tab>
+                </uib-tab>
 
-                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                <uib-tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
-                        <h3>Device Network Settings</h3>
+                        <h3>การตั้งค่าเครือข่ายอุปกรณ์</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
-                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Save settings and reboot the device</button>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">บันทึกการตั้งค่าและรีบูตเครื่อง</button>
                     </div>
                     <div ng-if="settings.flags.canSetupTime">
                         <h3>วันและเวลา</h3>
@@ -142,7 +142,7 @@
                                                 <input type="text"
                                                        id="date" name="date"
                                                        class="form-control"
-                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       uib-datepicker-popup="{{Config.dateSettingsFormat}}"
                                                        ng-model="dateTimeSettings.dateTime"
                                                        required
  is-open="dateTimeSettings.openDate"
@@ -155,7 +155,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                            <div ng-model="dateTimeSettings.dateTime" uib-timepicker></div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -172,8 +172,8 @@
                         <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()"> เรียกใช้ไคลเอ็นต์ </button> <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()"> หยุดไคลเอ็นต์ </button></p>
                         <p>ใช้แป้นพิมพ์ / เมาส์หรือแอปพลิเคชันมือถือเพื่อควบคุม</p>
                     </div>
-                </tab>
-            </tabset>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>

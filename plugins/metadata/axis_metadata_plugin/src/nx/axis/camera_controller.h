@@ -1,73 +1,15 @@
 #pragma once
 
-#include <algorithm>
 #include <initializer_list>
 #include <iterator>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <nx/utils/std/cpp14.h>
+#include <nx/utils/scoped_garbage_collector.h>
 
 namespace nx {
 namespace axis {
-
-// ScopedGarbageCollector should be relocated to some other module. Ask Roma where to.
-/**
-* Scoped Garbage Collector.
-* Declare
-* Usage:
-* 1. Declare garbage collector, e.g.
-*     <code>ScopedGarbageCollector gc;</code>
-* 2. Create objects with "create" member-function, e.g.
-* <pre><code>
-*     int* i = gc.create<int>;
-*     std::string* s1 = gc.create<std::string>("Hello!");
-*     auto s2 = gc.create<std::string>("Bye!");
-*     MyClass* myClass = gc.create<MyClass>(100, 200, "Ok");
-* </code></pre>
-* 3. Objects will be deleted when gc leaves it scope.
-* 4. Information: objects are deleted in reversed order: last created id destroyed first.
-*/
-class ScopedGarbageCollector final
-{
-    class BaseDeleter
-    {
-    public:
-        virtual ~BaseDeleter() = default;
-    };
-
-    template<class T>
-    class Deleter: public BaseDeleter
-    {
-        T* m_object;
-    public:
-        Deleter(T* object) noexcept : m_object(object) {}
-        virtual ~Deleter() override { delete m_object; }
-    };
-
-    std::vector<BaseDeleter*> m_deleters;
-
-public:
-    ~ScopedGarbageCollector()
-    {
-        std::for_each(m_deleters.rbegin(), m_deleters.rend(), [](BaseDeleter* d) { delete d; });
-    }
-
-    template<class T, class ...Args>
-    T* create(Args&& ... args)
-    {
-        // auto_ptr provides exception safety if code below throws exception.
-        auto object = std::make_unique<T>(std::forward<Args>(args)...);
-
-        // Separate push_back call provides exception safety if push_back fails.
-        m_deleters.push_back(nullptr);
-        m_deleters.back() = new Deleter<T>(object.get());
-
-        return object.release();
-    }
-};
 
 struct NameTypeParameter
 {
@@ -253,8 +195,6 @@ struct ActiveRecipient
 
 };
 
-
-
 class CameraController
 {
 public:
@@ -306,6 +246,7 @@ public:
 
     void filterSupportedEvents(const std::vector<std::string>& neededTopics);
     void filterSupportedEvents(std::initializer_list<const char*> neededTopics);
+    void removeForbiddenEvents(const std::vector<std::string>& forbiddenDescriptions);
 
     // The methods which names begin with "add" or "remove" do not modify corresponding inner
     // vectors. To update a vector call appropriate read method.

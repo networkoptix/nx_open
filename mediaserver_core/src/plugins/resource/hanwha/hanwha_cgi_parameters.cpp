@@ -19,7 +19,11 @@ HanwhaCgiParameters::HanwhaCgiParameters(
     m_statusCode(statusCode)
 
 {
-    m_isValid = parseXml(rawBuffer);
+    QXmlStreamReader reader(rawBuffer);
+    m_parameters.clear();
+    parseXml(reader);
+    m_isValid = !reader.hasError() ||
+        reader.error() == QXmlStreamReader::PrematureEndOfDocumentError;
 }
 
 boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(
@@ -61,7 +65,9 @@ boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(const QString
 
 bool HanwhaCgiParameters::isValid() const
 {
-    return m_isValid && nx::network::http::StatusCode::isSuccessCode(m_statusCode);
+    return m_isValid
+        && nx::network::http::StatusCode::isSuccessCode(m_statusCode)
+        && !m_parameters.empty();
 }
 
 nx::network::http::StatusCode::Value HanwhaCgiParameters::statusCode() const
@@ -69,268 +75,117 @@ nx::network::http::StatusCode::Value HanwhaCgiParameters::statusCode() const
     return m_statusCode;
 }
 
-bool HanwhaCgiParameters::parseXml(const nx::Buffer& rawBuffer)
+QString HanwhaCgiParameters::strAttribute(QXmlStreamReader& reader, const QString& name)
 {
-    QXmlStreamReader reader(rawBuffer);
-
-    if (!reader.readNextStartElement())
-        return false;
-
-    if (reader.name() == kHanwhaCgisNodeName)
-        reader.readNextStartElement();
-
-    if (reader.name() != kHanwhaCgiNodeName)
-        return false;
-
-    return parseCgis(reader);
+    return reader.attributes().value(name).toString();
 }
 
-bool HanwhaCgiParameters::parseCgis(QXmlStreamReader& reader)
-{
-    while (reader.name() == kHanwhaCgiNodeName)
-    {
-        auto cgiName = reader.attributes().value(kHanwhaNameAttribute).toString();
-
-        if (!reader.readNextStartElement())
-            return false;
-
-        if (!parseSubmenus(reader, cgiName))
-            return false;
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-    }
-
-    return true;
-}
-
-bool HanwhaCgiParameters::parseSubmenus(QXmlStreamReader& reader, const QString& cgi)
-{
-    while (reader.name() == kHanwhaSubmenuNodeName)
-    {
-        auto submenuName = reader.attributes().value(kHanwhaNameAttribute).toString();
-
-        if (reader.readNextStartElement())
-        {
-            if (!parseActions(reader, cgi, submenuName))
-                return false;
-
-            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-        }
-        else
-        {
-            // It is an empty submenu section
-            reader.readNext();
-            if (reader.hasError())
-                return false;
-        }
-    }
-
-    return true;
-}
-
-bool HanwhaCgiParameters::parseActions(
-    QXmlStreamReader& reader,
-    const QString& cgi,
-    const QString& submenu)
-{
-    while (reader.name() == kHanwhaActionNodeName)
-    {
-        auto actionName = reader.attributes().value(kHanwhaNameAttribute).toString();
-        actionName.replace(L'/', L'_');
-
-        while (!reader.hasError() && !reader.atEnd())
-        {
-            const auto tokenType = reader.readNext();
-            const bool isElement = tokenType == QXmlStreamReader::EndElement
-                || tokenType == QXmlStreamReader::StartElement;
-
-            if (isElement)
-                break;
-        }
-
-        if (reader.atEnd())
-            return reader.hasError();
-
-        if (reader.isEndElement())
-        {
-            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-            continue;
-        }
-
-        if (reader.name() == kHanwhaParameterNodeName)
-        {
-            if (!parseParameters(reader, cgi, submenu, actionName))
-                return false;
-        }
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-    }
-
-    return true;
-}
-
-bool HanwhaCgiParameters::parseParameters(
+void HanwhaCgiParameters::parseXml(
     QXmlStreamReader& reader,
     const QString& cgi,
     const QString& submenu,
     const QString& action)
 {
-    while (reader.name() == kHanwhaParameterNodeName)
+    while (!reader.atEnd() && reader.readNextStartElement())
     {
-        const auto attributes = reader.attributes();
-        const auto parameterName = attributes.value(kHanwhaNameAttribute).toString();
-        const bool isRequestParameter = attributes
-            .value(kHanwhaParameterIsRequestAttribute)
-            .toString()
-            .toLower() == kHanwhaTrue.toLower();
-
-        const bool isResponseParameter = attributes
-            .value(kHanwhaParameterIsResponseAttribute)
-            .toString()
-            .toLower() == kHanwhaTrue.toLower();
-
-        HanwhaCgiParameter parameter;
-        parameter.setName(parameterName);
-        parameter.setIsRequestParameter(isRequestParameter);
-        parameter.setIsResponseParameter(isResponseParameter);
-
-        while (!reader.hasError() && !reader.atEnd())
-        {
-            const auto tokenType = reader.readNext();
-            bool isElement = tokenType == QXmlStreamReader::EndElement
-                || tokenType == QXmlStreamReader::StartElement;
-
-            if (isElement)
-                break;
-        }
-
-        if (reader.isEndElement())
-        {
-            READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-            continue;
-        }
-
-        if (reader.name() == kHanwhaDataTypeNodeName)
-        {
-            if (!parseDataType(reader, cgi, submenu, action, parameter))
-                return false;
-        }
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+        if (reader.name() == "cgi")
+            parseXml(reader, strAttribute(reader, "name"));
+        else if (reader.name() == "submenu")
+            parseXml(reader, cgi, strAttribute(reader, "name"));
+        else if (reader.name() == "action")
+            parseXml(reader, cgi, submenu, strAttribute(reader, "name").replace(L'/', L'_'));
+        else if (reader.name() == "parameter")
+            parseParameter(reader, cgi, submenu, action, strAttribute(reader, "name"));
+        else
+            parseXml(reader);
     }
-
-    return true;
 }
 
-bool HanwhaCgiParameters::parseDataType(
+void HanwhaCgiParameters::parseParameter(
     QXmlStreamReader& reader,
     const QString& cgi,
     const QString& submenu,
     const QString& action,
-    HanwhaCgiParameter& parameter)
+    const QString& parameterName)
 {
-    if (reader.name() != kHanwhaDataTypeNodeName)
-        return false;
+    const auto attributes = reader.attributes();
+    const bool isRequestParameter = strAttribute(reader, kHanwhaParameterIsRequestAttribute)
+        .compare(kHanwhaTrue, Qt::CaseInsensitive) == 0;
 
-    READ_NEXT_AND_RETURN_IF_NEEDED(reader);
+    const bool isResponseParameter = strAttribute(reader, kHanwhaParameterIsResponseAttribute)
+        .compare(kHanwhaTrue, Qt::CaseInsensitive) == 0;
 
-    if (reader.name() == kHanwhaDataTypeNodeName)
+    HanwhaCgiParameter parameter;
+    parameter.setName(parameterName);
+    parameter.setIsRequestParameter(isRequestParameter);
+    parameter.setIsResponseParameter(isResponseParameter);
+
+    parseDataType(reader, &parameter);
+    m_parameters[cgi][submenu][action][parameterName] = parameter;
+}
+
+void HanwhaCgiParameters::parseDataType(
+    QXmlStreamReader& reader,
+    HanwhaCgiParameter* outParameter)
+{
+    while (!reader.atEnd() && reader.readNextStartElement())
     {
-        reader.skipCurrentElement();
-        return true;
-    }
+        const auto& attributes = reader.attributes();
 
-    if (reader.name() == kHanwhaEnumNodeName || reader.name() == kHanwhaCsvNodeName)
-    {
-        QStringList possibleValues;
-        while (reader.readNextStartElement() && reader.name() == kHanwhaEnumEntryNodeName)
+        if (reader.name() == kHanwhaDataTypeNodeName)
         {
-            auto entryValue = reader.attributes()
-                .value(kHanwhaValueAttribute)
-                .toString();
-
+            outParameter->setType(HanwhaCgiParameterType::enumeration);
+        }
+        else if (reader.name() == kHanwhaEnumEntryNodeName)
+        {
+            auto entryValue = strAttribute(reader, kHanwhaValueAttribute);
             if (!entryValue.isEmpty())
-                possibleValues.push_back(entryValue);
+                outParameter->addPossibleValues(entryValue);
+        }
+        else if (reader.name() == kHanwhaIntegerNodeName)
+        {
+            outParameter->setType(HanwhaCgiParameterType::integer);
+            bool success = false;
 
-            reader.skipCurrentElement();
+            const int min = attributes.value(kHanwhaMinValueAttribute).toInt(&success);
+            if (success)
+                outParameter->setMin(min);
+
+            const int max = attributes.value(kHanwhaMaxValueAttribute).toInt(&success);
+            if (success)
+                outParameter->setMax(max);
+        }
+        else if (reader.name() == kHanwhaFloatNodeName)
+        {
+            outParameter->setType(HanwhaCgiParameterType::floating);
+            bool success = false;
+
+            const float min = attributes.value(kHanwhaMinValueAttribute).toFloat(&success);
+            if (success)
+                outParameter->setFloatMin(min);
+
+            const float max = attributes.value(kHanwhaMaxValueAttribute).toFloat(&success);
+            if (success)
+                outParameter->setFloatMax(max);
+        }
+        else if (reader.name() == kHanwhaBooleanNodeName)
+        {
+            outParameter->setType(HanwhaCgiParameterType::boolean);
+
+            outParameter->setFalseValue(strAttribute(reader, kHanwhaFalseValueAttribute));
+            outParameter->setTrueValue(strAttribute(reader, kHanwhaTrueValueAttribute));
+        }
+        else if (reader.name() == kHanwhaStringNodeName)
+        {
+            outParameter->setType(HanwhaCgiParameterType::string);
+
+            outParameter->setFormatInfo(strAttribute(reader, kHanwhaFormatInfoAttribute));
+            outParameter->setFormatString(strAttribute(reader, kHanwhaFormatAttribute));
+            outParameter->setMaxLength(attributes.value(kHanwhaMaxLengthAttribute).toInt());
         }
 
-        parameter.setPossibleValues(possibleValues);
-        parameter.setType(HanwhaCgiParameterType::enumeration);
-        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
+        parseDataType(reader, outParameter);
     }
-    else if (reader.name() == kHanwhaIntegerNodeName)
-    {
-        parameter.setType(HanwhaCgiParameterType::integer);
-        const auto& attributes = reader.attributes();
-        bool success = false;
-
-        const int min = attributes.value(kHanwhaMinValueAttribute).toInt(&success);
-        if (success)
-            parameter.setMin(min);
-
-        const int max = attributes.value(kHanwhaMaxValueAttribute).toInt(&success);
-        if (success)
-            parameter.setMax(max);
-
-        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-    }
-    else if (reader.name() == kHanwhaFloatNodeName)
-    {
-        parameter.setType(HanwhaCgiParameterType::floating);
-        const auto& attributes = reader.attributes();
-        bool success = false;
-
-        const int min = attributes.value(kHanwhaMinValueAttribute).toFloat(&success);
-        if (success)
-            parameter.setFloatMin(min);
-
-        const int max = attributes.value(kHanwhaMaxValueAttribute).toFloat(&success);
-        if (success)
-            parameter.setFloatMax(max);
-
-        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-    }
-    else if (reader.name() == kHanwhaBooleanNodeName)
-    {
-        const auto attributes = reader.attributes();
-        const auto falseValue = attributes.value(kHanwhaFalseValueAttribute).toString();
-        const auto trueValue = attributes.value(kHanwhaTrueValueAttribute).toString();
-
-        parameter.setType(HanwhaCgiParameterType::boolean);
-        parameter.setFalseValue(falseValue);
-        parameter.setTrueValue(trueValue);
-
-        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-    }
-    else if (reader.name() == kHanwhaStringNodeName)
-    {
-        parameter.setType(HanwhaCgiParameterType::string);
-
-        const auto attributes = reader.attributes();
-        const auto formatInfo = attributes.value(kHanwhaFormatInfoAttribute).toString();
-        const auto format = attributes.value(kHanwhaFormatAttribute).toString();
-        const auto maxLength = attributes.value(kHanwhaMaxLengthAttribute).toInt();
-
-        parameter.setFormatInfo(formatInfo);
-        parameter.setFormatString(format);
-        parameter.setMaxLength(maxLength);
-
-        m_parameters[cgi][submenu][action][parameter.name()] = parameter;
-
-        READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-    }
-
-    READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-    READ_NEXT_AND_RETURN_IF_NEEDED(reader);
-
-    return true;
 }
 
 } // namespace plugins

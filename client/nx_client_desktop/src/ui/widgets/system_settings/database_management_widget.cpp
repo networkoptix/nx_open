@@ -13,7 +13,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -29,7 +28,6 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     ui(new Ui::DatabaseManagementWidget())
 {
     ui->setupUi(this);
-    ui->labelWidget->setText(tr("You can create a backup for System configurations that can be restored in case of failure."));
 
     setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
 
@@ -85,7 +83,7 @@ void QnDatabaseManagementWidget::backupDb()
     QByteArray databaseData;
     auto dumpDatabaseHandler =
         [&dialog, &errorCode, &databaseData]
-        (int /*reqID*/, ec2::ErrorCode _errorCode, const ec2::ApiDatabaseDumpData& dbData)
+        (int /*reqID*/, ec2::ErrorCode _errorCode, const nx::vms::api::DatabaseDumpData& dbData)
         {
             errorCode = _errorCode;
             databaseData = dbData.data;
@@ -111,11 +109,11 @@ void QnDatabaseManagementWidget::backupDb()
 
 void QnDatabaseManagementWidget::restoreDb()
 {
-    QString fileName = QnFileDialog::getOpenFileName(
+    QString fileName = QFileDialog::getOpenFileName(
         this,
         tr("Open Database Backup..."),
         qnSettings->lastDatabaseBackupDir(),
-        tr("Database Backup Files (*.db)"),
+        tr("Database Backup Files") + lit( "(*.db)"),
         NULL,
         QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())
@@ -146,7 +144,7 @@ void QnDatabaseManagementWidget::restoreDb()
         return;
     }
 
-    ec2::ApiDatabaseDumpData data;
+    nx::vms::api::DatabaseDumpData data;
     data.data = file.readAll();
     file.close();
 

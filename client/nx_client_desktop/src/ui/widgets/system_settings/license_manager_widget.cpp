@@ -32,12 +32,11 @@
 
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
-
-#include <llutil/hardware_id.h>
+#include <licensing/hardware_id_version.h>
 
 #include <nx/fusion/serialization/json_functions.h>
 
-#include <ui/common/widget_anchor.h>
+#include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
@@ -54,13 +53,16 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/license/util.h>
+#include <nx/vms/api/types/connection_types.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
-#include <nx/client/desktop/ui/common/clipboard_button.h>
+#include <nx/client/desktop/common/widgets/clipboard_button.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx;
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -183,7 +185,6 @@ protected:
 
 } // namespace
 
-
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -202,7 +203,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->alertBar->setVisible(false);
 
     m_exportLicensesButton = new QPushButton(ui->licensesGroupBox);
-    auto anchor = new QnWidgetAnchor(m_exportLicensesButton);
+    auto anchor = new WidgetAnchor(m_exportLicensesButton);
     anchor->setEdges(Qt::TopEdge | Qt::RightEdge);
     static const int kButtonTopAdjustment = -4;
     anchor->setMargins(0, kButtonTopAdjustment, 0, 0);
@@ -321,7 +322,7 @@ void QnLicenseManagerWidget::updateLicenses()
     bool connected = false;
     for (const QnPeerRuntimeInfo& info: runtimeInfoManager()->items()->getItems())
     {
-        if (info.data.peer.peerType != Qn::PT_Server)
+        if (info.data.peer.peerType != vms::api::PeerType::server)
             continue;
         connected = true;
         break;
@@ -357,10 +358,11 @@ void QnLicenseManagerWidget::updateLicenses()
 
         for (auto helper: helpers)
         {
-            for(Qn::LicenseType lt: helper->licenseTypes())
+            for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                if (helper->totalLicenses(lt) > 0)
-                    messages << lit("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                const int total = helper->totalLicenses(lt);
+                if (total > 0)
+                    messages << QnLicense::displayText(lt, total);
             }
         }
 
@@ -368,23 +370,24 @@ void QnLicenseManagerWidget::updateLicenses()
         {
             for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                if (helper->usedLicenses(lt) == 0)
+                const int used = helper->usedLicenses(lt);
+                if (used == 0)
                     continue;
 
                 if (helper->isValid(lt))
                 {
-                    messages << tr("%n %1 are currently in use", "", helper->usedLicenses(lt))
-                        .arg(QnLicense::longDisplayName(lt));
+                    messages << tr("%1 are currently in use", "", used)
+                        .arg(QnLicense::displayText(lt, used));
                 }
                 else
                 {
-                    messages << setWarningStyleHtml(tr("At least %n %1 are required", "",
-                        helper->requiredLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
+                    const int required = helper->requiredLicenses(lt);
+                    messages << setWarningStyleHtml(tr("At least %1 are required", "", required)
+                        .arg(QnLicense::displayText(lt, required)));
                 }
-
-
             }
         }
+
         ui->infoLabel->setText(messages.join(lit("<br/>")));
     }
 
@@ -403,7 +406,7 @@ void QnLicenseManagerWidget::showMessageLater(
             showMessage(icon, text, extras, button);
         };
 
-    executeDelayedParented(showThisMessage, 0, this);
+    executeLater(showThisMessage, this);
 }
 
 void QnLicenseManagerWidget::showMessage(
@@ -462,7 +465,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     for (const QString& hwid: hardwareIds)
     {
-        int version = LLUtil::hardwareIdVersion(hwid);
+        int version = nx::utils::license::hardwareIdVersion(hwid);
 
         QString name;
         if (version == 0)
@@ -478,7 +481,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     if (infoMode)
         params.addQueryItem(lit("mode"), lit("info"));
 
-    ec2::ApiRuntimeData runtimeData = runtimeInfoManager()->remoteInfo().data;
+    const auto runtimeData = runtimeInfoManager()->remoteInfo().data;
 
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);
@@ -907,12 +910,12 @@ void QnLicenseManagerWidget::at_licensesReceived(const QByteArray& licenseKey, e
 
 void QnLicenseManagerWidget::at_downloadError()
 {
-    if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender()))
+    if (const auto reply = qobject_cast<QNetworkReply*>(sender()))
     {
-        disconnect(reply, NULL, this, NULL); //avoid double "onError" handling
+        reply->disconnect(this); //< Avoid double "onError" handling.
         reply->deleteLater();
 
-        /* QNetworkReply slots should not start eventLoop */
+        // QNetworkReply slots should not start eventLoop.
         showMessageLater(QnMessageBoxIcon::Critical,
             networkErrorText(), networkErrorExtras(),
             CopyToClipboardButton::Hide);
@@ -1126,8 +1129,8 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
     const QString& time)
 {
     auto extras = (time.isEmpty()
-        ? tr("This license is already activated and linked to Hardware Id %1").arg(hwid)
-        : tr("This license is already activated and linked to Hardware Id %1 on %2")
+        ? tr("This license is already activated and linked to Hardware ID %1").arg(hwid)
+        : tr("This license is already activated and linked to Hardware ID %1 on %2")
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();

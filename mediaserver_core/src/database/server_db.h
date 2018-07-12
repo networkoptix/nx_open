@@ -48,14 +48,20 @@ public:
 
     /* Bookmarks API */
 
-    // It does not sort by tags or camera names. Caller should sort it manually
-    bool getBookmarks(const QnSecurityCamResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
+    // It does not sort by tags or camera names. Caller should sort it manually.
+    bool getBookmarks(const QnSecurityCamResourceList& cameras,
+        const QnCameraBookmarkSearchFilter& filter, QnCameraBookmarkList& result);
 
-    bool containsBookmark(const QnUuid &bookmarkId) const;
+    bool containsBookmark(const QnUuid& bookmarkId) const;
+
+    bool getBookmarks(
+        const QList<QnUuid>& cameraIds,
+        const QnCameraBookmarkSearchFilter& filter,
+        QnCameraBookmarkList& result);
     QnCameraBookmarkTagList getBookmarkTags(int limit = std::numeric_limits<int>().max());
 
-    bool addBookmark(const QnCameraBookmark &bookmark);
-    bool updateBookmark(const QnCameraBookmark &bookmark);
+    bool addBookmark(const QnCameraBookmark& bookmark);
+    bool updateBookmark(const QnCameraBookmark& bookmark);
     bool deleteAllBookmarksForCamera(const QnUuid& cameraId);
     bool deleteBookmark(const QnUuid &bookmarkId);
     bool deleteBookmarksToTime(const QMap<QnUuid, qint64>& dataToDelete);
@@ -81,7 +87,17 @@ private:
     bool cleanupAuditLog();
 
     QString getRequestStr(const QnEventLogFilterData& request,
-        Qt::SortOrder order = Qt::AscendingOrder, int limit = std::numeric_limits<int>().max()) const;
+        Qt::SortOrder order = Qt::AscendingOrder,
+        int limit = std::numeric_limits<int>().max()) const;
+    bool getBookmarksInternal(
+        const QList<QnUuid>& cameraIds,
+        const QnCameraBookmarkSearchFilter &filter,
+        QnCameraBookmarkList &result,
+        bool isAdditionRangeRequest);
+    bool getMaxBookmarksMaxDurationMs(
+        const QList<QnUuid>& cameraIds,
+        const QnCameraBookmarkSearchFilter& filter,
+        qint64* outResult) const;
 
 private:
     qint64 m_lastCleanuptime;

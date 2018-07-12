@@ -36,7 +36,6 @@ using namespace nx::mediaserver_core::plugins;
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
 
-
 // Add vendor and camera model to omit ONVIF search (you have to add in case insensitive here)
 static const char* ANALOG_CAMERAS[][2] =
 {
@@ -54,7 +53,7 @@ static const char* IGNORE_VENDORS[][2] =
     {"acti*", "*"},       // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
     {"*", "KCM*"},        // ACTi
     {"*", "DWCA-*"},      // NEW ISD cameras rebranded to DW
-	{"*", "DWEA-*"},      // NEW ISD cameras rebranded to DW
+    {"*", "DWEA-*"},      // NEW ISD cameras rebranded to DW
     {"*", "DWCS-*"},       // NEW ISD cameras rebranded to DW
     {"Network Optix", "*"}, // Nx cameras
     {"Digital Watchdog", "XPM-FL72-48MP"}, //For some reasons we want to use ISD resource instead Onvif Digital Watchdog one.
@@ -110,6 +109,7 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnCommonModule*
     m_hookChain.registerHook(searcher_hooks::hikvisionManufacturerReplacement);
     m_hookChain.registerHook(searcher_hooks::manufacturerReplacementByModel);
     m_hookChain.registerHook(searcher_hooks::pelcoModelNormalization);
+    m_hookChain.registerHook(searcher_hooks::additionalManufacturerNormalization);
 }
 
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
@@ -200,7 +200,6 @@ void OnvifResourceInformationFetcher::findResources(
     //if (info.name.contains(QLatin1String("netw")) || info.manufacturer.contains(QLatin1String("netw")))
     //    int n = 0;
 
-
     if (needIgnoreCamera(QUrl(endpoint).host(), info.manufacturer, info.name))
         return;
 
@@ -287,14 +286,12 @@ void OnvifResourceInformationFetcher::findResources(
         model = info.uniqId;
     }
 
-
     QnPlOnvifResourcePtr res = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
                                               model, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
     if (res)
         result << res;
     else
         return;
-
 
     QnResourceData resourceData = qnStaticCommon->dataPool()->data(res->getVendor(), res->getModel());
     bool shouldAppearAsSingleChannel =
@@ -315,11 +312,11 @@ void OnvifResourceInformationFetcher::findResources(
         }
         else {
             groupId = onvifRes->getGroupId();
-            groupName = onvifRes->getGroupName();
+            groupName = onvifRes->getUserDefinedGroupName();
         }
 
         res->setGroupId(groupId);
-        res->setGroupName(groupName);
+        res->setDefaultGroupName(groupName);
 
         for (int i = 1; i < onvifRes->getMaxChannels(); ++i)
         {
@@ -331,7 +328,7 @@ void OnvifResourceInformationFetcher::findResources(
                 subres->setPhysicalId(info.uniqId + suffix.replace(QLatin1String("?"), QLatin1String("_")));
                 subres->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
                 subres->setGroupId(groupId);
-                subres->setGroupName(groupName);
+                subres->setDefaultGroupName(groupName);
                 result << subres;
             }
         }
@@ -449,7 +446,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new nx::plugins::flir::OnvifResource());
     else if (manufacture.toLower().contains(QLatin1String("vivotek")))
         resource = QnPlOnvifResourcePtr(new VivotekResource());
-	else if (manufacture.toLower().contains(QLatin1String("merit-lilin")))
+    else if (manufacture.toLower().contains(QLatin1String("merit-lilin")))
         resource = QnPlOnvifResourcePtr(new LilinResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());

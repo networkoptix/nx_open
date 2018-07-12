@@ -91,7 +91,7 @@ String Engine::makeCertificateAndKey(
 static String x509info(X509& x509)
 {
     auto issuer = utils::wrapUnique(X509_NAME_oneline(
-        X509_get_issuer_name(&x509), NULL, 0), &CRYPTO_free);
+        X509_get_issuer_name(&x509), NULL, 0), [](char* ptr) { free(ptr); });
 
     if (!issuer || !issuer.get())
         return String("unavaliable");
@@ -133,7 +133,7 @@ static bool x509load(ssl::SslStaticData* sslData, const Buffer& certBytes)
         chainSize += (size_t)certSize;
         if (chainSize > maxChainSize)
         {
-            NX_ASSERT(false, "SSL: Certificate chain leght is too long");
+            NX_ASSERT(false, "SSL: Certificate chain is too long");
             return true;
         }
 
@@ -179,38 +179,58 @@ bool Engine::useCertificateAndPkey(const String& certData)
     return x509load(sslData, certData) && pKeyLoad(sslData, certData);
 }
 
-void Engine::useOrCreateCertificate(
+bool Engine::useOrCreateCertificate(
     const QString& filePath,
     const String& name, const String& country, const String& company)
 {
-    String certData;
-    QFile file(filePath);
-    if (filePath.isEmpty()
-        || !file.open(QIODevice::ReadOnly)
-        || (certData = file.readAll()).isEmpty())
+    if (loadCertificateFromFile(filePath))
     {
-        file.close();
-        NX_LOG(lm("SSL: Unable to find valid SSL certificate '%1', generate new one")
-            .arg(filePath), cl_logALWAYS);
+        NX_LOG(lm("SSL: Loaded certificate from '%1'").arg(filePath), cl_logINFO);
+        return true;
+    }
 
-        certData = makeCertificateAndKey(name, country, company);
+    NX_LOG(lm("SSL: Unable to find valid SSL certificate '%1', generate new one")
+        .arg(filePath), cl_logALWAYS);
 
-        NX_ASSERT(!certData.isEmpty());
-        if (!filePath.isEmpty())
+    const auto certData = makeCertificateAndKey(name, country, company);
+
+    NX_ASSERT(!certData.isEmpty());
+    if (!filePath.isEmpty())
+    {
+        QDir(filePath).mkpath("..");
+        QFile file(filePath);
+        if (!file.open(QIODevice::WriteOnly) ||
+            file.write(certData) != certData.size())
         {
-            QDir(filePath).mkpath(lit(".."));
-            if (!file.open(QIODevice::WriteOnly) ||
-                file.write(certData) != certData.size())
-            {
-                NX_LOG("SSL: Unable to write SSL certificate to file", cl_logERROR);
-            }
-
-            file.close();
+            NX_LOG(lm("SSL: Unable to write SSL certificate to file %1")
+                .args(filePath), cl_logERROR);
         }
     }
 
-    NX_LOG(lm("SSL: Load certificate from '%1'").arg(filePath), cl_logINFO);
-    useCertificateAndPkey(certData);
+    NX_LOG(lm("SSL: Using auto-generated certificate"), cl_logINFO);
+    return useCertificateAndPkey(certData);
+}
+
+bool Engine::loadCertificateFromFile(const QString& filePath)
+{
+    String certData;
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        NX_LOG(lm("SSL: Failed to open certificate file '%1'").arg(filePath), cl_logINFO);
+        return false;
+    }
+    certData = file.readAll();
+
+    NX_LOG(lm("SSL: Loaded certificate from '%1'").arg(filePath), cl_logINFO);
+    if (!useCertificateAndPkey(certData))
+    {
+        NX_LOG(lm("SSL: Failed to load certificate from '%1'").arg(filePath), cl_logINFO);
+        return false;
+    }
+
+    NX_LOG(lm("SSL: Loaded certificate from '%1'").arg(filePath), cl_logINFO);
+    return true;
 }
 
 void Engine::useRandomCertificate(const String& module)

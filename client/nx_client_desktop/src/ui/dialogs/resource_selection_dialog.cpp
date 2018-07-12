@@ -4,6 +4,7 @@
 #include <QtCore/QIdentityProxyModel>
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QAbstractItemView>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
@@ -11,9 +12,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
 #include <ui/common/palette.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_tree_model.h>
+#include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -23,6 +27,8 @@
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -75,6 +81,9 @@ private:
 
     QnResourceSelectionDialogDelegate* m_delegate;
 };
+
+// Threshold for expanding camera list.
+const int kAutoExpandThreshold = 50;
 
 } // namespace
 
@@ -150,6 +159,20 @@ void QnResourceSelectionDialog::initModel()
 
     m_resourceModel = new QnResourceTreeModel(scope, this);
 
+    // Auto expand if and only if server count <= 1 or cameras count <= 50.
+    if (scope == QnResourceTreeModel::CamerasScope)
+    {
+    if (auto treeRoot = m_resourceModel->rootNode(ResourceTreeNodeType::servers))
+        {
+            int numServers = treeRoot->children().size();
+            int numResources = treeRoot->childrenRecursive().size() - numServers;
+            bool expandAll = numServers <= 1 || numResources <= kAutoExpandThreshold;
+
+            auto expandPolicy = [expandAll](const QModelIndex& index) { return expandAll; };
+            ui->resourcesWidget->setAutoExpandPolicy(expandPolicy);
+        }
+    }
+
     connect(m_resourceModel, &QnResourceTreeModel::dataChanged, this,
         &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 
@@ -217,7 +240,7 @@ QSet<QnUuid> QnResourceSelectionDialog::selectedResourcesInternal(const QModelIn
         if (!checked)
             continue;
 
-        auto nodeType = idx.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        auto nodeType = idx.data(Qn::NodeTypeRole).value<ResourceTreeNodeType>();
         auto resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
         auto id = idx.data(Qn::UuidRole).value<QnUuid>();
 
@@ -230,7 +253,7 @@ QSet<QnUuid> QnResourceSelectionDialog::selectedResourcesInternal(const QModelIn
             case QnResourceSelectionDialog::Filter::users:
                 if (resource.dynamicCast<QnUserResource>())
                     result.insert(resource->getId());
-                if (nodeType == Qn::RoleNode)
+                if (nodeType == ResourceTreeNodeType::role)
                     result.insert(id);
                 break;
             default:

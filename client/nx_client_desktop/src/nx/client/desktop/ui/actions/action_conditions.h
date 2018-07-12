@@ -16,6 +16,8 @@
 #include <nx/client/desktop/ui/actions/action_types.h>
 #include <nx/client/desktop/ui/actions/action_parameter_types.h>
 
+#include <nx/client/desktop/resource_views/data/node_type.h>
+
 class QnWorkbenchContext;
 
 namespace nx {
@@ -295,12 +297,6 @@ public:
 private:
     TimePeriodTypes m_periodTypes;
     ActionVisibility m_nonMatchingVisibility;
-};
-
-class ExportCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
 class AddBookmarkCondition: public Condition
@@ -597,6 +593,9 @@ ConditionWrapper isLoggedIn();
 /** Check a condition only in the given scope */
 ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition);
 
+/** Check if current user has certain global permission. */
+ConditionWrapper hasGlobalPermission(GlobalPermission permission);
+
 /** Visible in preview search mode only. */
 ConditionWrapper isPreviewSearchMode();
 
@@ -606,8 +605,11 @@ ConditionWrapper isSafeMode();
 /** Allowed only for resource parameters with corresponding flags. */
 ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode);
 
-ConditionWrapper treeNodeType(QSet<Qn::NodeType> types);
-inline ConditionWrapper treeNodeType(Qn::NodeType type) { return treeNodeType({{type}}); }
+ConditionWrapper treeNodeType(QSet<ResourceTreeNodeType> types);
+inline ConditionWrapper treeNodeType(ResourceTreeNodeType type)
+{
+    return treeNodeType(QSet<ResourceTreeNodeType>{type});
+}
 
 /** Visible in layout tour preview mode only. */
 ConditionWrapper isLayoutTourReviewMode();
@@ -630,6 +632,18 @@ ConditionWrapper isEntropixCamera();
 
 /** Playback sync is forced. */
 ConditionWrapper syncIsForced();
+
+ConditionWrapper canExportLayout();
+
+ConditionWrapper canExportBookmark();
+
+/** Whether wearable camera upload is enabled. */
+ConditionWrapper wearableCameraUploadEnabled();
+
+/** Whether wearable camera upload can be cancelled. */
+ConditionWrapper canCancelWearableCameraUpload();
+
+ConditionWrapper currentLayoutIsVideowallScreen();
 
 } // namespace condition
 

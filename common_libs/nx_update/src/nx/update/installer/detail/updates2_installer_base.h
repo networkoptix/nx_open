@@ -4,10 +4,11 @@
 #include <nx/update/installer/detail/abstract_zip_extractor.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <utils/common/system_information.h>
+#include <nx/vms/api/data/system_information.h>
 
 namespace nx {
 namespace update {
+namespace installer {
 namespace detail {
 
 class NX_UPDATE_API Updates2InstallerBase: public AbstractUpdates2Installer
@@ -20,7 +21,7 @@ public:
 
 protected:
     QString installerWorkDir() const;
-    PrepareResult checkContents() const;
+    PrepareResult checkContents(const QString& outputPath) const;
 
 private:
     AbstractZipExtractorPtr m_extractor;
@@ -37,11 +38,12 @@ private:
     // These below should be overriden in CommonUpdates2Installer
     virtual bool cleanInstallerDirectory() = 0;
     virtual AbstractZipExtractorPtr createZipExtractor() const = 0;
-    virtual QVariantMap updateInformation() const = 0;
-    virtual QnSystemInformation systemInformation() const = 0;
+    virtual QVariantMap updateInformation(const QString& outputPath) const = 0;
+    virtual nx::vms::api::SystemInformation systemInformation() const = 0;
     virtual bool checkExecutable(const QString& executableName) const = 0;
 };
 
 } // namespace detail
-} // namespace updates2
+} // namespace installer
+} // namespace update
 } // namespace nx

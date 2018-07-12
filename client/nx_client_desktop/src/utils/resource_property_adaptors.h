@@ -15,10 +15,10 @@ class QnBusinessEventsFilterResourcePropertyAdaptor: public QnLexicalResourcePro
 public:
     QnBusinessEventsFilterResourcePropertyAdaptor(QObject *parent = NULL);
 
-    bool isAllowed(nx::vms::event::EventType eventType) const;
+    bool isAllowed(nx::vms::api::EventType eventType) const;
 
-    QList<nx::vms::event::EventType> watchedEvents() const;
-    void setWatchedEvents( const QList<nx::vms::event::EventType> &events );
+    QList<nx::vms::api::EventType> watchedEvents() const;
+    void setWatchedEvents( const QList<nx::vms::api::EventType> &events );
 };
 
 #endif // QN_RESOURCE_PROPERTY_ADAPTORS_H

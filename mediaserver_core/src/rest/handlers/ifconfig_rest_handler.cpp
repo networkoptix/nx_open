@@ -25,12 +25,10 @@ public:
 
 #define IfconfigReply_Fields (rebootNeeded)
 
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (IfconfigReply),
     (json),
     _Fields);
-
 
 namespace
 {
@@ -137,7 +135,6 @@ namespace
         return modified;
     }
 
-
     bool isValidIP(const QString& ipAddr)
     {
         return !QHostAddress(ipAddr).isNull();
@@ -228,7 +225,8 @@ int QnIfConfigRestHandler::executePost(
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
         return CODE_OK;
     }
-    if (!(mServer->getServerFlags() & Qn::SF_IfListCtrl)) {
+    if (!(mServer->getServerFlags().testFlag(nx::vms::api::SF_IfListCtrl)))
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("This server doesn't support interface list control"));
         return CODE_OK;
     }
@@ -274,12 +272,10 @@ int QnIfConfigRestHandler::executePost(
     return CODE_OK;
 }
 
-void QnIfConfigRestHandler::afterExecute(const QString &path, const QnRequestParamList &params, const QByteArray& body, const QnRestConnectionProcessor* owner)
+void QnIfConfigRestHandler::afterExecute(const QString& /*path*/,
+    const QnRequestParamList& /*params*/, const QByteArray& body,
+    const QnRestConnectionProcessor* /*owner*/)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(params);
-    Q_UNUSED(owner);
-
     QnJsonRestResult reply;
     if (!QJson::deserialize(body, &reply) || reply.error !=  QnJsonRestResult::NoError)
         return;

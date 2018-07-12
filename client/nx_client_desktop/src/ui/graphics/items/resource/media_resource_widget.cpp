@@ -12,6 +12,7 @@
 #include <boost/algorithm/cxx11/all_of.hpp>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 
 #include <nx/vms/event/rule.h>
@@ -33,6 +34,8 @@
 #include <client_core/client_core_module.h>
 
 #include <common/common_module.h>
+#include <translation/datetime_formatter.h>
+
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -51,17 +54,15 @@
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/fisheye_home_ptz_controller.h>
 
-#include <motion/motion_detection.h>
-
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/collection.h>
 
+#include <nx/client/core/motion/motion_grid.h>
 #include <nx/client/desktop/utils/entropix_image_enhancer.h>
-
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/common/utils/painter_transform_scale_stripper.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
 #include <nx/client/desktop/ui/graphics/items/overlays/area_select_overlay_widget.h>
 #include <nx/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
@@ -82,6 +83,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
+#include <ui/graphics/items/resource/watermark_painter.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
@@ -103,7 +105,6 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
-#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workbench/watchers/default_password_cameras_watcher.h>
 
@@ -118,6 +119,7 @@
 #include <utils/media/sse_helper.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <ini.h>
 
 using namespace std::chrono;
@@ -127,6 +129,7 @@ using namespace client::desktop;
 using namespace ui;
 
 using nx::client::core::Geometry;
+using nx::client::core::MotionGrid;
 
 namespace {
 
@@ -205,79 +208,6 @@ bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &o
     }
 }
 
-/* Motion sensitivity grid: */
-using MotionGrid = std::array<std::array<int, Qn::kMotionGridWidth>, Qn::kMotionGridHeight>;
-
-/* Fill entire motion grid with zeros: */
-void resetMotionGrid(MotionGrid& grid)
-{
-    for (auto& row : grid)
-        row.fill(0);
-}
-
-/* Fill specified rectangle of motion grid with specified value: */
-void fillMotionRect(MotionGrid& grid, const QRect& rect, int value)
-{
-    NX_ASSERT(rect.top() >= 0 && rect.bottom() < (int) grid.size());
-    NX_ASSERT(rect.left() >= 0 && rect.right() < (int) grid[0].size());
-
-    for (int row = rect.top(); row <= rect.bottom(); ++row)
-        std::fill(grid[row].begin() + rect.left(), grid[row].begin() + rect.right() + 1, value);
-}
-
-/* Fill sensitivity region that contains specified position with zeros: */
-void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
-{
-    NX_ASSERT(at.y() >= 0 && at.y() < (int) grid.size());
-    NX_ASSERT(at.x() >= 0 && at.x() < (int) grid[0].size());
-
-    int value = grid[at.y()][at.x()];
-    if (value == 0)
-        return;
-
-    QVarLengthArray<QPoint> pointStack;
-    grid[at.y()][at.x()] = 0;
-    pointStack.push_back(at);
-
-    while (!pointStack.empty())
-    {
-        QPoint p = pointStack.back();
-        pointStack.pop_back();
-
-        /* Spread left: */
-        int x = p.x() - 1;
-        if (x >= 0 && grid[p.y()][x] == value)
-        {
-            grid[p.y()][x] = 0;
-            pointStack.push_back({ x, p.y() });
-        }
-
-        /* Spread right: */
-        x = p.x() + 1;
-        if (x < (int) grid[0].size() && grid[p.y()][x] == value)
-        {
-            grid[p.y()][x] = 0;
-            pointStack.push_back({ x, p.y() });
-        }
-
-        /* Spread up: */
-        int y = p.y() - 1;
-        if (y >= 0 && grid[y][p.x()] == value)
-        {
-            grid[y][p.x()] = 0;
-            pointStack.push_back({ p.x(), y });
-        }
-
-        /* Spread down: */
-        y = p.y() + 1;
-        if (y < (int) grid.size() && grid[y][p.x()] == value)
-        {
-            grid[y][p.x()] = 0;
-            pointStack.push_back({ p.x(), y });
-        }
-    }
-};
-
 bool tourIsRunning(QnWorkbenchContext* context)
 {
     return context->action(action::ToggleLayoutTourModeAction)->isChecked();
@@ -290,6 +220,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     d(new QnMediaResourceWidgetPrivate(base_type::resource())),
     m_recordingStatusHelper(new RecordingStatusHelper(this)),
     m_posUtcMs(DATETIME_INVALID),
+    m_watermarkPainter(new QnWatermarkPainter),
     m_itemId(item->uuid())
 {
     NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");
@@ -356,13 +287,19 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const vms::event::AbstractActionPtr &businessAction)
         {
-            if (businessAction->actionType() != vms::event::executePtzPresetAction)
+            if (businessAction->actionType() != vms::api::ActionType::executePtzPresetAction)
                 return;
+
             const auto &actionParams = businessAction->getParams();
             if (actionParams.actionResourceId != d->resource->getId())
                 return;
+
             if (m_ptzController)
-                m_ptzController->activatePreset(actionParams.presetId, QnAbstractPtzController::MaxPtzSpeed);
+            {
+                m_ptzController->activatePreset(
+                    actionParams.presetId,
+                    QnAbstractPtzController::MaxPtzSpeed);
+            }
         });
 
     connect(context, &QnWorkbenchContext::userChanged,
@@ -418,8 +355,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
-    at_histogramButton_toggled(item->imageEnhancement().enabled);
-    updateButtonsVisibility();
+    at_imageEnhancementButton_toggled(item->imageEnhancement().enabled);
     updateIconButton();
 
     updateTitleText();
@@ -432,6 +368,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     setImageEnhancement(item->imageEnhancement());
 
     initSoftwareTriggers();
+
+    auto updateWatermark = [this, context]()
+    {
+        m_watermarkPainter->setWatermark(context->user() ? context->user()->getName() : "",
+            globalSettings()->watermarkSettings());
+    };
+    updateWatermark();
+    connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);
+    connect(context, &QnWorkbenchContext::userChanged, this, updateWatermark);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -447,6 +392,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     const bool canRotate = accessController()->hasPermissions(item->layout()->resource(),
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
+    updateButtonsVisibility();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -456,6 +402,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     if (d->display())
         d->display()->removeRenderer(m_renderer);
 
+    m_renderer->notInUse();
     m_renderer->destroyAsync();
 
     for (auto* data : m_binaryMotionMask)
@@ -523,6 +470,7 @@ void QnMediaResourceWidget::initRenderer()
     m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QnMediaResourceWidget::updateAspectRatio);
+    m_renderer->inUse();
 }
 
 void QnMediaResourceWidget::initDisplay()
@@ -575,7 +523,7 @@ void QnMediaResourceWidget::initIoModuleOverlay()
         m_ioModuleOverlayWidget->setIOModule(d->camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_ioModuleOverlayWidget->setUserInputEnabled(
-            accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
+            accessController()->hasGlobalPermission(GlobalPermission::userInput));
         m_ioModuleOverlayWidget->setContentsMargins(0.0, topMargin, 0.0, 0.0);
         addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
 
@@ -604,12 +552,13 @@ void QnMediaResourceWidget::initAreaSelectOverlay()
 
 QRectF QnMediaResourceWidget::analyticsSearchRect() const
 {
-    return m_areaSelectOverlayWidget->selectedArea();
+    return m_areaSelectOverlayWidget ? m_areaSelectOverlayWidget->selectedArea() : QRectF();
 }
 
 void QnMediaResourceWidget::setAnalyticsSearchRect(const QRectF& value)
 {
-    m_areaSelectOverlayWidget->setSelectedArea(value);
+    if (m_areaSelectOverlayWidget)
+        m_areaSelectOverlayWidget->setSelectedArea(value);
 }
 
 void QnMediaResourceWidget::initAreaHighlightOverlay()
@@ -672,6 +621,9 @@ void QnMediaResourceWidget::initStatusOverlayController()
 
 void QnMediaResourceWidget::setAnalyticsSearchModeEnabled(bool enabled)
 {
+    if (!m_areaSelectOverlayWidget)
+        return;
+
     m_areaSelectOverlayWidget->setActive(enabled);
     if (enabled)
     {
@@ -691,7 +643,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     if (statusOverlay != Qn::PasswordRequiredOverlay)
         return QString();
 
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
         return QString();
 
     const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
@@ -703,15 +655,18 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
 
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
 {
-    if (!rule)
+    const auto ruleId = rule->id();
+    const auto triggerIt = lowerBoundbyTriggerRuleId(ruleId);
+
+    if (triggerIt == m_triggers.end())
         return;
 
-    const auto triggerIt = m_softwareTriggers.find(rule->id());
-    if (triggerIt == m_softwareTriggers.end())
+    // Do not update data for the same rule, until we force it
+    if (triggerIt->ruleId != ruleId)
         return;
 
     const auto button = qobject_cast<QnSoftwareTriggerButton*>(
-        m_triggersContainer->item(triggerIt.value().overlayItemId));
+        m_triggersContainer->item(triggerIt->overlayItemId));
 
     if (!button)
         return;
@@ -722,8 +677,7 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
     if (button->isEnabled() == buttonEnabled)
         return;
 
-    const auto info = triggerIt.value().info;
-
+    const auto info = triggerIt->info;
     if (!buttonEnabled)
     {
         const bool longPressed = info.prolonged &&
@@ -738,8 +692,8 @@ void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr&
 
 void QnMediaResourceWidget::updateTriggersAvailability()
 {
-    for (auto ruleId: m_softwareTriggers.keys())
-        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(ruleId));
+    for (auto data: m_triggers)
+        updateTriggerAvailability(commonModule()->eventRuleManager()->rule(data.ruleId));
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -766,51 +720,42 @@ void QnMediaResourceWidget::createButtons()
         titleBar()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
     }
 
-    {
-        QnImageButtonWidget *ptzButton = createStatisticAwareButton(lit("media_widget_ptz"));
-        ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
-        ptzButton->setCheckable(true);
-        ptzButton->setToolTip(tr("PTZ"));
-        setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
-        connect(ptzButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::at_ptzButton_toggled);
-        titleBar()->rightButtonsBar()->addButton(Qn::PtzButton, ptzButton);
-    }
 
-    {
-        QnImageButtonWidget *fishEyeButton = createStatisticAwareButton(lit("media_widget_fisheye"));
-        fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
-        fishEyeButton->setCheckable(true);
-        fishEyeButton->setToolTip(tr("Dewarping"));
-        fishEyeButton->setChecked(item()->dewarpingParams().enabled);
-        setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
-        connect(fishEyeButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::at_fishEyeButton_toggled);
-        titleBar()->rightButtonsBar()->addButton(Qn::FishEyeButton, fishEyeButton);
-    }
+    createActionAndButton(
+        "item/ptz.png",
+        false,
+        lit("P"),
+        tr("PTZ"),
+        Qn::MainWindow_MediaItem_Ptz_Help,
+        Qn::PtzButton, lit("media_widget_ptz"),
+        &QnMediaResourceWidget::at_ptzButton_toggled);
 
-    {
-        QnImageButtonWidget *zoomWindowButton = createStatisticAwareButton(lit("media_widget_zoom"));
-        zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
-        zoomWindowButton->setCheckable(true);
-        zoomWindowButton->setToolTip(tr("Create Zoom Window"));
-        setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
-        connect(zoomWindowButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
-        titleBar()->rightButtonsBar()->addButton(Qn::ZoomWindowButton, zoomWindowButton);
-    }
+    createActionAndButton(
+        "item/fisheye.png",
+        item()->dewarpingParams().enabled,
+        lit("D"),
+        tr("Dewarping"),
+        Qn::MainWindow_MediaItem_Dewarping_Help,
+        Qn::FishEyeButton, lit("media_widget_fisheye"),
+        &QnMediaResourceWidget::at_fishEyeButton_toggled);
 
-    {
-        QnImageButtonWidget *enhancementButton = createStatisticAwareButton(lit("media_widget_enhancement"));
-        enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
-        enhancementButton->setCheckable(true);
-        enhancementButton->setToolTip(tr("Image Enhancement"));
-        enhancementButton->setChecked(item()->imageEnhancement().enabled);
-        setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
-        connect(enhancementButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::at_histogramButton_toggled);
-        titleBar()->rightButtonsBar()->addButton(Qn::EnhancementButton, enhancementButton);
-    }
+    createActionAndButton(
+        "item/zoom_window.png",
+        false,
+        lit("W"),
+        tr("Create Zoom Window"),
+        Qn::MainWindow_MediaItem_ZoomWindows_Help,
+        Qn::ZoomWindowButton, lit("media_widget_zoom"),
+        &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
+
+    createActionAndButton(
+        "item/image_enhancement.png",
+        item()->imageEnhancement().enabled,
+        lit("E"),
+        tr("Image Enhancement"),
+        Qn::MainWindow_MediaItem_ImageEnhancement_Help,
+        Qn::EnhancementButton, lit("media_widget_enhancement"),
+        &QnMediaResourceWidget::at_imageEnhancementButton_toggled);
 
     {
         QnImageButtonWidget *ioModuleButton = createStatisticAwareButton(lit("media_widget_io_module"));
@@ -925,32 +870,22 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
             return aspect.toFloat();
     }
 
-    /* Here we get 0.0 if no custom aspect ratio set. */
-    qreal result = resource()->customAspectRatio();
-    if (!qFuzzyIsNull(result))
-        return result;
+    auto result = resource()->customAspectRatio();
+    if (result.isValid())
+        return result.toFloat();
 
-    const auto& camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
-
-    if (m_renderer && !m_renderer->sourceSize().isEmpty())
-    {
-        auto sourceSize = m_renderer->sourceSize();
-        if (camera)
-        {
-            const auto& sensor = camera->combinedSensorsDescription().mainSensor();
-            if (sensor.isValid())
-                sourceSize = Geometry::cwiseMul(sourceSize, sensor.geometry.size()).toSize();
-        }
-        return Geometry::aspectRatio(sourceSize);
-    }
-
-    if (camera)
+    if (const auto& camera = resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>())
     {
         const auto cameraAr = camera->aspectRatio();
         if (cameraAr.isValid())
             return cameraAr.toFloat();
     }
 
+    if (m_renderer && !m_renderer->sourceSize().isEmpty())
+    {
+        auto sourceSize = m_renderer->sourceSize();
+        return Geometry::aspectRatio(sourceSize);
+    }
     return defaultAspectRatio(); /*< Here we can get -1.0 if there are no predefined AR set */
 }
 
@@ -1001,13 +936,13 @@ QPointF QnMediaResourceWidget::mapFromMotionGrid(const QPoint &gridPos)
 QSize QnMediaResourceWidget::motionGridSize() const
 {
     return Geometry::cwiseMul(
-        channelLayout()->size(), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+        channelLayout()->size(), QSize(MotionGrid::kWidth, MotionGrid::kHeight));
 }
 
 QPoint QnMediaResourceWidget::channelGridOffset(int channel) const
 {
     return Geometry::cwiseMul(
-        channelLayout()->position(channel), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+        channelLayout()->position(channel), QSize(MotionGrid::kWidth, MotionGrid::kHeight));
 }
 
 void QnMediaResourceWidget::suspendHomePtzController()
@@ -1148,7 +1083,7 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
         return;
 
     bool hasTwoWayAudio = d->camera && d->camera->hasTwoWayAudio()
-        && accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission);
+        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
 
     if (!hasTwoWayAudio)
         return;
@@ -1179,6 +1114,16 @@ void QnMediaResourceWidget::resumeHomePtzController()
             m_homePtzController->resume();
 }
 
+bool QnMediaResourceWidget::forceShowPosition() const
+{
+    const bool isLive = d->display()
+        && d->display()->camDisplay()
+        && d->display()->camDisplay()->isRealTimeSource();
+
+    // In videowall mode position item must always be visible if item is not in live.
+    return qnRuntime->isVideoWallMode() && !isLive;
+}
+
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const
 {
     return m_motionSelection;
@@ -1198,7 +1143,7 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect)
 
     for (int i = 0; i < channelCount(); ++i)
     {
-        QRect rect = gridRect.translated(-channelGridOffset(i)).intersected(QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+        QRect rect = gridRect.translated(-channelGridOffset(i)).intersected(QRect(0, 0, MotionGrid::kWidth, MotionGrid::kHeight));
         if (rect.isEmpty())
             continue;
 
@@ -1301,7 +1246,7 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
 
         for (int i = 0; i < layout->channelCount(); ++i)
         {
-            QRect r(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
+            QRect r(0, 0, MotionGrid::kWidth, MotionGrid::kHeight);
             r.translate(channelGridOffset(i));
             r = gridRect.intersected(r);
             r.translate(-channelGridOffset(i));
@@ -1333,7 +1278,7 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
 
         for (int i = 0; i < layout->channelCount(); ++i)
         {
-            QRect r(channelGridOffset(i), QSize(Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+            QRect r(channelGridOffset(i), QSize(MotionGrid::kWidth, MotionGrid::kHeight));
             if (r.contains(channelPos))
             {
                 channelPos -= r.topLeft();
@@ -1423,38 +1368,38 @@ void QnMediaResourceWidget::ensureMotionLabelPositions() const
     for (int channel = 0; channel < m_motionSensitivity.size(); ++channel)
     {
         /* Clear grid initially: */
-        resetMotionGrid(grid);
+        grid.reset();
 
         /* Fill grid with sensitivity numbers: */
         for (int sensitivity = 1; sensitivity < QnMotionRegion::kSensitivityLevelCount; ++sensitivity)
         {
             for (const auto& rect : m_motionSensitivity[channel].getRectsBySens(sensitivity))
-                fillMotionRect(grid, rect, sensitivity);
+                grid.fillRect(rect, sensitivity);
         }
 
         /* Label takes 1x2 cells. Find good areas to fit labels in,
          * going from the top to the bottom, from the left to the right:
          */
-        for (int y = 0; y < (int) grid.size() - 1; ++y)
+        for (int y = 0; y < MotionGrid::kHeight - 1; ++y)
         {
-            for (int x = 0; x < (int) grid[0].size(); ++x)
+            for (int x = 0; x < MotionGrid::kWidth; ++x)
             {
-                int sensitivity = grid[y][x];
+                QPoint pos(x, y);
+                int sensitivity = grid[pos];
 
                 /* If there's no motion detection region, or we already labeled it: */
                 if (sensitivity == 0)
                     continue;
 
                 /* If a label doesn't fit: */
-                if (grid[y + 1][x] != sensitivity)
+                if (grid[{x, y + 1}] != sensitivity)
                     continue;
 
                 /* Add label position: */
-                QPoint pos(x, y);
                 m_motionLabelPositions[channel][sensitivity] << pos;
 
                 /* Clear processed region: */
-                clearSensitivityRegion(grid, pos);
+                grid.clearRegion(pos);
             }
         }
     }
@@ -1525,21 +1470,13 @@ void QnMediaResourceWidget::updateIconButton()
         const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
         iconButton->setIcon(qnSkin->icon("item/zoom_window_hovered.png"));
         iconButton->setToolTip(tr("Zoom Window"));
-
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, true);
         return;
     }
 
     if (!d->camera || d->camera->hasFlags(Qn::wearable_camera))
-    {
-        buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, false);
         return;
-    }
 
     const auto icon = m_recordingStatusHelper->icon();
-
-    buttonsBar->setButtonsVisible(Qn::RecordingStatusIconButton, !icon.isNull());
-
     const auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
     iconButton->setIcon(icon);
     iconButton->setToolTip(m_recordingStatusHelper->tooltip());
@@ -1676,6 +1613,8 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (m_entropixProgress >= 0)
         paintProgress(painter, rect, m_entropixProgress);
 
+    paintWatermark(painter, rect);
+
     if (client::desktop::ini().showVideoQualityOverlay
         && hasVideo()
         && !d->resource->hasFlags(Qn::local))
@@ -1695,8 +1634,8 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
 
     ensureMotionSensitivity();
 
-    qreal xStep = rect.width() / Qn::kMotionGridWidth;
-    qreal yStep = rect.height() / Qn::kMotionGridHeight;
+    qreal xStep = rect.width() / MotionGrid::kWidth;
+    qreal yStep = rect.height() / MotionGrid::kHeight;
 
     QVector<QPointF> gridLines[2];
 
@@ -1708,17 +1647,17 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
         motion->removeMotion(m_binaryMotionMask[channel]);
 
         /* Horizontal lines. */
-        for (int y = 1; y < Qn::kMotionGridHeight; ++y)
+        for (int y = 1; y < MotionGrid::kHeight; ++y)
         {
             bool isMotion = motion->isMotionAt(0, y - 1) || motion->isMotionAt(0, y);
             gridLines[isMotion] << QPointF(0, y * yStep);
             int x = 1;
-            while (x < Qn::kMotionGridWidth)
+            while (x < MotionGrid::kWidth)
             {
-                while (x < Qn::kMotionGridWidth && isMotion == (motion->isMotionAt(x, y - 1) || motion->isMotionAt(x, y)))
+                while (x < MotionGrid::kWidth && isMotion == (motion->isMotionAt(x, y - 1) || motion->isMotionAt(x, y)))
                     x++;
                 gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                if (x < Qn::kMotionGridWidth)
+                if (x < MotionGrid::kWidth)
                 {
                     isMotion = !isMotion;
                     gridLines[isMotion] << QPointF(x * xStep, y * yStep);
@@ -1727,17 +1666,17 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
         }
 
         /* Vertical lines. */
-        for (int x = 1; x < Qn::kMotionGridWidth; ++x)
+        for (int x = 1; x < MotionGrid::kWidth; ++x)
         {
             bool isMotion = motion->isMotionAt(x - 1, 0) || motion->isMotionAt(x, 0);
             gridLines[isMotion] << QPointF(x * xStep, 0);
             int y = 1;
-            while (y < Qn::kMotionGridHeight)
+            while (y < MotionGrid::kHeight)
             {
-                while (y < Qn::kMotionGridHeight && isMotion == (motion->isMotionAt(x - 1, y) || motion->isMotionAt(x, y)))
+                while (y < MotionGrid::kHeight && isMotion == (motion->isMotionAt(x - 1, y) || motion->isMotionAt(x, y)))
                     y++;
                 gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                if (y < Qn::kMotionGridHeight)
+                if (y < MotionGrid::kHeight)
                 {
                     isMotion = !isMotion;
                     gridLines[isMotion] << QPointF(x * xStep, y * yStep);
@@ -1747,9 +1686,9 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     }
     else
     {
-        for (int x = 1; x < Qn::kMotionGridWidth; ++x)
+        for (int x = 1; x < MotionGrid::kWidth; ++x)
             gridLines[0] << QPointF(x * xStep, 0.0) << QPointF(x * xStep, rect.height());
-        for (int y = 1; y < Qn::kMotionGridHeight; ++y)
+        for (int y = 1; y < MotionGrid::kHeight; ++y)
             gridLines[0] << QPointF(0.0, y * yStep) << QPointF(rect.width(), y * yStep);
     }
 
@@ -1774,7 +1713,7 @@ void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRect
     QnScopedPainterPenRollback penRollback(painter); Q_UNUSED(penRollback);
 
     painter->translate(rect.topLeft());
-    painter->scale(rect.width() / Qn::kMotionGridWidth, rect.height() / Qn::kMotionGridHeight);
+    painter->scale(rect.width() / MotionGrid::kWidth, rect.height() / MotionGrid::kHeight);
     painter->setPen(QPen(penColor, 0.0));
     painter->drawPath(path);
 }
@@ -1805,8 +1744,8 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter* painter, 
 {
     QPoint channelOffset = channelGridOffset(channel);
 
-    qreal xStep = rect.width() / Qn::kMotionGridWidth;
-    qreal yStep = rect.height() / Qn::kMotionGridHeight;
+    qreal xStep = rect.width() / MotionGrid::kWidth;
+    qreal yStep = rect.height() / MotionGrid::kHeight;
     qreal xOffset = channelOffset.x() + 0.1;
     qreal yOffset = channelOffset.y();
     qreal fontIncrement = 1.2;
@@ -1857,6 +1796,11 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
     }
 }
 
+void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
+{
+    m_watermarkPainter->drawWatermark(painter, rect);
+}
+
 QnPtzControllerPtr QnMediaResourceWidget::ptzController() const
 {
     return m_ptzController;
@@ -1896,7 +1840,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay)
         return Qn::MainWindow_MediaItem_AnalogLicense_Help;
 
-    if (statusOverlay == Qn::OfflineOverlay)
+    if (statusOverlay == Qn::OfflineOverlay || statusOverlay == Qn::OldFirmwareOverlay)
         return Qn::MainWindow_MediaItem_Diagnostics_Help;
 
     if (statusOverlay == Qn::UnauthorizedOverlay)
@@ -1950,8 +1894,8 @@ void QnMediaResourceWidget::channelLayoutChangedNotify()
     }
     while (m_binaryMotionMask.size() < channelCount())
     {
-        m_binaryMotionMask.push_back(static_cast<simd128i *>(qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8, 32)));
-        memset(m_binaryMotionMask.back(), 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);
+        m_binaryMotionMask.push_back(static_cast<simd128i *>(qMallocAligned(MotionGrid::kWidth * MotionGrid::kHeight / 8, 32)));
+        memset(m_binaryMotionMask.back(), 0, MotionGrid::kWidth * MotionGrid::kHeight / 8);
     }
 
     updateAspectRatio();
@@ -2000,9 +1944,6 @@ QString QnMediaResourceWidget::calculateDetailsText() const
         mbps += statistics->getBitrateMbps();
     }
 
-    QSize size = d->display()->camDisplay()->getRawDataSize();
-    size.setWidth(size.width() * d->display()->camDisplay()->channelsCount());
-
     QString codecString;
     if (QnConstMediaContextPtr codecContext = d->display()->mediaProvider()->getCodecContext())
         codecString = codecContext->getCodecName();
@@ -2017,7 +1958,15 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     QString result;
     if (hasVideo())
     {
-        result.append(htmlFormattedParagraph(lit("%1x%2").arg(size.width()).arg(size.height()), kDetailsTextPixelSize, true));
+        const QSize channelResolution = d->display()->camDisplay()->getRawDataSize();
+        const QSize videoLayout = d->mediaResource->getVideoLayout()->size();
+        const QSize actualResolution = Geometry::cwiseMul(channelResolution, videoLayout);
+
+        result.append(
+            htmlFormattedParagraph(
+                lit("%1x%2").arg(actualResolution.width()).arg(actualResolution.height()),
+                kDetailsTextPixelSize,
+                true));
         result.append(htmlFormattedParagraph(lit("%1fps").arg(fps, 0, 'f', 2), kDetailsTextPixelSize, true));
     }
     result.append(htmlFormattedParagraph(lit("%1Mbps").arg(mbps, 0, 'f', 2), kDetailsTextPixelSize, true));
@@ -2047,19 +1996,25 @@ QString QnMediaResourceWidget::calculatePositionText() const
     if (!d->resource->flags().testFlag(Qn::utc))
         return QString();
 
-    static const auto extractTime = [](qint64 dateTimeUsec)
+    static const auto extractTime =
+        [](qint64 dateTimeUsec)
         {
             if (isSpecialDateTimeValueUsec(dateTimeUsec))
                 return QString();
 
-            static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
-
             const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
-            return QDateTime::fromMSecsSinceEpoch(dateTimeMs).toString(kOutputFormat);
+            const QString result = datetime::toString(dateTimeMs);
+
+            return ini().showPreciseItemTimestamps
+                ? lit("%1<br>%2 us").arg(result).arg(dateTimeUsec)
+                : result;
+
+            return result;
         };
 
     const QString timeString = (d->display()->camDisplay()->isRealTimeSource()
-        ? tr("LIVE") : extractTime(getDisplayTimeUsec()));
+        ? tr("LIVE")
+        : extractTime(getDisplayTimeUsec()));
 
     static const int kPositionTextPixelSize = 14;
     return htmlFormattedParagraph(timeString, kPositionTextPixelSize, true);
@@ -2120,6 +2075,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         {
             result |= Qn::EntropixEnhancementButton;
         }
+        result |= Qn::RecordingStatusIconButton;
 
         return result;
     }
@@ -2172,6 +2128,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (d->analyticsMetadataProvider)
         result |= Qn::AnalyticsButton;
 
+    if (d->camera && (!d->camera->hasFlags(Qn::wearable_camera)))
+        result |= Qn::RecordingStatusIconButton;
+
     return result;
 }
 
@@ -2184,6 +2143,9 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     // for live video make a quick check: status has higher priority than EOF
     if (d->isPlayingLive() && d->camera && d->camera->hasFlags(Qn::wearable_camera))
         return Qn::NoLiveStreamOverlay;
+
+    if (d->camera && d->camera->hasCameraCapabilities(Qn::IsOldFirmwareCapability))
+        return Qn::OldFirmwareOverlay;
 
     if (d->isOffline())
         return Qn::OfflineOverlay;
@@ -2242,8 +2204,15 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         return Qn::EmptyOverlay;
     }
 
-    if (d->resource->hasFlags(Qn::local_video) && d->resource->getStatus() == Qn::Offline)
-        return Qn::NoDataOverlay;
+    if (d->resource->hasFlags(Qn::local_video))
+    {
+        if (d->resource->getStatus() == Qn::Offline)
+            return Qn::NoDataOverlay;
+
+        // Handle export from I/O modules.
+        if (!d->hasVideo)
+            return Qn::NoVideoDataOverlay;
+    }
 
     if (options().testFlag(DisplayActivity) && d->display()->isPaused())
     {
@@ -2280,7 +2249,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         return Qn::ResourceOverlayButton::Empty;
 
     if (statusOverlay == Qn::PasswordRequiredOverlay
-        && context()->accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        && context()->accessController()->hasGlobalPermission(GlobalPermission::admin))
     {
         return Qn::ResourceOverlayButton::SetPassword;
     }
@@ -2310,6 +2279,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
             return Qn::ResourceOverlayButton::Empty;
         }
 
+        case Qn::OldFirmwareOverlay:
         case Qn::OfflineOverlay:
         {
             return menu()->canTrigger(action::CameraDiagnosticsAction, d->camera)
@@ -2385,6 +2355,9 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
     }
     updateCompositeOverlayMode();
     updateIconButton();
+
+    if (qnRuntime->isVideoWallMode())
+        updateHud(false);
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()
@@ -2421,14 +2394,14 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
     else
     {
         /* Stop all ptz activity. */
-        ptzController()->continuousMove(QVector3D(0, 0, 0));
+        ptzController()->continuousMove(nx::core::ptz::Vector());
         suspendHomePtzController();
     }
 
     updateButtonsVisibility();
 }
 
-void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
+void QnMediaResourceWidget::at_imageEnhancementButton_toggled(bool checked)
 {
     ImageCorrectionParams params = item()->imageEnhancement();
     if (params.enabled == checked)
@@ -2458,8 +2431,12 @@ void QnMediaResourceWidget::at_zoomRectChanged()
 
     // TODO: #PTZ probably belongs to instrument.
     if (options() & DisplayDewarped)
-        m_ptzController->absoluteMove(Qn::LogicalPtzCoordinateSpace,
-            QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()), 2.0);
+    {
+        m_ptzController->absoluteMove(
+            Qn::LogicalPtzCoordinateSpace,
+            QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()),
+            2.0);
+    }
 }
 
 void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields)
@@ -2515,9 +2492,11 @@ void QnMediaResourceWidget::updateFisheye()
 
     bool fisheyeEnabled = enabled && m_dewarpingParams.enabled;
 
-    setOption(ControlPtz, fisheyeEnabled && zoomRect().isEmpty());
-    setOption(DisplayCrosshair, fisheyeEnabled && zoomRect().isEmpty());
+    const bool showFisheyeOverlay = fisheyeEnabled && !isZoomWindow();
+    setOption(ControlPtz, showFisheyeOverlay);
+    setOption(DisplayCrosshair, showFisheyeOverlay);
     setOption(DisplayDewarped, fisheyeEnabled);
+
     if (fisheyeEnabled && titleBar()->rightButtonsBar()->button(Qn::FishEyeButton))
         titleBar()->rightButtonsBar()->button(Qn::FishEyeButton)->setChecked(fisheyeEnabled);
     if (enabled)
@@ -2540,8 +2519,11 @@ void QnMediaResourceWidget::updateFisheye()
 
     emit fisheyeChanged();
 
-    if (titleBar()->rightButtonsBar()->visibleButtons() & Qn::PtzButton)
-        at_ptzButton_toggled(titleBar()->rightButtonsBar()->checkedButtons() & Qn::PtzButton); // TODO: #Elric doesn't belong here, hack
+    // TODO: #Elric doesn't belong here, hack.
+    const bool hasPtz = titleBar()->rightButtonsBar()->visibleButtons() & Qn::PtzButton;
+    const bool ptzEnabled = titleBar()->rightButtonsBar()->checkedButtons() & Qn::PtzButton;
+    if (hasPtz && ptzEnabled)
+        at_ptzButton_toggled(true);
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio()
@@ -2694,8 +2676,8 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
     qint64 result = getUtcCurrentTimeUsec();
     if (!isSpecialDateTimeValueUsec(result))
     {
-        result += context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(
-            d->mediaResource) * 1000ll;
+        const auto timeWatcher = context()->instance<nx::client::core::ServerTimeWatcher>();
+        result += timeWatcher->displayOffset(d->mediaResource) * 1000ll;
     }
     return result;
 }
@@ -2740,7 +2722,9 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
         action(action::ToggleTimelineAction)->setChecked(true);
-        m_areaSelectOverlayWidget->setActive(false);
+
+        if (m_areaSelectOverlayWidget)
+            m_areaSelectOverlayWidget->setActive(false);
     }
 
     setOption(WindowResizingForbidden, enabled);
@@ -2818,13 +2802,16 @@ client::core::AbstractAnalyticsMetadataProviderPtr
 * Soft Triggers
 */
 
-QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRelevant(
+void QnMediaResourceWidget::createTriggerIfRelevant(
     const vms::event::RulePtr& rule)
 {
-    NX_ASSERT(!m_softwareTriggers.contains(rule->id()));
+    const auto ruleId = rule->id();
+    const auto it = lowerBoundbyTriggerRuleId(ruleId);
+
+    NX_ASSERT(it == m_triggers.end() || it->ruleId != ruleId);
 
     if (!isRelevantTriggerRule(rule))
-        return nullptr;
+        return;
 
     const SoftwareTriggerInfo info({
         rule->eventParams().inputPortId,
@@ -2834,7 +2821,7 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
 
     std::function<void()> clientSideHandler;
 
-    if (rule->actionType() == nx::vms::event::bookmarkAction)
+    if (rule->actionType() == nx::vms::api::ActionType::bookmarkAction)
     {
         clientSideHandler =
             [this] { action(action::BookmarksModeAction)->setChecked(true); };
@@ -2849,17 +2836,27 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
             updateTriggerAvailability(rule);
         });
 
-    // TODO: #vkutin #3.1 For now rule buttons are NOT sorted. Implement sorting by UUID later.
-    const auto overlayItemId = m_triggersContainer->insertItem(0, button);
+    const int index = std::distance(m_triggers.begin(), it);
+    const auto overlayItemId = m_triggersContainer->insertItem(index, button);
+    m_triggers.insert(it, SoftwareTrigger{ruleId, info, overlayItemId});
+}
 
-    auto& trigger = m_softwareTriggers[rule->id()];
-    trigger = SoftwareTrigger({ info, overlayItemId });
-    return &trigger;
+QnMediaResourceWidget::TriggerDataList::iterator
+    QnMediaResourceWidget::lowerBoundbyTriggerRuleId(const QnUuid& id)
+{
+    static const auto compareFunction =
+        [](const SoftwareTrigger& left, const SoftwareTrigger& right)
+        {
+            return left.ruleId > right.ruleId; // Bottom in the thick client - right in the mobile.
+        };
+
+    const auto idValue = SoftwareTrigger{id, SoftwareTriggerInfo(), QnUuid()};
+    return std::lower_bound(m_triggers.begin(), m_triggers.end(), idValue, compareFunction);
 }
 
 bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rule) const
 {
-    if (rule->isDisabled() || rule->eventType() != vms::event::softwareTriggerEvent)
+    if (rule->isDisabled() || rule->eventType() != vms::api::EventType::softwareTriggerEvent)
         return false;
 
     const auto resourceId = d->resource->getId();
@@ -2906,6 +2903,32 @@ void QnMediaResourceWidget::updateTriggerButtonTooltip(
 
 }
 
+void QnMediaResourceWidget::createActionAndButton(const char* iconName,
+    bool checked,
+    const QString& shortcut,
+    const QString& toolTip,
+    Qn::HelpTopic helpTopic,
+    Qn::WidgetButtons buttonId, const QString& buttonName,
+    void( QnMediaResourceWidget::* executor)(bool checked))
+{
+    auto action = new QAction(this);
+    action->setIcon(qnSkin->icon(iconName));
+    action->setCheckable(true);
+    action->setChecked(checked);
+    action->setShortcut(shortcut);
+    // We will get scene-wide shortcut otherwise.
+    action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    action->setToolTip(toolTip);
+    setHelpTopic(action, helpTopic);
+    connect(action, &QAction::toggled, this, executor);
+    // We still want the shortcut to work inside the whole widget.
+    addAction(action);
+
+    auto button = createStatisticAwareButton(buttonName);
+    button->setDefaultAction(action);
+    titleBar()->rightButtonsBar()->addButton(buttonId, button);
+}
+
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
     const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
 {
@@ -2939,7 +2962,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 if (!button->isLive())
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler, vms::event::EventState::active);
+                const auto requestId = invokeTrigger(id, resultHandler, vms::api::EventState::active);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
@@ -2960,7 +2983,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 if (button->state() == QnSoftwareTriggerButton::State::Failure)
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler, vms::event::EventState::inactive);
+                const auto requestId = invokeTrigger(id, resultHandler, vms::api::EventState::inactive);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
@@ -3016,13 +3039,13 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
 void QnMediaResourceWidget::resetTriggers()
 {
     /* Delete all buttons: */
-    for (const auto& trigger: m_softwareTriggers)
-        m_triggersContainer->deleteItem(trigger.overlayItemId);
+    for (const auto& data: m_triggers)
+        m_triggersContainer->deleteItem(data.overlayItemId);
 
     /* Clear triggers information: */
-    m_softwareTriggers.clear();
+    m_triggers.clear();
 
-    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::userInput))
         return;
 
     /* Create new relevant triggers: */
@@ -3034,12 +3057,12 @@ void QnMediaResourceWidget::resetTriggers()
 
 void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
 {
-    const auto iter = m_softwareTriggers.find(id);
-    if (iter == m_softwareTriggers.end())
+    const auto it = lowerBoundbyTriggerRuleId(id);
+    if (it == m_triggers.end() || it->ruleId != id)
         return;
 
-    m_triggersContainer->deleteItem(iter->overlayItemId);
-    m_softwareTriggers.erase(iter);
+    m_triggersContainer->deleteItem(it->overlayItemId);
+    m_triggers.erase(it);
 }
 
 void QnMediaResourceWidget::clearEntropixEnhancedImage()
@@ -3052,8 +3075,9 @@ void QnMediaResourceWidget::clearEntropixEnhancedImage()
 
 void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
-    const auto iter = m_softwareTriggers.find(rule->id());
-    if (iter == m_softwareTriggers.end())
+    const auto ruleId = rule->id();
+    const auto it = lowerBoundbyTriggerRuleId(ruleId);
+    if (it == m_triggers.end() || it->ruleId != ruleId)
     {
         /* Create trigger if the rule is relevant: */
         createTriggerIfRelevant(rule);
@@ -3061,21 +3085,22 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
     else
     {
         /* Delete trigger: */
-        at_eventRuleRemoved(rule->id());
+        at_eventRuleRemoved(ruleId);
 
         /* Recreate trigger if the rule is still relevant: */
         createTriggerIfRelevant(rule);
     }
 
+    // Forcing update of trigger button
     updateTriggerAvailability(rule);
 };
 
 rest::Handle QnMediaResourceWidget::invokeTrigger(
     const QString& id,
     std::function<void(bool, rest::Handle)> resultHandler,
-    vms::event::EventState toggleState)
+    vms::api::EventState toggleState)
 {
-    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::userInput))
         return rest::Handle();
 
     const auto responseHandler =

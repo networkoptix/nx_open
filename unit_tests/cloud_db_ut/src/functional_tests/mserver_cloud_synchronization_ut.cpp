@@ -108,7 +108,7 @@ TEST_P(FtEc2MserverCloudSynchronization, adding_user_locally_while_offline)
         cdb()->stop();
 
         // Adding user locally.
-        ::ec2::ApiUserData account2VmsData;
+        nx::vms::api::UserData account2VmsData;
         addCloudUserLocally(account2.email, &account2VmsData);
 
         ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
@@ -168,7 +168,7 @@ TEST_P(FtEc2MserverCloudSynchronization, merging_offline_changes)
     for (const auto& account: accounts)
     {
         // Adding user to vms.
-        ::ec2::ApiUserData accountVmsData;
+        nx::vms::api::UserData accountVmsData;
         addCloudUserLocally(account.first.email, &accountVmsData);
 
         // Adding users to the cloud.
@@ -212,7 +212,7 @@ TEST_P(FtEc2MserverCloudSynchronization, adding_user_in_cloud_and_removing_local
 
     //for (int i = 0; i < 5; ++i)
     {
-        ::ec2::ApiUserData accountVmsData;
+        nx::vms::api::UserData accountVmsData;
         addCloudUserLocally(testAccount.email, &accountVmsData);
 
         ASSERT_EQ(
@@ -376,11 +376,11 @@ TEST_P(FtEc2MserverCloudSynchronization, rename_system)
         }
         else
         {
-            ::ec2::ApiResourceParamWithRefData param;
+            nx::vms::api::ResourceParamWithRefData param;
             param.resourceId = QnUserResource::kAdminGuid;
             param.name = nx::settings_names::kNameSystemName;
             param.value = QString::fromStdString(newSystemName);
-            ::ec2::ApiResourceParamWithRefDataList paramList;
+            nx::vms::api::ResourceParamWithRefDataList paramList;
             paramList.push_back(std::move(param));
 
             ASSERT_EQ(
@@ -427,7 +427,7 @@ TEST_P(Ec2MserverCloudSynchronization, adding_cloud_user_with_not_registered_ema
     // Waiting for cloud owner to be synchronized to vms db.
     waitForCloudAndVmsToSyncUsers();
 
-    ::ec2::ApiUserData accountVmsData;
+    nx::vms::api::UserData accountVmsData;
     const std::string testEmail = "test_123@mail.ru";
     addCloudUserLocally(testEmail, &accountVmsData);
 
@@ -504,7 +504,7 @@ TEST_P(FtEc2MserverCloudSynchronization, transaction_timestamp)
 
         // Adding user locally with shifted timestamp.
         const std::string newAccountEmail = cdb()->generateRandomEmailAddress();
-        ::ec2::ApiUserData userData;
+        nx::vms::api::UserData userData;
         addCloudUserLocally(newAccountEmail, &userData);
 
         waitForCloudAndVmsToSyncUsers();

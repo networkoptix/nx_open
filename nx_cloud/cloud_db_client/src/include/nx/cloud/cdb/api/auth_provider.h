@@ -128,6 +128,11 @@ public:
     {
         return records == right.records;
     }
+
+    bool operator!=(const AuthInfo& right) const
+    {
+        return records != right.records;
+    }
 };
 
 } // namespace api

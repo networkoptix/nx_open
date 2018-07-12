@@ -27,24 +27,26 @@ bool requiresCameraResource(ActionType actionType)
 {
     switch (actionType)
     {
-        case undefinedAction:
-        case panicRecordingAction:
-        case sendMailAction:
-        case diagnosticsAction:
-        case showPopupAction:
-        case openLayoutAction:
+        case ActionType::undefinedAction:
+        case ActionType::panicRecordingAction:
+        case ActionType::sendMailAction:
+        case ActionType::diagnosticsAction:
+        case ActionType::showPopupAction:
+        case ActionType::openLayoutAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
-        case playSoundOnceAction:
-        case playSoundAction:
-        case sayTextAction:
-        case cameraOutputAction:
-        case bookmarkAction:
-        case cameraRecordingAction:
-        case executePtzPresetAction:
-        case showTextOverlayAction:
-        case showOnAlarmLayoutAction:
-        case acknowledgeAction:
+        case ActionType::playSoundOnceAction:
+        case ActionType::playSoundAction:
+        case ActionType::sayTextAction:
+        case ActionType::cameraOutputAction:
+        case ActionType::bookmarkAction:
+        case ActionType::cameraRecordingAction:
+        case ActionType::executePtzPresetAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::showOnAlarmLayoutAction:
+        case ActionType::acknowledgeAction:
+        case ActionType::fullscreenCameraAction:
             return true;
 
         default:
@@ -56,25 +58,27 @@ bool requiresUserResource(ActionType actionType)
 {
     switch (actionType)
     {
-        case undefinedAction:
-        case panicRecordingAction:
-        case cameraOutputAction:
-        case bookmarkAction:
-        case cameraRecordingAction:
-        case diagnosticsAction:
-        case showPopupAction:
-        case playSoundOnceAction:
-        case playSoundAction:
-        case sayTextAction:
-        case executePtzPresetAction:
-        case showTextOverlayAction:
-        case showOnAlarmLayoutAction:
-        case execHttpRequestAction:
-        case openLayoutAction:
+        case ActionType::undefinedAction:
+        case ActionType::panicRecordingAction:
+        case ActionType::cameraOutputAction:
+        case ActionType::bookmarkAction:
+        case ActionType::cameraRecordingAction:
+        case ActionType::diagnosticsAction:
+        case ActionType::showPopupAction:
+        case ActionType::playSoundOnceAction:
+        case ActionType::playSoundAction:
+        case ActionType::sayTextAction:
+        case ActionType::executePtzPresetAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::showOnAlarmLayoutAction:
+        case ActionType::execHttpRequestAction:
+        case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
-        case acknowledgeAction:
-        case sendMailAction:
+        case ActionType::acknowledgeAction:
+        case ActionType::sendMailAction:
             return true;
 
         default:
@@ -88,25 +92,27 @@ bool requiresAdditionalUserResource(ActionType actionType)
 {
     switch (actionType)
     {
-        case undefinedAction:
-        case panicRecordingAction:
-        case cameraOutputAction:
-        case cameraRecordingAction:
-        case diagnosticsAction:
-        case playSoundAction:
-        case executePtzPresetAction:
-        case showTextOverlayAction:
-        case execHttpRequestAction:
-        case acknowledgeAction:
-        case sendMailAction:
-        case openLayoutAction:
+        case ActionType::undefinedAction:
+        case ActionType::panicRecordingAction:
+        case ActionType::cameraOutputAction:
+        case ActionType::cameraRecordingAction:
+        case ActionType::diagnosticsAction:
+        case ActionType::playSoundAction:
+        case ActionType::executePtzPresetAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::execHttpRequestAction:
+        case ActionType::acknowledgeAction:
+        case ActionType::sendMailAction:
+        case ActionType::openLayoutAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
-        case bookmarkAction:
-        case showPopupAction:
-        case playSoundOnceAction:
-        case sayTextAction:
-        case showOnAlarmLayoutAction:
+        case ActionType::bookmarkAction:
+        case ActionType::showPopupAction:
+        case ActionType::playSoundOnceAction:
+        case ActionType::sayTextAction:
+        case ActionType::showOnAlarmLayoutAction:
             return true;
 
         default:
@@ -119,25 +125,27 @@ bool hasToggleState(ActionType actionType)
 {
     switch (actionType)
     {
-        case undefinedAction:
-        case sendMailAction:
-        case diagnosticsAction:
-        case showPopupAction:
-        case playSoundOnceAction:
-        case sayTextAction:
-        case executePtzPresetAction:
-        case showOnAlarmLayoutAction:
-        case execHttpRequestAction:
-        case acknowledgeAction:
-        case openLayoutAction:
+        case ActionType::undefinedAction:
+        case ActionType::sendMailAction:
+        case ActionType::diagnosticsAction:
+        case ActionType::showPopupAction:
+        case ActionType::playSoundOnceAction:
+        case ActionType::sayTextAction:
+        case ActionType::executePtzPresetAction:
+        case ActionType::showOnAlarmLayoutAction:
+        case ActionType::execHttpRequestAction:
+        case ActionType::acknowledgeAction:
+        case ActionType::openLayoutAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
-        case cameraOutputAction:
-        case cameraRecordingAction:
-        case panicRecordingAction:
-        case playSoundAction:
-        case bookmarkAction:
-        case showTextOverlayAction:
+        case ActionType::cameraOutputAction:
+        case ActionType::cameraRecordingAction:
+        case ActionType::panicRecordingAction:
+        case ActionType::playSoundAction:
+        case ActionType::bookmarkAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::fullscreenCameraAction:
             return true;
 
         default:
@@ -159,10 +167,11 @@ bool supportsDuration(ActionType actionType)
 {
     switch (actionType)
     {
-        case bookmarkAction:
-        case showTextOverlayAction:
-        case cameraOutputAction:
-        case cameraRecordingAction:
+        case ActionType::bookmarkAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::cameraOutputAction:
+        case ActionType::cameraRecordingAction:
+        case ActionType::fullscreenCameraAction:
             return true;
         default:
             return false;
@@ -173,10 +182,12 @@ bool allowsAggregation(ActionType actionType)
 {
     switch (actionType)
     {
-        case bookmarkAction:
-        case showTextOverlayAction:
-        case cameraOutputAction:
-        case playSoundAction:
+        case ActionType::bookmarkAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::cameraOutputAction:
+        case ActionType::playSoundAction:
+        case ActionType::fullscreenCameraAction:
+        case ActionType::exitFullscreenAction:
             return false;
 
         default:
@@ -191,10 +202,11 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
 
     switch (actionType)
     {
-        case bookmarkAction:
-        case showTextOverlayAction:
-        case cameraOutputAction:
-        case cameraRecordingAction:
+        case ActionType::bookmarkAction:
+        case ActionType::showTextOverlayAction:
+        case ActionType::cameraOutputAction:
+        case ActionType::cameraRecordingAction:
+        case ActionType::fullscreenCameraAction:
             return parameters.durationMs <= 0;
 
         default:
@@ -208,21 +220,24 @@ QList<ActionType> userAvailableActions()
 {
     static QList<ActionType> result
     {
-        cameraOutputAction,
-        bookmarkAction,
-        cameraRecordingAction,
-        panicRecordingAction,
-        sendMailAction,
-        diagnosticsAction,
-        showPopupAction,
-        playSoundAction,
-        playSoundOnceAction,
-        sayTextAction,
-        executePtzPresetAction,
-        showTextOverlayAction,
-        showOnAlarmLayoutAction,
-        execHttpRequestAction,
-        openLayoutAction,
+        ActionType::cameraOutputAction,
+        ActionType::bookmarkAction,
+        ActionType::cameraRecordingAction,
+        ActionType::panicRecordingAction,
+        ActionType::sendMailAction,
+        ActionType::diagnosticsAction,
+        ActionType::showPopupAction,
+        ActionType::playSoundAction,
+        ActionType::playSoundOnceAction,
+        ActionType::sayTextAction,
+        ActionType::executePtzPresetAction,
+        ActionType::showTextOverlayAction,
+        ActionType::showOnAlarmLayoutAction,
+        ActionType::execHttpRequestAction,
+        ActionType::openLayoutAction,
+        ActionType::execHttpRequestAction,
+        ActionType::fullscreenCameraAction,
+        ActionType::exitFullscreenAction,
     };
 
     return result;
@@ -234,7 +249,7 @@ QList<ActionType> allActions()
         []()
         {
             QList<ActionType> result = userAvailableActions();
-            result.append(acknowledgeAction);
+            result.append(ActionType::acknowledgeAction);
             return result;
         }();
 

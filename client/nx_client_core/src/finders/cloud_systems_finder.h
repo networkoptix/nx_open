@@ -14,32 +14,25 @@ class QTimer;
 
 namespace nx { namespace network { namespace http { class AsyncHttpClientPtr; } } }
 
-class QnCloudSystemsFinder : public Connective<QnAbstractSystemsFinder>
+class QnCloudSystemsFinder: public Connective<QnAbstractSystemsFinder>
 {
     Q_OBJECT
     typedef Connective<QnAbstractSystemsFinder> base_type;
 
 public:
-    QnCloudSystemsFinder(QObject *parent = nullptr);
-
-    virtual ~QnCloudSystemsFinder();
+    QnCloudSystemsFinder(QObject* parent = nullptr);
+    virtual ~QnCloudSystemsFinder() override;
 
 public: // overrides
     SystemDescriptionList systems() const override;
-
-    QnSystemDescriptionPtr getSystem(const QString &id) const override;
+    QnSystemDescriptionPtr getSystem(const QString& id) const override;
 
 private:
     void onCloudStatusChanged(QnCloudStatusWatcher::Status status);
-
-    void setCloudSystems(const QnCloudSystemList &systems);
-
-    void pingCloudSystem(const QString &cloudSystemId);
-
+    void setCloudSystems(const QnCloudSystemList& systems);
+    void pingCloudSystem(const QString& cloudSystemId);
     void updateSystems();
-
-    void tryRemoveAlienServer(const QnModuleInformation &serverInfo);
-
+    void tryRemoveAlienServer(const nx::vms::api::ModuleInformation& serverInfo);
     void updateOnlineStateUnsafe(const QnCloudSystemList& targetSystems);
 
 private:

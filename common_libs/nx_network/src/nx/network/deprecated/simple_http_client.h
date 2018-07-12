@@ -43,6 +43,7 @@ public:
     /*!
         \param timeout Timeout in milliseconds to be used as socket's read and write timeout
     */
+    CLSimpleHTTPClient(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
     CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
     CLSimpleHTTPClient(const nx::utils::Url& url, unsigned int timeout, const QAuthenticator& auth);
 
@@ -70,7 +71,7 @@ public:
 
     void close();
 
-    TCPSocketPtr getSocket() { return m_sock; }
+    //TCPSocketPtr getSocket() { return m_sock; }
 
     QHash<QByteArray, QByteArray> header() const
     {

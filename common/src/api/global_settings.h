@@ -6,25 +6,24 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <common/common_globals.h>
+#include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_fwd.h>
-
-#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 #include <utils/common/optional.h>
 
-#include <common/common_globals.h>
-
-#include <core/resource/resource_fwd.h>
-#include <nx_ec/data/api_resource_data.h>
-#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 class QnAbstractResourcePropertyAdaptor;
 
 template<class T>
 class QnResourcePropertyAdaptor;
 class QSettings;
+
+struct QnWatermarkSettings;
 
 namespace nx {
 namespace settings_names {
@@ -36,6 +35,8 @@ const QString kMaxSceneItemsOverrideKey(lit("maxSceneItems"));
 const QString kUseTextEmailFormat(lit("useTextEmailFormat"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
+const QString kNameTrafficEncryptionForced(lit("trafficEncryptionForced"));
+const QString kNameVideoTrafficEncryptionForced(lit("videoTrafficEncryptionForced"));
 const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
 const QString kNameHost(lit("smtpHost"));
 const QString kNamePort(lit("smtpPort"));
@@ -48,14 +49,25 @@ const QString kNameFrom(lit("emailFrom"));
 const QString kNameSignature(lit("emailSignature"));
 const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
+
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
 const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
+const QString kNamePrimaryTimeServer(lit("primaryTimeServer"));
+
+/* Max rtt for internet time synchronization request */
 const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
     lit("maxDifferenceBetweenSynchronizedAndInternetTime"));
+
+/* Max rtt for server to server or client to server time synchronization request */
 const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
     lit("maxDifferenceBetweenSynchronizedAndLocalTimeMs"));
+
+/* Period to check local time for changes */
 const QString kOsTimeChangeCheckPeriod(lit("osTimeChangeCheckPeriodMs"));
+
+/* Period to synchronize time via network */
 const QString kSyncTimeExchangePeriod(lit("syncTimeExchangePeriod"));
+
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -73,7 +85,6 @@ const QString kNameSystemName(lit("systemName"));
 const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
 
-
 const QString ldapUri(lit("ldapUri"));
 const QString ldapAdminDn(lit("ldapAdminDn"));
 const QString ldapAdminPassword(lit("ldapAdminPassword"));
@@ -89,6 +100,7 @@ const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
 static const QString kUpdates2PropertyName = lit("updateStatus");
 
+const QString kWatermarkSettingsName(lit("watermarkSettings"));
 
 } // namespace settings_names
 } // namespace nx
@@ -150,6 +162,12 @@ public:
     void setAuditTrailEnabled(bool value);
     int auditTrailPeriodDays() const;
     int eventLogPeriodDays() const;
+
+    bool isTrafficEncriptionForced() const;
+    void setTrafficEncriptionForced(bool value);
+
+    bool isVideoTrafficEncriptionForced() const;
+    void setVideoTrafficEncryptionForced(bool value);
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
@@ -224,6 +242,9 @@ public:
     bool isSynchronizingTimeWithInternet() const;
     void setSynchronizingTimeWithInternet(bool value);
 
+    QnUuid primaryTimeServer() const;
+    void setPrimaryTimeServer(const QnUuid& value);
+
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndLocalTime() const;
 
@@ -286,13 +307,22 @@ public:
     */
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
-    static bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param);
+    static bool isGlobalSetting(const nx::vms::api::ResourceParamWithRefData& param);
 
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
     bool hanwhaDeleteProfilesOnInitIfNeeded() const;
     void setHanwhaDeleteProfilesOnInitIfNeeded(bool deleteProfiles);
+
+    bool showHanwhaAlternativePtzControlsOnTile() const;
+    void setShowHanwhaAlternativePtzControlsOnTile(bool showPtzControls);
+
+    int hanwhaChunkReaderResponseTimeoutSeconds() const;
+    void setHanwhaChunkReaderResponseTimeoutSeconds(int value);
+
+    int hanwhaChunkReaderMessageBodyTimeoutSeconds() const;
+    void setHanwhaChunkReaderMessageBodyTimeoutSeconds(int value);
 
     bool isEdgeRecordingEnabled() const;
     void setEdgeRecordingEnabled(bool enabled);
@@ -305,6 +335,9 @@ public:
 
     int maxWearableArchiveSynchronizationThreads() const;
     void setMaxWearableArchiveSynchronizationThreads(int newValue);
+
+    QnWatermarkSettings watermarkSettings() const;
+    void setWatermarkSettings(const QnWatermarkSettings & settings) const;
 
 signals:
     void initialized();
@@ -324,6 +357,8 @@ signals:
     void emailSettingsChanged();
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
+    void trafficEncryptionForcedChanged();
+    void videoTrafficEncryptionForcedChanged();
     void updateNotificationsChanged();
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged(const QString& key);
@@ -333,6 +368,7 @@ signals:
     void cloudConnectUdpHolePunchingEnabledChanged();
     void cloudConnectRelayingEnabledChanged();
     void updates2RegistryChanged();
+    void watermarkChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -356,12 +392,15 @@ private:
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_trafficEncryptionForcedAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_videoTrafficEncryptionForcedAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnUuid> *m_primaryTimeServerAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_osTimeChangeCheckPeriodAdaptor = nullptr;
@@ -432,6 +471,9 @@ private:
     QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<bool>* m_hanwhaDeleteProfilesOnInitIfNeeded = nullptr;
+    QnResourcePropertyAdaptor<bool>* m_showHanwhaAlternativePtzControlsOnTile = nullptr;
+    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderResponseTimeoutSeconds = nullptr;
+    QnResourcePropertyAdaptor<int>* m_hanwhaChunkReaderMessageBodyTimeoutSeconds = nullptr;
 
     QnResourcePropertyAdaptor<bool>* m_edgeRecordingEnabledAdaptor = nullptr;
 
@@ -439,6 +481,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
 
     QnResourcePropertyAdaptor<QByteArray>* m_updates2InfoAdaptor;
+    QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettings = nullptr;
 
     AdaptorList m_allAdaptors;
 

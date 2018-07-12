@@ -38,7 +38,9 @@ public:
     EventConnection(
         network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
     virtual ~EventConnection();
-        
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+
     virtual void start(
         api::SystemEventHandlers eventHandlers,
         std::function<void(api::ResultCode)> completionHandler) override;

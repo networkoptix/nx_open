@@ -1,7 +1,7 @@
 #include "media_resource.h"
 
 #include <QtGui/QImage>
-#include <QtCore/QCoreApplication>
+
 
 #include <utils/common/warnings.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -9,85 +9,37 @@
 
 #include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
-#include "nx/streaming/abstract_stream_data_provider.h"
 #include <common/common_module.h>
+#include <common/static_common_module.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_data_pool.h>
+
+#include <nx/vms/api/types/motion_types.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/core/ptz/component.h>
+
+namespace core_ptz = nx::core::ptz;
 
 namespace {
-    const QString customAspectRatioKey          = lit("overrideAr");
-    const QString dontRecordPrimaryStreamKey    = lit("dontRecordPrimaryStream");
-    const QString dontRecordSecondaryStreamKey  = lit("dontRecordSecondaryStream");
-    const QString rtpTransportKey               = lit("rtpTransport");
-    const QString dynamicVideoLayoutKey         = lit("dynamicVideoLayout");
-    const QString motionStreamKey               = lit("motionStream");
-    const QString rotationKey                   = lit("rotation");
-    const QString panicRecordingKey             = lit("panic_mode");
 
-    const QString primaryStreamValue            = lit("primary");
-    const QString secondaryStreamValue          = lit("secondary");
-    const QString edgeStreamValue               = lit("edge");
+static const QString customAspectRatioKey = lit("overrideAr");
+static const QString dontRecordPrimaryStreamKey = lit("dontRecordPrimaryStream");
+static const QString dontRecordSecondaryStreamKey = lit("dontRecordSecondaryStream");
+static const QString rtpTransportKey = lit("rtpTransport");
+static const QString dynamicVideoLayoutKey = lit("dynamicVideoLayout");
+static const QString motionStreamKey = lit("motionStream");
+static const QString rotationKey = lit("rotation");
+static const QString panicRecordingKey = lit("panic_mode");
 
-    /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
-    const qreal noCustomAspectRatio = 0.0;
-}
+using nx::vms::api::MotionStreamType;
+static const QString primaryStreamValue = QnLexical::serialized(MotionStreamType::primary);
+static const QString secondaryStreamValue = QnLexical::serialized(MotionStreamType::secondary);
+static const QString edgeStreamValue = QnLexical::serialized(MotionStreamType::edge);
 
+/** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
+static constexpr qreal noCustomAspectRatio = 0.0;
 
-class QnStreamQualityStrings {
-    Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
-public:
-    static QString displayString(Qn::StreamQuality value)
-    {
-        switch(value) {
-        case Qn::QualityLowest:       return tr("Lowest");
-        case Qn::QualityLow:          return tr("Low");
-        case Qn::QualityNormal:       return tr("Medium");
-        case Qn::QualityHigh:         return tr("High");
-        case Qn::QualityHighest:      return tr("Best");
-        case Qn::QualityPreSet:       return tr("Preset");
-        case Qn::QualityNotDefined:   return tr("Undefined");
-        default:
-            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
-            return QString();
-        }
-    }
-
-    static QString shortDisplayString(Qn::StreamQuality value)
-    {
-        /* Note that '//:' are comments for translators. */
-        switch(value) {
-        case Qn::QualityLowest:
-            //: Short for 'Lowest'
-            return tr("Lst");
-        case Qn::QualityLow:
-            //: Short for 'Low'
-            return tr("Lo");
-        case Qn::QualityNormal:
-            //: Short for 'Medium'
-            return tr("Me");
-        case Qn::QualityHigh:
-            //: Short for 'High'
-            return tr("Hi");
-        case Qn::QualityHighest:
-            //: Short for 'Best'
-            return tr("Bst");
-        case Qn::QualityPreSet:
-            //: Short for 'Preset'
-            return tr("Ps");
-        case Qn::QualityNotDefined:
-            return lit("-");
-        default:
-            qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
-            return QString();
-        }
-    }
-};
-
-QString Qn::toDisplayString(Qn::StreamQuality value) {
-    return QnStreamQualityStrings::displayString(value);
-}
-
-QString Qn::toShortDisplayString(Qn::StreamQuality value) {
-    return QnStreamQualityStrings::shortDisplayString(value);
-}
+} // namespace
 
 // -------------------------------------------------------------------------- //
 // QnMediaResource
@@ -98,6 +50,11 @@ QnMediaResource::QnMediaResource()
 
 QnMediaResource::~QnMediaResource()
 {
+}
+
+Qn::StreamQuality QnMediaResource::getBestQualityForSuchOnScreenSize(const QSize&) const
+{
+    return Qn::StreamQuality::normal;
 }
 
 QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
@@ -144,14 +101,19 @@ QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractSt
     return audioLayout;
 }
 
-bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
+bool QnMediaResource::hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
-    Q_UNUSED(dataProvider);
+    const auto cameraResource = toResourcePtr().dynamicCast<QnSecurityCamResource>();
+    if (!cameraResource)
+        return false;
+
     if (!m_hasVideo.is_initialized())
-        m_hasVideo = toResource()->getProperty(Qn::VIDEO_DISABLED_PARAM_NAME).toInt() == 0;
+    {
+        const auto data = qnStaticCommon->dataPool()->data(cameraResource);
+        m_hasVideo = !data.value(Qn::VIDEO_DISABLED_PARAM_NAME, false);
+    }
     return *m_hasVideo;
 }
-
 
 void QnMediaResource::initMediaResource()
 {
@@ -181,30 +143,104 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-qreal QnMediaResource::customAspectRatio() const
+QnAspectRatio QnMediaResource::customAspectRatio() const
 {
     if (!this->toResource()->hasProperty(::customAspectRatioKey))
-        return noCustomAspectRatio;
+        return QnAspectRatio();
 
     bool ok = true;
     qreal value = this->toResource()->getProperty(::customAspectRatioKey).toDouble(&ok);
     if (!ok || qIsNaN(value) || qIsInf(value) || value < 0)
-        return noCustomAspectRatio;
+        return QnAspectRatio();
 
-    return value;
+    return QnAspectRatio::closestStandardRatio(value);
 }
 
-void QnMediaResource::setCustomAspectRatio(qreal value)
+void QnMediaResource::setCustomAspectRatio(const QnAspectRatio& value)
 {
-    if (qIsNaN(value) || qIsInf(value) || value < 0 || qFuzzyEquals(value, noCustomAspectRatio))
+    if (!value.isValid())
         clearCustomAspectRatio();
     else
-        this->toResource()->setProperty(::customAspectRatioKey, QString::number(value));
+        this->toResource()->setProperty(::customAspectRatioKey, QString::number(value.toFloat()));
 }
 
 void QnMediaResource::clearCustomAspectRatio()
 {
     this->toResource()->setProperty(::customAspectRatioKey, QString());
+}
+
+Ptz::Capabilities QnMediaResource::getPtzCapabilities(core_ptz::Type ptzType) const
+{
+    switch (ptzType)
+    {
+        case core_ptz::Type::operational:
+            return operationalPtzCapabilities();
+        case core_ptz::Type::configurational:
+            return Ptz::Capabilities(
+                toResource()->getProperty(Qn::kConfigurationalPtzCapabilities).toInt());
+        default:
+            NX_ASSERT(false, "Wrong ptz type, we should never be here");
+            return Ptz::NoPtzCapabilities;
+    }
+}
+
+bool QnMediaResource::hasAnyOfPtzCapabilities(
+    Ptz::Capabilities capabilities,
+    nx::core::ptz::Type ptzType) const
+{
+    return getPtzCapabilities(ptzType) & capabilities;
+}
+
+void QnMediaResource::setPtzCapabilities(
+    Ptz::Capabilities capabilities,
+    core_ptz::Type ptzType)
+{
+    switch (ptzType)
+    {
+        case core_ptz::Type::operational:
+        {
+            // TODO: #rvasilenko Why do we need this check?
+            if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
+                toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, (int) capabilities);
+            break;
+        }
+        case core_ptz::Type::configurational:
+        {
+            toResource()->setProperty(Qn::kConfigurationalPtzCapabilities, (int) capabilities);
+            break;
+        }
+        default:
+            NX_ASSERT(false, "Wrong ptz type, we should never be here");
+    }
+
+}
+
+void QnMediaResource::setPtzCapability(
+    Ptz::Capabilities capability,
+    bool value,
+    core_ptz::Type ptzType)
+{
+    setPtzCapabilities(value
+        ? (getPtzCapabilities(ptzType) | capability)
+        : (getPtzCapabilities(ptzType) & ~capability), ptzType);
+}
+
+Ptz::Capabilities QnMediaResource::operationalPtzCapabilities() const
+{
+    return Ptz::Capabilities(toResource()->getProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME).toInt());
+}
+
+void QnMediaResource::setOperationalPtzCapabilities(Ptz::Capabilities capabilities)
+{
+    if (toResource()->hasParam(Qn::PTZ_CAPABILITIES_PARAM_NAME))
+        toResource()->setProperty(Qn::PTZ_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities));
+}
+
+bool QnMediaResource::canDisableNativePtzPresets() const
+{
+    const auto caps = getPtzCapabilities();
+    return caps.testFlag(Ptz::NativePresetsPtzCapability)
+        && !caps.testFlag(Ptz::NoNxPresetsPtzCapability);
 }
 
 QString QnMediaResource::customAspectRatioKey()

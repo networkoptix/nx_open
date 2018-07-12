@@ -37,27 +37,22 @@ public:
     nx::network::http::StatusCode::Value statusCode() const;
 
 private:
-    bool parseXml(const nx::Buffer& rawBuffer);
-
-    bool parseCgis(QXmlStreamReader& reader);
-
-    bool parseSubmenus(QXmlStreamReader& reader, const QString& cgi);
-
-    bool parseActions(QXmlStreamReader& reader, const QString& cgi, const QString& submenu);
-
-    bool parseParameters(
+    void parseXml(
         QXmlStreamReader& reader,
-        const QString& cgi,
-        const QString& submenu,
-        const QString& action);
-
-    bool parseDataType(
+        const QString& cgi = QString(),
+        const QString& submenu = QString(),
+        const QString& action = QString());
+    void parseParameter(
         QXmlStreamReader& reader,
         const QString& cgi,
         const QString& submenu,
         const QString& action,
-        HanwhaCgiParameter& parameter);
+        const QString& parameter);
+    void parseDataType(
+        QXmlStreamReader& reader,
+        HanwhaCgiParameter* outParameter);
 
+    QString strAttribute(QXmlStreamReader& reader, const QString& name);
 private:
     using ParameterName = QString;
     using ActionName = QString;

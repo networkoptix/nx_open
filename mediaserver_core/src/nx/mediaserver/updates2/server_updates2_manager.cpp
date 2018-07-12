@@ -24,7 +24,6 @@ using namespace vms::common::p2p::downloader;
 
 namespace {
 
-static const qint64 kRefreshTimeoutMs = 24 * 60 * 60 * 1000; //< 1 day
 static const QString kFileName = "update.status";
 
 } // namespace
@@ -41,59 +40,26 @@ ServerUpdates2Manager::~ServerUpdates2Manager()
 
 qint64 ServerUpdates2Manager::refreshTimeout() const
 {
-    const auto settingsValue = qnServerModule->roSettings()->value(
-        nx_ms_conf::CHECK_FOR_UPDATE_TIMEOUT).toLongLong();
-    return settingsValue == 0 ? kRefreshTimeoutMs : settingsValue;
+    return qnServerModule->settings().checkForUpdateTimeout();
 }
 
-void ServerUpdates2Manager::connectToSignals()
-{
-    connect(
-        globalSettings(), &QnGlobalSettings::updates2RegistryChanged,
-        this, &ServerUpdates2Manager::checkForGlobalDictionaryUpdate);
-    connect(
-        downloader(), &Downloader::downloadFinished,
-        this, &ServerUpdates2Manager::onDownloadFinished);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::downloadFailed,
-        this, &ServerUpdates2Manager::onDownloadFailed);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::fileAdded,
-        this, &ServerUpdates2Manager::onFileAdded);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::fileDeleted,
-        this, &ServerUpdates2Manager::onFileDeleted);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::fileInformationChanged,
-        this, &ServerUpdates2Manager::onFileInformationChanged);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::fileStatusChanged,
-        this, &ServerUpdates2Manager::onFileInformationStatusChanged);
-    connect(
-        qnServerModule->findInstance<Downloader>(), &Downloader::chunkDownloadFailed,
-        this, &ServerUpdates2Manager::onChunkDownloadFailed);
-}
-
-vms::common::p2p::downloader::AbstractDownloader* ServerUpdates2Manager::downloader()
+AbstractDownloader* ServerUpdates2Manager::downloader()
 {
     return qnServerModule->findInstance<vms::common::p2p::downloader::Downloader>();
 }
 
 update::info::AbstractUpdateRegistryPtr ServerUpdates2Manager::getRemoteRegistry()
 {
-    auto updateUrl =
-        qnServerModule->roSettings()->value(nx_ms_conf::CHECK_FOR_UPDATE_URL).toString();
-    updateUrl = updateUrl.isNull() ? update::info::kDefaultUrl : updateUrl;
-
-    return update::info::checkSync(updateUrl);
+    auto updateUrl = qnServerModule->settings().checkForUpdateUrl();
+    return update::info::checkSync(peerId(), updateUrl);
 }
 
 QString ServerUpdates2Manager::filePath() const
 {
-    return qnServerModule->settings()->getDataDirectory() + QDir::separator() + kFileName;
+    return qnServerModule->settings().dataDir() + QDir::separator() + kFileName;
 }
 
-update::detail::AbstractUpdates2Installer* ServerUpdates2Manager::installer()
+update::installer::detail::AbstractUpdates2Installer* ServerUpdates2Manager::installer()
 {
     return &m_installer;
 }

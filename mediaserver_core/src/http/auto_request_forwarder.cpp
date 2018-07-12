@@ -22,6 +22,7 @@
 #include <common/common_module.h>
 
 #include <mediaserver_ini.h>
+#include <nx/vms/network/proxy_connection.h>
 
 static const qint64 kUsPerMs = 1000;
 
@@ -64,12 +65,12 @@ void QnAutoRequestForwarder::processRequest(nx::network::http::Request* const re
         return;
     }
 
-    if (QnUniversalRequestProcessor::isCloudRequest(*request))
+    if (nx::vms::network::ProxyConnectionProcessor::isCloudRequest(*request))
     {
         auto servers = resourcePool()->getResources<QnMediaServerResource>().filtered(
             [](const QnMediaServerResourcePtr server)
             {
-                return server->getServerFlags().testFlag(Qn::SF_HasPublicIP)
+                return server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP)
                     && server->getStatus() == Qn::Online;
             });
         if (!servers.isEmpty())
@@ -325,7 +326,7 @@ bool QnAutoRequestForwarder::findCameraInUrlQuery(
     if (paramNames.isEmpty()) //< Path trailing not found.
         return false;
 
-    NX_VERBOSE(this) << lm("Lookingh for camera id in url params [%2]").args(paramNames);
+    NX_VERBOSE(this) << lm("Looking for camera id in url params [%1]").args(paramNames);
 
     const QnRequestParams params = requestParamsFromUrl(request.requestLine.url);
     QString notFoundCameraId;

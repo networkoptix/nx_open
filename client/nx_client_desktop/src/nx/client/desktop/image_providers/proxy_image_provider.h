@@ -17,22 +17,22 @@ class AbstractImageProcessor;
  * This image provider takes input from another ImageProvider
  * and calls AbstractImageProcessor to produce output image
  */
-class ProxyImageProvider: public QnImageProvider
+class ProxyImageProvider: public ImageProvider
 {
     Q_OBJECT
-    using base_type = QnImageProvider;
+    using base_type = ImageProvider;
 
 public:
     explicit ProxyImageProvider(QObject* parent = nullptr);
-    explicit ProxyImageProvider(QnImageProvider* sourceProvider, QObject* parent = nullptr);
+    explicit ProxyImageProvider(ImageProvider* sourceProvider, QObject* parent = nullptr);
     virtual ~ProxyImageProvider() override;
 
     virtual QImage image() const override;
     virtual QSize sizeHint() const override;
     virtual Qn::ThumbnailStatus status() const override;
 
-    QnImageProvider* sourceProvider() const;
-    void setSourceProvider(QnImageProvider* sourceProvider); //< Does not take ownership.
+    ImageProvider* sourceProvider() const;
+    void setSourceProvider(ImageProvider* sourceProvider); //< Does not take ownership.
 
     AbstractImageProcessor* imageProcessor() const;
     void setImageProcessor(AbstractImageProcessor* imageProcessor); //< Does not take ownership.
@@ -49,7 +49,7 @@ private:
     void updateFromSource();
 
 private:
-    QnImageProvider* m_sourceProvider = nullptr;
+    ImageProvider* m_sourceProvider = nullptr;
     QScopedPointer<QnDisconnectHelper> m_sourceProviderConnections;
 
     AbstractImageProcessor* m_imageProcessor = nullptr;

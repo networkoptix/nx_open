@@ -1,15 +1,15 @@
 #include "user_resource.h"
 
 #include <api/model/password_data.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_properties.h>
+#include <utils/common/synctime.h>
+#include <utils/crypt/symmetrical.h>
 
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/raii_guard.h>
-
-#include <utils/common/synctime.h>
-#include <core/resource_management/resource_properties.h>
-#include <utils/crypt/symmetrical.h>
-#include <common/common_module.h>
-#include "resource.h"
+#include <nx/utils/log/log.h>
 
 namespace
 {
@@ -42,7 +42,7 @@ QnUserResource::QnUserResource(QnUserType userType):
     m_passwordExpirationTimestamp(0)
 {
     addFlags(Qn::user | Qn::remote);
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kUserTypeId));
+    setTypeId(nx::vms::api::UserData::kResourceTypeId);
 }
 
 QnUserResource::QnUserResource(const QnUserResource& right):
@@ -83,33 +83,33 @@ bool QnUserResource::setMemberChecked(
 Qn::UserRole QnUserResource::userRole() const
 {
     if (isOwner())
-        return Qn::UserRole::Owner;
+        return Qn::UserRole::owner;
 
     QnUuid id = userRoleId();
     if (!id.isNull())
-        return Qn::UserRole::CustomUserRole;
+        return Qn::UserRole::customUserRole;
 
     auto permissions = getRawPermissions();
 
-    if (permissions.testFlag(Qn::GlobalAdminPermission))
-        return Qn::UserRole::Administrator;
+    if (permissions.testFlag(GlobalPermission::admin))
+        return Qn::UserRole::administrator;
 
     switch (permissions)
     {
-        case Qn::GlobalAdvancedViewerPermissionSet:
-            return Qn::UserRole::AdvancedViewer;
+        case (int) GlobalPermission::advancedViewerPermissions:
+            return Qn::UserRole::advancedViewer;
 
-        case Qn::GlobalViewerPermissionSet:
-            return Qn::UserRole::Viewer;
+        case (int) GlobalPermission::viewerPermissions:
+            return Qn::UserRole::viewer;
 
-        case Qn::GlobalLiveViewerPermissionSet:
-            return Qn::UserRole::LiveViewer;
+        case (int) GlobalPermission::liveViewerPermissions:
+            return Qn::UserRole::liveViewer;
 
         default:
             break;
     };
 
-    return Qn::UserRole::CustomPermissions;
+    return Qn::UserRole::customPermissions;
 }
 
 QByteArray QnUserResource::getHash() const
@@ -185,19 +185,31 @@ bool QnUserResource::checkLocalUserPassword(const QString &password)
     QnMutexLocker locker(&m_mutex);
 
     if (!m_digest.isEmpty())
-        return nx::network::http::calcHa1(m_name.toLower(), m_realm, password) == m_digest;
+    {
+        const auto isDigestCorrect = nx::network::http::calcHa1(m_name.toLower(), m_realm, password)
+            == m_digest;
+
+        NX_VERBOSE(this, lm("Digest is %1").args(isDigestCorrect ? "correct" : "incorrect"));
+        return isDigestCorrect;
+    }
 
     //hash is obsolete. Cannot remove it to maintain update from version < 2.3
     //hash becomes empty after changing user's realm
     QList<QByteArray> values = m_hash.split(L'$');
     if (values.size() != 3)
+    {
+        NX_VERBOSE(this, lm("Unable to parse hash: %1").arg(m_hash));
         return false;
+    }
 
     QByteArray salt = values[1];
     QCryptographicHash md5(QCryptographicHash::Md5);
     md5.addData(salt);
     md5.addData(password.toUtf8());
-    return md5.result().toHex() == values[2];
+
+    const auto isHashCorrect = md5.result().toHex() == values[2];
+    NX_VERBOSE(this, lm("Hash is %1").arg(isHashCorrect ? "correct" : "incorrect"));
+    return isHashCorrect;
 }
 
 void QnUserResource::setDigest(const QByteArray& digest)
@@ -239,17 +251,19 @@ QString QnUserResource::getRealm() const
 
 void QnUserResource::setRealm(const QString& realm)
 {
+    // Uncoment to debug authorization related problems.
+    // NX_ASSERT(m_digest.isEmpty() || !realm.isEmpty());
     if (setMemberChecked(&QnUserResource::m_realm, realm))
         emit realmChanged(::toSharedPointer(this));
 }
 
-Qn::GlobalPermissions QnUserResource::getRawPermissions() const
+GlobalPermissions QnUserResource::getRawPermissions() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_permissions;
 }
 
-void QnUserResource::setRawPermissions(Qn::GlobalPermissions permissions)
+void QnUserResource::setRawPermissions(GlobalPermissions permissions)
 {
     if (setMemberChecked(&QnUserResource::m_permissions, permissions))
         emit permissionsChanged(::toSharedPointer(this));
@@ -343,19 +357,17 @@ QString QnUserResource::fullName() const
     return result.isNull() ? m_fullName : result;
 }
 
-ec2::ApiResourceParamWithRefDataList QnUserResource::params() const
+nx::vms::api::ResourceParamWithRefDataList QnUserResource::params() const
 {
-    ec2::ApiResourceParamWithRefDataList result;
+    nx::vms::api::ResourceParamWithRefDataList result;
     QString value;
     if (commonModule())
         value = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
     if (value.isEmpty() && !fullName().isEmpty() && isCloud())
         value = fullName(); //< move fullName to property dictionary to sync data with cloud correctly
     if (!value.isEmpty())
-    {
-        ec2::ApiResourceParamWithRefData param(getId(), Qn::USER_FULL_NAME, value);
-        result.push_back(param);
-    }
+        result.emplace_back(getId(), Qn::USER_FULL_NAME, value);
+
     return result;
 }
 
@@ -436,6 +448,8 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
 
 		if (m_realm != localOther->m_realm)
         {
+            // Uncoment to debug authorization related problems.
+            // NX_ASSERT(m_digest.isEmpty() || !localOther->m_realm.isEmpty());
             m_realm = localOther->m_realm;
             notifiers << [r = toSharedPointer(this)]{ emit r->realmChanged(r); };
         }
@@ -478,8 +492,13 @@ bool QnUserResource::passwordExpired() const
 
 void QnUserResource::fillId()
 {
-    // ATTENTION: This logic is similar to ApiUserData::fillId().
+    // ATTENTION: This logic is similar to UserData::fillId().
     NX_ASSERT(!(isCloud() && getEmail().isEmpty()));
     QnUuid id = isCloud() ? guidFromArbitraryData(getEmail()) : QnUuid::createUuid();
     setId(id);
+}
+
+QString QnUserResource::idForToStringFromPtr() const
+{
+    return getName();
 }

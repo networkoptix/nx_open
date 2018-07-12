@@ -123,6 +123,12 @@ qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
     return result;
 }
 
+bool DeviceFileCatalog::hasArchive(int storageIndex) const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_chunks.hasArchive(storageIndex);
+}
+
 QString getDirName(const QString& prefix, int currentParts[4], int i)
 {
     QString result = prefix;
@@ -133,7 +139,7 @@ QString getDirName(const QString& prefix, int currentParts[4], int i)
 
 bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage)
 {
-	QString prefix = rootFolder(storage, m_catalog);
+    QString prefix = rootFolder(storage, m_catalog);
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
     if (chunk.timeZone != -1)
@@ -229,6 +235,7 @@ void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>&
         [storageIndex](const Chunk& chunk){ return chunk.storageIndex == storageIndex; } );
     m_chunks.resize( filteredDataEndIter - filteredData.begin() + newCatalog.size() );
     std::merge( filteredData.begin(), filteredDataEndIter, newCatalog.begin(), newCatalog.end(), m_chunks.begin() );
+    m_chunks.reCalcArchivePresence();
 }
 
 QSet<QDate> DeviceFileCatalog::recordedMonthList()
@@ -286,6 +293,7 @@ void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
     auto itr = std::set_union(existChunks.begin(), existChunks.end(), chunks.begin(), chunks.end(), m_chunks.begin());
     if (!m_chunks.empty())
         m_chunks.resize(itr - m_chunks.begin());
+    m_chunks.reCalcArchivePresence();
 }
 
 std::deque<DeviceFileCatalog::Chunk> DeviceFileCatalog::mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2)
@@ -452,7 +460,8 @@ bool DeviceFileCatalog::needRebuildPause()
     return !m_pauseList.isEmpty();
 }
 
-void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
+void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage,
+    QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
 //    qDebug() << "folder being scanned: " << folder;
     NX_LOG(lit("%1 Processing directory %2").arg(Q_FUNC_INFO).arg(folder), cl_logDEBUG2);

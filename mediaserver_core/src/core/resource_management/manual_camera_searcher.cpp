@@ -21,7 +21,6 @@
 #include <plugins/resource/archive_camera/archive_camera.h>
 #include <common/common_module.h>
 
-
 static const int MAX_PERCENT = 100;
 //assuming that scanning ports is ten times faster than plugin check
 static const int PORT_SCAN_MAX_PROGRESS_PERCENT = 10;
@@ -76,20 +75,21 @@ namespace {
         return false;
     }
 
-    QnManualResourceSearchEntry entryFromCamera(const QnSecurityCamResourcePtr &camera)
+    QnManualResourceSearchEntry entryFromCamera(const QnSecurityCamResourcePtr& camera)
     {
+        const auto type = qnResTypePool->getResourceType(camera->getTypeId());
+        const auto resourceInPool = QnResourceDiscoveryManager::findSameResource(camera);
+
+        const bool exists =
+            (resourceInPool && resourceInPool->getHostAddress() == camera->getHostAddress())
+            || restrictNewManualCameraByIP(camera);
+
         return QnManualResourceSearchEntry(
-              camera->getName()
-            , camera->getUrl()
-            , qnResTypePool->getResourceType(camera->getTypeId())->getName()
-            , camera->getVendor()
-            , camera->getUniqueId()
-            , QnResourceDiscoveryManager::findSameResource(camera)
-              || restrictNewManualCameraByIP(camera)
-            );
+            camera->getName(), camera->getUrl(), type->getName(),
+            camera->getVendor(), camera->getUniqueId(), exists);
     }
 
-    QnManualResourceSearchEntry entryFromResource(const QnResourcePtr &resource)
+    QnManualResourceSearchEntry entryFromResource(const QnResourcePtr& resource)
     {
         if (const QnSecurityCamResourcePtr &camera = resource.dynamicCast<QnSecurityCamResource>())
             return entryFromCamera(camera);
@@ -234,7 +234,6 @@ QList<QnAbstractNetworkResourceSearcher*> QnManualCameraSearcher::getAllNetworkS
     return result;
 }
 
-
 bool QnManualCameraSearcher::run(
     QThreadPool* threadPool,
     const QString& startAddr,
@@ -357,7 +356,6 @@ bool QnManualCameraSearcher::run(
 
             return false;
         };
-
 
     QnMutexLocker lock(&m_mutex);
     m_state = QnManualResourceSearchStatus::CheckingHost;
