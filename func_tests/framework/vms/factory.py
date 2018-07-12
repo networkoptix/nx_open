@@ -2,14 +2,11 @@ import logging
 from collections import namedtuple
 from contextlib import contextmanager
 
-from framework.os_access.local_path import LocalPath
 from framework.os_access.ssh_access import VmSshAccess
 from framework.os_access.windows_access import WindowsAccess
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
-
-SSH_PRIVATE_KEY_PATH = LocalPath.home() / '.func_tests' / 'ssh' / 'private_key'  # Get from VM's description.
 
 VM = namedtuple('VM', ['alias', 'index', 'type', 'name', 'port_map', 'os_access'])
 
