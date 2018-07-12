@@ -42,8 +42,8 @@ def mediaserver_installers(request):
 
 
 @pytest.fixture()
-def mediaserver_factory(mediaserver_installers, artifact_factory, ca):
-    return MediaserverFactory(mediaserver_installers, artifact_factory, ca)
+def mediaserver_factory(mediaserver_installers, artifacts_dir, ca):
+    return MediaserverFactory(mediaserver_installers, artifacts_dir, ca)
 
 
 @pytest.fixture()

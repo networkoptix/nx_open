@@ -43,7 +43,7 @@ def group_install_os_access(request, config):
         return vm.os_access
 
 
-def test_group_install(artifact_factory, mediaserver_installers, ca, config, group_install_os_access):
+def test_group_install(artifacts_dir, mediaserver_installers, ca, config, group_install_os_access):
     installer = installer_by_vm_type(mediaserver_installers, vm_type='linux')
     group = UnpackedMediaserverGroup(
         posix_access=group_install_os_access,
@@ -59,4 +59,4 @@ def test_group_install(artifact_factory, mediaserver_installers, ca, config, gro
             server.start()
     finally:
         for server in server_list:
-            collect_artifacts_from_mediaserver(server, artifact_factory)
+            collect_artifacts_from_mediaserver(server, artifacts_dir)

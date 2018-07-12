@@ -69,50 +69,30 @@ def examine_mediaserver(mediaserver, stopped_ok=False):
             _logger.error("{} is stopped.".format(mediaserver))
 
 
-def collect_logs_from_mediaserver(mediaserver, root_artifact_factory):
-    log_contents = mediaserver.installation.read_log()
-    if log_contents is not None:
-        mediaserver_logs_artifact_factory = root_artifact_factory(
-            ['server', mediaserver.name], name='server-%s' % mediaserver.name, artifact_type=SERVER_LOG_ARTIFACT_TYPE)
-        log_path = mediaserver_logs_artifact_factory.produce_file_path().write_bytes(log_contents)
-        _logger.debug('log file for server %s, %s is stored to %s', mediaserver.name, mediaserver, log_path)
-
-
-def collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory):
+def collect_core_dumps_from_mediaserver(mediaserver, artifacts_dir):
     for core_dump in mediaserver.installation.list_core_dumps():
-        code_dumps_artifact_factory = root_artifact_factory(
-            ['server', mediaserver.name.lower(), core_dump.name],
-            name='%s-%s' % (mediaserver.name.lower(), core_dump.name),
-            is_error=True,
-            artifact_type=CORE_FILE_ARTIFACT_TYPE)
-        local_core_dump_path = code_dumps_artifact_factory.produce_file_path()
+        local_core_dump_path = artifacts_dir / core_dump.name
         copy_file(core_dump, local_core_dump_path)
         # noinspection PyBroadException
         try:
             traceback = mediaserver.installation.parse_core_dump(core_dump)
-            code_dumps_artifact_factory = root_artifact_factory(
-                ['server', mediaserver.name.lower(), core_dump.name, 'traceback'],
-                name='%s-%s-tb' % (mediaserver.name.lower(), core_dump.name),
-                is_error=True,
-                artifact_type=TRACEBACK_ARTIFACT_TYPE)
-            local_traceback_path = code_dumps_artifact_factory.produce_file_path()
+            backtrace_name = local_core_dump_path.name + '.backtrace.txt'
+            local_traceback_path = local_core_dump_path.with_name(backtrace_name)
             local_traceback_path.write_text(traceback)
-            _logger.warning(
-                'Core dump on %r: %s, %s.',
-                mediaserver, local_core_dump_path, local_traceback_path)
         except Exception:
             _logger.exception("Cannot parse core dump: %s.", core_dump)
 
 
-def collect_artifacts_from_mediaserver(mediaserver, root_artifact_factory):
-    collect_logs_from_mediaserver(mediaserver, root_artifact_factory)
-    collect_core_dumps_from_mediaserver(mediaserver, root_artifact_factory)
+def collect_artifacts_from_mediaserver(mediaserver, artifacts_dir):
+    for file in mediaserver.installation.list_log_files():
+        copy_file(file, artifacts_dir / file.name)
+    collect_core_dumps_from_mediaserver(mediaserver, artifacts_dir)
 
 
 class MediaserverFactory(object):
-    def __init__(self, mediaserver_installers, artifact_factory, ca):
+    def __init__(self, mediaserver_installers, artifacts_dir, ca):
         self._mediaserver_installers = mediaserver_installers
-        self._artifact_factory = artifact_factory
+        self._artifacts_dir = artifacts_dir
         self._ca = ca
 
     @contextmanager
@@ -126,4 +106,6 @@ class MediaserverFactory(object):
         mediaserver = setup_clean_mediaserver(name, installation, installer, self._ca)
         yield mediaserver
         examine_mediaserver(mediaserver)
-        collect_artifacts_from_mediaserver(mediaserver, self._artifact_factory)
+        mediaserver_artifacts_dir = self._artifacts_dir / mediaserver.name
+        mediaserver_artifacts_dir.ensure_empty_dir()
+        collect_artifacts_from_mediaserver(mediaserver, mediaserver_artifacts_dir)

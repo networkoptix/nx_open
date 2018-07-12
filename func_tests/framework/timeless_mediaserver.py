@@ -10,7 +10,7 @@ from framework.merging import setup_local_system
 
 
 @contextmanager
-def timeless_mediaserver(vm, mediaserver_installers, ca, artifact_factory):
+def timeless_mediaserver(vm, mediaserver_installers, ca, artifacts_dir):
     """Mediaserver never exposed to internet depending on machine time"""
     installer = installer_by_vm_type(mediaserver_installers, vm.type)
     installation = make_installation(mediaserver_installers, vm.type, vm.os_access)
@@ -27,4 +27,4 @@ def timeless_mediaserver(vm, mediaserver_installers, ca, artifact_factory):
     try:
         yield mediaserver
     finally:
-        collect_artifacts_from_mediaserver(mediaserver, artifact_factory)
+        collect_artifacts_from_mediaserver(mediaserver, artifacts_dir)

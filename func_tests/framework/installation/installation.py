@@ -43,12 +43,8 @@ class Installation(object):
     def update_mediaserver_conf(self, new_configuration):  # type: ({}) -> None
         pass
 
-    def read_log(self):
-        file = self.var / 'log' / 'log_file.log'
-        try:
-            return file.read_bytes()
-        except DoesNotExist:
-            return None
+    def list_log_files(self):
+        yield self.var / 'log' / 'log_file.log'
 
     def list_core_dumps(self):
         return [
