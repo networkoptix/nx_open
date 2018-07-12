@@ -17,7 +17,7 @@ def timeless_mediaserver(vm, mediaserver_installers, ca, artifacts_dir):
     mediaserver = make_dirty_mediaserver(vm.alias, installation, installer)
     mediaserver.stop(already_stopped_ok=True)
     vm.os_access.networking.disable_internet()
-    cleanup_mediaserver(mediaserver, ca)
+    mediaserver.installation.cleanup(ca.generate_key_and_cert())
     mediaserver.installation.update_mediaserver_conf({
         'ecInternetSyncTimePeriodSec': 3,
         'ecMaxInternetTimeSyncRetryPeriodSec': 3,

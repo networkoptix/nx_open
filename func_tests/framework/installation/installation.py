@@ -1,9 +1,12 @@
+import logging
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from framework.installation.service import Service
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.os_access_interface import OSAccess
 from framework.os_access.path import FileSystemPath
+
+_logger = logging.getLogger(__name__)
 
 
 class Installation(object):
@@ -57,3 +60,23 @@ class Installation(object):
     def parse_core_dump(self, path):
         """Parse MediaServer process dump"""
         return u''
+
+    def cleanup(self, new_key_pair):
+        _logger.info("Remove old core dumps.")
+        for core_dump_path in self.list_core_dumps():
+            core_dump_path.unlink()
+        try:
+            _logger.info("Remove var directory %s.", self.var)
+            self.var.rmtree()
+        except DoesNotExist:
+            pass
+        _logger.info("Put key pair to %s.", self.key_pair)
+        self.key_pair.parent.mkdir(parents=True, exist_ok=True)
+        self.key_pair.write_text(new_key_pair)
+        _logger.info("Update conf file.")
+        self.restore_mediaserver_conf()
+        self.update_mediaserver_conf({
+            'logLevel': 'DEBUG2',
+            'tranLogLevel': 'DEBUG2',
+            'checkForUpdateUrl': 'http://127.0.0.1:8080',  # TODO: Use fake server responding with small updates.
+            })
