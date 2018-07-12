@@ -28,7 +28,7 @@ class DpkgInstallation(DebInstallation):
         remote_path = self.os_access.Path.tmp() / installer.path.name
         remote_path.parent.mkdir(parents=True, exist_ok=True)
         copy_file(installer.path, remote_path)
-        self.posix_access.ssh.run_sh_script(
+        self.posix_access.shell.run_sh_script(
             # language=Bash
             '''
                 # Commands and dependencies for trusty template.
