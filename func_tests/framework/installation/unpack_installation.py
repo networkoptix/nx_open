@@ -1,13 +1,13 @@
 import logging
 import uuid
 
+from .deb_installation import DebInstallation
+from .upstart_service import LinuxAdHocService
 from .. import serialize
+from ..method_caching import cached_property
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
-from ..method_caching import cached_property
 from ..template_renderer import TemplateRenderer
-from .upstart_service import LinuxAdHocService
-from .deb_installation import DebInstallation
 
 _logger = logging.getLogger(__name__)
 

@@ -7,8 +7,8 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
-from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, exit_status_error_cls
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, exit_status_error_cls
 from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM

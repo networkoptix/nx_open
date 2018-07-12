@@ -1,15 +1,15 @@
 """Work with mediaserver as single entity: start/stop, setup, configure, access HTTP api, storage, etc..."""
 
 import datetime
+import json
 import logging
 import tempfile
 import time
-import json
+from Crypto.Cipher import AES
 
 import pytz
 import requests.exceptions
 from pathlib2 import Path
-from Crypto.Cipher import AES
 
 from framework.api_shortcuts import get_server_id
 from framework.camera import Camera, SampleMediaFile, make_schedule_task

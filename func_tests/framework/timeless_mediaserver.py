@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+
 from framework.installation.make_installation import installer_by_vm_type, make_installation
 from framework.installation.mediaserver_factory import (
     cleanup_mediaserver,

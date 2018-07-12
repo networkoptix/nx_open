@@ -2,10 +2,10 @@ import logging
 
 import pytest
 
-from framework.os_access.ssh_access import PhysicalSshAccess
 from framework.installation.make_installation import installer_by_vm_type, make_installation
+from framework.installation.mediaserver_factory import collect_artifacts_from_mediaserver, setup_clean_mediaserver
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
-from framework.installation.mediaserver_factory import setup_clean_mediaserver, collect_artifacts_from_mediaserver
+from framework.os_access.ssh_access import PhysicalSshAccess
 
 _logger = logging.getLogger(__name__)
 

@@ -3,9 +3,7 @@ import sys
 from io import BytesIO
 
 from framework.installation.installation import Installation
-from framework.installation.installer import InstallIdentity, UnknownCustomization
-from framework.installation.upstart_service import UpstartService
-from framework.method_caching import cached_property
+from framework.installation.installer import InstallIdentity
 from framework.os_access.exceptions import DoesNotExist
 from framework.os_access.posix_shell import PosixShell
 

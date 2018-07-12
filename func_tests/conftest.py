@@ -2,8 +2,8 @@ import logging
 import logging.config
 
 import pytest
-from pathlib2 import Path
 import yaml
+from pathlib2 import Path
 
 from defaults import defaults
 from framework.artifact import ArtifactFactory, ArtifactType

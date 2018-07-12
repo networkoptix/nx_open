@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 import pytest
 from pytz import utc
 
-from framework.timeless_mediaserver import timeless_mediaserver
 from framework.api_shortcuts import get_server_id, get_time, is_primary_time_server
 from framework.merging import merge_systems
+from framework.timeless_mediaserver import timeless_mediaserver
 from framework.utils import RunningTime, get_internet_time
 from framework.waiting import ensure_persistence, wait_for_true
 

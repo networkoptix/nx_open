@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from framework.os_access.local_path import LocalPath
 from framework.os_access.ssh_access import VmSshAccess
 from framework.os_access.windows_access import WindowsAccess
-from framework.vms.vm_type import VMType
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)

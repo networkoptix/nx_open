@@ -12,8 +12,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from netaddr.ip import IPAddress
 from pathlib2 import Path
 
-from framework.os_access.ssh_shell import SSH
 from framework.os_access.posix_shell_utils import sh_command_to_script
+from framework.os_access.ssh_shell import SSH
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)

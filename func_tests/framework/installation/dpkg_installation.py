@@ -1,9 +1,9 @@
 import logging
 
-from framework.os_access.path import copy_file
 from framework.method_caching import cached_property
-from .upstart_service import UpstartService
+from framework.os_access.path import copy_file
 from .deb_installation import DebInstallation
+from .upstart_service import UpstartService
 
 _logger = logging.getLogger(__name__)
 
