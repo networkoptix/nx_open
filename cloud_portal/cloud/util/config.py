@@ -19,6 +19,5 @@ def get_config(customization=None):
     if not os.path.isfile(file_path):  # this is for Jenkins to collect static
         file_path = os.path.join(conf_dir, '..', 'cloud_portal.yaml')
 
-    sys.stderr.write ("Reading config: " + file_path)
     return yaml.safe_load(open(file_path))
 

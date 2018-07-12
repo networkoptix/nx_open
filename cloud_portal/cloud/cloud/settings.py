@@ -24,6 +24,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCAL_ENVIRONMENT = 'runserver' in sys.argv
 conf = get_config()
 
+sys.stderr.write ("Loaded config: \n" + json.dumps(conf, indent=4, sort_keys=True) + "\n")
+
+
 CUSTOMIZATION = os.getenv('CUSTOMIZATION')
 if not CUSTOMIZATION:
     CUSTOMIZATION = conf['customization']
