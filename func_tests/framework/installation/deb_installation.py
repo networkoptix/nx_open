@@ -24,25 +24,23 @@ class DebInstallation(Installation):
     _NOT_SET = object()
 
     def __init__(self, posix_access, dir):
+        super(DebInstallation, self).__init__(
+            posix_access,
+            dir,
+            dir / 'bin' / 'mediaserver-bin',
+            dir / 'var',
+            [dir / 'bin'],
+            'core.*',
+            )
         self._posix_shell = posix_access.shell  # type: PosixShell
-        self.dir = dir
-        self._bin = self.dir / 'bin'
-        self.binary = self._bin / 'mediaserver-bin'
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
-        self.var = self.dir / 'var'
-        self._log_file = self.var / 'log' / 'log_file.log'
-        self.key_pair = self.var / 'ssl' / 'cert.pem'
         self.posix_access = posix_access  # type: PosixAccess
         self._identity = self._NOT_SET
 
-    @property
-    def os_access(self):
-        return self.posix_access
-
     def is_valid(self):
         paths_to_check = [
-            self.dir, self._bin / 'mediaserver', self.binary,
+            self.dir, self.binary,
             self._config, self._config_initial]
         all_paths_exist = True
         for path in paths_to_check:
@@ -53,11 +51,8 @@ class DebInstallation(Installation):
                 all_paths_exist = False
         return all_paths_exist
 
-    def list_core_dumps(self):
-        return self._bin.glob('core.*')
-
     def parse_core_dump(self, path):
-        return self.os_access.parse_core_dump(path, self.binary, self.dir / 'lib')
+        return self.os_access.parse_core_dump(path, executable_path=self.binary, lib_path=self.dir / 'lib')
 
     def restore_mediaserver_conf(self):
         self._posix_shell.run_command(['cp', self._config_initial, self._config])
@@ -72,12 +67,6 @@ class DebInstallation(Installation):
         f = BytesIO()  # TODO: Should be text.
         config.write(f)
         self._config.write_text(f.getvalue().decode(encoding='ascii'))
-
-    def read_log(self):
-        try:
-            return self._log_file.read_bytes()
-        except DoesNotExist:
-            return None
 
     # returns None if server is not installed (yet)
     # cached_property does not fit because we need to invalidate it after .install()

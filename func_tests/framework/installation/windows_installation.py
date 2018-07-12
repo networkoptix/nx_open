@@ -15,17 +15,24 @@ class WindowsInstallation(Installation):
     """Manage installation on Windows"""
 
     def __init__(self, windows_access, identity):  # type: (WindowsAccess, InstallIdentity) -> None
-        self._identity = identity
         program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
         customization = identity.customization
-        self.dir = program_files_dir / customization.windows_installation_subdir
-        self.binary = self.dir / 'mediaserver.exe'
-        self.info = self.dir / 'build_info.txt'
         system_profile_dir = windows_access.Path(windows_access.system_profile_dir())
-        self._local_app_data_dir = system_profile_dir / 'AppData' / 'Local'
-        self.var = self._local_app_data_dir / customization.windows_app_data_subdir
-        self._log_file = self.var / 'log' / 'log_file.log'
-        self.key_pair = self.var / 'ssl' / 'cert.pem'
+        user_profile_dir = windows_access.env_vars()[u'UserProfile']
+        system_app_data_dir = system_profile_dir / 'AppData' / 'Local'
+        super(WindowsInstallation, self).__init__(
+            windows_access,
+            program_files_dir / customization.windows_installation_subdir,
+            'mediaserver.exe',
+            system_app_data_dir / customization.windows_app_data_subdir,
+            [
+                system_app_data_dir,  # Crash dumps written here.
+                user_profile_dir,  # Manually created with `procdump`.
+                user_profile_dir / 'AppData' / 'Local' / 'Temp',  # From task manager.
+                ],
+            'mediaserver*.dmp',
+            )
+        self._identity = identity
         self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
         self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
         self.windows_access = windows_access
@@ -33,10 +40,6 @@ class WindowsInstallation(Installation):
     @property
     def identity(self):
         return self._identity
-
-    @property
-    def os_access(self):
-        return self.windows_access
 
     def is_valid(self):
         if not self.binary.exists():
@@ -66,38 +69,6 @@ class WindowsInstallation(Installation):
         self.windows_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
         self._backup_configuration()
 
-    def list_core_dumps_from_task_manager(self):
-        base_name = self.binary.stem
-
-        def iterate_names(limit):
-            yield '{}.DMP'.format(base_name)
-            for index in range(2, limit + 1):
-                yield '{} ({}).DMP'.format(base_name, index)
-
-        profile_dir = self.os_access.Path(self.os_access.env_vars()[u'UserProfile'])
-        temp_dir = profile_dir / 'AppData' / 'Local' / 'Temp'
-        dumps = []
-        for name in iterate_names(20):  # 20 is arbitrarily big number.
-            path = temp_dir / name
-            if not path.exists():
-                break
-            dumps.append(path)
-
-    def list_core_dumps_from_mediaserver(self):
-        dumps = list(self._local_app_data_dir.glob('{}_*.dmp'.format(self.binary.name)))
-        return dumps
-
-    def list_core_dumps_from_procdump(self):
-        profile_dir = self.os_access.Path(self.os_access.env_vars()[u'UserProfile'])
-        dumps = list(profile_dir.glob('{}_*.dmp'.format(self.binary.name)))
-        return dumps
-
-    def list_core_dumps(self):
-        dumps_from_mediaserver = self.list_core_dumps_from_mediaserver()
-        dumps_from_procdump = self.list_core_dumps_from_procdump()
-        dumps = dumps_from_mediaserver + dumps_from_procdump
-        return dumps
-
     def parse_core_dump(self, path):
         symbols_path = str.format(
             r'cache*;'
@@ -120,6 +91,3 @@ class WindowsInstallation(Installation):
 
     def update_mediaserver_conf(self, new_configuration):
         self._config_key.update_values(new_configuration)
-
-    def read_log(self):
-        pass
