@@ -1,6 +1,6 @@
-import csv
 import logging
 import re
+from collections import OrderedDict
 from pprint import pformat
 from uuid import UUID
 
@@ -35,6 +35,47 @@ def virtual_box_error(code):
             self.code = code
 
     return type('VirtualBoxError_{}'.format(code), (SpecificVirtualBoxError,), {})
+
+
+class _VmInfoParser(object):
+    """Single reason why it exists is multiline description"""
+
+    def __init__(self, raw_output):
+        self._data = raw_output.decode().replace('\r\n', '\n')
+        self._pos = 0
+
+    def _read_element(self, symbol_after):
+        if self._data[self._pos] == '"':
+            return self._read_quoted(symbol_after)
+        else:
+            return self._read_bare(symbol_after)
+
+    def _read_bare(self, symbol_after):
+        begin = self._pos
+        self._pos = self._data.find(symbol_after, begin)
+        end = self._pos
+        self._pos += len(symbol_after)
+        return self._data[begin:end]
+
+    def _read_quoted(self, symbol_after):
+        self._pos += 1
+        begin = self._pos
+        self._pos = self._data.find('"' + symbol_after, begin)
+        end = self._pos
+        self._pos += 1 + len(symbol_after)
+        return self._data[begin:end]
+
+    def _read_key(self):
+        return self._read_element('=')
+
+    def _read_value(self):
+        return self._read_element('\n')
+
+    def __iter__(self):
+        while self._pos < len(self._data):
+            key = self._read_key()
+            value = self._read_value()
+            yield key, value
 
 
 class VirtualBoxVm(VmHardware):
@@ -96,7 +137,7 @@ class VirtualBoxVm(VmHardware):
 
     @classmethod
     def from_raw_output(cls, raw_output):
-        raw_dict = dict(csv.reader(raw_output.splitlines(), delimiter='=', escapechar='\\', doublequote=False))
+        raw_dict = OrderedDict(_VmInfoParser(raw_output))
         name = raw_dict['name']
         _logger.info("Parse raw VM info of %s.", name)
         ports_map = ReciprocalPortMap(
