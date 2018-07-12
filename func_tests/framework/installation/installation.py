@@ -44,7 +44,7 @@ class Installation(object):
         pass
 
     def list_log_files(self):
-        yield self.var / 'log' / 'log_file.log'
+        return self.var.joinpath('log').glob('log_file*.log')
 
     def list_core_dumps(self):
         return [
