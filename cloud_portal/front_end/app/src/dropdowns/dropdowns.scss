@@ -7,6 +7,24 @@
     }
 }
 
+// Special case for dropdowns in header
+header {
+    .dropdown {
+        @media (max-width : $collapse-second-width) {
+            position : inherit !important;
+
+            .dropdown-menu {
+                right : 0 !important;
+            }
+        }
+
+        .dropdown-toggle {
+            height : 47px;
+            border : none;
+        }
+    }
+}
+
 .dropdown {
     &-wide {
         display : inline-block;
@@ -51,6 +69,10 @@
                     transition          : border-bottom-color 0.2s ease-in-out;
                 }
             }
+        }
+
+        &::after {
+            display : none !important;
         }
 
         .arrow {
@@ -145,12 +167,6 @@
         .dropdown-toggle-transparent {
             background-color : transparentize($light5, 0.75) !important;
         }
-    }
-}
-
-.dropdown-toggle {
-    &::after {
-        display : none !important;
     }
 }
 

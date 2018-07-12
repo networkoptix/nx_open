@@ -2,8 +2,6 @@
 
     <button class="btn btn-dropdown-toggle dropdown-toggle-transparent"
             id="systemsDropdown"
-            (mouseout)="disableFocus = true"
-            [class.my-class]="disableFocus"
             ngbDropdownToggle>
         <span [ngClass]="{'nx-d-md-none':!activeSystem}" class="glyphicon glyphicon-home"></span>
         <span *ngIf="activeSystem" class="ellipsis">{{activeSystem.name}}</span>
