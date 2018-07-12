@@ -33,6 +33,11 @@ def generate_languages_files():
     for lang in os.listdir(translations_path):
         language_json_filename = os.path.join("../../../..", "translations", lang, 'language.json')
 
+        if not os.path.isfile(language_json_filename): # ignore incomplete languages without language.json
+            sys.stderr.write('ERROR: For BORIS to fix: language.json is missing. '
+                             'File: ' + language_json_filename + '\n')
+            continue
+
         print("Load: " + language_json_filename)
         with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
             data = json.load(file_descriptor)
