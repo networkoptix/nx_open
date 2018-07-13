@@ -43,6 +43,8 @@ public:
         const QString& key,
         const QVariant& defaultValue = QVariant()) const;
 
+    std::multimap<QString, QString> allArgs() const;
+
     const QString getApplicationName() const { return m_applicationName; }
     const QString getModuleName() const { return m_moduleName; }
 

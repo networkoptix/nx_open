@@ -19,7 +19,7 @@ std::unique_ptr<AbstractLogger> LoggerBuilder::buildLogger(
     std::unique_ptr<AbstractWriter> writer)
 {
     std::vector<std::unique_ptr<AbstractLogger>> loggers;
-    for (const auto& loggerSettings : settings.loggers)
+    for (const auto& loggerSettings: settings.loggers)
     {
         auto logger = buildLogger(
             loggerSettings,

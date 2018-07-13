@@ -37,6 +37,8 @@ public:
     template<typename Handler>
     void forEach(const QString& name, const Handler& handler) const;
 
+    std::multimap<QString, QString> allArgs() const;
+
 private:
     template<typename ValueType = QString>
     boost::optional<ValueType> getImpl(const QString& name) const;

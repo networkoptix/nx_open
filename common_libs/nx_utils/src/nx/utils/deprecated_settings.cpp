@@ -56,6 +56,20 @@ QVariant QnSettings::value(
     return QVariant();
 }
 
+std::multimap<QString, QString> QnSettings::allArgs() const
+{
+    std::multimap<QString, QString> args = m_args.allArgs();
+
+    if (m_systemSettings)
+    {
+        const auto keys = m_systemSettings->allKeys();
+        for (const auto& key: keys)
+            args.emplace(key, m_systemSettings->value(key).toString());
+    }
+
+    return args;
+}
+
 void QnSettings::initializeSystemSettings()
 {
     if (const auto config = m_args.get("conf-file"))
