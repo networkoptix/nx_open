@@ -9,7 +9,8 @@ import { NgbTabChangeEvent, NgbTabset } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
     selector: 'download-component',
-    templateUrl: 'download.component.html'
+    templateUrl: 'download.component.html',
+    styleUrls: ['download.component.scss']
 })
 
 export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
