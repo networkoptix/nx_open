@@ -18,7 +18,7 @@ class WindowsInstallation(Installation):
         program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
         customization = identity.customization
         system_profile_dir = windows_access.Path(windows_access.system_profile_dir())
-        user_profile_dir = windows_access.env_vars()[u'UserProfile']
+        user_profile_dir = windows_access.Path(windows_access.env_vars()[u'UserProfile'])
         system_app_data_dir = system_profile_dir / 'AppData' / 'Local'
         super(WindowsInstallation, self).__init__(
             windows_access,
