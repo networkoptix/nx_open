@@ -48,7 +48,7 @@ TEST_F(BookmarksDatabaseTest, DISABLED_speedTest)
     ASSERT_TRUE(mediaServerLauncher->start());
 
     QList<QnUuid> cameras;
-    cameras << QUuid("3645c7ee-ca91-e579-e753-1d85af1fd08c}");
+    cameras << QUuid("{3645c7ee-ca91-e579-e753-1d85af1fd08c}");
     cameras << QUuid("{8e42995b-74d1-2fb6-8ca6-1c298a6a70f7}");
     cameras << QUuid("{95f1cf54-0b91-4afd-966c-2e9db69c0ce1}");
     cameras << QUuid("{97bad347-f07f-8457-cc86-76d1810bdd1a}");

@@ -12,16 +12,14 @@ You have to prepare old-version database files for the test in the bin directory
 All necessary files are on the rsync://noptix.enk.me/buildenv/test
 """
 
-import time
+import logging
 
 import pytest
-import logging
 
 from framework.merging import merge_systems, setup_local_system
 from framework.os_access.path import copy_file
 from framework.utils import SimpleNamespace, bool_to_str
-from framework.waiting import wait_for_true, WaitTimeout
-
+from framework.waiting import WaitTimeout, wait_for_true
 
 _logger = logging.getLogger(__name__)
 

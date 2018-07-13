@@ -13,6 +13,9 @@
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 
 class DiscoveryManager;
 
@@ -47,10 +50,21 @@ public:
 
     static HttpLinkPlugin* instance();
 
+    void setStreamState(const nx::utils::Url& url, bool isStreamRunning);
+
+    bool isStreamRunning(const nx::utils::Url& url) const;
+
 private:
+    void cleanStreamCacheUp();
+
+private:
+    mutable QnMutex m_mutex;
     nxpt::CommonRefManager m_refManager;
     std::unique_ptr<DiscoveryManager> m_discoveryManager;
     nxpl::TimeProvider *m_timeProvider;
+
+    nx::utils::ElapsedTimer m_streamStateCacheCleanupTimer;
+    std::map<nx::utils::Url, nx::utils::ElapsedTimer> m_streamStateCache;
 };
 
 #endif  //IMAGE_LIBRARY_PLUGIN_H

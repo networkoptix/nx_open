@@ -11,6 +11,7 @@
 #include <ui/style/nx_style.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
+#include "nx/utils/literal.h"
 #include <ui/style/skin.h>
 
 namespace {

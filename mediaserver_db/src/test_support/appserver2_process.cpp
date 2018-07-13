@@ -166,8 +166,6 @@ int Appserver2Process::exec()
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
-    addSelfServerResource(ec2Connection);
-
     ::ec2::CloudConnector cloudConnector(ec2ConnectionFactory->messageBus());
 
     TimeBasedNonceProvider timeBaseNonceProvider;
@@ -181,6 +179,8 @@ int Appserver2Process::exec()
 
     if (!settings.cloudIntegration().cloudDbUrl.isEmpty())
         cloudManagerGroup.setCloudDbUrl(settings.cloudIntegration().cloudDbUrl);
+
+    addSelfServerResource(ec2Connection);
 
     nx::vms::utils::loadResourcesFromEcs(
         m_commonModule.get(),

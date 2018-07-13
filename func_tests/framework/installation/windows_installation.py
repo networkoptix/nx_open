@@ -1,7 +1,7 @@
 import logging
 
 from framework.installation.installation import Installation
-from framework.installation.installer import Installer
+from framework.installation.installer import InstallIdentity
 from framework.installation.windows_service import WindowsService
 from framework.method_caching import cached_property
 from framework.os_access.path import copy_file
@@ -15,17 +15,24 @@ class WindowsInstallation(Installation):
     """Manage installation on Windows"""
 
     def __init__(self, windows_access, identity):  # type: (WindowsAccess, InstallIdentity) -> None
-        self._identity = identity
         program_files_dir = windows_access.Path(windows_access.env_vars()['ProgramFiles'])
         customization = identity.customization
-        self.dir = program_files_dir / customization.windows_installation_subdir
-        self.binary = self.dir / 'mediaserver.exe'
-        self.info = self.dir / 'build_info.txt'
         system_profile_dir = windows_access.Path(windows_access.system_profile_dir())
-        self._local_app_data_dir = system_profile_dir / 'AppData' / 'Local'
-        self.var = self._local_app_data_dir / customization.windows_app_data_subdir
-        self._log_file = self.var / 'log' / 'log_file.log'
-        self.key_pair = self.var / 'ssl' / 'cert.pem'
+        user_profile_dir = windows_access.Path(windows_access.env_vars()[u'UserProfile'])
+        system_app_data_dir = system_profile_dir / 'AppData' / 'Local'
+        super(WindowsInstallation, self).__init__(
+            os_access=windows_access,
+            dir=program_files_dir / customization.windows_installation_subdir,
+            binary_file='mediaserver.exe',
+            var_dir=system_app_data_dir / customization.windows_app_data_subdir,
+            core_dumps_dirs=[
+                system_app_data_dir,  # Crash dumps written here.
+                user_profile_dir,  # Manually created with `procdump`.
+                user_profile_dir / 'AppData' / 'Local' / 'Temp',  # From task manager.
+                ],
+            core_dump_glob='mediaserver*.dmp',
+            )
+        self._identity = identity
         self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
         self._config_key_backup = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key + ' Backup')
         self.windows_access = windows_access
@@ -33,10 +40,6 @@ class WindowsInstallation(Installation):
     @property
     def identity(self):
         return self._identity
-
-    @property
-    def os_access(self):
-        return self.windows_access
 
     def is_valid(self):
         if not self.binary.exists():
@@ -66,43 +69,25 @@ class WindowsInstallation(Installation):
         self.windows_access.winrm.run_command([remote_installer_path, '/passive', '/log', remote_log_path])
         self._backup_configuration()
 
-    def list_core_dumps_from_task_manager(self):
-        base_name = self.binary.stem
+    def parse_core_dump(self, path):
+        symbols_path = str.format(
+            r'cache*;'
+            # By some obscure reason, when run via WinRM, `cdb` cannot fetch `.pdb` from Microsoft Symbol Server.
+            # (Same command, copied from `procmon`, works like a charm.)
+            # Hope symbols exported from DLLs will suffice.
+            # r'srv*;'
+            r'{build_dir}\{build}\{customization}\windows-x64\bin;'
+            # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins;'
+            # r'{build_dir}\{build}\{customization}\windows-x64\bin\plugins_optional;'
+            ,
+            build_dir=r'\\cinas\beta-builds\repository\v1\develop\vms',
+            build=self.identity.version.build,
+            customization=self.identity.customization.customization_name,
+            )
+        self.os_access.parse_core_dump(path, symbols_path=symbols_path, timeout_sec=600)
 
-        def iterate_names(limit):
-            yield '{}.DMP'.format(base_name)
-            for index in range(2, limit + 1):
-                yield '{} ({}).DMP'.format(base_name, index)
-
-        profile_dir = self.os_access.Path(self.os_access.env_vars()[u'UserProfile'])
-        temp_dir = profile_dir / 'AppData' / 'Local' / 'Temp'
-        dumps = []
-        for name in iterate_names(20):  # 20 is arbitrarily big number.
-            path = temp_dir / name
-            if not path.exists():
-                break
-            dumps.append(path)
-
-    def list_core_dumps_from_mediaserver(self):
-        dumps = list(self._local_app_data_dir.glob('{}_*.dmp'.format(self.binary.name)))
-        return dumps
-
-    def list_core_dumps_from_procdump(self):
-        profile_dir = self.os_access.Path(self.os_access.env_vars()[u'UserProfile'])
-        dumps = list(profile_dir.glob('{}_*.dmp'.format(self.binary.name)))
-        return dumps
-
-    def list_core_dumps(self):
-        dumps_from_mediaserver = self.list_core_dumps_from_mediaserver()
-        dumps_from_procdump = self.list_core_dumps_from_procdump()
-        dumps = dumps_from_mediaserver + dumps_from_procdump
-        return dumps
-
-    def restore_mediaserver_conf(self):
+    def _restore_conf(self):
         self._config_key_backup.copy_values_to(self._config_key)
 
     def update_mediaserver_conf(self, new_configuration):
         self._config_key.update_values(new_configuration)
-
-    def read_log(self):
-        pass

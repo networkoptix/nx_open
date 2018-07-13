@@ -259,6 +259,19 @@ void MediaServerCloudIntegrationTest::waitForUserToAppearInCloud(const std::stri
     }
 }
 
+std::unique_ptr<QnStaticCommonModule> MediaServerCloudIntegrationTest::s_staticCommonModule;
+
+void MediaServerCloudIntegrationTest::SetUpTestCase()
+{
+    s_staticCommonModule =
+        std::make_unique<QnStaticCommonModule>(nx::vms::api::PeerType::server);
+}
+
+void MediaServerCloudIntegrationTest::TearDownTestCase()
+{
+    s_staticCommonModule.reset();
+}
+
 void MediaServerCloudIntegrationTest::SetUp()
 {
     ASSERT_TRUE(startCloudDB());
