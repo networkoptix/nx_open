@@ -8,7 +8,6 @@ from pathlib2 import PurePath
 from requests import RequestException
 
 from framework.method_caching import cached_getter
-from framework.os_access.exceptions import exit_status_error_cls
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
 from framework.os_access.windows_remoting._cim_query import CIMClass
 from ._cim_query import CIMQuery

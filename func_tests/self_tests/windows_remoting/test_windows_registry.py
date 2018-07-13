@@ -1,6 +1,6 @@
 import pytest
 
-from framework.os_access.windows_remoting.registry import WindowsRegistry, Type
+from framework.os_access.windows_remoting.registry import Type, WindowsRegistry
 
 
 @pytest.fixture(scope='session')

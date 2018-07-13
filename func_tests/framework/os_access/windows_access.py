@@ -7,8 +7,8 @@ import tzlocal.windows_tz
 
 from framework.method_caching import cached_getter, cached_property
 from framework.networking.windows import WindowsNetworking
-from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, exit_status_error_cls
 from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.exceptions import AlreadyDownloaded, CannotDownload, exit_status_error_cls
 from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.smb_path import SMBConnectionPool, SMBPath
 from framework.os_access.windows_remoting import WinRM
@@ -130,6 +130,28 @@ class WindowsAccess(RemoteAccess):
             pass
         else:
             raise RuntimeError("Unexpected zero exit status, {} expected".format(expected_exit_status))
+
+    def parse_core_dump(self, path, symbols_path='', timeout_sec=600):
+        output = self.run_command(
+            [
+                # Its folder is not added to %PATH% by Chocolatey, but installation location is known (default).
+                r'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe',
+                '-z', path,
+                # `-y` is string with special format. Example: `cache*;srv*;\\server\share\symbols\product\v100500`.
+                # See: https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/symbol-path
+                '-y', symbols_path,
+                '-c',  # Execute commands:
+                '.exr -1;'  # last exception,
+                '.ecxr;'  # last exception context,
+                'kc;'  # current thread backtrace,
+                '~*kc;'  # all threads backtrace,
+                'q',  # quit.
+                '-n',  # Verbose symbols loading.
+                '-s',  # Disable deferred symbols load to make stack clear of loading errors and warnings.
+                ],
+            timeout_sec=timeout_sec,  # It's takes a while when symbols are not cached yet.
+            )
+        return output.decode('ascii')
 
     def make_fake_disk(self, name, size_bytes):
         raise NotImplementedError()

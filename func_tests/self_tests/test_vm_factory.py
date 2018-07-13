@@ -32,11 +32,12 @@ def vm_type(hypervisor):
         )
     for index, name in vm_type.registry.possible_entries():
         try:
-            hypervisor.destroy(name)
+            vm = hypervisor.find_vm(name)
         except VMNotFound:
             _logger.info("VM %r doesn't exist in %r.", name, hypervisor)
-        else:
-            _logger.info("VM %r removed from %r.", name, hypervisor)
+            continue
+        vm.destroy()
+        _logger.info("VM %r removed from %r.", name, hypervisor)
     return vm_type
 
 

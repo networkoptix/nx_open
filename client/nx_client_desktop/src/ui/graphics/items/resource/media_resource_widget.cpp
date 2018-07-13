@@ -12,6 +12,7 @@
 #include <boost/algorithm/cxx11/all_of.hpp>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 
 #include <nx/vms/event/rule.h>
@@ -82,6 +83,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
+#include <ui/graphics/items/resource/watermark_painter.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
@@ -218,6 +220,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     d(new QnMediaResourceWidgetPrivate(base_type::resource())),
     m_recordingStatusHelper(new RecordingStatusHelper(this)),
     m_posUtcMs(DATETIME_INVALID),
+    m_watermarkPainter(new QnWatermarkPainter),
     m_itemId(item->uuid())
 {
     NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");
@@ -365,6 +368,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     setImageEnhancement(item->imageEnhancement());
 
     initSoftwareTriggers();
+
+    auto updateWatermark = [this, context]()
+    {
+        m_watermarkPainter->setWatermark(context->user() ? context->user()->getName() : "",
+            globalSettings()->watermarkSettings());
+    };
+    updateWatermark();
+    connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);
+    connect(context, &QnWorkbenchContext::userChanged, this, updateWatermark);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -1601,6 +1613,8 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (m_entropixProgress >= 0)
         paintProgress(painter, rect, m_entropixProgress);
 
+    paintWatermark(painter, rect);
+
     if (client::desktop::ini().showVideoQualityOverlay
         && hasVideo()
         && !d->resource->hasFlags(Qn::local))
@@ -1780,6 +1794,11 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
     {
         paintFilledRegionPath(painter, rect, m_motionSensitivity[channel].getMotionMaskPath(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
     }
+}
+
+void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
+{
+    m_watermarkPainter->drawWatermark(painter, rect);
 }
 
 QnPtzControllerPtr QnMediaResourceWidget::ptzController() const

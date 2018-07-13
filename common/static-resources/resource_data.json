@@ -2820,6 +2820,10 @@
             "keys": ["2nt|2N IP Verso", "2nt|2N IP Force"],
             "relayInputCountForced": 2,
             "onvifInputPortAliases": ["onvif_input_1", "input1"]
+        },
+        {
+            "keys": ["Hanwha|SNF-8010*"],
+            "operationalPtzCapabilities": "NoPtzCapabilities"
         }
     ]
 }

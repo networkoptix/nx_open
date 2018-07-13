@@ -47,11 +47,16 @@ vm_types:
       template_url: smb://qanas/rw/gsovetov/func_tests/trusty-template.ova
       port_forwarding:
         host_ports_base: 37000
-        host_ports_per_vm: 10
+        host_ports_per_vm: 30
         vm_ports_to_host_port_offsets:
           tcp/7001: 1
           tcp/7002: 2
           tcp/7003: 3
           tcp/7004: 4
           tcp/7005: 5
-          tcp/22: 6
+          tcp/8001: 11
+          tcp/8002: 12
+          tcp/8003: 13
+          tcp/8004: 14
+          tcp/8005: 15
+          tcp/22: 22

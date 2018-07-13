@@ -9,8 +9,8 @@ import server_api_data_generators as generator
 import transaction_log
 from framework.api_shortcuts import get_server_id
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.utils import SimpleNamespace, datetime_utc_now
 from framework.merging import merge_systems
+from framework.utils import SimpleNamespace, datetime_utc_now
 
 _logger = logging.getLogger(__name__)
 
