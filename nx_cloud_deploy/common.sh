@@ -64,8 +64,6 @@ function pushns()
 
 function push()
 {
-    $(aws ecr get-login --no-include-email)
-
     echo "Pushing $MODULE:$VERSION to the registry"
     [ -z "$REPOSITORY_HOST" ] && REPOSITORY_HOST=009544449203.dkr.ecr.us-east-1.amazonaws.com
     [ -z "$REPOSITORY_PATH" ] && REPOSITORY_PATH=/cloud
