@@ -49,7 +49,7 @@
     "LAST NAME IS REQUIRED TEXT": "성이 필요합니다",
     "EMAIL IS REQUIRED TEXT": "이메일이 필요합니다",
     "EMAIL ALREADY REGISTERED TEXT": "상기 이메일은 이미 %PRODUCT_NAME%에 등록되었습니다",
-    "EMAIL INVALID TEXT": "유효한 이메일을 입력하십시오.",
+    "EMAIL INVALID TEXT": "유효한 이메일을 입력하십시오",
     "PASSWORD IS REQUIRED TEXT": "패스워드가 필요합니다.",
     "CURRENT PASSWORD IS REQUIRED TEXT": "현 패스워드가 필요합니다",
     "PASSWORD SPECIAL CHARS TEXT": "라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",

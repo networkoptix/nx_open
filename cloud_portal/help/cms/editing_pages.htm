@@ -1,0 +1,342 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+   <title>Content Management &gt; Editing Pages</title>
+   <meta name="generator" content="Help & Manual">
+   <meta name="keywords" content="">
+   <meta name="description" content="Editing Pages">
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <link type="text/css" href="default.css" rel="stylesheet">
+   <link type="text/css" href="custom.css" rel="stylesheet">
+   <script type="text/javascript" src="nsh.js"></script>
+
+<script type="text/javascript">   
+// Toggle Toggler 
+
+var toggleCount=false;
+var switchState;
+
+function toggleToggles() {
+
+    if (!toggleCount) {
+     toggleCount = true;
+     HMToggleExpandAll(true);
+     switchState = true;
+     }
+   
+     else if (switchState) {
+        HMToggleExpandAll(false);
+        switchState = false;
+        }
+        
+     else  {
+        HMToggleExpandAll(true);
+        switchState = true;
+        } 
+    }
+</script>
+   
+<!-- non-scrolling headers for CHM and browser-based help, local styles-->
+<style type="text/css" media="screen"> 
+html, body {    
+      margin:0; 
+      padding:0; 
+      overflow: hidden; 
+      background: #FFFFFF; 
+   }
+ 
+div#printheader { 
+   display: none;
+   }
+   #idheader { 
+      width:100%; 
+      height:auto; 
+      padding: 0; 
+      margin: 0; 
+} 
+    #idheaderbg  {
+    background: #6F6F6F; 
+}
+   #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+   #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+   #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+   #callout-table a {text-decoration: none; color: blue;}
+   #callout-table a:visited {text-decoration: none; color: blue;}
+   #overview-table a {text-decoration: none; color: black;}
+   #overview-table a:visited {text-decoration: none; color: black;}
+   #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}
+   p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
+   </style>
+<!--[if lt IE 7]>
+<style type="text/css">
+  #idcontent {padding: 0px;} 
+  #innerdiv {padding: 10px 5px 5px 10px ;} 
+</style> 
+<![endif]-->
+   <noscript>
+   <style type="text/css">
+   html, body { overflow: auto; }
+   </style> 
+   </noscript>
+<style type="text/css" media="print">
+span.f_Heading1 { color: black; }
+#idheader, #printheader img { display:none; }
+#printheader { display: block; margin-top: 20px; }
+#idcontent { margin-top: 10px; }
+</style>   
+   <script type="text/javascript" src="jquery.js"></script>
+   <script type="text/javascript" src="helpman_settings.js"></script>
+   <script type="text/javascript" src="helpman_topicinit.js"></script>
+
+   <script type="text/javascript">
+     HMSyncTOC("index.html", "editing_pages.htm");
+   </script>
+</head>
+<body>
+<!--ZOOMSTOP-->
+
+<div id="printheader"><h1 class="p_Heading1"><span class="f_Heading1">Editing Pages</span></h1>
+</div>
+<div id="idheader">
+<div id="idheaderbg">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" 
+       style="margin: 0px; background: url(header_bg.jpg);">
+
+  <tr valign="bottom">
+    <td align="left" valign="bottom" class="topichead">
+   <p class="crumbs" id="idnav"><b>Navigation:</b>&nbsp;
+   
+   <a href="content_management.htm">Content Management</a>&nbsp;&gt;</p>
+   <h1 class="p_Heading1"><span class="f_Heading1">Editing Pages</span></h1>
+
+    </td>
+    <td align="right" width="120" valign="middle" class="topichead" id="idnav">
+    
+     <a href="content_management.htm"
+        onmouseover="document.images.prev.src='btn_prev_h.gif'" 
+        onmouseout="document.images.prev.src='btn_prev_n.gif'"
+        ><img name=prev src="btn_prev_n.gif" border=0 alt="Previous page"
+        ></a><a href="content_management.htm"
+        onmouseover="document.images.main.src='btn_home_h.gif'" 
+        onmouseout="document.images.main.src='btn_home_n.gif'"><img name=main src="btn_home_n.gif" border=0 alt="Return to chapter overview"
+        ></a><a href="branding_elements.htm"
+        onmouseover="document.images.next.src='btn_next_h.gif'" 
+        onmouseout="document.images.next.src='btn_next_n.gif'"><img name=next src="btn_next_n.gif" border=0 alt="Next page"
+        ></a>
+    </td>
+  </tr>
+  <tr><td colspan="2" style="height: 3px; background: url(header_bg_shadow.gif)"></td></tr>
+</table>
+</div>
+
+<!-- The following code displays Expand All/Collapse All links  below the header in topics containing toggles -->
+  
+
+</div>  
+
+
+
+<div id="idcontent"><div id="innerdiv"> 
+<!--ZOOMRESTART-->
+<p class="p_BodyText"><span class="f_BodyText" style="font-style: italic;">Content Management &gt; Pages</span><span class="f_BodyText"> provides a table of the pages that can be customized. </span></p>
+<p class="p_BodyText"><img src="hmfile_hash_6979d6a3.jpg" width="1065" height="525" alt="Editing Pages - 2" style="width:1065px;height:525px;border:none" /></p>
+<p class="p_BodyText"><span class="f_BodyText">This table can be sorted by clicking on one of the column headers, and t</span><span class="f_BodyText">here is a search tool that applies to all fields in the table.</span></p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyText">This table can be sorted by clicking on one of the column headers (</span><span class="f_BodyTextIndent">product, name, description).</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyText">T</span><span class="f_BodyText">here is a search tool that applies to all fields in the table.</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent">Pages can be filtered by product using the filter list to the right of the table. </span></td></tr></table></div><p class="p_BodyText"><span class="f_BodyText" style="text-decoration: underline;">To Edit Page Content</span></p>
+<p class="p_BodyText"><span class="f_BodyText">Click on the </span><span class="f_BodyText" style="font-weight: bold;">Edit content</span><span class="f_BodyText"> button for a specific page to enter changes. </span></p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent">Required fields are shown in red. If you click in an editable text field, the outline will change to blue.</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent">The</span><span class="f_BodyText"> database label (e.g. </span><span class="f_CodeExample" style="font-weight: normal;">%SUPPORT_LINK%</span><span class="f_BodyText">), field content (e.g. &quot;App ID for iOS mobile application&quot;), and any limits </span><span style="font-size: 11pt; font-family: Calibri;">(</span><span style="font-size: 11pt; font-family: Calibri; font-style: italic;">ex.</span><span style="font-size: 11pt; font-family: Calibri;"> required f</span><span class="f_BodyTextIndent">ile type, maximum number of characters</span><span style="font-size: 11pt; font-family: Calibri;">) are shown </span><span class="f_BodyText">for each field.</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyText">You can use </span><span class="f_BodyTextIndent">Cloud Portal </span><span class="f_BodyText">database labels as </span><span class="f_BodyTextIndent">variables in any field.</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyText">click on </span><span class="f_BodyText" style="font-weight: bold;">Link to Page</span><span class="f_BodyText"> to view the current version of a page.</span></td></tr></table></div><p class="p_BodyText"><span class="f_BodyText" style="text-decoration: underline;">Saving Changes</span></p>
+<p class="p_BodyText"><span class="f_BodyText">Once changes are entered you have several options:</span></p>
+<p class="p_BodyText"><img src="hmfile_hash_5e29cd34.jpg" width="386" height="43" alt="Editing Pages - 5" style="width:386px;height:43px;border:none" /></p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent" style="font-weight: bold;">Save and Preview</span><span class="f_BodyTextIndent"> - saves the latest changes and generates a preview page. You will see the message &quot;</span><span class="f_BodyTextIndent" style="font-style: italic;">Changes have been saved. Preview has been created.</span><span class="f_BodyTextIndent">&quot; Click the</span><span class="f_BodyTextIndent" style="font-weight: bold;"> Open Preview</span><span class="f_BodyTextIndent"> button at the bottom of the page to view the updated page in a new browser tab.</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent" style="font-weight: bold;">Save Draft</span><span class="f_BodyTextIndent"> - saves a draft of pages changes before publishing so you can return to work in progress. You will see the message &quot;</span><span class="f_BodyTextIndent" style="font-style: italic;">Changes have been saved.</span><span class="f_BodyTextIndent">&quot;</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyText" style="font-weight: bold;"><a href="reviewing_revisions.htm" class="topiclink">Send for Review</a></span><span class="f_BodyTextIndent"> - saves a draft of the latest content and sends it for review. You will see the message &quot;</span><span class="f_BodyTextIndent" style="font-style: italic;">Changes have been saved. A new version has been created.</span><span class="f_BodyTextIndent">&quot; Note that this may take some time if the branding page has been updated. Once changes are saved a confirmation screen displays showing the revision number and details of the changes.</span></td></tr></table></div><p class="p_BodyTextFirstIndent2"><img src="hmfile_hash_ac226e01.png" width="408" height="200" alt="Editing Pages - 4" style="width:408px;height:200px;border:none" /></p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent" style="font-weight: bold;">Reset</span><span class="f_BodyTextIndent"> - undoes all changes.</span></td></tr></table></div><p class="p_BodyText"><a id="htmlfields"></a><span class="f_BodyText" style="text-decoration: underline;">HTML Editor Fields</span></p>
+<p class="p_BodyText"><span class="f_BodyTextIndent">Certain page fields are also HTML editors and therefore allow for text formatting and the use of hyperlinks. Click on the </span><span class="f_BodyTextIndent" style="font-weight: bold;">Edit HTML source</span><span class="f_BodyTextIndent"> icon to open an editor that shows HTML code. You can also paste formatted Word content into these fields intact using the </span><span class="f_BodyTextIndent" style="font-weight: bold;">Paste from Word</span><span class="f_BodyTextIndent"> icon.</span></p>
+<p class="p_BodyText"><img src="hmfile_hash_f552db45.png" width="384" height="30" alt="Editing Pages - 1" style="width:384px;height:30px;border:none" /></p>
+<p class="p_BodyText"><a id="selectingalanguage"></a><span class="f_BodyText" style="text-decoration: underline;">Selecting a Language</span></p>
+<p class="p_BodyText"><span class="f_BodyText">Some pages have a language selection option. This setting controls the language used in certain elements of the Cloud Portal interface, such as the log in dialog, revision notice emails, or the shortcut tabs at the bottom of the landing page. Note that this setting does not translate the contents of all fields on a page. Selecting a language for a given page only changes a predefined set of interface elements. For the entire page to be in a given language, the content of user-editable fields must be entered in that language. </span></p>
+<p class="p_BodyText"><span class="f_BodyText">It is important to note that a separate template is saved for each language option that you select, and each template must be saved, edited, and reviewed independently. </span></p>
+<p class="p_BodyText"><span class="f_BodyText">Additional language support for the Cloud Portal is part of your customization agreement with Network Optix. Though you may see many translation options when editing page content, only specific language options will be available according to your customization contract.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="text-decoration: underline;">Possible Translation Options</span></p>
+<div style="text-align: left; text-indent: 0px; line-height: 1.15; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table id="langcodes" style="width:900px; border:none; border-spacing:2px;">
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">ar_SA</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Arabic (</span><span style="font-size: 11pt; font-family: Calibri;">العربية)</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">he_IL</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Hebrew (</span><span style="font-size: 11pt; font-family: 'Calibri (Hebrew)';">עברית)</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">pl_PL</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Polish (</span><span style="font-size: 11pt; font-family: Calibri;">Polski)</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">bg_BG</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Bulgarian</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Hr_HR</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Croatian</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Pt_BR</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Brazilian Portuguese</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">cs_CZ</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Czech (</span><span style="font-size: 11pt; font-family: Calibri;">Čeština)</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">hu_HU</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Hungarian (</span><span style="font-size: 11pt; font-family: Calibri;">Magyar)</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">pt_PT</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Portuguese (</span><span style="font-size: 11pt; font-family: Calibri;">Português)</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">da_DK</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Danish (</span><span style="font-size: 11pt; font-family: Calibri;">Dansk)</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Id_ID</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Indonesian</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Ro_RO</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Romanian</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">de_DE</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">German (</span><span style="font-size: 11pt; font-family: Calibri;">Deutsch)</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">it_IT</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Italian (</span><span style="font-size: 11pt; font-family: Calibri;">Italiano)</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">ru_RU</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Russian (</span><span style="font-size: 11pt; font-family: Calibri;">Русский)</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; height:34px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">en_GB</span></p>
+</td>
+<td style="vertical-align:top; width:201px; height:34px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">English (UK)</span></p>
+</td>
+<td style="vertical-align:top; width:84px; height:34px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">ja_JP</span></p>
+</td>
+<td style="vertical-align:top; width:181px; height:34px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Japanese (</span><span style="font-size: 11pt; font-family: 'MS Gothic';">日本語)</span></p>
+</td>
+<td style="vertical-align:top; width:86px; height:34px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Sv_SE</span></p>
+</td>
+<td style="vertical-align:top; width:239px; height:34px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Swedish</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">en_US</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">English (US)</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Km_KH</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Cambodian</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">th_TH</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Thai (</span><span style="font-size: 11pt; font-family: Calibri;">ภาษาไทย)</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">es_ES</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Spanish (</span><span style="font-size: 11pt; font-family: Calibri;">Español)</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">ko_KR</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Korean (</span><span style="font-size: 11pt; font-family: 'Malgun Gothic';">국어)</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">tr_TR</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Turkish (</span><span style="font-size: 11pt; font-family: Calibri;">Türk)</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">fi_FI</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Finnish (</span><span style="font-size: 11pt; font-family: Calibri;">Suomi)</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">nl_BE</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Belgian Dutch (</span><span style="font-size: 11pt; font-family: Calibri;">Vlaams)</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">vi_VN</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Vietnamese (</span><span style="font-size: 11pt; font-family: Calibri;">Tiếng Việt)</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">fil_PH</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Tagalog</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">nl_NL</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Dutch</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">zh_CN</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Simplified Chinese (</span><span style="font-size: 11pt; font-family: Calibri;">简体中文)</span></p>
+</td>
+</tr>
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:75px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">fr_FR</span></p>
+</td>
+<td style="vertical-align:top; width:201px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">French (</span><span style="font-size: 11pt; font-family: Calibri;">Français)</span></p>
+</td>
+<td style="vertical-align:top; width:84px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">no_NO</span></p>
+</td>
+<td style="vertical-align:top; width:181px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Norwegian (Norsk)</span></p>
+</td>
+<td style="vertical-align:top; width:86px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">zh_TW</span></p>
+</td>
+<td style="vertical-align:top; width:239px; padding:2px;"><p class="p_BodyText"><span class="f_BodyText">Traditional Chinese (</span><span style="font-size: 11pt; font-family: Calibri;">繁体中文)</span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="p_BodyText"><span class="f_BodyText" style="text-decoration: underline;">To View Page Change History</span></p>
+<p class="p_BodyText"><span class="f_BodyText">Click on a page name to open its </span><span class="f_BodyText" style="font-style: italic;">Change page,</span><span class="f_BodyText"> which displays the </span><span class="f_BodyText">database values for that page. Click on the </span><span class="f_BodyText" style="font-weight: bold;">History</span><span class="f_BodyText"> button </span><span class="f_BodyText">to see a log of field changes. </span><span class="f_BodyText">This page can only be edited by Network Optix. </span></p>
+<p class="p_BodyText"><img src="hmfile_hash_d0373028.jpg" width="649" height="525" alt="Editing Pages - 3" style="width:649px;height:525px;border:none" /></p>
+<p class="p_BodyText"><span class="f_BodyText">Fields shown are</span><span class="f_BodyText">:</span></p>
+<div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent" style="font-weight: bold;">Product</span><span class="f_BodyTextIndent"> – indicates the active site.</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent" style="font-weight: bold;">Description</span><span class="f_BodyTextIndent"> &nbsp;– shows the description used in the Pages list.</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent"> </span><span class="f_BodyTextIndent" style="font-weight: bold;">URL</span><span class="f_BodyTextIndent"> – URL for the page.</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent" style="font-weight: bold;">Translatable</span><span class="f_BodyTextIndent"> &nbsp;– if a page is translatable (green check icon </span><img src="ok_zoom50.png" width="20" height="20" alt="ok" style="width:20px;height:20px;border:none" /><span class="f_BodyTextIndent">) you will be able to select from a menu of available languages on its edit page. If it is not translatable it will have a red x icon </span><img src="error_zoom50.png" width="20" height="20" alt="error" style="width:20px;height:20px;border:none" /><span class="f_BodyTextIndent">.</span></td></tr></table></div><div style="text-align: left; text-indent: 0px; padding: 0px 0px 0px 0px; margin: 2px 0px 2px 14px;"><table border="0" cellpadding="0" cellspacing="0" style="border:none;border-spacing:0px;padding:0px;line-height: 1.15;"><tr valign="baseline" style="vertical-align:baseline"><td style="border:none;width:13px"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;">&#8226;</span></td><td style="border:none"><span class="f_BodyTextIndent" style="font-weight: bold;">Name</span><span class="f_BodyTextIndent"> – the name displayed in the Pages list.</span></td></tr></table></div>
+<!--ZOOMSTOP-->
+</div></div>
+<script type="text/javascript">
+
+var lastSlashPos = document.URL.lastIndexOf("/") > document.URL.lastIndexOf("\\") ? document.URL.lastIndexOf("/") : document.URL.lastIndexOf("\\");
+if( document.URL.substring(lastSlashPos + 1, lastSlashPos + 4).toLowerCase() != "~hh" )
+{
+ if (document.all) setTimeout(function() {nsrInit();},20); 
+    else nsrInit();
+ } 
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
