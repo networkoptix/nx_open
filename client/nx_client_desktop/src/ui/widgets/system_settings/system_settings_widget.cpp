@@ -13,6 +13,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
+#include <ini.h>
 
 QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     base_type(parent),
@@ -59,6 +60,12 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,          this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::watermarkChanged,                  this,   &QnSystemSettingsWidget::loadDataToUi);
+
+    if (!nx::client::desktop::ini().enableWatermark)
+    {
+        ui->watermarkSettingsButton->hide();
+        ui->displayWatermarkCheckBox->hide();
+    }
 }
 
 QnSystemSettingsWidget::~QnSystemSettingsWidget()
