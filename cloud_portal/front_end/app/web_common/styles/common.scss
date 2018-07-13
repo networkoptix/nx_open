@@ -154,17 +154,19 @@ placeholder{ /* Hack to have full-screen */
         top:40%;
     }
 
-    @media (max-width : 991px) {
-        position : relative;
-
-        & > .placeholder {
-            height   : auto !important;
+    &.offline {
+        @media (max-width : 991px) {
             position : relative;
-            margin   : 50px 0;
 
-            & > .placeholder-content {
-                top       : 0;
-                transform : none;
+            & > .placeholder {
+                height   : auto !important;
+                position : relative;
+                margin   : 50px 0;
+
+                & > .placeholder-content {
+                    top       : 0;
+                    transform : none;
+                }
             }
         }
     }
