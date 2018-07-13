@@ -28,7 +28,7 @@ MEDIASERVER_STORAGE_PATH = 'var/data'
 MEDIASERVER_CREDENTIALS_TIMEOUT = datetime.timedelta(minutes=5)
 MEDIASERVER_MERGE_TIMEOUT = MEDIASERVER_CREDENTIALS_TIMEOUT  # timeout for local system ids become the same
 MEDIASERVER_MERGE_REQUEST_TIMEOUT = datetime.timedelta(seconds=90)  # timeout for mergeSystems REST api request
-MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=20)  # timeout when waiting for server become online (pingable)
+MEDIASERVER_START_TIMEOUT = datetime.timedelta(minutes=2)  # timeout when waiting for server become online (pingable)
 
 _logger = logging.getLogger(__name__)
 
@@ -77,12 +77,13 @@ def encode_camera_credentials(login, password):
 class Mediaserver(object):
     """Mediaserver, same for physical and virtual machines"""
 
-    def __init__(self, name, installation):  # type: (str, Installation) -> None
+    def __init__(self, name, installation, port=7001):  # type: (str, Installation) -> None
+        assert port is not None
         self.name = name
         self.installation = installation
         self.service = installation.service
         self.os_access = installation.os_access
-        self.port = 7001
+        self.port = port
         forwarded_port = installation.os_access.port_map.remote.tcp(self.port)
         forwarded_address = installation.os_access.port_map.remote.address
         self.api = RestApi(name, forwarded_address, forwarded_port)
@@ -104,7 +105,7 @@ class Mediaserver(object):
                 raise Exception("Already started")
         else:
             self.service.start()
-            wait_for_true(self.is_online)
+            wait_for_true(self.is_online, timeout_sec=MEDIASERVER_START_TIMEOUT.total_seconds())
 
     def stop(self, already_stopped_ok=False):
         _logger.info("Stop mediaserver %r.", self)

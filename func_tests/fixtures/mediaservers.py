@@ -1,9 +1,11 @@
 import logging
 
+from argparse import ArgumentTypeError
 import pytest
 
 from defaults import defaults
 from framework.installation.installer import Installer, PackageNameParseError
+from framework.installation.lightweight_mediaserver import LWS_BINARY_NAME
 from framework.installation.mediaserver_factory import MediaserverFactory
 from framework.merging import merge_systems, setup_local_system
 from framework.os_access.local_path import LocalPath
@@ -39,6 +41,18 @@ def mediaserver_installers(request):
         raise ValueError("Only one version and customizations expected in {}: {}".format(installers_dir, installers))
     installers_by_platform = {installer.platform: installer for installer in installers}
     return installers_by_platform
+
+
+# we are expecting only one appserver2_ut in --mediaserver-installers-dir, for linux-x64 platform
+@pytest.fixture(scope='session')
+def lightweight_mediaserver_installer(request):
+    installers_dir = request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
+    path = installers_dir / LWS_BINARY_NAME
+    if not path.exists():
+        raise ArgumentTypeError(
+            '{} is missing from {}, but is required.'.format(LWS_BINARY_NAME, installers_dir))
+    _logger.info("Ligheweight mediaserver installer path: {}".format(path))
+    return path
 
 
 @pytest.fixture()

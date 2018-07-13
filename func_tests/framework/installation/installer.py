@@ -123,7 +123,7 @@ class InstallIdentity(object):
             )
 
     def __init__(self, version, customization):
-        self.version = version
+        self.version = version  # type: Version
         self.customization = customization  # type: Customization
 
     def __str__(self):

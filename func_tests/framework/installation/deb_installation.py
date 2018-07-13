@@ -38,12 +38,18 @@ class DebInstallation(Installation):
         self.posix_access = posix_access  # type: PosixAccess
         self._identity = self._NOT_SET
 
+    @property
+    def paths_to_validate(self):
+        return [
+            self.dir,
+            self.binary,
+            self._config,
+            self._config_initial,
+            ]
+
     def is_valid(self):
-        paths_to_check = [
-            self.dir, self.binary,
-            self._config, self._config_initial]
         all_paths_exist = True
-        for path in paths_to_check:
+        for path in self.paths_to_validate:
             if path.exists():
                 _logger.info("Path %r exists.", path)
             else:
@@ -77,8 +83,6 @@ class DebInstallation(Installation):
         return self._identity
 
     def _discover_identity(self):
-        if not self.is_valid():
-            return None
         build_info_path = self.dir / 'build_info.txt'
         try:
             build_info_text = build_info_path.read_text(encoding='ascii')
@@ -90,6 +94,9 @@ class DebInstallation(Installation):
         return InstallIdentity.from_build_info(build_info)
 
     def should_reinstall(self, installer):
+        if not self.is_valid():
+            _logger.info('Perform installation: Existing installation is not valid/complete')
+            return True
         if self.identity == installer.identity:
             _logger.info(
                 'Skip installation: Existing installation identity (%s) matches installer).', self.identity)
