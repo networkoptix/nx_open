@@ -12,10 +12,6 @@ namespace nx {
 namespace utils {
 namespace log {
 
-static std::atomic<bool> isInitializedGlobally(false);
-
-//-------------------------------------------------------------------------------------------------
-
 std::unique_ptr<AbstractLogger> buildLogger(
     const Settings& settings,
     const QString& applicationName,
@@ -33,43 +29,11 @@ std::unique_ptr<AbstractLogger> buildLogger(
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)
 {
-#if 1
     log::Settings logSettings;
     logSettings.load(arguments);
     setMainLogger(buildLogger(logSettings, QString()));
 
     // NOTE: Default log level is ensured by LevelSettings::primary default value.
-#else
-    const auto logger = mainLogger();
-    isInitializedGlobally = true;
-
-    bool isLogLevelSpecified = false;
-    if (const auto value = arguments.get("log-level", "ll"))
-    {
-        LevelSettings level;
-        level.parse(*value);
-        logger->setDefaultLevel(level.primary);
-        logger->setLevelFilters(level.filters);
-        isLogLevelSpecified = true;
-    }
-    else
-    {
-        logger->setDefaultLevel(Level::none);
-    }
-
-    if (const auto value = arguments.get("log-file", "lf"))
-    {
-        File::Settings fileSettings;
-        fileSettings.name = *value;
-        fileSettings.size = 1024 * 1024 * 10;
-        fileSettings.count = 5;
-
-        logger->setWriter(std::make_unique<File>(fileSettings));
-
-        if (!isLogLevelSpecified)
-            logger->setDefaultLevel(kDefaultLevel);
-    }
-#endif
 }
 
 } // namespace log

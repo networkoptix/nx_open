@@ -398,7 +398,7 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
                 std::make_unique<nx::utils::log::Logger>(
                     std::set<nx::utils::log::Tag>{tag},
                     nx::utils::log::Level::verbose,
-                    nullptr));//std::make_unique<nx::utils::log::StdOut>()));
+                    std::make_unique<nx::utils::log::StdOut>()));
         };
 
     // Constants kWorkbenchStateTag, kItemMapTag and kFreeSlotTag should be used instead.
