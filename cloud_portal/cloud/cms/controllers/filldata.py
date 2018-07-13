@@ -6,7 +6,11 @@ import base64
 import zipfile
 import distutils.dir_util
 import errno
+import traceback
 from StringIO import StringIO
+
+import logging
+logger = logging.getLogger(__name__)
 
 SOURCE_DIR = 'static/_source/{{skin}}'
 TARGET_DIR = 'static/{{customization}}'
@@ -33,57 +37,40 @@ def target_file(file_name, customization, language_code, preview):
             'static', customization.name, 'preview', file_name)
     return target_file_name
 
-def process_context_structure(customization, context, content, language, version_id, preview, force_global_files):
-    def replace_in(adict, key, value):
-        for dict_key in adict.keys():
-            itm_type = type(adict[dict_key])
-            if itm_type not in [str, unicode, dict, list]:
-                continue
 
-            if itm_type is list:
-                for item in adict[dict_key]:
-                    if type(item) in [str, unicode]:
-                        idx = adict[dict_key].index(item)
-                        adict[dict_key][idx] = item.replace(key, value)
-                    elif item in [dict, list]:
-                        replace_in(item, key, value)
-
-            elif itm_type is dict:
-                replace_in(adict[dict_key], key, value)
-
-            elif key in adict[dict_key]:
-                adict[dict_key] = adict[dict_key].replace(key, value)
-
-
+def process_context_structure(customization, context, content,
+                              language, version_id, preview, force_global_files):
     for datastructure in context.datastructure_set.order_by('order').all():
-        content_value = datastructure.find_actual_value(customization, language, version_id)
-        # replace marker with value
-        if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-            if type(content) == dict:
-                # Process language JSON file
-                replace_in(content, datastructure.name, content_value)
-            else:
+        try:
+            content_value = datastructure.find_actual_value(customization, language, version_id)
+            # replace marker with value
+            if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
                 content = content.replace(datastructure.name, content_value)
+            elif content_value or datastructure.optional:
+                if context.is_global and not force_global_files:
+                    # do not update files from global contexts all the time
+                    continue
 
-        elif content_value or datastructure.optional:
-            if context.is_global and not force_global_files:
-                # do not update files from global contexts all the time
-                continue
+                if not datastructure.translatable and language != customization.default_language:
+                    # if file itself is not translatable - update it only for default language
+                    continue
 
-            if not datastructure.translatable and language != customization.default_language:
-                # if file itself is not translatable - update it only for default language
-                continue
+                image_storage = os.path.join('static', customization.name)
+                if preview:
+                    image_storage = os.path.join(image_storage, 'preview')
 
-            image_storage = os.path.join('static', customization.name)
-            if preview:
-                image_storage = os.path.join(image_storage, 'preview')
-            
-            file_name = datastructure.name
-            if language:
-                file_name = file_name.replace("{{language}}", language.code)
+                file_name = datastructure.name
+                if language:
+                    file_name = file_name.replace("{{language}}", language.code)
 
-            # print "Save file from DB: " + file_name, context, language, context.is_global
-            save_b64_to_file(content_value, file_name, image_storage)
+                # print "Save file from DB: " + file_name, context, language, context.is_global
+                save_b64_to_file(content_value, file_name, image_storage)
+        except Exception:
+            # if something happens here - instance will not start and it will close to impossible to fix
+            # so we ignore broken records while logging them - it will raise cloud alarm and we will go and fix the problem
+            logger.error("ERROR: Cannot process data structure {0} for customization {1}".format(
+                datastructure.name, customization.name))
+            logger.error(traceback.format_exc())
 
     return content
 
@@ -96,28 +83,15 @@ def save_content(filename, content):
 
 def process_context(context, language_code, customization, preview, version_id, global_contexts):
     language = Language.by_code(language_code, customization.default_language)
-    context_template = context.template_for_language(language, customization.default_language)
-
-    # check if the file is language JSON
-    if context.file_path.endswith(".json") and isinstance(context_template, unicode):
-        try:
-            context_template = json.loads(context_template)
-        except ValueError:
-            print("Failed to decode file -> " + context.file_path)
-
-    if not context_template:
-        context_template = ''
-
-    content = process_context_structure(customization, context, context_template, language,
+    context_template_text = context.template_for_language(language, customization.default_language)
+    if not context_template_text:
+        context_template_text = ''
+    content = process_context_structure(customization, context, context_template_text, language,
                                         version_id, preview, context.is_global)  # if context is global - process it
     if not context.is_global:  # if current context is global - do not apply other contexts
         for global_context in global_contexts.all():
-            content = process_context_structure(customization, global_context, content, None,
-                                                version_id, preview, False)
-
-    # dump json to string
-    if type(content) == dict:
-        content = json.dumps(content)
+            content = process_context_structure(
+                customization, global_context, content, None, version_id, preview, False)
 
     return content
 
@@ -165,6 +139,7 @@ def save_context(context, context_path, language_code, customization, preview, v
     language = Language.by_code(language_code, customization.default_language)
     if context.template_for_language(language, customization.default_language):  # if we have template - save context to file
         target_file_name = target_file(context_path, customization, language_code, preview)
+        # print "save file: " + target_file_name
         save_content(target_file_name, content)
 
 
