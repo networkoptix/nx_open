@@ -14,7 +14,7 @@ namespace ptz {
 
 namespace {
 
-static const double kEpsilon = 0.5;
+static const double kEpsilon = 1.0;
 
 struct TestContinuousMovement
 {
@@ -98,7 +98,7 @@ TEST(TestPositionTrackerTest, continuousMovement)
     {
         tracker.continuousMove(movement.movementVector);
         std::this_thread::sleep_for(movement.duration);
-        ASSERT_LT(tracker.shortestVectorTo(movement.resultPosition).lengthSquared(), kEpsilon);
+        ASSERT_LT(tracker.shortestVectorTo(movement.resultPosition).length(), kEpsilon);
         tracker.setPosition(movement.resultPosition); //< To avoid error accumulation.
     }
 }
