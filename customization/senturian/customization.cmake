@@ -75,5 +75,5 @@ set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 
 # Localization
+set(translations en_US zh_CN)
 set(defaultTranslation en_US)
-set(additionalTranslations zh_CN)

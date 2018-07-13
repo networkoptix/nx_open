@@ -73,7 +73,7 @@ set(sign.cer "app.p12")
 
 # Localization
 set(defaultTranslation en_US)
-set(additionalTranslations fr_FR es_ES)
+set(translations en_US fr_FR es_ES)
 
 # Additional Features
 set(vmax "true")

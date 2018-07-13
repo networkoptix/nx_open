@@ -77,4 +77,5 @@ set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 
 # Localization
+set(translations ja_JP)
 set(defaultTranslation ja_JP)
