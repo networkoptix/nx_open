@@ -76,7 +76,7 @@ TEST_F(ProxyTest, proxyToAnotherThenToThemself)
 
     ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation")));
     ASSERT_TRUE(client->response());
-    ASSERT_EQ(200, client->response()->statusLine.statusCode);
+    ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
 
     for (int i = m_peers.size()-1; i >=0; --i)
     {
@@ -85,12 +85,13 @@ TEST_F(ProxyTest, proxyToAnotherThenToThemself)
         client->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, guid.toByteArray());
         ASSERT_TRUE(client->doGet(serverUrl(0, "/api/moduleInformation")));
         ASSERT_TRUE(client->response());
-        ASSERT_EQ(200, client->response()->statusLine.statusCode);
+        ASSERT_EQ(nx::network::http::StatusCode::ok, client->response()->statusLine.statusCode);
 
         bool success = false;
         auto response = client->fetchEntireMessageBody();
         ASSERT_TRUE(response);
-        QnJsonRestResult json = QJson::deserialized<QnJsonRestResult>(*response, QnJsonRestResult(), &success);
+        QnJsonRestResult json =
+            QJson::deserialized<QnJsonRestResult>(*response, QnJsonRestResult(), &success);
         auto moduleInformation = json.deserialized<nx::vms::api::ModuleInformation>();
 
         ASSERT_EQ(guid, moduleInformation.id);
