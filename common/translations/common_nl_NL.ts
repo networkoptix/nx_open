@@ -504,7 +504,7 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%n %2 word gebruikt van %1.</numerusform>
+        <numerusform>%n %2 worden gebruikt van %1.</numerusform>
         <numerusform>%n %2 worden gebruikt van %1.</numerusform>
       </translation>
     </message>
@@ -644,8 +644,8 @@
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O module</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O Module</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
     <message>
@@ -1125,10 +1125,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>Opslag fout</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>Netwerkprobleem</translation>
     </message>
@@ -1233,10 +1229,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>Beweging op %1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>Opslagfout bij %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1529,6 +1521,22 @@
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
       <translation>%1 op %2</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>
