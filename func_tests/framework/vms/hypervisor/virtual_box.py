@@ -140,9 +140,9 @@ class _VirtualBoxVm(VmHardware):
         macs = OrderedDict(cls._parse_macs(raw_dict))
         free_nics = list(cls._parse_free_nics(raw_dict, macs))
         description = raw_dict['description']
-        is_running = raw_dict['VMState'] == 'running'
-        super(_VirtualBoxVm, self).__init__(name, ports_map, macs, free_nics, description, is_running)
+        super(_VirtualBoxVm, self).__init__(name, ports_map, macs, free_nics, description)
         self._virtual_box = virtual_box  # type: VirtualBox
+        self._is_running = raw_dict['VMState'] == 'running'
 
     def _update(self):
         self_updated = self._virtual_box.find_vm(self.name)
@@ -188,7 +188,7 @@ class _VirtualBoxVm(VmHardware):
 
     def is_on(self):
         self._update()
-        return self.is_running
+        return self._is_running
 
     def is_off(self):
         return not self.is_on()

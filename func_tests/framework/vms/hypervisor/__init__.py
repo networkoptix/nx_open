@@ -7,17 +7,14 @@ class VmHardware(object):
     """Settings hypervisor is responsible for"""
     __metaclass__ = ABCMeta
 
-    def __init__(self, name, port_map, macs, vacant_nics, description, is_running):
+    def __init__(self, name, port_map, macs, vacant_nics, description):
         self.name = name
         self.port_map = port_map
         self.macs = macs
         self._vacant_nics = list(reversed(vacant_nics))
-        self.is_running = is_running
         self.description = description
 
     def __repr__(self):
-        if not self.is_running:
-            return '<VM {!s} (stopped)>'.format(self.name)
         return '<VM {!s}>'.format(self.name)
 
     def _find_vacant_nic(self):
