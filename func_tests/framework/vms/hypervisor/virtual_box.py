@@ -26,7 +26,7 @@ class VirtualBoxError(Exception):
 
 
 @lrudecorator(100)
-def virtual_box_error(code):
+def virtual_box_error_cls(code):
     assert code
 
     class SpecificVirtualBoxError(VirtualBoxError):
@@ -196,7 +196,7 @@ class _VirtualBoxVm(VmHardware):
     def power_on(self, already_on_ok=False):
         try:
             self._virtual_box.manage(['startvm', self.name, '--type', 'headless'])
-        except virtual_box_error('INVALID_OBJECT_STATE'):
+        except virtual_box_error_cls('INVALID_OBJECT_STATE'):
             if not already_on_ok:
                 raise
             return
@@ -292,7 +292,7 @@ class VirtualBox(Hypervisor):
                 raise VMNotFound("Cannot find VM:\n{}".format(message))
             if code == 'FILE_ERROR' and 'already exists' in message:
                 raise VMAlreadyExists(message)
-            raise virtual_box_error(code)(message)
+            raise virtual_box_error_cls(code)(message)
 
     def make_internal_network(self, network_name):
         return '{} {} flat'.format(uuid1(), network_name)
