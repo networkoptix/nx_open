@@ -64,6 +64,7 @@ public:
         Does nothing
     */
     virtual int getReservedModelList( char** modelList, int* count ) override;
+
 private:
     QList<nx::utils::Url> translateUrlHook(const nx::utils::Url& url) const;
     QString getGroupName(const nx::utils::Url& url) const;
