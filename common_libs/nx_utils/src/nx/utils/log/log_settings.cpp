@@ -1,5 +1,7 @@
 #include "log_settings.h"
 
+#include <filesystem>
+
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/string.h>
 
@@ -9,19 +11,35 @@ namespace log {
 
 void LoggerSettings::parse(const QString& str)
 {
+    using namespace std::experimental::filesystem;
+
     const auto params = parseNameValuePairs<std::multimap>(str.toUtf8(), ';');
     for (const auto& param: params)
     {
         if (param.first == "file")
-            logBaseName = param.second;
+        {
+            const auto filePath = path(param.second.toStdString());
+
+            logBaseName = QString::fromStdString(filePath.filename().string());
+            if (filePath.has_parent_path())
+                directory = QString::fromStdString(filePath.parent_path().string());
+        }
         else if (param.first == "level")
+        {
             loadLevel(param.second);
+        }
         else if (param.first == "dir")
+        {
             directory = param.second;
+        }
         else if (param.first == "maxBackupCount")
+        {
             maxBackupCount = param.second.toInt();
+        }
         else if (param.first == "maxFileSize")
+        {
             maxFileSize = stringToBytes(param.second);
+        }
     }
 }
 

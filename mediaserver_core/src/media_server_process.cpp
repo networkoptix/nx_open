@@ -1103,6 +1103,10 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
             "In some rare scenarios cameras can be assigned to removed server, "
             "This startup parameter force server to move these cameras to itself"), true);
 
+    commandLineParser.addParameter(&m_cmdLineArguments.auxLoggers, "--log/logger", NULL,
+        lit("Additional logger configuration. "
+            "E.g., to log every message <= WARING to stdout: file=-;level=WARNING"));
+
     commandLineParser.parse(argc, (const char**) argv, stderr);
     if (m_cmdLineArguments.showHelp)
     {
@@ -1111,6 +1115,13 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
     }
     if (m_cmdLineArguments.showVersion)
         std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
+
+    // NOTE: commandLineParser does not support multiple arguments with the same name.
+    nx::utils::ArgumentParser argumentParser;
+    argumentParser.parse(argc, (const char**) argv);
+    argumentParser.forEach(
+        "log/logger",
+        [this](const QString& value) { m_cmdLineArguments.auxLoggers.push_back(value); });
 }
 
 void MediaServerProcess::addCommandLineParametersFromConfig(MSSettings* settings)
@@ -3117,6 +3128,13 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings()
     s.loggers.front().directory = settings.logDir();
     s.loggers.front().maxFileSize = settings.maxLogFileSize();
     s.updateDirectoryIfEmpty(getDataDirectory());
+
+    for (const auto& loggerArg: cmdLineArguments().auxLoggers)
+    {
+        nx::utils::log::LoggerSettings loggerSettings;
+        loggerSettings.parse(loggerArg);
+        s.loggers.push_back(std::move(loggerSettings));
+    }
 
     return s;
 }
