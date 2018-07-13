@@ -56,6 +56,9 @@
                             style: 'badge-default'
                         }
                     },
+                    systemCapabilities: {
+                        cloudMerge: 'cloudMerge'
+                    },
                     accessRoles: {
                         unshare: 'none',
                         default: 'Viewer',
