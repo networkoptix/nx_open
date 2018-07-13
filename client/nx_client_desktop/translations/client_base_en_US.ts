@@ -891,6 +891,10 @@ to view more bookmarks</source>
         <source>Cell Spacing...</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Screen Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,20 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+        <source>Select layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n layouts</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>ExportSettingsDialog</name>
     <message>
         <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1056,37 @@ to view more bookmarks</source>
     <message>
         <source>Executable %1 Media File (x86)</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>FullscreenActionHelper</name>
+    <message>
+        <source>Source camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select device...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n layouts</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 on %2</source>
+        <comment>Camera %1 on layout %2</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3578,11 +3627,36 @@ to %1</source>
         <source>Image might be too dim.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Invalid input image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal error.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
         <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+        <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+        <source>Select exactly one camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3782,45 +3856,6 @@ to %1</source>
     </message>
     <message>
         <source>Failed to turn on I/O port %1</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-        <source>Select file...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pictures %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>No picture</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Error while loading picture</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Error while uploading picture</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Picture cannot be read</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Picture cannot be loaded</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>cells</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Picture is too big. Maximum size is %1 MB</source>
         <translation></translation>
     </message>
 </context>
@@ -4825,7 +4860,7 @@ to %1</source>
 <context>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
-        <source>Rotation: </source>
+        <source>Rotation</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6786,17 +6821,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-        <source>Select folder...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select file...</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
         <source>Hold to Speak</source>
@@ -7315,14 +7339,6 @@ to %1</source>
     <message>
         <source>Web Page</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8262,6 +8278,67 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+        <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while loading picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while uploading picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pictures %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture cannot be read</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture cannot be loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+        <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom number that can be assigned to a layout for quick identification and access</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+        <source>General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
         <source>NO DATA</source>
@@ -8901,10 +8978,6 @@ to %1</source>
     <message>
         <source>Failed to change password on %1 of %2 cameras</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
