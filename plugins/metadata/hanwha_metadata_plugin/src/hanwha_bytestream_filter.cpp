@@ -12,11 +12,11 @@ namespace plugins {
 
 namespace {
 
-static const QString kChannelField = lit("channel");
-static const QString kRegionField = lit("regionid");
+static const QString kChannelField("channel");
+static const std::set<QString> kRegionFields = {"regionid", "queue"};
 
-static const QString kActive = lit("true");
-static const QString kInactive = lit("false");
+static const QString kActive("true");
+static const QString kInactive("false");
 
 } // namespace
 
@@ -27,11 +27,6 @@ HanwhaBytestreamFilter::HanwhaBytestreamFilter(
     m_manifest(manifest),
     m_handler(handler)
 {
-}
-
-HanwhaBytestreamFilter::~HanwhaBytestreamFilter()
-{
-
 }
 
 bool HanwhaBytestreamFilter::processData(const QnByteArrayConstRef& buffer)
@@ -75,7 +70,7 @@ boost::optional<HanwhaEvent> HanwhaBytestreamFilter::createEvent(
 {
     using namespace nx::api;
 
-    auto eventTypeId = m_manifest.eventTypeByInternalName(eventSource);
+    auto eventTypeId = m_manifest.eventTypeByName(eventSource);
     if (eventTypeId.isNull())
         return boost::none;
     const auto eventDescriptor = m_manifest.eventDescriptorById(eventTypeId);
@@ -141,7 +136,7 @@ boost::optional<int> HanwhaBytestreamFilter::eventRegion(const QString& eventSou
 
     for (auto i = 0; i < splitSize; ++i)
     {
-        if (split[i].toLower() == kRegionField && i < splitSize - 1)
+        if (kRegionFields.find(split[i].toLower()) != kRegionFields.cend() && i < splitSize - 1)
         {
             bool success = false;
             int region = split[i + 1].toInt(&success);

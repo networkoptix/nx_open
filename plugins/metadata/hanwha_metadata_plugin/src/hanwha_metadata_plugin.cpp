@@ -1,12 +1,15 @@
 #include "hanwha_metadata_plugin.h"
-#include "hanwha_metadata_manager.h"
-#include "hanwha_common.h"
-#include "hanwha_attributes_parser.h"
-#include "hanwha_string_helper.h"
+
+#include <map>
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
+
+#include "hanwha_metadata_manager.h"
+#include "hanwha_common.h"
+#include "hanwha_attributes_parser.h"
+#include "hanwha_string_helper.h"
 
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
@@ -21,15 +24,30 @@ namespace plugins {
 
 namespace {
 
-const char* kPluginName = "Hanwha metadata plugin";
-const QString kSamsungTechwinVendor = lit("samsung");
-const QString kHanwhaTechwinVendor = lit("hanwha");
+static const char* kPluginName = "Hanwha metadata plugin";
+static const QString kSamsungTechwinVendor("samsung");
+static const QString kHanwhaTechwinVendor("hanwha");
 
-const QString kVideoAnalytics = lit("VideoAnalytics");
-const QString kAudioAnalytics = lit("AudioAnalytics");
+static const QString kVideoAnalytics("VideoAnalytics");
+static const QString kAudioAnalytics("AudioAnalytics");
+static const QString kQueueEvent("QueueEvent");
+static const std::map<QString, QString> kSpecialEventTypes = {
+    {kVideoAnalytics, kVideoAnalytics},
+    {kAudioAnalytics, kAudioAnalytics},
+    {kQueueEvent, "Queue"}
+};
 
-const std::chrono::milliseconds kAttributesTimeout(4000);
-const QString kAttributesPath = lit("/stw-cgi/attributes.cgi/cgis");
+static const std::chrono::milliseconds kAttributesTimeout(4000);
+static const QString kAttributesPath("/stw-cgi/attributes.cgi/cgis");
+
+QString specialEventName(const QString& eventName)
+{
+    const auto itr = kSpecialEventTypes.find(eventName);
+    if (itr == kSpecialEventTypes.cend())
+        return QString();
+
+    return itr->second;
+}
 
 } // namespace
 
@@ -194,41 +212,38 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
     if (!supportedEventsParameter.is_initialized())
         return boost::none;
 
-    QList<QnUuid> result;
+    QSet<QnUuid> result;
 
     auto supportedEvents = supportedEventsParameter->possibleValues();
     for (const auto& eventName: supportedEvents)
     {
         bool gotValidParameter = false;
 
-        auto guid = m_driverManifest.eventTypeByInternalName(eventName);
+        auto guid = m_driverManifest.eventTypeByName(eventName);
         if (!guid.isNull())
-            result.push_back(guid);
+            result.insert(guid);
 
-        if (eventName == kVideoAnalytics || eventName == kAudioAnalytics)
+        const auto altEventName = specialEventName(eventName);
+        if (!altEventName.isEmpty())
         {
             const auto parameters = eventStatuses.response();
-            for (const auto& entry : parameters)
+            for (const auto& entry: parameters)
             {
                 const auto& fullEventName = entry.first;
-                const bool isAnalyticsEvent = fullEventName.startsWith(
-                    lit("Channel.%1.%2.")
-                        .arg(channel)
-                        .arg(eventName));
+                const bool isMatched = fullEventName.startsWith(
+                    lm("Channel.%1.%2.").args(channel, altEventName));
 
-                if (isAnalyticsEvent)
+                if (isMatched)
                 {
-                    guid = m_driverManifest.eventTypeByInternalName(
-                        eventName + (".") + fullEventName.split(L'.').last());
-
+                    guid = m_driverManifest.eventTypeByName(fullEventName);
                     if (!guid.isNull())
-                        result.push_back(guid);
+                        result.insert(guid);;
                 }
             }
         }
     }
 
-    return result;
+    return QList<QnUuid>::fromSet(result);
 }
 
 const Hanwha::DriverManifest& HanwhaMetadataPlugin::driverManifest() const

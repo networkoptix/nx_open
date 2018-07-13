@@ -50,7 +50,7 @@ public:
     {
         QList<EventDescriptor> outputEventTypes;
 
-        QnUuid eventTypeByInternalName(const QString& internalEventName) const;
+        QnUuid eventTypeByName(const QString& eventName) const;
         const Hanwha::EventDescriptor& eventDescriptorById(const QnUuid& id) const;
     private:
         mutable QMap<QString, QnUuid> m_idByInternalName;

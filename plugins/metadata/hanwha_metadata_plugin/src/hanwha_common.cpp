@@ -1,5 +1,7 @@
 #include "hanwha_common.h"
 
+#include <QtCore/QRegExp>
+
 #include <nx/fusion/model_functions.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::mediaserver::plugins::Hanwha, EventItemType)
@@ -8,22 +10,48 @@ namespace nx {
 namespace mediaserver {
 namespace plugins {
 
-QnUuid Hanwha::DriverManifest::eventTypeByInternalName(const QString& internalEventName) const
+namespace {
+
+bool doesMatch(const QString& realEventName, const QString& internalEventName)
 {
-    QnUuid result = m_idByInternalName.value(internalEventName);
+    const auto realEventNameString = realEventName.trimmed();
+    const auto internalEventNameString = internalEventName.trimmed();
+
+    const auto possibleInternalNames = internalEventNameString.split(
+        L',',
+        QString::SplitBehavior::SkipEmptyParts);
+
+    for (const auto& name: possibleInternalNames)
+    {
+        if (realEventNameString.contains(name))
+            return true;
+    }
+
+    const QRegExp pattern(
+        internalEventName,
+        Qt::CaseSensitivity::CaseInsensitive,
+        QRegExp::PatternSyntax::Wildcard);
+
+    if (!pattern.isValid())
+        return false;
+
+    return pattern.exactMatch(realEventName);
+}
+
+} // namespace
+
+QnUuid Hanwha::DriverManifest::eventTypeByName(const QString& eventName) const
+{
+    QnUuid result = m_idByInternalName.value(eventName);
     if (!result.isNull())
         return result;
 
     for (const auto& eventDescriptor: outputEventTypes)
     {
-        const auto possibleInternalNames = eventDescriptor.internalName.split(L',');
-        for (const auto& name: possibleInternalNames)
+        if (doesMatch(eventName, eventDescriptor.internalName))
         {
-            if (internalEventName.contains(name))
-            {
-                m_idByInternalName.insert(internalEventName, eventDescriptor.eventTypeId);
-                return eventDescriptor.eventTypeId;
-            }
+            m_idByInternalName.insert(eventName, eventDescriptor.eventTypeId);
+            return eventDescriptor.eventTypeId;
         }
     }
 

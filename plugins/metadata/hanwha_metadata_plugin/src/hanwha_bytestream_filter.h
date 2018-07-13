@@ -20,7 +20,7 @@ public:
     using Handler = std::function<void(const HanwhaEventList&)>;
 
     HanwhaBytestreamFilter(const Hanwha::DriverManifest& manifest, Handler handler);
-    virtual ~HanwhaBytestreamFilter();
+    virtual ~HanwhaBytestreamFilter() = default;
     virtual bool processData(const QnByteArrayConstRef& notification) override;
 
 private:
