@@ -388,9 +388,9 @@ nx::network::http::header::WWWAuthenticate
     nx::network::http::header::WWWAuthenticate wwwAuthenticate;
 
     wwwAuthenticate.authScheme = header::AuthScheme::digest;
-    wwwAuthenticate.params.insert("nonce", generateNonce());
-    wwwAuthenticate.params.insert("realm", realm());
-    wwwAuthenticate.params.insert("algorithm", "MD5");
+    wwwAuthenticate.params.emplace("nonce", generateNonce());
+    wwwAuthenticate.params.emplace("realm", realm());
+    wwwAuthenticate.params.emplace("algorithm", "MD5");
 
     return wwwAuthenticate;
 }

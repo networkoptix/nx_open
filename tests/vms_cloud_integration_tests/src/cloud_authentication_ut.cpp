@@ -159,8 +159,8 @@ private:
     {
         nx::network::http::header::WWWAuthenticate wwwAuthenticate;
         wwwAuthenticate.authScheme = nx::network::http::header::AuthScheme::digest;
-        wwwAuthenticate.params.insert("nonce", nonceData.nonce.c_str());
-        wwwAuthenticate.params.insert("realm", "VMS");
+        wwwAuthenticate.params.emplace("nonce", nonceData.nonce.c_str());
+        wwwAuthenticate.params.emplace("realm", "VMS");
 
         nx::network::http::header::DigestAuthorization digestAuthorization;
 
