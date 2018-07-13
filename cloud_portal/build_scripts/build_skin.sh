@@ -39,7 +39,7 @@ dir=../skins/$SKIN
         rm -rf $TARGET_DIR/../common || true
         mkdir -p $TARGET_DIR/../common/static
         mv ../front_end/dist/fonts $TARGET_DIR/../common/static/fonts
-        cp -R ../help/* $TARGET_DIR/../common/static
+        cp -R ../help $TARGET_DIR/../common/static/help
     fi
     rm -rf ../front_end/dist/fonts || true
 
