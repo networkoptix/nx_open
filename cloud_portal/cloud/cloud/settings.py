@@ -95,7 +95,7 @@ if LOCAL_ENVIRONMENT:
     )
 
 ADMIN_TOOLS_INDEX_DASHBOARD = 'cloud.dashboard.CustomIndexDashboard'
-
+ADMIN_TOOLS_MENU = 'cms.menu.CustomMenu'
 
 TEMPLATES = [
     {
