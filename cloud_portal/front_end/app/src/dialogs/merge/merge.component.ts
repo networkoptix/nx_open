@@ -25,6 +25,7 @@ export class MergeModalContent {
     constructor(public activeModal: NgbActiveModal,
                 @Inject('process') private process: any,
                 @Inject('account') private account: any,
+                @Inject('system') private _system: any,
                 @Inject('configService') private configService: any,
                 @Inject('systemsProvider') private systemsProvider: any,
                 @Inject('cloudApiService') private cloudApi: any) {
@@ -44,7 +45,9 @@ export class MergeModalContent {
 
     setTargetSystem(system) {
         this.targetSystem = system;
-        this.systemMergeable = this.checkMergeAbility(system);
+        return this._system(system.id, this.user.email).update().then((system) => {
+            this.systemMergeable = this.checkMergeAbility(system);
+        });
     };
 
     addStatus(system) {
@@ -62,6 +65,7 @@ export class MergeModalContent {
     };
 
     ngOnInit() {
+        this.masterId = this.system.id;
         this.account
             .get()
             .then((user) => {
@@ -69,7 +73,9 @@ export class MergeModalContent {
                 this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
                 this.showMergeForm = this.system.canMerge && this.systems.length > 0;
                 this.targetSystem = this.systems[0];
-                this.systemMergeable = this.checkMergeAbility(this.targetSystem);
+                return this._system(this.targetSystem.id, user.email).update();
+            }).then((system)=>{
+                this.systemMergeable = this.checkMergeAbility(system);
             });
 
         this.merging = this.process.init(() => {
@@ -83,7 +89,7 @@ export class MergeModalContent {
                 masterSystemId = this.targetSystem.id;
                 slaveSystemId = this.system.id;
             }
-            //return cloudApi.systems(); //In for testing purposes with merging things
+            //return this.cloudApi.systems(); //In for testing purposes with merging things
             return this.cloudApi.merge(masterSystemId, slaveSystemId);
         }, {
             successMessage: this.language.system.mergeSystemSuccess
@@ -127,7 +133,7 @@ export class NxModalMergeComponent implements OnInit {
     }
 
     close() {
-        this.modalRef.close();
+        this.modalRef.close({});
     }
 
     ngOnInit() {

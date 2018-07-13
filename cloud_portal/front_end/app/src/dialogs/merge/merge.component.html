@@ -31,7 +31,7 @@
         <div class="form-group">
             <label for="system" translate>Merge current System with</label>
             <select class="form-control" name="targetSystem"
-                    id="system" [(ngModel)]="targetSystem">
+                    id="system" [(ngModel)]="targetSystem" (ngModelChange)="setTargetSystem($event)">>
                 <option *ngFor="let system of systems" [ngValue]="system">{{addStatus(system)}}</option>
             </select>
         </div>
@@ -48,34 +48,36 @@
         <p *ngIf="systemMergeable == ''"
            class="help-block-no-height" translate>You can only merge Systems in which you have owner permissions.</p>
         <div>
-            <div [ngClass]="{'text-muted': systemStatus != ''}" translate>Took system name and settings from</div>
-            <div ng-init="masterSystemId=system.id">
+            <div [ngClass]="{'text-muted': systemMergeable != ''}" translate>Took system name and settings from</div>
+            <div>
                 <div>
                     <input type="radio" id="firstSystem" name="firstSystem"
-                           [(ngModel)]="masterSystemId"
+                           [(ngModel)]="masterId"
                            [value]="system.id"
-                           [disabled]="systemStatus != ''">
+                           [checked]="system.id == masterId"
+                           [disabled]="systemMergeable != ''">
                     <label class="light-label"
-                           [ngClass]="{'text-muted': systemStatus != ''}"
+                           [ngClass]="{'text-muted': systemMergeable != ''}"
                            for="firstSystem">{{system.info.name}}</label>
                 </div>
                 <div>
                     <input type="radio" id="secondSystem" name="secondSystem"
-                           [(ngModel)]="masterSystemId"
+                           [(ngModel)]="masterId"
                            [value]="targetSystem.id"
-                           [disabled]="systemStatus != ''">
+                           [checked]="targetSystem.id == masterId"
+                           [disabled]="systemMergeable != ''">
                     <label class="light-label"
-                           [ngClass]="{'text-muted': systemStatus != ''}"
+                           [ngClass]="{'text-muted': systemMergeable != ''}"
                            for="secondSystem">{{targetSystem.name}}</label>
                 </div>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <nx-process-button [buttonDisabled]="systemStatus != ''"
-                           [process]="mergingSystems"
+        <nx-process-button [buttonDisabled]="systemMergeable != ''"
+                           [process]="merging"
                            [form]="mergeForm"
-                           actionType="'primary'"
+                           actionType="primary"
                            buttonText="{{ 'Merge' | translate}}"></nx-process-button>
     </div>
 </form>

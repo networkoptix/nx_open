@@ -162,7 +162,9 @@ angular.module('cloudApp')
 
             $scope.mergeSystems = function () {
                 dialogs.merge($scope.system).then(function (mergeInfo) {
-                    setMergeStatus(mergeInfo);
+                    if(mergeInfo) {
+                        setMergeStatus(mergeInfo);
+                    }
                 });
             };
 

@@ -13,7 +13,7 @@ import { TranslateHttpLoader }              from '@ngx-translate/http-loader';
 import { CookieService }                    from "ngx-cookie-service";
 
 import {
-    cloudApiServiceModule, systemsModule, languageServiceModule,
+    cloudApiServiceModule, systemModule, systemsModule, languageServiceModule,
     accountServiceModule, processServiceModule, uuid2ServiceModule,
     ngToastModule, configServiceModule, authorizationCheckServiceModule
 } from './src/ajs-upgrade/ajs-upgraded-providers';
@@ -56,6 +56,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         languageServiceModule,
         accountServiceModule,
         processServiceModule,
+        systemModule,
         systemsModule,
         ngToastModule,
         configServiceModule,
