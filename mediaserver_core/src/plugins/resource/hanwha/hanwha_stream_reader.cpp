@@ -253,6 +253,13 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
             << QDateTime::fromMSecsSinceEpoch(m_endTimeUsec / 1000);
     }
 
+    if (ini().forcedRtspPort > 0)
+    {
+        QUrl realUrl(*outUrl);
+        realUrl.setPort(ini().forcedRtspPort);
+        *outUrl = realUrl.toString();
+    }
+
     return CameraDiagnostics::NoErrorResult();
 }
 
