@@ -46,6 +46,7 @@ h1, h2 {
     align-items   : center;
     font-family   : $font-family-regular;
     color         : $dark9;
+    line-height   : 1rem;
 }
 
 h2 {
@@ -62,6 +63,7 @@ h3 {
     font-size     : $h3-font-size;
     font-family   : $font-family-medium;
     color         : $dark9;
+    line-height   : 1rem;
 }
 
 h4 {
@@ -82,6 +84,11 @@ h6 {
     color       : $dark9;
 }
 
+.h7 {
+    @extend h6;
+    font-family : $font-family-regular;
+}
+
 h1 > .label {
     font-size      : 60%;
     vertical-align : 33%;
@@ -93,7 +100,8 @@ h1 > .label {
 }
 
 p {
-    margin-bottom: 0.5rem;
+    margin-bottom : 0.5rem;
+    line-height   : 0.9rem;
 }
 
 .card .table-responsive {
@@ -173,18 +181,17 @@ label {
     background-image : none;
     border           : 1px solid #d7dfe3;
     border-radius    : 2px;
-    transition       : border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-
+    transition       : none;
     box-shadow       : none;
     padding          : $padding-base-vertical $padding-input-horizontal;
-
-    &:focus {
-        box-shadow : none;
-    }
 
     &[disabled],
     fieldset[disabled] & {
         opacity : 0.3;
+    }
+
+    &:focus {
+        border-color : $input-border;
     }
 
     &:invalid:not(.ng-untouched) {
@@ -201,37 +208,10 @@ label {
     border-color : $input-border;
 }
 
-.form-control:focus {
-    border-color : $input-border-focus;
-}
-
-.form-control:focus + .input-group-addon {
-    border-color : $input-border-focus;
-}
-
 select.form-control {
     -webkit-appearance : none;
     -moz-appearance    : none;
     background-color   : transparent;
-}
-
-.dropdown {
-    &.dropdown-wide {
-        .dropdown-menu {
-            width : 100%;
-        }
-
-        .dropdown-toggle {
-            max-width : none;
-            width     : 100%;
-
-            .arrow {
-                position     : absolute;
-                margin-top   : 4px;
-                margin-right : 10px !important;
-            }
-        }
-    }
 }
 
 button {
@@ -243,14 +223,10 @@ button {
     &:focus,
     &.focus {
         box-shadow : none;
-        outline    : none !important;
-        outline    : 0 !important;
     }
 }
 
 .btn {
-    outline       : none !important;
-    outline       : 0 !important;
     max-width     : 278px;
     text-overflow : ellipsis;
     overflow      : hidden;
@@ -269,8 +245,6 @@ button {
     &:focus,
     &.focus {
         box-shadow : none;
-        outline    : none !important;
-        outline    : 0 !important;
     }
 }
 
@@ -279,13 +253,9 @@ button {
     background-color : transparent;
     border-color     : $light5;
 
-    &:hover:not([disabled]):not(.disabled),
-    &:focus:not([disabled]):not(.disabled),
-    &.focus:not([disabled]):not(.disabled) {
+    &:hover:not([disabled]):not(.disabled) {
         background-color : transparentize($light5, 0.75);
         border-color     : $light8;
-        outline : none !important;
-        outline : 0 !important;
     }
 
     &:active,
@@ -293,8 +263,6 @@ button {
         background-color : transparentize($light5, 0.5) !important;
         border-color     : transparentize($light5, 0.5) !important;
         @include box-shadow(inset 0px 1px 0px 1px $light9);
-        outline : none !important;
-        outline : 0 !important;
     }
 }
 
@@ -307,19 +275,14 @@ button {
     &.focus {
         background-color : $brand_l1;
         border-color     : $brand_core;
-        outline : none !important;
-        outline : 0 !important;
-        box-shadow : none;
+        box-shadow       : none;
     }
 
     &:active,
     &.active {
         background-color : $brand_core !important;
         border-color     : $brand_core !important;
-        // @include box-shadow(inset 0px 1px 0px 1px $brand_d2);
-        outline : none !important;
-        outline : 0 !important;
-        box-shadow : none !important;
+        box-shadow       : none !important;
     }
 }
 
@@ -441,35 +404,6 @@ select {
     }
 }
 
-.nav-tabs {
-    .nav-item {
-        margin-right : 2px;
-    }
-}
-
-.nav-tabs .nav-link {
-    border-top-left-radius  : 2px;
-    border-top-right-radius : 2px;
-
-    &.active {
-        background-color : $light1;
-        border-bottom    : 1px solid transparent;
-
-        .tab-heading {
-            border-bottom : 1px solid #d7dfe3;
-            padding       : 10px 0;
-        }
-    }
-}
-
-.nav-tabs > li > a {
-    line-height : 22px;
-}
-
-.nav-tabs > li > a:hover {
-    background-color : #fff !important;
-}
-
 .info-icon.active {
     color : $brand_core !important;
 }
@@ -556,10 +490,10 @@ select {
 }
 
 .card-body {
-    padding : rem(12px 16px 14px 16px);
+    padding : rem(16px);
 
     .user-name {
-        height : 24px;
+        height        : 24px;
         margin-bottom : 0;
     }
 }
@@ -580,12 +514,30 @@ select {
 
 ngb-tabset {
     .nav-tabs {
-        a {
-            color       : $dark12;
-            font-size   : $h5-font-size;
-            font-family : $font-family-medium;
-            line-height : 26px;
-            padding     : 7px 20px;
+        .nav-item {
+            .nav-link {
+                border-top-left-radius  : 2px;
+                border-top-right-radius : 2px;
+                color                   : $dark12;
+                font-size               : $h5-font-size;
+                font-family             : $font-family-medium;
+                line-height             : 26px;
+                padding                 : 10px 20px;
+
+                &.active {
+                    background-color : $light1 !important;
+                    border-bottom    : 1px solid transparent;
+
+                    .tab-heading {
+                        border-bottom : 1px solid #d7dfe3;
+                        padding       : 14px 0;
+                    }
+                }
+
+                &:hover {
+                    background-color : transparentize($light5, 0.75);
+                }
+            }
         }
     }
 }

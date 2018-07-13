@@ -1,25 +1,30 @@
+@import '../../../styles/custom/custom_palette';
+@import '../../../styles/native-theme/theme_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+
 .popup {
     &.arrow {
         left: 17px;
     }
 }
 
-.dropdown-toggle {
-    height: 47px;
-    border: none;
-    padding-right : 0 !important;
-    padding-left : 15px !important;
-    background-color: transparent !important;
-
-    &:hover {
+.dropdown {
+    .dropdown-toggle {
+        padding-right    : 1rem !important;
+        padding-left     : 1rem !important;
         background-color : transparent !important;
-    }
 
-    .glyphicon-menu-hamburger {
-        margin : 0;
-    }
-}
+        &:hover {
+            background-color : transparent !important;
+        }
 
-.dropdown-toggle::after {
-    border: none;
+        &::after {
+            border : none;
+        }
+
+        .glyphicon-menu-hamburger {
+            margin : 0;
+        }
+    }
 }

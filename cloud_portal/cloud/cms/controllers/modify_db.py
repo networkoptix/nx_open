@@ -41,6 +41,7 @@ def notify_version_ready(customization, version_id, product_name, exclude_user):
 def save_unrevisioned_records(context, customization, language, data_structures,
                               request_data, request_files, user, version_id=None):
     upload_errors = []
+    touched_records = False
     for data_structure in data_structures:
         data_structure_name = data_structure.name
         ds_language = language
@@ -63,12 +64,9 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                         upload_errors.extend(file_errors)
                         continue
 
-                # If neither case do nothing for this record
-                elif not data_structure.optional:
-                    new_record_value = data_structure.default
-
-                elif 'delete_' + data_structure_name not in request_data:
-                    continue
+            # If neither case do nothing for this record
+            elif 'delete_' + data_structure_name not in request_data:
+                continue
 
         elif data_structure.type == DataStructure.DATA_TYPES.guid:
 
@@ -112,32 +110,38 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             if data_structure.default == new_record_value:
                 continue
 
+        touched_records = True
         record = DataRecord(data_structure=data_structure,
                             language=ds_language,
                             customization=customization,
                             value=new_record_value,
                             created_by=user)
         record.save()
+    if touched_records:
+        fill_content(customization_name=customization.name,
+                     product_name=context.product.name,
+                     preview=True,
+                     incremental=True,
+                     version_id=version_id,
+                     changed_context=context)
 
-    fill_content(customization_name=customization.name,
-                 product_name=context.product.name,
-                 preview=True,
-                 incremental=True,
-                 version_id=version_id,
-                 changed_context=context)
-
-    return upload_errors
+    return upload_errors, touched_records
 
 
 def update_latest_record_version(records, new_version):
     record = records.latest('created_date')
+    version_updated = False
     if not record.version:
+        version_updated = True
         record.version = new_version
         record.save()
+
+    return version_updated
 
 
 def update_records_to_version(contexts, customization, version):
     languages = Language.objects.all()
+    touched = False
     for context in contexts:
         for data_structure in context.datastructure_set.all():
             all_records = data_structure.datarecord_set.filter(
@@ -149,11 +153,13 @@ def update_records_to_version(contexts, customization, version):
                     # Now only the latest records that can be published will have its
                     # version altered
                     if records_for_language.exists():
-                        update_latest_record_version(records_for_language, version)
+                        if update_latest_record_version(records_for_language, version):
+                            touched = True
 
             elif all_records.exists():
-                update_latest_record_version(all_records, version)
-
+                if update_latest_record_version(all_records, version):
+                    touched = True
+    return touched
 
 def strip_version_from_records(version, product):
     records_to_strip = DataRecord.objects.filter(version=version, data_structure__context__product=product)
@@ -192,9 +198,8 @@ def publish_latest_version(customization, version_id, user):
     return publish_errors
 
 
-def send_version_for_review(context, customization, language, data_structures,
-                            product, request_data, request_files, user):
-    old_versions = ContentVersion.objects.filter(accepted_date=None, product=product)
+def send_version_for_review(customization, product, user):
+    old_versions = ContentVersion.objects.filter(product=product, customization=customization, accepted_date=None)
 
     if old_versions.exists():
         old_version = old_versions.latest('created_date')
@@ -205,14 +210,11 @@ def send_version_for_review(context, customization, language, data_structures,
                              product=product, created_by=user)
     version.save()
 
-    upload_errors = save_unrevisioned_records(context, customization, language, data_structures,
-                                              request_data, request_files, user, version_id=version.id)
-
-    update_records_to_version(Context.objects.filter(
-        product=product), customization, version)
+    touched = update_records_to_version(Context.objects.filter(product=product), customization, version)
 
     notify_version_ready(customization, version.id, product.name, user)
-    return upload_errors
+
+    return touched
 
 
 def get_records_for_version(version):

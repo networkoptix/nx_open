@@ -47,6 +47,10 @@ $header-collapsing-width-1: 1px;
             display: inline-block;
             margin:(($header-height - $logo-height)/2) 0;
         }
+
+        @include media-breakpoint-down(sm) {
+            margin-left : 0 !important;
+        }
     }
 
 
@@ -73,27 +77,27 @@ $header-collapsing-width-1: 1px;
         }
 
         & > a {
-            color: $dark9;
-            margin: 0;
-            padding: 0 $horizontal-spacing;
-            line-height: $line-height;
-            font-size: rem(14px);
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            border-bottom: $active-border-width solid transparent;
+            color          : $dark9;
+            margin         : 0;
+            padding        : 0 $horizontal-spacing;
+            line-height    : 47px;
+            font-size      : rem(14px);
+            display        : flex;
+            flex-direction : row;
+            align-items    : center;
+            position       : relative;
 
-            &>span.ellipsis{
-                white-space: nowrap;
-                display:inline-block;
-                vertical-align:bottom;
-                line-height: $line-height;
-                max-width: $max-header-item-width;
+            & > span.ellipsis {
+                white-space    : nowrap;
+                display        : inline-block;
+                vertical-align : bottom;
+                line-height    : $line-height;
+                max-width      : $max-header-item-width;
             }
 
-            &:hover{
-                background-color: $light2;
-                text-decoration: none;
+            &:hover {
+                background-color : $light2;
+                text-decoration  : none;
             }
         }
 
@@ -120,7 +124,7 @@ $header-collapsing-width-1: 1px;
 
                 @include box-shadow(0 2px 4px transparentize($dark15,0.8));
 
-                &:before {
+                &::before {
                     content:"";
                     position:absolute;
                     left: $horizontal-spacing;
@@ -131,20 +135,27 @@ $header-collapsing-width-1: 1px;
             }
         }
 
-        &.active{
-            background-color: white !important;
-            & > a{
-                margin:0 $horizontal-spacing;
-                padding-left:0;
-                padding-right:0;
-                color: $brand_core;
-                border-bottom: $active-border-width solid $brand_core;
+        &.active {
+            background-color : white !important;
+            & > a {
+                color         : $brand_core;
 
-                &:hover{
-                    background-color: transparent !important;
+                &:hover {
+                    background-color : transparent !important;
+                }
+
+                &::after {
+                    content          : "";
+                    position         : absolute;
+                    bottom           : 0;
+                    height           : $active-border-width;
+                    background-color : $brand_core;
+                    left             : 1rem;
+                    right            : 1rem;
                 }
             }
         }
+
         &>a>span{
             &.glyphicon{
                 margin-left: -2px;

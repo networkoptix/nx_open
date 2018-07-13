@@ -76,9 +76,6 @@
 }
 
 .dropdown-toggle {
-    height : 47px;
-    border : none;
-
     @media (max-width : $collapse-second-width) {
         padding-right : 10px !important;
     }

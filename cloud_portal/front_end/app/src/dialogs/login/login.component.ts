@@ -28,6 +28,7 @@ export class LoginModalContent implements OnInit, AfterViewInit{
     @Input() keepPage;
 
     nx_wrong_password: boolean;
+    nx_account_blocked: boolean;
 
     @ViewChild('loginForm') loginForm: HTMLFormElement;
 
@@ -77,6 +78,7 @@ export class LoginModalContent implements OnInit, AfterViewInit{
             this.loginForm.controls['email'].setErrors(null);
             this.loginForm.controls['password'].setErrors(null);
             this.nx_wrong_password = false;
+            this.nx_account_blocked = false;
         }
     }
 
@@ -87,6 +89,7 @@ export class LoginModalContent implements OnInit, AfterViewInit{
             this.loginForm.controls['email'].setErrors(null);
             this.loginForm.controls['password'].setErrors(null);
             this.nx_wrong_password = false;
+            this.nx_account_blocked = false;
 
             return this.account.login(this.auth.email, this.auth.password, this.auth.remember);
         }, {
@@ -115,6 +118,13 @@ export class LoginModalContent implements OnInit, AfterViewInit{
 
                     this.loginForm.controls['email'].setErrors({'no_user': true});
                     this.renderer.selectRootElement('#email').select();
+                },
+                accountBlocked: () => {
+                    this.loginForm.controls['password'].markAsPristine();
+                    this.loginForm.controls['password'].markAsUntouched();
+
+                    this.nx_account_blocked = true;
+                    this.loginForm.controls['password'].setErrors({'nx_account_blocked': true});
                 },
                 portalError: this.language.lang.errorCodes.brokenAccount
             }

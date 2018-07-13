@@ -9,7 +9,11 @@ import sys
 waitTime = 30
 
 # Path to the results folder
-loc = path.join('C:\\', 'Users', 'Kyle', 'Desktop', 'robot-outputs')
+if sys.argv[1] == 'u':
+    # Path I use on my VM for a shared file
+    loc = path.join('/media', 'sf_robot-outputs')
+else:
+    loc = path.join('C:\\', 'Users', 'Kyle', 'Desktop', 'robot-outputs')
 # Path I use on my VM for a shared file
 #loc = path.join('/media', 'sf_robot-outputs')
 
@@ -31,8 +35,8 @@ def allLanguages():
 
 def runTest(key, langList):
 
-    print datetime.now(), 'Server status:', ping().status_code
     while True:
+        print datetime.now(), 'Server status:', ping().status_code
         # ping the server at the start to make sure it's ready
         if ping().ok:
             # If the server is up, delete screenshots from previous run and

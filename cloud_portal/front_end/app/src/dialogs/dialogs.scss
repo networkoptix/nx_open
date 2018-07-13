@@ -37,16 +37,17 @@
         .close {
             color           : $dark9;
             opacity         : 1;
-            width           : 48px;
-            height          : 48px;
+            width           : 40px;
+            height          : 40px;
             position        : absolute;
-            right           : 0;
-            top             : 0;
+            right           : 4px;
+            top             : 4px;
             display         : flex;
             align-items     : center;
             justify-content : center;
             margin          : 0;
             padding         : 0;
+            border-radius   : 25px;
 
             .close-content {
                 border-radius : 25px;
@@ -56,12 +57,9 @@
             &:active,
             &:focus {
                 box-shadow : none;
-                outline    : none !important;
-                outline    : 0 !important;
             }
 
-            &:hover,
-            &:focus {
+            &:hover {
                 .close-content {
                     background-color : $additional_light2;
                 }
@@ -92,7 +90,7 @@
         background-color : $light1;
 
         .form-group {
-            margin-bottom : 1rem;
+            margin-bottom : 0;
         }
 
         label {
@@ -129,6 +127,6 @@
     &-footer {
         justify-content : flex-start;
         align-items     : baseline;
-        padding         : 0 1rem 1rem;
+        padding         : 1rem;
     }
 }

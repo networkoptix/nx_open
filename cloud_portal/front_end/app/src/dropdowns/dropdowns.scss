@@ -7,31 +7,43 @@
     }
 }
 
-.dropdown {
-    @media (max-width : $collapse-second-width) {
-        position : inherit;
+// Special case for dropdowns in header
+header {
+    .dropdown {
+        @media (max-width : $collapse-second-width) {
+            position : inherit !important;
 
-        .dropdown-menu {
-            right : 0 !important;
+            .dropdown-menu {
+                right : 0 !important;
+            }
+        }
+
+        .dropdown-toggle {
+            height : 47px;
+            border : none;
         }
     }
+}
 
+.dropdown {
     &-wide {
         display : inline-block;
         width   : 100%;
 
-        .dropdown-menu {
-            top : 32px !important;
-        }
-    }
-
-    &.show {
         .dropdown-toggle {
-            background-color : $light5;
+            max-width : none;
+            width     : 100%;
+
+            .arrow {
+                position     : absolute;
+                margin-top   : 4px;
+                margin-right : 10px !important;
+            }
         }
 
-        .dropdown-toggle-transparent {
-            background-color : transparentize($light5, 0.75) !important;
+        .dropdown-menu {
+            width : 100%;
+            top   : 32px !important;
         }
     }
 
@@ -43,6 +55,7 @@
         &:hover {
             background-color : $light5 !important;
             color            : $dark9 !important;
+            box-shadow       : none !important;
 
             .arrow {
                 &::after {
@@ -133,16 +146,28 @@
     .dropdown-toggle-transparent {
         background-color : transparent;
 
+        &:focus {
+            background-color : transparent !important;
+        }
+
         &:hover {
+            background-color : transparentize($light5, 0.75) !important;
+        }
+    }
+
+    &.show {
+        .dropdown-toggle {
+            background-color : $light5;
+        }
+
+        .dropdown-toggle-transparent {
             background-color : transparentize($light5, 0.75) !important;
         }
     }
 }
 
-.dropdown-toggle {
-    &::after {
-        display : none !important;
-    }
+.dropdown-toggle::after {
+    display : none !important;
 }
 
 nx-select.ng-invalid:not(.ng-untouched) {

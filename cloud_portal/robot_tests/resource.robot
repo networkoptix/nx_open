@@ -53,7 +53,8 @@ Log Out
     Wait Until Page Does Not Contain Element    ${BACKDROP}
     Wait Until Page Contains Element    ${LOG OUT BUTTON}
     Wait Until Element Is Visible    ${ACCOUNT DROPDOWN}
-    Click Button    ${ACCOUNT DROPDOWN}
+    Sleep    .05    #Ubuntu was clicking too soon
+    Click Link    ${ACCOUNT DROPDOWN}
     Wait Until Element Is Visible    ${LOG OUT BUTTON}
     Click Link    ${LOG OUT BUTTON}
     Validate Log Out
@@ -93,7 +94,7 @@ Get Email Link
     ${email}    Wait For Email    recipient=${recipient}    timeout=120    status=UNSEEN
     Run Keyword If    "${link type}"=="activate"    Check Email Subject    ${email}    ${ACTIVATE YOUR ACCOUNT EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Run Keyword If    "${link type}"=="restore_password"    Check Email Subject    ${email}    ${RESET PASSWORD EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
-    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    mark hamil
+    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    {{message.sharer_name}}    ${TEST FIRST NAME} ${TEST LAST NAME}
     Run Keyword If    "${link type}"=="register"    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT UNREGISTERED}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     ${links}    Get NX Links From Email    ${email}    ${link type}
     log    ${links}
@@ -250,6 +251,17 @@ Reset user owner first/last name
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Close Browser
+
+Reset user password to base
+    [arguments]    ${email}    ${current password}
+    Go To    ${url}/account/password
+    Log In    ${email}    ${current password}    None
+    Validate Log In
+    Wait Until Elements Are Visible    ${CURRENT PASSWORD INPUT}    ${NEW PASSWORD INPUT}    ${CHANGE PASSWORD BUTTON}
+    Input Text    ${CURRENT PASSWORD INPUT}    ${current password}
+    Input Text    ${NEW PASSWORD INPUT}    ${BASE PASSWORD}
+    Click Button    ${CHANGE PASSWORD BUTTON}
+    Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
 
 Add notowner
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}

@@ -36,6 +36,9 @@
             <div *ngIf="password.invalid && nx_wrong_password">
                 <label class="input-error" translate>Wrong password</label>
             </div>
+            <div *ngIf="password.invalid && nx_account_blocked">
+                <label class="input-error" translate>Too many attempts. Try again in a minute.</label>
+            </div>
         </div>
         <div class="form-group">
             <label class="checkbox" translate>Remember me
