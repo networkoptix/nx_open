@@ -14,7 +14,7 @@ namespace ptz {
 
 namespace {
 
-static const double kEpsilon = 0.01;
+static const double kEpsilon = 0.5;
 
 struct TestContinuousMovement
 {
