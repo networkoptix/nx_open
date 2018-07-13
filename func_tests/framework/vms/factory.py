@@ -1,5 +1,4 @@
 import logging
-from collections import namedtuple
 from contextlib import contextmanager
 
 from framework.os_access.ssh_access import VmSshAccess
@@ -8,7 +7,16 @@ from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
 
-VM = namedtuple('VM', ['alias', 'index', 'type', 'name', 'port_map', 'os_access'])
+
+class VM(object):
+    def __init__(self, alias, index, type, hardware, os_access):
+        self.alias = alias
+        self.index = index
+        self.type = type
+        self.name = hardware.name  # TODO: Remove.
+        self.port_map = hardware.port_map  # TODO: Remove.
+        self.hardware = hardware
+        self.os_access = os_access
 
 
 class UnknownOsFamily(Exception):
@@ -34,9 +42,9 @@ class VMFactory(object):
                 raise UnknownOsFamily("Expected 'linux' or 'windows', got %r", vm_type_configuration['os_family'])
             wait_for_true(os_access.is_accessible, timeout_sec=vm_type_configuration['power_on_timeout_sec'])
             # TODO: Consider unplug and reset only before network setup: that will make tests much faster.
-            self._hypervisor.unplug_all(info.name)
+            info.unplug_all()
             os_access.networking.reset()
-            vm = VM(alias, vm_index, vm_type, info.name, info.port_map, os_access)
+            vm = VM(alias, vm_index, vm_type, info, os_access)
             yield vm
 
     def cleanup(self):

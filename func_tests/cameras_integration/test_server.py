@@ -26,9 +26,9 @@ def config(test_config):
         )
 
 
-def test_cameras(hypervisor, one_vm, one_licensed_server, config, work_dir):
+def test_cameras(one_vm, one_licensed_server, config, work_dir):
     one_licensed_server.os_access.networking.setup_network(
-        hypervisor.plug_bridged(one_vm.name, config.CAMERAS_INTERFACE),
+        one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE),
         config.CAMERAS_NETWORK, config.CAMERAS_NETWORK_IP)
 
     expected_cameras = yaml.load(Path(config.EXPECTED_CAMERAS_FILE).read_bytes())

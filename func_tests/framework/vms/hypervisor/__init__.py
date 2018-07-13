@@ -1,5 +1,5 @@
 """Classes and functions unrelated to specific VM hypervisor (VirtualBox, libvirt, etc...)"""
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from pprint import pformat
 
 
@@ -21,18 +21,67 @@ class VmHardware(object):
             return '<VM {!s} (stopped)>'.format(self.name)
         return '<VM {!s}>'.format(self.name)
 
-    def find_vacant_nic(self):
+    def _find_vacant_nic(self):
         for key, occupation in self.networks.items():
             if occupation is None:
                 return key
         raise VMAllAdaptersBusy(self.name, self.networks)
+
+    @abstractmethod
+    def clone(self, clone_vm_name):  # type: (str) -> VmHardware
+        pass
+
+    @abstractmethod
+    def export_vm(self, vm_image_path):
+        """Export VM from its current state: it may not have snapshot at all"""
+        pass
+
+    @abstractmethod
+    def destroy(self):
+        pass
+
+    @abstractmethod
+    def power_on(self, already_on_ok=False):
+        pass
+
+    @abstractmethod
+    def power_off(self, already_off_ok=False):
+        pass
+
+    @abstractmethod
+    def plug_internal(self, network_name):
+        pass
+
+    @abstractmethod
+    def plug_bridged(self, host_nic):
+        pass
+
+    @abstractmethod
+    def unplug_all(self):
+        pass
+
+    @abstractmethod
+    def setup_mac_addresses(self, vm_index, mac_prefix):
+        pass
+
+    @abstractmethod
+    def setup_network_access(self, vm_index, network_access_configuration):
+        pass
+
+    @abstractmethod
+    def is_on(self):
+        pass
+
+    @abstractmethod
+    def is_off(self):
+        pass
 
 
 class VMNotFound(Exception):
     pass
 
 
-class TemplateVMNotFound(Exception):
+class VMAlreadyExists(Exception):
     pass
 
 

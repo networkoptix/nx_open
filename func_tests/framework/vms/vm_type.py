@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 from framework.os_access.exceptions import AlreadyDownloaded
 from framework.registry import Registry
-from framework.vms.hypervisor import TemplateVMNotFound, VMNotFound
+from framework.vms.hypervisor import VMNotFound
 from framework.vms.hypervisor.hypervisor import Hypervisor
 
 _logger = logging.getLogger(__name__)
@@ -32,10 +32,10 @@ class VMType(object):
 
     def _obtain_template(self):
         try:
-            self.hypervisor.find(self.template_vm_name)
+            return self.hypervisor.find_vm(self.template_vm_name)
         except VMNotFound:
             if self.template_url is None:
-                raise TemplateVMNotFound(
+                raise EnvironmentError(
                     "Template VM {} not found, template VM image URL is not specified".format(
                         self.template_vm_name))
             template_vm_images_dir = self.hypervisor.host_os_access.Path.home() / '.func_tests'
@@ -43,34 +43,32 @@ class VMType(object):
                 template_vm_image = self.hypervisor.host_os_access.download(self.template_url, template_vm_images_dir)
             except AlreadyDownloaded as e:
                 template_vm_image = e.path
-            self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
+            return self.hypervisor.import_vm(template_vm_image, self.template_vm_name)
 
     @contextmanager
     def obtained(self, alias):
-        self._obtain_template()
+        template_vm = self._obtain_template()
         with self.registry.taken(alias) as (vm_index, vm_name):
             try:
-                vm_info = self.hypervisor.find(vm_name)
+                vm = self.hypervisor.find_vm(vm_name)
             except VMNotFound:
-                self.hypervisor.clone(self.template_vm_name, vm_name)
-                self.hypervisor.setup_mac_addresses(vm_name, vm_index, self.mac_format)
-                self.hypervisor.setup_network_access(vm_name, vm_index, self.network_access_configuration)
-                vm_info = self.hypervisor.find(vm_name)
-            assert vm_info.name == vm_name
-            if not vm_info.is_running:
-                self.hypervisor.power_on(vm_info.name)
-            yield vm_info, vm_index
+                vm = template_vm.clone(vm_name)
+                vm.setup_mac_addresses(vm_index, self.mac_format)
+                vm.setup_network_access(vm_index, self.network_access_configuration)
+            vm.power_on(already_on_ok=True)
+            yield vm, vm_index
 
     def cleanup(self):
         def destroy(name, vm_alias):
-            if vm_alias is None:
-                try:
-                    self.hypervisor.destroy(name)
-                except VMNotFound:
-                    _logger.info("Machine %s not found.", name)
-                else:
-                    _logger.info("Machine %s destroyed.", name)
-            else:
+            if vm_alias is not None:
                 _logger.warning("Machine %s reserved now.", name)
+                return
+            try:
+                vm = self.hypervisor.find_vm(name)
+            except VMNotFound:
+                _logger.info("Machine %s not found.", name)
+                return
+            vm.destroy()
+            _logger.info("Machine %s destroyed.", name)
 
         self.registry.for_each(destroy)
