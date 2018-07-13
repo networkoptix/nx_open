@@ -58,5 +58,6 @@ set(sign.cer "app.p12")
 
 # Localization
 set(help.language "chinese")
+set(translations zh_TW zh_CN)
 set(defaultTranslation zh_TW)
-set(additionalTranslations zh_CN)
+
