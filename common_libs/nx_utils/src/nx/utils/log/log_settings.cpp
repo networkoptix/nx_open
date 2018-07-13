@@ -1,9 +1,8 @@
 #include "log_settings.h"
 
-#include <filesystem>
-
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/string.h>
+#include <nx/utils/std/filesystem.h>
 
 namespace nx {
 namespace utils {
@@ -11,7 +10,7 @@ namespace log {
 
 void LoggerSettings::parse(const QString& str)
 {
-    using namespace std::experimental::filesystem;
+    using namespace std::filesystem;
 
     const auto params = parseNameValuePairs<std::multimap>(str.toUtf8(), ';');
     for (const auto& param: params)
