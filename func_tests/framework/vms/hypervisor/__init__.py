@@ -7,12 +7,11 @@ class VmHardware(object):
     """Settings hypervisor is responsible for"""
     __metaclass__ = ABCMeta
 
-    def __init__(self, name, port_map, macs, networks, bridged, description, is_running):
+    def __init__(self, name, port_map, macs, vacant_nics, description, is_running):
         self.name = name
         self.port_map = port_map
         self.macs = macs
-        self.networks = networks
-        self.bridged = bridged
+        self._vacant_nics = list(reversed(vacant_nics))
         self.is_running = is_running
         self.description = description
 
@@ -22,10 +21,7 @@ class VmHardware(object):
         return '<VM {!s}>'.format(self.name)
 
     def _find_vacant_nic(self):
-        for key, occupation in self.networks.items():
-            if occupation is None:
-                return key
-        raise VMAllAdaptersBusy(self.name, self.networks)
+        return self._vacant_nics.pop()
 
     @abstractmethod
     def clone(self, clone_vm_name):  # type: (str) -> VmHardware

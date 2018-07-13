@@ -110,30 +110,23 @@ class _VirtualBoxVm(VmHardware):
         return host_address_from_vm
 
     @staticmethod
-    def _parse_nic_occupation(raw_dict):
-        macs = {}
-        networks = {}
-        bridged = {}
+    def _parse_macs(raw_dict):
         for nic_index in _INTERNAL_NIC_INDICES:
             try:
                 raw_mac = raw_dict['macaddress{}'.format(nic_index)]
             except KeyError:
                 _logger.error("NIC %d: not present.", nic_index)
                 continue
-            macs[nic_index] = EUI(raw_mac)
+            yield nic_index, EUI(raw_mac)
+
+    @staticmethod
+    def _parse_free_nics(raw_dict, macs):
+        for nic_index, mac in macs.items():
             nic_type = raw_dict['nic{}'.format(nic_index)]
-            if nic_type == 'intnet':
-                networks[nic_index] = raw_dict['intnet{}'.format(nic_index)]
-                _logger.info("NIC %d (%s): internal network %s", nic_index, macs[nic_index], networks[nic_index])
-            elif nic_type == 'bridged':
-                bridged[nic_index] = raw_dict['bridgeadapter{}'.format(nic_index)]
-                _logger.info("NIC %d (%s): bridged to %s", nic_index, macs[nic_index], bridged[nic_index])
-            elif nic_type == 'null':
-                networks[nic_index] = None
-                _logger.info("NIC %d (%s): empty", nic_index, macs[nic_index])
-            else:
-                raise EnvironmentError("Unsupported NIC type: {}.".format(nic_type))
-        return macs, networks, bridged
+            _logger.info("NIC %d (%s): %s", nic_index, mac, nic_type)
+            assert nic_type != 'none', "NIC is `none` and has MAC at the same time"
+            if nic_type == 'null':
+                yield nic_index
 
     def __init__(self, virtual_box, name):
         raw_output = virtual_box.manage(['showvminfo', name, '--machinereadable'])
@@ -144,10 +137,11 @@ class _VirtualBoxVm(VmHardware):
         ports_map = ReciprocalPortMap(
             OneWayPortMap.forwarding(cls._parse_port_forwarding(raw_dict)),
             OneWayPortMap.direct(cls._parse_host_address(raw_dict)))
-        macs, networks, bridged = cls._parse_nic_occupation(raw_dict)
+        macs = OrderedDict(cls._parse_macs(raw_dict))
+        free_nics = list(cls._parse_free_nics(raw_dict, macs))
         description = raw_dict['description']
         is_running = raw_dict['VMState'] == 'running'
-        super(_VirtualBoxVm, self).__init__(name, ports_map, macs, networks, bridged, description, is_running)
+        super(_VirtualBoxVm, self).__init__(name, ports_map, macs, free_nics, description, is_running)
         self._virtual_box = virtual_box  # type: VirtualBox
 
     def _update(self):
@@ -220,28 +214,23 @@ class _VirtualBoxVm(VmHardware):
         wait_for_true(self.is_off)
 
     def plug_internal(self, network_name):
-        self._update()
         slot = self._find_vacant_nic()
         self._virtual_box.manage([
             'controlvm', self.name,
             'nic{}'.format(slot), 'intnet', network_name])
+        self._update()
         return self.macs[slot]
 
     def plug_bridged(self, host_nic):
-        self._update()
         slot = self._find_vacant_nic()
         self._virtual_box.manage(['controlvm', self.name, 'nic{}'.format(slot), 'bridged', host_nic])
+        self._update()
         return self.macs[slot]
 
     def unplug_all(self):
         self._update()
-        for nic_index in self.networks:
-            if self.networks[nic_index] is not None:
-                self._virtual_box.manage(
-                    ['controlvm', self.name, 'nic{}'.format(nic_index), 'null'])
-        for nic_index in self.bridged:
-            self._virtual_box.manage(
-                ['controlvm', self.name, 'nic{}'.format(nic_index), 'null'])
+        for nic_index in self.macs.keys():
+            self._virtual_box.manage(['controlvm', self.name, 'nic{}'.format(nic_index), 'null'])
 
 
 class VirtualBox(Hypervisor):
