@@ -5,5 +5,9 @@ nx-language-select {
         background-color: #FFF;
         border-radius: 2px;
         width: auto;
+
+        & li > a:hover {
+            background-color : transparent;
+        }
     }
 }

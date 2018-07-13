@@ -18,11 +18,12 @@
 
         <li class="dropdown-item"
                 *ngFor="let lang of languages"
-                [ngClass]="{'active': lang.language === activeLanguage.language}"
-                (click)="changeLanguage(lang.language)">
+                [ngClass]="{'active': lang.language === activeLanguage.language}">
+            <a (click)="changeLanguage(lang.language)">
+                <span class="lang-sm" lang="{{lang.language}}"></span>
+                <span>{{lang.name}}</span>
+            </a>
 
-            <span class="lang-sm" lang="{{lang.language}}"></span>
-            <span>{{lang.name}}</span>
         </li>
     </ul>
 </div>

@@ -71,6 +71,10 @@ header {
             }
         }
 
+        &:active {
+            background-color: $light3;
+        }
+
         .arrow {
             position         : relative;
             bottom           : auto;
@@ -116,13 +120,20 @@ header {
             display      : flex;
             align-items  : center;
             padding-left : 12px;
+
+            &:hover {
+                background-color : $light5;
+                color            : $dark9;
+            }
         }
 
         & li {
             &.active {
+                background-color : $light16 !important;
+                color            : $light1;
+
                 a {
-                    background-color : $light16 !important;
-                    color            : $light1;
+                    color : $light1;
 
                     &:hover {
                         color : $light1;
@@ -134,17 +145,13 @@ header {
                 @media (max-width : $collapse-second-width) {
                     line-height : 2rem;
                 }
-
-                &:hover {
-                    background-color : $light5;
-                    color            : $dark9;
-                }
             }
         }
     }
 
     .dropdown-toggle-transparent {
         background-color : transparent;
+        border-bottom : 1px solid transparent !important;
 
         &:focus {
             background-color : transparent !important;
@@ -152,6 +159,11 @@ header {
 
         &:hover {
             background-color : transparentize($light5, 0.75) !important;
+        }
+
+        &:active {
+            background-color : $light3 !important;
+            border-bottom: 1px solid $light5;
         }
     }
 

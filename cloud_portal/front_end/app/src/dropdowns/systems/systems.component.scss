@@ -30,7 +30,6 @@
                 background-color: $light16 !important;
 
                 .system-name {
-                    color : white;
                 }
 
                 .glyphicon-home {
@@ -54,6 +53,12 @@
 
             & .glyphicon-home {
                 background-position : -24px -56px !important;
+            }
+
+            &:hover {
+                .system-owner {
+                    color : $light1;
+                }
             }
         }
     }

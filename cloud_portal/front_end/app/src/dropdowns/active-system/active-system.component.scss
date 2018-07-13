@@ -1,8 +1,3 @@
-@import '../../../styles/custom/custom_palette';
-@import '../../../styles/native-theme/theme_palette';
-@import '../../../styles/theme_palette';
-@import '../../../styles/theme_variables';
-
 .popup {
     &.arrow {
         left: 17px;
@@ -13,11 +8,6 @@
     .dropdown-toggle {
         padding-right    : 1rem !important;
         padding-left     : 1rem !important;
-        background-color : transparent !important;
-
-        &:hover {
-            background-color : transparent !important;
-        }
 
         &::after {
             border : none;

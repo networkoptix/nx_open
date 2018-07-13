@@ -438,10 +438,12 @@ select {
 
     li > a {
         padding         : 0 12px;
-        display         : block;
+        display         : flex;
         text-decoration : none;
         color           : $dark9;
         line-height     : 26px;
+        align-items     : center;
+        width: 100%;
 
         &:hover {
             color            : $light1;
