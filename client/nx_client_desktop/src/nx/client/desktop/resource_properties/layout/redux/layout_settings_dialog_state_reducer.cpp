@@ -195,8 +195,8 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
 
     state = resetBackgroundParameters(std::move(state));
     state.background.filename = layout->backgroundImageFilename();
-    state.background.width.value = layout->backgroundSize().width();
-    state.background.height.value = layout->backgroundSize().height();
+    state.background.width.setValue(layout->backgroundSize().width());
+    state.background.height.setValue(layout->backgroundSize().height());
     state.background.opacityPercent = boundOpacityPercent(int(layout->backgroundOpacity() * 100));
 
     return state;

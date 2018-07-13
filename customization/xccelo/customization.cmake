@@ -1,3 +1,4 @@
+set(enable_hanwha true)
 set(defaultSkin "dark_orange")
 # Components Namings
 set(product.name "Xstream")

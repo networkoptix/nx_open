@@ -7,9 +7,13 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+
+#include <api/resource_property_adaptor.h>
+
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
+#include <utils/common/watermark_settings.h>
 #include <utils/crypt/symmetrical.h>
 
 #include <nx/utils/app_info.h>
@@ -510,6 +514,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxWearableArchiveSynchronizationThreadsDefault,
         this);
 
+    m_watermarkSettings = new QnJsonResourcePropertyAdaptor<QnWatermarkSettings>(
+        kWatermarkSettingsName,
+        QnWatermarkSettings(),
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
@@ -540,6 +549,10 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(
         m_cloudConnectRelayingEnabledAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
         this, &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
+        Qt::QueuedConnection);
+
+    connect(m_watermarkSettings, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::watermarkChanged,
         Qt::QueuedConnection);
 
     connect(
@@ -579,6 +592,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxRemoteArchiveSynchronizationThreads
         << m_updates2InfoAdaptor
         << m_maxWearableArchiveSynchronizationThreads
+        << m_watermarkSettings
         ;
 
     if (isHanwhaEnabledCustomization())
@@ -1356,6 +1370,16 @@ bool QnGlobalSettings::cloudConnectRelayingEnabled() const
 bool QnGlobalSettings::takeCameraOwnershipWithoutLock() const
 {
     return m_takeCameraOwnershipWithoutLock->value();
+}
+
+QnWatermarkSettings QnGlobalSettings::watermarkSettings() const
+{
+    return m_watermarkSettings->value();
+}
+
+void QnGlobalSettings::setWatermarkSettings(const QnWatermarkSettings& settings) const
+{
+    m_watermarkSettings->setValue(settings);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

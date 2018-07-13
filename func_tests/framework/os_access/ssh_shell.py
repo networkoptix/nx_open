@@ -3,6 +3,7 @@ import select
 import socket
 from abc import ABCMeta
 from contextlib import contextmanager
+from io import StringIO
 
 import paramiko
 
@@ -168,17 +169,16 @@ class _SSHCommand(Command):
 
 
 class SSH(PosixShell):
-    def __init__(self, hostname, port, username, key_path):
+    def __init__(self, hostname, port, username, key):
         self._hostname = hostname
         self._port = port
         self._username = username
-        self._key_path = key_path
+        self._key = key
 
     def __repr__(self):
         return '<{!s}>'.format(sh_command_to_script([
             'ssh', '{!s}@{!s}'.format(self._username, self._hostname),
             '-p', self._port,
-            '-i', self._key_path,
             ]))
 
     def command(self, args, cwd=None, env=None, set_eux=True):
@@ -196,7 +196,7 @@ class SSH(PosixShell):
         try:
             client.connect(
                 str(self._hostname), port=self._port,
-                username=self._username, key_filename=str(self._key_path),
+                username=self._username, pkey=paramiko.RSAKey.from_private_key(StringIO(self._key)),
                 look_for_keys=False, allow_agent=False)
         except paramiko.ssh_exception.NoValidConnectionsError as e:
             raise SSHNotConnected("Cannot connect to {}: {} (is port opened?)".format(self, e))

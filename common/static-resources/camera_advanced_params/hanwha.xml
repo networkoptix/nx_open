@@ -987,24 +987,27 @@
                 compact="true"
                 aux="ptzCapabilities=ContinuousFocusCapability"
                 writeCmd="custom_focus"/>
-        </group>
-        <group name="Maintenance">
-            <param id="image/focus/Mode=SimpleFocus"
-                    name="Simple Focus"
-                    dataType="Button"
-                    writeCmd="control"
-                    description="Fits the focus automatically"
-                    aux="support=Image/SimpleFocus"/>
+            <param id="image/lens_control/PRIMARY%SERVICE%lastSeparator"
+                    dataType="Separator"
+                    name="sep"/>
             <param id="image/focus/Mode=Reset"
-                    name="Initialize Focus"
-                    dataType="Button"
-                    writeCmd="control"
-                    description="Restores the focus adjustment to the default flange back position"/>
+                name="Initialize Focus"
+                dataType="Button"
+                writeCmd="control"
+                compact="true"
+                description="Restores the focus adjustment to the default flange back position"/>
+            <param id="image/focus/Mode=SimpleFocus"
+                name="Simple Focus"
+                dataType="Button"
+                writeCmd="control"
+                compact="true"
+                description="Fits the focus automatically"
+                aux="support=Image/SimpleFocus"/>
             <param id="image/focus/Mode=AutoFocus"
-                    name="Simple Focus"
-                    dataType="Button"
-                    writeCmd="control"
-                    description="Fits the focus automatically">
+                name="Simple Focus"
+                dataType="Button"
+                writeCmd="control"
+                description="Fits the focus automatically">
                 <dependencies>
                     <dependencies-show>
                         <conditional-show>
@@ -1030,6 +1033,8 @@
                     </dependencies-show>
                 </dependencies>
             </param>
+        </group>
+        <group name="Maintenance">            
             <param id="system/factoryreset/ExcludeSettings=Network"
                     name="Reset to Factory Defaults except Network Settings"
                     dataType="Button"

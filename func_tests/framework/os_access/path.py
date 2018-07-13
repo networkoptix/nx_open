@@ -4,6 +4,8 @@ from abc import ABCMeta, abstractmethod
 
 from pathlib2 import PurePath
 
+from framework.os_access.exceptions import NotADir
+
 _logger = logging.getLogger(__name__)
 
 
@@ -38,6 +40,15 @@ class FileSystemPath(PurePath):
     @abstractmethod
     def glob(self, pattern):
         return [FileSystemPath()]
+
+    def walk(self):
+        children = self.glob('*')
+        for child in children:
+            try:
+                for descendant in child.walk():
+                    yield descendant
+            except NotADir:
+                yield child
 
     @abstractmethod
     def mkdir(self, parents=False, exist_ok=True):
