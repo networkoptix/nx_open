@@ -12,8 +12,6 @@
 #endif
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMap>
-#include <QtCore/QUrl>
 
 #include <nx/network/buffer.h>
 #include <nx/utils/log/assert.h>
@@ -440,7 +438,7 @@ class NX_NETWORK_API DigestCredentials:
     public UserCredentials
 {
 public:
-    QMap<BufferType, BufferType> params;
+    std::map<BufferType, BufferType> params;
 
     bool parse(const BufferType& str, char separator = ',');
     void serialize(BufferType* const dstBuffer) const;
@@ -508,7 +506,7 @@ public:
     static const StringType NAME;
 
     AuthScheme::Value authScheme;
-    QMap<BufferType, BufferType> params;
+    std::map<BufferType, BufferType> params;
 
     WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
 
