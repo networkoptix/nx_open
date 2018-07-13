@@ -510,6 +510,7 @@ public:
 
     WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
 
+    BufferType getParam(const BufferType& key) const;
     bool parse(const BufferType& str);
     void serialize(BufferType* const dstBuffer) const;
     BufferType serialized() const;

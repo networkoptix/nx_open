@@ -128,7 +128,7 @@ Dictionary<QByteArray, QByteArray> parseNameValuePairs(
     const QnByteArrayConstRef& serializedData,
     char separator = ',')
 {
-    typename Dictionary<QByteArray, QByteArray> nameValueContainer;
+    Dictionary<QByteArray, QByteArray> nameValueContainer;
     parseNameValuePairs<Dictionary>(
         serializedData,
         separator,

@@ -1186,6 +1186,12 @@ WWWAuthenticate::WWWAuthenticate(AuthScheme::Value authScheme):
 {
 }
 
+BufferType WWWAuthenticate::getParam(const BufferType& key) const
+{
+    const auto it = params.find(key);
+    return it != params.end() ? it->second : BufferType();
+}
+
 bool WWWAuthenticate::parse(const BufferType& str)
 {
     int authSchemeEndPos = str.indexOf(" ");
