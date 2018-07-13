@@ -9,7 +9,7 @@ import sys
 waitTime = 30
 
 # Path to the results folder
-if sys.argv[1] == 'u':
+if len(sys.argv) > 1 and sys.argv[1] == 'u':
     # Path I use on my VM for a shared file
     loc = path.join('/media', 'sf_robot-outputs')
 else:
