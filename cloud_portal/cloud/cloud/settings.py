@@ -211,42 +211,47 @@ LOGGING = {
         '': {  # default settings for all django loggers
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'handlers': ['console']
         },
         'api.views.utils': {
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'handlers': ['console']
         },
         'api.helpers.exceptions': {
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'handlers': ['console']
         },
         'api.controllers.cloud_gateway': {
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'handlers': ['console']
         },
         'notifications.tasks': {
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'handlers': ['console']
         },
         'api.account_backend': {  # explicitly mention all modules with loogers
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'handlers': ['console']
         },
         'api.controller.cloud_api': {
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'handlers': ['console']
         },
         'api.views.account': {
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console', 'mail_admins']
+            'handlers': ['console']
+        },
+        'cms.controllers.filldata': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console']
         }
     }
 }
