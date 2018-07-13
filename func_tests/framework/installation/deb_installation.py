@@ -25,12 +25,12 @@ class DebInstallation(Installation):
 
     def __init__(self, posix_access, dir):
         super(DebInstallation, self).__init__(
-            posix_access,
-            dir,
-            dir / 'bin' / 'mediaserver-bin',
-            dir / 'var',
-            [dir / 'bin'],
-            'core.*',
+            os_access=posix_access,
+            dir=dir,
+            binary_file=dir / 'bin' / 'mediaserver-bin',
+            var_dir=dir / 'var',
+            core_dumps_dirs=[dir / 'bin'],
+            core_dump_glob='core.*',
             )
         self._posix_shell = posix_access.shell  # type: PosixShell
         self._config = self.dir / 'etc' / 'mediaserver.conf'

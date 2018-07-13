@@ -21,16 +21,16 @@ class WindowsInstallation(Installation):
         user_profile_dir = windows_access.Path(windows_access.env_vars()[u'UserProfile'])
         system_app_data_dir = system_profile_dir / 'AppData' / 'Local'
         super(WindowsInstallation, self).__init__(
-            windows_access,
-            program_files_dir / customization.windows_installation_subdir,
-            'mediaserver.exe',
-            system_app_data_dir / customization.windows_app_data_subdir,
-            [
+            os_access=windows_access,
+            dir=program_files_dir / customization.windows_installation_subdir,
+            binary_file='mediaserver.exe',
+            var_dir=system_app_data_dir / customization.windows_app_data_subdir,
+            core_dumps_dirs=[
                 system_app_data_dir,  # Crash dumps written here.
                 user_profile_dir,  # Manually created with `procdump`.
                 user_profile_dir / 'AppData' / 'Local' / 'Temp',  # From task manager.
                 ],
-            'mediaserver*.dmp',
+            core_dump_glob='mediaserver*.dmp',
             )
         self._identity = identity
         self._config_key = WindowsRegistry(windows_access.winrm).key(customization.windows_registry_key)
