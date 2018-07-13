@@ -87,6 +87,15 @@ export class ShareModalContent {
 
     doShare() {
         this.user.role = this.selectedPermission;
+
+        if (!this.user.role.permissions) {
+            this.user.role.permissions = this.accessRoles.filter((role) => {
+                if (this.user.role.name === role.name) {
+                    return role;
+                }
+            })[0].permissions;
+        }
+
         return this.system.saveUser(this.user, this.user.role);
     }
 
@@ -95,7 +104,7 @@ export class ShareModalContent {
         this.buttonText = this.language.sharing.shareConfirmButton;
         this.isNewShare = !this.user;
 
-        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'Custom'}};
+        this.user = (this.user) ? {...this.user} : {email: '', isEnabled: true, role: {name: 'Viewer'}};
         this.selectedPermission = this.user.role;
 
         if (!this.isNewShare) {
@@ -120,7 +129,6 @@ export class ShareModalContent {
         }
 
         this.processAccessRoles();
-
         this.accessDescription = this.getRoleDescription();
 
         this.sharing = this.process.init(() => {

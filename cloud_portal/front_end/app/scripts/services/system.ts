@@ -103,8 +103,6 @@ import * as angular from 'angular';
                                 self.info = result.data[0];
                             }
 
-                            console.log(self);
-
                             self.isOnline = self.info.stateOfHealth == Config.systemStatuses.onlineStatus;
                             self.isMine = self.info.ownerAccountEmail == self.currentUserEmail;
                             self.canMerge = self.isMine && (self.info.capabilities && self.info.capabilities.indexOf(Config.systemCapabilities.cloudMerge) > -1
