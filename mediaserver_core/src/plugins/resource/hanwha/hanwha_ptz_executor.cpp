@@ -190,7 +190,7 @@ std::optional<nx::utils::Url> HanwhaPtzExecutor::makePtrUrl(
     const HanwhaConfigurationalPtzCommand& command,
     int64_t sequenceId) const
 {
-    if (command.command == HanwhaConfigurationalPtzCommandType::ptr)
+    if (command.command != HanwhaConfigurationalPtzCommandType::ptr)
     {
         NX_ASSERT(false, lit("Wrong command. PTR command is expected"));
         return std::nullopt;

@@ -26,6 +26,7 @@
 #include <utils/common/writer_pool.h>
 
 #include <utils/common/delayed.h>
+#include <utils/common/util.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <streaming/streaming_chunk_cache.h>
 #include "streaming/streaming_chunk_transcoder.h"
@@ -51,6 +52,7 @@
 #include <nx/mediaserver/resource/camera.h>
 #include <nx/mediaserver/root_tool.h>
 
+#include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -83,6 +85,7 @@ void installTranslations()
 }
 
 } // namespace
+
 
 QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
@@ -205,10 +208,10 @@ QnMediaServerModule::QnMediaServerModule(
 
 QDir QnMediaServerModule::downloadsDirectory() const
 {
-    const QDir dir(settings().dataDir() + lit("/downloads"));
-    if (!dir.exists())
-        QDir().mkpath(dir.absolutePath());
-
+    static const QString kDownloads("downloads");
+    QDir dir(settings().dataDir());
+    dir.mkpath(kDownloads);
+    dir.cd(kDownloads);
     return dir;
 }
 

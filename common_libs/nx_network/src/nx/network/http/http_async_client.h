@@ -310,6 +310,9 @@ public:
     static QString endpointWithProtocol(const nx::utils::Url& url);
 
     void setMaxNumberOfRedirects(int maxNumberOfRedirects);
+
+    int totalRequestsSentViaCurrentConnection() const;
+    int totalRequestsSent() const;
 private:
     enum class Result
     {

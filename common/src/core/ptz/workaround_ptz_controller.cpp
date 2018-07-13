@@ -21,9 +21,9 @@ core_ptz::Override loadOverride(const QnVirtualCameraResourcePtr& camera)
     const auto resourceData = qnStaticCommon->dataPool()->data(camera);
     resourceData.value<core_ptz::Override>(kPtzOverride, &ptzOverride);
 
-    const std::map<QString, decltype(core_ptz::OverridePart::capabilitiesOverride)> overrides = {
-        {kOperationalPtzCapabilitiesOverride, ptzOverride.operational.capabilitiesOverride},
-        {kConfigurationalPtzCapabilitiesOverride, ptzOverride.configurational.capabilitiesOverride}
+    const std::map<QString, std::optional<Ptz::Capabilities>*> overrides = {
+        {kOperationalPtzCapabilitiesOverride, &ptzOverride.operational.capabilitiesOverride},
+        {kConfigurationalPtzCapabilitiesOverride, &ptzOverride.configurational.capabilitiesOverride}
     };
 
     for (const auto& entry: overrides)
@@ -31,6 +31,7 @@ core_ptz::Override loadOverride(const QnVirtualCameraResourcePtr& camera)
         Ptz::Capabilities capabilitiesOverride;
         const auto parameterName = entry.first;
         auto capabilities = entry.second;
+
         if (resourceData.value<Ptz::Capabilities>(parameterName, &capabilitiesOverride))
             *capabilities = capabilitiesOverride;
     }

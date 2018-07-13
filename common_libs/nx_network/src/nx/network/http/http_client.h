@@ -78,6 +78,7 @@ public:
     std::optional<BufferType> fetchEntireMessageBody();
 
     void addAdditionalHeader(const StringType& key, const StringType& value);
+    void removeAdditionalHeader(const StringType& key);
     const nx::utils::Url& url() const;
     const nx::utils::Url& contentLocationUrl() const;
     StringType contentType() const;
@@ -120,6 +121,9 @@ public:
         BufferType* msgBody,
         StringType* contentType,
         std::optional<std::chrono::milliseconds> customResponseReadTimeout);
+
+    int totalRequestsSentViaCurrentConnection() const;
+    int totalRequestsSent() const;
 private:
     std::unique_ptr<nx::network::http::AsyncClient> m_asyncHttpClient;
     QnWaitCondition m_cond;

@@ -157,6 +157,7 @@ void QnModuleInformationRestHandler::afterExecute(
                 socket->readSomeAsync(buffer.get(),
                     [this, socket, buffer](SystemError::ErrorCode code, size_t size)
                     {
+                        socket->cancelIOSync(nx::network::aio::etNone);
                         m_socketsToKeepOpen.erase(socket);
                         NX_VERBOSE(this, lm("Unexpected event on connection from %1 (size=%2): %3")
                             .args(socket->getForeignAddress(), size, SystemError::toString(code)));
