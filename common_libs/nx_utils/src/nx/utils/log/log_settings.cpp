@@ -78,7 +78,7 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
     }
 
     // If there are more prefix/* arguments, adding one more logger.
-    if (loggers.size() < logSettingCount)
+    if ((int) loggers.size() < logSettingCount)
         loadCompatibilityLogger(settings, prefix);
 }
 

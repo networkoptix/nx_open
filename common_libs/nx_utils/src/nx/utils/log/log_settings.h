@@ -22,19 +22,31 @@ public:
     LoggerSettings() = default;
 
     /**
-     * Str = param (; param)
+     * LOGGER_SETTINGS = param (; param)
      * param = key [= value]
      * value = TEXT
      * param = file | dir | maxBackupCount | maxFileSize | level
      * level = LogLevel [: messageTagPrefix]
      * file = - | fileName
      *
-     * "-" meand STDOUT
+     * "-" means STDOUT
      *
-     * Examples:
+     * For most applications logger settings are specified with --log/logger=LOGGER_SETTINGS argument.
+     * There can be multiple --log/logger= arguments.
+     *
+     * LOGGER_SETTINGS examples:
+     *
+     * Log everything <= WARNING to stdout:
      *   file=-;level=WARNING
-     *   dir=/var/log/;maxBackupCount=11;maxFileSize=100M;
-     *       level=WARNING:nx::network;level=DEBUG:nx::network::http;level=none
+     *
+     * Log only nx::network::http* with <= VERBOSE level to /var/log/http_log file:
+     *   dir=/var/log/;file=http_log;level=VERBOSE:nx::network::http;level=none
+     *
+     * Log nx::network* with <= WARNING level and nx::network::http* with <= DEBUG level to a file:
+     *   dir=/var/log/;level=WARNING:nx::network;level=DEBUG:nx::network::http;level=none;
+     *       maxBackupCount=11;maxFileSize=100M;
+     *
+     * Generally, "level=none" means "ignore everything else".
      */
     void parse(const QString& str);
     void updateDirectoryIfEmpty(const QString& dataDirectory);

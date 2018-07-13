@@ -27,13 +27,19 @@ std::set<Tag> AggregateLogger::tags() const
 void AggregateLogger::log(Level level, const Tag& tag, const QString& message)
 {
     for (auto& logger: m_loggers)
-        logger->log(level, tag, message);
+    {
+        if (logger->isToBeLogged(level, tag))
+            logger->log(level, tag, message);
+    }
 }
 
 void AggregateLogger::logForced(Level level, const Tag& tag, const QString& message)
 {
     for (auto& logger: m_loggers)
-        logger->logForced(level, tag, message);
+    {
+        if (logger->isToBeLogged(level, tag))
+            logger->logForced(level, tag, message);
+    }
 }
 
 bool AggregateLogger::isToBeLogged(Level level, const Tag& tag)
