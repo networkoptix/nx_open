@@ -46,7 +46,11 @@ class Installation(object):
         pass
 
     def list_log_files(self):
-        return self._var.joinpath('log').glob('log_file*.log')
+        logs_dir = self._var.joinpath('log')
+        if logs_dir.exists():
+            return logs_dir.glob('log_file*.log')
+        else:
+            return []
 
     def list_core_dumps(self):
         return [
