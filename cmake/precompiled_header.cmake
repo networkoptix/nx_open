@@ -18,6 +18,10 @@ function(_generate_pch_parameters target pch_dir)
         list(INSERT flags 0 ${CMAKE_CXX_COMPILE_OPTIONS_TARGET}${CMAKE_CXX_COMPILER_TARGET})
     endif()
 
+    if(MACOSX AND CMAKE_OSX_SYSROOT MATCHES "^/.+$")
+        list(APPEND flags "-isysroot ${CMAKE_OSX_SYSROOT}")
+    endif()
+
     set(flags "$<$<BOOL:${flags}>:$<JOIN:${flags},\n>\n>")
 
     set(include_directories
