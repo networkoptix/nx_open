@@ -237,7 +237,7 @@ boost::optional<QList<QnUuid>> HanwhaMetadataPlugin::eventsFromParameters(
                 {
                     guid = m_driverManifest.eventTypeByName(fullEventName);
                     if (!guid.isNull())
-                        result.insert(guid);;
+                        result.insert(guid);
                 }
             }
         }
