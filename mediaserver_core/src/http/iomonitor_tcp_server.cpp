@@ -1,4 +1,3 @@
-
 #include "iomonitor_tcp_server.h"
 
 #include <QUrlQuery>
@@ -28,8 +27,11 @@ public:
     std::deque<QByteArray> messagesToSend;
 };
 
-QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket, owner)
+QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
+    QnTcpListener* owner)
+    :
+    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, std::move(socket), owner)
 {
 }
 
@@ -79,7 +81,10 @@ void QnIOMonitorConnectionProcessor::run()
         d->socket->setNonBlockingMode(true);
 
         using namespace std::placeholders;
-        d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
+        d->socket->readSomeAsync(
+            &d->requestBuffer,
+            std::bind(&QnIOMonitorConnectionProcessor::onSomeBytesReadAsync,
+                      this, d->socket.get(), _1, _2));
 
         addData(camera->ioStates());
         QnMutexLocker lock(&d->waitMutex);
@@ -124,7 +129,7 @@ void QnIOMonitorConnectionProcessor::onSomeBytesReadAsync(
     {
         d->socket->readSomeAsync(
             &d->requestBuffer,
-            std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
+            std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.get(), _1, _2 ) );
     }
     d->waitCond.wakeAll();
 }

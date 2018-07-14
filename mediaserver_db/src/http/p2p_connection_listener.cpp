@@ -28,13 +28,12 @@ namespace p2p {
 // -------------------------- ConnectionProcessor ---------------------
 
 ConnectionProcessor::ConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
-    QnTCPConnectionProcessor(socket, owner)
+    QnTCPConnectionProcessor(std::move(socket), owner)
 {
     Q_D(QnTCPConnectionProcessor);
-    d->isSocketTaken = true;
     setObjectName(::toString(this));
 }
 
@@ -235,10 +234,9 @@ void ConnectionProcessor::run()
         onConnectionClosedCallback = std::bind(&QnAuditManager::at_connectionClosed, qnAuditManager, session);
     }
 
-    std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
-    socket->setNonBlockingMode(true);
+    d->socket->setNonBlockingMode(true);
     auto keepAliveTimeout = std::chrono::milliseconds(remotePeer.aliveUpdateIntervalMs);
-    WebSocketPtr webSocket(new websocket::WebSocket(std::move(socket)));
+    WebSocketPtr webSocket(new websocket::WebSocket(std::move(d->socket)));
     webSocket->setAliveTimeout(keepAliveTimeout);
     webSocket->start();
 

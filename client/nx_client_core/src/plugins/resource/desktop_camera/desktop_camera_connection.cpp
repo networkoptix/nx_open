@@ -110,12 +110,12 @@ public:
 };
 
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     void* sslContext,
     QnDesktopResourcePtr desktop)
     :
     QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(),
-        socket,
+        std::move(socket),
         desktop->commonModule())
 {
     Q_UNUSED(sslContext)
@@ -131,8 +131,6 @@ QnDesktopCameraConnectionProcessor::~QnDesktopCameraConnectionProcessor()
 
     stop();
     disconnectInternal();
-
-    d->socket.clear(); // we have not ownership for socket in this class
 }
 
 void QnDesktopCameraConnectionProcessor::processRequest()
@@ -244,11 +242,12 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
         msleep(10);
 }
 
-QSharedPointer<nx::network::AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
+std::unique_ptr<nx::network::AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
     std::unique_ptr<nx::network::http::HttpClient>& httpClient)
 {
-    return QSharedPointer<nx::network::BufferedStreamSocket>(
-        new nx::network::BufferedStreamSocket(httpClient->takeSocket(), httpClient->fetchMessageBodyBuffer()));
+    auto buffer = httpClient->fetchMessageBodyBuffer();
+    return std::make_unique<nx::network::BufferedStreamSocket>(
+        std::move(httpClient->takeSocket()), buffer);
 }
 
 void QnDesktopCameraConnection::pleaseStop()
@@ -271,10 +270,10 @@ void QnDesktopCameraConnection::run()
     const auto setupNetwork =
         [this](
             std::unique_ptr<nx::network::http::HttpClient> newClient,
-            QSharedPointer<nx::network::AbstractStreamSocket> newSocket)
+            std::unique_ptr<nx::network::AbstractStreamSocket> newSocket)
         {
             auto newProcessor = newSocket
-                ? std::make_shared<QnDesktopCameraConnectionProcessor>(newSocket, nullptr, m_owner)
+                ? std::make_shared<QnDesktopCameraConnectionProcessor>(std::move(newSocket), nullptr, m_owner)
                 : std::shared_ptr<QnDesktopCameraConnectionProcessor>();
 
             QnMutexLocker lock(&m_mutex);

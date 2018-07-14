@@ -16,7 +16,7 @@ namespace
     const QString kStartStreamAction("start");
     const QString kStopStreamAction("stop");
 
-    bool readBytes(QSharedPointer<nx::network::AbstractStreamSocket> socket, quint8* dst, int size)
+    bool readBytes(nx::network::AbstractStreamSocket* socket, quint8* dst, int size)
     {
         while (size > 0)
         {
@@ -29,7 +29,7 @@ namespace
         return true;
     }
 
-    bool readHttpHeaders(QSharedPointer<nx::network::AbstractStreamSocket> socket)
+    bool readHttpHeaders(nx::network::AbstractStreamSocket* socket)
     {
         int toRead = QnProxyAudioTransmitter::kFixedPostRequest.size();
         QByteArray buffer;
@@ -60,11 +60,11 @@ public:
         delete [] m_recvBuffer;
     }
 
-    void setSocket(const QSharedPointer<nx::network::AbstractStreamSocket>& socket)
+    void setSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket)
     {
         stop();
         QnMutexLocker lock(&m_mutex);
-        m_socket = socket;
+        m_socket = std::move(socket);
     }
 
 protected:
@@ -74,14 +74,14 @@ protected:
         QnMutexLocker lock(&m_mutex);
         while (!m_needStop && m_socket->isConnected())
         {
-            if (!readBytes(m_socket, m_recvBuffer, 4))
+            if (!readBytes(m_socket.get(), m_recvBuffer, 4))
             {
                 m_socket->close();
                 break;
             }
 
             int packetSize = (m_recvBuffer[2] << 8) + m_recvBuffer[3];
-            if (!readBytes(m_socket, m_recvBuffer, packetSize))
+            if (!readBytes(m_socket.get(), m_recvBuffer, packetSize))
             {
                 m_socket->close();
                 break;
@@ -114,19 +114,18 @@ protected:
     }
 
 private:
-    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     mutable QnMutex m_mutex;
     QnUuid m_cameraId;
 };
 
 typedef QSharedPointer<QnProxyDesktopDataProvider> QnProxyDesktopDataProviderPtr;
 
-
 QnAudioProxyReceiver::QnAudioProxyReceiver(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
-:
-    QnTCPConnectionProcessor(socket, owner)
+    :
+    QnTCPConnectionProcessor(std::move(socket), owner)
 {
     setObjectName(::toString(this));
 }
@@ -160,19 +159,15 @@ void QnAudioProxyReceiver::run()
 
     // process 2-nd POST request with unlimited length
 
-    if (!readHttpHeaders(d->socket))
+    if (!readHttpHeaders(d->socket.get()))
         return;
 
     QnProxyDesktopDataProviderPtr desktopDataProvider(new QnProxyDesktopDataProvider(QnUuid::fromStringSafe(resourceId)));
-    desktopDataProvider->setSocket(d->socket);
+    desktopDataProvider->setSocket(takeSocket());
 
     QString errString;
     if (!QnAudioStreamerPool::instance()->startStopStreamToResource(desktopDataProvider, QnUuid(resourceId), action, errString))
     {
         qWarning() << "Cant start audio uploading to camera" << resourceId << errString;
-    }
-    else
-    {
-        takeSocket();
     }
 }

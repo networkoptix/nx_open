@@ -13,12 +13,12 @@
 #include <core/resource_management/resource_pool.h>
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     nx::vms::auth::AbstractUserDataProvider* userDataProvider,
     nx::vms::auth::AbstractNonceProvider* nonceProvider,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(socket, owner),
+    QnTCPConnectionProcessor(std::move(socket), owner),
     m_userDataProvider(userDataProvider),
     m_nonceProvider(nonceProvider)
 {
@@ -141,7 +141,7 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
     QnMutexLocker lock(&m_mutex);
     auto owner = static_cast<QnHttpConnectionListener*> (d->owner);
     if (auto handler = owner->findHandler(d->protocol, d->request))
-        m_processor = handler(d->socket, owner);
+        m_processor = handler(std::move(d->socket), owner);
     else
         return false;
 
@@ -154,13 +154,9 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
     if (!needToStop())
     {
         copyClientRequestTo(*m_processor);
-        if (m_processor->isSocketTaken())
-            d->socket.clear(); // some of handlers have addition thread and depend of socket destructor. We should clear socket immediately to prevent race condition
         m_processor->execute(m_mutex);
-        if (!m_processor->isSocketTaken())
-            m_processor->releaseSocket();
-        else
-            d->socket.clear(); // some of handlers set ownership dynamically during a execute call. So, check it again.
+        // Get socket back(if still exists) for the next request.
+        d->socket = m_processor->takeSocket();
     }
 
     delete m_processor;

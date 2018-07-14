@@ -196,9 +196,9 @@ bool QnDigitalWatchdogResource::useOnvifAdvancedParameterProviders() const
     return isCproChipset() || resData.value<bool>(lit("forceOnvifAdvancedParameters"));
 }
 
-CLSimpleHTTPClient QnDigitalWatchdogResource::httpClient() const
+std::unique_ptr<CLSimpleHTTPClient> QnDigitalWatchdogResource::httpClient() const
 {
-    return CLSimpleHTTPClient(
+    return std::make_unique<CLSimpleHTTPClient>(
         getHostAddress(), nx::network::http::DEFAULT_HTTP_PORT, getNetworkTimeout(), getAuth());
 }
 
@@ -208,11 +208,11 @@ bool QnDigitalWatchdogResource::isDualStreamingEnabled(bool& unauth)
         return false;
 
     auto http = httpClient();
-    CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
+    CLHttpStatus status = http->doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
     if (status == CL_HTTP_SUCCESS)
     {
         QByteArray body;
-        http.readAll(body);
+        http->readAll(body);
         QList<QByteArray> lines = body.split(',');
         for (int i = 0; i < lines.size(); ++i)
         {
@@ -263,7 +263,7 @@ void QnDigitalWatchdogResource::enableOnvifSecondStream()
     QByteArray request;
     request.append("onvif_stream_number=2&onvif_use_service=true&onvif_service_port=8032&");
     request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
-    http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), QLatin1String(request));
+    http->doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), QLatin1String(request));
 
     setStatus(Qn::Offline);
     // camera rebooting ....

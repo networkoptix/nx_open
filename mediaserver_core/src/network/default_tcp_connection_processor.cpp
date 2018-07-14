@@ -3,9 +3,9 @@
 #include "network/tcp_listener.h"
 
 QnDefaultTcpConnectionProcessor::QnDefaultTcpConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket, 
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner):
-    QnTCPConnectionProcessor(socket, owner)
+    QnTCPConnectionProcessor(std::move(socket), owner)
 {
 }
 
