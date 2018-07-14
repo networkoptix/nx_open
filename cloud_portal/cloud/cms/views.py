@@ -104,7 +104,6 @@ def context_editor_action(request, context_id, language_code):
     request_data = request.POST
     request_files = request.FILES
 
-    saved = True
     upload_errors = []
     preview_link = ""
     saved_msg = "Changes have been saved."
@@ -117,42 +116,34 @@ def context_editor_action(request, context_id, language_code):
     if 'languageChanged' in request_data and 'currentLanguage' in request_data and request_data['currentLanguage']:
         last_language = Language.by_code(request_data['currentLanguage'])
 
-        upload_errors, saved = save_unrevisioned_records(context, customization, last_language,
-                                                           context.datastructure_set.all(), request_data,
-                                                           request_files, request.user)
+        upload_errors = save_unrevisioned_records(context, customization, last_language,
+                                                  context.datastructure_set.all(), request_data,
+                                                  request_files, request.user)
 
     elif 'Preview' in request_data or 'SaveDraft' in request_data:
-        upload_errors, saved = save_unrevisioned_records(context, customization, language,
-                                                           context.datastructure_set.all(), request_data,
-                                                           request_files, request.user)
+        upload_errors = save_unrevisioned_records(context, customization, language,
+                                                  context.datastructure_set.all(), request_data,
+                                                  request_files, request.user)
 
         if 'Preview' in request_data:
             saved_msg += " Preview has been created."
 
     elif 'SendReview' in request_data:
-        upload_errors, saved = save_unrevisioned_records(context, customization, language,
-                                                           context.datastructure_set.all(), request_data,
-                                                           request_files, request.user)
+        upload_errors = save_unrevisioned_records(context, customization, language,
+                                                  context.datastructure_set.all(), request_data,
+                                                  request_files, request.user)
         if upload_errors:
             warning_no_error_msg = "Cannot have any errors when sending for review."
             messages.warning(request, "{} - {}".format(context.product.name, warning_no_error_msg))
-            saved = False
         else:
-            saved = send_version_for_review(customization, context.product, request.user)
+            send_version_for_review(customization, context.product, request.user)
             saved_msg += " A new version has been created."
-
-
-    else:
-        saved = False
 
     if upload_errors:
         add_upload_error_messages(request, upload_errors)
-
-    if saved:
+    else:
         messages.success(request, saved_msg)
         preview_link = generate_preview_link(context)
-    else:
-        messages.warning(request, "Nothing was saved because no records were changed")
 
     # The form is made here so that all of the changes to fields are sent with the new form
     form = initialize_form(context, customization, language, request.user)
