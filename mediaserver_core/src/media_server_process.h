@@ -74,6 +74,7 @@ public:
     QString ipVersion;
     QString createFakeData;
     QString crashDirectory;
+    std::vector<QString> auxLoggers;
 
     CmdLineArguments():
         cleanupDb(false),

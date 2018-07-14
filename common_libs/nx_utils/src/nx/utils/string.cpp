@@ -479,58 +479,6 @@ std::vector<QnByteArrayConstRef> splitQuotedString(const QnByteArrayConstRef& sr
     return result;
 }
 
-QMap<QByteArray, QByteArray> parseNameValuePairs(
-    const QnByteArrayConstRef& serializedData,
-    char separator)
-{
-    QMap<QByteArray, QByteArray> nameValueContainer;
-    parseNameValuePairs(
-        serializedData,
-        separator,
-        &nameValueContainer);
-    return nameValueContainer;
-}
-
-void parseNameValuePairs(
-    const QnByteArrayConstRef& serializedData,
-    char separator,
-    QMap<QByteArray, QByteArray>* const params)
-{
-    const std::vector<QnByteArrayConstRef>& paramsList =
-        splitQuotedString(serializedData, separator);
-    for (const QnByteArrayConstRef& token : paramsList)
-    {
-        const auto& nameAndValue = splitQuotedString(token.trimmed(), '=');
-        if (nameAndValue.empty())
-            continue;
-        QnByteArrayConstRef value = nameAndValue.size() > 1 ? nameAndValue[1] : QnByteArrayConstRef();
-        params->insert(nameAndValue[0].trimmed(), value.trimmed("\""));
-    }
-}
-
-QByteArray serializeNameValuePairs(
-    const QMap<QByteArray, QByteArray>& params)
-{
-    QByteArray serializedData;
-    serializeNameValuePairs(params, &serializedData);
-    return serializedData;
-}
-
-void serializeNameValuePairs(
-    const QMap<QByteArray, QByteArray>& params,
-    QByteArray* const dstBuffer)
-{
-    for (auto it = params.cbegin(); it != params.cend(); ++it)
-    {
-        if (it != params.begin())
-            dstBuffer->append(", ");
-        dstBuffer->append(it.key());
-        dstBuffer->append("=\"");
-        dstBuffer->append(it.value());
-        dstBuffer->append("\"");
-    }
-}
-
 QString removeMnemonics(QString text)
 {
     /**
