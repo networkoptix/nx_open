@@ -12,7 +12,7 @@ void LoggerSettings::parse(const QString& str)
 {
     using namespace std::filesystem;
 
-    const auto params = parseNameValuePairs<std::multimap>(str.toUtf8(), ';');
+    const auto params = parseNameValuePairs<std::multimap>(str.toUtf8(), ',');
     for (const auto& param: params)
     {
         if (param.first == "file")

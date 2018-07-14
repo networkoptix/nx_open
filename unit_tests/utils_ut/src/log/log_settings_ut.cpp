@@ -45,10 +45,10 @@ TEST_F(LogSettings, correct_parsing)
 TEST_F(LogSettings, multiple_loggers)
 {
     parse({
-        "-log/logger", "file=-;level=WARNING",
+        "-log/logger", "file=-,level=WARNING",
         "-log/logger",
-        "dir=/var/log/;maxBackupCount=11;maxFileSize=100M;"
-            "level=WARNING:nx::network;level=DEBUG:nx::network::http;level=none"
+        "dir=/var/log/,maxBackupCount=11,maxFileSize=100M,"
+            "level=WARNING:nx::network,level=DEBUG:nx::network::http,level=none"
     });
 
     ASSERT_EQ(2U, logSettings.loggers.size());
