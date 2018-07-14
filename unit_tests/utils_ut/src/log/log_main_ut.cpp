@@ -22,6 +22,8 @@ public:
     LogMainTest(std::unique_ptr<AbstractWriter> logWriter = nullptr):
         initialLevel(mainLogger()->defaultLevel())
     {
+        log::unlockConfiguration();
+
         mainLogger()->setDefaultLevel(Level::none);
 
         log::Settings settings;
@@ -50,6 +52,8 @@ public:
     {
         removeLoggers({kTestTag, kNamespaceTag});
         mainLogger()->setDefaultLevel(initialLevel);
+
+        log::lockConfiguration();
     }
 
     void expectMessages(const std::vector<const char*>& patterns)

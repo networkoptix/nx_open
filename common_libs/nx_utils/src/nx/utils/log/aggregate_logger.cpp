@@ -113,6 +113,12 @@ std::optional<QString> AggregateLogger::filePath() const
     return std::nullopt;
 }
 
+void AggregateLogger::writeLogHeader()
+{
+    for (auto& logger: m_loggers)
+        logger->writeLogHeader();
+}
+
 } // namespace log
 } // namespace utils
 } // namespace nx

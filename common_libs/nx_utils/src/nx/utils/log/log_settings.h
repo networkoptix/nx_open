@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "log_logger.h"
+#include "log_level.h"
 
 class QnSettings;
 

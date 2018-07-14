@@ -1,3 +1,5 @@
+#include <atomic>
+
 #include "log_main.h"
 
 namespace nx {
@@ -9,12 +11,10 @@ namespace {
 class LoggerCollection
 {
 public:
-    LoggerCollection():
-        m_mainLogger(std::make_shared<Logger>(
-            std::set<Tag>(), kDefaultLevel, /*writer*/ nullptr))
+    LoggerCollection()
     {
-        m_mainLogger->setOnLevelChanged([this]() { onLevelChanged(); });
-        updateMaxLevel();
+        setMainLogger(std::make_unique<Logger>(
+            std::set<Tag>(), kDefaultLevel, /*writer*/ nullptr));
     }
 
     std::shared_ptr<AbstractLogger> main()
@@ -28,8 +28,13 @@ public:
         if (!logger)
             return;
 
+        logger->writeLogHeader();
+
         QnMutexLocker lock(&m_mutex);
         m_mainLogger = std::move(logger);
+        m_mainLogger->setOnLevelChanged([this]() { onLevelChanged(); });
+
+        updateMaxLevel();
     }
 
     void add(std::unique_ptr<AbstractLogger> logger)
@@ -106,6 +111,8 @@ static LoggerCollection* loggerCollection()
     return &collection;
 }
 
+static std::atomic<bool> s_isConfigurationLocked = false;
+
 } // namespace
 
 std::shared_ptr<AbstractLogger> mainLogger()
@@ -113,14 +120,34 @@ std::shared_ptr<AbstractLogger> mainLogger()
     return loggerCollection()->main();
 }
 
-void setMainLogger(std::unique_ptr<AbstractLogger> logger)
+bool setMainLogger(std::unique_ptr<AbstractLogger> logger)
 {
-    return loggerCollection()->setMainLogger(std::move(logger));
+    if (s_isConfigurationLocked)
+        return false;
+
+    loggerCollection()->setMainLogger(std::move(logger));
+    return true;
 }
 
-void addLogger(std::unique_ptr<AbstractLogger> logger)
+bool addLogger(std::unique_ptr<AbstractLogger> logger)
 {
+    if (s_isConfigurationLocked)
+        return false;
+
+    logger->writeLogHeader();
+
     loggerCollection()->add(std::move(logger));
+    return true;
+}
+
+void lockConfiguration()
+{
+    s_isConfigurationLocked = true;
+}
+
+void unlockConfiguration()
+{
+    s_isConfigurationLocked = false;
 }
 
 std::shared_ptr<AbstractLogger> getLogger(const Tag& tag)

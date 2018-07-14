@@ -11,6 +11,9 @@
     static QString thisThreadId() { return QString::number((qint64) QThread::currentThreadId(), 16); }
 #endif
 
+#include <nx/utils/app_info.h>
+#include <nx/utils/string.h>
+
 namespace nx {
 namespace utils {
 namespace log {
@@ -110,6 +113,24 @@ Level Logger::maxLevel() const
     return maxLevel;
 }
 
+void Logger::setSettings(const LoggerSettings& loggerSettings)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_settings = loggerSettings;
+}
+
+void Logger::setApplicationName(const QString& applicationName)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_applicationName = applicationName;
+}
+
+void Logger::setBinaryPath(const QString& binaryPath)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_binaryPath = binaryPath;
+}
+
 void Logger::setWriter(std::unique_ptr<AbstractWriter> writer)
 {
     QnMutexLocker lock(&m_mutex);
@@ -133,6 +154,24 @@ std::optional<QString> Logger::filePath() const
     }
 
     return std::nullopt;
+}
+
+void Logger::writeLogHeader()
+{
+    const nx::utils::log::Tag kStart(QLatin1String("START"));
+    const auto write = [&](const Message& message) { log(Level::always, kStart, message); };
+    write(QByteArray(80, '='));
+    write(lm("%1 started, version: %2, revision: %3").args(
+        m_applicationName, AppInfo::applicationVersion(), AppInfo::applicationRevision()));
+
+    if (!m_binaryPath.isEmpty())
+        write(lm("Binary path: %1").arg(m_binaryPath));
+
+    const auto filePath = this->filePath();
+    write(lm("Log level: %1").arg(m_settings.level));
+    write(lm("Log file size: %2, backup count: %3, file: %4").args(
+        nx::utils::bytesToString(m_settings.maxFileSize), m_settings.maxBackupCount,
+        filePath ? *filePath : QString("-")));
 }
 
 void Logger::handleLevelChange(QnMutexLockerBase* lock) const

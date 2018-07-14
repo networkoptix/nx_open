@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abstract_logger.h"
+#include "log_settings.h"
 
 namespace nx {
 namespace utils {
@@ -42,6 +43,11 @@ public:
 
     virtual std::optional<QString> filePath() const override;
 
+    virtual void writeLogHeader() override;
+
+    void setSettings(const LoggerSettings& loggerSettings);
+    void setApplicationName(const QString& applicationName);
+    void setBinaryPath(const QString& binaryPath);
     void setWriter(std::unique_ptr<AbstractWriter> writer);
 
 private:
@@ -52,6 +58,9 @@ private:
     const std::set<Tag> m_tags;
     Level m_defaultLevel = Level::none;
     OnLevelChanged m_onLevelChanged;
+    LoggerSettings m_settings;
+    QString m_applicationName;
+    QString m_binaryPath;
     std::vector<std::unique_ptr<AbstractWriter>> m_writers;
     LevelFilters m_levelFilters;
 };

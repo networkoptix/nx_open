@@ -4,7 +4,7 @@
 
 #include <QtCore/QString>
 
-#include "abstract_logger.h"
+#include "log_logger.h"
 #include "log_settings.h"
 #include "log_writers.h"
 
@@ -23,16 +23,10 @@ public:
         std::unique_ptr<AbstractWriter> writer);
 
 private:
-    static std::unique_ptr<AbstractLogger> buildLogger(
+    static std::unique_ptr<Logger> buildLogger(
         const LoggerSettings& settings,
         const std::set<Tag>& tags,
         std::unique_ptr<AbstractWriter> writer);
-
-    static void printStartMessagesToLogger(
-        AbstractLogger* logger,
-        const LoggerSettings& settings,
-        const QString& applicationName,
-        const QString& binaryPath);
 };
 
 } // namespace log

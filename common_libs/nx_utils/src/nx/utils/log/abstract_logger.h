@@ -43,6 +43,8 @@ public:
     virtual void setOnLevelChanged(OnLevelChanged onLevelChanged) = 0;
 
     virtual std::optional<QString> filePath() const = 0;
+
+    virtual void writeLogHeader() = 0;
 };
 
 } // namespace log

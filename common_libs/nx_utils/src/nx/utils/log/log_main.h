@@ -9,9 +9,15 @@ namespace log {
 /** @return Main logger. */
 NX_UTILS_API std::shared_ptr<AbstractLogger> mainLogger();
 
-NX_UTILS_API void setMainLogger(std::unique_ptr<AbstractLogger> logger);
+NX_UTILS_API bool setMainLogger(std::unique_ptr<AbstractLogger> logger);
 
-NX_UTILS_API void addLogger(std::unique_ptr<AbstractLogger> logger);
+NX_UTILS_API bool addLogger(std::unique_ptr<AbstractLogger> logger);
+
+/** Every setMainLogger and addLogger calls will fail until unlockConfiguration is called. */
+NX_UTILS_API void lockConfiguration();
+
+/** Allow setMainLogger and addLogger calls after lockConfiguration. */
+NX_UTILS_API void unlockConfiguration();
 
 /** @return AbstractLogger by tag or main if no specific logger is set. */
 NX_UTILS_API std::shared_ptr<AbstractLogger> getLogger(const Tag& tag);

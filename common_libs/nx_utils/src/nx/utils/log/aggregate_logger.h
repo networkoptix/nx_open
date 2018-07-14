@@ -38,6 +38,8 @@ public:
 
     virtual std::optional<QString> filePath() const override;
 
+    virtual void writeLogHeader() override;
+
 private:
     std::vector<std::unique_ptr<AbstractLogger>> m_loggers;
 };

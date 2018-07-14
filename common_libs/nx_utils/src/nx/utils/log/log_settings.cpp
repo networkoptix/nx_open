@@ -4,6 +4,8 @@
 #include <nx/utils/string.h>
 #include <nx/utils/std/filesystem.h>
 
+#include "log_message.h"
+
 namespace nx {
 namespace utils {
 namespace log {
