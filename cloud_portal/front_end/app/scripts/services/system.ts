@@ -10,9 +10,9 @@ import * as angular from 'angular';
             .factory('system', ['cloudApi', 'systemAPI', '$q', 'uuid2', '$log', 'systemsProvider', 'configService', 'languageService',
                 function (cloudApi, systemAPI, $q, uuid2, $log, systemsProvider, configService, languageService) {
 
-                    var systems = {};
-                    var Config = configService.config;
-                    var L = languageService.lang;
+                    let systems = {};
+                    const CONFIG = configService.config;
+                    let L = languageService.lang;
 
                     function system(systemId, currentUserEmail) {
                         this.id = systemId;
@@ -26,8 +26,7 @@ import * as angular from 'angular';
                         this.accessRole = '';
 
                         this.currentUserEmail = currentUserEmail;
-                        var self = this;
-                        this.mediaserver = systemAPI(currentUserEmail, systemId, null, function () {
+                        this.mediaserver = systemAPI(currentUserEmail, systemId, null, () => {
                             // Unauthorised request handler
                             // Some options here:
                             // * Access was revoked
@@ -37,22 +36,22 @@ import * as angular from 'angular';
 
                             // We try to update nonce and auth on the server again
                             // Other cases are not distinguishable
-                            return self.updateSystemAuth(true);
+                            return this.updateSystemAuth(true);
                         });
                         this.updateSystemState();
                     }
 
                     system.prototype.updateSystemAuth = function (force) {
-                        var self = this;
-                        if (!force && self.auth) { //no need to update
+                        if (!force && this.auth) { //no need to update
                             return $q.resolve(true);
                         }
-                        self.auth = false;
-                        return cloudApi.getSystemAuth(self.id).then(function (data) {
-                            self.auth = true;
-                            return self.mediaserver.setAuthKeys(data.data.authGet, data.data.authPost, data.data.authPlay);
+                        this.auth = false;
+                        return cloudApi.getSystemAuth(this.id).then((data) => {
+                            this.auth = true;
+                            return this.mediaserver.setAuthKeys(data.data.authGet, data.data.authPost, data.data.authPlay);
                         });
                     };
+
                     system.prototype.updateSystemState = function () {
                         this.stateMessage = '';
                         if (!this.isAvailable) {
@@ -62,34 +61,34 @@ import * as angular from 'angular';
                             this.stateMessage = L.system.offline;
                         }
                     };
+
                     system.prototype.checkPermissions = function (offline) {
-                        var self = this;
-                        self.permissions = {};
-                        self.accessRole = self.info.accessRole;
-                        if (self.currentUserRecord) {
+                        this.permissions = {};
+                        this.accessRole = this.info.accessRole;
+                        if (this.currentUserRecord) {
                             if (!offline) {
-                                var role = self.findAccessRole(self.currentUserRecord);
-                                self.accessRole = role.name;
+                                let role = this.findAccessRole(this.currentUserRecord);
+                                this.accessRole = role.name;
                             }
-                            self.permissions.editAdmins = self.isOwner(self.currentUserRecord);
-                            self.permissions.isAdmin = self.isOwner(self.currentUserRecord) || self.isAdmin(self.currentUserRecord);
-                            self.permissions.editUsers = self.permissions.isAdmin || self.currentUserRecord.permissions.indexOf(Config.accessRoles.editUserPermissionFlag) >= 0;
+                            this.permissions.editAdmins = this.isOwner(this.currentUserRecord);
+                            this.permissions.isAdmin = this.isOwner(this.currentUserRecord) || this.isAdmin(this.currentUserRecord);
+                            this.permissions.editUsers = this.permissions.isAdmin || this.currentUserRecord.permissions.indexOf(CONFIG.accessRoles.editUserPermissionFlag) >= 0;
                         } else {
-                            self.accessRole = self.info.accessRole;
-                            if (self.isMine) {
-                                self.permissions.editUsers = true;
-                                self.permissions.editAdmins = true;
-                                self.permissions.isAdmin = true;
+                            this.accessRole = this.info.accessRole;
+                            if (this.isMine) {
+                                this.permissions.editUsers = true;
+                                this.permissions.editAdmins = true;
+                                this.permissions.isAdmin = true;
                             } else {
-                                self.permissions.editUsers = self.info.accessRole.indexOf(Config.accessRoles.editUserAccessRoleFlag) >= 0;
-                                self.permissions.isAdmin = self.info.accessRole.indexOf(Config.accessRoles.globalAdminAccessRoleFlag) >= 0;
+                                this.permissions.editUsers = this.info.accessRole.indexOf(CONFIG.accessRoles.editUserAccessRoleFlag) >= 0;
+                                this.permissions.isAdmin = this.info.accessRole.indexOf(CONFIG.accessRoles.globalAdminAccessRoleFlag) >= 0;
                             }
                         }
                     };
+
                     system.prototype.getInfoAndPermissions = function () {
-                        var self = this;
-                        return systemsProvider.getSystem(self.id).then(function (result) {
-                            var error = false;
+                        return systemsProvider.getSystem(this.id).then((result) => {
+                            let error = false;
                             if (error = cloudApi.checkResponseHasError(result)) {
                                 return $q.reject(error);
                             }
@@ -97,31 +96,29 @@ import * as angular from 'angular';
                             if (!result.data.length) {
                                 return $q.reject({ data: { resultCode: 'forbidden' } });
                             }
-                            if (self.info) {
-                                _.extend(self.info, result.data[0]); // Update
+                            if (this.info) {
+                                _.extend(this.info, result.data[0]); // Update
                             } else {
-                                self.info = result.data[0];
+                                this.info = result.data[0];
                             }
 
-                            self.isOnline = self.info.stateOfHealth == Config.systemStatuses.onlineStatus;
-                            self.isMine = self.info.ownerAccountEmail == self.currentUserEmail;
-                            self.canMerge = self.isMine && (self.info.capabilities && self.info.capabilities.indexOf(Config.systemCapabilities.cloudMerge) > -1
-                                    || Config.allowDebugMode
-                                    || Config.allowBetaMode);
+                            this.isOnline = this.info.stateOfHealth == CONFIG.systemStatuses.onlineStatus;
+                            this.isMine = this.info.ownerAccountEmail == this.currentUserEmail;
+                            this.canMerge = this.isMine && (this.info.capabilities && this.info.capabilities.indexOf(CONFIG.systemCapabilities.cloudMerge) > -1
+                                    || CONFIG.allowDebugMode
+                                    || CONFIG.allowBetaMode);
 
-                            self.checkPermissions();
+                            this.checkPermissions();
 
-                            return self.info;
+                            return this.info;
                         });
                     };
+
                     system.prototype.getInfo = function (force) {
                         if (force) {
                             this.infoPromise = null;
                         }
                         if (!this.infoPromise) {
-                            var deferred = $q.defer();
-                            var self = this;
-
                             this.infoPromise = $q.all([
                                 this.updateSystemAuth(),
                                 this.getInfoAndPermissions()
@@ -133,26 +130,24 @@ import * as angular from 'angular';
                     system.prototype.getUsersCachedInCloud = function () {
                         this.isAvailable = false;
                         this.updateSystemState();
-                        var self = this;
-                        return cloudApi.users(this.id).then(function (result) {
-                            _.each(result.data, function (user) {
+                        return cloudApi.users(this.id).then((result) => {
+                            _.each(result.data, (user) => {
                                 user.permissions = normalizePermissionString(user.customPermissions);
                                 user.email = user.accountEmail;
-                                if (user.email == self.currentUserEmail) {
-                                    self.currentUserRecord = user;
-                                    self.checkPermissions(true);
+                                if (user.email == this.currentUserEmail) {
+                                    this.currentUserRecord = user;
+                                    this.checkPermissions(true);
                                 }
                             });
                             return result.data;
                         })
                     };
 
-
                     function normalizePermissionString(permissions) {
                         return permissions.split('|').sort().join('|');
                     }
 
-                    _.each(Config.accessRoles.options, function (option) {
+                    _.each(CONFIG.accessRoles.options, function (option) {
                         if (option.permissions) {
                             option.permissions = normalizePermissionString(option.permissions);
                         }
@@ -166,18 +161,17 @@ import * as angular from 'angular';
                         return guid == '';
                     };
 
-
                     system.prototype.isOwner = function (user) {
                         return user.isAdmin || user.email === this.info.ownerAccountEmail;
                     };
 
                     system.prototype.isAdmin = function (user) {
-                        return user.permissions && user.permissions.indexOf(Config.accessRoles.globalAdminPermissionFlag) >= 0;
+                        return user.permissions && user.permissions.indexOf(CONFIG.accessRoles.globalAdminPermissionFlag) >= 0;
                     };
 
                     system.prototype.updateAccessRoles = function () {
                         if (!this.accessRoles) {
-                            var userRolesList = _.map(this.userRoles, function (userRole) {
+                            let userRolesList = _.map(this.userRoles, (userRole) => {
                                 return {
                                     name: userRole.name,
                                     userRoleId: userRole.id,
@@ -185,28 +179,28 @@ import * as angular from 'angular';
                                 };
                             });
                             this.accessRoles = _.union(this.predefinedRoles, userRolesList);
-                            this.accessRoles.push(Config.accessRoles.customPermission);
+                            this.accessRoles.push(CONFIG.accessRoles.customPermission);
                         }
                         return this.accessRoles;
                     };
+
                     system.prototype.findAccessRole = function (user) {
                         if (!user.isEnabled) {
                             return { name: 'Disabled' }
                         }
-                        var roles = this.accessRoles || Config.accessRoles.predefinedRoles;
-                        var self = this;
-                        var role = _.find(roles, function (role) {
+                        let roles = this.accessRoles || CONFIG.accessRoles.predefinedRoles;
+                        let role = _.find(roles, (role) => {
 
                             if (role.isOwner) { // Owner flag has top priority and overrides everything
                                 return role.isOwner == user.isAdmin;
                             }
-                            if (!self.isEmptyGuid(role.userRoleId)) {
+                            if (!this.isEmptyGuid(role.userRoleId)) {
                                 return role.userRoleId == user.userRoleId;
                             }
 
                             // Admins has second priority
-                            if (self.isAdmin(role)) {
-                                return self.isAdmin(user);
+                            if (this.isAdmin(role)) {
+                                return this.isAdmin(user);
                             }
                             return role.permissions == user.permissions;
                         });
@@ -215,105 +209,101 @@ import * as angular from 'angular';
                     };
 
                     system.prototype.getUsersDataFromTheSystem = function () {
-                        var self = this;
-
-                        function processUsers(users, userRoles, predefinedRoles) {
-                            self.predefinedRoles = predefinedRoles;
-                            _.each(self.predefinedRoles, function (role) {
+                        const processUsers = (users, userRoles, predefinedRoles) => {
+                            this.predefinedRoles = predefinedRoles;
+                            _.each(this.predefinedRoles, (role) => {
                                 role.permissions = normalizePermissionString(role.permissions);
-                                role.isAdmin = self.isAdmin(role);
+                                role.isAdmin = this.isAdmin(role);
                             });
 
-                            self.userRoles = _.sortBy(userRoles, function (userRole) {
+                            this.userRoles = _.sortBy(userRoles, (userRole) => {
                                 return userRole.name;
                             });
-                            self.updateAccessRoles();
+                            this.updateAccessRoles();
 
-                            users = _.filter(users, function (user) {
+                            users = _.filter(users, (user) => {
                                 return user.isCloud;
                             });
-                            // var accessRightsAssoc = _.indexBy(accessRights,'userId');
+                            // let accessRightsAssoc = _.indexBy(accessRights,'userId');
 
-                            _.each(users, function (user) {
+                            _.each(users, (user) => {
                                 user.permissions = normalizePermissionString(user.permissions);
-                                user.role = self.findAccessRole(user);
+                                user.role = this.findAccessRole(user);
                                 user.accessRole = user.role.name;
 
-                                if (user.email == self.currentUserEmail) {
-                                    self.currentUserRecord = user;
-                                    self.checkPermissions();
+                                if (user.email == this.currentUserEmail) {
+                                    this.currentUserRecord = user;
+                                    this.checkPermissions();
                                 }
                             });
 
                             return users;
                         }
 
-                        return self.mediaserver.getAggregatedUsersData().then(function (result) {
+                        return this.mediaserver.getAggregatedUsersData().then((result) => {
                             if (!result.data.reply) {
                                 $log.error('Aggregated request to server has failed', result);
                                 return $q.reject();
                             }
-                            var usersList = result.data.reply['ec2/getUsers'];
-                            var userRoles = result.data.reply['ec2/getUserRoles'];
-                            var predefinedRoles = result.data.reply['ec2/getPredefinedRoles'];
-                            self.isAvailable = true;
-                            self.updateSystemState();
+                            let usersList = result.data.reply['ec2/getUsers'];
+                            let userRoles = result.data.reply['ec2/getUserRoles'];
+                            let predefinedRoles = result.data.reply['ec2/getPredefinedRoles'];
+                            this.isAvailable = true;
+                            this.updateSystemState();
                             return processUsers(usersList, userRoles, predefinedRoles)
                         });
-                    }
+                    };
 
                     system.prototype.getUsers = function (reload) {
                         if (!this.usersPromise || reload) {
-                            var self = this;
-                            var promise = null;
-                            if (self.isOnline) { // Two separate cases - either we get info from the system (presuming it has actual names)
-                                promise = self.getUsersDataFromTheSystem(self.id).catch(function () {
-                                    return self.getUsersCachedInCloud(self.id);
+                            let promise = null;
+                            if (this.isOnline) { // Two separate cases - either we get info from the system (presuming it has actual names)
+                                promise = this.getUsersDataFromTheSystem(this.id).catch(() => {
+                                    return this.getUsersCachedInCloud(this.id);
                                 });
                             } else { // or we get old cached data from the cloud
-                                promise = self.getUsersCachedInCloud(self.id);
+                                promise = this.getUsersCachedInCloud(this.id);
                             }
 
-                            this.usersPromise = promise.then(function (users) {
+                            this.usersPromise = promise.then((users) => {
                                 if (!_.isArray(users)) {
                                     return false;
                                 }
                                 // Sort users here
-                                self.users = _.sortBy(users, function (user) {
-                                    var isMe = user.email === self.currentUserEmail;
-                                    var isOwner = self.isOwner(user);
-                                    var isAdmin = self.isAdmin(user);
+                                this.users = _.sortBy(users, (user) => {
+                                    let isMe = user.email === this.currentUserEmail;
+                                    let isOwner = this.isOwner(user);
+                                    let isAdmin = this.isAdmin(user);
 
                                     if (user.accountFullName && !user.fullName) {
                                         user.fullName = user.accountFullName;
                                     }
-                                    user.canBeDeleted = !isOwner && (!isAdmin || self.isMine);
-                                    user.canBeEdited = !isOwner && !isMe && (!isAdmin || self.isMine) && user.isEnabled;
+                                    user.canBeDeleted = !isOwner && (!isAdmin || this.isMine);
+                                    user.canBeEdited = !isOwner && !isMe && (!isAdmin || this.isMine) && user.isEnabled;
 
-                                    return -Config.accessRoles.order.indexOf(user.accessRole);
+                                    return -CONFIG.accessRoles.order.indexOf(user.accessRole);
                                 });
                                 // If system is reported to be online - try to get actual users list
 
-                                return self.users;
+                                return this.users;
                             });
 
                         }
                         return this.usersPromise;
                     };
 
-
                     system.prototype.saveUser = function (user, role) {
                         user.email = user.email.toLowerCase();
-                        var accessRole = role.name || role.label;
+                        let accessRole = role.name || role.label;
 
                         if (!user.userId) {
                             if (user.email == this.currentUserEmail) {
-                                var deferred = $q.defer();
+                                let deferred = $q.defer();
                                 deferred.reject({ resultCode: 'cantEditYourself' });
                                 return deferred.promise;
                             }
 
-                            var existingUser = _.find(this.users, function (u) {
+                            let existingUser = _.find(this.users, (u) => {
                                 return user.email == u.email;
                             });
                             if (!existingUser) { // user not found - create a new one
@@ -323,7 +313,7 @@ import * as angular from 'angular';
                             user = existingUser;
 
                             if (!user.canBeEdited && !this.isMine) {
-                                var deferred = $q.defer();
+                                let deferred = $q.defer();
                                 deferred.reject({ resultCode: 'cantEditAdmin' });
                                 return deferred.promise;
                             }
@@ -335,53 +325,45 @@ import * as angular from 'angular';
                         // TODO: remove later
                         //cloudApi.share(this.id, user.email, accessRole);
 
-                        return this.mediaserver.saveUser(user).then(function (result) {
+                        return this.mediaserver.saveUser(user).then((result) => {
                             user.role = role;
                             user.accessRole = accessRole;
                         });
-                    }
+                    };
 
                     system.prototype.deleteUser = function (user) {
-                        var self = this;
-
-                        // TODO: remove later
-                        //cloudApi.unshare(self.id, user.email);
-
-                        return this.mediaserver.deleteUser(user.id).then(function () {
-                            self.users = _.without(self.users, user);
+                        return this.mediaserver.deleteUser(user.id).then(() => {
+                            this.users = _.without(this.users, user);
                         });
-                    }
+                    };
 
                     system.prototype.deleteFromCurrentAccount = function () {
-                        var self = this;
-
-                        if (self.currentUserRecord && self.isAvailable) {
-                            this.mediaserver.deleteUser(self.currentUserRecord.id); // Try to remove me from the system directly
+                        if (this.currentUserRecord && this.isAvailable) {
+                            this.mediaserver.deleteUser(this.currentUserRecord.id); // Try to remove me from the system directly
                         }
-                        return cloudApi.unshare(self.id, self.currentUserEmail).then(function () {
-                            delete systems[self.id]
-                        }); // Anyway - send another request to cloud_db to remove myself
-                    }
+                        return cloudApi.unshare(this.id, this.currentUserEmail).then(() => {
+                            delete systems[this.id]
+                        }); // Anyway - send another request to cloud_db to remove mythis
+                    };
 
-                    system.prototype.update = function (secondAttempt) {
-                        var self = this;
-                        self.infoPromise = null; //Clear cache
-                        return self.getInfo().then(function () {
-                            if (self.usersPromise) {
-                                self.usersPromise = null;
-                                if (self.permissions.editUsers) {
-                                    return self.getUsers().then(function () {
-                                        return self;
+                    system.prototype.update = function () {
+                        this.infoPromise = null; //Clear cache
+                        return this.getInfo().then(() => {
+                            if (this.usersPromise) {
+                                this.usersPromise = null;
+                                if (this.permissions.editUsers) {
+                                    return this.getUsers().then(() => {
+                                        return this;
                                     });
                                 } else {
-                                    return self;
+                                    return this;
                                 }
                             }
-                            return self;
+                            return this;
                         });
-                    }
+                    };
 
-                    return function (systemId, email) {
+                    return (systemId, email) => {
                         if (!systems[systemId]) {
                             systems[systemId] = new system(systemId, email);
                         }

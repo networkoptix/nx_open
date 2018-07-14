@@ -12,15 +12,14 @@ import * as angular from 'angular';
 
             function (cloudApi, $interval, $q, $poll,
                       configService, languageService, account) {
-
-                const self = this;
+            
                 const CONFIG = configService.config;
 
                 this.systems = [];
 
                 this.forceUpdateSystems = function () {
-                    return cloudApi.systems().then(function (result) {
-                        self.systems = self.sortSystems(result.data);
+                    return cloudApi.systems().then((result) =>{
+                        this.systems = this.sortSystems(result.data);
                     });
                 };
 
@@ -29,7 +28,7 @@ import * as angular from 'angular';
                 };
 
                 this.getSystem = function (systemId) {
-                    const system = this.systems.find(function (system) {
+                    const system = this.systems.find((system) => {
                         return system.id == systemId;
                     });
 
@@ -57,25 +56,25 @@ import * as angular from 'angular';
 
                 this.sortSystems = function (systems, currentUserEmail) {
                     // Alphabet sorting
-                    let preSort = _.sortBy(systems, function (system) {
-                        return self.getSystemOwnerName(system, currentUserEmail, true);
+                    let preSort = _.sortBy(systems, (system) => {
+                        return this.getSystemOwnerName(system, currentUserEmail, true);
                     });
                     // Sort by usage frequency is more important than Alphabet
-                    return _.sortBy(preSort, function (system) {
+                    return _.sortBy(preSort, (system) => {
                         return -system.usageFrequency;
                     });
                 };
 
                 this.getMySystems = function (currentUserEmail, currentSystemId) {
-                    return this.systems.filter(function (system) {
+                    return this.systems.filter((system) => {
                         return system.ownerAccountEmail == currentUserEmail && system.id != currentSystemId;
                     });
                 };
 
                 account.checkLoginState()
-                       .then(() => {
-                           this.forceUpdateSystems();
-                           this.delayedUpdateSystems();
-                       });
+                   .then(() => {
+                       this.forceUpdateSystems();
+                       this.delayedUpdateSystems();
+                   });
             }]);
 })();
