@@ -200,11 +200,9 @@ def send_version_for_review(customization, product, user):
                              product=product, created_by=user)
     version.save()
 
-    touched = update_records_to_version(Context.objects.filter(product=product), customization, version)
+    update_records_to_version(Context.objects.filter(product=product), customization, version)
 
     notify_version_ready(customization, version.id, product.name, user)
-
-    return touched
 
 
 def get_records_for_version(version):
