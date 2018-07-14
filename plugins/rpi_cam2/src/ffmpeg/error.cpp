@@ -9,10 +9,10 @@ namespace ffmpeg {
 namespace error {
 
 namespace {
-static int err = 0;
+int err = 0;
 }
 
-std::string avStrError(int errorCode)
+std::string toString(int errorCode)
 {
     static constexpr int length = AV_ERROR_MAX_STRING_SIZE;
     char errorBuffer[length];

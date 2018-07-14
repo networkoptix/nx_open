@@ -2,7 +2,8 @@
 
 #include "abstract_stream_consumer.h"
 
-#include <nx/utils/thread/sync_queue.h>
+#include <mutex>
+#include <deque>
 
 namespace nx {
 namespace ffmpeg {
@@ -13,12 +14,18 @@ public:
     BufferedStreamConsumer(
         const std::weak_ptr<StreamReader>& streamReader,
         const CodecParameters& params);
-    
+
+    virtual int size() override;
     virtual void givePacket(const std::shared_ptr<Packet>& packet) override;
-    std::shared_ptr<Packet> popNextPacket();
+    std::shared_ptr<Packet> popFront();
+    std::shared_ptr<Packet> peekFront() const;
+    void clear();
+
+    int dropOldNonKeyPackets();
 
 private:
-    nx::utils::SyncQueue<std::shared_ptr<Packet>> m_packets;
+    mutable std::mutex m_mutex;
+    std::deque<std::shared_ptr<Packet>> m_vector;
 };
 
 } //namespace ffmpeg

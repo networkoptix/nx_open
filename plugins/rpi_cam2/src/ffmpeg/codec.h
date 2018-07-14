@@ -10,7 +10,7 @@ extern "C" {
 namespace nx {
 namespace ffmpeg {
 
-class Codec : Options
+class Codec : public Options
 {
 public:
     Codec();

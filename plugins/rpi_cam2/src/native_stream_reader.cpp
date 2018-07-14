@@ -40,7 +40,7 @@ namespace
             if (err != lastErrFfmpeg)
             {
                 lastErrFfmpeg = err;
-                std::string errStr = ffmpeg::error::avStrError(err);
+                std::string errStr = ffmpeg::error::toString(err);
                 debug("Last ffmpeg error: %s\n", errStr.c_str());
                 NX_DEBUG(logObject) << "Last ffmpeg error: " << errStr;
             }
@@ -76,17 +76,23 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     logError(this);
 
-    if(!initialized)
+    if (!initialized)
     {
         m_ffmpegStreamReader->addConsumer(m_consumer);
         initialized = true;
     }
 
-    std::shared_ptr<ffmpeg::Packet> packet = nullptr;
-    while (!packet)
-        packet = m_consumer->popNextPacket();
+    std::shared_ptr<ffmpeg::Packet> packet;
+    while (!packet && !m_interrupted)
+        packet = m_consumer->popFront();
 
-    *lpPacket = toNxPacket(packet->packet(), packet->codecID()).release();
+    if(m_interrupted)
+        return nxcip::NX_NO_DATA;
+
+    *lpPacket = toNxPacket(
+        packet->packet(),
+        packet->codecID(),
+        packet->timeStamp() * 1000).release();
 
     return nxcip::NX_NO_ERROR;
 }

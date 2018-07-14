@@ -2,8 +2,11 @@
 
 #include "stream_reader.h"
 
+#include <nx/utils/thread/sync_queue.h>
+
 struct SwsContext;
 
+namespace nx { namespace ffmpeg { class SpsPpsInjector; } }
 namespace nx { namespace ffmpeg { class StreamReader; } }
 namespace nx { namespace ffmpeg { class Codec; } }
 namespace nx { namespace ffmpeg { class Frame; } }
@@ -40,25 +43,39 @@ private:
     };
     StreamState m_state;
     
-    std::unique_ptr<nx::ffmpeg::Codec> m_videoEncoder;
+    std::shared_ptr<nx::ffmpeg::Codec> m_encoder;
     std::unique_ptr<nx::ffmpeg::Codec> m_decoder;
 
     std::unique_ptr<ffmpeg::Frame> m_decodedFrame;
     std::unique_ptr<ffmpeg::Frame> m_scaledFrame;
     
     struct SwsContext * m_scaleContext = nullptr;
+
+    bool m_started = false;
+    bool m_terminated = false;
+    std::thread m_runThread;
+    nx::utils::SyncQueue<std::shared_ptr<ffmpeg::Frame>> m_scaledFrames;
+
 private:
+    void start();
+    void stop();
+    void run();
+    std::shared_ptr<ffmpeg::Packet> nextPacket();
+    std::shared_ptr<ffmpeg::Frame> newScaledFrame(int * ffmpegErrorCode);
     int scale(AVFrame* frame, AVFrame * outFrame);
-    int encode(const AVFrame * frame, AVPacket * outPacket);
+    int encode(const ffmpeg::Frame * frame, ffmpeg::Packet * outPacket);
     int decode (AVFrame * outFrame, const AVPacket * packet);
+
+    virtual void interrupt() override;
 
     bool ensureInitialized();
     int initialize();
     void uninitialize();
     int openVideoEncoder();
     int openVideoDecoder();
-    int initializeScaledFrame(const std::unique_ptr<ffmpeg::Codec>& encoder);
-    void setEncoderOptions(const std::unique_ptr<ffmpeg::Codec>& encoder);
+    void initializeInjector();
+    int initializeScaledFrame(const std::shared_ptr<ffmpeg::Codec>& encoder);
+    void setEncoderOptions(const std::shared_ptr<ffmpeg::Codec>& encoder);
     
 };
 

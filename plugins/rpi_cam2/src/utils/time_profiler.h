@@ -4,46 +4,51 @@ namespace nx {
 namespace rpi_cam2 {
 namespace utils {
     
-class TimeProfiler
+struct TimeProfiler
 {
     typedef std::chrono::high_resolution_clock::time_point timepoint;
     timepoint startTime;
     timepoint stopTime;
 
 public:
+    TimeProfiler()
+    {
+        startTime = stopTime = now();
+    }
+
     timepoint now()
     {
-    return std::chrono::high_resolution_clock::now();
+        return std::chrono::high_resolution_clock::now();
     }
 
     void start()
     {
-    startTime = now();
+        startTime = now();
     }
 
     void stop()
     {
-    stopTime = now();
+        stopTime = now();
     }
 
     std::chrono::nanoseconds elapsed()
     {
-    return stopTime - startTime;
+        return stopTime - startTime;
     }
 
     int64_t countMsec()
     {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed()).count();
+        return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed()).count();
     }
 
     int64_t countUsec()
     {
-    return std::chrono::duration_cast<std::chrono::microseconds>(elapsed()).count();
+        return std::chrono::duration_cast<std::chrono::microseconds>(elapsed()).count();
     }
 
     int64_t countNsec()
     {
-    return elapsed().count();
+        return elapsed().count();
     }
 };  
 

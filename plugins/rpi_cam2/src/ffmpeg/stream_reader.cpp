@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include <nx/utils/log/log.h>
+#include <plugins/plugin_container_api.h>
 
 #include "../utils/time_profiler.h"
 #include "../utils/utils.h"
@@ -32,11 +33,16 @@ const char * deviceType()
 #endif
 }
 
-}
+} // namespace
 
-StreamReader::StreamReader(const char * url, const CodecParameters& codecParameters):
+StreamReader::StreamReader(
+    const char * url,
+    const CodecParameters& codecParameters,
+    nxpl::TimeProvider *const timeProvider)
+    :
     m_url(url),
-    m_codecParams(codecParameters)
+    m_codecParams(codecParameters),
+    m_timeProvider(timeProvider)
 {
     start();
 }
@@ -173,7 +179,6 @@ void StreamReader::stop()
 
     m_terminated = true;
     m_started = false;
-
     if(m_runThread.joinable())
         m_runThread.join();
 }
@@ -181,6 +186,16 @@ void StreamReader::stop()
 StreamReader::CameraState StreamReader::cameraState() const
 {
     return m_cameraState;
+}
+
+int StreamReader::gopSize() const
+{
+    return m_inputFormat ? m_inputFormat->gopSize() : 0;
+}
+
+int StreamReader::fps() const
+{
+    return m_codecParams.fps;
 }
 
 void StreamReader::updateFps()
@@ -206,15 +221,17 @@ void StreamReader::run()
     while (!m_terminated)
     {
         if (m_consumers.empty())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
             continue;
-        }
 
-        auto packet = std::make_shared<Packet>();
-        int readCode = readFrame(packet.get());
+        if(!ensureInitialized())
+            continue;
+
+        auto packet = std::make_shared<Packet>(m_inputFormat->videoCodecID());
+        int readCode = m_inputFormat->readFrame(packet->packet());
         if (readCode < 0)
             continue;
+
+        packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
 
         std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -224,15 +241,6 @@ void StreamReader::run()
                 c->givePacket(packet);
         }
     }
-}
-
-int StreamReader::readFrame(ffmpeg::Packet * outPacket)
-{
-    if(!ensureInitialized())
-        return error::lastError();
-
-    outPacket->setCodecID(m_inputFormat->videoCodecID());
-    return m_inputFormat->readFrame(outPacket->packet());
 }
 
 bool StreamReader::ensureInitialized()

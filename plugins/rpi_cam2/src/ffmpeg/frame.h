@@ -1,10 +1,12 @@
 #pragma once
 
+#include <stdint.h>
+
 extern"C"{
 #include<libavutil/pixfmt.h>
 }
 
-class AVFrame;
+struct AVFrame;
 
 namespace nx{
 namespace ffmpeg {
@@ -15,14 +17,18 @@ public:
     Frame();
     ~Frame();
 
+    uint64_t timeStamp() const;
+    void setTimeStamp(uint64_t millis);
+
     void unreference();
 
     AVFrame * frame() const;
 
-    int imageAlloc(int width, int height, AVPixelFormat format, int align);
+    int allocateImage(int width, int height, AVPixelFormat format, int align);
     void freeData();
 
 private:
+    uint64_t m_timeStamp;
     AVFrame * m_frame = nullptr;
     bool m_imageAllocated = false;
 };

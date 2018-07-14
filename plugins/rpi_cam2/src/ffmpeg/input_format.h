@@ -29,6 +29,7 @@ public:
     int setResolution(int width, int height);
     AVCodecID videoCodecID() const;
     AVCodecID audioCodecID() const;
+    int gopSize() const;
 
     AVFormatContext * formatContext() const;
     AVInputFormat * inputFormat() const;
@@ -38,6 +39,12 @@ public:
 private:
     AVFormatContext * m_formatContext = nullptr;
     AVInputFormat * m_inputFormat = nullptr;
+    int m_gopSize;
+    int m_gopSearch;
+
+private:
+    void calculateGopSize(const AVPacket * packet);
+
 };
 
 } // namespace ffmpeg

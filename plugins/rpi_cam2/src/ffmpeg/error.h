@@ -6,7 +6,7 @@ namespace nx{
 namespace ffmpeg {
 namespace error {
 
-std::string avStrError(int errorCode);
+std::string toString(int errorCode);
 bool updateIfError(int errorCode);
 void setLastError(int errorCode);
 int lastError();

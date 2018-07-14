@@ -8,7 +8,9 @@
 #include "ffmpeg/stream_reader.h"
 
 namespace {
+
 static constexpr nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
+
 }
 
 namespace nx {
@@ -34,8 +36,9 @@ StreamReader::StreamReader(
         m_codecContext.fps(),
         m_codecContext.bitrate(),
         m_codecContext.resolution().width,
-        m_codecContext.resolution().height);
-    m_consumer.reset(new ffmpeg::BufferedStreamConsumer(m_ffmpegStreamReader, params));
+        m_codecContext.resolution().height );
+    m_consumer.reset(
+        new ffmpeg::BufferedStreamConsumer(m_ffmpegStreamReader, params));
 }
 
 StreamReader::~StreamReader()
@@ -71,6 +74,7 @@ unsigned int StreamReader::releaseRef()
 
 void StreamReader::interrupt()
 {
+    m_interrupted = true;
 }
 
 void StreamReader::setFps(int fps)
@@ -96,13 +100,18 @@ void StreamReader::updateCameraInfo( const nxcip::CameraInfo& info )
     m_info = info;
 }
 
-std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(AVPacket *packet, AVCodecID codecID) 
+std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(
+    AVPacket *packet, 
+    AVCodecID codecID,
+    uint64_t time) 
 {
+    int keyFrame = (packet->flags & AV_PKT_FLAG_KEY) ? nxcip::MediaDataPacket::fKeyPacket : 0;
+
     std::unique_ptr<ILPVideoPacket> nxVideoPacket(new ILPVideoPacket(
         &m_allocator,
         0,
-        m_timeProvider->millisSinceEpoch() * USEC_IN_MS,
-        nxcip::MediaDataPacket::fKeyPacket,
+        time,
+        keyFrame,
         0 ) );
 
     nxVideoPacket->resizeBuffer(packet->size);
@@ -113,18 +122,6 @@ std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(AVPacket *packet, AVCod
 
     return nxVideoPacket;
 }
-
-// QString StreamReader::decodeCameraInfoUrl() const
-// {
-//     QString url = QString(m_info.url).mid(9);
-//     return nx::utils::Url::fromPercentEncoding(url.toLatin1());
-// }
-
-// std::string StreamReader::getAVCameraUrl()
-// {
-//     QString s = decodeCameraInfoUrl();
-//     return std::string(s.toLatin1().data());
-// }
 
 } // namespace rpi_cam2
 } // namespace nx

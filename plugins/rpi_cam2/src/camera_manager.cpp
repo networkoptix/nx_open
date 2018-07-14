@@ -106,35 +106,37 @@ int CameraManager::getEncoderCount( int* encoderCount ) const
 
 int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
 {
+    debug("getEncoder(): %d\n", encoderIndex);
     if(!m_ffmpegStreamReader)
     {
         m_ffmpegStreamReader = std::make_shared<nx::ffmpeg::StreamReader>(
             decodeCameraInfoUrl().c_str(),
-            toFfmpegParameters(getEncoderDefaults(0)));
+            toFfmpegParameters(getEncoderDefaults(0)),
+            m_timeProvider);
     }
 
     switch(encoderIndex)
     {
         case 0:
         {
-            if (!m_encoders[0].get())
+            if (!m_encoders[encoderIndex].get())
             {
-                m_encoders[0].reset(new NativeMediaEncoder(
+                m_encoders[encoderIndex].reset(new NativeMediaEncoder(
                     this,
                     m_timeProvider,
-                    getEncoderDefaults(0),
+                    getEncoderDefaults(encoderIndex),
                     m_ffmpegStreamReader));
             }
             break;
         }
         case 1:
         {
-            if(!m_encoders[1].get())
+            if(!m_encoders[encoderIndex].get())
             {
-                m_encoders[1].reset(new TranscodeMediaEncoder(
+                m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
                     this,
                     m_timeProvider,
-                    getEncoderDefaults(1),
+                    getEncoderDefaults(encoderIndex),
                     m_ffmpegStreamReader));
             }
             break;

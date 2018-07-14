@@ -12,7 +12,9 @@ namespace nx {
 namespace ffmpeg {
 
 InputFormat::InputFormat():
-    Options()
+    Options(),
+    m_gopSize(0),
+    m_gopSearch(0)
 {    
 }
 
@@ -61,7 +63,8 @@ void InputFormat::close()
 int InputFormat::readFrame(AVPacket * outPacket)
 {
     int readCode = av_read_frame(m_formatContext, outPacket);
-    error::updateIfError(readCode);
+    if(!error::updateIfError(readCode) && !m_gopSize)
+        calculateGopSize(outPacket);
     return readCode;
 }
 
@@ -83,6 +86,11 @@ AVCodecID InputFormat::videoCodecID() const
 AVCodecID InputFormat::audioCodecID() const
 {
     return m_formatContext->audio_codec_id;
+}
+
+int InputFormat::gopSize() const
+{
+    return m_gopSize;
 }
 
 AVFormatContext * InputFormat::formatContext() const
@@ -110,6 +118,25 @@ AVStream * InputFormat::getStream(AVMediaType type, int * streamIndex) const
         }
     }
     return nullptr;
+}
+
+void InputFormat::calculateGopSize(const AVPacket * packet)
+{
+    if (m_gopSize)
+        return;
+
+    bool keyFrame = packet->flags & AV_PKT_FLAG_KEY;
+    if (m_gopSearch)
+    {
+        if (keyFrame)
+            m_gopSize = m_gopSearch;
+        else
+            ++m_gopSearch;
+    }
+    else if (keyFrame)
+    {
+        m_gopSearch = 1;
+    }
 }
 
 } // namespace ffmpeg

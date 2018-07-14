@@ -26,6 +26,16 @@ Frame::~Frame()
     }
 }
 
+uint64_t Frame::timeStamp() const
+{
+    return m_timeStamp;
+}
+
+void Frame::setTimeStamp(uint64_t millis)
+{
+    m_timeStamp = millis;
+}
+
 void Frame::unreference()
 {
     av_frame_unref(m_frame);
@@ -36,7 +46,7 @@ AVFrame * Frame::frame() const
     return m_frame;
 }
 
-int Frame::imageAlloc(int width, int height, AVPixelFormat format, int align)
+int Frame::allocateImage(int width, int height, AVPixelFormat format, int align)
 {
     int allocCode = av_image_alloc(m_frame->data, m_frame->linesize, width, height, format, align);
     if (error::updateIfError(allocCode))

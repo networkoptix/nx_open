@@ -13,6 +13,7 @@ extern "C" {
 
 #include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
 #include <utils/memory/cyclic_allocator.h>
 
@@ -47,9 +48,7 @@ public:
     virtual void interrupt() override;
 
     virtual void setFps(int fps);
-
     virtual void setResolution(const nxcip::Resolution& resolution);
-
     virtual void setBitrate(int bitrate);
 
     void updateCameraInfo( const nxcip::CameraInfo& info );
@@ -59,16 +58,15 @@ protected:
     nxpl::TimeProvider* const m_timeProvider;
     CyclicAllocator m_allocator;
     nxcip::CameraInfo m_info;
-    CodecContext m_codecContext;
-    
-    QnMutex m_mutex;
 
+    bool m_interrupted = false;
+
+    CodecContext m_codecContext;
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
     std::shared_ptr<ffmpeg::BufferedStreamConsumer> m_consumer;
-
+    int m_lastFfmpegError = 0;
 protected:
-    std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID);
-    //QString decodeCameraInfoUrl() const;
+    std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID, uint64_t time);
 };
 
 } // namespace rpi_cam2

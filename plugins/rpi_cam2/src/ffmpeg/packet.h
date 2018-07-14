@@ -14,23 +14,33 @@ namespace ffmpeg {
 class Packet
 {
 public:
-    Packet();
-    Packet(const AVCodecID & codecID);
+    Packet(AVCodecID codecID);
     ~Packet();
 
+    int size() const;
+    uint8_t * data() const;
+    int flags() const;
     AVPacket * packet() const;
+
+    void setBuffer(uint8_t * data, int size, bool avMalloced);
 
     void initialize();
     void unreference();
     
     AVCodecID codecID() const;
-    void setCodecID(const AVCodecID& codecID);
 
     int copy(Packet * outPacket) const;
 
+    uint64_t timeStamp() const;
+    void setTimeStamp(uint64_t millis);
+
+    bool keyFrame() const;
+
 private:
-    AVCodecID m_codecID;
     AVPacket* m_packet;
+    AVCodecID m_codecID;
+    uint64_t m_timeStamp;
+    bool m_keyFrameVisited;
 };
 
 } // namespace ffmpeg

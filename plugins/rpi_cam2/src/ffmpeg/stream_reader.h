@@ -12,6 +12,8 @@
 #include "codec.h"
 #include "packet.h"
 
+namespace nxpl { class TimeProvider; }
+
 namespace nx {
 namespace ffmpeg {
 
@@ -29,14 +31,19 @@ public:
     };
 
 public:
-    StreamReader(const char * url, const CodecParameters& codecParameters);
+    StreamReader(
+        const char * url,
+        const CodecParameters& codecParameters,
+        nxpl::TimeProvider * const timeProvider);
     virtual ~StreamReader();
 
     void addConsumer(const std::weak_ptr<StreamConsumer>& consumer);
     void removeConsumer(const std::weak_ptr<StreamConsumer>& consumer);
 
     CameraState cameraState() const;
+    int gopSize() const;
 
+    int fps() const;
     void updateFps();
     void updateBitrate();
     void updateResolution();
@@ -45,6 +52,7 @@ public:
 private:
     std::string m_url;
     CodecParameters m_codecParams;
+    nxpl::TimeProvider *const m_timeProvider;
 
     //std::unique_ptr<Codec> m_decoder;
     std::unique_ptr<InputFormat> m_inputFormat;
@@ -80,6 +88,7 @@ public:
     virtual void resolution(int *width, int *height) const = 0;
     virtual int bitrate() const = 0;
     virtual void givePacket(const std::shared_ptr<Packet>& packet) = 0;
+    virtual int size() = 0;
 };
 
 } // namespace ffmpeg

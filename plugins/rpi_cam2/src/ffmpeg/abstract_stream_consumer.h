@@ -18,7 +18,6 @@ public:
     virtual void resolution(int *width, int *height) const override;
     virtual int bitrate() const override;
 
-    void initialize();
     virtual void setFps(int fps);
     virtual void setResolution(int width, int height);
     virtual void setBitrate(int bitrate);
