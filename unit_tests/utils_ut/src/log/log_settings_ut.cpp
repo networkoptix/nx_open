@@ -70,6 +70,21 @@ TEST_F(LogSettings, multiple_loggers)
     ASSERT_EQ(logger1Settings, logSettings.loggers[1]);
 }
 
+TEST_F(LogSettings, compatibility_settings)
+{
+    parse({
+        "--log-level=verbose",
+        "--log-file=/var/log/utils_ut"
+    });
+
+    ASSERT_EQ(1U, logSettings.loggers.size());
+
+    LoggerSettings logger0Settings;
+    logger0Settings.level.primary = nx::utils::log::Level::verbose;
+    logger0Settings.logBaseName = "/var/log/utils_ut";
+    ASSERT_EQ(logger0Settings, logSettings.loggers[0]);
+}
+
 } // namespace test
 } // namespace log
 } // namespace utils

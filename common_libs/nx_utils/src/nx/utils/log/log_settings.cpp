@@ -116,9 +116,9 @@ void Settings::loadCompatibilityLogger(
 
     QString logLevelStr = settings.value(makeKey("logLevel")).toString();
     if (logLevelStr.isEmpty())
-        logLevelStr = settings.value(makeKey("log-level")).toString();
+        logLevelStr = settings.value("log-level").toString();
     if (logLevelStr.isEmpty())
-        logLevelStr = settings.value(makeKey("ll")).toString();
+        logLevelStr = settings.value("ll").toString();
     loggerSettings.level.parse(logLevelStr);
 
     loggerSettings.directory = settings.value(makeKey("logDir")).toString();
@@ -129,9 +129,9 @@ void Settings::loadCompatibilityLogger(
 
     loggerSettings.logBaseName = settings.value(makeKey("baseName")).toString();
     if (loggerSettings.logBaseName.isEmpty())
-        loggerSettings.logBaseName = settings.value(makeKey("log-file")).toString();
+        loggerSettings.logBaseName = settings.value("log-file").toString();
     if (loggerSettings.logBaseName.isEmpty())
-        loggerSettings.logBaseName = settings.value(makeKey("lf")).toString();
+        loggerSettings.logBaseName = settings.value("lf").toString();
 
     loggers.push_back(std::move(loggerSettings));
 }
