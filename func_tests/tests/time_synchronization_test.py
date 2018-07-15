@@ -18,13 +18,13 @@ SYNC_TIMEOUT_SEC = 180
 
 
 @pytest.fixture()
-def two_mediaservers(two_vms, mediaserver_installers, ca, artifact_factory):
+def two_mediaservers(two_vms, mediaserver_installers, ca, artifacts_dir):
     """Make sure mediaservers are installed, stopped and internet is disabled."""
     first_vm, second_vm = two_vms
     first_vm.os_access.set_time(BASE_TIME.current)
     second_vm.os_access.set_time(BASE_TIME.current)
-    with timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as primary:
-        with timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as secondary:
+    with timeless_mediaserver(first_vm, mediaserver_installers, ca, artifacts_dir) as primary:
+        with timeless_mediaserver(second_vm, mediaserver_installers, ca, artifacts_dir) as secondary:
             merge_systems(primary, secondary)
             primary_guid = get_server_id(primary.api)
             primary.api.post('ec2/forcePrimaryTimeServer', dict(id=primary_guid))
