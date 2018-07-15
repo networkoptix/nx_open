@@ -16,6 +16,22 @@ namespace {
 
 using namespace nx::client::desktop;
 
+void fillText(const QString& text, ViewNode::Data& data)
+{
+    data.data[node_view::nameColumn][Qt::DisplayRole] = text;
+}
+
+void fillIcon(const QIcon& icon, ViewNode::Data& data)
+{
+    if (!icon.isNull())
+        data.data[node_view::nameColumn][Qt::DecorationRole] = icon;
+}
+
+void fillSiblingGroup(int siblingGroup, ViewNode::Data& data)
+{
+    data.data[node_view::nameColumn][node_view::siblingGroupRole] = siblingGroup;
+}
+
 const auto createCheckableLayoutNode =
     [](const QnResourcePtr& resource) -> NodePtr
     {
@@ -37,8 +53,8 @@ ViewNode::Data getResourceNodeData(
     if (checkable)
         nodeData.data[node_view::checkMarkColumn][Qt::CheckStateRole] = checkedState;
 
-    nodeData.data[node_view::nameColumn][Qt::DisplayRole] = resource->getName();
-    nodeData.data[node_view::nameColumn][Qt::DecorationRole] = qnResIconCache->icon(resource);
+    fillText(resource->getName(), nodeData);
+    fillIcon(qnResIconCache->icon(resource), nodeData);
     nodeData.data[node_view::nameColumn][node_view::resourceRole] = QVariant::fromValue(resource);
     return nodeData;
 }
@@ -97,12 +113,40 @@ namespace helpers {
 
 NodePtr createNode(
     const QString& caption,
-    const NodeList& children)
+    const NodeList& children,
+    int siblingGroup)
 {
     ViewNode::Data nodeData;
-    nodeData.data[node_view::nameColumn][Qt::DisplayRole] = caption;
+    fillText(caption, nodeData);
+    fillSiblingGroup(siblingGroup, nodeData);
     return ViewNode::create(nodeData, children);
 }
+
+NodePtr createNode(
+    const QString& caption,
+    int siblingGroup)
+{
+    return createNode(caption, NodeList(), siblingGroup)
+}
+
+NodePtr createSeparatorNode(int siblingGroup)
+{
+    ViewNode::Data nodeData;
+    fillSiblingGroup(siblingGroup, nodeData);
+    nodeData.data[node_view::nameColumn][node_view::separatorRole] = true;
+    return ViewNode::create(nodeData);
+}
+
+NodePtr createCheckGroupNode(
+    const QString& text,
+    const QIcon& icon)
+{
+    ViewNode::Data nodeData;
+    fillText(text, nodeData);
+    fillIcon(icon, nodeData);
+    return ViewNode::create(nodeData);
+}
+
 
 NodePtr createParentedLayoutsNode()
 {

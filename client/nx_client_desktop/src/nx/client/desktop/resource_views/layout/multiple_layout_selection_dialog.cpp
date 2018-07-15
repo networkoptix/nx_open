@@ -1,10 +1,15 @@
 #include "multiple_layout_selection_dialog.h"
 #include "ui_multiple_layout_selection_dialog.h"
 
+#include <QtWidgets/QItemDelegate>
+
+#include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_group_sorting_model.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/layout/accessible_layout_sort_model.h>
 
@@ -36,6 +41,64 @@
 
 //} // namespace
 
+#include <QtGui/QPainter>
+
+namespace {
+
+using namespace nx::client::desktop;
+
+class Delegate: public QItemDelegate
+{
+    using base_type = QItemDelegate;
+
+public:
+    Delegate(QTreeView* owner = nullptr);
+
+    virtual void paint(
+        QPainter *painter,
+        const QStyleOptionViewItem &option,
+        const QModelIndex &index) const override;
+
+private:
+    static QModelIndex getMappedIndex(const QModelIndex& index, QAbstractItemModel* model);
+
+private:
+    QTreeView const * m_owner;
+};
+
+Delegate::Delegate(QTreeView* owner):
+    base_type(owner),
+    m_owner(owner)
+{
+
+}
+
+void Delegate::paint(
+    QPainter *painter,
+    const QStyleOptionViewItem &option,
+    const QModelIndex &index) const
+{
+    base_type::paint(painter, option, index);
+
+    const auto node = NodeViewModel::nodeFromIndex(getMappedIndex(index, m_owner->model()));
+    if (!node || !node->data(node_view::nameColumn, node_view::separatorRole).toBool())
+        return;
+
+    painter->setBrush(Qt::red);
+    painter->fillRect(option.rect, Qt::red);
+}
+
+QModelIndex Delegate::getMappedIndex(const QModelIndex& index, QAbstractItemModel* model)
+{
+    const auto proxy = qobject_cast<QSortFilterProxyModel*>(model);
+    return proxy
+        ? getMappedIndex(proxy->mapToSource(index), proxy->sourceModel())
+        : index;
+}
+
+
+} // namespace
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -60,17 +123,24 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     ui->setupUi(this);
 
     const auto proxyModel = new AccessibleLayoutSortModel(this);
+    const auto siblingGroupProxyModel = new NodeViewGroupSortingModel(this);
+    siblingGroupProxyModel->setSourceModel(proxyModel);
 
     const auto tree = ui->layoutsTree;
-    tree->setProxyModel(proxyModel);
-    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
+    tree->setItemDelegate(new Delegate(tree));
+    tree->setProxyModel(siblingGroupProxyModel);
+//    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
     //tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
 
-//    tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
-//        createNode(lit("zero")),
-//        createNode(lit("first"), { createNode(lit("1_1")) }),
-//        createNode(lit("second"))
-//    })));
+    tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
+        createNode(lit("zero"), 1),
+        createNode(lit("first"), { createNode(lit("1_1")) }, 2),
+        createSeparatorNode(3),
+        createNode(lit("second"), 4)
+    })));
+
+//    tree->applyPatch(NodeViewStatePatch::fromRootNode(
+//        ViewNode::create({helpers::createSeparatorNode()})));
 
     tree->setExpandsOnDoubleClick(true);
     tree->expandAll();

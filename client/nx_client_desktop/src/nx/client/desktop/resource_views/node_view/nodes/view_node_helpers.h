@@ -11,7 +11,20 @@ namespace helpers {
 
 NodePtr createNode(
     const QString& caption,
-    const NodeList& children = NodeList());
+    const NodeList& children,
+    int siblingGroup = 0);
+
+NodePtr createNode(
+    const QString& caption,
+    int siblingGroup = 0);
+
+NodePtr createSeparatorNode(int siblingGroup = 0);
+
+NodePtr createCheckGroupNode(
+    const QString& text,
+    const QIcon& icon = QIcon());
+
+NodePtr createAllLayoutsNode();
 
 NodePtr createParentedLayoutsNode();
 NodePtr createCurrentUserLayoutsNode();

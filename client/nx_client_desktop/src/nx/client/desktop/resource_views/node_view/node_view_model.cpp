@@ -1,5 +1,7 @@
 #include "node_view_model.h"
 
+#include <nx/utils/log/log.h>
+
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_store.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
@@ -171,6 +173,7 @@ Qt::ItemFlags NodeViewModel::flags(const QModelIndex& index) const
 
 NodePtr NodeViewModel::nodeFromIndex(const QModelIndex& index)
 {
+    NX_EXPECT(qobject_cast<const NodeViewModel*>(index.model()), "Model of index is not appropriate!");
     return index.isValid()
         ? static_cast<ViewNode*>(index.internalPointer())->sharedFromThis()
         : NodePtr();

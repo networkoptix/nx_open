@@ -55,8 +55,8 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
         result.gatewayId = commonModule()->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
         if (const auto endpoint = m_moduleManager->getEndpoint(result.gatewayId))
             result.addr = *endpoint;
-        else
-            NX_ASSERT(false, "No primary interface found for current EC.");
+//        else
+//            NX_ASSERT(false, "No primary interface found for current EC.");
 
         // todo: add distance for camera route
         return result;
