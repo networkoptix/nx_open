@@ -168,5 +168,7 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
 void Ec2ConnectionProcessor::pleaseStop()
 {
     QnMutexLocker lk(&m_mutex);
+    if (m_processor)
+        m_processor->pleaseStop();
     QnTCPConnectionProcessor::pleaseStop();
 }
