@@ -6,15 +6,14 @@ Libraries required by this binary are taken from mediaserver distributive, *-ser
 
 import requests
 
+from .custom_posix_installation import CustomPosixInstallation
+from .installer import find_customization, Version, InstallIdentity
 from .. import serialize
 from ..os_access.exceptions import DoesNotExist
 from ..os_access.path import copy_file
 from ..rest_api import RestApi
-from ..waiting import wait_for_true
 from ..template_renderer import TemplateRenderer
-from .installer import find_customization, Version, InstallIdentity
-from .custom_posix_installation import CustomPosixInstallation
-
+from ..waiting import wait_for_true
 
 LWS_SYNC_CHECK_TIMEOUT_SEC = 60  # calling api/moduleInformation to check for SF_P2pSyncDone flag
 
@@ -29,7 +28,7 @@ class LwsInstallation(CustomPosixInstallation):
     SERVER_INFO_PATH = 'server_info.yaml'
 
     @classmethod
-    def create(cls, posix_access, dir, installation_group):
+    def create(cls, posix_access, dir, installation_group, server_port_base):
         try:
             server_info_text = dir.joinpath(cls.SERVER_INFO_PATH).read_text()
         except DoesNotExist:
@@ -43,15 +42,16 @@ class LwsInstallation(CustomPosixInstallation):
             posix_access,
             dir,
             installation_group,
+            server_port_base,
             identity,
             )
         installation.ensure_server_is_stopped()
         return installation
 
-    def __init__(self, posix_access, dir, installation_group, identity=None):
+    def __init__(self, posix_access, dir, installation_group, server_port_base, identity=None):
         super(LwsInstallation, self).__init__(posix_access, dir)
         self._installation_group = installation_group
-        self._server_port_base = None
+        self.server_port_base = server_port_base
         self._lws_binary_path = self.dir / LWS_BINARY_NAME
         self._log_file_base = 'lws'
         self._test_tmp_dir = self.dir / 'tmp'
@@ -63,11 +63,6 @@ class LwsInstallation(CustomPosixInstallation):
     def server_count(self):
         assert self._installed_server_count, "Call 'write_control_script' method first"
         return self._installed_server_count
-
-    @property
-    def server_port_base(self):
-        assert self._server_port_base, "Call 'write_control_script' method first"
-        return self._server_port_base
 
     @property
     def paths_to_validate(self):
@@ -99,13 +94,14 @@ class LwsInstallation(CustomPosixInstallation):
         self.dir.joinpath(LWS_CTL_NAME).ensure_file_is_missing()
         assert self.is_valid()
 
-    def write_control_script(self, server_port_base, server_count, **kw):
+    def write_control_script(self, server_count, **kw):
+        assert self.server_port_base, "'lws_port_base' is not defined for this host"
         assert not self._installed_server_count, "'write_control_script' was already called"
         contents = self._template_renderer.render(
             LWS_CTL_TEMPLATE_PATH,
             SERVER_DIR=str(self.dir),
             LOG_PATH_BASE=self._log_file_base,
-            SERVER_PORT_BASE=server_port_base,
+            SERVER_PORT_BASE=self.server_port_base,
             TEST_TMP_DIR=self._test_tmp_dir,
             SERVER_COUNT=server_count,
             **kw)
@@ -113,7 +109,6 @@ class LwsInstallation(CustomPosixInstallation):
         lws_ctl_path.write_text(contents)
         self.posix_access.run_command(['chmod', '+x', lws_ctl_path])
         self._installed_server_count = server_count
-        self._server_port_base = server_port_base
 
     def _write_server_info(self):
         server_info_text = serialize.dump(dict(

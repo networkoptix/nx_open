@@ -1,15 +1,10 @@
 import logging
 import uuid
 
-from .deb_installation import DebInstallation
-from .upstart_service import LinuxAdHocService
-from .. import serialize
-from ..method_caching import cached_property
-from ..os_access.exceptions import DoesNotExist
-from ..os_access.path import copy_file
-from ..template_renderer import TemplateRenderer
 from .custom_posix_installation import CustomPosixInstallation
 from .lightweight_mediaserver import LwsInstallation
+from ..os_access.path import copy_file
+from ..template_renderer import TemplateRenderer
 
 _logger = logging.getLogger(__name__)
 
@@ -20,7 +15,8 @@ SERVER_CONF_TEMPLATE_PATH = 'installation/mediaserver.conf.jinja2'
 
 class UnpackedMediaserverGroup(object):
 
-    def __init__(self, posix_access, installer, root_dir, base_port):
+    def __init__(self, name, posix_access, installer, root_dir, base_port, lws_port_base):
+        self.name = name
         self._posix_access = posix_access
         self._installer = installer
         self._root_dir = root_dir
@@ -29,7 +25,7 @@ class UnpackedMediaserverGroup(object):
         self._dist_dir = self._dist_root_dir / 'opt' / self._installer.customization.linux_subdir
         self._is_unpacked = False
         # we need to stop lws from previous tests even if current one does not use it
-        self.lws = LwsInstallation.create(posix_access, root_dir / 'lws', self)
+        self.lws = LwsInstallation.create(posix_access, root_dir / 'lws', self, lws_port_base)
         self._installation_list = list(self._discover_existing_installations())
         self._allocated_count = 0
         self._ensure_servers_are_stopped()
@@ -42,7 +38,7 @@ class UnpackedMediaserverGroup(object):
             dir = self._installation_dir(index)
             if not dir.exists():
                 break
-            yield CopyInstallation(self._posix_access, dir, self, index)
+            yield CopyInstallation(self._posix_access, dir, self)
             index += 1
 
     def _installation_dir(self, index):
@@ -86,7 +82,6 @@ class UnpackedMediaserverGroup(object):
                 self._posix_access,
                 self._installation_dir(index),
                 self,
-                index,
                 server_port,
                 )
             self._installation_list.append(installation)
@@ -100,10 +95,9 @@ class UnpackedMediaserverGroup(object):
 class CopyInstallation(CustomPosixInstallation):
     """Install mediaserver by copying unpacked deb contents and expanding configs and scripts"""
 
-    def __init__(self, posix_access, dir, installation_group, index, server_port=None):
+    def __init__(self, posix_access, dir, installation_group, server_port=None):
         super(CopyInstallation, self).__init__(posix_access, dir)
         self._installation_group = installation_group
-        self.index = index
         self.server_port = server_port
         self._template_renderer = TemplateRenderer()
 

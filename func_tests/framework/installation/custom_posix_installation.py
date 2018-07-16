@@ -1,7 +1,6 @@
-from ..method_caching import cached_property
-
-from .upstart_service import LinuxAdHocService
 from .deb_installation import DebInstallation
+from .upstart_service import LinuxAdHocService
+from ..method_caching import cached_property
 
 
 class CustomPosixInstallation(DebInstallation):
