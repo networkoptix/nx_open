@@ -3,6 +3,8 @@
 #include "ui_watermark_preview_dialog.h"
 
 #include <QtGui/QPainter>
+#include <QtCore/QScopedValueRollback>
+
 #include <ui/graphics/items/resource/watermark_painter.h>
 
 namespace {
@@ -35,24 +37,24 @@ bool QnWatermarkPreviewDialog::editSettings(QnWatermarkSettings& settings, QWidg
     dialog->loadDataToUi();
 
     bool result = (dialog->exec() == Accepted) && (dialog->m_settings != settings);
-    if(result)
+    if (result)
         settings = dialog->m_settings;
     return result;
 }
 
 void QnWatermarkPreviewDialog::loadDataToUi()
 {
-    m_lockUpdate = true;
+    QScopedValueRollback<bool> lock_guard(m_lockUpdate, true);
     ui->opacitySlider->setValue((int) (m_settings.opacity * ui->opacitySlider->maximum()));
     ui->frequencySlider->setValue((int) (m_settings.frequency * ui->frequencySlider->maximum()));
     drawPreview();
-    m_lockUpdate = false;
 }
 
 void QnWatermarkPreviewDialog::updateDataFromControls()
 {
     if (m_lockUpdate)
         return;
+
     m_settings.frequency = ui->frequencySlider->value() / (double) ui->frequencySlider->maximum();
     m_settings.opacity = ui->opacitySlider->value() / (double) ui->opacitySlider->maximum();
     drawPreview();

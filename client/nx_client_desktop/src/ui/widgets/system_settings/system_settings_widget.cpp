@@ -41,7 +41,11 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     });
 
     connect(ui->watermarkSettingsButton, &QPushButton::pressed, this,
-        [this] { ui::dialogs::watermark_preview::editSettings(*m_watermarkSettings, this); emit hasChangesChanged(); });
+        [this]
+        {
+            if (ui::dialogs::watermark_preview::editSettings(*m_watermarkSettings, this))
+                emit hasChangesChanged();
+        });
     // This should go before connecting to hasChangesChanged!
     connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged, this,
         [this](int state) { m_watermarkSettings->useWatermark = (state == Qt::Checked); });

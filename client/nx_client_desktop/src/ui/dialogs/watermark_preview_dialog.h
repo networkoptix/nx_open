@@ -7,15 +7,13 @@ class QPixmap;
 struct QnWatermarkSettings;
 class QnWatermarkPainter;
 
-namespace Ui {
-    class QnWatermarkPreviewDialog;
-}
+namespace Ui { class QnWatermarkPreviewDialog;}
 
-class QnWatermarkPreviewDialog : public QnButtonBoxDialog
+class QnWatermarkPreviewDialog: public QnButtonBoxDialog
 {
     Q_OBJECT
-public:
 
+public:
     QnWatermarkPreviewDialog(QWidget* parent);
     ~QnWatermarkPreviewDialog();
 

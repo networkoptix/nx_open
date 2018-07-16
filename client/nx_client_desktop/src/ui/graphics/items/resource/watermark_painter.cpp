@@ -7,12 +7,11 @@
 
 #include <ini.h>
 
-namespace
-{
-    // Pixmap is scaled on the mediawidget.
-    const QSize kWatermarkSize = QSize(1920, 1080);
-    const QColor kWatermarkColor = QColor(Qt::white);
-}
+namespace {
+// Pixmap is scaled on the mediawidget.
+const QSize kWatermarkSize = QSize(1920, 1080);
+const QColor kWatermarkColor = QColor(Qt::white);
+} // namespace
 
 QnWatermarkPainter::QnWatermarkPainter()
 {
@@ -24,7 +23,8 @@ void QnWatermarkPainter::drawWatermark(QPainter* painter, const QRectF& rect)
 {
     if (!m_settings.useWatermark)
         return;
-    if (rect.width() == 0) //< Just a double-check to avoid division byzeroem later.
+
+    if (rect.isEmpty()) //< Just a double-check to avoid division byzeroem later.
         return;
 
     // We are scaling our bitmap to the output rectangle. Probably there is better solution.
@@ -42,7 +42,7 @@ void QnWatermarkPainter::drawWatermark(QPainter* painter, const QRectF& rect)
 
 void QnWatermarkPainter::setWatermarkText(const QString& text)
 {
-    m_text = text.trimmed(); //< Whitespace is stripped, so that the text is empty or printable.
+    setWatermark(text, m_settings);
     updateWatermark();
 }
 
@@ -99,12 +99,17 @@ void QnWatermarkPainter::updateWatermark()
 
     width = m_pixmap.width() / xCount;
     int height = m_pixmap.height() / yCount;
-    for(int x = 0; x < xCount; x++)
-        for(int y = 0; y < yCount; y++)
+    for (int x = 0; x < xCount; x++)
+    {
+        for (int y = 0; y < yCount; y++)
         {
             painter.drawText((int)((x * m_pixmap.width()) / xCount),
                 (int)((y * m_pixmap.height()) / yCount),
-                width, height, Qt::AlignCenter, m_text);
+                width,
+                height,
+                Qt::AlignCenter,
+                m_text);
         }
+    }
 }
 
