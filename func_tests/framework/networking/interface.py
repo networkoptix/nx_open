@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
+from netaddr import IPNetwork
 
 
 class Networking(object):
@@ -16,10 +17,9 @@ class Networking(object):
     def setup_ip(self, mac, ip, prefix_length):
         pass
 
-    def setup_network(self, mac, ip_prefix, ip_sufix):
-        ip = ip_prefix + '.' + ip_sufix
-        mask = (ip_prefix.count('.') + 1) * 8
-        self.setup_ip(mac, ip, mask)
+    def setup_network(self, mac, network):
+        ip_network = IPNetwork(network)
+        self.setup_ip(mac, ip_network.ip, ip_network.prefixlen)
 
     @abstractmethod
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):

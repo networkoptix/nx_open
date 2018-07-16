@@ -1,5 +1,5 @@
-import traceback
 import logging
+import traceback
 
 from framework.camera import Camera
 from framework.rest_api import HttpError
@@ -72,26 +72,26 @@ class Result(object):
 
 
 class Verifier(object):
-    def __init__(self, server, id):
+    def __init__(self, server, camera_id):
         self.server = server
-        self.data = self.server.get_resource('CamerasEx', id)
-        self.camera = Camera(None, None, self.data['name'], self.data['mac'], id)
+        self.data = self.server.get_resource('CamerasEx', camera_id)
+        self.camera = Camera(None, None, self.data['name'], self.data['mac'], camera_id)
         self.errors = []
 
     def expect_values(self, expected, actual, path='camera'):
         if isinstance(expected, dict):
             self.expect_dict(expected, actual, path)
         elif isinstance(expected, list):
-            min, max = expected
-            if actual < min:
-                self.errors.append('{} is {}, expected >= {}'.format(path, repr(actual), repr(min)))
-            elif actual > max:
-                self.errors.append('{} is {}, expected <= {}'.format(path, repr(actual), repr(max)))
+            low, high = expected
+            if actual < low:
+                self.errors.append('{} is {}, expected >= {}'.format(path, repr(actual), repr(low)))
+            elif actual > high:
+                self.errors.append('{} is {}, expected <= {}'.format(path, repr(actual), repr(high)))
         elif expected != actual:
             self.errors.append('{} is {}, expected {}'.format(path, repr(actual), repr(expected)))
 
     def expect_dict(self, expected, actual, path='camera'):
-        for key, expected_value in expected.iteritems():
+        for key, expected_value in expected.items():
             if '=' in key:
                 if not isinstance(actual, list):
                     self.errors.append('{}.{} is {}, expected to be a list'.format(
