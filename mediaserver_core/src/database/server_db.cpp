@@ -1142,12 +1142,12 @@ bool QnServerDb::getBookmarksInternal(
             (SELECT group_concat(name) FROM bookmark_tags t where t.bookmark_guid = guid) as tags
         FROM bookmarks
         WHERE %1
-        ORDER BY camera_guid,
+        ORDER BY camera_guid %2,
     )");
     if (isAdditionRangeRequest)
-        queryTemplate += " end_time ";
+        queryTemplate += " end_time %2";
     else
-        queryTemplate += " start_time ";
+        queryTemplate += " start_time %2";
 
     QList<QVariant> bindings;
 
@@ -1189,7 +1189,8 @@ bool QnServerDb::getBookmarksInternal(
             "rowid in (SELECT docid FROM fts_bookmarks WHERE fts_bookmarks MATCH ?)", filter.text);
     }
 
-    QString queryStr = queryTemplate.arg(filterText);
+    QString queryStr = queryTemplate
+        .arg(filterText).arg(filter.orderBy.order == Qt::AscendingOrder ? "ASC" : "DESC");
 
     if (filter.limit != QnCameraBookmarkSearchFilter::kNoLimit)
         queryStr += lit(" LIMIT %1").arg(filter.limit);
