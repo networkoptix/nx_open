@@ -20,7 +20,7 @@ namespace ptz {
 
 namespace {
 
-static const double kEpsilon = 1.0;
+static const double kEpsilon = 5.0;
 
 struct ExtensionTestCase
 {
@@ -311,7 +311,7 @@ TEST(RelativeMoveWorkaround, relativeMoveViaContinuousMove)
         fut.wait();
         const auto realPosition = fut.get();
         ASSERT_LT(
-            (testCase.resultPosition - realPosition).lengthSquared(),
+            (testCase.resultPosition - realPosition).length(),
             kEpsilon);
     }
 }

@@ -210,7 +210,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Folder...</source>
-      <translation>Папка(и)...</translation>
+      <translation>Папка...</translation>
     </message>
     <message>
       <source>Web Client...</source>
@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>Відстань між клітинками...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,22 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1058,39 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>Виконуваний медіа файл %1 (x86)</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>Початкова камера</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -2274,42 +2327,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Немає налаштувань</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>Вторинний потік</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>Модулі вводу-виводу</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>Ідентифікатор камери</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>Аудіопотік</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>Основний потік</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL недоступний. Відкрийте потік і повторіть спробу.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL-адреса недоступна. Відкрийте відео потік і спробуйте ще раз.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>Модуль вводу-виводу не має аудіопотоку</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Камера не має вторинного потоку</translation>
     </message>
   </context>
   <context>
@@ -3694,12 +3711,39 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>Зображення може бути занадто тьмяне.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Використовуйте цей параметр для компенсації спотворень, якщо камера не встановлена точно вертикально або горизонтально.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Виберіть саме одну камеру</translation>
     </message>
   </context>
   <context>
@@ -3902,45 +3946,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Обрати файл...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>Картинки %1</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Немає картинки</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Помилка при завантаженні зображення</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Помилка при завантаженні зображення</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>Зображення неможливо прочитати</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>Картинку неможливо завантажити</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>клітинки</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Зображення завелике. Максимальний розмір - %1 Мб</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -4027,21 +4032,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>Імпортувати вибрані</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>Масштабування</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>Обертання:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>Фокус</translation>
     </message>
   </context>
   <context>
@@ -4720,7 +4710,7 @@ to %1</source>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http (s): // host: port</translation>
+      <translation>http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -4985,6 +4975,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>Встановити паролі</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -6975,17 +6972,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Вибрати папку...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Обрати файл...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
       <source>Hold to Speak</source>
@@ -8365,6 +8351,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Основний потік</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Вторинний потік</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8512,6 +8513,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>клітинки</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Немає картинки</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Помилка при завантаженні зображення</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Помилка при завантаженні зображення</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Обрати файл...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>Картинки %1</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>Зображення неможливо прочитати</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>Зображення завелике. Максимальний розмір - %1 Мб</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>Картинку неможливо завантажити</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>клітинки</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Загальні</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8520,6 +8582,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>НЕ КАМЕРА</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Вторинний потік</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>Модулі вводу-виводу</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Ідентифікатор камери</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>Аудіопотік</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Основний потік</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL недоступний. Відкрийте потік і повторіть спробу.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL-адреса недоступна. Відкрийте відео потік і спробуйте ще раз.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>Модуль вводу-виводу не має аудіопотоку</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>Камера не має вторинного потоку</translation>
     </message>
   </context>
   <context>
@@ -9118,16 +9219,16 @@ to %1</source>
       <translation>Портативні камери не можна переміщати між серверами</translation>
     </message>
     <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Увага! Ця збірка призначена тільки для тестування! Будь ласка оновіться на наступний офіційний патч або реліз після її появи.</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>Не вдалося змінити пароль</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>Не вдалося змінити пароль на %1 з %2 камер</translation>
-    </message>
-    <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Увага! Ця збірка призначена тільки для тестування! Будь ласка оновіться на наступний офіційний патч або реліз після її появи.</translation>
     </message>
   </context>
   <context>
