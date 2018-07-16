@@ -22,7 +22,7 @@ const int kKeepAliveIntervalMs = 5 * 1000;
 struct QnDesktopCameraResourceSearcher::ClientConnectionInfo
 {
     ClientConnectionInfo(
-        const const QSharedPointer<nx::network::AbstractStreamSocket>& socket,
+        const QSharedPointer<nx::network::AbstractStreamSocket>& socket,
         const QString& userName,
         const QString& uniqueId)
         :
