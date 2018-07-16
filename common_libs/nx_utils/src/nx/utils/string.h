@@ -102,7 +102,7 @@ NX_UTILS_API uint64_t stringToBytesConst(const char* str);
 NX_UTILS_API std::vector<QnByteArrayConstRef> splitQuotedString(
     const QnByteArrayConstRef& src, char separator=',');
 
-template<template<typename, typename> class Dictionary>
+template<template<typename...> class Dictionary>
 void parseNameValuePairs(
     const QnByteArrayConstRef& serializedData,
     char separator,
@@ -123,7 +123,7 @@ void parseNameValuePairs(
 /**
  * Parses string like "name1=value1,name2=value2,...".
  */
-template<template<typename, typename> class Dictionary>
+template<template<typename...> class Dictionary>
 Dictionary<QByteArray, QByteArray> parseNameValuePairs(
     const QnByteArrayConstRef& serializedData,
     char separator = ',')
@@ -139,7 +139,7 @@ Dictionary<QByteArray, QByteArray> parseNameValuePairs(
 /**
  * Serializes dictionary of (name, value) pairs into string like "name1=value1,name2=value2,...".
  */
-template<template<typename, typename> class Dictionary>
+template<template<typename...> class Dictionary>
 QByteArray serializeNameValuePairs(
     const Dictionary<QByteArray, QByteArray>& params)
 {
@@ -148,7 +148,7 @@ QByteArray serializeNameValuePairs(
     return serializedData;
 }
 
-template<template<typename, typename> class Dictionary>
+template<template<typename...> class Dictionary>
 void serializeNameValuePairs(
     const Dictionary<QByteArray, QByteArray>& params,
     QByteArray* const dstBuffer)
