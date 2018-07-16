@@ -116,6 +116,8 @@ public:
 
     // TODO: rename to getListeningPeersBySystem
     api::ListeningPeersBySystem getListeningPeers() const;
+    int listeningPeerCount() const;
+
     std::vector<ConnectionWeakRef> getAllConnections() const;
 
 private:

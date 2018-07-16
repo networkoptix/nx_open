@@ -77,6 +77,8 @@ public:
         network::stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler);
 
+    int boundClientCount() const;
+
 private:
     struct ClientBindInfo
     {

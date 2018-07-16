@@ -31,6 +31,8 @@ public:
     nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool();
     const nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool() const;
 
+    const stats::StatsManager& statisticsManager() const;
+
     void stop();
 
 private:
