@@ -20,8 +20,8 @@ def config(test_config):
         )
 
 
-def test_cameras(one_vm, one_licensed_server, config, work_dir):
-    one_licensed_server.os_access.networking.setup_network(
+def test_cameras(one_vm, one_licensed_mediaserver, config, work_dir):
+    one_licensed_mediaserver.os_access.networking.setup_network(
         one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE), config.CAMERAS_NETWORK)
 
     def save_yaml(data, file_name):
@@ -29,15 +29,15 @@ def test_cameras(one_vm, one_licensed_server, config, work_dir):
         (work_dir / (file_name + '.yaml')).write_bytes(serialized)
 
     stand = execution.Stand(
-        one_licensed_server,
+        one_licensed_mediaserver,
         yaml.load(Path(config.EXPECTED_CAMERAS_FILE).read_bytes()))
 
     try:
         stand.run_all_stages(config.CYCLE_DELAY_S)
 
     finally:
-        save_yaml(one_licensed_server.api.get('api/moduleInformation'), 'module_information')
-        save_yaml(one_licensed_server.get_resources('CamerasEx'), 'all_cameras')
+        save_yaml(one_licensed_mediaserver.api.get('api/moduleInformation'), 'module_information')
+        save_yaml(one_licensed_mediaserver.get_resources('CamerasEx'), 'all_cameras')
         save_yaml(stand.report(), 'test_report')
 
     assert stand.is_successful
