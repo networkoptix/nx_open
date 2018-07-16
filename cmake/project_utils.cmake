@@ -55,7 +55,7 @@ function(nx_add_target name type)
 
         set(needed_qm_files)
         foreach(qm_file ${qm_files})
-            foreach(lang ${defaultTranslation} ${additionalTranslations})
+            foreach(lang ${translations})
                 if(qm_file MATCHES "${lang}\\.qm$")
                     list(APPEND needed_qm_files ${qm_file})
                     break()

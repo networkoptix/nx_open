@@ -13,6 +13,7 @@
 #include <nx/kit/ini_config.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/rlimit.h>
 
 #include "test_options.h"
 
@@ -62,6 +63,8 @@ inline int runTest(
     DeinitFunctions deinitFunctions;
     if (extraInit)
         deinitFunctions = extraInit(args);
+
+    nx::utils::rlimit::setDefaultNoFile();
 
     const int result = RUN_ALL_TESTS();
     for (const auto& deinit: deinitFunctions)

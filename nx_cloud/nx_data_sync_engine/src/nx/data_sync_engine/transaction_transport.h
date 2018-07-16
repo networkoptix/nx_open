@@ -66,7 +66,7 @@ public:
         const nx::network::http::HttpHeaders& headers,
         const QnByteArrayConstRef& tranData);
 
-    void setOutgoingConnection(QSharedPointer<network::AbstractCommunicatingSocket> socket);
+    void setOutgoingConnection(std::unique_ptr<network::AbstractCommunicatingSocket> socket);
 
     void startOutgoingChannel();
 

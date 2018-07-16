@@ -70,9 +70,10 @@ static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
 size_t HttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming =
     nx::mediaserver::Settings::kDefaultHlsPlaylistPreFillChunks;
 
-HttpLiveStreamingProcessor::HttpLiveStreamingProcessor( QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner )
-:
-    QnTCPConnectionProcessor( socket, owner ),
+HttpLiveStreamingProcessor::HttpLiveStreamingProcessor(
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    :
+    QnTCPConnectionProcessor(std::move(socket), owner ),
     m_state( sReceiving ),
     m_switchToChunkedTransfer( false ),
     m_useChunkedTransfer( false ),

@@ -23,7 +23,7 @@ public:
         ConnectionLockGuard connectionLockGuard,
         const nx::vms::api::PeerData& localPeer,
         const nx::vms::api::PeerData& remotePeer,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         ConnectionType::Type connectionType,
         const nx::network::http::Request& request,
         const QByteArray& contentEncoding,

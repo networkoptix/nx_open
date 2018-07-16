@@ -99,26 +99,6 @@
       <comment>Shows that the bookmark was created by a system event</comment>
       <translation>אירוע מערכת</translation>
     </message>
-    <message>
-      <source>System already bound to cloud (id %1)</source>
-      <translation>המערכת כבר קשורה לענן (id %1)</translation>
-    </message>
-    <message>
-      <source>Server is not connected to the Internet.</source>
-      <translation>השרת אינו מחובר לאינטרנט.</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud credentials to local DB</source>
-      <translation>נכשלה שמירת אישורי ענן ל- DB המקומי</translation>
-    </message>
-    <message>
-      <source>Failed to save cloud owner to local DB</source>
-      <translation>שמירת הענן בעלים ל- DB המקומי נכשלה</translation>
-    </message>
-    <message>
-      <source>Could not connect to cloud: %1</source>
-      <translation>לא ניתן להתחבר לענן: %1</translation>
-    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -867,6 +847,169 @@
     </message>
   </context>
   <context>
+    <name>QnTimeStrings</name>
+    <message>
+      <source>ms</source>
+      <comment>Suffix for displaying milliseconds</comment>
+      <translation>ms</translation>
+    </message>
+    <message>
+      <source>s</source>
+      <comment>Suffix for displaying seconds</comment>
+      <translation>s</translation>
+    </message>
+    <message>
+      <source>m</source>
+      <comment>Suffix for displaying minutes</comment>
+      <translation>m</translation>
+    </message>
+    <message>
+      <source>h</source>
+      <comment>Suffix for displaying hours</comment>
+      <translation>h</translation>
+    </message>
+    <message>
+      <source>d</source>
+      <comment>Suffix for displaying days</comment>
+      <translation>d</translation>
+    </message>
+    <message>
+      <source>w</source>
+      <comment>Suffix for displaying weeks</comment>
+      <translation>w</translation>
+    </message>
+    <message>
+      <source>M</source>
+      <comment>Suffix for displaying months</comment>
+      <translation>M</translation>
+    </message>
+    <message>
+      <source>y</source>
+      <comment>Suffix for displaying years</comment>
+      <translation>y</translation>
+    </message>
+    <message>
+      <source>msec</source>
+      <comment>Long suffix for displaying milliseconds</comment>
+      <translation>msec</translation>
+    </message>
+    <message>
+      <source>sec</source>
+      <comment>Long suffix for displaying seconds</comment>
+      <translation>שניות</translation>
+    </message>
+    <message>
+      <source>min</source>
+      <comment>Long suffix for displaying minutes</comment>
+      <translation>דקות</translation>
+    </message>
+    <message>
+      <source>hrs</source>
+      <comment>Long suffix for displaying hours</comment>
+      <translation>שעות</translation>
+    </message>
+    <message>
+      <source>days</source>
+      <comment>Long suffix for displaying days</comment>
+      <translation>ימים</translation>
+    </message>
+    <message>
+      <source>wks</source>
+      <comment>Long suffix for displaying weeks</comment>
+      <translation>wks</translation>
+    </message>
+    <message>
+      <source>mos</source>
+      <comment>Long suffix for displaying months</comment>
+      <translation>mos</translation>
+    </message>
+    <message>
+      <source>yrs</source>
+      <comment>Long suffix for displaying years</comment>
+      <translation>yrs</translation>
+    </message>
+    <message numerus="yes">
+      <source>milliseconds</source>
+      <comment>Full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>מילי שניות</numerusform>
+        <numerusform>מילי שניות</numerusform>
+        <numerusform>מילי שניות</numerusform>
+        <numerusform>מילי שניות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>seconds</source>
+      <comment>Full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>שניות</numerusform>
+        <numerusform>שניות</numerusform>
+        <numerusform>שניות</numerusform>
+        <numerusform>שניות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>minutes</source>
+      <comment>Full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>דקות</numerusform>
+        <numerusform>דקות</numerusform>
+        <numerusform>דקות</numerusform>
+        <numerusform>דקות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>hours</source>
+      <comment>Full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>שעות</numerusform>
+        <numerusform>שעות</numerusform>
+        <numerusform>שעות</numerusform>
+        <numerusform>שעות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>days</source>
+      <comment>Full suffix for displaying days</comment>
+      <translation>
+        <numerusform>ימים</numerusform>
+        <numerusform>ימים</numerusform>
+        <numerusform>ימים</numerusform>
+        <numerusform>ימים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>weeks</source>
+      <comment>Full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>שבועות</numerusform>
+        <numerusform>שבועות</numerusform>
+        <numerusform>שבועות</numerusform>
+        <numerusform>שבועות</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>months</source>
+      <comment>Full suffix for displaying months</comment>
+      <translation>
+        <numerusform>חודשים</numerusform>
+        <numerusform>חודשים</numerusform>
+        <numerusform>חודשים</numerusform>
+        <numerusform>חודשים</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>years</source>
+      <comment>Full suffix for displaying years</comment>
+      <translation>
+        <numerusform>שנים</numerusform>
+        <numerusform>שנים</numerusform>
+        <numerusform>שנים</numerusform>
+        <numerusform>שנים</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
@@ -1020,10 +1163,6 @@
       </translation>
     </message>
     <message>
-      <source>Storage Failure</source>
-      <translation>כשל באחסון</translation>
-    </message>
-    <message>
       <source>Network Issue</source>
       <translation>בעיית רשת</translation>
     </message>
@@ -1140,10 +1279,6 @@
     <message>
       <source>Motion on %1</source>
       <translation>תנועה ב%1</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>שגיאת אחסון ב%1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -1448,8 +1583,20 @@
       <translation>%1 ב%2</translation>
     </message>
     <message>
-      <source>Open layout</source>
-      <translation>פתח את הפריסה</translation>
+      <source>Storage Issue</source>
+      <translation type="unfinished">Storage Issue</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation type="unfinished">Storage Issue at %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation type="unfinished">Set to fullscreen</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation type="unfinished">Exit fullscreen</translation>
     </message>
   </context>
   <context>

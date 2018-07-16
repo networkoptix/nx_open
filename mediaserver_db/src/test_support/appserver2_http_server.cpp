@@ -17,10 +17,10 @@ namespace ec2 {
 
 JsonConnectionProcessor::JsonConnectionProcessor(
     ProcessorHandler handler,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
     :
-    QnTCPConnectionProcessor(socket, owner),
+    QnTCPConnectionProcessor(std::move(socket), owner),
     m_handler(handler)
 {
 }
@@ -55,10 +55,10 @@ QnSimpleHttpConnectionListener::~QnSimpleHttpConnectionListener()
 }
 
 QnTCPConnectionProcessor* QnSimpleHttpConnectionListener::createRequestProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+    std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket)
 {
     return new Ec2ConnectionProcessor(
-        clientSocket,
+        std::move(clientSocket),
         m_userDataProvider,
         m_nonceProvider,
         this);

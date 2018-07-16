@@ -891,6 +891,10 @@ to view more bookmarks</source>
       <source>Cell Spacing...</source>
       <translation>Hücre aralığı...</translation>
     </message>
+    <message>
+      <source>Screen Settings...</source>
+      <translation type="unfinished">Screen Settings...</translation>
+    </message>
   </context>
   <context>
     <name>CustomHorizontalHeader</name>
@@ -983,6 +987,20 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ExitFullscreenActionHelper</name>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
@@ -1038,6 +1056,37 @@ to view more bookmarks</source>
     <message>
       <source>Executable %1 Media File (x86)</source>
       <translation>(X86) yürütülebilir %1 medya dosyası</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenActionHelper</name>
+    <message>
+      <source>Source camera</source>
+      <translation>Kaynak Kamera</translation>
+    </message>
+    <message>
+      <source>Select device...</source>
+      <translation type="unfinished">Select device...</translation>
+    </message>
+    <message>
+      <source>Select camera...</source>
+      <translation type="unfinished">Select camera...</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation type="unfinished">Select layout...</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n layouts</source>
+      <translation type="unfinished">
+        <numerusform>%n layouts</numerusform>
+        <numerusform>%n layouts</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>%1 on %2</source>
+      <comment>Camera %1 on layout %2</comment>
+      <translation type="unfinished">%1 on %2</translation>
     </message>
   </context>
   <context>
@@ -2230,42 +2279,6 @@ to view more bookmarks</source>
     <message>
       <source>No settings</source>
       <translation>Ayarlanmadı</translation>
-    </message>
-    <message>
-      <source>Secondary Stream</source>
-      <translation>İkincil akış</translation>
-    </message>
-    <message>
-      <source>I/O Module ID</source>
-      <translation>I/O Modül kimliği</translation>
-    </message>
-    <message>
-      <source>Camera ID</source>
-      <translation>Kamera ID</translation>
-    </message>
-    <message>
-      <source>Audio Stream</source>
-      <translation>Ses akışı</translation>
-    </message>
-    <message>
-      <source>Primary Stream</source>
-      <translation>Birincil akış</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open stream and try again.</source>
-      <translation>URL erişilemez. Akışı açıp tekrar deneyin.</translation>
-    </message>
-    <message>
-      <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL erişilemez. Video akışını açıp tekrar deneyin.</translation>
-    </message>
-    <message>
-      <source>I/O module has no audio stream</source>
-      <translation>I/O modül ses akışı içermiyor</translation>
-    </message>
-    <message>
-      <source>Camera has no secondary stream</source>
-      <translation>Kamera ikincil akışa sahip değil</translation>
     </message>
   </context>
   <context>
@@ -3614,12 +3627,37 @@ to %1</source>
       <source>Image might be too dim.</source>
       <translation>Görüntü çok karanlık olabilir.</translation>
     </message>
+    <message>
+      <source>Invalid input image.</source>
+      <translation type="unfinished">Invalid input image.</translation>
+    </message>
+    <message>
+      <source>Internal error.</source>
+      <translation type="unfinished">Internal error.</translation>
+    </message>
   </context>
   <context>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Kamera tam olarak dikey veya yatay olarak monte edilmediyse, bozulmayı telafi etmek için bu ayarı kullanın.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraActionWidget</name>
+    <message numerus="yes">
+      <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
+      <translation type="unfinished">
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFullscreenCameraPolicy</name>
+    <message>
+      <source>Select exactly one camera</source>
+      <translation>Yalnız Bir Kamera Seç</translation>
     </message>
   </context>
   <context>
@@ -3822,45 +3860,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnLayoutSettingsDialog</name>
-    <message>
-      <source>Select file...</source>
-      <translation>Dosya Seç...</translation>
-    </message>
-    <message>
-      <source>Pictures %1</source>
-      <translation>%1 Resimler</translation>
-    </message>
-    <message>
-      <source>No picture</source>
-      <translation>Görüntü yok</translation>
-    </message>
-    <message>
-      <source>Error while loading picture</source>
-      <translation>Resim yüklenirken hata oluştu</translation>
-    </message>
-    <message>
-      <source>Error while uploading picture</source>
-      <translation>Resim karşıya yüklenirken hata oluştu</translation>
-    </message>
-    <message>
-      <source>Picture cannot be read</source>
-      <translation>Resim okunamıyor</translation>
-    </message>
-    <message>
-      <source>Picture cannot be loaded</source>
-      <translation>Resim yüklenemiyor</translation>
-    </message>
-    <message>
-      <source>cells</source>
-      <translation>hücreler</translation>
-    </message>
-    <message>
-      <source>Picture is too big. Maximum size is %1 MB</source>
-      <translation>Resim çok büyük. Maksimum %1 MB olabilir</translation>
-    </message>
-  </context>
-  <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
@@ -3945,21 +3944,6 @@ to %1</source>
     <message>
       <source>Import Selected</source>
       <translation>Seçileni İçe Aktar</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnLensCameraAdvancedParamWidget</name>
-    <message>
-      <source>Zoom</source>
-      <translation>Yakınlaştır</translation>
-    </message>
-    <message>
-      <source>Rotation:</source>
-      <translation>Döndürme:</translation>
-    </message>
-    <message>
-      <source>Focus</source>
-      <translation>Odak</translation>
     </message>
   </context>
   <context>
@@ -4871,6 +4855,13 @@ to %1</source>
     <message>
       <source>Set Passwords</source>
       <translation>Parola Belirle</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
+    <message>
+      <source>Rotation</source>
+      <translation type="unfinished">Rotation</translation>
     </message>
   </context>
   <context>
@@ -6830,17 +6821,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnTwoStepFileDialog</name>
-    <message>
-      <source>Select folder...</source>
-      <translation>Klasör Seç...</translation>
-    </message>
-    <message>
-      <source>Select file...</source>
-      <translation>Dosya Seç...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
       <source>Hold to Speak</source>
@@ -8136,6 +8116,21 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::CameraStreamsDialog</name>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Birincil akış</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>İkincil akış</translation>
+    </message>
+    <message>
+      <source>No secondary stream</source>
+      <translation type="unfinished">No secondary stream</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::ExportProcess</name>
     <message>
       <source>Unsupported media for data export.</source>
@@ -8283,6 +8278,67 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>nx::client::desktop::LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>hücreler</translation>
+    </message>
+    <message>
+      <source>No picture</source>
+      <translation>Görüntü yok</translation>
+    </message>
+    <message>
+      <source>Error while loading picture</source>
+      <translation>Resim yüklenirken hata oluştu</translation>
+    </message>
+    <message>
+      <source>Error while uploading picture</source>
+      <translation>Resim karşıya yüklenirken hata oluştu</translation>
+    </message>
+    <message>
+      <source>Select file...</source>
+      <translation>Dosya Seç...</translation>
+    </message>
+    <message>
+      <source>Pictures %1</source>
+      <translation>%1 Resimler</translation>
+    </message>
+    <message>
+      <source>Picture cannot be read</source>
+      <translation>Resim okunamıyor</translation>
+    </message>
+    <message>
+      <source>Picture is too big. Maximum size is %1 MB</source>
+      <translation>Resim çok büyük. Maksimum %1 MB olabilir</translation>
+    </message>
+    <message>
+      <source>Picture cannot be loaded</source>
+      <translation>Resim yüklenemiyor</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>cells</source>
+      <translation>hücreler</translation>
+    </message>
+    <message>
+      <source>Custom number that can be assigned to a layout for quick identification and access</source>
+      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LayoutSettingsDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Genel</translation>
+    </message>
+    <message>
+      <source>Background</source>
+      <translation type="unfinished">Background</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
@@ -8291,6 +8347,45 @@ to %1</source>
     <message>
       <source>NOT A CAMERA</source>
       <translation>KAMERA DEĞİL</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::LegacyCameraSettingsStreamsPanel</name>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>İkincil akış</translation>
+    </message>
+    <message>
+      <source>I/O Module ID</source>
+      <translation>I/O Modül kimliği</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Kamera ID</translation>
+    </message>
+    <message>
+      <source>Audio Stream</source>
+      <translation>Ses akışı</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Birincil akış</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open stream and try again.</source>
+      <translation>URL erişilemez. Akışı açıp tekrar deneyin.</translation>
+    </message>
+    <message>
+      <source>URL is not available. Open video stream and try again.</source>
+      <translation>URL erişilemez. Video akışını açıp tekrar deneyin.</translation>
+    </message>
+    <message>
+      <source>I/O module has no audio stream</source>
+      <translation>I/O modül ses akışı içermiyor</translation>
+    </message>
+    <message>
+      <source>Camera has no secondary stream</source>
+      <translation>Kamera ikincil akışa sahip değil</translation>
     </message>
   </context>
   <context>
@@ -8873,16 +8968,16 @@ to %1</source>
       <translation>Giyilebilir Kameralar sunucular arasında taşınamaz</translation>
     </message>
     <message>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Uyarı! Bu yapı sadece test amaçlıdır! Lütfen mevcut olan bir sonraki yamaya veya sürüm sürümüne yükseltin.</translation>
+    </message>
+    <message>
       <source>Failed to change password</source>
       <translation>Parola Değiştirilemedi</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
       <translation>%2 kameradan %1'de şifre değiştirilemedi</translation>
-    </message>
-    <message>
-      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
-      <translation>Uyarı! Bu yapı sadece test amaçlıdır! Lütfen mevcut olan bir sonraki yamaya veya sürüm sürümüne yükseltin.</translation>
     </message>
   </context>
   <context>

@@ -51,7 +51,7 @@ namespace network {
 
 ProxyConnectionProcessor::ProxyConnectionProcessor(
 	::nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
-	QSharedPointer<::nx::network::AbstractStreamSocket> socket,
+	std::unique_ptr<::nx::network::AbstractStreamSocket> socket,
 	QnHttpConnectionListener* owner)
 :
 	QnTCPConnectionProcessor(new ProxyConnectionProcessorPrivate, std::move(socket), owner)
@@ -559,10 +559,10 @@ void ProxyConnectionProcessor::doRawProxy()
 
 		bool someBytesRead1 = false;
 		bool someBytesRead2 = false;
-		if (!doProxyData(d->socket.data(), d->dstSocket.get(), buffer.data(), buffer.size(), &someBytesRead1))
+		if (!doProxyData(d->socket.get(), d->dstSocket.get(), buffer.data(), buffer.size(), &someBytesRead1))
 			return;
 
-		if (!doProxyData(d->dstSocket.get(), d->socket.data(), buffer.data(), buffer.size(), &someBytesRead2))
+		if (!doProxyData(d->dstSocket.get(), d->socket.get(), buffer.data(), buffer.size(), &someBytesRead2))
 			return;
 
 		if (!someBytesRead1 && !someBytesRead2)
@@ -623,7 +623,7 @@ void ProxyConnectionProcessor::doSmartProxy()
 
 		bool someBytesRead1 = false;
 		int readed;
-		if (readSocketNonBlock(&readed, d->socket.data(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
+		if (readSocketNonBlock(&readed, d->socket.get(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
 		{
 			if (readed < 1)
 			{
@@ -646,7 +646,7 @@ void ProxyConnectionProcessor::doSmartProxy()
 		}
 
 		bool someBytesRead2 = false;
-		if (!doProxyData(d->dstSocket.get(), d->socket.data(), buffer.data(), kReadBufferSize, &someBytesRead2))
+		if (!doProxyData(d->dstSocket.get(), d->socket.get(), buffer.data(), kReadBufferSize, &someBytesRead2))
 			return;
 
 		if (!someBytesRead1 && !someBytesRead2)
