@@ -8,13 +8,14 @@ Empty result = Halt, next iteration will fallow.
 Stop iteration = Failure, last error is returned.
 """
 
+from typing import List
+
 import checks
 import stage
-
 from framework.camera import Camera
 
 # Filled by _stage decorator.
-LIST = []  # type: stage.Stage
+LIST = []  # type: List[stage.Stage]
 
 
 def _stage(is_essential=False, timeout_s=30, timeout_m=None):

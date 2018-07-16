@@ -1,10 +1,11 @@
 import logging
 import time
 
-from framework.installation.mediaserver import Mediaserver
-from framework.rest_api import HttpError
+from typing import Callable, Generator
 
 import checks
+from framework.installation.mediaserver import Mediaserver
+from framework.rest_api import HttpError
 
 _logger = logging.getLogger(__name__)
 
@@ -21,14 +22,16 @@ class Run(object):
 
 
 class Stage(object):
-    def __init__(self, name, actions, is_essential, timeout_s):  # type: (str, function, bool, int) -> None
+    def __init__(self, name, actions, is_essential, timeout_s
+                 ):  # type: (str, Callable[[Run], checks.Result], bool, int) -> None
         self.name = name
         self.is_essential = is_essential
         self.timeout_s = timeout_s
         self._actions = actions
         assert callable(actions), type(actions)
 
-    def steps(self, server, camera_id, rules):  # type: (Mediaserver, str, dict) -> generator
+    def steps(self, server, camera_id, rules
+              ):  # type: (Mediaserver, str, dict) -> Generator[checks.Result]
         run = Run(self, server, camera_id)
         actions = self._actions(run, **rules)
         while True:
@@ -50,7 +53,7 @@ class Runner(object):
         self._result = None
         self._duration = None
 
-    def steps(self, server):  # type: (Mediaserver) -> None
+    def steps(self, server):  # type: (Mediaserver) -> Generator[None]
         self._result = checks.Result('No result')
         steps = self.stage.steps(server, self.camera_id, self._rules)
         start_time_s = time.time()
@@ -80,7 +83,7 @@ class Runner(object):
             data.update(self._result.report())
         return data
 
-    def _step(self, steps):  # type: (generator) -> bool
+    def _step(self, steps):  # type: (Generator[checks.Result]) -> bool
         try:
             result = steps.next()
             if result is not None:

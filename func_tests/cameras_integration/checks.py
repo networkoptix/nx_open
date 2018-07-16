@@ -15,8 +15,8 @@ class Result(object):
     def is_successful(self):
         return not (self.errors or self.exception)
 
-    def report(self):
-        return {k: v for k, v in self.__dict__.iteritems() if v}
+    def report(self):  # type: () -> dict
+        return {k: v for k, v in self.__dict__.items() if v}
 
 
 def expect_values(expected, actual):
@@ -32,7 +32,7 @@ class Checker(object):
     def add_error(self, error, *args):
         self._errors.append(str(error).format(*[repr(a) for a in args]))
 
-    def result(self):
+    def result(self):  # type: () -> Result
         errors = self._errors
         self._errors = []
         return Result(errors)
@@ -41,18 +41,18 @@ class Checker(object):
         if isinstance(expected, dict):
             self.expect_dict(expected, actual, path)
         elif isinstance(expected, list):
-            min, max = expected
-            if actual < min:
-                self.add_error('{} is {}, expected >= {}', path, actual, min)
-            elif actual > max:
-                self.add_error('{} is {}, expected <= {}', path, actual, max)
+            low, high = expected
+            if actual < low:
+                self.add_error('{} is {}, expected >= {}', path, actual, low)
+            elif actual > high:
+                self.add_error('{} is {}, expected <= {}', path, actual, high)
         elif expected != actual:
             self.add_error('{} is {}, expected {}', path, actual, expected)
         return not self._errors
 
     def expect_dict(self, expected, actual, path='camera'):
         actual_type = type(actual).__name__
-        for key, expected_value in expected.iteritems():
+        for key, expected_value in expected.items():
             if '=' in key:
                 if not isinstance(actual, list):
                     self.add_error('{} is {}, expected to be a list', path, actual_type)
