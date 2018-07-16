@@ -64,10 +64,10 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                         upload_errors.extend(file_errors)
                         continue
 
-            # If neither case do nothing for this record
+            # No file was uploaded and there is a record means the user didn't change anything so skip
             elif not data_structure.optional and latest_value:
                 continue
-
+            # No file was uploaded and the user didn't delete an optional data structure so skip
             elif data_structure.optional and 'delete_' + data_structure_name not in request_data:
                 continue
 
@@ -98,6 +98,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             upload_errors.append((data_structure_name, "You do not have permission to edit this field"))
             continue
 
+        # If the data structure is not option and no record exists and nothing was uploaded try to use the default value
         if not data_structure.optional and not latest_value and not new_record_value:
             if data_structure.default:
                 new_record_value = data_structure.default
