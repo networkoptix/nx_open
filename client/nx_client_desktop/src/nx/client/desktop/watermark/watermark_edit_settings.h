@@ -3,12 +3,12 @@
 class QWidget;
 struct QnWatermarkSettings;
 
-namespace ui {
-namespace dialogs {
-namespace watermark_preview {
+namespace nx {
+namespace client {
+namespace desktop {
 
 /** returns true if settings were changed */
-bool editSettings(QnWatermarkSettings& settings, QWidget* parent);
+bool editWatermarkSettings(QnWatermarkSettings& settings, QWidget* parent);
 
 } // namespace watermark_preview
 } // namespace dialogs

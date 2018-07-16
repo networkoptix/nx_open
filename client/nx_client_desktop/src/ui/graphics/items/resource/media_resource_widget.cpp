@@ -59,6 +59,8 @@
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/common/painter_transform_scale_stripper.h>
+#include <nx/client/desktop/watermark/watermark_painter.h>
+
 #include <nx/client/desktop/scene/resource_widget/private/media_resource_widget_p.h>
 
 #include <ui/common/recording_status_helper.h>
@@ -72,7 +74,6 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
-#include <ui/graphics/items/resource/watermark_painter.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
@@ -277,7 +278,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     base_type(context, item, parent),
     d(new QnMediaResourceWidgetPrivate(base_type::resource())),
     m_posUtcMs(DATETIME_INVALID),
-    m_watermarkPainter(new QnWatermarkPainter),
+    m_watermarkPainter(new client::desktop::WatermarkPainter),
     m_itemId(item->uuid())
 {
     NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");

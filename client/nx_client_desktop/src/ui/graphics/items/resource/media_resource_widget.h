@@ -38,6 +38,7 @@ namespace desktop {
 
 class EntropixImageEnhancer;
 class MediaResourceWidgetPrivate;
+class WatermarkPainter;
 
 namespace ui {
 namespace graphics {
@@ -61,7 +62,6 @@ class QnIoModuleOverlayWidget;
 class QnScrollableItemsWidget;
 class QnScrollableTextItemsWidget;
 class QnGraphicsStackedWidget;
-class QnWatermarkPainter;
 class QnTwoWayAudioWidget;
 
 struct QnHtmlTextItemOptions;
@@ -406,7 +406,7 @@ private:
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
-    QScopedPointer<QnWatermarkPainter> m_watermarkPainter;
+    QScopedPointer<nx::client::desktop::WatermarkPainter> m_watermarkPainter;
 
     TriggerDataList m_triggers;
 

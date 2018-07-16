@@ -4,18 +4,22 @@
 #include <utils/common/watermark_settings.h>
 
 class QPixmap;
-struct QnWatermarkSettings;
-class QnWatermarkPainter;
 
-namespace Ui { class QnWatermarkPreviewDialog;}
+namespace nx {
+namespace client {
+namespace desktop {
 
-class QnWatermarkPreviewDialog: public QnButtonBoxDialog
+class WatermarkPainter;
+
+namespace Ui { class WatermarkPreviewDialog;}
+
+class WatermarkPreviewDialog: public QnButtonBoxDialog
 {
     Q_OBJECT
 
 public:
-    QnWatermarkPreviewDialog(QWidget* parent);
-    ~QnWatermarkPreviewDialog();
+    WatermarkPreviewDialog(QWidget* parent);
+    ~WatermarkPreviewDialog();
 
     /** returns true if settings were changed */
     static bool editSettings(QnWatermarkSettings& settings, QWidget* parent);
@@ -27,12 +31,16 @@ private:
     void drawPreview();
 
 private:
-    Q_DISABLE_COPY(QnWatermarkPreviewDialog)
+    Q_DISABLE_COPY(WatermarkPreviewDialog)
 
-    QScopedPointer<Ui::QnWatermarkPreviewDialog> ui;
+    QScopedPointer<Ui::WatermarkPreviewDialog> ui;
 
     QnWatermarkSettings m_settings;
-    QScopedPointer<QnWatermarkPainter> m_painter;
+    QScopedPointer<WatermarkPainter> m_painter;
     QScopedPointer<QPixmap> m_baseImage;
     bool m_lockUpdate = false;
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -7,19 +7,23 @@
 
 #include <ini.h>
 
+namespace nx {
+namespace client {
+namespace desktop {
+
 namespace {
 // Pixmap is scaled on the mediawidget.
 const QSize kWatermarkSize = QSize(1920, 1080);
 const QColor kWatermarkColor = QColor(Qt::white);
 } // namespace
 
-QnWatermarkPainter::QnWatermarkPainter()
+WatermarkPainter::WatermarkPainter()
 {
     m_pixmap = QPixmap(kWatermarkSize);
     updateWatermark();
 }
 
-void QnWatermarkPainter::drawWatermark(QPainter* painter, const QRectF& rect)
+void WatermarkPainter::drawWatermark(QPainter* painter, const QRectF& rect)
 {
     if (!m_settings.useWatermark)
         return;
@@ -40,26 +44,26 @@ void QnWatermarkPainter::drawWatermark(QPainter* painter, const QRectF& rect)
     //         QRectF(0, 0, (m_pixmap.height() * rect.width()) / rect.height(), m_pixmap.height()));
 }
 
-void QnWatermarkPainter::setWatermarkText(const QString& text)
+void WatermarkPainter::setWatermarkText(const QString& text)
 {
     setWatermark(text, m_settings);
     updateWatermark();
 }
 
-void QnWatermarkPainter::setWatermarkSettings(const QnWatermarkSettings& settings)
+void WatermarkPainter::setWatermarkSettings(const QnWatermarkSettings& settings)
 {
     m_settings = settings;
     updateWatermark();
 }
 
-void QnWatermarkPainter::setWatermark(const QString& text, const QnWatermarkSettings& settings)
+void WatermarkPainter::setWatermark(const QString& text, const QnWatermarkSettings& settings)
 {
     m_text = text.trimmed(); //< Whitespace is stripped, so that the text is empty or printable.
     m_settings = settings;
     updateWatermark();
 }
 
-void QnWatermarkPainter::updateWatermark()
+void WatermarkPainter::updateWatermark()
 {
     m_pixmap.fill(Qt::transparent);
 
@@ -113,3 +117,6 @@ void QnWatermarkPainter::updateWatermark()
     }
 }
 
+} // namespace desktop
+} // namespace client
+} // namespace nx
