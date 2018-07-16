@@ -111,13 +111,9 @@
                 $rootScope.session.email = email;
             }
 
-            function requireLogin(redirect?) {
+            function requireLogin() {
                 return get().catch(() => {
                     nxDialogsService.login(true);
-
-                    if (redirect) {
-                        $location.path(CONFIG.redirectUnauthorised);
-                    }
                 });
             }
 
