@@ -12,7 +12,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class AbstractEventListModel:
+class AbstractSearchListModel:
     public ScopedModelOperations<QAbstractListModel>,
     public QnWorkbenchContextAware
 {
@@ -20,8 +20,7 @@ class AbstractEventListModel:
     using base_type = ScopedModelOperations<QAbstractListModel>;
 
 public:
-    explicit AbstractEventListModel(QObject* parent = nullptr);
-    virtual ~AbstractEventListModel() override;
+    explicit AbstractSearchListModel(QObject* parent = nullptr);
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
@@ -30,6 +29,7 @@ public:
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 
     virtual bool fetchInProgress() const;
+    virtual bool cancelFetch();
 
     virtual bool isConstrained() const;
 
@@ -38,7 +38,6 @@ public:
 
     enum class FetchDirection
     {
-        none,
         earlier,
         later
     };
@@ -68,16 +67,17 @@ protected:
     virtual bool defaultAction(const QModelIndex& index);
     virtual bool activateLink(const QModelIndex& index, const QString& link);
 
+    virtual void truncateToMaximumCount();
+
     virtual void relevantTimePeriodChanged(const QnTimePeriod& previousValue);
     virtual void fetchDirectionChanged();
-    virtual void maximumCountChanged();
 
     void beginFinishFetch();
     void endFinishFetch(bool cancelled = false);
 
 private:
     QnTimePeriod m_relevantTimePeriod = QnTimePeriod::anytime();
-    FetchDirection m_fetchDirection = FetchDirection::none;
+    FetchDirection m_fetchDirection = FetchDirection::later;
     int m_maximumCount = 1000; //< Default maximum item count.
     int m_fetchBatchSize = 100; //< Default item count acquired by one fetch.
 };

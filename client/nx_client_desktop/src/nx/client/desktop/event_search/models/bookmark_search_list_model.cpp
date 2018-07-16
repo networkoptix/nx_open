@@ -9,6 +9,9 @@ BookmarkSearchListModel::BookmarkSearchListModel(QObject* parent):
     base_type([this]() { return new Private(this); }, parent),
     d(qobject_cast<Private*>(d_func()))
 {
+    // TODO: FIXME!!! REMOVE
+    setFetchBatchSize(10);
+    setMaximumCount(10);
 }
 
 QString BookmarkSearchListModel::filterText() const
@@ -18,6 +21,11 @@ QString BookmarkSearchListModel::filterText() const
 void BookmarkSearchListModel::setFilterText(const QString& value)
 {
     d->setFilterText(value);
+}
+
+void BookmarkSearchListModel::truncateToMaximumCount()
+{
+    // TODO: #vkutin Fixme!!
 }
 
 } // namespace desktop

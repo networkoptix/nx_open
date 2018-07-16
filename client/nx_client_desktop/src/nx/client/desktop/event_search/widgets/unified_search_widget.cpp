@@ -16,7 +16,7 @@
 #include <nx/client/desktop/common/utils/custom_painted.h>
 #include <nx/client/desktop/common/utils/widget_anchor.h>
 #include <nx/client/desktop/common/widgets/search_line_edit.h>
-#include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
+#include <nx/client/desktop/event_search/models/visual_search_list_model.h>
 #include <nx/client/desktop/ui/common/color_theme.h>
 
 #include <nx/utils/disconnect_helper.h>
@@ -104,13 +104,9 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     setPaletteColor(ui->filterLine, QPalette::Shadow, colorTheme()->color("dark6"));
 
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
-        this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
+        this, &UnifiedSearchWidget::requestFetch);
 
-    installEventHandler(ui->ribbon->scrollBar(), QEvent::Hide,
-        this, &UnifiedSearchWidget::fetchMoreIfNeeded, Qt::QueuedConnection);
-
-    installEventHandler(ui->ribbon, QEvent::Show,
-        this, &UnifiedSearchWidget::fetchMoreIfNeeded);
+    installEventHandler(this, QEvent::Show, this, &UnifiedSearchWidget::requestFetch);
 
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
 
@@ -190,12 +186,12 @@ UnifiedSearchWidget::~UnifiedSearchWidget()
     m_modelConnections.reset();
 }
 
-UnifiedAsyncSearchListModel* UnifiedSearchWidget::model() const
+VisualSearchListModel* UnifiedSearchWidget::model() const
 {
     return m_model;
 }
 
-void UnifiedSearchWidget::setModel(UnifiedAsyncSearchListModel* value)
+void UnifiedSearchWidget::setModel(VisualSearchListModel* value)
 {
     if (m_model == value)
         return;
@@ -403,15 +399,13 @@ void UnifiedSearchWidget::fetchMoreIfNeeded()
         return;
 
     const auto scrollBar = ui->ribbon->scrollBar();
-    if (scrollBar->isVisible() && qBetween(1, scrollBar->value(), scrollBar->maximum()))
-        return;
 
-    if (scrollBar->isHidden() || scrollBar->value() == scrollBar->maximum())
-        model()->setFetchDirection(AbstractEventListModel::FetchDirection::earlier);
-    else if (scrollBar->value() == 0)
-        model()->setFetchDirection(AbstractEventListModel::FetchDirection::later);
+    if (model()->relevantCount() == 0 || scrollBar->value() == scrollBar->maximum())
+        model()->setFetchDirection(AbstractSearchListModel::FetchDirection::earlier);
+    else if (scrollBar->value() == scrollBar->minimum())
+        model()->setFetchDirection(AbstractSearchListModel::FetchDirection::later);
     else
-        model()->setFetchDirection(AbstractEventListModel::FetchDirection::none);
+        return; //< Scroll bar is not at the beginning or the end.
 
     if (!model()->canFetchMore(QModelIndex()))
         return;

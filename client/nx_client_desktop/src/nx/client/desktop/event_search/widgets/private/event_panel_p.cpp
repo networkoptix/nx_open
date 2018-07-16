@@ -23,7 +23,7 @@
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/common/widgets/selectable_text_button.h>
-#include <nx/client/desktop/event_search/models/unified_async_search_list_model.h>
+#include <nx/client/desktop/event_search/models/visual_search_list_model.h>
 #include <nx/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/client/desktop/event_search/models/motion_search_list_model.h>
@@ -165,7 +165,7 @@ void EventPanel::Private::updateTabs()
 
 void EventPanel::Private::setupMotionSearch()
 {
-    auto model = new UnifiedAsyncSearchListModel(m_motionModel, this);
+    auto model = new VisualSearchListModel(m_motionModel, this);
     m_motionTab->setModel(model);
     m_motionTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/motion.png")));
 
@@ -188,7 +188,7 @@ void EventPanel::Private::setupBookmarkSearch()
             .arg(tr("No bookmarks"))
             .arg(tr("Select some period on timeline and click "
                 "with right mouse button on it to create a bookmark."));
-    m_bookmarksTab->setModel(new UnifiedAsyncSearchListModel(m_bookmarksModel, this));
+    m_bookmarksTab->setModel(new VisualSearchListModel(m_bookmarksModel, this));
     m_bookmarksTab->setPlaceholderTexts(tr("No bookmarks"), kHtmlPlaceholder);
     m_bookmarksTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/bookmarks.png")));
     m_bookmarksTab->showPreviewsButton()->show();
@@ -213,13 +213,12 @@ void EventPanel::Private::setupBookmarkSearch()
 
 void EventPanel::Private::setupEventSearch()
 {
-    auto model = new UnifiedAsyncSearchListModel(m_eventsModel, this);
+    auto model = new VisualSearchListModel(m_eventsModel, this);
     m_eventsTab->setModel(model);
     m_eventsTab->setPlaceholderTexts(tr("No events"), tr("No events occured"));
     m_eventsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/events.png")));
 
-    connect(m_eventsTab->filterEdit(), &SearchLineEdit::textChanged,
-        model, &UnifiedAsyncSearchListModel::setClientsideTextFilter);
+    // TODO: EVENTS TEXT FILTER
 
     auto button = m_eventsTab->typeButton();
     button->setIcon(qnSkin->icon(lit("text_buttons/event_rules.png")));
@@ -278,7 +277,7 @@ void EventPanel::Private::setupEventSearch()
 
 void EventPanel::Private::setupAnalyticsSearch()
 {
-    m_analyticsTab->setModel(new UnifiedAsyncSearchListModel(m_analyticsModel, this));
+    m_analyticsTab->setModel(new VisualSearchListModel(m_analyticsModel, this));
     m_analyticsTab->setPlaceholderTexts(tr("No objects"), tr("No objects detected"));
     m_analyticsTab->setPlaceholderIcon(qnSkin->pixmap(lit("events/placeholders/analytics.png")));
     m_analyticsTab->showPreviewsButton()->show();

@@ -5,11 +5,9 @@
 #include <core/resource/resource_fwd.h>
 #include <recording/time_period.h>
 
-#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
+#include <nx/client/desktop/event_search/models/abstract_search_list_model.h>
 #include <nx/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/vms/event/event_fwd.h>
-
-class QnSortFilterListModel;
 
 namespace nx {
 namespace client {
@@ -17,27 +15,24 @@ namespace desktop {
 
 class BusyIndicatorModel;
 
-class UnifiedAsyncSearchListModel: public ConcatenationListModel
+class VisualSearchListModel: public ConcatenationListModel
 {
     Q_OBJECT
     using base_type = ConcatenationListModel;
 
 public:
-    explicit UnifiedAsyncSearchListModel(AbstractEventListModel* sourceModel,
+    explicit VisualSearchListModel(AbstractSearchListModel* sourceModel,
         QObject* parent = nullptr);
 
-    virtual ~UnifiedAsyncSearchListModel() override;
+    virtual ~VisualSearchListModel() override;
 
     virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
     virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
 
-    QString clientsideTextFilter() const;
-    void setClientsideTextFilter(const QString& value);
-
     QnTimePeriod relevantTimePeriod() const;
     void setRelevantTimePeriod(const QnTimePeriod& value);
 
-    using FetchDirection = AbstractEventListModel::FetchDirection;
+    using FetchDirection = AbstractSearchListModel::FetchDirection;
     FetchDirection fetchDirection() const;
     void setFetchDirection(FetchDirection value);
 
@@ -46,8 +41,7 @@ public:
     int relevantCount() const;
 
 private:
-    AbstractEventListModel* const m_sourceModel = nullptr;
-    QnSortFilterListModel* const m_filterModel = nullptr;
+    AbstractSearchListModel* const m_sourceModel = nullptr;
     BusyIndicatorModel* const m_headIndicatorModel = nullptr;
     BusyIndicatorModel* const m_tailIndicatorModel = nullptr;
     int m_previousRowCount = 0;

@@ -30,11 +30,16 @@ public:
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const = 0;
 
     virtual void clear();
+    virtual bool requestFetch();
+
+    using PrefetchCompletionHandler = std::function<void(const QnTimePeriod& fetchedPeriod)>;
 
     bool canFetchMore() const;
     bool prefetch(PrefetchCompletionHandler completionHandler);
     void commit(const QnTimePeriod& periodToCommit);
     bool fetchInProgress() const;
+
+    void cancelPrefetch();
 
     QnTimePeriod fetchedTimeWindow() const;
 
@@ -46,7 +51,6 @@ protected:
 
     bool shouldSkipResponse(rest::Handle requestId) const;
     void completePrefetch(const QnTimePeriod& actuallyFetched, bool limitReached);
-    void cancelPrefetch();
 
     template<class DataContainer, class UpperBoundPredicate>
     void clipToTimePeriod(DataContainer& data,
@@ -57,12 +61,9 @@ protected:
     int lastBatchSize() const;
 
 private:
-    static QnTimePeriod infiniteFuture();
-
-private:
     AbstractAsyncSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
-    QnTimePeriod m_fetchedTimeWindow = infiniteFuture();
+    QnTimePeriod m_fetchedTimeWindow;
     rest::Handle m_currentFetchId = rest::Handle();
     PrefetchCompletionHandler m_prefetchCompletionHandler;
     FetchDirection m_prefetchDirection = FetchDirection::earlier;

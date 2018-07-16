@@ -14,6 +14,7 @@
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 
 #include <nx/utils/datetime.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 
 using std::chrono::milliseconds;
@@ -132,8 +133,6 @@ void BookmarkSearchListModel::Private::setFilterText(const QString& value)
 
 void BookmarkSearchListModel::Private::clear()
 {
-    qDebug() << "Clear bookmarks model";
-
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_guidToTimestampMs.clear();
@@ -146,15 +145,20 @@ void BookmarkSearchListModel::Private::clear()
 rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
 {
     QnCameraBookmarkSearchFilter filter;
-    filter.startTimeMs = milliseconds(period.startTimeMs);
-    filter.endTimeMs = milliseconds(period.endTimeMs());
+    filter.startTimeMs = period.startTime();
+    filter.endTimeMs = period.endTime();
     filter.text = m_filterText;
     filter.orderBy.column = Qn::BookmarkStartTime;
-    filter.orderBy.order = Qt::DescendingOrder;
+    filter.orderBy.order = q->fetchDirection() == FetchDirection::earlier
+        ? Qt::DescendingOrder
+        : Qt::AscendingOrder;
+
     filter.limit = lastBatchSize();
 
-    qDebug() << "Requesting bookmarks from" << utils::timestampToRfc2822(period.startTimeMs)
-        << "to" << utils::timestampToRfc2822(period.endTimeMs());
+    NX_VERBOSE(this) << "Requesting bookmarks from"
+        << utils::timestampToRfc2822(period.startTimeMs) << "to"
+        << utils::timestampToRfc2822(period.endTimeMs()) << "order"
+        << filter.orderBy.order;
 
     return qnCameraBookmarksManager->getBookmarksAsync({camera()}, filter,
         [this, period, guard = QPointer<QObject>(this)]
@@ -173,11 +177,11 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
 
             if (actuallyFetched.isNull())
             {
-                qDebug() << "Pre-fetched no bookmarks";
+                NX_VERBOSE(this) << "Pre-fetched no bookmarks";
             }
             else
             {
-                qDebug() << "Pre-fetched" << m_prefetch.size() << "bookmarks from"
+                NX_VERBOSE(this) << "Pre-fetched" << m_prefetch.size() << "bookmarks from"
                     << utils::timestampToRfc2822(actuallyFetched.startTimeMs) << "to"
                     << utils::timestampToRfc2822(actuallyFetched.endTimeMs());
             }
@@ -192,7 +196,7 @@ bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& period
 {
     if (!m_success)
     {
-        qDebug() << "Committing no bookmarks";
+        NX_VERBOSE(this) << "Committing no bookmarks";
         return false;
     }
 
@@ -205,7 +209,7 @@ bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& period
     const auto count = std::distance(begin, end);
     if (count > 0)
     {
-        qDebug() << "Committing" << count << "bookmarks from"
+        NX_VERBOSE(this) << "Committing" << count << "bookmarks from"
             << utils::timestampToRfc2822(((end-1)->startTimeMs).count()) << "to"
             << utils::timestampToRfc2822((begin->startTimeMs).count());
 
@@ -227,7 +231,7 @@ bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& period
     }
     else
     {
-        qDebug() << "Committing no bookmarks";
+        NX_VERBOSE(this) << "Committing no bookmarks";
     }
 
     fetchedAll = count == m_prefetch.size() && m_prefetch.size() < lastBatchSize();

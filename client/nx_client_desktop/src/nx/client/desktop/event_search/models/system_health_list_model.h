@@ -2,16 +2,16 @@
 
 #include <QtCore/QScopedPointer>
 
-#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
+#include <nx/client/desktop/event_search/models/abstract_search_list_model.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class SystemHealthListModel: public AbstractEventListModel
+class SystemHealthListModel: public AbstractSearchListModel
 {
     Q_OBJECT
-    using base_type = AbstractEventListModel;
+    using base_type = AbstractSearchListModel;
 
 public:
     explicit SystemHealthListModel(QObject* parent = nullptr);

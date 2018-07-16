@@ -9,7 +9,7 @@
 #include <nx/client/desktop/ui/actions/action.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <nx/client/desktop/common/utils/command_action.h>
-#include <nx/client/desktop/event_search/models/abstract_event_list_model.h>
+#include <nx/client/desktop/event_search/models/abstract_search_list_model.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
 
@@ -17,10 +17,10 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class EventListModel: public AbstractEventListModel
+class EventListModel: public AbstractSearchListModel
 {
     Q_OBJECT
-    using base_type = AbstractEventListModel;
+    using base_type = AbstractSearchListModel;
 
 public:
     struct EventData

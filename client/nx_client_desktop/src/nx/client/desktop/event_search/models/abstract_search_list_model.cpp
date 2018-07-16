@@ -1,4 +1,4 @@
-#include "abstract_event_list_model.h"
+#include "abstract_search_list_model.h"
 
 #include <chrono>
 
@@ -10,25 +10,21 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/synctime.h>
-#include <utils/common/delayed.h>
 
 #include <nx/utils/datetime.h>
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-AbstractEventListModel::AbstractEventListModel(QObject* parent):
+AbstractSearchListModel::AbstractSearchListModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
 }
 
-AbstractEventListModel::~AbstractEventListModel()
-{
-}
-
-QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
+QVariant AbstractSearchListModel::data(const QModelIndex& index, int role) const
 {
     if (!isValid(index))
         return QVariant();
@@ -59,7 +55,7 @@ QVariant AbstractEventListModel::data(const QModelIndex& index, int role) const
     }
 }
 
-bool AbstractEventListModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool AbstractSearchListModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     switch (role)
     {
@@ -74,32 +70,37 @@ bool AbstractEventListModel::setData(const QModelIndex& index, const QVariant& v
     }
 }
 
-bool AbstractEventListModel::canFetchMore(const QModelIndex& /*parent*/) const
+bool AbstractSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
 {
     return false;
 }
 
-void AbstractEventListModel::fetchMore(const QModelIndex& /*parent*/)
+void AbstractSearchListModel::fetchMore(const QModelIndex& /*parent*/)
 {
 }
 
-bool AbstractEventListModel::fetchInProgress() const
+bool AbstractSearchListModel::fetchInProgress() const
 {
     return false;
 }
 
-bool AbstractEventListModel::isConstrained() const
+bool AbstractSearchListModel::cancelFetch()
+{
+    return false;
+}
+
+bool AbstractSearchListModel::isConstrained() const
 {
     return m_relevantTimePeriod != QnTimePeriod::anytime();
 }
 
-bool AbstractEventListModel::isValid(const QModelIndex& index) const
+bool AbstractSearchListModel::isValid(const QModelIndex& index) const
 {
     return index.model() == this && !index.parent().isValid() && index.column() == 0
         && index.row() >= 0 && index.row() < rowCount();
 }
 
-QString AbstractEventListModel::timestampText(qint64 timestampUs) const
+QString AbstractSearchListModel::timestampText(qint64 timestampUs) const
 {
     if (timestampUs <= 0)
         return QString();
@@ -113,7 +114,7 @@ QString AbstractEventListModel::timestampText(qint64 timestampUs) const
         return datetime::toString(dateTime.time());
 }
 
-bool AbstractEventListModel::defaultAction(const QModelIndex& index)
+bool AbstractSearchListModel::defaultAction(const QModelIndex& index)
 {
     if (!isValid(index) || index.model() != this)
         return false;
@@ -140,17 +141,17 @@ bool AbstractEventListModel::defaultAction(const QModelIndex& index)
     return true;
 }
 
-bool AbstractEventListModel::activateLink(const QModelIndex& index, const QString& /*link*/)
+bool AbstractSearchListModel::activateLink(const QModelIndex& index, const QString& /*link*/)
 {
     return defaultAction(index);
 }
 
-const QnTimePeriod& AbstractEventListModel::relevantTimePeriod() const
+const QnTimePeriod& AbstractSearchListModel::relevantTimePeriod() const
 {
     return m_relevantTimePeriod;
 }
 
-void AbstractEventListModel::setRelevantTimePeriod(const QnTimePeriod& value)
+void AbstractSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
 {
     if (value == m_relevantTimePeriod)
         return;
@@ -158,70 +159,83 @@ void AbstractEventListModel::setRelevantTimePeriod(const QnTimePeriod& value)
     const auto previousValue = m_relevantTimePeriod;
     m_relevantTimePeriod = value;
 
+    NX_VERBOSE(this) << "Relevant time period changed\n"
+        << "--- Old was from"
+        << utils::timestampToRfc2822(previousValue.startTimeMs) << "to"
+        << utils::timestampToRfc2822(previousValue.endTimeMs())
+        << "\n--- New is from"
+        << utils::timestampToRfc2822(m_relevantTimePeriod.startTimeMs) << "to"
+        << utils::timestampToRfc2822(m_relevantTimePeriod.endTimeMs());
+
     relevantTimePeriodChanged(previousValue);
 }
 
-AbstractEventListModel::FetchDirection AbstractEventListModel::fetchDirection() const
+AbstractSearchListModel::FetchDirection AbstractSearchListModel::fetchDirection() const
 {
     return m_fetchDirection;
 }
 
-void AbstractEventListModel::setFetchDirection(FetchDirection value)
+void AbstractSearchListModel::setFetchDirection(FetchDirection value)
 {
     if (m_fetchDirection == value)
         return;
+
+    NX_VERBOSE(this) << "New fetch direction:" << value;
 
     m_fetchDirection = value;
     fetchDirectionChanged();
 }
 
-int AbstractEventListModel::maximumCount() const
+int AbstractSearchListModel::maximumCount() const
 {
     return m_maximumCount;
 }
 
-void AbstractEventListModel::setMaximumCount(int value)
+void AbstractSearchListModel::setMaximumCount(int value)
 {
     if (m_maximumCount == value)
         return;
 
+    const bool mayNeedToTruncate = value < m_maximumCount;
     m_maximumCount = value;
-    maximumCountChanged();
+
+    if (mayNeedToTruncate)
+        truncateToMaximumCount();
 }
 
-void AbstractEventListModel::maximumCountChanged()
+void AbstractSearchListModel::truncateToMaximumCount()
 {
 }
 
-int AbstractEventListModel::fetchBatchSize() const
+int AbstractSearchListModel::fetchBatchSize() const
 {
     return m_fetchBatchSize;
 }
 
-void AbstractEventListModel::setFetchBatchSize(int value)
+void AbstractSearchListModel::setFetchBatchSize(int value)
 {
     m_fetchBatchSize = value;
 }
 
-QnTimePeriod AbstractEventListModel::fetchedTimeWindow() const
+QnTimePeriod AbstractSearchListModel::fetchedTimeWindow() const
 {
-    return QnTimePeriod();
+    return {};
 }
 
-void AbstractEventListModel::relevantTimePeriodChanged(const QnTimePeriod& /*previousValue*/)
-{
-}
-
-void AbstractEventListModel::fetchDirectionChanged()
+void AbstractSearchListModel::relevantTimePeriodChanged(const QnTimePeriod& /*previousValue*/)
 {
 }
 
-void AbstractEventListModel::beginFinishFetch()
+void AbstractSearchListModel::fetchDirectionChanged()
+{
+}
+
+void AbstractSearchListModel::beginFinishFetch()
 {
     emit fetchAboutToBeFinished(QPrivateSignal());
 }
 
-void AbstractEventListModel::endFinishFetch(bool cancelled)
+void AbstractSearchListModel::endFinishFetch(bool cancelled)
 {
     emit fetchFinished(cancelled, QPrivateSignal());
 }
