@@ -28,6 +28,9 @@ public:
     void setProxyModel(QSortFilterProxyModel* proxy);
 
 private:
+    using base_type::setModel;
+
+private:
     struct Private;
     const QScopedPointer<Private> d;
 };

@@ -126,7 +126,7 @@ NodePtr createNode(
     const QString& caption,
     int siblingGroup)
 {
-    return createNode(caption, NodeList(), siblingGroup)
+    return createNode(caption, NodeList(), siblingGroup);
 }
 
 NodePtr createSeparatorNode(int siblingGroup)

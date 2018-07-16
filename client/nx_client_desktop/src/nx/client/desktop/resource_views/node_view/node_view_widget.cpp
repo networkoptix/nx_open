@@ -13,6 +13,8 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
+#include <nx/client/desktop/resource_views/node_view/detail/node_view_helpers.h>
+
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 
@@ -37,9 +39,9 @@ NodeViewWidget::Private::Private(NodeViewWidget* owner):
     owner(owner),
     model(&store),
     checkableCheck(
-        [this](const QModelIndex& index) -> bool
+        [owner](const QModelIndex& index) -> bool
         {
-            const auto mappedIndex = proxy ? proxy->mapToSource(index) : index;
+            const auto mappedIndex = detail::getSourceIndex(index, owner->model());
             const auto node = NodeViewModel::nodeFromIndex(mappedIndex);
             return node ? node->checkable() : false;
         })
@@ -95,7 +97,6 @@ void NodeViewWidget::setProxyModel(QSortFilterProxyModel* proxy)
 {
     proxy->setSourceModel(&d->model);
     setModel(proxy);
-    d->proxy = proxy;
 }
 
 } // namespace desktop

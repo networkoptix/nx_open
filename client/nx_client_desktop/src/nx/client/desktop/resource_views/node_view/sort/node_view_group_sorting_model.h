@@ -1,14 +1,14 @@
 #pragma once
 
-#include <QtCore/QSortFilterProxyModel>
+#include <nx/client/desktop/resource_views/node_view/sort/node_view_base_sort_model.h>
 
 namespace nx {
 namespace client {
 namespace desktop {
 
-class NodeViewGroupSortingModel: public QSortFilterProxyModel
+class NodeViewGroupSortingModel: public NodeViewBaseSortModel
 {
-    using base_type = QSortFilterProxyModel;
+    using base_type = NodeViewBaseSortModel;
 
 public:
     NodeViewGroupSortingModel(QObject* parent = nullptr);

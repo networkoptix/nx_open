@@ -9,7 +9,7 @@
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_group_sorting_model.h>
+#include <nx/client/desktop/resource_views/node_view/sort/node_view_group_sorting_model.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/layout/accessible_layout_sort_model.h>
 
@@ -133,10 +133,10 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     //tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
 
     tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
-        createNode(lit("zero"), 1),
-        createNode(lit("first"), { createNode(lit("1_1")) }, 2),
-        createSeparatorNode(3),
-        createNode(lit("second"), 4)
+        createNode(lit("zero")),
+        createNode(lit("first"), { createNode(lit("1_1")) }),
+        createSeparatorNode(1),
+        createNode(lit("second"), 2)
     })));
 
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(
