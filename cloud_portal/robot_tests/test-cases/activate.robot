@@ -127,5 +127,5 @@ Logging in before activation shows resend email link and email can be sent again
     Log In    ${random email}    ${BASE PASSWORD}
     Wait Until Element Is Visible    ${RESEND ACTIVATION LINK BUTTON}
     Validate Register Email Received    ${random email}
-    Click Link    ${RESEND ACTIVATION LINK BUTTON}
+    Click Button    ${RESEND ACTIVATION LINK BUTTON}
     Validate Register Email Received    ${random email}
