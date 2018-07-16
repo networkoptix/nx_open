@@ -54,6 +54,16 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             latest_value = records.latest('id').value
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
+        # TODO: Refactor image/file logic - CLOUD-1524
+        """
+            Currently if the data structure is optional you can remove the value.
+            
+            Planned change is to make it to where you can "delete" the value and if its not optional then fallback
+            to the default value.
+            
+            This will create a new record making images/files behave like the other data structure types
+            Places to touch are here, cms/forms.py, and cms/templates/context_editor.html
+        """
         if data_structure.type == DataStructure.DATA_TYPES.image\
                 or data_structure.type == DataStructure.DATA_TYPES.file:
             # If a file has been uploaded try to save it
