@@ -198,6 +198,7 @@
 #include <rest/handlers/multiserver_get_hardware_ids_rest_handler.h>
 #include <rest/handlers/wearable_camera_rest_handler.h>
 #include <rest/handlers/set_primary_time_server_rest_handler.h>
+#include <rest/handlers/update_information_rest_handler2.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -2067,8 +2068,8 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("api/getEvents", new QnEventLog2RestHandler(), kViewLogs); //< new version
 
-	// TODO: add API doc tool comments here
-	reg("ec2/getEvents", new QnMultiserverEventsRestHandler(lit("ec2/getEvents")), kViewLogs);
+    // TODO: add API doc tool comments here
+    reg("ec2/getEvents", new QnMultiserverEventsRestHandler(lit("ec2/getEvents")), kViewLogs);
 
     /**%apidoc GET /api/showLog
      * Return tail of the server log file
@@ -2537,6 +2538,7 @@ void MediaServerProcess::registerRestHandlers(
      *     in the system, in the specified format.
      */
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
+    reg("api/updateInformation", new nx::UpdateInformationRestHandler());
 
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
