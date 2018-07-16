@@ -425,33 +425,6 @@ select {
 // New styling or retrofitting missing styles
 ///////////////////////
 
-.dropdown-menu {
-    box-shadow                 : 0 16px 32px 0 transparentize($dark15, 0.4);
-    position                   : absolute !important;
-    background-color           : $light4;
-    border-top                 : 1px solid $light6;
-    border-radius              : 0;
-    border-bottom-left-radius  : 2px;
-    border-bottom-right-radius : 2px;
-    width                      : 100%;
-    padding                    : 4px 0;
-
-    li > a {
-        padding         : 0 12px;
-        display         : flex;
-        text-decoration : none;
-        color           : $dark9;
-        line-height     : 26px;
-        align-items     : center;
-        width: 100%;
-
-        &:hover {
-            color            : $light1;
-            background-color : $light16;
-        }
-    }
-}
-
 .input-group {
     &.has-addon {
         input {

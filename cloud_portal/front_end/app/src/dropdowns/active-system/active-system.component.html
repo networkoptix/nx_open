@@ -9,11 +9,11 @@
     <ul ngbDropdownMenu aria-labelledby="activeSystemDropdown">
         <div class="popup arrow up"></div>
 
-        <li *ngIf="activeSystem" [ngClass]="{ 'active' :active.settings}">
-            <a [href]="'/systems/' + activeSystem.id" translate>Settings</a>
+        <li *ngIf="activeSystem">
+            <a class="dropdown-item" [ngClass]="{ 'active': active.settings}" [href]="'/systems/' + activeSystem.id" translate>Settings</a>
         </li>
-        <li *ngIf="activeSystem" [ngClass]="{ 'active' :active.view }">
-            <a [href]="'/systems/' + activeSystem.id + '/view'" translate>View</a>
+        <li *ngIf="activeSystem">
+            <a class="dropdown-item" [ngClass]="{ 'active': active.view }" [href]="'/systems/' + activeSystem.id + '/view'" translate>View</a>
         </li>
     </ul>
 </div>

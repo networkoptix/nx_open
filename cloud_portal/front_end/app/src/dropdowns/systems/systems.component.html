@@ -15,15 +15,16 @@
     <ul ngbDropdownMenu aria-labelledby="systemsDropdown">
         <div class="popup arrow up"></div>
 
-        <li *ngIf="activeSystem" class="active">
-            <a [href]>
+        <li *ngIf="activeSystem">
+            <a class="dropdown-item active" [href]>
                 <span class="glyphicon glyphicon-home"></span>
                 <span class="system-name">{{activeSystem.name}}</span>
+                <span class="system-owner">&nbsp;&mdash;&nbsp;{{activeSystem.ownerFullName}}</span>
             </a>
         </li>
 
         <li *ngFor="let system of systems | slice:0:config.maxSystemsForHeader; trackBy: trackByFn;">
-            <a *ngIf="system !== activeSystem" [href]="getUrlFor(system.id)">
+            <a class="dropdown-item" *ngIf="system !== activeSystem" [href]="getUrlFor(system.id)">
                 <span class="glyphicon glyphicon-home"></span>
                 <span class="system-name">{{system.name}}</span>
                 <span class="system-owner">&nbsp;&mdash;&nbsp;{{system.ownerFullName}}</span>
@@ -31,7 +32,7 @@
         </li>
         <li role="separator" class="dropdown-divider"></li>
         <li>
-            <a [href]="'/systems'" translate>All Systems</a>
+            <a class="dropdown-item" [href]="'/systems'" translate>All Systems</a>
         </li>
     </ul>
 </div>

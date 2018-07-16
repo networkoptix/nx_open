@@ -2,12 +2,10 @@ nx-language-select {
     width: 100%;
 
     .dropdown-menu {
-        background-color: #FFF;
-        border-radius: 2px;
-        width: auto;
+        position: absolute !important;
 
-        & li > a:hover {
-            background-color : transparent;
+        .dropdown-item {
+            cursor : pointer;
         }
     }
 }

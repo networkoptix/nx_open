@@ -11,11 +11,12 @@
         </div>
     </button>
 
-    <div ngbDropdownMenu aria-labelledby="genericSelect">
-        <button class="dropdown-item"
-                *ngFor="let item of items"
-                (click)="change(item)">
-            <span>{{item[label]}}</span>
-        </button>
-    </div>
+    <ul ngbDropdownMenu aria-labelledby="genericSelect">
+        <li *ngFor="let item of items">
+
+            <a class="dropdown-item" (click)="change(item)">
+                <span>{{item[label]}}</span>
+            </a>
+        </li>
+    </ul>
 </div>

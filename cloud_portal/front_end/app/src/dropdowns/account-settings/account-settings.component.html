@@ -14,11 +14,11 @@
     <ul ngbDropdownMenu aria-labelledby="accountSettingsSelect">
         <div class="popup arrow up"></div>
 
-        <li><a [href]="'/account/'" translate>Account Settings</a></li>
-        <li><a [href]="'/account/password/'" translate>Change Password</a></li>
-        <li><a href (click)="logout()" translate>Log Out</a></li>
+        <li><a class="dropdown-item" [href]="'/account/'" translate>Account Settings</a></li>
+        <li><a class="dropdown-item" [href]="'/account/password/'" translate>Change Password</a></li>
+        <li><a class="dropdown-item" href (click)="logout()" translate>Log Out</a></li>
 
         <li class="dropdown-divider" role="separator" *ngIf="settings.is_staff"></li>
-        <li><a [href]="'/admin/'" target="_blank" *ngIf="settings.is_staff" translate>Portal management</a></li>
+        <li><a class="dropdown-item" [href]="'/admin/'" target="_blank" *ngIf="settings.is_staff" translate>Portal management</a></li>
     </ul>
 </div>
