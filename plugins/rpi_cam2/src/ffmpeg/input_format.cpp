@@ -125,15 +125,15 @@ void InputFormat::calculateGopSize(const AVPacket * packet)
     if (m_gopSize)
         return;
 
-    bool keyFrame = packet->flags & AV_PKT_FLAG_KEY;
+    bool keyPacket = packet->flags & AV_PKT_FLAG_KEY;
     if (m_gopSearch)
     {
-        if (keyFrame)
+        if (keyPacket)
             m_gopSize = m_gopSearch;
         else
             ++m_gopSearch;
     }
-    else if (keyFrame)
+    else if (keyPacket)
     {
         m_gopSearch = 1;
     }

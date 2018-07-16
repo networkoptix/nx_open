@@ -64,7 +64,7 @@ private:
     std::shared_ptr<ffmpeg::Frame> newScaledFrame(int * ffmpegErrorCode);
     int scale(AVFrame* frame, AVFrame * outFrame);
     int encode(const ffmpeg::Frame * frame, ffmpeg::Packet * outPacket);
-    int decode (AVFrame * outFrame, const AVPacket * packet);
+    int decode (AVFrame * outFrame, const AVPacket * packet, int * gotFrame);
 
     virtual void interrupt() override;
 

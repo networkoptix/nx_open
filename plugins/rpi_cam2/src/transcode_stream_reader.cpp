@@ -34,16 +34,6 @@ AVPixelFormat suggestPixelFormat(const std::shared_ptr<ffmpeg::Codec>& encoder)
         : ffmpeg::utils::suggestPixelFormat(encoder->codecID());
 }
 
-int frameDropCount = 0;
-
-void write(ffmpeg::Packet * packet)
-{
-    FILE * file;
-    file = fopen("/home/pi/test.h264", "ab");
-    fwrite(packet->data(), sizeof(packet->data()), packet->size(), file);
-    fclose(file);
-}
-
 bool startTimer = true;
 utils::TimeProfiler getNextDataTimer;
 
@@ -64,7 +54,6 @@ TranscodeStreamReader::TranscodeStreamReader(
         ffmpegStreamReader),
         m_state(kOff)
 {
-    //start();
 }
 
 TranscodeStreamReader::~TranscodeStreamReader()
@@ -77,7 +66,7 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
 
-    getNextDataTimer.stop();
+    //getNextDataTimer.stop();
     //debug("stop: %d\n", getNextDataTimer.stopTime);
     //if(getNextDataTimer.countMsec() > 500)
         //debug("time between calls: %d ms\n", getNextDataTimer.countMsec());
@@ -164,6 +153,15 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         return nxcip::NX_OTHER_ERROR;
     }
 
+    // int64_t nxTimeStamp;
+    // {
+    //     std::lock_guard<std::mutex> lock(m_timeStampMutex);
+    //     //m_timeStamps.insert(packet->pts(), packet->timeStamp());
+    //     m_timeStamps.remote
+    // }
+
+
+
     *lpPacket = toNxPacket(
         encodePacket.packet(),
         encodePacket.codecID(),
@@ -171,7 +169,7 @@ int TranscodeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         ).release();
 #endif
 
-    getNextDataTimer.start();
+    //getNextDataTimer.start();
     //debug("start: %d\n", getNextDataTimer.startTime);
 
     return nxcip::NX_NO_ERROR;
@@ -234,35 +232,32 @@ void TranscodeStreamReader::run()
         int gopSize = m_ffmpegStreamReader->gopSize();
         if(gopSize && gopSize < m_consumer->size())
         {
-            debug("about to drop\n");
             int dropped = m_consumer->dropOldNonKeyPackets();
-            debug("Dropped %d packets\n", dropped); 
+            debug("secondary stream dropping %d packets\n", dropped);
         }
 
         bool shouldScale = true;
         std::shared_ptr<ffmpeg::Packet> packet;
         int frameDropAmount = m_ffmpegStreamReader->fps() / m_codecContext.fps();
-        for(;frameDropCount < frameDropAmount; ++frameDropCount)
+        for(int i = 0; i < frameDropAmount; ++i)
         {
+            int gotFrame = 0;
             packet = nextPacket();
-            m_decodedFrame->setTimeStamp(packet->timeStamp());
             m_decodedFrame->unreference();
-            int decodeCode = decode(m_decodedFrame->frame(), packet->packet());
-            if(decodeCode < 0)
+            m_decodedFrame->setTimeStamp(packet->timeStamp());
+            int decodeCode = decode(m_decodedFrame->frame(), packet->packet(), &gotFrame);
+            if(decodeCode < 0 || !gotFrame)
             {
-                debug("decode error: %s\n", ffmpeg::error::toString(decodeCode).c_str());
-                if (frameDropCount - 1 < frameDropAmount)
-                {
+                if(decodeCode < 0)
+                    debug("decode error: %s\n", ffmpeg::error::toString(decodeCode).c_str());
+
+                if (i < frameDropAmount - 1)
                     continue;
-                }
-                else
-                {
-                    m_lastFfmpegError = decodeCode;
-                    shouldScale = false;
-                }
+
+                m_lastFfmpegError = decodeCode;
+                shouldScale = false;
             }
         }
-        frameDropCount = 0;
 
         if(!shouldScale)
             continue;
@@ -284,11 +279,9 @@ void TranscodeStreamReader::run()
             continue;
         }
 
-        scaledFrame->frame()->pts = packet->packet()->pts;
-
-        if(m_scaledFrames.size() > frameDropAmount - 1)
+        if(m_scaledFrames.size() > 0)
         {
-            debug("dropping %d frames\n", m_scaledFrames.size());
+            //debug("dropping %d frames\n", m_scaledFrames.size());
             m_scaledFrames.clear();
         }
 
@@ -373,7 +366,7 @@ int TranscodeStreamReader::encode(const ffmpeg::Frame * frame, ffmpeg::Packet * 
     int encodeCode = 0;
     int gotPacket = 0;
     while(!gotPacket)
-    {
+    {   
         encodeCode = m_encoder->encode(outPacket->packet(), frame->frame(), &gotPacket);
         if (encodeCode < 0)
             return encodeCode;
@@ -384,13 +377,28 @@ int TranscodeStreamReader::encode(const ffmpeg::Frame * frame, ffmpeg::Packet * 
     return encodeCode;
 }
 
-int TranscodeStreamReader::decode(AVFrame * outFrame, const AVPacket* packet)
+int TranscodeStreamReader::decode(AVFrame * outFrame, const AVPacket* packet, int * gotFrame)
 {
-    int decodeCode = 0;
-    int gotFrame = 0;
-    while(decodeCode >= 0 && !gotFrame)
-        decodeCode = m_decoder->decode(outFrame, &gotFrame, packet);
-    return decodeCode;
+    AVPacket pkt;
+    av_init_packet(&pkt);
+    pkt.data = packet->data;
+    pkt.size = packet->size;
+
+    int decodeSize = 0;
+    while (!(*gotFrame))
+    {
+        decodeSize = m_decoder->decode(outFrame, gotFrame, &pkt);
+        if (decodeSize > 0 && !(*gotFrame))
+        {
+            pkt.data += decodeSize;
+            pkt.size -= decodeSize;
+            if (pkt.size == 0)
+                break;
+        }
+        else if (decodeSize <= 0)
+            break;
+    }
+    return decodeSize;
 }
 
 void TranscodeStreamReader::interrupt()

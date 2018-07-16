@@ -41,6 +41,11 @@ int Packet::flags() const
     return m_packet->flags;
 }
 
+int64_t Packet::pts() const
+{
+    return m_packet->pts;
+}
+
 AVPacket * Packet::packet() const
 {
     return m_packet;
@@ -82,7 +87,7 @@ void Packet::setTimeStamp(uint64_t millis)
     m_timeStamp = millis;
 }
 
-bool Packet::keyFrame() const
+bool Packet::keyPacket() const
 {
     return m_packet->flags & AV_PKT_FLAG_KEY;
 }

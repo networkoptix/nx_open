@@ -20,6 +20,7 @@ public:
     int size() const;
     uint8_t * data() const;
     int flags() const;
+    int64_t pts() const;
     AVPacket * packet() const;
 
     void setBuffer(uint8_t * data, int size, bool avMalloced);
@@ -34,7 +35,7 @@ public:
     uint64_t timeStamp() const;
     void setTimeStamp(uint64_t millis);
 
-    bool keyFrame() const;
+    bool keyPacket() const;
 
 private:
     AVPacket* m_packet;

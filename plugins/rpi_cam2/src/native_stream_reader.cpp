@@ -46,8 +46,6 @@ namespace
             }
         }
     }
-
-    bool initialized = false;
 }
 
 NativeStreamReader::NativeStreamReader(
@@ -62,7 +60,8 @@ NativeStreamReader::NativeStreamReader(
         timeProvider,
         cameraInfo,
         codecContext,
-        ffmpegStreamReader)
+        ffmpegStreamReader),
+        m_initialized(false)
 {
 }
 
@@ -76,10 +75,17 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
     logError(this);
 
-    if (!initialized)
+    if (!m_initialized)
     {
         m_ffmpegStreamReader->addConsumer(m_consumer);
-        initialized = true;
+        m_initialized = true;
+    }
+
+    int gopSize = m_ffmpegStreamReader->gopSize();
+    if (gopSize && gopSize < m_consumer->size())
+    {
+        int dropCount = m_consumer->dropOldNonKeyPackets();
+        debug("native stream dropping %d packets\n", dropCount);
     }
 
     std::shared_ptr<ffmpeg::Packet> packet;

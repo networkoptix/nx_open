@@ -19,6 +19,7 @@ public:
     virtual void givePacket(const std::shared_ptr<Packet>& packet) override;
     std::shared_ptr<Packet> popFront();
     std::shared_ptr<Packet> peekFront() const;
+    std::shared_ptr<Packet> peekBack() const;
     void clear();
 
     int dropOldNonKeyPackets();
@@ -26,6 +27,7 @@ public:
 private:
     mutable std::mutex m_mutex;
     std::deque<std::shared_ptr<Packet>> m_vector;
+    bool m_ignoreNonKeyPackets;
 };
 
 } //namespace ffmpeg
