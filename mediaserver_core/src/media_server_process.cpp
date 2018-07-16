@@ -4326,9 +4326,7 @@ int MediaServerProcess::main(int argc, char* argv[])
 {
     redirectStdoutAndStderrIfNeeded(argc, argv);
 
-#ifdef Q_OS_LINUX
     nx::utils::rlimit::setDefaultNoFile();
-#endif
 
 #if 0
 #if defined(__GNUC__)
