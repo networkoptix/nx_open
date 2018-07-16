@@ -130,8 +130,8 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     sync("any/detection_plugin_interface")
 
-    if box in ("rpi", "bpi", "bananapi", "edge1"):
-        sync("linux-arm/openssl")
+    if box in ("rpi", "bpi", "bananapi", "edge1", "tx1"):
+        sync("linux-%s/openssl" % arch)
     else:
         sync("openssl")
 
