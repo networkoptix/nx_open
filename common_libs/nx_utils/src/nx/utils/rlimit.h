@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef Q_OS_LINUX
+
 namespace nx {
 namespace utils {
 namespace rlimit {
@@ -16,3 +18,5 @@ void setDefaultNoFile()
 } // namespace rlimit
 } // namespace utils
 } // namespace nx
+
+#endif
