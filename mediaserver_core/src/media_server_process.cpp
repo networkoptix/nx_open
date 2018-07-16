@@ -215,6 +215,7 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/rlimit.h>
 #include <utils/common/app_info.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
@@ -4324,6 +4325,8 @@ static void redirectStdoutAndStderrIfNeeded(int argc, char* argv[])
 int MediaServerProcess::main(int argc, char* argv[])
 {
     redirectStdoutAndStderrIfNeeded(argc, argv);
+
+    nx::utils::rlimit::setDefaultNoFile();
 
 #if 0
 #if defined(__GNUC__)

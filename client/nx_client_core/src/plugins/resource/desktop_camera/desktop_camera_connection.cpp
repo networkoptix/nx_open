@@ -258,8 +258,6 @@ void QnDesktopCameraConnection::pleaseStop()
             processor->pleaseStop();
         if (httpClient)
             httpClient->pleaseStop();
-        if (tcpSocket)
-            tcpSocket->shutdown();
     }
 
     base_type::pleaseStop();
@@ -277,7 +275,6 @@ void QnDesktopCameraConnection::run()
                 : std::shared_ptr<QnDesktopCameraConnectionProcessor>();
 
             QnMutexLocker lock(&m_mutex);
-            std::swap(tcpSocket, newSocket);
             std::swap(httpClient, newClient);
             std::swap(processor, newProcessor);
         };
@@ -318,9 +315,10 @@ void QnDesktopCameraConnection::run()
 
         QElapsedTimer timeout;
         timeout.start();
-        while (!m_needStop && tcpSocket->isConnected())
+        while (!m_needStop && processor->isConnected())
         {
-            if (processor->readRequest()) {
+            if (processor->readRequest())
+            {
                 processor->parseRequest();
                 processor->processRequest();
                 timeout.restart();

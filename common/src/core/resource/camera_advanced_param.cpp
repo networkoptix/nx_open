@@ -209,21 +209,22 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
 
 bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value)
 {
-	switch (value) {
-	case DataType::Bool:
-	case DataType::Number:
-	case DataType::Enumeration:
-	case DataType::String:
-    // It is weird, but right now hanwha plugin can not properly
-    // provide any value for those controls.
-    case DataType::SliderControl:
-    case DataType::PtrControl:
-		return true;
-	case DataType::Button:
-    case DataType::Separator:
-        return false;
-    default:
-        return false;
+    switch (value)
+    {
+        case DataType::Bool:
+        case DataType::Number:
+        case DataType::Enumeration:
+        case DataType::String:
+        // It is weird, but right now hanwha plugin can not properly
+        // provide any value for those controls.
+        case DataType::SliderControl:
+        case DataType::PtrControl:
+            return true;
+        case DataType::Button:
+        case DataType::Separator:
+            return false;
+        default:
+            return false;
     }
 }
 

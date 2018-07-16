@@ -14,8 +14,7 @@ def one_vm_type():
 def config(test_config):
     return test_config.with_defaults(
         CAMERAS_INTERFACE='enp5s0',
-        CAMERAS_NETWORK='192.168.0',
-        CAMERAS_NETWORK_IP='200',
+        CAMERAS_NETWORK='192.168.0.200/24',
         EXPECTED_CAMERAS_FILE=Path(__file__).parent / 'expected_cameras.yaml',
         CYCLE_DELAY_S=1,
         )
@@ -23,8 +22,7 @@ def config(test_config):
 
 def test_cameras(one_vm, one_licensed_server, config, work_dir):
     one_licensed_server.os_access.networking.setup_network(
-        one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE),
-        config.CAMERAS_NETWORK, config.CAMERAS_NETWORK_IP)
+        one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE), config.CAMERAS_NETWORK)
 
     def save_yaml(data, file_name):
         serialized = yaml.safe_dump(data, default_flow_style=False, width=1000)
