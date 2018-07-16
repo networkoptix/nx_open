@@ -60,7 +60,7 @@
         "autoUpdateThumbnails": "自動更新縮圖",
         "backupNewCamerasByDefault": "預設備份新攝影機",
         "backupQualities": "備份品質",
-        "cameraSettingsOptimization": "允許 Nx 優化設備",
+        "cameraSettingsOptimization": "允許設備設置優化",
         "clientStatisticsSettingsUrl": "客戶端統計相關 url",
         "cloudAccountName": "雲端主人帳號",
         "cloudConnectRelayingEnabled": "啟動雲端連接轉發",
