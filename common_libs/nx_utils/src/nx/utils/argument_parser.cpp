@@ -98,5 +98,10 @@ bool ArgumentParser::read(const QString& name, size_t* const value) const
     return true;
 }
 
+std::multimap<QString, QString> ArgumentParser::allArgs() const
+{
+    return m_args;
+}
+
 } // namespace utils
 } // namespace nx

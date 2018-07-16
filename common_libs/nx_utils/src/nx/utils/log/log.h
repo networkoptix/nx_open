@@ -28,8 +28,8 @@ struct QnLog
 struct QnLogs
 {
     static NX_UTILS_API std::vector<QString> getLoggerNames();
-    static NX_UTILS_API std::shared_ptr<nx::utils::log::Logger> getLogger(int id);
-    static NX_UTILS_API std::shared_ptr<nx::utils::log::Logger> getLogger(const QString& name);
+    static NX_UTILS_API std::shared_ptr<nx::utils::log::AbstractLogger> getLogger(int id);
+    static NX_UTILS_API std::shared_ptr<nx::utils::log::AbstractLogger> getLogger(const QString& name);
     static NX_UTILS_API QnLog* get();
 };
 

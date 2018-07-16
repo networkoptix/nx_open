@@ -2,9 +2,9 @@
 
 angular.module('cloudApp')
     .controller('DebugCtrl', ['$scope', 'cloudApi', 'account', 'process', '$q', '$timeout',
-                'dialogs', 'urlProtocol', '$base64', 'systemsProvider',
+                'dialogs', 'urlProtocol', '$base64', 'systemsProvider', '$http', 'systemAPI',
         function ($scope, cloudApi, account, process, $q, $timeout,
-                  dialogs, urlProtocol, $base64, systemsProvider) {
+                  dialogs, urlProtocol, $base64, systemsProvider, $http, systemAPI) {
 
         account.requireLogin();
 
@@ -136,7 +136,12 @@ angular.module('cloudApp')
         $scope.systemsProvider = systemsProvider;
         $scope.$watch('systemsProvider.systems', function(){
             $scope.systems = $scope.systemsProvider.systems;
+            if(!$scope.debugProxySettings.systemId && $scope.systems[0]) {
+                $scope.debugProxySettings.systemId = $scope.systems[0].id;
+            }
         });
+        $scope.systemsProvider.forceUpdateSystems();
+
         $scope.mergeSettings={
             masterSystemId:null,
             slaveSystemId:null
@@ -151,4 +156,44 @@ angular.module('cloudApp')
         }
 
 
+        $scope.debugProxySettings={
+            method:'POST',
+            proxyUrl:'relay-bur.vmsproxy.hdw.mx',
+            systemId:null,
+            apiCall:'web/ec2/saveUser',
+            data:'{}'
+        };
+
+        $scope.$watch('debugProxySettings.systemId', function(){
+            cloudApi.getSystemAuth($scope.debugProxySettings.systemId).then(function(data){
+                $scope.debugProxySettings.authPost = data.data.authPost;
+                $scope.debugProxySettings.authGet = data.data.authGet;
+            });
+        });
+        $scope.debugProxyUrl = function(){
+            var auth = ($scope.debugProxySettings.method === 'GET') ? $scope.debugProxySettings.authGet: $scope.debugProxySettings.authPost;
+            return '{protocol}//{systemId}.{proxyUrl}/{apiCall}?auth={auth}'.
+                    replace('{protocol}', window.location.protocol).
+                    replace('{systemId}', $scope.debugProxySettings.systemId).
+                    replace('{proxyUrl}', $scope.debugProxySettings.proxyUrl).
+                    replace('{apiCall}', $scope.debugProxySettings.apiCall).
+                    replace('{auth}', auth);
+        };
+        $scope.debugProxy = function(){
+            var data = null;
+            if($scope.debugProxySettings.data){
+                data = JSON.parse($scope.debugProxySettings.data);
+            }
+            $http({
+                method: $scope.debugProxySettings.method,
+                url: $scope.debugProxyUrl(),
+                data: data
+            }).then(function(result){
+                $scope.debugProxySettings.success = true;
+                $scope.debugProxySettings.result = JSON.stringify(result, null, 2);
+            },function(error){
+                $scope.debugProxySettings.success = false;
+                $scope.debugProxySettings.result = JSON.stringify(error, null, 2);
+            });
+        };
     }]);
