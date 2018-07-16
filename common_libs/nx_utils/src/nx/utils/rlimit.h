@@ -11,7 +11,7 @@ unsigned long setNoFile(unsigned long value);
 
 void setDefaultNoFile()
 {
-    constexpr unsigned long kDefaultNoFile = 8192;
+    constexpr unsigned long kDefaultNoFile = 32000;
     setNoFile(kDefaultNoFile);
 }
 
