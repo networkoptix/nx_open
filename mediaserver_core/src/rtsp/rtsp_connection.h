@@ -1,5 +1,4 @@
-#ifndef __RTSP_CONNECTION_H_
-#define __RTSP_CONNECTION_H_
+#pragma once
 
 #include <QtNetwork/QHostAddress>
 #include <nx/utils/thread/mutex.h>
@@ -88,7 +87,7 @@ class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
-    QnRtspConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRtspConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);
@@ -152,5 +151,3 @@ private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;
 };
-
-#endif

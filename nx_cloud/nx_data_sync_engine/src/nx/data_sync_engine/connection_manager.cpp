@@ -740,9 +740,7 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
                 dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
             if (transactionTransport)
             {
-                transactionTransport->setOutgoingConnection(
-                    QSharedPointer<network::AbstractCommunicatingSocket>(
-                        connection->takeSocket().release()));
+                transactionTransport->setOutgoingConnection(std::move(connection->takeSocket()));
                 transactionTransport->startOutgoingChannel();
             }
         };

@@ -1,5 +1,4 @@
-#ifndef __TCP_LISTENER_H__
-#define __TCP_LISTENER_H__
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -85,7 +84,8 @@ public slots:
 
 protected:
     virtual void run() override;
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) = 0;
+    virtual QnTCPConnectionProcessor* createRequestProcessor(
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) = 0;
     virtual void doPeriodicTasks();
     /** Called to create server socket.
         This method is supposed to bind socket to \a localAddress and call \a listen
@@ -106,5 +106,3 @@ protected:
 
     QnTcpListenerPrivate *d_ptr;
 };
-
-#endif // __TCP_LISTENER_H__

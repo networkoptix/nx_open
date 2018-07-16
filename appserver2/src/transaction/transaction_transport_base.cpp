@@ -234,6 +234,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 {
     m_connectionType =
 #ifdef USE_SINGLE_TWO_WAY_CONNECTION
+#error "Bidirection moed is not supported any more due to unique_ptr for socket. Need refactor to support it."
         ConnectionType::bidirectional
 #else
         ConnectionType::incoming
@@ -317,7 +318,7 @@ void QnTransactionTransportBase::setLocalPeerProtocolVersion(int version)
 }
 
 void QnTransactionTransportBase::setOutgoingConnection(
-    QSharedPointer<nx::network::AbstractCommunicatingSocket> socket)
+    std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket)
 {
     using namespace std::chrono;
 
@@ -336,7 +337,10 @@ void QnTransactionTransportBase::setOutgoingConnection(
     }
 
     if (m_connectionType == ConnectionType::bidirectional)
-        m_incomingDataSocket = m_outgoingDataSocket;
+    {
+        NX_CRITICAL(0, "Bidirection mode is not supported any more");
+        //m_incomingDataSocket = m_outgoingDataSocket;
+    }
 }
 
 void QnTransactionTransportBase::monitorConnectionForClosure()
@@ -836,7 +840,7 @@ QnUuid QnTransactionTransportBase::connectionGuid() const
 }
 
 void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
-    QSharedPointer<nx::network::AbstractCommunicatingSocket> socket,
+    std::unique_ptr<nx::network::AbstractCommunicatingSocket> socket,
     const nx::network::http::Request& /*request*/,
     const QByteArray& requestBuf )
 {
@@ -1399,9 +1403,12 @@ void QnTransactionTransportBase::at_responseReceived(const nx::network::http::As
                     keepAliveHeader.timeout);
         }
 
-        m_incomingDataSocket = QSharedPointer<nx::network::AbstractCommunicatingSocket>(m_httpClient->takeSocket().release());
-        if( m_connectionType == ConnectionType::bidirectional )
-            m_outgoingDataSocket = m_incomingDataSocket;
+        m_incomingDataSocket = m_httpClient->takeSocket();
+        if (m_connectionType == ConnectionType::bidirectional)
+        {
+            NX_CRITICAL(0, "Bidirection mode is not supported any more");
+            //m_outgoingDataSocket = m_incomingDataSocket;
+        }
 
         {
             QnMutexLocker lk( &m_mutex );

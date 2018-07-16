@@ -67,9 +67,9 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 }
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+    std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket)
 {
-    return new QnUniversalRequestProcessor(clientSocket, this, needAuth());
+    return new QnUniversalRequestProcessor(std::move(clientSocket), this, needAuth());
 }
 
 nx::network::AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(

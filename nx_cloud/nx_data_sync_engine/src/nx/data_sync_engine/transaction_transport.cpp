@@ -191,7 +191,7 @@ void TransactionTransport::receivedTransaction(
 }
 
 void TransactionTransport::setOutgoingConnection(
-    QSharedPointer<network::AbstractCommunicatingSocket> socket)
+    std::unique_ptr<network::AbstractCommunicatingSocket> socket)
 {
     m_baseTransactionTransport.setOutgoingConnection(std::move(socket));
 }

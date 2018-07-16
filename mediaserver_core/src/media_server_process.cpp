@@ -3221,9 +3221,10 @@ void MediaServerProcess::connectArchiveIntegrityWatcher()
 class TcpLogReceiverConnection: public QnTCPConnectionProcessor
 {
 public:
-    TcpLogReceiverConnection(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
-        QnTCPConnectionProcessor(socket, owner),
-        m_socket(socket),
+    TcpLogReceiverConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+        :
+        QnTCPConnectionProcessor(std::move(socket), owner),
+        m_socket(std::move(socket)),
         m_file(closeDirPath(getDataDirectory()) + lit("log/external_device.log"))
     {
         m_file.open(QFile::WriteOnly);
@@ -3244,7 +3245,7 @@ protected:
         }
     }
 private:
-    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
+    std::unique_ptr<nx::network::AbstractStreamSocket> m_socket;
     QFile m_file;
 };
 
@@ -3259,9 +3260,10 @@ public:
     virtual ~TcpLogReceiver() override { stop(); }
 
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+    virtual QnTCPConnectionProcessor* createRequestProcessor(
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
     {
-        return new TcpLogReceiverConnection(clientSocket, this);
+        return new TcpLogReceiverConnection(std::move(clientSocket), this);
     }
 };
 

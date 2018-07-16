@@ -34,7 +34,7 @@ public:
     }
 
     virtual QnTCPConnectionProcessor* createRequestProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> clientSocket) override
+        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
     {
         return nullptr;
     }
@@ -309,8 +309,6 @@ private:
     }
 
 private:
-    QSharedPointer<nx::network::AbstractStreamSocket> m_socket{new MockStreamSocket()};
-
     std::shared_ptr<MockConnection> m_connection{new MockConnection(
         [this](ApiCommand::Value command, QnUuid input, MockConnection::QueryHandler handler)
         {
@@ -325,7 +323,10 @@ private:
 
     QnCommonModule m_commonModule{/*clientMode*/ false, nx::core::access::Mode::direct};
     MockQnHttpConnectionListener listener{&m_commonModule};
-    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &listener };
+    QnRestConnectionProcessor m_restConnectionProcessor
+        {
+            std::make_unique<MockStreamSocket>(), /*owner*/ &listener 
+        };
 
     std::unique_ptr<TestUpdateHttpHandler> m_updateHttpHandler{new TestUpdateHttpHandler(
         m_connection)};
