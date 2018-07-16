@@ -212,7 +212,7 @@ TEST(RelativeMoveWorkaround, relativeMoveViaAbsoluteMove)
     ASSERT_TRUE(qFuzzyEquals(expectedMoveResult, moveResult));
 }
 
-TEST(RelativeMoveWorkaround, relativeMoveViaContinuousMove)
+TEST(RelativeMoveWorkaround, DISABLED_relativeMoveViaContinuousMove)
 {
     QSharedPointer<test_support::TestPtzController> controller(
         new test_support::TestPtzController());
