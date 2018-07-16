@@ -16,20 +16,45 @@ namespace {
 
 using namespace nx::client::desktop;
 
-void fillText(const QString& text, ViewNode::Data& data)
+void setText(const QString& text, ViewNode::Data& data)
 {
     data.data[node_view::nameColumn][Qt::DisplayRole] = text;
 }
 
-void fillIcon(const QIcon& icon, ViewNode::Data& data)
+void setIcon(const QIcon& icon, ViewNode::Data& data)
 {
     if (!icon.isNull())
         data.data[node_view::nameColumn][Qt::DecorationRole] = icon;
 }
 
-void fillSiblingGroup(int siblingGroup, ViewNode::Data& data)
+void setSiblingGroup(int siblingGroup, ViewNode::Data& data)
 {
     data.data[node_view::nameColumn][node_view::siblingGroupRole] = siblingGroup;
+}
+
+void setCheckedState(Qt::CheckState state, ViewNode::Data& data)
+{
+    data.data[node_view::checkMarkColumn][Qt::CheckStateRole] = state;
+}
+
+void setAllSiblingsCheck(ViewNode::Data& data)
+{
+    auto& nodeFlags = data.data[node_view::nameColumn][node_view::nodeFlagsRole];
+    nodeFlags.setValue(nodeFlags.value<node_view::NodeFlags>() | node_view::AllSiblingsCheckFlag);
+}
+
+void addSelectAll(const QString& caption, const QIcon& icon, const NodePtr& root)
+{
+    ViewNode::Data data;
+    setText(caption, data);
+    setIcon(icon, data);
+    setCheckedState(Qt::Unchecked, data);
+    setAllSiblingsCheck(data);
+    setSiblingGroup(-2, data);
+
+    const auto selectAllNode = ViewNode::create(data);
+    root->addChild(selectAllNode);
+    root->addChild(helpers::createSeparatorNode(-1));
 }
 
 const auto createCheckableLayoutNode =
@@ -51,10 +76,10 @@ ViewNode::Data getResourceNodeData(
 {
     ViewNode::Data nodeData;
     if (checkable)
-        nodeData.data[node_view::checkMarkColumn][Qt::CheckStateRole] = checkedState;
+        setCheckedState(checkedState, nodeData);
 
-    fillText(resource->getName(), nodeData);
-    fillIcon(qnResIconCache->icon(resource), nodeData);
+    setText(resource->getName(), nodeData);
+    setIcon(qnResIconCache->icon(resource), nodeData);
     nodeData.data[node_view::nameColumn][node_view::resourceRole] = QVariant::fromValue(resource);
     return nodeData;
 }
@@ -117,8 +142,9 @@ NodePtr createNode(
     int siblingGroup)
 {
     ViewNode::Data nodeData;
-    fillText(caption, nodeData);
-    fillSiblingGroup(siblingGroup, nodeData);
+    setText(caption, nodeData);
+    setSiblingGroup(siblingGroup, nodeData);
+//    setCheckedState(Qt::Unchecked, nodeData);
     return ViewNode::create(nodeData, children);
 }
 
@@ -132,23 +158,12 @@ NodePtr createNode(
 NodePtr createSeparatorNode(int siblingGroup)
 {
     ViewNode::Data nodeData;
-    fillSiblingGroup(siblingGroup, nodeData);
+    setSiblingGroup(siblingGroup, nodeData);
     nodeData.data[node_view::nameColumn][node_view::separatorRole] = true;
     return ViewNode::create(nodeData);
 }
 
-NodePtr createCheckGroupNode(
-    const QString& text,
-    const QIcon& icon)
-{
-    ViewNode::Data nodeData;
-    fillText(text, nodeData);
-    fillIcon(icon, nodeData);
-    return ViewNode::create(nodeData);
-}
-
-
-NodePtr createParentedLayoutsNode()
+NodePtr createParentedLayoutsNode(bool allowSelectAll)
 {
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto accessProvider = commonModule->resourceAccessProvider();
@@ -167,15 +182,22 @@ NodePtr createParentedLayoutsNode()
     for (const auto& userResource: pool->getResources<QnUserResource>(filterUser))
         accessibleUsers.append(userResource);
 
-    return createUserLayoutsNode(accessibleUsers);
+    const auto root = createUserLayoutsNode(accessibleUsers);
+    if (allowSelectAll)
+        addSelectAll(lit("Select All"), QIcon(), root);
+
+    return root;
 }
 
-NodePtr createCurrentUserLayoutsNode()
+NodePtr createCurrentUserLayoutsNode(bool allowSelectAll)
 {
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
     const auto currentUser = userWatcher->user();
     const auto root = createUserLayoutsNode({currentUser});
+    if (allowSelectAll)
+        addSelectAll(lit("Select All"), QIcon(), root);
+
     return root->children().first();
 }
 
@@ -212,7 +234,7 @@ NodePtr createParentResourceNode(
             children.append(node);
     }
 
-    return ViewNode::create(getResourceNodeData(resource), children);
+    return ViewNode::create(getResourceNodeData(resource, checkable), children);
 }
 
 QnResourceList getLeafSelectedResources(const NodePtr& node)
@@ -240,6 +262,12 @@ QnResourcePtr getResource(const NodePtr& node)
         NX_EXPECT(false, "Node is null");
 
     return QnResourcePtr();
+}
+
+Qt::CheckState checkedState(const NodePtr& node)
+{
+    const auto checkedData = node->data(node_view::checkMarkColumn, Qt::CheckStateRole);
+    return checkedData.isNull() ? Qt::Unchecked : checkedData.value<Qt::CheckState>();
 }
 
 } // namespace helpers

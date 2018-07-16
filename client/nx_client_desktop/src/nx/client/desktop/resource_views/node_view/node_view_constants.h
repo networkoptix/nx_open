@@ -16,11 +16,21 @@ enum Column
 enum Role
 {
     resourceRole = Qt::UserRole,
-    separatorRole,
-    siblingGroupRole
+    nodeFlagsRole,
+    separatorRole, //TODO: move to flags
+    siblingGroupRole //TODO: move to flags
 };
+
+enum NodeFlag
+{
+    AllSiblingsCheckFlag
+};
+
+Q_DECLARE_FLAGS(NodeFlags, NodeFlag);
 
 } // namespace node_view
 } // namespace desktop
 } // namespace client
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::client::desktop::node_view::NodeFlags);

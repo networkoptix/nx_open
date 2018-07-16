@@ -129,15 +129,15 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     const auto tree = ui->layoutsTree;
     tree->setItemDelegate(new Delegate(tree));
     tree->setProxyModel(siblingGroupProxyModel);
-//    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
-    //tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
+    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
+//    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
 
-    tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
-        createNode(lit("zero")),
-        createNode(lit("first"), { createNode(lit("1_1")) }),
-        createSeparatorNode(1),
-        createNode(lit("second"), 2)
-    })));
+//    tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
+//        createNode(lit("2")),
+//        createNode(lit("3"), 2),
+//        createNode(lit("1"), { createNode(lit("1_1")), createNode(lit("1_2")) }),
+//        createSeparatorNode(1),
+//    })));
 
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(
 //        ViewNode::create({helpers::createSeparatorNode()})));

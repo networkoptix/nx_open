@@ -41,6 +41,11 @@ ViewNodePath ViewNodePath::parentPath() const
     return ViewNodePath(indicies);
 }
 
+bool operator==(const ViewNodePath& left, const ViewNodePath& right)
+{
+    return left.indicies() == right.indicies();
+}
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

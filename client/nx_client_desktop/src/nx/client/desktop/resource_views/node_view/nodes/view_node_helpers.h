@@ -20,14 +20,10 @@ NodePtr createNode(
 
 NodePtr createSeparatorNode(int siblingGroup = 0);
 
-NodePtr createCheckGroupNode(
-    const QString& text,
-    const QIcon& icon = QIcon());
-
 NodePtr createAllLayoutsNode();
 
-NodePtr createParentedLayoutsNode();
-NodePtr createCurrentUserLayoutsNode();
+NodePtr createParentedLayoutsNode(bool allowSelectAll = true);
+NodePtr createCurrentUserLayoutsNode(bool allowSelectAll = true);
 
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
@@ -47,9 +43,9 @@ NodePtr createParentResourceNode(
 
 QnResourceList getLeafSelectedResources(const NodePtr& rootNode);
 
-bool isCheckable(const NodePtr& node);
-
 QnResourcePtr getResource(const NodePtr& node);
+
+Qt::CheckState checkedState(const NodePtr& node);
 
 } // namespace helpers
 } // namespace desktop

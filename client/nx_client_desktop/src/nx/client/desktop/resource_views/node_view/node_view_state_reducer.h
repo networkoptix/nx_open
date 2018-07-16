@@ -11,6 +11,7 @@ class NodeViewStateReducer
 {
 public:
     static NodeViewStatePatch setNodeChecked(
+        const NodeViewState& state,
         const ViewNodePath& path,
         Qt::CheckState checkedState);
 

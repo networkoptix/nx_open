@@ -25,6 +25,8 @@ private:
     Indicies m_indicies;
 };
 
+bool operator==(const ViewNodePath& left, const ViewNodePath& right);
+
 } // namespace desktop
 } // namespace client
 } // namespace nx

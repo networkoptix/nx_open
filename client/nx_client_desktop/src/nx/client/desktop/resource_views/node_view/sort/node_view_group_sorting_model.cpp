@@ -34,7 +34,7 @@ bool NodeViewGroupSortingModel::lessThan(
 {
     const int leftGroup = getNodeSiblingGroup(sourceLeft, sourceModel());
     const int rightGroup = getNodeSiblingGroup(sourceRight, sourceModel());
-    return leftGroup == rightGroup && leftGroup == 0
+    return leftGroup == rightGroup
         ? nextLessThan(sourceLeft, sourceRight)
         : leftGroup > rightGroup;
 }
