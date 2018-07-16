@@ -16,9 +16,9 @@
 #include <nx/utils/system_error.h>
 
 
-class QnRequestParam:  QPair<QString, QString> {
+class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;
-:
+public:
     QnRequestParam(const QPair<QString, QString> &other): base_type(other) {}
     QnRequestParam(const QString &first, const QString &second): base_type(first, second) {}
     QnRequestParam(const char *first, const char *second): base_type(QLatin1String(first), QLatin1String(second)) {}
