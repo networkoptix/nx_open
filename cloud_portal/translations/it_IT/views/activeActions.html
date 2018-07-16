@@ -38,7 +38,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> È richiesta l'email </span> <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Inserisca un'e-mail valida </span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">L'email è obbligatoria</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Inserisca un'e-mail valida</span>
                 </div>
             </div>
             <div class="form-group">
@@ -70,7 +71,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> È richiesta l'email </span> <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Inserisci un'e-mail valida </span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">L'email è obbligatoria</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Inserisca un'e-mail valida</span>
                 </div>
             </div>
             <div class="form-group">

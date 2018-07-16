@@ -4,6 +4,7 @@ from django.conf.urls import url
 from api.views import account, systems, common, utils
 
 urlpatterns = [
+    url(r'^account-autocomplete/$', account.AccountAutocomplete.as_view(), name='account-autocomplete',),
     url(r'^utils/visitedKey/?$',                utils.visited_key),
     url(r'^utils/language/?$',                  utils.language),
     url(r'^utils/downloads/history$',           utils.downloads_history),

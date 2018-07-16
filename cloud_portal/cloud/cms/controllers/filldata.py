@@ -6,7 +6,11 @@ import base64
 import zipfile
 import distutils.dir_util
 import errno
+import traceback
 from StringIO import StringIO
+
+import logging
+logger = logging.getLogger(__name__)
 
 SOURCE_DIR = 'static/_source/{{skin}}'
 TARGET_DIR = 'static/{{customization}}'
@@ -37,29 +41,37 @@ def target_file(file_name, customization, language_code, preview):
 def process_context_structure(customization, context, content,
                               language, version_id, preview, force_global_files):
     for datastructure in context.datastructure_set.order_by('order').all():
-        content_value = datastructure.find_actual_value(customization, language, version_id)
-        # replace marker with value
-        if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
-            content = content.replace(datastructure.name, content_value)
-        elif content_value or datastructure.optional:
-            if context.is_global and not force_global_files:
-                # do not update files from global contexts all the time
-                continue
+        try:
+            content_value = datastructure.find_actual_value(customization, language, version_id)
+            # replace marker with value
+            if datastructure.type not in (DataStructure.DATA_TYPES.image, DataStructure.DATA_TYPES.file):
+                content = content.replace(datastructure.name, content_value)
+            elif content_value or datastructure.optional:
+                if context.is_global and not force_global_files:
+                    # do not update files from global contexts all the time
+                    continue
 
-            if not datastructure.translatable and language != customization.default_language:
-                # if file itself is not translatable - update it only for default language
-                continue
+                if not datastructure.translatable and language != customization.default_language:
+                    # if file itself is not translatable - update it only for default language
+                    continue
 
-            image_storage = os.path.join('static', customization.name)
-            if preview:
-                image_storage = os.path.join(image_storage, 'preview')
-            
-            file_name = datastructure.name
-            if language:
-                file_name = file_name.replace("{{language}}", language.code)
+                image_storage = os.path.join('static', customization.name)
+                if preview:
+                    image_storage = os.path.join(image_storage, 'preview')
 
-            # print "Save file from DB: " + file_name, context, language, context.is_global
-            save_b64_to_file(content_value, file_name, image_storage)
+                file_name = datastructure.name
+                if language:
+                    file_name = file_name.replace("{{language}}", language.code)
+
+                # print "Save file from DB: " + file_name, context, language, context.is_global
+                save_b64_to_file(content_value, file_name, image_storage)
+        except Exception:
+            # if something happens here - instance will not start and it will close to impossible to fix
+            # so we ignore broken records while logging them - it will raise cloud alarm and we will go and fix the problem
+            logger.error("ERROR: Cannot process data structure {0} for customization {1}".format(
+                datastructure.name, customization.name))
+            logger.error(traceback.format_exc())
+
     return content
 
 
