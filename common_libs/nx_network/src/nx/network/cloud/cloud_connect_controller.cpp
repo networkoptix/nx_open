@@ -159,7 +159,8 @@ void CloudConnectController::printArgumentsHelp(std::ostream* outputStream)
     (*outputStream) <<
         "  --enforce-mediator={endpoint}    Enforces custom mediator address" << std::endl <<
         "  --cloud-connect-disable-udp      Disable UDP hole punching" << std::endl <<
-        "  --cloud-connect-enable-proxy-only" << std::endl;
+        "  --cloud-connect-enable-proxy-only" << std::endl <<
+        "  --cloud-connect-disable-proxy" << std::endl;
 }
 
 void CloudConnectController::readSettingsFromIni()
@@ -181,10 +182,20 @@ void CloudConnectController::loadSettings(const utils::ArgumentParser& arguments
     // TODO: #ak Following parameters are redundant and contradicting.
 
     if (arguments.get("cloud-connect-disable-udp"))
-        m_impl->settings.isUdpHpDisabled = true;
+        m_impl->settings.isUdpHpEnabled = false;
+
+    if (!static_cast<bool>(arguments.get("cloud-connect-enable-proxy-only")) &&
+        arguments.get("cloud-connect-disable-proxy"))
+    {
+        m_impl->settings.isCloudProxyEnabled = false;
+    }
 
     if (arguments.get("cloud-connect-enable-proxy-only"))
-        m_impl->settings.isOnlyCloudProxyEnabled = true;
+    {
+        m_impl->settings.isUdpHpEnabled = false;
+        m_impl->settings.isDirectTcpConnectEnabled = false;
+        m_impl->settings.isCloudProxyEnabled = true;
+    }
 }
 
 void CloudConnectController::applySettings()
@@ -196,18 +207,20 @@ void CloudConnectController::applySettings()
             url::getEndpoint(utils::Url(m_impl->settings.forcedMediatorUrl)));
     }
 
-    if (m_impl->settings.isUdpHpDisabled)
-    {
-        cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            cloud::ConnectorFactory::getEnabledCloudConnectMask() &
-            ~((int)cloud::ConnectType::udpHp));
-    }
+    int enabledConnectTypes = static_cast<int>(cloud::ConnectType::all);
 
-    if (m_impl->settings.isOnlyCloudProxyEnabled)
-    {
-        cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            (int)cloud::ConnectType::proxy);
-    }
+    if (!m_impl->settings.isCloudProxyEnabled)
+        enabledConnectTypes &= ~(int)cloud::ConnectType::proxy;
+
+    if (!m_impl->settings.isUdpHpEnabled)
+        enabledConnectTypes &= ~(int)cloud::ConnectType::udpHp;
+
+    if (!m_impl->settings.isDirectTcpConnectEnabled)
+        enabledConnectTypes &= ~(int)cloud::ConnectType::forwardedTcpPort;
+
+    cloud::ConnectorFactory::setEnabledCloudConnectMask(
+        cloud::ConnectorFactory::getEnabledCloudConnectMask() &
+        enabledConnectTypes);
 }
 
 } // namespace cloud

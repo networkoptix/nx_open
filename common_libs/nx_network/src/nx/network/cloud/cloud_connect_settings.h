@@ -16,8 +16,9 @@ class NX_NETWORK_API CloudConnectSettings
 {
 public:
     std::string forcedMediatorUrl;
-    bool isUdpHpDisabled = false;
-    bool isOnlyCloudProxyEnabled = false;
+    bool isUdpHpEnabled = true;
+    bool isCloudProxyEnabled = true;
+    bool isDirectTcpConnectEnabled = true;
     bool useHttpConnectToListenOnRelay = false;
 
     CloudConnectSettings() = default;
