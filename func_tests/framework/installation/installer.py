@@ -123,8 +123,8 @@ class InstallIdentity(object):
             )
 
     def __init__(self, version, customization):
-        self.version = version
-        self.customization = customization
+        self.version = version  # type: Version
+        self.customization = customization  # type: Customization
 
     def __str__(self):
         return '{}:{}'.format(self.version, self.customization.customization_name)

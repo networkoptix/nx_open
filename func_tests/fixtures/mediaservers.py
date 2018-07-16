@@ -1,13 +1,16 @@
 import logging
 
+from argparse import ArgumentTypeError
 import pytest
 
 from defaults import defaults
 from framework.installation.installer import Installer, PackageNameParseError
+from framework.installation.lightweight_mediaserver import LWS_BINARY_NAME
 from framework.installation.mediaserver_factory import MediaserverFactory
 from framework.merging import merge_systems, setup_local_system
 from framework.os_access.local_path import LocalPath
 from framework.os_access.path import copy_file
+import framework.licensing as licensing
 
 _logger = logging.getLogger(__name__)
 
@@ -40,9 +43,21 @@ def mediaserver_installers(request):
     return installers_by_platform
 
 
+# we are expecting only one appserver2_ut in --mediaserver-installers-dir, for linux-x64 platform
+@pytest.fixture(scope='session')
+def lightweight_mediaserver_installer(request):
+    installers_dir = request.config.getoption('--mediaserver-installers-dir')  # type: LocalPath
+    path = installers_dir / LWS_BINARY_NAME
+    if not path.exists():
+        raise ArgumentTypeError(
+            '{} is missing from {}, but is required.'.format(LWS_BINARY_NAME, installers_dir))
+    _logger.info("Ligheweight mediaserver installer path: {}".format(path))
+    return path
+
+
 @pytest.fixture()
-def mediaserver_factory(mediaserver_installers, artifact_factory, ca):
-    return MediaserverFactory(mediaserver_installers, artifact_factory, ca)
+def mediaserver_factory(mediaserver_installers, artifacts_dir, ca):
+    return MediaserverFactory(mediaserver_installers, artifacts_dir, ca)
 
 
 @pytest.fixture()
@@ -89,4 +104,22 @@ def one_mediaserver(one_vm, mediaserver_factory, artifacts_dir):
 def one_running_mediaserver(one_mediaserver):
     one_mediaserver.start()
     setup_local_system(one_mediaserver, {})
+    return one_mediaserver
+
+
+@pytest.fixture(scope='session')
+def required_licenses():
+    return [dict(n_cameras=100)]
+
+
+@pytest.fixture
+def one_licensed_server(one_mediaserver, required_licenses):
+    one_mediaserver.os_access.networking.static_dns(licensing.TEST_SERVER_IP, licensing.DNS)
+    one_mediaserver.start()
+    setup_local_system(one_mediaserver, {})
+
+    server = licensing.ServerApi()
+    for license in required_licenses:
+        one_mediaserver.api.get('api/activateLicense', params=dict(key=server.generate(**license)))
+
     return one_mediaserver

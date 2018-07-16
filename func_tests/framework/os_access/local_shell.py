@@ -8,7 +8,7 @@ import time
 from collections import namedtuple
 from contextlib import closing
 
-from framework.os_access.command import Command, Run, DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.command import Command, Run
 from framework.os_access.posix_shell import PosixOutcome, PosixShell, _STREAM_BUFFER_SIZE
 from framework.os_access.posix_shell_utils import sh_augment_script, sh_command_to_script
 

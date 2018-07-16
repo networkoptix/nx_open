@@ -302,6 +302,7 @@ def collect_additional_metrics(metrics_saver, servers, lightweight_servers):
             metrics_saver.save(metric_name, metric_value)
 
 
+@pytest.mark.skip
 def test_scalability(
         artifact_factory, metrics_saver, config, lightweight_servers, lightweight_servers_factory, servers):
     assert isinstance(config.MERGE_TIMEOUT, datetime.timedelta)

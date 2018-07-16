@@ -5,6 +5,8 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 
+#include <ini.h>
+
 namespace
 {
     // Pixmap is scaled on the mediawidget.
@@ -60,6 +62,10 @@ void QnWatermarkPainter::setWatermark(const QString& text, const QnWatermarkSett
 void QnWatermarkPainter::updateWatermark()
 {
     m_pixmap.fill(Qt::transparent);
+
+    if (!nx::client::desktop::ini().enableWatermark)
+        return;
+
     if (m_text.isEmpty())
         return;
 

@@ -10,19 +10,15 @@ _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture()
-def layout_file():
-    return 'direct-merge_toward_requested.yaml'
-
-
-# TODO: Rewrite with simpler fixtures.
-@pytest.fixture()
-def proxy(system):
-    return system['first']
+def proxy(two_merged_mediaservers):
+    first, second = two_merged_mediaservers
+    return first
 
 
 @pytest.fixture()
-def proxy_headers(system):
-    target_guid = get_server_id(system['second'].api)
+def proxy_headers(two_merged_mediaservers):
+    first, second = two_merged_mediaservers
+    target_guid = get_server_id(second.api)
     return {'X-server-guid': target_guid}
 
 

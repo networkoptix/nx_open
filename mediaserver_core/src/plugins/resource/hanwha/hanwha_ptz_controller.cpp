@@ -184,7 +184,7 @@ bool HanwhaPtzController::relativeMove(
     {
         NX_WARNING(
             this,
-            lm("Absolute movement - wrong PTZ type. "
+            lm("Relative movement - wrong PTZ type. "
                 "Only operational PTZ is supported. Resource %1 (%2)")
                 .args(resource()->getName(), resource()->getId()));
 

@@ -708,6 +708,16 @@ void AsyncClient::resetDataBeforeNewRequest()
     m_request = nx::network::http::Request();
 }
 
+int AsyncClient::totalRequestsSentViaCurrentConnection() const
+{
+    return m_totalRequestsSentViaCurrentConnection;
+}
+
+int AsyncClient::totalRequestsSent() const
+{
+    return m_totalRequestsSent;
+}
+
 void AsyncClient::initiateHttpMessageDelivery()
 {
     using namespace std::placeholders;

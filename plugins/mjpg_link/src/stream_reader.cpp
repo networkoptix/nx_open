@@ -219,6 +219,12 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
     if(m_videoPacket.get())
     {
         *lpPacket = m_videoPacket.release();
+        nxpt::ScopedRef<HttpLinkPlugin> plugin(HttpLinkPlugin::instance());
+        if (!plugin)
+            return nxcip::NX_OTHER_ERROR;
+
+        plugin->setStreamState(m_url, /*isStreamRunning*/ true);
+
         return nxcip::NX_NO_ERROR;
     }
 

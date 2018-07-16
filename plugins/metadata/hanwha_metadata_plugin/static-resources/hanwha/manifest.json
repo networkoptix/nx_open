@@ -215,6 +215,97 @@
             "positiveState": "has been detected",
             "flags": "regionDependent",
             "regionDescription": " in the region #%1"
+        },
+
+        {
+            "eventTypeId": "{ED282564-4C25-45B1-92C3-6797D51769FE}",
+            "eventName": {
+                "value": "Queue 1 high level",
+                "localization": {}
+            },
+            "internalName": "Queue.1.Level.High",
+            "description": "Queue 1 level %1 ",
+            "positiveState": "is high",
+            "negativeState": "has decreased to medium"
+            "flags": "stateDependent",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+        {
+            "eventTypeId": "{8950220F-717A-4E75-999E-966E7B204089}",
+            "eventName": {
+                "value": "Queue 1 medium level",
+                "localization": {}
+            },
+            "internalName": "Queue.1.Level.Medium",
+            "description": "Queue 1 level %1",
+            "positiveState": "is medium",
+            "negativeState": "has decreased to low"
+            "flags":"stateDependent",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+
+        {
+            "eventTypeId": "{F66BE53F-54AC-4BE0-A44A-9BA3D7D4826A}",
+            "eventName": {
+                "value": "Queue 2 high level",
+                "localization": {}
+            },
+            "internalName": "Queue.2.Level.High",
+            "description": "Queue 2 level %1 ",
+            "positiveState": "is high",
+            "negativeState": "has decreased to medium"
+            "flags": "stateDependent",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+        {
+            "eventTypeId": "{E9D8945F-45BD-43B7-B443-319AF4A8C747}",
+            "eventName": {
+                "value": "Queue 2 medium level",
+                "localization": {}
+            },
+            "internalName": "Queue.2.Level.Medium",
+            "description": "Queue 2 level %1",
+            "positiveState": "is medium",
+            "negativeState": "has decreased to low"
+            "flags":"stateDependent",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+
+        {
+            "eventTypeId": "{495E9A52-66F9-41A1-A994-8F9D0D16BD18}",
+            "eventName": {
+                "value": "Queue 3 high level",
+                "localization": {}
+            },
+            "internalName": "Queue.3.Level.High",
+            "description": "Queue 3 level %1 ",
+            "positiveState": "is high",
+            "negativeState": "has decreased to medium"
+            "flags": "stateDependent",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        },
+        {
+            "eventTypeId": "{6F44B0FC-ED45-43E8-BC8B-F361D3F2C361}",
+            "eventName": {
+                "value": "Queue 3 medium level",
+                "localization": {}
+            },
+            "internalName": "Queue.3.Level.Medium",
+            "description": "Queue 3 level %1",
+            "positiveState": "is medium",
+            "negativeState": "has decreased to low"
+            "flags":"stateDependent",
+            "groupId": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}"
+        }
+    ],
+
+    "groups": [
+        {
+            "id": "{EC95485E-BC58-4A93-AED9-6A4FC6E4DC9B}",
+            "name": {
+                "value": "Queue",
+                "localization": {}
+            }
         }
     ]
 }

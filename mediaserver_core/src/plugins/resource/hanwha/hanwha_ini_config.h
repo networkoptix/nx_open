@@ -46,6 +46,11 @@ struct HanwhaIni: public nx::kit::IniConfig
         enableArchivePositionExtrapolation,
         "Enable archive position extrapolation "
         "when no data is received from NVR during some period");
+
+    NX_INI_INT(
+        0,
+        forcedRtspPort,
+        "Forces RTSP port for Hanwha cameras");
 };
 
 inline HanwhaIni& ini()

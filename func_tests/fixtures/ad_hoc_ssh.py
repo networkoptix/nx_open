@@ -12,8 +12,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from netaddr.ip import IPAddress
 from pathlib2 import Path
 
-from framework.os_access.ssh_shell import SSH
 from framework.os_access.posix_shell_utils import sh_command_to_script
+from framework.os_access.ssh_shell import SSH
 from framework.waiting import wait_for_true
 
 _logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ def _generate_keys():
         crypto_serialization.Encoding.OpenSSH,
         crypto_serialization.PublicFormat.OpenSSH
         )
-    return private_key, public_key
+    return private_key.decode('ascii'), public_key.decode('ascii')
 
 
 def _write_config(config, path):
@@ -84,10 +84,10 @@ def ad_hoc_ssh_server(ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key)
     ip = IPAddress('127.0.0.1')
     port = 60022
     host_private_key_path = ad_hoc_ssh_dir / 'ad_hoc_host_key'
-    host_private_key_path.write_bytes(ad_hoc_host_key)
+    host_private_key_path.write_text(ad_hoc_host_key, encoding='ascii')
     host_private_key_path.chmod(0o600)
     authorized_keys_relative_path = ad_hoc_ssh_dir / 'authorized_keys'
-    authorized_keys_relative_path.write_bytes(ad_hoc_client_public_key)
+    authorized_keys_relative_path.write_text(ad_hoc_client_public_key, encoding='ascii')
     host_config = {
         'ListenAddress': ip,
         'HostKey': host_private_key_path,
@@ -120,11 +120,8 @@ def ad_hoc_ssh_server(ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key)
 
 
 @pytest.fixture()
-def ad_hoc_ssh(ad_hoc_ssh_dir, ad_hoc_ssh_server, ad_hoc_client_private_key):
-    client_key_path = ad_hoc_ssh_dir / 'client_key'
-    client_key_path.write_bytes(ad_hoc_client_private_key)
-    client_key_path.chmod(0o600)
-    ssh = SSH(ad_hoc_ssh_server.hostname, ad_hoc_ssh_server.port, getpass.getuser(), client_key_path)
+def ad_hoc_ssh(ad_hoc_ssh_server, ad_hoc_client_private_key):
+    ssh = SSH(ad_hoc_ssh_server.hostname, ad_hoc_ssh_server.port, getpass.getuser(), ad_hoc_client_private_key)
     _logger.debug(ssh)
     wait_for_true(ssh.is_working)
     return ssh

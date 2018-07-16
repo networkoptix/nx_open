@@ -109,6 +109,7 @@ class TestsConfig(object):
     def update(self, other):
         assert isinstance(other, TestsConfig), repr(other)
         self.physical_installation_host_list += other.physical_installation_host_list
+        self.tests.update(other.tests)
 
     def get_test_config(self, full_node_id):
         module_path_as_str, test_name = full_node_id.split('::')

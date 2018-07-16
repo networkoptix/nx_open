@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 import pytest
 from pytz import utc
 
-from framework.timeless_mediaserver import timeless_mediaserver
 from framework.api_shortcuts import get_server_id, get_time, is_primary_time_server
 from framework.merging import merge_systems
+from framework.timeless_mediaserver import timeless_mediaserver
 from framework.utils import RunningTime, get_internet_time
 from framework.waiting import ensure_persistence, wait_for_true
 
@@ -18,13 +18,13 @@ SYNC_TIMEOUT_SEC = 180
 
 
 @pytest.fixture()
-def two_mediaservers(two_vms, mediaserver_installers, ca, artifact_factory):
+def two_mediaservers(two_vms, mediaserver_installers, ca, artifacts_dir):
     """Make sure mediaservers are installed, stopped and internet is disabled."""
     first_vm, second_vm = two_vms
     first_vm.os_access.set_time(BASE_TIME.current)
     second_vm.os_access.set_time(BASE_TIME.current)
-    with timeless_mediaserver(first_vm, mediaserver_installers, ca, artifact_factory) as primary:
-        with timeless_mediaserver(second_vm, mediaserver_installers, ca, artifact_factory) as secondary:
+    with timeless_mediaserver(first_vm, mediaserver_installers, ca, artifacts_dir) as primary:
+        with timeless_mediaserver(second_vm, mediaserver_installers, ca, artifacts_dir) as secondary:
             merge_systems(primary, secondary)
             primary_guid = get_server_id(primary.api)
             primary.api.post('ec2/forcePrimaryTimeServer', dict(id=primary_guid))
