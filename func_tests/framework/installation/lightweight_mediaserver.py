@@ -134,7 +134,8 @@ class LwMultiServer(object):
     """Lightweight multi-mediaserver, single process with multiple server instances inside"""
 
     def __init__(self, installation):
-        self._installation = installation
+        self.installation = installation
+        self.os_access = installation.os_access
         self.address = installation.os_access.port_map.remote.address
         self._server_remote_port_base = installation.server_port_base
         self._server_count = installation.server_count
@@ -142,17 +143,21 @@ class LwMultiServer(object):
 
     def __repr__(self):
         return '<LwMultiServer at {}:{} {} (#{})>'.format(
-            self.address, self._server_remote_port_base, self._installation.dir, self._server_count)
+            self.address, self._server_remote_port_base, self.installation.dir, self._server_count)
 
     def __getitem__(self, index):
         remote_port = self._server_remote_port_base + index
-        local_port = self._installation.os_access.port_map.remote.tcp(remote_port)
+        local_port = self.os_access.port_map.remote.tcp(remote_port)
         return LwServer(
             name='lws-{:03d}'.format(index),
             address=self.address,
             local_port=local_port,
             remote_port=remote_port,
             )
+
+    @property
+    def servers(self):
+        return [self[index] for index in range(self._server_count)]
 
     def is_online(self):
         try:

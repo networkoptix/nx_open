@@ -40,7 +40,8 @@ class UnpackMediaserverInstallationGroups(object):
         self._group_list = group_list
 
     def allocate_one_server(self, server_name, system_settings):
-        installation = self._group_list[0].allocate()
+        # using last one, better if it's not the same as lws
+        installation = self._group_list[-1].allocate()
         return self._make_server(installation, server_name, system_settings)
 
     def allocate_many_servers(self, count, system_settings):
