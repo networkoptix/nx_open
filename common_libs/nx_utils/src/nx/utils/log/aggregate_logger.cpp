@@ -29,7 +29,7 @@ void AggregateLogger::log(Level level, const Tag& tag, const QString& message)
     for (auto& logger: m_loggers)
     {
         if (logger->isToBeLogged(level, tag))
-            logger->log(level, tag, message);
+            logger->logForced(level, tag, message);
     }
 }
 
