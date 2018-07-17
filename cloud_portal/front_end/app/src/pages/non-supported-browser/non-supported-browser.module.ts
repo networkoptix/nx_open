@@ -1,7 +1,7 @@
 import { NgModule }             from '@angular/core';
 import { CommonModule }         from '@angular/common';
 import { BrowserModule }        from '@angular/platform-browser';
-import { UpgradeModule }        from '@angular/upgrade/static';
+import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { RouterModule, Routes } from '@angular/router';
 
 
@@ -17,13 +17,24 @@ const appRoutes: Routes = [
         BrowserModule,
         UpgradeModule,
 
-        RouterModule.forChild(appRoutes)
+        //RouterModule.forChild(appRoutes)
     ],
     providers: [],
     declarations: [
         NonSupportedBrowserComponent,
     ],
-    bootstrap: []
+    bootstrap: [],
+    entryComponents:[
+        NonSupportedBrowserComponent
+    ],
+    exports: [
+        NonSupportedBrowserComponent
+    ]
 })
 export class NonSupportedBrowserModule {
 }
+
+declare var angular: angular.IAngularStatic;
+angular
+        .module('cloudApp.directives')
+        .directive('nonSupportedBrowser', downgradeComponent({ component: NonSupportedBrowserComponent }) as angular.IDirectiveFactory)

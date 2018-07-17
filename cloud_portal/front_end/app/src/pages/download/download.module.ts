@@ -1,7 +1,7 @@
 import { Injectable, NgModule }                  from '@angular/core';
 import { CommonModule }                          from '@angular/common';
 import { BrowserModule }                         from '@angular/platform-browser';
-import { UpgradeModule }                         from '@angular/upgrade/static';
+import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { Router, Resolve, RouterModule, Routes } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -54,7 +54,7 @@ const appRoutes: Routes = [
         UpgradeModule,
         NgbModule,
 
-        RouterModule.forChild(appRoutes)
+        //RouterModule.forChild(appRoutes)
     ],
     providers: [
         OsResolver
@@ -62,7 +62,19 @@ const appRoutes: Routes = [
     declarations: [
         DownloadComponent,
     ],
-    bootstrap: []
+    bootstrap: [],
+    entryComponents:[
+        DownloadComponent
+    ],
+    exports:[
+        DownloadComponent
+    ]
 })
 export class DownloadModule {
 }
+
+declare var angular: angular.IAngularStatic;
+angular
+        .module('cloudApp.directives')
+        .directive('downloadComponent', downgradeComponent({ component: DownloadComponent }) as angular.IDirectiveFactory)
+

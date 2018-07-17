@@ -1,7 +1,7 @@
 import {
     Component, OnInit, OnDestroy,
-    AfterViewChecked, ViewChild, Inject
-}                                       from '@angular/core';
+    AfterViewChecked, ViewChild, Inject, Input
+} from '@angular/core';
 import { ActivatedRoute, Router }       from '@angular/router';
 import { Title }                        from "@angular/platform-browser";
 import { DOCUMENT }                     from "@angular/common";
@@ -14,6 +14,8 @@ import { NgbTabChangeEvent, NgbTabset } from "@ng-bootstrap/ng-bootstrap";
 })
 
 export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
+    @Input() routeParamPlatform;
+
     private sub: any;
     private platform: any;
     private activeOs: string;
@@ -97,12 +99,14 @@ export class DownloadComponent implements OnInit, OnDestroy, AfterViewChecked {
             .requireLogin()
             .then(() => {
                 this.userAuthorized = true;
-                this.routeData = this.route.snapshot.data;
+                //this.routeData = this.route.snapshot.data;
 
                 this.sub = this.route.params.subscribe(params => {
-                    this.platform = params['platform'];
+                    //this.platform = params['platform'];
+                    this.platform = this.routeParamPlatform;
 
-                    this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
+                    //this.activeOs = this.platform || this.platformMatch[this.routeData.platform.os];
+                    this.activeOs = this.platform || this.platformMatch[this.platform];
 
                     for (let mobile in this.downloads.mobile) {
                         if (this.downloads.mobile[mobile].os === this.activeOs) {
