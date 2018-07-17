@@ -24,7 +24,7 @@ import * as angular from 'angular';
                 };
 
                 this.delayedUpdateSystems = function () {
-                    this.pollingSystemsUpdate = $poll(this.forceUpdateSystems, CONFIG.updateInterval);
+                    this.pollingSystemsUpdate = $poll(() => { return this.forceUpdateSystems(); }, CONFIG.updateInterval);
                 };
 
                 this.getSystem = function (systemId) {

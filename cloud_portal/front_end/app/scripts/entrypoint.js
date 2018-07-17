@@ -50,7 +50,7 @@ require('./services/language.ts');
 require('./services/mediaserver.js');
 require('./services/nx-config.ts');
 require('./services/page.js');
-require('./services/poll.js');
+require('./services/poll.ts');
 require('./services/process.ts');
 require('./services/system.ts');
 require('./services/systems.ts');

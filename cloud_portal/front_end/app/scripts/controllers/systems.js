@@ -29,7 +29,9 @@ angular
             }
         });
 
-        $scope.gettingSystems = process.init($scope.systemsProvider.forceUpdateSystems,{
+        $scope.gettingSystems = process.init(function () {
+            return systemsProvider.forceUpdateSystems();
+        }, {
             errorPrefix: $scope.Lang.errorCodes.cantGetSystemsListPrefix,
             logoutForbidden: true
         });

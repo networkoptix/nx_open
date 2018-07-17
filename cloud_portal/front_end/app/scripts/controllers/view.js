@@ -35,7 +35,7 @@
                     }, Config.updateInterval);
 
                     $scope.$on('$destroy', function (event) {
-                        $poll.cancel(pollingSystemUpdate);
+                        pollingSystemUpdate.cancel();
                     });
                 }
 
