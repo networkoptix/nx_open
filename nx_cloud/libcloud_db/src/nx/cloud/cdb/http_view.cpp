@@ -89,6 +89,21 @@ std::vector<network::SocketAddress> HttpView::endpoints() const
     return m_multiAddressHttpServer.endpoints();
 }
 
+const HttpView::HttpServer& HttpView::httpServer() const
+{
+    return m_multiAddressHttpServer;
+}
+
+void HttpView::registerStatisticsApiHandlers(
+    statistics::Provider* statisticsProvider)
+{
+    network::http::registerFusionRequestHandler(
+        &m_httpMessageDispatcher,
+        kStatisticsMetricsPath,
+        std::bind(&statistics::Provider::statistics, statisticsProvider),
+        network::http::Method::get);
+}
+
 void HttpView::registerApiHandlers(
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
