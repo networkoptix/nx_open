@@ -12,6 +12,7 @@
 #include "http_handlers/get_cloud_modules_xml.h"
 #include "managers/managers_types.h"
 #include "stree/cdb_ns.h"
+#include "statistics/provider.h"
 
 namespace nx { namespace data_sync_engine { class SyncronizationEngine; } }
 
@@ -33,6 +34,9 @@ namespace conf { class Settings; }
 class HttpView
 {
 public:
+    using HttpServer =
+        nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>;
+
     HttpView(
         const conf::Settings& settings,
         Controller* controller);
@@ -43,11 +47,15 @@ public:
 
     std::vector<network::SocketAddress> endpoints() const;
 
+    const HttpServer& httpServer() const;
+
+    void registerStatisticsApiHandlers(statistics::Provider* statisticsProvider);
+
 private:
     const conf::Settings& m_settings;
     Controller* m_controller;
     nx::network::http::server::rest::MessageDispatcher m_httpMessageDispatcher;
-    nx::network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer> m_multiAddressHttpServer;
+    HttpServer m_multiAddressHttpServer;
 
     void registerApiHandlers(
         const AuthorizationManager& authorizationManager,

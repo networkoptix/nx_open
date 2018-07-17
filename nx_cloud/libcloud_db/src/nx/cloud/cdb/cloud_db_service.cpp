@@ -7,6 +7,7 @@
 #include "controller.h"
 #include "http_view.h"
 #include "libcloud_db_app_info.h"
+#include "statistics/provider.h"
 
 static int registerQtResources()
 {
@@ -63,6 +64,11 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     HttpView view(settings, &controller);
     m_view = &view;
     view.bind();
+
+    statistics::Provider statisticsProvider(
+        view.httpServer(),
+        controller.ec2SyncronizationEngine().statisticsProvider());
+    view.registerStatisticsApiHandlers(&statisticsProvider);
 
     // Process privilege reduction.
     nx::utils::CurrentProcess::changeUser(settings.changeUser());
