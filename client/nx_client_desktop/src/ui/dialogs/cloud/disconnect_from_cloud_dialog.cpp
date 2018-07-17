@@ -71,7 +71,7 @@ private:
     void setupConfirmationPage();
 
     void onCloudPasswordValidated(
-        bool success,
+        CredentialCheckResult result,
         const QString& password);
 
 public:
@@ -86,7 +86,7 @@ public:
     bool unlinkedSuccessfully;
 
 private:
-    QHash<QString, bool> m_cloudPasswordCache;
+    QHash<QString, CredentialCheckResult> m_cloudPasswordCache;
 };
 
 QnDisconnectFromCloudDialog::QnDisconnectFromCloudDialog(QWidget *parent):
@@ -163,6 +163,7 @@ QnDisconnectFromCloudDialogPrivate::QnDisconnectFromCloudDialogPrivate(QnDisconn
     okButton(nullptr),
     unlinkedSuccessfully(false)
 {
+    qRegisterMetaType<CredentialCheckResult>("CredentialCheckResult");
     createAuthorizeWidget();
     createResetPasswordWidget();
 }
@@ -339,12 +340,12 @@ QString QnDisconnectFromCloudDialogPrivate::disconnectWarnMessage() const
 }
 
 void QnDisconnectFromCloudDialogPrivate::onCloudPasswordValidated(
-    bool success,
+    CredentialCheckResult result,
     const QString& password)
 {
-    m_cloudPasswordCache[password] = success;
+    m_cloudPasswordCache[password] = result;
     lockUi(false);
-    if (success)
+    if (result == CredentialCheckResult::Ok)
     {
         if (scenario == Scenario::CloudOwnerOnly)
             setupResetPasswordPage();
@@ -361,6 +362,18 @@ void QnDisconnectFromCloudDialogPrivate::onCloudPasswordValidated(
     }
 }
 
+CredentialCheckResult convertCode(ec2::ErrorCode errorCode)
+{
+    switch(errorCode)
+    {
+        case ec2::ErrorCode::ok:
+            return CredentialCheckResult::Ok;
+        case ec2::ErrorCode::userLockedOut:
+            return CredentialCheckResult::UserLockedOut;
+    }
+    return CredentialCheckResult::NotAuthorized;
+}
+
 void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
 {
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly || scenario == Scenario::CloudOwner);
@@ -375,7 +388,9 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
             if (!guard)
                 return;
 
-            emit guard->cloudPasswordValidated((errorCode == ec2::ErrorCode::ok), password);
+            CredentialCheckResult result = convertCode(errorCode);
+
+            emit guard->cloudPasswordValidated(result, password);
         };
 
     // Current url may be authorized using temporary credentials, so update both username and pass.
@@ -476,9 +491,13 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
                     if (!m_cloudPasswordCache.contains(password))
                         return ValidationResult::kValid;
 
-                    return m_cloudPasswordCache[password]
-                        ? ValidationResult::kValid
-                        : ValidationResult(tr("Wrong Password"));
+                    auto checkResult = m_cloudPasswordCache[password];
+                    if (checkResult == CredentialCheckResult::Ok)
+                        return ValidationResult::kValid;
+                    else if(checkResult == CredentialCheckResult::UserLockedOut)
+                        return ValidationResult(tr("Too many attempts. Try again in a minute."));
+                    else
+                        return ValidationResult(tr("Wrong Password"));
                 }
                 default:
                     break;
