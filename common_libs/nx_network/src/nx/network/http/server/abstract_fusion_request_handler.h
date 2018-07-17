@@ -95,7 +95,7 @@ private:
 
 template<typename Func>
 class CustomFusionRequestHandler:
-    public AbstractFusionRequestHandler<void, typename std::invoke_result<Func>::type>
+    public AbstractFusionRequestHandler<void, typename std::result_of<Func()>::type>
 {
 public:
     CustomFusionRequestHandler() = default;
