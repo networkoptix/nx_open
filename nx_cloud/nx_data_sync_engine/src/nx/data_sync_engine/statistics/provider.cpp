@@ -20,8 +20,11 @@ Provider::Provider(const ConnectionManager& connectionManager):
 
 Statistics Provider::statistics() const
 {
+    const auto connections = m_connectionManager.getConnections();
+
     Statistics data;
-    data.connectedServerCountByVersion["all"] = m_connectionManager.getConnectionCount();
+    for (const auto& connection: connections)
+        ++data.connectedServerCountByVersion[connection.userAgent];
     return data;
 }
 
