@@ -21,7 +21,9 @@
         <!-- /end of special hack -->
 
         <div class="form-group row" validate-field>
-            <label for="firstName" class="col-md-4 text-left text-md-right control-label">First name</label>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="firstName" class="text-left text-md-right control-label">First name</label>
+            </div>
             <div class="col-md-4">
                 <input type="text" class="form-control"
                        ng-model="account.firstName" id="firstName" maxlength="255"
@@ -43,7 +45,9 @@
             </div>
         </div>
         <div class="form-group row" validate-field>
-            <label for="registerEmail"  class="col-md-4 text-left text-md-right control-label">Email</label>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="registerEmail" class="text-left text-md-right control-label">Email</label>
+            </div>
             <div class="col-md-4">
                 <input ng-hide="lockEmail" type="email" class="form-control"
                        ng-model="account.email" id="registerEmail" maxlength="255"

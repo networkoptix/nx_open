@@ -4,14 +4,18 @@
     <form name="accountForm" class="form-horizontal" novalidate>
 
         <div class="form-group row">
-            <label class="col-md-4 text-left text-md-right control-label">Email</label>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label class="text-left text-md-right control-label">Email</label>
+            </div>
             <div class="col-md-4">
                 <input type="text"  class="form-control" ng-model="account.email" readonly>
             </div>
         </div>
 
         <div class="form-group row" validate-field>
-            <label for="firstName" class="col-md-4 text-left text-md-right control-label">First name</label>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="firstName" class="text-left text-md-right control-label">First name</label>
+            </div>
             <div class="col-md-4">
                 <input type="text" class="form-control" ng-model="account.first_name" name="firstName" id="firstName" maxlength="255" required>
             </div>
@@ -20,7 +24,9 @@
             </div>
         </div>
         <div class="form-group row" validate-field>
-            <label for="lastName" class="col-md-4 text-left text-md-right control-label">Last name</label>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="lastName" class="text-left text-md-right control-label">Last name</label>
+            </div>
             <div class="col-md-4">
                 <input type="text" class="form-control" ng-model="account.last_name" name="lastName" id="lastName" maxlength="255"  required>
             </div>
@@ -29,7 +35,9 @@
             </div>
         </div>
         <div class="form-group row" validate-field>
-            <label for="lastName" class="col-md-4 text-left text-md-right control-label">Language</label>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="lastName" class="text-left text-md-right control-label">Language</label>
+            </div>
             <div class="col-md-4">
                 <nx-language-select account-mode="true"></nx-language-select>
                 <!--<language-select account-mode="true" ng-model="account.language"></language-select>-->
@@ -52,7 +60,9 @@
     <h1>Change Password</h1>
     <form name="passwordForm" class="form-horizontal" novalidate>
         <div class="form-group row" validate-field>
-            <label for="password"  class="col-md-4 text-left text-md-right control-label">Current password</label>
+            <div class="col-md-4 justify-content-start justify-content-md-end">
+                <label for="password" class="text-left text-md-right control-label">Current password</label>
+            </div>
             <div class="col-md-4">
                 <input type="password" class="form-control"
                        ng-model="pass.password"

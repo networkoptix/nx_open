@@ -2,6 +2,9 @@
 @import '../../../../app/styles/custom/custom_palette';
 @import '../../../styles/theme_palette';
 @import '../../../styles/theme_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
 
 .installers {
     .links {
@@ -10,12 +13,12 @@
             float : left;
         }
 
-        @media (max-width : 991px) {
+        @include media-breakpoint-down(lg) {
             width : 50% !important;
             float : left;
         }
 
-        @media (max-width : 768px) {
+        @include media-breakpoint-down(sm) {
             width : 100% !important;
             float : left;
         }

@@ -166,7 +166,6 @@ label {
         float         : left;
         text-align    : right;
         margin-bottom : 0;
-        padding-top   : 8px;
     }
 }
 
@@ -198,8 +197,8 @@ label {
         border-color : $error;
 
         + .input-group-addon {
-            border-color     : $error;
-            background-color : $red2;
+            border-color     : transparent;
+            background-color : transparent;
         }
     }
 }
@@ -426,10 +425,8 @@ select {
 ///////////////////////
 
 .input-group {
-    &.has-addon {
-        input {
-            border-right : none !important;
-        }
+    &.has-addon input {
+        padding-right : 45px;
     }
 
     &-addon {
@@ -440,13 +437,14 @@ select {
         line-height      : 1;
         color            : #121517;
         text-align       : center;
-        background-color : $light_core !important;
-        border           : 1px solid $light5;
-        border-left      : none;
-        border-radius    : 2px;
+        background-color : transparent !important;
+        border           : none;
         display          : flex;
         align-items      : center;
         justify-items    : center;
+        position         : absolute;
+        right            : 2px;
+        z-index          : 9;
 
         .glyphicon {
             margin : 0;
