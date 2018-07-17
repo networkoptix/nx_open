@@ -45,15 +45,8 @@ void setAllSiblingsCheck(ViewNode::Data& data)
 
 void addSelectAll(const QString& caption, const QIcon& icon, const NodePtr& root)
 {
-    ViewNode::Data data;
-    setText(caption, data);
-    setIcon(icon, data);
-    setCheckedState(Qt::Unchecked, data);
-    setAllSiblingsCheck(data);
-    setSiblingGroup(-2, data);
-
-    const auto selectAllNode = ViewNode::create(data);
-    root->addChild(selectAllNode);
+    const auto checkAllNode = helpers::createCheckAllNode(caption, icon, -2);
+    root->addChild(checkAllNode);
     root->addChild(helpers::createSeparatorNode(-1));
 }
 
@@ -121,7 +114,7 @@ NodePtr createUserLayoutsNode(const UserResourceList& users)
     for (const auto& userResource: accessibleUsers)
     {
         const auto node = helpers::createParentResourceNode(userResource,
-            isChildLayout, createCheckableLayoutNode);
+            isChildLayout, createCheckableLayoutNode, true);
         if (node->childrenCount() > 0)
             childNodes.append(node);
     }
@@ -144,7 +137,9 @@ NodePtr createNode(
     ViewNode::Data nodeData;
     setText(caption, nodeData);
     setSiblingGroup(siblingGroup, nodeData);
-//    setCheckedState(Qt::Unchecked, nodeData);
+
+    setCheckedState(Qt::Unchecked, nodeData);//-------
+
     return ViewNode::create(nodeData, children);
 }
 
@@ -153,6 +148,20 @@ NodePtr createNode(
     int siblingGroup)
 {
     return createNode(caption, NodeList(), siblingGroup);
+}
+
+NodePtr createCheckAllNode(
+    const QString& text,
+    const QIcon& icon,
+    int siblingGroup)
+{
+    ViewNode::Data data;
+    setText(text, data);
+    setIcon(icon, data);
+    setCheckedState(Qt::Unchecked, data);
+    setAllSiblingsCheck(data);
+    setSiblingGroup(siblingGroup, data);
+    return ViewNode::create(data);
 }
 
 NodePtr createSeparatorNode(int siblingGroup)
@@ -195,10 +204,10 @@ NodePtr createCurrentUserLayoutsNode(bool allowSelectAll)
     const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
     const auto currentUser = userWatcher->user();
     const auto root = createUserLayoutsNode({currentUser});
+    const auto userRoot = root->children().first();
     if (allowSelectAll)
-        addSelectAll(lit("Select All"), QIcon(), root);
-
-    return root->children().first();
+        addSelectAll(lit("Select All"), QIcon(), userRoot);
+    return userRoot;
 }
 
 NodePtr createResourceNode(

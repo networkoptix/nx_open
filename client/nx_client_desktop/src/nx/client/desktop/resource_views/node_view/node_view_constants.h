@@ -23,7 +23,7 @@ enum Role
 
 enum NodeFlag
 {
-    AllSiblingsCheckFlag
+    AllSiblingsCheckFlag = 0x001
 };
 
 Q_DECLARE_FLAGS(NodeFlags, NodeFlag);

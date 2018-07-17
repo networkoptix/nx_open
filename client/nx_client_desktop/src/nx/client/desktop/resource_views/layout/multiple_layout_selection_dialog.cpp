@@ -133,10 +133,18 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
 
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
+//        createCheckAllNode(lit("Check All"), QIcon(), -2),
+//        createSeparatorNode(-1),
+//        createNode(lit("1"), {
+//            createCheckAllNode(lit("Check All #1"), QIcon(), -2),
+//            createSeparatorNode(-1),
+//            createNode(lit("1_1")),
+//            createNode(lit("1_2")),
+//            createSeparatorNode(1),
+//            createCheckAllNode(lit("Check All #1"), QIcon(), 2),
+//            }),
 //        createNode(lit("2")),
 //        createNode(lit("3"), 2),
-//        createNode(lit("1"), { createNode(lit("1_1")), createNode(lit("1_2")) }),
-//        createSeparatorNode(1),
 //    })));
 
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(

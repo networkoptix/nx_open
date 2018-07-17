@@ -19,6 +19,10 @@ NodePtr createNode(
     int siblingGroup = 0);
 
 NodePtr createSeparatorNode(int siblingGroup = 0);
+NodePtr createCheckAllNode(
+    const QString& text,
+    const QIcon& icon,
+    int siblingGroup = 0);
 
 NodePtr createAllLayoutsNode();
 
