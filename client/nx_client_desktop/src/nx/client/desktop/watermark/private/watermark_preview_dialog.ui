@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnWatermarkPreviewDialog</class>
- <widget class="QDialog" name="QnWatermarkPreviewDialog">
+ <class>nx::client::desktop::WatermarkPreviewDialog</class>
+ <widget class="QDialog" name="WatermarkPreviewDialog">
   <property name="geometry">
    <rect>
     <x>0</x>

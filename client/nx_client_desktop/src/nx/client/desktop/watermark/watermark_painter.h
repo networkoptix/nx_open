@@ -7,10 +7,14 @@
 class QPixmap;
 class QPainter;
 
-class QnWatermarkPainter
+namespace nx {
+namespace client {
+namespace desktop {
+
+class WatermarkPainter
 {
 public:
-    QnWatermarkPainter();
+    WatermarkPainter();
 
     void drawWatermark(QPainter* painter, const QRectF& rect);
 
@@ -27,4 +31,8 @@ private:
 
     QSize m_pixmapSize = QSize(0, 0);
 };
+
+} // namespace desktop
+} // namespace client
+} // namespace nx
 
