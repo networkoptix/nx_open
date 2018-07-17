@@ -146,7 +146,11 @@ namespace ec2
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
-            addCustomHeaders(httpClient);
+
+            // Custom headers allow client to pass authorization by sessionId.
+            // Don't fill it for requests related to a new connection.
+            if (cmdCode != ApiCommand::testConnection && cmdCode != ApiCommand::connect)
+                addCustomHeaders(httpClient);
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;

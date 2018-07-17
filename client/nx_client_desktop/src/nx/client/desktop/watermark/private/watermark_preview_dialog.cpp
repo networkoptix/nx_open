@@ -1,64 +1,70 @@
-#include "watermark_preview_dialog_iface.h"
+#include "../watermark_edit_settings.h"
 #include "watermark_preview_dialog.h"
 #include "ui_watermark_preview_dialog.h"
 
 #include <QtGui/QPainter>
-#include <ui/graphics/items/resource/watermark_painter.h>
+#include <QtCore/QScopedValueRollback>
+
+#include <nx/client/desktop/watermark/watermark_painter.h>
+
+namespace nx {
+namespace client {
+namespace desktop {
 
 namespace {
 const QString kPreviewUsername = "username";
 } // namespace
 
-QnWatermarkPreviewDialog::QnWatermarkPreviewDialog(QWidget* parent):
+WatermarkPreviewDialog::WatermarkPreviewDialog(QWidget* parent):
     QnButtonBoxDialog(parent),
-    ui(new Ui::QnWatermarkPreviewDialog),
-    m_painter(new QnWatermarkPainter),
+    ui(new Ui::WatermarkPreviewDialog),
+    m_painter(new WatermarkPainter),
     m_baseImage(new QPixmap(":/skin/system_settings/watermark_preview.png"))
 {
     ui->setupUi(this);
 
     connect(ui->opacitySlider, &QSlider::valueChanged,
-        this, &QnWatermarkPreviewDialog::updateDataFromControls);
+        this, &WatermarkPreviewDialog::updateDataFromControls);
     connect(ui->frequencySlider, &QSlider::valueChanged,
-        this, &QnWatermarkPreviewDialog::updateDataFromControls);
+        this, &WatermarkPreviewDialog::updateDataFromControls);
 
 }
 
-QnWatermarkPreviewDialog::~QnWatermarkPreviewDialog()
+WatermarkPreviewDialog::~WatermarkPreviewDialog()
 {
 }
 
-bool QnWatermarkPreviewDialog::editSettings(QnWatermarkSettings& settings, QWidget* parent)
+bool WatermarkPreviewDialog::editSettings(QnWatermarkSettings& settings, QWidget* parent)
 {
-    QScopedPointer<QnWatermarkPreviewDialog> dialog(new QnWatermarkPreviewDialog(parent));
+    QScopedPointer<WatermarkPreviewDialog> dialog(new WatermarkPreviewDialog(parent));
     dialog->m_settings = settings;
     dialog->loadDataToUi();
 
     bool result = (dialog->exec() == Accepted) && (dialog->m_settings != settings);
-    if(result)
+    if (result)
         settings = dialog->m_settings;
     return result;
 }
 
-void QnWatermarkPreviewDialog::loadDataToUi()
+void WatermarkPreviewDialog::loadDataToUi()
 {
-    m_lockUpdate = true;
+    QScopedValueRollback<bool> lock_guard(m_lockUpdate, true);
     ui->opacitySlider->setValue((int) (m_settings.opacity * ui->opacitySlider->maximum()));
     ui->frequencySlider->setValue((int) (m_settings.frequency * ui->frequencySlider->maximum()));
     drawPreview();
-    m_lockUpdate = false;
 }
 
-void QnWatermarkPreviewDialog::updateDataFromControls()
+void WatermarkPreviewDialog::updateDataFromControls()
 {
     if (m_lockUpdate)
         return;
+
     m_settings.frequency = ui->frequencySlider->value() / (double) ui->frequencySlider->maximum();
     m_settings.opacity = ui->opacitySlider->value() / (double) ui->opacitySlider->maximum();
     drawPreview();
 }
 
-void QnWatermarkPreviewDialog::drawPreview()
+void WatermarkPreviewDialog::drawPreview()
 {
     QPixmap image = *m_baseImage;
     QPainter painter(&image);
@@ -68,7 +74,11 @@ void QnWatermarkPreviewDialog::drawPreview()
     ui->image->setPixmap(image);
 }
 
-bool ui::dialogs::watermark_preview::editSettings(QnWatermarkSettings& settings, QWidget* parent)
+bool editWatermarkSettings(QnWatermarkSettings& settings, QWidget* parent)
 {
-    return QnWatermarkPreviewDialog::editSettings(settings, parent);
+    return WatermarkPreviewDialog::editSettings(settings, parent);
 }
+
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -1,9 +1,11 @@
+import logging
+import time
+from urlparse import urlparse
+
 import pytest
 import yaml
-import time
-import logging
-from urlparse import urlparse
 from pathlib2 import Path
+import netaddr
 
 import verifications
 
@@ -20,19 +22,17 @@ def one_vm_type():
 def config(test_config):
     return test_config.with_defaults(
         CAMERAS_INTERFACE='enp5s0',
-        CAMERAS_NETWORK='192.168.0',
-        CAMERAS_NETWORK_IP='200',
+        CAMERAS_NETWORK='192.168.0.200/24',
         EXPECTED_CAMERAS_FILE=Path(__file__).parent / 'expected_cameras.yaml',
         )
 
 
-def test_cameras(one_vm, one_licensed_server, config, work_dir):
-    one_licensed_server.os_access.networking.setup_network(
-        one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE),
-        config.CAMERAS_NETWORK, config.CAMERAS_NETWORK_IP)
+def test_cameras(one_vm, one_licensed_mediaserver, config, work_dir):
+    one_licensed_mediaserver.os_access.networking.setup_network(
+        one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE), config.CAMERAS_NETWORK)
 
     expected_cameras = yaml.load(Path(config.EXPECTED_CAMERAS_FILE).read_bytes())
-    stand = Stand(one_licensed_server, config.CAMERAS_NETWORK, expected_cameras)
+    stand = Stand(one_licensed_mediaserver, config.CAMERAS_NETWORK, expected_cameras)
 
     def save_yaml(data, file_name):
         serialized = yaml.safe_dump(data, default_flow_style=False, width=1000)
@@ -42,8 +42,8 @@ def test_cameras(one_vm, one_licensed_server, config, work_dir):
         stand.discover_cameras()
         stand.execute_verification_stages()
     finally:
-        save_yaml(one_licensed_server.api.get('api/moduleInformation'), 'server_information')
-        save_yaml(one_licensed_server.get_resources('CamerasEx'), 'discovered_cameras')
+        save_yaml(one_licensed_mediaserver.api.get('api/moduleInformation'), 'server_information')
+        save_yaml(one_licensed_mediaserver.get_resources('CamerasEx'), 'discovered_cameras')
         save_yaml(stand.result, 'test_result')
 
     assert stand.is_success
@@ -57,7 +57,7 @@ class Camera(object):
         self.has_essential_failure = not (data and is_expected)
 
     def __nonzero__(self):
-        return bool(self.data and self.is_expected and all(self.stages.itervalues()))
+        return bool(self.data and self.is_expected and all(self.stages.values()))
 
     def __repr__(self):
         return repr(self.to_dict())
@@ -104,23 +104,24 @@ class RetryWithDelay(object):
 
 class Stand(object):
     def __init__(self, server, cameras_network, expected_cameras):
-        self.cameras_network = cameras_network
+        network = netaddr.IPNetwork(cameras_network)
+        self.cameras_network = netaddr.IPRange(network.network, network.broadcast)
         self.server = server
         self.server_information = self.server.api.get('api/moduleInformation')
         self.actual_cameras = {}
         self.expected_cameras = {}
-        for ip, rules in expected_cameras.iteritems():
+        for ip, rules in expected_cameras.items():
             stages = self._filter_stages(rules)
-            if stages.has_key('discovery'):
+            if 'discovery' in stages:
                 self.expected_cameras[ip] = stages
 
     @property
     def result(self):
-        return {ip: camera.to_dict() for ip, camera in self.actual_cameras.iteritems()}
+        return {ip: camera.to_dict() for ip, camera in self.actual_cameras.items()}
 
     @property
     def is_success(self):
-        return all(camera for camera in self.actual_cameras.itervalues())
+        return all(camera for camera in self.actual_cameras.values())
 
     def discover_cameras(self):
         logging.info('Expected cameras: ' + ', '.join(self.expected_cameras.keys()))
@@ -129,7 +130,7 @@ class Stand(object):
             discovered_cameras = {}
             for camera in self.server.get_resources('Cameras'):
                 ip = urlparse(camera['url']).hostname
-                if ip and ip.startswith(self.cameras_network):
+                if ip and netaddr.IPAddress(ip) in self.cameras_network:
                     discovered_cameras[ip] = camera
 
             logging.info('Discovered cameras: ' + ', '.join(discovered_cameras))
@@ -139,7 +140,7 @@ class Stand(object):
         for ip in self.expected_cameras:
             self.actual_cameras[ip] = Camera(discovered_cameras.get(ip), is_expected=True)
 
-        for ip, data in discovered_cameras.iteritems():
+        for ip, data in discovered_cameras.items():
             if ip not in self.expected_cameras:
                 self.actual_cameras[ip] = Camera(data, is_expected=False)
 
@@ -151,14 +152,14 @@ class Stand(object):
                     break
 
             if stage.is_essential:
-                for camera in self.actual_cameras.itervalues():
+                for camera in self.actual_cameras.values():
                     result = camera.stages.get(stage.name)
                     if result is not None and not result:
                         camera.has_essential_failure = True
 
     def _execute_verification_stage(self, stage):
         error_count = 0
-        for ip, camera in self.actual_cameras.iteritems():
+        for ip, camera in self.actual_cameras.items():
             if camera.has_essential_failure:
                 continue  # < Does not make sense to verify anything else.
 
@@ -192,7 +193,7 @@ class Stand(object):
                     base_stage = conditional.setdefault(base_name.strip(), {})
                     self._merge_stage_dict(base_stage, stage, may_override=False)
 
-        for name, stage in conditional.iteritems():
+        for name, stage in conditional.items():
             base_stage = rules.setdefault(name, {})
             self._merge_stage_dict(base_stage, stage, may_override=True)
 
@@ -200,10 +201,10 @@ class Stand(object):
 
     @classmethod
     def _merge_stage_dict(cls, destination, source, may_override):
-        for key, value in source.iteritems():
+        for key, value in source.items():
             if isinstance(value, dict):
-                cls._merge_stage(destination[key], value, may_override)
+                cls._merge_stage_dict(destination[key], value, may_override)
             else:
-                if destination.has_key(key) and not may_override:
+                if key in destination and not may_override:
                     raise ValueError('Conflict in stage')
                 destination[key] = value

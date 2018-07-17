@@ -41,7 +41,6 @@ private:
     QnMediaServerResourcePtr m_server;
     QnUuid m_userId;
     std::shared_ptr<QnDesktopCameraConnectionProcessor> processor;
-    std::unique_ptr<nx::network::AbstractStreamSocket> tcpSocket;
     std::unique_ptr<nx::network::http::HttpClient> httpClient;
     QnMutex m_mutex;
 };

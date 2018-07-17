@@ -57,11 +57,11 @@ def parse_json_fields(data):
         return [parse_json_fields(i) for i in data]
     if isinstance(data, basestring):
         try:
-            data = json.loads(data)
+            json_data = json.loads(data)
         except ValueError:
             pass
         else:
-            return parse_json_fields(data)
+            return parse_json_fields(json_data)
     return data
 
 
