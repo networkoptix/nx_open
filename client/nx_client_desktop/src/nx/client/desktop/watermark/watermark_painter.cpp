@@ -5,8 +5,6 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 
-#include <ini.h>
-
 namespace nx {
 namespace client {
 namespace desktop {
@@ -66,9 +64,6 @@ void WatermarkPainter::setWatermark(const QString& text, const QnWatermarkSettin
 void WatermarkPainter::updateWatermark()
 {
     m_pixmap.fill(Qt::transparent);
-
-    if (!nx::client::desktop::ini().enableWatermark)
-        return;
 
     if (m_text.isEmpty())
         return;
