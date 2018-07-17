@@ -15,6 +15,7 @@ enum class Component
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(Component, (lexical))
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Component)
 
 struct Package
 {
@@ -29,7 +30,7 @@ struct Package
 };
 
 #define Package_Fields (component)(arch)(platform)(variant)(file)(url)(size)(md5)
-QN_FUSION_DECLARE_FUNCTIONS(Package, (json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json))
 
 struct Information
 {
@@ -42,19 +43,26 @@ struct Information
 };
 
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages)
-QN_FUSION_DECLARE_FUNCTIONS(Information, (json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json))
 
 enum class InformationError
 {
     noError,
-    downloadFailed
+    networkError,
+    httpError,
+    jsonError,
+    incompatibleCloudHost
 };
 
+QN_FUSION_DECLARE_FUNCTIONS(InformationError, (lexical))
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(InformationError)
+
 Information updateInformation(
+    const QString& url,
     const QString& publicationKey = kLatestVersion,
     InformationError* error = nullptr);
 
-Information updateInformationFromZipFile(
+Information updateInformation(
     const QString& zipFileName,
     InformationError* error = nullptr);
 

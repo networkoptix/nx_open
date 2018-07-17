@@ -16,6 +16,10 @@
 #include <nx/vms/discovery/manager.h>
 #include <api/global_settings.h>
 #include <media_server/media_server_module.h>
+#include <nx/vms/api/types/resource_types.h>
+#include <nx/update/update_information.h>
+#include <media_server/media_server_module.h>
+#include <nx/mediaserver/settings.h>
 
 namespace {
 
@@ -143,6 +147,45 @@ void checkCloudHostRemotely(
     requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 }
 
+static const QString kPublicationKeyParamName = "publicationKey";
+
+static int checkInternetForUpdate(
+    const QString& publicationKey,
+    QByteArray* result,
+    QByteArray* contentType,
+    const QnEmptyRequestData& request)
+{
+    nx::update::InformationError error;
+    auto information = nx::update::updateInformation(
+        qnServerModule->settings().checkForUpdateUrl(),
+        publicationKey,
+        &error);
+
+    if (error == nx::update::InformationError::noError)
+    {
+        QnFusionRestHandlerDetail::serialize(information, *result, *contentType, request.format);
+        return nx::network::http::StatusCode::ok;
+    }
+
+    using namespace nx::update;
+    QString s;
+    QnLexical::serialize(error, &s);
+    return QnFusionRestHandler::makeError(
+        nx::network::http::StatusCode::ok, "",
+        result, contentType, request.format, request.extraFormatting,
+        QnRestResult::CantProcessRequest);
+}
+
+static int checkForUpdatesRemotely(const QString& publicationKey, QByteArray* result)
+{
+    return -1;
+}
+
+static int getUpdateInformationFromGlobalSettings(QByteArray* result)
+{
+    return -1;
+}
+
 } // namespace
 
 int QnUpdateInformationRestHandler::executeGet(
@@ -152,10 +195,13 @@ int QnUpdateInformationRestHandler::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(processor->resourcePool(), params);
+    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
+        processor->resourcePool(),
+        params);
 
     QnMultiserverRequestContext<QnEmptyRequestData> context(
-        request, processor->owner()->getPort());
+        request,
+        processor->owner()->getPort());
 
     if (path.endsWith(lit("/freeSpaceForUpdateFiles")))
     {
@@ -181,8 +227,24 @@ int QnUpdateInformationRestHandler::executeGet(
         return nx::network::http::StatusCode::ok;
     }
 
-    return QnFusionRestHandler::makeError(nx::network::http::StatusCode::badRequest,
-        lit("Unknown operation"),
-        &result, &contentType, request.format, request.extraFormatting,
-        QnRestResult::CantProcessRequest);
+    auto mediaServer = qnServerModule->resourcePool()->getResourceById<QnMediaServerResource>(
+        qnServerModule->commonModule()->moduleGUID());
+
+    NX_CRITICAL(mediaServer);
+    if (params.contains(kPublicationKeyParamName))
+    {
+        if (mediaServer->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP) || request.isLocal)
+        {
+            return checkInternetForUpdate(
+                params.value(kPublicationKeyParamName),
+                &result,
+                &contentType,
+                request);
+        }
+
+        if (!request.isLocal)
+            return checkForUpdatesRemotely(params.value(kPublicationKeyParamName), &result);
+    }
+
+    return getUpdateInformationFromGlobalSettings(&result);
 }
