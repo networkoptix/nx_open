@@ -4,13 +4,13 @@ namespace nx {
 namespace utils {
 namespace rlimit {
 
-NX_UTILS_API unsigned long getNoFile();
-NX_UTILS_API unsigned long setNoFile(unsigned long value);
+NX_UTILS_API unsigned long getMaxFileDescriptiors();
+NX_UTILS_API unsigned long setMaxFileDescriptors(unsigned long value);
 
-inline void setDefaultNoFile()
+inline void setDefaultMaxFileDescriptiors()
 {
-    constexpr unsigned long kDefaultNoFile = 32000;
-    setNoFile(kDefaultNoFile);
+    constexpr unsigned long kDefaultMaxFileDescriptors = 32000;
+    setMaxFileDescriptors(kDefaultMaxFileDescriptors);
 }
 
 } // namespace rlimit

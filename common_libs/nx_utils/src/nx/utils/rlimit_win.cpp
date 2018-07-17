@@ -4,12 +4,12 @@ namespace nx {
 namespace utils {
 namespace rlimit {
 
-unsigned long getNoFile()
+unsigned long getMaxFileDescriptors()
 {
     return 0;
 }
 
-unsigned long setNoFile(unsigned long /*value*/)
+unsigned long setMaxFileDescriptors(unsigned long /*value*/)
 {
     return 0;
 }

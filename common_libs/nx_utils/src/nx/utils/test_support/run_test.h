@@ -62,7 +62,7 @@ inline int runTest(
     if (extraInit)
         deinitFunctions = extraInit(args);
 
-    nx::utils::rlimit::setDefaultNoFile();
+    nx::utils::rlimit::setDefaultMaxFileDescriptiors();
 
     const int result = RUN_ALL_TESTS();
     for (const auto& deinit: deinitFunctions)
