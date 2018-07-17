@@ -5,6 +5,7 @@
 #include "detail/abstract_fusion_request_handler_detail.h"
 
 #include "../http_types.h"
+#include "http_message_dispatcher.h"
 
 namespace nx {
 namespace network {
@@ -104,12 +105,12 @@ public:
     }
 
     virtual void processRequest(
-        nx::network::http::HttpServerConnection* const connection,
-        const nx::network::http::Request& request,
-        nx::utils::stree::ResourceContainer authInfo)
+        nx::network::http::HttpServerConnection* const /*connection*/,
+        const nx::network::http::Request& /*request*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/)
     {
         auto data = m_func();
-        requestCompleted(FusionRequestResult(), std::move(data));
+        this->requestCompleted(FusionRequestResult(), std::move(data));
     }
 
 private:
@@ -126,7 +127,7 @@ void registerFusionRequestHandler(
 {
     using Handler = CustomFusionRequestHandler<Func>;
 
-    dispatcher->registerRequestProcessor<Handler>(
+    dispatcher->template registerRequestProcessor<Handler>(
         path,
         [func]() -> std::unique_ptr<Handler>
         {
