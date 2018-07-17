@@ -113,7 +113,7 @@ def required_licenses():
 
 
 @pytest.fixture
-def one_licensed_server(one_mediaserver, required_licenses):
+def one_licensed_mediaserver(one_mediaserver, required_licenses):
     one_mediaserver.os_access.networking.static_dns(licensing.TEST_SERVER_IP, licensing.DNS)
     one_mediaserver.start()
     setup_local_system(one_mediaserver, {})

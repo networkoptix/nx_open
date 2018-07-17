@@ -29,7 +29,7 @@ enum CLHttpStatus
 
 QString NX_NETWORK_API toString( CLHttpStatus status );
 
-typedef QSharedPointer<nx::network::AbstractStreamSocket> TCPSocketPtr;
+typedef std::unique_ptr<nx::network::AbstractStreamSocket> TCPSocketPtr;
 
 /**
  * This class is deprecated. Please, use nx::network::http::HttpClient or nx::network::http::AsyncHttpClient.
@@ -70,8 +70,6 @@ public:
     int read(char* data, int max_len);
 
     void close();
-
-    //TCPSocketPtr getSocket() { return m_sock; }
 
     QHash<QByteArray, QByteArray> header() const
     {

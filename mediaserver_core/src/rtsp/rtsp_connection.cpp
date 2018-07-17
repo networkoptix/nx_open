@@ -275,8 +275,10 @@ public:
 
 static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, owner)
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner)
+    :
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, std::move(socket), owner)
 {
 }
 
@@ -446,7 +448,7 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 void QnRtspConnectionProcessor::generateSessionId()
 {
     Q_D(QnRtspConnectionProcessor);
-    d->sessionId = QString::number(reinterpret_cast<uintptr_t>(d->socket.data()));
+    d->sessionId = QString::number(reinterpret_cast<uintptr_t>(d->socket.get()));
     d->sessionId += QString::number(nx::utils::random::number());
 }
 
@@ -1038,8 +1040,8 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & 
             (!cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled))
         {
             m_needStop = true;
-            if (auto socket = d->socket)
-                socket->shutdown();
+            if (d->socket)
+                d->socket->shutdown();
         }
     }
 }
@@ -1052,8 +1054,8 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & 
     if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner))
     {
         m_needStop = true;
-        if (auto socket = d->socket)
-            socket->shutdown();
+        if (d->socket)
+            d->socket->shutdown();
     }
 }
 
@@ -1278,7 +1280,6 @@ int QnRtspConnectionProcessor::composePlay()
             return CODE_INTERNAL_ERROR;
         d->useProprietaryFormat = true;
         d->sessionTimeOut = 0;
-        //d->socket->setRecvTimeout(LARGE_RTSP_TIMEOUT);
         d->socket->setSendTimeout(kNativeRtspConnectionSendTimeout); // set large timeout for native connection
         QnConstResourceVideoLayoutPtr videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
         createPredefinedTracks(videoLayout);
