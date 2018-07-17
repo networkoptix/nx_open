@@ -3,15 +3,15 @@
 Measure system synchronization time.
 """
 
-from collections import namedtuple
 import datetime
 import logging
 import traceback
+from collections import namedtuple
 from functools import wraps
 from multiprocessing.dummy import Pool as ThreadPool
 
-from netaddr.ip import IPNetwork
 import pytest
+from netaddr.ip import IPNetwork
 from requests.exceptions import ReadTimeout
 
 import framework.utils as utils
@@ -21,15 +21,14 @@ import transaction_log
 from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
-from framework.networking import setup_flat_network
-from framework.utils import GrowingSleep
-from memory_usage_metrics import load_host_memory_usage
 from framework.merging import (
     REMOTE_ADDRESS_ACCESSIBLE,
     REMOTE_ADDRESS_ANY,
     merge_systems,
     setup_local_system,
-    )
+)
+from framework.networking import setup_flat_network
+from framework.utils import GrowingSleep
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
 
