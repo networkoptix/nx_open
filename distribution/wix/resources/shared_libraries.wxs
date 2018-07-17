@@ -31,9 +31,6 @@
         </ComponentGroup>
 
         <ComponentGroup Id="shared_qt_libraries" Source="$(var.QtDir)" Directory="InstallDirRoot">
-            <Component><File Name="icudt60.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="icuin60.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="icuuc60.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="Qt5Core.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="Qt5Gui.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="Qt5Multimedia.dll" KeyPath="yes" DiskId="2"/></Component>
@@ -43,5 +40,12 @@
             <Component><File Name="Qt5XmlPatterns.dll" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="Qt5Sql.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>
+
+        <ComponentGroup Id="shared_icu_libraries" Source="$(var.IcuDir)" Directory="InstallDirRoot">
+            <Component><File Name="icudt60.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="icuin60.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="icuuc60.dll" KeyPath="yes" DiskId="2"/></Component>
+        </ComponentGroup>
+
     </Fragment>
 </Wix>

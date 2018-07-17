@@ -2,7 +2,19 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <?include BuildVars.wxi ?>
-        <ComponentGroup Id="plugins" Directory="plugins" Source="$(var.PluginsDir)">
+        <ComponentGroup Id="server_misc_libraries" Source="$(var.SourceDir)" Directory="InstallDirRoot">
+            <Component><File Name="sigar.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="server_qt_libraries" Source="$(var.QtDir)" Directory="InstallDirRoot">
+            <Component><File Name="Qt5WebSockets.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="server_qt_sqldrivers" Source="$(var.QtPluginsDir)\sqldrivers" Directory="sqldrivers">
+            <Component><File Name="qsqlite.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="server_plugins" Directory="plugins" Source="$(var.PluginsDir)">
             <Component><File Name="genericrtspplugin.dll" KeyPath="yes"/></Component>
             <Component><File Name="mjpg_link.dll" KeyPath="yes"/></Component>
             <Component><File Name="generic_multicast_plugin.dll" KeyPath="yes"/></Component>
@@ -15,7 +27,7 @@
             <?endif?>
         </ComponentGroup>
 
-        <ComponentGroup Id="plugins_optional" Directory="plugins_optional" Source="$(var.plugins_optional_dir)">
+        <ComponentGroup Id="server_plugins_optional" Directory="plugins_optional" Source="$(var.plugins_optional_dir)">
             <Component><File Name="stub_metadata_plugin.dll" KeyPath="yes"/></Component>
         </ComponentGroup>
     </Fragment>

@@ -128,6 +128,7 @@
             <ComponentGroupRef Id="shared_qt_libraries"/>
             <ComponentGroupRef Id="shared_qt_gui"/>
             <ComponentGroupRef Id="shared_qt_platforms"/>
+            <ComponentGroupRef Id="shared_icu_libraries"/>
             <ComponentGroupRef Id="client_nx_libraries"/>
             <ComponentGroupRef Id="client_misc_libraries"/>
             <ComponentGroupRef Id="client_plugins"/>
