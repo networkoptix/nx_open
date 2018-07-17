@@ -181,9 +181,15 @@ static int checkForUpdatesRemotely(const QString& publicationKey, QByteArray* re
     return -1;
 }
 
-static int getUpdateInformationFromGlobalSettings(QByteArray* result)
+static int getUpdateInformationFromGlobalSettings(
+    QByteArray* result,
+    QByteArray* contentType,
+    const QnEmptyRequestData& request)
 {
-    return -1;
+    *contentType = Qn::serializationFormatToHttpContentType(request.format);
+    *result = qnServerModule->commonModule()->globalSettings()->updateInformation();
+
+    return nx::network::http::StatusCode::ok;;
 }
 
 } // namespace
@@ -246,5 +252,5 @@ int QnUpdateInformationRestHandler::executeGet(
             return checkForUpdatesRemotely(params.value(kPublicationKeyParamName), &result);
     }
 
-    return getUpdateInformationFromGlobalSettings(&result);
+    return getUpdateInformationFromGlobalSettings(&result, &contentType, request);
 }
