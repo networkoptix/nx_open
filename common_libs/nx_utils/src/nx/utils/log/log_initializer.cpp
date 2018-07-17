@@ -29,11 +29,28 @@ std::unique_ptr<AbstractLogger> buildLogger(
 
 void initializeGlobally(const nx::utils::ArgumentParser& arguments)
 {
-    log::Settings logSettings;
-    logSettings.load(arguments);
-    setMainLogger(buildLogger(logSettings, QString()));
+    bool isDefaultLoggerUsed = true;
 
-    // NOTE: Default log level is ensured by LevelSettings::primary default value.
+    if (const auto value = arguments.get("log-file", "lf"))
+    {
+        log::Settings logSettings;
+        logSettings.loggers.resize(1);
+        logSettings.loggers.front().logBaseName = *value;
+        setMainLogger(buildLogger(logSettings, QString()));
+        isDefaultLoggerUsed = false;
+    }
+
+    if (const auto value = arguments.get("log-level", "ll"))
+    {
+        LevelSettings level;
+        level.parse(*value);
+        mainLogger()->setDefaultLevel(level.primary);
+        mainLogger()->setLevelFilters(level.filters);
+    }
+    else if (isDefaultLoggerUsed)
+    {
+        mainLogger()->setDefaultLevel(Level::none);
+    }
 }
 
 } // namespace log
