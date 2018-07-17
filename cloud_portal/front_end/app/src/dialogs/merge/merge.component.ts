@@ -21,6 +21,7 @@ export class MergeModalContent {
     targetSystem: any;
     systemMergeable: string;
     masterId: string;
+    systemsSelect: any;
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('process') private process: any,
@@ -64,7 +65,18 @@ export class MergeModalContent {
         return system.name + status;
     };
 
+    makeSelectorList(systems) {
+        this.systemsSelect = [];
+        systems.forEach( (element) => {
+            this.systemsSelect.push({
+                name: this.addStatus(element),
+                id: element.id
+            })
+        });
+    }
+
     ngOnInit() {
+        this.systemsSelect = [];
         this.masterId = this.system.id;
         this.account
             .get()
@@ -72,7 +84,8 @@ export class MergeModalContent {
                 this.user = user;
                 this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
                 this.showMergeForm = this.system.canMerge && this.systems.length > 0;
-                this.targetSystem = this.systems[0];
+                this.makeSelectorList(this.systems);
+                this.targetSystem = this.systemsSelect[0];
                 return this._system(this.targetSystem.id, user.email).update();
             }).then((system)=>{
                 this.systemMergeable = this.checkMergeAbility(system);

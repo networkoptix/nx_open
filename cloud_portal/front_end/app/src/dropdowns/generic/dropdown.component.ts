@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input, forwardRef } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input, forwardRef, EventEmitter, Output } from '@angular/core';
 import { TranslateService }                                        from '@ngx-translate/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR }                 from '@angular/forms';
 
@@ -26,40 +26,31 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR }                 from '@angula
     ]
 })
 
-export class NxGenericDropdown implements OnInit, ControlValueAccessor {
+export class NxGenericDropdown implements OnInit {
     @Input() items: any;
-    @Input() label: string;
     @Input() selected: any;
+    @Output() onSelected = new EventEmitter<string>();
 
-    selection: string;
+
     message: string;
 
     constructor(private translate: TranslateService) {
         translate.get('Please select...')
-                 .subscribe((res: string) => {
-                     this.message = res;
-                 });
+                .subscribe((res: string) => {
+                    this.message = res;
+                });
     }
 
-    propagateChange = (_: any) => {
-    };
-
     ngOnInit(): void {
+        const selected = this.items.filter(x => x.name === this.selected.name)[0];
+        if (!this.selected) {
+            this.selected = selected.name || this.message;
+        }
     }
 
     change(item) {
-        this.selection = item[this.label];
-        this.propagateChange(this.selection);
-    }
-
-    writeValue(value: any) {
-        this.selection = (value) ? value : this.message;
-    }
-
-    registerOnChange(fn) {
-        this.propagateChange = fn;
-    }
-
-    registerOnTouched() {
+        this.selected = item;
+        this.onSelected.emit(item);
     }
 }
+
