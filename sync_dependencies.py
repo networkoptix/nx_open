@@ -146,7 +146,6 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
     if box == "tx1":
         sync("tegra_video")
         sync("jetpack")
-        sync("gstreamer")
         sync("deepstream")
 
     if platform in ("android", "windows") or box == "bpi":
