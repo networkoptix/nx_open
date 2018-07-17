@@ -15,7 +15,7 @@ TEGRA_VIDEO_SOURCE_DIR="$SOURCE_DIR/artifacts/tx1/tegra_multimedia_api"
 NVIDIA_MODELS_SOURCE_DIR="$TEGRA_VIDEO_SOURCE_DIR/data/model" #< Demo neural networks.
 NVIDIA_MODELS_INSTALL_PATH="$MEDIASERVER_INSTALL_PATH/nvidia_models"
 
-PACKAGE_QT="qt-5.6.3"
+PACKAGE_QT="qt-5.11.1"
 PACKAGE_SIGAR="sigar-1.7"
 PACKAGE_FFMPEG="ffmpeg-3.1.1"
 
