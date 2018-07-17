@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QItemDelegate>
 
+#include <utils/common/scoped_painter_rollback.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
@@ -78,14 +79,20 @@ void Delegate::paint(
     const QStyleOptionViewItem &option,
     const QModelIndex &index) const
 {
-    base_type::paint(painter, option, index);
 
     const auto node = NodeViewModel::nodeFromIndex(getMappedIndex(index, m_owner->model()));
-    if (!node || !node->data(node_view::nameColumn, node_view::separatorRole).toBool())
-        return;
-
-    painter->setBrush(Qt::red);
-    painter->fillRect(option.rect, Qt::red);
+    if (node && node->data(node_view::nameColumn, node_view::separatorRole).toBool())
+    {
+        if (option.features == QStyleOptionViewItem::None)
+        {
+            int y = option.rect.top() + option.rect.height() / 2;
+            QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Midlight));
+            painter->drawLine(0, y, option.rect.right(), y);
+            return;
+        }
+    }
+    else
+        base_type::paint(painter, option, index);
 }
 
 QModelIndex Delegate::getMappedIndex(const QModelIndex& index, QAbstractItemModel* model)
@@ -129,23 +136,23 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     const auto tree = ui->layoutsTree;
     tree->setItemDelegate(new Delegate(tree));
     tree->setProxyModel(siblingGroupProxyModel);
-    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
+//    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
 
-//    tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
-//        createCheckAllNode(lit("Check All"), QIcon(), -2),
-//        createSeparatorNode(-1),
-//        createNode(lit("1"), {
-//            createCheckAllNode(lit("Check All #1"), QIcon(), -2),
-//            createSeparatorNode(-1),
-//            createNode(lit("1_1")),
-//            createNode(lit("1_2")),
-//            createSeparatorNode(1),
-//            createCheckAllNode(lit("Check All #1"), QIcon(), 2),
-//            }),
-//        createNode(lit("2")),
-//        createNode(lit("3"), 2),
-//    })));
+    tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
+        createCheckAllNode(lit("Check All"), QIcon(), -2),
+        createSeparatorNode(-1),
+        createNode(lit("1"), {
+            createCheckAllNode(lit("Check All #1"), QIcon(), -2),
+            createSeparatorNode(-1),
+            createNode(lit("1_1")),
+            createNode(lit("1_2")),
+            createSeparatorNode(1),
+            createCheckAllNode(lit("Check All #1"), QIcon(), 2),
+            }),
+        createNode(lit("2")),
+        createNode(lit("3"), 2),
+    })));
 
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(
 //        ViewNode::create({helpers::createSeparatorNode()})));

@@ -30,23 +30,25 @@ void addCheckStateChange(NodeViewStatePatch& patch, const ViewNodePath& path, Qt
     patch.changedData.append(nodeDescirption);
 }
 
-NodeList getAllCheckSiblings(const NodePtr& node)
+NodeList getAllCheckNodes(NodeList nodes)
 {
-    const auto parent = node->parent();
-    if (!parent)
-        return NodeList();
+    if (nodes.isEmpty())
+        return nodes;
 
-    NodeList siblings = parent->children();
-    const auto nodePath = node->path();
-    const auto itOtherCheckableEnd = std::remove_if(siblings.begin(), siblings.end(),
-        [nodePath](const  NodePtr& siblingNode)
+    const auto itOtherCheckableEnd = std::remove_if(nodes.begin(), nodes.end(),
+        [](const  NodePtr& siblingNode)
         {
             return !isAllSiblingsCheckNode(siblingNode);
         });
 
-    siblings.erase(itOtherCheckableEnd, siblings.end());
-    return siblings;
+    nodes.erase(itOtherCheckableEnd, nodes.end());
+    return nodes;
+}
 
+NodeList getAllCheckSiblings(const NodePtr& node)
+{
+    const auto parent = node->parent();
+    return getAllCheckNodes(parent ? parent->children() : NodeList());
 }
 
 NodeList getSimpleCheckableNodes(NodeList nodes)
@@ -58,7 +60,7 @@ NodeList getSimpleCheckableNodes(NodeList nodes)
 }
 
 // Returns list of checkable siblings except specified node and All-Sibling-Check node.
-NodeList getCheckableSimpleSiblings(const NodePtr& node)
+NodeList getSimpleCheckableSiblings(const NodePtr& node)
 {
     const auto parent = node->parent();
     if (!parent)
@@ -112,7 +114,7 @@ void setNodeCheckedInternal(
     addCheckStateChange(patch, path, checkedState);
 
     const bool initialChange = flags.testFlag(UpsideFlag) && flags.testFlag(DownsideFlag);
-    const auto siblings = getCheckableSimpleSiblings(node);
+    const auto siblings = getSimpleCheckableSiblings(node);
     const auto allSiblingsCheckNode = isAllSiblingsCheckNode(node);
     NX_EXPECT(!allSiblingsCheckNode || initialChange, "Shouldn't get here!");
     if (allSiblingsCheckNode)
@@ -130,15 +132,22 @@ void setNodeCheckedInternal(
         // Fill up states for All-Sibling-Check nodes
 
         const auto siblingsState = getSiblingsCheckState(checkedState, siblings);
-        const auto checkAllState = initialChange ? siblingsState : checkedState;
-        for (const auto checkAllSibling: getAllCheckSiblings(node))
+        const auto checkAllState = initialChange || flags.testFlag(UpsideFlag)
+            ? siblingsState : checkedState;
+
+        const auto checkAllSiblings = getAllCheckSiblings(node);
+        for (const auto checkAllSibling: checkAllSiblings)
             addCheckStateChange(patch, checkAllSibling->path(), checkAllState);
 
         if (flags.testFlag(DownsideFlag))
         {
             // Just tries to set all children nodes to the same state.
-            for (const auto& child: getSimpleCheckableNodes(node->children()))
+            const auto children = node->children();
+            for (const auto& child: getSimpleCheckableNodes(children))
                 setNodeCheckedInternal(patch, state, child->path(), checkedState, DownsideFlag);
+
+            for (const auto& childCheckAll: getAllCheckNodes(children))
+                addCheckStateChange(patch, childCheckAll->path(), checkedState);
         }
 
         if (flags.testFlag(UpsideFlag))
