@@ -19,32 +19,6 @@
     }
 
     & li {
-        //&.active {
-        //    display : none;
-        //
-        //    @media (max-width : $collapse-first-width) {
-        //        display: block;
-        //    }
-        //
-        //    a {
-        //        background-color: $light16 !important;
-        //        color
-        //
-        //        .system-name {
-        //        }
-        //
-        //        &:hover {
-        //            .system-owner {
-        //                color : $light1;
-        //            }
-        //        }
-        //
-        //        .glyphicon-home {
-        //            background-position : 0px -56px !important;
-        //        }
-        //    }
-        //}
-
         & > a {
             white-space : nowrap;
             display     : flex;
