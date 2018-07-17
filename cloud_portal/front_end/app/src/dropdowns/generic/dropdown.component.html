@@ -4,7 +4,7 @@
             id="genericSelect"
             [ngClass]="{'ng-invalid': !isValid}"
             ngbDropdownToggle>
-        <span [innerHtml]="selection"></span>
+        <span [innerHtml]="selected.name"></span>
         <div class="nav-arrow">
             <span></span>
             <span></span>
@@ -15,7 +15,7 @@
         <li *ngFor="let item of items">
 
             <a class="dropdown-item" (click)="change(item)">
-                <span>{{item[label]}}</span>
+                <span>{{item.name}}</span>
             </a>
         </li>
     </ul>

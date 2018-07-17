@@ -294,22 +294,37 @@ window.L = {};
                                 }
                             })
                             .when('/downloads/history', {
-                                template: ''
+                                //templateUrl: CONFIG.viewsDir + 'downloads.html'
+                                template: '<download-history></download-history>'
                             })
                             .when('/downloads/:build', {
-                                template: ''
+                                template: '<download-history [route-param-build]="build"></download-history>',
+                                controller: function ($scope, getBuild) {
+                                    $scope.build = getBuild;
+                                },
+                                resolve: {
+                                    getBuild: function($route){return $route.current.params.build}
+                                }
                             })
                             .when('/downloads', {
-                                template: ''
+                                template: '<download-history></download-history>'
                             })
                             .when('/download', {
-                                template: ''
+                                template: '<download-component></download-component>'
                             })
                             .when('/download/:platform', {
-                                template: ''
+                                template: '<download-component [route-param-platform]="platform"></download-component>',
+                                controller: function ($scope, getPlatform) {
+                                    $scope.platform = getPlatform;
+                                },
+                                resolve: {
+                                    getPlatform: function ($route) {
+                                        return $route.current.params.platform
+                                    }
+                                }
                             })
                             .when('/browser', {
-                                template: ''
+                                template: '<non-supported-browser></non-supported-browser>'
                             })
                             .when('/', {
                                 title: ''/*lang.pageTitles.startPage*/,

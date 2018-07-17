@@ -30,10 +30,7 @@
     <div class="modal-body">
         <div class="form-group">
             <label for="system" translate>Merge current System with</label>
-            <select class="form-control" name="targetSystem"
-                    id="system" [(ngModel)]="targetSystem" (ngModelChange)="setTargetSystem($event)">>
-                <option *ngFor="let system of systems" [ngValue]="system">{{addStatus(system)}}</option>
-            </select>
+            <nx-select [items]="systemsSelect" [selected]="targetSystem" (onSelected)="setTargetSystem($event)"></nx-select>
         </div>
         <p *ngIf="systemMergeable =='offline'"
            class="help-block-no-height warning-label" translate>

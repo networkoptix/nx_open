@@ -4,7 +4,7 @@ import {
 
 
 @Component({
-    selector: 'non-supported-browser-component',
+    selector: 'non-supported-browser',
     templateUrl: 'non-supported-browser.component.html'
 })
 
