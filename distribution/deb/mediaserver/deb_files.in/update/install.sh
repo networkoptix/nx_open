@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DISTRIB="@artifact.name.server@.deb"
+DISTRIB="@server_distribution_name@.deb"
 
 RELEASE_YEAR=$(lsb_release -a |grep "Release:" |awk {'print $2'} |awk -F  "." '/1/ {print $1}')
 
