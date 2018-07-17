@@ -186,7 +186,6 @@ if(IOS)
         "-framework CoreVideo"
         "-framework CoreMedia"
         "-framework AVFoundation"
-        Qt5WebView
     )
 
     if(NOT ios.skip.sign)
