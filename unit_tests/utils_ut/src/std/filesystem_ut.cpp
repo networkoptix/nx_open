@@ -14,7 +14,8 @@ TEST(StdFilesystem, parent_path)
 
     ASSERT_EQ(path("/var"), path("/var/local").parent_path());
     ASSERT_EQ(path("/var/local"), path("/var/local/").parent_path());
-    ASSERT_EQ(path("c:"), path("c:\\tmp").parent_path());
+    ASSERT_EQ(path("c:\\"), path("c:\\tmp").parent_path());
+    ASSERT_EQ(path("c:/"), path("c:/tmp").parent_path());
     ASSERT_EQ(path(), path("tmp").parent_path());
 }
 
@@ -22,7 +23,7 @@ TEST(StdFilesystem, filename)
 {
     ASSERT_EQ(path("local"), path("/var/local").filename());
     ASSERT_EQ(path("hello.txt"), path("/var/local/hello.txt").filename());
-    ASSERT_EQ(path(), path("/var/local/").filename());
+    ASSERT_EQ(path("."), path("/var/local/").filename());
     ASSERT_EQ(path("tmp"), path("c:\\tmp").filename());
     ASSERT_EQ(path("tmp"), path("tmp").filename());
 }

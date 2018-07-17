@@ -1,10 +1,12 @@
 #pragma once
 
-#if defined(_WIN32) && 0
+#if defined(_WIN32)
 #include <filesystem>
 
-namespace std { namespace filesystem = experimental::filesystem; }
+namespace std { namespace filesystem { using namespace std::experimental::filesystem; } }
 #else
+
+#define NX_STD_FILESYSTEM_IMPLEMENTATION
 
 #include <string>
 
