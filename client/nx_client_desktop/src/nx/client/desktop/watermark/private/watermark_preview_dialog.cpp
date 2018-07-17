@@ -1,11 +1,11 @@
-#include "../watermark_edit_settings.h"
 #include "watermark_preview_dialog.h"
 #include "ui_watermark_preview_dialog.h"
+#include "../watermark_edit_settings.h"
 
 #include <QtGui/QPainter>
 #include <QtCore/QScopedValueRollback>
 
-#include <nx/client/desktop/watermark/watermark_painter.h>
+#include "../watermark_painter.h"
 
 namespace nx {
 namespace client {

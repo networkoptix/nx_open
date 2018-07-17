@@ -87,7 +87,7 @@ void WatermarkPainter::updateWatermark()
         font.setPixelSize(font.pixelSize() + 1);
         width = QFontMetrics(font).width(m_text);
     }
-    while (width * xCount > (2 * m_pixmap.width()) / 3 && font.pixelSize() > 2)
+    while ((width * xCount > (2 * m_pixmap.width()) / 3) && font.pixelSize() > 2)
     {
         font.setPixelSize(font.pixelSize() - 1);
         width = QFontMetrics(font).width(m_text);
