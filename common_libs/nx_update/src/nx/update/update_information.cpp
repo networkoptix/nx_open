@@ -95,14 +95,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 struct FileData
 {
     QString file;
-    QString url;
-    qint64 size;
     QByteArray md5;
+    qint64 size;
 };
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     FileData, (json),
-    (file)(url)(size)(md5))
+    (file)(md5)(size))
 
 const static QString kAlternativesServersKey = "__info";
 
@@ -140,6 +139,7 @@ static InformationError findCustomizationInfo(
 }
 
 static InformationError parseOsObject(
+    const QString& baseUpdateUrl,
     const QString& osName,
     const QJsonObject& osObject,
     bool isClient,
@@ -149,7 +149,6 @@ static InformationError parseOsObject(
     {
         FileData fileData;
         auto targetName = it.key();
-        auto osObject = it.value().toObject();
         QString fullTargetName = osName + "." + targetName;
         if (!QJson::deserialize(osObject, targetName, &fileData))
         {
@@ -170,7 +169,7 @@ static InformationError parseOsObject(
         package.platform = archVariant[1];
         package.variant = osName;
         package.file = "update/" + fileData.file;
-        package.url = fileData.url;
+        package.url = baseUpdateUrl + "/" + fileData.file;
         package.size = fileData.size;
         package.md5 = fileData.md5;
 
@@ -182,6 +181,7 @@ static InformationError parseOsObject(
 
 static InformationError parsePackages(
     const QJsonObject topLevelObject,
+    const QString& baseUpdateUrl,
     const QString& key,
     Information* result)
 {
@@ -197,6 +197,7 @@ static InformationError parsePackages(
     for (auto osIt = packagesObject.constBegin(); osIt != packagesObject.constEnd(); ++osIt)
     {
         InformationError error = parseOsObject(
+            baseUpdateUrl,
             osIt.key(),
             osIt.value().toObject(),
             isClient,
@@ -208,7 +209,10 @@ static InformationError parsePackages(
     return InformationError::noError;
 }
 
-static InformationError parseAndExtractInformation(const QByteArray& data, Information* result)
+static InformationError parseAndExtractInformation(
+            const QByteArray& data,
+            const QString& baseUpdateUrl,
+            Information* result)
 {
     QJsonParseError parseError;
     auto topLevelObject = QJsonDocument::fromJson(data, &parseError).object();
@@ -226,11 +230,11 @@ static InformationError parseAndExtractInformation(const QByteArray& data, Infor
     if (result->cloudHost != nx::network::SocketGlobals::cloud().cloudHost())
         return InformationError::incompatibleCloudHost;
 
-    InformationError error = parsePackages(topLevelObject, "packages", result);
+    InformationError error = parsePackages(topLevelObject, baseUpdateUrl, "packages", result);
     if (error != InformationError::noError)
         return error;
 
-    return parsePackages(topLevelObject, "clientPackages", result);
+    return parsePackages(topLevelObject, baseUpdateUrl, "clientPackages", result);
 }
 
 static InformationError fillUpdateInformation(
@@ -240,14 +244,13 @@ static InformationError fillUpdateInformation(
     QList<AlternativeServerData>* alternativeServers)
 {
     QJsonParseError parseError;
-    auto topLevelObject = QJsonDocument::fromJson(
-        httpClient->fetchMessageBodyBuffer(),
-        &parseError).object();
+    auto data = httpClient->fetchMessageBodyBuffer();
+    auto topLevelObject = QJsonDocument::fromJson(data, &parseError).object();
 
     if (parseError.error != QJsonParseError::ParseError::NoError || topLevelObject.isEmpty())
         return InformationError::jsonError;
 
-    if (QJson::deserialize(topLevelObject, kAlternativesServersKey, alternativeServers))
+    if (!QJson::deserialize(topLevelObject, kAlternativesServersKey, alternativeServers))
         return InformationError::jsonError;
 
     CustomizationInfo customizationInfo;
@@ -255,14 +258,13 @@ static InformationError fillUpdateInformation(
     if (error != InformationError::noError)
         return error;
 
-    error = makeHttpRequest(
-        httpClient,
-        customizationInfo.updates_prefix + "/" + publicationKey + "/update.json");
+    auto baseUpdateUrl = customizationInfo.updates_prefix + "/" + publicationKey;
+    error = makeHttpRequest(httpClient, baseUpdateUrl + "/update.json");
 
     if (error != InformationError::noError)
         return error;
 
-    error = parseAndExtractInformation(httpClient->fetchMessageBodyBuffer(), result);
+    error = parseAndExtractInformation(httpClient->fetchMessageBodyBuffer(), baseUpdateUrl, result);
     if (error != InformationError::noError)
         return error;
 
@@ -313,6 +315,9 @@ Information updateInformationImpl(
             }
         }
     }
+
+    if (error)
+        *error = InformationError::noError;
 
     return result;
 }

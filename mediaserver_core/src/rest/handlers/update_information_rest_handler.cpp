@@ -171,7 +171,7 @@ static int checkInternetForUpdate(
     QString s;
     QnLexical::serialize(error, &s);
     return QnFusionRestHandler::makeError(
-        nx::network::http::StatusCode::ok, "",
+        nx::network::http::StatusCode::ok, s,
         result, contentType, request.format, request.extraFormatting,
         QnRestResult::CantProcessRequest);
 }
