@@ -3764,7 +3764,6 @@ void MediaServerProcess::run()
     selfInformation.sslAllowed = sslAllowed;
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
-    selfInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
 
     commonModule()->setModuleInformation(selfInformation);
     commonModule()->bindModuleInformation(m_mediaServer);

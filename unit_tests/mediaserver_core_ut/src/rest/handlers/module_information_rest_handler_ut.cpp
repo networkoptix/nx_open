@@ -6,6 +6,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/app_info.h>
 
 namespace test {
 
@@ -53,6 +54,18 @@ TEST_F(ModuleInformationRestHandlerTest, checkCloudHost)
 
     client()->getModuleInformation(&result);
     ASSERT_EQ(result.cloudHost, validCloudHost);
+}
+
+TEST_F(ModuleInformationRestHandlerTest, checkRealm)
+{
+    const auto validRealm = nx::network::AppInfo::realm();
+    ASSERT_NE(client(), nullptr);
+
+    nx::vms::api::ModuleInformation result;
+    ASSERT_EQ(result.realm, QString());
+
+    client()->getModuleInformation(&result);
+    ASSERT_EQ(result.realm, validRealm);
 }
 
 } // namespace test
