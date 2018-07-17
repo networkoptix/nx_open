@@ -8,7 +8,7 @@ LIBRARIES=@libdir@/lib/@build.configuration@
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="@display.product.name@ @release.version@"
-DMG_FILE="@artifact.name.client@.dmg"
+DMG_FILE="@client_distribution_name@.dmg"
 KEYCHAIN="@codeSigningKeychainName@"
 
 # Take into consideration that we have protocol handler app with name
@@ -79,7 +79,7 @@ hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -fs "HFS+" -format UDRW -
 
 mv update.json $SRC
 cd dmg-folder
-zip -y -r ../@artifact.name.client_update@.zip ./*.app *.json
+zip -y -r ../@client_update_distribution_name@.zip ./*.app *.json
 cd ..
 
 rm -rf $TMP

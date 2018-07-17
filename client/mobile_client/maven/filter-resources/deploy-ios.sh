@@ -16,5 +16,5 @@ security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
 
 /usr/bin/xcrun -sdk "${TARGET_SDK}" PackageApplication \
     -v "${libdir}/bin/${build.configuration}/${project.artifactId}.app" \
-    -o "${project.build.directory}/${artifact.name.client}.ipa" \
+    -o "${project.build.directory}/${client_distribution_name}.ipa" \
     ${XCRUN_PROVISION_ARGS}

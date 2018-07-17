@@ -9,7 +9,7 @@
 			<directory>${project.build.directory}/bin/exe</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
-				<include>${artifact.name.server}.exe</include>
+				<include>${server_distribution_name}.exe</include>
 			</includes>
 		</fileSet>
 		<fileSet>

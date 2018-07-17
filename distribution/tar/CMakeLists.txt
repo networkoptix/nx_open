@@ -7,8 +7,8 @@ if(targetDevice STREQUAL "bpi")
     list(APPEND depends "mobile_client")
 endif()
 
-set(tar_file ${distribution_output_dir}/${artifact.name.server}.tar.gz)
-set(zip_file ${distribution_output_dir}/${artifact.name.server_update}.zip)
+set(tar_file ${distribution_output_dir}/${server_distribution_name}.tar.gz)
+set(zip_file ${distribution_output_dir}/${server_update_distribution_name}.zip)
 set(installer_output_list ${tar_file} ${zip_file})
 
 nx_configure_directory(
