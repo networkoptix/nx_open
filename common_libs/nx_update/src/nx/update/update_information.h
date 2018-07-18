@@ -29,6 +29,7 @@ struct NX_UPDATE_API Package
     QByteArray md5;
 };
 #define Package_Fields (component)(arch)(platform)(variant)(file)(url)(size)(md5)
+QN_FUSION_DECLARE_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json), NX_UPDATE_API)
 
 struct NX_UPDATE_API Information
 {
@@ -43,6 +44,7 @@ struct NX_UPDATE_API Information
 };
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages) \
     (supportedOs)(unsupportedOs)
+QN_FUSION_DECLARE_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json), NX_UPDATE_API)
 
 enum class NX_UPDATE_API InformationError
 {
@@ -71,5 +73,3 @@ NX_UPDATE_API QString toString(InformationError error);
 } // namespace update
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::update::Package, (xml)(csv_record)(ubjson)(json), NX_UPDATE_API)
-QN_FUSION_DECLARE_FUNCTIONS(nx::update::Information, (xml)(csv_record)(ubjson)(json), NX_UPDATE_API)

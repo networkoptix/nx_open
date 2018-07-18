@@ -9,9 +9,6 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Package, (xml)(csv_record)(ubjson)(json), Package_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Information, (xml)(csv_record)(ubjson)(json), Information_Fields)
-
 namespace nx {
 namespace update {
 
@@ -29,6 +26,43 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::update::InformationError::incompatibleCloudHostError, "incompatible cloud host")
     (nx::update::InformationError::notFoundError, "not found"))
 
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json), Package_Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json), Information_Fields)
+
+struct AlternativeServerData
+{
+    QString url;
+    QString name;
+};
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    AlternativeServerData, (json),
+    (url)(name))
+
+struct CustomizationInfo
+{
+    QString current_release;
+    QString updates_prefix;
+    QString release_notes;
+    QString description;
+    QMap<QString, nx::vms::api::SoftwareVersion> releases;
+};
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    CustomizationInfo,
+    (json),
+    (current_release)(updates_prefix)(release_notes)(description)(releases))
+
+struct FileData
+{
+    QString file;
+    QByteArray md5;
+    qint64 size;
+};
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    FileData, (json),
+    (file)(md5)(size))
 
 QString toString(InformationError error)
 {
@@ -76,41 +110,6 @@ static InformationError makeHttpRequest(
      readyFuture.wait();
      return error;
 }
-
-struct AlternativeServerData
-{
-    QString url;
-    QString name;
-};
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    AlternativeServerData, (json),
-    (url)(name))
-
-struct CustomizationInfo
-{
-    QString current_release;
-    QString updates_prefix;
-    QString release_notes;
-    QString description;
-    QMap<QString, nx::vms::api::SoftwareVersion> releases;
-};
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    CustomizationInfo,
-    (json),
-    (current_release)(updates_prefix)(release_notes)(description)(releases))
-
-struct FileData
-{
-    QString file;
-    QByteArray md5;
-    qint64 size;
-};
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    FileData, (json),
-    (file)(md5)(size))
 
 const static QString kAlternativesServersKey = "__info";
 
