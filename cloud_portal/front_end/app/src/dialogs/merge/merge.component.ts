@@ -6,7 +6,7 @@ import { EmailValidator }                                      from '@angular/fo
 @Component({
     selector: 'nx-modal-merge-content',
     templateUrl: 'merge.component.html',
-    styleUrls: []
+    styleUrls: ['merge.component.scss']
 })
 export class MergeModalContent {
     @Input() system;
