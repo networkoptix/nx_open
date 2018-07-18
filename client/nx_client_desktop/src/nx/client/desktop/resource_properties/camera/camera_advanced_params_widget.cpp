@@ -22,11 +22,6 @@ bool parameterIsInstant(const QnCameraAdvancedParameter &param)
     return param.isValid() && !QnCameraAdvancedParameter::dataTypeHasValue(param.dataType);
 }
 
-bool parameterIsCustomCommand(const QnCameraAdvancedParameter &param)
-{
-    return param.isValid() && param.writeCmd.startsWith(lit("custom_"));
-}
-
 QSet<QString> parameterIds(const QnCameraAdvancedParamGroup& group)
 {
     QSet<QString> result;
@@ -205,17 +200,19 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
     m_ptzSequenceNumber++;
 
     auto slot = SLOT(at_ptzCommandProcessed(int, const QVariant &, int));
+    nx::core::ptz::Options options{nx::core::ptz::Type::configurational};
 
     if(parameter.writeCmd == lit("custom_zoom"))
     {
         // Expecting a single value.
-        QVector3D speed;
+        nx::core::ptz::Vector speed;
         qreal val = value.toFloat(&ok);
         if (ok)
         {
-            speed.setZ(val*0.01);
+            speed.zoom = val * 0.01;
             qDebug() << "Sending custom_zoom(" << val << ")";
-            serverConnection->ptzContinuousMoveAsync(m_camera, speed, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
+            serverConnection->ptzContinuousMoveAsync(
+                m_camera, speed, options, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
         }
     }
     else if (parameter.writeCmd == lit("custom_ptr"))
@@ -223,14 +220,29 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
         QStringList values = value.split(L',');
         if (values.size() == 3)
         {
-            QVector3D speed;
+            nx::core::ptz::Vector speed;
             // Expecting a value like "horisontal,vertical,rotation".
-            speed.setX(values[0].toFloat(&ok));
-            speed.setY(values[1].toFloat(&ok));
+            speed.pan = values[0].toFloat(&ok);
+            speed.tilt = values[1].toFloat(&ok);
 
-            qDebug() << "Sending custom_ptr(pan=" << speed.x() << ", tilt=" << speed.y() << ", rot=" << speed.z() << ")";
+            // Control provides the angle in range [-180;180],
+            // but we should send values in range [-1.0, 1.0].
+            speed.rotation = values[2].toFloat(&ok) / 180.0;
+            if (speed.rotation > 1.0)
+                speed.rotation = 1.0;
+            if (speed.rotation < -1.0)
+                speed.rotation = -1.0;
+
+            qDebug() << "Sending custom_ptr(pan=" << speed.pan << ", tilt=" << speed.tilt << ", rot=" << speed.rotation << ")";
             // TODO: Implement rotation stuff
-            serverConnection->ptzContinuousMoveAsync(m_camera, speed, m_ptzSequenceId, m_ptzSequenceNumber, this, slot);
+            serverConnection->ptzContinuousMoveAsync(
+                m_camera,
+                speed,
+                options,
+                m_ptzSequenceId,
+                m_ptzSequenceNumber,
+                this,
+                slot);
         }
     }
     else if (parameter.writeCmd == lit("custom_focus"))
@@ -239,7 +251,8 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
         qreal speed = value.toFloat(&ok);
         if (ok)
         {
-            serverConnection->ptzContinuousFocusAsync(m_camera, speed, this, slot);
+            speed *= 0.01;
+            serverConnection->ptzContinuousFocusAsync(m_camera, speed, options, this, slot);
             qDebug() << "Sending custom_focus(" << speed << ")";
         }
     }
@@ -252,7 +265,7 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(const QnCameraAdvanc
 
 void CameraAdvancedParamsWidget::at_ptzCommandProcessed(int status, const QVariant& reply, int handle)
 {
-
+    // Just an empty handler for REST response.
 }
 
 
@@ -352,7 +365,7 @@ QnCameraAdvancedParamValueMap CameraAdvancedParamsWidget::groupParameters(
         if (groups.contains(parameter.group))
         {
             const auto parameterValue = m_advancedParamWidgetsManager->parameterValue(parameter.id);
-            if (parameterValue != boost::none)
+            if (parameterValue != std::nullopt)
                 result[parameter.id] = *parameterValue;
         }
     }
@@ -373,7 +386,7 @@ void CameraAdvancedParamsWidget::at_advancedParamChanged(const QString& id, cons
     if (!parameter.isValid())
         return;
 
-    if (parameterIsCustomCommand(parameter))
+    if (parameter.isCustomControl())
     {
         // This is a custom parameter with specific API.
         sendCustomParameterCommand(parameter, value);

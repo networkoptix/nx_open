@@ -45,7 +45,18 @@ class MergeUnauthorized(ExplicitMergeError):
     pass
 
 
-def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), take_remote_settings=False):
+# special constants for remote_address parameter
+REMOTE_ADDRESS_ACCESSIBLE = object()  # iflist filtered by accessible_ip_net
+REMOTE_ADDRESS_ANY = object()  # any of iflist
+
+
+def merge_systems(
+        local,
+        remote,
+        accessible_ip_net=IPNetwork('10.254.0.0/16'),
+        take_remote_settings=False,
+        remote_address=REMOTE_ADDRESS_ACCESSIBLE,
+        ):
     # When many servers are merged, there is server visible from others.
     # This server is passed as remote. That's why it's higher in loggers hierarchy.
     merge_logger = _logger.getChild('merge').getChild(remote.name).getChild(local.name)
@@ -57,17 +68,21 @@ def merge_systems(local, remote, accessible_ip_net=IPNetwork('10.254.0.0/16'), t
     merge_logger.debug("Other system id %s.", servant_system_id)
     if servant_system_id == master_system_id:
         raise AlreadyMerged(local, remote, master_system_id)
-    remote_interfaces = remote.api.get('api/iflist')
-    available_remote_ips = {IPAddress(interface['ipAddr']) for interface in remote_interfaces}
-    accessible_remote_ips = {ip for ip in available_remote_ips if ip in accessible_ip_net}
-    try:
-        any_accessible_remote_ip = next(iter(accessible_remote_ips))
-    except StopIteration:
-        raise MergeAddressesError(local, remote, accessible_ip_net, available_remote_ips)
-    merge_logger.debug("Access %r by %s.", remote, any_accessible_remote_ip)
+    if remote_address in [REMOTE_ADDRESS_ACCESSIBLE, REMOTE_ADDRESS_ANY]:
+        remote_interfaces = remote.api.get('api/iflist')
+        available_remote_ips = {IPAddress(interface['ipAddr']) for interface in remote_interfaces}
+        if remote_address == REMOTE_ADDRESS_ACCESSIBLE:
+            accessible_remote_ip_set = {ip for ip in available_remote_ips if ip in accessible_ip_net}
+        if remote_address == REMOTE_ADDRESS_ANY:
+            accessible_remote_ip_set = available_remote_ips
+        try:
+            remote_address = next(iter(accessible_remote_ip_set))
+        except StopIteration:
+            raise MergeAddressesError(local, remote, accessible_ip_net, available_remote_ips)
+    merge_logger.debug("Access %r by %s.", remote, remote_address)
     try:
         local.api.post('api/mergeSystems', {
-            'url': remote.api.with_hostname_and_port(any_accessible_remote_ip, remote.port).url(''),
+            'url': remote.api.with_hostname_and_port(remote_address, remote.port).url(''),
             'getKey': remote.api.auth_key('GET'),
             'postKey': remote.api.auth_key('POST'),
             'takeRemoteSettings': take_remote_settings,
@@ -100,6 +115,7 @@ def setup_local_system(mediaserver, system_settings):
         'systemSettings': system_settings,
         })
     assert system_settings == {key: response['settings'][key] for key in system_settings.keys()}
+    mediaserver.api = mediaserver.api.with_credentials(mediaserver.api.user, DEFAULT_API_PASSWORD)
     wait_for_true(lambda: local_system_is_set_up(mediaserver), "local system is set up")
     return response['settings']
 

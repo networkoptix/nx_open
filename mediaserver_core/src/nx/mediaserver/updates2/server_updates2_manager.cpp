@@ -24,7 +24,6 @@ using namespace vms::common::p2p::downloader;
 
 namespace {
 
-static const qint64 kRefreshTimeoutMs = 24 * 60 * 60 * 1000; //< 1 day
 static const QString kFileName = "update.status";
 
 } // namespace
@@ -41,9 +40,7 @@ ServerUpdates2Manager::~ServerUpdates2Manager()
 
 qint64 ServerUpdates2Manager::refreshTimeout() const
 {
-    const auto settingsValue = qnServerModule->roSettings()->value(
-        nx_ms_conf::CHECK_FOR_UPDATE_TIMEOUT).toLongLong();
-    return settingsValue == 0 ? kRefreshTimeoutMs : settingsValue;
+    return qnServerModule->settings().checkForUpdateTimeout();
 }
 
 AbstractDownloader* ServerUpdates2Manager::downloader()
@@ -53,16 +50,13 @@ AbstractDownloader* ServerUpdates2Manager::downloader()
 
 update::info::AbstractUpdateRegistryPtr ServerUpdates2Manager::getRemoteRegistry()
 {
-    auto updateUrl =
-        qnServerModule->roSettings()->value(nx_ms_conf::CHECK_FOR_UPDATE_URL).toString();
-    updateUrl = updateUrl.isNull() ? update::info::kDefaultUrl : updateUrl;
-
+    auto updateUrl = qnServerModule->settings().checkForUpdateUrl();
     return update::info::checkSync(peerId(), updateUrl);
 }
 
 QString ServerUpdates2Manager::filePath() const
 {
-    return qnServerModule->settings()->getDataDirectory() + QDir::separator() + kFileName;
+    return qnServerModule->settings().dataDir() + QDir::separator() + kFileName;
 }
 
 update::installer::detail::AbstractUpdates2Installer* ServerUpdates2Manager::installer()

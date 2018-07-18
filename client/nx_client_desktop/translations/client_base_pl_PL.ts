@@ -1128,10 +1128,10 @@ to view more bookmarks</source>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>Nazwa pliku nie może zawierać znaku: </numerusform>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: </numerusform>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: </numerusform>
-        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków: </numerusform>
+        <numerusform>Nazwa pliku nie może zawierać znaku:</numerusform>
+        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków:</numerusform>
+        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków:</numerusform>
+        <numerusform>Nazwa pliku nie może zawierać następujących zarezerwowanych znaków:</numerusform>
       </translation>
     </message>
   </context>
@@ -1175,7 +1175,7 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hasło powinno zawierać znaki, symbole lub cyfry</numerusform>
         <numerusform>Hasło powinno zawierać %n znaki, symbole lub cyfry</numerusform>
         <numerusform>Hasło powinno zawierać %n znaków, symboli lub cyfr</numerusform>
@@ -1436,12 +1436,16 @@ to view more bookmarks</source>
       <translation>Wysoka wartość minimalna może doprowadzić do zmniejszenia długości archiwum na innych kamerach.</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>Określa, czy archiwum kamery ma zostać usunięte, czy zachowane, w przypadku gdy brakuje miejsca na nowe nagrania.</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>Nagrania archiwalne mogą być usuwane w przypadku, gdy nie ma miejsca na nowe nagrania.</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;Auto&quot; usuwa najpierw najstarszy materiał, niezależnie od źródła.</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>Ustawienia Min i Max określają zakres archiwum, który należy przechowywać dla danej kamery.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>Jeśli opcja &quot;Auto&quot; jest włączona, najstarsze nagrania z kamer zostaną usunięte jako pierwsze.</translation>
     </message>
   </context>
   <context>
@@ -3207,12 +3211,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w opisie zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Jeśli pole jest puste, zdarzenie zawsze będzie wyzwalane.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu źródła zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu tytułu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu opisu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
     </message>
   </context>
   <context>
@@ -3429,8 +3441,8 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation>Nagrywanie w trybie paniki zmienia ustawienia nagrywania dla wszystkich kamer na maksymalną jakość i liczbę klatek FPS</translation>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>Nagrywanie w trybie paniki zmienia ustawienia nagrywania dla wszystkich kamer na maksymalną jakość i liczbę klatek FPS.</translation>
     </message>
   </context>
   <context>
@@ -3943,6 +3955,10 @@ to %1</source>
         <numerusform>Test zakończony pomyślnie. Znaleziono %n użytkowników.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>Zmiana jakichkolwiek ustawień LDAP innych niż &quot;Filtr wyszukiwania&quot; spowoduje utratę łączności wszystkich użytkowników zalogowanych przez LDAP.</translation>
+    </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
@@ -4425,7 +4441,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Użyj licencji, aby wyświetlać tę kamerę</numerusform>
         <numerusform>Użyj licencji, aby wyświetlać te %n kamery</numerusform>
         <numerusform>Użyj licencji, aby wyświetlać te %n kamer</numerusform>
@@ -4615,12 +4631,12 @@ to %1</source>
       <translation>Ustawia czas, jaki ma być używany w kliencie (linia czasu, znaczniki czasu itp.) w sytuacji gdy komputery klienckie i serwerowe znajdują się w różnych strefach czasowych.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>Czas wyświetlania każdej z kamer w układzie po rozpoczęciu cyklu układów.</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>Wyświetla adresy IP kamer, serwerów i grupy użytkowników.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>Wyświetla adresy IP kamer, serwerów i grupy użytkowników.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>Czas wyświetlania każdej z kamer w układzie po rozpoczęciu cyklu.</translation>
     </message>
   </context>
   <context>
@@ -6532,12 +6548,8 @@ to %1</source>
       <translation>Nagrywanie zostało włączone na nośniku USB</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Kopia zapasowa obejmuje ustawienia serwerów i kamer, użytkowników, stron WWW, reguł zdarzeń itp. Nagrania wideo nie są backupowane.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Tworzy kopię zapasową konfiguracji systemu, którą można przywrócić w przypadku awarii.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>Ponowne indeksowanie może rozwiązać problemy z archiwum lub backupem, jeśli jakieś nagrania zostały utracone lub uszkodzone, lub jeśli jakieś komponenty sprzętowe zostały wymienione.</translation>
     </message>
   </context>
   <context>
@@ -6832,12 +6844,16 @@ to %1</source>
       <translation>Zezwalaj systemowi na optymalizowanie ustawień w kamerze</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>Wysyła anonimowo informacje o systemie (firmware, kodeki, strumienie itp.).</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>Śledzi i rejestruje wszystkie działania użytkownika.</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>Zawiera informacje o systemie, takie jak modele kamer i wersje firmware, liczbę serwerów itp.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>Nie zawiera informacji osobistych i jest całkowicie anonimowe.</translation>
     </message>
   </context>
   <context>
@@ -7565,6 +7581,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>Usunięto ścianę wideo z serwera, dlatego musi zostać zamknięta.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>Aby korzystać z oprogramowania, musisz zaakceptować umowę licencyjną użytkownika końcowego</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>Akceptuję</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>Nie akceptuję</translation>
     </message>
   </context>
   <context>
@@ -8517,7 +8548,7 @@ to %1</source>
     <name>nx::client::desktop::RapidReviewSettingsWidget</name>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej sekundę.</numerusform>
         <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej %n sekundy.</numerusform>
         <numerusform>Przy eksportowaniu w trybie szybkiego przeglądu długość wideo powinna wynosić co najmniej %n sekund.</numerusform>
@@ -8715,16 +8746,20 @@ to %1</source>
       <translation>Wybierz kamery za pomocą powyższego przycisku, aby wyświetlić listę obsługiwanych zdarzeń.</translation>
     </message>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu komunikatu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>Jeśli pole jest puste, zdarzenie zawsze będzie wyzwalane.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu opisu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>Zdarzenie uruchomi się tylko wtedy, gdy w polu tytułu zdarzenia znajdują się dowolne z wprowadzonych słów kluczowych.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>W tym polu wielkość liter jest istotna.</translation>
     </message>
   </context>
   <context>
@@ -9059,10 +9094,6 @@ to %1</source>
       <translation>Wersja beta %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Niektóre funkcje mogą być niedostępne lub mogą działać nieprawidłowo.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>System wysyła anonimowe statystyki</translation>
     </message>
@@ -9091,16 +9122,8 @@ to %1</source>
       <translation>Nie udało się zmienić hasła w %1 z %2 kamer</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>Aby korzystać z oprogramowania, musisz zaakceptować umowę licencyjną użytkownika końcowego</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>Akceptuję</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>Nie akceptuję</translation>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>Uwaga! Ta wersja służy wyłącznie do testowania! Proszę zaktualizować oprogramowanie do następnej wersji, gdy tylko zostanie ona udostępniona.</translation>
     </message>
   </context>
   <context>

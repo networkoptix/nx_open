@@ -131,7 +131,7 @@ QnMobileClientModule::QnMobileClientModule(
 
     updateTwoWayAudioControllerSourceId();
 
-    ec2::ApiRuntimeData runtimeData;
+    nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = qnStaticCommon->localPeerType();

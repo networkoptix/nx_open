@@ -1,16 +1,15 @@
 #include "cloud_url_helper.h"
 
-#include <common/common_module.h>
-
-#include <client_core/client_core_module.h>
-
-#include <nx/network/app_info.h>
-#include <nx/vms/utils/system_uri.h>
-
 #include <api/global_settings.h>
+#include <client_core/client_core_module.h>
+#include <common/common_module.h>
 #include <utils/common/app_info.h>
 #include <watchers/cloud_status_watcher.h>
 
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
+#include <nx/vms/utils/system_uri.h>
 #include <nx/utils/log/log.h>
 
 using namespace nx::vms::utils;

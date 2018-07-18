@@ -20,10 +20,10 @@ TransactionTransport::TransactionTransport(
     TransactionLog* const transactionLog,
     const ConnectionRequestAttributes& connectionRequestAttributes,
     const nx::String& systemId,
-    const ::ec2::ApiPeerData& localPeer,
+    const vms::api::PeerData& localPeer,
     const network::SocketAddress& remotePeerEndpoint,
     const nx::network::http::Request& request)
-:
+    :
     m_baseTransactionTransport(
         QnUuid(), //< localSystemId. Not used here
         QnUuid::fromStringSafe(connectionRequestAttributes.connectionId),
@@ -174,7 +174,7 @@ void TransactionTransport::sendTransaction(
                 cl_logDEBUG1);
 
             //cannot send transaction right now: updating local transaction sequence
-            const ::ec2::ApiPersistentIdData tranStateKey(
+            const vms::api::PersistentIdData tranStateKey(
                 transactionHeader.peerID,
                 transactionHeader.persistentInfo.dbID);
             m_tranStateToSynchronizeTo.values[tranStateKey] =
@@ -204,7 +204,7 @@ void TransactionTransport::startOutgoingChannel()
         cl_logDEBUG1);
 
     //sending tranSyncRequest
-    Command<::ec2::ApiSyncRequestData> requestTran(
+    Command<vms::api::SyncRequestData> requestTran(
         ::ec2::ApiCommand::tranSyncRequest,
         m_baseTransactionTransport.localPeer().id);
     requestTran.params.persistentState = m_transactionLogReader->getCurrentState();
@@ -222,7 +222,7 @@ void TransactionTransport::startOutgoingChannel()
 
 void TransactionTransport::processSpecialTransaction(
     const TransactionTransportHeader& /*transportHeader*/,
-    Command<::ec2::ApiSyncRequestData> data,
+    Command<vms::api::SyncRequestData> data,
     TransactionProcessedHandler handler)
 {
     m_baseTransactionTransport.setWriteSync(true);
@@ -231,7 +231,7 @@ void TransactionTransport::processSpecialTransaction(
     m_remotePeerTranState = std::move(data.params.persistentState);
 
     //sending sync response
-    Command<::ec2::QnTranStateResponse> tranSyncResponse(
+    Command<vms::api::TranStateResponse> tranSyncResponse(
         ::ec2::ApiCommand::tranSyncResponse,
         m_baseTransactionTransport.localPeer().id);
     tranSyncResponse.params.result = 0;
@@ -258,7 +258,7 @@ void TransactionTransport::processSpecialTransaction(
 
 void TransactionTransport::processSpecialTransaction(
     const TransactionTransportHeader& /*transportHeader*/,
-    Command<::ec2::QnTranStateResponse> /*data*/,
+    Command<vms::api::TranStateResponse> /*data*/,
     TransactionProcessedHandler /*handler*/)
 {
     // TODO: no need to do anything?
@@ -267,7 +267,7 @@ void TransactionTransport::processSpecialTransaction(
 
 void TransactionTransport::processSpecialTransaction(
     const TransactionTransportHeader& /*transportHeader*/,
-    Command<::ec2::ApiTranSyncDoneData> /*data*/,
+    Command<vms::api::TranSyncDoneData> /*data*/,
     TransactionProcessedHandler /*handler*/)
 {
     // TODO: no need to do anything?
@@ -374,7 +374,7 @@ void TransactionTransport::forwardStateChangedEvent(
 void TransactionTransport::onTransactionsReadFromLog(
     ResultCode resultCode,
     std::vector<dao::TransactionLogRecord> serializedTransactions,
-    ::ec2::QnTranState readedUpTo)
+    vms::api::TranState readedUpTo)
 {
     using namespace std::placeholders;
     // TODO: handle api::ResultCode::tryLater result code
@@ -450,7 +450,7 @@ void TransactionTransport::enableOutputChannel()
     {
         m_haveToSendSyncDone = false;
 
-        Command<::ec2::ApiTranSyncDoneData>
+        Command<vms::api::TranSyncDoneData>
             tranSyncDone(::ec2::ApiCommand::tranSyncDone, m_baseTransactionTransport.localPeer().id);
         tranSyncDone.params.result = 0;
 

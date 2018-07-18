@@ -1,5 +1,3 @@
-#define QT_NO_CAST_FROM_ASCII
-
 #ifdef _WIN32
 #   define FD_SETSIZE 2048
 #   include <winsock2.h>

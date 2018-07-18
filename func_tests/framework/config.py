@@ -9,7 +9,7 @@ from pathlib2 import Path
 from .server_physical_host import PhysicalInstallationHostConfig
 from .utils import SimpleNamespace
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 TIMEDELTA_REGEXP = re.compile(r'^((?P<days>\d+?)d)?((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?$')
@@ -109,6 +109,7 @@ class TestsConfig(object):
     def update(self, other):
         assert isinstance(other, TestsConfig), repr(other)
         self.physical_installation_host_list += other.physical_installation_host_list
+        self.tests.update(other.tests)
 
     def get_test_config(self, full_node_id):
         module_path_as_str, test_name = full_node_id.split('::')
@@ -146,7 +147,7 @@ class SingleTestConfig(object):
                 config[name] = self._cast_value(value, type(default_value))
             else:
                 config[name] = default_value
-            log.info('Test config: %s = %r', name, config[name])
+            _logger.info('Test config: %s = %r', name, config[name])
         return SimpleNamespace(**config)
 
     @staticmethod

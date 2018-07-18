@@ -54,12 +54,14 @@
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/license/util.h>
+#include <nx/vms/api/types/connection_types.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
 #include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
 #include <nx/client/desktop/common/widgets/clipboard_button.h>
 
+using namespace nx;
 using namespace nx::client::desktop;
 
 namespace {
@@ -320,7 +322,7 @@ void QnLicenseManagerWidget::updateLicenses()
     bool connected = false;
     for (const QnPeerRuntimeInfo& info: runtimeInfoManager()->items()->getItems())
     {
-        if (info.data.peer.peerType != Qn::PT_Server)
+        if (info.data.peer.peerType != vms::api::PeerType::server)
             continue;
         connected = true;
         break;
@@ -356,10 +358,11 @@ void QnLicenseManagerWidget::updateLicenses()
 
         for (auto helper: helpers)
         {
-            for(Qn::LicenseType lt: helper->licenseTypes())
+            for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                if (helper->totalLicenses(lt) > 0)
-                    messages << lit("%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                const int total = helper->totalLicenses(lt);
+                if (total > 0)
+                    messages << QnLicense::displayText(lt, total);
             }
         }
 
@@ -367,23 +370,24 @@ void QnLicenseManagerWidget::updateLicenses()
         {
             for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                if (helper->usedLicenses(lt) == 0)
+                const int used = helper->usedLicenses(lt);
+                if (used == 0)
                     continue;
 
                 if (helper->isValid(lt))
                 {
-                    messages << tr("%n %1 are currently in use", "", helper->usedLicenses(lt))
-                        .arg(QnLicense::longDisplayName(lt));
+                    messages << tr("%1 are currently in use", "", used)
+                        .arg(QnLicense::displayText(lt, used));
                 }
                 else
                 {
-                    messages << setWarningStyleHtml(tr("At least %n %1 are required", "",
-                        helper->requiredLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
+                    const int required = helper->requiredLicenses(lt);
+                    messages << setWarningStyleHtml(tr("At least %1 are required", "", required)
+                        .arg(QnLicense::displayText(lt, required)));
                 }
-
-
             }
         }
+
         ui->infoLabel->setText(messages.join(lit("<br/>")));
     }
 
@@ -477,7 +481,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     if (infoMode)
         params.addQueryItem(lit("mode"), lit("info"));
 
-    ec2::ApiRuntimeData runtimeData = runtimeInfoManager()->remoteInfo().data;
+    const auto runtimeData = runtimeInfoManager()->remoteInfo().data;
 
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);

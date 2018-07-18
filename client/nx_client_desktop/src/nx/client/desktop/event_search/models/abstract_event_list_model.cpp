@@ -134,7 +134,7 @@ bool AbstractEventListModel::defaultAction(const QModelIndex& index)
 
     using namespace std::chrono;
     const auto timestampMs = duration_cast<milliseconds>(microseconds(
-        timestampUsVariant.value<qint64>())).count();
+        timestampUsVariant.value<qint64>()));
 
     slider->setValue(timestampMs, true);
     return true;

@@ -11,6 +11,8 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/home_ptz_executor.h>
 
+using namespace nx::core;
+
 QnHomePtzController::QnHomePtzController(
     const QnPtzControllerPtr &baseController,
     QThread* executorThread)
@@ -20,8 +22,7 @@ QnHomePtzController::QnHomePtzController(
         lit("ptzHomeObject"), QnPtzObject(), this)),
     m_executor(new QnHomePtzExecutor(baseController))
 {
-    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)); // TODO: #Elric
-
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
     m_adaptor->setResource(baseController->resource());
     m_executor->moveToThread(executorThread);
 
@@ -44,15 +45,20 @@ bool QnHomePtzController::extends(Ptz::Capabilities capabilities)
         && !capabilities.testFlag(Ptz::HomePtzCapability);
 }
 
-Ptz::Capabilities QnHomePtzController::getCapabilities() const
+Ptz::Capabilities QnHomePtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
-    const Ptz::Capabilities capabilities = base_type::getCapabilities();
+    const Ptz::Capabilities capabilities = base_type::getCapabilities(options);
+    if (options.type != ptz::Type::operational)
+        return capabilities;
+
     return extends(capabilities) ? (capabilities | Ptz::HomePtzCapability) : capabilities;
 }
 
-bool QnHomePtzController::continuousMove(const QVector3D& speed)
+bool QnHomePtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
-    if(!base_type::continuousMove(speed))
+    if(!base_type::continuousMove(speed, options))
         return false;
 
     restartExecutor();
@@ -61,19 +67,24 @@ bool QnHomePtzController::continuousMove(const QVector3D& speed)
 
 bool QnHomePtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const QVector3D& position,
-    qreal speed)
+    const nx::core::ptz::Vector& position,
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    if(!base_type::absoluteMove(space, position, speed))
+    if(!base_type::absoluteMove(space, position, speed, options))
         return false;
 
     restartExecutor();
     return true;
 }
 
-bool QnHomePtzController::viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed)
+bool QnHomePtzController::viewportMove(
+    qreal aspectRatio,
+    const QRectF& viewport,
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    if(!base_type::viewportMove(aspectRatio, viewport, speed))
+    if(!base_type::viewportMove(aspectRatio, viewport, speed, options))
         return false;
 
     restartExecutor();
@@ -100,7 +111,7 @@ bool QnHomePtzController::activateTour(const QString& tourId)
 
 bool QnHomePtzController::updateHomeObject(const QnPtzObject& homeObject)
 {
-    const Ptz::Capabilities capabilities = getCapabilities();
+    const Ptz::Capabilities capabilities = getCapabilities({nx::core::ptz::Type::operational});
     if(homeObject.type == Qn::PresetPtzObject && !capabilities.testFlag(Ptz::PresetsPtzCapability))
         return false;
 
@@ -124,6 +135,7 @@ void QnHomePtzController::restartExecutor()
 
 void QnHomePtzController::at_adaptor_valueChanged()
 {
+    // Only operational PTZ is supported now.
     m_executor->setHomePosition(m_adaptor->value());
 
     /* Restart only if it's running right now. */

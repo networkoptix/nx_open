@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Personnalisé",
-      "description": "Utiliser l'application client %PRODUCT_NAME% pour configurer des autorisations personnalisées"
+      "description": "Utiliser l'application client %VMS_NAME% pour configurer des autorisations personnalisées"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "Cet usager dispose d’autorisations administrateur",
     "cantOpenClient": "%VMS_NAME% application non détectée. <a href=\"/download\"> Télécharger</a>",
     "lostConnection": "Connexion à {{systemName}} perdu",
-    "thisSystem": "le système"
+    "thisSystem": "le système",
+    "oldSafariNotSupported": "Les versions de Safari antérieures à 10 ne sont pas supportées"
   },
   "passwordRequirements": {
     "minLengthMessage": "Mot de passe doit contenir au moins 8 caractères",
@@ -160,7 +161,7 @@
     "offline": "System Hors ligne",
     "openClient": "Ouvert à %VMS_NAME%",
     "openClientNoSystem": "Ouvrir %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Fusionner",
     "mergeSystemTitle": "Fusionner systèmes",
     "confirmRenameTitle": "Nom système",
     "confirmRenameAction": "Enregistrer",
@@ -203,7 +204,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -212,7 +213,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",

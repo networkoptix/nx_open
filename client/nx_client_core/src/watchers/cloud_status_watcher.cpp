@@ -15,21 +15,18 @@
 
 #include <client_core/client_core_settings.h>
 #include <client_core/connection_context_aware.h>
-
 #include <cloud/cloud_connection.h>
-
-#include <utils/common/delayed.h>
+#include <network/cloud_system_data.h>
 #include <utils/common/app_info.h>
+#include <utils/common/delayed.h>
+#include <utils/common/guarded_callback.h>
+#include <utils/common/id.h>
 
-#include <nx_ec/data/api_cloud_system_data.h>
-
-#include <nx/utils/string.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/fusion/model_functions.h>
-
-#include <network/cloud_system_data.h>
-#include <utils/common/guarded_callback.h>
+#include <nx/utils/string.h>
+#include <nx/vms/api/data/cloud_system_data.h>
 
 using namespace nx::cdb;
 
@@ -72,7 +69,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList& systemsList, b
         if (!isCustomizationCompatible(customization, isMobile))
             continue;
 
-        auto data = QJson::deserialized<ec2::ApiCloudSystemData>(
+        auto data = QJson::deserialized<nx::vms::api::CloudSystemData>(
             QByteArray::fromStdString(systemData.opaque));
 
         QnCloudSystem system;
@@ -385,6 +382,9 @@ void QnCloudStatusWatcher::updateSystems()
                             d->setStatus(QnCloudStatusWatcher::LoggedOut,
                                 QnCloudStatusWatcher::AccountNotActivated);
                             break;
+                        case api::ResultCode::accountBlocked:
+                            d->setStatus(QnCloudStatusWatcher::LoggedOut,
+                                QnCloudStatusWatcher::UserTemporaryLockedOut);
                         default:
                             d->setStatus(QnCloudStatusWatcher::Offline,
                                 QnCloudStatusWatcher::UnknownError);

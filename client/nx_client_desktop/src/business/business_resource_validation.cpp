@@ -22,6 +22,7 @@
 
 #include <nx/api/analytics/driver_manifest.h>
 #include <nx/api/analytics/supported_events.h>
+#include <nx/vms/event/analytics_helper.h>
 
 #include <utils/email/email.h>
 
@@ -238,7 +239,7 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 
 bool QnCameraAnalyticsPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
 {
-    return !camera->analyticsSupportedEvents().isEmpty();
+    return !nx::vms::event::AnalyticsHelper::supportedAnalyticsEvents({camera}).isEmpty();
 }
 
 QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const bool detailed)
@@ -248,6 +249,24 @@ QString QnCameraAnalyticsPolicy::getText(const QnResourceList& resources, const 
     int invalid = invalidResourcesCount<QnCameraAnalyticsPolicy>(cameras);
     return genericCameraText<QnCameraAnalyticsPolicy>(cameras, detailed,
         tr("Analytics is not available for %1"), invalid);
+}
+
+//-------------------------------------------------------------------------------------------------
+// QnFullscreenCameraPolicy
+//-------------------------------------------------------------------------------------------------
+
+bool QnFullscreenCameraPolicy::isResourceValid(const QnVirtualCameraResourcePtr& camera)
+{
+    return true;
+}
+
+QString QnFullscreenCameraPolicy::getText(const QnResourceList& resources, const bool /*detailed*/)
+{
+    const auto cameras = resources.filtered<QnVirtualCameraResource>();
+    if (cameras.size() != 1)
+        return tr("Select exactly one camera");
+
+    return getShortResourceName(cameras.first());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -284,7 +303,7 @@ bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
     /* We can get here either user id or role id. User should be checked additionally, role is
      * always counted as valid (if exists). */
     return !userRolesManager()->userRole(resourceId).isNull()
-        || userRolesManager()->predefinedRole(resourceId) != Qn::UserRole::CustomUserRole;
+        || userRolesManager()->predefinedRole(resourceId) != Qn::UserRole::customUserRole;
 }
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
@@ -431,12 +450,22 @@ bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 namespace QnBusiness {
 
 // TODO: #vkutin It's here until full refactoring.
-bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
+bool actionAllowedForUser(const nx::vms::event::AbstractActionPtr& action,
     const QnUserResourcePtr& user)
 {
     if (!user)
         return false;
 
+    switch (action->actionType())
+    {
+        case nx::vms::event::ActionType::fullscreenCameraAction:
+        case nx::vms::event::ActionType::exitFullscreenAction:
+            return true;
+        default:
+            break;
+    }
+
+    const auto params = action->getParams();
     if (params.allUsers)
         return true;
 
@@ -641,7 +670,7 @@ bool QnDefaultSubjectValidationPolicy::userValidity(const QnUserResourcePtr& /*u
 // QnRequiredPermissionSubjectPolicy
 
 QnRequiredPermissionSubjectPolicy::QnRequiredPermissionSubjectPolicy(
-    Qn::GlobalPermission requiredPermission,
+    GlobalPermission requiredPermission,
     const QString& permissionName,
     bool allowEmptySelection)
     :
@@ -666,13 +695,13 @@ bool QnRequiredPermissionSubjectPolicy::isRoleValid(const QnUuid& roleId) const
     const auto role = userRolesManager()->predefinedRole(roleId);
     switch (role)
     {
-        case Qn::UserRole::CustomPermissions:
+        case Qn::UserRole::customPermissions:
         {
             NX_ASSERT(false); //< Should never happen.
             return false;
         }
 
-        case Qn::UserRole::CustomUserRole:
+        case Qn::UserRole::customUserRole:
         {
             const auto customRole = userRolesManager()->userRole(roleId);
             return customRole.permissions.testFlag(m_requiredPermission);

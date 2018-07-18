@@ -32,6 +32,8 @@ QString htmlFormattedParagraph(const QString &text
     , bool isBold = false
     , bool isItalic = false);
 
+QString htmlParagraph(const QString& source);
+
 QString makeHref(const QString& text, const QUrl& url);
 QString makeHref(const QString& text, const nx::utils::Url &url);
 QString makeHref(const QString& text, const QString& link);

@@ -172,11 +172,6 @@ enum IDType
     BetaVersionMessageAction,
 
     /**
-     * Displays eula acceptance dialog.
-     */
-    ShowEulaAction,
-
-    /**
      * Displays HiDpi screens support warning dialog.
      */
     HiDpiSupportMessageAction,
@@ -227,6 +222,11 @@ enum IDType
      * Sets up desktop camera as a layout for all items in the provided QnVideoWallItemIndexList.
      */
     PushMyScreenToVideowallAction,
+
+    /**
+     * Open Video Wall Screen Settings dialog.
+     */
+    VideoWallScreenSettingsAction,
 
     /**
      * Saves videowall review layout.
@@ -481,7 +481,6 @@ enum IDType
      * Saves selected local layout.
      */
     SaveLocalLayoutAction,
-    SaveLocalLayoutAsAction,
 
     /**
      * Saves selected layout under another name.
@@ -980,6 +979,11 @@ enum IDType
     ExportVideoAction,
 
     /**
+     * Exports selected bookmark.
+     */
+    ExportBookmarkAction,
+
+    /**
      * Bookmark selected range.
      */
     AddCameraBookmarkAction,
@@ -1031,11 +1035,6 @@ enum IDType
     ToggleTitleBarAction,
 
     /**
-     * Shows/hides tree.
-     */
-    ToggleTreeAction,
-
-    /**
      * Pins/unpins tree.
      */
     PinTreeAction,
@@ -1054,8 +1053,6 @@ enum IDType
      * Shows/hides timeline.
      */
     ToggleTimelineAction,
-
-    ToggleNotificationsAction,
 
     PinNotificationsAction,
 

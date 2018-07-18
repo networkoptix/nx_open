@@ -16,15 +16,19 @@ const QString kUpdateLogFileName = lit("update.log");
 
 QString ServerUpdates2Installer::dataDirectoryPath() const
 {
-    return qnServerModule->settings()->getDataDirectory();
+    return getDataDirectory();
 }
 
 bool ServerUpdates2Installer::initializeUpdateLog(
     const QString& targetVersion,
     QString* logFileName) const
 {
-    QString logDir = qnServerModule->roSettings()->value(
-        lit("logDir"), getDataDirectory() + lit("/log/")).toString();
+    QString logDir;
+    if (qnServerModule->settings().logDir.present())
+        logDir = qnServerModule->settings().logDir();
+    else
+        logDir = getDataDirectory() + lit("/log/");
+
     if (logDir.isEmpty())
         return false;
 

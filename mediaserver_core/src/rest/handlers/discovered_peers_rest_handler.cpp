@@ -1,8 +1,8 @@
 #include "discovered_peers_rest_handler.h"
 
 #include <common/common_module.h>
+#include <managers/discovery_manager.h>
 #include <network/tcp_connection_priv.h>
-#include <nx_ec/data/api_discovery_data.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/discovery/manager.h>
 #include <rest/server/rest_connection_processor.h>

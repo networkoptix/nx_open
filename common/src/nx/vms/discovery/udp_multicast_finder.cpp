@@ -2,6 +2,7 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/api/data/module_information.h>
 
 namespace nx {
 namespace vms {
@@ -13,7 +14,7 @@ const nx::network::SocketAddress UdpMulticastFinder::kMulticastEndpoint("239.255
 const std::chrono::milliseconds UdpMulticastFinder::kUpdateInterfacesInterval = std::chrono::minutes(1);
 const std::chrono::milliseconds UdpMulticastFinder::kSendInterval = std::chrono::seconds(10);
 
-UdpMulticastFinder::UdpMulticastFinder(network::aio::AbstractAioThread* thread):
+UdpMulticastFinder::UdpMulticastFinder(nx::network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
     m_multicastEndpoint(kMulticastEndpoint),
     m_updateInterfacesInterval(kUpdateInterfacesInterval),
@@ -39,7 +40,7 @@ void UdpMulticastFinder::setSendInterval(std::chrono::milliseconds interval)
 }
 
 void UdpMulticastFinder::multicastInformation(
-    const QnModuleInformationWithAddresses& information)
+    const nx::vms::api::ModuleInformationWithAddresses& information)
 {
     m_updateTimer.post(
         [this, information = QJson::serialized(information)]() mutable
@@ -178,7 +179,7 @@ void UdpMulticastFinder::receiveModuleInformation()
             }
 
             NX_LOGX(lm("From %1 got: %2").args(endpoint, m_inData), cl_logDEBUG2);
-            QnModuleInformationWithAddresses moduleInformation;
+            nx::vms::api::ModuleInformationWithAddresses moduleInformation;
             if (!QJson::deserialize(m_inData, &moduleInformation))
             {
                 NX_LOGX(lm("From %1 unable to deserialize: %2").args(endpoint, m_inData),

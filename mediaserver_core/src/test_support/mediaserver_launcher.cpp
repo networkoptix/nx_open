@@ -10,9 +10,9 @@ MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures
     m_firstStartup(true)
 {
     if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
-        addSetting(QnServer::kNoResourceDiscovery, "1");
+        addSetting("noResourceDiscovery", "1");
     if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
-        addSetting(QnServer::kNoMonitorStatistics, "1");
+        addSetting("noMonitorStatistics", "1");
 }
 
 MediaServerLauncher::~MediaServerLauncher()
@@ -33,6 +33,11 @@ int MediaServerLauncher::port() const
 QnCommonModule* MediaServerLauncher::commonModule() const
 {
     return m_mediaServerProcess->commonModule();
+}
+
+nx::mediaserver::Authenticator* MediaServerLauncher::authenticator() const
+{
+    return m_mediaServerProcess->authenticator();
 }
 
 void MediaServerLauncher::addSetting(const QString& name, const QVariant& value)

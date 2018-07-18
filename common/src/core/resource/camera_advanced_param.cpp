@@ -129,6 +129,11 @@ bool QnCameraAdvancedParameter::isValid() const
         && (!id.isEmpty());
 }
 
+bool QnCameraAdvancedParameter::isCustomControl() const
+{
+    return isValid() && writeCmd.startsWith(lit("custom_"));
+}
+
 bool QnCameraAdvancedParameter::isValueValid(const QString& value) const
 {
     if (dataType == DataType::None)
@@ -209,13 +214,13 @@ bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value)
 	case DataType::Number:
 	case DataType::Enumeration:
 	case DataType::String:
-		return true;
-	case DataType::Button:
-    case DataType::Separator:
     // It is weird, but right now hanwha plugin can not properly
     // provide any value for those controls.
     case DataType::SliderControl:
     case DataType::PtrControl:
+		return true;
+	case DataType::Button:
+    case DataType::Separator:
         return false;
     default:
         return false;

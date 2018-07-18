@@ -3,17 +3,17 @@
 #include <set>
 
 #include "api_globals.h"
-#include "api_resource_data.h"
-#include "api_media_server_data.h"
-#include <nx/vms/api/data/camera_data_ex.h>
-#include <nx/vms/api/data/client_info_data.h>
-#include "api_license_data.h"
-#include <nx/vms/api/data/event_rule_data.h>
-#include <nx/vms/api/data/layout_data.h>
-#include "api_user_data.h"
-#include <nx/vms/api/data/videowall_data.h>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/vms/api/data/camera_data_ex.h>
+#include <nx/vms/api/data/client_info_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
+#include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/api/data/license_data.h>
+#include <nx/vms/api/data/media_server_data.h>
+#include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/api/data/user_data.h>
+#include <nx/vms/api/data/videowall_data.h>
 
 // NOTE: structs with suffix 'Statistics' are only used to tell fusion which
 //       fields should be serialized for statistics (to cut out private data
@@ -50,19 +50,19 @@ struct ApiCameraDataStatistics:
     (backupType)
 
 struct ApiStorageDataStatistics:
-    ApiStorageData
+    nx::vms::api::StorageData
 {
     ApiStorageDataStatistics();
-    ApiStorageDataStatistics(ApiStorageData&& data);
+    ApiStorageDataStatistics(nx::vms::api::StorageData&& data);
 };
 #define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting) \
     (storageType)(isBackup)(addParams)
 
 struct ApiMediaServerDataStatistics:
-    ApiMediaServerDataEx
+    nx::vms::api::MediaServerDataEx
 {
     ApiMediaServerDataStatistics();
-    ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data);
+    ApiMediaServerDataStatistics(nx::vms::api::MediaServerDataEx&& data);
 
     // overrides ApiMediaServerDataEx::storages for fusion
     std::vector<ApiStorageDataStatistics> storages;
@@ -74,7 +74,7 @@ struct ApiMediaServerDataStatistics:
 struct ApiLicenseStatistics
 {
     ApiLicenseStatistics();
-    ApiLicenseStatistics(const ApiLicenseData& data);
+    ApiLicenseStatistics(const nx::vms::api::LicenseData& data);
 
     QString name, key, licenseType, version, brand, expiration, validation;
     qint64 cameraCount;
@@ -93,10 +93,10 @@ struct ApiBusinessRuleStatistics:
     (actionParams)(aggregationPeriod)(disabled)(schedule)(system)
 
 struct ApiUserDataStatistics:
-    ApiUserData
+    nx::vms::api::UserData
 {
     ApiUserDataStatistics();
-    ApiUserDataStatistics(ApiUserData&& data);
+    ApiUserDataStatistics(nx::vms::api::UserData&& data);
 };
 #define ApiUserDataStatistics_Fields (id)(isAdmin)(permissions)(isLdap)(isEnabled)
 

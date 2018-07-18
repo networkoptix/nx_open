@@ -4,53 +4,49 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
-#include <nx/network/deprecated/asynchttpclient.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/url/url_builder.h>
-#include <nx/network/url/url_parse_helper.h>
-#include <nx/fusion/serialization/lexical.h>
-
-#include "api/session_manager.h"
+#include <api/session_manager.h>
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
-
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource/server_backup_schedule.h>
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_pool.h>
-
-#include "nx_ec/ec_proto_version.h"
-
+#include <network/networkoptixmodulerevealcommon.h>
+#include <nx_ec/ec_proto_version.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <rest/server/json_rest_result.h>
-
 #include <utils/common/app_info.h>
-#include "utils/common/delete_later.h"
-#include "utils/common/sleep.h"
-#include "utils/common/util.h"
-#include "network/networkoptixmodulerevealcommon.h"
-#include "api/server_rest_connection.h"
-#include <common/common_module.h>
-#include <api/global_settings.h>
+#include <utils/common/delete_later.h>
+#include <utils/common/sleep.h>
+#include <utils/common/util.h>
 
 #include <nx/api/analytics/driver_manifest.h>
+#include <nx/network/app_info.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/deprecated/asynchttpclient.h>
+#include <nx/network/rtsp/rtsp_types.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
+#include <nx/network/url/url_parse_helper.h>
+
+using namespace nx;
 
 namespace {
-    const QString kUrlScheme = lit("rtsp");
-    const QString protoVersionPropertyName = lit("protoVersion");
-    const QString safeModePropertyName = lit("ecDbReadOnly");
-}
 
-QString QnMediaServerResource::apiUrlScheme(bool sslAllowed)
-{
-    return sslAllowed ? lit("https") : lit("http");
-}
+const QString protoVersionPropertyName = lit("protoVersion");
+const QString safeModePropertyName = lit("ecDbReadOnly");
+
+} // namespace
 
 QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_serverFlags(Qn::SF_None),
+    m_serverFlags(vms::api::SF_None),
     m_panicModeCache(
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
         &m_mutex ),
@@ -63,7 +59,7 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
         &m_mutex
     )
 {
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
+    setTypeId(nx::vms::api::MediaServerData::kResourceTypeId);
     addFlags(Qn::server | Qn::remote);
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 
@@ -79,7 +75,7 @@ QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
 QnMediaServerResource::~QnMediaServerResource()
 {
     directDisconnectAll();
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     m_runningIfRequests.clear();
 }
 
@@ -107,14 +103,14 @@ void QnMediaServerResource::resetCachedValues()
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     if (m_firstCamera.isNull() && resource.dynamicCast<QnSecurityCamResource>() &&  resource->getParentId() == getId())
         m_firstCamera = resource;
 }
 
 void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     if (m_firstCamera && resource->getId() == m_firstCamera->getId())
         m_firstCamera.clear();
 }
@@ -133,9 +129,9 @@ QString QnMediaServerResource::getUniqueId() const
 
 QString QnMediaServerResource::getName() const
 {
-    if (getServerFlags() & Qn::SF_Edge)
+    if (getServerFlags().testFlag(vms::api::SF_Edge))
     {
-        QnMutexLocker lock( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
@@ -161,7 +157,7 @@ void QnMediaServerResource::setName( const QString& name )
         return;
     }
 
-    if (getServerFlags() & Qn::SF_Edge)
+    if (getServerFlags().testFlag(vms::api::SF_Edge))
         return;
 
     {
@@ -176,7 +172,7 @@ void QnMediaServerResource::setName( const QString& name )
 void QnMediaServerResource::setNetAddrList(const QList<nx::network::SocketAddress>& netAddrList)
 {
     {
-        QnMutexLocker lock( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         if (m_netAddrList == netAddrList)
             return;
         m_netAddrList = netAddrList;
@@ -186,7 +182,7 @@ void QnMediaServerResource::setNetAddrList(const QList<nx::network::SocketAddres
 
 QList<nx::network::SocketAddress> QnMediaServerResource::getNetAddrList() const
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     return m_netAddrList;
 }
 
@@ -288,7 +284,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 
 rest::QnConnectionPtr QnMediaServerResource::restConnection()
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
 
     if (!m_restConnection)
         m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(
@@ -318,14 +314,15 @@ void QnMediaServerResource::setUrl(const QString& url)
 nx::utils::Url QnMediaServerResource::getApiUrl() const
 {
     return nx::network::url::Builder()
-        .setScheme(apiUrlScheme(isSslAllowed()))
+        .setScheme(nx::network::http::urlSheme(isSslAllowed()))
         .setEndpoint(getPrimaryAddress()).toUrl();
 }
 
 QString QnMediaServerResource::getUrl() const
 {
+    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
     return nx::network::url::Builder()
-        .setScheme(kUrlScheme)
+        .setScheme(nx_rtsp::urlSheme(isSslAllowed() && isSecure))
         .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
@@ -403,12 +400,12 @@ void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
     m_panicModeCache.update();
 }
 
-Qn::ServerFlags QnMediaServerResource::getServerFlags() const
+vms::api::ServerFlags QnMediaServerResource::getServerFlags() const
 {
     return m_serverFlags;
 }
 
-void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
+void QnMediaServerResource::setServerFlags(vms::api::ServerFlags flags)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -465,10 +462,9 @@ void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::Notif
     }
 }
 
-QnSoftwareVersion QnMediaServerResource::getVersion() const
+nx::utils::SoftwareVersion QnMediaServerResource::getVersion() const
 {
-    QnMutexLocker lock( &m_mutex );
-
+    QnMutexLocker lock(&m_mutex);
     return m_version;
 }
 
@@ -517,10 +513,10 @@ bool QnMediaServerResource::isRedundancy() const
     return (*lk)->isRedundancyEnabled;
 }
 
-void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
+void QnMediaServerResource::setVersion(const nx::utils::SoftwareVersion& version)
 {
     {
-        QnMutexLocker lock( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         if (m_version == version)
             return;
         m_version = version;
@@ -528,18 +524,19 @@ void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
     emit versionChanged(::toSharedPointer(this));
 }
 
-QnSystemInformation QnMediaServerResource::getSystemInfo() const {
-    QnMutexLocker lock( &m_mutex );
-
+nx::vms::api::SystemInformation QnMediaServerResource::getSystemInfo() const
+{
+    QnMutexLocker lock(&m_mutex);
     return m_systemInfo;
 }
 
-void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo) {
-    QnMutexLocker lock( &m_mutex );
-
+void QnMediaServerResource::setSystemInfo(const nx::vms::api::SystemInformation& systemInfo)
+{
+    QnMutexLocker lock(&m_mutex);
     m_systemInfo = systemInfo;
 }
-QnModuleInformation QnMediaServerResource::getModuleInformation() const
+
+nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() const
 {
     if (auto module = commonModule())
     {
@@ -549,10 +546,12 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
 
     // build module information for other server
 
-    QnModuleInformation moduleInformation;
-    moduleInformation.type = QnModuleInformation::nxMediaServerId();
+    nx::vms::api::ModuleInformation moduleInformation;
+    moduleInformation.type = nx::vms::api::ModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = m_sslAllowed;
+    moduleInformation.realm = nx::network::AppInfo::realm();
+    moduleInformation.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     moduleInformation.name = getName();
     moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     if (moduleInformation.protoVersion == 0)
@@ -581,10 +580,11 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
     return moduleInformation;
 }
 
-QnModuleInformationWithAddresses QnMediaServerResource::getModuleInformationWithAddresses() const
+nx::vms::api::ModuleInformationWithAddresses
+    QnMediaServerResource::getModuleInformationWithAddresses() const
 {
-    QnModuleInformationWithAddresses information = getModuleInformation();
-    information.setEndpoints(getAllAvailableAddresses());
+    nx::vms::api::ModuleInformationWithAddresses information = getModuleInformation();
+    ec2::setModuleInformationEndpoints(information, getAllAvailableAddresses());
     return information;
 }
 
@@ -600,15 +600,17 @@ void QnMediaServerResource::setAnalyticsDrivers(
     setProperty(Qn::kAnalyticsDriversParamName, value);
 }
 
-bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
+bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource)
+{
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return (server->getServerFlags() & Qn::SF_Edge);
+        return (server->getServerFlags().testFlag(vms::api::SF_Edge));
     return false;
 }
 
-bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
+bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource)
+{
     if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-        return (server->getServerFlags() & Qn::SF_Edge) && !server->isRedundancy();
+        return server->getServerFlags().testFlag(vms::api::SF_Edge) && !server->isRedundancy();
     return false;
 }
 
@@ -617,7 +619,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
     if (getStatus() != newStatus)
     {
         {
-            QnMutexLocker lock( &m_mutex );
+            QnMutexLocker lock(&m_mutex);
             m_statusTimer.restart();
         }
 
@@ -640,7 +642,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
 
 qint64 QnMediaServerResource::currentStatusTime() const
 {
-    QnMutexLocker lock( &m_mutex );
+    QnMutexLocker lock(&m_mutex);
     return m_statusTimer.elapsed();
 }
 
@@ -681,7 +683,7 @@ void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
 
     if (auto pool = this->resourcePool())
     {
-        if (getServerFlags() & Qn::SF_Edge)
+        if (getServerFlags().testFlag(vms::api::SF_Edge))
         {
             // watch to own camera to change default server name
             connect(pool, &QnResourcePool::resourceAdded,
@@ -707,12 +709,12 @@ nx::utils::Url QnMediaServerResource::buildApiUrl() const
     if (m_primaryAddress.isNull())
     {
         url = m_apiConnection->url();
-        url.setScheme(apiUrlScheme(m_sslAllowed));
+        url.setScheme(nx::network::http::urlSheme(m_sslAllowed));
     }
     else
     {
         url = nx::network::url::Builder()
-            .setScheme(apiUrlScheme(m_sslAllowed))
+            .setScheme(nx::network::http::urlSheme(m_sslAllowed))
             .setEndpoint(m_primaryAddress).toUrl();
     }
 

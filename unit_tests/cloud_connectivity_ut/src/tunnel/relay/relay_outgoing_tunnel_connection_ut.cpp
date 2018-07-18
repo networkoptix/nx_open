@@ -233,7 +233,7 @@ private:
     nx::network::SocketAttributes m_resultingSocketAttributes;
 
     virtual void onClientToRelayConnectionInstanciated(
-        nx::cloud::relay::api::test::ClientImpl* relayClient) override
+        nx::cloud::relay::api::test::ClientStub* relayClient) override
     {
         relayClient->setBehavior(m_relayType);
 
@@ -247,11 +247,12 @@ private:
 
         const auto relayUrl = nx::utils::Url("http://127.0.0.1:12345");
 
-        auto clientToRelayConnection = api::ClientFactory::create(relayUrl);
+        auto clientToRelayConnection =
+            api::ClientFactory::instance().create(relayUrl);
 
         m_tunnelConnection = std::make_unique<relay::OutgoingTunnelConnection>(
             relayUrl,
-            nx::String(),
+            std::string(),
             std::move(clientToRelayConnection));
         m_tunnelConnection->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_tunnelConnection->setControlConnectionClosedHandler(

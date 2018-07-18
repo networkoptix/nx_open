@@ -1,36 +1,38 @@
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
-#include <utils/common/system_information.h>
+#include <utils/common/app_info.h>
 
-TEST( QnSystemInformation, ToString )
+using nx::vms::api::SystemInformation;
+
+TEST( SystemInformation, ToString )
 {
     {
-        const QnSystemInformation info;
+        const SystemInformation info;
         EXPECT_FALSE( info.isValid() );
         EXPECT_EQ( info.toString(), lit(" ") );
     }
     {
-        const QnSystemInformation info( lit("hello"), lit("world") );
+        const SystemInformation info( lit("hello"), lit("world") );
         EXPECT_TRUE( info.isValid() );
         EXPECT_EQ( info.toString(), lit("hello world") );
     }
     {
-        const QnSystemInformation info( lit("hello"), lit("world"), lit("!") );
+        const SystemInformation info( lit("hello"), lit("world"), lit("!") );
         EXPECT_TRUE( info.isValid() );
         EXPECT_EQ( info.toString(), lit("hello world !") );
     }
     {
-        const auto info = QnSystemInformation::currentSystemInformation();
+        const auto info = QnAppInfo::currentSystemInformation();
         EXPECT_TRUE( info.isValid() );
         EXPECT_GT( info.toString().length(), 0 );
     }
 }
 
-TEST( QnSystemInformation, FromString )
+TEST( SystemInformation, FromString )
 {
     {
-        const QnSystemInformation info( lit("linux rules") );
+        const SystemInformation info( lit("linux rules") );
         EXPECT_TRUE( info.isValid() );
 
         EXPECT_EQ( info.platform,       lit("linux") );
@@ -39,7 +41,7 @@ TEST( QnSystemInformation, FromString )
         EXPECT_EQ( info.toString(),     lit("linux rules") );
     }
     {
-        const QnSystemInformation info( lit("windows sucks :)") );
+        const SystemInformation info( lit("windows sucks :)") );
         EXPECT_TRUE( info.isValid() );
 
         EXPECT_EQ( info.platform,       lit("windows") );
@@ -48,8 +50,8 @@ TEST( QnSystemInformation, FromString )
         EXPECT_EQ( info.toString(),     lit("windows sucks :)") );
     }
     {
-        const auto curInfo = QnSystemInformation::currentSystemInformation();
-        const QnSystemInformation parsedInfo( curInfo.toString() );
+        const auto curInfo = QnAppInfo::currentSystemInformation();
+        const SystemInformation parsedInfo( curInfo.toString() );
 
         EXPECT_GT( parsedInfo.arch.length(),            0 );
         EXPECT_GT( parsedInfo.platform.length(),        0 );

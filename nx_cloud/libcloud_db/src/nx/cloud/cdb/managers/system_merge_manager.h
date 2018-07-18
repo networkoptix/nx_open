@@ -4,12 +4,12 @@
 #include <set>
 #include <string>
 
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/counter.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/cloud/cdb/api/system_data.h>
-#include <nx_ec/data/api_system_merge_history_record.h>
+#include <nx/vms/api/data/system_merge_history_record.h>
 
 #include "managers_types.h"
 #include "system_manager.h"
@@ -37,12 +37,12 @@ public:
         std::function<void(api::ResultCode)> completionHandler) = 0;
 
     virtual void processMergeHistoryRecord(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
         std::function<void(api::ResultCode)> completionHandler) = 0;
 
     virtual void processMergeHistoryRecord(
-        nx::utils::db::QueryContext* queryContext,
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord) = 0;
+        nx::sql::QueryContext* queryContext,
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord) = 0;
 };
 
 class SystemMergeManager:
@@ -54,7 +54,7 @@ public:
         AbstractSystemManager* systemManager,
         const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
         AbstractVmsGateway* vmsGateway,
-        nx::utils::db::AsyncSqlQueryExecutor* queryExecutor);
+        nx::sql::AsyncSqlQueryExecutor* queryExecutor);
     virtual ~SystemMergeManager() override;
 
     virtual void startMergingSystems(
@@ -64,12 +64,12 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 
     virtual void processMergeHistoryRecord(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
         std::function<void(api::ResultCode)> completionHandler) override;
 
     virtual void processMergeHistoryRecord(
-        nx::utils::db::QueryContext* queryContext,
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord) override;
+        nx::sql::QueryContext* queryContext,
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord) override;
 
     virtual void modifySystemBeforeProviding(api::SystemDataEx* system) override;
 
@@ -85,7 +85,7 @@ private:
     AbstractSystemManager* m_systemManager = nullptr;
     const AbstractSystemHealthInfoProvider& m_systemHealthInfoProvider;
     AbstractVmsGateway* m_vmsGateway;
-    nx::utils::db::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
+    nx::sql::AsyncSqlQueryExecutor* m_queryExecutor = nullptr;
     QnMutex m_mutex;
     // TODO: #ak Replace with std::set when c++17 is supported.
     std::map<MergeRequestContext*, std::unique_ptr<MergeRequestContext>> m_currentRequests;
@@ -110,26 +110,25 @@ private:
 
     void processUpdateSystemResult(
         MergeRequestContext* mergeRequestContext,
-        nx::utils::db::QueryContext* queryContext,
-        nx::utils::db::DBResult dbResult);
+        nx::sql::DBResult dbResult);
 
-    nx::utils::db::DBResult updateSystemStateInDb(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult updateSystemStateInDb(
+        nx::sql::QueryContext* queryContext,
         const std::string& idOfSystemToMergeTo,
         const std::string& idOfSystemToMergeBeMerged);
 
     void saveSystemMergeInfoToCache(const dao::MergeInfo& mergeInfo);
 
     bool verifyMergeHistoryRecord(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
         const data::SystemData& system);
 
     void updateCompletedMergeData(
-        nx::utils::db::QueryContext* queryContext,
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord);
+        nx::sql::QueryContext* queryContext,
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord);
 
     void removeMergeInfoFromCache(
-        const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord);
+        const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord);
 
     void finishMerge(
         MergeRequestContext* mergeRequestContextPtr,

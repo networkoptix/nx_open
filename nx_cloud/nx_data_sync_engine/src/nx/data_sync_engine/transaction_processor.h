@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/aio/timer.h>
-#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/log/log.h>
 
@@ -211,14 +211,12 @@ class TransactionProcessor:
 public:
     typedef Command<TransactionDataType> Ec2Transaction;
 
-    typedef nx::utils::MoveOnlyFunc<
-        nx::utils::db::DBResult(
-            nx::utils::db::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)
-    > ProcessEc2TransactionFunc;
+    using ProcessEc2TransactionFunc = nx::utils::MoveOnlyFunc<
+        nx::sql::DBResult(
+            nx::sql::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)>;
 
-    typedef nx::utils::MoveOnlyFunc<
-        void(nx::utils::db::QueryContext*, nx::utils::db::DBResult, AuxiliaryArgType)
-    > OnTranProcessedFunc;
+    using OnTranProcessedFunc =
+        nx::utils::MoveOnlyFunc<void(nx::sql::DBResult, AuxiliaryArgType)>;
 
     /**
      * @param processTranFunc This function does transaction-specific logic: e.g., saves data to DB
@@ -263,7 +261,7 @@ private:
             [this,
                 auxiliaryArgPtr,
                 transactionContext = std::move(transactionContext)](
-                    nx::utils::db::QueryContext* queryContext) mutable
+                    nx::sql::QueryContext* queryContext) mutable
             {
                 return processTransactionInDbConnectionThread(
                     queryContext,
@@ -271,19 +269,17 @@ private:
                     auxiliaryArgPtr);
             },
             [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
-                nx::utils::db::QueryContext* queryContext,
-                nx::utils::db::DBResult dbResult) mutable
+                nx::sql::DBResult dbResult) mutable
             {
                 dbProcessingCompleted(
-                    queryContext,
                     dbResult,
                     std::move(*auxiliaryArg),
                     std::move(handler));
             });
     }
 
-    nx::utils::db::DBResult processTransactionInDbConnectionThread(
-        nx::utils::db::QueryContext* queryContext,
+    nx::sql::DBResult processTransactionInDbConnectionThread(
+        nx::sql::QueryContext* queryContext,
         TransactionContext transactionContext,
         AuxiliaryArgType* const auxiliaryArg)
     {
@@ -296,7 +292,7 @@ private:
         const auto transactionCommand =
             transactionContext.transaction.get().command;
 
-        if (dbResultCode == nx::utils::db::DBResult::cancelled)
+        if (dbResultCode == nx::sql::DBResult::cancelled)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
@@ -306,14 +302,14 @@ private:
                 cl_logDEBUG1);
             return dbResultCode;
         }
-        else if (dbResultCode != nx::utils::db::DBResult::ok)
+        else if (dbResultCode != nx::sql::DBResult::ok)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader.systemId)
                 .arg(transactionContext.transportHeader.endpoint)
-                .arg(queryContext->connection()->lastError().text()),
+                .arg(queryContext->connection()->lastErrorText()),
                 cl_logWARNING);
             return dbResultCode;
         }
@@ -323,35 +319,34 @@ private:
             transactionContext.transportHeader.systemId,
             std::move(transactionContext.transaction.take()),
             auxiliaryArg);
-        if (dbResultCode != nx::utils::db::DBResult::ok)
+        if (dbResultCode != nx::sql::DBResult::ok)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Error processing transaction %1 received from %2. %3")
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader)
-                .arg(queryContext->connection()->lastError().text()),
+                .arg(queryContext->connection()->lastErrorText()),
                 cl_logWARNING);
         }
         return dbResultCode;
     }
 
     void dbProcessingCompleted(
-        nx::utils::db::QueryContext* queryContext,
-        nx::utils::db::DBResult dbResult,
+        nx::sql::DBResult dbResult,
         AuxiliaryArgType auxiliaryArg,
         TransactionProcessedHandler completionHandler)
     {
         if (m_onTranProcessedFunc)
-            m_onTranProcessedFunc(queryContext, dbResult, std::move(auxiliaryArg));
+            m_onTranProcessedFunc(dbResult, std::move(auxiliaryArg));
 
         switch (dbResult)
         {
-            case nx::utils::db::DBResult::ok:
-            case nx::utils::db::DBResult::cancelled:
+            case nx::sql::DBResult::ok:
+            case nx::sql::DBResult::cancelled:
                 return completionHandler(ResultCode::ok);
             default:
                 return completionHandler(
-                    dbResult == nx::utils::db::DBResult::retryLater
+                    dbResult == nx::sql::DBResult::retryLater
                     ? ResultCode::retryLater
                     : ResultCode::dbError);
         }

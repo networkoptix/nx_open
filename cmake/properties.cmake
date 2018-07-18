@@ -28,7 +28,6 @@ if(WINDOWS)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(client.binary.name "${display.product.name}")
     set(installation.root "/Applications/")
-    nx_set_variable_if_empty(protocol_handler_app_name "${display.product.name} Client.app")
 endif()
 
 if(targetDevice MATCHES "bpi|bananapi|rpi|edge1")
@@ -38,6 +37,3 @@ else()
 endif()
 
 set(apple_team_id "L6FE34GJWM")
-
-hg_changeset(${PROJECT_SOURCE_DIR} changeSet)
-hg_branch(${PROJECT_SOURCE_DIR} branch)

@@ -16,6 +16,9 @@
 #include "settings.h"
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/ubjson_transaction_serializer.h>
+#include <transaction/threadsafe_message_bus_adapter.h>
+
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
 namespace ec2 {
 
@@ -29,8 +32,7 @@ class RemoteConnectionFactory:
 public:
     RemoteConnectionFactory(
         QnCommonModule* commonModule,
-        Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager,
+        nx::vms::api::PeerType peerType,
         bool isP2pMode);
     virtual ~RemoteConnectionFactory();
 
@@ -55,24 +57,24 @@ public:
     virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
-    virtual TimeSynchronizationManager* timeSyncManager() const override;
+    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override;
 
     virtual void shutdown() override;
 
 private:
     QnMutex m_mutex;
     Settings m_settingsInstance;
-    std::unique_ptr<TransactionMessageBusAdapter> m_bus;
-    std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
+    std::unique_ptr<ThreadsafeMessageBusAdapter> m_bus;
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
+    std::unique_ptr<nx::vms::time_sync::AbstractTimeSyncManager> m_timeSynchronizationManager;
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;
 
     std::unique_ptr<ClientQueryProcessor> m_remoteQueryProcessor;
     bool m_p2pMode = false;
-    Qn::PeerType m_peerType = Qn::PeerType::PT_NotDefined;
+    nx::vms::api::PeerType m_peerType = nx::vms::api::PeerType::notDefined;
 
 private:
     int establishConnectionToRemoteServer(

@@ -100,7 +100,7 @@ public:
     QTimer* suspendTimer = nullptr;
     int connectionHandle = kInvalidHandle;
     QnConnectionManager::State connectionState = QnConnectionManager::Disconnected;
-    QnSoftwareVersion connectionVersion;
+    nx::utils::SoftwareVersion connectionVersion;
     QnConnectionManager::ConnectionType connectionType = QnConnectionManager::NormalConnection;
 };
 
@@ -206,7 +206,7 @@ QString QnConnectionManager::currentPassword() const
     return d->url.isValid() ? d->url.password() : QString();
 }
 
-QnSoftwareVersion QnConnectionManager::connectionVersion() const
+nx::utils::SoftwareVersion QnConnectionManager::connectionVersion() const
 {
     Q_D(const QnConnectionManager);
     return d->connectionVersion;
@@ -388,7 +388,8 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
 
             if (status == Qn::IncompatibleVersionConnectionResult)
             {
-                infoParameter = connectionInfo.version.toString(QnSoftwareVersion::BugfixFormat);
+                infoParameter = connectionInfo.version.toString(
+                    nx::utils::SoftwareVersion::BugfixFormat);
             }
             else if(status == Qn::IncompatibleCloudHostConnectionResult)
             {
@@ -432,12 +433,6 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
                             &ec2::DummyHandler::onRequestDone);
                     }
                 });
-
-            connect(
-                ec2Connection->getTimeNotificationManager().get(),
-                &ec2::AbstractTimeNotificationManager::timeChanged,
-                QnSyncTime::instance(),
-                static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
             commonModule()->instance<nx::client::core::UserWatcher>()->setUserName(
                 connectionInfo.effectiveUserName.isEmpty()
@@ -522,7 +517,7 @@ void QnConnectionManagerPrivate::doDisconnect()
     commonModule()->sessionManager()->stop();
 
     setSystemName(QString());
-    connectionVersion = QnSoftwareVersion();
+    connectionVersion = {};
     emit q->connectionVersionChanged();
 
     updateConnectionState();

@@ -1,30 +1,33 @@
 #include "system_commands.h"
 #include "system_commands/domain_socket/detail/send_linux.h"
-#include <string>
-#include <sstream>
+#include "system_commands/detail/mount_helper.h"
+
+#include <algorithm>
+#include <assert.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <fstream>
+#include <grp.h>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
-#include <fstream>
-#include <algorithm>
 #include <iterator>
-#include <set>
-#include <assert.h>
-#include <string.h>
+#include <functional>
 #include <pwd.h>
-#include <grp.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/types.h>
-#include <sys/statvfs.h>
-#include <sys/mount.h>
-#include <sys/wait.h>
+#include <set>
 #include <signal.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <dirent.h>
+#include <sstream>
+#include <string>
+#include <string.h>
+#include <sys/mount.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/statvfs.h>
+#include <sys/syscall.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/un.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 namespace nx {
 
@@ -34,7 +37,7 @@ const char* const SystemCommands::kDomainSocket = "/tmp/syscmd_socket3f64fa";
 
 namespace {
 
-std::string formatImpl(const char* pstr, std::stringstream& out)
+static std::string formatImpl(const char* pstr, std::stringstream& out)
 {
     while (*pstr)
         out << *pstr++;
@@ -90,8 +93,23 @@ std::string format(const std::string& formatString, Args&&... args)
     return formatImpl(pstr, out, std::forward<Args>(args)...);
 }
 
-} // namespace
+static std::string makeCredentialsFile(
+    const std::string& userName, const std::string& password, std::string* outError)
+{
+    const std::string fileName = "/tmp/cifs_credentials_" + std::to_string(syscall(SYS_gettid));
+    std::ofstream file(fileName.c_str());
+    file << "username=" << userName << std::endl;
+    file << "password=" << password << std::endl;
+    if (!file.fail())
+        return fileName;
 
+    if (outError)
+        *outError = "Unable to create credentials file: " + fileName;
+
+    return "";
+}
+
+} // namespace
 
 bool SystemCommands::checkMountPermissions(const std::string& directory)
 {
@@ -168,87 +186,34 @@ bool SystemCommands::execute(
     return true;
 }
 
-
 SystemCommands::MountCode SystemCommands::mount(
     const std::string& url, const std::string& directory,
     const boost::optional<std::string>& username,
     const boost::optional<std::string>& password, bool reportViaSocket, int socketPostfix)
 {
-    MountCode result= MountCode::otherError;
-    if (!checkMountPermissions(directory))
-    {
-        if (reportViaSocket)
-            system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
-
-        return result;
-    }
-
-    if (url.find("//") != 0)
-    {
-        m_lastError = format("% is not an SMB url", url);
-        if (reportViaSocket)
-            system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
-
-        return result;
-    }
-
-    auto makeCommandString =
-        [&url, &directory](const std::string& username, const std::string& password,
-            const std::string& domain,
-            const std::string& dialect)
+    system_commands::MountHelperDelegates delegates;
+    delegates.credentialsFileName =
+        [this](const std::string& username, const std::string& password)
         {
-            std::ostringstream command;
-            command << "mount -t cifs '" << url << "' '" << directory << "'"
-                << " -o uid=" << kRealUid << ",gid=" << kRealGid
-                << ",username=" << username << ",password=" << password;
+            return makeCredentialsFile(username, password, &m_lastError);
+        };
+    delegates.gid = []() { return kRealGid; };
+    delegates.uid = []() { return kRealGid; };
+    delegates.isPathAllowed =
+        [this](const std::string& path) { return checkMountPermissions(path); };
+    delegates.osMount =
+        [this](const std::string& command)
+        {
+            if (execute(command))
+                return MountCode::ok;
 
-            if (!domain.empty())
-                command << ",domain=" << domain;
-
-            if (!dialect.empty())
-                command << ",vers=" << dialect;
-
-            return command.str();
+            return (m_lastError.find("13") != std::string::npos) //< 'Permission denied' error code
+                ? MountCode::wrongCredentials
+                : MountCode::otherError;
         };
 
-    std::string passwordString = password ? *password : "";
-    std::string userNameString = username ? *username : "guest";
-    std::string userProvidedDomain;
-
-    if (auto pos = userNameString.find("\\");
-        pos != std::string::npos && pos != userNameString.size() - 1)
-    {
-        userProvidedDomain = userNameString.substr(pos + 1);
-        userNameString = userNameString.substr(0, pos);
-    }
-
-    std::vector<std::string> domains = { "WORKGROUP", "" };
-    if (!userProvidedDomain.empty())
-        domains.push_back(userProvidedDomain);
-
-    bool gotWrongCredentialsError = false;
-    for (const auto& domain: domains)
-    {
-        for (const auto& passwordCandidate: {passwordString, std::string("123")})
-        {
-            for (const auto& dialect: {"", "2.0", "1.0"})
-            {
-                if (execute(makeCommandString(userNameString, passwordCandidate, domain, dialect)))
-                {
-                    result = MountCode::ok;
-                    break;
-                }
-                else if (m_lastError.find("13") != std::string::npos) //< 'Permission denied' error code
-                {
-                    gotWrongCredentialsError = true;
-                }
-            }
-        }
-    }
-
-    if (gotWrongCredentialsError && result != MountCode::ok)
-        result = MountCode::wrongCredentials;
-
+    system_commands::MountHelper mountHelper(username, password, delegates);
+    auto result = mountHelper.mount(url, directory);
     if (reportViaSocket)
         system_commands::domain_socket::detail::sendInt64(socketPostfix, (int64_t) result);
 
@@ -273,6 +238,8 @@ SystemCommands::UnmountCode SystemCommands::unmount(
         switch(errno)
         {
             case EINVAL:
+                result = UnmountCode::notMounted;
+                break;
             case ENOENT:
                 result = UnmountCode::notExists;
                 break;

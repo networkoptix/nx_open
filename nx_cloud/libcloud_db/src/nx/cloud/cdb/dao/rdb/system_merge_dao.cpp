@@ -1,7 +1,7 @@
 #include "system_merge_dao.h"
 
 #include <nx/fusion/model_functions.h>
-#include <nx/utils/db/query.h>
+#include <nx/sql/query.h>
 
 namespace nx {
 namespace cdb {
@@ -9,16 +9,16 @@ namespace dao {
 namespace rdb {
 
 SystemMergeDao::SystemMergeDao(
-    utils::db::AsyncSqlQueryExecutor* queryExecutor)
+    sql::AsyncSqlQueryExecutor* queryExecutor)
     :
     m_queryExecutor(queryExecutor)
 {
 }
 
 std::vector<MergeInfo> SystemMergeDao::fetchAll(
-    utils::db::QueryContext* queryContext)
+    sql::QueryContext* queryContext)
 {
-    utils::db::SqlQuery query(*queryContext->connection());
+    sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         SELECT master_system_id AS masterSystemId, slave_system_id AS slaveSystemId,
             start_time_utc AS startTime
@@ -32,10 +32,10 @@ std::vector<MergeInfo> SystemMergeDao::fetchAll(
 }
 
 void SystemMergeDao::save(
-    utils::db::QueryContext* queryContext,
+    sql::QueryContext* queryContext,
     const MergeInfo& mergeInfo)
 {
-    utils::db::SqlQuery query(*queryContext->connection());
+    sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         INSERT INTO system_merge_info (master_system_id, slave_system_id, start_time_utc)
         VALUES (:masterSystemId, :slaveSystemId, :startTime)
@@ -45,10 +45,10 @@ void SystemMergeDao::save(
 }
 
 void SystemMergeDao::removeMergeBySlaveSystemId(
-    utils::db::QueryContext* queryContext,
+    sql::QueryContext* queryContext,
     const std::string& slaveSystemId)
 {
-    utils::db::SqlQuery query(*queryContext->connection());
+    sql::SqlQuery query(queryContext->connection());
     query.prepare(R"sql(
         DELETE FROM system_merge_info WHERE slave_system_id = :slaveSystemId
     )sql");

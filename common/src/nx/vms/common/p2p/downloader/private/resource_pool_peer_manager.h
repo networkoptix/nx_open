@@ -9,7 +9,6 @@
 #include <nx/network/deprecated/asynchttpclient.h>
 
 class QnResourcePool;
-class QnAsyncHttpClientReply;
 
 namespace nx {
 namespace vms {
@@ -61,6 +60,7 @@ public:
         ValidateCallback callback) override;
 
     virtual void cancelRequest(const QnUuid& peerId, rest::Handle handle) override;
+    virtual bool hasAccessToTheUrl(const QString& url) const override;
 
 private:
     QnMediaServerResourcePtr getServer(const QnUuid& peerId) const;

@@ -7,7 +7,7 @@
             <button class="btn btn-default" ng-click="rename()">Cambiar Nombre del Sistema</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Fusionar con otro sistema</button>
         </p>
         <hr></hr>
         <button class="btn btn-default" ng-click="disconnect()">Desconectar de
@@ -33,20 +33,17 @@
 </div>
 <div class="panel panel-default" ng-if="currentlyMerging">
     <div class="panel-body" ng-if="isMaster && system.isMine">
-        <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
+        <div><strong>{{mergeTargetSystem.name}}</strong> se fusiona con este sistema</div>
         <hr></hr>
-        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+        <div class="merge-info-text">Dependiendo del tamaño de la base de datos, puede tomar varias horas</div>
     </div>
     <div class="panel-body" ng-if="!isMaster || !system.isMine">
-        <div>This system is being merged to
-            <strong>{{mergeTargetSystem.name}}</strong></div>
+        <div>Este sistema se está fusionando a <strong>{{mergeTargetSystem.name}}</strong></div>
         <hr></hr>
         <div class="merge-info-text">
-            <p>Depending of the size of the database it may take up to several hours.</p>
-            <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System, and this system will be deleted.</p>
+            <p>Dependiendo del tamaño de la base de datos, puede tomar varias horas.</p>
+            <p>Hasta que finalice la fusión, puede iniciar sesión en este sistema y ver el video, pero no puede cambiar ninguna configuración.</p>
+            <p>Cuando termine la fusión, todos los usuarios y cámaras de este sistema estarán disponibles en <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. El Sistema, y ​​este sistema será eliminado.</p>
         </div>
     </div>
 </div>

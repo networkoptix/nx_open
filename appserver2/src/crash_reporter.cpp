@@ -276,21 +276,19 @@ nx::network::http::HttpHeaders ReportData::makeHttpHeaders() const
     const auto binName = fileName.split(QChar('_')).first();
 #endif
 
+    const auto uuidHash = m_host.commonModule()->moduleGUID().toSimpleString().replace(lit("-"), lit(""));
     const auto version = nx::utils::AppInfo::applicationFullVersion();
-    const auto systemInfo = QnSystemInformation::currentSystemInformation().toString();
-    const auto systemRuntime = QnSystemInformation::currentSystemRuntime();
+    const auto systemInfo = QnAppInfo::currentSystemInformation().toString();
+    const auto systemRuntime = nx::vms::api::SystemInformation::currentSystemRuntime();
     const auto system = lit( "%1 %2" ).arg( systemInfo ).arg( systemRuntime )
             .replace( QChar( ' ' ), QChar( '-' ) );
 
     const auto timestamp = m_crashFile.created().toUTC().toString("yyyy-MM-dd_hh-mm-ss");
     const auto extension = fileName.split(QChar('.')).last();
 
-    QCryptographicHash uuidHash(QCryptographicHash::Sha1);
-    uuidHash.addData(m_host.commonModule()->moduleGUID().toByteArray());
-
     nx::network::http::HttpHeaders headers;
     headers.insert(std::make_pair("Nx-Binary", binName.toUtf8()));
-    headers.insert(std::make_pair("Nx-Uuid-Hash", uuidHash.result().toHex()));
+    headers.insert(std::make_pair("Nx-Uuid-Hash", uuidHash.toUtf8()));
     headers.insert(std::make_pair("Nx-Version", version.toUtf8()));
     headers.insert(std::make_pair("Nx-System", system.toUtf8()));
     headers.insert(std::make_pair("Nx-Timestamp", timestamp.toUtf8()));

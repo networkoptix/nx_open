@@ -111,6 +111,28 @@
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="Line" name="filterLine">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>1</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>1</height>
+         </size>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -183,9 +205,6 @@
          </item>
          <item>
           <widget class="nx::client::desktop::ToolButton" name="showInfoButton">
-           <property name="toolTip">
-            <string>Show/hide information</string>
-           </property>
            <property name="text">
             <string notr="true"/>
            </property>
@@ -196,9 +215,6 @@
          </item>
          <item>
           <widget class="nx::client::desktop::ToolButton" name="showPreviewsButton">
-           <property name="toolTip">
-            <string>Show/hide thumbnails</string>
-           </property>
            <property name="text">
             <string notr="true"/>
            </property>
@@ -314,6 +330,9 @@
        <width>16777215</width>
        <height>1</height>
       </size>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

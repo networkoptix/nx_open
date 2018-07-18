@@ -251,6 +251,9 @@
         "palette": {
             "default": {
                 "midlight":         "dark13"
+            },
+            "disabled": {
+                "midlight":         "dark13.setAlpha(77)"
             }
         }
     },
@@ -378,6 +381,14 @@
             "window": "light4",
             "windowText": "dark5",
             "highlight": "light4.setAlpha(0)"
+        }}
+    },
+
+    "nx::client::desktop::TimelineScreenshotCursor": {
+        "palette": { "default": {
+            "window": "dark13",
+            "windowText": "light3",
+            "mid": "dark15"
         }}
     },
 
@@ -518,6 +529,14 @@
     },
 
     "QnServerUpdatesModel": {
+        "colors": {
+            "latest": "green_l2",
+            "target": "yellow_core",
+            "error": "red_l2"
+        }
+    },
+
+    "nx::client::desktop::ServerUpdatesModel": {
         "colors": {
             "latest": "green_l2",
             "target": "yellow_core",
@@ -753,7 +772,7 @@
         }
     },
 
-    "QnScheduleGridWidget": {
+    "nx::client::desktop::ScheduleGridWidget": {
         "colors": {
             "normalLabel": "light10",
             "weekendLabel": "red_core",
@@ -840,21 +859,20 @@
         "palette": {
             "_1": "selected",
             "active": {
-                "window": "dark5",
                 "dark": "dark5",
-                "midlight": "dark5",
                 "shadow": "dark4",
-                "windowText": "light10",
-                "text": "light10"
+                "windowText": "light10"
             },
             "_2": "not selected",
             "inactive": {
                 "window": "dark10",
-                "dark": "dark6",
                 "shadow": "transparent",
                 "midlight": "dark11",
                 "windowText": "light14",
-                "text": "light16"
+                "text": "light16",
+                "highlightedText": "light10",
+                "highlight": "brand_core.setAlpha(102)",
+                "light": "brand_l1.setAlpha(102)"
             }
         }
     },
@@ -881,8 +899,7 @@
     "nx::client::desktop::EventTile": {
         "palette": {
             "default": {
-                "window": "dark7",
-                "midlight": "dark8",
+                "base": "dark7",
                 "light": "light10",
                 "windowText": "light16",
                 "text": "light4",

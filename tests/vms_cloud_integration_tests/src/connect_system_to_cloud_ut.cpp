@@ -15,6 +15,8 @@
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
+using nx::vms::api::ServerFlag;
+
 namespace {
 
 static constexpr auto kRetryRequestDelay = std::chrono::seconds(1);
@@ -44,12 +46,12 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            QnModuleInformation moduleInformation;
+            nx::vms::api::ModuleInformation moduleInformation;
             QnJsonRestResult resultCode =
                 mediaServerClient->getModuleInformation(&moduleInformation);
             ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
 
-            if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
+            if (moduleInformation.serverFlags.testFlag(ServerFlag::SF_NewSystem))
                 break;
             std::this_thread::sleep_for(kRetryRequestDelay);
         }
@@ -60,7 +62,7 @@ protected:
         auto mediaServerClient = prepareMediaServerClient();
         for (;;)
         {
-            ec2::ApiUserDataList users;
+            nx::vms::api::UserDataList users;
             if (mediaServerClient->ec2GetUsers(&users) == ec2::ErrorCode::ok)
             {
                 bool foundCloudUser = false;

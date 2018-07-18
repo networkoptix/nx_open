@@ -4,7 +4,7 @@ import Nx 1.0
 
 ColorThemeBase
 {
-    property color window: colors.dark4
+    property color window: colors.dark3
     property color windowText: colors.light16
     property color shadow: colors.dark5
     property color text: colors.light4

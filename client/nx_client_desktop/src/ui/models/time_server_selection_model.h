@@ -48,8 +48,6 @@ public:
     QnUuid selectedServer() const;
     void setSelectedServer(const QnUuid& serverId);
 
-    static bool isSelected(quint64 priority);
-
     static QString formattedOffset(qint64 offsetMs);
     QVariant offsetForeground(qint64 offsetMs) const;
 
@@ -64,7 +62,7 @@ signals:
     void hasInternetAccessChanged();
 
 private:
-    void addItem(const QnPeerRuntimeInfo& info);
+    void addItem(QnMediaServerResourcePtr server);
     void updateColumn(Columns column);
 
     bool calculateSameTimezone() const;
@@ -77,9 +75,8 @@ private:
     struct Item
     {
         QnUuid peerId;
-        qint64 offset;
-        quint64 priority;
-        bool ready;
+        qint64 offset = 0;
+        bool ready = false;
     };
 
     QList<Item> m_items;

@@ -3,60 +3,51 @@ import logging
 import pytest
 from pathlib2 import Path
 
-from framework.os_access.posix_shell import local_shell
-from framework.registry import Registry
 from framework.vms.factory import VMFactory
 from framework.vms.hypervisor import VMNotFound
+from framework.vms.vm_type import VMType
 
 _logger = logging.getLogger(__name__)
 
 
 @pytest.fixture()
-def registry(hypervisor):
+def vm_type(hypervisor):
     registry_path = Path('/tmp/func_tests/linux-test_factory.registry.yaml')
     if registry_path.exists():
         registry_path.unlink()
-    registry = Registry(local_shell, registry_path, 'func_tests-temp-factory_test-{index}', 2)
-    for index, name in registry.possible_entries():
+    vm_type = VMType(
+        hypervisor,
+        registry_path,
+        'func_tests-temp-factory_test-{vm_index}',
+        2,
+        'trusty-template',
+        '0A-00-00-FF-{vm_index:02X}-0{nic_index:01X}',
+        {
+            'host_ports_base': 39000,
+            'host_ports_per_vm': 1,
+            'vm_ports_to_host_port_offsets': {
+                'tcp/22': 0,
+                },
+            },
+        )
+    for index, name in vm_type.registry.possible_entries():
         try:
-            hypervisor.destroy(name)
+            vm = hypervisor.find_vm(name)
         except VMNotFound:
             _logger.info("VM %r doesn't exist in %r.", name, hypervisor)
-        else:
-            _logger.info("VM %r removed from %r.", name, hypervisor)
-    return registry
-
-
-@pytest.fixture()
-def vm_type_configuration():
-    return {
-        'os_family': 'linux',
-        'power_on_timeout_sec': 60,
-        'vm': {
-            'mac_address_format': '0A-00-00-FF-{vm_index:02X}-0{nic_index:01X}',
-            'port_forwarding': {
-                'host_ports_base': 39000,
-                'host_ports_per_vm': 1,
-                'forwarded_ports': {
-                    'ssh': {
-                        'guest_port': 22,
-                        'host_port_offset': 0,
-                        'protocol': 'tcp',
-                        },
-                    },
-                },
-            'template_vm': 'trusty-template',
-            'template_vm_snapshot': 'template',
-            },
-        }
+            continue
+        vm.destroy()
+        _logger.info("VM %r removed from %r.", name, hypervisor)
+    return vm_type
 
 
 _vm_type = 'linux-test_factory'
 
 
 @pytest.fixture()
-def vm_factory(hypervisor, vm_type_configuration, registry):
-    factory = VMFactory({_vm_type: vm_type_configuration}, hypervisor, {_vm_type: registry})
+def vm_factory(hypervisor, vm_type):
+    vm_type_configuration = {'os_family': 'linux', 'power_on_timeout_sec': 120}
+    factory = VMFactory({_vm_type: vm_type_configuration}, hypervisor, {_vm_type: vm_type})
     return factory
 
 

@@ -3,14 +3,14 @@
 #include <list>
 
 #include <common/common_module.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_access/resource_access_filter.h>
-
-#include <utils/common/warnings.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <core/resource/avi/avi_resource.h>
+#include <utils/common/warnings.h>
+
+#include <nx/vms/api/data/layout_data.h>
 
 QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     base_type(commonModule),
@@ -22,7 +22,7 @@ QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
     m_locked(false)
 {
     addFlags(Qn::layout);
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
+    setTypeId(nx::vms::api::LayoutData::kResourceTypeId);
 }
 
 QString QnLayoutResource::getUniqueId() const
@@ -218,6 +218,18 @@ void QnLayoutResource::updateInternal(const QnResourcePtr &other, Qn::NotifierLi
             notifiers << [r = toSharedPointer(this)]{ emit r->lockedChanged(r); };
         }
 
+        if (m_fixedSize != localOther->m_fixedSize)
+        {
+            m_fixedSize = localOther->m_fixedSize;
+            notifiers << [r = toSharedPointer(this)]{ emit r->fixedSizeChanged(r); };
+        }
+
+        if (m_logicalId != localOther->m_logicalId)
+        {
+            m_logicalId = localOther->m_logicalId;
+            notifiers << [r = toSharedPointer(this)]{ emit r->logicalIdChanged(r); };
+        }
+
         setItemsUnderLockInternal(m_items.data(), localOther->m_items.data(), notifiers);
     }
 }
@@ -373,6 +385,40 @@ QString QnLayoutResource::backgroundImageFilename() const
 {
     QnMutexLocker locker(&m_mutex);
     return m_backgroundImageFilename;
+}
+
+QSize QnLayoutResource::fixedSize() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_fixedSize;
+}
+
+void QnLayoutResource::setFixedSize(const QSize& value)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_fixedSize == value)
+            return;
+        m_fixedSize = value;
+    }
+    emit fixedSizeChanged(::toSharedPointer(this));
+}
+
+int QnLayoutResource::logicalId() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_logicalId;
+}
+
+void QnLayoutResource::setLogicalId(int value)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_logicalId == value)
+            return;
+        m_logicalId = value;
+    }
+    emit logicalIdChanged(::toSharedPointer(this));
 }
 
 void QnLayoutResource::setBackgroundImageFilename(const QString &filename)

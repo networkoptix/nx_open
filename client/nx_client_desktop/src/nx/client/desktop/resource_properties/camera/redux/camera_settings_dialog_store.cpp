@@ -67,6 +67,12 @@ void CameraSettingsDialogStore::setSettingsOptimizationEnabled(bool value)
         });
 }
 
+void CameraSettingsDialogStore::setGlobalPermissions(GlobalPermissions value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setGlobalPermissions(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setSingleWearableState(const WearableState& value)
 {
     d->executeAction(
@@ -219,6 +225,12 @@ void CameraSettingsDialogStore::setRecordingEnabled(bool value)
         [&](State state) { return Reducer::setRecordingEnabled(std::move(state), value); });
 }
 
+void CameraSettingsDialogStore::setAudioEnabled(bool value)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setAudioEnabled(std::move(state), value); });
+}
+
 void CameraSettingsDialogStore::setMotionDetectionEnabled(bool value)
 {
     d->executeAction(
@@ -327,6 +339,16 @@ void CameraSettingsDialogStore::setWearableMotionSensitivity(int value)
 {
     d->executeAction(
         [&](State state) { return Reducer::setWearableMotionSensitivity(std::move(state), value); });
+}
+
+void CameraSettingsDialogStore::setCredentials(
+    const std::optional<QString>& login, const std::optional<QString>& password)
+{
+    if (!login && !password)
+        return;
+
+    d->executeAction(
+        [&](State state) { return Reducer::setCredentials(std::move(state), login, password); });
 }
 
 } // namespace desktop

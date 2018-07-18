@@ -33,6 +33,13 @@ public:
     }
 
 protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        m_mediatorTcpEndpoint = mediator().stunTcpEndpoint();
+    }
+
     void givenGatewayThatFailedToConnectToMediator()
     {
         mediator().stop();
@@ -44,7 +51,7 @@ protected:
         whenStartGateway();
 
         // Waiting for gateway to fail request.
-        // TODO: #ak Replace with event.
+        // TODO: #ak Replace with an event.
         std::this_thread::sleep_for(std::chrono::seconds(10));
     }
 
@@ -56,7 +63,7 @@ protected:
     void whenStartGateway()
     {
         // Specifying mediator port to gateway.
-        const auto mediatorEndpointStr = mediator().stunEndpoint().toStdString();
+        const auto mediatorEndpointStr = m_mediatorTcpEndpoint.toStdString();
         m_vmsGateway.addArg("-general/mediatorEndpoint", mediatorEndpointStr.c_str());
 
         ASSERT_TRUE(m_vmsGateway.startAndWaitUntilStarted());
@@ -88,6 +95,7 @@ protected:
 private:
     nx::cloud::gateway::VmsGatewayFunctionalTest m_vmsGateway;
     const std::string m_vmsGatewayPeerId;
+    network::SocketAddress m_mediatorTcpEndpoint;
 };
 
 TEST_F(VmsGatewayMediatorIntegration, gateway_reconnects_to_mediator)

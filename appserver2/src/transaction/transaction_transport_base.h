@@ -100,8 +100,8 @@ public:
         const QnUuid& localSystemId,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
-        const ApiPeerData& localPeer,
-        const ApiPeerData& remotePeer,
+        const nx::vms::api::PeerData& localPeer,
+        const nx::vms::api::PeerData& remotePeer,
         ConnectionType::Type connectionType,
         const nx::network::http::Request& request,
         const QByteArray& contentEncoding,
@@ -111,7 +111,7 @@ public:
     QnTransactionTransportBase(
         const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
-        const ApiPeerData& localPeer,
+        const nx::vms::api::PeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);
     ~QnTransactionTransportBase();
@@ -149,8 +149,8 @@ public:
     bool isNeedResync() const { return m_needResync; }
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
-    virtual const ec2::ApiPeerData& localPeer() const override;
-    virtual const ec2::ApiPeerData& remotePeer() const override;
+    virtual const nx::vms::api::PeerData& localPeer() const override;
+    virtual const nx::vms::api::PeerData& remotePeer() const override;
     virtual nx::utils::Url remoteAddr() const override;
     nx::network::SocketAddress remoteSocketAddr() const;
     int remotePeerProtocolVersion() const;
@@ -243,8 +243,8 @@ private:
     };
 
     QnUuid m_localSystemId;
-    const ApiPeerData m_localPeer;
-    ApiPeerData m_remotePeer;
+    const nx::vms::api::PeerData m_localPeer;
+    nx::vms::api::PeerData m_remotePeer;
 
     qint64 m_lastConnectTime;
 
@@ -312,7 +312,7 @@ private:
     QnTransactionTransportBase(
         const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
-        const ApiPeerData& localPeer,
+        const nx::vms::api::PeerData& localPeer,
         PeerRole peerRole,
         std::chrono::milliseconds tcpKeepAliveTimeout,
         int keepAliveProbeCount);

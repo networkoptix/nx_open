@@ -64,8 +64,8 @@ template<
     typename OldTransactionType,
     typename NewTransactionType
 >
-nx::utils::db::DBResult upgradeSerializedTransactions(
-    nx::utils::db::QueryContext* const queryContext)
+nx::sql::DBResult upgradeSerializedTransactions(
+    nx::sql::QueryContext* const queryContext)
 {
     QSqlQuery fetchCurrentTransactions(*queryContext->connection());
     fetchCurrentTransactions.setForwardOnly(true);
@@ -78,7 +78,7 @@ nx::utils::db::DBResult upgradeSerializedTransactions(
         NX_LOG(lm("Error fetching transactions. %1")
             .arg(fetchCurrentTransactions.lastError().text()),
             cl_logWARNING);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
     QSqlQuery saveUpdatedTransactionQuery(*queryContext->connection());
@@ -94,7 +94,7 @@ nx::utils::db::DBResult upgradeSerializedTransactions(
         if (!oldTransaction.readFrom(fetchCurrentTransactions.record()))
         {
             NX_CRITICAL(false);
-            return nx::utils::db::DBResult::ioError;
+            return nx::sql::DBResult::ioError;
         }
 
         Transaction<NewTransactionType> newTransaction = oldTransaction;
@@ -104,11 +104,11 @@ nx::utils::db::DBResult upgradeSerializedTransactions(
             NX_LOG(lm("Error saving new transaction to DB. %1")
                 .arg(saveUpdatedTransactionQuery.lastError().text()),
                 cl_logWARNING);
-            return nx::utils::db::DBResult::ioError;
+            return nx::sql::DBResult::ioError;
         }
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 } // namespace detail

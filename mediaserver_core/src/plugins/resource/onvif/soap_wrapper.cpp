@@ -191,10 +191,7 @@ struct SoapTimeouts
 
 SoapTimeouts getSoapTimeouts()
 {
-    auto serializedTimeouts = qnServerModule->roSettings()
-        ->value(nx_ms_conf::ONVIF_TIMEOUTS, QString()).toString();
-
-    return SoapTimeouts(serializedTimeouts);
+    return SoapTimeouts(qnServerModule->settings().onvifTimeouts());
 }
 
 /*
@@ -646,6 +643,34 @@ int MediaSoapWrapper::getVideoEncoderConfigurationOptions(VideoOptionsReq& reque
     return m_soapProxy->GetVideoEncoderConfigurationOptions(m_endpoint, NULL, &request, &response);
 }
 
+int MediaSoapWrapper::getAudioOutputConfigurations(GetAudioOutputConfigurationsReq& request, GetAudioOutputConfigurationsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetAudioOutputConfigurations(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::addAudioOutputConfiguration(AddAudioOutputConfigurationReq& request, AddAudioOutputConfigurationResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AddAudioOutputConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::addAudioDecoderConfiguration(
+    AddAudioDecoderConfigurationReq& request,
+    AddAudioDecoderConfigurationResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AddAudioDecoderConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getCompatibleAudioDecoderConfigurations(
+    GetCompatibleAudioDecoderConfigurationsReq& request,
+    GetCompatibleAudioDecoderConfigurationsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetCompatibleAudioDecoderConfigurations(m_endpoint, NULL, &request, &response);
+}
+
 int MediaSoapWrapper::getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response)
 {
     beforeMethodInvocation();
@@ -840,6 +865,12 @@ int PtzSoapWrapper::doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& r
 {
     beforeMethodInvocation();
     return m_soapProxy->AbsoluteMove(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::doRelativeMove(RelativeMoveReq& request, RelativeMoveResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->RelativeMove(m_endpoint, NULL, &request, &response);
 }
 
 int PtzSoapWrapper::gotoPreset(GotoPresetReq& request, GotoPresetResp& response)

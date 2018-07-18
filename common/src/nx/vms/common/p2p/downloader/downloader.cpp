@@ -225,12 +225,12 @@ QVector<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
     return d->storage->getChunkChecksums(fileName);
 }
 
-void Downloader::validateAsync(const QString& url, int expectedSize,
+void Downloader::validateAsync(const QString& url, bool onlyConnectionCheck, int expectedSize,
     std::function<void(bool)> callback)
 {
     auto httpClient = createHttpClient();
     httpClient->doHead(url,
-        [httpClient, url, callback, expectedSize](
+        [httpClient, url, callback, expectedSize, onlyConnectionCheck](
             network::http::AsyncHttpClientPtr asyncClient) mutable
         {
             if (asyncClient->failed()
@@ -240,11 +240,20 @@ void Downloader::validateAsync(const QString& url, int expectedSize,
                 auto response = asyncClient->response();
                 NX_WARNING(
                     typeid(Downloader),
-                    lm("[Downloader, validate] Validate %1 http request failed. Http client failed: %2, has response: %3, status code: %4")
-                    .args(url, asyncClient->failed(), (bool) response,
-                       !response ? -1 : response->statusLine.statusCode));
+                    lm("[Downloader, validate] Validate %1 http request failed. "
+                       "Http client failed: %2, has response: %3, status code: %4")
+                        .args(url, asyncClient->failed(), (bool) response,
+                            !response ? -1 : response->statusLine.statusCode));
 
                 return callback(false);
+            }
+
+            if (onlyConnectionCheck)
+            {
+                NX_VERBOSE(
+                    typeid(Downloader),
+                    lm("[Downloader, validate] %1. Success (only connection check)").args(url));
+                callback(true);
             }
 
             auto& responseHeaders = asyncClient->response()->headers;
@@ -268,12 +277,12 @@ void Downloader::validateAsync(const QString& url, int expectedSize,
         });
 }
 
-bool Downloader::validate(const QString& url, int expectedSize)
+bool Downloader::validate(const QString& url, bool onlyConnectionCheck, int expectedSize)
 {
     nx::utils::promise<bool> readyPromise;
     auto readyFuture = readyPromise.get_future();
 
-    validateAsync(url, expectedSize,
+    validateAsync(url, onlyConnectionCheck, expectedSize,
         [&readyPromise](bool success) mutable
         {
             readyPromise.set_value(success);

@@ -62,13 +62,20 @@ QnScreenshotParameters::QnScreenshotParameters()
     timestampParams.corner = Qt::BottomRightCorner;
 }
 
-QString QnScreenshotParameters::timeString() const 
+QString QnScreenshotParameters::timeString(bool forFilename) const
 {
+    datetime::Format timeFormat = forFilename
+        ? datetime::Format::filename_time
+        : datetime::Format::hh_mm_ss;
+    datetime::Format fullFormat = forFilename
+        ? datetime::Format::filename_date
+        : datetime::Format::yyyy_MM_dd_hh_mm_ss;
+
     if (utcTimestampMsec == latestScreenshotTime)
-        return datetime::toString(QTime::currentTime());
+        return datetime::toString(QTime::currentTime(), timeFormat);
     if (isUtc)
-        return datetime::toString(displayTimeMsec);
-    return datetime::toString(displayTimeMsec, datetime::Format::hh_mm_ss);
+        return datetime::toString(displayTimeMsec, fullFormat);
+    return datetime::toString(displayTimeMsec, timeFormat);
 }
 
 
@@ -168,7 +175,7 @@ ImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaR
     bool anyQuality = forced || layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
 
     const QnMediaServerResourcePtr server = display->resource()->getParentResource().dynamicCast<QnMediaServerResource>();
-    if (!server || (server->getServerFlags() & Qn::SF_Edge))
+    if (!server || server->getServerFlags().testFlag(nx::vms::api::SF_Edge))
         anyQuality = true; // local file or edge cameras will be done locally
 
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
@@ -383,7 +390,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
     QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename
-        + QLatin1Char('_') + parameters.timeString(), QLatin1Char('_')).
+        + QLatin1Char('_') + parameters.timeString(true), QLatin1Char('_')).
         replace(QChar::Space, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 

@@ -16,6 +16,11 @@ class Networking(object):
     def setup_ip(self, mac, ip, prefix_length):
         pass
 
+    def setup_network(self, mac, ip_prefix, ip_sufix):
+        ip = ip_prefix + '.' + ip_sufix
+        mask = (ip_prefix.count('.') + 1) * 8
+        self.setup_ip(mac, ip, mask)
+
     @abstractmethod
     def route(self, destination_ip_net, gateway_bound_mac, gateway_ip):
         pass

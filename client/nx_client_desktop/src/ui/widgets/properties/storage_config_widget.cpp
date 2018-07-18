@@ -56,6 +56,7 @@
 
 #include <common/common_globals.h>
 
+using namespace nx;
 using namespace nx::client::desktop;
 
 namespace
@@ -189,7 +190,7 @@ namespace
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
         {
-            return camera->getActualBackupQualities() != Qn::CameraBackupQuality::CameraBackup_Disabled;
+            return camera->getActualBackupQualities() != nx::vms::api::CameraBackupQuality::CameraBackup_Disabled;
         };
 
         QnVirtualCameraResourceList serverCameras = resourcePool->getAllCameras(QnResourcePtr(), true);
@@ -256,11 +257,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     m_storagePoolMenu->addAction(tr("Backup"))->setData(true);
 
     setHelpTopic(this, Qn::ServerSettings_Storages_Help);
-    setHelpTopic(ui->backupGroupBox, Qn::ServerSettings_ArchiveRestoring_Help);
+    setHelpTopic(ui->backupGroupBox, Qn::SystemSettings_Server_Backup_Help);
 
-    ui->rebuildBackupButtonHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));
-    ui->rebuildBackupButtonHint->addHintLine(tr("Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved."));
-    setHelpTopic(ui->rebuildBackupButtonHint, Qn::SystemSettings_Server_Backup_Help);
+    ui->rebuildBackupButtonHint->addHintLine(tr("Reindexing can fix problems with archive or "
+        "backup if they have been lost or damaged, or if some hardware has been replaced."));
+    setHelpTopic(ui->rebuildBackupButtonHint, Qn::ServerSettings_ArchiveRestoring_Help);
 
     auto hoverTracker = new ItemViewHoverTracker(ui->storageView);
     hoverTracker->setMouseCursorRole(Qn::ItemMouseCursorRole);
@@ -802,7 +803,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
         return error(text);
     }
 
-    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
+    if (m_backupSchedule.backupType == vms::api::BackupType::realtime)
         return true;
 
     const auto rebuildStatusState = [this](QnServerStoragesPool type)
@@ -821,7 +822,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
 
 quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 {
-    if (m_backupSchedule.backupType != Qn::Backup_Schedule || !m_backupSchedule.isValid())
+    if (m_backupSchedule.backupType != vms::api::BackupType::scheduled || !m_backupSchedule.isValid())
         return 0;
 
     QDateTime current = qnSyncTime->currentDateTime();
@@ -835,19 +836,8 @@ quint64 QnStorageConfigWidget::nextScheduledBackupTimeMs() const
 
     for (int i = 0; i <= kDaysPerWeek; ++i, scheduled = scheduled.addDays(1))
     {
-        int dayOfWeek = (currentDayOfWeek + i) % kDaysPerWeek; // zero-based
-        int dayOfWeekFlag;
-
-        switch (dayOfWeek + 1)
-        {
-            case Qt::Monday    : dayOfWeekFlag = ec2::backup::Monday;    break;
-            case Qt::Tuesday   : dayOfWeekFlag = ec2::backup::Tuesday;   break;
-            case Qt::Wednesday : dayOfWeekFlag = ec2::backup::Wednesday; break;
-            case Qt::Thursday  : dayOfWeekFlag = ec2::backup::Thursday;  break;
-            case Qt::Friday    : dayOfWeekFlag = ec2::backup::Friday;    break;
-            case Qt::Saturday  : dayOfWeekFlag = ec2::backup::Saturday;  break;
-            case Qt::Sunday    : dayOfWeekFlag = ec2::backup::Sunday;    break;
-        }
+        const auto dayIndex = (currentDayOfWeek + i) % kDaysPerWeek; // Zero-based.
+        const auto dayOfWeekFlag = vms::api::dayOfWeek(Qt::DayOfWeek(dayIndex + 1));
 
         if ((m_backupSchedule.backupDaysOfTheWeek & dayOfWeekFlag) == 0)
             continue;
@@ -913,7 +903,7 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
         bool canStartBackup = this->canStartBackup(
             reply, overallSelectedCameras, &backupInfo);
 
-        if (m_backupSchedule.backupType == Qn::Backup_RealTime)
+        if (m_backupSchedule.backupType == vms::api::BackupType::realtime)
         {
             ui->realtimeBackupWarningLabel->setText(backupInfo);
             ui->realtimeBackupWarningLabel->setVisible(!canStartBackup);
@@ -936,7 +926,7 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
         {
             m_lastPerformedBackupTimeMs = reply.backupTimeMs;
 
-            bool backupSchedule = m_backupSchedule.backupType == Qn::Backup_Schedule;
+            bool backupSchedule = m_backupSchedule.backupType == vms::api::BackupType::scheduled;
             ui->backupScheduleWidget->setVisible(backupSchedule);
             if (backupSchedule)
                 m_nextScheduledBackupTimeMs = nextScheduledBackupTimeMs();
@@ -1011,7 +1001,7 @@ void QnStorageConfigWidget::updateIntervalLabels()
         ui->backupTimeLabelExtra->setText(lit("(%1)").arg(extra));
     }
 
-    if (m_backupSchedule.backupType == Qn::Backup_Schedule)
+    if (m_backupSchedule.backupType == vms::api::BackupType::scheduled)
     {
         if (m_nextScheduledBackupTimeMs)
         {
@@ -1041,7 +1031,7 @@ void QnStorageConfigWidget::updateCamerasForBackup(const QnVirtualCameraResource
 }
 
 void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceList& cameras,
-    Qn::CameraBackupQualities quality)
+    nx::vms::api::CameraBackupQualities quality)
 {
     qnGlobalSettings->setBackupQualities(quality);
     qnGlobalSettings->setBackupNewCamerasByDefault(m_backupNewCameras);
@@ -1049,7 +1039,7 @@ void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceLi
 
     const auto qualityForCamera = [cameras, quality](const QnVirtualCameraResourcePtr& camera)
     {
-        return (cameras.contains(camera) ? quality : Qn::CameraBackupQuality::CameraBackup_Disabled);
+        return (cameras.contains(camera) ? quality : nx::vms::api::CameraBackupQuality::CameraBackup_Disabled);
     };
 
     /* Update all default cameras and all cameras that we have changed. */
@@ -1077,7 +1067,8 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
     bool isMainPool = pool == QnServerStoragesPool::Main;
 
     /* Here we must check actual backup schedule, not ui-selected. */
-    bool backupIsInProgress = m_server && m_server->getBackupSchedule().backupType != Qn::Backup_RealTime
+    bool backupIsInProgress = m_server
+        && m_server->getBackupSchedule().backupType != vms::api::BackupType::realtime
         && qnServerStorageManager->backupStatus(m_server).state != Qn::BackupState_None;
 
     ui->addExtStorageToMainBtn->setEnabled(!backupIsInProgress);

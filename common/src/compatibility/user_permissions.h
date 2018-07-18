@@ -31,7 +31,7 @@ enum GlobalPermissionV26
 Q_DECLARE_FLAGS(GlobalPermissionsV26, GlobalPermissionV26)
 Q_DECLARE_OPERATORS_FOR_FLAGS(GlobalPermissionsV26)
 
-Qn::GlobalPermissions migrateFromV26(GlobalPermissionsV26 oldPermissions);
+GlobalPermissions migrateFromV26(GlobalPermissionsV26 oldPermissions);
 
 } // namespace user_permissions
 } // namespace compatibility

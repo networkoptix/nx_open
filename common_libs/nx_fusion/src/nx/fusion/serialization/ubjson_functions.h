@@ -7,6 +7,8 @@
 #include <set>
 #include <map>
 #include <array>
+#include <chrono>
+
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
@@ -214,6 +216,21 @@ bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 
 //QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS(quint32, qint32) // This is not semantically correct, so it's commented out.
 //QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS(quint64, qint64)
 #undef QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS
+
+template<class Output>
+void serialize(const std::chrono::milliseconds &value, QnUbjsonWriter<Output> *stream)
+{
+    stream->writeInt64(value.count());
+}
+
+template<class Input>
+bool deserialize(QnUbjsonReader<Input> *stream, std::chrono::milliseconds *target)
+{
+    qint64 tmp = 0;
+    bool result = stream->readInt64(&tmp);
+    *target = std::chrono::milliseconds(tmp);
+    return result;
+}
 
 
 #define QN_DEFINE_COLLECTION_UBJSON_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG, IMPL) \

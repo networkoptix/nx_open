@@ -18,7 +18,10 @@ struct NX_UPDATE_API Updates2StatusDataEx: api::Updates2StatusData
         const QnUuid& serverId,
         StatusCode status,
         QString message = QString(),
+        const QList<api::TargetVersionWithEula>& targetVersions = QList<api::TargetVersionWithEula>(),
+        const QString& releaseNotesUrl = QString(),
         double progress = 0.0);
+
     Updates2StatusDataEx(const api::Updates2StatusData& other) = delete;
     Updates2StatusDataEx& operator=(const api::Updates2StatusData& other) = delete;
     Updates2StatusDataEx& operator=(const Updates2StatusDataEx& other) = delete;

@@ -33,6 +33,16 @@ def _raising_on_exit_status(exit_status_to_error_cls):
 
 
 class SSHPath(FileSystemPath, PurePosixPath):
+    """Base class for file system access through SSH
+
+    It's the simplest way to integrate with `pathlib` and `pathlib2`.
+    When manipulating with paths, `pathlib` doesn't call neither
+    `__new__` nor `__init__`. The only information preserved is type.
+    That's why `SSH` instance is bound to class, not to object.
+    This class is not on a module level, therefore,
+    it will be referenced by `SSHAccess` object and by path objects
+    and will live until those objects live.
+    """
     __metaclass__ = ABCMeta
     _ssh = abstractproperty()  # PurePath's manipulations can preserve only the type.
 
@@ -42,7 +52,12 @@ class SSHPath(FileSystemPath, PurePosixPath):
 
     @classmethod
     def tmp(cls):
-        return cls('/tmp/func_tests')
+        temp_dir = cls('/tmp/func_tests')
+        temp_dir.mkdir(parents=True, exist_ok=True)
+        return temp_dir
+
+    def __repr__(self):
+        return '<SSHPath {!s} on {!r}>'.format(self, self._ssh)
 
     def exists(self):
         try:
@@ -141,10 +156,12 @@ class SSHPath(FileSystemPath, PurePosixPath):
                 test ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 3
                 cat "$SELF"
                 ''',
-            env={'SELF': self})
+            env={'SELF': self},
+            timeout_sec=600,
+            )
 
     @_raising_on_exit_status({2: BadParent, 3: BadParent, 4: NotAFile})
-    def write_bytes(self, contents):
+    def write_bytes(self, contents, offset=None):
         output = self._ssh.run_sh_script(
             # language=Bash
             '''
@@ -152,11 +169,17 @@ class SSHPath(FileSystemPath, PurePosixPath):
                 test ! -e "$parent" && >&2 echo "no parent: $parent" && exit 2
                 test ! -d "$parent" && >&2 echo "parent not a dir: $parent" && exit 3
                 test -e "$SELF" -a ! -f "$SELF" && >&2 echo "not a file: $SELF" && exit 4
-                cat >"$SELF"
+                if [ -z $OFFSET ]; then
+                    cat >"$SELF"
+                else
+                    dd bs=$((1024 * 1024)) conv=notrunc of="$SELF" seek=$OFFSET oflag=seek_bytes
+                fi
                 stat --printf="%s" "$SELF"
                 ''',
-            env={'SELF': self},
-            input=contents)
+            env={'SELF': self, 'OFFSET': offset},
+            input=contents,
+            timeout_sec=600,
+            )
         written = int(output)
         return written
 
@@ -164,13 +187,20 @@ class SSHPath(FileSystemPath, PurePosixPath):
         # ASCII encoding is single used encoding in the project.
         return self.read_bytes().decode(encoding=encoding, errors=errors)
 
-    def write_text(self, data, encoding='ascii', errors='strict'):
+    def write_text(self, text, encoding='ascii', errors='strict'):
         # ASCII encoding is single used encoding in the project.
-        self.write_bytes(data.encode(encoding=encoding, errors=errors))
+        data = text.encode(encoding=encoding, errors=errors)
+        bytes_written = self.write_bytes(data)
+        assert bytes_written == len(data)
+        return len(text)
 
 
 def make_ssh_path_cls(ssh):
-    """Separate function to be used within SSHAccess and with ad-hoc SSH"""
+    """Separate function to be used within SSHAccess and with ad-hoc SSH
+
+    Look for explanation in SSHPath.__doc__.
+    """
+
     class SpecificSSHPath(SSHPath):
         _ssh = ssh
 

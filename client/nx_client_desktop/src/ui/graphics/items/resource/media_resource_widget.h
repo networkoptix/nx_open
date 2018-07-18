@@ -28,6 +28,8 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
+#include <ui/graphics/items/resource/button_ids.h>
+#include <ui/help/help_topics.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
 
@@ -65,6 +67,7 @@ class QnIoModuleOverlayWidget;
 class QnScrollableItemsWidget;
 class QnScrollableTextItemsWidget;
 class QnGraphicsStackedWidget;
+class QnWatermarkPainter;
 class QnTwoWayAudioWidget;
 
 struct QnHtmlTextItemOptions;
@@ -217,6 +220,7 @@ protected:
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
+    void paintWatermark(QPainter *painter, const QRectF &rect);
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
     void paintProgress(QPainter* painter, const QRectF& rect, int progress);
 
@@ -240,6 +244,7 @@ protected:
     void suspendHomePtzController();
     void resumeHomePtzController();
 
+    virtual bool forceShowPosition() const override;
     virtual void updateHud(bool animate) override;
 
     void ensureTwoWayAudioWidget();
@@ -254,7 +259,7 @@ private slots:
     void at_screenshotButton_clicked();
     void at_ptzButton_toggled(bool checked);
     void at_fishEyeButton_toggled(bool checked);
-    void at_histogramButton_toggled(bool checked);
+    void at_imageEnhancementButton_toggled(bool checked);
     void at_ioModuleButton_toggled(bool checked);
     void at_camDisplay_liveChanged();
     void processSettingsRequest();
@@ -361,6 +366,15 @@ private:
         const SoftwareTriggerInfo& info,
         bool enabledBySchedule);
 
+    void createActionAndButton(
+        const char* iconName,
+        bool checked,
+        const QString& shortcut,
+        const QString& toolTip,
+        Qn::HelpTopic helpTopic,
+        Qn::WidgetButtons buttonId, const QString& buttonName,
+        void (QnMediaResourceWidget::*executor)(bool checked));
+
     void getResourceStates();
 
     using TriggerDataList = QList<SoftwareTrigger>;
@@ -422,8 +436,9 @@ private:
     QnScrollableTextItemsWidget* m_bookmarksContainer = nullptr;
     QnScrollableTextItemsWidget* m_textOverlayWidget = nullptr;
     QnGraphicsStackedWidget* m_compositeOverlay = nullptr;
-
     QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
+
+    QScopedPointer<QnWatermarkPainter> m_watermarkPainter;
 
     nx::client::desktop::AreaHighlightOverlayWidget* m_areaHighlightOverlayWidget = nullptr;
     nx::client::desktop::AreaSelectOverlayWidget* m_areaSelectOverlayWidget = nullptr;

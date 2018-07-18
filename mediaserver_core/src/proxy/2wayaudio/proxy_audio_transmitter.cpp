@@ -12,7 +12,7 @@
 
 namespace
 {
-    static const int kRequestTimeout = 1000 * 3;
+    static const std::chrono::seconds kRequestTimeout(3);
 
     QUrlQuery toUrlQuery(const QnRequestParams& params)
     {
@@ -83,8 +83,8 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         url.setUserName(currentServer->getId().toByteArray());
         url.setPassword(currentServer->getAuthKey());
 
-        httpClient.setResponseReadTimeoutMs(kRequestTimeout);
-        httpClient.setSendTimeoutMs(kRequestTimeout);
+        httpClient.setResponseReadTimeout(kRequestTimeout);
+        httpClient.setSendTimeout(kRequestTimeout);
         if (!httpClient.doPost(url, "text/plain", QByteArray()))
             return false;
         if (httpClient.response()->statusLine.statusCode != nx::network::http::StatusCode::ok)

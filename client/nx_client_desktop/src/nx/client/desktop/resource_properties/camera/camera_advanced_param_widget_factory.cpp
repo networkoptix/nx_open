@@ -381,10 +381,10 @@ public:
     {
         QSize buttonSize(30, 30);
 
-        const QString kIconCw(lit("buttons/rotate_cw.png"));
-        const QString kIconCwHovered(lit("buttons/rotate_cw_hovered.png"));
-        const QString kIconCcw(lit("buttons/rotate_ccw.png"));
-        const QString kIconCcwHovered(lit("buttons/rotate_ccw_hovered.png"));
+        const QString kIconCw(lit("text_buttons/rotate_cw.png"));
+        const QString kIconCwHovered(lit("text_buttons/rotate_cw_hovered.png"));
+        const QString kIconCcw(lit("text_buttons/rotate_ccw.png"));
+        const QString kIconCcwHovered(lit("text_buttons/rotate_ccw_hovered.png"));
 
         // Central widget is here.
         const auto ptzrContainer = new QVBoxLayout();
@@ -392,17 +392,27 @@ public:
 
         const auto ptzrInfoContainer = new QHBoxLayout();
 
-        m_rotationAdd = new nx::client::desktop::HoverButton(kIconCw, kIconCwHovered, this);
-        m_rotationDec = new nx::client::desktop::HoverButton(kIconCcw, kIconCcwHovered, this);
+        m_rotationDec = new nx::client::desktop::HoverButton(kIconCw, kIconCwHovered, this);
+        m_rotationAdd = new nx::client::desktop::HoverButton(kIconCcw, kIconCcwHovered, this);
         m_rotationLabel = new QLabel();
         m_rotationLabel->setText(rotationText(0));
-        ptzrInfoContainer->addWidget(m_rotationAdd);
-        ptzrInfoContainer->addWidget(m_rotationLabel);
         ptzrInfoContainer->addWidget(m_rotationDec);
+        ptzrInfoContainer->addWidget(m_rotationLabel);
+        ptzrInfoContainer->addWidget(m_rotationAdd);
         ptzrContainer->addLayout(ptzrInfoContainer);
         ptzrContainer->setAlignment(ptzrInfoContainer, Qt::AlignCenter);
 
         m_layout->addLayout(ptzrContainer);
+
+        connect(m_rotationAdd, &QAbstractButton::pressed,
+            this, [this]() { onRotationAdd(true); });
+        connect(m_rotationAdd, &QAbstractButton::released,
+            this, [this]() { onRotationAdd(false); });
+
+        connect(m_rotationDec, &QAbstractButton::pressed,
+            this, [this]() { onRotationDec(true); });
+        connect(m_rotationDec, &QAbstractButton::released,
+            this, [this]() { onRotationDec(false); });
 
         connect(m_ptrWidget, &LensPtzControl::valueChanged, this,
             [this](const LensPtzControl::Value& v)
@@ -412,9 +422,21 @@ public:
             });
     }
 
+    void onRotationAdd(bool value)
+    {
+        m_ptrWidget->lockRotationAdd(value);
+    }
+
+    void onRotationDec(bool value)
+    {
+        m_ptrWidget->lockRotationDec(value);
+    }
+
     QString rotationText(int rotation)
     {
-        return tr("Rotation: ") + QString::number(int(rotation)) + lit("\xB0");
+        // Right now we do not have specific rotation. So we disable it for now.
+        //return tr("Rotation: ") + QString::number(int(rotation)) + lit("\xB0");
+        return tr("Rotation");
     }
 
     virtual QString value() const override
@@ -423,11 +445,21 @@ public:
         return lit("%1,%2,%3").arg(val.horizontal).arg(val.vertical).arg(val.rotation);
     }
 
-    virtual void setValue(const QString &range) override
+    virtual void setRange(const QString& range) override
     {
         // Expecting 6 numbers, like "-40,40,-30,30,-40,40";
+        qDebug() << "QnPanTiltRotationCameraAdvancedParamWidget setRange(" << range << ")";
         QStringList minMax = range.split(L',');
         if (minMax.size() != 6)
+            return;
+    }
+
+    virtual void setValue(const QString &range) override
+    {
+        qDebug() << "QnPanTiltRotationCameraAdvancedParamWidget setValue(" << range << ")";
+        // Expecting 3 numbers, like "4,-3,3";
+        QStringList minMax = range.split(L',');
+        if (minMax.size() != 3)
             return;
         // TODO: Impelemt it, when a proper value infrastructure implemented for this case.
     }

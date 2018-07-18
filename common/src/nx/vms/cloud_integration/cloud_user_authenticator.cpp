@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/utils/log/log.h>

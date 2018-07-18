@@ -21,16 +21,16 @@ namespace ec2 {
         );
 
         template <typename MessageBusType>
-		MessageBusType* init(Qn::PeerType peerType)
+		MessageBusType* init(nx::vms::api::PeerType peerType)
 		{
 			reset();
 			m_bus.reset(new MessageBusType(
-				peerType,
+                peerType,
 				commonModule(),
 				m_jsonTranSerializer,
 				m_ubjsonTranSerializer));
 
-			initInternal(peerType);
+			initInternal();
 			return dynamic_cast<MessageBusType*> (m_bus.get());
 		}
 
@@ -46,7 +46,8 @@ namespace ec2 {
         virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
         virtual QSet<QnUuid> directlyConnectedServerPeers() const override;
 
-        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+        virtual QnUuid routeToPeerVia(
+            const QnUuid& dstPeer, int* distance, nx::network::SocketAddress* knownPeerAddress) const override;
         virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 
         virtual void addOutgoingConnectionToPeer(const QnUuid& id, const nx::utils::Url& url) override;
@@ -65,8 +66,6 @@ namespace ec2 {
         virtual ConnectionGuardSharedState* connectionGuardSharedState() override;
         //detail::QnDbManager* getDb() const;
 
-        virtual void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager) override;
-
     public:
         template<class T>
         void sendTransaction(
@@ -81,7 +80,7 @@ namespace ec2 {
         template<class T>
         void sendTransaction(
             const QnTransaction<T>& tran,
-            const QnPeerSet& dstPeers)
+            const nx::vms::api::PeerSet& dstPeers)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
                 p2pBus->sendTransaction(tran, dstPeers);
@@ -95,20 +94,21 @@ namespace ec2 {
             const QnUuid& peer)
         {
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
-                p2pBus->sendTransaction(tran, QnPeerSet() << peer);
+                p2pBus->sendTransaction(tran, {peer});
             else if (auto msgBus = dynamicCast<QnTransactionMessageBus*>())
-                msgBus->sendTransaction(tran, QnPeerSet() << peer);
+                msgBus->sendTransaction(tran, {peer});
             else
                 NX_CRITICAL(false, "Not implemented");
         }
+		
 	private:
-		void initInternal(Qn::PeerType peerType);
+		void initInternal();
+		
     private:
-        std::unique_ptr<TransactionMessageBusBase> m_bus;
+        std::unique_ptr<AbstractTransactionMessageBus> m_bus;
 
         QnJsonTransactionSerializer* m_jsonTranSerializer;
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer;
-        TimeSynchronizationManager* m_timeSyncManager;
     };
 
 } // namespace ec2

@@ -1,4 +1,5 @@
 #include "p2p_connection_base.h"
+#include "p2p_serialization.h"
 
 #include <nx/utils/log/log_message.h>
 #include <nx/network/websocket/websocket_handshake.h>
@@ -7,7 +8,6 @@
 #include <common/static_common_module.h>
 #include <nx/network/http/buffer_source.h>
 #include <transaction/transaction_message_bus_base.h>
-#include "p2p_serialization.h"
 
 // For debug purpose only
 //#define CHECK_SEQUENCE
@@ -40,7 +40,7 @@ QString toString(ConnectionBase::State value)
 
 ConnectionBase::ConnectionBase(
     const QnUuid& remoteId,
-    const ApiPeerDataEx& localPeer,
+    const vms::api::PeerDataEx& localPeer,
     const nx::utils::Url& _remotePeerUrl,
     const std::chrono::seconds& keepAliveTimeout,
     std::unique_ptr<QObject> opaqueObject,
@@ -61,8 +61,8 @@ ConnectionBase::ConnectionBase(
 }
 
 ConnectionBase::ConnectionBase(
-    const ApiPeerDataEx& remotePeer,
-    const ApiPeerDataEx& localPeer,
+    const vms::api::PeerDataEx& remotePeer,
+    const vms::api::PeerDataEx& localPeer,
     nx::network::WebSocketPtr webSocket,
     std::unique_ptr<QObject> opaqueObject,
     std::unique_ptr<ConnectionLockGuard> connectionLockGuard)
@@ -185,15 +185,7 @@ void ConnectionBase::onHttpClientDone()
         return;
     }
 
-    ApiPeerDataEx remotePeer;
-    QByteArray serializedPeerData = nx::network::http::getHeaderValue(headers, Qn::EC2_PEER_DATA);
-    serializedPeerData = QByteArray::fromBase64(serializedPeerData);
-
-    bool success = false;
-    if (m_localPeer.dataFormat == Qn::JsonFormat)
-        remotePeer = QJson::deserialized(serializedPeerData, ApiPeerDataEx(), &success);
-    else if (m_localPeer.dataFormat == Qn::UbjsonFormat)
-        remotePeer = QnUbjson::deserialized(serializedPeerData, ApiPeerDataEx(), &success);
+    vms::api::PeerDataEx remotePeer = deserializePeerData(headers, m_localPeer.dataFormat);
 
     if (remotePeer.id.isNull())
     {
@@ -213,7 +205,7 @@ void ConnectionBase::onHttpClientDone()
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
     if (m_remotePeer.id == ::ec2::kCloudPeerId)
-        m_remotePeer.peerType = Qn::PT_CloudServer;
+        m_remotePeer.peerType = vms::api::PeerType::cloudServer;
 
     if (m_connectionLockGuard && !m_connectionLockGuard->tryAcquireConnected())
     {
@@ -313,7 +305,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
 {
     NX_ASSERT(!data.isEmpty());
 
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2, this) && qnStaticCommon)
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(localPeer().id);
         auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);

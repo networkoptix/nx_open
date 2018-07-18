@@ -1,26 +1,22 @@
 #include "resource.h"
+#include "resource_consumer.h"
+#include "resource_property.h"
 
 #include <typeinfo>
 
 #include <QtCore/QMetaObject>
 #include <QtCore/QRunnable>
 
-#include <nx_ec/data/api_resource_data.h>
-#include <nx/utils/log/log.h>
-
-#include <core/resource/camera_advanced_param.h>
-#include "core/resource_management/resource_pool.h"
-
-#include "resource_consumer.h"
-#include "resource_property.h"
-
-#include "utils/common/util.h"
-#include "../resource_management/resource_properties.h"
-#include "../resource_management/status_dictionary.h"
-
 #include <common/common_module.h>
+#include <core/resource/camera_advanced_param.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+#include <utils/common/util.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/api/data/resource_data.h>
 
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
@@ -331,7 +327,6 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    NX_EXPECT(commonModule());
     return commonModule()
         ? commonModule()->statusDictionary()->value(getId())
         : Qn::NotDefined;
@@ -417,6 +412,16 @@ void QnResource::setUrl(const QString &url)
         m_url = url;
     }
     emit urlChanged(toSharedPointer(this));
+}
+
+int QnResource::logicalId() const
+{
+    return 0;
+}
+
+void QnResource::setLogicalId(int /*value*/)
+{
+    // Base implementation does not keep logical Id.
 }
 
 void QnResource::addConsumer(QnResourceConsumer *consumer)

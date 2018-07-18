@@ -1,12 +1,14 @@
+import logging
 import time
 import timeit
 
-from framework.utils import log
+_logger = logging.getLogger(__name__)
 
 
 class Wait(object):
-    def __init__(self, until, timeout_sec=30, attempts_limit=100, log_continue=log.debug, log_stop=log.error):
+    def __init__(self, until, timeout_sec=30, attempts_limit=100, log_continue=_logger.debug, log_stop=_logger.error):
         self._until = until
+        assert timeout_sec is not None
         self._timeout_sec = timeout_sec
         self._started_at = timeit.default_timer()
         self._last_checked_at = self._started_at
@@ -78,8 +80,9 @@ def wait_for_true(bool_func, description=None, timeout_sec=30):
         description = _description_from_func(bool_func)
     wait = Wait(description, timeout_sec=timeout_sec)
     while True:
-        if bool_func():
-            break
+        result = bool_func()
+        if result:
+            return result
         if not wait.again():
             raise WaitTimeout("Cannot wait anymore until " + description)
         wait.sleep()
@@ -92,7 +95,7 @@ class NotPersistent(Exception):
 def ensure_persistence(condition_is_true, description, timeout_sec=10):
     if description is None:
         description = _description_from_func(condition_is_true)
-    wait = Wait(description, timeout_sec=timeout_sec, log_continue=log.debug, log_stop=log.info)
+    wait = Wait(description, timeout_sec=timeout_sec, log_continue=_logger.debug, log_stop=_logger.info)
     while True:
         if not condition_is_true():
             raise NotPersistent("Have waited until " + description)

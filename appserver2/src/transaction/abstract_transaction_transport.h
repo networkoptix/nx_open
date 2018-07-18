@@ -1,9 +1,11 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
+
+#include <QtCore/QObject>
+
 #include <nx/network/http/auth_cache.h>
+#include <nx/vms/api/data_fwd.h>
 
 namespace ec2 {
 
@@ -15,8 +17,8 @@ namespace ec2 {
     class QnAbstractTransactionTransport: public QObject
     {
     public:
-        virtual const ec2::ApiPeerData& localPeer() const = 0;
-        virtual const ec2::ApiPeerData& remotePeer() const = 0;
+        virtual const nx::vms::api::PeerData& localPeer() const = 0;
+        virtual const nx::vms::api::PeerData& remotePeer() const = 0;
         virtual nx::utils::Url remoteAddr() const = 0;
         virtual bool isIncoming() const = 0;
         virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const = 0;

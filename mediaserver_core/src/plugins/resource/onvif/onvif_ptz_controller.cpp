@@ -12,10 +12,14 @@
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/assert.h>
 #include <common/static_common_module.h>
 
 #include "soap_wrapper.h"
 #include <nx/utils/log/log_main.h>
+
+using namespace nx::core;
 
 namespace {
 
@@ -45,6 +49,28 @@ static const Namespace kOverridenNamespaces[] = {
     },
     {nullptr, nullptr, nullptr, nullptr}
 };
+
+std::unique_ptr<PtzSoapWrapper> makePtzSoapWrapper(
+    const QnPlOnvifResourcePtr& resource,
+    const char* floatFormat,
+    const char* doubleFormat)
+{
+    const auto ptzUrl = resource->getPtzUrl();
+    if (ptzUrl.isEmpty())
+        return nullptr;
+
+    const auto auth = resource->getAuth();
+    auto ptz = std::make_unique<PtzSoapWrapper>(
+        ptzUrl.toStdString(),
+        auth.user(),
+        auth.password(),
+        resource->getTimeDrift());
+
+    ptz->getProxy()->soap->float_format = floatFormat;
+    ptz->getProxy()->soap->double_format = doubleFormat;
+
+    return ptz;
+}
 
 } // namespace
 
@@ -149,14 +175,18 @@ Ptz::Capabilities QnOnvifPtzController::initMove() {
     // TODO: #PTZ #Elric we can init caps by examining spaces in response!
 
     Ptz::Capabilities configCapabilities;
-    if(response.PTZConfiguration[0]->DefaultContinuousPanTiltVelocitySpace)
+    if (response.PTZConfiguration[0]->DefaultContinuousPanTiltVelocitySpace)
         configCapabilities |= Ptz::ContinuousPanCapability | Ptz::ContinuousTiltCapability;
-    if(response.PTZConfiguration[0]->DefaultContinuousZoomVelocitySpace)
+    if (response.PTZConfiguration[0]->DefaultContinuousZoomVelocitySpace)
         configCapabilities |= Ptz::ContinuousZoomCapability;
-    if(response.PTZConfiguration[0]->DefaultAbsolutePantTiltPositionSpace)
+    if (response.PTZConfiguration[0]->DefaultAbsolutePantTiltPositionSpace)
         configCapabilities |= Ptz::AbsolutePanCapability | Ptz::AbsoluteTiltCapability;
-    if(response.PTZConfiguration[0]->DefaultAbsoluteZoomPositionSpace)
+    if (response.PTZConfiguration[0]->DefaultAbsoluteZoomPositionSpace)
         configCapabilities |= Ptz::AbsoluteZoomCapability;
+    if (response.PTZConfiguration[0]->DefaultRelativePanTiltTranslationSpace)
+        configCapabilities |= Ptz::RelativePanTiltCapabilities;
+    if (response.PTZConfiguration[0]->DefaultRelativeZoomTranslationSpace)
+        configCapabilities |= Ptz::RelativeZoomCapability;
 
     _onvifPtz__GetNode nodeRequest;
     _onvifPtz__GetNodeResponse nodeResponse;
@@ -206,6 +236,19 @@ Ptz::Capabilities QnOnvifPtzController::initMove() {
             m_limits.maxFov = spaces->AbsoluteZoomPositionSpace[0]->XRange->Max;
             nodeCapabilities |= Ptz::AbsoluteZoomCapability;
         }
+    }
+
+    if (!spaces->RelativePanTiltTranslationSpace.empty()
+        && spaces->RelativePanTiltTranslationSpace[0])
+    {
+        if (spaces->RelativePanTiltTranslationSpace[0]->XRange)
+            nodeCapabilities |= Ptz::RelativePanTiltCapabilities;
+    }
+
+    if (!spaces->RelativeZoomTranslationSpace.empty() && spaces->RelativeZoomTranslationSpace[0])
+    {
+        if (spaces->RelativeZoomTranslationSpace[0]->XRange)
+            nodeCapabilities |= Ptz::RelativeZoomCapability;
     }
 
     Ptz::Capabilities result = configCapabilities & nodeCapabilities;
@@ -289,8 +332,11 @@ double QnOnvifPtzController::normalizeSpeed(qreal speed, const SpeedLimits &spee
     return qBound(speedLimits.min, speed, speedLimits.max);
 }
 
-Ptz::Capabilities QnOnvifPtzController::getCapabilities() const
+Ptz::Capabilities QnOnvifPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+        return Ptz::NoPtzCapabilities;
+
     return m_capabilities;
 }
 
@@ -326,7 +372,7 @@ bool QnOnvifPtzController::stopInternal()
     return true;
 }
 
-bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
+bool QnOnvifPtzController::moveInternal(const nx::core::ptz::Vector& speedVector) {
     QString ptzUrl = m_resource->getPtzUrl();
     if (ptzUrl.isEmpty())
     {
@@ -342,11 +388,11 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     onvifXsd__Vector2D onvifPanTiltSpeed;
-    onvifPanTiltSpeed.x = normalizeSpeed(speed.x(), m_panSpeedLimits);
-    onvifPanTiltSpeed.y = normalizeSpeed(speed.y(), m_tiltSpeedLimits);
+    onvifPanTiltSpeed.x = normalizeSpeed(speedVector.pan, m_panSpeedLimits);
+    onvifPanTiltSpeed.y = normalizeSpeed(speedVector.tilt, m_tiltSpeedLimits);
 
     onvifXsd__Vector1D onvifZoomSpeed;
-    onvifZoomSpeed.x = normalizeSpeed(speed.z(), m_zoomSpeedLimits);
+    onvifZoomSpeed.x = normalizeSpeed(speedVector.zoom, m_zoomSpeedLimits);
 
     onvifXsd__PTZSpeed onvifSpeed;
     onvifSpeed.PanTilt = &onvifPanTiltSpeed;
@@ -365,8 +411,21 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     return true;
 }
 
-bool QnOnvifPtzController::continuousMove(const QVector3D &speed)
+bool QnOnvifPtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Continuous movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
     if(qFuzzyIsNull(speed) && !m_stopBroken) {
         return stopInternal();
     } else {
@@ -374,7 +433,21 @@ bool QnOnvifPtzController::continuousMove(const QVector3D &speed)
     }
 }
 
-bool QnOnvifPtzController::continuousFocus(qreal speed) {
+bool QnOnvifPtzController::continuousFocus(
+    qreal speed,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Continuous focus - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
     QString imagingUrl = m_resource->getImagingUrl();
     if(imagingUrl.isEmpty())
         return false;
@@ -403,7 +476,23 @@ bool QnOnvifPtzController::continuousFocus(qreal speed) {
     return true;
 }
 
-bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
+bool QnOnvifPtzController::absoluteMove(
+    Qn::PtzCoordinateSpace space,
+    const nx::core::ptz::Vector& position,
+    qreal speed,
+    const nx::core::ptz::Options& options)
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Absolute movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
@@ -418,11 +507,11 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     ptz.getProxy()->soap->double_format = m_doubleFormat;
 
     onvifXsd__Vector2D onvifPanTilt;
-    onvifPanTilt.x = position.x();
-    onvifPanTilt.y = position.y();
+    onvifPanTilt.x = position.pan;
+    onvifPanTilt.y = position.tilt;
 
     onvifXsd__Vector1D onvifZoom;
-    onvifZoom.x = position.z();
+    onvifZoom.x = position.zoom;
 
     onvifXsd__PTZVector onvifPosition;
     onvifPosition.PanTilt = &onvifPanTilt;
@@ -481,8 +570,67 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     return result;
 }
 
-bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const
+bool QnOnvifPtzController::relativeMove(
+    const nx::core::ptz::Vector& relativeMovementVector,
+    const nx::core::ptz::Options& options)
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Relative movement - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
+    auto wrapper = makePtzSoapWrapper(m_resource, m_floatFormat, m_doubleFormat);
+
+    onvifXsd__Vector2D panTilt;
+    panTilt.x = relativeMovementVector.pan;
+    panTilt.y = relativeMovementVector.tilt;
+
+    onvifXsd__Vector1D zoom;
+    zoom.x = relativeMovementVector.zoom;
+
+    onvifXsd__PTZVector translation;
+    translation.PanTilt = &panTilt;
+    translation.Zoom = &zoom;
+
+    RelativeMoveReq request;
+    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.Speed = nullptr; //< Always use the default speed.
+    request.Translation = &translation;
+
+    RelativeMoveResp response;
+    if (!wrapper->doRelativeMove(request, response))
+    {
+        NX_ERROR(this, lm("Failed to perform relative movement. Resource %1 (%2), error: %3")
+            .args(m_resource->getName(), m_resource->getId(), wrapper->getLastError()));
+
+        return false;
+    }
+
+    return true;
+}
+
+bool QnOnvifPtzController::getPosition(
+    Qn::PtzCoordinateSpace space,
+    nx::core::ptz::Vector* outPosition,
+    const nx::core::ptz::Options& options) const
+{
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Getting current position - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
@@ -504,23 +652,37 @@ bool QnOnvifPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *
         return false;
     }
 
-    *position = QVector3D();
+    *outPosition = nx::core::ptz::Vector();
 
     if (response.PTZStatus && response.PTZStatus->Position) {
         if(response.PTZStatus->Position->PanTilt) {
-            position->setX(response.PTZStatus->Position->PanTilt->x);
-            position->setY(response.PTZStatus->Position->PanTilt->y);
+            outPosition->pan = response.PTZStatus->Position->PanTilt->x;
+            outPosition->tilt = response.PTZStatus->Position->PanTilt->y;
         }
         if(response.PTZStatus->Position->Zoom) {
-            position->setZ(response.PTZStatus->Position->Zoom->x);
+            outPosition->zoom = response.PTZStatus->Position->Zoom->x;
         }
     }
 
     return true;
 }
 
-bool QnOnvifPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const
+bool QnOnvifPtzController::getLimits(
+    Qn::PtzCoordinateSpace space,
+    QnPtzLimits *limits,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Getting limits - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
@@ -528,8 +690,21 @@ bool QnOnvifPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *
     return true;
 }
 
-bool QnOnvifPtzController::getFlip(Qt::Orientations *flip) const
+bool QnOnvifPtzController::getFlip(
+    Qt::Orientations *flip,
+    const nx::core::ptz::Options& options) const
 {
+    if (options.type != ptz::Type::operational)
+    {
+        NX_WARNING(
+            this,
+            lm("Getting flip - wrong PTZ type. "
+                "Only operational PTZ is supported. Resource %1 (%2)")
+                .args(resource()->getName(), resource()->getId()));
+
+        return false;
+    }
+
     *flip = 0; // TODO: #PTZ #Elric
     return true;
 }
@@ -550,7 +725,8 @@ QString QnOnvifPtzController::presetName(const QString &presetId) {
     return m_presetNameByToken.value(internalId);
 }
 
-bool QnOnvifPtzController::removePreset(const QString &presetId) {
+bool QnOnvifPtzController::removePreset(const QString &presetId)
+{
     QnMutexLocker lk( &m_mutex );
 
     QString ptzUrl = m_resource->getPtzUrl();
@@ -586,7 +762,8 @@ bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets) const
     return true;
 }
 
-bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) {
+bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
+{
     QnMutexLocker lk( &m_mutex );
 
     QString ptzUrl = m_resource->getPtzUrl();
@@ -638,11 +815,13 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) 
     return true;
 }
 
-bool QnOnvifPtzController::updatePreset(const QnPtzPreset &preset) {
+bool QnOnvifPtzController::updatePreset(const QnPtzPreset &preset)
+{
     return createPreset(preset); // TODO: #Elric #PTZ wrong, update does not create new preset, and does not change saved position
 }
 
-bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset) {
+bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset)
+{
     QnMutexLocker lk( &m_mutex );
 
     if (!readBuiltinPresets())

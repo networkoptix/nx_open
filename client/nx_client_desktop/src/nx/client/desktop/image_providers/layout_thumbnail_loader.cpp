@@ -7,6 +7,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/client/desktop/image_providers/layout_background_image_provider.h>
@@ -24,7 +25,6 @@
 #include <ini.h>
 
 using nx::client::core::Geometry;
-
 
 namespace nx {
 namespace client {
@@ -467,13 +467,17 @@ void LayoutThumbnailLoader::doLoadAsync()
     QnResourcePool* resourcePool = d->layout->resourcePool();
     if (!resourcePool)
         resourcePool = m_resourcePool;
+    if (!resourcePool)
+        return;
 
     d->reset();
 
-    QRectF bounding;
+    const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
+    const auto backgroundRect = d->layout->backgroundRect();
+
     const QnLayoutItemDataMap& layoutItems = d->layout->getItems();
 
-    QVector<QPair<QnUuid, QnResourcePtr>> validItems;
+    std::vector<std::pair<QnLayoutItemData, QnResourcePtr>> validItems;
     validItems.reserve(layoutItems.size());
 
     // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
@@ -490,12 +494,18 @@ void LayoutThumbnailLoader::doLoadAsync()
         if (!resource)
             continue;
 
-        bounding = bounding.united(itemRect);
-        validItems << qMakePair(iter.key(),  resource);
+        validItems.emplace_back(item, resource);
     }
 
-    const bool hasBackground = !d->layout->backgroundImageFilename().isEmpty();
-    const auto backgroundRect = d->layout->backgroundRect();
+    // This is initial bounding box. This calculation uses cell sizes, instead of a pixels.
+    // Right now we do not know actual pixel size of layout items.
+    // Pixel-accurate calculations will be done in Private::finalizeOutputImage.
+    QRectF bounding;
+    if (!d->layout->fixedSize().isEmpty())
+        bounding = d->layout->backgroundRect(d->layout->fixedSize());
+
+    for (const auto& [item, resource]: validItems)
+        bounding = bounding.united(item.combinedGeometry);
 
     if (hasBackground)
         bounding = bounding.united(backgroundRect);
@@ -582,15 +592,13 @@ void LayoutThumbnailLoader::doLoadAsync()
         item->provider->loadAsync();
     }
 
-    for (const auto& layoutItem: validItems)
+    for (const auto& [data, resource]: validItems)
     {
-        QnLayoutItemData data = d->layout->getItem(layoutItem.first);
-
         Private::ItemPtr thumbnailItem = d->newItem();
 
-        thumbnailItem->resource = layoutItem.second;
+        thumbnailItem->resource = resource;
         thumbnailItem->rotation = data.rotation;
-        thumbnailItem->name = layoutItem.second->getName();
+        thumbnailItem->name = resource->getName();
 
         // Cell bounds.
         const auto& cellRect = data.combinedGeometry;
@@ -613,6 +621,11 @@ void LayoutThumbnailLoader::doLoadAsync()
         api::ResourceImageRequest request;
         request.resource = thumbnailItem->resource;
         request.usecSinceEpoch = microseconds(milliseconds(d->msecSinceEpoch)).count();
+        // Here we imitate old FfmpegImageProvider behavior where it ignored position
+        // and always returned middle screenshot.
+        if (thumbnailItem->resource.dynamicCast<QnAviResource>())
+            request.usecSinceEpoch = -1;
+
         request.size = thumbnailSize;
         request.rotation = 0;
         // server still should provide most recent frame when we request request.msecSinceEpoch = -1

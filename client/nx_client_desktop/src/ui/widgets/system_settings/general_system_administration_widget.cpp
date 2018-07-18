@@ -2,6 +2,7 @@
 #include "ui_general_system_administration_widget.h"
 
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QAction>
 
 #include <api/runtime_info_manager.h>
 
@@ -10,8 +11,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx_ec/data/api_runtime_data.h>
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -165,13 +164,15 @@ void QnGeneralSystemAdministrationWidget::loadDataToUi()
     ui->systemNameLabel->setText(qnGlobalSettings->systemName());
     ui->systemSettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
+    if(!qnGlobalSettings->isVideoTrafficEncriptionForced())
+        ui->forceVideoEncryptionWarning->hide();
 }
 
 void QnGeneralSystemAdministrationWidget::applyChanges()
 {
     ui->systemSettingsWidget->applyChanges();
     ui->systemNameLabel->setEditing(false);
-    ui->forceVideoEncryptionWarning->setVisible(false);
+    ui->forceVideoEncryptionWarning->hide();
 
     qnGlobalSettings->setSystemName(ui->systemNameLabel->text().trimmed());
     qnGlobalSettings->synchronizeNow();
@@ -227,6 +228,11 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
             tr("Open Camera List"))));
 
     ui->systemSettingsWidget->retranslateUi();
+}
+
+void QnGeneralSystemAdministrationWidget::resetWarnings()
+{
+    ui->forceVideoEncryptionWarning->hide();
 }
 
 bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const

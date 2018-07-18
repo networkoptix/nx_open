@@ -1,14 +1,15 @@
 #pragma once
 
+#include "compatibility_item.h"
+
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QUrl>
 
-#include <utils/common/software_version.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
-#include "compatibility_item.h"
+#include <nx/vms/api/data/software_version.h>
 
 /*
  * Please note: part of this structure up to effectiveUserName (included) CANNOT BE MODIFIED.
@@ -22,7 +23,7 @@ struct QnConnectionInfo
     QnConnectionInfo();
 
     nx::utils::Url ecUrl;
-    QnSoftwareVersion version;
+    nx::vms::api::SoftwareVersion version;
     QList<QnCompatibilityItem> compatibilityItems;
     QString ecsGuid;    //< Id of remote server. Contains valid QnUuid.
     QString systemName;

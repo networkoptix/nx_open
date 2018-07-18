@@ -85,6 +85,7 @@
                     group="primaryStream"
                     dataType="Number"
                     writeCmd="update"
+                    keepInitialValue="true"
                     aux="range=media/videoprofile/add_update/FrameRate;profile=primary;resourceProperty=primaryStreamFps;specific=true;deviceTypes=nvr">
                 </param>
 
@@ -95,7 +96,7 @@
                         writeCmd="update"
                         unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=primary;resourceProperty=primaryStreamBitrate;specific=true;deviceTypes=nvr"
-                        shouldKeepInitialValue="true"
+                        keepInitialValue="true"
                         bindDefaultToMinimum="true">
                 </param>
                 <!-- NVR only properties -->
@@ -313,6 +314,7 @@
                         group="secondaryStream"
                         dataType="Number"
                         writeCmd="update"
+                        keepInitialValue="true"
                         aux="range=media/videoprofile/add_update/FrameRate;profile=secondary;resourceProperty=secondaryStreamFps;specific=true">
                 </param>
 
@@ -323,7 +325,7 @@
                         writeCmd="update"
                         unit="Kbit/s"
                         aux="range=media/videoprofile/add_update/Bitrate;profile=secondary;resourceProperty=secondaryStreamBitrate;specific=true"
-                        shouldKeepInitialValue="true"
+                        keepInitialValue="true"
                         bindDefaultToMinimum="true">
                 </param>
 
@@ -961,46 +963,51 @@
             </group>
         </group>
         <group name="Lens Control">
-            <param id="image/custom/zoom"
+            <param id="image/lens_control/zoom"
                 name="Zoom"
-                description="Zoom machinery"
-                range="-30,30"
+                description="Zoom adjustment"
                 dataType="SliderControl"
-                writeCmd="custom_zoom"
-                compact="true"/>
-            <param id="image/custom/Ptr"
+                range="-1,1"
+                compact="true"
+                aux="ptzCapabilities=ContinuousZoomCapability"
+                writeCmd="custom_zoom"/>
+            <param id="image/lens_control/ptr"
                 name=""
-                description="Pan tilt rotation machinery"
+                description="PTR adjustment"
                 dataType="PtrControl"
-                range="-30,30,-30,30,-30,30"
-                readCmd="param.cgi"
-                writeCmd="custom_ptr"
-                compact="true"/>
-            <param id="image/custom/focus"
+                range="-1,1,-1,1,-1,1"
+                compact="true"
+                aux="ptzCapabilities=ContinuousPanCapability|ContinuousTiltCapability|ContinuousRotationCapability"
+                writeCmd="custom_ptr"/>
+            <param id="image/lens_control/focus"
                 name="Focus"
-                description="Focus machinery"
-                range="-30,30"
+                description="Focus adjustment"
                 dataType="SliderControl"
-                writeCmd="custom_focus"
-                compact="true"/>
-        </group>
-        <group name="Maintenance">
-            <param id="image/focus/Mode=SimpleFocus"
-                    name="Simple Focus"
-                    dataType="Button"
-                    writeCmd="control"
-                    description="Fits the focus automatically"
-                    aux="support=Image/SimpleFocus"/>
+                range="-1,1"
+                compact="true"
+                aux="ptzCapabilities=ContinuousFocusCapability"
+                writeCmd="custom_focus"/>
+            <param id="image/lens_control/PRIMARY%SERVICE%lastSeparator"
+                    dataType="Separator"
+                    name="sep"/>
             <param id="image/focus/Mode=Reset"
-                    name="Initialize Focus"
-                    dataType="Button"
-                    writeCmd="control"
-                    description="Restores the focus adjustment to the default flange back position"/>
+                name="Initialize Focus"
+                dataType="Button"
+                writeCmd="control"
+                compact="true"
+                description="Restores the focus adjustment to the default flange back position"/>
+            <param id="image/focus/Mode=SimpleFocus"
+                name="Simple Focus"
+                dataType="Button"
+                writeCmd="control"
+                compact="true"
+                description="Fits the focus automatically"
+                aux="support=Image/SimpleFocus"/>
             <param id="image/focus/Mode=AutoFocus"
-                    name="Simple Focus"
-                    dataType="Button"
-                    writeCmd="control"
-                    description="Fits the focus automatically">
+                name="Simple Focus"
+                dataType="Button"
+                writeCmd="control"
+                description="Fits the focus automatically">
                 <dependencies>
                     <dependencies-show>
                         <conditional-show>
@@ -1026,6 +1033,8 @@
                     </dependencies-show>
                 </dependencies>
             </param>
+        </group>
+        <group name="Maintenance">            
             <param id="system/factoryreset/ExcludeSettings=Network"
                     name="Reset to Factory Defaults except Network Settings"
                     dataType="Button"

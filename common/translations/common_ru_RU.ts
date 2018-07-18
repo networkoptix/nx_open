@@ -1266,7 +1266,7 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>Нет данных в течение %n секунды.</numerusform>
+        <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>
         <numerusform>Нет данных в течение %n секунд.</numerusform>

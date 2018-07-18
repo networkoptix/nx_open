@@ -33,9 +33,14 @@ std::vector<network::SocketAddress> MediatorProcess::httpEndpoints() const
     return m_view->httpServer().endpoints();
 }
 
-std::vector<network::SocketAddress> MediatorProcess::stunEndpoints() const
+std::vector<network::SocketAddress> MediatorProcess::stunUdpEndpoints() const
 {
-    return m_view->stunServer().endpoints();
+    return m_view->stunServer().udpEndpoints();
+}
+
+std::vector<network::SocketAddress> MediatorProcess::stunTcpEndpoints() const
+{
+    return m_view->stunServer().tcpEndpoints();
 }
 
 ListeningPeerPool* MediatorProcess::listeningPeerPool() const
@@ -75,6 +80,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
     m_view = &view;
 
     stats::Provider statisticsProvider(
+        controller.statisticsManager(),
         view.httpServer().server(),
         view.stunServer().server());
     view.httpServer().registerStatisticsApiHandlers(statisticsProvider);

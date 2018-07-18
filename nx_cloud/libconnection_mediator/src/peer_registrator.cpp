@@ -285,7 +285,7 @@ void PeerRegistrator::clientBind(
     };
 
     // Only local peers are alowed while auth is not avaliable for clients:
-    if (!connection->getSourceAddress().address.isLocal())
+    if (!connection->getSourceAddress().address.isLocalNetwork())
         return reject(api::ResultCode::notAuthorized);
 
     if (requestData.tcpReverseEndpoints.empty())
@@ -335,6 +335,12 @@ void PeerRegistrator::clientBind(
     for (const auto& connectionRef: listeningPeerConnections)
         if (const auto connection = connectionRef.lock())
             connection->sendMessage(indication);
+}
+
+int PeerRegistrator::boundClientCount() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return (int) m_boundClients.size();
 }
 
 void PeerRegistrator::sendListenResponse(

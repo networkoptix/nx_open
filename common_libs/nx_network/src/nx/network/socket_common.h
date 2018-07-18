@@ -115,7 +115,8 @@ public:
     IpV6WithScope ipV6() const;
     boost::optional<uint32_t> scopeId() const;
 
-    bool isLocal() const;
+    bool isLocalHost() const;
+    bool isLocalNetwork() const;
     bool isIpAddress() const;
     bool isPureIpV6() const;
 
@@ -167,6 +168,7 @@ public:
     SocketAddress(const HostAddress& _address = HostAddress::anyHost, quint16 _port = 0);
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
+    SocketAddress(const std::string& str);
     SocketAddress(const char* utf8Str);
     SocketAddress(const sockaddr_in& ipv4Endpoint);
     SocketAddress(const sockaddr_in6& ipv6Endpoint);

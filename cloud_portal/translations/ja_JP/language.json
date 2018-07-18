@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "カスタム",
-      "description": "%PRODUCT_NAME% クライアント アプリケーションを使用してカスタム権限を設定する"
+      "description": "%VMS_NAME% クライアントアプリケーションを使用してカスタム権限を設定"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "このユーザーは管理者権限を持っています",
     "cantOpenClient": "%VMS_NAME% アプリケーションが検出されません<a href=\"/download\"> ダウンロード</a>",
     "lostConnection": "{{systemName}} への接続が失われました",
-    "thisSystem": "システム"
+    "thisSystem": "システム",
+    "oldSafariNotSupported": "Safariのバージョン10以前はサポートされません"
   },
   "passwordRequirements": {
     "minLengthMessage": "パスワードは8文字以上必要です",
@@ -203,7 +204,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -212,7 +213,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",

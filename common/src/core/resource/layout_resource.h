@@ -107,6 +107,12 @@ public:
     bool locked() const;
     void setLocked(bool value);
 
+    QSize fixedSize() const;
+    void setFixedSize(const QSize& value);
+
+    virtual int logicalId() const override;
+    virtual void setLogicalId(int value) override;
+
     /** Check if layout is an exported file. */
     bool isFile() const;
 
@@ -139,6 +145,7 @@ signals:
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
     void storeRequested(const QnLayoutResourcePtr &resource);
 
+    void fixedSizeChanged(const QnLayoutResourcePtr& resource);
     void backgroundSizeChanged(const QnLayoutResourcePtr &resource);
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
@@ -159,6 +166,8 @@ private:
     qreal m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
+    QSize m_fixedSize;
+    int m_logicalId = 0;
     QSize m_backgroundSize;
     QString m_backgroundImageFilename;
     qreal m_backgroundOpacity;

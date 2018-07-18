@@ -5,15 +5,15 @@ from subprocess import list2cmdline
 
 import winrm
 from pathlib2 import PurePath
-from pylru import lrudecorator
 from requests import RequestException
 
+from framework.method_caching import cached_getter
+from framework.os_access.command import DEFAULT_RUN_TIMEOUT_SEC
+from framework.os_access.windows_remoting._cim_query import CIMClass
 from ._cim_query import CIMQuery
-from ._cmd import Shell, run_command
-from ._env_vars import EnvVars
+from ._cmd import Shell
 from ._powershell import run_powershell_script
-from ._registry import Key
-from ._users import Users
+from .registry import _WindowsRegistryKey
 
 _logger = logging.getLogger(__name__)
 
@@ -29,13 +29,18 @@ def command_args_to_str_list(command):
 
 
 class WinRM(object):
-    """Windows-specific interface"""
+    """Windows-specific interface
+
+    WinRM has only generic functions.
+    WinRM must not know of particular WMI classes and CMD and PowerShell scripts.
+    """
 
     def __init__(self, address, port, username, password):
         self._protocol = winrm.Protocol(
             'http://{}:{}/wsman'.format(address, port),
             username=username, password=password,
-            transport='ntlm',  # 'ntlm' works fast, 'plaintext' is easier to debug.
+            transport='ntlm',  # 'plaintext' is easier to debug but, for some obscure reason, is slower.
+            message_encryption='never',  # Any value except 'always' and 'auto'.
             operation_timeout_sec=120, read_timeout_sec=240)
         self._username = username
         self._repr = 'WinRM({!r}, {!r}, {!r}, {!r})'.format(address, port, username, password)
@@ -46,55 +51,31 @@ class WinRM(object):
     def __del__(self):
         self._shell().__exit__(None, None, None)
 
-    @lrudecorator(1)
+    @cached_getter
     def _shell(self):
         """Lazy shell creation"""
         shell = Shell(self._protocol)
         shell.__enter__()
         return shell
 
-    def run_command(self, command, input=None):
-        command_str_list = command_args_to_str_list(command)
+    def command(self, args):
+        command_str_list = command_args_to_str_list(args)
         _logger.debug("Command: %s", list2cmdline(command_str_list))
-        exit_code, stdout_bytes, stderr_bytes = run_command(self._shell(), command_str_list, stdin_bytes=input)
-        _logger.debug(
-            "Outcome:\nexit code: %d\nstdout:\n%s\nstderr:\n%s",
-            exit_code,
-            stdout_bytes.decode('ascii', errors='replace'),
-            stderr_bytes.decode('ascii', errors='replace'))
-        return stdout_bytes
+        return self._shell().start(*command_str_list)
+
+    def run_command(self, command, input=None, timeout_sec=DEFAULT_RUN_TIMEOUT_SEC):
+        return self.command(command).check_output(input, timeout_sec=timeout_sec)
 
     def run_powershell_script(self, script, variables):
         return run_powershell_script(self._shell(), script, variables)
 
-    @lrudecorator(1)
-    def user_env_vars(self):
-        # TODO: Work via Users class.
-        users = Users(self._protocol)
-        account = users.account_by_name(self._username)
-        profile = users.profile_by_sid(account[u'SID'])
-        profile_dir = profile[u'LocalPath']
-        default_env_vars = {
-            u'USERPROFILE': profile_dir,
-            u'PROGRAMFILES': u'C:\\Program Files',
-            }
-        env_vars = EnvVars.request(self._protocol, account[u'Caption'], default_env_vars)
-        return env_vars
-
-    @lrudecorator(1)
-    def system_profile_dir(self):
-        # TODO: Work via Users class.
-        users = Users(self._protocol)
-        system_profile = users.system_profile()
-        profile_dir = system_profile[u'LocalPath']
-        return profile_dir
-
-    def wmi_query(self, class_name, selectors):
-        return CIMQuery(self._protocol, class_name, selectors)
-
-    def registry_key(self, path):
-        # TODO: Make a separate Registry class.
-        return Key(self.wmi_query(u'StdRegProv', {}), path)
+    def wmi_query(
+            self,
+            class_name, selectors,
+            namespace=CIMClass.default_namespace, root_uri=CIMClass.default_root_uri):
+        cim_class = CIMClass(class_name, namespace=namespace, root_uri=root_uri)
+        cim_query = CIMQuery(self._protocol, cim_class, selectors)
+        return cim_query
 
     def is_working(self):
         try:

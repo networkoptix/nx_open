@@ -1416,12 +1416,16 @@ to view more bookmarks</source>
       <translation>最小值可能会导致其他摄像机上的录像长度减小。</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation>当录影空间不够时, 请设定摄像机存档应被删除或储存。</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>如果储存空间已满, 则可以删除存档</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation>&quot;自动&quot; 优先删除最早的视频, 不考虑来源。</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>最小和最大的设制决定了此摄像机的影像档被保存的时间</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>如果启用了 &quot;自动&quot; 选项, 所有摄像机中最​旧的影片将优先被删除</translation>
     </message>
   </context>
   <context>
@@ -2853,7 +2857,7 @@ to %1</source>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation>请登录到 %1 , 并依照提供的指示进行操作。</translation>
+      <translation>请登录到 %1, 并依照提供的指示进行操作。</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -3112,12 +3116,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>只有当标题中的文字与任何输入的关键字相符时, 事件才会触发。</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>如果该栏位为空白, 事件将维持在触发状态。</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>只有当来源栏位中的文字与输入的任何关键字相符时，事件才会触发。</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>只有当标题栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>只有当叙述栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
     </message>
   </context>
   <context>
@@ -3334,7 +3346,7 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
       <translation>紧急錄影模式將切換全部攝像機的錄影配置至最大帪數和質量</translation>
     </message>
   </context>
@@ -3826,6 +3838,10 @@ to %1</source>
       <translation>
         <numerusform>测试成功， 发现 %n 用户.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>除了 &quot;搜寻筛选器&quot; 更改其他的LDAP设定, 将导致所有 LDAP使用者的连接失败</translation>
     </message>
   </context>
   <context>
@@ -4457,12 +4473,12 @@ to %1</source>
       <translation>当客户端和服务器电脑处于不同时区时, 配置依循客户端使用的时间 (时间表、时间戳等)。</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation>当启动布局巡航, 调整影像在屏幕上显示的时间长度。</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>提示额外讯息, 包含摄像机和服务器的IP地址以及用户所属之角色</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation>提示额外讯息, 包含摄像机和服务器的IP地址以及用户所属之角色。</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>当启动巡航, 调整影像在屏幕上显示的时间长度。</translation>
     </message>
   </context>
   <context>
@@ -4815,7 +4831,7 @@ to %1</source>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation>若需启用全功能模式,请使用另外的服务器</translation>
+      <translation>若需启用全功能模式, 请使用另外的服务器</translation>
     </message>
   </context>
   <context>
@@ -6323,12 +6339,8 @@ to %1</source>
       <translation>在USB存储器上启用了录制</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>备份包括服务器和摄像机设置，用户，网页，事件规则等。视频不保存。</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>创建系统配置备份档可在系统毁损后还原.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>当资料遗失、损坏或更新硬件时，重新索引可以协助归档或备份</translation>
     </message>
   </context>
   <context>
@@ -6623,12 +6635,16 @@ to %1</source>
       <translation>允许系统优化摄像机设置</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation>发送匿名系统信息 (固件、编解码器、碼流等)。</translation>
-    </message>
-    <message>
       <source>Tracks and logs all user actions.</source>
       <translation>跟踪和记录所有用户操作</translation>
+    </message>
+    <message>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>包含系统相关资讯, 如摄像机型号和固件版本、服务器数量等等</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>不包含任何个人信息，并且完全匿名</translation>
     </message>
   </context>
   <context>
@@ -7332,6 +7348,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>将在服务器上删除视频墙, 并将其关闭</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>使用该软件前，您必须同意用户许可协议</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>同意</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>拒绝</translation>
     </message>
   </context>
   <context>
@@ -8377,16 +8408,20 @@ to %1</source>
       <translation>选择摄像机并点击上方的按钮以查看支援的事件清单</translation>
     </message>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation>只有当标题栏位中的文字与输入的任何关键字相符时，事件才会触发。</translation>
-    </message>
-    <message>
       <source>If the field is empty, event will always trigger.</source>
       <translation>如果该栏位为空白，事件将维持在触发状态</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
       <translation>如果该栏位为空白，事件将维持在触发状态。只有当叙述栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>只有当标题栏位中的文字与输入的任何关键字相符时，事件才会触发</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>此栏位有大小写之区分</translation>
     </message>
   </context>
   <context>
@@ -8700,10 +8735,6 @@ to %1</source>
       <translation>测试版%1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>某些功能可能不可用或運作不正确。</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>系统发送匿名使用情况统计信息</translation>
     </message>
@@ -8732,16 +8763,8 @@ to %1</source>
       <translation>无法更改%2个摄像机中%1个摄像机上的密码</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation>使用该软件前，您必须同意用户许可协议</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation>同意</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation>拒绝</translation>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>警告！此版本仅用于测试目的！请升级到下一版补丁或正式版</translation>
     </message>
   </context>
   <context>

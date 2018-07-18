@@ -31,6 +31,9 @@ namespace {
  */
 QPoint screenRelatedToGlobal(const QPoint& point, QScreen* sourceScreen)
 {
+    if (!sourceScreen)
+        return point;
+
     const auto geometry = sourceScreen->geometry();
     if (geometry.contains(point))
         return point;
@@ -140,7 +143,7 @@ private:
         return window;
     }
 private:
-    QScreen* m_screen;
+    QPointer<QScreen> m_screen;
 };
 
 typedef QSharedPointer<MenuScreenCorrector> MenuScreenCorrectorPtr;
@@ -233,7 +236,7 @@ class ContextMenuEventCorrector : public QObject
 public:
     bool eventFilter(QObject* watched, QEvent* event)
     {
-        //if (event->type() != QEvent::ContextMenu)
+        if (event->type() != QEvent::ContextMenu)
             return QObject::eventFilter(watched, event);
 
         const auto contextMenuEvent = static_cast<QContextMenuEvent*>(event);

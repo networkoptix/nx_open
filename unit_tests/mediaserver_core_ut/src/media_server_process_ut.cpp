@@ -24,8 +24,8 @@ TEST(MediaServerProcess, ApiRestrictions)
         {"/api/camera_event", AuthMethod::noAuth},
         {"/api/camera_event_what/ever", AuthMethod::noAuth},
 
-        {"/api/showLog", AuthMethod::urlQueryParam | AuthMethod::allowWithourCsrf },
-        {"/api/showLogAnd/more", AuthMethod::urlQueryParam | AuthMethod::allowWithourCsrf },
+        {"/api/showLog", AuthMethod::urlQueryDigest | AuthMethod::allowWithourCsrf},
+        {"/api/showLogAnd/more", AuthMethod::urlQueryDigest | AuthMethod::allowWithourCsrf},
 
         {"/api/moduleInformation", AuthMethod::noAuth},
         {"/web/api/moduleInformation", AuthMethod::noAuth},

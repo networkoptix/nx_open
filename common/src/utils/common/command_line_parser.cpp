@@ -9,7 +9,9 @@
 #include <nx/utils/log/assert.h>
 
 namespace {
-    const QString uriDelimiter(lit("://"));
+
+static const auto kUriDelimiter = lit("://");
+static const auto kParamDelimiter = L'=';
 };
 
 void QnCommandLineParameter::init(void *target, int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue) {
@@ -144,14 +146,18 @@ bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *error
     {
         /* Extract name. */
         QString argument = QString(QLatin1String(argv[pos]));
-        bool isUri = argument.contains(uriDelimiter);
 
-        QStringList paramInfo = isUri
-            ? argument.split(uriDelimiter)
-            : argument.split(L'=');
+        const int delimiterIndex = argument.indexOf(kParamDelimiter);
+        const int uriDelimiterIndex = argument.indexOf(kUriDelimiter);
+        const bool isSingleUri = uriDelimiterIndex >= 0
+            && (delimiterIndex < 0 || uriDelimiterIndex < delimiterIndex);
+
+        const auto paramInfo = isSingleUri
+            ? argument.split(kUriDelimiter)
+            : argument.split(kParamDelimiter);
         QString name = paramInfo[0];
-        if (isUri)
-            name += uriDelimiter;   /* So the registering code looks much better. */
+        if (isSingleUri)
+            name += kUriDelimiter;   /* So the registering code looks much better. */
 
         int index = m_indexByName.value(name, -1);
         if (index == -1)

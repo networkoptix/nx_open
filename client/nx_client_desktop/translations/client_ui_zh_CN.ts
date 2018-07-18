@@ -1740,7 +1740,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>摄像机的IP地址,服務器以及用户所属之角色等等...</translation>
+      <translation>摄像机的IP地址, 服務器以及用户所属之角色等等...</translation>
     </message>
   </context>
   <context>
@@ -1990,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation>请输入用户名和密码...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>从</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>文件名称:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>选择文件...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>浏览...</translation>
     </message>
   </context>
   <context>

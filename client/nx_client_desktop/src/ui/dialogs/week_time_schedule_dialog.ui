@@ -39,7 +39,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QnScheduleGridWidget" name="gridWidget" native="true">
+          <widget class="nx::client::desktop::ScheduleGridWidget" name="gridWidget" native="true">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -245,9 +245,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnScheduleGridWidget</class>
+   <class>nx::client::desktop::ScheduleGridWidget</class>
    <extends>QWidget</extends>
-   <header>ui/widgets/properties/schedule_grid_widget.h</header>
+   <header>nx/client/desktop/resource_properties/camera/widgets/schedule_grid_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -12,14 +12,16 @@ You have to prepare old-version database files for the test in the bin directory
 All necessary files are on the rsync://noptix.enk.me/buildenv/test
 """
 
-import time
+import logging
 
 import pytest
 
-from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import merge_systems, setup_local_system
 from framework.os_access.path import copy_file
-from framework.utils import SimpleNamespace, bool_to_str, datetime_utc_now
+from framework.utils import SimpleNamespace, bool_to_str
+from framework.waiting import WaitTimeout, wait_for_true
+
+_logger = logging.getLogger(__name__)
 
 SERVER_CONFIG = dict(
     one=SimpleNamespace(
@@ -42,13 +44,13 @@ def db_version(request):
     return request.param
 
 
-@pytest.fixture
+@pytest.fixture()
 def one(two_stopped_mediaservers, bin_dir, db_version):
     one, _ = two_stopped_mediaservers
     yield server('one', one, bin_dir, db_version)
 
 
-@pytest.fixture
+@pytest.fixture()
 def two(two_stopped_mediaservers, bin_dir, db_version):
     _, two = two_stopped_mediaservers
     yield server('two', two, bin_dir, db_version)
@@ -67,7 +69,7 @@ def server(name, mediaserver, bin_dir, db_version):
     mediaserver.start()
     system_settings = dict(autoDiscoveryEnabled=bool_to_str(False))
     setup_local_system(mediaserver, system_settings)
-    mediaserver.api.api.systemSettings.GET(statisticsAllowed=False)
+    mediaserver.api.get('api/systemSettings', params=dict(statisticsAllowed=False))
     if db_version == '2.4':
         check_camera(mediaserver, server_config.CAMERA_GUID)
     return mediaserver
@@ -78,69 +80,60 @@ def copy_database_file(server, bin_dir, backup_db_filename):
     assert backup_db_path.exists(), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
     server_db_path = server.installation.dir / MEDIASERVER_DATABASE_PATH
-    copy_file(backup_db_path, server.machine.Path(server_db_path))
+    copy_file(backup_db_path, server.os_access.Path(server_db_path))
 
 
 def check_camera(server, camera_guid):
-    cameras = [c for c in server.api.ec2.getCameras.GET() if c['id'] == camera_guid]
+    cameras = [c for c in server.api.get('ec2/getCameras') if c['id'] == camera_guid]
     assert len(cameras) == 1, "'%r': one of cameras '%s' is absent" % (server, camera_guid)
 
 
-def assert_jsons_are_equal(json_one, json_two, json_name):
-    """It fails after the first error"""
-    if isinstance(json_one, dict):
-        assert json_one.keys() == json_two.keys(), "'%s' {}s have different keys" % json_name
-        for key in json_one.keys():
-            entity_name = '%s.%s' % (json_name, key)
-            assert_jsons_are_equal(json_one[key], json_two[key], entity_name)
-    elif isinstance(json_one, list):
-        assert len(json_one) == len(json_two), "'%s' lists have different lengths" % json_name
-        for i, v in enumerate(json_one):
-            entity_name = '%s[%d]' % (json_name, i)
-            assert_jsons_are_equal(json_one[i], json_two[i], entity_name)
-    else:
-        assert json_one == json_two, json_name
+def check_camera_absence_on_server(server, camera_guid):
+    return len([c for c in server.api.get('ec2/getCameras')
+                if c['id'] == camera_guid]) == 0
 
 
-def wait_until_servers_have_same_full_info(one, two):
-    start_time = datetime_utc_now()
-    while True:
-        full_info_one = one.api.ec2.getFullInfo.GET()
-        full_info_two = two.api.ec2.getFullInfo.GET()
-        if full_info_one == full_info_two:
-            return full_info_one
-        if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
+def wait_for_full_info_be_the_same(one, two, stage, artifact_factory):
+    try:
+        wait_for_true(
+            lambda: one.api.get('ec2/getFullInfo') == two.api.get('ec2/getFullInfo'),
+            "Servers have the same ec2/getFullInfo {}".format(stage),
+            timeout_sec=90)
+    except WaitTimeout:
+        # Re-check condition & store ec2/getFullInfo to artifacts
+        full_info_one = one.api.get('ec2/getFullInfo')
+        full_info_two = two.api.get('ec2/getFullInfo')
+        if full_info_one != full_info_two:
+            full_info_one_desc = 'full_info_one_{}'.format(stage)
+            full_info_two_desc = 'full_info_two_{}'.format(stage)
+            artifact_factory([full_info_one_desc],
+                             name=full_info_one_desc).save_as_json(full_info_one)
+            artifact_factory([full_info_two_desc],
+                             name=full_info_two_desc).save_as_json(full_info_two)
             assert full_info_one == full_info_two
-        time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
-
-
-def wait_for_camera_disappearance_after_backup(server, camera_guid):
-    start_time = datetime_utc_now()
-    while True:
-        cameras = [c for c in server.api.ec2.getCameras.GET()
-                   if c['id'] == camera_guid]
-        if not cameras:
-            return
-        if datetime_utc_now() - start_time >= MEDIASERVER_MERGE_TIMEOUT:
-            pytest.fail('Camera %s did not disappear in %s after backup' % (
-                camera_guid, MEDIASERVER_MERGE_TIMEOUT))
-        time.sleep(MEDIASERVER_MERGE_TIMEOUT.total_seconds() / 10.)
+    return one.api.get('ec2/getFullInfo')
 
 
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/85690455/Mediaserver+database+test#Mediaserverdatabasetest-test_backup_restore
 def test_backup_restore(artifact_factory, one, two, camera):
     merge_systems(two, one)
-    full_info_initial = wait_until_servers_have_same_full_info(one, two)
-    backup = one.api.ec2.dumpDatabase.GET()
+    full_info_initial = wait_for_full_info_be_the_same(
+        one, two, "after_merge", artifact_factory)
+    backup = one.api.get('ec2/dumpDatabase')
     camera_guid = two.add_camera(camera)
-    full_info_with_new_camera = wait_until_servers_have_same_full_info(one, two)
+    full_info_with_new_camera = wait_for_full_info_be_the_same(
+        one, two, "after_adding_camera", artifact_factory)
     assert full_info_with_new_camera != full_info_initial, (
-        "ec2/getFullInfo data before and after saveCamera are the same")
-    one.api.ec2.restoreDatabase.POST(data=backup['data'])
-    wait_for_camera_disappearance_after_backup(one, camera_guid)
-    full_info_after_backup_restore = wait_until_servers_have_same_full_info(one, two)
+        "Servers ec2/getFullInfo data before and after saveCamera are not the same")
+    one.api.post('ec2/restoreDatabase', dict(data=backup['data']))
+    wait_for_true(
+        lambda: check_camera_absence_on_server(one, camera_guid),
+        "Server ONE camera disappearance")
+    full_info_after_backup_restore = wait_for_full_info_be_the_same(
+        one, two, "after_restore_database", artifact_factory)
     try:
-        assert full_info_after_backup_restore == full_info_initial
+        assert full_info_after_backup_restore == full_info_initial, (
+            "Servers ec2/getFullInfo data before and after restoreDatabase are not the same, diff")
     except AssertionError:
         artifact_factory(['full_info_initial'],
                          name='full_info_initial').save_as_json(full_info_initial)

@@ -40,15 +40,20 @@ AnalyticsSdkEventWidget::AnalyticsSdkEventWidget(QWidget* parent):
         &AnalyticsSdkEventWidget::paramsChanged);
 
     ui->sdkEventTypeLabel->addHintLine(tr("Analytics events can be set up on a certain cameras."));
-    ui->sdkEventTypeLabel->addHintLine(tr("Choose cameras using the button above to see the list of supported events."));
+    ui->sdkEventTypeLabel->addHintLine(tr("Choose cameras using the button above to see the list "
+        "of supported events."));
     setHelpTopic(ui->sdkEventTypeLabel, Qn::EventsActions_VideoAnalytics_Help);
 
-    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in caption with any of entered keywords."));
+    ui->captionLabel->addHintLine(tr("Event will trigger only if there are matches in the caption "
+        "with any of the entered keywords."));
     ui->captionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
+    ui->captionLabel->addHintLine(tr("This field is case sensitive."));
     setHelpTopic(ui->captionLabel, Qn::EventsActions_VideoAnalytics_Help);
 
-    ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the description field with any of the entered keywords."));
+    ui->descriptionLabel->addHintLine(tr("Event will trigger only if there are matches in the "
+        "description field with any of the entered keywords."));
     ui->descriptionLabel->addHintLine(tr("If the field is empty, event will always trigger."));
+    ui->descriptionLabel->addHintLine(tr("This field is case sensitive."));
     setHelpTopic(ui->descriptionLabel, Qn::EventsActions_VideoAnalytics_Help);
 }
 

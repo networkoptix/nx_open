@@ -12,8 +12,6 @@
 #endif
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMap>
-#include <QtCore/QUrl>
 
 #include <nx/network/buffer.h>
 #include <nx/utils/log/assert.h>
@@ -41,6 +39,9 @@ const int DEFAULT_HTTPS_PORT = 443;
 NX_NETWORK_API extern const char* const kUrlSchemeName;
 NX_NETWORK_API extern const char* const kSecureUrlSchemeName;
 
+QString NX_NETWORK_API urlSheme(bool isSecure);
+bool NX_NETWORK_API isUrlSheme(const QString& scheme);
+
 /**
  * TODO: #ak Consider using another container.
  * Need some buffer with:
@@ -61,6 +62,7 @@ typedef nx::Buffer StringType;
 int NX_NETWORK_API strcasecmp(const StringType& one, const StringType& two);
 
 int NX_NETWORK_API defaultPortForScheme(const StringType& scheme);
+int NX_NETWORK_API defaultPort(bool isSecure);
 
 /**
  * Comparator for case-insensitive comparison in STL associative containers.
@@ -336,6 +338,10 @@ public:
         const ConstBufferRefType& boundary) const;
     StringType toString() const;
     StringType toMultipartString(const ConstBufferRefType& boundary) const;
+
+    void setCookie(const StringType& name, const StringType& value, const StringType& path = "/");
+    void setDeletedCookie(const StringType& name);
+    std::map<StringType, StringType> getCookies() const;
 };
 
 NX_NETWORK_API bool isMessageBodyPresent(const Response& response);
@@ -432,7 +438,7 @@ class NX_NETWORK_API DigestCredentials:
     public UserCredentials
 {
 public:
-    QMap<BufferType, BufferType> params;
+    std::map<BufferType, BufferType> params;
 
     bool parse(const BufferType& str, char separator = ',');
     void serialize(BufferType* const dstBuffer) const;
@@ -500,10 +506,11 @@ public:
     static const StringType NAME;
 
     AuthScheme::Value authScheme;
-    QMap<BufferType, BufferType> params;
+    std::map<BufferType, BufferType> params;
 
     WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
 
+    BufferType getParam(const BufferType& key) const;
     bool parse(const BufferType& str);
     void serialize(BufferType* const dstBuffer) const;
     BufferType serialized() const;
@@ -676,6 +683,44 @@ public:
     bool operator==(const StrictTransportSecurity&) const;
     bool parse(const nx::network::http::StringType& strValue);
     StringType toString() const;
+};
+
+class NX_NETWORK_API XForwardedFor
+{
+public:
+    static const StringType NAME;
+
+    StringType client;
+    std::vector<StringType> proxies;
+
+    bool parse(const StringType& str);
+};
+
+struct NX_NETWORK_API ForwardedElement
+{
+    StringType by;
+    StringType for_;
+    StringType host;
+    StringType proto;
+
+    bool parse(const StringType& str);
+
+    bool operator==(const ForwardedElement& right) const;
+};
+
+class NX_NETWORK_API Forwarded
+{
+public:
+    static const StringType NAME;
+
+    std::vector<ForwardedElement> elements;
+
+    Forwarded() = default;
+    Forwarded(std::vector<ForwardedElement> elements);
+
+    bool parse(const StringType& str);
+
+    bool operator==(const Forwarded& right) const;
 };
 
 } // namespace header

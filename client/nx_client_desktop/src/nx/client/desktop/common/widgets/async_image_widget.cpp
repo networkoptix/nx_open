@@ -372,30 +372,43 @@ void AsyncImageWidget::setReloadMode(ReloadMode value)
     m_reloadMode = value;
 }
 
+void AsyncImageWidget::setNoDataMode(bool noData)
+{
+    m_noDataMode = noData;
+    updateThumbnailStatus(m_previousStatus);
+}
+
 void AsyncImageWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
 {
-    switch (status)
+    if(m_noDataMode)
     {
+        m_placeholder->show();
+        m_indicator->hide();
+    }
+    else
+    {
+        switch (status)
+        {
         case Qn::ThumbnailStatus::Loaded:
-            m_placeholder->setHidden(true);
-            m_indicator->setHidden(true);
+            m_placeholder->hide();
+            m_indicator->hide();
             break;
 
         case Qn::ThumbnailStatus::Loading:
             if (m_reloadMode == ReloadMode::showLoadingIndicator
                 || m_previousStatus == Qn::ThumbnailStatus::Invalid)
             {
-                m_placeholder->setHidden(true);
-                m_indicator->setHidden(false);
+                m_placeholder->hide();
+                m_indicator->show();
             }
             break;
 
         default:
-            m_placeholder->setHidden(false);
-            m_indicator->setHidden(true);
+            m_placeholder->show();
+            m_indicator->hide();
             break;
+        }
     }
-
     m_previousStatus = status;
 }
 

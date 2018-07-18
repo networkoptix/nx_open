@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 System can only be merged with non-%1. System name and password are taken from %1 System.</translation>
+      <translation>Hệ thống điện toán %1 chỉ có thể được hợp nhất với hệ thống không sử dụng điện toán %1. Tên và mật khẩu hệ thống được lấy từ hệ thống điện toán %1.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>

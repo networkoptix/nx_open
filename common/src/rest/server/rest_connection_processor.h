@@ -22,7 +22,8 @@ public:
     /*!
         Takes ownership of \a handler
     */
-    void registerHandler( const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions = Qn::NoGlobalPermissions);
+    void registerHandler(const QString& path, QnRestRequestHandler* handler,
+        GlobalPermission permission = GlobalPermission::none);
     QnRestRequestHandlerPtr findHandler( QString path ) const;
     const Handlers& handlers() const;
 
@@ -51,7 +52,6 @@ public:
     //!Rest handler can use following methods to access http request/response directly
     const nx::network::http::Request& request() const;
     nx::network::http::Response* response() const;
-    QnTcpListener* owner() const;
 
 protected:
     virtual void run() override;

@@ -60,10 +60,7 @@ void WearableCameraMotionWidget::loadState(const CameraSettingsDialogState& stat
     setReadOnly(ui->motionDetectionCheckBox, state.readOnly);
     setReadOnly(ui->sensitivityComboBox, state.readOnly);
 
-    CheckboxUtils::setupTristateCheckbox(
-        ui->motionDetectionCheckBox,
-        state.wearableMotion.enabled.hasValue(),
-        state.wearableMotion.enabled.valueOr(false));
+    CheckboxUtils::setupTristateCheckbox(ui->motionDetectionCheckBox, state.wearableMotion.enabled);
 
     ui->sensitivityWidget->setVisible(ui->motionDetectionCheckBox->checkState() == Qt::Checked);
     ui->sensitivityComboBox->setCurrentIndex(state.wearableMotion.sensitivity.valueOr(0));

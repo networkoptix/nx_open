@@ -12,6 +12,7 @@
 #include <boost/algorithm/cxx11/all_of.hpp>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 
 #include <nx/vms/event/rule.h>
@@ -82,6 +83,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
+#include <ui/graphics/items/resource/watermark_painter.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
@@ -218,6 +220,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     d(new QnMediaResourceWidgetPrivate(base_type::resource())),
     m_recordingStatusHelper(new RecordingStatusHelper(this)),
     m_posUtcMs(DATETIME_INVALID),
+    m_watermarkPainter(new QnWatermarkPainter),
     m_itemId(item->uuid())
 {
     NX_ASSERT(d->resource, "Media resource widget was created with a non-media resource.");
@@ -286,11 +289,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         {
             if (businessAction->actionType() != vms::api::ActionType::executePtzPresetAction)
                 return;
+
             const auto &actionParams = businessAction->getParams();
             if (actionParams.actionResourceId != d->resource->getId())
                 return;
+
             if (m_ptzController)
-                m_ptzController->activatePreset(actionParams.presetId, QnAbstractPtzController::MaxPtzSpeed);
+            {
+                m_ptzController->activatePreset(
+                    actionParams.presetId,
+                    QnAbstractPtzController::MaxPtzSpeed);
+            }
         });
 
     connect(context, &QnWorkbenchContext::userChanged,
@@ -346,7 +355,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
-    at_histogramButton_toggled(item->imageEnhancement().enabled);
+    at_imageEnhancementButton_toggled(item->imageEnhancement().enabled);
     updateIconButton();
 
     updateTitleText();
@@ -359,6 +368,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     setImageEnhancement(item->imageEnhancement());
 
     initSoftwareTriggers();
+
+    auto updateWatermark = [this, context]()
+    {
+        m_watermarkPainter->setWatermark(context->user() ? context->user()->getName() : "",
+            globalSettings()->watermarkSettings());
+    };
+    updateWatermark();
+    connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);
+    connect(context, &QnWorkbenchContext::userChanged, this, updateWatermark);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -384,6 +402,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     if (d->display())
         d->display()->removeRenderer(m_renderer);
 
+    m_renderer->notInUse();
     m_renderer->destroyAsync();
 
     for (auto* data : m_binaryMotionMask)
@@ -451,6 +470,7 @@ void QnMediaResourceWidget::initRenderer()
     m_renderer = new QnResourceWidgetRenderer(nullptr, viewport ? viewport->context() : nullptr);
     connect(m_renderer, &QnResourceWidgetRenderer::sourceSizeChanged, this,
         &QnMediaResourceWidget::updateAspectRatio);
+    m_renderer->inUse();
 }
 
 void QnMediaResourceWidget::initDisplay()
@@ -503,7 +523,7 @@ void QnMediaResourceWidget::initIoModuleOverlay()
         m_ioModuleOverlayWidget->setIOModule(d->camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_ioModuleOverlayWidget->setUserInputEnabled(
-            accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
+            accessController()->hasGlobalPermission(GlobalPermission::userInput));
         m_ioModuleOverlayWidget->setContentsMargins(0.0, topMargin, 0.0, 0.0);
         addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
 
@@ -623,7 +643,7 @@ QString QnMediaResourceWidget::overlayCustomButtonText(
     if (statusOverlay != Qn::PasswordRequiredOverlay)
         return QString();
 
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
         return QString();
 
     const auto watcher = context()->instance<DefaultPasswordCamerasWatcher>();
@@ -700,51 +720,42 @@ void QnMediaResourceWidget::createButtons()
         titleBar()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
     }
 
-    {
-        QnImageButtonWidget *ptzButton = createStatisticAwareButton(lit("media_widget_ptz"));
-        ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
-        ptzButton->setCheckable(true);
-        ptzButton->setToolTip(tr("PTZ"));
-        setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
-        connect(ptzButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::at_ptzButton_toggled);
-        titleBar()->rightButtonsBar()->addButton(Qn::PtzButton, ptzButton);
-    }
 
-    {
-        QnImageButtonWidget *fishEyeButton = createStatisticAwareButton(lit("media_widget_fisheye"));
-        fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
-        fishEyeButton->setCheckable(true);
-        fishEyeButton->setToolTip(tr("Dewarping"));
-        fishEyeButton->setChecked(item()->dewarpingParams().enabled);
-        setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
-        connect(fishEyeButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::at_fishEyeButton_toggled);
-        titleBar()->rightButtonsBar()->addButton(Qn::FishEyeButton, fishEyeButton);
-    }
+    createActionAndButton(
+        "item/ptz.png",
+        false,
+        lit("P"),
+        tr("PTZ"),
+        Qn::MainWindow_MediaItem_Ptz_Help,
+        Qn::PtzButton, lit("media_widget_ptz"),
+        &QnMediaResourceWidget::at_ptzButton_toggled);
 
-    {
-        QnImageButtonWidget *zoomWindowButton = createStatisticAwareButton(lit("media_widget_zoom"));
-        zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
-        zoomWindowButton->setCheckable(true);
-        zoomWindowButton->setToolTip(tr("Create Zoom Window"));
-        setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
-        connect(zoomWindowButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
-        titleBar()->rightButtonsBar()->addButton(Qn::ZoomWindowButton, zoomWindowButton);
-    }
+    createActionAndButton(
+        "item/fisheye.png",
+        item()->dewarpingParams().enabled,
+        lit("D"),
+        tr("Dewarping"),
+        Qn::MainWindow_MediaItem_Dewarping_Help,
+        Qn::FishEyeButton, lit("media_widget_fisheye"),
+        &QnMediaResourceWidget::at_fishEyeButton_toggled);
 
-    {
-        QnImageButtonWidget *enhancementButton = createStatisticAwareButton(lit("media_widget_enhancement"));
-        enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
-        enhancementButton->setCheckable(true);
-        enhancementButton->setToolTip(tr("Image Enhancement"));
-        enhancementButton->setChecked(item()->imageEnhancement().enabled);
-        setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
-        connect(enhancementButton, &QnImageButtonWidget::toggled, this,
-            &QnMediaResourceWidget::at_histogramButton_toggled);
-        titleBar()->rightButtonsBar()->addButton(Qn::EnhancementButton, enhancementButton);
-    }
+    createActionAndButton(
+        "item/zoom_window.png",
+        false,
+        lit("W"),
+        tr("Create Zoom Window"),
+        Qn::MainWindow_MediaItem_ZoomWindows_Help,
+        Qn::ZoomWindowButton, lit("media_widget_zoom"),
+        &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
+
+    createActionAndButton(
+        "item/image_enhancement.png",
+        item()->imageEnhancement().enabled,
+        lit("E"),
+        tr("Image Enhancement"),
+        Qn::MainWindow_MediaItem_ImageEnhancement_Help,
+        Qn::EnhancementButton, lit("media_widget_enhancement"),
+        &QnMediaResourceWidget::at_imageEnhancementButton_toggled);
 
     {
         QnImageButtonWidget *ioModuleButton = createStatisticAwareButton(lit("media_widget_io_module"));
@@ -1072,7 +1083,7 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
         return;
 
     bool hasTwoWayAudio = d->camera && d->camera->hasTwoWayAudio()
-        && accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission);
+        && accessController()->hasGlobalPermission(GlobalPermission::userInput);
 
     if (!hasTwoWayAudio)
         return;
@@ -1101,6 +1112,16 @@ void QnMediaResourceWidget::resumeHomePtzController()
     if (m_homePtzController && options().testFlag(DisplayDewarped)
         && display()->camDisplay()->isRealTimeSource())
             m_homePtzController->resume();
+}
+
+bool QnMediaResourceWidget::forceShowPosition() const
+{
+    const bool isLive = d->display()
+        && d->display()->camDisplay()
+        && d->display()->camDisplay()->isRealTimeSource();
+
+    // In videowall mode position item must always be visible if item is not in live.
+    return qnRuntime->isVideoWallMode() && !isLive;
 }
 
 const QList<QRegion> &QnMediaResourceWidget::motionSelection() const
@@ -1592,6 +1613,8 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     if (m_entropixProgress >= 0)
         paintProgress(painter, rect, m_entropixProgress);
 
+    paintWatermark(painter, rect);
+
     if (client::desktop::ini().showVideoQualityOverlay
         && hasVideo()
         && !d->resource->hasFlags(Qn::local))
@@ -1771,6 +1794,11 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter* painter, int channe
     {
         paintFilledRegionPath(painter, rect, m_motionSensitivity[channel].getMotionMaskPath(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
     }
+}
+
+void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
+{
+    m_watermarkPainter->drawWatermark(painter, rect);
 }
 
 QnPtzControllerPtr QnMediaResourceWidget::ptzController() const
@@ -2116,7 +2144,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     if (d->isPlayingLive() && d->camera && d->camera->hasFlags(Qn::wearable_camera))
         return Qn::NoLiveStreamOverlay;
 
-    if (d->camera && d->camera->hasCameraCapabilities(Qn::isOldFirmwareCapability))
+    if (d->camera && d->camera->hasCameraCapabilities(Qn::IsOldFirmwareCapability))
         return Qn::OldFirmwareOverlay;
 
     if (d->isOffline())
@@ -2221,7 +2249,7 @@ Qn::ResourceOverlayButton QnMediaResourceWidget::calculateOverlayButton(
         return Qn::ResourceOverlayButton::Empty;
 
     if (statusOverlay == Qn::PasswordRequiredOverlay
-        && context()->accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+        && context()->accessController()->hasGlobalPermission(GlobalPermission::admin))
     {
         return Qn::ResourceOverlayButton::SetPassword;
     }
@@ -2327,6 +2355,9 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
     }
     updateCompositeOverlayMode();
     updateIconButton();
+
+    if (qnRuntime->isVideoWallMode())
+        updateHud(false);
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked()
@@ -2363,14 +2394,14 @@ void QnMediaResourceWidget::at_fishEyeButton_toggled(bool checked)
     else
     {
         /* Stop all ptz activity. */
-        ptzController()->continuousMove(QVector3D(0, 0, 0));
+        ptzController()->continuousMove(nx::core::ptz::Vector());
         suspendHomePtzController();
     }
 
     updateButtonsVisibility();
 }
 
-void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
+void QnMediaResourceWidget::at_imageEnhancementButton_toggled(bool checked)
 {
     ImageCorrectionParams params = item()->imageEnhancement();
     if (params.enabled == checked)
@@ -2400,8 +2431,12 @@ void QnMediaResourceWidget::at_zoomRectChanged()
 
     // TODO: #PTZ probably belongs to instrument.
     if (options() & DisplayDewarped)
-        m_ptzController->absoluteMove(Qn::LogicalPtzCoordinateSpace,
-            QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()), 2.0);
+    {
+        m_ptzController->absoluteMove(
+            Qn::LogicalPtzCoordinateSpace,
+            QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()),
+            2.0);
+    }
 }
 
 void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields)
@@ -2868,6 +2903,32 @@ void QnMediaResourceWidget::updateTriggerButtonTooltip(
 
 }
 
+void QnMediaResourceWidget::createActionAndButton(const char* iconName,
+    bool checked,
+    const QString& shortcut,
+    const QString& toolTip,
+    Qn::HelpTopic helpTopic,
+    Qn::WidgetButtons buttonId, const QString& buttonName,
+    void( QnMediaResourceWidget::* executor)(bool checked))
+{
+    auto action = new QAction(this);
+    action->setIcon(qnSkin->icon(iconName));
+    action->setCheckable(true);
+    action->setChecked(checked);
+    action->setShortcut(shortcut);
+    // We will get scene-wide shortcut otherwise.
+    action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+    action->setToolTip(toolTip);
+    setHelpTopic(action, helpTopic);
+    connect(action, &QAction::toggled, this, executor);
+    // We still want the shortcut to work inside the whole widget.
+    addAction(action);
+
+    auto button = createStatisticAwareButton(buttonName);
+    button->setDefaultAction(action);
+    titleBar()->rightButtonsBar()->addButton(buttonId, button);
+}
+
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
     const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
 {
@@ -2984,7 +3045,7 @@ void QnMediaResourceWidget::resetTriggers()
     /* Clear triggers information: */
     m_triggers.clear();
 
-    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::userInput))
         return;
 
     /* Create new relevant triggers: */
@@ -3039,7 +3100,7 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
     std::function<void(bool, rest::Handle)> resultHandler,
     vms::api::EventState toggleState)
 {
-    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+    if (!accessController()->hasGlobalPermission(GlobalPermission::userInput))
         return rest::Handle();
 
     const auto responseHandler =

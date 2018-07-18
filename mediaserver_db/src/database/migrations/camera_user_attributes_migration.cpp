@@ -5,7 +5,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/utils/uuid.h>
-#include <nx/utils/db/sql_query_execution_helper.h>
+#include <nx/sql/sql_query_execution_helper.h>
 
 namespace ec2 {
 namespace db {
@@ -29,7 +29,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     MIGRATION_PARAM_TYPES, (sql_record), _Fields)
 
 using ScheduleTasks = std::vector<ScheduleTaskThresholdsWithRefData>;
-using nx::utils::db::SqlQueryExecutionHelper;
+using nx::sql::SqlQueryExecutionHelper;
 
 bool fetchScheduleTasks(const QSqlDatabase& database, ScheduleTasks& scheduleTasks)
 {

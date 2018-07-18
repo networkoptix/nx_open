@@ -7,11 +7,10 @@
             <button class="btn btn-default" ng-click="rename()">Renszer átnevezése</button>
         </p>
         <p>
-            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Merge with Another System</button>
+            <button class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Egyesítés egy másik rendszerrel</button>
         </p>
         <hr></hr>
-        <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">%PRODUCT_NAME%</span>
-leválasztása</button>
+        <button class="btn btn-default" ng-click="disconnect()">Leválasztás <span class="product-name">%PRODUCT_NAME%</span> termékről</button>
     </div>
 </div>
 <div class="panel panel-default" ng-if="!system.isMine">
@@ -33,20 +32,18 @@ leválasztása</button>
 </div>
 <div class="panel panel-default" ng-if="currentlyMerging">
     <div class="panel-body" ng-if="isMaster && system.isMine">
-        <div><strong>{{mergeTargetSystem.name}}</strong>
-            is being merged to this system</div>
+        <div><strong>{{mergeTargetSystem.name}}</strong> 
+hozzá lett csatlakoztatva a rendszerhez</div>
         <hr></hr>
-        <div class="merge-info-text">Depending of the size of the database it may take up to several hours</div>
+        <div class="merge-info-text">Az adatbázis méretétől függően ez akár több óráig is eltarthat</div>
     </div>
     <div class="panel-body" ng-if="!isMaster || !system.isMine">
-        <div>This system is being merged to
-            <strong>{{mergeTargetSystem.name}}</strong></div>
+        <div>Ez a rendszer hozzá lett csatlakoztatva a <strong>{{mergeTargetSystem.name}}</strong> rendszerhez</div>
         <hr></hr>
         <div class="merge-info-text">
-            <p>Depending of the size of the database it may take up to several hours.</p>
-            <p>Until merge is finished you can log in to this system and watch video, but cannot change any settings.</p>
-            <p>When merge is finished, all users and cameras from this system will become available
-                in <span class="merge-system-name">{{mergeTargetSystem.name}}</span>. System, and this system will be deleted.</p>
+            <p>Az adatbázis méretétől függően ez akár több óráig is eltarthat.</p>
+            <p>Amíg az egyesítés befejeződik, be tud jelentkezni a rendszerbe és megtekinthet videókat, de közben nem módosíthatja a beállításokat.</p>
+            <p>Amikor az egyesítés befejeződött, a rendszer összes felhasználója és kamerája elérhető lesz a <span class="merge-system-name">{{mergeTargetSystem.name}}</span>  rendszerben. A rendszer, és ez a rendszer is törlésre kerül.</p>
         </div>
     </div>
 </div>

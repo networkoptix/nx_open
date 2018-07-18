@@ -55,8 +55,20 @@ void UserLockerPool::updateLockoutState(
     UserLocker::AuthResult authResult)
 {
     QnMutexLocker lock(&m_mutex);
-    const auto iterAndInsertedFlag = m_userLockers.try_emplace(key, m_settings);
-    iterAndInsertedFlag.first->second.updateLockoutState(authResult);
+
+    auto it = m_userLockers.lower_bound(key);
+    const auto exists = it != m_userLockers.end() && it->first == key;
+
+    if (authResult == UserLocker::AuthResult::success && !exists)
+        return;
+
+    if (!exists)
+        it = m_userLockers.emplace_hint(it, key, m_settings);
+
+    it->second.updateLockoutState(authResult);
+
+    if (authResult == UserLocker::AuthResult::success && !it->second.isLocked())
+        m_userLockers.erase(it);
 }
 
 bool UserLockerPool::isLocked(const Key& key) const
@@ -64,6 +76,12 @@ bool UserLockerPool::isLocked(const Key& key) const
     QnMutexLocker lock(&m_mutex);
     auto it = m_userLockers.find(key);
     return it == m_userLockers.end() ? false : it->second.isLocked();
+}
+
+std::map<UserLockerPool::Key, UserLocker> UserLockerPool::userLockers() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_userLockers;
 }
 
 } // namespace server

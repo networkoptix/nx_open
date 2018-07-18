@@ -165,7 +165,7 @@ void QnTransactionMessageBus::proxyTransaction(
     const QnTransaction<T>& tran,
     const QnTransactionTransportHeader& transportHeader)
 {
-    if (ApiPeerData::isClient(m_localPeerType))
+    if (nx::vms::api::PeerData::isClient(m_localPeerType))
         return;
 
     auto newTransportHeader = transportHeader;
@@ -260,7 +260,7 @@ bool QnTransactionMessageBus::processSpecialTransaction(
         return true;
     }
 
-    if (tran.isLocal() && ApiPeerData::isServer(m_localPeerType))
+    if (tran.isLocal() && nx::vms::api::PeerData::isServer(m_localPeerType))
     {
         printTransaction("reject local transaction",
             tran, transactionHash, transportHeader, sender);
@@ -289,17 +289,6 @@ bool QnTransactionMessageBus::processSpecialTransaction(
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran, sender, transportHeader);
             return true; //< Do not proxy. This call contains built in proxy.
-        case ApiCommand::forcePrimaryTimeServer:
-            if (m_timeSyncManager)
-                m_timeSyncManager->onGotPrimariTimeServerTran(tran);
-            break;
-        case ApiCommand::broadcastPeerSyncTime:
-            if (m_timeSyncManager)
-                m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
-            return true; //< Do not proxy.
-        case ApiCommand::broadcastPeerSystemTime:
-        case ApiCommand::getKnownPeersSystemTime:
-            return true; //< Ignore deprecated transactions.
         case ApiCommand::runtimeInfoChanged:
             if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
                 return true; //< Already processed. Do not proxy and ignore the transaction.
@@ -317,7 +306,7 @@ bool QnTransactionMessageBus::processSpecialTransaction(
             // We are only interested in relevant notifications triggered.
             // Also they are allowed only if sender is Admin.
             if (!commonModule()->resourceAccessManager()->hasGlobalPermission(
-                sender->getUserAccessData(), Qn::GlobalAdminPermission))
+                sender->getUserAccessData(), GlobalPermission::admin))
             {
                 NX_WARNING(QnLog::EC2_TRAN_LOG,
                     lm("Can't handle transaction %1 because of no administrator rights. "

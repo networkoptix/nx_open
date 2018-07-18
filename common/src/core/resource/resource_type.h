@@ -66,20 +66,7 @@ class QnResourceTypePool
 public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
 
-    static const QString kLayoutTypeId;
-    static const QString kServerTypeId;
-    static const QString kVideoWallTypeId;
-    static const QString kWebPageTypeId;
     static const QString kC2pCameraTypeId;
-    static const QString kStorageTypeId;
-    static const QString kUserTypeId;
-
-    static const QnUuid kUserTypeUuid;
-    static const QnUuid kServerTypeUuid;
-    static const QnUuid kStorageTypeUuid;
-    static const QnUuid kLayoutTypeUuid;
-    static const QnUuid kDesktopCameraTypeUuid;
-    static const QnUuid kWearableCameraTypeUuid;
 
     static QnResourceTypePool *instance();
 
@@ -90,9 +77,6 @@ public:
 
     /* exact match name */
     QnUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
-
-    /* exact match name for fixed resourceTypes (Layout, Server, etc) */
-    static QnUuid getFixedResourceTypeId(const QString& name);
 
     /* match name using like operation */
     QnUuid getLikeResourceTypeId(const QString& manufacture, const QString& name) const;

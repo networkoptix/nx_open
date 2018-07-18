@@ -18,8 +18,7 @@
 
 bool QnPermissionsHelper::isSafeMode(const QnCommonModule* commonModule)
 {
-    return qnServerModule->roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()
-        || commonModule->isReadOnly();
+    return qnServerModule->settings().ecDbReadOnly() || commonModule->isReadOnly();
 }
 
 int QnPermissionsHelper::safeModeError(QnRestResult &result)

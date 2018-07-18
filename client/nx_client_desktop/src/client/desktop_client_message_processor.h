@@ -1,7 +1,8 @@
 #pragma once
 
 #include <client/client_message_processor.h>
-#include <nx_ec/data/api_discovery_data.h>
+
+#include <nx/vms/api/data_fwd.h>
 
 class QnIncompatibleServerWatcher;
 
@@ -18,11 +19,12 @@ public:
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
-    virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData) override;
+    virtual void onGotInitialNotification(const nx::vms::api::FullInfoData& fullData) override;
     virtual QnResourceFactory* getResourceFactory() const override;
 
 private slots:
-    void at_gotInitialDiscoveredServers(const ec2::ApiDiscoveredServerDataList &discoveredServers);
+    void at_gotInitialDiscoveredServers(
+        const nx::vms::api::DiscoveredServerDataList& discoveredServers);
 
 private:
     QScopedPointer<QnIncompatibleServerWatcher> m_incompatibleServerWatcher;

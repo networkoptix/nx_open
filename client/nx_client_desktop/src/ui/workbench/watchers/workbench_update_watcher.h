@@ -3,32 +3,36 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/software_version.h>
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <nx/utils/software_version.h>
 
 class QnUpdateChecker;
 class QTimer;
 struct QnUpdateInfo;
 
-class QnWorkbenchUpdateWatcher: public QObject, public QnWorkbenchContextAware
+class QnWorkbenchUpdateWatcher:
+    public QObject,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
+
 public:
-    QnWorkbenchUpdateWatcher(QObject *parent = NULL);
-    virtual ~QnWorkbenchUpdateWatcher();
+    QnWorkbenchUpdateWatcher(QObject* parent = nullptr);
+    virtual ~QnWorkbenchUpdateWatcher() override;
 
 public:
     void start();
     void stop();
 
 private:
-    void showUpdateNotification(const QnUpdateInfo &info);
+    void showUpdateNotification(const QnUpdateInfo& info);
+    void at_checker_updateAvailable(const QnUpdateInfo& info);
 
-    void at_checker_updateAvailable(const QnUpdateInfo &info);
 private:
-    QnUpdateChecker *m_checker;
-    QTimer *m_timer;
-    QnSoftwareVersion m_notifiedVersion;
+    QnUpdateChecker* const m_checker;
+    QTimer* const m_timer;
+    nx::utils::SoftwareVersion m_notifiedVersion;
 };
 
 #endif // QN_WORKBENCH_UPDATE_WATCHER_H

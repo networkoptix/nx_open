@@ -146,6 +146,9 @@ edge_firmware/isd/*.tar.gz
 .vagrant
 **/Makefile
 
+nx_cloud/cloud_tests/health_site/dist
+nx_cloud/cloud_tests/health_site/node_modules
+
 cloud_portal/front_end/node_modules
 cloud_portal/front_end/app/images/promo
 cloud_portal/front_end/app/images/favicon.ico
@@ -195,9 +198,6 @@ statserver/dist
 
 *test-tmp.cfg
 func_tests_old/ssh.*.conf
-func_tests/test_utils/updates2/test_updates_server/data/*.json
-func_tests/test_utils/updates2/test_updates_server/data/*/*/*.json
-func_tests/test_utils/updates2/test_updates_server/data/*.raw
 
 statserver/statserver.egg-info
 

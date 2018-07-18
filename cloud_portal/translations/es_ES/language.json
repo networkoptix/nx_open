@@ -48,7 +48,7 @@
       "description": "El usuario está deshabilitado y no puedo acceder al sistema"
     },
     "Owner": {
-      "label": "Propietario",
+      "label": "Dueño",
       "description": "Acceso sin restricciones, incluyendo la capacidad para compartir y conectar/desconectar el sistema de la nube"
     },
     "Viewer": {
@@ -80,7 +80,7 @@
       "description": "Función personalizada de usuario especificado en el sistema"
     },
     "owner": {
-      "label": "Propietario",
+      "label": "Dueño",
       "description": "Acceso sin restricciones, incluyendo la capacidad para compartir y conectar/desconectar el sistema de la nube"
     },
     "viewer": {
@@ -97,7 +97,7 @@
     },
     "custom": {
       "label": "Personalizado",
-      "description": "Use el %PRODUCT_NAME% Aplicación de cliente para establecer permisos personalizados"
+      "description": "Use la aplicación de cliente %VMS_NAME% para configurar permisos personalizados"
     }
   },
   "errorCodes": {
@@ -135,7 +135,8 @@
     "cantEditAdmin": "Este usuario tiene permisos de administrador",
     "cantOpenClient": "%VMS_NAME% aplicación no es detectada.<a href=\"/download\">Descargar</a>",
     "lostConnection": "Conexión al {{systemName}} se ha perdido",
-    "thisSystem": "el sistema"
+    "thisSystem": "el sistema",
+    "oldSafariNotSupported": "Versions of Safari older than 10 are not supported"
   },
   "passwordRequirements": {
     "minLengthMessage": "La contraseña debe tener al menos 8 caracteres",
@@ -160,7 +161,7 @@
     "offline": "Sistema está desconectado",
     "openClient": "Abierto en %VMS_NAME%",
     "openClientNoSystem": "Abrir %VMS_NAME%",
-    "confirmMergeAction": "Merge",
+    "confirmMergeAction": "Combinar",
     "mergeSystemTitle": "Unir Sistemas",
     "confirmRenameTitle": "Nombre del sistema",
     "confirmRenameAction": "Guardar",
@@ -172,7 +173,7 @@
     "confirmUnshareFromMeAction": "Desconectar",
     "confirmUnshare": "Este usuario no podrá acceder el sistema. ¿Está seguro?",
     "confirmUnshareTitle": "¿Eliminar el usuario?",
-    "confirmUnshareAction": "borrar",
+    "confirmUnshareAction": "Borrar",
     "successDisconnected": "El sistema está desconectado de %PRODUCT_NAME%",
     "successDeleted": "Sistema {{systemName}} se ha eliminado de su cuenta",
     "permissionsRemoved": "Los permisos fueron removidos de {{email}}"
@@ -203,7 +204,7 @@
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -212,7 +213,7 @@
       },
       "macos": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra"
+        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
       },
       "ios": {
         "label": "iOS",

@@ -1,17 +1,23 @@
 #pragma once
 
 #include <nx_ec/ec_api.h>
+#include <transaction/transaction.h>
 
-namespace ec2
-{
+#include <nx/vms/time_sync/abstract_time_sync_manager.h>
 
-class QnTimeNotificationManager : public AbstractTimeNotificationManager
+namespace ec2 {
+
+class QnTimeNotificationManager: public AbstractTimeNotificationManager
 {
 public:
-    QnTimeNotificationManager(TimeSynchronizationManager* timeSyncManager);
-    ~QnTimeNotificationManager();
-private:
-    QPointer<TimeSynchronizationManager> m_timeSyncManager;
+    QnTimeNotificationManager(nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager);
+    virtual ~QnTimeNotificationManager() override {}
+
+    void triggerNotification(
+        const QnTransaction<nx::vms::api::PeerSyncTimeData> &transaction,
+        NotificationSource source);
 };
+
+using QnTimeNotificationManagerPtr = std::shared_ptr<QnTimeNotificationManager> ;
 
 } // namespace ec2

@@ -4,8 +4,6 @@
 
 #include <common/common_module.h>
 
-#include <nx_ec/data/api_peer_alive_data.h>
-
 //#define RUNTIME_INFO_DEBUG
 
 QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
@@ -22,51 +20,56 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
 
     if (messageProcessor)
     {
-        connect(messageProcessor, &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData)
-        {
-            QnPeerRuntimeInfo info(runtimeData);
-            m_items->addOrUpdateItem(info);
-        });
+        connect(messageProcessor, &QnCommonMessageProcessor::runtimeInfoChanged, this,
+            [this](const nx::vms::api::RuntimeData &runtimeData)
+            {
+                QnPeerRuntimeInfo info(runtimeData);
+                m_items->addOrUpdateItem(info);
+            });
 
-        connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this, [this](QnUuid peer, Qn::PeerType peerType)
-        {
-            m_items->removeItem(peer);
-        });
+        connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this,
+            [this](QnUuid peer, nx::vms::api::PeerType peerType)
+            {
+                m_items->removeItem(peer);
+            });
 
-        connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this, [this]
-        {
-            m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
-        });
+        connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,
+            [this]()
+            {
+                m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
+            });
 
         /* Client updates running instance guid on each connect to server */
-        connect(commonModule(), &QnCommonModule::runningInstanceGUIDChanged, this, [this]()
-        {
-            ec2::ApiRuntimeData item = localInfo().data;
-            item.peer.instanceId = commonModule()->runningInstanceGUID();
-            updateLocalItem(item);
-        }, Qt::DirectConnection);
+        connect(commonModule(), &QnCommonModule::runningInstanceGUIDChanged, this,
+            [this]()
+            {
+                nx::vms::api::RuntimeData item = localInfo().data;
+                item.peer.instanceId = commonModule()->runningInstanceGUID();
+                updateLocalItem(item);
+            }, Qt::DirectConnection);
     }
     m_messageProcessor = messageProcessor;
 }
 
-const QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {
+const QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const
+{
     return m_items.data();
 }
 
-Qn::Notifier QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo &item)
+Qn::Notifier QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo& item)
 {
 #ifdef RUNTIME_INFO_DEBUG
     qDebug() <<"runtime info added" << item.uuid << item.data.peer.peerType;
 #endif
-    return [this, item]{ emit runtimeInfoAdded(item); };
+    return [this, item](){ emit runtimeInfoAdded(item); };
 }
 
-Qn::Notifier QnRuntimeInfoManager::storedItemRemoved(const QnPeerRuntimeInfo &item)
+Qn::Notifier QnRuntimeInfoManager::storedItemRemoved(const QnPeerRuntimeInfo& item)
 {
 #ifdef RUNTIME_INFO_DEBUG
     qDebug() <<"runtime info removed" << item.uuid << item.data.peer.peerType;
 #endif
-    return [this, item]{ emit runtimeInfoRemoved(item); };
+    return [this, item](){ emit runtimeInfoRemoved(item); };
 }
 
 Qn::Notifier QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo& item)
@@ -77,16 +80,19 @@ Qn::Notifier QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo& it
     return [this, item]{ emit runtimeInfoChanged(item); };
 }
 
-QnPeerRuntimeInfo QnRuntimeInfoManager::localInfo() const {
+QnPeerRuntimeInfo QnRuntimeInfoManager::localInfo() const
+{
     NX_ASSERT(m_items->hasItem(commonModule()->moduleGUID()));
     return m_items->getItem(commonModule()->moduleGUID());
 }
 
-QnPeerRuntimeInfo QnRuntimeInfoManager::item(const QnUuid& id) const {
+QnPeerRuntimeInfo QnRuntimeInfoManager::item(const QnUuid& id) const
+{
     return m_items->getItem(id);
 }
 
-QnPeerRuntimeInfo QnRuntimeInfoManager::remoteInfo() const {
+QnPeerRuntimeInfo QnRuntimeInfoManager::remoteInfo() const
+{
     if (!m_items->hasItem(commonModule()->remoteGUID()))
         return QnPeerRuntimeInfo();
     return m_items->getItem(commonModule()->remoteGUID());
@@ -102,12 +108,14 @@ void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
     QnMutexLocker lock( &m_updateMutex );
     NX_ASSERT(value.uuid == commonModule()->moduleGUID());
     QnPeerRuntimeInfo modifiedValue = value;
-    if (m_items->hasItem(value.uuid)) {
+    if (m_items->hasItem(value.uuid))
+    {
         int oldVersion = m_items->getItem(value.uuid).data.version;
         modifiedValue.data.version = oldVersion + 1;
         m_items->updateItem(modifiedValue);
     }
-    else {
+    else
+    {
         modifiedValue.data.version = 1;
         m_items->addItem(modifiedValue);
     }

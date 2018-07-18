@@ -4,6 +4,8 @@
 #include <api/global_settings.h>
 
 #include <common/common_module.h>
+#include <utils/common/watermark_settings.h>
+#include <ui/dialogs/watermark_preview_dialog_iface.h>
 
 #include <core/resource/device_dependent_strings.h>
 
@@ -14,7 +16,8 @@
 
 QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     base_type(parent),
-    ui(new Ui::SystemSettingsWidget)
+    ui(new Ui::SystemSettingsWidget),
+    m_watermarkSettings(new QnWatermarkSettings)
 {
     ui->setupUi(this);
 
@@ -22,8 +25,12 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     setHelpTopic(ui->auditTrailCheckBox,        Qn::AuditTrail_Help);
     setHelpTopic(ui->statisticsReportCheckBox,  Qn::SystemSettings_General_AnonymousUsage_Help);
 
-    ui->statisticsReportHint->setHint(tr("Sends anonymous System information (firmware, codecs, streams, etc.)."));
+    ui->statisticsReportHint->addHintLine(tr("Includes information about system, such as cameras models and firmware versions, number of servers, etc."));
+    ui->statisticsReportHint->addHintLine(tr("Does not include any personal information and is completely anonymous."));
+    setHelpTopic(ui->statisticsReportHint, Qn::SystemSettings_General_AnonymousUsage_Help);
+
     ui->auditTrailHint->setHint(tr("Tracks and logs all user actions."));
+    setHelpTopic(ui->auditTrailHint, Qn::AuditTrail_Help);
 
     setWarningStyle(ui->settingsWarningLabel);
 
@@ -31,6 +38,12 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     {
         ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked());
     });
+
+    connect(ui->watermarkSettingsButton, &QPushButton::pressed, this,
+        [this] { ui::dialogs::watermark_preview::editSettings(*m_watermarkSettings, this); emit hasChangesChanged(); });
+    // This should go before connecting to hasChangesChanged!
+    connect(ui->displayWatermarkCheckBox, &QCheckBox::stateChanged, this,
+        [this](int state) { m_watermarkSettings->useWatermark = (state == Qt::Checked); });
 
     connect(ui->autoDiscoveryCheckBox,      &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->auditTrailCheckBox,         &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
@@ -46,6 +59,8 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(ui->forceVideoTrafficEncryptionCheckBox, &QCheckBox::clicked,
         this, &QnSystemSettingsWidget::at_forceVideoTrafficEncryptionCheckBoxClicked);
 
+    connect(ui->displayWatermarkCheckBox,   &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
     retranslateUi();
 
     /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
@@ -55,6 +70,7 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::trafficEncryptionForcedChanged,      this,   &QnSystemSettingsWidget::loadDataToUi);
     connect(qnGlobalSettings, &QnGlobalSettings::videoTrafficEncryptionForcedChanged, this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::watermarkChanged,                  this,   &QnSystemSettingsWidget::loadDataToUi);
 }
 
 QnSystemSettingsWidget::~QnSystemSettingsWidget() = default;
@@ -95,6 +111,9 @@ void QnSystemSettingsWidget::loadDataToUi()
     ui->forceVideoTrafficEncryptionCheckBox->setEnabled(qnGlobalSettings->isTrafficEncriptionForced());
 
     ui->statisticsReportCheckBox->setChecked(qnGlobalSettings->isStatisticsAllowed());
+
+    *m_watermarkSettings = qnGlobalSettings->watermarkSettings();
+    ui->displayWatermarkCheckBox->setChecked(m_watermarkSettings->useWatermark);
 }
 
 void QnSystemSettingsWidget::applyChanges()
@@ -108,6 +127,8 @@ void QnSystemSettingsWidget::applyChanges()
     qnGlobalSettings->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());
     qnGlobalSettings->setTrafficEncriptionForced(ui->forceTrafficEncryptionCheckBox->isChecked());
     qnGlobalSettings->setVideoTrafficEncryptionForced(ui->forceVideoTrafficEncryptionCheckBox->isChecked());
+
+    qnGlobalSettings->setWatermarkSettings(*m_watermarkSettings);
 
     ui->settingsWarningLabel->setVisible(false);
 
@@ -139,6 +160,9 @@ bool QnSystemSettingsWidget::hasChanges() const
         return true;
 
     if (ui->forceVideoTrafficEncryptionCheckBox->isChecked() != qnGlobalSettings->isVideoTrafficEncriptionForced())
+        return true;
+
+    if (*m_watermarkSettings != qnGlobalSettings->watermarkSettings())
         return true;
 
     return false;

@@ -31,10 +31,12 @@ class StreamReader
 {
 public:
     StreamReader(nxpt::CommonRefManager* const parentRefManager,
-                 nxpl::TimeProvider *const timeProvider,
-                 const nxcip::CameraInfo& cameraInfo,
-                 float fps,
-                 int encoderNumber );
+        nxpl::TimeProvider *const timeProvider,
+        const QString& login,
+        const QString& password,
+        const QString& url,
+        float fps,
+        int encoderNumber );
     virtual ~StreamReader();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -50,7 +52,8 @@ public:
     virtual void interrupt() override;
 
     void setFps( float fps );
-    void updateCameraInfo( const nxcip::CameraInfo& info );
+    void updateCredentials(const QString& login, const QString& password);
+    void updateMediaUrl(const QString& url);
 
 private:
     enum StreamType
@@ -62,7 +65,9 @@ private:
 
     nxpt::CommonRefManager m_refManager;
     CyclicAllocator m_allocator;
-    nxcip::CameraInfo m_cameraInfo;
+    QString m_login;
+    QString m_password;
+    QString m_url;
     float m_fps;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
@@ -77,7 +82,7 @@ private:
     QnMutex m_mutex;
     std::atomic<int> m_isInGetNextData;
     nxpl::TimeProvider* const m_timeProvider;
- 
+
     int doRequest( nx::network::http::HttpClient* const httpClient );
     void gotJpegFrame( const nx::network::http::ConstBufferRefType& jpgFrame );
     /*!

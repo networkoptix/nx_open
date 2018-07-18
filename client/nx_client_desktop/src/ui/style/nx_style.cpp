@@ -63,6 +63,8 @@
 #include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/client/core/utils/geometry.h>
+#include "webview_style.h"
+
 
 using namespace style;
 using namespace nx::client::desktop;
@@ -1749,10 +1751,18 @@ void QnNxStyle::drawComplexControl(
                     }
 
                     /* Handle hovered & pressed states: */
-                    if (scrollBar->state.testFlag(State_Sunken))
-                        sliderColor = sliderColor.lighter(1);
-                    else if (scrollBar->state.testFlag(State_MouseOver))
-                        sliderColor = sliderColor.lighter(scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                    if (scrollBar->state.testFlag(State_Enabled))
+                    {
+                        if (scrollBar->state.testFlag(State_Sunken))
+                        {
+                            sliderColor = sliderColor.lighter(1);
+                        }
+                        else if (scrollBar->state.testFlag(State_MouseOver))
+                        {
+                            sliderColor = sliderColor.lighter(
+                                scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider) ? 2 : 1);
+                        }
+                    }
 
                     /* Paint: */
                     if (style == CommonScrollBar)
@@ -3982,6 +3992,12 @@ void QnNxStyle::polish(QWidget *widget)
     {
         if (widget->focusPolicy() != Qt::NoFocus)
             widget->setFocusPolicy(Qt::TabFocus);
+    }
+
+    if (widget->inherits("WebCore::QtWebComboBox"))
+    {
+        auto palette = NxUi::createWebViewPalette();
+        widget->setPalette(palette);
     }
 }
 

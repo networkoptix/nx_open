@@ -21,7 +21,7 @@ TEST(HttpRest_substituteParameters, correct)
 
 TEST(HttpRest_substituteParameters, bad_input)
 {
-    nx::network::http::StringType resultPath;
+    std::string resultPath;
 
     ASSERT_FALSE(substituteParameters(
         "/account/dummy/systems", &resultPath, {"ak"}));

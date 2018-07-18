@@ -12,6 +12,8 @@ namespace nx {
 namespace api {
 
 // TODO: Rename all classes replacing "driver" with "plugin".
+
+// TODO: Rename to MetadataPluginManifestBase.
 /**
  * Description of the analytics driver, which can generate different events.
  */
@@ -32,6 +34,7 @@ public:
         needUncompressedVideoFrames_bgra = 1 << 4,
         needUncompressedVideoFrames_rgb = 1 << 5,
         needUncompressedVideoFrames_bgr = 1 << 6,
+        cameraModelIndependent = 1 << 7,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
@@ -46,8 +49,8 @@ public:
 Q_DECLARE_OPERATORS_FOR_FLAGS(AnalyticsDriverManifestBase::Capabilities)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AnalyticsDriverManifestBase::Capability)
 
-#define AnalyticsDriverManifestBase_Fields (driverId)(driverName)(acceptedDataTypes)(supportedCodecs)\
-    (supportedHandleTypes)(supportedPixelFormats)(capabilities)
+#define AnalyticsDriverManifestBase_Fields (driverId)(driverName)(acceptedDataTypes)\
+    (supportedCodecs)(supportedHandleTypes)(supportedPixelFormats)(capabilities)
 
 struct AnalyticsManifestObjectAction
 {

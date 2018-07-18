@@ -91,13 +91,13 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
             // Look for server with public IP address.
             const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
                 commonModule()->moduleGUID());
-            if (!server || (server->getServerFlags() & Qn::SF_HasPublicIP))
+            if (!server || server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); //< Do not proxy.
 
             const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
             for (const auto& server: onlineServers)
             {
-                if (server->getServerFlags() & Qn::SF_HasPublicIP)
+                if (server->getServerFlags().testFlag(vms::api::SF_HasPublicIP))
                     return server;
             }
             return QnMediaServerResourcePtr();
@@ -213,6 +213,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
     {
         case vms::api::ActionType::showTextOverlayAction:
         case vms::api::ActionType::showOnAlarmLayoutAction:
+        case vms::api::ActionType::fullscreenCameraAction:
         {
             if (action->getParams().useSource)
                 resources << resourcePool()->getResourcesByIds<QnNetworkResource>(action->getSourceResources());
@@ -302,6 +303,8 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
         case vms::api::ActionType::showOnAlarmLayoutAction:
         case vms::api::ActionType::openLayoutAction:
         case vms::api::ActionType::showTextOverlayAction:
+        case vms::api::ActionType::fullscreenCameraAction:
+        case vms::api::ActionType::exitFullscreenAction:
             return broadcastAction(action);
         default:
             break;

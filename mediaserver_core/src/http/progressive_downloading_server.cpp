@@ -31,7 +31,6 @@
 #include "transcoding/ffmpeg_transcoder.h"
 #include "camera/video_camera.h"
 #include "camera/camera_pool.h"
-#include "network/authenticate_helper.h"
 #include "streaming/streaming_params.h"
 #include "media_server/settings.h"
 #include "cached_output_stream.h"
@@ -226,7 +225,8 @@ private:
         //Preparing output packet. Have to do everything right here to avoid additional frame copying
         //TODO shared chunked buffer and socket::writev is wanted very much here
         QByteArray outPacket;
-        if (m_owner->getTranscoder()->getVideoCodecContext()->codec_id == AV_CODEC_ID_MJPEG)
+        const auto context = m_owner->getTranscoder()->getVideoCodecContext();
+        if (context && context->codec_id == AV_CODEC_ID_MJPEG)
         {
             //preparing timestamp header
             QByteArray timestampHeader;
@@ -379,9 +379,8 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    const int sessionLiveTimeoutSec = qnServerModule->roSettings()->value(
-        nx_ms_conf::PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME,
-        nx_ms_conf::DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME ).toUInt();
+    const int sessionLiveTimeoutSec =
+        qnServerModule->settings().progressiveDownloadSessionLiveTimeSec();
     if( sessionLiveTimeoutSec > 0 )
         d->killTimerID = nx::utils::TimerManager::instance()->addTimer(
             this,
@@ -645,7 +644,7 @@ void QnProgressiveDownloadingConsumer::run()
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
-        if (rtOptimization && qnServerModule->roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
+        if (rtOptimization && qnServerModule->settings().ffmpegRealTimeOptimization())
             d->transcoder.setUseRealTimeOptimization(true);
 
 

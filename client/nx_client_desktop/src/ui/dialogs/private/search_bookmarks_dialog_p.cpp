@@ -375,7 +375,7 @@ void QnSearchBookmarksDialogPrivate::chooseCamera()
 
 bool QnSearchBookmarksDialogPrivate::currentUserHasAllCameras()
 {
-    return accessController()->hasGlobalPermission(Qn::GlobalAccessAllMediaPermission);
+    return accessController()->hasGlobalPermission(GlobalPermission::accessAllMedia);
 }
 
 void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
@@ -399,7 +399,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
 
     addActionToMenu(action::OpenInNewTabAction, m_openInNewTabAction);
     addActionToMenu(action::EditCameraBookmarkAction, m_editBookmarkAction);
-    addActionToMenu(action::ExportVideoAction, m_exportBookmarkAction);
+    addActionToMenu(action::ExportBookmarkAction, m_exportBookmarkAction);
     addActionToMenu(action::RemoveBookmarksAction, m_removeBookmarksAction);
 
     /* Connect action signal handlers: */
@@ -426,7 +426,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     connect(m_exportBookmarkAction, &QAction::triggered, this,
         [this, params]
         {
-            menu()->triggerIfPossible(action::ExportVideoAction, params);
+            menu()->triggerIfPossible(action::ExportBookmarkAction, params);
         });
 
     /* Execute popup menu: */

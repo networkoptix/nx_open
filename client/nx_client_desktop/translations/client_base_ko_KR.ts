@@ -1397,11 +1397,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>100 % CPU 부하를 유발하는 OpenGL 그리기의 문제점을 피할 수 있습니다.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>라이브 뷰를 저하시키지 않는 최소값으로 조정하십시오. 버퍼가 클수록 재생이 원활 해지지 만 실시간 및 라이브 뷰 사이의 지연이 증가합니다. 버퍼가 작 으면 지연은 줄어들지 만 더듬 거리는 원인이 될 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -1415,12 +1415,16 @@ to view more bookmarks</source>
       <translation>High minimum value can lead to archive length decrease on other cameras.</translation>
     </message>
     <message>
-      <source>Sets when camera archive will be deleted or saved when there is no space for new recordings.</source>
-      <translation type="unfinished">Sets when camera archive will be deleted or saved when there is no space for new recordings.</translation>
+      <source>Archive can be deleted in case if there are no space for new recording.</source>
+      <translation>새로운 녹음을위한 공간이없는 경우 아카이브를 삭제할 수 있습니다.</translation>
     </message>
     <message>
-      <source>&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</source>
-      <translation type="unfinished">&quot;Auto&quot; deletes the oldest footage first, regardless of the source.</translation>
+      <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
+      <translation>최소 와 최대 설정은 이 카메라에 대한 아카이브는가 얼마간 보과되어 하는지 결정 합니다.</translation>
+    </message>
+    <message>
+      <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
+      <translation>&quot;자동&quot; 옵션이 설정되어 있으면 모든 카메라들 중에서 가장 오래된 영상이 먼저 삭제됩니다.</translation>
     </message>
   </context>
   <context>
@@ -2359,15 +2363,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation type="unfinished">Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</translation>
+      <translation>일부 카메라에서 이미지 품질 문제를 해결하는 데 도움이되고 다른 것들은 상당한 비트 전송률 증가를 야기 할 것이다.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a camera for quick identification and access</translation>
+      <translation>빠른 식별 및 액세스를 위해 카메라에 할당 할 수있는 사용자 지정 번호</translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation type="unfinished">Server will not change any cameras settings, it will receive and use camera stream as-is.</translation>
+      <translation>서버는 어떤 카메라 설정도 변경하지 않고 그대로 카메라 스트림을 수신하여 사용합니다.</translation>
     </message>
   </context>
   <context>
@@ -2648,11 +2652,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+      <translation>품질 설정은 압축률 만 판단하며 해상도에는 영향을 미치지 않습니다. 낮음, 중간, 높음 및 최상은 사전 설정된 비트 전송률 값입니다.</translation>
     </message>
     <message>
       <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
-      <translation type="unfinished">First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</translation>
+      <translation>먼저 녹화 옵션을 선택한 다음 녹화 일정의 요일 및 시간 블록에 적용합니다. (0 블록은 오전 12 시부 터 오전 1 시까 지, 23 블록은 오후 11시에서 12시 사이입니다.)</translation>
     </message>
   </context>
   <context>
@@ -3111,12 +3115,20 @@ to %1</source>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
+      <source>If the field is empty, event will always trigger.</source>
+      <translation>필드가 비어 있으면 이벤트가 항상 트리거됩니다.</translation>
     </message>
     <message>
-      <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
+      <translation>소스에 입력 된 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>캡션에 입력 한 키워드 중 하나와 일치하는 것이있는 경우에만 이벤트가 트리거됩니다.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
+      <translation>설명에 입력 한 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
     </message>
   </context>
   <context>
@@ -3333,8 +3345,8 @@ to %1</source>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
-      <source>Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all Cameras to maximum FPS and Quality</translation>
+      <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
+      <translation>패닉 촬영 모드는 모든 카메라의 녹화 설정을 최대 FPS 및 화질로 전환합니다.</translation>
     </message>
   </context>
   <context>
@@ -3569,7 +3581,7 @@ to %1</source>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
+      <translation>카메라가 정확히 수직 또는 수평으로 장착되지 않은 경우 왜곡을 보정하려면이 설정을 사용하십시오.</translation>
     </message>
   </context>
   <context>
@@ -3643,11 +3655,11 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>백업에는 서버 및 카메라 설정, 사용자, 웹 페이지, 이벤트 규칙 등이 포함됩니다. 비디오는 저장되지 않습니다.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>오류가 발생할 경우 복원할 수 있는 시스템 구성에 대 한 백업을 만듭니다.</translation>
     </message>
   </context>
   <context>
@@ -3825,6 +3837,10 @@ to %1</source>
       <translation>
         <numerusform>테스트완료:%n 사용자 검색됨.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
+      <translation>&quot;검색 필터&quot; 이외의 LDAP 설정을 변경하면 LDAP에서 갖고온 모든 사용자의 연결이 끊어집니다.</translation>
     </message>
   </context>
   <context>
@@ -4453,15 +4469,15 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+      <translation>클라이언트와 서버 시스템이 다른 시간대에있을 때 클라이언트에서 사용할 시간 (시간대, 시간 소인 등) 을 설정합니다.</translation>
     </message>
     <message>
-      <source>Length of time each camera on layout will be displayed if you start a Layout Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Layout Tour.</translation>
+      <source>Displays IP addresses for cameras and servers and roles for users.</source>
+      <translation>카메라 및 서버의 IP 주소와 사용자의 역할을 표시합니다.</translation>
     </message>
     <message>
-      <source>Displays IP addresses for cameras and servers and groups for users.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers and groups for users.</translation>
+      <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
+      <translation>둘러보기를 시작하면 레이아웃의 각 카메라가 표시되는 시간입니다.</translation>
     </message>
   </context>
   <context>
@@ -5626,7 +5642,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation type="unfinished">Servers with failover enabled will automatically take cameras from offline servers.</translation>
+      <translation>장애조치가 활성화 된 서버는 자동으로 오프라인 서버에서 카메라를 가져옵니다.</translation>
     </message>
   </context>
   <context>
@@ -5835,11 +5851,11 @@ to %1</source>
     </message>
     <message>
       <source>Validating the update...</source>
-      <translation type="unfinished">Validating the update...</translation>
+      <translation>업데이트 확인 중...</translation>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation type="unfinished">Checking for free space...</translation>
+      <translation>여유 공간 확인 중...</translation>
     </message>
   </context>
   <context>
@@ -6322,12 +6338,8 @@ to %1</source>
       <translation>USB 저장소에서 저장이 활성화되었습니다.</translation>
     </message>
     <message>
-      <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
-    </message>
-    <message>
-      <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
+      <translation>색인 재생성은 아카이브 또는 백업이 손실되거나 손상된 경우 또는 일부 하드웨어가 교체 된 경우 문제를 해결할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -6622,12 +6634,16 @@ to %1</source>
       <translation>카메라 설정을 최적화 하는 시스템을 허용</translation>
     </message>
     <message>
-      <source>Sends anonymous System information (firmware, codecs, streams, etc.).</source>
-      <translation type="unfinished">Sends anonymous System information (firmware, codecs, streams, etc.).</translation>
+      <source>Tracks and logs all user actions.</source>
+      <translation>모든 사용자 작업을 추적하고 기록합니다.</translation>
     </message>
     <message>
-      <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
+      <translation>카메라 모델 및 펌웨어 버전, 서버 수 등과 같은 시스템 관련 정보가 포함됩니다.</translation>
+    </message>
+    <message>
+      <source>Does not include any personal information and is completely anonymous.</source>
+      <translation>개인 정보는 포함되지 않으며 완전히 익명입니다.</translation>
     </message>
   </context>
   <context>
@@ -6926,7 +6942,7 @@ to %1</source>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
+      <translation>사용자는 LDAP 서버에서 가져올 수 있습니다. LDAP 서버가 온라인 상태이고 계정이 활성 상태 인 경우에만 로그인 할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -7120,22 +7136,22 @@ to %1</source>
     </message>
     <message>
       <source>Local users</source>
-      <translation type="unfinished">Local users</translation>
+      <translation>로컬 사용자</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 사용자</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation type="unfinished">%1 belong to this system only and are fully managed by system administrators.</translation>
+      <translation>%1 은이 시스템에만 속하며 시스템 관리자가 전적으로 관리합니다.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation type="unfinished">%1 can have access to many Systems. Administrators can manage their rights only.</translation>
+      <translation>%1 은 여러 시스템에 액세스 할 수 있습니다. 관리자는 자신의 권한 만 관리 할 수 ​​있습니다.</translation>
     </message>
   </context>
   <context>
@@ -7331,6 +7347,21 @@ to %1</source>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
       <translation>비디오월이 서버에서 제거되어 종료합니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchContext</name>
+    <message>
+      <source>To use the software you must accept the end user license agreement</source>
+      <translation>소프트웨어를 사용하려면 사용자 사용권 계약에 동의해야합니다.</translation>
+    </message>
+    <message>
+      <source>Accept</source>
+      <translation>수락</translation>
+    </message>
+    <message>
+      <source>Decline</source>
+      <translation>거절</translation>
     </message>
   </context>
   <context>
@@ -8118,7 +8149,7 @@ to %1</source>
     <name>nx::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>클릭하여 더 자세히 알아보십시오</translation>
     </message>
   </context>
   <context>
@@ -8369,23 +8400,27 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>특정 카메라에서는 애널리틱 이벤트들을 설정할 수 있습니다.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
-    </message>
-    <message>
-      <source>Event will trigger only if there are matches in caption with any of entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in caption with any of entered keywords.</translation>
+      <translation>위의 버튼을 사용하여 카메라를 선택하면 지원되는 이벤트 목록을 볼 수 있습니다.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>필드가 비어 있으면 이벤트가 항상 트리거됩니다.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description field with any of the entered keywords.</translation>
+      <translation>설명 필드에 입력 한 키워드 중 하나와 일치하는 항목이있는 경우에만 이벤트가 트리거됩니다.</translation>
+    </message>
+    <message>
+      <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
+      <translation>캡션에 입력 한 키워드 중 하나와 일치하는 것이있는 경우에만 이벤트가 트리거됩니다.</translation>
+    </message>
+    <message>
+      <source>This field is case sensitive.</source>
+      <translation>이 필드는 대소 문자를 구분합니다.</translation>
     </message>
   </context>
   <context>
@@ -8699,10 +8734,6 @@ to %1</source>
       <translation>베타 버젼 %1</translation>
     </message>
     <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>일부 기능은 동작하지 않거나 사용할수 없습니다.</translation>
-    </message>
-    <message>
       <source>System sends anonymous usage statistics</source>
       <translation>익명 사용 통계 수집을 사용합니다.</translation>
     </message>
@@ -8731,16 +8762,8 @@ to %1</source>
       <translation>%2 카메라의 %1에 암호를 변경하지 못했습니다.</translation>
     </message>
     <message>
-      <source>To use the software you must accept the end user license agreement</source>
-      <translation type="unfinished">To use the software you must accept the end user license agreement</translation>
-    </message>
-    <message>
-      <source>Accept</source>
-      <translation type="unfinished">Accept</translation>
-    </message>
-    <message>
-      <source>Decline</source>
-      <translation type="unfinished">Decline</translation>
+      <source>Warning! This build is for testing purposes only! Please upgrade to a next available patch or release version once available.</source>
+      <translation>경고! 이 빌드는 테스트 용입니다! 다음 패치 또는 릴리스 버전으로 업그레이드하십시오.</translation>
     </message>
   </context>
   <context>

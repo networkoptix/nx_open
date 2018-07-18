@@ -4,17 +4,21 @@
 
 #include <nx/utils/log/log.h>
 
+using std::chrono::milliseconds;
+using namespace std::literals::chrono_literals;
+
 namespace
 {
-    const qint64 kDefaultBookmarkDurationMs = 60 * 1000;
+    const milliseconds kDefaultBookmarkDuration = 60s;
 
-    QnCameraBookmark createValidBookmark(qint64 startTimeMs = 0) {
+    QnCameraBookmark createValidBookmark(milliseconds startTimeMs = 0ms)
+    {
         QnCameraBookmark result;
         result.guid = QnUuid::createUuid();
         result.name = lit("Bookmark");
         result.cameraId =  guidFromArbitraryData(lit("testcamera"));
         result.startTimeMs = startTimeMs;
-        result.durationMs = kDefaultBookmarkDurationMs;
+        result.durationMs = kDefaultBookmarkDuration;
         NX_ASSERT(result.isValid(), Q_FUNC_INFO, "This function must create valid bookmarks");
 
         return result;

@@ -1,19 +1,17 @@
 ////////////////////////////////////////////////////////////
 // 14 mar 2013    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
-
-#ifndef APPLICATION_TASK_H
-#define APPLICATION_TASK_H
+#pragma once
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
 #include <nx/utils/qnbytearrayref.h>
-#include <utils/common/software_version.h>
-
+#include <nx/utils/software_version.h>
 
 namespace applauncher {
 namespace api {
+
 namespace TaskType {
 enum Value
 {
@@ -31,7 +29,7 @@ enum Value
 
 Value fromString(const QnByteArrayConstRef& str);
 QByteArray toString(Value val);
-}
+} // namespace TaskType
 
 class BaseTask
 {
@@ -49,36 +47,33 @@ public:
 bool deserializeTask(const QByteArray& serializedTask, BaseTask** ptr);
 
 //!Task, sent by application, to start specified application version
-class StartApplicationTask
-    :
-    public BaseTask
+class StartApplicationTask: public BaseTask
 {
 public:
-    QnSoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     //!Command-line params to pass to application instance
-    QString appArgs;
+    QStringList appArgs;
     bool autoRestore;
 
     StartApplicationTask();
-    StartApplicationTask(const QnSoftwareVersion& _version, const QString& _appParams = QString());
-    StartApplicationTask(const QnSoftwareVersion& _version, const QStringList& _appParams);
+    StartApplicationTask(const nx::utils::SoftwareVersion& _version);
+    StartApplicationTask(const nx::utils::SoftwareVersion& _version,
+        const QStringList& _appParams);
 
     virtual QByteArray serialize() const override;
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
-class StartInstallationTask
-    :
-    public BaseTask
+class StartInstallationTask: public BaseTask
 {
 public:
-    QnSoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     //!Module name for install. By default, "client". For future use
     QString module;
     bool autoStart;
 
     StartInstallationTask();
-    StartInstallationTask(const QnSoftwareVersion& _version, bool _autoStart = false);
+    StartInstallationTask(const nx::utils::SoftwareVersion& _version, bool _autoStart = false);
 
     //!Implementation of \a BaseTask::serialize()
     virtual QByteArray serialize() const override;
@@ -87,9 +82,7 @@ public:
 };
 
 //!Applauncher process quits running on receiving this task
-class QuitTask
-    :
-    public BaseTask
+class QuitTask: public BaseTask
 {
 public:
     QuitTask();
@@ -98,27 +91,23 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
-class InstallZipTask
-    :
-    public BaseTask
+class InstallZipTask: public BaseTask
 {
 public:
-    QnSoftwareVersion version;
+    nx::utils::SoftwareVersion version;
     QString zipFileName;
 
     InstallZipTask();
-    InstallZipTask(const QnSoftwareVersion &version, const QString &zipFileName);
+    InstallZipTask(const nx::utils::SoftwareVersion& version, const QString& zipFileName);
 
     virtual QByteArray serialize() const override;
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
-class IsVersionInstalledRequest
-    :
-    public BaseTask
+class IsVersionInstalledRequest: public BaseTask
 {
 public:
-    QnSoftwareVersion version;
+    nx::utils::SoftwareVersion version;
 
     IsVersionInstalledRequest();
 
@@ -126,9 +115,7 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
-class GetInstalledVersionsRequest
-    :
-    public BaseTask
+class GetInstalledVersionsRequest: public BaseTask
 {
 public:
     GetInstalledVersionsRequest();
@@ -151,9 +138,10 @@ enum Value
     ioError,
     otherError
 };
+
 Value fromString(const QnByteArrayConstRef& str);
 QByteArray toString(Value val);
-}
+} // namespace ResultType
 
 class Response
 {
@@ -166,9 +154,7 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef& data);
 };
 
-class StartInstallationResponse
-    :
-    public Response
+class StartInstallationResponse: public Response
 {
 public:
     //!Valid if \a result == \a ResultType::ok
@@ -180,9 +166,7 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
-class GetInstallationStatusRequest
-    :
-    public BaseTask
+class GetInstallationStatusRequest: public BaseTask
 {
 public:
     unsigned int installationID;
@@ -209,11 +193,9 @@ enum Value
 
 Value fromString(const QnByteArrayConstRef& str);
 QByteArray toString(Value val);
-}
+} // namespace InstallationStatus
 
-class InstallationStatusResponse
-    :
-    public Response
+class InstallationStatusResponse: public Response
 {
 public:
     InstallationStatus::Value status;
@@ -226,9 +208,7 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
-class IsVersionInstalledResponse
-    :
-    public Response
+class IsVersionInstalledResponse: public Response
 {
 public:
     bool installed;
@@ -239,12 +219,10 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
-class GetInstalledVersionsResponse
-    :
-    public Response
+class GetInstalledVersionsResponse: public Response
 {
 public:
-    QList<QnSoftwareVersion> versions;
+    QList<nx::utils::SoftwareVersion> versions;
 
     GetInstalledVersionsResponse();
 
@@ -252,9 +230,7 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef &data) override;
 };
 
-class CancelInstallationRequest
-    :
-    public BaseTask
+class CancelInstallationRequest: public BaseTask
 {
 public:
     unsigned int installationID;
@@ -265,12 +241,11 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
-class CancelInstallationResponse : public Response {};
+class CancelInstallationResponse: public Response
+{
+};
 
-
-class AddProcessKillTimerRequest
-    :
-    public BaseTask
+class AddProcessKillTimerRequest: public BaseTask
 {
 public:
     qint64 processID;
@@ -282,8 +257,9 @@ public:
     virtual bool deserialize(const QnByteArrayConstRef& data) override;
 };
 
-class AddProcessKillTimerResponse : public Response {};
-}
-}
+class AddProcessKillTimerResponse: public Response
+{
+};
 
-#endif  //APPLICATION_TASK_H
+} // namespace api
+} // namespace applauncher

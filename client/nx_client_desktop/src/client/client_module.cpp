@@ -5,6 +5,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWebKit/QWebSettings>
 #include <QtQml/QQmlEngine>
+#include <QtOpenGL/QtOpenGL>
+#include <QtGui/QSurfaceFormat>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -37,8 +39,6 @@
 #include <client/client_settings_watcher.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_autorun_watcher.h>
-
-#include <camera/video_decoder_factory.h>
 
 #include <cloud/cloud_connection.h>
 
@@ -103,6 +103,7 @@
 #include <nx/client/desktop/utils/upload_manager.h>
 #include <nx/client/desktop/utils/wearable_manager.h>
 #include <nx/client/desktop/analytics/object_display_settings.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -132,7 +133,7 @@
 
 #include <ini.h>
 
-
+using namespace nx;
 using namespace nx::client::desktop;
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -248,6 +249,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initNetwork(startupParams);
     initSkin(startupParams);
     initLocalResources(startupParams);
+    initSurfaceFormat();
 
     // WebKit initialization must occur only once per application run. Actual for ActiveX module.
     static bool isWebKitInitialized = false;
@@ -345,11 +347,26 @@ void QnClientModule::initMetaInfo()
     QnClientMetaTypes::initialize();
 }
 
+void QnClientModule::initSurfaceFormat()
+{
+    QSurfaceFormat format;
+
+    if (qnSettings->lightMode().testFlag(Qn::LightModeNoMultisampling))
+        format.setSamples(2);
+    format.setSwapBehavior(qnSettings->isGlDoubleBuffer()
+        ? QSurfaceFormat::DoubleBuffer
+        : QSurfaceFormat::SingleBuffer);
+    format.setSwapInterval(qnSettings->isVSyncEnabled() ? 1 : 0);
+
+    QSurfaceFormat::setDefaultFormat(format);
+    QGLFormat::setDefaultFormat(QGLFormat::fromSurfaceFormat(format));
+}
+
 void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 {
-    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
-        ? Qn::PT_DesktopClient
-        : Qn::PT_VideowallClient;
+    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? vms::api::PeerType::desktopClient
+        : vms::api::PeerType::videowallClient;
     const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
     const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
 
@@ -479,7 +496,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 
     if (!startupParams.engineVersion.isEmpty())
     {
-        QnSoftwareVersion version(startupParams.engineVersion);
+        nx::utils::SoftwareVersion version(startupParams.engineVersion);
         if (!version.isNull())
         {
             qWarning() << "Starting with overridden version: " << version.toString();
@@ -537,38 +554,44 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     if (logLevel.isEmpty())
         logLevel = qnSettings->logLevel();
 
+    if (ec2TranLogLevel.isEmpty())
+        ec2TranLogLevel = qnSettings->ec2TranLogLevel();
+
     nx::utils::log::Settings logSettings;
-    logSettings.maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
-    logSettings.maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();
+    logSettings.loggers.resize(1);
+    logSettings.loggers.front().maxBackupCount = qnSettings->rawSettings()->value(lit("logArchiveSize"), 10).toUInt();
+    logSettings.loggers.front().maxFileSize = qnSettings->rawSettings()->value(lit("maxLogFileSize"), 10 * 1024 * 1024).toUInt();
     logSettings.updateDirectoryIfEmpty(QStandardPaths::writableLocation(QStandardPaths::DataLocation));
 
-    logSettings.level.parse(logLevel);
-    logSettings.logBaseName = logFile.isEmpty()
+    logSettings.loggers.front().level.parse(logLevel);
+    logSettings.loggers.front().logBaseName = logFile.isEmpty()
         ? lit("client_log") + logFileNameSuffix
         : logFile;
 
-    nx::utils::log::initialize(
-        logSettings,
-        qApp->applicationName(),
-        qApp->applicationFilePath());
-
-    const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
-    if (ec2TranLogLevel != lit("none"))
-    {
-        logSettings.level.parse(ec2TranLogLevel);
-        logSettings.logBaseName = lit("ec2_tran") + logFileNameSuffix;
-        nx::utils::log::initialize(
+    nx::utils::log::setMainLogger(
+        nx::utils::log::buildLogger(
             logSettings,
             qApp->applicationName(),
-            qApp->applicationFilePath(),
-            ec2logger);
+            qApp->applicationFilePath()));
+
+    if (ec2TranLogLevel != lit("none"))
+    {
+        logSettings.loggers.front().level.parse(ec2TranLogLevel);
+        logSettings.loggers.front().logBaseName = lit("ec2_tran") + logFileNameSuffix;
+        nx::utils::log::addLogger(
+            nx::utils::log::buildLogger(
+                logSettings,
+                qApp->applicationName(),
+                qApp->applicationFilePath(),
+                {QnLog::EC2_TRAN_LOG}));
     }
 
     {
         // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
-        const auto logger = nx::utils::log::addLogger({
-            nx::utils::log::Tag(lit("DecodedPictureToOpenGLUploader"))});
-        logger->setDefaultLevel(nx::utils::log::Level::info);
+        nx::utils::log::addLogger(
+            std::make_unique<nx::utils::log::Logger>(
+                std::set<nx::utils::log::Tag>{nx::utils::log::Tag(lit("DecodedPictureToOpenGLUploader"))},
+                nx::utils::log::Level::info));
     }
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
@@ -580,13 +603,13 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 
     //TODO #ak get rid of this class!
     commonModule->store(new ec2::DummyHandler());
-    commonModule->store(new nx::network::http::HttpModManager());
     if (!startupParams.enforceSocketType.isEmpty())
         nx::network::SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
     {
         nx::network::SocketGlobals::cloud().mediatorConnector().mockupMediatorUrl(
+            startupParams.enforceMediatorEndpoint,
             startupParams.enforceMediatorEndpoint);
     }
 
@@ -650,6 +673,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     auto commonModule = m_clientCoreModule->commonModule();
     commonModule->store(skin.take());
     commonModule->store(customizer.take());
+    commonModule->store(new ColorTheme());
 }
 
 void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
@@ -660,10 +684,7 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("layout"), QnLayoutFileStorageResource::instance);
 
-    auto pluginManager = commonModule->store(new PluginManager(nullptr));
-
-    QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
-    QnVideoDecoderFactory::setPluginManager(pluginManager);
+    commonModule->store(new PluginManager());
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 
@@ -721,11 +742,11 @@ void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
 {
     auto commonModule = m_clientCoreModule->commonModule();
 
-    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
-        ? Qn::PT_DesktopClient
-        : Qn::PT_VideowallClient;
+    vms::api::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? vms::api::PeerType::desktopClient
+        : vms::api::PeerType::videowallClient;
 
-    ec2::ApiRuntimeData runtimeData;
+    nx::vms::api::RuntimeData runtimeData;
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;

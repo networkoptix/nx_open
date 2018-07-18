@@ -17,7 +17,7 @@ SystemMergeManager::SystemMergeManager(
     AbstractSystemManager* systemManager,
     const AbstractSystemHealthInfoProvider& systemHealthInfoProvider,
     AbstractVmsGateway* vmsGateway,
-    nx::utils::db::AsyncSqlQueryExecutor* queryExecutor)
+    nx::sql::AsyncSqlQueryExecutor* queryExecutor)
     :
     m_systemManager(systemManager),
     m_systemHealthInfoProvider(systemHealthInfoProvider),
@@ -69,27 +69,26 @@ void SystemMergeManager::startMergingSystems(
 }
 
 void SystemMergeManager::processMergeHistoryRecord(
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
     std::function<void(api::ResultCode)> completionHandler)
 {
     m_queryExecutor->executeUpdate(
         [this, mergeHistoryRecord](
-            utils::db::QueryContext* queryContext)
+            sql::QueryContext* queryContext)
         {
             processMergeHistoryRecord(queryContext, mergeHistoryRecord);
-            return utils::db::DBResult::ok;
+            return sql::DBResult::ok;
         },
         [completionHandler = std::move(completionHandler)](
-            nx::utils::db::QueryContext* /*queryContext*/,
-            utils::db::DBResult dbResultCode)
+            sql::DBResult dbResultCode)
         {
             completionHandler(dbResultToApiResult(dbResultCode));
         });
 }
 
 void SystemMergeManager::processMergeHistoryRecord(
-    nx::utils::db::QueryContext* queryContext,
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+    nx::sql::QueryContext* queryContext,
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord)
 {
     NX_DEBUG(this, lm("Received notification that system %1 merge is complete. "
         "Marking system for deletion").args(mergeHistoryRecord.mergedSystemCloudId));
@@ -99,15 +98,15 @@ void SystemMergeManager::processMergeHistoryRecord(
         queryContext,
         mergeHistoryRecord.mergedSystemCloudId.toStdString(),
         &system);
-    if (resultCode == nx::utils::db::DBResult::notFound)
+    if (resultCode == nx::sql::DBResult::notFound)
     {
         NX_INFO(this, lm("Ignoring merge history record for unknown system %1...")
             .args(mergeHistoryRecord.mergedSystemCloudId));
         return;
     }
 
-    if (resultCode != nx::utils::db::DBResult::ok)
-        throw nx::utils::db::Exception(resultCode);
+    if (resultCode != nx::sql::DBResult::ok)
+        throw nx::sql::Exception(resultCode);
 
     if (!verifyMergeHistoryRecord(mergeHistoryRecord, system))
         return;
@@ -116,7 +115,7 @@ void SystemMergeManager::processMergeHistoryRecord(
 }
 
 bool SystemMergeManager::verifyMergeHistoryRecord(
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord,
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord,
     const data::SystemData& system)
 {
     if (!mergeHistoryRecord.verify(system.authKey.c_str()))
@@ -137,8 +136,8 @@ bool SystemMergeManager::verifyMergeHistoryRecord(
 }
 
 void SystemMergeManager::updateCompletedMergeData(
-    nx::utils::db::QueryContext* queryContext,
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+    nx::sql::QueryContext* queryContext,
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord)
 {
     using namespace std::placeholders;
 
@@ -151,15 +150,15 @@ void SystemMergeManager::updateCompletedMergeData(
 
     auto resultCode = m_systemManager->markSystemForDeletion(
         queryContext, mergeHistoryRecord.mergedSystemCloudId.toStdString());
-    if (resultCode != nx::utils::db::DBResult::ok)
-        throw nx::utils::db::Exception(resultCode);
+    if (resultCode != nx::sql::DBResult::ok)
+        throw nx::sql::Exception(resultCode);
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         std::bind(&SystemMergeManager::removeMergeInfoFromCache, this, mergeHistoryRecord));
 }
 
 void SystemMergeManager::removeMergeInfoFromCache(
-    const ::ec2::ApiSystemMergeHistoryRecord& mergeHistoryRecord)
+    const nx::vms::api::SystemMergeHistoryRecord& mergeHistoryRecord)
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -287,24 +286,23 @@ void SystemMergeManager::processVmsMergeRequestResult(
             mergeRequestContext->idOfSystemToMergeTo,
             mergeRequestContext->idOfSystemToBeMerged),
         std::bind(&SystemMergeManager::processUpdateSystemResult, this,
-            mergeRequestContext, _1, _2));
+            mergeRequestContext, _1));
 }
 
 void SystemMergeManager::processUpdateSystemResult(
     MergeRequestContext* mergeRequestContextPtr,
-    nx::utils::db::QueryContext* /*queryContext*/,
-    nx::utils::db::DBResult dbResult)
+    nx::sql::DBResult dbResult)
 {
     NX_VERBOSE(this, lm("Merge %1 into %2. Updating system %1 status completed with result %3")
         .args(mergeRequestContextPtr->idOfSystemToBeMerged,
             mergeRequestContextPtr->idOfSystemToMergeTo,
-            nx::utils::db::toString(dbResult)));
+            nx::sql::toString(dbResult)));
 
     finishMerge(mergeRequestContextPtr, dbResultToApiResult(dbResult));
 }
 
-nx::utils::db::DBResult SystemMergeManager::updateSystemStateInDb(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult SystemMergeManager::updateSystemStateInDb(
+    nx::sql::QueryContext* queryContext,
     const std::string& idOfSystemToMergeTo,
     const std::string& idOfSystemToMergeBeMerged)
 {

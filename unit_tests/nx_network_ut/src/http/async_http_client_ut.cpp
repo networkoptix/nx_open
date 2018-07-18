@@ -1250,7 +1250,7 @@ X-Nx-Result-Code: ok
     url.setUserName("don't tell");
     url.setPassword("anyone");
     nx::network::http::HttpClient httpClient;
-    httpClient.setResponseReadTimeoutMs(nx::network::kNoTimeout.count());
+    httpClient.setResponseReadTimeout(nx::network::kNoTimeout);
     ASSERT_TRUE(httpClient.doGet(url));
     ASSERT_NE(nullptr, httpClient.response());
     ASSERT_EQ(nx::network::http::StatusCode::ok, httpClient.response()->statusLine.statusCode);

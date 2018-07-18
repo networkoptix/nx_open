@@ -1012,7 +1012,6 @@ void MultipleClientSocketTester::connectAsync(
 
 SocketAddress MultipleClientSocketTester::modifyAddress(const SocketAddress& address)
 {
-    static std::atomic<size_t> enumirator(0);
     if (m_address == SocketAddress())
     {
         auto addressOpt = m_addressBinder->random(address);

@@ -5,11 +5,11 @@
 #include <QtCore/QUrl>
 
 #include <client_core/connection_context_aware.h>
-
-#include <utils/common/software_version.h>
-#include <common/common_globals.h>
 #include <client/client_connection_status.h>
+#include <common/common_globals.h>
+
 #include <nx/utils/url.h>
+#include <nx/utils/software_version.h>
 
 class QnConnectionManagerPrivate;
 class QnConnectionManager: public QObject, public QnConnectionContextAware
@@ -65,14 +65,14 @@ public:
     QString currentLogin() const;
     QString currentPassword() const;
 
-    QnSoftwareVersion connectionVersion() const;
+    nx::utils::SoftwareVersion connectionVersion() const;
 
     bool restoringConnection() const;
 
 signals:
     void connected(bool initialConnect);
-    void connectionFailed(Qn::ConnectionResult status, const QVariant &infoParameter);
-    void systemNameChanged(const QString &systemName);
+    void connectionFailed(Qn::ConnectionResult status, const QVariant& infoParameter);
+    void systemNameChanged(const QString& systemName);
     void connectionStateChanged();
     void isOnlineChanged();
 

@@ -12,6 +12,8 @@
 #include <core/ptz/tour_ptz_executor.h>
 #include <core/ptz/ptz_controller_pool.h>
 
+using namespace nx::core;
+
 bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
 {
     Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
@@ -21,13 +23,14 @@ bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
 QnTourPtzController::QnTourPtzController(
     const QnPtzControllerPtr &baseController,
     QThreadPool* threadPool,
-    QThread* executorThread):
+    QThread* executorThread)
+    :
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(
         lit("ptzTours"), QnPtzTourHash(), this)),
     m_executor(new QnTourPtzExecutor(baseController, threadPool))
 {
-    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
 
     // TODO: #Elric implement it in a saner way
     if (!baseController->hasCapabilities(Ptz::VirtualPtzCapability))
@@ -49,40 +52,50 @@ bool QnTourPtzController::extends(Ptz::Capabilities capabilities)
         && !capabilities.testFlag(Ptz::ToursPtzCapability);
 }
 
-Ptz::Capabilities QnTourPtzController::getCapabilities() const
+Ptz::Capabilities QnTourPtzController::getCapabilities(const nx::core::ptz::Options& options) const
 {
-    Ptz::Capabilities capabilities = base_type::getCapabilities();
+    Ptz::Capabilities capabilities = base_type::getCapabilities(options);
+    if (options.type != ptz::Type::operational)
+        return capabilities;
+
     return extends(capabilities) ? (capabilities | Ptz::ToursPtzCapability) : capabilities;
 }
 
-bool QnTourPtzController::continuousMove(const QVector3D& speed)
+bool QnTourPtzController::continuousMove(
+    const nx::core::ptz::Vector& speed,
+    const nx::core::ptz::Options& options)
 {
-    if (!supports(Qn::ContinuousMovePtzCommand))
+    if (!supports(Qn::ContinuousMovePtzCommand, options))
         return false;
 
     clearActiveTour();
-    return base_type::continuousMove(speed);
+    return base_type::continuousMove(speed, options);
 }
 
 bool QnTourPtzController::absoluteMove(
     Qn::PtzCoordinateSpace space,
-    const QVector3D& position,
-    qreal speed)
+    const nx::core::ptz::Vector& position,
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    if (!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space)))
+    if (!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), options))
         return false;
 
     clearActiveTour();
-    return base_type::absoluteMove(space, position, speed);
+    return base_type::absoluteMove(space, position, speed, options);
 }
 
-bool QnTourPtzController::viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed)
+bool QnTourPtzController::viewportMove(
+    qreal aspectRatio,
+    const QRectF& viewport,
+    qreal speed,
+    const nx::core::ptz::Options& options)
 {
-    if (!supports(Qn::ViewportMovePtzCommand))
+    if (!supports(Qn::ViewportMovePtzCommand, options))
         return false;
 
     clearActiveTour();
-    return base_type::viewportMove(aspectRatio, viewport, speed);
+    return base_type::viewportMove(aspectRatio, viewport, speed, options);
 }
 
 bool QnTourPtzController::activatePreset(const QString& presetId, qreal speed)

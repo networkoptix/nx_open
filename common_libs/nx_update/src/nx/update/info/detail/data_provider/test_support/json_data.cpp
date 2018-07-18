@@ -11,6 +11,7 @@ const QByteArray& metaDataJson()
 {
     static const QByteArray result = R"JSON(
 {
+    "__version": 42,
     "__info": [
         {
             "url": "http://beta.networkoptix.com/beta-builds/daily/updates.json",
@@ -417,12 +418,14 @@ const std::vector<UpdateTestData>& updateTestDataList()
 {
     static const std::vector<UpdateTestData> result = {
 {
-    "default",
+    "http://updates.networkoptix.com/default",
     "16975",
     R"JSON(
     {
         "version": "3.1.0.16975",
         "cloudHost": "nxvms.com",
+        "eulaVersion": 2,
+        "eulaLink": "http://new.eula.com/eulaText",
         "packages": {
             "linux": {
                 "arm_rpi": {
@@ -502,7 +505,7 @@ const std::vector<UpdateTestData>& updateTestDataList()
     )JSON"
 },
 {
-    "tricom",
+    "http://updates.networkoptix.com/tricom",
     "14532",
     R"JSON(
     {
@@ -581,17 +584,21 @@ const std::vector<UpdateTestData>& updateTestDataList()
                 }
             }
         },
-        "cloudHost": "tricom.cloud-demo.hdw.mx"
+        "cloudHost": "tricom.cloud-demo.hdw.mx",
+        "eulaVersion": 2,
+        "eulaLink": "http://new.eula.com/eulaText"
     }
     )JSON"
 },
 {
-    "vista",
+    "http://updates.vista-cctv.com/vista",
     "16975",
     R"JSON(
     {
         "version": "3.1.0.16975",
         "cloudHost": "qcloud.vista-cctv.com",
+        "eulaVersion": 2,
+        "eulaLink": "http://new.eula.com/eulaText",
         "packages": {
             "linux": {
                 "arm_bpi": {

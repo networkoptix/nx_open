@@ -141,6 +141,11 @@ public:
         return CameraDiagnostics::NoErrorResult();
     }
 
+    /**
+     * Stop consuming network resources e.t.c before long halt.
+     * Reader should be able to restore its state on getNextPacket again.
+     */
+    virtual void pleaseStop() {}
 protected:
     Flags m_flags;
     std::function<void()> m_endOfPlaybackHandler;

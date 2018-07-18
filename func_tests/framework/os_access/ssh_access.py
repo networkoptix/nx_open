@@ -2,40 +2,35 @@ import datetime
 import timeit
 
 import pytz
-from pylru import lrudecorator
 
+from framework.method_caching import cached_property
 from framework.networking.linux import LinuxNetworking
-from framework.os_access.os_access_interface import OSAccess
-from framework.os_access.posix_shell import SSH
+from framework.networking.prohibited import ProhibitedNetworking
+from framework.os_access.os_access_interface import OneWayPortMap, ReciprocalPortMap
+from framework.os_access.posix_access import PosixAccess
+from framework.os_access.remote_access import RemoteAccess
 from framework.os_access.ssh_path import make_ssh_path_cls
+from framework.os_access.ssh_shell import SSH
+from framework.os_access.ssh_traffic_capture import SSHTrafficCapture
 from framework.utils import RunningTime
 
 
-class SSHAccess(OSAccess):
-    def __init__(self, forwarded_ports, macs, username, key_path):
-        self._macs = macs
-        ssh_hostname, ssh_port = forwarded_ports['tcp', 22]
-        self.ssh = SSH(ssh_hostname, ssh_port, username, key_path)
-        self._forwarded_ports = forwarded_ports
+class SSHAccess(RemoteAccess, PosixAccess):
+
+    def __init__(self, port_map, username, key):
+        RemoteAccess.__init__(self, port_map)
+        self.ssh = SSH(port_map.remote.address, port_map.remote.tcp(22), username, key)
 
     @property
-    def forwarded_ports(self):
-        return self._forwarded_ports
+    def shell(self):
+        return self.ssh
 
-    @property
+    @cached_property
     def Path(self):
         return make_ssh_path_cls(self.ssh)
 
-    def run_command(self, command, input=None):
-        return self.ssh.run_command(command, input=input)
-
     def is_accessible(self):
         return self.ssh.is_working()
-
-    @property
-    @lrudecorator(1)
-    def networking(self):
-        return LinuxNetworking(self.ssh, self._macs)
 
     def get_time(self):
         started_at = timeit.default_timer()
@@ -47,7 +42,47 @@ class SSHAccess(OSAccess):
         local_time = datetime.datetime.fromtimestamp(timestamp, tz=timezone)
         return RunningTime(local_time, datetime.timedelta(seconds=delay_sec))
 
+
+class VmSshAccess(SSHAccess):
+
+    def __init__(self, port_map, macs, username, key):
+        super(VmSshAccess, self).__init__(port_map, username, key)
+        self._macs = macs
+
+    def __repr__(self):
+        return '<VmSshAccess via {!r}>'.format(self.ssh)
+
+    @cached_property
+    def networking(self):
+        return LinuxNetworking(self.ssh, self._macs)
+
     def set_time(self, new_time):
         started_at = datetime.datetime.now(pytz.utc)
         self.run_command(['date', '--set', new_time.isoformat()])
         return RunningTime(new_time, datetime.datetime.now(pytz.utc) - started_at)
+
+    @cached_property
+    def traffic_capture(self):
+        return SSHTrafficCapture(self.shell, self.Path.tmp() / 'traffic_capture')
+
+
+class PhysicalSshAccess(SSHAccess):
+
+    def __init__(self, address, username, key):
+        # portmap.local is never used, so OneWayPortMap.local() for it will be ok here
+        port_map = ReciprocalPortMap(OneWayPortMap.direct(address), OneWayPortMap.local())
+        super(PhysicalSshAccess, self).__init__(port_map, username, key)
+
+    def __repr__(self):
+        return '<PhysicalSshAccess via {!r}>'.format(self.ssh)
+
+    @property
+    def networking(self):
+        return ProhibitedNetworking()
+
+    def set_time(self, new_time):
+        raise NotImplementedError("Changing time on physical is prohibited")
+
+    @cached_property
+    def traffic_capture(self):
+        raise NotImplementedError("Traffic capture on physical machine is prohibited intentionally")

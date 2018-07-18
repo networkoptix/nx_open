@@ -1,10 +1,11 @@
 #pragma once
 
+#include <array>
+#include <chrono>
+
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 #include <QtCore/QTime>
-
-#include <array>
 
 #include <nx/utils/uuid.h>
 
@@ -18,6 +19,7 @@
 
 #include <recording/time_period.h>
 
+#include <nx/client/desktop/camera/camera_fwd.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -45,8 +47,6 @@ class QnCameraDataManager;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
-class QnResourceDisplay;
-typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class QnSearchQueryStrategy;
 class VariantAnimator;
 
@@ -60,6 +60,8 @@ class QnWorkbenchNavigator:
     Q_OBJECT;
 
     typedef Connective<QObject> base_type;
+
+    using milliseconds = std::chrono::milliseconds;
 
     Q_PROPERTY(bool hasArchive READ hasArchive NOTIFY hasArchiveChanged)
 public:
@@ -235,7 +237,7 @@ protected slots:
 
     void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
 
-    void at_timeSlider_valueChanged(qint64 value);
+    void at_timeSlider_valueChanged(milliseconds value);
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
     void at_timeSlider_selectionPressed();

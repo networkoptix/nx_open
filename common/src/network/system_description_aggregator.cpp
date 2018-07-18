@@ -11,13 +11,13 @@ QnBaseSystemDescription::ServersList subtractLists(
 {
     QnBaseSystemDescription::ServersList result;
     std::copy_if(first.begin(), first.end(), std::back_inserter(result),
-        [&second](const QnModuleInformation& first)
+        [&second](const nx::vms::api::ModuleInformation& first)
         {
             const auto secondIt = std::find_if(second.begin(), second.end(),
-                                                [first](const QnModuleInformation& second)
-            {
-                return (first.id == second.id);
-            });
+                [first](const nx::vms::api::ModuleInformation& second)
+                {
+                    return (first.id == second.id);
+                });
 
             return (secondIt == second.end()); // add to result if not found in second
         });
@@ -134,7 +134,7 @@ void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,
     QnServerFields fields)
 {
     const auto it = std::find_if(m_servers.begin(), m_servers.end(),
-        [serverId](const QnModuleInformation& info) { return (serverId == info.id); });
+        [serverId](const nx::vms::api::ModuleInformation& info) { return (serverId == info.id); });
 
     if (it != m_servers.end())
         emit serverChanged(serverId, fields);
@@ -312,14 +312,15 @@ bool QnSystemDescriptionAggregator::containsServer(const QnUuid& serverId) const
     return false;
 }
 
-QnModuleInformation QnSystemDescriptionAggregator::getServer(const QnUuid& serverId) const
+nx::vms::api::ModuleInformation QnSystemDescriptionAggregator::getServer(
+    const QnUuid& serverId) const
 {
     for (const auto systemDescription : m_systems)
     {
         if (systemDescription->containsServer(serverId))
             return systemDescription->getServer(serverId);
     }
-    return QnModuleInformation();
+    return {};
 }
 
 nx::utils::Url QnSystemDescriptionAggregator::getServerHost(const QnUuid& serverId) const

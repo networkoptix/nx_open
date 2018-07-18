@@ -1740,7 +1740,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>카메라들의 IP 주소들, 서버들, 사용자들의 그룹 등</translation>
     </message>
   </context>
   <context>
@@ -1990,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation>사용자 이름과 비밀번호를 입력하세요...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>틀</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>파일이름:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>파일선택...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>찾기...</translation>
     </message>
   </context>
   <context>

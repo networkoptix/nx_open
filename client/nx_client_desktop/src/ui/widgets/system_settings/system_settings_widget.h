@@ -6,6 +6,8 @@
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
+struct QnWatermarkSettings;
+
 namespace Ui
 {
     class SystemSettingsWidget;
@@ -38,4 +40,5 @@ protected:
 
 private:
     QScopedPointer<Ui::SystemSettingsWidget> ui;
+    QScopedPointer<QnWatermarkSettings> m_watermarkSettings;
 };

@@ -40,6 +40,11 @@ class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
 class QnFfmpegVideoTranscoder;
 
+extern "C"
+{
+    typedef int (*FfmpegWriteFrame) (AVFormatContext *s, AVPacket *pkt);
+}
+
 class QnStreamRecorder:
     public QnAbstractDataConsumer,
     public QnResourceConsumer,
@@ -166,7 +171,7 @@ protected:
     virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
     virtual bool isUtcOffsetAllowed() const { return true; }
     virtual void updateContainerMetadata(QnAviArchiveMetadata* metadata) const {}
-
+    virtual bool forceDefaultContext(const QnConstAbstractMediaDataPtr& mediaData) const;
 private:
     struct StreamRecorderContext
     {
@@ -250,6 +255,7 @@ private:
     QnResourceAudioLayoutPtr m_forcedAudioLayout;
     bool m_disableRegisterFile;
     int64_t m_lastFileSize = 0;
+    FfmpegWriteFrame m_writeFrameFunc = nullptr;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

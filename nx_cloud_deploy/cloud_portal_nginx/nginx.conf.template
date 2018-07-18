@@ -34,6 +34,8 @@ http {
 
         # path for static files
         root /app/app/static/$CUSTOMIZATION;
+        error_page 503 /static/503.html;
+        error_page 502 /static/503.html;
 
         location @proxy_to_app {
             proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
@@ -99,12 +101,22 @@ http {
             try_files ${DOLLAR}uri ${DOLLAR}uri/ @proxy_to_app_no_auth;
         }
 
+        location /static/help/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
         location /static/fonts/ {
             root /app/app/static/common;
             error_page 404 /static/index.html;
         }
 
         location /static/admin/ {
+            root /app/app/static/common;
+            error_page 404 /static/index.html;
+        }
+
+        location /static/autocomplete_light/ {
             root /app/app/static/common;
             error_page 404 /static/index.html;
         }

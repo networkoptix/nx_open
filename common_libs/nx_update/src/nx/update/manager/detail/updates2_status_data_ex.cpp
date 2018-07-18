@@ -18,9 +18,12 @@ Updates2StatusDataEx::Updates2StatusDataEx(
     const QnUuid& serverId,
     StatusCode status,
     QString message,
+    const QList<api::TargetVersionWithEula>& targetVersions,
+    const QString& releaseNotesUrl,
     double progress)
     :
-    api::Updates2StatusData(serverId, status, std::move(message), progress),
+    api::Updates2StatusData(serverId, status, std::move(message), targetVersions, releaseNotesUrl,
+        progress),
     lastRefreshTime(lastRefreshTime)
 {}
 

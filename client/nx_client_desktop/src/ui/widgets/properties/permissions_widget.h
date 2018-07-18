@@ -27,12 +27,12 @@ public:
     virtual void loadDataToUi() override;
     virtual void applyChanges() override;
 
-    Qn::GlobalPermissions selectedPermissions() const;
+    GlobalPermissions selectedPermissions() const;
 
 private:
     void updateDependentPermissions();
     void addCheckBox(
-        Qn::GlobalPermission permission,
+        GlobalPermission permission,
         const QString& text,
         const QString& description = QString());
 

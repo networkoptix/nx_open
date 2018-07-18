@@ -6,8 +6,6 @@
 #include <nx/network/socket_common.h>
 #include <nx/vms/discovery/manager.h>
 
-struct QnModuleInformation;
-
 class QnDirectSystemsFinder : public QnAbstractSystemsFinder
 {
     Q_OBJECT

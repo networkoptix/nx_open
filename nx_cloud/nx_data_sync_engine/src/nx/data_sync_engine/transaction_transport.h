@@ -6,7 +6,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
 
-#include <nx_ec/data/api_tran_state_data.h>
+#include <nx/vms/api/data/tran_state_data.h>
 #include <nx_ec/ec_proto_version.h>
 #include <transaction/transaction_transport_base.h>
 
@@ -24,7 +24,7 @@ class TransactionLog;
 struct ConnectionRequestAttributes
 {
     nx::String connectionId;
-    ::ec2::ApiPeerData remotePeer;
+    vms::api::PeerData remotePeer;
     nx::String contentEncoding;
     int remotePeerProtocolVersion = 0;
 };
@@ -45,7 +45,7 @@ public:
         TransactionLog* const transactionLog,
         const ConnectionRequestAttributes& connectionRequestAttributes,
         const nx::String& systemId,
-        const ::ec2::ApiPeerData& localPeer,
+        const vms::api::PeerData& localPeer,
         const network::SocketAddress& remotePeerEndpoint,
         const nx::network::http::Request& request);
     virtual ~TransactionTransport();
@@ -72,17 +72,17 @@ public:
 
     void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
-        Command<::ec2::ApiSyncRequestData> data,
+        Command<vms::api::SyncRequestData> data,
         TransactionProcessedHandler handler);
 
     void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
-        Command<::ec2::QnTranStateResponse> data,
+        Command<vms::api::TranStateResponse> data,
         TransactionProcessedHandler handler);
 
     void processSpecialTransaction(
         const TransactionTransportHeader& transportHeader,
-        Command<::ec2::ApiTranSyncDoneData> data,
+        Command<vms::api::TranSyncDoneData> data,
         TransactionProcessedHandler handler);
 
 private:
@@ -97,11 +97,11 @@ private:
     /**
      * Transaction state, we need to synchronize remote side to, before we can mark it write sync.
      */
-    ::ec2::QnTranState m_tranStateToSynchronizeTo;
+    vms::api::TranState m_tranStateToSynchronizeTo;
     /**
      * Transaction state of remote peer. Transactions before this state have been sent to the peer.
      */
-    ::ec2::QnTranState m_remotePeerTranState;
+    vms::api::TranState m_remotePeerTranState;
     bool m_haveToSendSyncDone;
     bool m_closed;
     std::unique_ptr<network::aio::Timer> m_inactivityTimer;
@@ -126,7 +126,7 @@ private:
     void onTransactionsReadFromLog(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransaction,
-        ::ec2::QnTranState readedUpTo);
+        vms::api::TranState readedUpTo);
 
     void enableOutputChannel();
 

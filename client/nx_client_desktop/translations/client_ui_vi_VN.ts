@@ -715,7 +715,7 @@
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>Nó sẽ tăng bitrate cho camera</translation>
+      <translation>Nó sẽ tăng bitrate cho camera.</translation>
     </message>
     <message>
       <location/>
@@ -1098,7 +1098,7 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Rotation, Dewarping, Image Enhancement vv</translation>
+      <translation>Rotation, Dewarping, Image Enhancement vv.</translation>
     </message>
     <message>
       <location/>
@@ -1740,7 +1740,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>Địa chỉ IP cho các máy ảnh và máy chủ, nhóm người sử dụng, vv.</translation>
     </message>
   </context>
   <context>
@@ -1990,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation>Nhập tên người dùng và mật khẩu...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>Hình thức</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>Tên tập tin:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>Chọn File...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>Duyệt...</translation>
     </message>
   </context>
   <context>

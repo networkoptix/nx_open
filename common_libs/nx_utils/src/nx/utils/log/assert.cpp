@@ -1,5 +1,12 @@
 #include "assert.h"
 
+#if defined(_WIN32)
+#else
+    #include <signal.h>
+    #include <unistd.h>
+    #include <pthread.h>
+#endif
+
 #include "log.h"
 
 namespace nx {
@@ -20,6 +27,19 @@ void logAssert(const log::Message& message)
 void setOnAssertHandler(std::function<void(const log::Message&)> handler)
 {
     g_onAssertHandler = std::move(handler);
+}
+
+void crashProgram()
+{
+    #if defined(_DEBUG)
+        #if defined(_WIN32)
+            *reinterpret_cast<volatile int*>(0) = 7;
+        #else
+            pthread_kill(pthread_self(), SIGTRAP);
+        #endif
+    #else
+        *reinterpret_cast<volatile int*>(0) = 7;
+    #endif
 }
 
 AssertTimer::TimeInfo::TimeInfo()

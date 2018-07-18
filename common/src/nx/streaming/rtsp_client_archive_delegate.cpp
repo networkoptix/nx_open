@@ -367,7 +367,7 @@ bool QnRtspClientArchiveDelegate::openInternal()
             auto newValue = QnCustomResourceVideoLayout::fromString(vLayout);
             bool isChanged =  getVideoLayout()->toString() != newValue->toString();
             setCustomVideoLayout(newValue);
-            if(isChanged)
+            if (m_reader && isChanged)
                 emit m_reader->videoLayoutChanged();
         }
     }
@@ -642,9 +642,11 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 startTime, qint64 endTime)
     return seek(startTime, true);
 }
 
-
 qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
+    NX_DEBUG(this, lm("Set position %1 for device %2").args(mksecToDateTime(time),
+        m_camera ? m_camera->getUniqueId() : lit("'Unknown device'")));
+
     m_blockReopening = false;
 
     //if (time == m_position)
@@ -828,7 +830,7 @@ void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
     m_rtspSession->setScale(value);
 
     bool needSendRequest = !m_rtspSession->isOpened() || oldReverseMode != newReverseMode
-        || m_camera->getCameraCapabilities().testFlag(Qn::isPlaybackSpeedSupported);
+        || m_camera->getCameraCapabilities().testFlag(Qn::IsPlaybackSpeedSupported);
     if (!needSendRequest)
         return;
 
@@ -855,6 +857,12 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
     m_quality = quality;
     m_qualityFastSwitch = fastSwitch;
     m_resolution = resolution;
+
+    if (!isRealTimeSource() && m_camera
+        && m_camera->getCameraCapabilities().testFlag(Qn::DualStreamingForLiveOnly))
+    {
+        return false;
+    }
 
     if (m_quality == MEDIA_Quality_CustomResolution)
     {
@@ -910,8 +918,12 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
-    if (m_camera && m_camera->isGroupPlayOnly())
-        return; // avoid close/open for VMAX
+    if (m_camera
+        && (m_camera->isGroupPlayOnly()
+            || m_camera->getCameraCapabilities().testFlag(Qn::DeviceBasedSync)))
+    {
+        return; // avoid close/open for NVR
+    }
 
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
     bool longNoData = ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10;
@@ -994,4 +1006,10 @@ void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
 bool QnRtspClientArchiveDelegate::hasVideo() const
 {
     return m_camera && m_camera->hasVideo(nullptr);
+}
+
+void QnRtspClientArchiveDelegate::pleaseStop()
+{
+    if (m_rtspSession->isOpened())
+        m_rtspSession->shutdown();
 }

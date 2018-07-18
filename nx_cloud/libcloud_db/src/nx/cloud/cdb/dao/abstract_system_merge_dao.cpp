@@ -46,7 +46,7 @@ SystemMergeDaoFactory& SystemMergeDaoFactory::instance()
 }
 
 std::unique_ptr<AbstractSystemMergeDao> SystemMergeDaoFactory::defaultFactoryFunction(
-    nx::utils::db::AsyncSqlQueryExecutor* queryExecutor)
+    nx::sql::AsyncSqlQueryExecutor* queryExecutor)
 {
     return std::make_unique<rdb::SystemMergeDao>(queryExecutor);
 }

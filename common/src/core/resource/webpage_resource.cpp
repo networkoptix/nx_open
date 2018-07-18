@@ -1,18 +1,33 @@
 #include "webpage_resource.h"
 
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/api/data/webpage_data.h>
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api, WebPageSubtype,
+    (nx::vms::api::WebPageSubtype::none, QString())
+    (nx::vms::api::WebPageSubtype::c2p, "c2p")
+)
+
+namespace {
+
+static const QString kSubtypePropertyName = lit("subtype");
+
+} // namespace
+
+using namespace nx::vms::api;
+
 QnWebPageResource::QnWebPageResource(QnCommonModule* commonModule):
     base_type(commonModule)
 {
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId));
+    setTypeId(nx::vms::api::WebPageData::kResourceTypeId);
     addFlags(Qn::web_page);
-}
 
-QnWebPageResource::QnWebPageResource(const QUrl& url, QnCommonModule* commonModule):
-    QnWebPageResource(commonModule)
-{
-    setId(QnUuid::createUuid());
-    setName(nameForUrl(url));
-    setUrl(url.toString());
+    connect(this, &QnResource::propertyChanged, this,
+        [this](const QnResourcePtr& /*resource*/, const QString& key)
+        {
+            if (key == kSubtypePropertyName)
+                emit subtypeChanged(toSharedPointer(this));
+        });
 }
 
 QnWebPageResource::~QnWebPageResource()
@@ -48,4 +63,14 @@ void QnWebPageResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChange
         m_status = newStatus;
     }
     emit statusChanged(toSharedPointer(), reason);
+}
+
+WebPageSubtype QnWebPageResource::subtype() const
+{
+    return QnLexical::deserialized<WebPageSubtype>(getProperty(kSubtypePropertyName));
+}
+
+void QnWebPageResource::setSubtype(WebPageSubtype value)
+{
+    setProperty(kSubtypePropertyName, QnLexical::serialized(value));
 }

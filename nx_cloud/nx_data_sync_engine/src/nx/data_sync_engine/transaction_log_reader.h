@@ -4,7 +4,7 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx_ec/data/api_tran_state_data.h>
+#include <nx/vms/api/data/tran_state_data.h>
 
 #include "transaction_log.h"
 
@@ -30,13 +30,13 @@ public:
     virtual void stopWhileInAioThread() override;
 
     void readTransactions(
-        boost::optional<::ec2::QnTranState> from,
-        boost::optional<::ec2::QnTranState> to,
+        boost::optional<vms::api::TranState> from,
+        boost::optional<vms::api::TranState> to,
         int maxTransactionsToReturn,
         TransactionsReadHandler completionHandler);
 
     // TODO: #ak following method MUST be asynchronous
-    ::ec2::QnTranState getCurrentState() const;
+    vms::api::TranState getCurrentState() const;
     nx::String systemId() const;
 
 private:
@@ -50,7 +50,7 @@ private:
     void onTransactionsRead(
         ResultCode resultCode,
         std::vector<dao::TransactionLogRecord> serializedTransactions,
-        ::ec2::QnTranState readedUpTo,
+        vms::api::TranState readedUpTo,
         TransactionsReadHandler completionHandler);
 };
 

@@ -242,7 +242,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
 void QnResourceBrowserWidget::initNewSearch()
 {
-    if (!nx::client::desktop::ini().enableResourceFiltering)
+    if (!nx::client::desktop::ini().enableResourceFilteringByDefault)
         return;
 
     ui->tabWidget->tabBar()->hide();
@@ -818,7 +818,7 @@ void QnResourceBrowserWidget::clearSelection()
 void QnResourceBrowserWidget::updateIcons()
 {
     QnResourceItemDelegate::Options opts = QnResourceItemDelegate::RecordingIcons;
-    if (accessController()->hasGlobalPermission(Qn::GlobalEditCamerasPermission))
+    if (accessController()->hasGlobalPermission(GlobalPermission::editCameras))
         opts |= QnResourceItemDelegate::ProblemIcons;
 
     ui->resourceTreeWidget->itemDelegate()->setOptions(opts);

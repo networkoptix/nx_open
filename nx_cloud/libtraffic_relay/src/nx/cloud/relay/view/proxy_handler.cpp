@@ -96,9 +96,16 @@ void ProxyHandler::selectOnlineHost(
 
     m_detectProxyTargetHandler = std::move(handler);
 
-    findRelayInstanceToRedirectTo(
-        hostNames,
-        std::bind(&ProxyHandler::onRelayInstanceSearchCompleted, this, _1, _2));
+    if (m_remotePeerPool->isConnected())
+    {
+        findRelayInstanceToRedirectTo(
+            hostNames,
+            std::bind(&ProxyHandler::onRelayInstanceSearchCompleted, this, _1, _2));
+    }
+    else
+    {
+        onRelayInstanceSearchCompleted(std::nullopt, std::string());
+    }
 }
 
 std::optional<std::string> ProxyHandler::selectOnlineHostLocally(
@@ -119,6 +126,8 @@ void ProxyHandler::findRelayInstanceToRedirectTo(
         std::optional<std::string> /*relayHostName*/,
         std::string /*proxyTargetHostName*/)> handler)
 {
+    QnMutexLocker lock(&m_mutex);
+
     m_pendingRequestCount = hostNames.size();
     m_findRelayInstanceHandler = std::move(handler);
 
@@ -132,6 +141,12 @@ void ProxyHandler::findRelayInstanceToRedirectTo(
                 if (!lock)
                     return cf::unit();
 
+                {
+                    // Using this to make sure
+                    // ProxyHandler::findRelayInstanceToRedirectTo has exited.
+                    QnMutexLocker lock(&m_mutex);
+                }
+
                 --m_pendingRequestCount;
                 if (!m_findRelayInstanceHandler)
                     return cf::unit();
@@ -140,12 +155,16 @@ void ProxyHandler::findRelayInstanceToRedirectTo(
                 if (relayDomain.empty())
                 {
                     if (m_pendingRequestCount == 0)
-                        nx::utils::swapAndCall(m_findRelayInstanceHandler, std::nullopt, std::string());
+                    {
+                        nx::utils::swapAndCall(
+                            m_findRelayInstanceHandler, std::nullopt, std::string());
+                    }
                     // Else, waiting for other requests to finish.
                     return cf::unit();
                 }
 
-                nx::utils::swapAndCall(m_findRelayInstanceHandler, relayDomain, domainName);
+                nx::utils::swapAndCall(
+                    m_findRelayInstanceHandler, relayDomain, domainName);
                 return cf::unit();
             });
     }
@@ -165,7 +184,8 @@ void ProxyHandler::onRelayInstanceSearchCompleted(
     }
 
     auto locationUrl = network::url::Builder(m_requestUrl)
-        .setHost(lm("%1.%2").args(proxyTargetHost, *relayHost)).toUrl();
+        .setEndpoint(network::SocketAddress(
+            lm("%1.%2").args(proxyTargetHost, *relayHost))).toUrl();
 
     response()->headers.emplace("Location", locationUrl.toString().toUtf8());
 

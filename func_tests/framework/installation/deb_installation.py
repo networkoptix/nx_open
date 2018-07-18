@@ -1,15 +1,12 @@
-"""Manipulate directory to which server instance is installed."""
-
 import logging
-import re
 import sys
 from io import BytesIO
 
 from framework.installation.installation import Installation
-from framework.installation.installer import Version, known_customizations
-from framework.installation.upstart_service import UpstartService
+from framework.installation.installer import InstallIdentity
 from framework.os_access.exceptions import DoesNotExist
-from framework.os_access.path import copy_file
+from framework.os_access.posix_access import PosixAccess
+from framework.os_access.posix_shell import PosixShell
 
 if sys.version_info[:2] == (2, 7):
     # noinspection PyCompatibility,PyUnresolvedReferences
@@ -22,29 +19,37 @@ _logger = logging.getLogger(__name__)
 
 
 class DebInstallation(Installation):
-    """Either installed via dpkg or unpacked"""
+    """Manage installation via dpkg"""
 
-    def __init__(self, ssh_access, deb):
-        """Either valid or hypothetical (invalid or non-existent) installation."""
-        self._ssh = ssh_access.ssh
-        self._deb = deb
-        self.dir = ssh_access.Path('/opt', self._deb.customization.linux_subdir)
-        self._bin = self.dir / 'bin'
-        self._executable = self._bin / 'mediaserver-bin'
+    _NOT_SET = object()
+
+    def __init__(self, posix_access, dir):
+        super(DebInstallation, self).__init__(
+            os_access=posix_access,
+            dir=dir,
+            binary_file=dir / 'bin' / 'mediaserver-bin',
+            var_dir=dir / 'var',
+            core_dumps_dirs=[dir / 'bin'],
+            core_dump_glob='core.*',
+            )
+        self._posix_shell = posix_access.shell  # type: PosixShell
         self._config = self.dir / 'etc' / 'mediaserver.conf'
         self._config_initial = self.dir / 'etc' / 'mediaserver.conf.initial'
-        self.var = self.dir / 'var'
-        self._log_file = self.var / 'log' / 'log_file.log'
-        self.key_pair = self.var / 'ssl' / 'cert.pem'
-        self.os_access = ssh_access
-        self.service = UpstartService(self.os_access.ssh, self._deb.customization.linux_service_name)
+        self.posix_access = posix_access  # type: PosixAccess
+        self._identity = self._NOT_SET
+
+    @property
+    def paths_to_validate(self):
+        return [
+            self.dir,
+            self.binary,
+            self._config,
+            self._config_initial,
+            ]
 
     def is_valid(self):
-        paths_to_check = [
-            self.dir, self._bin / 'mediaserver', self._executable,
-            self._config, self._config_initial]
         all_paths_exist = True
-        for path in paths_to_check:
+        for path in self.paths_to_validate:
             if path.exists():
                 _logger.info("Path %r exists.", path)
             else:
@@ -52,11 +57,11 @@ class DebInstallation(Installation):
                 all_paths_exist = False
         return all_paths_exist
 
-    def list_core_dumps(self):
-        return self._bin.glob('core.*')
+    def parse_core_dump(self, path):
+        return self.os_access.parse_core_dump(path, executable_path=self.binary, lib_path=self.dir / 'lib')
 
-    def restore_mediaserver_conf(self):
-        self._ssh.run_command(['cp', self._config_initial, self._config])
+    def _restore_conf(self):
+        self._posix_shell.run_command(['cp', self._config_initial, self._config])
 
     def update_mediaserver_conf(self, new_configuration):
         old_config = self._config.read_text(encoding='ascii')
@@ -69,80 +74,35 @@ class DebInstallation(Installation):
         config.write(f)
         self._config.write_text(f.getvalue().decode(encoding='ascii'))
 
-    def read_log(self):
-        try:
-            return self._log_file.read_bytes()
-        except DoesNotExist:
-            return None
+    # returns None if server is not installed (yet)
+    # cached_property does not fit because we need to invalidate it after .install()
+    @property
+    def identity(self):
+        if self._identity is self._NOT_SET:
+            self._identity = self._discover_identity()
+        return self._identity
 
-    def patch_binary_set_cloud_host(self, new_host):
-        regex = re.compile(r'(?P<tag>this_is_cloud_host_name) (?P<host>[^\0]+)\0+')
-
-        # Path to .so with cloud host string. Differs among versions.
-        for lib_name in {'libnx_network.so', 'libcommon.so'}:
-            lib_path = self.dir / 'lib' / lib_name
-            try:
-                lib_bytes_original = lib_path.read_bytes()
-            except DoesNotExist:
-                _logger.warning("Lib %s doesn't exist.", lib_path)
-            else:
-                def compose_replacement(match):
-                    replacement = '{} {}'.format(match.group('tag'), new_host).ljust(len(match.group(0)), '\0')
-                    _logger.info("Replace cloud host %s with %s in %s.", match.group('host'), new_host, lib_path)
-                    assert replacement.endswith('\0'), "Host name {} is too long.".format(new_host)
-                    return replacement
-
-                lib_bytes_replaced = regex.sub(compose_replacement, lib_bytes_original)
-                if lib_bytes_replaced != lib_bytes_original:
-                    assert len(lib_bytes_replaced) == len(lib_bytes_original)
-                    lib_path.write_bytes(lib_bytes_replaced)
-
-    def _can_be_reused(self):
-        if not self.is_valid():
-            return False
+    def _discover_identity(self):
         build_info_path = self.dir / 'build_info.txt'
         try:
             build_info_text = build_info_path.read_text(encoding='ascii')
         except DoesNotExist:
-            return False
+            return None
         build_info = dict(
             line.split('=', 1)
             for line in build_info_text.splitlines(False))
-        if self._deb.version != Version(build_info['version']):
-            return False
-        customization, = (
-            customization
-            for customization in known_customizations
-            if customization.customization_name == build_info['customization'])
-        if self._deb.customization != customization:
-            return False
-        return True
+        return InstallIdentity.from_build_info(build_info)
 
-    def install(self):
-        if self._can_be_reused():
-            return
-
-        remote_path = self.os_access.Path.tmp() / self._deb.path.name
-        remote_path.parent.mkdir(parents=True, exist_ok=True)
-        copy_file(self._deb.path, remote_path)
-        self.os_access.ssh.run_sh_script(
-            # language=Bash
-            '''
-                # Commands and dependencies for Ubuntu 14.04 (ubuntu/trusty64 from Vagrant's Atlas).
-                CORE_PATTERN_FILE='/etc/sysctl.d/60-core-pattern.conf'
-                echo 'kernel.core_pattern=core.%t.%p' > "$CORE_PATTERN_FILE"  # %t is timestamp, %p is pid.
-                sysctl -p "$CORE_PATTERN_FILE"  # See: https://superuser.com/questions/625840
-                POINT=/mnt/trusty-packages
-                mkdir -p "$POINT"
-                mount -t nfs -o ro "$SHARE" "$POINT"
-                DEBIAN_FRONTEND=noninteractive dpkg -i "$DEB" "$POINT"/*  # GDB (to parse core dumps) and deps.
-                umount "$POINT"
-                cp "$CONFIG" "$CONFIG_INITIAL"
-                ''',
-            env={
-                'DEB': remote_path,
-                'CONFIG': self._config,
-                'CONFIG_INITIAL': self._config_initial,
-                'SHARE': '10.0.2.107:/data/QA/func_tests/trusty-packages',
-                })
-        assert self.is_valid()
+    def should_reinstall(self, installer):
+        if not self.is_valid():
+            _logger.info('Perform installation: Existing installation is not valid/complete')
+            return True
+        if self.identity == installer.identity:
+            _logger.info(
+                'Skip installation: Existing installation identity (%s) matches installer).', self.identity)
+            return False
+        else:
+            _logger.info(
+                'Perform installation: Existing installation identity (%s) does NOT match installer (%s).',
+                self.identity, installer.identity)
+            return True

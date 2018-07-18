@@ -14,8 +14,7 @@
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx_ec/data/api_peer_data.h>
-#include <nx_ec/data/api_tran_state_data.h>
+#include <nx/vms/api/data/peer_data.h>
 
 #include <transaction/connection_guard_shared_state.h>
 
@@ -61,6 +60,7 @@ struct SystemConnectionInfo
 {
     std::string systemId;
     nx::network::SocketAddress peerEndpoint;
+    std::string userAgent;
 };
 
 /**
@@ -144,6 +144,7 @@ private:
         std::unique_ptr<AbstractTransactionTransport> connection;
         nx::String connectionId;
         FullPeerName fullPeerName;
+        std::string userAgent;
     };
 
     typedef boost::multi_index::multi_index_container<
@@ -170,7 +171,7 @@ private:
     TransactionLog* const m_transactionLog;
     IncomingTransactionDispatcher* const m_transactionDispatcher;
     OutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
-    const ::ec2::ApiPeerData m_localPeerData;
+    const vms::api::PeerData m_localPeerData;
     ConnectionDict m_connections;
     mutable QnMutex m_mutex;
     nx::utils::Counter m_startedAsyncCallsCounter;
@@ -179,7 +180,7 @@ private:
 
     bool addNewConnection(
         ConnectionContext connectionContext,
-        const ::ec2::ApiPeerDataEx& remotePeerInfo);
+        const vms::api::PeerDataEx& remotePeerInfo);
 
     bool isOneMoreConnectionFromSystemAllowed(
         const QnMutexLockerBase& lk,
@@ -228,10 +229,11 @@ private:
         const ConnectionRequestAttributes& connectionRequestAttributes,
         nx::network::http::Response* const response);
 
-    void onHttpConnectionUpgraded(
-        nx::network::http::HttpServerConnection* connection,
-        ::ec2::ApiPeerDataEx remotePeerInfo,
-        const std::string& systemId);
+    void addWebSocketTransactionTransport(
+        std::unique_ptr<network::AbstractStreamSocket> connection,
+        vms::api::PeerDataEx remotePeerInfo,
+        const std::string& systemId,
+        const std::string& userAgent);
 };
 
 } // namespace data_sync_engine

@@ -11,6 +11,7 @@
 
 #include "ec2_connection_processor.h"
 #include "transaction/message_bus_adapter.h"
+#include <core/resource_management/status_dictionary.h>
 
 namespace ec2 {
 
@@ -121,7 +122,7 @@ void Appserver2MessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
         return;
     QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(resourceId);
 
-    ec2::ApiMediaServerData apiServer;
+    nx::vms::api::MediaServerData apiServer;
     ec2::fromResourceToApi(mServer, apiServer);
     auto connection = commonModule()->ec2Connection();
     connection->getMediaServerManager(Qn::kSystemAccess)->save(
@@ -144,6 +145,18 @@ void Appserver2MessageProcessor::updateResource(
                 addOutgoingConnectionToPeer(server->getId(), server->getApiUrl());
         }
     }
+}
+
+void Appserver2MessageProcessor::handleRemotePeerFound(
+    QnUuid peer, nx::vms::api::PeerType /*peerType*/)
+{
+    commonModule()->statusDictionary()->setValue(peer, Qn::Online);
+}
+
+void Appserver2MessageProcessor::handleRemotePeerLost(
+    QnUuid peer, nx::vms::api::PeerType /*peerType*/)
+{
+    commonModule()->statusDictionary()->setValue(peer, Qn::Offline);
 }
 
 } // namespace ec2

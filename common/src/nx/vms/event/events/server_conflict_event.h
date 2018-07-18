@@ -3,10 +3,10 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <nx/vms/event/events/conflict_event.h>
 #include <core/resource/resource_fwd.h>
 
-struct QnModuleInformation;
+#include <nx/vms/event/events/conflict_event.h>
+#include <nx/vms/api/data_fwd.h>
 
 // TODO: #vkutin Think of a location to put this to
 struct QnCameraConflictList
@@ -31,7 +31,7 @@ public:
         const QnCameraConflictList& conflictList);
 
     explicit ServerConflictEvent(const QnResourcePtr& server, qint64 timeStamp,
-        const QnModuleInformation& conflictModule, const QUrl& conflictUrl);
+        const nx::vms::api::ModuleInformation& conflictModule, const QUrl& conflictUrl);
 
 private:
     QnCameraConflictList m_cameraConflicts;

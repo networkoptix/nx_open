@@ -19,9 +19,7 @@ public:
     AsyncJsonProviderMockup(data_provider::AbstractAsyncRawDataProviderHandler* handler);
     ~AsyncJsonProviderMockup();
     virtual void getUpdatesMetaInformation() override;
-    virtual void getSpecificUpdateData(
-        const QString& customization,
-        const QString& version) override;
+    virtual void getSpecificUpdateData(const QString& updatePrefix, const QString& build) override;
 
 private:
     AbstractAsyncRawDataProviderHandler* m_handler;

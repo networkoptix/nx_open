@@ -7,8 +7,6 @@ which automatically translated to
 But for POST method keyword parameters are translated to json request body.
 """
 import base64
-import csv
-import datetime
 import hashlib
 import json
 import logging
@@ -19,12 +17,13 @@ import requests.exceptions
 from requests.auth import HTTPDigestAuth
 
 DEFAULT_API_USER = 'admin'
-DEFAULT_API_PASSWORD = 'admin'
-STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, 'qweasd123']  # do not mask these passwords in log files
-REST_API_TIMEOUT = datetime.timedelta(seconds=10)
+INITIAL_API_PASSWORD = 'admin'
+DEFAULT_API_PASSWORD = 'qweasd123'
+STANDARD_PASSWORDS = [DEFAULT_API_PASSWORD, INITIAL_API_PASSWORD]  # do not mask these passwords in log files
+REST_API_TIMEOUT_SEC = 20
 MAX_CONTENT_LEN_TO_LOG = 1000
 
-log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 def _to_get_param(python_value):
@@ -62,34 +61,10 @@ class RestApiError(Exception):
         self.error_string = error_string
 
 
-class _RestApiProxy(object):
-    """
-    >>> api = RestApi('HTTP Request & Response Service', 'http://httpbin.org', '', '')
-    >>> directory = _RestApiProxy(api, '/')
-    >>> directory.get.GET(wise='choice')  # doctest: +ELLIPSIS
-    {...wise...choice...}
-    >>> directory.post.POST(wise='choice')  # doctest: +ELLIPSIS
-    {...wise...choice...}
-    """
-
-    def __init__(self, api, url):
-        self._path = url
-        self._api = api
-
-    def __getattr__(self, name):
-        return _RestApiProxy(self._api, self._path + '/' + name)
-
-    # noinspection PyPep8Naming
-    def GET(self, timeout=None, headers=None, **kw):
-        params = {name: _to_get_param(value) for name, value in kw.items()}
-        return self._api.request('GET', self._path, timeout=timeout, headers=headers, params=params)
-
-    # noinspection PyPep8Naming
-    def POST(self, timeout=None, headers=None, json=None, **kw):
-        if kw:
-            assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
-            json = kw
-        return self._api.request('POST', self._path, timeout=timeout, headers=headers, json=json)
+class InappropriateRedirect(Exception):
+    def __init__(self, server_name, url, location):
+        message = 'Mediaserver {} redirected {} to {}'.format(server_name, url, location)
+        super(InappropriateRedirect, self).__init__(self, message)
 
 
 class RestApi(object):
@@ -106,19 +81,16 @@ class RestApi(object):
     HttpError...401...
     """
 
-    def __init__(self, alias, hostname, port, username='admin', password='admin', ca_cert=None):
+    def __init__(self, alias, hostname, port, username='admin', password=INITIAL_API_PASSWORD, ca_cert=None):
         self._port = port
         self._hostname = hostname
         self._alias = alias
         self.ca_cert = ca_cert
         if self.ca_cert is not None:
-            log.info("Trust CA cert: %s.", self.ca_cert)
+            _logger.info("Trust CA cert: %s.", self.ca_cert)
         self._auth = HTTPDigestAuth(username, password)
         self.user = username  # Only for interface.
         self.password = password  # Only for interface.
-
-    def __getattr__(self, name):
-        return _RestApiProxy(self, '/' + name)
 
     def __repr__(self):
         password_display = self._auth.password if self._auth.password in STANDARD_PASSWORDS else '***'
@@ -139,27 +111,17 @@ class RestApi(object):
             ca_cert=self.ca_cert)
 
     def auth_key(self, method):
+        # `requests.auth.HTTPDigestAuth.build_digest_header` does the same but it substitutes empty path with '/'.
+        # No straightforward way of getting key has been found.
+        # This method is used only for specific tests, so there is no need to save one HTTP request.
         path = ''
-        header = self._auth.build_digest_header(method, path)
-        if header is None:  # First time requested.
-            response = self.get('api/getNonce')
-            realm, nonce = response['realm'], response['nonce']
-        else:
-            key, value = header.split(' ', 1)
-            assert key.lower() == 'digest'
-            info = dict(csv.reader(value.split(', '), delimiter='=', doublequote=False))
-            realm, nonce = info['realm'], info['nonce']
-        # requests.auth.HTTPDigestAuth.build_digest_header does the same but it substitutes empty path with '/'.
+        response = self.get('api/getNonce')
+        realm, nonce = response['realm'], response['nonce']
         ha1 = hashlib.md5(':'.join([self.user.lower(), realm, self.password]).encode()).hexdigest()
         ha2 = hashlib.md5(':'.join([method, path]).encode()).hexdigest()  # Empty path.
         digest = hashlib.md5(':'.join([ha1, nonce, ha2]).encode()).hexdigest()
         key = base64.b64encode(':'.join([self.user.lower(), nonce, digest]))
         return key
-
-    def get_api_fn(self, method, api_object, api_method):
-        object = getattr(self, api_object)  # server.api.ec2
-        function = getattr(object, api_method)  # server.api.ec2.getUsers
-        return getattr(function, method)  # server.api.ec2.getUsers.GET
 
     def _raise_for_status(self, response):
         if 400 <= response.status_code < 600:
@@ -182,14 +144,14 @@ class RestApi(object):
 
     def _retrieve_data(self, response):
         if not response.content:
-            log.warning("Empty response.")
+            _logger.warning("Empty response.")
             return None
         try:
             response_data = response.json()
         except ValueError:
-            log.warning("Non-JSON response:\n%s", response.content)
+            _logger.warning("Non-JSON response:\n%s", response.content)
             return response.content
-        log.debug("JSON response:\n%s", json.dumps(response_data, indent=4))
+        _logger.debug("JSON response:\n%s", json.dumps(response_data, indent=4))
         if not isinstance(response_data, dict):
             return response_data
         try:
@@ -204,18 +166,26 @@ class RestApi(object):
         return '{}://{}:{}/{}'.format('https' if secure else 'http', self._hostname, self._port, path.lstrip('/'))
 
     def get(self, path, params=None, **kwargs):
-        log.debug('GET params:\n%s', pformat(params, indent=4))
+        _logger.debug('GET params:\n%s', pformat(params, indent=4))
         assert 'data' not in kwargs
         assert 'json' not in kwargs
         return self.request('GET', path, params=params, **kwargs)
 
     def post(self, path, data, **kwargs):
-        log.debug('JSON payload:\n%s', json.dumps(data, indent=4))
+        _logger.debug('JSON payload:\n%s', json.dumps(data, indent=4))
         return self.request('POST', path, json=data, **kwargs)
 
-    def request(self, method, path, secure=False, timeout=10, **kwargs):
+    def request(self, method, path, secure=False, timeout=None, auth=None, **kwargs):
         url = self.url(path, secure=secure)
-        response = requests.request(method, url, auth=self._auth, verify=str(self.ca_cert), timeout=timeout, **kwargs)
+        response = requests.request(
+            method, url,
+            auth=auth or self._auth,
+            verify=str(self.ca_cert),
+            allow_redirects=False,
+            timeout=timeout or REST_API_TIMEOUT_SEC,
+            **kwargs)
+        if response.is_redirect:
+            raise InappropriateRedirect(self._alias, url, response.next.url)
         data = self._retrieve_data(response)
         self._raise_for_status(response)
         return data

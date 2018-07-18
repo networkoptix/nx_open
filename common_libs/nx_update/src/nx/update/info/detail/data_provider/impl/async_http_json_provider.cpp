@@ -43,11 +43,10 @@ void AsyncHttpJsonProvider::getUpdatesMetaInformation()
             this));
 }
 
-void AsyncHttpJsonProvider::getSpecificUpdateData(const QString& customization, const QString& version)
+void AsyncHttpJsonProvider::getSpecificUpdateData(const QString& updatePrefix, const QString& build)
 {
-    nx::network::url::Builder urlBuilder(m_baseUrl);
-    urlBuilder.appendPath("/" + customization);
-    urlBuilder.appendPath("/" + version);
+    nx::network::url::Builder urlBuilder(updatePrefix);
+    urlBuilder.appendPath("/" + build);
     urlBuilder.appendPath(kUpdateUrlPostfix);
 
     m_asyncHttpClient.doGet(
@@ -81,7 +80,8 @@ bool AsyncHttpJsonProvider::hasTransportError(HandlerFunction handlerFunction)
     {
         NX_WARNING(
             this,
-            lm("Http client transport error: %1").args(m_asyncHttpClient.lastSysErrorCode()));
+            lm("Http client transport error: %1, url: %2")
+                .args(m_asyncHttpClient.lastSysErrorCode(), m_asyncHttpClient.url()));
         handlerFunction(ResultCode::getRawDataError, QByteArray());
         return true;
     }
@@ -89,7 +89,10 @@ bool AsyncHttpJsonProvider::hasTransportError(HandlerFunction handlerFunction)
     int statusCode = m_asyncHttpClient.response()->statusLine.statusCode;
     if (statusCode != network::http::StatusCode::ok)
     {
-        NX_WARNING(this, lm("Http client http error: %1").args(statusCode));
+        NX_WARNING(
+            this,
+            lm("Http client http error: %1, url: %2")
+                .args(statusCode, m_asyncHttpClient.url().toString()));
         handlerFunction(ResultCode::getRawDataError, QByteArray());
         return true;
     }

@@ -1740,7 +1740,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>แสดงที่อยู่ IP สำหรับกล้องและเซิร์ฟเวอร์และกลุ่มสำหรับผู้ใช้</translation>
     </message>
   </context>
   <context>
@@ -1990,6 +1990,29 @@
       <location/>
       <source>Enter a valid username and password...</source>
       <translation>ป้อนชื่อผู้ใช้และรหัสผ่าน...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFileNameInputWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/file_name_input_widget.ui"/>
+      <source>Form</source>
+      <translation>แบบฟอร์ม</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Filename:</source>
+      <translation>ชื่อไฟล์:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select file...</source>
+      <translation>เลือกไฟล์...</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Browse...</source>
+      <translation>ค้นหา...</translation>
     </message>
   </context>
   <context>

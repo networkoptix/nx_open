@@ -10,11 +10,11 @@ namespace data_sync_engine {
 namespace dao {
 namespace rdb {
 
-nx::utils::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult TransactionDataObject::insertOrReplaceTransaction(
+    nx::sql::QueryContext* queryContext,
     const TransactionData& tran)
 {
-    QSqlQuery saveTranQuery(*queryContext->connection());
+    QSqlQuery saveTranQuery(*queryContext->connection()->qtSqlConnection());
     saveTranQuery.prepare(
         R"sql(
         REPLACE INTO transaction_log(system_id, peer_guid, db_guid, sequence,
@@ -38,18 +38,18 @@ nx::utils::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
             .arg(tran.systemId).arg(::ec2::ApiCommand::toString(tran.header.command))
             .arg(tran.header).arg(tran.hash).arg(saveTranQuery.lastError().text()),
             cl_logWARNING);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult TransactionDataObject::updateTimestampHiForSystem(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult TransactionDataObject::updateTimestampHiForSystem(
+    nx::sql::QueryContext* queryContext,
     const nx::String& systemId,
     quint64 newValue)
 {
-    QSqlQuery saveSystemTimestampSequence(*queryContext->connection());
+    QSqlQuery saveSystemTimestampSequence(*queryContext->connection()->qtSqlConnection());
     saveSystemTimestampSequence.prepare(
         R"sql(
         REPLACE INTO transaction_source_settings(system_id, timestamp_hi) VALUES (?, ?)
@@ -62,14 +62,14 @@ nx::utils::db::DBResult TransactionDataObject::updateTimestampHiForSystem(
             lm("systemId %1. Error saving transaction timestamp sequence %2 to log. %3")
             .arg(systemId).arg(newValue).arg(saveSystemTimestampSequence.lastError().text()),
             cl_logWARNING);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
-nx::utils::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
-    nx::utils::db::QueryContext* queryContext,
+nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
+    nx::sql::QueryContext* queryContext,
     const nx::String& systemId,
     const QString& peerId,
     const QString& dbInstanceId,
@@ -77,7 +77,7 @@ nx::utils::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     std::int64_t maxSequence,
     std::vector<dao::TransactionLogRecord>* const transactions)
 {
-    QSqlQuery fetchTransactionsOfAPeerQuery(*queryContext->connection());
+    QSqlQuery fetchTransactionsOfAPeerQuery(*queryContext->connection()->qtSqlConnection());
     fetchTransactionsOfAPeerQuery.prepare(
         R"sql(
             SELECT tran_data, tran_hash, timestamp, sequence
@@ -97,7 +97,7 @@ nx::utils::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
                 "for peer (%2; %3). %4")
             .arg(peerId).arg(dbInstanceId).arg(fetchTransactionsOfAPeerQuery.lastError().text()),
             cl_logERROR);
-        return nx::utils::db::DBResult::ioError;
+        return nx::sql::DBResult::ioError;
     }
 
     while (fetchTransactionsOfAPeerQuery.next())
@@ -111,7 +111,7 @@ nx::utils::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
                 });
     }
 
-    return nx::utils::db::DBResult::ok;
+    return nx::sql::DBResult::ok;
 }
 
 } // namespace rdb

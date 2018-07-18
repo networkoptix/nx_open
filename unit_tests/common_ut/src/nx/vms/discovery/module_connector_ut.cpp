@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
+#include <nx/network/app_info.h>
 #include <nx/network/address_resolver.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket_global.h>
@@ -32,7 +34,8 @@ public:
         connector.setReconnectPolicy(kReconnectPolicy);
 
         connector.setConnectHandler(
-            [this](QnModuleInformation information, nx::network::SocketAddress endpoint, nx::network::HostAddress /*ip*/)
+            [this](nx::vms::api::ModuleInformation information,
+                nx::network::SocketAddress endpoint, nx::network::HostAddress /*ip*/)
             {
                 QnMutexLocker lock(&m_mutex);
                 auto& knownEndpoint = m_knownServers[information.id];
@@ -117,7 +120,9 @@ public:
 
     nx::network::SocketAddress addMediaserver(QnUuid id, nx::network::HostAddress ip = nx::network::HostAddress::localhost)
     {
-        QnModuleInformation module;
+        nx::vms::api::ModuleInformation module;
+        module.realm = nx::network::AppInfo::realm();
+        module.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
         module.id = id;
 
         QnJsonRestResult result;
@@ -220,9 +225,6 @@ TEST_F(DiscoveryModuleConnector, ActivateDiactivate)
 
 TEST_F(DiscoveryModuleConnector, EndpointPriority)
 {
-    NX_DEBUG(this) << "Remove this line and change line blow to true in 4.0:";
-    static bool kIsEndpointPrioritizedSwitchSupported = false;
-
     nx::network::HostAddress interfaceIp;
     const auto interfaceIpsV4 = nx::network::getLocalIpV4AddressList();
     if (interfaceIpsV4.empty())
@@ -239,37 +241,29 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     expectConnect(id, localEndpoint); //< Local is prioritized.
 
     removeMediaserver(localEndpoint);
-    expectConnect(id, networkEndpoint);  //< Network is a second choice.
+    expectConnect(id, networkEndpoint); //< Network is a second choice.
 
     const auto newLocalEndpoint = addMediaserver(id);
     connector.newEndpoints({newLocalEndpoint}, id);
-    if (kIsEndpointPrioritizedSwitchSupported)
-        expectConnect(id, newLocalEndpoint);  //< Expected switch to a new local endpoint.
+    expectConnect(id, newLocalEndpoint); //< New local is prioritized.
 
     const auto dnsRealEndpoint = addMediaserver(id);
     const auto cloudRealEndpoint = addMediaserver(id);
     const nx::network::SocketAddress dnsEndpoint(kLocalDnsHost, dnsRealEndpoint.port);
     const nx::network::SocketAddress cloudEndpoint(kLocalCloudHost, cloudRealEndpoint.port);
-    connector.newEndpoints({dnsEndpoint, cloudEndpoint}, id);
 
-    removeMediaserver(networkEndpoint);
-    if (kIsEndpointPrioritizedSwitchSupported)
-        expectNoChanges(); //< Not any reconnects are expected.
-    else
-        expectConnect(id, newLocalEndpoint); //< The switch that did not happen erlier.
+    connector.newEndpoints({dnsEndpoint, cloudEndpoint}, id);
+    expectConnect(id, dnsEndpoint);  //< DNS is the most prioritized.
 
     removeMediaserver(newLocalEndpoint);
-    expectConnect(id, dnsEndpoint);  //< DNS is the most prioritized now.
-
+    removeMediaserver(networkEndpoint);
     removeMediaserver(dnsRealEndpoint);
     expectConnect(id, cloudEndpoint);  //< Cloud endpoint is the last possible option.
 
     const auto newDnsRealEndpoint = addMediaserver(id);
     const nx::network::SocketAddress newDnsEndpoint(kLocalDnsHost, newDnsRealEndpoint.port);
     connector.newEndpoints({newDnsEndpoint}, id);
-    NX_DEBUG(this) << "Remove this line and uncomment line below in 4.0:";
-    if (kIsEndpointPrioritizedSwitchSupported)
-        expectConnect(id, newDnsEndpoint); //< Expected switch to DNS as better choise than cloud.
+    expectConnect(id, newDnsEndpoint);
 
     removeMediaserver(cloudRealEndpoint);
     removeMediaserver(newDnsRealEndpoint);
@@ -312,6 +306,31 @@ TEST_F(DiscoveryModuleConnector, DISABLED_RealLocalServer)
 {
     connector.newEndpoints({ nx::network::SocketAddress("127.0.0.1:7001") }, QnUuid());
     std::this_thread::sleep_for(std::chrono::hours(1));
+}
+
+TEST_F(DiscoveryModuleConnector, IgnoredEndpointsByStrings)
+{
+    const auto firstId = QnUuid::createUuid();
+    const auto firstEndpoint1 = addMediaserver(firstId);
+    const auto firstEndpoint2 = addMediaserver(firstId);
+
+    connector.newEndpoints({firstEndpoint1}, firstId);
+    expectConnect(firstId, firstEndpoint1); //< Only have one.
+
+    connector.newEndpoints({firstEndpoint2}, firstId);
+    connector.setForbiddenEndpoints({firstEndpoint1.toString()}, firstId);
+    expectConnect(firstId, firstEndpoint2); //< Switch to a single avaliable.
+
+    const auto secondId = QnUuid::createUuid();
+    const auto secondEndpoint1 = addMediaserver(secondId);
+    const auto secondEndpoint2 = addMediaserver(secondId);
+
+    connector.newEndpoints({secondEndpoint1});
+    expectConnect(secondId, secondEndpoint1); //< Detect correct serverId.
+
+    connector.newEndpoints({secondEndpoint2}, secondId);
+    connector.setForbiddenEndpoints({secondEndpoint1.toString()}, secondId);
+    expectConnect(secondId, secondEndpoint2); //< Switch to a single avaliable.
 }
 
 } // namespace test

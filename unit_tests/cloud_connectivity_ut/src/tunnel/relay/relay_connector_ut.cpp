@@ -173,18 +173,18 @@ private:
     std::unique_ptr<relay::Connector> m_connector;
     nx::utils::promise<Result> m_connectFinished;
     nx::utils::Url m_relayUrl;
-    std::atomic<nx::cloud::relay::api::test::ClientImpl*>
+    std::atomic<nx::cloud::relay::api::test::ClientStub*>
         m_prevClientToRelayConnectionInstanciated;
     boost::optional<Result> m_prevConnectorResult;
 
     virtual void onClientToRelayConnectionInstanciated(
-        nx::cloud::relay::api::test::ClientImpl* connection) override
+        nx::cloud::relay::api::test::ClientStub* connection) override
     {
         m_prevClientToRelayConnectionInstanciated = connection;
     }
 
     virtual void onClientToRelayConnectionDestroyed(
-        nx::cloud::relay::api::test::ClientImpl* clientToRelayConnection) override
+        nx::cloud::relay::api::test::ClientStub* clientToRelayConnection) override
     {
         m_prevClientToRelayConnectionInstanciated.compare_exchange_strong(
             clientToRelayConnection, nullptr);
@@ -280,6 +280,15 @@ private:
         SystemError::ErrorCode systemErrorCode;
         std::unique_ptr<nx::network::AbstractStreamSocket> connection;
         bool stillValid;
+
+        ConnectResult(ConnectResult&&) = default;
+        ConnectResult& operator=(ConnectResult&&) = default;
+
+        ~ConnectResult()
+        {
+            if (connection)
+                connection->pleaseStopSync();
+        }
     };
 
     nx::network::http::TestHttpServer m_redirectingRelay;

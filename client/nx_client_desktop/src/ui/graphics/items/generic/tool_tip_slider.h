@@ -43,6 +43,7 @@ public:
     void setAutoHideToolTip(bool autoHideToolTip);
 
     qreal tooltipMargin() const;
+    // Currently not used because good default value is set.
     void setTooltipMargin(qreal margin);
 
     virtual bool eventFilter(QObject* target, QEvent* event) override;

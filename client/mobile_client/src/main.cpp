@@ -280,13 +280,14 @@ private:
 void initLog(const QString& logLevel)
 {
     nx::utils::log::Settings logSettings;
-    logSettings.level.parse(logLevel);
+    logSettings.loggers.resize(1);
+    logSettings.loggers.front().level.parse(logLevel);
     if (*ini().logLevel)
-        logSettings.level.parse(QString::fromUtf8(ini().logLevel));
+        logSettings.loggers.front().level.parse(QString::fromUtf8(ini().logLevel));
 
-    logSettings.maxFileSize = 10 * 1024 * 1024;
-    logSettings.maxBackupCount = 5;
-    logSettings.logBaseName = *ini().logFile
+    logSettings.loggers.front().maxFileSize = 10 * 1024 * 1024;
+    logSettings.loggers.front().maxBackupCount = 5;
+    logSettings.loggers.front().logBaseName = *ini().logFile
         ? QString::fromUtf8(ini().logFile)
         : QnAppInfo::isAndroid()
             ? lit("-")
@@ -294,9 +295,8 @@ void initLog(const QString& logLevel)
 
     if (ini().enableLog)
     {
-        nx::utils::log::initialize(
-            logSettings,
-            /*applicationName*/ lit("mobile_client"));
+        std::unique_ptr<nx::utils::log::AbstractWriter> logWriter;
+
         const QString tcpLogAddress(QLatin1String(ini().tcpLogAddress));
         if (!tcpLogAddress.isEmpty())
         {
@@ -305,22 +305,29 @@ void initLog(const QString& logLevel)
             int port = 7001;
             if (params.size() >= 2)
                 port = params[1].toInt();
-            nx::utils::log::mainLogger()->setWriter(
-                std::make_unique<TcpLogWriterOut>(nx::network::SocketAddress(address, port)));
+            logWriter = std::make_unique<TcpLogWriterOut>(nx::network::SocketAddress(address, port));
         }
+
+        nx::utils::log::setMainLogger(
+            nx::utils::log::buildLogger(
+                logSettings,
+                /*applicationName*/ lit("mobile_client"),
+                QString(),
+                std::set<nx::utils::log::Tag>(),
+                std::move(logWriter)));
     }
 
-    const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ini().enableEc2TranLog)
     {
-        logSettings.logBaseName = QnAppInfo::isAndroid()
+        logSettings.loggers.front().logBaseName = QnAppInfo::isAndroid()
             ? lit("-")
             : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + lit("ec2_tran"));
-        nx::utils::log::initialize(
-            logSettings,
-            /*applicationName*/ lit("mobile_client"),
-            /*binaryPath*/ QString(),
-            ec2logger);
+        nx::utils::log::addLogger(
+            nx::utils::log::buildLogger(
+                logSettings,
+                /*applicationName*/ lit("mobile_client"),
+                /*binaryPath*/ QString(),
+                {QnLog::EC2_TRAN_LOG}));
     }
 }
 
@@ -391,7 +398,7 @@ int main(int argc, char *argv[])
     ini().reload();
     initLog(startupParams.logLevel);
 
-    QnStaticCommonModule staticModule(Qn::PT_MobileClient, QnAppInfo::brand(),
+    QnStaticCommonModule staticModule(nx::vms::api::PeerType::mobileClient, QnAppInfo::brand(),
         QnAppInfo::customizationName());
     Q_UNUSED(staticModule);
 

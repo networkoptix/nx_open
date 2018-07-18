@@ -9,16 +9,6 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QGridLayout>
 
-#ifdef Q_OS_MAC
-#define QN_TWO_STEP_DIALOG
-#endif
-
-#ifdef QN_TWO_STEP_DIALOG
-#   include <ui/dialogs/two_step_file_dialog.h>
-
-typedef QnTwoStepFileDialog QnSystemBasedCustomDialog;
-
-#else
 class QnSystemBasedCustomDialog: public QFileDialog {
 public:
     explicit QnSystemBasedCustomDialog(QWidget *parent = 0, const QString &caption = QString(), const QString &directory = QString(), const QString &filter = QString()):
@@ -38,8 +28,6 @@ public:
 protected:
     QGridLayout *customizedLayout() const { return dynamic_cast<QGridLayout *>(layout()); }
 };
-#endif
-
 
 class QnAbstractWidgetControlDelegate: public QObject
 {

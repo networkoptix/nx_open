@@ -1,14 +1,15 @@
 #include "videowall_resource.h"
 
+#include <nx/vms/api/data/videowall_data.h>
+
 QnVideoWallResource::QnVideoWallResource(QnCommonModule* commonModule):
     base_type(commonModule),
-    m_autorun(false),
     m_items(new QnThreadsafeItemStorage<QnVideoWallItem>(&m_mutex, this)),
     m_pcs(new QnThreadsafeItemStorage<QnVideoWallPcData>(&m_mutex, this)),
     m_matrices(new QnThreadsafeItemStorage<QnVideoWallMatrix>(&m_mutex, this))
 {
     addFlags(Qn::videowall | Qn::remote);
-    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kVideoWallTypeId));
+    setTypeId(nx::vms::api::VideowallData::kResourceTypeId);
 }
 
 Qn::ResourceStatus QnVideoWallResource::getStatus() const
@@ -62,6 +63,12 @@ void QnVideoWallResource::updateInternal(const QnResourcePtr &other, Qn::Notifie
             m_autorun = localOther->m_autorun;
             notifiers << [r = toSharedPointer(this)]{ emit r->autorunChanged(r); };
         }
+
+        if (m_timelineEnabled != localOther->m_timelineEnabled)
+        {
+            m_timelineEnabled = localOther->m_timelineEnabled;
+            notifiers << [r = toSharedPointer(this)]{ emit r->timelineEnabledChanged(r); };
+        }
     }
 }
 
@@ -80,6 +87,23 @@ void QnVideoWallResource::setAutorun(bool value)
         m_autorun = value;
     }
     emit autorunChanged(::toSharedPointer(this));
+}
+
+bool QnVideoWallResource::isTimelineEnabled() const
+{
+    QnMutexLocker locker(&m_mutex);
+    return m_timelineEnabled;
+}
+
+void QnVideoWallResource::setTimelineEnabled(bool value)
+{
+    {
+        QnMutexLocker locker(&m_mutex);
+        if (m_timelineEnabled == value)
+            return;
+        m_timelineEnabled = value;
+    }
+    emit timelineEnabledChanged(::toSharedPointer(this));
 }
 
 Qn::Notifier QnVideoWallResource::storedItemAdded(const QnVideoWallItem &item)

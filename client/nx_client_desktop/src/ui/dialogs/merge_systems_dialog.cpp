@@ -28,6 +28,7 @@
 
 #include <nx/utils/string.h>
 #include <network/system_helpers.h>
+#include <nx/network/http/http_types.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -175,7 +176,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
     QString login = ui->loginEdit->text();
     QString password = ui->passwordEdit->text();
 
-    if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
+    if (!nx::network::http::isUrlSheme(url.scheme()) || url.host().isEmpty()) {
         updateErrorLabel(tr("URL is invalid."));
         updateConfigurationBlock();
         return;
@@ -216,7 +217,7 @@ void QnMergeSystemsDialog::at_mergeButton_clicked()
 
 void QnMergeSystemsDialog::at_mergeTool_systemFound(
     utils::MergeSystemsStatus::Value mergeStatus,
-    const QnModuleInformation& moduleInformation,
+    const nx::vms::api::ModuleInformation& moduleInformation,
     const QnMediaServerResourcePtr& discoverer)
 {
     ui->buttonBox->hideProgress();
@@ -293,7 +294,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
 
 void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
     utils::MergeSystemsStatus::Value mergeStatus,
-    const QnModuleInformation& moduleInformation)
+    const nx::vms::api::ModuleInformation& moduleInformation)
 {
     ui->buttonBox->hideProgress();
     ui->credentialsGroupBox->setEnabled(true);

@@ -3,6 +3,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
@@ -13,6 +14,7 @@
 #include <core/resource/camera_resource.h>
 #include <utils/common/event_processors.h>
 #include <nx/client/desktop/common/utils/custom_painted.h>
+#include <ui/common/palette.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workaround/hidpi_workarounds.h>
@@ -30,6 +32,7 @@
 #include <nx/client/desktop/event_search/models/progress_list_model.h>
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/common/color_theme.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -54,7 +57,24 @@ public:
     }
 };
 
+class SeparatorListModel: public QAbstractListModel
+{
+public:
+    using QAbstractListModel::QAbstractListModel; //< Forward constructors.
+
+    virtual int rowCount(const QModelIndex& parent) const override
+    {
+        return parent.isValid() ? 0 : 1;
+    }
+
+    virtual QVariant data(const QModelIndex& index, int role) const override
+    {
+        return QVariant();
+    }
+};
+
 static constexpr int kPlaceholderFontPixelSize = 15;
+
 } // namespace
 
 
@@ -95,6 +115,10 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
 
     m_eventRibbon->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    m_eventRibbon->scrollBar()->ensurePolished();
+    setPaletteColor(m_eventRibbon->scrollBar(), QPalette::Disabled, QPalette::Midlight,
+        colorTheme()->color("dark5"));
+
     auto sortModel = new SystemHealthSortFilterModel(this);
     auto systemHealthListModel = new SubsetListModel(sortModel, 0, QModelIndex(), this);
     sortModel->setSourceModel(m_systemHealthModel);
@@ -103,8 +127,10 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
 
     auto progressModel = new ProgressListModel(this);
 
+    auto separatorModel = new SeparatorListModel(this);
+
     m_eventRibbon->setModel(new ConcatenationListModel(
-        {systemHealthListModel, progressModel, m_notificationsModel}, this));
+        {systemHealthListModel, progressModel, separatorModel, m_notificationsModel}, this));
 
     connect(m_eventRibbon, &EventRibbon::tileHovered, q, &NotificationListWidget::tileHovered);
 
@@ -116,10 +142,6 @@ NotificationListWidget::Private::Private(NotificationListWidget* q) :
         {
             m_placeholder->setVisible(count < 1);
         });
-
-    q->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(q, &NotificationListWidget::customContextMenuRequested,
-        this, &NotificationListWidget::Private::showContextMenu);
 }
 
 NotificationListWidget::Private::~Private() = default;
@@ -167,17 +189,6 @@ QToolButton* NotificationListWidget::Private::newActionButton(
 
     context()->statisticsModule()->registerButton(statAlias, button);
     return button;
-}
-
-void NotificationListWidget::Private::showContextMenu(const QPoint& pos)
-{
-    QMenu contextMenu;
-    contextMenu.addAction(action(ui::action::OpenBusinessLogAction));
-    contextMenu.addAction(action(ui::action::BusinessEventsAction));
-    contextMenu.addAction(action(ui::action::PreferencesNotificationTabAction));
-    contextMenu.addSeparator();
-    contextMenu.addAction(action(ui::action::PinNotificationsAction));
-    contextMenu.exec(QnHiDpiWorkarounds::safeMapToGlobal(q, pos));
 }
 
 } // namespace desktop

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
+#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_connect.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/sync_call.h>
@@ -34,7 +34,7 @@ protected:
     void whenServerSendsConnectRequestToOpenTunnel()
     {
         m_httpClient.doConnect(
-            basicUrl(),
+            relay().basicUrl(),
             lm("%1.%2").args(m_serverId, m_systemId).toUtf8(),
             std::bind(&TunnelingUsingHttpConnectMethod::saveEstablishServerTunnelResult, this));
     }
@@ -97,9 +97,10 @@ private:
 
     virtual void SetUp() override
     {
-        ASSERT_TRUE(startAndWaitUntilStarted());
+        addRelayInstance();
 
-        m_relayClient = api::ClientFactory::create(basicUrl());
+        m_relayClient = std::make_unique<api::ClientOverHttpConnect>(
+            relay().basicUrl(), nullptr);
     }
 
     void saveEstablishServerTunnelResult()

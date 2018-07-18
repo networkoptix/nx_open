@@ -27,9 +27,9 @@ set(defaultWebPages
 set(companyUrl "http://networkoptix.com")
 set(productUrl "http://networkoptix.com/nxwitness-overview")
 set(supportUrl "http://support.networkoptix.com")
-set(supportEmail "support@networkoptix.com")
+set(supportEmail "")
 set(supportPhone "")
-set(licenseEmail "support@networkoptix.com")
+set(licenseEmail "https://support.networkoptix.com/hc/en-us/requests/new?ticket_form_id=316807")
 
 set(installer.name "nxwitness")
 set(android.packageName "com.networkoptix.nxwitness")
@@ -91,6 +91,7 @@ set(additionalTranslations
     de_DE
     ru_RU
     es_ES
+    it_IT
     ja_JP
     ko_KR
     tr_TR

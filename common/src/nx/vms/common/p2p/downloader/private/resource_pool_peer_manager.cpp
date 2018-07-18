@@ -64,7 +64,7 @@ nx::network::http::AsyncHttpClientPtr createHttpClient()
     auto httpClient = nx::network::http::AsyncHttpClient::create();
     httpClient->setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
     httpClient->setSendTimeoutMs(kDownloadRequestTimeoutMs);
-    httpClient->setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient->setMessageBodyReadTimeoutMs(5);
 
     return httpClient;
 }
@@ -118,7 +118,7 @@ int ResourcePoolPeerManager::distanceTo(const QnUuid& peerId) const
         return -1;
 
     int distance = std::numeric_limits<int>::max();
-    connection->routeToPeerVia(peerId, &distance);
+    connection->routeToPeerVia(peerId, &distance, /*address*/ nullptr);
     return distance;
 }
 
@@ -129,7 +129,15 @@ bool ResourcePoolPeerManager::hasInternetConnection(const QnUuid& peerId) const
     if (!server)
         return false;
 
-    return server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+    return server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
+}
+
+bool ResourcePoolPeerManager::hasAccessToTheUrl(const QString& url) const
+{
+    if (url.isEmpty())
+        return false;
+
+    return Downloader::validate(url, /* onlyConnectionCheck */ true, /* expectedSize */ 0);
 }
 
 rest::Handle ResourcePoolPeerManager::requestFileInfo(
@@ -257,7 +265,7 @@ rest::Handle ResourcePoolPeerManager::validateFileInformation(
 
     const auto handle = ++m_currentSelfRequestHandle;
     Downloader::validateAsync(
-        fileInformation.url.toString(), fileInformation.size,
+        fileInformation.url.toString(), /* onlyConnectionCheck */ false, fileInformation.size,
         [this, callback, handle](bool success)
         {
             callback(success, handle);
@@ -305,12 +313,14 @@ rest::Handle ResourcePoolPeerManager::downloadChunkFromInternet(
 
     const auto handle = ++m_currentSelfRequestHandle;
     m_httpClientByHandle[handle] = httpClient;
+
+    qWarning() << "Starting http client" << url.toString() << handle;
     httpClient->doGet(url,
-        [this, handle, callback, httpClient](network::http::AsyncHttpClientPtr client)
+        [this, handle, callback, httpClient, url](network::http::AsyncHttpClientPtr client)
         {
             if (!m_httpClientByHandle.remove(handle))
                 return;
-
+            qWarning() << "http client done" << url.toString() << handle;
             using namespace network;
             QByteArray result;
 

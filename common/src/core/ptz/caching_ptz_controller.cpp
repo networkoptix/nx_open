@@ -45,17 +45,21 @@ bool QnCachingPtzController::extends(Ptz::Capabilities capabilities)
         && !capabilities.testFlag(Ptz::SynchronizedPtzCapability);
 }
 
-Ptz::Capabilities QnCachingPtzController::getCapabilities() const
+Ptz::Capabilities QnCachingPtzController::getCapabilities(
+    const nx::core::ptz::Options& options) const
 {
-    const Ptz::Capabilities capabilities = base_type::getCapabilities();
+    const Ptz::Capabilities capabilities = base_type::getCapabilities(options);
     return extends(capabilities)
         ? capabilities | Ptz::SynchronizedPtzCapability
         : capabilities;
 }
 
-bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
+bool QnCachingPtzController::getLimits(
+    Qn::PtzCoordinateSpace space,
+    QnPtzLimits* limits,
+    const nx::core::ptz::Options& options) const
 {
-    if (!base_type::getLimits(space, limits))
+    if (!base_type::getLimits(space, limits, options))
         return false;
 
     const QnMutexLocker locker(&m_mutex);
@@ -83,9 +87,11 @@ bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits
     return false;
 }
 
-bool QnCachingPtzController::getFlip(Qt::Orientations* flip) const
+bool QnCachingPtzController::getFlip(
+    Qt::Orientations* flip,
+    const nx::core::ptz::Options& options) const
 {
-    if (!base_type::getFlip(flip))
+    if (!base_type::getFlip(flip, options))
         return false;
 
     const QnMutexLocker locker(&m_mutex);
@@ -148,9 +154,11 @@ bool QnCachingPtzController::getHomeObject(QnPtzObject* homeObject) const
     return true;
 }
 
-bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const
+bool QnCachingPtzController::getAuxilaryTraits(
+    QnPtzAuxilaryTraitList* auxilaryTraits,
+    const nx::core::ptz::Options& options) const
 {
-    if (!base_type::getAuxilaryTraits(auxilaryTraits))
+    if (!base_type::getAuxilaryTraits(auxilaryTraits, options))
         return false;
 
     const QnMutexLocker locker(&m_mutex);
@@ -161,12 +169,15 @@ bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryT
     return true;
 }
 
-bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) const
+bool QnCachingPtzController::getData(
+    Qn::PtzDataFields query,
+    QnPtzData* data,
+    const nx::core::ptz::Options& options) const
 {
     // TODO: #GDM There is something really wrong with the thread safety in these classes.
     const auto base = baseController();
     // TODO: #Elric should be base_type::getData => bad design =(
-    if (!base || !base->getData(query, data))
+    if (!base || !base->getData(query, data, options))
         return false;
 
     const QnMutexLocker locker(&m_mutex);
@@ -293,7 +304,7 @@ bool QnCachingPtzController::initialize()
         return false;
 
     QnPtzData data;
-    return getData(Qn::AllPtzFields, &data);
+    return getData(Qn::AllPtzFields, &data, {nx::core::ptz::Type::operational});
 }
 
 template<class T>

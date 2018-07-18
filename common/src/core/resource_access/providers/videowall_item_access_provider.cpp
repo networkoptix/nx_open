@@ -80,7 +80,7 @@ Source QnVideoWallItemAccessProvider::baseSource() const
 bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    if (!globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!globalPermissionsManager()->hasGlobalPermission(subject, GlobalPermission::controlVideowall))
         return false;
 
     if (mode() == Mode::direct)
@@ -134,7 +134,7 @@ void QnVideoWallItemAccessProvider::fillProviders(
     const QnResourcePtr& resource,
     QnResourceList& providers) const
 {
-    if (!globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!globalPermissionsManager()->hasGlobalPermission(subject, GlobalPermission::controlVideowall))
         return;
 
     if (resource->hasFlags(Qn::layout))

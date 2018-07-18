@@ -65,6 +65,11 @@ bool RemoteRelayPeerPool::connectToDb()
     return m_dbReady;
 }
 
+bool RemoteRelayPeerPool::isConnected() const
+{
+    return m_dbReady;
+}
+
 void RemoteRelayPeerPool::prepareDbStructure()
 {
     // TODO: Use DbStructureUpdater here (it will require some refactoring).
@@ -389,20 +394,23 @@ RemoteRelayPeerPool::~RemoteRelayPeerPool()
 
 //-------------------------------------------------------------------------------------------------
 
-static RemoteRelayPeerPoolFactory::FactoryFunc remoteRelayPeerPoolFactoryFunc;
-
-std::unique_ptr<model::AbstractRemoteRelayPeerPool> RemoteRelayPeerPoolFactory::create(
-    const conf::Settings& settings)
+RemoteRelayPeerPoolFactory::RemoteRelayPeerPoolFactory():
+    base_type(std::bind(&RemoteRelayPeerPoolFactory::defaultFactory, this,
+        std::placeholders::_1))
 {
-    if (remoteRelayPeerPoolFactoryFunc)
-        return remoteRelayPeerPoolFactoryFunc(settings);
-
-    return std::make_unique<model::RemoteRelayPeerPool>(settings);
 }
 
-void RemoteRelayPeerPoolFactory::setFactoryFunc(FactoryFunc func)
+RemoteRelayPeerPoolFactory& RemoteRelayPeerPoolFactory::instance()
 {
-    remoteRelayPeerPoolFactoryFunc.swap(func);
+    static RemoteRelayPeerPoolFactory staticInstance;
+    return staticInstance;
+}
+
+std::unique_ptr<model::AbstractRemoteRelayPeerPool>
+    RemoteRelayPeerPoolFactory::defaultFactory(
+        const conf::Settings& settings)
+{
+    return std::make_unique<model::RemoteRelayPeerPool>(settings);
 }
 
 } // namespace model

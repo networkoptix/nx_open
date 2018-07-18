@@ -21,7 +21,7 @@
             "keys": [
                 "N8Fx-OLAH4|IP-Camera"
             ],
-            "macFromMulticast": true
+            "obtainMacFromMulticast": "Always"
         },
         {
             "_comment1": "Autodiscovery response contains scopes like onvif://www.onvif.org/hardware/DWC-MTT4Wi36 and onvif://www.onvif.org/name/ONVIF",
@@ -31,7 +31,7 @@
                 "DWC-MTT4Wi*|ONVIF",
                 "DWC-MVT4Wi*|ONVIF"
             ],
-            "ignoreMacFromMulticast": true
+            "obtainMacFromMulticast": "Never"
         },
         {
             "keys": [
@@ -589,7 +589,14 @@
                 "Samsung Techwin|SPE-400*",
                 "VIVOTEK|VS8102",
                 "TCS-300|TCAM",
-                "UNIVEW|NVR302-16S-P16*"
+                "UNIVEW|NVR302-16S-P16*",
+                "Sony|SNT-EX104",
+                "Sony|SNT-EX154",
+                "Sony|SNT-EP154",
+                "Dahua|DHI-HCVR7108H*",
+                "Siqura|EVE FOUR",
+                "Hikvision|DS-6708*",
+                "HIKVISION|DS-6708*"
             ],
             "analogEncoder": true
         },
@@ -676,7 +683,11 @@
             "keys": [
                 "HANWHA|SNP*"
             ],
-            "ptzCapabilitiesToAdd": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability"
+            "ptzOverride": {
+                "operational": {
+                    "capabilitiesToAdd": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability"
+                }
+            }
         },
         {
             "keys": [
@@ -700,7 +711,7 @@
                 "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
                 "DW|DWC-MB950TIR", "DW|DWC-MV950TIR", "DW|DWC-BVI2IR"
             ],
-            "ptzCapabilities": "NoPtzCapabilities"
+            "operationalPtzCapabilities": "NoPtzCapabilities"
         },
         {
             "keys": [
@@ -714,7 +725,9 @@
                 "Milesight*|MS-C2961-EB",
                 "Dahua|DH-SD22404T-GN"
             ],
-            "ptzTraits": "EightWayPtz"
+            "ptzOverride": {
+                "operational": {"traits": "EightWayPtz"}
+            }
         },
         {
             "keys": [
@@ -731,7 +744,7 @@
                 "Sony|SNC-XM636",
             "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20","DW|DWC-MD421D"
             ],
-            "ptzCapabilities": "ContinuousZoomCapability"
+            "operationalPtzCapabilities": "ContinuousZoomCapability"
         },
         {
             "keys": [
@@ -754,7 +767,7 @@
                 "VISTA|VK2-3MPBIR28V12re",
                 "VISTA|VK2-3MPVRDIR28V12re"
             ],
-            "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
         {
             "keys": [
@@ -762,8 +775,10 @@
                 "DW|DWC-MPT","Win4NET Co., Ltd.|Clebo-MPT",
                 "DW|DWC-MPTFM","Win4NET Co., Ltd.|Clebo-MPTFM"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
-            "ptzTraits": "FourWayPtz"
+            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
+            "ptzOverride": {
+                "operational": {"traits": "FourWayPtz"}
+            }
         },
         {
             "keys": [
@@ -774,7 +789,9 @@
                 "Vista|VK2-3MPEFEDre",
                 "eneo|IEP-63M2812M0A"
             ],
-            "ptzTraits": "FourWayPtz"
+            "ptzOverride": {
+                "operational": {"traits": "FourWayPtz"}
+            }
         },
         {
             "keys": [
@@ -802,7 +819,9 @@
                 "ACTi|V32", "ACTi|V23"
             ],
             "defaultAR": "16x9",
-            "ptzTraits": "EightWayPtz"
+            "ptzOverride": {
+                "operational": {"traits": "EightWayPtz"}
+            }
         },
         {
             "keys": [
@@ -812,20 +831,20 @@
         "Pelco|D5220",
                 "Pelco|PelcoD5220"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
+            "operationalPtzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
         {
             "keys": [
                 "VISTA|VK2-1080VRD",
                 "VISTA|VK2-1080VRD3V9"
             ],
-            "ptzCapabilities": ""
+            "operationalPtzCapabilities": ""
         },
     {
             "keys": [
                 "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
             ],
-            "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
+            "operationalPtzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },
     {
             "keys": [
@@ -851,6 +870,25 @@
                     "VideoEncoderConfigurationA02,VideoEncoderConfigurationA06",
                     "VideoEncoderConfigurationA03,VideoEncoderConfigurationA07",
                     "VideoEncoderConfigurationA04,VideoEncoderConfigurationA08"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "Hikvision|DS-6708*", "HIKVISION|DS-6708*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderConfigurationA01,VideoEncoderConfigurationA09",
+                    "VideoEncoderConfigurationA02,VideoEncoderConfigurationA10",
+                    "VideoEncoderConfigurationA03,VideoEncoderConfigurationA11",
+                    "VideoEncoderConfigurationA04,VideoEncoderConfigurationA12",
+                    "VideoEncoderConfigurationA05,VideoEncoderConfigurationA13",
+                    "VideoEncoderConfigurationA06,VideoEncoderConfigurationA14",
+                    "VideoEncoderConfigurationA07,VideoEncoderConfigurationA15",
+                    "VideoEncoderConfigurationA08,VideoEncoderConfigurationA16"
                 ]
             }
         },
@@ -918,7 +956,9 @@
                 "Hikvision|DS-2DE4A220IW-DE",
                 "HIKVISION|DS-2CD4032FWD*",
                 "HIKVISION|DS-2CD2142FWD*",
-                "hikvision|DS-2CD2142FWD*"
+                "hikvision|DS-2CD2142FWD*",
+                "Hikvision|DS-6716*", "HIKVISION|DS-6716*",
+                "Hikvision|DS-6708*", "HIKVISION|DS-6708*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -950,7 +990,12 @@
             "portNamePrefixToIgnore": "AlarmOut"
         },
     {
-            "keys": ["DW|DWC-PF5M1TIR"],
+            "keys": [
+            	"DW|DWC-PF5M1TIR",
+            	"DW|DWC-MB45DiA",
+            	"DW|DWC-MV85DiA",
+            	"DW|DWC-PB6M4T"
+            ],
       "fixWrongInputPortNumber": true
     },
         {
@@ -2672,6 +2717,113 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "UNIVIEW|NVR302-08S-P8*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "00100,00101",
+                    "00200,00201",
+                    "00300,00301",
+                    "00400,00401",
+                    "00500,00501",
+                    "00600,00601",
+                    "00700,00701",
+                    "00800,00801"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "UNIVIEW|NVR302-16S-P16*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "00100,00101",
+                    "00200,00201",
+                    "00300,00301",
+                    "00400,00401",
+                    "00500,00501",
+                    "00600,00601",
+                    "00700,00701",
+                    "00800,00801",
+                    "00900,00901",
+                    "01000,01001",
+                    "01100,01101",
+                    "01200,01201",
+                    "01300,01301",
+                    "01400,01401",
+                    "01500,01501",
+                    "01600,01601"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "Bosch|AUTODOME IP starlight 7000 HD"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1, -1],
+                        "logical": [18, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 3.5, 5.25, 6.125, 6.56, 6.78, 6.89, 6.95, 6.97, 6.99, 7],
+                        "logicalMultiplier": 30,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "UNIVIEW|IPC6252SL-X33*", "NONE|IPC6252SL-X33*"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-0.1666667, 1],
+                        "logical": [-15, 90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 5.04, 5.56, 5.89, 6.14, 6.34, 6.51, 6.65, 6.78, 6.90, 7],
+                        "logicalMultiplier": 32,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": ["2nt|2N IP Verso", "2nt|2N IP Force"],
+            "relayInputCountForced": 2,
+            "onvifInputPortAliases": ["onvif_input_1", "input1"]
+        },
+        {
+            "keys": ["Hanwha|SNF-8010*"],
+            "operationalPtzCapabilities": "NoPtzCapabilities"
         }
     ]
 }

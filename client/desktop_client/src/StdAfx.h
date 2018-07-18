@@ -1,5 +1,3 @@
-#define QT_NO_CAST_FROM_ASCII
-
 #ifdef __cplusplus
 
 /* STL headers. */

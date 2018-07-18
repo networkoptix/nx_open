@@ -1,6 +1,12 @@
+import logging
+import os
 from abc import ABCMeta, abstractmethod
 
 from pathlib2 import PurePath
+
+from framework.os_access.exceptions import NotADir
+
+_logger = logging.getLogger(__name__)
 
 
 class FileSystemPath(PurePath):
@@ -35,6 +41,15 @@ class FileSystemPath(PurePath):
     def glob(self, pattern):
         return [FileSystemPath()]
 
+    def walk(self):
+        children = self.glob('*')
+        for child in children:
+            try:
+                for descendant in child.walk():
+                    yield descendant
+            except NotADir:
+                yield child
+
     @abstractmethod
     def mkdir(self, parents=False, exist_ok=True):
         pass
@@ -48,8 +63,8 @@ class FileSystemPath(PurePath):
         return b''
 
     @abstractmethod
-    def write_bytes(self, contents):
-        pass
+    def write_bytes(self, contents, offset=None):
+        return 0
 
     @abstractmethod
     def read_text(self, encoding, errors):
@@ -57,8 +72,23 @@ class FileSystemPath(PurePath):
 
     @abstractmethod
     def write_text(self, data, encoding, errors):
-        pass
+        return 0
+
+    def ensure_empty_dir(self):
+        if self.exists():
+            self.rmtree()
+        self.mkdir(parents=True)
+
+    def ensure_file_is_missing(self):
+        if self.exists():
+            self.unlink()
+
+    @classmethod
+    def tmp_file(cls, base_name):
+        random_name = os.urandom(6).encode('hex')
+        return cls.tmp().joinpath(base_name.stem + '-' + random_name).with_suffix(base_name.suffix)
 
 
 def copy_file(source, destination):  # type: (FileSystemPath, FileSystemPath) -> None
+    _logger.info("Copy from %s to %s", source, destination)
     destination.write_bytes(source.read_bytes())

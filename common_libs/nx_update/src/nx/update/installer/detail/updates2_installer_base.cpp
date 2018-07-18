@@ -79,7 +79,7 @@ PrepareResult Updates2InstallerBase::checkContents(const QString& outputPath) co
         return PrepareResult::updateContentsError;
     }
 
-    QnSystemInformation systemInfo = systemInformation();
+    const auto systemInfo = systemInformation();
 
     QString platform = infoMap.value("platform").toString();
     if (platform != systemInfo.platform)

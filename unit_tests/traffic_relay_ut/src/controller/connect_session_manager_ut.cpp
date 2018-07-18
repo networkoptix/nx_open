@@ -38,6 +38,11 @@ public:
         return true;
     }
 
+    virtual bool isConnected() const override
+    {
+        return true;
+    }
+
     virtual cf::future<std::string> findRelayByDomain(
         const std::string& /*domainName*/) const override
     {
@@ -450,19 +455,14 @@ private:
 
     void onConnectCompletion(
         api::ResultCode resultCode,
-        nx::network::http::ConnectionEvents connectionEvents)
+        AbstractConnectSessionManager::StartRelayingFunc startRelayingFunc)
     {
-        if (connectionEvents.onResponseHasBeenSent)
+        if (startRelayingFunc)
         {
             auto tcpConnection = std::make_unique<network::test::StreamSocketStub>();
             tcpConnection->setForeignAddress(m_clientEndpoint);
             m_lastClientConnection = tcpConnection.get();
-            auto httpConnection = std::make_unique<nx::network::http::HttpServerConnection>(
-                nullptr,
-                std::move(tcpConnection),
-                nullptr,
-                nullptr);
-            connectionEvents.onResponseHasBeenSent(httpConnection.get());
+            startRelayingFunc(std::move(tcpConnection));
         }
 
         ConnectResult result;
@@ -576,7 +576,9 @@ protected:
                 nx::utils::promise<api::ResultCode> completed;
                 connectSessionManager().connectToPeer(
                     request,
-                    [&completed](api::ResultCode resultCode, nx::network::http::ConnectionEvents)
+                    [&completed](
+                        api::ResultCode resultCode,
+                        AbstractConnectSessionManager::StartRelayingFunc)
                     {
                         completed.set_value(resultCode);
                     });

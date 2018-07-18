@@ -53,6 +53,7 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
 #include <nx/utils/counter.h>
@@ -174,37 +175,40 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             }
         });
 
-    connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        [this](const vms::event::AbstractActionPtr& businessAction)
-        {
-            if (businessAction->actionType() != vms::api::ActionType::openLayoutAction)
-                return;
-            const auto &actionParams = businessAction->getParams();
-
-            QnResourcePool* pool = this->resourcePool();
-            QnLayoutResourcePtr layout =
-                pool->getResourceById<QnLayoutResource>(actionParams.actionResourceId);
-            if (!layout)
-                return;
-
-            auto currentUser = context()->user();
-            NX_ASSERT(currentUser);
-
-            auto accessManager = commonModule()->resourceAccessManager();
-            NX_ASSERT(accessManager);
-            // TODO: Is it better to a add additional permission flags to the place
-            // where all menu actions are registered?
-            if (accessManager->hasPermission(currentUser, layout, Qn::ReadPermission))
-                menu()->trigger(action::OpenInNewTabAction, layout);
-            else
-            {
-                qDebug() << "User does " << currentUser->getName() << " does not have permission to view layout " << layout->getName();
-            }
-        });
+    connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived,
+        this, &LayoutsHandler::at_openLayoutAction_triggered);
 }
 
 LayoutsHandler::~LayoutsHandler()
 {
+}
+
+void LayoutsHandler::at_openLayoutAction_triggered(const vms::event::AbstractActionPtr& businessAction)
+{
+    if (businessAction->actionType() != vms::api::ActionType::openLayoutAction)
+        return;
+    const auto& actionParams = businessAction->getParams();
+
+    QnResourcePool* pool = this->resourcePool();
+    QnLayoutResourcePtr layout =
+        pool->getResourceById<QnLayoutResource>(actionParams.actionResourceId);
+    if (!layout)
+        return;
+
+    auto currentUser = context()->user();
+    NX_ASSERT(currentUser);
+
+    // This user should be mentioned in actionParams.additionalResources
+    // to be able to run this action
+    auto permittedUsers = actionParams.additionalResources;
+    auto it = std::find(permittedUsers.begin(), permittedUsers.end(), currentUser->getId());
+    if (it == permittedUsers.end() && !actionParams.allUsers)
+        return;
+
+    if (accessController()->hasPermissions(layout, Qn::ReadPermission))
+        menu()->trigger(action::OpenInNewTabAction, layout);
+    else
+        NX_WARNING(this) << "User does " << currentUser->getName() << " does not have permission to view layout " << layout->getName();
 }
 
 void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName)
@@ -291,12 +295,6 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
 {
     if (!layout || !user)
         return;
-
-    if (layout->isFile())
-    {
-        menu()->trigger(action::SaveLocalLayoutAsAction, layout);
-        return;
-    }
 
     if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
         return;
@@ -600,9 +598,9 @@ bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
     /* Calculate removed cameras that are still directly accessible. */
     switch (user->userRole())
     {
-        case Qn::UserRole::CustomPermissions:
+        case Qn::UserRole::customPermissions:
             return ui::messages::Resources::changeUserLocalLayout(mainWindowWidget(), change.removed);
-        case Qn::UserRole::CustomUserRole:
+        case Qn::UserRole::customUserRole:
             return ui::messages::Resources::addToRoleLocalLayout(
                     mainWindowWidget(),
                     calculateResourcesToShare(change.added, user))
@@ -622,7 +620,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     if (!user)
         return true;
 
-    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia))
         return true;
 
     /* Never ask for own layouts. */
@@ -662,7 +660,7 @@ void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     if (!user)
         return;
 
-    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia))
         return;
 
     auto accessible = sharedResourcesManager()->sharedResources(user);

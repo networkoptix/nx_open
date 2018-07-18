@@ -180,9 +180,9 @@ bool VivotekResource::parseStreamCodecCapabilities(
 void VivotekResource::tuneHttpClient(nx::network::http::HttpClient& httpClient) const
 {
     auto auth = getAuth();
-    httpClient.setSendTimeoutMs(kHttpTimeout.count());
-    httpClient.setMessageBodyReadTimeoutMs(kHttpTimeout.count());
-    httpClient.setResponseReadTimeoutMs(kHttpTimeout.count());
+    httpClient.setSendTimeout(kHttpTimeout);
+    httpClient.setMessageBodyReadTimeout(kHttpTimeout);
+    httpClient.setResponseReadTimeout(kHttpTimeout);
     httpClient.setUserName(auth.user());
     httpClient.setUserPassword(auth.password());
 }

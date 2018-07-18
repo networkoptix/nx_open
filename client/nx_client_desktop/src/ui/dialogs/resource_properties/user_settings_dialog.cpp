@@ -68,7 +68,7 @@ public:
         int total = currentUserIsAdmin ? 0 : -1;
 
         if (filter == QnResourceAccessFilter::MediaFilter &&
-            permissions.testFlag(Qn::GlobalAccessAllMediaPermission))
+            permissions.testFlag(GlobalPermission::accessAllMedia))
         {
             addRow(makeResourceAccessRow(filter, true, count, total));
             return;
@@ -165,12 +165,12 @@ private:
         return makeGenericCountOfTotalRow(name, count, total);
     };
 
-    QString makePermissionsRow(Qn::GlobalPermissions rawPermissions) const
+    QString makePermissionsRow(GlobalPermissions rawPermissions) const
     {
         int count = 0;
         int total = 0;
 
-        auto checkFlag = [&count, &total, rawPermissions](Qn::GlobalPermission flag)
+        auto checkFlag = [&count, &total, rawPermissions](GlobalPermission flag)
             {
                 ++total;
                 if (rawPermissions.testFlag(flag))
@@ -178,14 +178,14 @@ private:
             };
 
         // TODO: #GDM think where to store flags set to avoid duplication
-        checkFlag(Qn::GlobalEditCamerasPermission);
-        checkFlag(Qn::GlobalControlVideoWallPermission);
-        checkFlag(Qn::GlobalViewLogsPermission);
-        checkFlag(Qn::GlobalViewArchivePermission);
-        checkFlag(Qn::GlobalExportPermission);
-        checkFlag(Qn::GlobalViewBookmarksPermission);
-        checkFlag(Qn::GlobalManageBookmarksPermission);
-        checkFlag(Qn::GlobalUserInputPermission);
+        checkFlag(GlobalPermission::editCameras);
+        checkFlag(GlobalPermission::controlVideowall);
+        checkFlag(GlobalPermission::viewLogs);
+        checkFlag(GlobalPermission::viewArchive);
+        checkFlag(GlobalPermission::exportArchive);
+        checkFlag(GlobalPermission::viewBookmarks);
+        checkFlag(GlobalPermission::manageBookmarks);
+        checkFlag(GlobalPermission::userInput);
 
         return makeGenericCountOfTotalRow(tr("Permissions"), count, total);
     }
@@ -322,7 +322,7 @@ void QnUserSettingsDialog::updatePermissions()
         Qn::UserRole role = m_user->userRole();
         QString permissionsText;
 
-        if (role == Qn::UserRole::CustomUserRole || role == Qn::UserRole::CustomPermissions)
+        if (role == Qn::UserRole::customUserRole || role == Qn::UserRole::customPermissions)
         {
             QnResourceAccessSubject subject(m_user);
             helper.addPermissionsRow(subject);
@@ -342,7 +342,7 @@ void QnUserSettingsDialog::updatePermissions()
         Qn::UserRole roleType = m_settingsPage->selectedRole();
         QString permissionsText;
 
-        if (roleType == Qn::UserRole::CustomUserRole)
+        if (roleType == Qn::UserRole::customUserRole)
         {
             /* Handle custom user role: */
             QnUuid roleId = m_settingsPage->selectedUserRoleId();
@@ -353,7 +353,7 @@ void QnUserSettingsDialog::updatePermissions()
             helper.addResourceAccessRow(QnResourceAccessFilter::LayoutsFilter, subject, true);
             permissionsText = helper.makeTable();
         }
-        else if (roleType == Qn::UserRole::CustomPermissions)
+        else if (roleType == Qn::UserRole::customPermissions)
         {
             helper.addPermissionsRow(m_permissionsPage);
             helper.addResourceAccessRow(m_camerasPage);
@@ -513,7 +513,7 @@ void QnUserSettingsDialog::applyChanges()
 
     qnResourcesChangesManager->saveUser(m_user, applyChangesFunction, callbackFunction);
 
-    if (m_user->userRole() == Qn::UserRole::CustomPermissions)
+    if (m_user->userRole() == Qn::UserRole::customPermissions)
     {
         auto accessibleResources = m_model->accessibleResources();
 
@@ -578,7 +578,7 @@ void QnUserSettingsDialog::updateControlsVisibility()
         || mode == QnUserSettingsModel::OtherSettings;
 
     bool customAccessRights = settingsPageVisible
-        && m_settingsPage->selectedRole() == Qn::UserRole::CustomPermissions;
+        && m_settingsPage->selectedRole() == Qn::UserRole::customPermissions;
 
     setPageVisible(ProfilePage,     profilePageVisible);
 

@@ -13,7 +13,7 @@ static const QString kManualFile1 = "manual.file.1";
 static const QString kManualFile2 = "manual.file.2";
 static const QString kManualFile3 = "manual.file.3";
 
-static const QnSoftwareVersion kNxVersion{"4.0.0.0"};
+static const nx::utils::SoftwareVersion kNxVersion{"4.0.0.0"};
 static const OsVersion kOsVersion1 = ubuntuX64();
 static const OsVersion kOsVersion2 = ubuntuX86();
 
@@ -56,13 +56,13 @@ protected:
         const OsVersion& osVersion,
         const QList<QnUuid>& additionalPeers)
     {
-        UpdateFileRequestData request;
+        UpdateRequestData request;
 
         request.isClient = false;
-        request.currentNxVersion = QnSoftwareVersion("3.1.0");
+        request.currentNxVersion = nx::utils::SoftwareVersion("3.1.0");
         request.osVersion = osVersion;
 
-        ASSERT_EQ(ResultCode::ok, m_registry.latestUpdate(request, nullptr));
+        ASSERT_EQ(ResultCode::ok, m_registry.latestUpdate(request, nullptr, nullptr));
 
         auto referencePeers = additionalPeers;
         std::sort(
@@ -163,10 +163,10 @@ private:
 
     void assertDataPresence(const OsVersion& version, bool shouldBePresent)
     {
-        UpdateFileRequestData request;
+        UpdateRequestData request;
 
         request.isClient = false;
-        request.currentNxVersion = QnSoftwareVersion("3.1.0");
+        request.currentNxVersion = nx::utils::SoftwareVersion("3.1.0");
         request.osVersion = version;
 
         FileData fileData;
@@ -191,12 +191,8 @@ TEST_F(CommonUpdateRegistry, manualData_remove)
     whenManualDataAdded(kManualFile1, kOsVersion1);
     whenManualDataAdded(kManualFile2, kOsVersion2);
 
-    thenAllPeersShouldBePresent(kOsVersion1, QList<QnUuid>() << kPeer1Id);
-    thenAllPeersShouldBePresent(kOsVersion2, QList<QnUuid>() << kPeer1Id);
-
     whenManualDataRemoved(kManualFile2);
     thenManualDataShouldNotBeFound(kOsVersion2);
-    thenAllPeersShouldBePresent(kOsVersion1, QList<QnUuid>() << kPeer1Id);
 
     whenManualDataRemoved(kManualFile1);
     thenManualDataShouldNotBeFound(kOsVersion1);

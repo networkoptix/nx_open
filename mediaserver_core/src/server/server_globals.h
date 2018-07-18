@@ -33,11 +33,7 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
         return static_cast<StoragePool>
             (static_cast<int>(lhs) & static_cast<int>(rhs));
     }
-    static const QByteArray kRemoveDbParamName = "removeDbOnStartup";
     static const QByteArray kNoInitStoragesOnStartup = "noInitStoragesOnStartup";
-    static const QByteArray kNoResourceDiscovery = "noResourceDiscovery";
-    static const QByteArray kNoMonitorStatistics = "noMonitorStatistics"; //< disable CPU/network usage stats
-
     static const QString kIsConnectedToCloudKey = "isConnectedToCloud";
 
 } // namespace QnServer

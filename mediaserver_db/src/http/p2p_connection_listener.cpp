@@ -6,7 +6,6 @@
 #include <nx_ec/ec_proto_version.h>
 
 #include "network/tcp_connection_priv.h"
-#include "nx_ec/data/api_full_info_data.h"
 #include <database/db_manager.h>
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
@@ -18,29 +17,13 @@
 
 #include <nx/network/websocket/websocket_handshake.h>
 #include <nx/network/websocket/websocket.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_delegate.h>
 #include <transaction/message_bus_adapter.h>
 #include <nx/p2p/p2p_server_message_bus.h>
 
 namespace nx {
 namespace p2p {
-
-class ShareSocketDelegate: public nx::network::StreamSocketDelegate
-{
-    using base_type = nx::network::StreamSocketDelegate;
-public:
-    ShareSocketDelegate(QSharedPointer<nx::network::AbstractStreamSocket> socket):
-        base_type(socket.data()),
-        m_socket(std::move(socket))
-    {
-    }
-    ~ShareSocketDelegate()
-    {
-
-    }
-private:
-    QSharedPointer<nx::network::AbstractStreamSocket> m_socket;
-};
 
 // -------------------------- ConnectionProcessor ---------------------
 
@@ -60,15 +43,14 @@ ConnectionProcessor::~ConnectionProcessor()
     stop();
 }
 
-ec2::ApiPeerDataEx ConnectionProcessor::localPeer() const
+vms::api::PeerDataEx ConnectionProcessor::localPeer() const
 {
-    ec2::ApiPeerDataEx localPeer;
+    vms::api::PeerDataEx localPeer;
     localPeer.id = commonModule()->moduleGUID();
     localPeer.persistentId = commonModule()->dbId();
     localPeer.instanceId = commonModule()->runningInstanceGUID();
     localPeer.systemId = commonModule()->globalSettings()->localSystemId();
-
-    localPeer.peerType = Qn::PT_Server;
+    localPeer.peerType = vms::api::PeerType::server;
     localPeer.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
     localPeer.identityTime = commonModule()->systemIdentityTime();
     localPeer.aliveUpdateIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -77,19 +59,19 @@ ec2::ApiPeerDataEx ConnectionProcessor::localPeer() const
     return localPeer;
 }
 
-bool ConnectionProcessor::isDisabledPeer(const ec2::ApiPeerData& remotePeer) const
+bool ConnectionProcessor::isDisabledPeer(const vms::api::PeerData& remotePeer) const
 {
     return (!commonModule()->allowedPeers().isEmpty() &&
         !commonModule()->allowedPeers().contains(remotePeer.id) &&
         !remotePeer.isClient());
 }
 
-bool ConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer) const
+bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePeer) const
 {
     Q_D(const QnTCPConnectionProcessor);
     const auto& commonModule = d->owner->commonModule();
 
-    if (remotePeer.peerType == Qn::PT_Server && commonModule->isReadOnly())
+    if (remotePeer.peerType == vms::api::PeerType::server && commonModule->isReadOnly())
         return false;
     if (!remotePeer.systemId.isNull() &&
         remotePeer.systemId != commonModule->globalSettings()->localSystemId())
@@ -103,7 +85,7 @@ bool ConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer)
             .arg(remotePeer.systemId));
         return false;
     }
-    if (remotePeer.peerType != Qn::PT_MobileClient)
+    if (remotePeer.peerType != vms::api::PeerType::mobileClient)
     {
         if (nx_ec::EC2_PROTO_VERSION != remotePeer.protoVersion)
         {
@@ -117,7 +99,7 @@ bool ConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer)
             return false;
         }
     }
-    if (remotePeer.peerType == Qn::PT_Server)
+    if (remotePeer.peerType == vms::api::PeerType::server)
     {
         if (nx::network::SocketGlobals::cloud().cloudHost() != remotePeer.cloudHost)
         {
@@ -134,12 +116,12 @@ bool ConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer)
     return true;
 }
 
-Qn::UserAccessData ConnectionProcessor::userAccessData(const ec2::ApiPeerDataEx& remotePeer) const
+Qn::UserAccessData ConnectionProcessor::userAccessData(const vms::api::PeerDataEx& remotePeer) const
 {
     Q_D(const QnTCPConnectionProcessor);
     // By default all peers have read permissions on all resources
     auto access = d->accessRights;
-    if (remotePeer.peerType == Qn::PT_Server)
+    if (remotePeer.peerType == vms::api::PeerType::server)
     {
         // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
         // since server-to-server order of transactions is unpredictable and access check for resource attribute
@@ -176,7 +158,7 @@ void ConnectionProcessor::run()
         return;
     }
 
-    ec2::ApiPeerDataEx remotePeer = deserializeFromRequest(d->request);
+    vms::api::PeerDataEx remotePeer = deserializePeerData(d->request);
     if (!isPeerCompatible(remotePeer))
     {
         sendResponse(nx::network::http::StatusCode::forbidden, nx::network::http::StringType());
@@ -199,7 +181,7 @@ void ConnectionProcessor::run()
         remotePeer.id,
         ec2::ConnectionLockGuard::Direction::Incoming);
 
-    if (remotePeer.peerType == Qn::PT_Server)
+    if (remotePeer.peerType == vms::api::PeerType::server)
     {
         // addition checking to prevent two connections (ingoing and outgoing) at once
         // 1-st stage
@@ -238,7 +220,7 @@ void ConnectionProcessor::run()
         return;
     }
 
-    serializeToResponse(&d->response, localPeer(), remotePeer.dataFormat);
+    serializePeerData(d->response, localPeer(), remotePeer.dataFormat);
 
     sendResponse(
         nx::network::http::StatusCode::switchingProtocols,

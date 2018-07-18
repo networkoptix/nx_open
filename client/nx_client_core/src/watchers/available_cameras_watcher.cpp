@@ -32,12 +32,12 @@ QnAvailableCamerasWatcher::QnAvailableCamerasWatcher(QObject* parent):
 
     connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
-        [this, d](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
+        [this, d](const QnResourceAccessSubject& subject, GlobalPermissions value)
         {
             if (!subject.isUser() || subject.user() != d->user)
                 return;
 
-            const bool userHasAllMediaAccess = value.testFlag(Qn::GlobalAccessAllMediaPermission);
+            const bool userHasAllMediaAccess = value.testFlag(GlobalPermission::accessAllMedia);
             if (d->userHasAllMediaAccess != userHasAllMediaAccess)
             {
                 d->userHasAllMediaAccess = userHasAllMediaAccess;
@@ -64,7 +64,7 @@ void QnAvailableCamerasWatcher::setUser(const QnUserResourcePtr& user)
 
     d->user = user;
     d->userHasAllMediaAccess = user &&
-        globalPermissionsManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission);
+        globalPermissionsManager()->hasGlobalPermission(user, GlobalPermission::accessAllMedia);
     d->updateWatcher();
 }
 

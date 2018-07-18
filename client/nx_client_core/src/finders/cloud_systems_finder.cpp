@@ -155,7 +155,7 @@ void QnCloudSystemsFinder::updateOnlineStateUnsafe(const QnCloudSystemList& targ
     }
 }
 
-void QnCloudSystemsFinder::tryRemoveAlienServer(const QnModuleInformation &serverInfo)
+void QnCloudSystemsFinder::tryRemoveAlienServer(const nx::vms::api::ModuleInformation& serverInfo)
 {
     const auto serverId = serverInfo.id;
     for (auto it = m_systems.begin(); it != m_systems.end(); ++it)
@@ -219,7 +219,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     if (!QJson::deserialize(data, &jsonReply))
                         return;
 
-                    QnModuleInformation moduleInformation;
+                    nx::vms::api::ModuleInformation moduleInformation;
                     if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
                         return;
 
@@ -244,7 +244,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
 
                     nx::utils::Url url;
                     url.setHost(moduleInformation.cloudId());
-                    url.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
+                    url.setScheme(nx::network::http::urlSheme(moduleInformation.sslAllowed));
                     systemDescription->setServerHost(serverId, url);
                 }); //< executeInThread
             reply->pleaseStopSync();

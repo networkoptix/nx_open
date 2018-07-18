@@ -5,13 +5,13 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx_ec/transaction_timestamp.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/vms/api/data/timestamp.h>
 
 namespace nx {
 namespace data_sync_engine {
 
-typedef ::ec2::Timestamp Timestamp;
+using Timestamp = nx::vms::api::Timestamp;
 
 class TransactionTimestampCalculator
 {

@@ -11,7 +11,7 @@ namespace cdb {
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
     data_sync_engine::SyncronizationEngine* const syncronizationEngine,
-    const nx::utils::db::InstanceController& dbInstanceController)
+    const nx::sql::InstanceController& dbInstanceController)
     :
     m_moduleGuid(moduleGuid),
     m_syncronizationEngine(syncronizationEngine),
@@ -96,7 +96,7 @@ void MaintenanceManager::onTransactionLogRead(
     const std::string& systemId,
     data_sync_engine::ResultCode ec2ResultCode,
     std::vector<data_sync_engine::dao::TransactionLogRecord> serializedTransactions,
-    ::ec2::QnTranState /*readedUpTo*/,
+    vms::api::TranState /*readedUpTo*/,
     std::function<void(
         api::ResultCode,
         ::ec2::ApiTransactionDataList)> completionHandler)

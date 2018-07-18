@@ -2,20 +2,22 @@
 
 #include <cassert>
 
+#include <api/resource_property_adaptor.h>
+#include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 
-#include "resource_property_adaptor.h"
+#include <api/resource_property_adaptor.h>
 
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
+#include <utils/common/watermark_settings.h>
 #include <utils/crypt/symmetrical.h>
-#include <nx/utils/app_info.h>
 
-#include <nx_ec/data/api_resource_data.h>
-#include <common/common_module.h>
+#include <nx/utils/app_info.h>
+#include <nx/vms/api/data/resource_data.h>
 
 namespace
 {
@@ -82,9 +84,9 @@ namespace
     const QString kCloudConnectRelayingEnabled(lit("cloudConnectRelayingEnabled"));
     const bool kCloudConnectRelayingEnabledDefault = true;
 
-    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(20);
-    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(1);
-    const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(10);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndInternetDefault(5);
+    const std::chrono::seconds kMaxDifferenceBetweenSynchronizedAndLocalTimeDefault(5);
+    const std::chrono::seconds kOsTimeChangeCheckPeriodDefault(1);
     const std::chrono::minutes kSyncTimeExchangePeriodDefault(10);
 
     const QString kHanwhaDeleteProfilesOnInitIfNeeded(lit("hanwhaDeleteProfilesOnInitIfNeeded"));
@@ -314,6 +316,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors(
         this);
     timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
 
+    m_primaryTimeServerAdaptor = new QnLexicalResourcePropertyAdaptor<QnUuid>(
+        kNamePrimaryTimeServer,
+        QnUuid(),
+        this);
+    timeSynchronizationAdaptors << m_primaryTimeServerAdaptor;
+
     m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor =
         new QnLexicalResourcePropertyAdaptor<int>(
             kMaxDifferenceBetweenSynchronizedAndInternetTime,
@@ -506,6 +514,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxWearableArchiveSynchronizationThreadsDefault,
         this);
 
+    m_watermarkSettings = new QnJsonResourcePropertyAdaptor<QnWatermarkSettings>(
+        kWatermarkSettingsName,
+        QnWatermarkSettings(),
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
 
@@ -536,6 +549,10 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(
         m_cloudConnectRelayingEnabledAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
         this, &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
+        Qt::QueuedConnection);
+
+    connect(m_watermarkSettings, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::watermarkChanged,
         Qt::QueuedConnection);
 
     connect(
@@ -575,6 +592,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxRemoteArchiveSynchronizationThreads
         << m_updates2InfoAdaptor
         << m_maxWearableArchiveSynchronizationThreads
+        << m_watermarkSettings
         ;
 
     if (isHanwhaEnabledCustomization())
@@ -1069,6 +1087,16 @@ void QnGlobalSettings::setSynchronizingTimeWithInternet(bool value)
     m_synchronizeTimeWithInternetAdaptor->setValue(value);
 }
 
+QnUuid QnGlobalSettings::primaryTimeServer() const
+{
+    return m_primaryTimeServerAdaptor->value();
+}
+
+void QnGlobalSettings::setPrimaryTimeServer(const QnUuid& value)
+{
+    m_primaryTimeServerAdaptor->setValue(value);
+}
+
 std::chrono::milliseconds QnGlobalSettings::maxDifferenceBetweenSynchronizedAndInternetTime() const
 {
     return std::chrono::milliseconds(
@@ -1342,6 +1370,16 @@ bool QnGlobalSettings::cloudConnectRelayingEnabled() const
 bool QnGlobalSettings::takeCameraOwnershipWithoutLock() const
 {
     return m_takeCameraOwnershipWithoutLock->value();
+}
+
+QnWatermarkSettings QnGlobalSettings::watermarkSettings() const
+{
+    return m_watermarkSettings->value();
+}
+
+void QnGlobalSettings::setWatermarkSettings(const QnWatermarkSettings& settings) const
+{
+    m_watermarkSettings->setValue(settings);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const

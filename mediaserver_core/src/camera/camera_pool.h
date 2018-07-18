@@ -7,6 +7,7 @@
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/mediaserver/settings.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -15,7 +16,7 @@
 
 #define qnCameraPool QnVideoCameraPool::instance()
 
-class MSSettings;
+namespace nx { namespace mediaserver { class Settings; } }
 class QnResourcePool;
 
 class VideoCameraLocker
@@ -36,7 +37,7 @@ class QnVideoCameraPool:
 {
 public:
     QnVideoCameraPool(
-        const MSSettings& settings,
+        const nx::mediaserver::Settings& settings,
         QnResourcePool* resourcePool);
     virtual ~QnVideoCameraPool();
 
@@ -56,7 +57,7 @@ public:
 private:
     typedef QMap<QnResourcePtr, QnVideoCameraPtr> CameraMap;
 
-    const MSSettings& m_settings;
+    const nx::mediaserver::Settings& m_settings;
     QnResourcePool* m_resourcePool = nullptr;
     CameraMap m_cameras;
     mutable QnMutex m_mutex;

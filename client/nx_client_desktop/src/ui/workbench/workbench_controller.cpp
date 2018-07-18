@@ -46,7 +46,6 @@
 
 #include "ui/dialogs/sign_dialog.h" // TODO: move out.
 #include <ui/dialogs/common/custom_file_dialog.h>  //for QnCustomFileDialog::fileDialogOptions() constant
-#include <ui/dialogs/common/file_dialog.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/animator_group.h>
@@ -400,6 +399,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
 
     /* Set up context menu. */
+    // #sandreenko most probably this is to activate key shortcuts, not for the menu.
     QWidget *window = display()->view()->window();
     window->addAction(action(action::ToggleSmartSearchAction));
     window->addAction(action(action::ToggleInfoAction));

@@ -90,7 +90,7 @@ private:
     std::unique_ptr<AuthorizationManager> m_authorizationManager;
 
     void performDataMigrations();
-    void generateUserAuthRecords(nx::utils::db::QueryContext* queryContext);
+    void generateUserAuthRecords(nx::sql::QueryContext* queryContext);
 
     void initializeDataSynchronizationEngine();
     void initializeSecurity();

@@ -1,7 +1,3 @@
-////////////////////////////////////////////////////////////
-// 21 dec 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
 #include "streaming_chunk_provider.h"
 
 #include <memory>
@@ -32,13 +28,12 @@ bool StreamingChunkProvider::get(
     StreamingChunkPtr newChunk = std::make_shared<VideoCameraStreamingChunk>(
         m_resourcePool,
         key,
-        qnServerModule->settings()->roSettings()->value(
-            nx_ms_conf::HLS_MAX_CHUNK_BUFFER_SIZE,
-            nx_ms_conf::DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE).toUInt());
+        qnServerModule->settings().hlsMaxChunkBufferSize());
     if( !m_transcoder->transcodeAsync( key, newChunk ) )
         return false;
 
-    //NOTE at this time chunk size in bytes is unknown, since transcoding is about to be started
+    // NOTE: At this time chunk size in bytes is unknown,
+    // since transcoding is about to be started.
     *itemCost = duration_cast<seconds>(key.duration()).count();
     *chunk = newChunk;
     return true;

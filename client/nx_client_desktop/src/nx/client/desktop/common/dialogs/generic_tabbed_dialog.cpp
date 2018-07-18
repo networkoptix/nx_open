@@ -5,8 +5,6 @@
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
-#include <ui/widgets/common/abstract_preferences_widget.h>
-
 #include <utils/common/warnings.h>
 
 using boost::algorithm::any_of;
@@ -24,7 +22,6 @@ namespace desktop {
 
 GenericTabbedDialog::GenericTabbedDialog(QWidget* parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
-    m_pages(),
     m_tabWidget(nullptr)
 {
 }

@@ -7,7 +7,7 @@ namespace update {
 namespace info {
 
 ManualFileData::ManualFileData(const QString& file, const OsVersion& osVersion,
-    const QnSoftwareVersion& nxVersion, bool isClient)
+    const nx::utils::SoftwareVersion& nxVersion, bool isClient)
     :
     file(file),
     osVersion(osVersion),
@@ -17,7 +17,7 @@ ManualFileData::ManualFileData(const QString& file, const OsVersion& osVersion,
 
 ManualFileData ManualFileData::fromFileName(const QString& fileName)
 {
-    const QRegExp fileRegExp("^.+-([a-z]+)_update-([0-9:.]+)-(.+)\\.zip$");
+    const QRegExp fileRegExp("^.+-([a-z]+)_update-([0-9:.]+)-([0-9,a-z]+)-?.*\\.zip$");
     ManualFileData result;
 
     if (int pos = fileRegExp.indexIn(fileName); pos == -1)
@@ -26,7 +26,7 @@ ManualFileData ManualFileData::fromFileName(const QString& fileName)
     const auto capture1 = fileRegExp.cap(1);
     NX_ASSERT(capture1 == "server" || capture1 == "client");
     result.isClient = capture1 == "client";
-    result.nxVersion = QnSoftwareVersion(fileRegExp.cap(2));
+    result.nxVersion = nx::utils::SoftwareVersion(fileRegExp.cap(2));
     result.osVersion = OsVersion::fromString(fileRegExp.cap(3));
     result.file = fileName;
 

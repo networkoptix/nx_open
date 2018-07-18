@@ -32,6 +32,9 @@ PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 
 namespace api_requests_detail {
 
+std::unique_ptr<nx::network::http::HttpClient> createHttpClient();
+nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QString& urlStr);
+
 void doExecutePost(
     const MediaServerLauncher* const launcher,
     const QString& urlStr,

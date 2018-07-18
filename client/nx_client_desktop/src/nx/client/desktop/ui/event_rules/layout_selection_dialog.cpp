@@ -1,6 +1,6 @@
 #include "layout_selection_dialog.h"
 #include "private/subject_selection_dialog_p.h"
-#include <ui_layout_selection_dialog.h> //< generated file
+#include "ui_layout_selection_dialog.h"
 
 #include <QtGui/QStandardItemModel>
 #include <QItemDelegate>
@@ -22,7 +22,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
-#include <nx/client/desktop/common/models/natural_string_sort_proxy_model.h>
 
 namespace nx {
 namespace client {
@@ -62,21 +61,23 @@ QnCustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
     return delegate;
 }
 
-// It makes everything red
+// It makes everything red.
 QnCustomizableItemDelegate* makeRedDelegate(QObject* parent)
 {
     auto delegate = new QnCustomizableItemDelegate(parent);
     delegate->setCustomInitStyleOption(
-        [](QStyleOptionViewItem* item, const QModelIndex& index)
+        [](QStyleOptionViewItem* item, const QModelIndex& /*index*/)
         {
-            NX_ASSERT(item);
-            if (item)
-                setWarningStyle(&item->palette);
+            setWarningStyle(&item->palette);
         });
     return delegate;
 }
 
-LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Qt::WindowFlags windowFlags):
+LayoutSelectionDialog::LayoutSelectionDialog(
+    bool singlePick,
+    QWidget* parent,
+    Qt::WindowFlags windowFlags)
+    :
     base_type(parent, windowFlags),
     ui(new Ui::LayoutSelectionDialog()),
     m_singlePick(singlePick)
@@ -84,15 +85,15 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     ui->setupUi(this);
     ui->additionalInfoLabel->setHidden(true);
 
-    // Setup local layouts
+    // Setup local layouts.
     m_localLayoutsModel = new QnResourceListModel(this);
     m_localLayoutsModel->setHasCheckboxes(true);
     m_localLayoutsModel->setSinglePick(m_singlePick);
 
-    // Setup shared layouts
+    // Setup shared layouts.
     m_sharedLayoutsModel = new QnResourceListModel(this);
-    m_sharedLayoutsModel->setSinglePick(m_singlePick);
     m_sharedLayoutsModel->setHasCheckboxes(true);
+    m_sharedLayoutsModel->setSinglePick(m_singlePick);
 
     auto radioButtonDelegate = makeRadioButtonDelegate(this);
 
@@ -102,7 +103,6 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     filterLocalLayouts->setFilterKeyColumn(QnResourceListModel::NameColumn);
     filterLocalLayouts->setSourceModel(m_localLayoutsModel);
     ui->localTreeView->setModel(filterLocalLayouts.get());
-    ui->localTreeView->setItemDelegateForColumn(QnResourceListModel::CheckColumn, radioButtonDelegate);
 
     // Making a filtered model for shared layouts.
     auto filterSharedLayouts = std::make_shared<QSortFilterProxyModel>(m_sharedLayoutsModel);
@@ -111,10 +111,8 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     filterSharedLayouts->setSourceModel(m_sharedLayoutsModel);
     ui->sharedTreeView->setModel(filterSharedLayouts.get());
 
-    // Lambda will keep the reference to filterLocalLayouts and filterSharedLayouts
-
-    auto setupTreeView =
-        [this, radioButtonDelegate](TreeView* treeView)
+    const auto setupTreeView =
+        [singlePick, radioButtonDelegate](TreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->header()->setStretchLastSection(false);
@@ -125,7 +123,11 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
                 QVariant::fromValue(kIndents));
             treeView->setIgnoreDefaultSpace(true);
             ItemViewUtils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
-            treeView->setItemDelegateForColumn(QnResourceListModel::CheckColumn, radioButtonDelegate);
+            if (singlePick)
+            {
+                treeView->setItemDelegateForColumn(
+                    QnResourceListModel::CheckColumn, radioButtonDelegate);
+            }
         };
 
     setupTreeView(ui->localTreeView);
@@ -136,6 +138,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
     scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
+    // Lambda will keep the reference to filterLocalLayouts and filterSharedLayouts.
     const auto updateFilter =
         [this, filterLocalLayouts, filterSharedLayouts]()
         {
@@ -154,22 +157,6 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
             updateFilter();
         });
 
-    const auto connectToModelChanges =
-        [this](QAbstractItemModel* model)
-        {
-            connect(model, &QAbstractItemModel::modelReset,
-                this, &LayoutSelectionDialog::at_layoutsChanged);
-            connect(model, &QAbstractItemModel::rowsInserted,
-                this, &LayoutSelectionDialog::at_layoutsChanged);
-            connect(model, &QAbstractItemModel::rowsRemoved,
-                this, &LayoutSelectionDialog::at_layoutsChanged);
-            connect(model, &QAbstractItemModel::dataChanged,
-                this, &LayoutSelectionDialog::at_layoutsChanged);
-        };
-
-    connectToModelChanges(m_localLayoutsModel);
-    connectToModelChanges(m_sharedLayoutsModel);
-
     // We will hide some items if there are no data for them.
     const auto updateVisibility =
         [this]()
@@ -182,16 +169,35 @@ LayoutSelectionDialog::LayoutSelectionDialog(bool singlePick, QWidget* parent, Q
             update();
         };
 
-    connect(m_localLayoutsModel, &QAbstractItemModel::rowsInserted, this, updateVisibility);
-    connect(m_localLayoutsModel, &QAbstractItemModel::rowsRemoved, this, updateVisibility);
-    connect(m_localLayoutsModel, &QAbstractItemModel::modelReset, this, updateVisibility);
-    connect(m_localLayoutsModel, &QnResourceListModel::selectionChanged, this, &LayoutSelectionDialog::at_localLayoutSelected);
-    connect(m_sharedLayoutsModel, &QAbstractItemModel::rowsInserted, this, updateVisibility);
-    connect(m_sharedLayoutsModel, &QAbstractItemModel::rowsRemoved, this, updateVisibility);
-    connect(m_sharedLayoutsModel, &QAbstractItemModel::modelReset, this, updateVisibility);
-    connect(m_sharedLayoutsModel, &QnResourceListModel::selectionChanged, this, &LayoutSelectionDialog::at_sharedLayoutSelected);
+    const auto connectToModelChanges =
+        [this, updateVisibility](QAbstractItemModel* model)
+        {
+            connect(model, &QAbstractItemModel::modelReset,
+                this, &LayoutSelectionDialog::at_layoutsChanged);
+            connect(model, &QAbstractItemModel::rowsInserted,
+                this, &LayoutSelectionDialog::at_layoutsChanged);
+            connect(model, &QAbstractItemModel::rowsRemoved,
+                this, &LayoutSelectionDialog::at_layoutsChanged);
+            connect(model, &QAbstractItemModel::dataChanged,
+                this, &LayoutSelectionDialog::at_layoutsChanged);
 
-    // Customized top margin for panel content:
+            connect(model, &QAbstractItemModel::rowsInserted, this, updateVisibility);
+            connect(model, &QAbstractItemModel::rowsRemoved, this, updateVisibility);
+            connect(model, &QAbstractItemModel::modelReset, this, updateVisibility);
+        };
+
+    connectToModelChanges(m_localLayoutsModel);
+    connectToModelChanges(m_sharedLayoutsModel);
+
+    if (singlePick)
+    {
+        connect(m_localLayoutsModel, &QnResourceListModel::selectionChanged, this,
+            &LayoutSelectionDialog::at_localLayoutSelected);
+        connect(m_sharedLayoutsModel, &QnResourceListModel::selectionChanged, this,
+            &LayoutSelectionDialog::at_sharedLayoutSelected);
+    }
+
+    // Customized top margin for panel content.
     static constexpr int kContentTopMargin = 8;
     QnNxStyle::setGroupBoxContentTopMargin(ui->localGroupBox, kContentTopMargin);
     QnNxStyle::setGroupBoxContentTopMargin(ui->sharedGroupBox, kContentTopMargin);
@@ -221,7 +227,7 @@ void LayoutSelectionDialog::at_sharedLayoutSelected()
     if (!selection.empty())
         m_localLayoutsModel->setCheckedResources({});
 
-    // Reset local layouts
+    // Reset local layouts.
     if (m_localSelectionMode == ModeLimited)
     {
         m_localLayoutsModel->setResources(QnResourceList());

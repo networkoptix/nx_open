@@ -29,6 +29,9 @@ public:
     bool isAutorun() const;
     void setAutorun(bool value);
 
+    bool isTimelineEnabled() const;
+    void setTimelineEnabled(bool value);
+
     /** Utility method to get IDs of all online items.  */
     QList<QnUuid> onlineItems() const;
 
@@ -48,7 +51,8 @@ signals:
     void matrixRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
     void matrixChanged(const QnVideoWallResourcePtr &resource, const QnVideoWallMatrix &matrix);
 
-    void autorunChanged(const QnResourcePtr &resource);
+    void autorunChanged(const QnVideoWallResourcePtr& videowall);
+    void timelineEnabledChanged(const QnVideoWallResourcePtr& videowall);
 
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
@@ -66,7 +70,8 @@ protected:
     virtual Qn::Notifier storedItemRemoved(const QnVideoWallMatrix& item) override;
     virtual Qn::Notifier storedItemChanged(const QnVideoWallMatrix& item) override;
 private:
-    bool m_autorun;
+    bool m_autorun = false;
+    bool m_timelineEnabled = false;
 
     QScopedPointer<QnThreadsafeItemStorage<QnVideoWallItem> > m_items;
     QScopedPointer<QnThreadsafeItemStorage<QnVideoWallPcData> > m_pcs;

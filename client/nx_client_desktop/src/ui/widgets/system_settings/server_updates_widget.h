@@ -4,31 +4,29 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-
-#include <utils/common/id.h>
-#include <utils/common/software_version.h>
-
 #include <update/updates_common.h>
+#include <utils/common/id.h>
+
+#include <nx/utils/software_version.h>
 
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
 struct QnLowFreeSpaceWarning;
 
-namespace Ui {
-    class QnServerUpdatesWidget;
-} // namespace Ui
+namespace Ui { class QnServerUpdatesWidget; }
 
-class QnServerUpdatesWidget: public QnAbstractPreferencesWidget, public QnSessionAwareDelegate
+class QnServerUpdatesWidget:
+    public QnAbstractPreferencesWidget,
+    public QnSessionAwareDelegate
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
     QnServerUpdatesWidget(QWidget* parent = nullptr);
-    ~QnServerUpdatesWidget();
+    virtual ~QnServerUpdatesWidget() override;
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
@@ -80,7 +78,7 @@ private:
     bool beginChecking();
     void endChecking(const QnCheckForUpdateResult& result);
 
-    bool restartClient(const QnSoftwareVersion& version);
+    bool restartClient(const nx::utils::SoftwareVersion& version);
 
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
@@ -90,10 +88,10 @@ private:
     QnServerUpdatesModel* m_updatesModel = nullptr;
     QnMediaServerUpdateTool* m_updateTool = nullptr;
 
-    QnSoftwareVersion m_targetVersion;
+    nx::utils::SoftwareVersion m_targetVersion;
     QString m_targetChangeset;
 
-    QnSoftwareVersion m_latestVersion;
+    nx::utils::SoftwareVersion m_latestVersion;
     QString m_localFileName;
     bool m_checking = false;
     QnCheckForUpdateResult m_lastUpdateCheckResult;

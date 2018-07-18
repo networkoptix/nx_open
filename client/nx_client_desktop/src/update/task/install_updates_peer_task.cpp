@@ -4,43 +4,45 @@
 
 #include <QtCore/QTimer>
 
-#include <common/common_module.h>
 
 #include <api/app_server_connection.h>
 #include <api/model/upload_update_reply.h>
-#include <nx_ec/ec_proto_version.h>
+#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <client/client_message_processor.h>
-#include <utils/common/delete_later.h>
-#include <nx/utils/log/log.h>
 #include <network/router.h>
+#include <nx_ec/ec_proto_version.h>
+#include <utils/common/delete_later.h>
 
-namespace detail {
-    using namespace std::chrono;
-    using namespace std::chrono_literals;
+#include <nx/utils/log/log.h>
 
-    constexpr milliseconds kCheckTimeoutMs = 20min;
-    constexpr milliseconds kStartPingTimeoutMs = 1min;
-    constexpr milliseconds kPingIntervalMs = 10s;
+namespace {
 
-    const QnSoftwareVersion kUnauthenticatedUpdateMinVersion(3, 0);
+using namespace std::chrono;
+using namespace std::chrono_literals;
 
-    QnInstallUpdatesPeerTask::PeersToQueryMap sortedPeers(QnRouter* router, const QSet<QnUuid>& peers)
-    {
-        QnInstallUpdatesPeerTask::PeersToQueryMap result;
+constexpr milliseconds kCheckTimeoutMs = 20min;
+constexpr milliseconds kStartPingTimeoutMs = 1min;
+constexpr milliseconds kPingIntervalMs = 10s;
 
-        if (!router)
-            return result;
+static const nx::utils::SoftwareVersion kUnauthenticatedUpdateMinVersion(3, 0);
 
-        for (const auto& id: peers)
-            result.emplace(router->routeTo(id).distance, id);
+QnInstallUpdatesPeerTask::PeersToQueryMap sortedPeers(QnRouter* router, const QSet<QnUuid>& peers)
+{
+    QnInstallUpdatesPeerTask::PeersToQueryMap result;
 
+    if (!router)
         return result;
-    }
 
-} using namespace detail;
+    for (const auto& id: peers)
+        result.emplace(router->routeTo(id).distance, id);
+
+    return result;
+}
+
+} // namespace;
 
 QnInstallUpdatesPeerTask::QnInstallUpdatesPeerTask(QObject* parent):
     QnNetworkPeerTask(parent)
@@ -61,7 +63,7 @@ void QnInstallUpdatesPeerTask::setUpdateId(const QString& updateId)
     m_updateId = updateId;
 }
 
-void QnInstallUpdatesPeerTask::setVersion(const QnSoftwareVersion& version)
+void QnInstallUpdatesPeerTask::setVersion(const nx::utils::SoftwareVersion& version)
 {
     m_version = version;
 }
@@ -305,11 +307,11 @@ void QnInstallUpdatesPeerTask::at_pingTimer_timeout()
     }
 
     m_ecConnection->modulesInformation(
-        this, SLOT(at_gotModuleInformation(int,QList<QnModuleInformation>,int)));
+        this, SLOT(at_gotModuleInformation(int, QList<nx::vms::api::ModuleInformation>, int)));
 }
 
 void QnInstallUpdatesPeerTask::at_gotModuleInformation(
-    int status, const QList<QnModuleInformation>& modules, int handle)
+    int status, const QList<nx::vms::api::ModuleInformation>& modules, int handle)
 {
     Q_UNUSED(handle)
 

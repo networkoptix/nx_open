@@ -18,11 +18,11 @@
 #include <core/resource_management/resource_pool.h>
 #include <utils/license_usage_helper.h>
 
-#include <nx_ec/data/api_tran_state_data.h>
-
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
 #include "ec_connection_notification_manager.h"
+
+using namespace nx::vms;
 
 namespace ec2 {
 
@@ -141,6 +141,10 @@ void apiIdDataTriggerNotificationHelper(
             return notificationParams.userNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
+        case ApiCommand::broadcastPeerSyncTime:
+            return notificationParams.timeNotificationManager->triggerNotification(
+                tran,
+                notificationParams.source);
         case ApiCommand::removeEventRule:
             return notificationParams.businessEventNotificationManager->triggerNotification(
                 tran,
@@ -165,7 +169,6 @@ void apiIdDataTriggerNotificationHelper(
             return notificationParams.cameraNotificationManager->triggerNotification(
                 tran,
                 notificationParams.source);
-        case ApiCommand::forcePrimaryTimeServer:
         case ApiCommand::removeAccessRights:
             //#ak no notification needed
             break;
@@ -184,17 +187,18 @@ QnUuid createHashForApiCameraAttributesDataHelper(const nx::vms::api::CameraAttr
     return QnAbstractTransaction::makeHash(params.cameraId.toRfc4122(), "camera_attributes");
 }
 
-QnUuid createHashForApiAccessRightsDataHelper(const ApiAccessRightsData& params)
+QnUuid createHashForApiAccessRightsDataHelper(const nx::vms::api::AccessRightsData& params)
 {
     return QnAbstractTransaction::makeHash(params.userId.toRfc4122(), "access_rights");
 }
 
-QnUuid createHashForApiLicenseDataHelper(const ApiLicenseData &params)
+QnUuid createHashForApiLicenseDataHelper(const nx::vms::api::LicenseData& params)
 {
     return QnAbstractTransaction::makeHash(params.key, "ApiLicense");
 }
 
-QnUuid createHashForApiMediaServerUserAttributesDataHelper(const ApiMediaServerUserAttributesData &params)
+QnUuid createHashForApiMediaServerUserAttributesDataHelper(
+    const api::MediaServerUserAttributesData &params)
 {
     return QnAbstractTransaction::makeHash(params.serverId.toRfc4122(), "server_attributes");
 }
@@ -204,7 +208,7 @@ QnUuid createHashForApiStoredFileDataHelper(const nx::vms::api::StoredFileData& 
     return QnAbstractTransaction::makeHash(params.path.toUtf8());
 }
 
-QnUuid createHashForApiDiscoveryDataHelper(const ApiDiscoveryData& params)
+QnUuid createHashForApiDiscoveryDataHelper(const nx::vms::api::DiscoveryData& params)
 {
     return QnAbstractTransaction::makeHash("discovery_data", params);
 }
@@ -242,6 +246,15 @@ struct UserNotificationManagerHelper
     void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
     {
         notificationParams.userNotificationManager->triggerNotification(tran, notificationParams.source);
+    }
+};
+
+struct TimeNotificationManagerHelper
+{
+    template<typename Param>
+    void operator ()(const QnTransaction<Param> &tran, const NotificationParams &notificationParams)
+    {
+        notificationParams.timeNotificationManager->triggerNotification(tran, notificationParams.source);
     }
 };
 
@@ -424,7 +437,7 @@ bool resourceAccessHelper(
     const auto& resPool = commonModule->resourcePool();
     QnResourcePtr target = resPool->getResourceById(resourceId);
     auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-    if (commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission))
+    if (commonModule->resourceAccessManager()->hasGlobalPermission(userResource, GlobalPermission::admin))
         return true;
 
     if (permissions == Qn::ReadPermission
@@ -504,17 +517,18 @@ struct ModifyCameraDataAccess
 template<typename Param>
 void applyColumnFilter(QnCommonModule*, const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
 
-void applyColumnFilter(QnCommonModule*, const Qn::UserAccessData& accessData, ApiMediaServerData& data)
+void applyColumnFilter(
+    QnCommonModule*, const Qn::UserAccessData& accessData, api::MediaServerData& data)
 {
     if (accessData != Qn::kSystemAccess)
         data.authKey.clear();
 }
 
-void applyColumnFilter(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiStorageData& data)
+void applyColumnFilter(
+    QnCommonModule* commonModule, const Qn::UserAccessData& accessData, api::StorageData& data)
 {
     if (!hasSystemAccess(accessData) && !commonModule->resourceAccessManager()->hasGlobalPermission(
-            accessData,
-            Qn::GlobalPermission::GlobalAdminPermission))
+        accessData, GlobalPermission::admin))
     {
         data.url = QnStorageResource::urlWithoutCredentials(data.url);
     }
@@ -795,7 +809,8 @@ struct ModifyCameraAttributesListAccess
 
 struct ReadServerAttributesAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
+        const api::MediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::ReadPermission);
     }
@@ -803,7 +818,8 @@ struct ReadServerAttributesAccess
 
 struct ReadServerAttributesAccessOut
 {
-    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
+    RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
+        const api::MediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
@@ -813,7 +829,8 @@ struct ReadServerAttributesAccessOut
 
 struct ModifyServerAttributesAccess
 {
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ApiMediaServerUserAttributesData& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData,
+        const api::MediaServerUserAttributesData& param)
     {
         return resourceAccessHelper(commonModule, accessData, param.serverId, Qn::SavePermission);
     }
@@ -829,7 +846,7 @@ struct UserInputAccess
 
         const auto& resPool = commonModule->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalUserInputPermission);
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, GlobalPermission::userInput);
         return result;
     }
 };
@@ -844,7 +861,7 @@ struct AdminOnlyAccess
 
         const auto& resPool = commonModule->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission);
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, GlobalPermission::admin);
         return result;
     }
 };
@@ -859,7 +876,7 @@ struct AdminOnlyAccessOut
 
         const auto& resPool = commonModule->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        RemotePeerAccess result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission)
+        RemotePeerAccess result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, GlobalPermission::admin)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
         return result;
@@ -904,7 +921,7 @@ struct VideoWallControlAccess
         >();
         bool result = commonModule->resourceAccessManager()->hasGlobalPermission(
             userResource,
-            Qn::GlobalControlVideoWallPermission);
+            GlobalPermission::controlVideowall);
         if (!result)
         {
             QString userName = userResource ? userResource->fullName() : lit("Unknown user");
@@ -1106,9 +1123,10 @@ struct LocalTransactionType
     }
 };
 
-ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, AbstractPersistentStorage* db)
+ec2::TransactionType::Value getStatusTransactionTypeFromDb(
+    const QnUuid& id, AbstractPersistentStorage* db)
 {
-    ApiMediaServerData server = db->getServer(id);
+    api::MediaServerData server = db->getServer(id);
     if (server.id.isNull())
         return ec2::TransactionType::Unknown;
     return TransactionType::Local;
@@ -1134,7 +1152,8 @@ struct SetStatusTransactionType
 
 struct SaveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(QnCommonModule*, const ApiUserData& params, AbstractPersistentStorage* /*db*/)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const nx::vms::api::UserData& params,
+        AbstractPersistentStorage* /*db*/)
     {
         return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
     }
@@ -1168,7 +1187,7 @@ ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
     const QnUuid& id,
     AbstractPersistentStorage* db)
 {
-    ApiUserData userData = db->getUser(id);
+    nx::vms::api::UserData userData = db->getUser(id);
     if (userData.id.isNull())
         return ec2::TransactionType::Unknown;
 

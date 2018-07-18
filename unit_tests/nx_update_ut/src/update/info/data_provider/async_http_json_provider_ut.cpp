@@ -22,7 +22,7 @@ public:
         QnMutexLocker lock(&m_mutex);
         m_lastResultCode = resultCode;
         m_metaData = std::make_unique<QByteArray>(std::move(rawData));
-        m_condition.wakeOne();;
+        m_condition.wakeOne();
     }
 
     virtual void onGetSpecificUpdateInformationDone(
@@ -120,6 +120,7 @@ private:
     info::test::detail::UpdateServer m_updateServer;
     size_t m_updateRequestCount = 0;
     QList<UpdateResponse> m_updateResponses;
+    QString m_updatePrefix;
 
     void prepareDataProvider()
     {
@@ -127,6 +128,7 @@ private:
         baseUrl.setScheme("http");
         baseUrl.setHost(m_updateServer.address().address.toString());
         baseUrl.setPort(m_updateServer.address().port);
+        m_updatePrefix = baseUrl.toString();
 
         m_rawDataProvider = RawDataProviderFactory::create(baseUrl.toString(), &m_providerHandler);
         ASSERT_TRUE((bool) m_rawDataProvider);
@@ -141,8 +143,8 @@ private:
         const test_support::UpdateTestData& updateTestData =
             test_support::updateTestDataList()[m_updateRequestCount];
         m_rawDataProvider->getSpecificUpdateData(
-            updateTestData.customization,
-            updateTestData.version);
+            m_updatePrefix + "/" + updateTestData.customization(),
+            updateTestData.build);
 
         processResponse();
     }

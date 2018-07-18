@@ -6,25 +6,24 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
+#include <common/common_globals.h>
+#include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_fwd.h>
-
-#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
 #include <utils/common/optional.h>
 
-#include <common/common_globals.h>
-
-#include <core/resource/resource_fwd.h>
-#include <nx_ec/data/api_resource_data.h>
-#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 class QnAbstractResourcePropertyAdaptor;
 
 template<class T>
 class QnResourcePropertyAdaptor;
 class QSettings;
+
+struct QnWatermarkSettings;
 
 namespace nx {
 namespace settings_names {
@@ -50,14 +49,25 @@ const QString kNameFrom(lit("emailFrom"));
 const QString kNameSignature(lit("emailSignature"));
 const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
+
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
 const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
+const QString kNamePrimaryTimeServer(lit("primaryTimeServer"));
+
+/* Max rtt for internet time synchronization request */
 const QString kMaxDifferenceBetweenSynchronizedAndInternetTime(
     lit("maxDifferenceBetweenSynchronizedAndInternetTime"));
+
+/* Max rtt for server to server or client to server time synchronization request */
 const QString kMaxDifferenceBetweenSynchronizedAndLocalTime(
     lit("maxDifferenceBetweenSynchronizedAndLocalTimeMs"));
+
+/* Period to check local time for changes */
 const QString kOsTimeChangeCheckPeriod(lit("osTimeChangeCheckPeriodMs"));
+
+/* Period to synchronize time via network */
 const QString kSyncTimeExchangePeriod(lit("syncTimeExchangePeriod"));
+
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -75,7 +85,6 @@ const QString kNameSystemName(lit("systemName"));
 const QString kNameStatisticsReportServerApi(lit("statisticsReportServerApi"));
 const QString kNameSettingsUrlParam(lit("clientStatisticsSettingsUrl"));
 
-
 const QString ldapUri(lit("ldapUri"));
 const QString ldapAdminDn(lit("ldapAdminDn"));
 const QString ldapAdminPassword(lit("ldapAdminPassword"));
@@ -91,6 +100,7 @@ const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 
 static const QString kUpdates2PropertyName = lit("updateStatus");
 
+const QString kWatermarkSettingsName(lit("watermarkSettings"));
 
 } // namespace settings_names
 } // namespace nx
@@ -232,6 +242,9 @@ public:
     bool isSynchronizingTimeWithInternet() const;
     void setSynchronizingTimeWithInternet(bool value);
 
+    QnUuid primaryTimeServer() const;
+    void setPrimaryTimeServer(const QnUuid& value);
+
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndInternetTime() const;
     std::chrono::milliseconds maxDifferenceBetweenSynchronizedAndLocalTime() const;
 
@@ -323,6 +336,9 @@ public:
     int maxWearableArchiveSynchronizationThreads() const;
     void setMaxWearableArchiveSynchronizationThreads(int newValue);
 
+    QnWatermarkSettings watermarkSettings() const;
+    void setWatermarkSettings(const QnWatermarkSettings & settings) const;
+
 signals:
     void initialized();
 
@@ -352,6 +368,7 @@ signals:
     void cloudConnectUdpHolePunchingEnabledChanged();
     void cloudConnectRelayingEnabledChanged();
     void updates2RegistryChanged();
+    void watermarkChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -383,6 +400,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnUuid> *m_primaryTimeServerAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndInternetTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_maxDifferenceBetweenSynchronizedAndLocalTimeAdaptor = nullptr;
     QnResourcePropertyAdaptor<int> *m_osTimeChangeCheckPeriodAdaptor = nullptr;
@@ -463,6 +481,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxWearableArchiveSynchronizationThreads = nullptr;
 
     QnResourcePropertyAdaptor<QByteArray>* m_updates2InfoAdaptor;
+    QnResourcePropertyAdaptor<QnWatermarkSettings>* m_watermarkSettings = nullptr;
 
     AdaptorList m_allAdaptors;
 

@@ -253,7 +253,7 @@ void SubjectSelectionDialog::UserListModel::setCustomUsersOnly(bool value)
 
 bool SubjectSelectionDialog::UserListModel::systemHasCustomUsers() const
 {
-    const auto id = userRolesManager()->predefinedRoleId(Qn::UserRole::CustomPermissions);
+    const auto id = userRolesManager()->predefinedRoleId(Qn::UserRole::customPermissions);
     return countEnabledUsers(resourceAccessSubjectsCache()->usersInRole(id)) > 0;
 }
 
@@ -298,7 +298,7 @@ bool SubjectSelectionDialog::UserListModel::filterAcceptsRow(int sourceRow,
     if (!user || !user->isEnabled())
         return false;
 
-    if (m_customUsersOnly && user->userRole() != Qn::UserRole::CustomPermissions)
+    if (m_customUsersOnly && user->userRole() != Qn::UserRole::customPermissions)
         return false;
 
     return base_type::filterAcceptsRow(sourceRow, sourceParent);
@@ -323,7 +323,7 @@ bool SubjectSelectionDialog::UserListModel::isIndirectlyChecked(const QModelInde
         return false;
 
     const auto role = user->userRole();
-    const auto roleId = role == Qn::UserRole::CustomUserRole
+    const auto roleId = role == Qn::UserRole::customUserRole
         ? user->userRoleId()
         : QnUserRolesManager::predefinedRoleId(role);
 
