@@ -180,7 +180,7 @@ int Appserver2Process::exec()
     if (!settings.cloudIntegration().cloudDbUrl.isEmpty())
         cloudManagerGroup.setCloudDbUrl(settings.cloudIntegration().cloudDbUrl);
 
-    addSelfServerResource(ec2Connection);
+    auto server = addSelfServerResource(ec2Connection);
 
     nx::vms::utils::loadResourcesFromEcs(
         m_commonModule.get(),
@@ -215,6 +215,7 @@ int Appserver2Process::exec()
 
     tcpListener.start();
     m_commonModule->messageProcessor()->init(ec2Connection);
+    server->setStatus(Qn::Online);
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
@@ -458,13 +459,12 @@ void Appserver2Process::resetInstanceCounter()
     m_instanceCounter = 0;
 }
 
-void Appserver2Process::addSelfServerResource(
+QnMediaServerResourcePtr Appserver2Process::addSelfServerResource(
     ec2::AbstractECConnectionPtr ec2Connection)
 {
     auto server = QnMediaServerResourcePtr(new QnMediaServerResource(m_commonModule.get()));
     server->setId(commonModule()->moduleGUID());
     m_commonModule->resourcePool()->addResource(server);
-    server->setStatus(Qn::Online);
     server->setServerFlags(nx::vms::api::SF_HasPublicIP);
     server->setName(QString::number(m_instanceCounter));
 
@@ -478,6 +478,7 @@ void Appserver2Process::addSelfServerResource(
         != ec2::ErrorCode::ok)
     {
     }
+    return server;
 }
 
 bool initResourceTypes(ec2::AbstractECConnection* ec2Connection)

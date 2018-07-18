@@ -97,6 +97,17 @@ Appserver2MessageProcessor::Appserver2MessageProcessor(QObject* parent):
     QnCommonMessageProcessor(parent),
     m_factory(new nx::TestResourceFactory())
 {
+    connect(resourcePool(), &QnResourcePool::statusChanged, this,
+        [this](const QnResourcePtr& resource)
+        {
+            const QnMediaServerResourcePtr& mserverRes = resource.dynamicCast<QnMediaServerResource>();
+            if (!mserverRes)
+                return;
+
+            auto connection = commonModule()->ec2Connection();
+            auto manager = connection->getResourceManager(Qn::kSystemAccess);
+            manager->setResourceStatusSync(resource->getId(), resource->getStatus());
+        });
 }
 
 void Appserver2MessageProcessor::onResourceStatusChanged(
@@ -140,10 +151,15 @@ void Appserver2MessageProcessor::updateResource(
     {
         if (!server->getApiUrl().host().isEmpty())
         {
-            QString gg4 = server->getApiUrl().toString();
             commonModule()->ec2Connection()->messageBus()->
                 addOutgoingConnectionToPeer(server->getId(), server->getApiUrl());
         }
+    }
+
+    if (m_delayedOnlineStatus.contains(resource->getId()))
+    {
+        m_delayedOnlineStatus.remove(resource->getId());
+        resource->setStatus(Qn::Online);
     }
 }
 
@@ -151,12 +167,19 @@ void Appserver2MessageProcessor::handleRemotePeerFound(
     QnUuid peer, nx::vms::api::PeerType /*peerType*/)
 {
     commonModule()->statusDictionary()->setValue(peer, Qn::Online);
+
+    QnResourcePtr res = resourcePool()->getResourceById(peer);
+    if (res)
+        res->setStatus(Qn::Online);
+    else
+        m_delayedOnlineStatus << peer;
 }
 
 void Appserver2MessageProcessor::handleRemotePeerLost(
     QnUuid peer, nx::vms::api::PeerType /*peerType*/)
 {
     commonModule()->statusDictionary()->setValue(peer, Qn::Offline);
+    m_delayedOnlineStatus.remove(peer);
 }
 
 } // namespace ec2
