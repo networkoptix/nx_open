@@ -329,7 +329,8 @@ void QnRtspConnectionProcessor::parseRequest()
     if (!nx_http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
         d->useProprietaryFormat = true;
     else {
-        d->sessionTimeOut = DEFAULT_RTSP_TIMEOUT.count();
+        d->sessionTimeOut =
+            std::chrono::duration_cast<std::chrono::seconds>(DEFAULT_RTSP_TIMEOUT).count();
         d->socket->setRecvTimeout(d->sessionTimeOut * 1500);
     }
 

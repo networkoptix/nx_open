@@ -31,7 +31,6 @@
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (10*1000)
 
-static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
