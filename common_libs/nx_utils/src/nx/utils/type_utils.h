@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -42,7 +43,7 @@ template<size_t N>
 struct TupleForEach
 {
     template<typename Tuple, typename Func>
-    static inline void for_each(const Tuple& tuple, Func& func)
+    static inline void for_each(const Tuple& tuple, Func func)
     {
         func(std::get<N-1>(tuple));
 
@@ -65,7 +66,7 @@ decltype(detail::Apply<
 }
 
 template<typename Tuple, typename Func>
-inline void tuple_for_each(const Tuple& tuple, Func& func)
+inline void tuple_for_each(const Tuple& tuple, Func func)
 {
     detail::TupleForEach<::std::tuple_size<typename ::std::decay<Tuple>::type>::value>
         ::for_each(tuple, func);

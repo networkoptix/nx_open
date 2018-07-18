@@ -53,7 +53,7 @@
     bool foundMatchingValue = false; \
     nx::utils::tuple_for_each( \
         std::make_tuple expectedValues, \
-        [&actualValue, &foundMatchingValue](const auto& value) \
+        [&actualValue, &foundMatchingValue](const auto& value) mutable \
             { foundMatchingValue |= actualValue == value; }); \
     ASSERT_TRUE(foundMatchingValue); \
 } while (0)
