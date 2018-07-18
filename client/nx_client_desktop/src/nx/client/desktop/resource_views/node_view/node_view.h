@@ -9,17 +9,19 @@ namespace nx {
 namespace client {
 namespace desktop {
 
+class NodeViewStore;
 class NodeViewState;
+class NodeViewModel;
 class NodeViewStatePatch;
 
-class NodeViewWidget: public Connective<TreeView>
+class NodeView: public Connective<TreeView>
 {
     Q_OBJECT
     using base_type = Connective<TreeView>;
 
 public:
-    NodeViewWidget(QWidget* parent = nullptr);
-    virtual ~NodeViewWidget() override;
+    NodeView(QWidget* parent = nullptr);
+    virtual ~NodeView() override;
 
     const NodeViewState& state() const;
 
@@ -27,7 +29,14 @@ public:
 
     void setProxyModel(QSortFilterProxyModel* proxy);
 
+protected:
+    const NodeViewStore* store() const;
+
+    NodeViewModel* sourceModel() const;
+
 private:
+    // Node view uses special model and proxy and we have to control this process.
+    // Thus it is denied to set model directly. Please use setProxyModel to set any other proxy.
     using base_type::setModel;
 
 private:

@@ -23,6 +23,8 @@ public:
 
     void applyPatch(const NodeViewStatePatch& patch);
 
+    QModelIndex index(const ViewNodePath& path, int column) const;
+
 public: // Overrides section
     virtual QModelIndex index(
         int row,

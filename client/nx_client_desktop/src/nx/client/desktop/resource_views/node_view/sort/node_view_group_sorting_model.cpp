@@ -3,7 +3,7 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/detail/node_view_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_helpers.h>
 
 namespace {
 
@@ -11,7 +11,7 @@ using namespace nx::client::desktop;
 
 int getNodeSiblingGroup(const QModelIndex& sourceIndex, const QAbstractItemModel* model)
 {
-    const auto mapped = detail::getSourceIndex(sourceIndex, model);
+    const auto mapped = details::getLeafIndex(sourceIndex, model);
     const auto node = NodeViewModel::nodeFromIndex(mapped);
     const auto data = node->data(node_view::nameColumn, node_view::siblingGroupRole);
     return data.isValid() ? data.toInt() : 0;

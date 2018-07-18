@@ -6,8 +6,6 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_state_patch.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/sort/node_view_group_sorting_model.h>
-#include <nx/client/desktop/resource_views/node_view/delegates/resource_node_view_item_delegate.h>
 
 #include <nx/client/desktop/resource_views/layout/accessible_layout_sort_model.h>
 
@@ -35,12 +33,8 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     ui->setupUi(this);
 
     const auto proxyModel = new AccessibleLayoutSortModel(this);
-    const auto siblingGroupProxyModel = new NodeViewGroupSortingModel(this);
-    siblingGroupProxyModel->setSourceModel(proxyModel);
-
     const auto tree = ui->layoutsTree;
-    tree->setItemDelegate(new ResourceNodeViewItemDelegate(tree, tree));
-    tree->setProxyModel(siblingGroupProxyModel);
+    tree->setProxyModel(proxyModel);
     tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
 
@@ -62,9 +56,7 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(
 //        ViewNode::create({helpers::createSeparatorNode()})));
 
-    tree->setExpandsOnDoubleClick(true);
     tree->expandAll();
-
     connect(ui->searchLineEdit, &SearchLineEdit::textChanged, this,
         [proxyModel](const QString& text) { proxyModel->setFilter(text); });
 }

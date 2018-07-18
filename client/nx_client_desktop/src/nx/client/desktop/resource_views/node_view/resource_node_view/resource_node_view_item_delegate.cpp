@@ -9,7 +9,7 @@
 
 #include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
-#include <nx/client/desktop/resource_views/node_view/detail/node_view_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_helpers.h>
 
 #include <ui/style/helper.h>
 #include <ui/common/text_pixmap_cache.h>
@@ -33,16 +33,22 @@ ResourceNodeViewItemDelegate::ResourceNodeViewItemDelegate(QTreeView* owner, QOb
 {
 }
 
+ResourceNodeViewItemDelegate::~ResourceNodeViewItemDelegate()
+{
+}
+
 void ResourceNodeViewItemDelegate::paint(
     QPainter *painter,
     const QStyleOptionViewItem &styleOption,
     const QModelIndex &index) const
 {
+    base_type::paint(painter, styleOption, index);
+
     QStyleOptionViewItem option(styleOption);
     initStyleOption(&option, index);
 
-    const auto topModel = owner()->model();
-    const auto sourceIndex = nx::client::desktop::detail::getSourceIndex(index, topModel);
+    const auto rootModel = owner()->model();
+    const auto sourceIndex = details::getLeafIndex(index, rootModel);
     const auto node = NodeViewModel::nodeFromIndex(sourceIndex);
     if (!node)
         return;
@@ -56,13 +62,6 @@ void ResourceNodeViewItemDelegate::paint(
         option.palette.setColor(QPalette::Text, mainColor);
         style->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);
     }
-    else if (option.features == QStyleOptionViewItem::None)
-    {
-        int y = option.rect.top() + option.rect.height() / 2;
-        QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Midlight));
-        painter->drawLine(0, y, option.rect.right(), y);
-    }
-
 
     // TOOD: think towmorrow how to move it to the base class (if we need it?)
     /* Obtain sub-element rectangles: */
@@ -113,6 +112,58 @@ const QnResourceItemColors& ResourceNodeViewItemDelegate::colors() const
 void ResourceNodeViewItemDelegate::setColors(const QnResourceItemColors& colors)
 {
     d->colors = colors;
+}
+
+void ResourceNodeViewItemDelegate::initStyleOption(
+    QStyleOptionViewItem* option,
+    const QModelIndex& index) const
+{
+    base_type::initStyleOption(option, index);
+
+    /* Init font options: */
+    option->font.setWeight(QFont::DemiBold);
+    option->fontMetrics = QFontMetrics(option->font);
+
+    /* Save default decoration size: */
+    QSize defaultDecorationSize = option->decorationSize;
+
+    /* If icon size is explicitly specified in itemview, decorationSize already holds that value.
+     * If icon size is not specified in itemview, set decorationSize to something big.
+     * It will be treated as maximal allowed size: */
+
+//    auto view = qobject_cast<const QAbstractItemView*>(option->widget);
+//    if ((!view || !view->iconSize().isValid()) && m_fixedHeight > 0)
+//        option->decorationSize.setHeight(qMin(defaultDecorationSize.height(), m_fixedHeight));
+
+    /* Call inherited implementation.
+     * When it configures item icon, it sets decorationSize to actual icon size: */
+    base_type::initStyleOption(option, index);
+
+    /* But if the item has no icon, restore decoration size to saved default: */
+    if (option->icon.isNull())
+        option->decorationSize = defaultDecorationSize;
+
+    if (!option->state.testFlag(QStyle::State_Enabled))
+        option->state &= ~(QStyle::State_Selected | QStyle::State_MouseOver);
+
+//    // Determine validity.
+//    if (m_options.testFlag(ValidateOnlyChecked))
+//    {
+//        const auto checkState = rowCheckState(index);
+//        if (checkState.canConvert<int>() && checkState.toInt() == Qt::Unchecked)
+//            return;
+//    }
+
+//    const auto isValid = index.data(Qn::ValidRole);
+//    if (isValid.canConvert<bool>() && !isValid.toBool())
+//        option->state |= State_Error;
+
+//    const auto validationState = index.data(Qn::ValidationStateRole);
+//    if (validationState.canConvert<QValidator::State>()
+//        && validationState.value<QValidator::State>() == QValidator::Invalid)
+//    {
+//        option->state |= State_Error;
+//    }
 }
 
 } // namespace desktop

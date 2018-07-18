@@ -3,11 +3,11 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 class QTreeView;
-class QPainter;
 
 namespace nx {
 namespace client {
 namespace desktop {
+namespace details {
 
 class NodeViewItemDelegate: public QStyledItemDelegate
 {
@@ -15,9 +15,14 @@ class NodeViewItemDelegate: public QStyledItemDelegate
     using base_type = QStyledItemDelegate;
 
 public:
-    NodeViewItemDelegate(QTreeView* owner, QObject* parent);
+    NodeViewItemDelegate(QTreeView* owner, QObject* parent = nullptr);
 
-    const QTreeView* owner() const;
+    QTreeView* owner() const;
+
+    virtual void paint(
+        QPainter *painter,
+        const QStyleOptionViewItem &styleOption,
+        const QModelIndex &index) const override;
 
 protected:
     virtual void initStyleOption(
@@ -25,9 +30,10 @@ protected:
         const QModelIndex& index) const override;
 
 private:
-    QTreeView const * const m_owner;
+    QTreeView* const m_owner;
 };
 
+} // namespace details
 } // namespace desktop
 } // namespace client
 } // namespace nx

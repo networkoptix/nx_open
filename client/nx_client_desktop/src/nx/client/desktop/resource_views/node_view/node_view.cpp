@@ -1,4 +1,4 @@
-#include "node_view_widget.h"
+#include "node_view.h"
 
 #include <QtWidgets/QHeaderView>
 #include <QtCore/QSortFilterProxyModel>
@@ -9,12 +9,12 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_model.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_store.h>
-
 #include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
-#include <nx/client/desktop/resource_views/node_view/detail/node_view_helpers.h>
-
+#include <nx/client/desktop/resource_views/node_view/sort/node_view_group_sorting_model.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_item_delegate.h>
 
 #include <nx/client/desktop/common/utils/item_view_utils.h>
 
@@ -22,33 +22,36 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-struct NodeViewWidget::Private: public QObject
+struct NodeView::Private: public QObject
 {
-    Private(NodeViewWidget* owner);
+    Private(NodeView* owner);
 
     void updateColumns();
 
-    NodeViewWidget * const owner;
+    NodeView * const owner;
     NodeViewStore store;
+
     NodeViewModel model;
-    QSortFilterProxyModel* proxy = nullptr;
+    NodeViewGroupSortingModel groupSortingProxyModel;
+    details::NodeViewItemDelegate itemDelegate;
     ItemViewUtils::CheckableCheckFunction checkableCheck;
 };
 
-NodeViewWidget::Private::Private(NodeViewWidget* owner):
+NodeView::Private::Private(NodeView* owner):
     owner(owner),
     model(&store),
+    itemDelegate(owner),
     checkableCheck(
         [owner](const QModelIndex& index) -> bool
         {
-            const auto mappedIndex = detail::getSourceIndex(index, owner->model());
+            const auto mappedIndex = details::getLeafIndex(index, owner->model());
             const auto node = NodeViewModel::nodeFromIndex(mappedIndex);
             return node ? node->checkable() : false;
         })
 {
 }
 
-void NodeViewWidget::Private::updateColumns()
+void NodeView::Private::updateColumns()
 {
     const auto header = owner->header();
 
@@ -63,41 +66,53 @@ void NodeViewWidget::Private::updateColumns()
 
 //-------------------------------------------------------------------------------------------------
 
-NodeViewWidget::NodeViewWidget(QWidget* parent):
+NodeView::NodeView(QWidget* parent):
     base_type(parent),
     d(new Private(this))
 {
-    setModel(&d->model);
+    d->groupSortingProxyModel.setSourceModel(&d->model);
+    setModel(&d->groupSortingProxyModel);
     setSortingEnabled(true);
     setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents(0, 1)));
     setIndentation(style::Metrics::kDefaultIconSize);
-
+    setItemDelegate(&d->itemDelegate);
     ItemViewUtils::setupDefaultAutoToggle(this, node_view::checkMarkColumn, d->checkableCheck);
 
     connect(&d->store, &NodeViewStore::patchApplied, &d->model, &NodeViewModel::applyPatch);
     connect(&d->model, &NodeViewModel::checkedChanged, &d->store, &NodeViewStore::setNodeChecked);
 }
 
-NodeViewWidget::~NodeViewWidget()
+NodeView::~NodeView()
 {
 }
 
-const NodeViewState& NodeViewWidget::state() const
+const NodeViewState& NodeView::state() const
 {
     return d->store.state();
 }
 
-void NodeViewWidget::applyPatch(const NodeViewStatePatch& patch)
+void NodeView::applyPatch(const NodeViewStatePatch& patch)
 {
     d->store.applyPatch(patch);
     d->updateColumns();
 }
 
-void NodeViewWidget::setProxyModel(QSortFilterProxyModel* proxy)
+void NodeView::setProxyModel(QSortFilterProxyModel* proxy)
 {
+    d->groupSortingProxyModel.setSourceModel(proxy);
     proxy->setSourceModel(&d->model);
-    setModel(proxy);
 }
+
+const NodeViewStore* NodeView::store() const
+{
+    return &d->store;
+}
+
+NodeViewModel* NodeView::sourceModel() const
+{
+    return &d->model;
+}
+
 
 } // namespace desktop
 } // namespace client

@@ -105,6 +105,13 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
     applyNodeViewPatch(std::move(d->state), patch, getAddNodeGuard, getDataChangedGuard);
 }
 
+QModelIndex NodeViewModel::index(const ViewNodePath& path, int column) const
+{
+    const auto node = d->state.nodeByPath(path);
+    NX_EXPECT(node, "Wrong path!");
+    return node ? d->getModelIndex(node, column) : QModelIndex();
+}
+
 QModelIndex NodeViewModel::index(
     int row,
     int column,

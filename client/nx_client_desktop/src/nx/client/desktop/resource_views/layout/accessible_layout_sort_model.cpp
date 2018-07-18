@@ -11,6 +11,7 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/details/node_view_helpers.h>
 
 QnUuid getCurrentUserId()
 {
@@ -38,8 +39,12 @@ bool AccessibleLayoutSortModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    const auto left = NodeViewModel::nodeFromIndex(sourceLeft);
-    const auto right = NodeViewModel::nodeFromIndex(sourceRight);
+    const auto leafModel = sourceModel();
+    const auto leafLeft = details::getLeafIndex(sourceLeft, leafModel);
+    const auto leafRight = details::getLeafIndex(sourceRight, leafModel);
+
+    const auto left = NodeViewModel::nodeFromIndex(leafLeft);
+    const auto right = NodeViewModel::nodeFromIndex(leafRight);
     if (!left || !right)
         return !base_type::lessThan(sourceLeft, sourceRight);
 
