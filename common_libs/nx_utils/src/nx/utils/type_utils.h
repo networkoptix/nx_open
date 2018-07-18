@@ -36,7 +36,22 @@ struct Apply<0>
     }
 };
 
-}   //namespace detail
+//-------------------------------------------------------------------------------------------------
+
+template<size_t N>
+struct TupleForEach
+{
+    template<typename Tuple, typename Func>
+    static inline void for_each(const Tuple& tuple, Func& func)
+    {
+        func(std::get<N-1>(tuple));
+
+        if constexpr (N > 1)
+            TupleForEach<N - 1>::for_each(tuple, func);
+    }
+};
+
+} // namespace detail
 
 /** Calls f passing it members of tuple t as arguments. */
 template<typename F, typename T>
@@ -49,6 +64,12 @@ decltype(detail::Apply<
         ::apply(::std::forward<F>(f), ::std::forward<T>(t));
 }
 
+template<typename Tuple, typename Func>
+inline void tuple_for_each(const Tuple& tuple, Func& func)
+{
+    detail::TupleForEach<::std::tuple_size<typename ::std::decay<Tuple>::type>::value>
+        ::for_each(tuple, func);
+}
 
 /**
  * Converts unique_ptr of one type to another using static_cast.
