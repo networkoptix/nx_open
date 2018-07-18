@@ -1,4 +1,4 @@
-# Framework for creating .deb packages.
+# Utilities helpful for creating distribution packages (.deb, .dmg or archives).
 #
 # All global symbols have prefix "distrib_".
 
@@ -112,20 +112,20 @@ distrib_onExit()
 }
 
 # Global variables - need to be accessible in onExit().
-declare -g distrib_WORK_DIR
-declare -g -i distrib_VERBOSE
-declare -g -i distrib_KEEP_WORK_DIR
-declare -g distrib_STDERR_FILE
+declare distrib_WORK_DIR
+declare -i distrib_VERBOSE
+declare -i distrib_KEEP_WORK_DIR
+declare distrib_STDERR_FILE
 
 #--------------------------------------------------------------------------------------------------
 # public
 
 # Description of additional command-line options to show with the help.
-declare -g distrib_EXTRA_HELP=""
+declare distrib_EXTRA_HELP=""
 
 # Callback which is called for each command-line argument:
 #     parseExtraArgs arg_value arg_number "$@"
-declare -g distrib_PARSE_EXTRA_ARGS_FUNC=""
+declare distrib_PARSE_EXTRA_ARGS_FUNC=""
 
 # [in,out] CONFIG If defined, overrides config_file, otherwise is set to config_file.
 #
@@ -155,6 +155,28 @@ distrib_copySystemLibs() # dest_dir libs_to_copy...
         --link-flags="$LDFLAGS" \
         --dest-dir="$DEST_DIR" \
         "$@"
+}
+
+# Copy specified plugins from $BUILD_DIR/bin/plugins-dir-name to target-dir/plugins-dir-name>/.
+# Create target-dir if needed.
+#
+# [in] BUILD_DIR
+#
+distrib_copyMediaserverPlugins() # plugins-folder-name target-dir plugin_lib_name...
+{
+    local -r PLUGINS_DIR_NAME="$1" && shift
+    local -r TARGET_DIR="$1" && shift
+
+    mkdir -p "$TARGET_DIR/$PLUGINS_DIR_NAME"
+
+    local PLUGIN
+    local PLUGIN_FILENAME
+    for PLUGIN in "$@"
+    do
+        PLUGIN_FILENAME="lib$PLUGIN.so"
+        echo "  Copying $PLUGIN_FILENAME to $PLUGINS_DIR_NAME"
+        cp "$BUILD_DIR/bin/$PLUGINS_DIR_NAME/$PLUGIN_FILENAME" "$TARGET_DIR/$PLUGINS_DIR_NAME/"
+    done
 }
 
 distrib_createArchive() # archive dir command...

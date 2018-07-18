@@ -7,12 +7,6 @@ source "$(dirname $0)/../../build_distribution_utils.sh"
 distrib_loadConfig "build_distribution.conf"
 
 WORK_DIR="server_build_distribution_tmp"
-STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
-STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/mediaserver"
-STAGE_BIN="$STAGE_MODULE/bin"
-STAGE_LIB="$STAGE_MODULE/lib"
-STAGE_PLUGINS="$STAGE_MODULE/bin/plugins"
-
 LOG_FILE="$LOGS_DIR/server_build_distribution.log"
 
 # Strip binaries and remove rpath.
@@ -59,7 +53,7 @@ copyLibs()
     stripIfNeeded "$STAGE_LIB"
 }
 
-# [in] STAGE_PLUGINS
+# [in] STAGE_MODULE
 copyMediaserverPlugins()
 {
     echo ""
@@ -71,7 +65,7 @@ copyMediaserverPlugins()
         it930x_plugin
         mjpg_link
     )
-    PLUGINS+=(
+    PLUGINS+=( # Metadata plugins.
         hikvision_metadata_plugin
         axis_metadata_plugin
         dw_mtt_metadata_plugin
@@ -82,17 +76,15 @@ copyMediaserverPlugins()
         PLUGINS+=( hanwha_metadata_plugin )
     fi
 
-    mkdir -p "$STAGE_PLUGINS"
-    local PLUGIN_FILENAME
-    local PLUGIN
-    for PLUGIN in "${PLUGINS[@]}"
-    do
-        PLUGIN_FILENAME="lib$PLUGIN.so"
-        echo "  Copying $PLUGIN_FILENAME"
-        cp "$BUILD_DIR/bin/plugins/$PLUGIN_FILENAME" "$STAGE_PLUGINS/"
-    done
+    distrib_copyMediaserverPlugins "plugins" "$STAGE_MODULE/bin" "${PLUGINS[@]}"
+    stripIfNeeded "$STAGE_MODULE/bin/plugins"
 
-    stripIfNeeded "$STAGE_PLUGINS"
+    local PLUGINS_OPTIONAL=(
+        stub_metadata_plugin
+    )
+
+    distrib_copyMediaserverPlugins "plugins_optional" "$STAGE_MODULE/bin" "${PLUGINS_OPTIONAL[@]}"
+    stripIfNeeded "$STAGE_MODULE/bin/plugins_optional"
 }
 
 # [in] STAGE_BIN
@@ -243,10 +235,14 @@ createUpdateZip() # file.deb
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
 }
 
-# [in] STAGE_MODULE
-# [in] STAGE_BIN
+# [in] WORK_DIR
 buildDistribution()
 {
+    local -r STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
+    local -r STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/mediaserver"
+    local -r STAGE_BIN="$STAGE_MODULE/bin"
+    local -r STAGE_LIB="$STAGE_MODULE/lib"
+
     echo "Creating stage dir $STAGE_MODULE/etc"
     mkdir -p "$STAGE_MODULE/etc" #< TODO: This folder is always empty. Is it needed?
 
