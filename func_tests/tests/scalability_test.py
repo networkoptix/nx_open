@@ -3,6 +3,7 @@
 Measure system synchronization time.
 """
 
+from contextlib import contextmanager
 import datetime
 import logging
 import traceback
@@ -319,28 +320,33 @@ system_settings = dict(
     synchronizeTimeWithInternet=utils.bool_to_str(False),
     )
 
+server_config = dict(
+    p2pMode=True,
+    )
+
 
 Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merge_start_time')
 
-def make_lws_env(config, groups):
-    server = groups.allocate_one_server('standalone', system_settings)
-    lws = groups.allocate_lws(
-        server_count=config.SERVER_COUNT - 1,  # minus one standalone
-        merge_timeout_sec=config.MERGE_TIMEOUT.total_seconds(),
-        CAMERAS_PER_SERVER=config.CAMERAS_PER_SERVER,
-        STORAGES_PER_SERVER=config.STORAGES_PER_SERVER,
-        USERS_PER_SERVER=config.USERS_PER_SERVER,
-        PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
-        )
-    merge_start_time = utils.datetime_utc_now()
-    merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
-    return Env(
-        all_server_list=[server] + lws.servers,
-        real_server_list=[server],
-        lws=lws,
-        os_access_set=set([server.os_access, lws.os_access]),
-        merge_start_time=merge_start_time,
-        )
+@contextmanager
+def lws_env(config, groups):
+    with groups.allocated_one_server('standalone', system_settings, server_config) as server:
+        with groups.allocated_lws(
+                server_count=config.SERVER_COUNT - 1,  # minus one standalone
+                merge_timeout_sec=config.MERGE_TIMEOUT.total_seconds(),
+                CAMERAS_PER_SERVER=config.CAMERAS_PER_SERVER,
+                STORAGES_PER_SERVER=config.STORAGES_PER_SERVER,
+                USERS_PER_SERVER=config.USERS_PER_SERVER,
+                PROPERTIES_PER_CAMERA=config.PROPERTIES_PER_CAMERA,
+                ) as lws:
+            merge_start_time = utils.datetime_utc_now()
+            merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
+            yield Env(
+                all_server_list=[server] + lws.servers,
+                real_server_list=[server],
+                lws=lws,
+                os_access_set=set([server.os_access, lws.os_access]),
+                merge_start_time=merge_start_time,
+                )
 
 def make_real_servers_env(config, server_list, remote_address=REMOTE_ADDRESS_ACCESSIBLE):
     # lightweight servers create data themselves
@@ -356,9 +362,11 @@ def make_real_servers_env(config, server_list, remote_address=REMOTE_ADDRESS_ACC
         merge_start_time=merge_start_time,
         )
 
-def make_unpack_env(config, groups):
-    server_list = groups.allocate_many_servers(config.SERVER_COUNT, system_settings)
-    return make_real_servers_env(config, server_list, remote_address=REMOTE_ADDRESS_ANY)
+@contextmanager
+def unpack_env(config, groups):
+    with groups.allocated_many_servers(
+            config.SERVER_COUNT, system_settings, server_config) as server_list:
+        yield make_real_servers_env(config, server_list, remote_address=REMOTE_ADDRESS_ANY)
 
 @pytest.fixture
 def vm_env(hypervisor, vm_factory, mediaserver_factory, config):
@@ -378,11 +386,13 @@ def env(request, unpacked_mediaserver_factory, config):
     if config.HOST_LIST:
         groups = unpacked_mediaserver_factory.from_host_config_list(config.HOST_LIST)
         if config.USE_LIGHTWEIGHT_SERVERS:
-            return make_lws_env(config, groups)
+            with lws_env(config, groups) as env:
+                yield env
         else:
-            return make_unpack_env(config, groups)
+            with unpack_env(config, groups) as env:
+                yield env
     else:
-        return request.getfixturevalue('vm_env')
+        yield request.getfixturevalue('vm_env')
     
 
 def test_scalability(artifact_factory, metrics_saver, config, env):

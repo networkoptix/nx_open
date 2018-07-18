@@ -49,11 +49,11 @@ class LwsInstallation(CustomPosixInstallation):
         return installation
 
     def __init__(self, posix_access, dir, installation_group, server_port_base, identity=None):
-        super(LwsInstallation, self).__init__(posix_access, dir)
+        super(LwsInstallation, self).__init__(posix_access, dir, core_dumps_dirs=[dir])
         self._installation_group = installation_group
         self.server_port_base = server_port_base
         self._lws_binary_path = self.dir / LWS_BINARY_NAME
-        self._log_file_base = 'lws'
+        self._log_file_base = self.dir / 'lws'
         self._test_tmp_dir = self.dir / 'tmp'
         self._identity = identity  # never has value self._NOT_SET, _discover_identity is never called
         self._template_renderer = TemplateRenderer()
@@ -73,6 +73,12 @@ class LwsInstallation(CustomPosixInstallation):
             self._test_tmp_dir,
             ]
 
+    def list_log_files(self):
+        return self.dir.glob('lws*.log') + [
+            self.dir / 'server.stderr',
+            self.dir / 'server.stdout',
+            ]
+
     def ensure_server_is_stopped(self):
         if not self.is_valid():
             return
@@ -80,8 +86,8 @@ class LwsInstallation(CustomPosixInstallation):
             return
         self.service.stop()
 
-    def install(self, installer, lightweight_mediaserver_installer):
-        if not self.should_reinstall(installer):
+    def install(self, installer, lightweight_mediaserver_installer, force=False):
+        if not force and not self.should_reinstall(installer):
             return
         dist_dir = self._installation_group.get_unpacked_dist_dir(installer)
         self.dir.ensure_empty_dir()
@@ -94,13 +100,20 @@ class LwsInstallation(CustomPosixInstallation):
         self.dir.joinpath(LWS_CTL_NAME).ensure_file_is_missing()
         assert self.is_valid()
 
+    def cleanup(self):
+        self.cleanup_core_dumps()
+        try:
+            self._log_file_base.with_suffix('.log').unlink()
+        except DoesNotExist:
+            pass
+
     def write_control_script(self, server_count, **kw):
         assert self.server_port_base, "'lws_port_base' is not defined for this host"
         assert not self._installed_server_count, "'write_control_script' was already called"
         contents = self._template_renderer.render(
             LWS_CTL_TEMPLATE_PATH,
             SERVER_DIR=str(self.dir),
-            LOG_PATH_BASE=self._log_file_base,
+            LOG_PATH_BASE=str(self._log_file_base),
             SERVER_PORT_BASE=self.server_port_base,
             TEST_TMP_DIR=self._test_tmp_dir,
             SERVER_COUNT=server_count,
@@ -139,11 +152,15 @@ class LwMultiServer(object):
         self.address = installation.os_access.port_map.remote.address
         self._server_remote_port_base = installation.server_port_base
         self._server_count = installation.server_count
-        self._service = installation.service
+        self.service = installation.service
 
     def __repr__(self):
         return '<LwMultiServer at {}:{} {} (#{})>'.format(
             self.address, self._server_remote_port_base, self.installation.dir, self._server_count)
+
+    @property
+    def name(self):
+        return 'lws'
 
     def __getitem__(self, index):
         remote_port = self._server_remote_port_base + index
@@ -168,18 +185,18 @@ class LwMultiServer(object):
             return True
 
     def start(self, already_started_ok=False):
-        if self._service.is_running():
+        if self.service.is_running():
             if not already_started_ok:
                 raise Exception("Already started")
         else:
-            self._service.start()
+            self.service.start()
             wait_for_true(self.is_online)
 
     def stop(self, already_stopped_ok=False):
         _logger.info("Stop lw multi mediaserver %r.", self)
-        if self._service.is_running():
-            self._service.stop()
-            wait_for_true(lambda: not self._service.is_running(), "{} stops".format(self._service))
+        if self.service.is_running():
+            self.service.stop()
+            wait_for_true(lambda: not self.service.is_running(), "{} stops".format(self.service))
         else:
             if not already_stopped_ok:
                 raise Exception("Already stopped")
