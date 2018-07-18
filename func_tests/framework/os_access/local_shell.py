@@ -112,7 +112,7 @@ class _LocalRun(Run):
                     else:
                         stream.logger.debug("Ready.")
                     chunk = os.read(fd, _STREAM_BUFFER_SIZE)
-                    assert chunk, "Must be some data: see `mode`"
+                    assert chunk, "Must be some data: see local variable `mode`"
                     name2data[stream.name] = chunk
                 elif mode & select.POLLHUP:
                     stream.logger.debug("Ended.")
