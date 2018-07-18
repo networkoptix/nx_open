@@ -57,7 +57,7 @@
     "PASSWORD TOO COMMON TEXT": "Mật khẩu này nằm trong mật khẩu phổ biến nhất trên thế giới",
     "PASSWORD IS WEAK TEXT": "Sử dụng số, chữ hoa và chữ thường và ký tự đặc biệt để làm cho mật khẩu của bạn mạnh mẽ hơn",
     "TERMS AND CONDITIONS ERROR TEXT": "Vui lòng xem và đồng ý với các điều khoản và điều kiện và quyền riêng tư chính sách để tiếp tục",
-    "THIS LINK IS BROKEN TEXT": "Kiểm tra các lỗi dưới đây,<br>\n            Hệ thống truy nhập có thể bị mất kết nối khỏi %PRODUCT_NAME%<br>\n            Truy cập vào hệ thống này có thể bị thu hồi,<br>\n            Hoặc bạn có thể đăng nhập vào bằng một tài khoản khác",
+    "THIS LINK IS BROKEN TEXT": "Kiểm tra các lỗi dưới đây,<br>\n            Hệ thống truy nhập có thể bị mất kết nối khỏi%PRODUCT_NAME%<br>\n            Truy cập vào hệ thống này có thể bị thu hồi,<br>\n            Hoặc bạn có thể đăng nhập vào bằng một tài khoản khác",
     "PAGE NOT FOUND": "Không tìm thấy trang",
     "TAKE ME HOME": "Quay về trang chủ",
     "OPEN NX WITNESS BUTTON TEXT": "Mở %VMS_NAME%"
