@@ -30,6 +30,8 @@ protected:
             .setEndpoint(endpoint()).setPath(kStatisticsMetricsPath);
 
         network::http::HttpClient httpClient;
+        httpClient.setResponseReadTimeout(network::kNoTimeout);
+
         ASSERT_TRUE(httpClient.doGet(url));
         ASSERT_NE(nullptr, httpClient.response());
         ASSERT_EQ(
