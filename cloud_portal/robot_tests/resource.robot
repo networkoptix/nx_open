@@ -10,16 +10,38 @@ Resource          ${variables_file}
 ${headless}    false
 ${directory}    ${SCREENSHOTDIRECTORY}
 ${variables_file}    variables-env.robot
+${docker}    false
+@{chrome_arguments}    --disable-infobars    --headless    --disable-gpu    --no-sandbox
 
 *** Keywords ***
 Open Browser and go to URL
     [Arguments]    ${url}
-    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
-    Open Browser    ${ENV}    ${BROWSER}
-#    Maximize Browser Window
+    run keyword if    "${docker}"=="false"    Regular Open Browser    ${url}
+    ...          ELSE    Docker Open Browser    ${url}
     Set Selenium Speed    0
     Check Language
     Go To    ${url}
+
+Regular Open Browser
+    [Arguments]    ${url}
+    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
+    Open Browser    ${ENV}    ${BROWSER}
+#    Maximize Browser Window
+
+Docker Open Browser
+    [Arguments]    ${url}
+    Set Screenshot Directory    ${SCREENSHOT_DIRECTORY}
+    ${chrome_options}=    Set Chrome Options
+    Create Webdriver    Chrome    chrome_options=${chrome_options}
+    Sleep    20
+    Go to    ${url}
+
+Set Chrome Options
+    [Documentation]    Set Chrome options for headless mode
+    ${options}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
+    : FOR    ${option}    IN    @{chrome_arguments}
+    \    Call Method    ${options}    add_argument    ${option}
+    [Return]    ${options}
 
 Check Language
     Wait Until Page Contains Element    ${LANGUAGE DROPDOWN}/following-sibling::ul//a[@ng-click='changeLanguage(lang.language)']/span[@lang='en_US']
