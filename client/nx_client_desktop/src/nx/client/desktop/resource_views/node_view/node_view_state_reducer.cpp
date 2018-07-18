@@ -87,7 +87,7 @@ Qt::CheckState getSiblingsCheckState(Qt::CheckState currentCheckedState, const N
 
     for (auto it = siblings.begin(); it != siblings.end(); ++it)
     {
-        const auto state = helpers::checkedState(*it);
+        const auto state = helpers::nodeCheckedState(*it);
         if (state != currentCheckedState)
             return Qt::PartiallyChecked;
     }

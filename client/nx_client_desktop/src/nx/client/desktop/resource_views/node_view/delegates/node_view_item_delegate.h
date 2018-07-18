@@ -19,12 +19,6 @@ public:
 
     const QTreeView* owner() const;
 
-public:
-    virtual void paint(
-        QPainter *painter,
-        const QStyleOptionViewItem &option,
-        const QModelIndex &index) const override;
-
 protected:
     virtual void initStyleOption(
         QStyleOptionViewItem* option,

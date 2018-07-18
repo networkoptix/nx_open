@@ -3,6 +3,7 @@
 #include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_fwd.h>
+#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 namespace nx {
 namespace client {
@@ -32,7 +33,7 @@ NodePtr createCurrentUserLayoutsNode(bool allowSelectAll = true);
 NodePtr createResourceNode(
     const QnResourcePtr& resource,
     bool checkable = false,
-    Qt::CheckState checkedState = Qt::Unchecked);
+    Qt::CheckState nodeCheckedState = Qt::Unchecked);
 
 using RelationCheckFunction =
     std::function<bool (const QnResourcePtr& parent, const QnResourcePtr& child)>;
@@ -43,13 +44,14 @@ NodePtr createParentResourceNode(
     const RelationCheckFunction& relationCheckFunction,
     const NodeCreationFunction& nodeCreationFunction = NodeCreationFunction(),
     bool checkable = false,
-    Qt::CheckState checkedState = Qt::Unchecked);
+    Qt::CheckState nodeCheckedState = Qt::Unchecked);
 
 QnResourceList getLeafSelectedResources(const NodePtr& rootNode);
 
 QnResourcePtr getResource(const NodePtr& node);
 
-Qt::CheckState checkedState(const NodePtr& node);
+Qt::CheckState nodeCheckedState(const NodePtr& node);
+QString nodeText(const NodePtr& node, int column = node_view::nameColumn);
 
 } // namespace helpers
 } // namespace desktop

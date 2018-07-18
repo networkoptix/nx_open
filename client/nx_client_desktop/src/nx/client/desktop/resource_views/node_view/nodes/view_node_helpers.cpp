@@ -8,7 +8,6 @@
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
-#include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 
 #include <ui/style/resource_icon_cache.h>
 
@@ -273,10 +272,15 @@ QnResourcePtr getResource(const NodePtr& node)
     return QnResourcePtr();
 }
 
-Qt::CheckState checkedState(const NodePtr& node)
+Qt::CheckState nodeCheckedState(const NodePtr& node)
 {
     const auto checkedData = node->data(node_view::checkMarkColumn, Qt::CheckStateRole);
     return checkedData.isNull() ? Qt::Unchecked : checkedData.value<Qt::CheckState>();
+}
+
+QString nodeText(const NodePtr& node, int column)
+{
+    return node->data(column, Qt::DisplayRole).toString();
 }
 
 } // namespace helpers

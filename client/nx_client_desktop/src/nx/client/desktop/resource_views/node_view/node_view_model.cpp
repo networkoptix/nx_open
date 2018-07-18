@@ -94,10 +94,8 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
             return QnRaiiGuard::createDestructible(
                 [this, changedData, node]()
                 {
-                    for (const auto data: changedData)
+                    for (const auto [column, roles]: changedData)
                     {
-                        const int column = data.first;
-                        const auto roles = data.second;
                         const auto nodeIndex = d->getModelIndex(node, column);
                         emit dataChanged(nodeIndex, nodeIndex, roles);
                     }

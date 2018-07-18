@@ -2,6 +2,8 @@
 
 #include <nx/client/desktop/resource_views/node_view/delegates/node_view_item_delegate.h>
 
+class QnResourceItemColors;
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -18,8 +20,12 @@ public:
         const QStyleOptionViewItem &option,
         const QModelIndex &index) const override;
 
+    const QnResourceItemColors& colors() const;
+    void setColors(const QnResourceItemColors& colors);
+
 private:
-    QTreeView const * m_owner;
+    struct Private;
+    const QScopedPointer<Private> d;
 };
 
 } // namespace desktop

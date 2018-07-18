@@ -23,26 +23,6 @@ const QTreeView* NodeViewItemDelegate::owner() const
     return m_owner;
 }
 
-void NodeViewItemDelegate::paint(
-    QPainter *painter,
-    const QStyleOptionViewItem &styleOption,
-    const QModelIndex &index) const
-{
-    QStyleOptionViewItem option(styleOption);
-    initStyleOption(&option, index);
-
-    if (option.features == QStyleOptionViewItem::None)
-    {
-        int y = option.rect.top() + option.rect.height() / 2;
-        QnScopedPainterPenRollback penRollback(painter, option.palette.color(QPalette::Midlight));
-        painter->drawLine(0, y, option.rect.right(), y);
-    }
-    else
-    {
-        base_type::paint(painter, option, index);
-    }
-}
-
 void NodeViewItemDelegate::initStyleOption(
     QStyleOptionViewItem* option,
     const QModelIndex& index) const
