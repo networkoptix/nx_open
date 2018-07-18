@@ -142,7 +142,6 @@ private:
 
     void addAuthHeader(
         nx::network::http::Response& responseHeaders,
-        const QnUserResourcePtr& userRes = {},
         bool isProxy = false,
         bool isDigest = true);
 

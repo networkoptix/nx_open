@@ -368,22 +368,15 @@ Qn::AuthResult Authenticator::tryHttpMethods(
 
                     addAuthHeader(
                         response,
-                        QnUserResourcePtr(),
                         isProxy,
                         false); //requesting Basic authorization
                         return authResult;
                 }
             }
         }
-        else {
-            // use admin's realm by default for better compatibility with previous version
-            // in case of default realm upgrade
-            userResource = resourcePool()->getAdministrator();
-        }
 
         addAuthHeader(
             response,
-            QnUserResourcePtr(),
             isProxy);
 
         NX_DEBUG(this, lm("%1 requesting digest auth (%2)").args(authResult, request.requestLine));
@@ -624,7 +617,6 @@ Qn::AuthResult Authenticator::tryHttpDigest(
     if (nonce.isEmpty() || userName.isEmpty() || !verifyDigestUri(requestLine.url, uri))
         return Qn::Auth_WrongDigest;
 
-    QnUserResourcePtr userResource;
     Qn::AuthResult errCode = Qn::Auth_WrongDigest;
     if (m_nonceProvider->isNonceValid(nonce))
     {
@@ -643,17 +635,8 @@ Qn::AuthResult Authenticator::tryHttpDigest(
             return Qn::Auth_OK;
     }
 
-    if (userResource &&
-        userResource->getRealm() != nx::network::AppInfo::realm())
-    {
-        //requesting client to re-calculate user's HA1 digest
-        nx::network::http::insertOrReplaceHeader(
-            &responseHeaders.headers,
-            nx::network::http::HttpHeader(Qn::REALM_HEADER_NAME, nx::network::AppInfo::realm().toLatin1()));
-    }
     addAuthHeader(
         responseHeaders,
-        userResource,
         isProxy);
 
     if (errCode == Qn::Auth_WrongLogin && !QUuid(userName).isNull())
@@ -704,21 +687,10 @@ Qn::AuthResult Authenticator::tryHttpBasic(
 
 void Authenticator::addAuthHeader(
     nx::network::http::Response& response,
-    const QnUserResourcePtr& userResource,
     bool isProxy,
     bool isDigest)
 {
-    QString realm;
-    if (userResource)
-        realm = userResource->getRealm();
-    else
-        realm = nx::network::AppInfo::realm();
-
-    if (realm.isEmpty())
-    {
-        NX_ASSERT(false, lm("%1 does not have a realm").args(userResource));
-        realm = nx::network::AppInfo::realm();
-    }
+    const QString realm = nx::network::AppInfo::realm();
 
     const QString auth =
         isDigest
