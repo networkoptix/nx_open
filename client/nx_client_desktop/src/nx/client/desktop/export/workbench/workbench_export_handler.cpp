@@ -13,6 +13,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource_directory_browser.h>
+#include <core/resource/user_resource.h>
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/fusion/model_functions.h>
@@ -38,10 +39,13 @@
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ini.h>
+#include <api/global_settings.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -361,8 +365,22 @@ void WorkbenchExportHandler::startExportFromDialog(ExportSettingsDialog* dialog)
     {
         case ExportSettingsDialog::Mode::Media:
         {
-            const auto settings = dialog->exportMediaSettings();
+            auto settings = dialog->exportMediaSettings();
             exportProcessId = d->initExport(settings.fileName);
+
+            // Add watermark if needed.
+            if (ini().enableWatermark)
+            {
+                if (globalSettings()->watermarkSettings().useWatermark
+                    && context()->user() && !context()->user()->getName().isEmpty())
+                {
+                    auto watermarkExportSettings =
+                        QSharedPointer<ExportWatermarkSettings>(new ExportWatermarkSettings());
+                    watermarkExportSettings->settings = globalSettings()->watermarkSettings();
+                    watermarkExportSettings->username = context()->user()->getName();
+                    settings.transcodingSettings.overlays.push_back(watermarkExportSettings);
+                }
+            }
 
             if (FileExtensionUtils::isLayout(settings.fileName.extension))
             {
