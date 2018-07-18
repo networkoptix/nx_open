@@ -26,6 +26,7 @@
         border-radius    : 2px 2px 0 0;
 
         .modal-title {
+            font-family : $font-family-medium;
             font-size   : $h5-font-size;
             font-weight : $modal-title-font-weight;
             color       : $dark9;
@@ -92,7 +93,7 @@
         label {
             font-size   : $font-size-base;
             font-weight : normal;
-            margin      : 0;
+            margin      : 0 0 8px;
             padding     : 0;
         }
 
@@ -104,8 +105,12 @@
             }
         }
 
-        .form-group:last-child {
-            margin-bottom : 0;
+        .form-group {
+            margin-bottom : 1rem;
+            
+            &:last-child {
+                margin-bottom : 0;
+            }
         }
 
         .checkbox {

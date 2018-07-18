@@ -152,7 +152,8 @@ label {
 
 .form-horizontal {
     .form-group {
-        display : flex;
+        display       : flex;
+        margin-bottom : 1rem;
 
         & > div {
             display     : flex;
@@ -165,6 +166,20 @@ label {
         float         : left;
         text-align    : right;
         margin-bottom : 0;
+
+        @include media-breakpoint-down(sm) {
+            margin-bottom : 8px;
+        }
+    }
+
+    .help-block {
+        display : flex;
+    }
+
+    .input-error {
+        @include media-breakpoint-down(sm) {
+            margin-top : 8px;
+        }
     }
 }
 
