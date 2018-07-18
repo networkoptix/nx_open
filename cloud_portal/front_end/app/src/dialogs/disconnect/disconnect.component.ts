@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { Location }                                            from '@angular/common';
-import { NgbModal, NgbActiveModal, NgbModalRef }               from '@ng-bootstrap/ng-bootstrap';
-import { EmailValidator }                                      from '@angular/forms';
+import { Component, Inject, OnInit, Input, ViewEncapsulation, Renderer2, ViewChild } from '@angular/core';
+import { Location }                                                                  from '@angular/common';
+import { NgbModal, NgbActiveModal, NgbModalRef }                                     from '@ng-bootstrap/ng-bootstrap';
+import { EmailValidator }                                                            from '@angular/forms';
 
 @Component({
     selector: 'nx-modal-disconnect-content',
@@ -15,20 +15,39 @@ export class DisconnectModalContent {
     @Input() closable;
 
     password: string;
+    nx_wrong_password: boolean;
+    auth = {
+      password: ''
+    };
+
+    @ViewChild('disconnectForm') disconnectForm: HTMLFormElement;
 
     constructor(private activeModal: NgbActiveModal,
                 @Inject('account') private account: any,
                 @Inject('process') private process: any,
-                @Inject('cloudApiService') private cloudApi: any,) {
+                @Inject('cloudApiService') private cloudApi: any,
+                private renderer: Renderer2) {
     }
 
     ngOnInit() {
+        this.auth.password = '';
+
         this.disconnect = this.process.init(() => {
-            return this.cloudApi.disconnect(this.systemId, this.password);
+            this.disconnectForm.controls['password'].setErrors(null);
+            this.nx_wrong_password = false;
+
+            return this.cloudApi.disconnect(this.systemId, this.auth.password);
         }, {
             ignoreUnauthorized: true,
             errorCodes: {
-                notAuthorized: this.language.errorCodes.passwordMismatch
+                notAuthorized: () => {
+                    this.nx_wrong_password = true;
+                    this.disconnectForm.controls['password'].setErrors({'nx_wrong_password': true});
+                    this.auth.password = '';
+
+                    this.renderer.selectRootElement('#password').focus();
+
+                },
             },
             successMessage: this.language.system.successDisconnected,
             errorPrefix: this.language.errorCodes.cantDisconnectSystemPrefix

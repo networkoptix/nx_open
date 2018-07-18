@@ -126,6 +126,9 @@ export class LoginModalContent implements OnInit, AfterViewInit{
                     this.nx_account_blocked = true;
                     this.loginForm.controls['password'].setErrors({'nx_account_blocked': true});
                 },
+                wrongParameters: () => {
+
+                },
                 portalError: this.language.lang.errorCodes.brokenAccount
             }
         }).then(() => {
