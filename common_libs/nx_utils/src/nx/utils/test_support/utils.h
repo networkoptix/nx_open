@@ -1,6 +1,9 @@
 #pragma once
 
 #include <stdexcept>
+#include <tuple>
+
+#include <nx/utils/type_utils.h>
 
 /** Creates gmock checker that verifies argument type with dynamic_cast. */
 #define GMOCK_DYNAMIC_TYPE_MATCHER(T) ::testing::WhenDynamicCastTo<T>(::testing::An<T>())
@@ -42,6 +45,17 @@
 #define NX_GTEST_ASSERT_LT(actual, expected) do \
 { \
     NX_GTEST_ASSERT_TRUE(actual < expected); \
+} while (0)
+
+#define NX_GTEST_ASSERT_ANY_OF(expectedValues, actual) do \
+{ \
+    const auto& actualValue = actual; \
+    bool foundMatchingValue = false; \
+    nx::utils::tuple_for_each( \
+        std::make_tuple expectedValues, \
+        [&actualValue, &foundMatchingValue](const auto& value) \
+            { foundMatchingValue |= actualValue == value; }); \
+    ASSERT_TRUE(foundMatchingValue); \
 } while (0)
 
 #define NX_GTEST_ASSERT_NO_THROW(expression) do \
