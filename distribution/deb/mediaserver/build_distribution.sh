@@ -289,4 +289,4 @@ main()
     buildDistribution
 }
 
-main "$@" -k
+main "$@"
