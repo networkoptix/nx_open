@@ -6,7 +6,7 @@
 namespace nx {
 namespace update {
 
-const static QString kLatestVersion = "0.0.0.0";
+const static QString kLatestVersion = "latest";
 
 enum class NX_UPDATE_API Component
 {
