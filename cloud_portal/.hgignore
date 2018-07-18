@@ -26,7 +26,7 @@ front_end/test/visual
 front_end/**/*.js.map
 front_end/app/src/**/*.js
 
-front_end/app/scripts/services/{language,dialogs,systems,process,nx-config,cloud_api,account,angular-uuid2,authorizationCheckService}.js
+front_end/app/scripts/services/{poll,language,dialogs,systems,process,nx-config,cloud_api,account,angular-uuid2,authorizationCheckService}.js
 front_end/app/scripts/downgraded-providers.js
 front_end/app/{main,polyfills,vendor,overrides.d,app.module,app.component,ajs-upgraded-providers}.js
 

@@ -25,15 +25,13 @@ export class NxActiveSystemDropdown implements OnInit, OnDestroy, OnChanges {
     }
 
     private isActive(val) {
-        const currentPath = this.location.path();
-
-        return (currentPath.indexOf(val) >= 0)
+        return (this.location.path().indexOf(val) >= 0)
     }
 
     private updateActive() {
         this.active.register = this.isActive('/register');
         this.active.view = this.isActive('/view');
-        this.active.settings = this.routeSystemId && !this.isActive('/view');
+        this.active.settings = !this.isActive('/register') && !this.isActive('/view');
     }
 
     ngOnInit(): void {

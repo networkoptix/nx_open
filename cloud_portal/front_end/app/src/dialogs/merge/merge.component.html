@@ -30,11 +30,7 @@
     <div class="modal-body">
         <div class="form-group">
             <label for="system" translate>Merge current System with</label>
-            <select class="form-control" name="targetSystem"
-                    id="system"
-                    [(ngModel)]="targetSystem"
-                    ng-options="system as addStatus(system) for system in systems">
-            </select>
+            <nx-select [items]="systemsSelect" [selected]="targetSystem" (onSelected)="setTargetSystem($event)"></nx-select>
         </div>
         <p *ngIf="systemMergeable =='offline'"
            class="help-block-no-height warning-label" translate>
@@ -49,34 +45,40 @@
         <p *ngIf="systemMergeable == ''"
            class="help-block-no-height" translate>You can only merge Systems in which you have owner permissions.</p>
         <div>
-            <div [ngClass]="{'text-muted': systemStatus != ''}" translate>Took system name and settings from</div>
-            <div ng-init="$parent.masterSystemId=system.id">
-                <div>
-                    <input type="radio" id="firstSystem"
-                           [(ngModel)]="$parent.masterSystemId"
-                           [value]="system.id"
-                           [disabled]="systemStatus != ''">
-                    <label class="light-label"
-                           [ngClass]="{'text-muted': systemStatus != ''}"
-                           for="firstSystem">{{system.info.name}}</label>
+            <div [ngClass]="{'text-muted': systemMergeable != ''}" translate>Took system name and settings from</div>
+            <div>
+                <div class="radio-group">
+                    <label class="light-label option"
+                           [ngClass]="{'text-muted': systemMergeable != ''}"
+                           for="firstSystem">{{system.info.name}}
+                        <input type="radio" id="firstSystem" name="firstSystem"
+                               [(ngModel)]="masterId"
+                               [value]="system.id"
+                               [checked]="system.id == masterId"
+                               [disabled]="systemMergeable != ''">
+                        <span class="optionmark"></span>
+                    </label>
                 </div>
-                <div>
-                    <input type="radio" id="secondSystem"
-                           [(ngModel)]="$parent.masterSystemId"
-                           [value]="targetSystem.id"
-                           [disabled]="systemStatus != ''">
-                    <label class="light-label"
-                           [ngClass]="{'text-muted': systemStatus != ''}"
-                           for="secondSystem">{{targetSystem.name}}</label>
+                <div class="radio-group">
+                    <label class="light-label option"
+                           [ngClass]="{'text-muted': systemMergeable != ''}"
+                           for="secondSystem">{{targetSystem.name}}
+                        <input type="radio" id="secondSystem" name="secondSystem"
+                               [(ngModel)]="masterId"
+                               [value]="targetSystem.id"
+                               [checked]="targetSystem.id == masterId"
+                               [disabled]="systemMergeable != ''">
+                        <span class="optionmark"></span>
+                    </label>
                 </div>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <nx-process-button [buttonDisabled]="systemStatus != ''"
-                           [process]="mergingSystems"
+        <nx-process-button [buttonDisabled]="systemMergeable != ''"
+                           [process]="merging"
                            [form]="mergeForm"
-                           actionType="'primary'"
+                           actionType="primary"
                            buttonText="{{ 'Merge' | translate}}"></nx-process-button>
     </div>
 </form>

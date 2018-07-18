@@ -79,7 +79,7 @@ should trim leading and trailing spaces
     Wait Until Textfield Contains    ${ACCOUNT FIRST NAME}    mark
     Wait Until Textfield Contains    ${ACCOUNT LAST NAME}    hamill
 
-should display Open Nx Witness button after activation, if user is registered by link /register/?from=client
+should allow activation, if user is registered by link /register/?from=client
     [tags]    email
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register?from=client
@@ -87,10 +87,8 @@ should display Open Nx Witness button after activation, if user is registered by
     Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
-    Wait Until Element Is Visible    ${OPEN NX WITNESS BUTTON FROM =}
 
-
-should display Open Nx Witness button after activation, if user is registered by link /register/?from=mobile
+should allow activation, if user is registered by link /register/?from=mobile
     [tags]    email
     ${email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register?from=mobile
@@ -98,8 +96,6 @@ should display Open Nx Witness button after activation, if user is registered by
     Activate    ${email}
     Log In    ${email}    ${password}    button=${SUCCESS LOG IN BUTTON}
     Validate Log In
-    Wait Until Element Is Visible    ${OPEN NX WITNESS BUTTON FROM =}
-
 
 link works and suggests to log out user, if he was logged in, buttons operate correctly
     [tags]    email

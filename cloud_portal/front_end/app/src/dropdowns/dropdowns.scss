@@ -71,6 +71,10 @@ header {
             }
         }
 
+        &:active {
+            background-color : $light3;
+        }
+
         .arrow {
             position         : relative;
             bottom           : auto;
@@ -106,45 +110,49 @@ header {
     }
 
     .dropdown-menu {
-        margin-top       : 0;
-        background-color : $light4;
-        border-bottom    : none;
-        border-left      : none;
-        border-right     : none;
+        margin-top                 : 0;
+        background-color           : $light4;
+        border-bottom              : none;
+        border-left                : none;
+        border-right               : none;
+        box-shadow                 : 0 16px 32px 0 transparentize($dark15, 0.4);
+        position                   : absolute !important;
+        border-top                 : 1px solid $light6;
+        border-radius              : 0;
+        border-bottom-left-radius  : 2px;
+        border-bottom-right-radius : 2px;
+        width                      : 100%;
+        padding                    : 4px 0;
 
         .dropdown-item {
             display      : flex;
             align-items  : center;
             padding-left : 12px;
-        }
+            height       : 26px;
 
-        & li {
+            @media (max-width : $collapse-second-width) {
+                height : 32px;
+            }
+
             &.active {
-                a {
-                    background-color : $light16 !important;
-                    color            : $light1;
+                background-color : $light16 !important;
+                color            : $light1;
 
-                    &:hover {
-                        color : $light1;
-                    }
+                &:hover {
+                    color : $light1 !important;
                 }
             }
 
-            & > a {
-                @media (max-width : $collapse-second-width) {
-                    line-height : 2rem;
-                }
-
-                &:hover {
-                    background-color : $light5;
-                    color            : $dark9;
-                }
+            &:hover {
+                background-color : $light5;
+                color            : $dark9 !important;
             }
         }
     }
 
     .dropdown-toggle-transparent {
         background-color : transparent;
+        border-bottom    : 1px solid transparent !important;
 
         &:focus {
             background-color : transparent !important;
@@ -152,6 +160,11 @@ header {
 
         &:hover {
             background-color : transparentize($light5, 0.75) !important;
+        }
+
+        &:active {
+            background-color : $light3 !important;
+            border-bottom    : 1px solid $light5;
         }
     }
 

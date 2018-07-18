@@ -79,7 +79,8 @@ angular.module('cloudApp')
                 }, Config.updateInterval);
 
                 $scope.$on('$destroy', function (event) {
-                    $poll.cancel(pollingSystemUpdate);
+                    // $poll.cancel(pollingSystemUpdate);
+                    pollingSystemUpdate.cancel();
                 });
             }
 
@@ -162,7 +163,9 @@ angular.module('cloudApp')
 
             $scope.mergeSystems = function () {
                 dialogs.merge($scope.system).then(function (mergeInfo) {
-                    setMergeStatus(mergeInfo);
+                    if(mergeInfo) {
+                        setMergeStatus(mergeInfo);
+                    }
                 });
             };
 
@@ -207,7 +210,7 @@ angular.module('cloudApp')
                     .then(function (result) {
                         if (result) {
                             // Run a process of sharing
-                            $poll.cancel(pollingSystemUpdate);
+                            pollingSystemUpdate.cancel();
                             $scope.unsharing = process.init(function () {
                                 return $scope.system.deleteUser(user);
                             }, {

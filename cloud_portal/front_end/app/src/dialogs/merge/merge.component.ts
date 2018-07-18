@@ -6,7 +6,7 @@ import { EmailValidator }                                      from '@angular/fo
 @Component({
     selector: 'nx-modal-merge-content',
     templateUrl: 'merge.component.html',
-    styleUrls: []
+    styleUrls: ['merge.component.scss']
 })
 export class MergeModalContent {
     @Input() system;
@@ -21,10 +21,12 @@ export class MergeModalContent {
     targetSystem: any;
     systemMergeable: string;
     masterId: string;
+    systemsSelect: any;
 
     constructor(public activeModal: NgbActiveModal,
                 @Inject('process') private process: any,
                 @Inject('account') private account: any,
+                @Inject('system') private _system: any,
                 @Inject('configService') private configService: any,
                 @Inject('systemsProvider') private systemsProvider: any,
                 @Inject('cloudApiService') private cloudApi: any) {
@@ -44,7 +46,9 @@ export class MergeModalContent {
 
     setTargetSystem(system) {
         this.targetSystem = system;
-        this.systemMergeable = this.checkMergeAbility(system);
+        return this._system(system.id, this.user.email).update().then((system) => {
+            this.systemMergeable = this.checkMergeAbility(system);
+        });
     };
 
     addStatus(system) {
@@ -61,15 +65,30 @@ export class MergeModalContent {
         return system.name + status;
     };
 
+    makeSelectorList(systems) {
+        this.systemsSelect = [];
+        systems.forEach( (element) => {
+            this.systemsSelect.push({
+                name: this.addStatus(element),
+                id: element.id
+            })
+        });
+    }
+
     ngOnInit() {
+        this.systemsSelect = [];
+        this.masterId = this.system.id;
         this.account
             .get()
             .then((user) => {
                 this.user = user;
                 this.systems = this.systemsProvider.getMySystems(user.email, this.system.id);
                 this.showMergeForm = this.system.canMerge && this.systems.length > 0;
-                this.targetSystem = this.systems[0];
-                this.systemMergeable = this.checkMergeAbility(this.targetSystem);
+                this.makeSelectorList(this.systems);
+                this.targetSystem = this.systemsSelect[0];
+                return this._system(this.targetSystem.id, user.email).update();
+            }).then((system)=>{
+                this.systemMergeable = this.checkMergeAbility(system);
             });
 
         this.merging = this.process.init(() => {
@@ -83,7 +102,7 @@ export class MergeModalContent {
                 masterSystemId = this.targetSystem.id;
                 slaveSystemId = this.system.id;
             }
-            //return cloudApi.systems(); //In for testing purposes with merging things
+            //return this.cloudApi.systems(); //In for testing purposes with merging things
             return this.cloudApi.merge(masterSystemId, slaveSystemId);
         }, {
             successMessage: this.language.system.mergeSystemSuccess
@@ -115,7 +134,7 @@ export class NxModalMergeComponent implements OnInit {
 
     private dialog(system) {
         this.modalRef = this.modalService.open(MergeModalContent, {backdrop: 'static', centered: true});
-        this.modalRef.componentInstance.language = this.language;
+        this.modalRef.componentInstance.language = this.language.lang;
         this.modalRef.componentInstance.system = system;
         this.modalRef.componentInstance.closable = true;
 
@@ -123,11 +142,11 @@ export class NxModalMergeComponent implements OnInit {
     }
 
     open(system) {
-        return this.dialog(system);
+        return this.dialog(system).result;
     }
 
     close() {
-        this.modalRef.close();
+        this.modalRef.close({});
     }
 
     ngOnInit() {

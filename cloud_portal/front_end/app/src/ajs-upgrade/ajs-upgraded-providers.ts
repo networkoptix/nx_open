@@ -71,6 +71,16 @@ const systemsServiceProvider = {
     deps: ['$injector']
 };
 
+function systemServiceFactory(i: any){
+    return i.get('system');
+}
+
+const systemService = {
+    provide: 'system',
+    useFactory: systemServiceFactory,
+    deps: ['$injector']
+};
+
 function authorizationCheckServiceFactory(i: any) {
     return i.get('authorizationCheckService');
 }
@@ -151,6 +161,14 @@ export class ngToastModule {
     ]
 })
 export class systemsModule {
+}
+
+@NgModule({
+    providers: [
+        systemService
+    ]
+})
+export class systemModule {
 }
 
 @NgModule({

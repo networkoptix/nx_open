@@ -177,6 +177,7 @@
     "confirmUnshareAction": "Delete",
     "successDisconnected": "System is successfully disconnected from %PRODUCT_NAME%",
     "successDeleted": "System {{systemName}} is successfully deleted from your account",
+    "successMerge":"System {{systemName}} has been merged with {{systemName}}",
     "permissionsRemoved": "Permissions were removed from {{email}}"
   },
   "account": {

@@ -166,7 +166,7 @@ cloud_portal/env
 cloud_portal/cloud/static
 cloud_portal/front_end/**/*.js.map
 cloud_portal/front_end/app/src/**/*.js
-cloud_portal/front_end/app/scripts/services/{language,dialogs,systems,process,nx-config,cloud_api,account,angular-uuid2,authorizationCheckService}.js
+cloud_portal/front_end/app/scripts/services/{poll,language,dialogs,system, systems,process,nx-config,cloud_api,account,angular-uuid2,authorizationCheckService}.js
 cloud_portal/front_end/app/scripts/downgraded-providers.js
 cloud_portal/front_end/app/{main,polyfills,vendor,overrides.d,app.module,app.component,ajs-upgraded-providers}.js
 

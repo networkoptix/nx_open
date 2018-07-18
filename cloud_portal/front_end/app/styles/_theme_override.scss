@@ -44,7 +44,7 @@ h1, h2 {
     font-size     : $h1-font-size;
     display       : flex;
     align-items   : center;
-    font-family   : $font-family-regular;
+    font-family   : $font-family-light;
     color         : $dark9;
     line-height   : 1rem;
 }
@@ -53,7 +53,7 @@ h2 {
     margin      : 0;
     padding     : 0;
     font-size   : $h2-font-size;
-    font-family : $font-family-regular;
+    font-family : $font-family-light;
     color       : $dark9;
 }
 
@@ -61,7 +61,7 @@ h3 {
     margin-top    : ($line-height-computed / 2);
     margin-bottom : ($line-height-computed / 4);
     font-size     : $h3-font-size;
-    font-family   : $font-family-medium;
+    font-family   : $font-family-regular;
     color         : $dark9;
     line-height   : 1rem;
 }
@@ -101,7 +101,6 @@ h1 > .label {
 
 p {
     margin-bottom : 0.5rem;
-    line-height   : 0.9rem;
 }
 
 .card .table-responsive {
@@ -166,7 +165,6 @@ label {
         float         : left;
         text-align    : right;
         margin-bottom : 0;
-        padding-top   : 8px;
     }
 }
 
@@ -198,8 +196,8 @@ label {
         border-color : $error;
 
         + .input-group-addon {
-            border-color     : $error;
-            background-color : $red2;
+            border-color     : transparent;
+            background-color : transparent;
         }
     }
 }
@@ -425,36 +423,9 @@ select {
 // New styling or retrofitting missing styles
 ///////////////////////
 
-.dropdown-menu {
-    box-shadow                 : 0 16px 32px 0 transparentize($dark15, 0.4);
-    position                   : absolute !important;
-    background-color           : $light4;
-    border-top                 : 1px solid $light6;
-    border-radius              : 0;
-    border-bottom-left-radius  : 2px;
-    border-bottom-right-radius : 2px;
-    width                      : 100%;
-    padding                    : 4px 0;
-
-    li > a {
-        padding         : 0 12px;
-        display         : block;
-        text-decoration : none;
-        color           : $dark9;
-        line-height     : 26px;
-
-        &:hover {
-            color            : $light1;
-            background-color : $light16;
-        }
-    }
-}
-
 .input-group {
-    &.has-addon {
-        input {
-            border-right : none !important;
-        }
+    &.has-addon input {
+        padding-right : 45px;
     }
 
     &-addon {
@@ -465,13 +436,14 @@ select {
         line-height      : 1;
         color            : #121517;
         text-align       : center;
-        background-color : $light_core !important;
-        border           : 1px solid $light5;
-        border-left      : none;
-        border-radius    : 2px;
+        background-color : transparent !important;
+        border           : none;
         display          : flex;
         align-items      : center;
         justify-items    : center;
+        position         : absolute;
+        right            : 2px;
+        z-index          : 9;
 
         .glyphicon {
             margin : 0;

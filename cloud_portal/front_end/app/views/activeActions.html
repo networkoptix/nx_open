@@ -30,7 +30,9 @@
         <h1 ng-if="!data.email">Activate your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" ng-if="!data.email" validate-field>
-                <label for="emailReactivate" class="col-sm-4 control-label">Email</label>
+                <div class="col-md-4 justify-content-start justify-content-md-end">
+                    <label for="emailReactivate" class="control-label">Email</label>
+                </div>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"
                            validate-email
@@ -66,7 +68,9 @@
         <h1>Reset Password</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email" class="col-sm-4 control-label">Email</label>
+                <div class="col-md-4 justify-content-start justify-content-md-end">
+                    <label for="email" class="col-sm-4 control-label">Email</label>
+                </div>
                 <div class="col-sm-4">
                     <input type="email" class="form-control" validate-email
                            ng-model="data.email"

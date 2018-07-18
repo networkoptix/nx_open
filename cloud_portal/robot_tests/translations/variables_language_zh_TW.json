@@ -47,7 +47,7 @@
     "DISCONNECT FORM HEADER TEXT": "是否從 %PRODUCT_NAME% 中斷開系統?",
     "FIRST NAME IS REQUIRED TEXT": "名為必填欄位",
     "LAST NAME IS REQUIRED TEXT": "姓為必填欄位",
-    "EMAIL IS REQUIRED TEXT": "電子郵件是必填的",
+    "EMAIL IS REQUIRED TEXT": "電子郵件為必填欄位",
     "EMAIL ALREADY REGISTERED TEXT": "此電子郵件已在 %PRODUCT_NAME% 中註冊",
     "EMAIL INVALID TEXT": "請輸入有效的 Email",
     "PASSWORD IS REQUIRED TEXT": "密碼是必填的",

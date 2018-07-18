@@ -18,7 +18,7 @@ ${valid email}                 noptixqa+valid@gmail.com
 #Register form errors
 ${FIRST NAME IS REQUIRED}      //span[@ng-if='registerForm.firstName.$touched && registerForm.firstName.$error.required' and contains(text(),'${FIRST NAME IS REQUIRED TEXT}')]
 ${LAST NAME IS REQUIRED}       //span[@ng-if='registerForm.lastName.$touched && registerForm.lastName.$error.required' and contains(text(),'${LAST NAME IS REQUIRED TEXT}')]
-${EMAIL IS REQUIRED}           //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required' and contains(text(),'${EMAIL IS REQUIRED TEXT}')]
+${EMAIL IS REQUIRED}           //span[@ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required" and contains(text(),"${EMAIL IS REQUIRED TEXT}")]
 ${EMAIL ALREADY REGISTERED}    //span[@ng-if='registerForm.registerEmail.$error.alreadyExists' and contains(text(),'${EMAIL ALREADY REGISTERED TEXT}')]
 ${EMAIL INVALID}               //span[@ng-if='registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email' and contains(text(),'${EMAIL INVALID TEXT}')]
 ${PASSWORD IS REQUIRED}        //span[@ng-if='passwordInput.password.$error.required' and contains(text(),'${PASSWORD IS REQUIRED TEXT}')]

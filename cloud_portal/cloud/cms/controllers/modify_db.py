@@ -41,19 +41,29 @@ def notify_version_ready(customization, version_id, product_name, exclude_user):
 def save_unrevisioned_records(context, customization, language, data_structures,
                               request_data, request_files, user, version_id=None):
     upload_errors = []
-    touched_records = False
     for data_structure in data_structures:
         data_structure_name = data_structure.name
         ds_language = language
         if not data_structure.translatable:
             ds_language = None
-        records = data_structure.datarecord_set\
-            .filter(customization=customization,
-                    language=ds_language)
 
         new_record_value = ""
+        latest_value = data_structure.default
+        records = data_structure.datarecord_set.filter(customization=customization, language=ds_language)
+        if records.exists():
+            latest_value = records.latest('id').value
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
+        # TODO: Refactor image/file logic - CLOUD-1524
+        """
+            Currently if the data structure is optional you can remove the value.
+            
+            Planned change is to make it to where you can "delete" the value and if its not optional then fallback
+            to the default value.
+            
+            This will create a new record making images/files behave like the other data structure types
+            Places to touch are here, cms/forms.py, and cms/templates/context_editor.html
+        """
         if data_structure.type == DataStructure.DATA_TYPES.image\
                 or data_structure.type == DataStructure.DATA_TYPES.file:
             # If a file has been uploaded try to save it
@@ -64,8 +74,11 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                         upload_errors.extend(file_errors)
                         continue
 
-            # If neither case do nothing for this record
-            elif 'delete_' + data_structure_name not in request_data:
+            # No file was uploaded and there is a record means the user didn't change anything so skip
+            elif not data_structure.optional and latest_value:
+                continue
+            # No file was uploaded and the user didn't delete an optional data structure so skip
+            elif data_structure.optional and 'delete_' + data_structure_name not in request_data:
                 continue
 
         elif data_structure.type == DataStructure.DATA_TYPES.guid:
@@ -95,7 +108,8 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             upload_errors.append((data_structure_name, "You do not have permission to edit this field"))
             continue
 
-        if not data_structure.optional and not new_record_value:
+        # If the data structure is not option and no record exists and nothing was uploaded try to use the default value
+        if not data_structure.optional and not latest_value and not new_record_value:
             if data_structure.default:
                 new_record_value = data_structure.default
                 upload_errors.append((data_structure_name, "This field cannot be blank. Using default value"))
@@ -103,45 +117,34 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                 upload_errors.append((data_structure_name, "This field cannot be blank"))
                 continue
 
-        if records.exists():
-            if new_record_value == records.latest('created_date').value:
-                continue
-        else:
-            if data_structure.default == new_record_value:
-                continue
+        if new_record_value == latest_value:
+            continue
 
-        touched_records = True
         record = DataRecord(data_structure=data_structure,
                             language=ds_language,
                             customization=customization,
                             value=new_record_value,
                             created_by=user)
         record.save()
-    if touched_records:
-        fill_content(customization_name=customization.name,
-                     product_name=context.product.name,
-                     preview=True,
-                     incremental=True,
-                     version_id=version_id,
-                     changed_context=context)
+    fill_content(customization_name=customization.name,
+                 product_name=context.product.name,
+                 preview=True,
+                 incremental=True,
+                 version_id=version_id,
+                 changed_context=context)
 
-    return upload_errors, touched_records
+    return upload_errors
 
 
 def update_latest_record_version(records, new_version):
     record = records.latest('created_date')
-    version_updated = False
     if not record.version:
-        version_updated = True
         record.version = new_version
         record.save()
-
-    return version_updated
 
 
 def update_records_to_version(contexts, customization, version):
     languages = Language.objects.all()
-    touched = False
     for context in contexts:
         for data_structure in context.datastructure_set.all():
             all_records = data_structure.datarecord_set.filter(
@@ -153,13 +156,11 @@ def update_records_to_version(contexts, customization, version):
                     # Now only the latest records that can be published will have its
                     # version altered
                     if records_for_language.exists():
-                        if update_latest_record_version(records_for_language, version):
-                            touched = True
+                        update_latest_record_version(records_for_language, version)
 
             elif all_records.exists():
-                if update_latest_record_version(all_records, version):
-                    touched = True
-    return touched
+                update_latest_record_version(all_records, version)
+
 
 def strip_version_from_records(version, product):
     records_to_strip = DataRecord.objects.filter(version=version, data_structure__context__product=product)
@@ -210,11 +211,9 @@ def send_version_for_review(customization, product, user):
                              product=product, created_by=user)
     version.save()
 
-    touched = update_records_to_version(Context.objects.filter(product=product), customization, version)
+    update_records_to_version(Context.objects.filter(product=product), customization, version)
 
     notify_version_ready(customization, version.id, product.name, user)
-
-    return touched
 
 
 def get_records_for_version(version):

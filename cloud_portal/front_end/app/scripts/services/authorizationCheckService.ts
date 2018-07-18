@@ -114,7 +114,6 @@
             function requireLogin() {
                 return get().catch(() => {
                     nxDialogsService.login(true);
-                    $location.path(CONFIG.redirectUnauthorised);
                 });
             }
 

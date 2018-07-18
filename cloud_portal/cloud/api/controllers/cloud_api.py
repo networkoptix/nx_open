@@ -132,7 +132,7 @@ class System(object):
     def merge(email, password, master_system_id, slave_system_id):
         request = CLOUD_DB_URL + "/system/%s/merged_systems/" % master_system_id
         params = {
-            'system_id': slave_system_id
+            'systemId': slave_system_id
         }
         return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 

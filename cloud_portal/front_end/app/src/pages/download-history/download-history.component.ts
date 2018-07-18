@@ -1,5 +1,5 @@
 import {
-    Component, OnInit, OnDestroy,
+    Component, OnInit, OnDestroy, Input,
     AfterViewChecked, ViewChild, Inject
 }                                       from '@angular/core';
 import { ActivatedRoute, Router }       from '@angular/router';
@@ -10,11 +10,13 @@ import { DeviceDetectorService }        from 'ngx-device-detector';
 
 
 @Component({
-    selector: 'download-history-component',
+    selector: 'download-history',
     templateUrl: 'download-history.component.html'
 })
 
 export class DownloadHistoryComponent implements OnInit, OnDestroy, AfterViewChecked {
+    @Input() routeParamBuild;
+
     private sub: any;
     private build: any;
     private deviceInfo = null;
@@ -51,7 +53,8 @@ export class DownloadHistoryComponent implements OnInit, OnDestroy, AfterViewChe
         this.downloads = this.configService.config.downloads;
 
         this.sub = this.route.params.subscribe(params => {
-            this.build = params['build'];
+            //this.build = params['build'];
+            this.build = this.routeParamBuild;
 
             this.authorizationService
                 .requireLogin()

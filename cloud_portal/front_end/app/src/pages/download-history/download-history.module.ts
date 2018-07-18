@@ -1,7 +1,7 @@
 import { NgModule }             from '@angular/core';
 import { CommonModule }         from '@angular/common';
 import { BrowserModule }        from '@angular/platform-browser';
-import { UpgradeModule }        from '@angular/upgrade/static';
+import { downgradeComponent, UpgradeModule } from '@angular/upgrade/static';
 import { RouterModule, Routes } from '@angular/router';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -21,7 +21,7 @@ const appRoutes: Routes = [
         UpgradeModule,
         NgbModule,
 
-        RouterModule.forChild(appRoutes)
+        //RouterModule.forChild(appRoutes)
     ],
     providers: [
     ],
@@ -29,7 +29,18 @@ const appRoutes: Routes = [
         DownloadHistoryComponent,
         ReleaseComponent
     ],
-    bootstrap: []
+    bootstrap: [],
+    entryComponents:[
+            DownloadHistoryComponent
+    ],
+    exports:[
+            DownloadHistoryComponent
+    ]
 })
 export class DownloadHistoryModule {
 }
+
+declare var angular: angular.IAngularStatic;
+angular
+        .module('cloudApp.directives')
+        .directive('downloadHistory', downgradeComponent({ component: DownloadHistoryComponent }) as angular.IDirectiveFactory)

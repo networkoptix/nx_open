@@ -49,6 +49,7 @@ export class NxProcessButtonComponent implements OnInit {
 
             return false;
         } else {
+            this.processing = true;
             this.process.run();
         }
     }

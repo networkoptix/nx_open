@@ -16,13 +16,14 @@
     <ul ngbDropdownMenu aria-labelledby="languageSelect"
          [ngClass]="{'two-columns': languages.length>12}">
 
-        <li class="dropdown-item"
-                *ngFor="let lang of languages"
-                [ngClass]="{'active': lang.language === activeLanguage.language}"
-                (click)="changeLanguage(lang.language)">
+        <li *ngFor="let lang of languages">
+            <a class="dropdown-item"
+               (click)="changeLanguage(lang.language)"
+               [ngClass]="{'active': lang.language === activeLanguage.language}">
 
-            <span class="lang-sm" lang="{{lang.language}}"></span>
-            <span>{{lang.name}}</span>
+                <span class="lang-sm" lang="{{lang.language}}"></span>
+                <span>{{lang.name}}</span>
+            </a>
         </li>
     </ul>
 </div>
