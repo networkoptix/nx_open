@@ -13,6 +13,7 @@ class TranscodeMediaEncoder
 {
 public:
     TranscodeMediaEncoder(
+        int encoderIndex,
         CameraManager* const cameraManager, 
         nxpl::TimeProvider *const timeProvider,
         const CodecContext& codecContext,

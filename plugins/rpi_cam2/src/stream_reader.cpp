@@ -17,12 +17,14 @@ namespace nx {
 namespace rpi_cam2 {
 
 StreamReader::StreamReader(
+    int encoderIndex,
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
     const CodecContext& codecContext,
     const std::shared_ptr<ffmpeg::StreamReader>& ffmpegStreamReader)
 :
+    m_encoderIndex(encoderIndex),
     m_refManager(parentRefManager),
     m_timeProvider(timeProvider),
     m_info(cameraInfo),
@@ -121,6 +123,24 @@ std::unique_ptr<ILPVideoPacket> StreamReader::toNxPacket(
     nxVideoPacket->setCodecType(ffmpeg::utils::toNxCompressionType(codecID));
 
     return nxVideoPacket;
+}
+
+std::shared_ptr<ffmpeg::Packet> StreamReader::nextPacket()
+{
+    std::shared_ptr<ffmpeg::Packet> packet;
+    while(!packet)
+        packet = m_consumer->popFront();
+    return packet;
+}
+
+void StreamReader::maybeDropPackets()
+{
+    int gopSize = m_ffmpegStreamReader->gopSize();
+    if(gopSize && m_consumer->size() > gopSize)
+    {
+        int dropped = m_consumer->dropOldNonKeyPackets();
+        debug("stream reader %d dropping %d packets\n", m_encoderIndex, dropped);
+    }
 }
 
 } // namespace rpi_cam2

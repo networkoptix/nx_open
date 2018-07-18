@@ -10,12 +10,14 @@ namespace nx {
 namespace rpi_cam2 {
 
 NativeMediaEncoder::NativeMediaEncoder(
+    int encoderIndex,
     CameraManager* const cameraManager,
     nxpl::TimeProvider *const timeProvider,
     const CodecContext& codecContext,
     const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
 MediaEncoder(
+    encoderIndex,
     cameraManager,
     timeProvider,
     codecContext,
@@ -32,6 +34,7 @@ nxcip::StreamReader* NativeMediaEncoder::getLiveStreamReader()
     if (!m_streamReader)
     {
         m_streamReader.reset(new NativeStreamReader(
+            m_encoderIndex,
             &m_refManager,
             m_timeProvider,
             m_cameraManager->info(),

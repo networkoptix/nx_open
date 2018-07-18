@@ -33,6 +33,7 @@ class StreamReader
 {
 public:
     StreamReader(
+        int encoderIndex,
         nxpt::CommonRefManager* const parentRefManager,
         nxpl::TimeProvider *const timeProvider,
         const nxcip::CameraInfo& cameraInfo,
@@ -54,6 +55,7 @@ public:
     void updateCameraInfo( const nxcip::CameraInfo& info );
 
 protected:
+    int m_encoderIndex;
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider* const m_timeProvider;
     CyclicAllocator m_allocator;
@@ -65,8 +67,11 @@ protected:
     std::shared_ptr<ffmpeg::StreamReader> m_ffmpegStreamReader;
     std::shared_ptr<ffmpeg::BufferedStreamConsumer> m_consumer;
     int m_lastFfmpegError = 0;
+
 protected:
     std::unique_ptr<ILPVideoPacket> toNxPacket(AVPacket *packet, AVCodecID codecID, uint64_t time);
+    std::shared_ptr<ffmpeg::Packet> nextPacket();
+    void maybeDropPackets();
 };
 
 } // namespace rpi_cam2

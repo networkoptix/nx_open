@@ -7,7 +7,7 @@
 
 #include <nx/network/http/http_client.h>
 
-#include "utils/utils.h"
+#include "device/utils.h"
 #include "camera_manager.h"
 #include "plugin.h"
 
@@ -56,14 +56,14 @@ void DiscoveryManager::getVendorName(char* buf) const
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
-    std::vector<utils::DeviceData> devices = utils::getDeviceList();
+    std::vector<device::DeviceData> devices = device::utils::getDeviceList();
     int deviceCount = devices.size();
     for (int i = 0; i < deviceCount && i < nxcip::CAMERA_INFO_ARRAY_SIZE; ++i)
     {
-        std::string deviceName = devices[i].deviceName();
+        std::string deviceName = devices[i].deviceName;
         strcpy(cameras[i].modelName, deviceName.c_str());
 
-        std::string devicePath = devices[i].devicePath();
+        std::string devicePath = devices[i].devicePath;
         QByteArray url =
             QByteArray("webcam://").append(
             nx::utils::Url::toPercentEncoding(devicePath.c_str()));

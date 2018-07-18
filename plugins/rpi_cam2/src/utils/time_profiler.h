@@ -53,5 +53,5 @@ public:
 };  
 
 } // namespace utils
-} // namespace rpi_cam2
+} // namespace device
 } // namespace nx

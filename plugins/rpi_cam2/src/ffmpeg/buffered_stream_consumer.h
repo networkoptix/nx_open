@@ -26,7 +26,7 @@ public:
 
 private:
     mutable std::mutex m_mutex;
-    std::deque<std::shared_ptr<Packet>> m_vector;
+    std::deque<std::shared_ptr<Packet>> m_packets;
     bool m_ignoreNonKeyPackets;
 };
 

@@ -7,7 +7,7 @@
 
 #include "native_stream_reader.h"
 #include "transcode_stream_reader.h"
-#include "device_data.h"
+#include "device/device_data.h"
 #include "codec_context.h"
 
 namespace nx{ namespace ffmpeg { class StreamReader; } }
@@ -23,6 +23,7 @@ class MediaEncoder
 {
 public:
     MediaEncoder(
+        int encoderIndex,
         CameraManager* const cameraManager,
         nxpl::TimeProvider *const timeProvider,
         const CodecContext& codecContext,
@@ -48,6 +49,7 @@ public:
     void setVideoCodecID(nxcip::CompressionType codecID);
 
 protected:
+    int m_encoderIndex;
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
     nxpl::TimeProvider *const m_timeProvider;

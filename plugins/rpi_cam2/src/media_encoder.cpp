@@ -5,21 +5,23 @@
 
 #include "camera_manager.h"
 #include "stream_reader.h"
-#include "utils/utils.h"
+#include "device/utils.h"
 #include "ffmpeg/stream_reader.h"
 
 namespace nx {
 namespace rpi_cam2 {
 
 MediaEncoder::MediaEncoder(
+    int encoderIndex,
     CameraManager* const cameraManager,
     nxpl::TimeProvider *const timeProvider,
     const CodecContext& codecContext,
     const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
-    m_refManager( cameraManager->refManager() ),
-    m_cameraManager( cameraManager ),
-    m_timeProvider( timeProvider ),
+    m_encoderIndex(encoderIndex),
+    m_refManager(cameraManager->refManager()),
+    m_cameraManager(cameraManager),
+    m_timeProvider(timeProvider),
     m_videoCodecContext(codecContext),
     m_ffmpegStreamReader(ffmpegStreamReader),
     m_maxBitrate(0)
@@ -70,16 +72,16 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 {
     QString url = decodeCameraInfoUrl();
 
-    std::vector<utils::ResolutionData> resList
-        = utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
+    std::vector<device::ResolutionData> resList
+        = device::utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
 
     NX_DEBUG(this) << "getResolutionList()::m_info.modelName:" << m_cameraManager->info().modelName;
     int count = resList.size();
     for (int i = 0; i < count; ++i)
     {
         NX_DEBUG(this)
-            << "w:" << resList[i].resolution.width << ", h:" << resList[i].resolution.height;
-        infoList[i].resolution = resList[i].resolution;
+            << "w:" << resList[i].width << ", h:" << resList[i].height;
+        infoList[i].resolution = {resList[i].width, resList[i].height};
         infoList[i].maxFps = resList[i].maxFps;
     }
     *infoListCount = count;
@@ -96,11 +98,11 @@ int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 
     QString url = decodeCameraInfoUrl();
 
-    std::vector<utils::ResolutionData> resList
-        = utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
+    std::vector<device::ResolutionData> resList
+        = device::utils::getResolutionList(url.toLatin1().data(), m_videoCodecContext.codecID());
 
     auto max = std::max_element(resList.begin(), resList.end(),
-        [](const utils::ResolutionData& a, const utils::ResolutionData& b)
+        [](const device::ResolutionData& a, const device::ResolutionData& b)
         {
             return a.bitrate < b.bitrate;
         });

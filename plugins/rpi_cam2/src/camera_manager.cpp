@@ -4,7 +4,8 @@
 
 #include <nx/utils/url.h>
 
-#include "utils/utils.h"
+#include "utils/debug.h"
+#include "device/utils.h"
 #include "native_media_encoder.h"
 #include "transcode_media_encoder.h"
 #include "ffmpeg/stream_reader.h"
@@ -59,8 +60,9 @@ CameraManager::CameraManager(
         nxcip::BaseCameraManager::primaryStreamSoftMotionCapability)
 {
     m_encoders.reserve(ENCODER_COUNT);
-    m_encoders.push_back(nullptr);
-    m_encoders.push_back(nullptr);    
+    /* adding nullptr so we can check for it in getEncoder() */
+    for(int i = 0; i < ENCODER_COUNT; ++i)
+        m_encoders.push_back(nullptr);
 }
 
 CameraManager::~CameraManager()
@@ -100,7 +102,6 @@ unsigned int CameraManager::releaseRef()
 int CameraManager::getEncoderCount( int* encoderCount ) const
 {
     *encoderCount = ENCODER_COUNT;
-    //*encoderCount = 1;
     return nxcip::NX_NO_ERROR;
 }
 
@@ -122,6 +123,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             if (!m_encoders[encoderIndex].get())
             {
                 m_encoders[encoderIndex].reset(new NativeMediaEncoder(
+                    encoderIndex,
                     this,
                     m_timeProvider,
                     getEncoderDefaults(encoderIndex),
@@ -134,6 +136,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
             if(!m_encoders[encoderIndex].get())
             {
                 m_encoders[encoderIndex].reset(new TranscodeMediaEncoder(
+                    encoderIndex,
                     this,
                     m_timeProvider,
                     getEncoderDefaults(encoderIndex),
@@ -236,29 +239,26 @@ CodecContext CameraManager::getEncoderDefaults(int encoderIndex)
     nxcip::Resolution resolution = {640, 480};
 
     std::string url = decodeCameraInfoUrl();
-    auto codecList = utils::getSupportedCodecs(url.c_str());
+    auto codecList = device::utils::getSupportedCodecs(url.c_str());
     nxcip::CompressionType codecID = getPriorityCodec(codecList);
 
     switch (encoderIndex)
     {
         case 0: // native stream
         {
-            auto resolutionList = utils::getResolutionList(url.c_str(), codecID);
+            auto resolutionList = device::utils::getResolutionList(url.c_str(), codecID);
             auto it = std::max_element(resolutionList.begin(), resolutionList.end(),
-                [](const utils::ResolutionData& a, const utils::ResolutionData& b)
+                [](const device::ResolutionData& a, const device::ResolutionData& b)
                 {
-                    return
-                        a.resolution.width
-                        * a.resolution.height <
-                        b.resolution.width
-                        * b.resolution.height;
+                    return a.width * a.height < b.width * b.height;
                 });
 
-            bool valid = it != resolutionList.end();
-
-            defaultFPS = valid ? it->maxFps : 30;
-            defaultBitrate = valid ? (int) it->bitrate : 200000;
-            resolution = valid ? it->resolution : nxcip::Resolution();
+            if(it != resolutionList.end())
+            {
+               defaultFPS = it->maxFps;
+               defaultBitrate = it->bitrate;
+               resolution = {it->width, it->height};
+            }
             break;
         }
         case 1: // motion stream

@@ -12,6 +12,7 @@ class NativeStreamReader
 {
 public:
     NativeStreamReader(
+        int encoderIndex,
         nxpt::CommonRefManager* const parentRefManager,
         nxpl::TimeProvider *const timeProvider,
         const nxcip::CameraInfo& cameraInfo,

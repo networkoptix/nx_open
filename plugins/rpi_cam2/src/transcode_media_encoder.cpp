@@ -4,19 +4,21 @@
 
 #include "camera_manager.h"
 #include "transcode_stream_reader.h"
-#include "utils/utils.h"
+#include "device/utils.h"
 #include "ffmpeg/stream_reader.h"
 
 namespace nx {
 namespace rpi_cam2 {
 
 TranscodeMediaEncoder::TranscodeMediaEncoder(
+    int encoderIndex,
     CameraManager* const cameraManager, 
     nxpl::TimeProvider *const timeProvider,
     const CodecContext& codecContext,
     const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     MediaEncoder(
+        encoderIndex,
         cameraManager,
         timeProvider,
         codecContext,
@@ -33,6 +35,7 @@ nxcip::StreamReader* TranscodeMediaEncoder::getLiveStreamReader()
     if (!m_streamReader)
     {
         m_streamReader.reset(new TranscodeStreamReader(
+            m_encoderIndex,
             &m_refManager,
             m_timeProvider,
             m_cameraManager->info(),

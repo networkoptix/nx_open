@@ -5,8 +5,8 @@
 #include <nx/utils/log/log.h>
 #include <plugins/plugin_container_api.h>
 
-#include "../utils/time_profiler.h"
-#include "../utils/utils.h"
+#include "utils/utils.h"
+#include "device/utils.h"
 #include "utils.h"
 #include "input_format.h"
 #include "codec.h"
@@ -152,6 +152,7 @@ void StreamReader::updateBitrateUnlocked()
         debug("ffmpeg::StreamReader selected bitrate: %d\n", largest);
         m_codecParams.bitrate = largest;
         m_cameraState = kModified;
+        device::utils::setBitrate(m_url.c_str(), largest);
     }
 }
 
@@ -234,7 +235,6 @@ void StreamReader::run()
         packet->setTimeStamp(m_timeProvider->millisSinceEpoch());
 
         std::lock_guard<std::mutex> lock(m_mutex);
-
         for (auto & consumer : m_consumers)
         {
             if (auto c = consumer.lock())
@@ -263,6 +263,8 @@ bool StreamReader::ensureInitialized()
 
 int StreamReader::initialize()
 {
+    debug("ffmpeg init\n");
+
     auto inputFormat = std::make_unique<InputFormat>();
 
     int initCode = inputFormat->initialize(deviceType());
@@ -281,7 +283,7 @@ int StreamReader::initialize()
     av_dump_format(m_inputFormat->formatContext(), 0, m_url.c_str(), 0);
     m_cameraState = kInitialized;
     
-    debug("initialize done\n");
+    debug("ffmpeg init done\n");
 
     return 0;
 }

@@ -2,6 +2,8 @@
 
 #include "stream_reader.h"
 
+#include <map>
+
 #include <nx/utils/thread/sync_queue.h>
 
 struct SwsContext;
@@ -21,6 +23,7 @@ class TranscodeStreamReader
 {
 public:
     TranscodeStreamReader(
+        int encoderIndex,
         nxpt::CommonRefManager* const parentRefManager,
         nxpl::TimeProvider *const timeProvider,
         const nxcip::CameraInfo& cameraInfo,
@@ -56,17 +59,17 @@ private:
     std::thread m_runThread;
     nx::utils::SyncQueue<std::shared_ptr<ffmpeg::Frame>> m_scaledFrames;
 
+    int64_t m_lastTimeStamp = 0;
+
 private:
     void start();
     void stop();
     void run();
-    std::shared_ptr<ffmpeg::Packet> nextPacket();
-    std::shared_ptr<ffmpeg::Frame> newScaledFrame(int * ffmpegErrorCode);
     int scale(AVFrame* frame, AVFrame * outFrame);
     int encode(const ffmpeg::Frame * frame, ffmpeg::Packet * outPacket);
     int decode (AVFrame * outFrame, const AVPacket * packet, int * gotFrame);
 
-    virtual void interrupt() override;
+    std::shared_ptr<ffmpeg::Frame> newScaledFrame(int * ffmpegErrorCode);
 
     bool ensureInitialized();
     int initialize();

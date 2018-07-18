@@ -13,62 +13,13 @@
 #include <stdlib.h>
 
 namespace nx {
-namespace rpi_cam2 {
+namespace device {
 namespace utils {
 namespace v4l2 {
 
 std::vector<std::string> getDevicePaths();
 nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat);
 unsigned int toV4L2PixelFormat(nxcip::CompressionType nxCodecID);
-
-
-struct BitrateMap
-{
-    nxcip::CompressionType codecID;
-    nxcip::Resolution resolution;
-    int bitrate;
-};
-
-static BitrateMap bitrateMappings[] =
-{
-    // codecID                 resolution    bitrate
-    {nxcip::AV_CODEC_ID_H264,  {2560, 1440}, 16000000},
-    {nxcip::AV_CODEC_ID_H264,  {1920, 1080},  8000000},
-    {nxcip::AV_CODEC_ID_H264,  {1280, 720},   5000000},
-    {nxcip::AV_CODEC_ID_H264,  {640, 480},    2500000},
-    {nxcip::AV_CODEC_ID_H264,  {320, 240},    1000000},
-
-    {nxcip::AV_CODEC_ID_H263,  {2560, 1440}, 16000000},
-    {nxcip::AV_CODEC_ID_H263,  {1920, 1080},  8000000},
-    {nxcip::AV_CODEC_ID_H263,  {1280, 720},   5000000},
-    {nxcip::AV_CODEC_ID_H263,  {640, 480},    2500000},
-    {nxcip::AV_CODEC_ID_H263,  {320, 240},    1000000},
-
-    // todo bitrate mappings for the rest of these
-    {nxcip::AV_CODEC_ID_MJPEG, {2560, 1440}, 0},
-    {nxcip::AV_CODEC_ID_MJPEG, {1920, 1080}, 0},
-    {nxcip::AV_CODEC_ID_MJPEG, {1280, 720},  0},
-    {nxcip::AV_CODEC_ID_MJPEG, {640, 480},   0},
-    {nxcip::AV_CODEC_ID_MJPEG, {320, 240},   0},
-
-    {nxcip::AV_CODEC_ID_MPEG4, {2560, 1440}, 0},
-    {nxcip::AV_CODEC_ID_MPEG4, {1920, 1080}, 0},
-    {nxcip::AV_CODEC_ID_MPEG4, {1280, 720},  0},
-    {nxcip::AV_CODEC_ID_MPEG4, {640, 480},   0},
-    {nxcip::AV_CODEC_ID_MPEG4, {320, 240},   0},
-
-    {nxcip::AV_CODEC_ID_NONE, {2560, 1440}, 0},
-    {nxcip::AV_CODEC_ID_NONE, {1920, 1080}, 0},
-    {nxcip::AV_CODEC_ID_NONE, {1280, 720},  0},
-    {nxcip::AV_CODEC_ID_NONE, {640, 480},   0},
-    {nxcip::AV_CODEC_ID_NONE, {320, 240},   0},
-
-};
-
-int calculateBitRate(nxcip::CompressionType codecID, const nxcip::Resolution& resolution, float fps)
-{
-    return 0;
-}
 
 /*!
  * convenience class for opening and closing devices represented by devicePath
@@ -106,7 +57,10 @@ nxcip::CompressionType toNxCompressionTypeVideo(unsigned int v4l2PixelFormat)
         case V4L2_PIX_FMT_MPEG4:      return nxcip::AV_CODEC_ID_MPEG4;
         case V4L2_PIX_FMT_H264:
         case V4L2_PIX_FMT_H264_NO_SC:
-        /*case V4L2_PIX_FMT_H264_MVC:*/   return nxcip::AV_CODEC_ID_H264;
+#ifdef V4L2_PIX_FMT_H264_MVC
+        case V4L2_PIX_FMT_H264_MVC:   
+#endif
+                                      return nxcip::AV_CODEC_ID_H264;
         default:                      return nxcip::AV_CODEC_ID_NONE;
     }
 }
@@ -179,10 +133,7 @@ std::vector<DeviceData> getDeviceList()
         if (fileDescriptor == -1)
             continue;
 
-        DeviceData d;
-        d.setDeviceName(getDeviceName(fileDescriptor));
-        d.setDevicePath(devicePath);
-        deviceList.push_back(d);
+        deviceList.push_back(device::DeviceData(getDeviceName(fileDescriptor), devicePath));
     }
     return deviceList;
 }
@@ -214,7 +165,8 @@ std::vector<nxcip::CompressionType> getSupportedCodecs(const char * devicePath)
 float getHighestFrameRate(
     int fileDescriptor,
     unsigned int v4l2PixelFormat,
-    const nxcip::Resolution& resolution)
+    int width,
+    int height)
 {
     const auto toFrameRate =
         [] (const v4l2_fract& frameInterval) -> float
@@ -228,8 +180,8 @@ float getHighestFrameRate(
     memset(&frameRateEnum, 0, sizeof(frameRateEnum));
     frameRateEnum.index = 0;
     frameRateEnum.pixel_format = v4l2PixelFormat;
-    frameRateEnum.width = resolution.width;
-    frameRateEnum.height = resolution.height;
+    frameRateEnum.width = width;
+    frameRateEnum.height = height;
 
     float highestFrameRate = 0;
     while(ioctl(fileDescriptor, VIDIOC_ENUM_FRAMEINTERVALS, &frameRateEnum) == 0)
@@ -275,11 +227,18 @@ std::vector<ResolutionData> getResolutionList(
     nxcip::CompressionType targetCodecID)
 {
     const auto getResolution =
-        [](const v4l2_frmsizeenum& enumerator) -> nxcip::Resolution
+        [](const v4l2_frmsizeenum& enumerator, int * width, int * height)
         {
-            return enumerator.type == V4L2_FRMSIZE_TYPE_DISCRETE
-                ? nxcip::Resolution(enumerator.discrete.width, enumerator.discrete.height)
-                : nxcip::Resolution(enumerator.stepwise.max_width, enumerator.stepwise.max_height);
+            if(enumerator.type == V4L2_FRMSIZE_TYPE_DISCRETE)
+            {
+                *width = enumerator.discrete.width;
+                *height = enumerator.discrete.height;
+            }
+            else
+            {
+                *width = enumerator.stepwise.max_width;
+                *height = enumerator.stepwise.max_height;
+            }
         };
 
     DeviceInitializer initializer(devicePath);
@@ -302,11 +261,11 @@ std::vector<ResolutionData> getResolutionList(
     while (ioctl(fileDescriptor, VIDIOC_ENUM_FRAMESIZES, &frameSizeEnum) == 0)
     {
         ResolutionData resolutionData;
-        resolutionData.resolution = getResolution(frameSizeEnum);
-        printf("v4l2_utils::getResolutionList()::resolution: w=%d, h=%d\n",
-            resolutionData.resolution.width, resolutionData.resolution.height);
+        getResolution(frameSizeEnum, &resolutionData.width, &resolutionData.height);
+        printf("v4l2_utils::getResolutionList()::resolution: w=%d, h=%d\n", 
+            resolutionData.width, resolutionData.height);
         resolutionData.maxFps =
-            getHighestFrameRate(fileDescriptor, pixelFormat, resolutionData.resolution);
+            (int)getHighestFrameRate(fileDescriptor, pixelFormat, resolutionData.width, resolutionData.height);
         resolutionData.bitrate = getBitrate(fileDescriptor);
 
         resolutionList.push_back(resolutionData);
@@ -320,7 +279,23 @@ std::vector<ResolutionData> getResolutionList(
     return resolutionList;
 }
 
+void setBitrate(const char * devicePath, int bitrate)
+{
+    DeviceInitializer initializer(devicePath);
+    struct v4l2_ext_controls ecs;
+    struct v4l2_ext_control ec;
+    memset(&ecs, 0, sizeof(ecs));
+    memset(&ec, 0, sizeof(ec));
+    ec.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+    ec.value = bitrate;
+    ec.size = 0;
+    ecs.controls = &ec;
+    ecs.count = 1;
+    ecs.ctrl_class = V4L2_CTRL_CLASS_MPEG;
+    ioctl(initializer.fileDescriptor(), VIDIOC_S_EXT_CTRLS, &ecs);
+}
+
 } // namespace v4l2
 } // namespace utils
-} // namespace rpi_cam2
+} // namespace device
 } // namespace nx

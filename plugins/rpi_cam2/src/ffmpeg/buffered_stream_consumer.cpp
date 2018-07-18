@@ -24,49 +24,49 @@ void BufferedStreamConsumer::givePacket(const std::shared_ptr<Packet>& packet)
             return;
         m_ignoreNonKeyPackets = false;
     }
-    m_vector.push_back(packet);
+    m_packets.push_back(packet);
 }
 
 std::shared_ptr<Packet> BufferedStreamConsumer::popFront()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_vector.empty())
+    if (m_packets.empty())
         return nullptr;
-    auto packet = m_vector.front();
-    m_vector.pop_front();
+    auto packet = m_packets.front();
+    m_packets.pop_front();
     return packet;
 }
 
 std::shared_ptr<Packet> BufferedStreamConsumer::peekFront() const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_vector.empty() ? nullptr : m_vector.front();
+    return m_packets.empty() ? nullptr : m_packets.front();
 }
 
 int BufferedStreamConsumer::size()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    return m_vector.size();
+    return m_packets.size();
 }
 
 void BufferedStreamConsumer::clear()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_vector.clear();
+    m_packets.clear();
 }
 
 int BufferedStreamConsumer::dropOldNonKeyPackets()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     int keepCount = 1;
-    auto it = m_vector.begin();
-    for (; it != m_vector.end(); ++it, ++keepCount)
+    auto it = m_packets.begin();
+    for (; it != m_packets.end(); ++it, ++keepCount)
     {
         if ((*it)->keyPacket())
             break;
     }
 
-    if (it == m_vector.end())
+    if (it == m_packets.end())
         return 0;
         
     /* Checking if the back of the que is a key packet.
@@ -74,16 +74,16 @@ int BufferedStreamConsumer::dropOldNonKeyPackets()
      * Otherwise, givePacket() drops until it gets a key packet.
      */    
     std::shared_ptr<Packet> keyPacketEnd;
-    auto rit = m_vector.rbegin();
-    if(rit != m_vector.rend() && (*rit)->keyPacket())
+    auto rit = m_packets.rbegin();
+    if(rit != m_packets.rend() && (*rit)->keyPacket())
         keyPacketEnd = *rit;
 
-    int dropCount = m_vector.size() - keepCount;
-    m_vector.resize(keepCount);
+    int dropCount = m_packets.size() - keepCount;
+    m_packets.resize(keepCount);
 
     if (keyPacketEnd)
     {
-        m_vector.push_back(keyPacketEnd);
+        m_packets.push_back(keyPacketEnd);
         --dropCount;
     }
     else

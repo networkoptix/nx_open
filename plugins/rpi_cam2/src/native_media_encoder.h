@@ -13,6 +13,7 @@ class NativeMediaEncoder
 {
 public:
     NativeMediaEncoder(
+        int encoderIndex,
         CameraManager* const cameraManager, 
         nxpl::TimeProvider *const timeProvider,
         const CodecContext& codecContext,

@@ -20,6 +20,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "utils/utils.h"
+#include "device/utils.h"
 #include "ffmpeg/stream_reader.h"
 #include "ffmpeg/codec.h"
 #include "ffmpeg/utils.h"
@@ -49,6 +50,7 @@ namespace
 }
 
 NativeStreamReader::NativeStreamReader(
+    int encoderIndex,
     nxpt::CommonRefManager* const parentRefManager,
     nxpl::TimeProvider *const timeProvider,
     const nxcip::CameraInfo& cameraInfo,
@@ -56,6 +58,7 @@ NativeStreamReader::NativeStreamReader(
     const std::shared_ptr<nx::ffmpeg::StreamReader>& ffmpegStreamReader)
 :
     StreamReader(
+        encoderIndex,
         parentRefManager,
         timeProvider,
         cameraInfo,
@@ -81,19 +84,8 @@ int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         m_initialized = true;
     }
 
-    int gopSize = m_ffmpegStreamReader->gopSize();
-    if (gopSize && gopSize < m_consumer->size())
-    {
-        int dropCount = m_consumer->dropOldNonKeyPackets();
-        debug("native stream dropping %d packets\n", dropCount);
-    }
-
-    std::shared_ptr<ffmpeg::Packet> packet;
-    while (!packet && !m_interrupted)
-        packet = m_consumer->popFront();
-
-    if(m_interrupted)
-        return nxcip::NX_NO_DATA;
+    maybeDropPackets();
+    auto packet = nextPacket();
 
     *lpPacket = toNxPacket(
         packet->packet(),
