@@ -91,6 +91,9 @@ protected:
     void cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
 private:
+    void recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket);
+
+private:
     //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;

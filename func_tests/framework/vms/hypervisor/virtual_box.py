@@ -148,7 +148,7 @@ class _VirtualBoxVm(VmHardware):
         self_updated = self._virtual_box.find_vm(self.name)
         self.__dict__.update(self_updated.__dict__)
 
-    def export_vm(self, vm_image_path):
+    def export(self, vm_image_path):
         """Export VM from its current state: it may not have snapshot at all"""
         self._virtual_box.manage(['export', self.name, '-o', vm_image_path, '--options', 'nomacs'])
 

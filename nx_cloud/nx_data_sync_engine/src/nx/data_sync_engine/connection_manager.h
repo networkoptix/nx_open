@@ -60,6 +60,7 @@ struct SystemConnectionInfo
 {
     std::string systemId;
     nx::network::SocketAddress peerEndpoint;
+    std::string userAgent;
 };
 
 /**
@@ -143,6 +144,7 @@ private:
         std::unique_ptr<AbstractTransactionTransport> connection;
         nx::String connectionId;
         FullPeerName fullPeerName;
+        std::string userAgent;
     };
 
     typedef boost::multi_index::multi_index_container<
@@ -227,10 +229,11 @@ private:
         const ConnectionRequestAttributes& connectionRequestAttributes,
         nx::network::http::Response* const response);
 
-    void onHttpConnectionUpgraded(
-        nx::network::http::HttpServerConnection* connection,
+    void addWebSocketTransactionTransport(
+        std::unique_ptr<network::AbstractStreamSocket> connection,
         vms::api::PeerDataEx remotePeerInfo,
-        const std::string& systemId);
+        const std::string& systemId,
+        const std::string& userAgent);
 };
 
 } // namespace data_sync_engine

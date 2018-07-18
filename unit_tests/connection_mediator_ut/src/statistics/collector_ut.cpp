@@ -120,7 +120,7 @@ protected:
 
 private:
     std::unique_ptr<nx::sql::AsyncSqlQueryExecutor> m_queryExecutor;
-    std::unique_ptr<stats::Collector> m_collector;
+    std::unique_ptr<stats::PersistentCollector> m_collector;
     TestDataObject* m_testDataObject;
     conf::Statistics m_statisticsSettings;
     nx::utils::promise<void> m_testDonePromise;
@@ -144,7 +144,7 @@ private:
                 m_testDataObject = result.get();
                 return result;
             });
-        m_collector = std::make_unique<stats::Collector>(
+        m_collector = std::make_unique<stats::PersistentCollector>(
             m_statisticsSettings,
             m_queryExecutor.get());
         ASSERT_NE(nullptr, m_testDataObject);

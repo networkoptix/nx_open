@@ -17,7 +17,7 @@ class ConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     ConnectionProcessor(
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner);
 
     virtual ~ConnectionProcessor();

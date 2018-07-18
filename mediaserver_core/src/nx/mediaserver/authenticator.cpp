@@ -349,7 +349,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
         if (!nxUserName.isEmpty())
         {
             userResource = findUserByName(nxUserName);
-            if (userResource)
+            if (userResource && !userResource->isCloud())
             {
                 NX_VERBOSE(this, lm("Authenticating %1. Found Nx user %2. Checking realm...")
                     .arg(request.requestLine).arg(nxUserName));
@@ -358,7 +358,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
                 bool needRecalcPassword =
                     userResource->getRealm() != desiredRealm ||
                     (userResource->isLdap() && userResource->passwordExpired()) ||
-                    (userResource->getDigest().isEmpty() && !userResource->isCloud());
+                    userResource->getDigest().isEmpty();
                 if (canUpdateRealm && needRecalcPassword)
                 {
                     //requesting client to re-calculate digest after upgrade to 2.4 or fill ldap password
@@ -368,7 +368,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
 
                     addAuthHeader(
                         response,
-                        userResource,
+                        QnUserResourcePtr(),
                         isProxy,
                         false); //requesting Basic authorization
                         return authResult;
@@ -383,8 +383,9 @@ Qn::AuthResult Authenticator::tryHttpMethods(
 
         addAuthHeader(
             response,
-            userResource,
+            QnUserResourcePtr(),
             isProxy);
+
         NX_DEBUG(this, lm("%1 requesting digest auth (%2)").args(authResult, request.requestLine));
         return authResult;
     }
@@ -713,6 +714,12 @@ void Authenticator::addAuthHeader(
     else
         realm = nx::network::AppInfo::realm();
 
+    if (realm.isEmpty())
+    {
+        NX_ASSERT(false, lm("%1 does not have a realm").args(userResource));
+        realm = nx::network::AppInfo::realm();
+    }
+
     const QString auth =
         isDigest
         ? lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5")
@@ -720,7 +727,6 @@ void Authenticator::addAuthHeader(
             .arg(QLatin1String(m_nonceProvider->generateNonce()))
         : lit("Basic realm=\"%1\"").arg(realm);
 
-    //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\",algorithm=MD5,qop=\"auth\""));
     const QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
     nx::network::http::insertOrReplaceHeader(&response.headers, nx::network::http::HttpHeader(
         headerName,

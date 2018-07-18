@@ -32,7 +32,7 @@ Clean up
 
 Reset DB and Open New Browser On Failure
     Close Browser
-    Reset user noperm first/last name
+    Reset user viewer password    ${EMAIL VIEWER}    ${ALT PASSWORD}
     Open Browser and go to URL    ${url}
 
 *** Test Cases ***

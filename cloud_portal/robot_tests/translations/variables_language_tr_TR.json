@@ -47,7 +47,7 @@
     "DISCONNECT FORM HEADER TEXT": "%PRODUCT_NAME% den bağlantıyı kesmek istiyor musunuz?",
     "FIRST NAME IS REQUIRED TEXT": "Ad girmek zorunludur",
     "LAST NAME IS REQUIRED TEXT": "Soyad girmek zorunludur",
-    "EMAIL IS REQUIRED TEXT": "E-posta zorunludur",
+    "EMAIL IS REQUIRED TEXT": "E-posta gerekiyor",
     "EMAIL ALREADY REGISTERED TEXT": "Bu e-posta, %PRODUCT_NAME% 'de zaten kayıtlı",
     "EMAIL INVALID TEXT": "Lütfen geçerli bir Eposta girin",
     "PASSWORD IS REQUIRED TEXT": "Parola gerekmektedir",

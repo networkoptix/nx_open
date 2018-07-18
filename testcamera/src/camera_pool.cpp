@@ -204,10 +204,10 @@ void QnCameraPool::addCameras(
 }
 
 QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> clientSocket)
+    std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket, this, m_noSecondaryStream, m_fps);
+    return new QnTestCameraProcessor(std::move(clientSocket), this, m_noSecondaryStream, m_fps);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()

@@ -27,7 +27,7 @@ public:
     QnDigitalWatchdogResource();
     ~QnDigitalWatchdogResource();
 
-    CLSimpleHTTPClient httpClient() const;
+    std::unique_ptr<CLSimpleHTTPClient> httpClient() const;
 
 protected:
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;

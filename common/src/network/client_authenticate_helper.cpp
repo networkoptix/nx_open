@@ -49,8 +49,8 @@ Qn::AuthResult QnClientAuthHelper::addAuthorizationToRequest(
                 &request->headers,
                 nx::network::http::parseHeader(CLSimpleHTTPClient::digestAccess(
                     auth,
-                    QLatin1String(authHeader.params.value("realm")),
-                    QLatin1String(authHeader.params.value("nonce")),
+                    QLatin1String(authHeader.getParam("realm")),
+                    QLatin1String(authHeader.getParam("nonce")),
                     QLatin1String(request->requestLine.method),
                     request->requestLine.url.toString(),
                     authenticationCtx->responseStatusCode() == nx::network::http::StatusCode::proxyAuthenticationRequired).toLatin1()));

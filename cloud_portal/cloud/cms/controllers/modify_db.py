@@ -46,11 +46,12 @@ def save_unrevisioned_records(context, customization, language, data_structures,
         ds_language = language
         if not data_structure.translatable:
             ds_language = None
-        records = data_structure.datarecord_set\
-            .filter(customization=customization,
-                    language=ds_language)
 
         new_record_value = ""
+        latest_value = data_structure.default
+        records = data_structure.datarecord_set.filter(customization=customization, language=ds_language)
+        if records.exists():
+            latest_value = records.latest('id').value
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
         if data_structure.type == DataStructure.DATA_TYPES.image\
@@ -63,12 +64,12 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                         upload_errors.extend(file_errors)
                         continue
 
-                # If neither case do nothing for this record
-                elif not data_structure.optional:
-                    new_record_value = data_structure.default
+            # If neither case do nothing for this record
+            elif not data_structure.optional and latest_value:
+                continue
 
-                elif 'delete_' + data_structure_name not in request_data:
-                    continue
+            elif data_structure.optional and 'delete_' + data_structure_name not in request_data:
+                continue
 
         elif data_structure.type == DataStructure.DATA_TYPES.guid:
 
@@ -97,7 +98,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             upload_errors.append((data_structure_name, "You do not have permission to edit this field"))
             continue
 
-        if not data_structure.optional and not new_record_value:
+        if not data_structure.optional and not latest_value and not new_record_value:
             if data_structure.default:
                 new_record_value = data_structure.default
                 upload_errors.append((data_structure_name, "This field cannot be blank. Using default value"))
@@ -105,12 +106,8 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                 upload_errors.append((data_structure_name, "This field cannot be blank"))
                 continue
 
-        if records.exists():
-            if new_record_value == records.latest('created_date').value:
-                continue
-        else:
-            if data_structure.default == new_record_value:
-                continue
+        if new_record_value == latest_value:
+            continue
 
         record = DataRecord(data_structure=data_structure,
                             language=ds_language,
@@ -118,7 +115,6 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                             value=new_record_value,
                             created_by=user)
         record.save()
-
     fill_content(customization_name=customization.name,
                  product_name=context.product.name,
                  preview=True,
@@ -192,9 +188,8 @@ def publish_latest_version(customization, version_id, user):
     return publish_errors
 
 
-def send_version_for_review(context, customization, language, data_structures,
-                            product, request_data, request_files, user):
-    old_versions = ContentVersion.objects.filter(accepted_date=None, product=product)
+def send_version_for_review(customization, product, user):
+    old_versions = ContentVersion.objects.filter(product=product, customization=customization, accepted_date=None)
 
     if old_versions.exists():
         old_version = old_versions.latest('created_date')
@@ -205,14 +200,9 @@ def send_version_for_review(context, customization, language, data_structures,
                              product=product, created_by=user)
     version.save()
 
-    upload_errors = save_unrevisioned_records(context, customization, language, data_structures,
-                                              request_data, request_files, user, version_id=version.id)
-
-    update_records_to_version(Context.objects.filter(
-        product=product), customization, version)
+    update_records_to_version(Context.objects.filter(product=product), customization, version)
 
     notify_version_ready(customization, version.id, product.name, user)
-    return upload_errors
 
 
 def get_records_for_version(version):

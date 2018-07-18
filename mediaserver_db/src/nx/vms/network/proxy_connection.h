@@ -22,7 +22,7 @@ class ProxyConnectionProcessor: public QnTCPConnectionProcessor
 public:
     ProxyConnectionProcessor(
         nx::vms::network::ReverseConnectionManager* reverseConnectionManager,
-        QSharedPointer<nx::network::AbstractStreamSocket> socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
     static void cleanupProxyInfo(nx::network::http::Request* request);

@@ -26,33 +26,6 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
-template<typename ResultType>
-class GetHandler:
-    public nx::network::http::AbstractFusionRequestHandler<void, ResultType>
-{
-public:
-    using FunctorType = nx::utils::MoveOnlyFunc<ResultType()>;
-
-    GetHandler(FunctorType func):
-        m_func(std::move(func))
-    {
-    }
-
-private:
-    FunctorType m_func;
-
-    virtual void processRequest(
-        nx::network::http::HttpServerConnection* const /*connection*/,
-        const nx::network::http::Request& /*request*/,
-        nx::utils::stree::ResourceContainer /*authInfo*/) override
-    {
-        auto data = m_func();
-        this->requestCompleted(nx::network::http::FusionRequestResult(), std::move(data));
-    }
-};
-
-//-------------------------------------------------------------------------------------------------
-
 View::View(
     const conf::Settings& settings,
     Model* model,
@@ -84,12 +57,11 @@ View::~View()
 void View::registerStatisticsApiHandlers(
     const AbstractStatisticsProvider& statisticsProvider)
 {
-    using GetAllStatisticsHandler = GetHandler<Statistics>;
-
-    registerApiHandler<GetAllStatisticsHandler>(
+    network::http::registerFusionRequestHandler(
+        &m_httpMessageDispatcher,
         api::kRelayStatisticsMetricsPath,
-        nx::network::http::Method::get,
-        std::bind(&AbstractStatisticsProvider::getAllStatistics, &statisticsProvider));
+        std::bind(&AbstractStatisticsProvider::getAllStatistics, &statisticsProvider),
+        nx::network::http::Method::get);
 }
 
 void View::start()

@@ -2,27 +2,29 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <server/server_globals.h>
-#include <test_support/utils.h>
-#include <test_support/mediaserver_launcher.h>
-#include <api/app_server_connection.h>
-#include <nx/network/http/auth_tools.h>
-#include <nx/network/http/http_client.h>
-#include <nx/network/http/custom_headers.h>
 
-#include <nx/fusion/model_functions.h>
-#include <nx/network/app_info.h>
-#include <nx/mediaserver/authenticator.h>
-#include <api/model/cookie_login_data.h>
-#include <network/authutil.h>
-#include <rest/server/json_rest_result.h>
-#include "utils/common/sleep.h"
-#include "common/common_module.h"
+#include <api/app_server_connection.h>
 #include <api/global_settings.h>
-#include <database/server_db.h>
-#include <recording/time_period.h>
+#include <api/model/cookie_login_data.h>
 #include <audit/mserver_audit_manager.h>
+#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <database/server_db.h>
+#include <network/authutil.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/mediaserver/authenticator.h>
+#include <nx/network/app_info.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/elapsed_timer.h>
+#include <recording/time_period.h>
+#include <rest/server/json_rest_result.h>
+#include <server/server_globals.h>
+#include <test_support/mediaserver_launcher.h>
+#include <test_support/utils.h>
+#include <utils/common/sleep.h>
 
 // TODO: Major refactring is required:
 // - Get rid of number http codes, use constants intead.
@@ -59,7 +61,6 @@ public:
         userData.email = userData.name;
         userData.isEnabled = true;
         userData.isCloud = true;
-        userData.realm = nx::network::AppInfo::realm();
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
 
         ldapUserWithEmptyDigest.id = QnUuid::createUuid();
@@ -213,7 +214,7 @@ public:
         const QString& password,
         nx::network::http::AuthType authType,
         int expectedStatusCode,
-        boost::optional<Qn::AuthResult> expectedAuthResult)
+        boost::optional<Qn::AuthResult> expectedAuthResult = boost::none)
     {
         auto httpClient = std::make_unique<nx::network::http::HttpClient>();
         httpClient->setUserName(login);
@@ -499,6 +500,35 @@ TEST_F(AuthenticationTest, authKeyInUrl)
     ASSERT_TRUE(client->doGet(serverUrl("/ec2/getUsersEx", query.toString())));
     ASSERT_TRUE(client->response());
     ASSERT_EQ(401, client->response()->statusLine.statusCode);
+}
+
+TEST_F(AuthenticationTest, serverKey)
+{
+    const auto commonModule = server->commonModule();
+    const auto serverResource = commonModule->resourcePool()
+        ->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
+
+    const auto login = serverResource->getId().toString();
+    const auto makeClient =
+        [&](const QString& password)
+        {
+            auto client = std::make_unique<nx::network::http::HttpClient>();
+            client->setUserName(login);
+            client->setUserPassword(password);
+            return client;
+        };
+
+    testServerReturnCode(
+        makeClient(serverResource->getAuthKey()),
+        nx::network::http::StatusCode::ok);
+
+    testServerReturnCode(
+        makeClient("invalid password"),
+        nx::network::http::StatusCode::unauthorized, Qn::Auth_WrongPassword);
+
+    auto client = makeClient(serverResource->getAuthKey());
+    client->addAdditionalHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, userData.name.toUtf8());
+    testServerReturnCode(std::move(client), nx::network::http::StatusCode::ok);
 }
 
 } // namespace test

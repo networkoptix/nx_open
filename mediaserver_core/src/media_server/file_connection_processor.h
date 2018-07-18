@@ -1,5 +1,4 @@
-#ifndef QN_FILE_CONNECTION_PROCESSOR_H
-#define QN_FILE_CONNECTION_PROCESSOR_H
+#pragma once
 
 #include "network/tcp_connection_processor.h"
 
@@ -12,7 +11,7 @@ class QnFileConnectionProcessor: public QnTCPConnectionProcessor {
 public:
     static QString externalPackagePath();
 
-    QnFileConnectionProcessor(QSharedPointer<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnFileConnectionProcessor(std::unique_ptr<nx::network::AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnFileConnectionProcessor();
 
     static QByteArray readStaticFile(const QString& path);
@@ -30,5 +29,3 @@ private:
 private:
     Q_DECLARE_PRIVATE(QnFileConnectionProcessor);
 };
-
-#endif // QN_FILE_REST_HANDLER_H

@@ -33,40 +33,40 @@
 
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
 :
     QnCommonModuleAware(owner->commonModule()),
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
-    d->socket = socket;
+    d->socket = std::move(socket);
     d->owner = owner;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner)
 :
     QnCommonModuleAware(owner->commonModule()),
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
-    d->socket = socket;
+    d->socket = std::move(socket);
     d->owner = owner;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
-    QSharedPointer<nx::network::AbstractStreamSocket> socket,
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnCommonModule* commonModule)
 :
     QnCommonModuleAware(commonModule),
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
-    d->socket = socket;
+    d->socket = std::move(socket);
 }
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
@@ -354,21 +354,19 @@ QString QnTCPConnectionProcessor::codeToMessage(int code)
 void QnTCPConnectionProcessor::pleaseStop()
 {
     Q_D(QnTCPConnectionProcessor);
-    if (auto socket = d->socket)
-        socket->shutdown();
+    {
+        QnMutexLocker lock(&d->socketMutex);
+        if (d->socket)
+            d->socket->shutdown();
+    }
     QnLongRunnable::pleaseStop();
 }
 
-QSharedPointer<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::socket() const
+nx::network::SocketAddress QnTCPConnectionProcessor::getForeignAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    return d->socket;
-}
-
-int QnTCPConnectionProcessor::getSocketTimeout()
-{
-    Q_D(QnTCPConnectionProcessor);
-    return d->socketTimeout;
+    QnMutexLocker lock(&d->socketMutex);
+    return d->socket->getForeignAddress();
 }
 
 int QnTCPConnectionProcessor::readSocket( quint8* buffer, int bufSize )
@@ -536,27 +534,20 @@ nx::network::SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
     return d->socket ? d->socket->getForeignAddress() : nx::network::SocketAddress();
 }
 
-bool QnTCPConnectionProcessor::isSocketTaken() const
-{
-    Q_D(const QnTCPConnectionProcessor);
-    return d->isSocketTaken;
-}
-
-QSharedPointer<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
+std::unique_ptr<nx::network::AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
 {
     Q_D(QnTCPConnectionProcessor);
-    d->isSocketTaken = true;
-
-    const auto socket = d->socket;
-    d->socket.clear();
-    return socket;
+    QnMutexLocker lock(&d->socketMutex);
+    return std::move(d->socket);
 }
 
+#if 0
 void QnTCPConnectionProcessor::releaseSocket()
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket.clear();
 }
+#endif
 
 int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
 {

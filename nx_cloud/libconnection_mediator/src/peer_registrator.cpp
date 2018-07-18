@@ -337,6 +337,12 @@ void PeerRegistrator::clientBind(
             connection->sendMessage(indication);
 }
 
+int PeerRegistrator::boundClientCount() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return (int) m_boundClients.size();
+}
+
 void PeerRegistrator::sendListenResponse(
     boost::optional<QUrl> trafficRelayInstanceUrl,
     std::function<void(api::ResultCode, api::ListenResponse)> responseSender)

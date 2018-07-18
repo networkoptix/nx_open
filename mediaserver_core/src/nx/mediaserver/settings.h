@@ -146,7 +146,7 @@ public:
         "will end with storages guid."
     };
     Option<QString> delayBeforeSettingMasterFlag{this, "delayBeforeSettingMasterFlag", "30s", ""};
-    Option<bool> p2pMode{this, "p2pMode", false,
+    Option<bool> p2pMode{this, "p2pMode", true,
         "Switch data synchronization to the new optimized mode"
     };
     Option<int> allowRemovableStorages{this, "allowRemovableStorages", 1,

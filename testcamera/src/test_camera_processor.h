@@ -12,7 +12,7 @@ public:
      * @param fps If not -1, override the default value or the value received from Client.
      */
     QnTestCameraProcessor(
-        const QSharedPointer<nx::network::AbstractStreamSocket>& socket,
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner,
         bool noSecondaryStream,
         int fps);

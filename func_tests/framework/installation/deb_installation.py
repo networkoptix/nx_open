@@ -23,13 +23,13 @@ class DebInstallation(Installation):
 
     _NOT_SET = object()
 
-    def __init__(self, posix_access, dir):
+    def __init__(self, posix_access, dir, core_dumps_dirs=None):
         super(DebInstallation, self).__init__(
             os_access=posix_access,
             dir=dir,
             binary_file=dir / 'bin' / 'mediaserver-bin',
             var_dir=dir / 'var',
-            core_dumps_dirs=[dir / 'bin'],
+            core_dumps_dirs=core_dumps_dirs or [dir / 'bin'],
             core_dump_glob='core.*',
             )
         self._posix_shell = posix_access.shell  # type: PosixShell
@@ -73,6 +73,7 @@ class DebInstallation(Installation):
         f = BytesIO()  # TODO: Should be text.
         config.write(f)
         self._config.write_text(f.getvalue().decode(encoding='ascii'))
+        _logger.debug('Write config to %s:\n%s', self._config, f.getvalue())
 
     # returns None if server is not installed (yet)
     # cached_property does not fit because we need to invalidate it after .install()

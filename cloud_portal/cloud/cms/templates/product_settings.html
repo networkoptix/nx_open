@@ -37,6 +37,13 @@
         <button class="btn btn-sm btn-primary" type="submit" name="Upload" onclick="cookieInterval()">Upload</button>
     </div>
     <script>
+        /*
+            The checkCookie function starts on a 100ms interval once the user uploads a file.
+            Once the user submits the file we wait for the structure.json file to be returned.
+            When the file is sent to the user it also sets a cookie.
+            The check cookie function keeps checking the cookies until it a changed.
+            Afterwards it reloads the page so that the user can see any error messages with the file upload
+         */
         var checkCookie = function () {
             var lastCookie = document.cookie;
             return function () {
