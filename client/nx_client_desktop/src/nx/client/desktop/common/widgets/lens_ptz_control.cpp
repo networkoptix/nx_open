@@ -11,6 +11,7 @@
 #include <ui/style/nx_style.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/math/color_transformations.h>
+#include "nx/utils/literal.h"
 #include <ui/style/skin.h>
 
 namespace {
@@ -34,7 +35,7 @@ namespace {
     // Time period to read updates for ptzr control.
     const int kUpdatePeriod = 33;
 
-    // Increments to be applied when we press appropriate button
+    // Increments to be applied when we press appropriate button.
     const float kPanTiltIncrement = 1.0;
     const float kRotationIncrement = 90;
 
@@ -109,10 +110,10 @@ template<class T> T clamp(T value, T limit)
     return value;
 }
 
-bool changedEnough(qreal vOld, qreal vNew, qreal threshold)
+bool changedEnough(qreal oldValue, qreal newValue, qreal threshold)
 {
     // Check if delta is large enough, or we crossed zero
-    return qAbs(vNew - vOld) >= threshold || ((vOld != 0) != (vNew != 0));
+    return qAbs(newValue - oldValue) >= threshold || ((oldValue != 0) != (newValue != 0));
 }
 
 void LensPtzControl::updateState()
@@ -155,7 +156,7 @@ void LensPtzControl::updateState()
         if (qAbs(newValue.rotation) > 0)
         {
             if (qAbs(newValue.rotation) > returnSpeed)
-                newValue.rotation -= newValue.rotation > 0 ? returnSpeed : -returnSpeed;
+                newValue.rotation -= (newValue.rotation > 0 ? returnSpeed : -returnSpeed);
             else
                 newValue.rotation = 0;
             m_needRedraw = true;
@@ -208,32 +209,33 @@ void LensPtzControl::onButtonClicked(ButtonType button, bool state)
     if (m_state != StateInitial)
         return;
 
+    const auto delta = state ? kPanTiltIncrement : -kPanTiltIncrement;
+
     switch (button)
     {
-    case ButtonLeft:
-        m_buttonState.horizontal += state ? kPanTiltIncrement : -kPanTiltIncrement;
-        break;
-    case ButtonRight:
-        m_buttonState.horizontal -= state ? kPanTiltIncrement : -kPanTiltIncrement;
-        break;
-    case ButtonUp:
-        m_buttonState.vertical += state ? kPanTiltIncrement : -kPanTiltIncrement;
-        break;
-    case ButtonDown:
-        m_buttonState.vertical -= state ? kPanTiltIncrement : -kPanTiltIncrement;
-        break;
+        case ButtonLeft:
+            m_buttonState.horizontal += delta;
+            break;
+        case ButtonRight:
+            m_buttonState.horizontal -= delta;
+            break;
+        case ButtonUp:
+            m_buttonState.vertical += delta;
+            break;
+        case ButtonDown:
+            m_buttonState.vertical -= delta;
+            break;
     }
-    // TODO: Implement
 }
 
-void LensPtzControl::lockRotationAdd(bool state)
+void LensPtzControl::onRotationButtonCounterClockWise(bool pressed)
 {
-    m_buttonState.rotation += state ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation += pressed ? kRotationIncrement : -kRotationIncrement;
 }
 
-void LensPtzControl::lockRotationDec(bool state)
+void LensPtzControl::onRotationButtonClockWise(bool pressed)
 {
-    m_buttonState.rotation -= state ? kRotationIncrement : -kRotationIncrement;
+    m_buttonState.rotation -= pressed ? kRotationIncrement : -kRotationIncrement;
 }
 
 QSize LensPtzControl::sizeHint() const
@@ -298,11 +300,13 @@ void LensPtzControl::mousePressEvent(QMouseEvent* event)
         // Buttons use widget coordinates
         auto pos = event->pos();
         for (int i = 0; i < ButtonMax; ++i)
+        {
             if (m_buttons[i].picks(pos))
             {
                 m_buttons[i].isClicked = true;
                 onButtonClicked((ButtonType)i, true);
             }
+        }
     }
 
     if (m_needRedraw)
@@ -312,11 +316,13 @@ void LensPtzControl::mousePressEvent(QMouseEvent* event)
 void LensPtzControl::mouseReleaseEvent(QMouseEvent* event)
 {
     for (int i = 0; i < ButtonMax; ++i)
+    {
         if (m_buttons[i].isClicked)
         {
             m_buttons[i].isClicked = false;
             onButtonClicked((ButtonType)i, false);
         }
+    }
 
     if (m_state == StateInitial)
     {

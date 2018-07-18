@@ -386,27 +386,27 @@ public:
 
         const auto ptzrInfoContainer = new QHBoxLayout();
 
-        m_rotationDec = new nx::client::desktop::HoverButton(kIconCw, kIconCwHovered, this);
-        m_rotationAdd = new nx::client::desktop::HoverButton(kIconCcw, kIconCcwHovered, this);
+        m_rotationCw = new nx::client::desktop::HoverButton(kIconCw, kIconCwHovered, this);
+        m_rotationCcw = new nx::client::desktop::HoverButton(kIconCcw, kIconCcwHovered, this);
         m_rotationLabel = new QLabel();
         m_rotationLabel->setText(rotationText(0));
-        ptzrInfoContainer->addWidget(m_rotationDec);
+        ptzrInfoContainer->addWidget(m_rotationCw);
         ptzrInfoContainer->addWidget(m_rotationLabel);
-        ptzrInfoContainer->addWidget(m_rotationAdd);
+        ptzrInfoContainer->addWidget(m_rotationCcw);
         ptzrContainer->addLayout(ptzrInfoContainer);
         ptzrContainer->setAlignment(ptzrInfoContainer, Qt::AlignCenter);
 
         m_layout->addLayout(ptzrContainer);
 
-        connect(m_rotationAdd, &QAbstractButton::pressed,
-            this, [this]() { onRotationAdd(true); });
-        connect(m_rotationAdd, &QAbstractButton::released,
-            this, [this]() { onRotationAdd(false); });
+        connect(m_rotationCcw, &QAbstractButton::pressed,
+            this, [this]() { onRotationCcw(true); });
+        connect(m_rotationCcw, &QAbstractButton::released,
+            this, [this]() { onRotationCcw(false); });
 
-        connect(m_rotationDec, &QAbstractButton::pressed,
-            this, [this]() { onRotationDec(true); });
-        connect(m_rotationDec, &QAbstractButton::released,
-            this, [this]() { onRotationDec(false); });
+        connect(m_rotationCw, &QAbstractButton::pressed,
+            this, [this]() { onRotationCw(true); });
+        connect(m_rotationCw, &QAbstractButton::released,
+            this, [this]() { onRotationCw(false); });
 
         connect(m_ptrWidget, &LensPtzControl::valueChanged, this,
             [this](const LensPtzControl::Value& v)
@@ -416,14 +416,14 @@ public:
             });
     }
 
-    void onRotationAdd(bool value)
+    void onRotationCcw(bool value)
     {
-        m_ptrWidget->lockRotationAdd(value);
+        m_ptrWidget->onRotationButtonCounterClockWise(value);
     }
 
-    void onRotationDec(bool value)
+    void onRotationCw(bool value)
     {
-        m_ptrWidget->lockRotationDec(value);
+        m_ptrWidget->onRotationButtonClockWise(value);
     }
 
     QString rotationText(int rotation)
@@ -460,8 +460,8 @@ public:
 
 protected:
     nx::client::desktop::LensPtzControl* m_ptrWidget = nullptr;
-    QAbstractButton* m_rotationAdd = nullptr;
-    QAbstractButton* m_rotationDec = nullptr;
+    QAbstractButton* m_rotationCcw = nullptr;
+    QAbstractButton* m_rotationCw = nullptr;
     QLabel* m_rotationLabel = nullptr;
 };
 
