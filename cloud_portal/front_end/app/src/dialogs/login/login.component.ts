@@ -178,7 +178,7 @@ export class NxModalLoginComponent implements OnInit {
         this.modalRef.componentInstance.cancellable = !keepPage || false;
         this.modalRef.componentInstance.closable = true;
         this.modalRef.componentInstance.location = this.location;
-        this.modalRef.componentInstance.keepPage = keepPage || true;
+        this.modalRef.componentInstance.keepPage = (keepPage !== undefined) ? keepPage : true;
 
         return this.modalRef;
     }
