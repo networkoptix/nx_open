@@ -3,8 +3,9 @@
 set -x
 set -e
 
-BINARIES=@libdir@/bin/@build.configuration@
-LIBRARIES=@libdir@/lib/@build.configuration@
+BUILD_DIR=@CMAKE_CURRENT_BINARY_DIR@
+BINARIES=@CMAKE_RUNTIME_OUTPUT_DIRECTORY@
+LIBRARIES=@CMAKE_LIBRARY_OUTPUT_DIRECTORY@
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="@display.product.name@ @release.version@"
@@ -73,7 +74,8 @@ function hard_detach_dmg
 patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 
-python macdeployqt.py "$APP_DIR" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
+python macdeployqt.py \
+    "$BUILD_DIR" "$APP_DIR" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
 
 if [ '${mac.skip.sign}' == 'false'  ]
 then
