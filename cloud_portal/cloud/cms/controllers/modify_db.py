@@ -54,6 +54,16 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             latest_value = records.latest('id').value
         # If the DataStructure is supposed to be an image convert to base64 and
         # error check
+        # TODO: Refactor image/file logic - CLOUD-1524
+        """
+            Currently if the data structure is optional you can remove the value.
+            
+            Planned change is to make it to where you can "delete" the value and if its not optional then fallback
+            to the default value.
+            
+            This will create a new record making images/files behave like the other data structure types
+            Places to touch are here, cms/forms.py, and cms/templates/context_editor.html
+        """
         if data_structure.type == DataStructure.DATA_TYPES.image\
                 or data_structure.type == DataStructure.DATA_TYPES.file:
             # If a file has been uploaded try to save it
@@ -64,10 +74,10 @@ def save_unrevisioned_records(context, customization, language, data_structures,
                         upload_errors.extend(file_errors)
                         continue
 
-            # If neither case do nothing for this record
+            # No file was uploaded and there is a record means the user didn't change anything so skip
             elif not data_structure.optional and latest_value:
                 continue
-
+            # No file was uploaded and the user didn't delete an optional data structure so skip
             elif data_structure.optional and 'delete_' + data_structure_name not in request_data:
                 continue
 
@@ -98,6 +108,7 @@ def save_unrevisioned_records(context, customization, language, data_structures,
             upload_errors.append((data_structure_name, "You do not have permission to edit this field"))
             continue
 
+        # If the data structure is not option and no record exists and nothing was uploaded try to use the default value
         if not data_structure.optional and not latest_value and not new_record_value:
             if data_structure.default:
                 new_record_value = data_structure.default
