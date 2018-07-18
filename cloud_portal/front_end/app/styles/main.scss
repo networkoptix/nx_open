@@ -44,6 +44,14 @@ body {
 [data-whatintent='keyboard'] a:focus:not([disabled]):not(.disabled) {
     outline : none !important;
     @extend #outline;
+
+    &.inset {
+        @extend #inset-outline;
+    }
+}
+
+[data-whatintent='keyboard'] .nav-tabs .nav-item a:focus {
+    @extend #inset-outline;
 }
 
 html.webclient-page{

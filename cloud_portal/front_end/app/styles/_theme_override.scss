@@ -44,7 +44,7 @@ h1, h2 {
     font-size     : $h1-font-size;
     display       : flex;
     align-items   : center;
-    font-family   : $font-family-regular;
+    font-family   : $font-family-light;
     color         : $dark9;
     line-height   : 1rem;
 }
@@ -53,7 +53,7 @@ h2 {
     margin      : 0;
     padding     : 0;
     font-size   : $h2-font-size;
-    font-family : $font-family-regular;
+    font-family : $font-family-light;
     color       : $dark9;
 }
 
@@ -61,7 +61,7 @@ h3 {
     margin-top    : ($line-height-computed / 2);
     margin-bottom : ($line-height-computed / 4);
     font-size     : $h3-font-size;
-    font-family   : $font-family-medium;
+    font-family   : $font-family-regular;
     color         : $dark9;
     line-height   : 1rem;
 }
@@ -101,7 +101,6 @@ h1 > .label {
 
 p {
     margin-bottom : 0.5rem;
-    line-height   : 0.9rem;
 }
 
 .card .table-responsive {

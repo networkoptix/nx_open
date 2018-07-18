@@ -10,7 +10,7 @@
                 </ul>
 
                 <div class="navbar-header">
-                    <a class="navbar-brand product-name add-version" href="/"
+                    <a class="inset navbar-brand product-name add-version" href="/"
                        [ngClass]="{'ml-sm-0': true}">
                         <img ng-src="{{config.previewPath}}/static/images/logo.png">
                     </a>
@@ -18,10 +18,10 @@
 
                 <ul ng-if="activeSystem" class="nav navbar-nav auth-visible d-none d-md-flex">
                     <li ng-class="{ 'active' :active.view }">
-                        <a ng-href="/systems/{{activeSystem.id}}/view">View</a>
+                        <a class="inset" ng-href="/systems/{{activeSystem.id}}/view">View</a>
                     </li>
                     <li ng-class="{ 'active' :active.settings}">
-                        <a ng-href="/systems/{{activeSystem.id}}">Settings</a>
+                        <a class="inset" ng-href="/systems/{{activeSystem.id}}">Settings</a>
                     </li>
                 </ul>
             </div>
