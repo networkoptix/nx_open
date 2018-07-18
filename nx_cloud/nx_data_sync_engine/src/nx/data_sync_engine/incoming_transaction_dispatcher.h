@@ -6,6 +6,7 @@
 #include <nx/sql/async_sql_query_executor.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/subscription.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
@@ -20,9 +21,13 @@ class TransactionLog;
 /**
  * Dispaches transaction received from remote peer to a corresponding processor.
  */
-class IncomingTransactionDispatcher
+class NX_DATA_SYNC_ENGINE_API IncomingTransactionDispatcher
 {
 public:
+    using WatchTransactionSubscription = nx::utils::Subscription<
+        const TransactionTransportHeader&,
+        const CommandHeader&>;
+
     IncomingTransactionDispatcher(
         const QnUuid& moduleGuid,
         TransactionLog* const transactionLog);
@@ -83,25 +88,9 @@ public:
     /**
      * Waits for every running transaction of type transactionType processing to complete.
      */
-    void removeHandler(::ec2::ApiCommand::Value transactionType)
-    {
-        std::unique_ptr<TransactionProcessorContext> processor;
+    void removeHandler(::ec2::ApiCommand::Value transactionType);
 
-        {
-            QnMutexLocker lock(&m_mutex);
-
-            auto processorIter = m_transactionProcessors.find(transactionType);
-            if (processorIter == m_transactionProcessors.end())
-                return;
-            processorIter->second->markedForRemoval = true;
-
-            while (processorIter->second->usageCount.load() > 0)
-                processorIter->second->usageCountDecreased.wait(lock.mutex());
-
-            processor.swap(processorIter->second);
-            m_transactionProcessors.erase(processorIter);
-        }
-    }
+    WatchTransactionSubscription& watchTransactionSubscription();
 
 private:
     struct TransactionProcessorContext
@@ -122,6 +111,7 @@ private:
     TransactionProcessors m_transactionProcessors;
     nx::network::aio::Timer m_aioTimer;
     mutable QnMutex m_mutex;
+    WatchTransactionSubscription m_watchTransactionSubscription;
 
     void dispatchUbjsonTransaction(
         TransactionTransportHeader transportHeader,
