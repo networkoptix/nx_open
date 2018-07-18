@@ -496,8 +496,7 @@ void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()
                         return ValidationResult::kValid;
                     else if(checkResult == CredentialCheckResult::UserLockedOut)
                         return ValidationResult(tr("Too many attempts. Try again in a minute."));
-                    else
-                        return ValidationResult(tr("Wrong Password"));
+                    return ValidationResult(tr("Wrong Password"));
                 }
                 default:
                     break;
