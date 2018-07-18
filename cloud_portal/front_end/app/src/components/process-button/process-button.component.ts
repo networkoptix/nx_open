@@ -13,7 +13,6 @@ export class NxProcessButtonComponent implements OnInit {
     @Input() form: any;
 
     buttonClass: string;
-    processing = false;
 
     constructor() {
     }
@@ -49,7 +48,6 @@ export class NxProcessButtonComponent implements OnInit {
 
             return false;
         } else {
-            this.processing = true;
             this.process.run();
         }
     }
