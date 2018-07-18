@@ -25,6 +25,30 @@ namespace {
 
 static const QString kPublicationKeyParamName = "publicationKey";
 
+struct UpdateInformationRequestData: public QnMultiserverRequestData
+{
+    UpdateInformationRequestData() = default;
+
+    virtual void loadFromParams(
+        QnResourcePool* resourcePool,
+        const QnRequestParamList& params) override
+    {
+        QnMultiserverRequestData::loadFromParams(resourcePool, params);
+        if (params.contains(kPublicationKeyParamName))
+            publicationId = params.value(kPublicationKeyParamName);
+    }
+
+    virtual QnRequestParamList toParams() const override
+    {
+        auto result = QnMultiserverRequestData::toParams();
+        if (!publicationId.isNull())
+            result.insert(kPublicationKeyParamName, publicationId);
+        return result;
+    }
+
+    QString publicationId;
+};
+
 template<typename ContextType>
 nx::utils::Url getServerApiUrl(
     const QString& path, const QnMediaServerResourcePtr& server, ContextType context)
@@ -53,7 +77,7 @@ void requestRemotePeers(
     QnCommonModule* commonModule,
     const QString& path,
     ReplyType& outputReply,
-    QnMultiserverRequestContext<QnEmptyRequestData>* context,
+    QnMultiserverRequestContext<UpdateInformationRequestData>* context,
     const MergeFunction& mergeFunction)
 {
     const auto systemName = commonModule->globalSettings()->systemName();
@@ -109,7 +133,7 @@ void loadFreeSpaceRemotely(
     QnCommonModule* commonModule,
     const QString& path,
     QnUpdateFreeSpaceReply& outputReply,
-    QnMultiserverRequestContext<QnEmptyRequestData>* context)
+    QnMultiserverRequestContext<UpdateInformationRequestData>* context)
 {
     auto mergeFunction =
         [](
@@ -133,7 +157,7 @@ void checkCloudHostRemotely(
     QnCommonModule* commonModule,
     const QString& path,
     QnCloudHostCheckReply& outputReply,
-    QnMultiserverRequestContext<QnEmptyRequestData>* context)
+    QnMultiserverRequestContext<UpdateInformationRequestData>* context)
 {
     auto mergeFunction =
         [](
@@ -153,7 +177,7 @@ static int checkInternetForUpdate(
     const QString& publicationKey,
     QByteArray* result,
     QByteArray* contentType,
-    const QnEmptyRequestData& request)
+    const UpdateInformationRequestData& request)
 {
     nx::update::InformationError error;
     auto information = nx::update::updateInformation(
@@ -169,16 +193,17 @@ static int checkInternetForUpdate(
 
     using namespace nx::update;
     return QnFusionRestHandler::makeError(
-        nx::network::http::StatusCode::notFound, toString(error),
+        nx::network::http::StatusCode::ok, toString(error),
         result, contentType, request.format, request.extraFormatting,
         QnRestResult::CantProcessRequest);
 }
 
 static int checkForUpdateInformationRemotely(
     QnCommonModule* commonModule,
+    const QString& path,
     QByteArray* result,
     QByteArray* contentType,
-    QnMultiserverRequestContext<QnEmptyRequestData>* context)
+    QnMultiserverRequestContext<UpdateInformationRequestData>* context)
 {
     bool done = false;
     auto mergeFunction =
@@ -199,7 +224,7 @@ static int checkForUpdateInformationRemotely(
         };
 
     nx::update::Information outputReply;
-    requestRemotePeers(commonModule, "", outputReply, context, mergeFunction);
+    requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 
     if (done)
     {
@@ -208,7 +233,7 @@ static int checkForUpdateInformationRemotely(
     }
 
     using namespace nx::update;
-    return QnFusionRestHandler::makeError(nx::network::http::StatusCode::notFound,
+    return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
         toString(InformationError::notFoundError),
         result, contentType, context->request().format, context->request().extraFormatting,
         QnRestResult::CantProcessRequest);
@@ -217,10 +242,12 @@ static int checkForUpdateInformationRemotely(
 static int getUpdateInformationFromGlobalSettings(
     QByteArray* result,
     QByteArray* contentType,
-    const QnEmptyRequestData& request)
+    const UpdateInformationRequestData& request)
 {
     *contentType = Qn::serializationFormatToHttpContentType(request.format);
     *result = qnServerModule->commonModule()->globalSettings()->updateInformation();
+    if (result->isEmpty())
+        *result = "{}";
 
     return nx::network::http::StatusCode::ok;
 }
@@ -234,11 +261,11 @@ int QnUpdateInformationRestHandler::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
+    const auto request = QnMultiserverRequestData::fromParams<UpdateInformationRequestData>(
         processor->resourcePool(),
         params);
 
-    QnMultiserverRequestContext<QnEmptyRequestData> context(
+    QnMultiserverRequestContext<UpdateInformationRequestData> context(
         request,
         processor->owner()->getPort());
 
@@ -275,19 +302,13 @@ int QnUpdateInformationRestHandler::executeGet(
         if (mediaServer->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP) || request.isLocal)
         {
             return checkInternetForUpdate(
-                params.value(kPublicationKeyParamName),
-                &result,
-                &contentType,
-                request);
+                params.value(kPublicationKeyParamName), &result, &contentType, request);
         }
 
         if (!request.isLocal)
         {
             return checkForUpdateInformationRemotely(
-                processor->commonModule(),
-                &result,
-                &contentType,
-                &context);
+                processor->commonModule(), path, &result, &contentType, &context);
         }
     }
 

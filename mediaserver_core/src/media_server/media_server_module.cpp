@@ -189,8 +189,8 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_sharedContextPool = store(new nx::mediaserver::resource::SharedContextPool(this));
     m_archiveIntegrityWatcher = store(new nx::mediaserver::ServerArchiveIntegrityWatcher);
-    //m_updates2Manager = store(
-    //    new nx::mediaserver::updates2::ServerUpdates2Manager(this->commonModule()));
+    m_updates2Manager = store(
+        new nx::mediaserver::updates2::ServerUpdates2Manager(this->commonModule()));
     m_rootTool = nx::mediaserver::findRootTool(qApp->applicationFilePath());
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
     registerResourceDataProviders();
@@ -320,10 +320,10 @@ void QnMediaServerModule::registerResourceDataProviders()
     m_resourceDataProviderFactory->registerResourceType<nx::mediaserver::resource::Camera>();
 }
 
-//nx::mediaserver::updates2::ServerUpdates2Manager* QnMediaServerModule::updates2Manager() const
-//{
-//    return m_updates2Manager;
-//}
+nx::mediaserver::updates2::ServerUpdates2Manager* QnMediaServerModule::updates2Manager() const
+{
+    return m_updates2Manager;
+}
 
 QnDataProviderFactory* QnMediaServerModule::dataProviderFactory() const
 {

@@ -218,9 +218,9 @@ static InformationError parsePackages(
 }
 
 static InformationError parseAndExtractInformation(
-            const QByteArray& data,
-            const QString& baseUpdateUrl,
-            Information* result)
+    const QByteArray& data,
+    const QString& baseUpdateUrl,
+    Information* result)
 {
     QJsonParseError parseError;
     auto topLevelObject = QJsonDocument::fromJson(data, &parseError).object();

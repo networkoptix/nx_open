@@ -4,6 +4,8 @@
 namespace nx {
 namespace api {
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((TargetVersionWithEula), (json)(ubjson)(eq), _Fields)
+
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Updates2StatusData, StatusCode)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Updates2StatusData), (json)(ubjson)(eq), _Fields)
 
