@@ -422,11 +422,11 @@ angular.module('webadminApp')
                     if (url.indexOf('http') != 0) {
                         url = 'http://' + url;
                     }
-                    return wrapPost(proxy + '/web/api/pingSystem?' + $.param({
+                    return wrapGet(proxy + '/web/api/pingSystem', {
                         getKey: getKey,
                         postKey: postKey,
                         url: url
-                    }));
+                    });
                 },function(error){
                     return $q.reject(error);
                 });
