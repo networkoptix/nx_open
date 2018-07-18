@@ -38,8 +38,8 @@ nx_configure_file(
     @ONLY)
 list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf)
 
-set(zip_file ${distribution_output_dir}/${artifact.name.server_update}.zip)
-set(deb_file ${distribution_output_dir}/${artifact.name.server}.deb)
+set(zip_file ${distribution_output_dir}/${server_update_distribution_name}.zip)
+set(deb_file ${distribution_output_dir}/${server_distribution_name}.deb)
 set(installer_output_list ${zip_file} ${deb_file})
 
 set(script ${CMAKE_CURRENT_SOURCE_DIR}/build_distribution.sh)

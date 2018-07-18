@@ -1,7 +1,7 @@
 #!/bin/sh
 
 CUSTOMIZATION="@deb.customization.company.name@"
-DISTRIB="@artifact.name.server@"
+DISTRIB="@server_distribution_name@"
 
 INSTALL_DIR="/usr/local/apps/$CUSTOMIZATION"
 STARTUP_SCRIPT="/etc/init.d/S99$CUSTOMIZATION-mediaserver"

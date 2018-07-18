@@ -1,30 +1,30 @@
 # Framework for creating .deb packages.
 #
-# All global symbols have prefix "distr_".
+# All global symbols have prefix "distrib_".
 
 #--------------------------------------------------------------------------------------------------
 # private
 
-# [in] distr_EXTRA_HELP
+# [in] distrib_EXTRA_HELP
 #
-distr_showHelp()
+distrib_showHelp()
 {
     echo "Options:"
     echo " -v, --verbose: Do not redirect output to a log file."
     echo " -k, --keep-work-dir: Do not delete work directory on success."
-    if [[ ! -z $distr_EXTRA_HELP ]]
+    if [[ ! -z $distrib_EXTRA_HELP ]]
     then
-        echo "$distr_EXTRA_HELP"
+        echo "$distrib_EXTRA_HELP"
     fi
 }
 
-# [out] distr_KEEP_WORK_DIR
-# [out] distr_VERBOSE
+# [out] distrib_KEEP_WORK_DIR
+# [out] distrib_VERBOSE
 #
-distr_parseArgs() # "$@"
+distrib_parseArgs() # "$@"
 {
-    distr_KEEP_WORK_DIR=0
-    distr_VERBOSE=0
+    distrib_KEEP_WORK_DIR=0
+    distrib_VERBOSE=0
 
     local -i ARG_N=0
     local ARG
@@ -32,26 +32,26 @@ distr_parseArgs() # "$@"
     do
         if [ "$ARG" = "-h" -o "$ARG" = "--help" ]
         then
-            distr_showHelp
+            distrib_showHelp
             exit 0
         elif [ "$ARG" = "-k" ] || [ "$ARG" = "--keep-work-dir" ]
         then
-            distr_KEEP_WORK_DIR=1
+            distrib_KEEP_WORK_DIR=1
         elif [ "$ARG" = "-v" ] || [ "$ARG" = "--verbose" ]
         then
-            distr_VERBOSE=1
-        elif [[ ! -z $distr_PARSE_EXTRA_ARGS_FUNC ]]
+            distrib_VERBOSE=1
+        elif [[ ! -z $distrib_PARSE_EXTRA_ARGS_FUNC ]]
         then
-            $distr_PARSE_EXTRA_ARGS_FUNC "$ARG" $ARG_N "$@"
+            $distrib_PARSE_EXTRA_ARGS_FUNC "$ARG" $ARG_N "$@"
         fi
 
         ((++ARG_N))
     done
 }
 
-# [out] distr_STDERR_FILE
+# [out] distrib_STDERR_FILE
 #
-distr_redirectOutputToLog() # log_file
+distrib_redirectOutputToLog() # log_file
 {
     local -r LOG_FILE="$1" && shift
 
@@ -65,46 +65,46 @@ distr_redirectOutputToLog() # log_file
     # of regular and error lines in the log file.
     exec 1>"$LOG_FILE" #< Open log file for writing as stdout.
 
-    distr_STDERR_FILE=$(mktemp)
-    exec 2> >(tee "$distr_STDERR_FILE" >&2) #< Redirect stderr to a temporary file.
+    distrib_STDERR_FILE=$(mktemp)
+    exec 2> >(tee "$distrib_STDERR_FILE" >&2) #< Redirect stderr to a temporary file.
 }
 
 # Called by trap.
 # [in] $?
-# [in] distr_VERBOSE
-# [in] distr_STDERR_FILE
-# [in] distr_KEEP_WORK_DIR
-# [in] distr_WORK_DIR
+# [in] distrib_VERBOSE
+# [in] distrib_STDERR_FILE
+# [in] distrib_KEEP_WORK_DIR
+# [in] distrib_WORK_DIR
 #
-distr_onExit()
+distrib_onExit()
 {
     local -r -i RESULT=$?
 
-    if [ -s "$distr_STDERR_FILE" ] #< Whether the file exists and is not empty.
+    if [ -s "$distrib_STDERR_FILE" ] #< Whether the file exists and is not empty.
     then
         echo ""
         python -c 'print("-" * 99)' #< Print separator.
         echo "- stderr"
         echo ""
-        cat "$distr_STDERR_FILE" #< Copy accumulated stderr to the log file.
+        cat "$distrib_STDERR_FILE" #< Copy accumulated stderr to the log file.
     fi
-    rm -rf "$distr_STDERR_FILE"
+    rm -rf "$distrib_STDERR_FILE"
 
     echo "" #< Empty line to separate SUCCESS/FAILURE message from the above log.
     if [ $RESULT != 0 ]
     then #< Failure.
         local -r ERROR_MESSAGE="FAILURE (status $RESULT); see the error message(s) above."
         echo "$ERROR_MESSAGE" >&2 #< To stderr.
-        if [ $distr_VERBOSE = 0 ] #< Whether stdout is redirected to the log file.
+        if [ $distrib_VERBOSE = 0 ] #< Whether stdout is redirected to the log file.
         then
             echo "$ERROR_MESSAGE" #< To log file.
         fi
     else
         echo "SUCCESS"
 
-        if [ $distr_KEEP_WORK_DIR = 0 ]
+        if [ $distrib_KEEP_WORK_DIR = 0 ]
         then
-            rm -rf "$distr_WORK_DIR"
+            rm -rf "$distrib_WORK_DIR"
         fi
     fi
 
@@ -112,24 +112,24 @@ distr_onExit()
 }
 
 # Global variables - need to be accessible in onExit().
-declare -g distr_WORK_DIR
-declare -g -i distr_VERBOSE
-declare -g -i distr_KEEP_WORK_DIR
-declare -g distr_STDERR_FILE
+declare -g distrib_WORK_DIR
+declare -g -i distrib_VERBOSE
+declare -g -i distrib_KEEP_WORK_DIR
+declare -g distrib_STDERR_FILE
 
 #--------------------------------------------------------------------------------------------------
 # public
 
 # Description of additional command-line options to show with the help.
-declare -g distr_EXTRA_HELP=""
+declare -g distrib_EXTRA_HELP=""
 
 # Callback which is called for each command-line argument:
 #     parseExtraArgs arg_value arg_number "$@"
-declare -g distr_PARSE_EXTRA_ARGS_FUNC=""
+declare -g distrib_PARSE_EXTRA_ARGS_FUNC=""
 
 # [in,out] CONFIG If defined, overrides config_file, otherwise is set to config_file.
 #
-distr_loadConfig() # config_file
+distrib_loadConfig() # config_file
 {
     : ${CONFIG="$1"} && shift #< CONFIG can be overridden externally.
     if [ ! -z "$CONFIG" ]
@@ -138,14 +138,14 @@ distr_loadConfig() # config_file
     fi
 }
 
-# Copy system library(ies) using copy_system_library.py.
+# Copy system libraries using copy_system_library.py.
 #
 # [in] SOURCE_DIR
 # [in] COMPILER
 # [in] CFLAGS
 # [in] LDFLAGS
 #
-distr_cpSysLib() # dest_dir libs_to_copy...
+distrib_copySystemLibs() # dest_dir libs_to_copy...
 {
     local -r DEST_DIR="$1" && shift
 
@@ -157,7 +157,18 @@ distr_cpSysLib() # dest_dir libs_to_copy...
         "$@"
 }
 
-# Prepare to build the distribution .deb package.
+distrib_createArchive() # archive dir command...
+{
+    local -r ARCHIVE="$1"; shift
+    local -r DIR="$1"; shift
+
+    rm -rf "$ARCHIVE" #< Avoid updating an existing archive.
+    echo "  Creating $ARCHIVE"
+    ( cd "$DIR" && "$@" "$ARCHIVE" * ) #< Subshell prevents "cd" from changing the current dir.
+    echo "  Done"
+}
+
+# Prepare to build the distribution archives/packages.
 #
 # The specified work_dir will be deleted on exit (if not prohibited by the command-line args), but
 # should be created after calling this function.
@@ -170,30 +181,30 @@ distr_cpSysLib() # dest_dir libs_to_copy...
 # - Suppress output redirection (verbose mode).
 # - Do not delete work_dir on exit (useful for debugging).
 #
-# [in] distr_EXTRA_HELP
+# [in] distrib_EXTRA_HELP
 #
-distr_prepareToBuildDistribution() # work_dir log_file "$@"
+distrib_prepareToBuildDistribution() # work_dir log_file "$@"
 {
-    distr_WORK_DIR="$1" && shift
+    distrib_WORK_DIR="$1" && shift
     local -r LOG_FILE="$1" && shift
 
-    distr_parseArgs "$@"
+    distrib_parseArgs "$@"
 
-    trap distr_onExit EXIT
+    trap distrib_onExit EXIT
 
-    rm -rf "$distr_WORK_DIR"
+    rm -rf "$distrib_WORK_DIR"
 
-    if [ distr_KEEP_WORK_DIR = 1 ]
+    if [ distrib_KEEP_WORK_DIR = 1 ]
     then
         local -r WORK_DIR_NOTE="(ATTENTION: will NOT be deleted)"
     else
         local -r WORK_DIR_NOTE="(will be deleted on success)"
     fi
-    echo "Creating distribution in $distr_WORK_DIR $WORK_DIR_NOTE."
+    echo "Creating distribution in $distrib_WORK_DIR $WORK_DIR_NOTE."
 
-    distr_STDERR_FILE=""
-    if [ $distr_VERBOSE = 0 ]
+    distrib_STDERR_FILE=""
+    if [ $distrib_VERBOSE = 0 ]
     then
-        distr_redirectOutputToLog "$LOG_FILE"
+        distrib_redirectOutputToLog "$LOG_FILE"
     fi
 }

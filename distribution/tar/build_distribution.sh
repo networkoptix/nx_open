@@ -2,12 +2,9 @@
 set -e #< Exit on any error.
 set -u #< Prohibit undefined variables.
 
-source "$(dirname $0)/../../build_utils/linux/build_distribution_utils.sh"
+source "$(dirname $0)/../build_distribution_utils.sh"
 
-distr_loadConfig "build_distribution.conf"
-
-LIB_BUILD_DIR="$BUILD_DIR/lib"
-BIN_BUILD_DIR="$BUILD_DIR/bin"
+distrib_loadConfig "build_distribution.conf"
 
 # VMS files will be copied to this path.
 INSTALL_PATH="opt/$CUSTOMIZATION"
@@ -19,8 +16,6 @@ SYMLINK_INSTALL_PATH=""
 # defined by ALT_LIB_INSTALL_PATH (e.g. an sdcard which does not support symlinks), and symlinks
 # to these .so files will be created in the regular LIB_INSTALL_DIR.
 ALT_LIB_INSTALL_PATH=""
-
-OUTPUT_DIR=${DISTRIBUTION_OUTPUT_DIR:-"$CURRENT_BUILD_DIR"}
 
 if [ "$BOX" = "edge1" ]
 then
@@ -41,17 +36,6 @@ LOG_FILE="$LOGS_DIR/build_distribution.log"
 WORK_DIR="build_distribution_tmp"
 
 #--------------------------------------------------------------------------------------------------
-
-createArchive() # archive dir command...
-{
-    local -r ARCHIVE="$1"; shift
-    local -r DIR="$1"; shift
-
-    rm -rf "$ARCHIVE" #< Avoid updating an existing archive.
-    echo "  Creating $ARCHIVE"
-    ( cd "$DIR" && "$@" "$ARCHIVE" * ) #< Subshell prevents "cd" from changing the current dir.
-    echo "  Done"
-}
 
 # Copy the specified file to the proper location, creating the symlink if necessary: if alt_lib_dir
 # is empty, or the file is a symlink, just copy it to lib_dir; otherwise, put it to alt_lib_dir,
@@ -78,7 +62,7 @@ copyLib() # file lib_dir alt_lib_dir symlink_target_dir
 
 # [in] Library name
 # [in] Destination directory
-copy_sys_lib()
+copySystemLib()
 {
     "$SOURCE_DIR"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
 }
@@ -190,7 +174,7 @@ copyBuildLibs()
     for LIB in "${LIBS_TO_COPY[@]}"
     do
         local FILE
-        for FILE in "$LIB_BUILD_DIR/$LIB"*.so*
+        for FILE in "$BUILD_DIR/lib/$LIB"*.so*
         do
             if [[ $FILE != *.debug ]]
             then
@@ -202,7 +186,7 @@ copyBuildLibs()
     for LIB in "${OPTIONAL_LIBS_TO_COPY[@]}"
     do
         local FILE
-        for FILE in "$LIB_BUILD_DIR/$LIB"*.so*
+        for FILE in "$BUILD_DIR/lib/$LIB"*.so*
         do
             if [ -f "$FILE" ]
             then
@@ -219,6 +203,9 @@ copyBuildLibs()
 # [in] ALT_LIB_INSTALL_PATH
 copyQtLibs()
 {
+    echo ""
+    echo "Copying Qt libs"
+
     local QT_LIBS_TO_COPY=(
         Concurrent
         Core
@@ -252,7 +239,7 @@ copyQtLibs()
     for QT_LIB in "${QT_LIBS_TO_COPY[@]}"
     do
         local LIB_FILENAME="libQt5$QT_LIB.so"
-        echo "Copying (Qt) $LIB_FILENAME"
+        echo "  Copying (Qt) $LIB_FILENAME"
         local FILE
         for FILE in "$QT_DIR/lib/$LIB_FILENAME"*
         do
@@ -273,7 +260,7 @@ copyBins()
     for BIN in "${BINS_TO_COPY[@]}"
     do
         local FILE
-        for FILE in "$BIN_BUILD_DIR/$BIN"
+        for FILE in "$BUILD_DIR/bin/$BIN"
         do
             echo "Copying (binary) $(basename "$FILE")"
             cp -r "$FILE" "$MEDIASERVER_BIN_INSTALL_DIR/"
@@ -290,15 +277,18 @@ copyBins()
 # [in] MEDIASERVER_BIN_INSTALL_DIR
 copyMediaserverPlugins()
 {
+    echo ""
+    echo "Copying mediaserver plugins"
+
     mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins"
     mkdir -p "$MEDIASERVER_BIN_INSTALL_DIR/plugins_optional"
 
     if [ "$BOX" = "edge1" ]
     then
-        # NOTE: Plugins from $BIN_BUILD_DIR/plugins are not needed on edge1.
+        # NOTE: Plugins from $BUILD_DIR/bin/plugins are not needed on edge1.
         local -r PLUGIN="libcpro_ipnc_plugin.so.1.0.0"
-        echo "Copying $PLUGIN"
-        cp -r "$LIB_BUILD_DIR/$PLUGIN" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
+        echo "  Copying $PLUGIN"
+        cp -r "$BUILD_DIR/lib/$PLUGIN" "$MEDIASERVER_BIN_INSTALL_DIR/plugins/"
         return
     fi
 
@@ -322,6 +312,7 @@ copyMediaserverPlugins()
         stub_metadata_plugin
     )
 
+    local PLUGIN
     local PLUGIN
     local LIB
 
@@ -412,15 +403,15 @@ copyBpiLiteClient()
 {
     local -r LITE_CLIENT_BIN_DIR="$INSTALL_DIR/lite_client/bin"
 
-    if [ -d "$LIB_BUILD_DIR/ffmpeg" ]
+    if [ -d "$BUILD_DIR/lib/ffmpeg" ]
     then
         echo "Copying libs of a dedicated ffmpeg for Lite Client's proxydecoder"
-        cp -r "$LIB_BUILD_DIR/ffmpeg" "$LIB_INSTALL_DIR/"
+        cp -r "$BUILD_DIR/lib/ffmpeg" "$LIB_INSTALL_DIR/"
     fi
 
     echo "Copying mobile_client binary"
     mkdir -p "$LITE_CLIENT_BIN_DIR"
-    cp "$BIN_BUILD_DIR/mobile_client" "$LITE_CLIENT_BIN_DIR/"
+    cp "$BUILD_DIR/bin/mobile_client" "$LITE_CLIENT_BIN_DIR/"
 
     echo "Creating symlink for rpath needed by mobile_client binary"
     ln -s "../lib" "$INSTALL_DIR/lite_client/lib"
@@ -441,7 +432,7 @@ copyBpiLiteClient()
     for DIR in "${DIRS_TO_COPY[@]}"
     do
         echo "Copying directory (to Lite Client bin/) $DIR"
-        cp -r "$BIN_BUILD_DIR/$DIR" "$LITE_CLIENT_BIN_DIR/"
+        cp -r "$BUILD_DIR/bin/$DIR" "$LITE_CLIENT_BIN_DIR/"
     done
 
     echo "Copying Qt translations"
@@ -486,7 +477,7 @@ copyEdge1SpecificFiles()
 {
     local -r GDB_DIR="$INSTALL_DIR/mediaserver/bin"
     echo "Copying gdb to $GDB_DIR/"
-    cp -r "$PACKAGES_DIR/gdb"/* "$GDB_DIR/"
+    cp -r "$PLATFORM_PACKAGES_DIR/gdb"/* "$GDB_DIR/"
 }
 
 # [in] INSTALL_DIR
@@ -525,12 +516,12 @@ copyAdditionalSysrootFilesIfNeeded()
 
 # [in] INSTALL_DIR
 # [in] VOX_SOURCE_DIR
-copyVox()
+copyFestivalVox()
 {
     if [ -d "$VOX_SOURCE_DIR" ]
     then
         local -r VOX_INSTALL_DIR="$INSTALL_DIR/mediaserver/bin/vox"
-        echo "Copying Festival VOX files"
+        echo "Copying Festival Vox files"
         mkdir -p "$VOX_INSTALL_DIR"
         cp -r "$VOX_SOURCE_DIR/"* "$VOX_INSTALL_DIR/"
     fi
@@ -540,15 +531,14 @@ copyVox()
 copyToolchainLibs()
 {
     echo "Copying toolchain libs (libstdc++, libatomic)"
-    copy_sys_lib "libstdc++.so.6" "$LIB_INSTALL_DIR"
-    copy_sys_lib "libgcc_s.so.1" "$LIB_INSTALL_DIR"
-    copy_sys_lib "libatomic.so.1" "$LIB_INSTALL_DIR"
+    copySystemLib "libstdc++.so.6" "$LIB_INSTALL_DIR"
+    copySystemLib "libgcc_s.so.1" "$LIB_INSTALL_DIR"
+    copySystemLib "libatomic.so.1" "$LIB_INSTALL_DIR"
 }
 
 # [in] WORK_DIR
 # [in] TAR_DIR
-# [in] OUTPUT_DIR
-buildInstaller()
+createDistributionArchive()
 {
     echo ""
     echo "Creating distribution .tar.gz"
@@ -557,42 +547,49 @@ buildInstaller()
         mkdir -p "$TAR_DIR/$(dirname "$SYMLINK_INSTALL_PATH")"
         ln -s "/$INSTALL_PATH" "$TAR_DIR/$SYMLINK_INSTALL_PATH"
     fi
-    createArchive "$OUTPUT_DIR/$TAR_FILENAME" "$TAR_DIR" tar czf
+    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_TAR_GZ" "$TAR_DIR" tar czf
+}
+
+# [in] WORK_DIR
+# [in] TAR_DIR
+createUpdateZip() # file.tar.gz
+{
+    local -r TAR_GZ_FILE="$1" && shift
 
     echo ""
     echo "Creating \"update\" .zip"
     local -r ZIP_DIR="$WORK_DIR/zip"
     mkdir -p "$ZIP_DIR"
-    cp -r "$OUTPUT_DIR/$TAR_FILENAME" "$ZIP_DIR/"
-    cp -r "$CURRENT_BUILD_DIR"/update.* "$ZIP_DIR/"
-    cp -r "$CURRENT_BUILD_DIR"/install.sh "$ZIP_DIR/"
-    createArchive "$OUTPUT_DIR/$ZIP_FILENAME" "$ZIP_DIR" zip
-    cp "$OUTPUT_DIR/$ZIP_FILENAME" "$OUTPUT_DIR/$ZIP_INSTALLER_FILENAME"
+
+    ln -s "$TAR_GZ_FILE" "$ZIP_DIR/"
+    cp -r "$CURRENT_BUILD_DIR/update.json" "$ZIP_DIR/"
+    cp -r "$CURRENT_BUILD_DIR/install.sh" "$ZIP_DIR/"
+
+    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip
 }
 
 # [in] WORK_DIR
-# [in] OUTPUT_DIR
-buildDebugSymbolsArchive()
+createDebugSymbolsArchive()
 {
     echo ""
     echo "Creating debug symbols .tar.gz"
 
-    local -r DEBUG_TAR_DIR="$WORK_DIR/debug-symbols-tar"
-    mkdir -p "$DEBUG_TAR_DIR"
+    local -r TAR_GZ_DIR="$WORK_DIR/debug-symbols_tar_gz"
+    mkdir -p "$TAR_GZ_DIR"
 
     local -i DEBUG_FILES_EXIST=0
     local FILE
     for FILE in \
-        "$LIB_BUILD_DIR"/*.debug \
-        "$BIN_BUILD_DIR"/*.debug \
-        "$BIN_BUILD_DIR/plugins"/*.debug \
-        "$BIN_BUILD_DIR/plugins_optional"/*.debug
+        "$BUILD_DIR/lib"/*.debug \
+        "$BUILD_DIR/bin"/*.debug \
+        "$BUILD_DIR/bin/plugins"/*.debug \
+        "$BUILD_DIR/bin/plugins_optional"/*.debug
     do
         if [ -f "$FILE" ]
         then
             DEBUG_FILES_EXIST=1
             echo "  Copying $(basename $FILE)"
-            cp -r "$FILE" "$DEBUG_TAR_DIR/"
+            cp -r "$FILE" "$TAR_GZ_DIR/"
         fi
     done
 
@@ -600,8 +597,9 @@ buildDebugSymbolsArchive()
     then
         echo "  No .debug files found"
     else
-        createArchive \
-            "$OUTPUT_DIR/$TAR_FILENAME-debug-symbols.tar.gz" "$DEBUG_TAR_DIR" tar czf
+        distrib_createArchive \
+            "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_TAR_GZ-debug-symbols.tar.gz" "$TAR_GZ_DIR" \
+            tar czf
     fi
 }
 
@@ -640,7 +638,7 @@ buildDistribution()
     copyScripts
     copyDebs
     copyAdditionalSysrootFilesIfNeeded
-    copyVox
+    copyFestivalVox
     copyToolchainLibs
 
     if [ "$BOX" = "bpi" ]
@@ -655,8 +653,11 @@ buildDistribution()
         copyEdge1SpecificFiles
     fi
 
-    buildInstaller
-    buildDebugSymbolsArchive
+    createDistributionArchive
+    createUpdateZip "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_TAR_GZ"
+    cp "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_ZIP"
+
+    createDebugSymbolsArchive
 }
 
 #--------------------------------------------------------------------------------------------------
@@ -673,10 +674,10 @@ parseExtraArgs() # arg arg_n "$@"
 main()
 {
     local -i LITE_CLIENT=1
-    distr_EXTRA_HELP=" --no-client: Do not pack Lite Client."
-    distr_PARSE_EXTRA_ARGS_FUNC=parseExtraArgs
+    distrib_EXTRA_HELP=" --no-client: Do not pack Lite Client."
+    distrib_PARSE_EXTRA_ARGS_FUNC=parseExtraArgs
 
-    distr_prepareToBuildDistribution "$WORK_DIR" "$LOG_FILE" "$@"
+    distrib_prepareToBuildDistribution "$WORK_DIR" "$LOG_FILE" "$@"
 
     buildDistribution
 }
