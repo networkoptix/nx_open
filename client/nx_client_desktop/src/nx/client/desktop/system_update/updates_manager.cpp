@@ -33,7 +33,7 @@ static const QString kFileName = "update.status";
 } // namespace
 
 UpdatesManager::UpdatesManager(QnCommonModule* commonModule):
-    CommonUpdates2Manager(commonModule), m_downloader(QDir(), commonModule)
+    CommonUpdateManager(commonModule), m_downloader(QDir(), commonModule)
 {
 }
 

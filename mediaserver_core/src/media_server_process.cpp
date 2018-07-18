@@ -1231,7 +1231,7 @@ void MediaServerProcess::stopObjects()
         m_universalTcpListener = 0;
     }
 
-    serverModule()->updates2Manager()->stopAsyncTasks();
+    //serverModule()->updates2Manager()->stopAsyncTasks();
     m_stopObjectsCalled = true;
 }
 
@@ -3279,9 +3279,9 @@ void MediaServerProcess::run()
         m_cmdLineArguments.rwConfigFilePath));
     m_serverModule = serverModule;
 
-    connect(
-        this, &MediaServerProcess::started,
-        [this]() { this->serverModule()->updates2Manager()->atServerStart(); });
+    //connect(
+    //    this, &MediaServerProcess::started,
+    //    [this]() { this->serverModule()->updates2Manager()->atServerStart(); });
 
     using namespace nx::vms::common::p2p::downloader;
     connect(

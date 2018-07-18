@@ -23,6 +23,8 @@
 
 namespace {
 
+static const QString kPublicationKeyParamName = "publicationKey";
+
 template<typename ContextType>
 nx::utils::Url getServerApiUrl(
     const QString& path, const QnMediaServerResourcePtr& server, ContextType context)
@@ -147,8 +149,6 @@ void checkCloudHostRemotely(
     requestRemotePeers(commonModule, path, outputReply, context, mergeFunction);
 }
 
-static const QString kPublicationKeyParamName = "publicationKey";
-
 static int checkInternetForUpdate(
     const QString& publicationKey,
     QByteArray* result,
@@ -168,17 +168,50 @@ static int checkInternetForUpdate(
     }
 
     using namespace nx::update;
-    QString s;
-    QnLexical::serialize(error, &s);
     return QnFusionRestHandler::makeError(
-        nx::network::http::StatusCode::ok, s,
+        nx::network::http::StatusCode::notFound, toString(error),
         result, contentType, request.format, request.extraFormatting,
         QnRestResult::CantProcessRequest);
 }
 
-static int checkForUpdatesRemotely(const QString& publicationKey, QByteArray* result)
+static int checkForUpdateInformationRemotely(
+    QnCommonModule* commonModule,
+    QByteArray* result,
+    QByteArray* contentType,
+    QnMultiserverRequestContext<QnEmptyRequestData>* context)
 {
-    return -1;
+    bool done = false;
+    auto mergeFunction =
+        [&done](
+            const QnUuid& serverId,
+            bool success,
+            const nx::update::Information& reply,
+            nx::update::Information& outputReply)
+        {
+            if (done)
+                return;
+
+            if (success && !done)
+            {
+                outputReply = reply;
+                done = true;
+            }
+        };
+
+    nx::update::Information outputReply;
+    requestRemotePeers(commonModule, "", outputReply, context, mergeFunction);
+
+    if (done)
+    {
+        QnFusionRestHandlerDetail::serialize(outputReply, *result, *contentType, context->request().format);
+        return nx::network::http::StatusCode::ok;
+    }
+
+    using namespace nx::update;
+    return QnFusionRestHandler::makeError(nx::network::http::StatusCode::notFound,
+        toString(InformationError::notFoundError),
+        result, contentType, context->request().format, context->request().extraFormatting,
+        QnRestResult::CantProcessRequest);
 }
 
 static int getUpdateInformationFromGlobalSettings(
@@ -189,7 +222,7 @@ static int getUpdateInformationFromGlobalSettings(
     *contentType = Qn::serializationFormatToHttpContentType(request.format);
     *result = qnServerModule->commonModule()->globalSettings()->updateInformation();
 
-    return nx::network::http::StatusCode::ok;;
+    return nx::network::http::StatusCode::ok;
 }
 
 } // namespace
@@ -249,7 +282,13 @@ int QnUpdateInformationRestHandler::executeGet(
         }
 
         if (!request.isLocal)
-            return checkForUpdatesRemotely(params.value(kPublicationKeyParamName), &result);
+        {
+            return checkForUpdateInformationRemotely(
+                processor->commonModule(),
+                &result,
+                &contentType,
+                &context);
+        }
     }
 
     return getUpdateInformationFromGlobalSettings(&result, &contentType, request);

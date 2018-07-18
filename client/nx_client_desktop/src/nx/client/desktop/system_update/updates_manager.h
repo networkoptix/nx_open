@@ -10,7 +10,7 @@ namespace nx {
 namespace client {
 namespace desktop {
 
-class UpdatesManager: public nx::update::CommonUpdates2Manager
+class UpdatesManager: public nx::update::CommonUpdateManager
 {
 public:
     UpdatesManager(QnCommonModule* commonModule);

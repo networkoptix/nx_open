@@ -10,29 +10,6 @@
 namespace nx {
 namespace api {
 
-struct TargetVersionWithEula
-{
-    nx::vms::api::SoftwareVersion targetVersion;
-    int eulaVersion = -1;
-    QString eulaLink;
-
-    TargetVersionWithEula(
-        const nx::vms::api::SoftwareVersion& targetVersion,
-        int eulaVersion = -1,
-        const QString& eulaLink = QString())
-        :
-        targetVersion(targetVersion),
-        eulaVersion(eulaVersion),
-        eulaLink(eulaLink)
-    {
-    }
-
-    TargetVersionWithEula() = default;
-};
-
-#define TargetVersionWithEula_Fields (targetVersion)(eulaVersion)(eulaLink)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((TargetVersionWithEula), (json)(ubjson)(eq))
-
 struct Updates2StatusData
 {
     Q_GADGET
@@ -40,22 +17,18 @@ struct Updates2StatusData
 public:
     enum class StatusCode
     {
-        checking,
-        available,
-        notAvailable,
+        idle,
         downloading,
-        preparing,
         readyToInstall,
         installing,
+        offline,
         error,
     };
     Q_ENUM(StatusCode)
 
     QnUuid serverId;
-    StatusCode state = StatusCode::notAvailable;
+    StatusCode state = StatusCode::idle;
     QString message;
-    QList<TargetVersionWithEula> targets;
-    QString releaseNotesUrl;
     double progress = 0.0;
 
     Updates2StatusData() = default;
@@ -63,20 +36,16 @@ public:
         const QnUuid& serverId,
         StatusCode state,
         QString message = QString(),
-        const QList<TargetVersionWithEula> targets = QList<TargetVersionWithEula>(),
-        const QString& releaseNotesUrl = QString(),
         double progress = 0.0)
         :
         serverId(serverId),
         state(state),
         message(std::move(message)),
-        targets(targets),
-        releaseNotesUrl(releaseNotesUrl),
         progress(progress)
     {}
 };
 
-#define Updates2StatusData_Fields (serverId)(state)(message)(targets)(releaseNotesUrl)(progress)
+#define Updates2StatusData_Fields (serverId)(state)(message)(progress)
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Updates2StatusData::StatusCode)
 QN_FUSION_DECLARE_FUNCTIONS(Updates2StatusData::StatusCode, (lexical)(numeric))

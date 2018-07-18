@@ -9,6 +9,9 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/vms/api/data/software_version.h>
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Package, (xml)(csv_record)(ubjson)(json), Package_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(nx::update::Information, (xml)(csv_record)(ubjson)(json), Information_Fields)
+
 namespace nx {
 namespace update {
 
@@ -23,10 +26,16 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::update::InformationError::networkError, "network error")
     (nx::update::InformationError::httpError, "http error")
     (nx::update::InformationError::jsonError, "json error")
-    (nx::update::InformationError::incompatibleCloudHost, "incompatible cloud host"))
+    (nx::update::InformationError::incompatibleCloudHostError, "incompatible cloud host")
+    (nx::update::InformationError::notFoundError, "not found"))
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Package, (xml)(csv_record)(ubjson)(json), Package_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Information, (xml)(csv_record)(ubjson)(json), Information_Fields)
+
+QString toString(InformationError error)
+{
+    QString result;
+    QnLexical::serialize(error, &result);
+    return result;
+}
 
 namespace {
 
@@ -228,7 +237,7 @@ static InformationError parseAndExtractInformation(
     }
 
     if (result->cloudHost != nx::network::SocketGlobals::cloud().cloudHost())
-        return InformationError::incompatibleCloudHost;
+        return InformationError::incompatibleCloudHostError;
 
     InformationError error = parsePackages(topLevelObject, baseUpdateUrl, "packages", result);
     if (error != InformationError::noError)

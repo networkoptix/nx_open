@@ -6,26 +6,21 @@
 namespace nx {
 namespace update {
 
-class NX_UPDATE_API CommonUpdates2Manager:
-    public QnCommonModuleAware,
-    public manager::detail::Updates2ManagerBase
+class NX_UPDATE_API CommonUpdateManager: public QnCommonModuleAware
 {
 public:
-    CommonUpdates2Manager(QnCommonModule* commonModule);
+    CommonUpdateManager(QnCommonModule* commonModule);
+
+    // Call this to connect to all needed signals
+    void connectToSignals();
 
 protected:
-    virtual QnUuid peerId() const override;
+    //virtual QnUuid peerId() const override;
 
 private:
-    virtual void loadStatusFromFile() override;
-    virtual update::info::AbstractUpdateRegistryPtr getGlobalRegistry() override;
-    virtual QnUuid moduleGuid() const override;
-    virtual void updateGlobalRegistry(const QByteArray& serializedRegistry) override;
-    virtual void writeStatusToFile(const manager::detail::Updates2StatusDataEx& statusData) override;
-    virtual void remoteUpdateCompleted() override {}
-    virtual bool isClient() const override;
+    virtual vms::common::p2p::downloader::AbstractDownloader* downloader() = 0;
+    virtual installer::detail::AbstractUpdates2Installer* installer() = 0;
 
-    void connectToSignals();
 };
 
 } // namespace update

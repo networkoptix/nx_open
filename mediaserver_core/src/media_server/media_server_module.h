@@ -103,7 +103,7 @@ class QnMediaServerModule : public QObject,
     nx::mediaserver::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::storage::AbstractEventsStorage* analyticsEventsStorage() const;
-    nx::mediaserver::updates2::ServerUpdates2Manager* updates2Manager() const;
+    //nx::mediaserver::updates2::ServerUpdates2Manager* updates2Manager() const;
     QnDataProviderFactory* dataProviderFactory() const;
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
@@ -142,7 +142,7 @@ class QnMediaServerModule : public QObject,
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::storage::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::mediaserver::RootTool> m_rootTool;
-    nx::mediaserver::updates2::ServerUpdates2Manager* m_updates2Manager;
+    //nx::mediaserver::updates2::ServerUpdates2Manager* m_updates2Manager;
     QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
 };
