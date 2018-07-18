@@ -36,12 +36,13 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
-    virtual void clear() override;
+    virtual void clearData() override;
+    virtual void truncateToMaximumCount() override;
+    virtual void truncateToRelevantTimePeriod() override;
 
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
-    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit, bool& fetchedAll) override;
-    virtual void clipToSelectedTimePeriod() override;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
     virtual bool hasAccessRights() const override;
 
 private:
@@ -55,6 +56,10 @@ private:
 
     utils::PendingOperation* createUpdateBookmarksWatcherOperation();
 
+    template<typename Iter>
+    void commitPrefetch(const QnTimePeriod& periodToCommit,
+        Iter prefetchBegin, Iter prefetchEnd, int position);
+
     static QPixmap pixmap();
     static QColor color();
 
@@ -62,9 +67,9 @@ private:
     BookmarkSearchListModel* const q = nullptr;
     QString m_filterText;
     QnCameraBookmarkList m_prefetch;
-    QScopedPointer<utils::PendingOperation> m_updateBookmarksWatcher;
+    QScopedPointer<utils::PendingOperation> m_updateBookmarks;
     std::deque<QnCameraBookmark> m_data;
-    QHash<QnUuid, qint64> m_guidToTimestampMs;
+    QHash<QnUuid, std::chrono::milliseconds> m_guidToTimestamp;
     bool m_success = true;
 };
 

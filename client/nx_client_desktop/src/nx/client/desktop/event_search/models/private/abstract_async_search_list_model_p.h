@@ -23,60 +23,62 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     virtual void setCamera(const QnVirtualCameraResourcePtr& camera);
 
-    void relevantTimePeriodChanged(const QnTimePeriod& previousValue);
-    void fetchDirectionChanged();
-
     virtual int count() const = 0;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const = 0;
 
-    virtual void clear();
-    virtual bool requestFetch();
+    virtual void clearData() = 0;
+    virtual void truncateToMaximumCount() = 0;
+    virtual void truncateToRelevantTimePeriod() = 0;
 
-    using PrefetchCompletionHandler = std::function<void(const QnTimePeriod& fetchedPeriod)>;
-
-    bool canFetchMore() const;
-    bool prefetch(PrefetchCompletionHandler completionHandler);
-    void commit(const QnTimePeriod& periodToCommit);
+    bool canFetch() const;
+    bool requestFetch();
     bool fetchInProgress() const;
-
     void cancelPrefetch();
 
-    QnTimePeriod fetchedTimeWindow() const;
+    using PrefetchCompletionHandler = std::function<void(const QnTimePeriod& fetchedPeriod)>;
+    bool prefetch(PrefetchCompletionHandler completionHandler);
+    void commit(const QnTimePeriod& periodToCommit);
 
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) = 0;
-    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit, bool& fetchedAll) = 0;
-    virtual void clipToSelectedTimePeriod() = 0;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) = 0;
     virtual bool hasAccessRights() const = 0;
 
-    bool shouldSkipResponse(rest::Handle requestId) const;
-    void completePrefetch(const QnTimePeriod& actuallyFetched, bool limitReached);
+    void completePrefetch(const QnTimePeriod& actuallyFetched, int fetchedBatchSize);
 
     template<class DataContainer, class UpperBoundPredicate>
-    void clipToTimePeriod(DataContainer& data,
+    void truncateDataToTimePeriod(DataContainer& data,
         UpperBoundPredicate upperBoundPredicate,
         const QnTimePeriod& period,
         std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
 
-    int lastBatchSize() const;
+    template<class DataContainer>
+    void truncateDataToCount(DataContainer& data, int count,
+        std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
+
+    struct FetchInformation
+    {
+        rest::Handle id = rest::Handle();
+        FetchDirection direction = FetchDirection::earlier;
+        QnTimePeriod period;
+        int batchSize = 0;
+    };
+
+    const FetchInformation& currentRequest() const;
 
 private:
     AbstractAsyncSearchListModel* const q = nullptr;
     QnVirtualCameraResourcePtr m_camera;
-    QnTimePeriod m_fetchedTimeWindow;
-    rest::Handle m_currentFetchId = rest::Handle();
+
     PrefetchCompletionHandler m_prefetchCompletionHandler;
-    FetchDirection m_prefetchDirection = FetchDirection::earlier;
-    QnTimePeriod m_requestedFetchPeriod;
-    bool m_fetchedAll = false;
-    int m_lastBatchSize = 0;
+    FetchInformation m_request;
 };
 
 // ------------------------------------------------------------------------------------------------
 // Template method implementation.
 
 template<class DataContainer, class UpperBoundPredicate>
-void AbstractAsyncSearchListModel::Private::clipToTimePeriod(
+void AbstractAsyncSearchListModel::Private::truncateDataToTimePeriod(
     DataContainer& data,
     UpperBoundPredicate upperBoundPredicate,
     const QnTimePeriod& period,
@@ -87,7 +89,7 @@ void AbstractAsyncSearchListModel::Private::clipToTimePeriod(
 
     // Remove records later than end of the period.
     const auto frontEnd = std::upper_bound(data.begin(), data.end(),
-        period.endTimeMs(), upperBoundPredicate);
+        period.endTime(), upperBoundPredicate);
 
     const auto frontLength = std::distance(data.begin(), frontEnd);
     if (frontLength != 0)
@@ -100,7 +102,7 @@ void AbstractAsyncSearchListModel::Private::clipToTimePeriod(
 
     // Remove records earlier than start of the period.
     const auto tailBegin = std::upper_bound(data.begin(), data.end(),
-        period.startTimeMs, upperBoundPredicate);
+        period.startTime(), upperBoundPredicate);
 
     const auto tailLength = std::distance(tailBegin, data.end());
     if (tailLength != 0)
@@ -110,6 +112,44 @@ void AbstractAsyncSearchListModel::Private::clipToTimePeriod(
         if (itemCleanup)
             std::for_each(tailBegin, data.end(), itemCleanup);
         data.erase(tailBegin, data.end());
+    }
+}
+
+template<class DataContainer>
+void AbstractAsyncSearchListModel::Private::truncateDataToCount(DataContainer& data, int count,
+    std::function<void(typename DataContainer::const_reference)> itemCleanup)
+{
+    const int toRemove = int(data.size()) - count;
+    if (toRemove <= 0)
+        return;
+
+    NX_ASSERT(count > 0);
+    if (count <= 0)
+    {
+        q->clear();
+        return;
+    }
+
+    if (q->fetchDirection() == FetchDirection::earlier)
+    {
+        ScopedRemoveRows removeRows(q, 0, toRemove - 1);
+        const auto removeEnd = data.begin() + toRemove;
+        if (itemCleanup)
+            std::for_each(data.begin(), removeEnd, itemCleanup);
+
+        data.erase(data.begin(), removeEnd);
+    }
+    else
+    {
+        NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+        const auto index = int(data.size()) - toRemove;
+        const auto removeBegin = data.begin() + index;
+
+        ScopedRemoveRows removeRows(q, index, index + toRemove - 1);
+        if (itemCleanup)
+            std::for_each(removeBegin, data.end(), itemCleanup);
+
+        data.erase(removeBegin, data.end());
     }
 }
 

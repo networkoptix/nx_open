@@ -25,18 +25,20 @@ namespace desktop {
 
 namespace {
 
+using namespace std::chrono;
+
 static const auto lowerBoundPredicate =
-    [](const QnCameraBookmark& left, qint64 right) { return left.startTimeMs.count() > right; };
+    [](const QnCameraBookmark& left, milliseconds right) { return left.startTimeMs > right; };
 
 static const auto upperBoundPredicate =
-    [](qint64 left, const QnCameraBookmark& right) { return left > right.startTimeMs.count(); };
+    [](milliseconds left, const QnCameraBookmark& right) { return left > right.startTimeMs; };
 
 } // namespace
 
 BookmarkSearchListModel::Private::Private(BookmarkSearchListModel* q):
     base_type(q),
     q(q),
-    m_updateBookmarksWatcher(createUpdateBookmarksWatcherOperation())
+    m_updateBookmarks(createUpdateBookmarksWatcherOperation())
 {
     watchBookmarkChanges();
 }
@@ -126,20 +128,44 @@ void BookmarkSearchListModel::Private::setFilterText(const QString& value)
     if (m_filterText == value)
         return;
 
-    clear();
+    q->clear();
     m_filterText = value;
-    m_updateBookmarksWatcher->requestOperation();
 }
 
-void BookmarkSearchListModel::Private::clear()
+void BookmarkSearchListModel::Private::clearData()
 {
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
-    m_guidToTimestampMs.clear();
+    m_guidToTimestamp.clear();
     m_prefetch.clear();
-    base_type::clear();
+    m_updateBookmarks->requestOperation();
+}
 
-    m_updateBookmarksWatcher->requestOperation();
+void BookmarkSearchListModel::Private::truncateToMaximumCount()
+{
+    const auto itemCleanup =
+        [this](const QnCameraBookmark& item) { m_guidToTimestamp.remove(item.guid); };
+
+    this->truncateDataToCount(m_data, q->maximumCount(), itemCleanup);
+    if (m_data.empty())
+        return;
+
+    auto timeWindow = q->fetchedTimeWindow();
+    if (q->fetchDirection() == FetchDirection::earlier)
+        timeWindow.truncate(m_data.front().startTimeMs.count());
+    else
+        timeWindow.truncateFront(m_data.back().startTimeMs.count());
+
+    q->setFetchedTimeWindow(timeWindow);
+}
+
+void BookmarkSearchListModel::Private::truncateToRelevantTimePeriod()
+{
+    const auto itemCleanup =
+        [this](const QnCameraBookmark& item) { m_guidToTimestamp.remove(item.guid); };
+
+    this->truncateDataToTimePeriod<decltype(m_data), decltype(upperBoundPredicate)>(
+        m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
 }
 
 rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
@@ -153,18 +179,20 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
         ? Qt::DescendingOrder
         : Qt::AscendingOrder;
 
-    filter.limit = lastBatchSize();
+    filter.limit = currentRequest().batchSize;
 
-    NX_VERBOSE(this) << "Requesting bookmarks from"
-        << utils::timestampToRfc2822(period.startTimeMs) << "to"
-        << utils::timestampToRfc2822(period.endTimeMs()) << "order"
+    NX_VERBOSE(q) << "Requesting bookmarks from"
+        << utils::timestampToDebugString(period.startTimeMs) << "to"
+        << utils::timestampToDebugString(period.endTimeMs()) << "order"
         << filter.orderBy.order;
 
     return qnCameraBookmarksManager->getBookmarksAsync({camera()}, filter,
-        [this, period, guard = QPointer<QObject>(this)]
-            (bool success, const QnCameraBookmarkList& bookmarks, int requestId)
+        [this, period, guard = QPointer<QObject>(this)](
+            bool success,
+            const QnCameraBookmarkList& bookmarks,
+            int requestId)
         {
-            if (!guard || shouldSkipResponse(requestId))
+            if (!guard || !requestId || requestId != currentRequest().id)
                 return;
 
             m_prefetch = success ? std::move(bookmarks) : QnCameraBookmarkList();
@@ -172,79 +200,72 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
 
             const auto actuallyFetched = m_prefetch.empty()
                 ? QnTimePeriod()
-                : QnTimePeriod::fromInterval(m_prefetch.back().startTimeMs,
-                    m_prefetch.front().startTimeMs);
+                : currentRequest().period.intersected(QnTimePeriod::fromInterval(
+                    m_prefetch.back().startTimeMs, m_prefetch.front().startTimeMs));
 
             if (actuallyFetched.isNull())
             {
-                NX_VERBOSE(this) << "Pre-fetched no bookmarks";
+                NX_VERBOSE(q) << "Pre-fetched no bookmarks";
             }
             else
             {
-                NX_VERBOSE(this) << "Pre-fetched" << m_prefetch.size() << "bookmarks from"
-                    << utils::timestampToRfc2822(actuallyFetched.startTimeMs) << "to"
-                    << utils::timestampToRfc2822(actuallyFetched.endTimeMs());
+                NX_VERBOSE(q) << "Pre-fetched" << m_prefetch.size() << "bookmarks from"
+                    << utils::timestampToDebugString(actuallyFetched.startTimeMs) << "to"
+                    << utils::timestampToDebugString(actuallyFetched.endTimeMs());
             }
 
-            const bool limitReached = m_prefetch.size() >= lastBatchSize();
-            completePrefetch(actuallyFetched, limitReached);
+            completePrefetch(actuallyFetched, m_prefetch.size());
         });
 }
 
-bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit,
-    bool& fetchedAll)
+template<typename Iter>
+void BookmarkSearchListModel::Private::commitPrefetch(
+    const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position)
 {
-    if (!m_success)
-    {
-        NX_VERBOSE(this) << "Committing no bookmarks";
-        return false;
-    }
+    const auto begin = std::lower_bound(prefetchBegin, prefetchEnd,
+        periodToCommit.endTime(), lowerBoundPredicate);
 
-    const auto begin = std::lower_bound(m_prefetch.cbegin(), m_prefetch.cend(),
-        periodToCommit.endTimeMs(), lowerBoundPredicate);
-
-    const auto end = std::upper_bound(m_prefetch.cbegin(), m_prefetch.cend(),
-        periodToCommit.startTimeMs, upperBoundPredicate);
+    const auto end = std::upper_bound(prefetchBegin, prefetchEnd,
+        periodToCommit.startTime(), upperBoundPredicate);
 
     const auto count = std::distance(begin, end);
     if (count > 0)
     {
-        NX_VERBOSE(this) << "Committing" << count << "bookmarks from"
-            << utils::timestampToRfc2822(((end-1)->startTimeMs).count()) << "to"
-            << utils::timestampToRfc2822((begin->startTimeMs).count());
+        NX_VERBOSE(q) << "Committing" << count << "bookmarks from"
+            << utils::timestampToDebugString(((end - 1)->startTimeMs).count()) << "to"
+            << utils::timestampToDebugString((begin->startTimeMs).count());
 
-        if (q->fetchDirection() == FetchDirection::earlier)
-        {
-            const auto first = this->count();
-            ScopedInsertRows insertRows(q, first, first + count - 1);
-            m_data.insert(m_data.end(), begin, end);
-        }
-        else
-        {
-            NX_ASSERT(q->fetchDirection() == FetchDirection::later);
-            ScopedInsertRows insertRows(q, 0, count - 1);
-            m_data.insert(m_data.begin(), begin, end);
-        }
+        ScopedInsertRows insertRows(q, position, position + count - 1);
+        m_data.insert(m_data.begin() + position, begin, end);
 
         for (auto iter = begin; iter != end; ++iter)
-            m_guidToTimestampMs[iter->guid] = iter->startTimeMs.count();
+            m_guidToTimestamp[iter->guid] = iter->startTimeMs;
     }
     else
     {
-        NX_VERBOSE(this) << "Committing no bookmarks";
+        NX_VERBOSE(q) << "Committing no bookmarks";
     }
-
-    fetchedAll = count == m_prefetch.size() && m_prefetch.size() < lastBatchSize();
-    return true;
 }
 
-void BookmarkSearchListModel::Private::clipToSelectedTimePeriod()
+bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
-    const auto itemCleanup =
-        [this](const QnCameraBookmark& item) { m_guidToTimestampMs.remove(item.guid); };
+    if (!m_success)
+    {
+        NX_VERBOSE(q) << "Committing no bookmarks";
+        return false;
+    }
 
-    clipToTimePeriod<decltype(m_data), decltype(upperBoundPredicate)>(
-        m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
+    if (q->fetchDirection() == FetchDirection::earlier)
+    {
+        commitPrefetch(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count());
+    }
+    else
+    {
+        NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+        commitPrefetch(periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0);
+    }
+
+    return true;
 }
 
 bool BookmarkSearchListModel::Private::hasAccessRights() const
@@ -270,10 +291,10 @@ void BookmarkSearchListModel::Private::watchBookmarkChanges()
 void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookmark)
 {
     // Skip bookmarks outside of time range.
-    if (!fetchedTimeWindow().contains(bookmark.startTimeMs.count()))
+    if (!q->fetchedTimeWindow().contains(bookmark.startTimeMs.count()))
         return;
 
-    if (m_guidToTimestampMs.contains(bookmark.guid))
+    if (m_guidToTimestamp.contains(bookmark.guid))
     {
         NX_ASSERT(false, Q_FUNC_INFO, "Bookmark already exists");
         updateBookmark(bookmark);
@@ -281,13 +302,13 @@ void BookmarkSearchListModel::Private::addBookmark(const QnCameraBookmark& bookm
     }
 
     const auto insertionPos = std::lower_bound(m_data.cbegin(), m_data.cend(),
-        bookmark.startTimeMs.count(), lowerBoundPredicate);
+        bookmark.startTimeMs, lowerBoundPredicate);
 
     const auto index = std::distance(m_data.cbegin(), insertionPos);
 
     ScopedInsertRows insertRows(q,  index, index);
     m_data.insert(m_data.begin() + index, bookmark);
-    m_guidToTimestampMs[bookmark.guid] = bookmark.startTimeMs.count();
+    m_guidToTimestamp[bookmark.guid] = bookmark.startTimeMs;
 }
 
 void BookmarkSearchListModel::Private::updateBookmark(const QnCameraBookmark& bookmark)
@@ -319,13 +340,13 @@ void BookmarkSearchListModel::Private::removeBookmark(const QnUuid& guid)
 
     ScopedRemoveRows removeRows(q,  index, index);
     m_data.erase(m_data.begin() + index);
-    m_guidToTimestampMs.remove(guid);
+    m_guidToTimestamp.remove(guid);
 }
 
 int BookmarkSearchListModel::Private::indexOf(const QnUuid& guid) const
 {
-    const auto iter = m_guidToTimestampMs.find(guid);
-    if (iter == m_guidToTimestampMs.end())
+    const auto iter = m_guidToTimestamp.find(guid);
+    if (iter == m_guidToTimestamp.end())
         return -1;
 
     const auto range = std::make_pair(

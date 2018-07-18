@@ -5,11 +5,36 @@
 namespace nx {
 namespace utils {
 
+using namespace std::chrono;
+
 QString timestampToRfc2822(qint64 timestampMs)
 {
-    return timestampMs == DATETIME_NOW
-        ? "LIVE"
-        : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
+    if (timestampMs == DATETIME_NOW)
+        return "LIVE";
+
+    return QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::RFC2822Date);
+}
+
+QString timestampToRfc2822(milliseconds timestamp)
+{
+    return timestampToRfc2822(timestamp.count());
+}
+
+QString timestampToDebugString(qint64 timestampMs)
+{
+    if (timestampMs == 0)
+        return "0";
+
+    if (timestampMs == DATETIME_NOW)
+        return "LIVE";
+
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs, Qt::UTC);
+    return dateTime.toString("dd.MM.yyyy HH:mm:ss.zzz UTC");
+}
+
+QString timestampToDebugString(milliseconds timestamp)
+{
+    return timestampToDebugString(timestamp.count());
 }
 
 } // namespace utils

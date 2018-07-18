@@ -41,12 +41,13 @@ public:
     virtual int count() const override;
     virtual QVariant data(const QModelIndex& index, int role, bool& handled) const override;
 
-    virtual void clear() override;
+    virtual void clearData() override;
+    virtual void truncateToMaximumCount() override;
+    virtual void truncateToRelevantTimePeriod() override;
 
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
-    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit, bool& fetchedAll) override;
-    virtual void clipToSelectedTimePeriod() override;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
     virtual bool hasAccessRights() const override;
 
 private:
@@ -69,9 +70,8 @@ private:
     vms::api::EventType m_selectedEventType = vms::api::undefinedEvent;
     QScopedPointer<QTimer> m_updateTimer;
     mutable QScopedPointer<vms::event::StringsHelper> m_helper;
-    qint64 m_latestTimeMs = 0;
+    std::chrono::milliseconds m_latestTime = {};
     rest::Handle m_currentUpdateId = rest::Handle();
-    int m_requestLimitMultiplier = 1;
 
     vms::event::ActionDataList m_prefetch;
     std::deque<vms::event::ActionData> m_data;

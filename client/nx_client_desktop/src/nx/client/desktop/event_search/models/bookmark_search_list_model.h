@@ -18,8 +18,7 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
-protected:
-    virtual void truncateToMaximumCount();
+    virtual bool isConstrained() const override;
 
 private:
     class Private;

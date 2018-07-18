@@ -27,30 +27,26 @@ using nx::vms::api::ActionType;
 
 namespace {
 
+using namespace std::chrono;
+
 // In "live mode", every kUpdateTimerInterval newly happened events are fetched.
-static constexpr auto kUpdateTimerInterval = std::chrono::seconds(15);
+static constexpr milliseconds kUpdateTimerInterval = std::chrono::seconds(15);
 
-static qint64 timestampUs(const vms::event::ActionData& event)
+static microseconds timestamp(const vms::event::ActionData& event)
 {
-    return event.eventParams.eventTimestampUsec;
-}
-
-static qint64 timestampMs(const vms::event::ActionData& event)
-{
-    using namespace std::chrono;
-    return duration_cast<milliseconds>(microseconds(timestampUs(event))).count();
+    return microseconds(event.eventParams.eventTimestampUsec);
 }
 
 static const auto lowerBoundPredicate =
-    [](const vms::event::ActionData& left, qint64 rightMs)
+    [](const vms::event::ActionData& left, milliseconds right)
     {
-        return timestampMs(left) > rightMs;
+        return timestamp(left) > right;
     };
 
 static const auto upperBoundPredicate =
-    [](qint64 leftMs, const vms::event::ActionData& right)
+    [](milliseconds left, const vms::event::ActionData& right)
     {
-        return leftMs > timestampMs(right);
+        return left > timestamp(right);
     };
 
 } // namespace
@@ -61,7 +57,7 @@ EventSearchListModel::Private::Private(EventSearchListModel* q):
     m_updateTimer(new QTimer()),
     m_helper(new vms::event::StringsHelper(q->commonModule()))
 {
-    m_updateTimer->setInterval(std::chrono::milliseconds(kUpdateTimerInterval).count());
+    m_updateTimer->setInterval(kUpdateTimerInterval.count());
     connect(m_updateTimer.data(), &QTimer::timeout, this, &Private::periodicUpdate);
 }
 
@@ -89,7 +85,7 @@ void EventSearchListModel::Private::setSelectedEventType(vms::api::EventType val
         return;
 
     m_selectedEventType = value;
-    clear();
+    q->clear();
 }
 
 int EventSearchListModel::Private::count() const
@@ -138,19 +134,45 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
     }
 }
 
-void EventSearchListModel::Private::clear()
+void EventSearchListModel::Private::clearData()
 {
-    qDebug() << "Clear events model";
-
     ScopedReset reset(q, !m_data.empty());
     m_data.clear();
     m_prefetch.clear();
     m_currentUpdateId = rest::Handle();
-    m_latestTimeMs = qMin(qnSyncTime->currentMSecsSinceEpoch(), q->relevantTimePeriod().endTimeMs());
-    m_requestLimitMultiplier = 1;
-    base_type::clear();
-
+    m_latestTime = qMin(std::chrono::milliseconds(qnSyncTime->currentMSecsSinceEpoch()),
+        q->relevantTimePeriod().endTime());
     refreshUpdateTimer();
+}
+
+void EventSearchListModel::Private::truncateToMaximumCount()
+{
+    this->truncateDataToCount(m_data, q->maximumCount());
+    if (m_data.empty())
+        return;
+
+    auto timeWindow = q->fetchedTimeWindow();
+    if (q->fetchDirection() == FetchDirection::earlier)
+    {
+        timeWindow.setEndTime(qMin(timeWindow.endTime(),
+            duration_cast<milliseconds>(timestamp(m_data.front()))));
+    }
+    else
+    {
+        timeWindow.setStartTime(qMax(timeWindow.startTime(),
+            duration_cast<milliseconds>(timestamp(m_data.back()))));
+    }
+
+    q->setFetchedTimeWindow(timeWindow);
+}
+
+void EventSearchListModel::Private::truncateToRelevantTimePeriod()
+{
+    // TODO: FIXME!!!
+    m_currentUpdateId = rest::Handle(); //< Cancel timed update.
+    m_latestTime = qMin(m_latestTime, q->relevantTimePeriod().endTime());
+    refreshUpdateTimer();
+    this->truncateDataToTimePeriod(m_data, upperBoundPredicate, q->relevantTimePeriod());
 }
 
 bool EventSearchListModel::Private::hasAccessRights() const
@@ -160,86 +182,69 @@ bool EventSearchListModel::Private::hasAccessRights() const
 
 rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& period)
 {
-    const auto limit = lastBatchSize() * m_requestLimitMultiplier;
     const auto eventsReceived =
-        [this, period, limit]
-            (bool success, rest::Handle handle, vms::event::ActionDataList&& data)
+        [this, period](
+            bool success,
+            rest::Handle requestId,
+            vms::event::ActionDataList&& data)
         {
-            if (shouldSkipResponse(handle))
+            if (!requestId || requestId != currentRequest().id)
                 return;
 
             m_prefetch = success ? std::move(data) : vms::event::ActionDataList();
             m_success = success;
 
-            const bool limitReached = m_prefetch.size() >= limit;
-
-            // Event log lookup has precision of seconds, so we need to do additional filtering.
-            while (!m_prefetch.empty() && timestampMs(m_prefetch.back()) < period.startTimeMs)
-                m_prefetch.pop_back();
-
-            auto begin = m_prefetch.begin();
-            while (begin != m_prefetch.end() && timestampMs(*begin) > period.endTimeMs())
-                ++begin;
-
-            // TODO: #vkutin Optimize it.
-            m_prefetch.erase(m_prefetch.begin(), begin);
-
-            // Correct limit multiplier.
-            if (limitReached)
-            {
-                static constexpr int kMaxMultiplier = 64;
-
-                if (m_prefetch.size() < lastBatchSize())
-                    m_requestLimitMultiplier = qMin(m_requestLimitMultiplier * 2, kMaxMultiplier);
-                else
-                    m_requestLimitMultiplier = qMax(m_requestLimitMultiplier / 2, 1);
-            }
-
             const auto actuallyFetched = m_prefetch.empty()
                 ? QnTimePeriod()
-                : QnTimePeriod::fromInterval(timestampMs(m_prefetch.back()),
-                    timestampMs(m_prefetch.front()));
+                : QnTimePeriod::fromInterval(
+                    duration_cast<milliseconds>(timestamp(m_prefetch.back())),
+                    duration_cast<milliseconds>(timestamp(m_prefetch.front())));
 
             if (actuallyFetched.isNull())
             {
-                qDebug() << "Pre-fetched no events";
+                NX_VERBOSE(this) << "Pre-fetched no events";
             }
             else
             {
-                qDebug() << "Pre-fetched" << m_prefetch.size() << "events from"
+                NX_VERBOSE(this) << "Pre-fetched" << m_prefetch.size() << "events from"
                     << utils::timestampToRfc2822(actuallyFetched.startTimeMs) << "to"
                     << utils::timestampToRfc2822(actuallyFetched.endTimeMs());
             }
 
-            completePrefetch(actuallyFetched, limitReached);
+            completePrefetch(actuallyFetched, int(m_prefetch.size()));
         };
 
-    qDebug() << "Requesting up to" << limit << "events from"
+    NX_VERBOSE(this) << "Requesting events from"
         << utils::timestampToRfc2822(period.startTimeMs) << "to"
         << utils::timestampToRfc2822(period.endTimeMs());
 
-    return getEvents(period, eventsReceived, limit);
+    return getEvents(period, eventsReceived, currentRequest().batchSize);
 }
 
-bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit,
-    bool& fetchedAll)
+bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
     if (!m_success)
     {
-        qDebug() << "Committing no events";
+        NX_VERBOSE(this) << "Committing no events";
         return false;
     }
 
     const auto begin = std::lower_bound(m_prefetch.cbegin(), m_prefetch.cend(),
-        periodToCommit.endTimeMs(), lowerBoundPredicate);
+        periodToCommit.endTime(), lowerBoundPredicate);
 
     const auto end = std::upper_bound(m_prefetch.cbegin(), m_prefetch.cend(),
-        periodToCommit.startTimeMs, upperBoundPredicate);
+        periodToCommit.startTime(), upperBoundPredicate);
+
+    const auto timestampMs =
+        [](const vms::event::ActionData& event)
+        {
+            return duration_cast<std::chrono::milliseconds>(timestamp(event)).count();
+        };
 
     const auto count = std::distance(begin, end);
     if (count > 0)
     {
-        qDebug() << "Committing" << count << "events from"
+        NX_VERBOSE(this) << "Committing" << count << "events from"
             << utils::timestampToRfc2822(timestampMs(*(end - 1))) << "to"
             << utils::timestampToRfc2822(timestampMs(*begin));
 
@@ -258,21 +263,11 @@ bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToC
     }
     else
     {
-        qDebug() << "Committing no events";
+        NX_VERBOSE(this) << "Committing no events";
     }
 
-    // TODO: FIXME: #vkutin Fix this condition.
-    fetchedAll = count == m_prefetch.size() && m_prefetch.size() < lastBatchSize();
     m_prefetch.clear();
     return true;
-}
-
-void EventSearchListModel::Private::clipToSelectedTimePeriod()
-{
-    m_currentUpdateId = rest::Handle(); //< Cancel timed update.
-    m_latestTimeMs = qMin(m_latestTimeMs, q->relevantTimePeriod().endTimeMs());
-    refreshUpdateTimer();
-    clipToTimePeriod(m_data, upperBoundPredicate, q->relevantTimePeriod());
 }
 
 void EventSearchListModel::Private::refreshUpdateTimer()
@@ -281,7 +276,7 @@ void EventSearchListModel::Private::refreshUpdateTimer()
     {
         if (!m_updateTimer->isActive())
         {
-            qDebug() << "Event search update timer started";
+            NX_VERBOSE(this) << "Event search update timer started";
             m_updateTimer->start();
         }
     }
@@ -289,7 +284,7 @@ void EventSearchListModel::Private::refreshUpdateTimer()
     {
         if (m_updateTimer->isActive())
         {
-            qDebug() << "Event search update timer stopped";
+            NX_VERBOSE(this) << "Event search update timer stopped";
             m_updateTimer->stop();
         }
     }
@@ -311,20 +306,21 @@ void EventSearchListModel::Private::periodicUpdate()
             if (success && !data.empty())
                 addNewlyReceivedEvents(std::move(data));
             else
-                qDebug() << "Periodic update: no new events added";
+                NX_VERBOSE(this) << "Periodic update: no new events added";
         };
 
-    qDebug() << "Periodic update: requesting new events from"
-        << utils::timestampToRfc2822(m_latestTimeMs) << "to infinity";
+    NX_VERBOSE(this) << "Periodic update: requesting new events from"
+        << utils::timestampToRfc2822(m_latestTime.count()) << "to infinity";
 
-    m_currentUpdateId = getEvents(QnTimePeriod(m_latestTimeMs, QnTimePeriod::infiniteDuration()),
+    m_currentUpdateId = getEvents(
+        QnTimePeriod(m_latestTime.count(), QnTimePeriod::infiniteDuration()),
         eventsReceived);
 }
 
 void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDataList&& data)
 {
     const auto overlapBegin = std::lower_bound(m_data.cbegin(), m_data.cend(),
-        m_latestTimeMs, lowerBoundPredicate);
+        m_latestTime, lowerBoundPredicate);
 
     const auto alreadyExists =
         [this, &overlapBegin](const vms::event::ActionData& event) -> bool
@@ -343,7 +339,7 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
     int count = int(data.size());
     for (auto& event: data)
     {
-        if (timestampMs(event) > m_latestTimeMs)
+        if (timestamp(event) > m_latestTime)
             break;
 
         if (!alreadyExists(event) && event.actionType != ActionType::undefinedAction)
@@ -353,7 +349,7 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
         --count;
     }
 
-    qDebug() << "Periodic update:" << count << "new events added";
+    NX_VERBOSE(this) << "Periodic update:" << count << "new events added";
 
     if (count == 0)
         return;
@@ -365,7 +361,8 @@ void EventSearchListModel::Private::addNewlyReceivedEvents(vms::event::ActionDat
             m_data.push_front(std::move(*iter));
     }
 
-    m_latestTimeMs = timestampMs(m_data.front());
+    using namespace std::chrono;
+    m_latestTime = duration_cast<milliseconds>(timestamp(m_data.front()));
 }
 
 rest::Handle EventSearchListModel::Private::getEvents(const QnTimePeriod& period,

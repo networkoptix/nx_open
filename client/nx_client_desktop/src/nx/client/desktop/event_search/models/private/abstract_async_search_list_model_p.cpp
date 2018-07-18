@@ -29,56 +29,8 @@ void AbstractAsyncSearchListModel::Private::setCamera(const QnVirtualCameraResou
     if (m_camera == camera)
         return;
 
-    clear();
+    q->clear();
     m_camera = camera;
-}
-
-void AbstractAsyncSearchListModel::Private::relevantTimePeriodChanged(
-    const QnTimePeriod& previousValue)
-{
-    const auto currentValue = q->relevantTimePeriod();
-    NX_ASSERT(currentValue != previousValue);
-
-    if (!currentValue.isValid())
-    {
-        clear();
-        m_fetchedAll = true;
-        return;
-    }
-
-    if (currentValue.endTimeMs() > previousValue.endTimeMs()
-        || !currentValue.intersects(previousValue))
-    {
-        clear();
-    }
-    else
-    {
-        m_fetchedAll = m_fetchedAll && m_fetchedTimeWindow.contains(currentValue);
-        m_fetchedTimeWindow = m_fetchedTimeWindow.isEmpty()
-            ? m_fetchedTimeWindow.intersected(currentValue)
-            : currentValue;
-
-        clipToSelectedTimePeriod();
-        cancelPrefetch();
-    }
-}
-
-void AbstractAsyncSearchListModel::Private::fetchDirectionChanged()
-{
-    cancelPrefetch();
-    m_fetchedAll = false;
-    // TODO: FIXME: #vkutin Implement me!
-}
-
-void AbstractAsyncSearchListModel::Private::clear()
-{
-    NX_VERBOSE(this) << "Clear model";
-
-    m_fetchedAll = false;
-    m_fetchedTimeWindow = {};
-
-    cancelPrefetch();
-    q->setFetchDirection(FetchDirection::earlier);
 }
 
 bool AbstractAsyncSearchListModel::Private::requestFetch()
@@ -90,41 +42,38 @@ bool AbstractAsyncSearchListModel::Private::requestFetch()
             if (!guard)
                 return;
 
-            const bool cancelled = fetchedPeriod.startTimeMs < 0;
-
-            QnRaiiGuard finishFetch(
-                [this]() { q->beginFinishFetch(); },
-                [this, cancelled]() { q->endFinishFetch(cancelled); });
+            const bool cancelled = fetchedPeriod.isNull();
 
             if (!cancelled)
                 commit(fetchedPeriod);
+
+            q->finishFetch(cancelled);
         });
 }
 
 void AbstractAsyncSearchListModel::Private::cancelPrefetch()
 {
-    if (m_currentFetchId && m_prefetchCompletionHandler)
-        m_prefetchCompletionHandler(QnTimePeriod(-1, 0));
+    if (m_request.id && m_prefetchCompletionHandler)
+        m_prefetchCompletionHandler({});
 
-    m_currentFetchId = {};
-    m_prefetchCompletionHandler = {};
+    m_request = {};
 }
 
-bool AbstractAsyncSearchListModel::Private::canFetchMore() const
+bool AbstractAsyncSearchListModel::Private::canFetch() const
 {
-    if (m_fetchedAll || !m_camera || fetchInProgress() || !hasAccessRights())
+    if (!m_camera || fetchInProgress() || !hasAccessRights())
         return false;
 
-    if (m_fetchedTimeWindow.isEmpty())
+    if (q->fetchedTimeWindow().isEmpty())
         return true;
 
     switch (q->fetchDirection())
     {
         case FetchDirection::earlier:
-            return m_fetchedTimeWindow.startTimeMs > q->relevantTimePeriod().startTimeMs;
+            return q->fetchedTimeWindow().startTimeMs > q->relevantTimePeriod().startTimeMs;
 
         case FetchDirection::later:
-            return m_fetchedTimeWindow.endTimeMs() < q->relevantTimePeriod().endTimeMs();
+            return q->fetchedTimeWindow().endTimeMs() < q->relevantTimePeriod().endTimeMs();
 
         default:
             NX_ASSERT(false);
@@ -134,32 +83,32 @@ bool AbstractAsyncSearchListModel::Private::canFetchMore() const
 
 bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler completionHandler)
 {
-    if (!canFetchMore() || !completionHandler)
+    if (!canFetch() || !completionHandler)
         return false;
 
-    m_prefetchDirection = q->fetchDirection();
-    m_lastBatchSize = q->fetchBatchSize();
+    m_request.direction = q->fetchDirection();
+    m_request.batchSize = q->fetchBatchSize();
 
-    if (fetchedTimeWindow().isEmpty())
+    if (q->fetchedTimeWindow().isEmpty())
     {
-        m_requestedFetchPeriod = QnTimePeriod(0, QnTimePeriod::infiniteDuration());
+        m_request.period = q->relevantTimePeriod();
     }
-    else if (m_prefetchDirection == FetchDirection::earlier)
+    else if (m_request.direction == FetchDirection::earlier)
     {
-        m_requestedFetchPeriod.startTimeMs = q->relevantTimePeriod().startTimeMs;
-        m_requestedFetchPeriod.setEndTimeMs(fetchedTimeWindow().startTimeMs - 1);
+        m_request.period.startTimeMs = q->relevantTimePeriod().startTimeMs;
+        m_request.period.setEndTimeMs(q->fetchedTimeWindow().startTimeMs - 1);
     }
     else
     {
-        m_requestedFetchPeriod.startTimeMs = fetchedTimeWindow().endTimeMs() + 1;
-        m_requestedFetchPeriod.setEndTimeMs(q->relevantTimePeriod().endTimeMs());
+        m_request.period.startTimeMs = q->fetchedTimeWindow().endTimeMs() + 1;
+        m_request.period.setEndTimeMs(q->relevantTimePeriod().endTimeMs());
     }
 
-    m_currentFetchId = requestPrefetch(m_requestedFetchPeriod);
-    if (!m_currentFetchId)
+    m_request.id = requestPrefetch(m_request.period);
+    if (!m_request.id)
         return false;
 
-    NX_VERBOSE(this) << "Prefetch id:" << m_currentFetchId;
+    NX_VERBOSE(this) << "Prefetch id:" << m_request.id;
 
     m_prefetchCompletionHandler = completionHandler;
     return true;
@@ -167,62 +116,62 @@ bool AbstractAsyncSearchListModel::Private::prefetch(PrefetchCompletionHandler c
 
 void AbstractAsyncSearchListModel::Private::commit(const QnTimePeriod& periodToCommit)
 {
-    if (!m_currentFetchId)
+    if (!fetchInProgress())
         return;
 
-    NX_VERBOSE(this) << "Commit id:" << m_currentFetchId;
-    m_currentFetchId = rest::Handle();
+    NX_VERBOSE(this) << "Commit id:" << m_request.id;
 
-    if (!commitPrefetch(periodToCommit, m_fetchedAll))
-        return;
+    if (commitPrefetch(periodToCommit))
+    {
+        auto timeWindow = q->fetchedTimeWindow();
+        timeWindow.addPeriod(periodToCommit);
+        q->setFetchedTimeWindow(timeWindow);
 
-    if (m_fetchedTimeWindow.isEmpty())
-        m_fetchedTimeWindow = periodToCommit;
-    else
-        m_fetchedTimeWindow.addPeriod(periodToCommit);
+        if (count() > q->maximumCount())
+        {
+            NX_VERBOSE(this) << "Truncating to maximum count";
+            q->truncateToMaximumCount();
+        }
+    }
+
+    m_request = {};
+    m_prefetchCompletionHandler = {};
 }
 
 bool AbstractAsyncSearchListModel::Private::fetchInProgress() const
 {
-    return m_currentFetchId != rest::Handle();
+    return m_request.id != rest::Handle();
 }
 
-bool AbstractAsyncSearchListModel::Private::shouldSkipResponse(rest::Handle requestId) const
+const AbstractAsyncSearchListModel::Private::FetchInformation&
+    AbstractAsyncSearchListModel::Private::currentRequest() const
 {
-    return !m_currentFetchId || !m_prefetchCompletionHandler || m_currentFetchId != requestId;
+    return m_request;
 }
 
 void AbstractAsyncSearchListModel::Private::completePrefetch(
-    const QnTimePeriod& actuallyFetched, bool limitReached)
+    const QnTimePeriod& actuallyFetched, int fetchedBatchSize)
 {
-    auto fetchedPeriod =
+    const bool limitReached = fetchedBatchSize >= m_request.batchSize;
+
+    const auto fetchedPeriod =
         [&]()
         {
             if (!limitReached)
-                return m_requestedFetchPeriod;
+                return m_request.period;
 
-            auto result = m_requestedFetchPeriod;
-            if (m_prefetchDirection == FetchDirection::earlier)
-                result.startTimeMs = actuallyFetched.startTimeMs + 1;
+            auto result = m_request.period;
+            if (m_request.direction == FetchDirection::earlier)
+                result.truncateFront(actuallyFetched.startTimeMs + 1);
             else
-                result.setEndTimeMs(actuallyFetched.endTimeMs() - 1);
+                result.truncate(actuallyFetched.endTimeMs() - 1);
 
             return result;
         };
 
     NX_ASSERT(m_prefetchCompletionHandler);
     m_prefetchCompletionHandler(fetchedPeriod());
-    m_prefetchCompletionHandler = PrefetchCompletionHandler();
-}
-
-QnTimePeriod AbstractAsyncSearchListModel::Private::fetchedTimeWindow() const
-{
-    return m_fetchedTimeWindow;
-}
-
-int AbstractAsyncSearchListModel::Private::lastBatchSize() const
-{
-    return m_lastBatchSize;
+    m_prefetchCompletionHandler = {};
 }
 
 } // namespace desktop

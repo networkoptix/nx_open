@@ -111,30 +111,41 @@ QVariant MotionSearchListModel::data(const QModelIndex& index, int role) const
     }
 }
 
-bool MotionSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
-{
-    return d->canFetchMore();
-}
-
-void MotionSearchListModel::fetchMore(const QModelIndex& /*parent*/)
-{
-    d->fetchMore();
-}
-
-bool MotionSearchListModel::fetchInProgress() const
-{
-    return d->fetchInProgress();
-}
+// TODO: FIXME!!!
+//bool MotionSearchListModel::fetchInProgress() const
+//{
+//    return d->fetchInProgress();
+//}
 
 int MotionSearchListModel::totalCount() const
 {
     return d->totalCount();
 }
 
-void MotionSearchListModel::relevantTimePeriodChanged(const QnTimePeriod& previousValue)
+bool MotionSearchListModel::canFetch() const
 {
-    NX_ASSERT(previousValue != relevantTimePeriod());
+    return d->canFetchMore();
+}
+
+void MotionSearchListModel::requestFetch()
+{
+    d->fetchMore();
+    finishFetch(false);
+}
+
+void MotionSearchListModel::clearData()
+{
     d->reset();
+}
+
+void MotionSearchListModel::truncateToRelevantTimePeriod()
+{
+    // TODO: FIXME!!!
+}
+
+void MotionSearchListModel::truncateToMaximumCount()
+{
+    // TODO: FIXME!!!
 }
 
 } // namespace desktop

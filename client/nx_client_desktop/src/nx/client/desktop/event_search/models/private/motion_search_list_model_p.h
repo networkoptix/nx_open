@@ -31,7 +31,6 @@ public:
 
     bool canFetchMore() const;
     void fetchMore();
-    bool fetchInProgress() const;
 
     void reset();
 
@@ -47,7 +46,6 @@ private:
     QnCachingCameraDataLoaderPtr m_loader;
     std::deque<QnTimePeriod> m_data; //< Reversed list.
     int m_totalCount = 0;
-    bool m_fetchInProgress = false;
 };
 
 } // namespace desktop

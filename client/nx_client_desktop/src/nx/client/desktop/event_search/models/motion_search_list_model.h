@@ -30,17 +30,17 @@ public:
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    virtual bool canFetchMore(const QModelIndex& parent = QModelIndex()) const override;
-    virtual void fetchMore(const QModelIndex& parent = QModelIndex()) override;
-    virtual bool fetchInProgress() const override;
-
     int totalCount() const;
 
 signals:
     void totalCountChanged(int value);
 
 protected:
-    virtual void relevantTimePeriodChanged(const QnTimePeriod& previousValue) override;
+    virtual bool canFetch() const override;
+    virtual void requestFetch() override;
+    virtual void clearData() override;
+    virtual void truncateToRelevantTimePeriod() override;
+    virtual void truncateToMaximumCount() override;
 
 private:
     class Private;

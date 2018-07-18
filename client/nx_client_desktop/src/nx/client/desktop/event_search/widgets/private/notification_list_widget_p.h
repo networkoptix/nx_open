@@ -16,7 +16,7 @@ namespace client {
 namespace desktop {
 
 class EventRibbon;
-class AbstractSearchListModel;
+class AbstractEventListModel;
 
 class NotificationListWidget::Private:
     public QObject,
@@ -34,8 +34,8 @@ private:
 private:
     NotificationListWidget* q = nullptr;
     EventRibbon* const m_eventRibbon = nullptr;
-    AbstractSearchListModel* m_systemHealthModel = nullptr;
-    AbstractSearchListModel* m_notificationsModel = nullptr;
+    AbstractEventListModel* m_systemHealthModel = nullptr;
+    AbstractEventListModel* m_notificationsModel = nullptr;
 
     QWidget* m_placeholder = nullptr;
 };

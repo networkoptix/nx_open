@@ -174,6 +174,7 @@ static int performGet(
     QnGetBookmarksRequestContext context(request, ownerPort);
     QnCameraBookmarkList outputData =
         QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(commonModule, context);
+
     QnFusionRestHandlerDetail::serialize(
         outputData, *outBody, *outContentType, request.format, request.extraFormatting);
     return nx::network::http::StatusCode::ok;

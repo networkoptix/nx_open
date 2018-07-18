@@ -3,6 +3,8 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -32,19 +34,43 @@ void AbstractAsyncSearchListModel::setCamera(const QnVirtualCameraResourcePtr& c
     d->setCamera(camera);
 }
 
-void AbstractAsyncSearchListModel::fetchDirectionChanged()
+bool AbstractAsyncSearchListModel::cancelFetch()
 {
-    return d->fetchDirectionChanged();
+    if (!fetchInProgress())
+        return false;
+
+    d->cancelPrefetch();
+    return true;
 }
 
-void AbstractAsyncSearchListModel::relevantTimePeriodChanged(const QnTimePeriod& previousValue)
+void AbstractAsyncSearchListModel::clearData()
 {
-    d->relevantTimePeriodChanged(previousValue);
+    d->clearData();
 }
 
-void AbstractAsyncSearchListModel::clear()
+bool AbstractAsyncSearchListModel::canFetch() const
 {
-    d->clear();
+    return d->canFetch();
+}
+
+void AbstractAsyncSearchListModel::requestFetch()
+{
+    d->requestFetch();
+}
+
+bool AbstractAsyncSearchListModel::fetchInProgress() const
+{
+    return d->fetchInProgress();
+}
+
+void AbstractAsyncSearchListModel::truncateToMaximumCount()
+{
+    d->truncateToMaximumCount();
+}
+
+void AbstractAsyncSearchListModel::truncateToRelevantTimePeriod()
+{
+    d->truncateToRelevantTimePeriod();
 }
 
 int AbstractAsyncSearchListModel::rowCount(const QModelIndex& parent) const
@@ -61,42 +87,13 @@ QVariant AbstractAsyncSearchListModel::data(const QModelIndex& index, int role) 
     {
         using namespace std::chrono;
         return data(index, Qn::TimestampRole).value<qint64>()
-            >= microseconds(milliseconds(d->fetchedTimeWindow().startTimeMs)).count();
+            >= microseconds(milliseconds(fetchedTimeWindow().startTimeMs)).count();
     }
 
     bool handled = false;
     const auto result = d->data(index, role, handled);
 
     return handled ? result : base_type::data(index, role);
-}
-
-bool AbstractAsyncSearchListModel::canFetchMore(const QModelIndex& /*parent*/) const
-{
-    return d->canFetchMore();
-}
-
-void AbstractAsyncSearchListModel::fetchMore(const QModelIndex& /*parent*/)
-{
-    d->requestFetch();
-}
-
-bool AbstractAsyncSearchListModel::fetchInProgress() const
-{
-    return d->fetchInProgress();
-}
-
-bool AbstractAsyncSearchListModel::cancelFetch()
-{
-    if (!fetchInProgress())
-        return false;
-
-    d->cancelPrefetch();
-    return true;
-}
-
-QnTimePeriod AbstractAsyncSearchListModel::fetchedTimeWindow() const
-{
-    return d->fetchedTimeWindow();
 }
 
 } // namespace desktop

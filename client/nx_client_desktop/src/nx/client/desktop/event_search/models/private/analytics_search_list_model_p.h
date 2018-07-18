@@ -50,14 +50,13 @@ public:
     QString filterText() const;
     void setFilterText(const QString& value);
 
-    virtual void clear() override;
-
-    static constexpr int kMaximumItemCount = 1000;
+    virtual void clearData() override;
+    virtual void truncateToMaximumCount() override;
+    virtual void truncateToRelevantTimePeriod() override;
 
 protected:
     virtual rest::Handle requestPrefetch(const QnTimePeriod& period) override;
-    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit, bool& fetchedAll) override;
-    virtual void clipToSelectedTimePeriod() override;
+    virtual bool commitPrefetch(const QnTimePeriod& periodToCommit) override;
     virtual bool hasAccessRights() const override;
 
 private:
@@ -108,14 +107,14 @@ private:
     QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
     media::AbstractMetadataConsumerPtr m_metadataSource;
     QnResourceDisplayPtr m_display;
-    qint64 m_latestTimeMs = 0;
+    std::chrono::milliseconds m_latestTime;
     rest::Handle m_currentUpdateId = rest::Handle();
 
     analytics::storage::LookupResult m_prefetch;
     std::deque<analytics::storage::DetectedObject> m_data;
     bool m_success = true;
 
-    QHash<QnUuid, qint64> m_objectIdToTimestampUs;
+    QHash<QnUuid, std::chrono::microseconds> m_objectIdToTimestamp;
 
     const QScopedPointer<QTimer> m_metadataProcessingTimer;
     QVector<QnAbstractCompressedMetadataPtr> m_metadataPackets;

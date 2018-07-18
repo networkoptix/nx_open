@@ -28,10 +28,13 @@ namespace desktop {
 
 namespace {
 
+using namespace std::literals::chrono_literals;
+using namespace std::chrono;
+
 static constexpr int kPlaceholderFontPixelSize = 15;
-static constexpr int kQueuedFetchMoreDelayMs = 50;
-static constexpr int kTimeSelectionDelayMs = 250;
-static constexpr int kTextFilterDelayMs = 250;
+static constexpr milliseconds kQueuedFetchMoreDelay = 50ms;
+static constexpr milliseconds kTimeSelectionDelay = 250ms;
+static constexpr milliseconds kTextFilterDelay = 250ms;
 
 SearchLineEdit* createSearchLineEdit(QWidget* parent)
 {
@@ -54,7 +57,7 @@ SearchLineEdit* createSearchLineEdit(QWidget* parent)
     result->setAttribute(Qt::WA_TranslucentBackground);
     result->setAttribute(Qt::WA_Hover);
     result->setAutoFillBackground(false);
-    result->setTextChangedSignalFilterMs(kTextFilterDelayMs);
+    result->setTextChangedSignalFilterMs(kTextFilterDelay.count());
     setPaletteColor(result, QPalette::Shadow, Qt::transparent);
     return result;
 }
@@ -67,8 +70,7 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     ui(new Ui::UnifiedSearchWidget()),
     m_searchLineEdit(createSearchLineEdit(this)),
     m_dayChangeTimer(new QTimer(this)),
-    m_fetchMoreOperation(new utils::PendingOperation([this]() { fetchMoreIfNeeded(); },
-        kQueuedFetchMoreDelayMs, this))
+    m_fetchMoreOperation(new utils::PendingOperation(this))
 {
     ui->setupUi(this);
     ui->headerLayout->insertWidget(0, m_searchLineEdit);
@@ -104,14 +106,21 @@ UnifiedSearchWidget::UnifiedSearchWidget(QWidget* parent):
     setPaletteColor(ui->filterLine, QPalette::Shadow, colorTheme()->color("dark6"));
 
     connect(ui->ribbon->scrollBar(), &QScrollBar::valueChanged,
-        this, &UnifiedSearchWidget::requestFetch);
+        this, &UnifiedSearchWidget::requestFetch, Qt::QueuedConnection);
 
     installEventHandler(this, QEvent::Show, this, &UnifiedSearchWidget::requestFetch);
 
     m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    m_fetchMoreOperation->setIntervalMs(kQueuedFetchMoreDelay.count());
+    m_fetchMoreOperation->setCallback(
+        [this]()
+        {
+            if (model() && model()->canFetchMore())
+                model()->fetchMore();
+        });
 
     auto applyTimePeriod = new utils::PendingOperation([this]() { updateCurrentTimePeriod(); },
-        kTimeSelectionDelayMs, this);
+        kTimeSelectionDelay.count(), this);
 
     applyTimePeriod->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
 
@@ -206,8 +215,9 @@ void UnifiedSearchWidget::setModel(VisualSearchListModel* value)
 
     m_modelConnections.reset(new QnDisconnectHelper());
 
-    *m_modelConnections << connect(value, &QAbstractItemModel::rowsRemoved,
-        this, &UnifiedSearchWidget::requestFetch, Qt::QueuedConnection);
+// TODO: #vkutin Re-check whether this is needed.
+//    *m_modelConnections << connect(value, &QAbstractItemModel::rowsRemoved,
+//        this, &UnifiedSearchWidget::requestFetch);
 
     *m_modelConnections << connect(value, &QAbstractItemModel::modelReset,
         this, &UnifiedSearchWidget::updatePlaceholderState);
@@ -221,8 +231,6 @@ void UnifiedSearchWidget::setModel(VisualSearchListModel* value)
     // For busy indicator going on/off.
     *m_modelConnections << connect(value, &QAbstractItemModel::dataChanged,
         this, &UnifiedSearchWidget::updatePlaceholderState);
-
-    fetchMoreIfNeeded();
 }
 
 SearchLineEdit* UnifiedSearchWidget::filterEdit() const
@@ -390,11 +398,6 @@ void UnifiedSearchWidget::setupTimeSelection()
 
 void UnifiedSearchWidget::requestFetch()
 {
-    m_fetchMoreOperation->requestOperation();
-}
-
-void UnifiedSearchWidget::fetchMoreIfNeeded()
-{
     if (!ui->ribbon->isVisible() || !model())
         return;
 
@@ -407,10 +410,7 @@ void UnifiedSearchWidget::fetchMoreIfNeeded()
     else
         return; //< Scroll bar is not at the beginning or the end.
 
-    if (!model()->canFetchMore(QModelIndex()))
-        return;
-
-    model()->fetchMore(QModelIndex());
+    m_fetchMoreOperation->requestOperation();
 }
 
 void UnifiedSearchWidget::updatePlaceholderState()

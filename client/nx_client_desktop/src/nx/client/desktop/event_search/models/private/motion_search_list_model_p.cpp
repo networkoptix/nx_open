@@ -1,7 +1,5 @@
 #include "motion_search_list_model_p.h"
 
-#include <QtCore/QScopedValueRollback>
-
 #include <core/resource/camera_resource.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -172,10 +170,8 @@ bool MotionSearchListModel::Private::canFetchMore() const
 
 void MotionSearchListModel::Private::fetchMore()
 {
-    if (!m_loader || m_fetchInProgress)
+    if (!m_loader)
         return;
-
-    QScopedValueRollback<bool> progressRollback(m_fetchInProgress, true);
 
     const auto periods = this->periods();
     const auto oldCount = count();
@@ -183,10 +179,6 @@ void MotionSearchListModel::Private::fetchMore()
     const auto remaining = periods.size() - oldCount;
     if (remaining == 0)
         return;
-
-    QnRaiiGuard finishFetch(
-        [this]() { q->beginFinishFetch(); },
-        [this]() { q->endFinishFetch(); });
 
     const auto delta = qMin(remaining, q->fetchBatchSize());
     const auto newCount = oldCount + delta;
@@ -196,11 +188,6 @@ void MotionSearchListModel::Private::fetchMore()
 
     for (auto chunk = range.first; chunk != range.second; ++chunk)
         m_data.push_front(*chunk);
-}
-
-bool MotionSearchListModel::Private::fetchInProgress() const
-{
-    return m_fetchInProgress;
 }
 
 int MotionSearchListModel::Private::totalCount() const

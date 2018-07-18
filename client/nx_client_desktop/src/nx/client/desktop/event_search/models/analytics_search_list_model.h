@@ -25,8 +25,6 @@ public:
 
     virtual bool isConstrained() const override;
 
-    virtual bool canFetchMore(const QModelIndex& parent) const override;
-
 private:
     class Private;
     Private* const d = nullptr;
