@@ -751,7 +751,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     return true;
 }
 
-void QnRtspDataConsumer::recvRtcpReport(AbstractDatagramSocket* rtcpSocket)
+void QnRtspDataConsumer::recvRtcpReport(nx::network::AbstractDatagramSocket* rtcpSocket)
 {
     int bytesRead = 0;
     uint8_t buffer[MAX_RTCP_PACKET_SIZE];
