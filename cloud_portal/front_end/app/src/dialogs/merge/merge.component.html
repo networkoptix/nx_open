@@ -47,25 +47,29 @@
         <div>
             <div [ngClass]="{'text-muted': systemMergeable != ''}" translate>Took system name and settings from</div>
             <div>
-                <div>
-                    <input type="radio" id="firstSystem" name="firstSystem"
-                           [(ngModel)]="masterId"
-                           [value]="system.id"
-                           [checked]="system.id == masterId"
-                           [disabled]="systemMergeable != ''">
-                    <label class="light-label"
+                <div class="radio-group">
+                    <label class="light-label option"
                            [ngClass]="{'text-muted': systemMergeable != ''}"
-                           for="firstSystem">{{system.info.name}}</label>
+                           for="firstSystem">{{system.info.name}}
+                        <input type="radio" id="firstSystem" name="firstSystem"
+                               [(ngModel)]="masterId"
+                               [value]="system.id"
+                               [checked]="system.id == masterId"
+                               [disabled]="systemMergeable != ''">
+                        <span class="optionmark"></span>
+                    </label>
                 </div>
-                <div>
-                    <input type="radio" id="secondSystem" name="secondSystem"
-                           [(ngModel)]="masterId"
-                           [value]="targetSystem.id"
-                           [checked]="targetSystem.id == masterId"
-                           [disabled]="systemMergeable != ''">
-                    <label class="light-label"
+                <div class="radio-group">
+                    <label class="light-label option"
                            [ngClass]="{'text-muted': systemMergeable != ''}"
-                           for="secondSystem">{{targetSystem.name}}</label>
+                           for="secondSystem">{{targetSystem.name}}
+                        <input type="radio" id="secondSystem" name="secondSystem"
+                               [(ngModel)]="masterId"
+                               [value]="targetSystem.id"
+                               [checked]="targetSystem.id == masterId"
+                               [disabled]="systemMergeable != ''">
+                        <span class="optionmark"></span>
+                    </label>
                 </div>
             </div>
         </div>
