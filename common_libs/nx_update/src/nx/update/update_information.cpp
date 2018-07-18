@@ -286,27 +286,20 @@ Information updateInformationImpl(
     bool checkAlternativeServers)
 {
     nx::network::http::AsyncClient httpClient;
+    Information result;
     InformationError localError = makeHttpRequest(&httpClient, url);
 
     if (localError != InformationError::noError)
     {
         if (error)
             *error = localError;
-        return Information();
+        return result;
     }
 
-    Information result;
     QList<AlternativeServerData> alternativeServers;
-
     localError = fillUpdateInformation(&httpClient, publicationKey, &result, &alternativeServers);
-    if (localError != InformationError::noError)
+    if (localError != InformationError::noError && checkAlternativeServers)
     {
-        if (error)
-            *error = localError;
-
-        if (!checkAlternativeServers)
-            return result;
-
         for (const auto& alternativeServer: alternativeServers)
         {
             result = updateInformationImpl(
@@ -316,16 +309,12 @@ Information updateInformationImpl(
                 /*checkAlternativeServers*/ false);
 
             if (localError == InformationError::noError)
-            {
-                if (error)
-                    *error = localError;;
-                return result;
-            }
+                break;
         }
     }
 
     if (error)
-        *error = InformationError::noError;
+        *error = localError;
 
     return result;
 }
