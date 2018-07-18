@@ -21,8 +21,8 @@ def one_vm_type():
 @pytest.fixture
 def config(test_config):
     return test_config.with_defaults(
-        CAMERAS_INTERFACE='enp5s0',
-        CAMERAS_NETWORK='192.168.0.200/24',
+        CAMERAS_INTERFACE='enp3s0',
+        CAMERAS_NETWORK='192.168.200.111/24',
         EXPECTED_CAMERAS_FILE=Path(__file__).parent / 'expected_cameras.yaml',
         )
 
