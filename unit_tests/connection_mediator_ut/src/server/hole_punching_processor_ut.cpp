@@ -354,7 +354,8 @@ class DummyStatisticsCollector:
     public stats::AbstractCollector
 {
 public:
-    virtual void saveConnectSessionStatistics(stats::ConnectSession /*data*/) override
+    virtual void saveConnectSessionStatistics(
+        const stats::ConnectSession& /*data*/) override
     {
     }
 };

@@ -102,25 +102,67 @@ NX_UTILS_API uint64_t stringToBytesConst(const char* str);
 NX_UTILS_API std::vector<QnByteArrayConstRef> splitQuotedString(
     const QnByteArrayConstRef& src, char separator=',');
 
+template<template<typename...> class Dictionary>
+void parseNameValuePairs(
+    const QnByteArrayConstRef& serializedData,
+    char separator,
+    Dictionary<QByteArray, QByteArray>* const params)
+{
+    const std::vector<QnByteArrayConstRef>& paramsList =
+        splitQuotedString(serializedData, separator);
+    for (const QnByteArrayConstRef& token: paramsList)
+    {
+        const auto& nameAndValue = splitQuotedString(token.trimmed(), '=');
+        if (nameAndValue.empty())
+            continue;
+        QnByteArrayConstRef value = nameAndValue.size() > 1 ? nameAndValue[1] : QnByteArrayConstRef();
+        params->emplace(nameAndValue[0].trimmed(), value.trimmed("\""));
+    }
+}
+
 /**
  * Parses string like "name1=value1,name2=value2,...".
  */
-NX_UTILS_API QMap<QByteArray, QByteArray> parseNameValuePairs(
+template<template<typename...> class Dictionary>
+Dictionary<QByteArray, QByteArray> parseNameValuePairs(
     const QnByteArrayConstRef& serializedData,
-    char separator = ',');
-NX_UTILS_API void parseNameValuePairs(
-    const QnByteArrayConstRef& serializedData,
-    char separator,
-    QMap<QByteArray, QByteArray>* const params);
+    char separator = ',')
+{
+    Dictionary<QByteArray, QByteArray> nameValueContainer;
+    parseNameValuePairs<Dictionary>(
+        serializedData,
+        separator,
+        &nameValueContainer);
+    return nameValueContainer;
+}
 
 /**
  * Serializes dictionary of (name, value) pairs into string like "name1=value1,name2=value2,...".
  */
-NX_UTILS_API QByteArray serializeNameValuePairs(
-    const QMap<QByteArray, QByteArray>& params);
-NX_UTILS_API void serializeNameValuePairs(
-    const QMap<QByteArray, QByteArray>& params,
-    QByteArray* const dstBuffer);
+template<template<typename...> class Dictionary>
+QByteArray serializeNameValuePairs(
+    const Dictionary<QByteArray, QByteArray>& params)
+{
+    QByteArray serializedData;
+    serializeNameValuePairs<Dictionary>(params, &serializedData);
+    return serializedData;
+}
+
+template<template<typename...> class Dictionary>
+void serializeNameValuePairs(
+    const Dictionary<QByteArray, QByteArray>& params,
+    QByteArray* const dstBuffer)
+{
+    for (auto it = params.cbegin(); it != params.cend(); ++it)
+    {
+        if (it != params.begin())
+            dstBuffer->append(", ");
+        dstBuffer->append(it->first);
+        dstBuffer->append("=\"");
+        dstBuffer->append(it->second);
+        dstBuffer->append("\"");
+    }
+}
 
 /**
  * Removes all ampersands that are not concatenated with others

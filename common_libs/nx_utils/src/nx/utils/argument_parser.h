@@ -18,6 +18,9 @@ class NX_UTILS_API ArgumentParser
 public:
     ArgumentParser(int argc = 0, const char* argv[] = nullptr);
     ArgumentParser(const QStringList& args);
+    ArgumentParser(ArgumentParser&&) = default;
+    ArgumentParser(const ArgumentParser&) = default;
+
     void parse(int argc, const char* argv[]);
     void parse(const QStringList& args);
 
@@ -33,6 +36,8 @@ public:
 
     template<typename Handler>
     void forEach(const QString& name, const Handler& handler) const;
+
+    std::multimap<QString, QString> allArgs() const;
 
 private:
     template<typename ValueType = QString>

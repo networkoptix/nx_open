@@ -14,6 +14,7 @@ files:
       - /cloud_portal/front_end/app/views/debug.html
       - /cloud_portal/front_end/app/views/view.html
       - /cloud_portal/front_end/app/views/static/eula.html
+      - /cloud_portal/front_end/app/views/components/downloadRelease.html
   -
     source: '/cloud_portal/cloud/notifications/static/templates/*.json'
     translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'

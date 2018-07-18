@@ -31,15 +31,17 @@ public:
     nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool();
     const nx::cloud::discovery::RegisteredPeerPool& discoveredPeerPool() const;
 
+    const stats::StatsManager& statisticsManager() const;
+
     void stop();
 
 private:
-    stats::StatsManager m_statsManager;
     std::unique_ptr<AbstractCloudDataProvider> m_cloudDataProvider;
     MediaserverEndpointTester m_mediaserverEndpointTester;
     std::unique_ptr<AbstractRelayClusterClient> m_relayClusterClient;
     ListeningPeerPool m_listeningPeerPool;
     PeerRegistrator m_listeningPeerRegistrator;
+    stats::StatsManager m_statsManager;
     HolePunchingProcessor m_cloudConnectProcessor;
     nx::cloud::discovery::RegisteredPeerPool m_discoveredPeerPool;
 };

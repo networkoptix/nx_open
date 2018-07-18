@@ -11,6 +11,7 @@
 #include "http/sync_connection_request_handler.h"
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
+#include "statistics/provider.h"
 #include "transaction_log.h"
 
 namespace nx {
@@ -39,6 +40,8 @@ public:
     ConnectionManager& connectionManager();
     const ConnectionManager& connectionManager() const;
 
+    const statistics::Provider& statisticsProvider() const;
+
     void subscribeToSystemDeletedNotification(
         nx::utils::Subscription<std::string>& subscription);
     void unsubscribeFromSystemDeletedNotification(
@@ -54,6 +57,7 @@ private:
     TransactionLog m_transactionLog;
     IncomingTransactionDispatcher m_incomingTransactionDispatcher;
     ConnectionManager m_connectionManager;
+    statistics::Provider m_statisticsProvider;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
     nx::utils::Counter m_startedAsyncCallsCounter;
 

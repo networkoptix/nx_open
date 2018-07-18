@@ -1104,6 +1104,10 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
             "In some rare scenarios cameras can be assigned to removed server, "
             "This startup parameter force server to move these cameras to itself"), true);
 
+    commandLineParser.addParameter(&m_cmdLineArguments.auxLoggers, "--log/logger", NULL,
+        lit("Additional logger configuration. "
+            "E.g., to log every message <= WARING to stdout: file=-;level=WARNING"));
+
     commandLineParser.parse(argc, (const char**) argv, stderr);
     if (m_cmdLineArguments.showHelp)
     {
@@ -1112,6 +1116,13 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
     }
     if (m_cmdLineArguments.showVersion)
         std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
+
+    // NOTE: commandLineParser does not support multiple arguments with the same name.
+    nx::utils::ArgumentParser argumentParser;
+    argumentParser.parse(argc, (const char**) argv);
+    argumentParser.forEach(
+        "log/logger",
+        [this](const QString& value) { m_cmdLineArguments.auxLoggers.push_back(value); });
 }
 
 void MediaServerProcess::addCommandLineParametersFromConfig(MSSettings* settings)
@@ -3112,10 +3123,18 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings()
     const auto& settings = serverModule()->settings();
 
     nx::utils::log::Settings s;
-    s.maxBackupCount = settings.logArchiveSize();
-    s.directory = settings.logDir();
-    s.maxFileSize = settings.maxLogFileSize();
+    s.loggers.resize(1);
+    s.loggers.front().maxBackupCount = settings.logArchiveSize();
+    s.loggers.front().directory = settings.logDir();
+    s.loggers.front().maxFileSize = settings.maxLogFileSize();
     s.updateDirectoryIfEmpty(getDataDirectory());
+
+    for (const auto& loggerArg: cmdLineArguments().auxLoggers)
+    {
+        nx::utils::log::LoggerSettings loggerSettings;
+        loggerSettings.parse(loggerArg);
+        s.loggers.push_back(std::move(loggerSettings));
+    }
 
     return s;
 }
@@ -3129,48 +3148,60 @@ void MediaServerProcess::initializeLogging()
 
     auto logSettings = makeLogSettings();
 
-    logSettings.level.parse(cmdLineArguments().logLevel,
+    logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
         settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
-    logSettings.logBaseName = "log_file";
-    nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath);
+    logSettings.loggers.front().logBaseName = "log_file";
+    nx::utils::log::setMainLogger(
+        nx::utils::log::buildLogger(
+            logSettings,
+            qApp->applicationName(),
+            binaryPath));
 
     if (auto path = nx::utils::log::mainLogger()->filePath())
         serverModule()->roSettings()->setValue("logFile", path->replace(lit(".log"), QString()));
     else
         serverModule()->roSettings()->remove("logFile");
 
-    logSettings.level.parse(cmdLineArguments().httpLogLevel,
+    logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(nx::utils::log::Level::none));
-    logSettings.logBaseName = "http_log";
-    nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath,
-        nx::utils::log::addLogger({QnLog::HTTP_LOG_INDEX}));
+    logSettings.loggers.front().logBaseName = "http_log";
+    nx::utils::log::addLogger(
+        nx::utils::log::buildLogger(
+            logSettings, qApp->applicationName(), binaryPath,
+            {QnLog::HTTP_LOG_INDEX}));
 
-    logSettings.level.parse(cmdLineArguments().systemLogLevel,
+    logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         settings.systemLogLevel(), toString(nx::utils::log::Level::info));
-    logSettings.logBaseName = "hw_log";
-    nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath,
-        nx::utils::log::addLogger(
+    logSettings.loggers.front().logBaseName = "hw_log";
+    nx::utils::log::addLogger(
+        nx::utils::log::buildLogger(
+            logSettings,
+            qApp->applicationName(),
+            binaryPath,
             {
                 QnLog::HWID_LOG,
                 nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))
             }));
 
-    logSettings.level.parse(cmdLineArguments().ec2TranLogLevel,
+    logSettings.loggers.front().level.parse(cmdLineArguments().ec2TranLogLevel,
         settings.tranLogLevel(), toString(nx::utils::log::Level::none));
-    logSettings.logBaseName = "ec2_tran";
-    nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath,
-        nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
+    logSettings.loggers.front().logBaseName = "ec2_tran";
+    nx::utils::log::addLogger(
+        nx::utils::log::buildLogger(
+            logSettings,
+            qApp->applicationName(),
+            binaryPath,
+            {QnLog::EC2_TRAN_LOG}));
 
-    logSettings.level.parse(cmdLineArguments().permissionsLogLevel,
+    logSettings.loggers.front().level.parse(cmdLineArguments().permissionsLogLevel,
         settings.permissionsLogLevel(), toString(nx::utils::log::Level::none));
-    logSettings.logBaseName = "permissions";
-    nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath,
-        nx::utils::log::addLogger({QnLog::PERMISSIONS_LOG}));
+    logSettings.loggers.front().logBaseName = "permissions";
+    nx::utils::log::addLogger(
+        nx::utils::log::buildLogger(
+            logSettings,
+            qApp->applicationName(),
+            binaryPath,
+            {QnLog::PERMISSIONS_LOG}));
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 }
@@ -3181,12 +3212,14 @@ void MediaServerProcess::initializeHardwareId()
 
     auto logSettings = makeLogSettings();
 
-    logSettings.level.parse(cmdLineArguments().systemLogLevel,
+    logSettings.loggers.front().level.parse(cmdLineArguments().systemLogLevel,
         serverModule()->settings().systemLogLevel(), toString(nx::utils::log::Level::info));
-    logSettings.logBaseName = "hw_log";
-    nx::utils::log::initialize(
-        logSettings, qApp->applicationName(), binaryPath,
-        nx::utils::log::addLogger(
+    logSettings.loggers.front().logBaseName = "hw_log";
+    nx::utils::log::addLogger(
+        nx::utils::log::buildLogger(
+            logSettings,
+            qApp->applicationName(),
+            binaryPath,
             {
                 QnLog::HWID_LOG,
                 nx::utils::log::Tag(toString(typeid(nx::mediaserver::LicenseWatcher)))

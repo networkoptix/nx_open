@@ -10,6 +10,7 @@
 
 #include <nx/kit/ini_config.h>
 #include <nx/utils/log/log_initializer.h>
+#include <nx/utils/log/log_main.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/rlimit.h>
 
@@ -57,6 +58,7 @@ inline int runTest(
     ArgumentParser args(argc, extendedArgs.data());
     TestOptions::applyArguments(args);
     nx::utils::log::initializeGlobally(args);
+    nx::utils::log::lockConfiguration();
 
     DeinitFunctions deinitFunctions;
     if (extraInit)
