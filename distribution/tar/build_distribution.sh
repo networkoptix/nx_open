@@ -263,7 +263,7 @@ copyBins()
     fi
 
     echo "Copying qt.conf"
-    cp -r "$CURRENT_BUILD_DIR/qt.conf" "$MEDIASERVER_BIN_INSTALL_DIR/"
+    cp -r "$CURRENT_BUILD_DIR/qt.conf" "$STAGE_MEDIASERVER_BIN/"
 }
 
 # [in] INSTALL_DIR
