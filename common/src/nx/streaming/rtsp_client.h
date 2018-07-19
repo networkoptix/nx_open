@@ -20,6 +20,8 @@ extern "C"
 
 #include <nx/network/socket.h>
 #include <nx/network/http/http_types.h>
+#include <nx/streaming/rtp/rtcp.h>
+
 
 #include <utils/common/threadqueue.h>
 #include <utils/common/byte_array.h>
@@ -46,20 +48,14 @@ static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 class QnRtspStatistic
 {
 public:
-    QnRtspStatistic(): timestamp(0), ntpTime(0), localTime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
     bool isEmpty() const
     {
-        return timestamp == 0
-            && ntpTime == 0
+        return senderReport.rtpTimestamp == 0
+            && senderReport.ntpTimestamp == 0
             && !ntpOnvifExtensionTime.is_initialized();
     }
-
-    quint32 timestamp;
-    double ntpTime;
-    double localTime;
-    qint64 receivedPackets;
-    qint64 receivedOctets;
-    quint32 ssrc;
+    nx::streaming::rtp::RtcpSenderReport senderReport;
+    double localTime = 0;
     boost::optional<std::chrono::microseconds> ntpOnvifExtensionTime;
 };
 
@@ -360,9 +356,8 @@ public:
     int readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int& channelNumber);
 
     void sendBynaryResponse(const quint8* buffer, int size);
-
+    
     QnRtspStatistic parseServerRTCPReport(const quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
-    int buildClientRTCPReport(quint8 *dstBuffer, int bufferLen);
 
     void setUsePredefinedTracks(int numOfVideoChannel);
 
