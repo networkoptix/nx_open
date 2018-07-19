@@ -121,9 +121,14 @@ void AbstractSearchListModel::setFetchBatchSize(int value)
     m_fetchBatchSize = value;
 }
 
-bool AbstractSearchListModel::live() const
+bool AbstractSearchListModel::isLive() const
 {
     return m_live;
+}
+
+bool AbstractSearchListModel::effectiveIsLive() const
+{
+    return isLive() && relevantTimePeriod().isInfinite();
 }
 
 void AbstractSearchListModel::setLive(bool value)

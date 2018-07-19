@@ -2,6 +2,7 @@
 
 #include "../analytics_search_list_model.h"
 
+#include <chrono>
 #include <deque>
 #include <limits>
 
@@ -24,7 +25,6 @@ class QMenu;
 namespace nx {
 
 namespace api { struct AnalyticsManifestObjectAction; }
-
 namespace utils { class PendingOperation; }
 
 namespace client {
@@ -65,17 +65,16 @@ private:
 
     int indexOf(const QnUuid& objectId) const;
 
-    void periodicUpdate();
-    void refreshUpdateTimer();
-    void addNewlyReceivedObjects(analytics::storage::LookupResult&& data);
-    void emitDataChangedIfNeeded();
+    template<typename Iter>
+    bool commitPrefetch(
+        const QnTimePeriod& periodToCommit, Iter prefetchBegin, Iter prefetchEnd, int position);
 
+    void emitDataChangedIfNeeded();
     void advanceObject(analytics::storage::DetectedObject& object,
         analytics::storage::ObjectPosition&& position, bool emitDataChanged = true);
 
     using GetCallback = std::function<void(bool, rest::Handle, analytics::storage::LookupResult&&)>;
-    rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback,
-        int limit = std::numeric_limits<int>::max());
+    rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit);
 
     QString description(const analytics::storage::DetectedObject& object) const;
     QString attributes(const analytics::storage::DetectedObject& object) const;
@@ -87,11 +86,9 @@ private:
         const api::AnalyticsManifestObjectAction& action,
         const analytics::storage::DetectedObject& object) const;
 
-    void constrainLength();
-
     struct PreviewParams
     {
-        qint64 timestampUs = 0;
+        std::chrono::microseconds timestamp = std::chrono::microseconds(0);
         QRectF boundingBox;
     };
 
@@ -101,19 +98,16 @@ private:
     AnalyticsSearchListModel* const q = nullptr;
     QRectF m_filterRect;
     QString m_filterText;
-    const QScopedPointer<QTimer> m_updateTimer;
     const QScopedPointer<utils::PendingOperation> m_emitDataChanged;
     const QScopedPointer<utils::PendingOperation> m_updateWorkbenchFilter;
     QSet<QnUuid> m_dataChangedObjectIds; //< For which objects delayed dataChanged is queued.
     media::AbstractMetadataConsumerPtr m_metadataSource;
     QnResourceDisplayPtr m_display;
-    std::chrono::milliseconds m_latestTime;
-    rest::Handle m_currentUpdateId = rest::Handle();
 
     analytics::storage::LookupResult m_prefetch;
     std::deque<analytics::storage::DetectedObject> m_data;
 
-    QHash<QnUuid, std::chrono::microseconds> m_objectIdToTimestamp;
+    QHash<QnUuid, std::chrono::milliseconds> m_objectIdToTimestamp;
 
     const QScopedPointer<QTimer> m_metadataProcessingTimer;
     QVector<QnAbstractCompressedMetadataPtr> m_metadataPackets;

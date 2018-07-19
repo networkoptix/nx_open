@@ -131,17 +131,7 @@ void EventSearchListModel::Private::clearData()
 
 void EventSearchListModel::Private::truncateToMaximumCount()
 {
-    this->truncateDataToCount(m_data, q->maximumCount());
-    if (m_data.empty())
-        return;
-
-    auto timeWindow = q->fetchedTimeWindow();
-    if (q->fetchDirection() == FetchDirection::earlier)
-        timeWindow.truncate(startTime(m_data.front()).count());
-    else
-        timeWindow.truncateFront(startTime(m_data.back()).count());
-
-    q->setFetchedTimeWindow(timeWindow);
+    this->truncateDataToMaximumCount(m_data, &startTime);
 }
 
 void EventSearchListModel::Private::truncateToRelevantTimePeriod()
@@ -171,11 +161,11 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& 
 
             if (actuallyFetched.isNull())
             {
-                NX_VERBOSE(this) << "Pre-fetched no events";
+                NX_VERBOSE(q) << "Pre-fetched no events";
             }
             else
             {
-                NX_VERBOSE(this) << "Pre-fetched" << m_prefetch.size() << "events from"
+                NX_VERBOSE(q) << "Pre-fetched" << m_prefetch.size() << "events from"
                     << utils::timestampToDebugString(actuallyFetched.startTimeMs) << "to"
                     << utils::timestampToDebugString(actuallyFetched.endTimeMs());
             }
@@ -184,7 +174,7 @@ rest::Handle EventSearchListModel::Private::requestPrefetch(const QnTimePeriod& 
             completePrefetch(actuallyFetched, fetchedAll);
         };
 
-    NX_VERBOSE(this) << "Requesting events from"
+    NX_VERBOSE(q) << "Requesting events from"
         << utils::timestampToDebugString(period.startTimeMs) << "to"
         << utils::timestampToDebugString(period.endTimeMs());
 
@@ -203,19 +193,16 @@ bool EventSearchListModel::Private::commitPrefetch(
     auto end = std::upper_bound(prefetchBegin, prefetchEnd,
         periodToCommit.startTime(), upperBoundPredicate);
 
-    const auto startTimeUs =
-        [](const ActionData& event) { return event.eventParams.eventTimestampUsec; };
-
     // In live mode "later" direction events are requested with 1 ms overlap. Handle overlap here.
-    if (q->live() && !m_data.empty() && q->fetchDirection() == FetchDirection::later)
+    if (q->effectiveIsLive() && !m_data.empty() && currentRequest().direction == FetchDirection::later)
     {
         const auto last = m_data.front();
-        const auto lastTimeUs = startTimeUs(last);
+        const auto lastTimeUs = last.eventParams.eventTimestampUsec;
 
         while (end != begin)
         {
             const auto iter = end - 1;
-            const auto timeUs = startTimeUs(*iter);
+            const auto timeUs = iter->eventParams.eventTimestampUsec;
 
             if (timeUs > lastTimeUs)
                 break;
@@ -247,10 +234,10 @@ bool EventSearchListModel::Private::commitPrefetch(
 
 bool EventSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
-    if (q->fetchDirection() == FetchDirection::earlier)
+    if (currentRequest().direction == FetchDirection::earlier)
         return commitPrefetch(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count());
 
-    NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+    NX_ASSERT(currentRequest().direction == FetchDirection::later);
     return commitPrefetch(periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0);
 }
 
@@ -270,7 +257,7 @@ rest::Handle EventSearchListModel::Private::getEvents(const QnTimePeriod& period
     request.filter.period = period;
     request.filter.eventType = m_selectedEventType;
     request.limit = limit;
-    request.order = q->fetchDirection() == FetchDirection::earlier
+    request.order = currentRequest().direction == FetchDirection::earlier
         ? Qt::DescendingOrder
         : Qt::AscendingOrder;
 

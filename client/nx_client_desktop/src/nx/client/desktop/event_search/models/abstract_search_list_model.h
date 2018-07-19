@@ -48,7 +48,8 @@ public:
     void setFetchBatchSize(int value);
 
     /** Returns whether underlying data store can be populated with new items in live mode. */
-    bool live() const;
+    bool isLive() const;
+    bool effectiveIsLive() const; //< isLive && relevantTimePeriod().isInfinite()
 
     /** Time window fetched at this moment. */
     QnTimePeriod fetchedTimeWindow() const;

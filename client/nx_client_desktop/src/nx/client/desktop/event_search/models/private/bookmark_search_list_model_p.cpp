@@ -145,17 +145,9 @@ void BookmarkSearchListModel::Private::truncateToMaximumCount()
     const auto itemCleanup =
         [this](const QnCameraBookmark& item) { m_guidToTimestamp.remove(item.guid); };
 
-    this->truncateDataToCount(m_data, q->maximumCount(), itemCleanup);
-    if (m_data.empty())
-        return;
-
-    auto timeWindow = q->fetchedTimeWindow();
-    if (q->fetchDirection() == FetchDirection::earlier)
-        timeWindow.truncate(m_data.front().startTimeMs.count());
-    else
-        timeWindow.truncateFront(m_data.back().startTimeMs.count());
-
-    q->setFetchedTimeWindow(timeWindow);
+    this->truncateDataToMaximumCount(m_data,
+        [](const QnCameraBookmark& item) { return item.startTimeMs; },
+        itemCleanup);
 }
 
 void BookmarkSearchListModel::Private::truncateToRelevantTimePeriod()
@@ -163,7 +155,7 @@ void BookmarkSearchListModel::Private::truncateToRelevantTimePeriod()
     const auto itemCleanup =
         [this](const QnCameraBookmark& item) { m_guidToTimestamp.remove(item.guid); };
 
-    this->truncateDataToTimePeriod<decltype(m_data), decltype(upperBoundPredicate)>(
+    this->truncateDataToTimePeriod(
         m_data, upperBoundPredicate, q->relevantTimePeriod(), itemCleanup);
 }
 
@@ -174,7 +166,7 @@ rest::Handle BookmarkSearchListModel::Private::requestPrefetch(const QnTimePerio
     filter.endTimeMs = period.endTime();
     filter.text = m_filterText;
     filter.orderBy.column = Qn::BookmarkStartTime;
-    filter.orderBy.order = q->fetchDirection() == FetchDirection::earlier
+    filter.orderBy.order = currentRequest().direction == FetchDirection::earlier
         ? Qt::DescendingOrder
         : Qt::AscendingOrder;
 
@@ -251,11 +243,11 @@ bool BookmarkSearchListModel::Private::commitPrefetch(
 
 bool BookmarkSearchListModel::Private::commitPrefetch(const QnTimePeriod& periodToCommit)
 {
-    if (q->fetchDirection() == FetchDirection::earlier)
+    if (currentRequest().direction == FetchDirection::earlier)
         return commitPrefetch(periodToCommit, m_prefetch.cbegin(), m_prefetch.cend(), count());
 
-    NX_ASSERT(!q->live()); //< We don't handle any overlaps as this model is not live-updated.
-    NX_ASSERT(q->fetchDirection() == FetchDirection::later);
+    NX_ASSERT(!q->isLive()); //< We don't handle any overlaps as this model is not live-updated.
+    NX_ASSERT(currentRequest().direction == FetchDirection::later);
     return commitPrefetch(periodToCommit, m_prefetch.crbegin(), m_prefetch.crend(), 0);
 }
 

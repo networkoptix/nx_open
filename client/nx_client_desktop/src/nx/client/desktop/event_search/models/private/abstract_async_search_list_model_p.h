@@ -54,7 +54,8 @@ protected:
         std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
 
     template<class DataContainer>
-    void truncateDataToCount(DataContainer& data, int count,
+    void truncateDataToMaximumCount(DataContainer& data,
+        std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
         std::function<void(typename DataContainer::const_reference)> itemCleanup = nullptr);
 
     struct FetchInformation
@@ -117,19 +118,16 @@ void AbstractAsyncSearchListModel::Private::truncateDataToTimePeriod(
 }
 
 template<class DataContainer>
-void AbstractAsyncSearchListModel::Private::truncateDataToCount(DataContainer& data, int count,
+void AbstractAsyncSearchListModel::Private::truncateDataToMaximumCount(DataContainer& data,
+    std::function<std::chrono::milliseconds(typename DataContainer::const_reference)> timestamp,
     std::function<void(typename DataContainer::const_reference)> itemCleanup)
 {
-    const int toRemove = int(data.size()) - count;
-    if (toRemove <= 0)
+    if (q->maximumCount() <= 0)
         return;
 
-    NX_ASSERT(count > 0);
-    if (count <= 0)
-    {
-        q->clear();
+    const int toRemove = int(data.size()) - q->maximumCount();
+    if (toRemove <= 0)
         return;
-    }
 
     if (q->fetchDirection() == FetchDirection::earlier)
     {
@@ -152,6 +150,14 @@ void AbstractAsyncSearchListModel::Private::truncateDataToCount(DataContainer& d
 
         data.erase(removeBegin, data.end());
     }
+
+    auto timeWindow = q->fetchedTimeWindow();
+    if (q->fetchDirection() == FetchDirection::earlier)
+        timeWindow.truncate(timestamp(data.front()).count());
+    else
+        timeWindow.truncateFront(timestamp(data.back()).count());
+
+    q->setFetchedTimeWindow(timeWindow);
 }
 
 } // namespace desktop
