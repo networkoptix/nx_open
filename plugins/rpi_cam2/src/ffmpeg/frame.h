@@ -23,11 +23,7 @@ public:
     void unreference();
 
     AVFrame * frame() const;
-    int64_t& pts();
     int64_t pts() const;
-
-    int64_t& packetDts();
-    int64_t packetDts() const;
 
     int allocateImage(int width, int height, AVPixelFormat format, int align);
     void freeData();

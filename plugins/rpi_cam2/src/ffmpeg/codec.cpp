@@ -134,7 +134,6 @@ int Codec::initializeEncoder(const char * codecName)
 
 int Codec::initializeDecoder(AVCodecParameters * codecParameters)
 {
-
     int initCode = initializeDecoder(codecParameters->codec_id);
     if(initCode < 0)
         return initCode;
