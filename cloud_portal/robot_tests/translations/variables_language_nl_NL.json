@@ -49,7 +49,7 @@
     "LAST NAME IS REQUIRED TEXT": "Achternaam is verplicht",
     "EMAIL IS REQUIRED TEXT": "E-mail is verplicht",
     "EMAIL ALREADY REGISTERED TEXT": "Dit Email is al geregistreerd voor %PRODUCT_NAME%",
-    "EMAIL INVALID TEXT": "Geef een geldig Email op",
+    "EMAIL INVALID TEXT": "Geef een geldig e-mailadres op",
     "PASSWORD IS REQUIRED TEXT": "Wachtwoord is vereist",
     "CURRENT PASSWORD IS REQUIRED TEXT": "Huidig wachtwoord (verplicht)",
     "PASSWORD SPECIAL CHARS TEXT": "Gebruik alleen alfanumerieke tekens en symbolen van het toetsenbord, Vermijd spaties voor en na het wachtwoord",
