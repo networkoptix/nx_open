@@ -1,8 +1,9 @@
+import json
+
+import execution
 import pytest
 import yaml
 from pathlib2 import Path
-
-import execution
 
 
 @pytest.fixture(scope='session')
@@ -24,9 +25,11 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
     one_licensed_mediaserver.os_access.networking.setup_network(
         one_vm.hardware.plug_bridged(config.CAMERAS_INTERFACE), config.CAMERAS_NETWORK)
 
-    def save_yaml(data, file_name):
-        serialized = yaml.safe_dump(data, default_flow_style=False, width=1000)
-        (artifacts_dir / (file_name + '.yaml')).write_bytes(serialized)
+    def save_result(name, data):
+        file_path = artifacts_dir / name
+        file_path.with_suffix('.json').write_bytes(json.dumps(data, indent=4, sort_keys=True))
+        file_path.with_suffix('.yaml').write_bytes(
+            yaml.safe_dump(data, default_flow_style=False, width=1000))
 
     stand = execution.Stand(
         one_licensed_mediaserver,
@@ -36,8 +39,8 @@ def test_cameras(one_vm, one_licensed_mediaserver, config, artifacts_dir):
         stand.run_all_stages(config.CYCLE_DELAY_S)
 
     finally:
-        save_yaml(one_licensed_mediaserver.api.get('api/moduleInformation'), 'module_information')
-        save_yaml(one_licensed_mediaserver.get_resources('CamerasEx'), 'all_cameras')
-        save_yaml(stand.report(), 'test_report')
+        save_result('module_information', one_licensed_mediaserver.api.get('api/moduleInformation'))
+        save_result('all_cameras', one_licensed_mediaserver.get_resources('CamerasEx'))
+        save_result('test_results', stand.report())
 
     assert stand.is_successful
