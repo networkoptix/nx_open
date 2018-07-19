@@ -216,7 +216,7 @@ static int checkForUpdateInformationRemotely(
             if (done)
                 return;
 
-            if (success && !done)
+            if (success && reply.isValid() && !done)
             {
                 outputReply = reply;
                 done = true;
@@ -299,12 +299,13 @@ int QnUpdateInformationRestHandler::executeGet(
     NX_CRITICAL(mediaServer);
     if (params.contains(kPublicationKeyParamName))
     {
+#if 0
         if (mediaServer->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP) || request.isLocal)
         {
             return checkInternetForUpdate(
                 params.value(kPublicationKeyParamName), &result, &contentType, request);
         }
-
+#endif
         if (!request.isLocal)
         {
             return checkForUpdateInformationRemotely(

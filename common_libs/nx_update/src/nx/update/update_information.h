@@ -41,6 +41,8 @@ struct NX_UPDATE_API Information
     QList<Package> packages;
     QList<QString> supportedOs;
     QList<QString> unsupportedOs;
+
+    bool isValid() const { return !version.isNull(); }
 };
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl)(packages) \
     (supportedOs)(unsupportedOs)
