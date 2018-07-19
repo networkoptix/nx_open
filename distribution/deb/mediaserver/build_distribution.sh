@@ -63,7 +63,6 @@ copyMediaserverPlugins()
     local PLUGINS=(
         generic_multicast_plugin
         genericrtspplugin
-        it930x_plugin
         mjpg_link
     )
     PLUGINS+=( # Metadata plugins.

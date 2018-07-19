@@ -13,7 +13,7 @@
 
 namespace
 {
-static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
+std::chrono::minutes kdefaultLdapPasswordExperationPeriod(5);
 static const int MSEC_PER_SEC = 1000;
 
 QnRaiiGuardPtr createSignalGuard(
@@ -39,7 +39,7 @@ QnUserResource::QnUserResource(QnUserType userType):
     m_isOwner(false),
 	m_isEnabled(true),
     m_fullName(),
-    m_passwordExpirationTimestamp(0)
+    m_ldapPasswordExperationPeriod(kdefaultLdapPasswordExperationPeriod)
 {
     addFlags(Qn::user | Qn::remote);
     setTypeId(nx::vms::api::UserData::kResourceTypeId);
@@ -59,8 +59,14 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_isEnabled(right.m_isEnabled),
     m_email(right.m_email),
     m_fullName(right.m_fullName),
-    m_passwordExpirationTimestamp(right.m_passwordExpirationTimestamp)
+    m_ldapPasswordExperationPeriod(right.m_ldapPasswordExperationPeriod)
 {
+}
+
+QnUserResource::~QnUserResource()
+{
+    if (m_ldapPasswordTimer)
+        m_ldapPasswordTimer->pleaseStopSync();
 }
 
 template<typename T>
@@ -218,7 +224,12 @@ void QnUserResource::setDigest(const QByteArray& digest)
         [this]()
         {
             if (m_userType == QnUserType::Ldap)
-                m_passwordExpirationTimestamp = 0;
+            {
+                m_ldapPasswordValid = false;
+                QnMutexLocker lk(&m_mutex);
+                if (m_ldapPasswordTimer)
+                    m_ldapPasswordTimer->pleaseStopSync();
+            }
         };
 
     if (setMemberChecked(&QnUserResource::m_digest, digest, middlestep))
@@ -467,27 +478,30 @@ Qn::ResourceStatus QnUserResource::getStatus() const
     return Qn::Online;
 }
 
-qint64 QnUserResource::passwordExpirationTimestamp() const
+void QnUserResource::prolongatePassword()
 {
-    QnMutexLocker lk(&m_mutex);
-    return m_passwordExpirationTimestamp;
-}
+    {
+        QnMutexLocker lk(&m_mutex);
+        if (!m_ldapPasswordTimer)
+            m_ldapPasswordTimer = std::make_unique<nx::network::aio::Timer>();
+    }
+    m_ldapPasswordTimer->pleaseStopSync();
+    m_ldapPasswordValid = true;
+    m_ldapPasswordTimer->start(
+        m_ldapPasswordExperationPeriod,
+        [this]()
+        {
+            m_ldapPasswordValid = false;
+            emit sessionExpired(toSharedPointer(this));
+        });
 
-void QnUserResource::prolongatePassword(qint64 value)
-{
-    QnMutexLocker lk(&m_mutex);
-    if (value == PasswordProlongationAuto)
-        m_passwordExpirationTimestamp = qnSyncTime->currentMSecsSinceEpoch() + LDAP_PASSWORD_PROLONGATION_PERIOD_SEC * MSEC_PER_SEC;
-    else
-        m_passwordExpirationTimestamp = value;
 }
 
 bool QnUserResource::passwordExpired() const
 {
     if (!isLdap())
         return false;
-
-    return passwordExpirationTimestamp() < qnSyncTime->currentMSecsSinceEpoch();
+    return !m_ldapPasswordValid;
 }
 
 void QnUserResource::fillId()
@@ -501,4 +515,9 @@ void QnUserResource::fillId()
 QString QnUserResource::idForToStringFromPtr() const
 {
     return getName();
+}
+
+void QnUserResource::setLdapPasswordExperationPeriod(std::chrono::milliseconds value)
+{
+    m_ldapPasswordExperationPeriod = value;
 }
