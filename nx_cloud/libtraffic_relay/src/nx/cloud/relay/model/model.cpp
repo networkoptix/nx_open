@@ -56,6 +56,16 @@ const model::AbstractRemoteRelayPeerPool& Model::remoteRelayPeerPool() const
     return *m_remoteRelayPeerPool;
 }
 
+model::AliasManager& Model::aliasManager()
+{
+    return m_aliasManager;
+}
+
+const model::AliasManager& Model::aliasManager() const
+{
+    return m_aliasManager;
+}
+
 } // namespace relay
 } // namespace cloud
 } // namespace nx
