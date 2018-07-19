@@ -12,10 +12,12 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
                 form:'='
             },
             link:function(scope, element, attrs){
-                scope.buttonClass = 'btn-primary';
                 if(scope.actionType){
                     scope.buttonClass = 'btn-' + scope.actionType;
+                } else {
+                    scope.buttonClass = 'btn-primary';
                 }
+
                 function touchForm(form){
 
                     if (!angular.isObject(form)) {
