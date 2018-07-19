@@ -6,6 +6,9 @@ source "$(dirname $0)/../build_distribution_utils.sh"
 
 distrib_loadConfig "build_distribution.conf"
 
+WORK_DIR="build_distribution_tmp"
+LOG_FILE="$LOGS_DIR/build_distribution.log"
+
 # VMS files will be copied to this path.
 VMS_INSTALL_PATH="opt/$CUSTOMIZATION"
 
@@ -30,10 +33,6 @@ then
 else
     LIB_INSTALL_PATH="$VMS_INSTALL_PATH/mediaserver/lib"
 fi
-
-LOG_FILE="$LOGS_DIR/build_distribution.log"
-
-WORK_DIR="build_distribution_tmp"
 
 #--------------------------------------------------------------------------------------------------
 

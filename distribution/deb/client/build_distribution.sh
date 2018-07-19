@@ -7,13 +7,13 @@ source "$(dirname $0)/../../build_distribution_utils.sh"
 distrib_loadConfig "build_distribution.conf"
 
 WORK_DIR="client_build_distribution_tmp"
+LOG_FILE="$LOGS_DIR/client_build_distribution.log"
+
 STAGE="$WORK_DIR/$DISTRIBUTION_NAME"
 STAGE_MODULE="$STAGE/opt/$CUSTOMIZATION/client/$VERSION"
 STAGE_BIN="$STAGE_MODULE/bin"
 STAGE_LIB="$STAGE_MODULE/lib"
 STAGE_ICONS="$STAGE/usr/share/icons"
-
-LOG_FILE="$LOGS_DIR/client_build_distribution.log"
 
 #--------------------------------------------------------------------------------------------------
 

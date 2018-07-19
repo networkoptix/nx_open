@@ -80,6 +80,8 @@ distrib_onExit()
 {
     local -r -i RESULT=$?
 
+    set +x #< Disable logging each command (in case it was enabled previously with "set -x").
+
     if [ -s "$distrib_STDERR_FILE" ] #< Whether the file exists and is not empty.
     then
         echo ""
