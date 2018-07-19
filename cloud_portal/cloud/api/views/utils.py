@@ -194,7 +194,7 @@ def downloads(request):
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
-def settings(request):
+def get_settings(request):
     settings_object = {
         'trafficRelayHost':settings.TRAFFIC_RELAY_HOST
     }
