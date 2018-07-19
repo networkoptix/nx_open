@@ -184,8 +184,12 @@ int Codec::initializeDecoder(const char * codecName)
 
 void Codec::setFps(int fps)
 {
-    m_codecContext->time_base = {1, fps};
     m_codecContext->framerate = {fps, 1};
+}
+
+void Codec::setTimeBase(int timeBase)
+{
+    m_codecContext->time_base = {1, timeBase};
 }
 
 void Codec::setResolution(int width, int height)

@@ -53,6 +53,11 @@ StreamReader::~StreamReader()
     uninitialize();
 }
 
+InputFormat * StreamReader::inputFormat() const
+{
+    return m_inputFormat.get();
+}
+
 void StreamReader::addConsumer(const std::weak_ptr<StreamConsumer>& consumer)
 {
     std::lock_guard<std::mutex> lock(m_mutex);

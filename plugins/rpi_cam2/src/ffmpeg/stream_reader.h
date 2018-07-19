@@ -37,13 +37,15 @@ public:
         nxpl::TimeProvider * const timeProvider);
     virtual ~StreamReader();
 
+    InputFormat * inputFormat() const;
+
     void addConsumer(const std::weak_ptr<StreamConsumer>& consumer);
     void removeConsumer(const std::weak_ptr<StreamConsumer>& consumer);
 
     CameraState cameraState() const;
     int gopSize() const;
-
     int fps() const;
+
     void updateFps();
     void updateBitrate();
     void updateResolution();

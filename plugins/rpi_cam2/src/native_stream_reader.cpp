@@ -1,23 +1,8 @@
 #include "native_stream_reader.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#undef max
-#undef min
-#else
-#include <time.h>
-#include <unistd.h>
-#ifdef __linux__
-#include <errno.h>
-#endif
-#endif
-
-#include <sys/timeb.h>
 #include <memory>
-#include <chrono>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/thread/mutex.h>
 
 #include "utils/utils.h"
 #include "device/utils.h"
@@ -29,25 +14,6 @@
 
 namespace nx {
 namespace rpi_cam2 {
-
-namespace 
-{
-    int lastErrFfmpeg = 0;
-
-    void logError(const NativeStreamReader * logObject)
-    {
-        if (int err = ffmpeg::error::lastError())
-        {
-            if (err != lastErrFfmpeg)
-            {
-                lastErrFfmpeg = err;
-                std::string errStr = ffmpeg::error::toString(err);
-                debug("Last ffmpeg error: %s\n", errStr.c_str());
-                NX_DEBUG(logObject) << "Last ffmpeg error: " << errStr;
-            }
-        }
-    }
-}
 
 NativeStreamReader::NativeStreamReader(
     int encoderIndex,
@@ -75,8 +41,6 @@ NativeStreamReader::~NativeStreamReader()
 int NativeStreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 {
     *lpPacket = nullptr;
-
-    logError(this);
 
     if (!m_initialized)
     {

@@ -103,7 +103,14 @@ AVInputFormat * InputFormat::inputFormat() const
     return m_inputFormat;
 }
 
-AVStream * InputFormat::getStream(AVMediaType type, int * streamIndex) const
+AVStream * InputFormat::stream(int index) const
+{
+    if (index < 0 || index >= m_formatContext->nb_streams)
+        return nullptr;
+    return m_formatContext->streams[index];
+}
+
+AVStream * InputFormat::findStream(AVMediaType type, int * streamIndex) const
 {
     for (unsigned int i = 0; i < m_formatContext->nb_streams; ++i)
     {

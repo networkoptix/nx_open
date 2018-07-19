@@ -46,6 +46,27 @@ AVFrame * Frame::frame() const
     return m_frame;
 }
 
+int64_t& Frame::pts()
+{
+    return m_frame->pts;
+}
+
+int64_t Frame::pts() const
+{
+    return m_frame->pts;
+}
+
+
+int64_t& Frame::packetDts()
+{
+    return m_frame->pkt_dts;
+}
+
+int64_t Frame::packetDts() const
+{
+    return m_frame->pkt_dts;
+}
+
 int Frame::allocateImage(int width, int height, AVPixelFormat format, int align)
 {
     int allocCode = av_image_alloc(m_frame->data, m_frame->linesize, width, height, format, align);

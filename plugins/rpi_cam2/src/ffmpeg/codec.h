@@ -36,6 +36,8 @@ public:
     int initializeDecoder(const char *codecName);
 
     void setFps(int fps);
+    void setTimeBase(int timeBase);
+    void setPacketTimeBase(int timeBase);
     void setResolution(int width, int height);
     void setBitrate(int bitrate);
     void setPixelFormat(AVPixelFormat pixelFormat);

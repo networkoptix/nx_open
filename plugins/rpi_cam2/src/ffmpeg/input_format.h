@@ -34,7 +34,8 @@ public:
     AVFormatContext * formatContext() const;
     AVInputFormat * inputFormat() const;
 
-    AVStream * getStream(AVMediaType type, int *streamIndex = nullptr) const;
+    AVStream * stream(int index) const;
+    AVStream * findStream(AVMediaType type, int *streamIndex = nullptr) const;
 
 private:
     AVFormatContext * m_formatContext = nullptr;
