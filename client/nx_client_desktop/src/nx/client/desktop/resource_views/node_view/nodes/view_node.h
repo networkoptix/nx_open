@@ -8,29 +8,14 @@ namespace client {
 namespace desktop {
 
 class ViewNodePath;
+class ViewNodeData;
 
 class ViewNode: public QEnableSharedFromThis<ViewNode>
 {
-    struct PathInternal;
-
 public:
-    struct Data
-    {
-        using Column = int;
-        using Role = int;
-
-        using ColumnFlagHash = QHash<Column, Qt::ItemFlags>;
-        using RoleValueHash = QHash<Role, QVariant>;
-        using ColumnDataHash = QHash<Column, RoleValueHash>;
-
-        ColumnFlagHash flags;
-        ColumnDataHash data;
-    };
-
-public:
-    static NodePtr create(const Data& data);
+    static NodePtr create(const ViewNodeData& data);
     static NodePtr create(const NodeList& children);
-    static NodePtr create(const Data& data, const NodeList& children);
+    static NodePtr create(const ViewNodeData& data, const NodeList& children);
 
     ~ViewNode();
 
@@ -46,21 +31,17 @@ public:
 
     int indexOf(const ConstNodePtr& node) const;
 
-    bool hasData(int column, int role) const;
     QVariant data(int column, int role) const;
 
     Qt::ItemFlags flags(int column) const;
 
     NodePtr parent() const;
 
-    bool checkable() const;
-
-    const Data& nodeData() const;
-    void setNodeData(const Data& data);
-    void applyNodeData(const Data& data);
+    const ViewNodeData& nodeData() const;
+    void applyNodeData(const ViewNodeData& data);
 
 private:
-    ViewNode(const Data& data);
+    ViewNode(const ViewNodeData& data);
 
     WeakNodePtr currentSharedNode();
     ConstWeakNodePtr currentSharedNode() const;

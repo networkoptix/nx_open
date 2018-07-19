@@ -3,6 +3,7 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_state.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data.h>
 
 #include <nx/utils/raii_guard.h>
 
@@ -15,12 +16,12 @@ struct NodeViewStatePatch
     struct NodeDescription
     {
         ViewNodePath path;
-        ViewNode::Data data;
+        ViewNodeData data;
     };
 
     static NodeViewStatePatch fromRootNode(const NodePtr& node);
 
-    using DataList = QList<NodeDescription>;
+    using DataList = std::vector<NodeDescription>;
     DataList addedNodes;
     DataList changedData;
 };

@@ -12,6 +12,7 @@
 #include <nx/client/desktop/resource_views/node_view/node_view_state_reducer.h>
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_path.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/sort/node_view_group_sorting_model.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_helpers.h>
 #include <nx/client/desktop/resource_views/node_view/details/node_view_item_delegate.h>
@@ -46,7 +47,7 @@ NodeView::Private::Private(NodeView* owner):
         {
             const auto mappedIndex = details::getLeafIndex(index, owner->model());
             const auto node = NodeViewModel::nodeFromIndex(mappedIndex);
-            return node ? node->checkable() : false;
+            return node ? helpers::checkableNode(node) : false;
         })
 {
 }

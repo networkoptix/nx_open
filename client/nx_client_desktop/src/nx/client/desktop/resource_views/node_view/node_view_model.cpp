@@ -86,25 +86,14 @@ void NodeViewModel::applyPatch(const NodeViewStatePatch& patch)
     const auto getDataChangedGuard =
         [this](const NodeViewStatePatch::NodeDescription& description) -> QnRaiiGuardPtr
         {
-            const auto node = d->state.rootNode->nodeAt(description.path);
-            const auto nodeData = description.data.data;
-
-            using RolesData = QPair<int, QVector<int>>;
-            using RolesDataList = QList<RolesData>;
-            RolesDataList changedData;
-            for (auto it = nodeData.begin(); it != nodeData.end(); ++it)
-            {
-                const int column = it.key();
-                const auto roles = it.value().keys();
-                changedData.append(RolesData(column, roles.toVector()));
-            }
             return QnRaiiGuard::createDestructible(
-                [this, changedData, node]()
+                [this, path = description.path, data = description.data]()
                 {
-                    for (const auto [column, roles]: changedData)
+                    const auto node = d->state.rootNode->nodeAt(path);
+                    for (const int column: data.columns())
                     {
                         const auto nodeIndex = d->getModelIndex(node, column);
-                        emit dataChanged(nodeIndex, nodeIndex, roles);
+                        emit dataChanged(nodeIndex, nodeIndex, data.rolesForColumn(column));
                     }
                 });
         };

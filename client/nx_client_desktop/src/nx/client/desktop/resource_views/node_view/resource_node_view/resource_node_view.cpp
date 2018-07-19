@@ -37,16 +37,10 @@ ResourceNodeView::ResourceNodeView(QWidget* parent):
         {
             for (const auto data: patch.changedData)
             {
-                const auto itCheckColumnData = data.data.data.find(node_view::checkMarkColumn);
-                if (itCheckColumnData == data.data.data.end())
+                if (!data.data.hasData(node_view::checkMarkColumn, Qt::CheckStateRole))
                     continue;
 
-                const auto hasCheckUpdate = itCheckColumnData.value().contains(Qt::CheckStateRole);
-                if (!hasCheckUpdate)
-                    continue;
-
-                const auto itNameColumnData = data.data.data.find(node_view::nameColumn);
-                if (itNameColumnData != data.data.data.end())
+                if (data.data.hasDataForColumn(node_view::nameColumn))
                     continue;
 
                 const auto index = model->index(data.path, node_view::nameColumn);

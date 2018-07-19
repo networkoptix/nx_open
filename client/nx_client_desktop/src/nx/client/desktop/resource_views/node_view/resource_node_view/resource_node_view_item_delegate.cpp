@@ -55,6 +55,8 @@ void ResourceNodeViewItemDelegate::paint(
 
     const auto style = option.widget ? option.widget->style() : QApplication::style();
     const bool checked = helpers::nodeCheckedState(node) != Qt::Unchecked;
+
+    const auto extraColor = checked ? d->colors.extraTextSelected : d->colors.extraText;
     auto mainColor = checked ? d->colors.mainTextSelected : d->colors.mainText;
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
     {
@@ -84,6 +86,8 @@ void ResourceNodeViewItemDelegate::paint(
 
     /* Draw text: */
     const auto text = helpers::nodeText(node, index.column());
+    const auto extraText = helpers::nodeExtraText(node, index.column());
+
     const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
     const int textEnd = textRect.right() - textPadding + 1;
 
@@ -101,6 +105,18 @@ void ResourceNodeViewItemDelegate::paint(
             painter->drawPixmap(textPos + main.origin, main.pixmap);
             textPos.rx() += main.origin.x() + main.size().width() + kExtraTextMargin;
         }
+
+        if (textEnd > textPos.x() && !main.elided() && !extraText.isEmpty())
+        {
+            option.font.setWeight(QFont::Normal);
+
+            const auto extra = d->textPixmapCache.pixmap(extraText, option.font, extraColor,
+                textEnd - textPos.x(), option.textElideMode);
+
+            if (!extra.pixmap.isNull())
+                painter->drawPixmap(textPos + extra.origin, extra.pixmap);
+        }
+
     }
 }
 
@@ -124,46 +140,8 @@ void ResourceNodeViewItemDelegate::initStyleOption(
     option->font.setWeight(QFont::DemiBold);
     option->fontMetrics = QFontMetrics(option->font);
 
-    /* Save default decoration size: */
-    QSize defaultDecorationSize = option->decorationSize;
-
-    /* If icon size is explicitly specified in itemview, decorationSize already holds that value.
-     * If icon size is not specified in itemview, set decorationSize to something big.
-     * It will be treated as maximal allowed size: */
-
-//    auto view = qobject_cast<const QAbstractItemView*>(option->widget);
-//    if ((!view || !view->iconSize().isValid()) && m_fixedHeight > 0)
-//        option->decorationSize.setHeight(qMin(defaultDecorationSize.height(), m_fixedHeight));
-
-    /* Call inherited implementation.
-     * When it configures item icon, it sets decorationSize to actual icon size: */
-    base_type::initStyleOption(option, index);
-
-    /* But if the item has no icon, restore decoration size to saved default: */
-    if (option->icon.isNull())
-        option->decorationSize = defaultDecorationSize;
-
     if (!option->state.testFlag(QStyle::State_Enabled))
         option->state &= ~(QStyle::State_Selected | QStyle::State_MouseOver);
-
-//    // Determine validity.
-//    if (m_options.testFlag(ValidateOnlyChecked))
-//    {
-//        const auto checkState = rowCheckState(index);
-//        if (checkState.canConvert<int>() && checkState.toInt() == Qt::Unchecked)
-//            return;
-//    }
-
-//    const auto isValid = index.data(Qn::ValidRole);
-//    if (isValid.canConvert<bool>() && !isValid.toBool())
-//        option->state |= State_Error;
-
-//    const auto validationState = index.data(Qn::ValidationStateRole);
-//    if (validationState.canConvert<QValidator::State>()
-//        && validationState.value<QValidator::State>() == QValidator::Invalid)
-//    {
-//        option->state |= State_Error;
-//    }
 }
 
 } // namespace desktop

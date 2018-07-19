@@ -11,7 +11,7 @@ void addNode(NodeViewStatePatch::DataList& data, const NodePtr& node)
         return;
 
     const auto path = node->path();
-    data.append({path, node->nodeData()});
+    data.push_back({path, node->nodeData()});
     for (const auto child: node->children())
         addNode(data, child);
 }

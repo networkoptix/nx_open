@@ -8,6 +8,8 @@
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data_builder.h>
 
 #include <ui/style/resource_icon_cache.h>
 
@@ -15,31 +17,13 @@ namespace {
 
 using namespace nx::client::desktop;
 
-void setText(const QString& text, ViewNode::Data& data)
+void setAllSiblingsCheck(ViewNodeData& data)
 {
-    data.data[node_view::nameColumn][Qt::DisplayRole] = text;
-}
+    const auto nodeFlags = data.data(node_view::nameColumn, node_view::nodeFlagsRole)
+        .value<node_view::NodeFlags>();
 
-void setIcon(const QIcon& icon, ViewNode::Data& data)
-{
-    if (!icon.isNull())
-        data.data[node_view::nameColumn][Qt::DecorationRole] = icon;
-}
-
-void setSiblingGroup(int siblingGroup, ViewNode::Data& data)
-{
-    data.data[node_view::nameColumn][node_view::siblingGroupRole] = siblingGroup;
-}
-
-void setCheckedState(Qt::CheckState state, ViewNode::Data& data)
-{
-    data.data[node_view::checkMarkColumn][Qt::CheckStateRole] = state;
-}
-
-void setAllSiblingsCheck(ViewNode::Data& data)
-{
-    auto& nodeFlags = data.data[node_view::nameColumn][node_view::nodeFlagsRole];
-    nodeFlags.setValue(nodeFlags.value<node_view::NodeFlags>() | node_view::AllSiblingsCheckFlag);
+    data.setData(node_view::nameColumn, node_view::nodeFlagsRole,
+        QVariant::fromValue(nodeFlags | node_view::AllSiblingsCheckFlag));
 }
 
 void addSelectAll(const QString& caption, const QIcon& icon, const NodePtr& root)
@@ -61,23 +45,29 @@ bool isSelected(const NodePtr& node)
     return !variantState.isNull() && variantState.value<Qt::CheckState>() == Qt::Checked;
 }
 
-ViewNode::Data getResourceNodeData(
+ViewNodeData getResourceNodeData(
     const QnResourcePtr& resource,
     bool checkable = false,
-    Qt::CheckState checkedState = Qt::Unchecked)
+    Qt::CheckState checkedState = Qt::Unchecked,
+    const QString& parentExtraTextTemplate = QString(),
+    int count = 0)
 {
-    ViewNode::Data nodeData;
-    if (checkable)
-        setCheckedState(checkedState, nodeData);
+    auto data = ViewNodeDataBuilder()
+        .withText(resource->getName())
+        .withCheckable(checkable, checkedState)
+        .withIcon(qnResIconCache->icon(resource))
+        .data();
 
-    setText(resource->getName(), nodeData);
-    setIcon(qnResIconCache->icon(resource), nodeData);
-    nodeData.data[node_view::nameColumn][node_view::resourceRole] = QVariant::fromValue(resource);
-    return nodeData;
+    data.setData(node_view::nameColumn, node_view::resourceRole, QVariant::fromValue(resource));
+    if (count > 0 && !parentExtraTextTemplate.isEmpty())
+        data.setData(node_view::nameColumn, node_view::extraTextRole, parentExtraTextTemplate.arg(count));
+    return data;
 }
 
 using UserResourceList = QList<QnUserResourcePtr>;
-NodePtr createUserLayoutsNode(const UserResourceList& users)
+NodePtr createUserLayoutsNode(
+    const UserResourceList& users,
+    const QString& extraTextTemplate)
 {
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto accessProvider = commonModule->resourceAccessProvider();
@@ -113,7 +103,7 @@ NodePtr createUserLayoutsNode(const UserResourceList& users)
     for (const auto& userResource: accessibleUsers)
     {
         const auto node = helpers::createParentResourceNode(userResource,
-            isChildLayout, createCheckableLayoutNode, true);
+            isChildLayout, createCheckableLayoutNode, true, Qt::Unchecked, extraTextTemplate);
         if (node->childrenCount() > 0)
             childNodes.append(node);
     }
@@ -133,13 +123,12 @@ NodePtr createNode(
     const NodeList& children,
     int siblingGroup)
 {
-    ViewNode::Data nodeData;
-    setText(caption, nodeData);
-    setSiblingGroup(siblingGroup, nodeData);
-
-    setCheckedState(Qt::Unchecked, nodeData);//-------
-
-    return ViewNode::create(nodeData, children);
+    const auto data = ViewNodeDataBuilder()
+        .withText(caption)
+        .withSiblingGroup(siblingGroup)
+        .withCheckedState(Qt::Unchecked)//-------
+        .data();
+    return ViewNode::create(data, children);
 }
 
 NodePtr createNode(
@@ -154,24 +143,22 @@ NodePtr createCheckAllNode(
     const QIcon& icon,
     int siblingGroup)
 {
-    ViewNode::Data data;
-    setText(text, data);
-    setIcon(icon, data);
-    setCheckedState(Qt::Unchecked, data);
+    auto data = ViewNodeDataBuilder()
+        .withText(text)
+        .withIcon(icon)
+        .withCheckedState(Qt::Unchecked)
+        .withSiblingGroup(siblingGroup)
+        .data();
     setAllSiblingsCheck(data);
-    setSiblingGroup(siblingGroup, data);
     return ViewNode::create(data);
 }
 
 NodePtr createSeparatorNode(int siblingGroup)
 {
-    ViewNode::Data nodeData;
-    setSiblingGroup(siblingGroup, nodeData);
-    nodeData.data[node_view::nameColumn][node_view::separatorRole] = true;
-    return ViewNode::create(nodeData);
+    return ViewNode::create(ViewNodeDataBuilder().separator().withSiblingGroup(siblingGroup));
 }
 
-NodePtr createParentedLayoutsNode(bool allowSelectAll)
+NodePtr createParentedLayoutsNode(bool allowSelectAll, const QString& extraTextTemplate)
 {
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto accessProvider = commonModule->resourceAccessProvider();
@@ -190,7 +177,7 @@ NodePtr createParentedLayoutsNode(bool allowSelectAll)
     for (const auto& userResource: pool->getResources<QnUserResource>(filterUser))
         accessibleUsers.append(userResource);
 
-    const auto root = createUserLayoutsNode(accessibleUsers);
+    const auto root = createUserLayoutsNode(accessibleUsers, extraTextTemplate);
     if (allowSelectAll)
         addSelectAll(lit("Select All"), QIcon(), root);
 
@@ -202,7 +189,7 @@ NodePtr createCurrentUserLayoutsNode(bool allowSelectAll)
     const auto commonModule = qnClientCoreModule->commonModule();
     const auto userWatcher = commonModule->instance<nx::client::core::UserWatcher>();
     const auto currentUser = userWatcher->user();
-    const auto root = createUserLayoutsNode({currentUser});
+    const auto root = createUserLayoutsNode({currentUser}, QString());
     const auto userRoot = root->children().first();
     if (allowSelectAll)
         addSelectAll(lit("Select All"), QIcon(), userRoot);
@@ -223,8 +210,9 @@ NodePtr createParentResourceNode(
     const QnResourcePtr& resource,
     const RelationCheckFunction& relationCheckFunction,
     const NodeCreationFunction& nodeCreationFunction,
-    bool checkable, //TODO : use it
-    Qt::CheckState checkedState)
+    bool checkable,
+    Qt::CheckState checkedState,
+    const QString& parentExtraTextTemplate)
 {
     const auto pool = qnClientCoreModule->commonModule()->resourcePool();
 
@@ -242,7 +230,9 @@ NodePtr createParentResourceNode(
             children.append(node);
     }
 
-    return ViewNode::create(getResourceNodeData(resource, checkable), children);
+    const auto data = getResourceNodeData(resource, checkable, Qt::Unchecked,
+        parentExtraTextTemplate, children.count());
+    return ViewNode::create(data, children);
 }
 
 QnResourceList getLeafSelectedResources(const NodePtr& node)
@@ -272,6 +262,11 @@ QnResourcePtr getResource(const NodePtr& node)
     return QnResourcePtr();
 }
 
+bool checkableNode(const NodePtr& node)
+{
+    return !node->data(node_view::checkMarkColumn, Qt::CheckStateRole).isNull();
+}
+
 Qt::CheckState nodeCheckedState(const NodePtr& node)
 {
     const auto checkedData = node->data(node_view::checkMarkColumn, Qt::CheckStateRole);
@@ -281,6 +276,11 @@ Qt::CheckState nodeCheckedState(const NodePtr& node)
 QString nodeText(const NodePtr& node, int column)
 {
     return node->data(column, Qt::DisplayRole).toString();
+}
+
+QString nodeExtraText(const NodePtr& node, int column)
+{
+    return node->data(column, node_view::extraTextRole).toString();
 }
 
 } // namespace helpers

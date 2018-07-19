@@ -35,8 +35,10 @@ MultipleLayoutSelectionDialog::MultipleLayoutSelectionDialog(QWidget* parent):
     const auto proxyModel = new AccessibleLayoutSortModel(this);
     const auto tree = ui->layoutsTree;
     tree->setProxyModel(proxyModel);
-    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createParentedLayoutsNode()));
-//    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode()));
+    tree->applyPatch(NodeViewStatePatch::fromRootNode(
+        helpers::createParentedLayoutsNode(true, tr("- %1 layout(s)"))));
+//    tree->applyPatch(NodeViewStatePatch::fromRootNode(helpers::createCurrentUserLayoutsNode(
+//        true)));
 
 //    tree->applyPatch(NodeViewStatePatch::fromRootNode(ViewNode::create({
 //        createCheckAllNode(lit("Check All"), QIcon(), -2),

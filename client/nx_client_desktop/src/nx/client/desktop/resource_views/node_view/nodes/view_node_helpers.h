@@ -27,7 +27,7 @@ NodePtr createCheckAllNode(
 
 NodePtr createAllLayoutsNode();
 
-NodePtr createParentedLayoutsNode(bool allowSelectAll = true);
+NodePtr createParentedLayoutsNode(bool allowSelectAll, const QString& extraTextTemplate);
 NodePtr createCurrentUserLayoutsNode(bool allowSelectAll = true);
 
 NodePtr createResourceNode(
@@ -44,14 +44,17 @@ NodePtr createParentResourceNode(
     const RelationCheckFunction& relationCheckFunction,
     const NodeCreationFunction& nodeCreationFunction = NodeCreationFunction(),
     bool checkable = false,
-    Qt::CheckState nodeCheckedState = Qt::Unchecked);
+    Qt::CheckState nodeCheckedState = Qt::Unchecked,
+    const QString& parentExtraTextTemplate = QString());
 
 QnResourceList getLeafSelectedResources(const NodePtr& rootNode);
 
 QnResourcePtr getResource(const NodePtr& node);
 
+bool checkableNode(const NodePtr& node);
 Qt::CheckState nodeCheckedState(const NodePtr& node);
 QString nodeText(const NodePtr& node, int column = node_view::nameColumn);
+QString nodeExtraText(const NodePtr& node, int column = node_view::nameColumn);
 
 } // namespace helpers
 } // namespace desktop

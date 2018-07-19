@@ -2,6 +2,7 @@
 
 #include <nx/client/desktop/resource_views/node_view/node_view_constants.h>
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_data_builder.h>
 
 namespace {
 
@@ -26,8 +27,8 @@ bool isAllSiblingsCheckNode(const NodePtr& node)
 void addCheckStateChange(NodeViewStatePatch& patch, const ViewNodePath& path, Qt::CheckState state)
 {
     auto nodeDescirption = NodeViewStatePatch::NodeDescription({path});
-    nodeDescirption.data.data[node_view::checkMarkColumn][Qt::CheckStateRole] = state;
-    patch.changedData.append(nodeDescirption);
+    ViewNodeDataBuilder(nodeDescirption.data).withCheckedState(state);
+    patch.changedData.push_back(nodeDescirption);
 }
 
 NodeList getAllCheckNodes(NodeList nodes)
@@ -54,7 +55,10 @@ NodeList getAllCheckSiblings(const NodePtr& node)
 NodeList getSimpleCheckableNodes(NodeList nodes)
 {
     const auto newEnd = std::remove_if(nodes.begin(), nodes.end(),
-        [](const NodePtr& node) { return !node->checkable() || isAllSiblingsCheckNode(node); });
+        [](const NodePtr& node)
+        {
+            return !helpers::checkableNode(node) || isAllSiblingsCheckNode(node);
+        });
     nodes.erase(newEnd, nodes.end());
     return nodes;
 }
@@ -71,7 +75,7 @@ NodeList getSimpleCheckableSiblings(const NodePtr& node)
     const auto itOtherCheckableEnd = std::remove_if(siblings.begin(), siblings.end(),
         [nodePath](const  NodePtr& siblingNode)
         {
-            return !siblingNode->checkable()
+            return !helpers::checkableNode(siblingNode)
                 || siblingNode->path() == nodePath
                 || isAllSiblingsCheckNode(siblingNode);
         });
@@ -94,6 +98,7 @@ Qt::CheckState getSiblingsCheckState(Qt::CheckState currentCheckedState, const N
     return currentCheckedState;
 }
 
+// TODO: get rid of duplicate code
 void setNodeCheckedInternal(
     NodeViewStatePatch& patch,
     const NodeViewState& state,
@@ -108,7 +113,7 @@ void setNodeCheckedInternal(
         return;
     }
 
-    if (!node->checkable())
+    if (!helpers::checkableNode(node))
         return;
 
     addCheckStateChange(patch, path, checkedState);
@@ -123,7 +128,7 @@ void setNodeCheckedInternal(
         for (const auto sibling: siblings)
             setNodeCheckedInternal(patch, state, sibling->path(), checkedState, DownsideFlag);
         const auto parent = node->parent();
-        if (parent && parent->checkable())
+        if (parent && helpers::checkableNode(parent))
             setNodeCheckedInternal(patch, state, parent->path(), checkedState, UpsideFlag);
     }
     else
@@ -154,7 +159,7 @@ void setNodeCheckedInternal(
         {
             // Just tries to update parent (and all above, accordingly) state to calculated one.
             const auto parent = node->parent();
-            if (parent && parent->checkable())
+            if (parent && helpers::checkableNode(parent))
                 setNodeCheckedInternal(patch, state, parent->path(), siblingsState, UpsideFlag);
         }
     }

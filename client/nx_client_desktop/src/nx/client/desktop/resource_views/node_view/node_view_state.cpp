@@ -1,6 +1,7 @@
 #include "node_view_state.h"
 
 #include <nx/client/desktop/resource_views/node_view/nodes/view_node.h>
+#include <nx/client/desktop/resource_views/node_view/nodes/view_node_helpers.h>
 
 namespace {
 
@@ -8,7 +9,7 @@ using namespace nx::client::desktop;
 
 bool checkableInternal(const NodePtr& root)
 {
-    if (root->checkable())
+    if (helpers::checkableNode(root))
         return true;
 
     if (!root->childrenCount())

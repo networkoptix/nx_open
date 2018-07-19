@@ -16,6 +16,7 @@ enum Column
 enum Role
 {
     resourceRole = Qt::UserRole,
+    extraTextRole,
     nodeFlagsRole,
     separatorRole, //TODO: move to flags
     siblingGroupRole //TODO: move to flags
