@@ -6976,7 +6976,7 @@ a %1</translation>
     <name>QnUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation>Propietario</translation>
+      <translation>Dueño</translation>
     </message>
     <message>
       <source>Administrator</source>

@@ -2922,7 +2922,7 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3905,7 +3905,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>DN</source>
@@ -4445,7 +4445,7 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -5614,7 +5614,7 @@ to %1</source>
     </message>
     <message>
       <source>Send email to %1</source>
-      <translation>Verzend email naar %1</translation>
+      <translation>Verzend Email naar %1</translation>
     </message>
   </context>
   <context>
@@ -6039,7 +6039,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -6074,11 +6074,11 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Ongeldig e-mailadres.</translation>
+      <translation>Ongeldig Email.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -6525,7 +6525,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -7036,7 +7036,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
   </context>
   <context>
@@ -7187,7 +7187,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -7208,7 +7208,7 @@ to %1</source>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 gebruiker met opgegeven e-mailadres bestaat al.</translation>
+      <translation>%1 gebruiker met opgegeven Email bestaat al.</translation>
     </message>
     <message>
       <source>Local users</source>
@@ -7238,7 +7238,7 @@ to %1</source>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Ongeldig e-mailadres.</translation>
+      <translation>Ongeldig Email.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -8656,7 +8656,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mailadres</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
