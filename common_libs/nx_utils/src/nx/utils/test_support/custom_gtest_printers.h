@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
+#include "../std/filesystem.h"
 #include "../url.h"
 
 NX_UTILS_API void PrintTo(const QByteArray& val, ::std::ostream* os);
@@ -26,6 +27,16 @@ NX_UTILS_API void PrintTo(const steady_clock::time_point& val, ::std::ostream* o
 NX_UTILS_API void PrintTo(const system_clock::time_point& val, ::std::ostream* os);
 
 } // namespace chrono
+} // namespace std
+
+//-------------------------------------------------------------------------------------------------
+
+namespace std {
+namespace filesystem {
+
+NX_UTILS_API void PrintTo(const path& val, ::std::ostream* os);
+
+} // namespace filesystem
 } // namespace std
 
 //-------------------------------------------------------------------------------------------------

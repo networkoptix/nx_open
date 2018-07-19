@@ -147,6 +147,7 @@ class Run(object):
         buffers = _Buffers()
         wait = Wait("data received on stdout and stderr", timeout_sec=timeout_sec, attempts_limit=10000)
         while True:
+            _logger.debug("Receive data, timeout: %f sec", wait.delay_sec)
             chunks = self.receive(timeout_sec=wait.delay_sec)
             for buffer, chunk in zip(buffers, chunks):
                 buffer.write(chunk)

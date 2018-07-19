@@ -37,7 +37,7 @@ int QnLogRestHandler::executeGet(
         }
     }
 
-    boost::optional<QString> logFilePath;
+    std::optional<QString> logFilePath;
     {
         const auto name = params.value(lit("name"));
         if (!name.isEmpty())

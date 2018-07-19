@@ -47,8 +47,8 @@ public:
     // Note: we should track on/off state for both cw/ccw buttons.
     // It solves problems when we can press both buttons simultaneously, i.e
     // in case of multitouch or when this buttons are binded to the keyboard.
-    void onRotationButtonCcw(bool value);
-    void onRotationButtonCw(bool value);
+    void onRotationButtonCounterClockWise(bool pressed);
+    void onRotationButtonClockWise(bool pressed);
 
 signals:
     void valueChanged(const Value& value);

@@ -1,6 +1,5 @@
 import getpass
 import logging
-import subprocess
 from collections import namedtuple
 from shutil import rmtree
 from threading import Thread
@@ -12,6 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from netaddr.ip import IPAddress
 from pathlib2 import Path
 
+from framework.os_access.local_shell import local_shell
 from framework.os_access.posix_shell_utils import sh_command_to_script
 from framework.os_access.ssh_shell import SSH
 from framework.waiting import wait_for_true
@@ -103,20 +103,16 @@ def ad_hoc_ssh_server(ad_hoc_ssh_dir, ad_hoc_client_public_key, ad_hoc_host_key)
         }
     host_config_path = ad_hoc_ssh_dir / 'host_config'
     _write_config(host_config, host_config_path)
-    sshd_command = ['/usr/sbin/sshd', '-D', '-f', str(host_config_path), '-p', str(port)]
+    sshd_command = ['/usr/sbin/sshd', '-ddd', '-f', str(host_config_path), '-p', str(port)]
     _logger.info('RUN: %s', sh_command_to_script(sshd_command))
-    process = subprocess.Popen(sshd_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    def dump_output():
-        while process.poll() is None:
-            _logger.debug('STDOUT:\n%s', process.stdout.read())
-            _logger.debug('STDERR:\n%s', process.stderr.read())
-
-    Thread(target=dump_output).start()
-
-    yield _SSHHost(ip, port)
-
-    process.terminate()  # Hangs because of SSH client connection pool.
+    with local_shell.command(sshd_command).running() as process:  # Most tests are very quick.
+        thread = Thread(target=process.communicate, kwargs=dict(timeout_sec=300))
+        thread.start()
+        try:
+            yield _SSHHost(ip, port)
+        finally:
+            thread.join(630)
+            assert not thread.is_alive()
 
 
 @pytest.fixture()
@@ -124,4 +120,5 @@ def ad_hoc_ssh(ad_hoc_ssh_server, ad_hoc_client_private_key):
     ssh = SSH(ad_hoc_ssh_server.hostname, ad_hoc_ssh_server.port, getpass.getuser(), ad_hoc_client_private_key)
     _logger.debug(ssh)
     wait_for_true(ssh.is_working)
-    return ssh
+    yield ssh
+    ssh.close()

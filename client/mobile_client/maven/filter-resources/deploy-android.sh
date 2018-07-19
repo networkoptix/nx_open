@@ -22,7 +22,7 @@ if [[ "${build.configuration}" == "release" ]]; then
 else
     SOURCE_APK=apk/bin/QtApp-debug.apk
 fi
-TARGET_APK=${artifact.name.client}.apk
+TARGET_APK=${client_distribution_name}.apk
 
 rm -rf $BUILD_TARGET
 

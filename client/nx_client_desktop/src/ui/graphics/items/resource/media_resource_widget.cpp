@@ -371,8 +371,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     auto updateWatermark = [this, context]()
     {
+        // Ini guard; remove on release.
+        auto settings = globalSettings()->watermarkSettings();
+        if (!client::desktop::ini().enableWatermark)
+            settings.useWatermark = false;
+
         m_watermarkPainter->setWatermark(context->user() ? context->user()->getName() : "",
-            globalSettings()->watermarkSettings());
+            settings);
     };
     updateWatermark();
     connect(globalSettings(), &QnGlobalSettings::watermarkChanged, this, updateWatermark);

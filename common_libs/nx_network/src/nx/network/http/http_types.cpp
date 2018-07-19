@@ -950,10 +950,10 @@ void BasicCredentials::serialize(BufferType* const dstBuffer) const
 
 bool DigestCredentials::parse(const BufferType& str, char separator)
 {
-    nx::utils::parseNameValuePairs(str, separator, &params);
+    nx::utils::parseNameValuePairs<std::map>(str, separator, &params);
     auto usernameIter = params.find("username");
     if (usernameIter != params.cend())
-        userid = usernameIter.value();
+        userid = usernameIter->second;
     return true;
 }
 
@@ -986,12 +986,12 @@ void DigestCredentials::serialize(BufferType* const dstBuffer) const
         auto itr = params.find(name);
         if (itr != params.end())
         {
-            serializeParam(itr.key(), itr.value());
+            serializeParam(itr->first, itr->second);
             params.erase(itr);
         }
     }
     for (auto itr = params.begin(); itr != params.end(); ++itr)
-        serializeParam(itr.key(), itr.value());
+        serializeParam(itr->first, itr->second);
 
 }
 
@@ -1172,7 +1172,7 @@ void DigestAuthorization::addParam(const BufferType& name, const BufferType& val
     if (name == "username")
         digest->userid = value;
 
-    digest->params.insert(name, value);
+    digest->params.emplace(name, value);
 }
 
 
@@ -1186,6 +1186,12 @@ WWWAuthenticate::WWWAuthenticate(AuthScheme::Value authScheme):
 {
 }
 
+BufferType WWWAuthenticate::getParam(const BufferType& key) const
+{
+    const auto it = params.find(key);
+    return it != params.end() ? it->second : BufferType();
+}
+
 bool WWWAuthenticate::parse(const BufferType& str)
 {
     int authSchemeEndPos = str.indexOf(" ");
@@ -1194,7 +1200,7 @@ bool WWWAuthenticate::parse(const BufferType& str)
 
     authScheme = AuthScheme::fromString(ConstBufferRefType(str, 0, authSchemeEndPos));
 
-    nx::utils::parseNameValuePairs(
+    nx::utils::parseNameValuePairs<std::map>(
         ConstBufferRefType(str, authSchemeEndPos + 1),
         ',',
         &params);
@@ -1206,7 +1212,7 @@ void WWWAuthenticate::serialize(BufferType* const dstBuffer) const
 {
     dstBuffer->append(AuthScheme::toString(authScheme));
     dstBuffer->append(" ");
-    nx::utils::serializeNameValuePairs(params, dstBuffer);
+    nx::utils::serializeNameValuePairs<std::map>(params, dstBuffer);
 }
 
 BufferType WWWAuthenticate::serialized() const
@@ -1757,13 +1763,14 @@ bool StrictTransportSecurity::operator==(const StrictTransportSecurity& rhs) con
 
 bool StrictTransportSecurity::parse(const nx::network::http::StringType& strValue)
 {
-    const auto nameValueDictionary = nx::utils::parseNameValuePairs(strValue, ';');
+    const auto nameValueDictionary = nx::utils::parseNameValuePairs<std::map>(strValue, ';');
     const auto maxAgeIter = nameValueDictionary.find("max-age");
     if (maxAgeIter == nameValueDictionary.end())
         return false;
-    maxAge = std::chrono::seconds(maxAgeIter->toInt());
-    includeSubDomains = nameValueDictionary.contains("includeSubDomains");
-    preload = nameValueDictionary.contains("preload");
+    maxAge = std::chrono::seconds(maxAgeIter->second.toInt());
+    includeSubDomains =
+        nameValueDictionary.find("includeSubDomains") != nameValueDictionary.end();
+    preload = nameValueDictionary.find("preload") != nameValueDictionary.end();
     // Ignoring unknown attributes.
     return true;
 }
@@ -1799,20 +1806,23 @@ bool XForwardedFor::parse(const StringType& str)
 
 bool ForwardedElement::parse(const StringType& str)
 {
-    const auto params = nx::utils::parseNameValuePairs(str, ';');
+    const auto params = nx::utils::parseNameValuePairs<std::map>(str, ';');
     if (params.empty())
         return false;
 
-    for (auto it = params.begin(); it != params.end(); ++it)
+    for (const auto& param: params)
     {
-        if (it.key().toLower() == "by")
-            by = it.value();
-        else if (it.key().toLower() == "for")
-            for_ = it.value();
-        else if (it.key().toLower() == "host")
-            host = it.value();
-        else if (it.key().toLower() == "proto")
-            proto = it.value();
+        const auto& key = param.first;
+        const auto& value = param.second;
+
+        if (key.toLower() == "by")
+            by = value;
+        else if (key.toLower() == "for")
+            for_ = value;
+        else if (key.toLower() == "host")
+            host = value;
+        else if (key.toLower() == "proto")
+            proto = value;
     }
 
     return true;

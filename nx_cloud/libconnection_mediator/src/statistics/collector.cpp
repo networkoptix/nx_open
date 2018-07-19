@@ -1,12 +1,14 @@
 #include "collector.h"
 
+#include <nx/fusion/model_functions.h>
+
 #include "dao/data_object_factory.h"
 
 namespace nx {
 namespace hpm {
 namespace stats {
 
-Collector::Collector(
+PersistentCollector::PersistentCollector(
     const conf::Statistics& settings,
     nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor)
     :
@@ -16,12 +18,12 @@ Collector::Collector(
 {
 }
 
-Collector::~Collector()
+PersistentCollector::~PersistentCollector()
 {
     m_startedAsyncCallsCounter.wait();
 }
 
-void Collector::saveConnectSessionStatistics(ConnectSession data)
+void PersistentCollector::saveConnectSessionStatistics(const ConnectSession& data)
 {
     using namespace std::placeholders;
 
@@ -33,8 +35,54 @@ void Collector::saveConnectSessionStatistics(ConnectSession data)
 
 //-------------------------------------------------------------------------------------------------
 
-void DummyCollector::saveConnectSessionStatistics(ConnectSession /*data*/)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (CloudConnectStatistics),
+    (json),
+    _Fields)
+
+StatisticsCalculator::StatisticsCalculator():
+    m_connectionsEstablishedPerPeriod(std::chrono::minutes(1)),
+    m_connectionsFailedPerPeriod(std::chrono::minutes(1))
 {
+}
+
+void StatisticsCalculator::saveConnectSessionStatistics(const ConnectSession& data)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    if (data.resultCode == api::NatTraversalResultCode::ok)
+        m_connectionsEstablishedPerPeriod.add(1);
+    else
+        m_connectionsFailedPerPeriod.add(1);
+}
+
+CloudConnectStatistics StatisticsCalculator::statistics() const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    CloudConnectStatistics statistics;
+
+    statistics.connectionsEstablishedPerMinute =
+        m_connectionsEstablishedPerPeriod.getSumPerLastPeriod();
+    statistics.connectionsFailedPerMinute =
+        m_connectionsFailedPerPeriod.getSumPerLastPeriod();
+
+    return statistics;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+StatisticsForwarder::StatisticsForwarder(
+    std::vector<std::unique_ptr<AbstractCollector>> collectors)
+    :
+    m_collectors(std::move(collectors))
+{
+}
+
+void StatisticsForwarder::saveConnectSessionStatistics(const ConnectSession& data)
+{
+    for (auto& collector: m_collectors)
+        collector->saveConnectSessionStatistics(data);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -55,7 +103,7 @@ std::unique_ptr<AbstractCollector> CollectorFactory::defaultFactoryFunction(
     const conf::Statistics& settings,
     nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor)
 {
-    return std::make_unique<Collector>(settings, sqlQueryExecutor);
+    return std::make_unique<PersistentCollector>(settings, sqlQueryExecutor);
 }
 
 } // namespace stats

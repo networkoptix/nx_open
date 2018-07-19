@@ -58,7 +58,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
         msgBody.append(client.fetchMessageBodyBuffer());
 
     int statusCode = client.response()->statusLine.statusCode;
-    if (statusCode / 2 != 200 && msgBody.isEmpty())
+    if (!nx::network::http::StatusCode::isSuccessCode(statusCode))
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest,

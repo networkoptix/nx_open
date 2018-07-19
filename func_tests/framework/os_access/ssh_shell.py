@@ -204,8 +204,11 @@ class SSH(PosixShell):
             raise SSHNotConnected("Cannot connect to {}: {} (is service started? using VirtualBox?)".format(self, e))
         return client
 
-    def __del__(self):
+    def close(self):
         self._client().close()
+
+    def __del__(self):
+        self.close()
 
     def sh_script(self, script, cwd=None, env=None, set_eux=True):
         augmented_script = sh_augment_script(script, cwd=cwd, env=env, set_eux=set_eux)

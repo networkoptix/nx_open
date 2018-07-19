@@ -6,7 +6,6 @@ namespace nx {
 namespace hpm {
 
 Controller::Controller(const conf::Settings& settings):
-    m_statsManager(settings),
     m_cloudDataProvider(
         settings.cloudDB().runWithCloud
         ? AbstractCloudDataProviderFactory::create(
@@ -24,6 +23,10 @@ Controller::Controller(const conf::Settings& settings):
         m_cloudDataProvider.get(),
         &m_listeningPeerPool,
         m_relayClusterClient.get()),
+    m_statsManager(
+        settings,
+        m_listeningPeerPool,
+        m_listeningPeerRegistrator),
     m_cloudConnectProcessor(
         settings,
         m_cloudDataProvider.get(),
@@ -71,6 +74,11 @@ nx::cloud::discovery::RegisteredPeerPool& Controller::discoveredPeerPool()
 const nx::cloud::discovery::RegisteredPeerPool& Controller::discoveredPeerPool() const
 {
     return m_discoveredPeerPool;
+}
+
+const stats::StatsManager& Controller::statisticsManager() const
+{
+    return m_statsManager;
 }
 
 void Controller::stop()

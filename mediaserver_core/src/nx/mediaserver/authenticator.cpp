@@ -349,7 +349,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
         if (!nxUserName.isEmpty())
         {
             userResource = findUserByName(nxUserName);
-            if (userResource)
+            if (userResource && !userResource->isCloud())
             {
                 NX_VERBOSE(this, lm("Authenticating %1. Found Nx user %2. Checking realm...")
                     .arg(request.requestLine).arg(nxUserName));
@@ -358,7 +358,7 @@ Qn::AuthResult Authenticator::tryHttpMethods(
                 bool needRecalcPassword =
                     userResource->getRealm() != desiredRealm ||
                     (userResource->isLdap() && userResource->passwordExpired()) ||
-                    (userResource->getDigest().isEmpty() && !userResource->isCloud());
+                    userResource->getDigest().isEmpty();
                 if (canUpdateRealm && needRecalcPassword)
                 {
                     //requesting client to re-calculate digest after upgrade to 2.4 or fill ldap password
@@ -368,23 +368,17 @@ Qn::AuthResult Authenticator::tryHttpMethods(
 
                     addAuthHeader(
                         response,
-                        userResource,
                         isProxy,
                         false); //requesting Basic authorization
                         return authResult;
                 }
             }
         }
-        else {
-            // use admin's realm by default for better compatibility with previous version
-            // in case of default realm upgrade
-            userResource = resourcePool()->getAdministrator();
-        }
 
         addAuthHeader(
             response,
-            userResource,
             isProxy);
+
         NX_DEBUG(this, lm("%1 requesting digest auth (%2)").args(authResult, request.requestLine));
         return authResult;
     }
@@ -623,7 +617,6 @@ Qn::AuthResult Authenticator::tryHttpDigest(
     if (nonce.isEmpty() || userName.isEmpty() || !verifyDigestUri(requestLine.url, uri))
         return Qn::Auth_WrongDigest;
 
-    QnUserResourcePtr userResource;
     Qn::AuthResult errCode = Qn::Auth_WrongDigest;
     if (m_nonceProvider->isNonceValid(nonce))
     {
@@ -642,17 +635,8 @@ Qn::AuthResult Authenticator::tryHttpDigest(
             return Qn::Auth_OK;
     }
 
-    if (userResource &&
-        userResource->getRealm() != nx::network::AppInfo::realm())
-    {
-        //requesting client to re-calculate user's HA1 digest
-        nx::network::http::insertOrReplaceHeader(
-            &responseHeaders.headers,
-            nx::network::http::HttpHeader(Qn::REALM_HEADER_NAME, nx::network::AppInfo::realm().toLatin1()));
-    }
     addAuthHeader(
         responseHeaders,
-        userResource,
         isProxy);
 
     if (errCode == Qn::Auth_WrongLogin && !QUuid(userName).isNull())
@@ -703,15 +687,10 @@ Qn::AuthResult Authenticator::tryHttpBasic(
 
 void Authenticator::addAuthHeader(
     nx::network::http::Response& response,
-    const QnUserResourcePtr& userResource,
     bool isProxy,
     bool isDigest)
 {
-    QString realm;
-    if (userResource)
-        realm = userResource->getRealm();
-    else
-        realm = nx::network::AppInfo::realm();
+    const QString realm = nx::network::AppInfo::realm();
 
     const QString auth =
         isDigest
@@ -720,7 +699,6 @@ void Authenticator::addAuthHeader(
             .arg(QLatin1String(m_nonceProvider->generateNonce()))
         : lit("Basic realm=\"%1\"").arg(realm);
 
-    //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\",algorithm=MD5,qop=\"auth\""));
     const QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
     nx::network::http::insertOrReplaceHeader(&response.headers, nx::network::http::HttpHeader(
         headerName,

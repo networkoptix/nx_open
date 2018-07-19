@@ -233,6 +233,12 @@ api::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
     return result;
 }
 
+int ListeningPeerPool::listeningPeerCount() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return (int) m_peers.size();
+}
+
 std::vector<ConnectionWeakRef> ListeningPeerPool::getAllConnections() const
 {
     QnMutexLocker lock(&m_mutex);

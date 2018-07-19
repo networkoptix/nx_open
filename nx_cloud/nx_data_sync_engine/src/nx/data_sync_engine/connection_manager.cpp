@@ -142,7 +142,8 @@ void ConnectionManager::createTransactionConnection(
     ConnectionContext context{
         std::move(newTransport),
         connectionRequestAttributes.connectionId,
-        {systemIdLocal, connectionRequestAttributes.remotePeer.id.toByteArray()} };
+        {systemIdLocal, connectionRequestAttributes.remotePeer.id.toByteArray()},
+        network::http::getHeaderValue(request.headers, "User-Agent").toStdString()};
 
     vms::api::PeerDataEx remotePeer;
     remotePeer.assign(connectionRequestAttributes.remotePeer);
@@ -205,8 +206,16 @@ void ConnectionManager::createWebsocketTransactionConnection(
 
     nx::network::http::RequestResult result(nx::network::http::StatusCode::switchingProtocols);
     result.connectionEvents.onResponseHasBeenSent =
-        std::bind(&ConnectionManager::onHttpConnectionUpgraded, this,
-            _1, std::move(remotePeerInfo), systemId);
+        [this, remotePeerInfo = std::move(remotePeerInfo),
+            request = std::move(request), systemId](
+                network::http::HttpServerConnection* connection)
+        {
+            addWebSocketTransactionTransport(
+                connection->takeSocket(),
+                std::move(remotePeerInfo),
+                systemId,
+                network::http::getHeaderValue(request.headers, "User-Agent").toStdString());
+        };
     completionHandler(std::move(result));
 }
 
@@ -344,7 +353,8 @@ std::vector<SystemConnectionInfo> ConnectionManager::getConnections() const
     {
         result.push_back({
             it->fullPeerName.systemId.toStdString(),
-            it->connection->remoteSocketAddr()});
+            it->connection->remoteSocketAddr(),
+            it->userAgent});
     }
 
     return result;
@@ -740,7 +750,7 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
                 dynamic_cast<TransactionTransport*>(connectionIter->connection.get());
             if (transactionTransport)
             {
-                transactionTransport->setOutgoingConnection(std::move(connection->takeSocket()));
+                transactionTransport->setOutgoingConnection(connection->takeSocket());
                 transactionTransport->startOutgoingChannel();
             }
         };
@@ -752,14 +762,15 @@ nx::network::http::RequestResult ConnectionManager::prepareOkResponseToCreateTra
     return requestResult;
 }
 
-void ConnectionManager::onHttpConnectionUpgraded(
-    nx::network::http::HttpServerConnection* connection,
+void ConnectionManager::addWebSocketTransactionTransport(
+    std::unique_ptr<network::AbstractStreamSocket> connection,
     vms::api::PeerDataEx remotePeerInfo,
-    const std::string& systemId)
+    const std::string& systemId,
+    const std::string& userAgent)
 {
-    const auto remoteAddress = connection->socket()->getForeignAddress();
+    const auto remoteAddress = connection->getForeignAddress();
     auto webSocket = std::make_unique<network::websocket::WebSocket>(
-        connection->takeSocket());
+        std::move(connection));
 
     auto connectionId = QnUuid::createUuid();
 
@@ -768,8 +779,9 @@ void ConnectionManager::onHttpConnectionUpgraded(
     localPeerData.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION; // TODO: #common Is it correct?
     localPeerData.cloudHost = nx::network::SocketGlobals::cloud().cloudHost();
 
+    const auto aioThread = webSocket->getAioThread();
     auto transactionTransport = std::make_unique<WebSocketTransactionTransport>(
-        connection->getAioThread(),
+        aioThread,
         m_transactionLog,
         systemId.c_str(),
         connectionId,
@@ -780,7 +792,8 @@ void ConnectionManager::onHttpConnectionUpgraded(
     ConnectionContext context{
         std::move(transactionTransport),
         connectionId.toSimpleByteArray(),
-        { systemId.c_str(), remotePeerInfo.id.toByteArray() } };
+        {systemId.c_str(), remotePeerInfo.id.toByteArray()},
+        userAgent};
 
     if (!addNewConnection(std::move(context), remotePeerInfo))
     {

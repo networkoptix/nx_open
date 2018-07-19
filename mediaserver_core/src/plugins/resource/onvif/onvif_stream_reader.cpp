@@ -127,7 +127,7 @@ void QnOnvifStreamReader::setCameraControlDisabled(bool value)
 CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl(
     QString* const streamUrl, bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
-    if (!m_streamUrl.isEmpty() && !m_cachedTimer.isValid() && m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
+    if (!m_streamUrl.isEmpty() && m_cachedTimer.isValid() && m_cachedTimer.elapsed() < MAX_CAHCE_URL_TIME)
     {
         if (!isCameraControlRequired)
         {

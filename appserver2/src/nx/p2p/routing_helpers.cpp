@@ -14,7 +14,7 @@ RoutingRecord::RoutingRecord(
     distance(distance),
     firstVia(firstVia)
 {
-    NX_ASSERT(!firstVia.isNull() || distance == 0 || distance > kMaxOnlineDistance);
+    NX_ASSERT(!firstVia.isNull() || distance == 0 || distance >= kMaxOnlineDistance);
 }
 
 

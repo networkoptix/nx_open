@@ -110,7 +110,7 @@ const std::chrono::milliseconds kDefaultVmsGatewayRequestTimeout(std::chrono::se
 // LoginLockout
 
 const QLatin1String kLoginLockoutEnabled("loginLockout/enabled");
-constexpr bool kDefaultLoginLockoutEnabled = false;
+constexpr bool kDefaultLoginLockoutEnabled = true;
 
 const QLatin1String kLoginLockoutCheckPeriod("loginLockout/checkPeriod");
 const std::chrono::milliseconds kDefaultLoginLockoutCheckPeriod =

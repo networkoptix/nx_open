@@ -25,7 +25,7 @@ class VmHardware(object):
         pass
 
     @abstractmethod
-    def export_vm(self, vm_image_path):
+    def export(self, vm_image_path):
         """Export VM from its current state: it may not have snapshot at all"""
         pass
 

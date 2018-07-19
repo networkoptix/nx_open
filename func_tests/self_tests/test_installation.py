@@ -3,9 +3,6 @@ import logging
 import pytest
 
 from framework.installation.make_installation import installer_by_vm_type, make_installation
-from framework.installation.mediaserver_factory import (
-    examine_mediaserver,
-)
 from framework.merging import REMOTE_ADDRESS_ANY, merge_systems
 from framework.utils import bool_to_str
 
@@ -57,20 +54,16 @@ system_settings = dict(
 
 
 def test_group_install(config, groups):
-    server_list = groups.allocate_many_servers(config.SERVER_COUNT, system_settings)
-    try:
+    with groups.allocated_many_servers(config.SERVER_COUNT, system_settings) as server_list:
         for server in server_list[1:]:
             merge_systems(server_list[0], server, remote_address=REMOTE_ADDRESS_ANY)
-    finally:
-        for server in server_list:
-            examine_mediaserver(server)
 
 
 def test_lightweight_install(config, groups):
-    server = groups.allocate_one_server('standalone', system_settings)
-    lws = groups.allocate_lws(
-        server_count=config.LWS_SERVER_COUNT,
-        merge_timeout_sec=config.MERGE_TIMEOUT_SEC,
-        CAMERAS_PER_SERVER=20,
-        )
-    merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
+    with groups.allocated_one_server('standalone', system_settings) as server:
+        with groups.allocated_lws(
+                server_count=config.LWS_SERVER_COUNT,
+                merge_timeout_sec=config.MERGE_TIMEOUT_SEC,
+                CAMERAS_PER_SERVER=20,
+                ) as lws:
+            merge_systems(server, lws[0], take_remote_settings=True, remote_address=lws.address)
