@@ -23,9 +23,11 @@ Host = namedtuple('Host', 'name os_access dir server_port_base lws_port_base')
 
 def host_from_config(host_config):
     ssh_key = Path(host_config['key_path']).read_text()
+    host_name = host_config['name']
     return Host(
-        name=host_config['name'],
+        name=host_name,
         os_access=PhysicalSshAccess(
+            host_name,
             host_config['address'],
             host_config['username'],
             ssh_key,

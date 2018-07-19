@@ -30,6 +30,7 @@ from framework.merging import (
 )
 from framework.networking import setup_flat_network
 from framework.utils import GrowingSleep
+from memory_usage_metrics import load_host_memory_usage
 
 pytest_plugins = ['fixtures.unpacked_mediaservers']
 
@@ -307,13 +308,12 @@ def collect_additional_metrics(metrics_saver, os_access_set, lws):
         metrics_saver.save('total_bytes_sent', int(reply['totalBytesSent']))
         # for test with lightweight servers pick only hosts with lightweight servers
         os_access_set = set([lws.os_access])
-# TODO
-##     for os_access in os_access_set:
-##         metrics = load_host_memory_usage(os_access)
-##         for name in 'total used free used_swap mediaserver lws'.split():
-##             metric_name = 'host_memory_usage.%s.%s' % (os_access.name, name)
-##             metric_value = getattr(metrics, name)
-##             metrics_saver.save(metric_name, metric_value)
+    for os_access in os_access_set:
+        metrics = load_host_memory_usage(os_access)
+        for name in 'total used free used_swap mediaserver lws'.split():
+            metric_name = 'host_memory_usage.%s.%s' % (os_access.alias, name)
+            metric_value = getattr(metrics, name)
+            metrics_saver.save(metric_name, metric_value)
 
 
 system_settings = dict(
