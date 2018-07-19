@@ -2,6 +2,7 @@ import logging
 import logging.config
 import mimetypes
 from datetime import datetime
+from multiprocessing.dummy import Pool as ThreadPool
 
 import pytest
 import yaml
@@ -82,7 +83,12 @@ def run_dir(work_dir):
     prefix = 'run'
     this = work_dir / '{}{:%Y%m%d%H%M%S}'.format(prefix, datetime.now())
     this.mkdir(parents=False, exist_ok=False)
-    return this
+    old = list(sorted(work_dir.glob('{}*'.format(prefix))))[:-5]
+    pool = ThreadPool(10)  # Arbitrary, just not so much.
+    future = pool.map_async(lambda dir: dir.rmtree(), old)
+    yield this
+    future.wait(timeout=30)
+    pool.terminate()
 
 
 @pytest.fixture()
