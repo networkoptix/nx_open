@@ -23,9 +23,19 @@ class AlreadyMerged(MergeError):
         self.system_id = common_system_id
 
 
-class MergeAddressesError(MergeError):
-    def __init__(self, local, remote, ip_net, available_ips):
-        super(MergeAddressesError, self).__init__(local, remote, "no IPs from {}: {}".format(ip_net, available_ips))
+class NoAddressesError(Exception):
+    def __init__(self, mediaserver, available_ips):
+        super(NoAddressesError, self).__init__(
+            "For mediaserver {} there is no IPs: {}".format(mediaserver, available_ips))
+        self.mediaserver = mediaserver
+        self.available_ips = available_ips
+
+
+class NoAvailableAddressesError(Exception):
+    def __init__(self, mediaserver, ip_net, available_ips):
+        super(NoAvailableAddressesError, self).__init__(
+            "For mediaserver {} there is no available IPs from {}: {}".format(mediaserver, ip_net, available_ips))
+        self.mediaserver = mediaserver
         self.ip_net = ip_net
         self.available_ips = available_ips
 
@@ -45,17 +55,30 @@ class MergeUnauthorized(ExplicitMergeError):
     pass
 
 
-# special constants for remote_address parameter
-REMOTE_ADDRESS_ACCESSIBLE = object()  # iflist filtered by accessible_ip_net
-REMOTE_ADDRESS_ANY = object()  # any of iflist
+def find_accessible_mediaserver_address(mediaserver, accessible_ip_net=IPNetwork('10.254.0.0/16')):
+    interface_list = mediaserver.api.get('api/iflist')
+    ip_set = {IPAddress(interface['ipAddr']) for interface in interface_list}
+    accessible_ip_set = {ip for ip in ip_set if ip in accessible_ip_net}
+    try:
+        return next(iter(accessible_ip_set))
+    except StopIteration:
+        raise NoAvailableAddressesError(mediaserver, accessible_ip_net, ip_set)
+
+
+def find_any_mediaserver_address(mediaserver):
+    interface_list = mediaserver.api.get('api/iflist')
+    ip_set = {IPAddress(interface['ipAddr']) for interface in interface_list}
+    try:
+        return next(iter(ip_set))
+    except StopIteration:
+        raise NoAddressesError(mediaserver, ip_set)
 
 
 def merge_systems(
         local,
         remote,
-        accessible_ip_net=IPNetwork('10.254.0.0/16'),
         take_remote_settings=False,
-        remote_address=REMOTE_ADDRESS_ACCESSIBLE,
+        remote_address=None,
         ):
     # When many servers are merged, there is server visible from others.
     # This server is passed as remote. That's why it's higher in loggers hierarchy.
@@ -68,17 +91,8 @@ def merge_systems(
     merge_logger.debug("Other system id %s.", servant_system_id)
     if servant_system_id == master_system_id:
         raise AlreadyMerged(local, remote, master_system_id)
-    if remote_address in [REMOTE_ADDRESS_ACCESSIBLE, REMOTE_ADDRESS_ANY]:
-        remote_interfaces = remote.api.get('api/iflist')
-        available_remote_ips = {IPAddress(interface['ipAddr']) for interface in remote_interfaces}
-        if remote_address == REMOTE_ADDRESS_ACCESSIBLE:
-            accessible_remote_ip_set = {ip for ip in available_remote_ips if ip in accessible_ip_net}
-        if remote_address == REMOTE_ADDRESS_ANY:
-            accessible_remote_ip_set = available_remote_ips
-        try:
-            remote_address = next(iter(accessible_remote_ip_set))
-        except StopIteration:
-            raise MergeAddressesError(local, remote, accessible_ip_net, available_remote_ips)
+    if remote_address is None:
+        remote_address = find_accessible_mediaserver_address(remote)
     merge_logger.debug("Access %r by %s.", remote, remote_address)
     try:
         local.api.post('api/mergeSystems', {

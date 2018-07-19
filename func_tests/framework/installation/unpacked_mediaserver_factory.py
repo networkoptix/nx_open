@@ -12,7 +12,7 @@ from framework.installation.mediaserver import Mediaserver
 from framework.installation.mediaserver_factory import (
     examine_mediaserver,
     collect_artifacts_from_mediaserver,
-    )
+)
 from framework.installation.unpack_installation import UnpackedMediaserverGroup
 from framework.merging import setup_local_system
 from framework.os_access.ssh_access import PhysicalSshAccess
@@ -69,9 +69,11 @@ class UnpackMediaserverInstallationGroups(object):
             self._allocate_servers_from_group(group, count_per_group, system_settings, server_config)
             for group in self._group_list]
         server_list = flatten_list(server_list_list)
-        yield server_list
-        for server in server_list:
-            self._post_process_server(server)
+        try:
+            yield server_list
+        finally:
+            for server in server_list:
+                self._post_process_server(server)
 
     @contextmanager
     def allocated_lws(self, server_count, merge_timeout_sec, **kw):
@@ -83,8 +85,10 @@ class UnpackMediaserverInstallationGroups(object):
         lws = LwMultiServer(group.lws)
         lws.start()
         lws.wait_until_synced(merge_timeout_sec)
-        yield lws
-        self._post_process_server(lws)
+        try:
+            yield lws
+        finally:
+            self._post_process_server(lws)
 
     def _allocate_servers_from_group(self, group, count, system_settings, server_config):
         installation_list = group.allocate_many(count)

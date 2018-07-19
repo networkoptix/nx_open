@@ -3,11 +3,11 @@
 Measure system synchronization time.
 """
 
-from contextlib import contextmanager
 import datetime
 import logging
 import traceback
 from collections import namedtuple
+from contextlib import contextmanager
 from functools import wraps
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -23,8 +23,8 @@ from framework.api_shortcuts import get_server_id, get_system_settings
 from framework.compare import compare_values
 from framework.installation.mediaserver import MEDIASERVER_MERGE_TIMEOUT
 from framework.merging import (
-    REMOTE_ADDRESS_ACCESSIBLE,
-    REMOTE_ADDRESS_ANY,
+    find_accessible_mediaserver_address,
+    find_any_mediaserver_address,
     merge_systems,
     setup_local_system,
 )
@@ -241,10 +241,11 @@ def make_dumps_and_fail(env, merge_timeout, api_method, api_call_start_time, mes
     full_message = 'Servers did not merge in %s: %s; currently waiting for method %r for %s' % (
         merge_timeout, message, api_method, utils.datetime_utc_now() - api_call_start_time)
     _logger.info(full_message)
-    _logger.info('killing servers for core dumps')
-# TODO
-##     for server in env.real_server_list:
-##         server.service.make_core_dump()
+    _logger.info("Producing servers core dumps.")
+    for server in [env.lws] + env.real_server_list:
+        status = server.service.status()
+        if status.is_running:
+            server.os_access.make_core_dump(status.pid)
     pytest.fail(full_message)
 
 
@@ -327,6 +328,7 @@ server_config = dict(
 
 Env = namedtuple('Env', 'all_server_list real_server_list lws os_access_set merge_start_time')
 
+
 @contextmanager
 def lws_env(config, groups):
     with groups.allocated_one_server('standalone', system_settings, server_config) as server:
@@ -348,11 +350,13 @@ def lws_env(config, groups):
                 merge_start_time=merge_start_time,
                 )
 
-def make_real_servers_env(config, server_list, remote_address=REMOTE_ADDRESS_ACCESSIBLE):
+
+def make_real_servers_env(config, server_list, remote_address_picker):
     # lightweight servers create data themselves
     create_test_data(config, server_list)
     merge_start_time = utils.datetime_utc_now()
     for server in server_list[1:]:
+        remote_address = remote_address_picker(server)
         merge_systems(server_list[0], server, remote_address=remote_address)
     return Env(
         all_server_list=server_list,
@@ -362,11 +366,13 @@ def make_real_servers_env(config, server_list, remote_address=REMOTE_ADDRESS_ACC
         merge_start_time=merge_start_time,
         )
 
+
 @contextmanager
 def unpack_env(config, groups):
     with groups.allocated_many_servers(
             config.SERVER_COUNT, system_settings, server_config) as server_list:
-        yield make_real_servers_env(config, server_list, remote_address=REMOTE_ADDRESS_ANY)
+        yield make_real_servers_env(config, server_list, remote_address_picker=find_any_mediaserver_address)
+
 
 @pytest.fixture
 def vm_env(hypervisor, vm_factory, mediaserver_factory, config):
@@ -379,7 +385,9 @@ def vm_env(hypervisor, vm_factory, mediaserver_factory, config):
                     for server in server_list:
                         server.start()
                         setup_local_system(server, system_settings)
-                    yield make_real_servers_env(config, server_list)
+                    yield make_real_servers_env(
+                        config, server_list, remote_address_picker=find_accessible_mediaserver_address)
+
 
 @pytest.fixture
 def env(request, unpacked_mediaserver_factory, config):

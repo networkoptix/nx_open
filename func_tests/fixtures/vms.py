@@ -92,7 +92,7 @@ def vm_factory(request, hypervisor, vm_types):
 
 def vm_type_list():
     return [name for name, conf in vm_types_configuration().items()
-                if not conf.get('custom')]
+                if not conf.get('is_custom', False)]
 
 @pytest.fixture(
     scope='session',
