@@ -26,3 +26,4 @@ Flask==0.12.2
 pathlib2==2.3.0
 Werkzeug==0.14.1
 pyOpenSSL==18.0.0
+typing==3.6.4

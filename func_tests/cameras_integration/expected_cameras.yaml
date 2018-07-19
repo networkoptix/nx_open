@@ -1,6 +1,6 @@
 # TODO: This is a local test, production file should be prepared separately.
 
-192.168.0.30:
+64-76-57-80-00-97:
   discovery:
     physicalId: 64-76-57-80-00-97
     vendor: ISD
@@ -26,7 +26,7 @@
         encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
 
 
-192.168.0.173:
+00-09-18-50-C8-23:
   discovery if version >= '3.1.1':
     physicalId: 00-09-18-50-C8-23
     vendor: Hanwha Techwin
@@ -53,7 +53,7 @@
         encoderIndex=secondary: {'codec': 28, 'resolution': '640x360'}
 
 
-192.168.0.196:
+00-09-18-51-DE-4B:
   discovery if version >= '3.1.1':
     physicalId: 00-09-18-51-DE-4B
     vendor: Hanwha Techwin
