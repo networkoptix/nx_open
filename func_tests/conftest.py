@@ -81,7 +81,7 @@ def work_dir(request):
 def node_dir(request, work_dir):
     # Don't call it "test_dir" to avoid interpretation as test.
     # `node`, in pytest terms, is test with instantiated parameters.
-    node_dir = work_dir / request.node.name
+    node_dir = work_dir.joinpath(*request.node.listnames()[1:])  # First path is always same.
     try:
         node_dir.rmtree()
     except DoesNotExist:
