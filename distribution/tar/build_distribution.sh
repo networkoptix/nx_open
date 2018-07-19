@@ -59,13 +59,6 @@ copyLib() # file lib_dir alt_lib_dir symlink_target_dir
     fi
 }
 
-# [in] Library name
-# [in] Destination directory
-copySystemLib()
-{
-    "$SOURCE_DIR"/build_utils/copy_system_library.sh -c "$COMPILER" "$@"
-}
-
 #--------------------------------------------------------------------------------------------------
 
 # [in] LITE_CLIENT
@@ -512,9 +505,7 @@ copyFestivalVox()
 copyToolchainLibs()
 {
     echo "Copying toolchain libs (libstdc++, libatomic)"
-    copySystemLib "libstdc++.so.6" "$STAGE_LIB"
-    copySystemLib "libgcc_s.so.1" "$STAGE_LIB"
-    copySystemLib "libatomic.so.1" "$STAGE_LIB"
+    distrib_copySystemLibs "$STAGE_LIB" "libstdc++.so.6" "libgcc_s.so.1" "libatomic.so.1"
 }
 
 # [in] WORK_DIR
